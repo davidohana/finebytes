@@ -1,4 +1,3 @@
-using System.CommandLine;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,120 +8,19 @@ namespace Mfr8.Cli;
 
 public static class CliApp
 {
+    /// <summary>
+    /// Runs the CLI entry point for <c>mfr8</c>.
+    /// </summary>
+    /// <param name="args">Command-line arguments.</param>
+    /// <returns>The process exit code.</returns>
     public static int Run(string[] args)
     {
-        var presetOption = new Option<string>("--preset")
-        {
-            Description = "Preset name or id (matches preset JSON 'name' or 'id')."
-        };
-
-        var presetsDirOption = new Option<string>("--presets-dir")
-        {
-            Description = "Override presets directory (for development/testing)."
-        };
-
-        var outputOption = new Option<string>("--output")
-        {
-            Description = "Output format: table | json | csv."
-        };
-
-        var includeHiddenOption = new Option<bool>("--include-hidden")
-        {
-            Description = "Include hidden/system files."
-        };
-
-        var continueOption = new Option<bool>("--continue-on-preview-errors")
-        {
-            Description = "Continue even if preview errors exist."
-        };
-
-        var silentOption = new Option<bool>("--silent")
-        {
-            Description = "Silent mode (only exit code)."
-        };
-
-        var verboseOption = new Option<bool>("--verbose")
-        {
-            Description = "Verbose mode (reserved in phase 1)."
-        };
-
-        var sourcesArgument = new Argument<string[]>("sources");
-        sourcesArgument.Arity = ArgumentArity.OneOrMore;
-
-        var root = new RootCommand("mfr8 (CLI-only): rename using JSON presets and filename-only filters.");
-        root.Add(presetOption);
-        root.Add(presetsDirOption);
-        root.Add(outputOption);
-        root.Add(includeHiddenOption);
-        root.Add(continueOption);
-        root.Add(silentOption);
-        root.Add(verboseOption);
-        root.Add(sourcesArgument);
-
-        root.SetAction(parseResult =>
-        {
-            var preset = parseResult.GetValue(presetOption);
-            var sources = parseResult.GetValue(sourcesArgument);
-            var output = parseResult.GetValue(outputOption) ?? "table";
-            var presetsDir = parseResult.GetValue(presetsDirOption) ?? PresetLoader.DefaultPresetsDirectory();
-
-            var includeHidden = parseResult.GetValue(includeHiddenOption);
-            var continueOnPreviewErrors = parseResult.GetValue(continueOption);
-            var silent = parseResult.GetValue(silentOption);
-            var verbose = parseResult.GetValue(verboseOption);
-
-            if (string.IsNullOrWhiteSpace(preset))
-            {
-                Console.Error.WriteLine("Missing required option: --preset.");
-                return 1;
-            }
-
-            if (!TryParseOutputFormat(output, out var outFormat))
-            {
-                Console.Error.WriteLine($"Unknown output '{output}'. Use table|json|csv.");
-                return 1;
-            }
-
-            var options = new CliOptions(
-                PresetName: preset,
-                Sources: sources ?? Array.Empty<string>(),
-                OutputFormat: outFormat,
-                IncludeHidden: includeHidden,
-                ContinueOnPreviewErrors: continueOnPreviewErrors,
-                Silent: silent,
-                Verbose: verbose,
-                PresetsDirectory: presetsDir);
-
-            return Execute(options);
-        });
-
+        var root = CliCommandFactory.CreateRootCommand(_Execute);
         var parseResult = root.Parse(args);
         return parseResult.InvokeAsync().GetAwaiter().GetResult();
     }
 
-    private static bool TryParseOutputFormat(string? value, out OutputFormat format)
-    {
-        format = default;
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
-
-        switch (value.Trim().ToLowerInvariant())
-        {
-            case "table":
-                format = OutputFormat.Table;
-                return true;
-            case "json":
-                format = OutputFormat.Json;
-                return true;
-            case "csv":
-                format = OutputFormat.Csv;
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private static int Execute(CliOptions options)
+    private static int _Execute(CliOptions options)
     {
         if (string.IsNullOrWhiteSpace(options.PresetsDirectory))
             return 1;
@@ -162,7 +60,7 @@ public static class CliApp
             continueOnErrors: options.ContinueOnPreviewErrors);
 
         if (!options.Silent)
-            PrintResult(result, options.OutputFormat);
+            _PrintResult(result, options.OutputFormat);
 
         if (result.Errors > 0 && !options.ContinueOnPreviewErrors)
             return 4;
@@ -170,26 +68,26 @@ public static class CliApp
         return 0;
     }
 
-    private static void PrintResult(RenameBatchResult result, OutputFormat format)
+    private static void _PrintResult(RenameBatchResult result, OutputFormat format)
     {
         switch (format)
         {
             case OutputFormat.Table:
-                PrintTable(result);
+                _PrintTable(result);
                 break;
             case OutputFormat.Json:
-                PrintJson(result);
+                _PrintJson(result);
                 break;
             case OutputFormat.Csv:
-                PrintCsv(result);
+                _PrintCsv(result);
                 break;
             default:
-                PrintTable(result);
+                _PrintTable(result);
                 break;
         }
     }
 
-    private static void PrintTable(RenameBatchResult result)
+    private static void _PrintTable(RenameBatchResult result)
     {
         Console.WriteLine($"Preset: {result.PresetName}");
         Console.WriteLine($"Total: {result.TotalFiles}  Renamed: {result.Renamed}  Skipped: {result.Skipped}  Conflicts: {result.Conflicts}  Errors: {result.Errors}");
@@ -198,11 +96,11 @@ public static class CliApp
 
         foreach (var item in result.Results)
         {
-            Console.WriteLine($"{Trunc(item.OriginalPath, 60),-60} {Trunc(item.ResultPath, 60),-60} {item.Status,-16} {item.Error ?? ""}");
+            Console.WriteLine($"{_Trunc(item.OriginalPath, 60),-60} {_Trunc(item.ResultPath, 60),-60} {item.Status,-16} {item.Error ?? ""}");
         }
     }
 
-    private static void PrintJson(RenameBatchResult result)
+    private static void _PrintJson(RenameBatchResult result)
     {
         using var ms = new MemoryStream();
         using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions { Indented = true });
@@ -234,25 +132,25 @@ public static class CliApp
         Console.WriteLine(Encoding.UTF8.GetString(ms.ToArray()));
     }
 
-    private static void PrintCsv(RenameBatchResult result)
+    private static void _PrintCsv(RenameBatchResult result)
     {
         var sb = new StringBuilder();
         sb.AppendLine("original,result,status,error");
         foreach (var item in result.Results)
         {
-            sb.AppendLine($"{CsvEscape(item.OriginalPath)},{CsvEscape(item.ResultPath)},{CsvEscape(item.Status.ToString())},{CsvEscape(item.Error ?? "")}");
+            sb.AppendLine($"{_CsvEscape(item.OriginalPath)},{_CsvEscape(item.ResultPath)},{_CsvEscape(item.Status.ToString())},{_CsvEscape(item.Error ?? "")}");
         }
         Console.WriteLine(sb.ToString());
     }
 
-    private static string CsvEscape(string value)
+    private static string _CsvEscape(string value)
     {
         if (value.Contains('"') || value.Contains(',') || value.Contains('\n') || value.Contains('\r'))
             return $"\"{value.Replace("\"", "\"\"")}\"";
         return value;
     }
 
-    private static string Trunc(string s, int max)
+    private static string _Trunc(string s, int max)
     {
         if (s.Length <= max) return s;
         return s.Substring(0, max);

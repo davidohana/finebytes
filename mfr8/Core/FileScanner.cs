@@ -2,6 +2,13 @@ namespace Mfr8.Core;
 
 public static class FileScanner
 {
+    /// <summary>
+    /// Scans the provided <paramref name="sources"/> (files, folders, and top-level wildcards)
+    /// and returns a distinct, ordered list of file entries.
+    /// </summary>
+    /// <param name="sources">Paths to files/folders or wildcard expressions.</param>
+    /// <param name="includeHidden">If <c>true</c>, includes hidden/system files.</param>
+    /// <returns>A list of files represented as <see cref="FileEntryLite"/>.</returns>
     public static IReadOnlyList<FileEntryLite> ScanSources(
         IEnumerable<string> sources,
         bool includeHidden)

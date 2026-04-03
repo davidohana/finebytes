@@ -27,6 +27,13 @@ public sealed record RenameBatchResult(
 
 public static class FilterEngine
 {
+    /// <summary>
+    /// Previews rename outcomes for a batch and then commits non-conflicting moves.
+    /// </summary>
+    /// <param name="preset">The rename preset (sequence of enabled filters).</param>
+    /// <param name="files">Candidate files to rename.</param>
+    /// <param name="continueOnErrors">If <c>true</c>, continue when preview/commit errors occur.</param>
+    /// <returns>Summary of rename outcomes (renamed, skipped, conflicts, errors).</returns>
     public static RenameBatchResult PreviewAndCommit(
         FilterPreset preset,
         IReadOnlyList<FileEntryLite> files,
@@ -41,7 +48,7 @@ public static class FilterEngine
         {
             try
             {
-                var (prefix, extension) = ApplyFiltersToName(preset.Filters, file);
+                var (prefix, extension) = _ApplyFiltersToName(preset.Filters, file);
                 var finalFileName = prefix + extension;
                 var destPath = Path.Combine(file.DirectoryPath, finalFileName);
 
@@ -58,14 +65,14 @@ public static class FilterEngine
             {
                 previewResults.Add(new RenameResultItem(file.FullPath, file.FullPath, RenameStatus.Error, ex.Message));
                 if (!continueOnErrors)
-                    return Summarize(preset.Name, files.Count, previewResults);
+                    return _Summarize(preset.Name, files.Count, previewResults);
             }
         }
 
         // If there were preview errors and /COPE is not enabled, do not commit.
         if (previewResults.Any(r => r.Status == RenameStatus.Error))
         {
-            return Summarize(preset.Name, files.Count, previewResults);
+            return _Summarize(preset.Name, files.Count, previewResults);
         }
 
         // 2) Resolve conflicts among pending destinations and against disk.
@@ -99,7 +106,7 @@ public static class FilterEngine
 
             try
             {
-                CommitMove(file.FullPath, destPath);
+                _CommitMove(file.FullPath, destPath);
                 previewResults[idx] = new RenameResultItem(file.FullPath, destPath, RenameStatus.Ok, null);
                 renamedCount++;
             }
@@ -111,10 +118,10 @@ public static class FilterEngine
             }
         }
 
-        return Summarize(preset.Name, files.Count, previewResults, renamedCount);
+        return _Summarize(preset.Name, files.Count, previewResults, renamedCount);
     }
 
-    private static RenameBatchResult Summarize(
+    private static RenameBatchResult _Summarize(
         string presetName,
         int totalFiles,
         IReadOnlyList<RenameResultItem> results,
@@ -127,7 +134,7 @@ public static class FilterEngine
         return new RenameBatchResult(presetName, totalFiles, renamed, skipped, conflicts, errors, results);
     }
 
-    private static (string prefix, string extension) ApplyFiltersToName(IReadOnlyList<Filter> filters, FileEntryLite file)
+    private static (string prefix, string extension) _ApplyFiltersToName(IReadOnlyList<Filter> filters, FileEntryLite file)
     {
         var prefix = file.Prefix;
         var extension = file.Extension;
@@ -149,7 +156,7 @@ public static class FilterEngine
                 _ => throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.")
             };
 
-            var transformed = ApplySingleFilter(filter, segment, file, prefix, extension);
+            var transformed = _ApplySingleFilter(filter, segment, file, prefix, extension);
 
             switch (mode)
             {
@@ -172,11 +179,11 @@ public static class FilterEngine
         return (prefix, extension);
     }
 
-    private static string ApplySingleFilter(Filter filter, string segment, FileEntryLite file, string currentPrefix, string currentExtension)
+    private static string _ApplySingleFilter(Filter filter, string segment, FileEntryLite file, string currentPrefix, string currentExtension)
     {
         return filter switch
         {
-            LettersCaseFilter f => ApplyLettersCase(segment, f.Options),
+            LettersCaseFilter f => _ApplyLettersCase(segment, f.Options),
             SpaceCharacterFilter f => segment.Replace(" ", f.Options.ReplaceSpaceWith).Replace(f.Options.ReplaceCharWithSpace, " "),
             RemoveSpacesFilter => Regex.Replace(segment, @"\s+", ""),
             ShrinkSpacesFilter => Regex.Replace(segment, @"\s+", " "),
@@ -184,31 +191,31 @@ public static class FilterEngine
             TrimRightFilter f => f.Count <= 0 ? segment : segment.Length <= f.Count ? "" : segment.Substring(0, segment.Length - f.Count),
             ExtractLeftFilter f => f.Count <= 0 ? "" : segment.Length <= f.Count ? segment : segment.Substring(0, f.Count),
             ExtractRightFilter f => f.Count <= 0 ? "" : segment.Length <= f.Count ? segment : segment.Substring(segment.Length - f.Count),
-            ReplacerFilter f => ApplyReplacer(segment, f.Options),
+            ReplacerFilter f => _ApplyReplacer(segment, f.Options),
             FormatterFilter f => TokenFormatter.Format(f.Options.Template, file),
-            CounterFilter f => ApplyCounter(segment, file, f.Options),
-            CleanerFilter f => ApplyCleaner(segment, f.Options),
-            FixLeadingZerosFilter f => FixLeadingZeros(segment, f.Options),
-            StripParenthesesFilter f => StripParentheses(segment, f.Options),
+            CounterFilter f => _ApplyCounter(segment, file, f.Options),
+            CleanerFilter f => _ApplyCleaner(segment, f.Options),
+            FixLeadingZerosFilter f => _FixLeadingZeros(segment, f.Options),
+            StripParenthesesFilter f => _StripParentheses(segment, f.Options),
             _ => throw new NotSupportedException($"Phase 1 does not support filter type '{filter.Type}'.")
         };
     }
 
-    private static string ApplyLettersCase(string input, LettersCaseOptions options)
+    private static string _ApplyLettersCase(string input, LettersCaseOptions options)
     {
         // Phase 1 only requires reasonable correctness, not perfect linguistics.
         return options.Mode switch
         {
             LettersCaseMode.UpperCase => input.ToUpperInvariant(),
             LettersCaseMode.LowerCase => input.ToLowerInvariant(),
-            LettersCaseMode.TitleCase => ApplyTitleCase(input, options.SkipWords),
-            LettersCaseMode.SentenceCase => ApplySentenceCase(input),
-            LettersCaseMode.InvertCase => InvertCase(input),
+            LettersCaseMode.TitleCase => _ApplyTitleCase(input, options.SkipWords),
+            LettersCaseMode.SentenceCase => _ApplySentenceCase(input),
+            LettersCaseMode.InvertCase => _InvertCase(input),
             _ => input
         };
     }
 
-    private static string ApplyTitleCase(string input, IReadOnlyList<string> skipWords)
+    private static string _ApplyTitleCase(string input, IReadOnlyList<string> skipWords)
     {
         if (input.Length == 0) return input;
 
@@ -226,7 +233,7 @@ public static class FilterEngine
         });
     }
 
-    private static string ApplySentenceCase(string input)
+    private static string _ApplySentenceCase(string input)
     {
         if (string.IsNullOrEmpty(input)) return input;
         var lower = input.ToLowerInvariant();
@@ -239,7 +246,7 @@ public static class FilterEngine
         });
     }
 
-    private static string InvertCase(string input)
+    private static string _InvertCase(string input)
     {
         var chars = input.ToCharArray();
         for (var i = 0; i < chars.Length; i++)
@@ -250,14 +257,14 @@ public static class FilterEngine
         return new string(chars);
     }
 
-    private static string ApplyReplacer(string input, ReplacerOptions options)
+    private static string _ApplyReplacer(string input, ReplacerOptions options)
     {
         var regexOptions = options.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
 
         var pattern = options.Mode switch
         {
             ReplacerMode.Literal => Regex.Escape(options.Find),
-            ReplacerMode.Wildcard => WildcardToRegex(options.Find),
+            ReplacerMode.Wildcard => _WildcardToRegex(options.Find),
             ReplacerMode.Regex => options.Find,
             _ => options.Find
         };
@@ -274,7 +281,7 @@ public static class FilterEngine
         return regex.Replace(input, options.Replacement, 1);
     }
 
-    private static string WildcardToRegex(string wildcard)
+    private static string _WildcardToRegex(string wildcard)
     {
         // Convert '*' -> '.*', '?' -> '.', and escape everything else.
         var sb = new System.Text.StringBuilder();
@@ -290,7 +297,7 @@ public static class FilterEngine
         return sb.ToString();
     }
 
-    private static string ApplyCounter(string currentSegment, FileEntryLite file, CounterOptions options)
+    private static string _ApplyCounter(string currentSegment, FileEntryLite file, CounterOptions options)
     {
         var n = options.ResetPerFolder ? file.FolderOccurrenceIndex : file.GlobalIndex;
         var value = (long)options.Start + (long)options.Step * n;
@@ -314,7 +321,7 @@ public static class FilterEngine
         };
     }
 
-    private static string ApplyCleaner(string input, CleanerOptions options)
+    private static string _ApplyCleaner(string input, CleanerOptions options)
     {
         var res = input;
         if (options.RemoveIllegalChars)
@@ -332,7 +339,7 @@ public static class FilterEngine
         return res;
     }
 
-    private static string FixLeadingZeros(string input, FixLeadingZerosOptions options)
+    private static string _FixLeadingZeros(string input, FixLeadingZerosOptions options)
     {
         if (options.Width <= 0) return input;
 
@@ -347,7 +354,7 @@ public static class FilterEngine
         });
     }
 
-    private static string StripParentheses(string input, StripParenthesesOptions options)
+    private static string _StripParentheses(string input, StripParenthesesOptions options)
     {
         var pairs = new List<(char open, char close)>();
         foreach (var token in options.Types.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
@@ -401,7 +408,7 @@ public static class FilterEngine
         return res;
     }
 
-    private static void CommitMove(string sourcePath, string destPath)
+    private static void _CommitMove(string sourcePath, string destPath)
     {
         // Keep it simple for phase 1: try Move first, fallback to Copy+Delete.
         try
@@ -420,12 +427,18 @@ public static class FilterEngine
     {
         private static readonly Regex TokenRegex = new(@"<([^<>]+)>", RegexOptions.Compiled);
 
+        /// <summary>
+        /// Expands formatter tokens in <paramref name="template"/> for a given <paramref name="file"/>.
+        /// </summary>
+        /// <param name="template">The formatter template containing tokens like <c>&lt;file-name&gt;</c>.</param>
+        /// <param name="file">The file being renamed (provides token values).</param>
+        /// <returns>The template with all recognized tokens replaced.</returns>
         public static string Format(string template, FileEntryLite file)
         {
-            return TokenRegex.Replace(template, m => ResolveToken(m.Groups[1].Value, file));
+            return TokenRegex.Replace(template, m => _ResolveToken(m.Groups[1].Value, file));
         }
 
-        private static string ResolveToken(string tokenInner, FileEntryLite file)
+        private static string _ResolveToken(string tokenInner, FileEntryLite file)
         {
             var parts = tokenInner.Split(':', 2);
             var name = parts[0];
@@ -440,12 +453,12 @@ public static class FilterEngine
                 "parent-folder" => Path.GetFileName(file.DirectoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)),
                 "full-path" => file.FullPath,
                 "now" => string.IsNullOrWhiteSpace(arg) ? DateTimeOffset.UtcNow.ToString("o") : DateTimeOffset.UtcNow.ToString(arg),
-                "counter" => ResolveCounterToken(arg, file),
+                "counter" => _ResolveCounterToken(arg, file),
                 _ => throw new NotSupportedException($"Phase 1 formatter token '{name}' is not supported.")
             };
         }
 
-        private static string ResolveCounterToken(string arg, FileEntryLite file)
+        private static string _ResolveCounterToken(string arg, FileEntryLite file)
         {
             // Syntax: start,step,reset,width,pad
             var parts = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);

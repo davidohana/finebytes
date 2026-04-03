@@ -6,6 +6,9 @@ namespace mfr8.Tests;
 public class Phase1UnitTests
 {
     [Fact]
+    /// <summary>
+    /// Verifies that the JSON parser correctly builds a <see cref="LettersCaseFilter"/> from valid input.
+    /// </summary>
     public void FilterParser_Parses_LettersCase()
     {
         var json = """
@@ -27,6 +30,9 @@ public class Phase1UnitTests
     }
 
     [Fact]
+    /// <summary>
+    /// Verifies that parsing rejects non-<c>FileName</c> targets in phase 1.
+    /// </summary>
     public void FilterParser_Rejects_NonFileNameFamily()
     {
         var json = """
@@ -44,9 +50,12 @@ public class Phase1UnitTests
     }
 
     [Fact]
+    /// <summary>
+    /// Verifies that duplicate destinations are treated as conflicts and skipped.
+    /// </summary>
     public void FilterEngine_ConflictSkipped_ForDuplicateDestinations()
     {
-        var dir = CreateTempDir();
+        var dir = _CreateTempDir();
 
         try
         {
@@ -90,9 +99,12 @@ public class Phase1UnitTests
     }
 
     [Fact]
+    /// <summary>
+    /// Verifies that the counter filter generates sequential names and commits expected moves.
+    /// </summary>
     public void FilterEngine_Renames_WithCounter()
     {
-        var dir = CreateTempDir();
+        var dir = _CreateTempDir();
 
         try
         {
@@ -145,7 +157,7 @@ public class Phase1UnitTests
         }
     }
 
-    private static string CreateTempDir()
+    private static string _CreateTempDir()
     {
         var dir = Path.Combine(Path.GetTempPath(), "mfr8_tests_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);

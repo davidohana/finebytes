@@ -1,0 +1,25 @@
+---
+description: Require XML docs for public funcs (C#)
+globs: **/*.cs
+alwaysApply: true
+---
+
+# Public function documentation
+
+Add XML documentation comments (`/// <summary>...</summary>`) to every `public` member:
+
+- `public` methods
+- `public` constructors
+- `public` properties/indexers/events (if you expose them publicly)
+
+The minimum expected shape is:
+
+```csharp
+/// <summary>One-sentence description.</summary>
+/// <param name="x">Meaning of the parameter.</param>
+/// <returns>What the method returns.</returns>
+public int MyMethod(...)
+```
+
+If a parameter/return is not relevant, omit the corresponding tag, but keep a `summary`.
+
