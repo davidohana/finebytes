@@ -79,7 +79,7 @@ namespace Mfr8.Cli
                 var format = _ParseOutputFormat(Output);
 
                 var presetsFilePath = string.IsNullOrWhiteSpace(PresetsFilePath)
-                    ? PresetLoader.DefaultPresetsFilePath()
+                    ? PresetManager.DefaultPresetsFilePath()
                     : PresetsFilePath;
 
                 return new CliOptions(

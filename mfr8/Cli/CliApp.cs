@@ -39,8 +39,9 @@ namespace Mfr8.Cli
                 throw new UserException("Presets file path is required.");
             }
 
-            var loader = new PresetLoader(options.PresetsFilePath);
-            var preset = loader.Load(options.PresetName);
+            var presetManager = new PresetManager(options.PresetsFilePath);
+            presetManager.LoadAll();
+            var preset = presetManager.GetByName(options.PresetName);
 
             var files = FileScanner.ScanSources(options.Sources, includeHidden: options.IncludeHidden);
 
