@@ -17,7 +17,7 @@ namespace Mfr8.Cli
             try
             {
                 var options = CliCommandFactory.ParseArgs(args);
-                return _Execute(options);
+                return options is null ? 0 : _Execute(options);
             }
             catch (ArgumentException ex)
             {

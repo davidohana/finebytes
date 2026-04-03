@@ -11,9 +11,9 @@ namespace Mfr8.Cli
         /// Prints help and validation errors to the console when parsing fails.
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
-        /// <returns>Parsed <see cref="CliOptions"/> on success.</returns>
+        /// <returns>Parsed <see cref="CliOptions"/> on success; <c>null</c> when the user requested help (<c>--help</c> / <c>-h</c>).</returns>
         /// <exception cref="ArgumentException">Thrown when argument parsing cannot produce options.</exception>
-        public static CliOptions ParseArgs(string[] args)
+        public static CliOptions? ParseArgs(string[] args)
         {
             var result = Parser.Default.ParseArguments<CliArguments>(args);
             return result.MapResult(_MapParsed, _MapNotParsed);
@@ -23,10 +23,12 @@ namespace Mfr8.Cli
                 return parsedArgs.ToOptions();
             }
 
-            CliOptions _MapNotParsed(IEnumerable<Error> errors)
+            CliOptions? _MapNotParsed(IEnumerable<Error> errors)
             {
-                _ = errors;
-                throw new ArgumentException("Invalid arguments.");
+                var list = errors.ToList();
+                return list.All(e => e.Tag is ErrorType.HelpRequestedError or ErrorType.HelpVerbRequestedError)
+                    ? null
+                    : throw new ArgumentException("Invalid arguments.");
             }
 
         }
