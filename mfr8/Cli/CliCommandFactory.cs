@@ -25,12 +25,27 @@ namespace Mfr8.Cli
 
             CliOptions? _MapNotParsed(IEnumerable<Error> errors)
             {
-                var list = errors.ToList();
-                return list.All(e => e.Tag is ErrorType.HelpRequestedError or ErrorType.HelpVerbRequestedError)
+                var errorList = errors.ToList();
+                return errorList.All(e => e.Tag is ErrorType.HelpRequestedError or ErrorType.HelpVerbRequestedError)
                     ? null
-                    : throw new UserException("Invalid arguments.");
+                    : throw new UserException(_BuildErrorMessage(errorList));
             }
 
+        }
+
+        private static string _BuildErrorMessage(IReadOnlyList<Error> errors)
+        {
+            return errors.Any(_IsMissingRequiredSource)
+                ? "Missing required argument: sources. Provide one or more files, folders, or wildcards."
+                : "Invalid arguments.";
+        }
+
+        private static bool _IsMissingRequiredSource(Error error)
+        {
+            return (error is MissingValueOptionError missingValueError
+                && missingValueError.NameInfo.Equals(NameInfo.EmptyName))
+                || (error is MissingRequiredOptionError missingRequiredOptionError
+                && missingRequiredOptionError.NameInfo.Equals(NameInfo.EmptyName));
         }
 
         private sealed class CliArguments

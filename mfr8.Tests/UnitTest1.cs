@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Mfr8.Cli;
 using Mfr8.Core;
 
 namespace mfr8.Tests
@@ -154,6 +155,31 @@ namespace mfr8.Tests
             finally
             {
                 Directory.Delete(dir, recursive: true);
+            }
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that missing positional <c>sources</c> reports a clear user-facing error.
+        /// </summary>
+        public void CliApp_Shows_Clear_Message_When_Sources_Are_Missing()
+        {
+            using var errorWriter = new StringWriter();
+            var originalError = Console.Error;
+
+            try
+            {
+                Console.SetError(errorWriter);
+
+                var exitCode = CliApp.Run(["-p", "xxx"]);
+                var output = errorWriter.ToString();
+
+                Assert.Equal(CliExitCode.UserError, exitCode);
+                Assert.Contains("Missing required argument: sources", output, StringComparison.Ordinal);
+            }
+            finally
+            {
+                Console.SetError(originalError);
             }
         }
 
