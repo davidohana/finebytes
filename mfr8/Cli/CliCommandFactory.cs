@@ -23,50 +23,33 @@ namespace Mfr8.Cli
             });
 
             var result = parser.ParseArguments<CliArguments>(args);
-            var state = new ParseState(result);
+            CliOptions? parsedOptions = null;
 
             _ = result
-                .WithParsed(state._HandleParsed)
-                .WithNotParsed(state._HandleNotParsed);
+                .WithParsed(_HandleParsed)
+                .WithNotParsed(_HandleNotParsed);
 
-            return state.ParsedOptions ?? throw new ArgumentException(state.ErrorMessage);
-        }
+            return parsedOptions ?? throw new ArgumentException("Failed to parse arguments.");
 
-        private sealed class ParseState(ParserResult<CliArguments> result)
-        {
-            private readonly ParserResult<CliArguments> _result = result;
-
-            internal CliOptions? ParsedOptions { get; private set; }
-
-            internal void _HandleParsed(CliArguments args)
+            void _HandleParsed(CliArguments parsedArgs)
             {
-                try
-                {
-                    ParsedOptions = args.ToOptions();
-                }
-                catch (ArgumentException ex)
-                {
-                    ErrorMessage = ex.Message;
-                }
+                parsedOptions = parsedArgs.ToOptions();
             }
 
-            internal void _HandleNotParsed(IEnumerable<Error> errors)
+            void _HandleNotParsed(IEnumerable<Error> errors)
             {
-                var helpText = HelpText.AutoBuild(_result, h =>
+                var helpText = HelpText.AutoBuild(result, h =>
                 {
                     h.Heading = "mfr8 - Magic File Renamer";
                     h.AdditionalNewLineAfterOption = true;
                     h.AddDashesToOption = true;
-                    return HelpText.DefaultParsingErrorsHandler(_result, h);
+                    return HelpText.DefaultParsingErrorsHandler(result, h);
                 },
                 e => e);
 
-                ErrorMessage = helpText;
-
                 _ = errors;
+                throw new ArgumentException(helpText);
             }
-
-            internal string? ErrorMessage { get; private set; }
         }
 
         private sealed class CliArguments
