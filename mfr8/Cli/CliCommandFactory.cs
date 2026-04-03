@@ -12,13 +12,10 @@ namespace Mfr8.Cli
         /// Prints help and validation errors to the console when parsing fails.
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
-        /// <param name="exitCode">Exit code when parsing cannot produce options (help or error).</param>
-        /// <returns>Parsed <see cref="CliOptions"/> on success; otherwise <c>null</c>.</returns>
-        public static CliOptions? ParseArgs(string[] args, out int exitCode)
+        /// <returns>Parsed <see cref="CliOptions"/> on success.</returns>
+        /// <exception cref="ArgumentException">Thrown when argument parsing cannot produce options.</exception>
+        public static CliOptions ParseArgs(string[] args)
         {
-            CliOptions? parsedOptions = null;
-            var localExitCode = 0;
-
             var parser = new Parser(settings =>
             {
                 // We control help / error output via HelpText.
@@ -26,43 +23,50 @@ namespace Mfr8.Cli
             });
 
             var result = parser.ParseArguments<CliArguments>(args);
+            var state = new ParseState(result);
 
             _ = result
-                .WithParsed(a =>
+                .WithParsed(state._HandleParsed)
+                .WithNotParsed(state._HandleNotParsed);
+
+            return state.ParsedOptions ?? throw new ArgumentException(state.ErrorMessage);
+        }
+
+        private sealed class ParseState(ParserResult<CliArguments> result)
+        {
+            private readonly ParserResult<CliArguments> _result = result;
+
+            internal CliOptions? ParsedOptions { get; private set; }
+
+            internal void _HandleParsed(CliArguments args)
+            {
+                try
                 {
-                    try
-                    {
-                        parsedOptions = a.ToOptions();
-                        localExitCode = 0;
-                    }
-                    catch (ArgumentException ex)
-                    {
-                        Console.Error.WriteLine(ex.Message);
-                        localExitCode = 1;
-                    }
-                })
-                .WithNotParsed(errors =>
+                    ParsedOptions = args.ToOptions();
+                }
+                catch (ArgumentException ex)
                 {
-                    var helpText = HelpText.AutoBuild(result, h =>
-                    {
-                        h.Heading = "mfr8 - Magic File Renamer";
-                        h.AdditionalNewLineAfterOption = true;
-                        h.AddDashesToOption = true;
-                        return HelpText.DefaultParsingErrorsHandler(result, h);
-                    },
-                    e => e);
+                    ErrorMessage = ex.Message;
+                }
+            }
 
-                    Console.WriteLine(helpText);
+            internal void _HandleNotParsed(IEnumerable<Error> errors)
+            {
+                var helpText = HelpText.AutoBuild(_result, h =>
+                {
+                    h.Heading = "mfr8 - Magic File Renamer";
+                    h.AdditionalNewLineAfterOption = true;
+                    h.AddDashesToOption = true;
+                    return HelpText.DefaultParsingErrorsHandler(_result, h);
+                },
+                e => e);
 
-                    // Help requests exit with 0, other errors with 1.
-                    localExitCode = errors.Any(e =>
-                            e is { Tag: ErrorType.HelpRequestedError or ErrorType.HelpVerbRequestedError })
-                        ? 0
-                        : 1;
-                });
+                ErrorMessage = helpText;
 
-            exitCode = localExitCode;
-            return parsedOptions;
+                _ = errors;
+            }
+
+            internal string? ErrorMessage { get; private set; }
         }
 
         private sealed class CliArguments

@@ -14,8 +14,20 @@ namespace Mfr8.Cli
         /// <returns>The process exit code.</returns>
         public static int Run(string[] args)
         {
-            var options = CliCommandFactory.ParseArgs(args, out var exitCode);
-            return options is null ? exitCode : _Execute(options);
+            try
+            {
+                var options = CliCommandFactory.ParseArgs(args);
+                return _Execute(options);
+            }
+            catch (ArgumentException ex)
+            {
+                if (!string.IsNullOrWhiteSpace(ex.Message))
+                {
+                    Console.Error.WriteLine(ex.Message);
+                }
+
+                return 1;
+            }
         }
 
         private static int _Execute(CliOptions options)
