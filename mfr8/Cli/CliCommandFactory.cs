@@ -30,28 +30,16 @@ namespace Mfr8.Cli
             _ = result
                 .WithParsed(a =>
                 {
-                    if (!_TryParseOutputFormat(a.Output, out var format))
+                    try
                     {
-                        Console.Error.WriteLine($"Unknown output '{a.Output}'. Use table|json|csv.");
-                        localExitCode = 1;
-                        return;
+                        parsedOptions = a.ToOptions();
+                        localExitCode = 0;
                     }
-
-                    var presetsDir = string.IsNullOrWhiteSpace(a.PresetsDirectory)
-                        ? PresetLoader.DefaultPresetsDirectory()
-                        : a.PresetsDirectory;
-
-                    parsedOptions = new CliOptions(
-                        PresetName: a.PresetName,
-                        Sources: [.. a.Sources],
-                        OutputFormat: format,
-                        IncludeHidden: a.IncludeHidden,
-                        ContinueOnPreviewErrors: a.ContinueOnPreviewErrors,
-                        Silent: a.Silent,
-                        Verbose: a.Verbose,
-                        PresetsDirectory: presetsDir);
-
-                    localExitCode = 0;
+                    catch (ArgumentException ex)
+                    {
+                        Console.Error.WriteLine(ex.Message);
+                        localExitCode = 1;
+                    }
                 })
                 .WithNotParsed(errors =>
                 {
@@ -75,30 +63,6 @@ namespace Mfr8.Cli
 
             exitCode = localExitCode;
             return parsedOptions;
-        }
-
-        private static bool _TryParseOutputFormat(string? value, out OutputFormat format)
-        {
-            format = default;
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return false;
-            }
-
-            switch (value.Trim().ToLowerInvariant())
-            {
-                case "table":
-                    format = OutputFormat.Table;
-                    return true;
-                case "json":
-                    format = OutputFormat.Json;
-                    return true;
-                case "csv":
-                    format = OutputFormat.Csv;
-                    return true;
-                default:
-                    return false;
-            }
         }
 
         private sealed class CliArguments
@@ -126,6 +90,40 @@ namespace Mfr8.Cli
 
             [Option("verbose", HelpText = "Reserved for future verbose diagnostics.")]
             public bool Verbose { get; set; }
+
+            internal CliOptions ToOptions()
+            {
+                var format = _ParseOutputFormat(Output);
+
+                var presetsDir = string.IsNullOrWhiteSpace(PresetsDirectory)
+                    ? PresetLoader.DefaultPresetsDirectory()
+                    : PresetsDirectory;
+
+                return new CliOptions(
+                    PresetName: PresetName,
+                    Sources: [.. Sources],
+                    OutputFormat: format,
+                    IncludeHidden: IncludeHidden,
+                    ContinueOnPreviewErrors: ContinueOnPreviewErrors,
+                    Silent: Silent,
+                    Verbose: Verbose,
+                    PresetsDirectory: presetsDir);
+            }
+
+            private static OutputFormat _ParseOutputFormat(string? value)
+            {
+                var normalized = string.IsNullOrWhiteSpace(value)
+                    ? throw new ArgumentException("Unknown output ''. Use table|json|csv.")
+                    : value.Trim().ToLowerInvariant();
+
+                return normalized switch
+                {
+                    "table" => OutputFormat.Table,
+                    "json" => OutputFormat.Json,
+                    "csv" => OutputFormat.Csv,
+                    _ => throw new ArgumentException($"Unknown output '{value}'. Use table|json|csv.")
+                };
+            }
         }
     }
 
