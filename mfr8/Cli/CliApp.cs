@@ -14,12 +14,32 @@ namespace Mfr8.Cli
         /// <returns>The process exit code.</returns>
         public static int Run(string[] args)
         {
+            CliOptions? options;
             try
             {
-                var options = CliCommandFactory.ParseArgs(args);
-                return options is null ? 0 : _Execute(options);
+                options = CliCommandFactory.ParseArgs(args);
+
+                if (options is null)
+                {
+                    return 0;
+                }
             }
             catch (ArgumentException ex)
+            {
+                if (!string.IsNullOrWhiteSpace(ex.Message))
+                {
+                    Console.Error.WriteLine(ex.Message);
+                }
+
+                return 1;
+            }
+
+
+            try
+            {
+                return _Execute(options);
+            }
+            catch (Exception ex)
             {
                 if (!string.IsNullOrWhiteSpace(ex.Message))
                 {
@@ -37,28 +57,10 @@ namespace Mfr8.Cli
                 return 1;
             }
 
-            FilterPreset preset;
-            try
-            {
-                var loader = new PresetLoader(options.PresetsDirectory);
-                preset = loader.Load(options.PresetName);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-                return 1;
-            }
+            var loader = new PresetLoader(options.PresetsDirectory);
+            var preset = loader.Load(options.PresetName);
 
-            IReadOnlyList<FileEntryLite> files;
-            try
-            {
-                files = FileScanner.ScanSources(options.Sources, includeHidden: options.IncludeHidden);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-                return 1;
-            }
+            var files = FileScanner.ScanSources(options.Sources, includeHidden: options.IncludeHidden);
 
             if (files.Count == 0)
             {
