@@ -27,6 +27,17 @@ csharp_indent_labels = flush_left
 # Keep using directives outside namespace blocks.
 csharp_using_directive_placement = outside_namespace:warning
 
+# Private methods should use '_' prefix.
+dotnet_naming_symbols.private_methods.applicable_kinds = method
+dotnet_naming_symbols.private_methods.applicable_accessibilities = private
+
+dotnet_naming_style.private_method_with_underscore.required_prefix = _
+dotnet_naming_style.private_method_with_underscore.capitalization = pascal_case
+
+dotnet_naming_rule.private_methods_must_have_underscore.symbols = private_methods
+dotnet_naming_rule.private_methods_must_have_underscore.style = private_method_with_underscore
+dotnet_naming_rule.private_methods_must_have_underscore.severity = warning
+
 # Base diagnostics severity for style and quality.
 dotnet_analyzer_diagnostic.category-Style.severity = warning
 dotnet_analyzer_diagnostic.category-Performance.severity = warning
