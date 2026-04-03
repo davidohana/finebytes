@@ -1,5 +1,4 @@
 using CommandLine;
-using CommandLine.Text;
 
 using Mfr8.Core;
 
@@ -16,18 +15,10 @@ namespace Mfr8.Cli
         /// <exception cref="ArgumentException">Thrown when argument parsing cannot produce options.</exception>
         public static CliOptions ParseArgs(string[] args)
         {
-            var normalizedArgs = args.Length == 0 ? ["-h"] : args;
-
-            var parser = new Parser(settings =>
-            {
-                // We control help / error output via HelpText.
-                settings.HelpWriter = null;
-            });
-
-            var result = parser.ParseArguments<CliArguments>(normalizedArgs);
+            var result = Parser.Default.ParseArguments<CliArguments>(args);
             return result.MapResult(_MapParsed, _MapNotParsed);
 
-            static CliOptions _MapParsed(CliArguments parsedArgs)
+            CliOptions _MapParsed(CliArguments parsedArgs)
             {
                 return parsedArgs.ToOptions();
             }
@@ -35,17 +26,9 @@ namespace Mfr8.Cli
             CliOptions _MapNotParsed(IEnumerable<Error> errors)
             {
                 _ = errors;
-                var helpText = HelpText.AutoBuild(result, h =>
-                {
-                    h.Heading = "mfr8 - Magic File Renamer";
-                    h.AdditionalNewLineAfterOption = true;
-                    h.AddDashesToOption = true;
-                    return HelpText.DefaultParsingErrorsHandler(result, h);
-                },
-                e => e);
-
-                throw new ArgumentException(helpText);
+                throw new ArgumentException("Invalid arguments.");
             }
+
         }
 
         private sealed class CliArguments
@@ -53,25 +36,25 @@ namespace Mfr8.Cli
             [Value(0, MetaName = "sources", Required = true, HelpText = "Files, folders, or wildcards to rename (e.g. C:\\Music\\*.mp3).")]
             public IEnumerable<string> Sources { get; set; } = [];
 
-            [Option("preset", Required = true, HelpText = "Preset name or id (matches preset JSON 'name' or 'id').")]
+            [Option('p', "preset", Required = true, HelpText = "Preset name or id (matches preset JSON 'name' or 'id').")]
             public string PresetName { get; set; } = string.Empty;
 
-            [Option("presets-dir", HelpText = "Override presets directory (for development/testing).")]
+            [Option('d', "presets-dir", HelpText = "Override presets directory (for development/testing).")]
             public string? PresetsDirectory { get; set; }
 
-            [Option("output", HelpText = "Output format: table | json | csv.", Default = "table")]
+            [Option('o', "output", HelpText = "Output format: table | json | csv.", Default = "table")]
             public string Output { get; set; } = "table";
 
-            [Option("include-hidden", HelpText = "Include hidden/system files.")]
+            [Option('i', "include-hidden", HelpText = "Include hidden/system files.")]
             public bool IncludeHidden { get; set; }
 
-            [Option("continue-on-preview-errors", HelpText = "Continue even if preview errors exist.")]
+            [Option('c', "continue-on-preview-errors", HelpText = "Continue even if preview errors exist.")]
             public bool ContinueOnPreviewErrors { get; set; }
 
-            [Option("silent", HelpText = "Only exit code, no output.")]
+            [Option('s', "silent", HelpText = "Only exit code, no output.")]
             public bool Silent { get; set; }
 
-            [Option("verbose", HelpText = "Reserved for future verbose diagnostics.")]
+            [Option('v', "verbose", HelpText = "Reserved for future verbose diagnostics.")]
             public bool Verbose { get; set; }
 
             internal CliOptions ToOptions()
