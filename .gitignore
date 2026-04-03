@@ -1,0 +1,39 @@
+# Build output
+**/bin/
+**/obj/
+**/TestResults/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider / IntelliJ
+.idea/
+
+# VS Code
+.vscode/
+
+# NuGet packages
+packages/
+*.nupkg
+*.snupkg
+
+# Logs / temp
+*.log
+*.tlog
+*.tmp
+*.bak
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Environment / secrets (if you use them)
+.env
+
+# macOS
+.DS_Store
