@@ -101,7 +101,7 @@ Core capabilities:
 - **Single process, no IPC.** All work runs on the .NET ThreadPool via `Channel<T>` pipelines.
 - **UI depends on Core; Core has no UI dependency.** Console mode and GUI share identical service classes.
 - **Every domain object is a plain C# record**, serializable to/from JSON with `System.Text.Json` source generators.
-- **Immutable filter definitions.** `FilterStepDefinition` records are never mutated; edits produce new stack snapshots for undo.
+- **Immutable filter definitions.** `Filter` records are never mutated; edits produce new filter snapshots for undo.
 - **Lazy metadata loading.** EXIF, ID3, and media properties are loaded only when a filter or column actually needs them.
 - **CLI-first, UI-later.** Core pipeline, filters, presets, and logging are implemented and tested in console mode before the Avalonia UI is added on top.
 
@@ -120,7 +120,7 @@ public sealed record FilterPreset
     public IReadOnlyList<string> Tags { get; init; } = [];
     public SortConfiguration Sort { get; init; } = new();
     public IReadOnlyList<ColumnConfiguration> Columns { get; init; } = [];
-    public IReadOnlyList<FilterStepDefinition> Steps { get; init; } = [];
+    public IReadOnlyList<Filter> Filters { get; init; } = [];
 }
 
 public sealed record SortConfiguration
@@ -143,29 +143,137 @@ public sealed record ColumnConfiguration
     public bool ShowPreview { get; init; } = false;
 }
 
-public sealed record FilterStepDefinition
+// Each filter has its own type-safe options record and filter definition record.
+public abstract record Filter
 {
-    public string Type { get; init; } = "";
+    // Written to JSON as discriminator; used by FilterEngine to resolve implementation.
+    public abstract string Type { get; }
     public bool Enabled { get; init; } = true;
-    public FilterTarget Target { get; init; } = new();
-    public JsonElement Options { get; init; }
+    public FilterTarget Target { get; init; } = default!;
 }
 
-public sealed record FilterTarget
+public abstract record Filter<TOptions> : Filter
 {
-    public FilterTargetFamily Family { get; init; }
-    public string? Field { get; init; }
+    public TOptions Options { get; init; } = default!;
+}
+
+// Example filter definitions (all 38 follow the same typed pattern).
+public enum LettersCaseMode { UpperCase, LowerCase, TitleCase, SentenceCase, InvertCase }
+public sealed record LettersCaseOptions
+{
+    public LettersCaseMode Mode { get; init; } = LettersCaseMode.UpperCase;
+    public IReadOnlyList<string> SkipWords { get; init; } = [];
+}
+
+public sealed record LettersCaseFilter : Filter<LettersCaseOptions>
+{
+    public override string Type => "LettersCase";
+}
+
+public enum CounterPosition { Prepend, Append, Replace }
+public sealed record CounterOptions
+{
+    public int Start { get; init; } = 1;
+    public int Step { get; init; } = 1;
+    public int Width { get; init; } = 3;
+    public string PadChar { get; init; } = "0";
+    public CounterPosition Position { get; init; } = CounterPosition.Replace;
+    public string Separator { get; init; } = " - ";
+    public bool ResetPerFolder { get; init; } = false;
+}
+
+public sealed record CounterFilter : Filter<CounterOptions>
+{
+    public override string Type => "Counter";
+}
+
+public sealed record FormatterOptions
+{
+    public string Template { get; init; } = "";
+}
+
+public sealed record FormatterFilter : Filter<FormatterOptions>
+{
+    public override string Type => "Formatter";
+}
+
+// FilterTarget is an abstract base with one derived type per FilterTargetFamily.
+public abstract record FilterTarget
+{
+    public abstract FilterTargetFamily Family { get; }
+}
+
+public sealed record FileNameTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.FileName;
     public FileNameTargetMode FileNameMode { get; init; } = FileNameTargetMode.Full;
-    public int? DirectoryLevel { get; init; } // 0 = direct parent, 1 = parent-of-parent, ...
+}
+
+public sealed record FullFilePathTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.FullFilePath;
+}
+
+public sealed record DirectorySegmentTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.DirectorySegment;
+    public int DirectoryLevel { get; init; } // 0 = direct parent, 1 = parent-of-parent, ...
+}
+
+public sealed record FileContentsTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.FileContents;
+}
+
+public sealed record AttributesTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.Attributes;
+}
+
+public sealed record CreationDateTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.CreationDate;
+}
+
+public sealed record LastWriteDateTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.LastWriteDate;
+}
+
+public sealed record LastAccessDateTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.LastAccessDate;
+}
+
+public sealed record AudioTagTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.AudioTag;
+    public string? Field { get; init; } = null;
+}
+
+public sealed record Id3v1Target : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.Id3v1;
+    public string? Field { get; init; } = null;
+}
+
+public sealed record Id3v2Target : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.Id3v2;
+    public string? Field { get; init; } = null;
+}
+
+public sealed record ImageTagTarget : FilterTarget
+{
+    public override FilterTargetFamily Family => FilterTargetFamily.ImageTag;
+    public string? Field { get; init; } = null;
 }
 
 public enum FilterTargetFamily
 {
-    FileName,            // operates on name only
-    FileExtension,       // extension only
-    FullFileName,        // name + extension
-    FullFilePath,        // full path string
-    DirectorySegment,    // directory at DirectoryLevel
+    FileName,
+    FullFilePath,
+    DirectorySegment,
     FileContents,
     Attributes,
     CreationDate,
@@ -260,17 +368,40 @@ classDiagram
       int Width
       bool ShowPreview
     }
-    class FilterStepDefinition {
+    class Filter {
       string Type
       bool Enabled
       FilterTarget Target
-      JsonElement Options
+    }
+    class LettersCaseFilter {
+      LettersCaseMode Mode
     }
     class FilterTarget {
       FilterTargetFamily Family
-      string Field
+    }
+    class FileNameTarget {
       FileNameTargetMode FileNameMode
+    }
+    class DirectorySegmentTarget {
       int DirectoryLevel
+    }
+    class FullFilePathTarget
+    class AudioTagTarget {
+      string Field
+    }
+    class FileContentsTarget
+    class AttributesTarget
+    class CreationDateTarget
+    class LastWriteDateTarget
+    class LastAccessDateTarget
+    class Id3v1Target {
+      string Field
+    }
+    class Id3v2Target {
+      string Field
+    }
+    class ImageTagTarget {
+      string Field
     }
     class UndoSession {
       string Id
@@ -292,8 +423,21 @@ classDiagram
 
     FilterPreset "1" --> "1" SortConfiguration
     FilterPreset "1" --> "many" ColumnConfiguration
-    FilterPreset "1" --> "many" FilterStepDefinition
-    FilterStepDefinition "1" --> "1" FilterTarget
+    FilterPreset "1" --> "many" Filter
+    Filter "1" --> "1" FilterTarget
+    Filter <|-- LettersCaseFilter
+    FilterTarget <|-- FileNameTarget
+    FilterTarget <|-- DirectorySegmentTarget
+    FilterTarget <|-- FullFilePathTarget
+    FilterTarget <|-- AudioTagTarget
+    FilterTarget <|-- FileContentsTarget
+    FilterTarget <|-- AttributesTarget
+    FilterTarget <|-- CreationDateTarget
+    FilterTarget <|-- LastWriteDateTarget
+    FilterTarget <|-- LastAccessDateTarget
+    FilterTarget <|-- Id3v1Target
+    FilterTarget <|-- Id3v2Target
+    FilterTarget <|-- ImageTagTarget
     UndoSession "1" --> "many" UndoEntry
     UndoEntry "many" --> "1" FileEntry
     FileEntry "0..1" --> "1" Id3Tags
@@ -402,7 +546,7 @@ Each preset is stored in its **own file**. File name convention: `<slug>-<id>.js
     { "field": "Filename",   "width": 220, "showPreview": true },
     { "field": "Id3v2.Artist", "width": 150, "showPreview": false }
   ],
-  "steps": [
+  "filters": [
     {
       "type": "SetFromFreeDB",
       "enabled": true,
@@ -489,17 +633,17 @@ Each preset is stored in its **own file**. File name convention: `<slug>-<id>.js
 }
 ```
 
-### 4.4 Filter step envelope
+### 4.4 Filter envelope
 
-The `type` string discriminates deserialization. All steps share:
+The `type` string discriminates deserialization. All filters share:
 
 ```json
 {
-  "type": "<StepTypeName>",
+  "type": "<FilterTypeName>",
   "enabled": true,
   "target": {
-    "family": "FileName | FileExtension | FullFileName | FullFilePath | DirectorySegment | FileContents | Attributes | CreationDate | LastWriteDate | LastAccessDate | AudioTag | Id3v1 | Id3v2 | ImageTag",
-    "field": "<tag field name — only when family is a tag group>",
+    "family": "FileName | FullFilePath | DirectorySegment | FileContents | Attributes | CreationDate | LastWriteDate | LastAccessDate | AudioTag | Id3v1 | Id3v2 | ImageTag",
+    "field": "<tag field name (optional; depends on filter) — only when family is AudioTag/Id3v1/Id3v2/ImageTag>",
     "fileNameMode": "Prefix | Extension | Full",
     "directoryLevel": 0
   },
@@ -665,6 +809,8 @@ Every filter has: `enabled` toggle, `target` field, and a type-specific `options
 - `fileNameMode` — how to interpret the filename (Prefix / Extension / Full) when `family` is `FileName`.
 - `directoryLevel` — which parent directory to target when `family` is `DirectorySegment` (0 = direct parent, 1 = parent-of-parent, etc.).
 
+In code, the JSON `type` discriminator maps to a concrete typed `Filter<TOptions>` record (one per filter), and the JSON `target.family` maps to a concrete derived `FilterTarget` record (one per family). `FilterEngine` passes the typed filter definition into `IFilterStep<TFilterDefinition>`.
+
 A **Filter Options** panel (gear icon on each filter row) provides:
 - **Apply Target** override without editing the JSON
 - **Apply Condition** — only apply when a field matches a condition (equals/contains/matches/starts-with)
@@ -678,7 +824,7 @@ A **Filter Options** panel (gear icon on each filter row) provides:
 ```json
 {
   "type": "LettersCase",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "mode": "UpperCase | LowerCase | TitleCase | SentenceCase | InvertCase",
     "skipWords": ["a", "an", "the", "of", "in", "at"]
@@ -691,7 +837,7 @@ Uppercases the first letter of each word using specified delimiters to identify 
 ```json
 {
   "type": "UppercaseInitials",
-  "target": { "kind": "AudioTag", "field": "Title" },
+  "target": { "family": "AudioTag", "field": "Title" },
   "options": { "delimiters": " -_.", "keepExistingCase": false }
 }
 ```
@@ -701,7 +847,7 @@ Capitalizes the character after any occurrence of specified characters.
 ```json
 {
   "type": "CapitalizeAfter",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": { "chars": ".-_(", "uppercaseFirst": true }
 }
 ```
@@ -711,7 +857,7 @@ User-defined dictionary of words with fixed casing applied regardless of input c
 ```json
 {
   "type": "CasingList",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "entries": [
       { "match": "mfr", "replacement": "MFR" },
@@ -727,7 +873,7 @@ Capitalizes the first letter after sentence-ending punctuation.
 ```json
 {
   "type": "SentenceEndCharacters",
-  "target": { "kind": "AudioTag", "field": "Comment" },
+  "target": { "family": "AudioTag", "field": "Comment" },
   "options": { "endChars": ".!?", "capitalizeFirst": true }
 }
 ```
@@ -741,7 +887,7 @@ Replaces all spaces with a specified character, or a specified character with sp
 ```json
 {
   "type": "SpaceCharacter",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": { "replaceSpaceWith": "_", "replaceCharWithSpace": "" }
 }
 ```
@@ -749,13 +895,13 @@ Replaces all spaces with a specified character, or a specified character with sp
 #### RemoveSpaces
 Removes all whitespace.
 ```json
-{ "type": "RemoveSpaces", "target": { "kind": "Filename" }, "options": {} }
+{ "type": "RemoveSpaces", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": {} }
 ```
 
 #### ShrinkSpaces
 Collapses consecutive whitespace to a single space.
 ```json
-{ "type": "ShrinkSpaces", "target": { "kind": "Filename" }, "options": {} }
+{ "type": "ShrinkSpaces", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": {} }
 ```
 
 #### SpaceAfter
@@ -763,7 +909,7 @@ Inserts a space after every occurrence of specified characters.
 ```json
 {
   "type": "SpaceAfter",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": { "chars": ",-" }
 }
 ```
@@ -773,7 +919,7 @@ Inserts a space before and after every occurrence of specified characters.
 ```json
 {
   "type": "SpaceAround",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": { "chars": "-" }
 }
 ```
@@ -783,7 +929,7 @@ Inserts a separator before each capital letter (for CamelCase to spaced conversi
 ```json
 {
   "type": "SeparateCapitalizedText",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": { "separator": " ", "skipConsecutiveCaps": true }
 }
 ```
@@ -794,34 +940,34 @@ Inserts a separator before each capital letter (for CamelCase to spaced conversi
 
 #### TrimLeft
 ```json
-{ "type": "TrimLeft", "target": { "kind": "Filename" }, "options": { "count": 3 } }
+{ "type": "TrimLeft", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": { "count": 3 } }
 ```
 
 #### TrimRight
 ```json
-{ "type": "TrimRight", "target": { "kind": "Filename" }, "options": { "count": 5 } }
+{ "type": "TrimRight", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": { "count": 5 } }
 ```
 
 #### TrimSpacesLeft
 ```json
-{ "type": "TrimSpacesLeft", "target": { "kind": "AudioTag", "field": "Title" }, "options": {} }
+{ "type": "TrimSpacesLeft", "target": { "family": "AudioTag", "field": "Title" }, "options": {} }
 ```
 
 #### TrimSpacesRight
 ```json
-{ "type": "TrimSpacesRight", "target": { "kind": "AudioTag", "field": "Title" }, "options": {} }
+{ "type": "TrimSpacesRight", "target": { "family": "AudioTag", "field": "Title" }, "options": {} }
 ```
 
 #### ExtractLeft
 Keeps only the leftmost N characters.
 ```json
-{ "type": "ExtractLeft", "target": { "kind": "Filename" }, "options": { "count": 20 } }
+{ "type": "ExtractLeft", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": { "count": 20 } }
 ```
 
 #### ExtractRight
 Keeps only the rightmost N characters.
 ```json
-{ "type": "ExtractRight", "target": { "kind": "Filename" }, "options": { "count": 10 } }
+{ "type": "ExtractRight", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": { "count": 10 } }
 ```
 
 #### TrimBetween
@@ -829,7 +975,7 @@ Removes content between two delimiter strings.
 ```json
 {
   "type": "TrimBetween",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "startDelimiter": "(",
     "endDelimiter": ")",
@@ -844,7 +990,7 @@ Collapses consecutive occurrences of specified characters to one.
 ```json
 {
   "type": "RemoveDuplicateCharacters",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": { "chars": " _-." }
 }
 ```
@@ -858,7 +1004,7 @@ Search and replace with literal, wildcard, or regex mode.
 ```json
 {
   "type": "Replacer",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "find": "(feat\\.)",
     "replacement": "ft.",
@@ -875,7 +1021,7 @@ Applies a sequence of find/replace pairs from an embedded list or external file 
 ```json
 {
   "type": "ReplaceList",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "source": "Inline | File",
     "filePath": "",
@@ -894,7 +1040,7 @@ Removes or replaces illegal or user-specified characters. `removeIllegalChars` s
 ```json
 {
   "type": "Cleaner",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "removeIllegalChars": true,
     "illegalCharReplacement": "_",
@@ -913,7 +1059,7 @@ Renames any target field to a format string built from literals and formatting p
 ```json
 {
   "type": "Formatter",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "template": "<counter:1,1,0,2,0>.<image-width:0>x<image-height:0>.<image-format:0><ext:0>"
   }
@@ -926,7 +1072,7 @@ Adds an auto-incrementing serial number to the target field.
 ```json
 {
   "type": "Counter",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "start": 1,
     "step": 1,
@@ -944,7 +1090,7 @@ Replaces each item's target field value with the corresponding line from a text 
 ```json
 {
   "type": "NameList",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "filePath": "C:\\names.txt",
     "skipEmptyLines": true,
@@ -958,7 +1104,7 @@ Splits the target field by a delimiter and rearranges the parts. E.g. `Lastname,
 ```json
 {
   "type": "TokenMover",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "delimiter": ", ",
     "outputOrder": [1, 0],
@@ -972,7 +1118,7 @@ Inserts text at a specified position within the target field.
 ```json
 {
   "type": "Inserter",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "text": "PREFIX_",
     "position": "Start | End | Index | BeforeMatch | AfterMatch",
@@ -992,7 +1138,7 @@ Sets a standard audio tag field (multi-format via TagLibSharp). Value can be a l
 ```json
 {
   "type": "AudioTagSetter",
-  "target": { "kind": "AudioTag", "field": "Title" },
+  "target": { "family": "AudioTag", "field": "Title" },
   "options": { "value": "<file-name:0>", "useFormatter": true }
 }
 ```
@@ -1002,7 +1148,7 @@ Sets any specific ID3v2 frame by frame ID (e.g. TXXX, TIT1) for frames not acces
 ```json
 {
   "type": "Id3v2FieldSetter",
-  "target": { "kind": "Id3v2" },
+  "target": { "family": "Id3v2" },
   "options": {
     "frameId": "TXXX",
     "value": "my custom value",
@@ -1016,7 +1162,7 @@ Deletes audio tags entirely or clears specific fields.
 ```json
 {
   "type": "AudioTagRemover",
-  "target": { "kind": "AudioTag" },
+  "target": { "family": "AudioTag" },
   "options": {
     "removeId3v1": true,
     "removeId3v2": false,
@@ -1031,7 +1177,7 @@ Queries FreeDB.org using the disc ID computed from track lengths. Populates the 
 {
   "type": "SetFromFreeDB",
   "enabled": true,
-  "target": { "kind": "AudioTag" },
+  "target": { "family": "AudioTag" },
   "options": {
     "preferredMatchIndex": 0,
     "promptOnMultipleMatches": true
@@ -1047,7 +1193,7 @@ Queries FreeDB.org using the disc ID computed from track lengths. Populates the 
 ```json
 {
   "type": "AttributesSetter",
-  "target": { "kind": "Attributes" },
+  "target": { "family": "Attributes" },
   "options": {
     "readOnly":  "Set | Clear | Keep",
     "hidden":    "Set | Clear | Keep",
@@ -1062,7 +1208,7 @@ Sets a file date from a fixed value, EXIF date, ID3 year, or current time.
 ```json
 {
   "type": "DateSetter",
-  "target": { "kind": "CreationDate" },
+  "target": { "family": "CreationDate" },
   "options": {
     "source": "Fixed | FileModified | ExifDateTaken | Id3Year | Now",
     "fixedDate": "2024-01-01"
@@ -1075,7 +1221,7 @@ Sets the time portion of a file datetime.
 ```json
 {
   "type": "TimeSetter",
-  "target": { "kind": "LastWriteDate" },
+  "target": { "family": "LastWriteDate" },
   "options": {
     "source": "Fixed | Now | ExifDateTaken",
     "fixedTime": "12:00:00",
@@ -1093,7 +1239,7 @@ Moves files to a different folder. Destination = `rootFolder` + `subFolderTempla
 ```json
 {
   "type": "Mover",
-  "target": { "kind": "ParentFolder" },
+  "target": { "family": "DirectorySegment", "directoryLevel": 0 },
   "options": {
     "rootFolder": "C:\\Music\\Organized",
     "subFolderTemplate": "<id3-artist:0> (<id3-year:0>)\\<id3-album:0>",
@@ -1108,7 +1254,7 @@ Normalizes numbers within the field to a consistent digit width.
 ```json
 {
   "type": "FixLeadingZeros",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": { "width": 2, "removeExtraZeros": true }
 }
 ```
@@ -1118,7 +1264,7 @@ Removes specified bracket types and their contents.
 ```json
 {
   "type": "StripParentheses",
-  "target": { "kind": "Filename" },
+  "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "types": "Round | Square | Curly | Angle",
     "removeContents": true
@@ -1274,10 +1420,10 @@ public sealed class PresetService
 │ Presets                    [+ New] [Import]    │
 │ [Search...]                        [Export]    │
 ├────────────────────────────────────────────────┤
-│ ★ Music — Artist/Album tree      4 steps      │
+│ ★ Music — Artist/Album tree      4 filters      │
 │   modified 2026-02-20          [▶] [✏] [⋮]   │
 ├────────────────────────────────────────────────┤
-│   Photo Organizer — EXIF Date    5 steps       │
+│   Photo Organizer — EXIF Date    5 filters       │
 │   modified 2026-01-10          [▶] [✏] [⋮]   │
 └────────────────────────────────────────────────┘
 ```
@@ -1433,6 +1579,15 @@ public interface IFilterStep
     ValueTask ApplyCommitAsync(FilterContext context, CancellationToken cancellationToken);
 }
 
+public interface IFilterStep<TFilterDefinition> where TFilterDefinition : Filter
+{
+    // Must match `TFilterDefinition.Type`.
+    string Type { get; }
+
+    ValueTask ApplyPreviewAsync(FilterContext context, TFilterDefinition filter, CancellationToken cancellationToken);
+    ValueTask ApplyCommitAsync(FilterContext context, TFilterDefinition filter, CancellationToken cancellationToken);
+}
+
 public sealed record FilterContext
 {
     public FileEntry File { get; init; } = default!;
@@ -1461,7 +1616,7 @@ public interface IUndoJournal
 }
 ```
 
-Concrete filters such as `LettersCaseFilter`, `FormatterFilter`, `ReplacerFilter`, etc. each implement `IFilterStep` and are resolved by `FilterEngine` based on `FilterStepDefinition.Type`.
+Concrete filters such as `LettersCaseFilter`, `FormatterFilter`, `ReplacerFilter`, etc. each implement `IFilterStep<TFilterDefinition>` for their corresponding typed `Filter` record, and are resolved by `FilterEngine` based on `Filter.Type`.
 
 ### 11.3 Conflict detection rules
 
@@ -1720,7 +1875,7 @@ Dragging files onto the MFR desktop shortcut launches MFR with those items pre-l
    [Token Picker ▾]   Preview: "01 - Queen - Bohemian Rhapsody.mp3"
 ```
 
-Steps are drag-reorderable via the `≡` handle.
+Filters are drag-reorderable via the `≡` handle.
 
 ### 17.3 Visual Trim Helper
 
@@ -1932,7 +2087,7 @@ Filters are tested using JSON-defined fixtures:
 {
   "name": "LettersCase basic upper",
   "file": { "fullPath": "C:\\Music\\track01.mp3", "originalName": "track01.mp3" },
-  "step": {
+  "filter": {
     "type": "LettersCase",
     "enabled": true,
     "target": { "family": "FileName", "fileNameMode": "Full" },
@@ -1944,7 +2099,7 @@ Filters are tested using JSON-defined fixtures:
 }
 ```
 
-`FilterFixtureRunner` loads fixtures from JSON, constructs `FileEntry` and `FilterStepDefinition`, resolves the `IFilterStep` implementation, and asserts on `RenameResult`.
+`FilterFixtureRunner` loads fixtures from JSON, constructs `FileEntry` and `Filter`, resolves the `IFilterStep` implementation, and asserts on `RenameResult`.
 
 ### 21.2 Filesystem and metadata isolation
 
