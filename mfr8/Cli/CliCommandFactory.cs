@@ -1,152 +1,130 @@
-using System.CommandLine;
-
 using Mfr8.Core;
 
-namespace Mfr8.Cli;
-
-internal static class CliCommandFactory
+namespace Mfr8.Cli
 {
-    /// <summary>
-    /// Parses command-line arguments into <see cref="CliOptions"/>, or returns a process exit code for help/errors.
-    /// </summary>
-    /// <param name="args">Command-line arguments.</param>
-    /// <param name="exitCode">Exit code when parsing cannot produce options (help or error).</param>
-    /// <returns>Parsed <see cref="CliOptions"/> on success; otherwise <c>null</c>.</returns>
-    public static CliOptions? ParseArgs(string[] args, out int exitCode)
+    internal static class CliCommandFactory
     {
-        var presetOption = new Option<string>("--preset")
+        /// <summary>
+        /// Parses command-line arguments into <see cref="CliOptions"/> using <c>CommandLineParser</c>.
+        /// Prints help and validation errors to the console when parsing fails.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <param name="exitCode">Exit code when parsing cannot produce options (help or error).</param>
+        /// <returns>Parsed <see cref="CliOptions"/> on success; otherwise <c>null</c>.</returns>
+        public static CliOptions? ParseArgs(String[] args, out Int32 exitCode)
         {
-            Description = "Preset name or id (matches preset JSON 'name' or 'id')."
-        };
+            CliOptions? parsedOptions = null;
+            Int32 localExitCode = 0;
 
-        var presetsDirOption = new Option<string>("--presets-dir")
-        {
-            Description = "Override presets directory (for development/testing)."
-        };
+            var parser = new Parser(settings =>
+            {
+                // We control help / error output via HelpText.
+                settings.HelpWriter = null;
+            });
 
-        var outputOption = new Option<string>("--output")
-        {
-            Description = "Output format: table | json | csv."
-        };
+            var result = parser.ParseArguments<CliArguments>(args);
 
-        var includeHiddenOption = new Option<bool>("--include-hidden")
-        {
-            Description = "Include hidden/system files."
-        };
+            result
+                .WithParsed(a =>
+                {
+                    if (!_TryParseOutputFormat(a.Output, out OutputFormat format))
+                    {
+                        Console.Error.WriteLine($"Unknown output '{a.Output}'. Use table|json|csv.");
+                        localExitCode = 1;
+                        return;
+                    }
 
-        var continueOption = new Option<bool>("--continue-on-preview-errors")
-        {
-            Description = "Continue even if preview errors exist."
-        };
+                    var presetsDir = String.IsNullOrWhiteSpace(a.PresetsDirectory)
+                        ? PresetLoader.DefaultPresetsDirectory()
+                        : a.PresetsDirectory;
 
-        var silentOption = new Option<bool>("--silent")
-        {
-            Description = "Silent mode (only exit code)."
-        };
+                    parsedOptions = new CliOptions(
+                        PresetName: a.PresetName,
+                        Sources: a.Sources.ToArray(),
+                        OutputFormat: format,
+                        IncludeHidden: a.IncludeHidden,
+                        ContinueOnPreviewErrors: a.ContinueOnPreviewErrors,
+                        Silent: a.Silent,
+                        Verbose: a.Verbose,
+                        PresetsDirectory: presetsDir);
 
-        var verboseOption = new Option<bool>("--verbose")
-        {
-            Description = "Verbose mode (reserved in phase 1)."
-        };
+                    localExitCode = 0;
+                })
+                .WithNotParsed(errors =>
+                {
+                    var helpText = HelpText.AutoBuild(result, h =>
+                    {
+                        h.Heading = "mfr8 - Magic File Renamer";
+                        h.AdditionalNewLineAfterOption = true;
+                        h.AddDashesToOption = true;
+                        return HelpText.DefaultParsingErrorsHandler(result, h);
+                    },
+                    e => e);
 
-        var sourcesArgument = new Argument<string[]>("sources");
-        sourcesArgument.Arity = ArgumentArity.OneOrMore;
+                    Console.WriteLine(helpText);
 
-        var root = new RootCommand("mfr8 (CLI-only): rename using JSON presets and filename-only filters.");
-        root.Add(presetOption);
-        root.Add(presetsDirOption);
-        root.Add(outputOption);
-        root.Add(includeHiddenOption);
-        root.Add(continueOption);
-        root.Add(silentOption);
-        root.Add(verboseOption);
-        root.Add(sourcesArgument);
+                    // Help requests exit with 0, other errors with 1.
+                    localExitCode = errors.Any(e =>
+                            e.Tag == ErrorType.HelpRequestedError ||
+                            e.Tag == ErrorType.HelpVerbRequestedError)
+                        ? 0
+                        : 1;
+                });
 
-        // If user explicitly asks for help, don't try to bind required arguments.
-        if (args.Any(a => a == "--help" || a == "-h" || a == "/?"))
-        {
-            Console.WriteLine("Usage: mfr8 <sources>... --preset <name-or-id> [options]");
-            Console.WriteLine();
-            Console.WriteLine("  <sources>   Files, folders, or wildcards to rename (e.g. C:\\Music\\*.mp3).");
-            Console.WriteLine("  --preset    Preset name or id (matches preset JSON 'name' or 'id').");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            Console.WriteLine("  --presets-dir <dir>              Override presets directory.");
-            Console.WriteLine("  --output <table|json|csv>        Output format (default: table).");
-            Console.WriteLine("  --include-hidden                 Include hidden/system files.");
-            Console.WriteLine("  --continue-on-preview-errors     Continue even if preview errors exist.");
-            Console.WriteLine("  --silent                         Only exit code, no output.");
-            Console.WriteLine("  --verbose                        Reserved for future verbose diagnostics.");
-
-            exitCode = 0;
-            return null;
+            exitCode = localExitCode;
+            return parsedOptions;
         }
 
-        var parseResult = root.Parse(args);
-        if (parseResult.Errors.Count > 0)
+        private static Boolean _TryParseOutputFormat(String? value, out OutputFormat format)
         {
-            foreach (var error in parseResult.Errors)
-                Console.Error.WriteLine(error.Message);
-            exitCode = 1;
-            return null;
-        }
-
-        var preset = parseResult.GetValue(presetOption);
-        var sources = parseResult.GetValue(sourcesArgument);
-        var output = parseResult.GetValue(outputOption) ?? "table";
-        var presetsDir = parseResult.GetValue(presetsDirOption) ?? PresetLoader.DefaultPresetsDirectory();
-
-        var includeHidden = parseResult.GetValue(includeHiddenOption);
-        var continueOnPreviewErrors = parseResult.GetValue(continueOption);
-        var silent = parseResult.GetValue(silentOption);
-        var verbose = parseResult.GetValue(verboseOption);
-
-        if (string.IsNullOrWhiteSpace(preset))
-        {
-            Console.Error.WriteLine("Missing required option: --preset.");
-            exitCode = 1;
-            return null;
-        }
-
-        if (!_TryParseOutputFormat(output, out var outFormat))
-        {
-            Console.Error.WriteLine($"Unknown output '{output}'. Use table|json|csv.");
-            exitCode = 1;
-            return null;
-        }
-
-        exitCode = 0;
-        return new CliOptions(
-            PresetName: preset,
-            Sources: sources ?? Array.Empty<string>(),
-            OutputFormat: outFormat,
-            IncludeHidden: includeHidden,
-            ContinueOnPreviewErrors: continueOnPreviewErrors,
-            Silent: silent,
-            Verbose: verbose,
-            PresetsDirectory: presetsDir);
-    }
-
-    private static bool _TryParseOutputFormat(string? value, out OutputFormat format)
-    {
-        format = default;
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
-
-        switch (value.Trim().ToLowerInvariant())
-        {
-            case "table":
-                format = OutputFormat.Table;
-                return true;
-            case "json":
-                format = OutputFormat.Json;
-                return true;
-            case "csv":
-                format = OutputFormat.Csv;
-                return true;
-            default:
+            format = default;
+            if (String.IsNullOrWhiteSpace(value))
+            {
                 return false;
+            }
+
+            switch (value.Trim().ToLowerInvariant())
+            {
+                case "table":
+                    format = OutputFormat.Table;
+                    return true;
+                case "json":
+                    format = OutputFormat.Json;
+                    return true;
+                case "csv":
+                    format = OutputFormat.Csv;
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private sealed class CliArguments
+        {
+            [Value(0, MetaName = "sources", Required = true, HelpText = "Files, folders, or wildcards to rename (e.g. C:\\Music\\*.mp3).")]
+            public IEnumerable<String> Sources { get; set; } = [];
+
+            [Option("preset", Required = true, HelpText = "Preset name or id (matches preset JSON 'name' or 'id').")]
+            public String PresetName { get; set; } = String.Empty;
+
+            [Option("presets-dir", HelpText = "Override presets directory (for development/testing).")]
+            public String? PresetsDirectory { get; set; }
+
+            [Option("output", HelpText = "Output format: table | json | csv.", Default = "table")]
+            public String Output { get; set; } = "table";
+
+            [Option("include-hidden", HelpText = "Include hidden/system files.")]
+            public Boolean IncludeHidden { get; set; }
+
+            [Option("continue-on-preview-errors", HelpText = "Continue even if preview errors exist.")]
+            public Boolean ContinueOnPreviewErrors { get; set; }
+
+            [Option("silent", HelpText = "Only exit code, no output.")]
+            public Boolean Silent { get; set; }
+
+            [Option("verbose", HelpText = "Reserved for future verbose diagnostics.")]
+            public Boolean Verbose { get; set; }
         }
     }
-}
 
+}

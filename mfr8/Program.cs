@@ -1,4 +1,4 @@
 ﻿using Mfr8.Cli;
 
-int exitCode = CliApp.Run(args);
+Int32 exitCode = CliApp.Run(args);
 Environment.Exit(exitCode);
