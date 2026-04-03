@@ -27,7 +27,7 @@ namespace Mfr8.Core
                 {
                     var dir = Path.GetDirectoryName(src);
                     var pattern = Path.GetFileName(src);
-                    dir = string.IsNullOrWhiteSpace(dir) ? Directory.GetCurrentDirectory() : dir!;
+                    dir = string.IsNullOrWhiteSpace(dir) ? Directory.GetCurrentDirectory() : dir;
 
                     if (!Directory.Exists(dir))
                     {
@@ -75,7 +75,7 @@ namespace Mfr8.Core
                 var extension = Path.GetExtension(fullPath); // includes leading '.'
 
                 var folderKey = directoryPath;
-                _ = folderCounts.TryGetValue(folderKey, out var folderOccurrence);
+                var folderOccurrence = folderCounts.GetValueOrDefault(folderKey);
                 folderCounts[folderKey] = folderOccurrence + 1;
 
                 entries.Add(new FileEntryLite(

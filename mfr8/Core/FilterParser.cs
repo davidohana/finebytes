@@ -47,7 +47,7 @@ namespace Mfr8.Core
             };
         }
 
-        private static FilterTarget _ParseTarget(JsonElement targetEl, string filterType)
+        private static FileNameTarget _ParseTarget(JsonElement targetEl, string filterType)
         {
             var familyStr = _GetStringRequired(targetEl, "family");
             if (!string.Equals(familyStr, "FileName", StringComparison.OrdinalIgnoreCase))
@@ -58,10 +58,10 @@ namespace Mfr8.Core
             var modeStr = _GetStringRequired(targetEl, "fileNameMode");
             return !Enum.TryParse(modeStr, ignoreCase: true, out FileNameTargetMode mode)
                 ? throw new InvalidOperationException($"Invalid fileNameMode '{modeStr}' for filter '{filterType}'.")
-                : (FilterTarget)new FileNameTarget(mode);
+                : new FileNameTarget(mode);
         }
 
-        private static Filter _ParseLettersCase(bool enabled, JsonElement targetEl, FilterTarget target, JsonElement optionsEl)
+        private static LettersCaseFilter _ParseLettersCase(bool enabled, JsonElement targetEl, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("LettersCase target must be FileNameTarget.");
 
@@ -87,7 +87,7 @@ namespace Mfr8.Core
             return new LettersCaseFilter(enabled, t, opts);
         }
 
-        private static Filter _ParseSpaceCharacter(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static SpaceCharacterFilter _ParseSpaceCharacter(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("SpaceCharacter target must be FileNameTarget.");
             var replaceSpaceWith = _GetStringRequired(optionsEl, "replaceSpaceWith");
@@ -96,47 +96,47 @@ namespace Mfr8.Core
             return new SpaceCharacterFilter(enabled, t, opts);
         }
 
-        private static Filter _ParseRemoveSpaces(bool enabled, FilterTarget target)
+        private static RemoveSpacesFilter _ParseRemoveSpaces(bool enabled, FilterTarget target)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("RemoveSpaces target must be FileNameTarget.");
             return new RemoveSpacesFilter(enabled, t);
         }
 
-        private static Filter _ParseShrinkSpaces(bool enabled, FilterTarget target)
+        private static ShrinkSpacesFilter _ParseShrinkSpaces(bool enabled, FilterTarget target)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("ShrinkSpaces target must be FileNameTarget.");
             return new ShrinkSpacesFilter(enabled, t);
         }
 
-        private static Filter _ParseTrimLeft(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static TrimLeftFilter _ParseTrimLeft(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("TrimLeft target must be FileNameTarget.");
             var count = _GetIntRequired(optionsEl, "count");
             return new TrimLeftFilter(enabled, t, count);
         }
 
-        private static Filter _ParseTrimRight(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static TrimRightFilter _ParseTrimRight(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("TrimRight target must be FileNameTarget.");
             var count = _GetIntRequired(optionsEl, "count");
             return new TrimRightFilter(enabled, t, count);
         }
 
-        private static Filter _ParseExtractLeft(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static ExtractLeftFilter _ParseExtractLeft(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("ExtractLeft target must be FileNameTarget.");
             var count = _GetIntRequired(optionsEl, "count");
             return new ExtractLeftFilter(enabled, t, count);
         }
 
-        private static Filter _ParseExtractRight(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static ExtractRightFilter _ParseExtractRight(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("ExtractRight target must be FileNameTarget.");
             var count = _GetIntRequired(optionsEl, "count");
             return new ExtractRightFilter(enabled, t, count);
         }
 
-        private static Filter _ParseReplacer(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static ReplacerFilter _ParseReplacer(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("Replacer target must be FileNameTarget.");
             var find = _GetStringRequired(optionsEl, "find");
@@ -155,7 +155,7 @@ namespace Mfr8.Core
             return new ReplacerFilter(enabled, t, opts);
         }
 
-        private static Filter _ParseFormatter(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static FormatterFilter _ParseFormatter(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("Formatter target must be FileNameTarget.");
             var template = _GetStringRequired(optionsEl, "template");
@@ -163,7 +163,7 @@ namespace Mfr8.Core
             return new FormatterFilter(enabled, t, opts);
         }
 
-        private static Filter _ParseCounter(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static CounterFilter _ParseCounter(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("Counter target must be FileNameTarget.");
 
@@ -184,7 +184,7 @@ namespace Mfr8.Core
             return new CounterFilter(enabled, t, opts);
         }
 
-        private static Filter _ParseCleaner(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static CleanerFilter _ParseCleaner(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("Cleaner target must be FileNameTarget.");
             var removeIllegalChars = _GetBoolOrDefault(optionsEl, "removeIllegalChars", true);
@@ -195,7 +195,7 @@ namespace Mfr8.Core
             return new CleanerFilter(enabled, t, opts);
         }
 
-        private static Filter _ParseFixLeadingZeros(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static FixLeadingZerosFilter _ParseFixLeadingZeros(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("FixLeadingZeros target must be FileNameTarget.");
             var width = _GetIntRequired(optionsEl, "width");
@@ -204,7 +204,7 @@ namespace Mfr8.Core
             return new FixLeadingZerosFilter(enabled, t, opts);
         }
 
-        private static Filter _ParseStripParentheses(bool enabled, FilterTarget target, JsonElement optionsEl)
+        private static StripParenthesesFilter _ParseStripParentheses(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("StripParentheses target must be FileNameTarget.");
             var types = _GetStringRequired(optionsEl, "types");

@@ -27,7 +27,7 @@ namespace Mfr8.Cli
 
             var result = parser.ParseArguments<CliArguments>(args);
 
-            result
+            _ = result
                 .WithParsed(a =>
                 {
                     if (!_TryParseOutputFormat(a.Output, out var format))
@@ -43,7 +43,7 @@ namespace Mfr8.Cli
 
                     parsedOptions = new CliOptions(
                         PresetName: a.PresetName,
-                        Sources: a.Sources.ToArray(),
+                        Sources: [.. a.Sources],
                         OutputFormat: format,
                         IncludeHidden: a.IncludeHidden,
                         ContinueOnPreviewErrors: a.ContinueOnPreviewErrors,
@@ -68,8 +68,7 @@ namespace Mfr8.Cli
 
                     // Help requests exit with 0, other errors with 1.
                     localExitCode = errors.Any(e =>
-                            e.Tag == ErrorType.HelpRequestedError ||
-                            e.Tag == ErrorType.HelpVerbRequestedError)
+                            e is { Tag: ErrorType.HelpRequestedError or ErrorType.HelpVerbRequestedError })
                         ? 0
                         : 1;
                 });

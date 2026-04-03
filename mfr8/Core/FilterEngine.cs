@@ -257,7 +257,7 @@ namespace Mfr8.Core
             }
 
             var lower = input.ToLowerInvariant();
-            return Regex.Replace(lower, @"(^|[.!?]\s+)([a-z])", m =>
+            return _SentenceCaseRegex().Replace(lower, m =>
             {
                 // Keep punctuation group as-is, uppercase the following letter.
                 var prefix = m.Groups[1].Value;
@@ -379,7 +379,7 @@ namespace Mfr8.Core
         {
             return options.Width <= 0
                 ? input
-                : Regex.Replace(input, @"\d+", m =>
+                : _DigitsRegex().Replace(input, m =>
             {
                 var digits = m.Value;
                 if (options.RemoveExtraZeros)
@@ -426,25 +426,25 @@ namespace Mfr8.Core
                 if (open == '(' && close == ')')
                 {
                     res = options.RemoveContents
-                        ? Regex.Replace(res, @"\([^)]*\)", "")
+                        ? _RoundParenRegex().Replace(res, "")
                         : res.Replace("(", "").Replace(")", "");
                 }
                 else if (open == '[' && close == ']')
                 {
                     res = options.RemoveContents
-                        ? Regex.Replace(res, @"\[[^\]]*\]", "")
+                        ? _SquareParenRegex().Replace(res, "")
                         : res.Replace("[", "").Replace("]", "");
                 }
                 else if (open == '{' && close == '}')
                 {
                     res = options.RemoveContents
-                        ? Regex.Replace(res, @"\{[^}]*\}", "")
+                        ? _CurlyParenRegex().Replace(res, "")
                         : res.Replace("{", "").Replace("}", "");
                 }
                 else if (open == '<' && close == '>')
                 {
                     res = options.RemoveContents
-                        ? Regex.Replace(res, @"<[^>]*>", "")
+                        ? _AngleParenRegex().Replace(res, "")
                         : res.Replace("<", "").Replace(">", "");
                 }
             }
@@ -537,6 +537,18 @@ namespace Mfr8.Core
         private static partial Regex MyRegex();
         [GeneratedRegex(@"\b[0-9A-Za-z']+\b")]
         private static partial Regex MyRegex1();
+        [GeneratedRegex(@"(^|[.!?]\s+)([a-z])")]
+        private static partial Regex _SentenceCaseRegex();
+        [GeneratedRegex(@"\d+")]
+        private static partial Regex _DigitsRegex();
+        [GeneratedRegex(@"\([^)]*\)")]
+        private static partial Regex _RoundParenRegex();
+        [GeneratedRegex(@"\[[^\]]*\]")]
+        private static partial Regex _SquareParenRegex();
+        [GeneratedRegex(@"\{[^}]*\}")]
+        private static partial Regex _CurlyParenRegex();
+        [GeneratedRegex(@"<[^>]*>")]
+        private static partial Regex _AngleParenRegex();
     }
 
 }
