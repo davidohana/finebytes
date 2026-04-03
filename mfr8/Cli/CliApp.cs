@@ -15,9 +15,11 @@ public static class CliApp
     /// <returns>The process exit code.</returns>
     public static int Run(string[] args)
     {
-        var root = CliCommandFactory.CreateRootCommand(_Execute);
-        var parseResult = root.Parse(args);
-        return parseResult.InvokeAsync().GetAwaiter().GetResult();
+        var options = CliCommandFactory.ParseArgs(args, out var exitCode);
+        if (options is null)
+            return exitCode;
+
+        return _Execute(options);
     }
 
     private static int _Execute(CliOptions options)
@@ -34,7 +36,7 @@ public static class CliApp
         catch (Exception ex)
         {
             Console.Error.WriteLine(ex.Message);
-            return 3;
+            return 1;
         }
 
         IReadOnlyList<FileEntryLite> files;
@@ -45,13 +47,13 @@ public static class CliApp
         catch (Exception ex)
         {
             Console.Error.WriteLine(ex.Message);
-            return 2;
+            return 1;
         }
 
         if (files.Count == 0)
         {
             Console.Error.WriteLine("No files matched the provided sources.");
-            return 2;
+            return 1;
         }
 
         var result = FilterEngine.PreviewAndCommit(
@@ -63,7 +65,7 @@ public static class CliApp
             _PrintResult(result, options.OutputFormat);
 
         if (result.Errors > 0 && !options.ContinueOnPreviewErrors)
-            return 4;
+            return 1;
 
         return 0;
     }

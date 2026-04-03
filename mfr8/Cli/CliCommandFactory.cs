@@ -7,11 +7,12 @@ namespace Mfr8.Cli;
 internal static class CliCommandFactory
 {
     /// <summary>
-    /// Creates and configures the root <see cref="RootCommand"/> for the CLI.
+    /// Parses command-line arguments into <see cref="CliOptions"/>, or returns a process exit code for help/errors.
     /// </summary>
-    /// <param name="execute">Callback that receives parsed <see cref="CliOptions"/> and returns an exit code.</param>
-    /// <returns>A configured <see cref="RootCommand"/> instance.</returns>
-    public static RootCommand CreateRootCommand(Func<CliOptions, int> execute)
+    /// <param name="args">Command-line arguments.</param>
+    /// <param name="exitCode">Exit code when parsing cannot produce options (help or error).</param>
+    /// <returns>Parsed <see cref="CliOptions"/> on success; otherwise <c>null</c>.</returns>
+    public static CliOptions? ParseArgs(string[] args, out int exitCode)
     {
         var presetOption = new Option<string>("--preset")
         {
@@ -61,44 +62,49 @@ internal static class CliCommandFactory
         root.Add(verboseOption);
         root.Add(sourcesArgument);
 
-        root.SetAction(parseResult =>
+        var parseResult = root.Parse(args);
+        if (parseResult.Errors.Count > 0)
         {
-            var preset = parseResult.GetValue(presetOption);
-            var sources = parseResult.GetValue(sourcesArgument);
-            var output = parseResult.GetValue(outputOption) ?? "table";
-            var presetsDir = parseResult.GetValue(presetsDirOption) ?? PresetLoader.DefaultPresetsDirectory();
+            foreach (var error in parseResult.Errors)
+                Console.Error.WriteLine(error.Message);
+            exitCode = 1;
+            return null;
+        }
 
-            var includeHidden = parseResult.GetValue(includeHiddenOption);
-            var continueOnPreviewErrors = parseResult.GetValue(continueOption);
-            var silent = parseResult.GetValue(silentOption);
-            var verbose = parseResult.GetValue(verboseOption);
+        var preset = parseResult.GetValue(presetOption);
+        var sources = parseResult.GetValue(sourcesArgument);
+        var output = parseResult.GetValue(outputOption) ?? "table";
+        var presetsDir = parseResult.GetValue(presetsDirOption) ?? PresetLoader.DefaultPresetsDirectory();
 
-            if (string.IsNullOrWhiteSpace(preset))
-            {
-                Console.Error.WriteLine("Missing required option: --preset.");
-                return 1;
-            }
+        var includeHidden = parseResult.GetValue(includeHiddenOption);
+        var continueOnPreviewErrors = parseResult.GetValue(continueOption);
+        var silent = parseResult.GetValue(silentOption);
+        var verbose = parseResult.GetValue(verboseOption);
 
-            if (!_TryParseOutputFormat(output, out var outFormat))
-            {
-                Console.Error.WriteLine($"Unknown output '{output}'. Use table|json|csv.");
-                return 1;
-            }
+        if (string.IsNullOrWhiteSpace(preset))
+        {
+            Console.Error.WriteLine("Missing required option: --preset.");
+            exitCode = 1;
+            return null;
+        }
 
-            var options = new CliOptions(
-                PresetName: preset,
-                Sources: sources ?? Array.Empty<string>(),
-                OutputFormat: outFormat,
-                IncludeHidden: includeHidden,
-                ContinueOnPreviewErrors: continueOnPreviewErrors,
-                Silent: silent,
-                Verbose: verbose,
-                PresetsDirectory: presetsDir);
+        if (!_TryParseOutputFormat(output, out var outFormat))
+        {
+            Console.Error.WriteLine($"Unknown output '{output}'. Use table|json|csv.");
+            exitCode = 1;
+            return null;
+        }
 
-            return execute(options);
-        });
-
-        return root;
+        exitCode = 0;
+        return new CliOptions(
+            PresetName: preset,
+            Sources: sources ?? Array.Empty<string>(),
+            OutputFormat: outFormat,
+            IncludeHidden: includeHidden,
+            ContinueOnPreviewErrors: continueOnPreviewErrors,
+            Silent: silent,
+            Verbose: verbose,
+            PresetsDirectory: presetsDir);
     }
 
     private static bool _TryParseOutputFormat(string? value, out OutputFormat format)
