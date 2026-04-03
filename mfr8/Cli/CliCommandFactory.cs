@@ -16,28 +16,25 @@ namespace Mfr8.Cli
         /// <exception cref="ArgumentException">Thrown when argument parsing cannot produce options.</exception>
         public static CliOptions ParseArgs(string[] args)
         {
+            var normalizedArgs = args.Length == 0 ? ["-h"] : args;
+
             var parser = new Parser(settings =>
             {
                 // We control help / error output via HelpText.
                 settings.HelpWriter = null;
             });
 
-            var result = parser.ParseArguments<CliArguments>(args);
-            CliOptions? parsedOptions = null;
+            var result = parser.ParseArguments<CliArguments>(normalizedArgs);
+            return result.MapResult(_MapParsed, _MapNotParsed);
 
-            _ = result
-                .WithParsed(_HandleParsed)
-                .WithNotParsed(_HandleNotParsed);
-
-            return parsedOptions ?? throw new ArgumentException("Failed to parse arguments.");
-
-            void _HandleParsed(CliArguments parsedArgs)
+            static CliOptions _MapParsed(CliArguments parsedArgs)
             {
-                parsedOptions = parsedArgs.ToOptions();
+                return parsedArgs.ToOptions();
             }
 
-            void _HandleNotParsed(IEnumerable<Error> errors)
+            CliOptions _MapNotParsed(IEnumerable<Error> errors)
             {
+                _ = errors;
                 var helpText = HelpText.AutoBuild(result, h =>
                 {
                     h.Heading = "mfr8 - Magic File Renamer";
@@ -47,7 +44,6 @@ namespace Mfr8.Cli
                 },
                 e => e);
 
-                _ = errors;
                 throw new ArgumentException(helpText);
             }
         }
