@@ -10,14 +10,14 @@ namespace Mfr8.Core
         /// <param name="includeHidden">If <c>true</c>, includes hidden/system files.</param>
         /// <returns>A list of files represented as <see cref="FileEntryLite"/>.</returns>
         public static IReadOnlyList<FileEntryLite> ScanSources(
-            IEnumerable<String> sources,
-            Boolean includeHidden)
+            IEnumerable<string> sources,
+            bool includeHidden)
         {
-            var results = new List<String>();
+            var results = new List<string>();
 
-            foreach (String raw in sources)
+            foreach (var raw in sources)
             {
-                String src = raw.Trim();
+                var src = raw.Trim();
                 if (src.Length == 0)
                 {
                     continue;
@@ -25,9 +25,9 @@ namespace Mfr8.Core
 
                 if (src.Contains('*') || src.Contains('?'))
                 {
-                    String? dir = Path.GetDirectoryName(src);
-                    String pattern = Path.GetFileName(src);
-                    dir = String.IsNullOrWhiteSpace(dir) ? Directory.GetCurrentDirectory() : dir!;
+                    var dir = Path.GetDirectoryName(src);
+                    var pattern = Path.GetFileName(src);
+                    dir = string.IsNullOrWhiteSpace(dir) ? Directory.GetCurrentDirectory() : dir!;
 
                     if (!Directory.Exists(dir))
                     {
@@ -55,13 +55,13 @@ namespace Mfr8.Core
 
             results = [.. results.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(p => p, StringComparer.OrdinalIgnoreCase)];
 
-            var folderCounts = new Dictionary<String, Int32>(StringComparer.OrdinalIgnoreCase);
+            var folderCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             var entries = new List<FileEntryLite>(results.Count);
 
-            for (Int32 i = 0; i < results.Count; i++)
+            for (var i = 0; i < results.Count; i++)
             {
-                String fullPath = results[i];
-                FileAttributes attrs = File.GetAttributes(fullPath);
+                var fullPath = results[i];
+                var attrs = File.GetAttributes(fullPath);
                 if (!includeHidden)
                 {
                     if (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System))
@@ -70,12 +70,12 @@ namespace Mfr8.Core
                     }
                 }
 
-                String directoryPath = Path.GetDirectoryName(fullPath) ?? "";
-                String prefix = Path.GetFileNameWithoutExtension(fullPath);
-                String extension = Path.GetExtension(fullPath); // includes leading '.'
+                var directoryPath = Path.GetDirectoryName(fullPath) ?? "";
+                var prefix = Path.GetFileNameWithoutExtension(fullPath);
+                var extension = Path.GetExtension(fullPath); // includes leading '.'
 
-                String folderKey = directoryPath;
-                _ = folderCounts.TryGetValue(folderKey, out Int32 folderOccurrence);
+                var folderKey = directoryPath;
+                _ = folderCounts.TryGetValue(folderKey, out var folderOccurrence);
                 folderCounts[folderKey] = folderOccurrence + 1;
 
                 entries.Add(new FileEntryLite(

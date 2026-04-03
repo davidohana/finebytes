@@ -5,8 +5,8 @@ namespace Mfr8.Core
     public sealed record FilterPreset
     {
         public required Guid Id { get; init; }
-        public required String Name { get; init; }
-        public String? Description { get; init; }
+        public required string Name { get; init; }
+        public string? Description { get; init; }
         public required IReadOnlyList<Filter> Filters { get; init; }
     }
 
@@ -46,14 +46,14 @@ namespace Mfr8.Core
         public override FilterTargetFamily Family => FilterTargetFamily.FileName;
     }
 
-    public abstract record Filter(Boolean Enabled, FilterTarget Target)
+    public abstract record Filter(bool Enabled, FilterTarget Target)
     {
-        public abstract String Type { get; }
+        public abstract string Type { get; }
     }
 
     public sealed record LettersCaseOptions(
         LettersCaseMode Mode,
-        IReadOnlyList<String> SkipWords);
+        IReadOnlyList<string> SkipWords);
 
     public enum LettersCaseMode
     {
@@ -65,69 +65,69 @@ namespace Mfr8.Core
     }
 
     public sealed record LettersCaseFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
         LettersCaseOptions Options) : Filter(Enabled, Target)
     {
-        public override String Type => "LettersCase";
+        public override string Type => "LettersCase";
     }
 
     public sealed record SpaceCharacterOptions(
-        String ReplaceSpaceWith,
-        String ReplaceCharWithSpace);
+        string ReplaceSpaceWith,
+        string ReplaceCharWithSpace);
 
     public sealed record SpaceCharacterFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
         SpaceCharacterOptions Options) : Filter(Enabled, Target)
     {
-        public override String Type => "SpaceCharacter";
+        public override string Type => "SpaceCharacter";
     }
 
     public sealed record RemoveSpacesFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target) : Filter(Enabled, Target)
     {
-        public override String Type => "RemoveSpaces";
+        public override string Type => "RemoveSpaces";
     }
 
     public sealed record ShrinkSpacesFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target) : Filter(Enabled, Target)
     {
-        public override String Type => "ShrinkSpaces";
+        public override string Type => "ShrinkSpaces";
     }
 
     public sealed record TrimLeftFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
-        Int32 Count) : Filter(Enabled, Target)
+        int Count) : Filter(Enabled, Target)
     {
-        public override String Type => "TrimLeft";
+        public override string Type => "TrimLeft";
     }
 
     public sealed record TrimRightFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
-        Int32 Count) : Filter(Enabled, Target)
+        int Count) : Filter(Enabled, Target)
     {
-        public override String Type => "TrimRight";
+        public override string Type => "TrimRight";
     }
 
     public sealed record ExtractLeftFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
-        Int32 Count) : Filter(Enabled, Target)
+        int Count) : Filter(Enabled, Target)
     {
-        public override String Type => "ExtractLeft";
+        public override string Type => "ExtractLeft";
     }
 
     public sealed record ExtractRightFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
-        Int32 Count) : Filter(Enabled, Target)
+        int Count) : Filter(Enabled, Target)
     {
-        public override String Type => "ExtractRight";
+        public override string Type => "ExtractRight";
     }
 
     public enum ReplacerMode
@@ -138,29 +138,29 @@ namespace Mfr8.Core
     }
 
     public sealed record ReplacerOptions(
-        String Find,
-        String Replacement,
+        string Find,
+        string Replacement,
         ReplacerMode Mode,
-        Boolean CaseSensitive,
-        Boolean ReplaceAll,
-        Boolean WholeWord);
+        bool CaseSensitive,
+        bool ReplaceAll,
+        bool WholeWord);
 
     public sealed record ReplacerFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
         ReplacerOptions Options) : Filter(Enabled, Target)
     {
-        public override String Type => "Replacer";
+        public override string Type => "Replacer";
     }
 
-    public sealed record FormatterOptions(String Template);
+    public sealed record FormatterOptions(string Template);
 
     public sealed record FormatterFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
         FormatterOptions Options) : Filter(Enabled, Target)
     {
-        public override String Type => "Formatter";
+        public override string Type => "Formatter";
     }
 
     public enum CounterPosition
@@ -171,68 +171,68 @@ namespace Mfr8.Core
     }
 
     public sealed record CounterOptions(
-        Int32 Start,
-        Int32 Step,
-        Int32 Width,
-        String PadChar,
+        int Start,
+        int Step,
+        int Width,
+        string PadChar,
         CounterPosition Position,
-        String Separator,
-        Boolean ResetPerFolder);
+        string Separator,
+        bool ResetPerFolder);
 
     public sealed record CounterFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
         CounterOptions Options) : Filter(Enabled, Target)
     {
-        public override String Type => "Counter";
+        public override string Type => "Counter";
     }
 
     public sealed record CleanerOptions(
-        Boolean RemoveIllegalChars,
-        String IllegalCharReplacement,
-        String CustomCharsToRemove,
-        String CustomReplacement);
+        bool RemoveIllegalChars,
+        string IllegalCharReplacement,
+        string CustomCharsToRemove,
+        string CustomReplacement);
 
     public sealed record CleanerFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
         CleanerOptions Options) : Filter(Enabled, Target)
     {
-        public override String Type => "Cleaner";
+        public override string Type => "Cleaner";
     }
 
     public sealed record FixLeadingZerosOptions(
-        Int32 Width,
-        Boolean RemoveExtraZeros);
+        int Width,
+        bool RemoveExtraZeros);
 
     public sealed record FixLeadingZerosFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
         FixLeadingZerosOptions Options) : Filter(Enabled, Target)
     {
-        public override String Type => "FixLeadingZeros";
+        public override string Type => "FixLeadingZeros";
     }
 
     public sealed record StripParenthesesOptions(
-        String Types,
-        Boolean RemoveContents);
+        string Types,
+        bool RemoveContents);
 
     public sealed record StripParenthesesFilter(
-        Boolean Enabled,
+        bool Enabled,
         FilterTarget Target,
         StripParenthesesOptions Options) : Filter(Enabled, Target)
     {
-        public override String Type => "StripParentheses";
+        public override string Type => "StripParentheses";
     }
 
     public enum OutputFormat { Table, Json, Csv }
 
     public sealed record FileEntryLite(
-        Int32 GlobalIndex,
-        Int32 FolderOccurrenceIndex,
-        String FullPath,
-        String DirectoryPath,
-        String Prefix,
-        String Extension);
+        int GlobalIndex,
+        int FolderOccurrenceIndex,
+        string FullPath,
+        string DirectoryPath,
+        string Prefix,
+        string Extension);
 
 }

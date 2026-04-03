@@ -11,10 +11,10 @@ namespace Mfr8.Cli
         /// <param name="args">Command-line arguments.</param>
         /// <param name="exitCode">Exit code when parsing cannot produce options (help or error).</param>
         /// <returns>Parsed <see cref="CliOptions"/> on success; otherwise <c>null</c>.</returns>
-        public static CliOptions? ParseArgs(String[] args, out Int32 exitCode)
+        public static CliOptions? ParseArgs(string[] args, out int exitCode)
         {
             CliOptions? parsedOptions = null;
-            Int32 localExitCode = 0;
+            var localExitCode = 0;
 
             var parser = new Parser(settings =>
             {
@@ -27,14 +27,14 @@ namespace Mfr8.Cli
             result
                 .WithParsed(a =>
                 {
-                    if (!_TryParseOutputFormat(a.Output, out OutputFormat format))
+                    if (!_TryParseOutputFormat(a.Output, out var format))
                     {
                         Console.Error.WriteLine($"Unknown output '{a.Output}'. Use table|json|csv.");
                         localExitCode = 1;
                         return;
                     }
 
-                    var presetsDir = String.IsNullOrWhiteSpace(a.PresetsDirectory)
+                    var presetsDir = string.IsNullOrWhiteSpace(a.PresetsDirectory)
                         ? PresetLoader.DefaultPresetsDirectory()
                         : a.PresetsDirectory;
 
@@ -75,10 +75,10 @@ namespace Mfr8.Cli
             return parsedOptions;
         }
 
-        private static Boolean _TryParseOutputFormat(String? value, out OutputFormat format)
+        private static bool _TryParseOutputFormat(string? value, out OutputFormat format)
         {
             format = default;
-            if (String.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(value))
             {
                 return false;
             }
@@ -102,28 +102,28 @@ namespace Mfr8.Cli
         private sealed class CliArguments
         {
             [Value(0, MetaName = "sources", Required = true, HelpText = "Files, folders, or wildcards to rename (e.g. C:\\Music\\*.mp3).")]
-            public IEnumerable<String> Sources { get; set; } = [];
+            public IEnumerable<string> Sources { get; set; } = [];
 
             [Option("preset", Required = true, HelpText = "Preset name or id (matches preset JSON 'name' or 'id').")]
-            public String PresetName { get; set; } = String.Empty;
+            public string PresetName { get; set; } = string.Empty;
 
             [Option("presets-dir", HelpText = "Override presets directory (for development/testing).")]
-            public String? PresetsDirectory { get; set; }
+            public string? PresetsDirectory { get; set; }
 
             [Option("output", HelpText = "Output format: table | json | csv.", Default = "table")]
-            public String Output { get; set; } = "table";
+            public string Output { get; set; } = "table";
 
             [Option("include-hidden", HelpText = "Include hidden/system files.")]
-            public Boolean IncludeHidden { get; set; }
+            public bool IncludeHidden { get; set; }
 
             [Option("continue-on-preview-errors", HelpText = "Continue even if preview errors exist.")]
-            public Boolean ContinueOnPreviewErrors { get; set; }
+            public bool ContinueOnPreviewErrors { get; set; }
 
             [Option("silent", HelpText = "Only exit code, no output.")]
-            public Boolean Silent { get; set; }
+            public bool Silent { get; set; }
 
             [Option("verbose", HelpText = "Reserved for future verbose diagnostics.")]
-            public Boolean Verbose { get; set; }
+            public bool Verbose { get; set; }
         }
     }
 

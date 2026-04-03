@@ -11,18 +11,18 @@ namespace Mfr8.Core
     }
 
     public sealed record RenameResultItem(
-        String OriginalPath,
-        String ResultPath,
+        string OriginalPath,
+        string ResultPath,
         RenameStatus Status,
-        String? Error);
+        string? Error);
 
     public sealed record RenameBatchResult(
-        String PresetName,
-        Int32 TotalFiles,
-        Int32 Renamed,
-        Int32 Skipped,
-        Int32 Conflicts,
-        Int32 Errors,
+        string PresetName,
+        int TotalFiles,
+        int Renamed,
+        int Skipped,
+        int Conflicts,
+        int Errors,
         IReadOnlyList<RenameResultItem> Results);
 
     public static partial class FilterEngine
@@ -37,22 +37,22 @@ namespace Mfr8.Core
         public static RenameBatchResult PreviewAndCommit(
             FilterPreset preset,
             IReadOnlyList<FileEntryLite> files,
-            Boolean continueOnErrors)
+            bool continueOnErrors)
         {
             // Phase 1: Conflict strategy is `Skip` (no auto-number, no overwrite).
             var previewResults = new List<RenameResultItem>(files.Count);
-            var pending = new List<(FileEntryLite file, String destPath)>(files.Count);
+            var pending = new List<(FileEntryLite file, string destPath)>(files.Count);
 
             // 1) Preview and compute destinations (or preview errors).
-            foreach (FileEntryLite file in files)
+            foreach (var file in files)
             {
                 try
                 {
-                    (String? prefix, String? extension) = _ApplyFiltersToName(preset.Filters, file);
-                    String finalFileName = prefix + extension;
-                    String destPath = Path.Combine(file.DirectoryPath, finalFileName);
+                    (var prefix, var extension) = _ApplyFiltersToName(preset.Filters, file);
+                    var finalFileName = prefix + extension;
+                    var destPath = Path.Combine(file.DirectoryPath, finalFileName);
 
-                    if (String.Equals(destPath, file.FullPath, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(destPath, file.FullPath, StringComparison.OrdinalIgnoreCase))
                     {
                         previewResults.Add(new RenameResultItem(file.FullPath, destPath, RenameStatus.Skipped, null));
                         continue;
@@ -82,8 +82,8 @@ namespace Mfr8.Core
                 .Where(g => g.Count() > 1)
                 .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
 
-            var conflictDestinations = new HashSet<String>(StringComparer.OrdinalIgnoreCase);
-            foreach ((FileEntryLite? file, String? destPath) in pending)
+            var conflictDestinations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach ((var file, var destPath) in pending)
             {
                 if (File.Exists(destPath))
                 {
@@ -97,16 +97,16 @@ namespace Mfr8.Core
             }
 
             // 3) Commit non-conflicting renames.
-            Int32 renamedCount = 0;
-            var resultIndex = new Dictionary<String, Int32>(StringComparer.OrdinalIgnoreCase);
-            for (Int32 i = 0; i < previewResults.Count; i++)
+            var renamedCount = 0;
+            var resultIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (var i = 0; i < previewResults.Count; i++)
             {
                 resultIndex[previewResults[i].OriginalPath] = i;
             }
 
-            foreach ((FileEntryLite? file, String? destPath) in pending)
+            foreach ((var file, var destPath) in pending)
             {
-                Int32 idx = resultIndex[file.FullPath];
+                var idx = resultIndex[file.FullPath];
                 if (conflictDestinations.Contains(destPath))
                 {
                     previewResults[idx] = new RenameResultItem(file.FullPath, destPath, RenameStatus.ConflictSkipped, null);
@@ -133,24 +133,24 @@ namespace Mfr8.Core
         }
 
         private static RenameBatchResult _Summarize(
-            String presetName,
-            Int32 totalFiles,
+            string presetName,
+            int totalFiles,
             IReadOnlyList<RenameResultItem> results,
-            Int32 renamedCount = 0)
+            int renamedCount = 0)
         {
-            Int32 renamed = results.Count(r => r.Status == RenameStatus.Ok);
-            Int32 skipped = results.Count(r => r.Status == RenameStatus.Skipped);
-            Int32 conflicts = results.Count(r => r.Status == RenameStatus.ConflictSkipped);
-            Int32 errors = results.Count(r => r.Status == RenameStatus.Error);
+            var renamed = results.Count(r => r.Status == RenameStatus.Ok);
+            var skipped = results.Count(r => r.Status == RenameStatus.Skipped);
+            var conflicts = results.Count(r => r.Status == RenameStatus.ConflictSkipped);
+            var errors = results.Count(r => r.Status == RenameStatus.Error);
             return new RenameBatchResult(presetName, totalFiles, renamed, skipped, conflicts, errors, results);
         }
 
-        private static (String prefix, String extension) _ApplyFiltersToName(IReadOnlyList<Filter> filters, FileEntryLite file)
+        private static (string prefix, string extension) _ApplyFiltersToName(IReadOnlyList<Filter> filters, FileEntryLite file)
         {
-            String prefix = file.Prefix;
-            String extension = file.Extension;
+            var prefix = file.Prefix;
+            var extension = file.Extension;
 
-            foreach (Filter filter in filters)
+            foreach (var filter in filters)
             {
                 if (!filter.Enabled)
                 {
@@ -162,8 +162,8 @@ namespace Mfr8.Core
                     throw new NotSupportedException($"Phase 1 only supports target.family='FileName'. Filter '{filter.Type}' got '{filter.Target.Family}'.");
                 }
 
-                FileNameTargetMode mode = fileTarget.FileNameMode;
-                String segment = mode switch
+                var mode = fileTarget.FileNameMode;
+                var segment = mode switch
                 {
                     FileNameTargetMode.Prefix => prefix,
                     FileNameTargetMode.Extension => extension,
@@ -171,7 +171,7 @@ namespace Mfr8.Core
                     _ => throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.")
                 };
 
-                String transformed = _ApplySingleFilter(filter, segment, file, prefix, extension);
+                var transformed = _ApplySingleFilter(filter, segment, file, prefix, extension);
 
                 switch (mode)
                 {
@@ -182,7 +182,7 @@ namespace Mfr8.Core
                         extension = transformed;
                         break;
                     case FileNameTargetMode.Full:
-                        String fullName = Path.GetFileName(transformed);
+                        var fullName = Path.GetFileName(transformed);
                         extension = Path.GetExtension(fullName);
                         prefix = Path.GetFileNameWithoutExtension(fullName);
                         break;
@@ -194,7 +194,7 @@ namespace Mfr8.Core
             return (prefix, extension);
         }
 
-        private static String _ApplySingleFilter(Filter filter, String segment, FileEntryLite file, String currentPrefix, String currentExtension)
+        private static string _ApplySingleFilter(Filter filter, string segment, FileEntryLite file, string currentPrefix, string currentExtension)
         {
             return filter switch
             {
@@ -216,7 +216,7 @@ namespace Mfr8.Core
             };
         }
 
-        private static String _ApplyLettersCase(String input, LettersCaseOptions options)
+        private static string _ApplyLettersCase(string input, LettersCaseOptions options)
         {
             // Phase 1 only requires reasonable correctness, not perfect linguistics.
             return options.Mode switch
@@ -230,64 +230,64 @@ namespace Mfr8.Core
             };
         }
 
-        private static String _ApplyTitleCase(String input, IReadOnlyList<String> skipWords)
+        private static string _ApplyTitleCase(string input, IReadOnlyList<string> skipWords)
         {
             if (input.Length == 0)
             {
                 return input;
             }
 
-            var skip = new HashSet<String>(skipWords, StringComparer.OrdinalIgnoreCase);
+            var skip = new HashSet<string>(skipWords, StringComparer.OrdinalIgnoreCase);
 
             // Capitalize word starts and lowercase the rest.
-            return Regex.Replace(input, @"\b[0-9A-Za-z']+\b", m =>
+            return MyRegex1().Replace(input, m =>
             {
-                String word = m.Value;
+                var word = m.Value;
                 return skip.Contains(word)
                     ? word.ToLowerInvariant()
-                    : word.Length == 1 ? word.ToUpperInvariant() : Char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant();
+                    : word.Length == 1 ? word.ToUpperInvariant() : char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant();
             });
         }
 
-        private static String _ApplySentenceCase(String input)
+        private static string _ApplySentenceCase(string input)
         {
-            if (String.IsNullOrEmpty(input))
+            if (string.IsNullOrEmpty(input))
             {
                 return input;
             }
 
-            String lower = input.ToLowerInvariant();
+            var lower = input.ToLowerInvariant();
             return Regex.Replace(lower, @"(^|[.!?]\s+)([a-z])", m =>
             {
                 // Keep punctuation group as-is, uppercase the following letter.
-                String prefix = m.Groups[1].Value;
-                String ch = m.Groups[2].Value;
+                var prefix = m.Groups[1].Value;
+                var ch = m.Groups[2].Value;
                 return prefix + ch.ToUpperInvariant();
             });
         }
 
-        private static String _InvertCase(String input)
+        private static string _InvertCase(string input)
         {
-            Char[] chars = input.ToCharArray();
-            for (Int32 i = 0; i < chars.Length; i++)
+            var chars = input.ToCharArray();
+            for (var i = 0; i < chars.Length; i++)
             {
-                if (Char.IsUpper(chars[i]))
+                if (char.IsUpper(chars[i]))
                 {
-                    chars[i] = Char.ToLowerInvariant(chars[i]);
+                    chars[i] = char.ToLowerInvariant(chars[i]);
                 }
-                else if (Char.IsLower(chars[i]))
+                else if (char.IsLower(chars[i]))
                 {
-                    chars[i] = Char.ToUpperInvariant(chars[i]);
+                    chars[i] = char.ToUpperInvariant(chars[i]);
                 }
             }
-            return new String(chars);
+            return new string(chars);
         }
 
-        private static String _ApplyReplacer(String input, ReplacerOptions options)
+        private static string _ApplyReplacer(string input, ReplacerOptions options)
         {
-            RegexOptions regexOptions = options.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+            var regexOptions = options.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
 
-            String pattern = options.Mode switch
+            var pattern = options.Mode switch
             {
                 ReplacerMode.Literal => Regex.Escape(options.Find),
                 ReplacerMode.Wildcard => _WildcardToRegex(options.Find),
@@ -313,11 +313,11 @@ namespace Mfr8.Core
             return regex.Replace(input, options.Replacement, 1);
         }
 
-        private static String _WildcardToRegex(String wildcard)
+        private static string _WildcardToRegex(string wildcard)
         {
             // Convert '*' -> '.*', '?' -> '.', and escape everything else.
             var sb = new System.Text.StringBuilder();
-            foreach (Char ch in wildcard)
+            foreach (var ch in wildcard)
             {
                 _ = sb.Append(ch switch
                 {
@@ -329,20 +329,20 @@ namespace Mfr8.Core
             return sb.ToString();
         }
 
-        private static String _ApplyCounter(String currentSegment, FileEntryLite file, CounterOptions options)
+        private static string _ApplyCounter(string currentSegment, FileEntryLite file, CounterOptions options)
         {
-            Int32 n = options.ResetPerFolder ? file.FolderOccurrenceIndex : file.GlobalIndex;
-            Int64 value = options.Start + ((Int64)options.Step * n);
+            var n = options.ResetPerFolder ? file.FolderOccurrenceIndex : file.GlobalIndex;
+            var value = options.Start + ((long)options.Step * n);
 
-            Char pad = options.PadChar switch
+            var pad = options.PadChar switch
             {
                 "0" => '0',
                 "1" => ' ',
-                _ => String.IsNullOrEmpty(options.PadChar) ? '0' : options.PadChar[0]
+                _ => string.IsNullOrEmpty(options.PadChar) ? '0' : options.PadChar[0]
             };
 
-            String raw = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
-            String formatted = options.Width > 0 ? raw.PadLeft(options.Width, pad) : raw;
+            var raw = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var formatted = options.Width > 0 ? raw.PadLeft(options.Width, pad) : raw;
 
             return options.Position switch
             {
@@ -353,20 +353,20 @@ namespace Mfr8.Core
             };
         }
 
-        private static String _ApplyCleaner(String input, CleanerOptions options)
+        private static string _ApplyCleaner(string input, CleanerOptions options)
         {
-            String res = input;
+            var res = input;
             if (options.RemoveIllegalChars)
             {
-                foreach (Char c in Path.GetInvalidFileNameChars())
+                foreach (var c in Path.GetInvalidFileNameChars())
                 {
                     res = res.Replace(c.ToString(), options.IllegalCharReplacement);
                 }
             }
 
-            if (!String.IsNullOrEmpty(options.CustomCharsToRemove))
+            if (!string.IsNullOrEmpty(options.CustomCharsToRemove))
             {
-                foreach (Char c in options.CustomCharsToRemove)
+                foreach (var c in options.CustomCharsToRemove)
                 {
                     res = res.Replace(c.ToString(), options.CustomReplacement);
                 }
@@ -375,13 +375,13 @@ namespace Mfr8.Core
             return res;
         }
 
-        private static String _FixLeadingZeros(String input, FixLeadingZerosOptions options)
+        private static string _FixLeadingZeros(string input, FixLeadingZerosOptions options)
         {
             return options.Width <= 0
                 ? input
                 : Regex.Replace(input, @"\d+", m =>
             {
-                String digits = m.Value;
+                var digits = m.Value;
                 if (options.RemoveExtraZeros)
                 {
                     digits = digits.TrimStart('0');
@@ -396,10 +396,10 @@ namespace Mfr8.Core
             });
         }
 
-        private static String _StripParentheses(String input, StripParenthesesOptions options)
+        private static string _StripParentheses(string input, StripParenthesesOptions options)
         {
-            var pairs = new List<(Char open, Char close)>();
-            foreach (String token in options.Types.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+            var pairs = new List<(char open, char close)>();
+            foreach (var token in options.Types.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
             {
                 switch (token.Trim())
                 {
@@ -420,8 +420,8 @@ namespace Mfr8.Core
                 }
             }
 
-            String res = input;
-            foreach ((Char open, Char close) in pairs)
+            var res = input;
+            foreach ((var open, var close) in pairs)
             {
                 if (open == '(' && close == ')')
                 {
@@ -452,7 +452,7 @@ namespace Mfr8.Core
             return res;
         }
 
-        private static void _CommitMove(String sourcePath, String destPath)
+        private static void _CommitMove(string sourcePath, string destPath)
         {
             // Keep it simple for phase 1: try Move first, fallback to Copy+Delete.
             try
@@ -467,9 +467,9 @@ namespace Mfr8.Core
             }
         }
 
-        private sealed class TokenFormatter
+        private sealed partial class TokenFormatter
         {
-            private static readonly Regex TokenRegex = new(@"<([^<>]+)>", RegexOptions.Compiled);
+            private static readonly Regex TokenRegex = MyRegex();
 
             /// <summary>
             /// Expands formatter tokens in <paramref name="template"/> for a given <paramref name="file"/>.
@@ -477,16 +477,16 @@ namespace Mfr8.Core
             /// <param name="template">The formatter template containing tokens like <c>&lt;file-name&gt;</c>.</param>
             /// <param name="file">The file being renamed (provides token values).</param>
             /// <returns>The template with all recognized tokens replaced.</returns>
-            public static String Format(String template, FileEntryLite file)
+            public static string Format(string template, FileEntryLite file)
             {
                 return TokenRegex.Replace(template, m => _ResolveToken(m.Groups[1].Value, file));
             }
 
-            private static String _ResolveToken(String tokenInner, FileEntryLite file)
+            private static string _ResolveToken(string tokenInner, FileEntryLite file)
             {
-                String[] parts = tokenInner.Split(':', 2);
-                String name = parts[0];
-                String arg = parts.Length == 2 ? parts[1] : "";
+                var parts = tokenInner.Split(':', 2);
+                var name = parts[0];
+                var arg = parts.Length == 2 ? parts[1] : "";
 
                 return name switch
                 {
@@ -496,42 +496,47 @@ namespace Mfr8.Core
                     "full-name" => file.Prefix + file.Extension,
                     "parent-folder" => Path.GetFileName(file.DirectoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)),
                     "full-path" => file.FullPath,
-                    "now" => String.IsNullOrWhiteSpace(arg) ? DateTimeOffset.UtcNow.ToString("o") : DateTimeOffset.UtcNow.ToString(arg),
+                    "now" => string.IsNullOrWhiteSpace(arg) ? DateTimeOffset.UtcNow.ToString("o") : DateTimeOffset.UtcNow.ToString(arg),
                     "counter" => _ResolveCounterToken(arg, file),
                     _ => throw new NotSupportedException($"Phase 1 formatter token '{name}' is not supported.")
                 };
             }
 
-            private static String _ResolveCounterToken(String arg, FileEntryLite file)
+            private static string _ResolveCounterToken(string arg, FileEntryLite file)
             {
                 // Syntax: start,step,reset,width,pad
-                String[] parts = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                var parts = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length != 5)
                 {
                     throw new InvalidOperationException($"Invalid counter token arg '{arg}'. Expected 5 comma-separated params.");
                 }
 
-                Int32 start = Int32.Parse(parts[0]);
-                Int32 step = Int32.Parse(parts[1]);
-                Int32 reset = Int32.Parse(parts[2]);
-                Int32 width = Int32.Parse(parts[3]);
-                Int32 pad = Int32.Parse(parts[4]);
+                var start = int.Parse(parts[0]);
+                var step = int.Parse(parts[1]);
+                var reset = int.Parse(parts[2]);
+                var width = int.Parse(parts[3]);
+                var pad = int.Parse(parts[4]);
 
-                Int32 n = reset == 1 ? file.FolderOccurrenceIndex : file.GlobalIndex;
-                Int64 value = start + ((Int64)step * n);
-                String raw = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                var n = reset == 1 ? file.FolderOccurrenceIndex : file.GlobalIndex;
+                var value = start + ((long)step * n);
+                var raw = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 if (width <= 0)
                 {
                     return raw;
                 }
 
-                Char padChar = pad == 0 ? '0' : ' ';
+                var padChar = pad == 0 ? '0' : ' ';
                 return raw.PadLeft(width, padChar);
             }
+
+            [GeneratedRegex(@"<([^<>]+)>", RegexOptions.Compiled)]
+            private static partial Regex MyRegex();
         }
 
         [GeneratedRegex(@"\s+")]
         private static partial Regex MyRegex();
+        [GeneratedRegex(@"\b[0-9A-Za-z']+\b")]
+        private static partial Regex MyRegex1();
     }
 
 }

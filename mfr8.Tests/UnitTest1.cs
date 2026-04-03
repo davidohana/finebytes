@@ -11,7 +11,7 @@ namespace mfr8.Tests
         /// </summary>
         public void FilterParser_Parses_LettersCase()
         {
-            String json = """
+            var json = """
         {
           "type": "LettersCase",
           "enabled": true,
@@ -23,7 +23,7 @@ namespace mfr8.Tests
             var el = JsonDocument.Parse(json).RootElement;
             var filter = FilterParser.ParseFilter(el);
 
-            Assert.IsType<LettersCaseFilter>(filter);
+            _ = Assert.IsType<LettersCaseFilter>(filter);
             var typed = (LettersCaseFilter)filter;
             Assert.Equal(LettersCaseMode.UpperCase, typed.Options.Mode);
             Assert.Contains("the", typed.Options.SkipWords);
@@ -35,7 +35,7 @@ namespace mfr8.Tests
         /// </summary>
         public void FilterParser_Rejects_NonFileNameFamily()
         {
-            String json = """
+            var json = """
         {
           "type": "LettersCase",
           "enabled": true,
@@ -55,12 +55,12 @@ namespace mfr8.Tests
         /// </summary>
         public void FilterEngine_ConflictSkipped_ForDuplicateDestinations()
         {
-            String dir = _CreateTempDir();
+            var dir = _CreateTempDir();
 
             try
             {
-                String a = Path.Combine(dir, "a.mp3");
-                String b = Path.Combine(dir, "b.mp3");
+                var a = Path.Combine(dir, "a.mp3");
+                var b = Path.Combine(dir, "b.mp3");
                 File.WriteAllText(a, "x");
                 File.WriteAllText(b, "y");
 
@@ -104,12 +104,12 @@ namespace mfr8.Tests
         /// </summary>
         public void FilterEngine_Renames_WithCounter()
         {
-            String dir = _CreateTempDir();
+            var dir = _CreateTempDir();
 
             try
             {
-                String a = Path.Combine(dir, "track01.mp3");
-                String b = Path.Combine(dir, "track02.mp3");
+                var a = Path.Combine(dir, "track01.mp3");
+                var b = Path.Combine(dir, "track02.mp3");
                 File.WriteAllText(a, "x");
                 File.WriteAllText(b, "y");
 
@@ -157,9 +157,9 @@ namespace mfr8.Tests
             }
         }
 
-        private static String _CreateTempDir()
+        private static string _CreateTempDir()
         {
-            String dir = Path.Combine(Path.GetTempPath(), "mfr8_tests_" + Guid.NewGuid().ToString("N"));
+            var dir = Path.Combine(Path.GetTempPath(), "mfr8_tests_" + Guid.NewGuid().ToString("N"));
             _ = Directory.CreateDirectory(dir);
             return dir;
         }

@@ -4,14 +4,14 @@ namespace Mfr8.Cli
 {
     // Data carried from argument parsing into the CLI execution.
     public sealed record CliOptions(
-        String PresetName,
-        IReadOnlyList<String> Sources,
+        string PresetName,
+        IReadOnlyList<string> Sources,
         OutputFormat OutputFormat,
-        Boolean IncludeHidden,
-        Boolean ContinueOnPreviewErrors,
-        Boolean Silent,
-        Boolean Verbose,
-        String PresetsDirectory)
+        bool IncludeHidden,
+        bool ContinueOnPreviewErrors,
+        bool Silent,
+        bool Verbose,
+        string PresetsDirectory)
     ;
 
 }

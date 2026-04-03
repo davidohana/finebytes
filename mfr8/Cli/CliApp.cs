@@ -12,15 +12,15 @@ namespace Mfr8.Cli
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>The process exit code.</returns>
-        public static Int32 Run(String[] args)
+        public static int Run(string[] args)
         {
-            CliOptions? options = CliCommandFactory.ParseArgs(args, out Int32 exitCode);
+            var options = CliCommandFactory.ParseArgs(args, out var exitCode);
             return options is null ? exitCode : _Execute(options);
         }
 
-        private static Int32 _Execute(CliOptions options)
+        private static int _Execute(CliOptions options)
         {
-            if (String.IsNullOrWhiteSpace(options.PresetsDirectory))
+            if (string.IsNullOrWhiteSpace(options.PresetsDirectory))
             {
                 return 1;
             }
@@ -54,7 +54,7 @@ namespace Mfr8.Cli
                 return 1;
             }
 
-            RenameBatchResult result = FilterEngine.PreviewAndCommit(
+            var result = FilterEngine.PreviewAndCommit(
                 preset: preset,
                 files: files,
                 continueOnErrors: options.ContinueOnPreviewErrors);
@@ -91,9 +91,9 @@ namespace Mfr8.Cli
             Console.WriteLine($"Preset: {result.PresetName}");
             Console.WriteLine($"Total: {result.TotalFiles}  Renamed: {result.Renamed}  Skipped: {result.Skipped}  Conflicts: {result.Conflicts}  Errors: {result.Errors}");
             Console.WriteLine();
-            Console.WriteLine(String.Format("{0,-60} {1,-60} {2,-16} {3}", "Original", "Result", "Status", "Error"));
+            Console.WriteLine(string.Format("{0,-60} {1,-60} {2,-16} {3}", "Original", "Result", "Status", "Error"));
 
-            foreach (RenameResultItem item in result.Results)
+            foreach (var item in result.Results)
             {
                 Console.WriteLine($"{_Trunc(item.OriginalPath, 60),-60} {_Trunc(item.ResultPath, 60),-60} {item.Status,-16} {item.Error ?? ""}");
             }
@@ -114,7 +114,7 @@ namespace Mfr8.Cli
 
             writer.WritePropertyName("results");
             writer.WriteStartArray();
-            foreach (RenameResultItem r in result.Results)
+            foreach (var r in result.Results)
             {
                 writer.WriteStartObject();
                 writer.WriteString("original", r.OriginalPath);
@@ -142,21 +142,21 @@ namespace Mfr8.Cli
         {
             var sb = new StringBuilder();
             _ = sb.AppendLine("original,result,status,error");
-            foreach (RenameResultItem item in result.Results)
+            foreach (var item in result.Results)
             {
                 _ = sb.AppendLine($"{_CsvEscape(item.OriginalPath)},{_CsvEscape(item.ResultPath)},{_CsvEscape(item.Status.ToString())},{_CsvEscape(item.Error ?? "")}");
             }
             Console.WriteLine(sb.ToString());
         }
 
-        private static String _CsvEscape(String value)
+        private static string _CsvEscape(string value)
         {
             return value.Contains('"') || value.Contains(',') || value.Contains('\n') || value.Contains('\r')
                 ? $"\"{value.Replace("\"", "\"\"")}\""
                 : value;
         }
 
-        private static String _Trunc(String s, Int32 max)
+        private static string _Trunc(string s, int max)
         {
             return s.Length <= max ? s : s[..max];
         }
