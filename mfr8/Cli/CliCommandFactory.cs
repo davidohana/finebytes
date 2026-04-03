@@ -33,9 +33,9 @@ namespace Mfr8.Cli
 
         }
 
-        private static string _BuildErrorMessage(IReadOnlyList<Error> errors)
+        private static string _BuildErrorMessage(IReadOnlyList<Error> errorList)
         {
-            return errors.Any(_IsMissingRequiredSource)
+            return errorList.Any(_IsMissingRequiredSource)
                 ? "Missing required argument: sources. Provide one or more files, folders, or wildcards."
                 : "Invalid arguments.";
         }

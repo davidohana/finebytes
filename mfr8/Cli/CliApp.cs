@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 
 using Mfr8.Core;
+using Spectre.Console;
 
 namespace Mfr8.Cli
 {
@@ -21,12 +22,12 @@ namespace Mfr8.Cli
             }
             catch (UserException ex)
             {
-                Console.Error.WriteLine(ex.Message);
+                _PrintError(ex.Message);
                 return CliExitCode.UserError;
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.ToString());
+                _PrintError(ex.ToString());
                 return CliExitCode.AppError;
             }
         }
@@ -82,14 +83,14 @@ namespace Mfr8.Cli
 
         private static void _PrintTable(RenameBatchResult result)
         {
-            Console.WriteLine($"Preset: {result.PresetName}");
-            Console.WriteLine($"Total: {result.TotalFiles}  Renamed: {result.Renamed}  Skipped: {result.Skipped}  Conflicts: {result.Conflicts}  Errors: {result.Errors}");
-            Console.WriteLine();
-            Console.WriteLine(string.Format("{0,-60} {1,-60} {2,-16} {3}", "Original", "Result", "Status", "Error"));
+            _PrintLine($"Preset: {result.PresetName}");
+            _PrintLine($"Total: {result.TotalFiles}  Renamed: {result.Renamed}  Skipped: {result.Skipped}  Conflicts: {result.Conflicts}  Errors: {result.Errors}");
+            _PrintLine(string.Empty);
+            _PrintLine(string.Format("{0,-60} {1,-60} {2,-16} {3}", "Original", "Result", "Status", "Error"));
 
             foreach (var item in result.Results)
             {
-                Console.WriteLine($"{_Trunc(item.OriginalPath, 60),-60} {_Trunc(item.ResultPath, 60),-60} {item.Status,-16} {item.Error ?? ""}");
+                _PrintLine($"{_Trunc(item.OriginalPath, 60),-60} {_Trunc(item.ResultPath, 60),-60} {item.Status,-16} {item.Error ?? ""}");
             }
         }
 
@@ -129,7 +130,7 @@ namespace Mfr8.Cli
             writer.WriteEndObject();
 
             writer.Flush();
-            Console.WriteLine(Encoding.UTF8.GetString(ms.ToArray()));
+            _PrintLine(Encoding.UTF8.GetString(ms.ToArray()));
         }
 
         private static void _PrintCsv(RenameBatchResult result)
@@ -140,7 +141,17 @@ namespace Mfr8.Cli
             {
                 _ = sb.AppendLine($"{_CsvEscape(item.OriginalPath)},{_CsvEscape(item.ResultPath)},{_CsvEscape(item.Status.ToString())},{_CsvEscape(item.Error ?? "")}");
             }
-            Console.WriteLine(sb.ToString());
+            _PrintLine(sb.ToString());
+        }
+
+        private static void _PrintLine(string text)
+        {
+            AnsiConsole.MarkupLine(Markup.Escape(text));
+        }
+
+        private static void _PrintError(string text)
+        {
+            AnsiConsole.MarkupLine($"[red]{Markup.Escape(text)}[/]");
         }
 
         private static string _CsvEscape(string value)
