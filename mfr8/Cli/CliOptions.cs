@@ -11,7 +11,7 @@ namespace Mfr8.Cli
         bool ContinueOnPreviewErrors,
         bool Silent,
         bool Verbose,
-        string PresetsDirectory)
+        string PresetsFilePath)
     ;
 
 }

@@ -34,12 +34,12 @@ namespace Mfr8.Cli
 
         private static CliExitCode _Execute(CliOptions options)
         {
-            if (string.IsNullOrWhiteSpace(options.PresetsDirectory))
+            if (string.IsNullOrWhiteSpace(options.PresetsFilePath))
             {
-                throw new UserException("Presets directory is required.");
+                throw new UserException("Presets file path is required.");
             }
 
-            var loader = new PresetLoader(options.PresetsDirectory);
+            var loader = new PresetLoader(options.PresetsFilePath);
             var preset = loader.Load(options.PresetName);
 
             var files = FileScanner.ScanSources(options.Sources, includeHidden: options.IncludeHidden);

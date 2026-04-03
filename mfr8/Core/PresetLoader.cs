@@ -3,80 +3,99 @@ using System.Text.Json;
 namespace Mfr8.Core
 {
     /// <summary>
-    /// Creates a preset loader that reads JSON preset files from <paramref name="presetsDirectory"/>.
+    /// Creates a preset loader that reads all presets from a single JSON file.
     /// </summary>
-    /// <param name="presetsDirectory">Directory containing <c>*.json</c> preset files.</param>
-    public sealed class PresetLoader(string presetsDirectory)
+    /// <param name="presetsFilePath">Path to the JSON file containing all presets.</param>
+    public sealed class PresetLoader(string presetsFilePath)
     {
-        public string PresetsDirectory { get; } = presetsDirectory;
+        /// <summary>
+        /// Gets the JSON file path containing all presets.
+        /// </summary>
+        public string PresetsFilePath { get; } = presetsFilePath;
 
         /// <summary>
-        /// Gets the default presets directory for the current user.
+        /// Gets the default presets file path for the current user.
         /// </summary>
-        /// <returns>Absolute path to the default presets directory.</returns>
-        public static string DefaultPresetsDirectory()
+        /// <returns>Absolute path to the default presets JSON file.</returns>
+        public static string DefaultPresetsFilePath()
         {
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return Path.Combine(appData, "MagicFileRenamer", "presets");
+            return Path.Combine(appData, "MagicFileRenamer", "presets.json");
         }
 
         /// <summary>
-        /// Loads a preset by either its <c>id</c> or <c>name</c>.
+        /// Loads a preset by its unique <c>name</c>.
         /// </summary>
-        /// <param name="presetNameOrId">Preset id (GUID) or preset name.</param>
+        /// <param name="presetName">Preset name.</param>
         /// <returns>The loaded preset.</returns>
-        public FilterPreset Load(string presetNameOrId)
+        public FilterPreset Load(string presetName)
         {
-            if (!Directory.Exists(PresetsDirectory))
+            if (string.IsNullOrWhiteSpace(presetName))
             {
-                throw new UserException($"Presets directory not found: '{PresetsDirectory}'.");
+                throw new UserException("Preset name is required.");
             }
 
-            var presetId = _TryParseGuid(presetNameOrId);
-
-            string[] presetFiles = [.. Directory.EnumerateFiles(PresetsDirectory, "*.json", SearchOption.TopDirectoryOnly)];
-
-            if (presetFiles.Length == 0)
+            if (!File.Exists(PresetsFilePath))
             {
-                throw new UserException($"No preset JSON files found in '{PresetsDirectory}'.");
+                throw new UserException($"Presets file not found: '{PresetsFilePath}'.");
             }
 
-            foreach (var file in presetFiles)
+            JsonDocument doc;
+            try
             {
-                JsonDocument doc;
-                try
+                doc = JsonDocument.Parse(File.ReadAllText(PresetsFilePath));
+            }
+            catch (Exception ex)
+            {
+                throw new UserException($"Failed to read presets file '{PresetsFilePath}': {ex.Message}", ex);
+            }
+
+            using (doc)
+            {
+                var presetElements = _GetPresetElements(doc.RootElement);
+                if (presetElements.Count == 0)
                 {
-                    doc = JsonDocument.Parse(File.ReadAllText(file));
+                    throw new UserException($"No presets found in '{PresetsFilePath}'.");
                 }
-                catch (Exception ex)
+
+                var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var presetElement in presetElements)
                 {
-                    throw new UserException($"Failed to read preset file '{file}': {ex.Message}", ex);
-                }
-
-                using (doc)
-                {
-                    var root = doc.RootElement;
-
-                    var id = _TryParseGuid(_GetString(root, "id")) ?? Guid.Empty;
-                    if (presetId is not null && id == presetId.Value)
+                    var parsedName = _GetString(presetElement, "name") ?? "";
+                    if (!names.Add(parsedName))
                     {
-                        return _ParsePreset(root, file, presetNameOrId);
-                    }
-
-                    var name = _GetString(root, "name") ?? "";
-                    if (string.Equals(name, presetNameOrId, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return _ParsePreset(root, file, presetNameOrId);
+                        throw new UserException($"Duplicate preset name '{parsedName}' in '{PresetsFilePath}'. Preset names must be unique.");
                     }
                 }
+
+                foreach (var presetElement in presetElements)
+                {
+                    var name = _GetString(presetElement, "name") ?? "";
+                    if (string.Equals(name, presetName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return _ParsePreset(presetElement, PresetsFilePath, presetName);
+                    }
+                }
             }
 
-            throw new UserException($"Preset not found: '{presetNameOrId}'.");
+            throw new UserException($"Preset not found: '{presetName}'.");
         }
 
-        private static Guid? _TryParseGuid(string? value)
+        private static IReadOnlyList<JsonElement> _GetPresetElements(JsonElement root)
         {
-            return string.IsNullOrWhiteSpace(value) ? null : Guid.TryParse(value, out var g) ? g : null;
+            if (root.ValueKind == JsonValueKind.Array)
+            {
+                return [.. root.EnumerateArray()];
+            }
+
+            if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("presets", out var presetsEl))
+            {
+                return presetsEl.ValueKind == JsonValueKind.Array
+                    ? [.. presetsEl.EnumerateArray()]
+                    : throw new UserException("The 'presets' property must be a JSON array.");
+            }
+
+            throw new UserException("Presets JSON must be an array or an object with a 'presets' array.");
         }
 
         private static string? _GetString(JsonElement root, string name)
@@ -84,7 +103,7 @@ namespace Mfr8.Core
             return root.TryGetProperty(name, out var prop) && prop.ValueKind == JsonValueKind.String ? prop.GetString() : null;
         }
 
-        private static FilterPreset _ParsePreset(JsonElement root, string filePath, string presetNameOrId)
+        private static FilterPreset _ParsePreset(JsonElement root, string filePath, string presetName)
         {
             try
             {
@@ -117,7 +136,7 @@ namespace Mfr8.Core
             }
             catch (Exception ex)
             {
-                throw new UserException($"Preset '{presetNameOrId}' in '{filePath}' is invalid: {ex.Message}", ex);
+                throw new UserException($"Preset '{presetName}' in '{filePath}' is invalid: {ex.Message}", ex);
             }
         }
     }

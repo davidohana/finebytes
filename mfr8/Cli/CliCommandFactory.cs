@@ -53,11 +53,11 @@ namespace Mfr8.Cli
             [Value(0, MetaName = "sources", Required = true, HelpText = "Files, folders, or wildcards to rename (e.g. C:\\Music\\*.mp3).")]
             public IEnumerable<string> Sources { get; set; } = [];
 
-            [Option('p', "preset", Required = true, HelpText = "Preset name or id (matches preset JSON 'name' or 'id').")]
+            [Option('p', "preset", Required = true, HelpText = "Preset name (must be unique inside presets JSON).")]
             public string PresetName { get; set; } = string.Empty;
 
-            [Option('d', "presets-dir", HelpText = "Override presets directory (for development/testing).")]
-            public string? PresetsDirectory { get; set; }
+            [Option('d', "presets-file", HelpText = "Override presets JSON file path.")]
+            public string? PresetsFilePath { get; set; }
 
             [Option('o', "output", HelpText = "Output format: table | json | csv.", Default = "table")]
             public string Output { get; set; } = "table";
@@ -78,9 +78,9 @@ namespace Mfr8.Cli
             {
                 var format = _ParseOutputFormat(Output);
 
-                var presetsDir = string.IsNullOrWhiteSpace(PresetsDirectory)
-                    ? PresetLoader.DefaultPresetsDirectory()
-                    : PresetsDirectory;
+                var presetsFilePath = string.IsNullOrWhiteSpace(PresetsFilePath)
+                    ? PresetLoader.DefaultPresetsFilePath()
+                    : PresetsFilePath;
 
                 return new CliOptions(
                     PresetName: PresetName,
@@ -90,7 +90,7 @@ namespace Mfr8.Cli
                     ContinueOnPreviewErrors: ContinueOnPreviewErrors,
                     Silent: Silent,
                     Verbose: Verbose,
-                    PresetsDirectory: presetsDir);
+                    PresetsFilePath: presetsFilePath);
             }
 
             private static OutputFormat _ParseOutputFormat(string? value)

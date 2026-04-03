@@ -77,3 +77,25 @@ Example run (Linux bash):
 ```bash
 dotnet run --project ./mfr8/mfr8.csproj -- "/home/user/music/*.mp3" -p "my-preset"
 ```
+
+### Presets File
+
+- Presets are loaded from a single JSON file.
+- Default path on Windows: `%APPDATA%\MagicFileRenamer\presets.json`
+- Override path with: `-d` / `--presets-file`
+- Preset names must be unique (case-insensitive).
+
+Minimal shape:
+
+```json
+{
+  "presets": [
+    {
+      "id": "3f40e2ab-2d9f-4ea4-b597-4ef8c715d2c1",
+      "name": "my-preset",
+      "description": "optional",
+      "filters": []
+    }
+  ]
+}
+```
