@@ -62,6 +62,26 @@ internal static class CliCommandFactory
         root.Add(verboseOption);
         root.Add(sourcesArgument);
 
+        // If user explicitly asks for help, don't try to bind required arguments.
+        if (args.Any(a => a == "--help" || a == "-h" || a == "/?"))
+        {
+            Console.WriteLine("Usage: mfr8 <sources>... --preset <name-or-id> [options]");
+            Console.WriteLine();
+            Console.WriteLine("  <sources>   Files, folders, or wildcards to rename (e.g. C:\\Music\\*.mp3).");
+            Console.WriteLine("  --preset    Preset name or id (matches preset JSON 'name' or 'id').");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            Console.WriteLine("  --presets-dir <dir>              Override presets directory.");
+            Console.WriteLine("  --output <table|json|csv>        Output format (default: table).");
+            Console.WriteLine("  --include-hidden                 Include hidden/system files.");
+            Console.WriteLine("  --continue-on-preview-errors     Continue even if preview errors exist.");
+            Console.WriteLine("  --silent                         Only exit code, no output.");
+            Console.WriteLine("  --verbose                        Reserved for future verbose diagnostics.");
+
+            exitCode = 0;
+            return null;
+        }
+
         var parseResult = root.Parse(args);
         if (parseResult.Errors.Count > 0)
         {
