@@ -12,49 +12,30 @@ namespace Mfr8.Cli
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>The process exit code.</returns>
-        public static int Run(string[] args)
+        public static CliExitCode Run(string[] args)
         {
-            CliOptions? options;
             try
             {
-                options = CliCommandFactory.ParseArgs(args);
-
-                if (options is null)
-                {
-                    return 0;
-                }
+                var options = CliCommandFactory.ParseArgs(args);
+                return options is null ? CliExitCode.Success : _Execute(options);
             }
-            catch (ArgumentException ex)
+            catch (UserException ex)
             {
-                if (!string.IsNullOrWhiteSpace(ex.Message))
-                {
-                    Console.Error.WriteLine(ex.Message);
-                }
-
-                return 1;
-            }
-
-
-            try
-            {
-                return _Execute(options);
+                Console.Error.WriteLine(ex.Message);
+                return CliExitCode.UserError;
             }
             catch (Exception ex)
             {
-                if (!string.IsNullOrWhiteSpace(ex.Message))
-                {
-                    Console.Error.WriteLine(ex.Message);
-                }
-
-                return 1;
+                Console.Error.WriteLine(ex.ToString());
+                return CliExitCode.AppError;
             }
         }
 
-        private static int _Execute(CliOptions options)
+        private static CliExitCode _Execute(CliOptions options)
         {
             if (string.IsNullOrWhiteSpace(options.PresetsDirectory))
             {
-                return 1;
+                throw new UserException("Presets directory is required.");
             }
 
             var loader = new PresetLoader(options.PresetsDirectory);
@@ -64,8 +45,7 @@ namespace Mfr8.Cli
 
             if (files.Count == 0)
             {
-                Console.Error.WriteLine("No files matched the provided sources.");
-                return 1;
+                throw new UserException("No files matched the provided sources.");
             }
 
             var result = FilterEngine.PreviewAndCommit(
@@ -78,7 +58,7 @@ namespace Mfr8.Cli
                 _PrintResult(result, options.OutputFormat);
             }
 
-            return result.Errors > 0 && !options.ContinueOnPreviewErrors ? 1 : 0;
+            return result.Errors > 0 && !options.ContinueOnPreviewErrors ? CliExitCode.UserError : CliExitCode.Success;
         }
 
         private static void _PrintResult(RenameBatchResult result, OutputFormat format)

@@ -31,7 +31,7 @@ namespace Mfr8.Core
 
                     if (!Directory.Exists(dir))
                     {
-                        throw new DirectoryNotFoundException($"Directory for wildcard does not exist: '{dir}'.");
+                        throw new UserException($"Directory for wildcard does not exist: '{dir}'.");
                     }
 
                     results.AddRange(Directory.EnumerateFiles(dir, pattern, SearchOption.TopDirectoryOnly));
@@ -50,7 +50,7 @@ namespace Mfr8.Core
                     continue;
                 }
 
-                throw new FileNotFoundException($"Source not found: '{src}'.");
+                throw new UserException($"Source not found: '{src}'.");
             }
 
             results = [.. results.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(p => p, StringComparer.OrdinalIgnoreCase)];

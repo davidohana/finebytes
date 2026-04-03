@@ -29,7 +29,7 @@ namespace Mfr8.Core
         {
             if (!Directory.Exists(PresetsDirectory))
             {
-                throw new DirectoryNotFoundException($"Presets directory not found: '{PresetsDirectory}'.");
+                throw new UserException($"Presets directory not found: '{PresetsDirectory}'.");
             }
 
             var presetId = _TryParseGuid(presetNameOrId);
@@ -38,28 +38,40 @@ namespace Mfr8.Core
 
             if (presetFiles.Length == 0)
             {
-                throw new FileNotFoundException($"No preset JSON files found in '{PresetsDirectory}'.");
+                throw new UserException($"No preset JSON files found in '{PresetsDirectory}'.");
             }
 
             foreach (var file in presetFiles)
             {
-                var doc = JsonDocument.Parse(File.ReadAllText(file));
-                var root = doc.RootElement;
-
-                var id = _TryParseGuid(_GetString(root, "id")) ?? Guid.Empty;
-                if (presetId is not null && id == presetId.Value)
+                JsonDocument doc;
+                try
                 {
-                    return _ParsePreset(root);
+                    doc = JsonDocument.Parse(File.ReadAllText(file));
+                }
+                catch (Exception ex)
+                {
+                    throw new UserException($"Failed to read preset file '{file}': {ex.Message}", ex);
                 }
 
-                var name = _GetString(root, "name") ?? "";
-                if (string.Equals(name, presetNameOrId, StringComparison.OrdinalIgnoreCase))
+                using (doc)
                 {
-                    return _ParsePreset(root);
+                    var root = doc.RootElement;
+
+                    var id = _TryParseGuid(_GetString(root, "id")) ?? Guid.Empty;
+                    if (presetId is not null && id == presetId.Value)
+                    {
+                        return _ParsePreset(root, file, presetNameOrId);
+                    }
+
+                    var name = _GetString(root, "name") ?? "";
+                    if (string.Equals(name, presetNameOrId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return _ParsePreset(root, file, presetNameOrId);
+                    }
                 }
             }
 
-            throw new InvalidOperationException($"Preset not found: '{presetNameOrId}'.");
+            throw new UserException($"Preset not found: '{presetNameOrId}'.");
         }
 
         private static Guid? _TryParseGuid(string? value)
@@ -72,30 +84,41 @@ namespace Mfr8.Core
             return root.TryGetProperty(name, out var prop) && prop.ValueKind == JsonValueKind.String ? prop.GetString() : null;
         }
 
-        private static FilterPreset _ParsePreset(JsonElement root)
+        private static FilterPreset _ParsePreset(JsonElement root, string filePath, string presetNameOrId)
         {
-            var id = Guid.Parse(_GetString(root, "id") ?? throw new InvalidOperationException("Preset missing 'id'."));
-            var name = _GetString(root, "name") ?? throw new InvalidOperationException("Preset missing 'name'.");
-            var description = _GetString(root, "description");
-
-            if (!root.TryGetProperty("filters", out var filtersEl) || filtersEl.ValueKind != JsonValueKind.Array)
+            try
             {
-                throw new InvalidOperationException("Preset missing 'filters' array.");
+                var id = Guid.Parse(_GetString(root, "id") ?? throw new UserException("Preset missing 'id'."));
+                var name = _GetString(root, "name") ?? throw new UserException("Preset missing 'name'.");
+                var description = _GetString(root, "description");
+
+                if (!root.TryGetProperty("filters", out var filtersEl) || filtersEl.ValueKind != JsonValueKind.Array)
+                {
+                    throw new UserException("Preset missing 'filters' array.");
+                }
+
+                var filters = new List<Filter>();
+                foreach (var filterEl in filtersEl.EnumerateArray())
+                {
+                    filters.Add(FilterParser.ParseFilter(filterEl));
+                }
+
+                return new FilterPreset
+                {
+                    Id = id,
+                    Name = name,
+                    Description = description,
+                    Filters = filters
+                };
             }
-
-            var filters = new List<Filter>();
-            foreach (var filterEl in filtersEl.EnumerateArray())
+            catch (UserException)
             {
-                filters.Add(FilterParser.ParseFilter(filterEl));
+                throw;
             }
-
-            return new FilterPreset
+            catch (Exception ex)
             {
-                Id = id,
-                Name = name,
-                Description = description,
-                Filters = filters
-            };
+                throw new UserException($"Preset '{presetNameOrId}' in '{filePath}' is invalid: {ex.Message}", ex);
+            }
         }
     }
 

@@ -12,7 +12,7 @@ namespace Mfr8.Cli
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>Parsed <see cref="CliOptions"/> on success; <c>null</c> when the user requested help (<c>--help</c> / <c>-h</c>).</returns>
-        /// <exception cref="ArgumentException">Thrown when argument parsing cannot produce options.</exception>
+        /// <exception cref="UserException">Thrown when argument parsing cannot produce options.</exception>
         public static CliOptions? ParseArgs(string[] args)
         {
             var result = Parser.Default.ParseArguments<CliArguments>(args);
@@ -28,7 +28,7 @@ namespace Mfr8.Cli
                 var list = errors.ToList();
                 return list.All(e => e.Tag is ErrorType.HelpRequestedError or ErrorType.HelpVerbRequestedError)
                     ? null
-                    : throw new ArgumentException("Invalid arguments.");
+                    : throw new UserException("Invalid arguments.");
             }
 
         }
@@ -81,7 +81,7 @@ namespace Mfr8.Cli
             private static OutputFormat _ParseOutputFormat(string? value)
             {
                 var normalized = string.IsNullOrWhiteSpace(value)
-                    ? throw new ArgumentException("Unknown output ''. Use table|json|csv.")
+                    ? throw new UserException("Unknown output ''. Use table|json|csv.")
                     : value.Trim().ToLowerInvariant();
 
                 return normalized switch
@@ -89,7 +89,7 @@ namespace Mfr8.Cli
                     "table" => OutputFormat.Table,
                     "json" => OutputFormat.Json,
                     "csv" => OutputFormat.Csv,
-                    _ => throw new ArgumentException($"Unknown output '{value}'. Use table|json|csv.")
+                    _ => throw new UserException($"Unknown output '{value}'. Use table|json|csv.")
                 };
             }
         }
