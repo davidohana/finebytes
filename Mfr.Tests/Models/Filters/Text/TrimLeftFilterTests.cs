@@ -18,8 +18,7 @@ namespace Mfr.Tests.Models.Filters.Text
         public void Apply_RemovesLeftCharacters()
         {
             var f = new TrimLeftFilter(true, _Target, new CountFilterOptions(2));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("cd", f.Apply("abcd", file));
+            Assert.Equal("cd", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
         }
 
         /// <summary>
@@ -29,8 +28,7 @@ namespace Mfr.Tests.Models.Filters.Text
         public void Apply_NonPositiveCount_ReturnsOriginal()
         {
             var f = new TrimLeftFilter(true, _Target, new CountFilterOptions(0));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("ab", f.Apply("ab", file));
+            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
 
         /// <summary>
@@ -40,8 +38,7 @@ namespace Mfr.Tests.Models.Filters.Text
         public void Apply_CountExceedsLength_ReturnsEmpty()
         {
             var f = new TrimLeftFilter(true, _Target, new CountFilterOptions(10));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("", f.Apply("hi", file));
+            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "hi"));
         }
     }
 }

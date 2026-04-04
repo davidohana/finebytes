@@ -20,8 +20,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                 true,
                 _Target,
                 new StripParenthesesOptions(Types: "Round", RemoveContents: true));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("ab", f.Apply("a(rem)b", file));
+            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a(rem)b"));
         }
 
         /// <summary>
@@ -34,8 +33,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                 true,
                 _Target,
                 new StripParenthesesOptions(Types: "Round", RemoveContents: false));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("arem", f.Apply("a(rem)", file));
+            Assert.Equal("arem", FilterTestHelpers.ApplyToPrefix(f, "a(rem)"));
         }
 
         /// <summary>
@@ -48,8 +46,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                 true,
                 _Target,
                 new StripParenthesesOptions(Types: "Square", RemoveContents: true));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("ab", f.Apply("a[xx]b", file));
+            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a[xx]b"));
         }
     }
 }

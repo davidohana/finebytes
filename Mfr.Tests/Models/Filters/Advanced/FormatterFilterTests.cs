@@ -18,8 +18,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         public void Apply_FileNameToken_UsesPrefix()
         {
             var f = new FormatterFilter(true, _Target, new FormatterOptions("<file-name>"));
-            var file = FilterTestHelpers.CreateFile(prefix: "song", extension: ".mp3");
-            Assert.Equal("song", f.Apply("ignored", file));
+            Assert.Equal("song", FilterTestHelpers.ApplyToPrefix(f, "song"));
         }
 
         /// <summary>
@@ -29,8 +28,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         public void Apply_CounterToken_UsesGlobalIndex()
         {
             var f = new FormatterFilter(true, _Target, new FormatterOptions("<counter:10,2,0,4,0>"));
-            var file = FilterTestHelpers.CreateFile(globalIndex: 3);
-            Assert.Equal("0016", f.Apply("ignored", file));
+            Assert.Equal("0016", FilterTestHelpers.ApplyToPrefix(f, "ignored", globalIndex: 3));
         }
 
         /// <summary>
@@ -40,8 +38,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         public void Apply_ParentFolderToken_UsesDirectoryName()
         {
             var f = new FormatterFilter(true, _Target, new FormatterOptions("<parent-folder>"));
-            var file = FilterTestHelpers.CreateFile(directory: "Music".CombinePath("My Album"));
-            Assert.Equal("My Album", f.Apply("ignored", file));
+            Assert.Equal("My Album", FilterTestHelpers.ApplyToPrefix(f, "ignored", directory: "Music".CombinePath("My Album")));
         }
     }
 }

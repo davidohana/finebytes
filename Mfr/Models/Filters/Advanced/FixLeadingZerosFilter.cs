@@ -26,7 +26,7 @@ namespace Mfr.Models.Filters.Advanced
         /// </summary>
         public override string Type => "FixLeadingZeros";
 
-        internal override string Apply(string segment, RenameItem item)
+        internal override string ApplySegment(string segment, RenameItem item)
         {
             return Options.Width <= 0
                 ? segment

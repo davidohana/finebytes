@@ -16,8 +16,6 @@ namespace Mfr.Core
         public static void ApplyFilters(this RenameItem item, IReadOnlyList<Filter> filters)
         {
             item.ResetPreview();
-            var prefix = item.Original.Prefix;
-            var extension = item.Original.Extension;
 
             foreach (var filter in filters)
             {
@@ -26,41 +24,14 @@ namespace Mfr.Core
                     continue;
                 }
 
-                if (filter.Target is not FileNameTarget fileTarget)
-                {
-                    throw new NotSupportedException($"Phase 1 only supports target.family='FileName'. Filter '{filter.Type}' got '{filter.Target.Family}'.");
-                }
-
-                var mode = fileTarget.FileNameMode;
-                var segment = mode switch
-                {
-                    FileNameTargetMode.Prefix => prefix,
-                    FileNameTargetMode.Extension => extension,
-                    FileNameTargetMode.Full => prefix + extension,
-                    _ => throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.")
-                };
-
-                var transformed = filter.Apply(segment, item);
-
-                switch (mode)
-                {
-                    case FileNameTargetMode.Prefix:
-                        prefix = transformed;
-                        break;
-                    case FileNameTargetMode.Extension:
-                        extension = transformed;
-                        break;
-                    case FileNameTargetMode.Full:
-                        var fullName = Path.GetFileName(transformed);
-                        extension = Path.GetExtension(fullName);
-                        prefix = Path.GetFileNameWithoutExtension(fullName);
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.");
-                }
+                filter.Apply(item);
+            }
+            if (item.Preview is not null)
+            {
+                return;
             }
 
-            item.SetPreviewName(prefix, extension);
+            item.SetPreviewName(item.Original.Prefix, item.Original.Extension);
         }
     }
 }

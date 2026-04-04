@@ -16,7 +16,7 @@ namespace Mfr.Models.Filters.Text
         /// </summary>
         public override string Type => "TrimRight";
 
-        internal override string Apply(string segment, RenameItem item)
+        internal override string ApplySegment(string segment, RenameItem item)
         {
             return Options.Count <= 0 ? segment : segment.Length <= Options.Count ? "" : segment[..^Options.Count];
         }

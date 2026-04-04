@@ -20,8 +20,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                 true,
                 _Target,
                 new ReplacerOptions("a", "X", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("XbX", f.Apply("aba", file));
+            Assert.Equal("XbX", FilterTestHelpers.ApplyToPrefix(f, "aba"));
         }
 
         /// <summary>
@@ -34,8 +33,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                 true,
                 _Target,
                 new ReplacerOptions("a", "X", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("Xba", f.Apply("aba", file));
+            Assert.Equal("Xba", FilterTestHelpers.ApplyToPrefix(f, "aba"));
         }
 
         /// <summary>
@@ -48,8 +46,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                 true,
                 _Target,
                 new ReplacerOptions("f*o", "X", ReplacerMode.Wildcard, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("X", f.Apply("foo", file));
+            Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "foo"));
         }
 
         /// <summary>
@@ -62,8 +59,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                 true,
                 _Target,
                 new ReplacerOptions(@"\d+", "N", ReplacerMode.Regex, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("aNb", f.Apply("a12b", file));
+            Assert.Equal("aNb", FilterTestHelpers.ApplyToPrefix(f, "a12b"));
         }
     }
 }

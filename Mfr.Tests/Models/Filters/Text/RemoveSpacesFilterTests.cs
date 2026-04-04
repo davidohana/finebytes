@@ -17,8 +17,7 @@ namespace Mfr.Tests.Models.Filters.Text
         public void Apply_StripsAllWhitespace()
         {
             var f = new RemoveSpacesFilter(true, _Target);
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("ab", f.Apply("a \t\r\nb", file));
+            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a \t\r\nb"));
         }
     }
 }

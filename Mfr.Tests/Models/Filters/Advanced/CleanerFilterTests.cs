@@ -24,8 +24,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                     IllegalCharReplacement: "_",
                     CustomCharsToRemove: "",
                     CustomReplacement: ""));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("a_b", f.Apply("a/b", file));
+            Assert.Equal("a_b", FilterTestHelpers.ApplyToPrefix(f, "a/b"));
         }
 
         /// <summary>
@@ -42,8 +41,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                     IllegalCharReplacement: "",
                     CustomCharsToRemove: "@#",
                     CustomReplacement: "-"));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("a-b-c", f.Apply("a@b#c", file));
+            Assert.Equal("a-b-c", FilterTestHelpers.ApplyToPrefix(f, "a@b#c"));
         }
     }
 }

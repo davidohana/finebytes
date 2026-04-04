@@ -17,8 +17,7 @@ namespace Mfr.Tests.Models.Filters.Text
         public void Apply_CollapsesWhitespaceRunsToSingleSpace()
         {
             var f = new ShrinkSpacesFilter(true, _Target);
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("a b c", f.Apply("a  \t b \n c", file));
+            Assert.Equal("a b c", FilterTestHelpers.ApplyToPrefix(f, "a  \t b \n c"));
         }
     }
 }

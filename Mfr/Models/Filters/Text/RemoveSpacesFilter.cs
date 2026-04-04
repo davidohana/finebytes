@@ -14,7 +14,7 @@ namespace Mfr.Models.Filters.Text
         /// </summary>
         public override string Type => "RemoveSpaces";
 
-        internal override string Apply(string segment, RenameItem item)
+        internal override string ApplySegment(string segment, RenameItem item)
         {
             return TextFilterRegexCache.WhitespaceRegex.Replace(segment, "");
         }

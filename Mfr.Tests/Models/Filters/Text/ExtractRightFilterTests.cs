@@ -18,8 +18,7 @@ namespace Mfr.Tests.Models.Filters.Text
         public void Apply_TakesRightSubstring()
         {
             var f = new ExtractRightFilter(true, _Target, new CountFilterOptions(3));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("def", f.Apply("abcdef", file));
+            Assert.Equal("def", FilterTestHelpers.ApplyToPrefix(f, "abcdef"));
         }
 
         /// <summary>
@@ -29,8 +28,7 @@ namespace Mfr.Tests.Models.Filters.Text
         public void Apply_ZeroCount_ReturnsEmpty()
         {
             var f = new ExtractRightFilter(true, _Target, new CountFilterOptions(0));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("", f.Apply("abc", file));
+            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "abc"));
         }
 
         /// <summary>
@@ -40,8 +38,7 @@ namespace Mfr.Tests.Models.Filters.Text
         public void Apply_CountBeyondLength_ReturnsFullSegment()
         {
             var f = new ExtractRightFilter(true, _Target, new CountFilterOptions(100));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("ab", f.Apply("ab", file));
+            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
     }
 }

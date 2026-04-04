@@ -20,8 +20,7 @@ namespace Mfr.Tests.Models.Filters.Text
                 true,
                 _Target,
                 new SpaceCharacterOptions(ReplaceSpaceWith: "_", ReplaceCharWithSpace: "-"));
-            var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("a_b c", f.Apply("a b-c", file));
+            Assert.Equal("a_b c", FilterTestHelpers.ApplyToPrefix(f, "a b-c"));
         }
     }
 }
