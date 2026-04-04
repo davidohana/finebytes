@@ -248,7 +248,7 @@ namespace Mfr.Cli
                     OriginalPath: item.Original.FullPath,
                     ResultPath: resultPath,
                     Status: item.Status,
-                    Error: item.PreviewError));
+                    Error: item.PreviewError?.Message));
             }
 
             return results;

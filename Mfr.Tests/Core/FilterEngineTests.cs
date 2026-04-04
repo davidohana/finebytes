@@ -167,7 +167,10 @@ namespace Mfr.Tests.Core
             Assert.Equal(0, result.Count(x => x.Status == RenameStatus.Ok));
             Assert.Equal(RenameStatus.Error, result[0].Status);
             Assert.Equal(RenameStatus.Skipped, result[1].Status);
-            Assert.NotNull(files[0].CommitError);
+            var firstCommitError = files[0].CommitError!;
+            Assert.NotNull(firstCommitError);
+            Assert.NotNull(firstCommitError.Cause);
+            Assert.Equal(firstCommitError.Cause!.Message, firstCommitError.Message);
             Assert.Null(files[1].CommitError);
             Assert.True(File.Exists(secondSource));
             Assert.False(File.Exists(dir.CombinePath("002.mp3")));
@@ -223,7 +226,10 @@ namespace Mfr.Tests.Core
             Assert.Equal(1, result.Count(x => x.Status == RenameStatus.Ok));
             Assert.Equal(RenameStatus.Error, result[0].Status);
             Assert.Equal(RenameStatus.Ok, result[1].Status);
-            Assert.NotNull(files[0].CommitError);
+            var firstCommitError = files[0].CommitError!;
+            Assert.NotNull(firstCommitError);
+            Assert.NotNull(firstCommitError.Cause);
+            Assert.Equal(firstCommitError.Cause!.Message, firstCommitError.Message);
             Assert.Null(files[1].CommitError);
             Assert.True(File.Exists(dir.CombinePath("002.mp3")));
             Assert.False(File.Exists(secondSource));
@@ -259,7 +265,10 @@ namespace Mfr.Tests.Core
             };
 
             FilterEngine.Preview(failingPreset, files, failFast: false);
-            Assert.NotNull(files[0].PreviewError);
+            var previewError = files[0].PreviewError!;
+            Assert.NotNull(previewError);
+            Assert.NotNull(previewError.Cause);
+            Assert.Equal(previewError.Cause!.Message, previewError.Message);
 
             var successPreset = new FilterPreset
             {

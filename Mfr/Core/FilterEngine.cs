@@ -43,7 +43,7 @@ namespace Mfr.Core
                 }
                 catch (Exception ex)
                 {
-                    renameItem.PreviewError = ex.Message;
+                    renameItem.PreviewError = new RenameItemError(Message: ex.Message, Cause: ex);
                     renameItem.Status = RenameStatus.Error;
                     if (failFast)
                     {
@@ -170,13 +170,13 @@ namespace Mfr.Core
                 }
                 catch (Exception ex)
                 {
-                    item.CommitError = ex.Message;
+                    item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
                     item.Status = RenameStatus.Error;
                     commitResults[idx] = new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
                         Status: RenameStatus.Error,
-                        Error: ex.Message);
+                        Error: item.CommitError.Message);
                     if (failFast)
                     {
                         break;

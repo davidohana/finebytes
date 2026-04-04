@@ -1,6 +1,13 @@
 namespace Mfr.Models
 {
     /// <summary>
+    /// Represents error details for preview/commit processing.
+    /// </summary>
+    /// <param name="Message">Human-readable error message.</param>
+    /// <param name="Cause">Optional underlying exception instance.</param>
+    public sealed record RenameItemError(string Message, Exception? Cause = null);
+
+    /// <summary>
     /// Represents the outcome state of a rename item.
     /// </summary>
     public enum RenameStatus
@@ -46,12 +53,12 @@ namespace Mfr.Models
         /// <summary>
         /// Gets the latest error captured while generating preview for this item.
         /// </summary>
-        public string? PreviewError { get; set; }
+        public RenameItemError? PreviewError { get; set; }
 
         /// <summary>
         /// Gets the latest error captured while committing this item.
         /// </summary>
-        public string? CommitError { get; set; }
+        public RenameItemError? CommitError { get; set; }
 
         /// <summary>
         /// Gets the latest status for this item during preview/commit processing.
