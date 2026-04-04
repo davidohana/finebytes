@@ -66,31 +66,28 @@ namespace Mfr.Cli
                 preset: preset,
                 files: renameItems,
                 failFast: options.FailFast);
-            var stats = previewStats;
-            var shouldCommit = previewStats.Errors == 0;
-            if (!options.FailFast && previewStats.Errors > 0)
+            if (options.FailFast && previewStats.Errors > 0)
             {
-                shouldCommit = true;
+                _PrintResult(previewStats, options.OutputFormat, options.Silent);
+                return CliExitCode.UserError;
             }
 
-            if (shouldCommit)
-            {
-                stats = FilterEngine.Commit(
-                    presetName: preset.Name,
-                    files: renameItems,
-                    failFast: options.FailFast);
-            }
+            var stats = FilterEngine.Commit(
+                presetName: preset.Name,
+                files: renameItems,
+                failFast: options.FailFast);
 
-            if (!options.Silent)
-            {
-                _PrintResult(stats, options.OutputFormat);
-            }
-
-            return stats.Errors > 0 && options.FailFast ? CliExitCode.UserError : CliExitCode.Success;
+            _PrintResult(stats, options.OutputFormat, options.Silent);
+            return stats.Errors > 0 ? CliExitCode.UserError : CliExitCode.Success;
         }
 
-        private static void _PrintResult(RenameBatchResult result, OutputFormat format)
+        private static void _PrintResult(RenameBatchResult result, OutputFormat format, bool silent)
         {
+            if (silent)
+            {
+                return;
+            }
+
             switch (format)
             {
                 case OutputFormat.Table:
