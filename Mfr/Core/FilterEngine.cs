@@ -28,7 +28,7 @@ namespace Mfr.Core
             {
                 item.ResetPreview();
                 item.ResetPreviewError();
-                item.Status = RenameStatus.Skipped;
+                item.Status = RenameStatus.Init;
             }
 
             foreach (var renameItem in renameItems)
@@ -40,11 +40,17 @@ namespace Mfr.Core
                     {
                         throw new InvalidOperationException("Preview not generated");
                     }
+
+                    var sourcePath = renameItem.Original.FullPath;
+                    var destPath = renameItem.Preview.FullPath;
+                    renameItem.Status = string.Equals(sourcePath, destPath, StringComparison.OrdinalIgnoreCase)
+                        ? RenameStatus.PreviewNoChange
+                        : RenameStatus.PreviewOk;
                 }
                 catch (Exception ex)
                 {
                     renameItem.PreviewError = new RenameItemError(Message: ex.Message, Cause: ex);
-                    renameItem.Status = RenameStatus.Error;
+                    renameItem.Status = RenameStatus.PreviewError;
                     if (failFast)
                     {
                         break;
@@ -72,11 +78,11 @@ namespace Mfr.Core
                 var preview = item.Preview;
                 if (preview is null)
                 {
-                    item.Status = RenameStatus.Skipped;
+                    item.Status = RenameStatus.CommitSkipped;
                     commitResults.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: sourcePath,
-                        Status: RenameStatus.Skipped,
+                        Status: RenameStatus.CommitSkipped,
                         Error: null));
                     continue;
                 }
@@ -84,20 +90,20 @@ namespace Mfr.Core
                 var destPath = preview.FullPath;
                 if (string.Equals(sourcePath, destPath, StringComparison.OrdinalIgnoreCase))
                 {
-                    item.Status = RenameStatus.Skipped;
+                    item.Status = RenameStatus.CommitSkipped;
                     commitResults.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
-                        Status: RenameStatus.Skipped,
+                        Status: RenameStatus.CommitSkipped,
                         Error: null));
                     continue;
                 }
 
-                item.Status = RenameStatus.Skipped;
+                item.Status = RenameStatus.CommitSkipped;
                 commitResults.Add(new RenameResultItem(
                     OriginalPath: sourcePath,
                     ResultPath: destPath,
-                    Status: RenameStatus.Skipped,
+                    Status: RenameStatus.CommitSkipped,
                     Error: null));
                 pending.Add(item);
             }
@@ -149,11 +155,11 @@ namespace Mfr.Core
                 var idx = resultIndex[sourcePath];
                 if (conflictDestinations.Contains(destPath))
                 {
-                    item.Status = RenameStatus.ConflictSkipped;
+                    item.Status = RenameStatus.CommitConflictSkipped;
                     commitResults[idx] = new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
-                        Status: RenameStatus.ConflictSkipped,
+                        Status: RenameStatus.CommitConflictSkipped,
                         Error: null);
                     continue;
                 }
@@ -161,21 +167,21 @@ namespace Mfr.Core
                 try
                 {
                     item.CommitPreview();
-                    item.Status = RenameStatus.Ok;
+                    item.Status = RenameStatus.CommitOk;
                     commitResults[idx] = new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
-                        Status: RenameStatus.Ok,
+                        Status: RenameStatus.CommitOk,
                         Error: null);
                 }
                 catch (Exception ex)
                 {
                     item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
-                    item.Status = RenameStatus.Error;
+                    item.Status = RenameStatus.CommitError;
                     commitResults[idx] = new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
-                        Status: RenameStatus.Error,
+                        Status: RenameStatus.CommitError,
                         Error: item.CommitError.Message);
                     if (failFast)
                     {

@@ -13,24 +13,44 @@ namespace Mfr.Models
     public enum RenameStatus
     {
         /// <summary>
-        /// Rename operation completed successfully.
+        /// Item has not been previewed/committed yet.
         /// </summary>
-        Ok,
+        Init,
 
         /// <summary>
-        /// Rename was skipped.
+        /// Preview generated a destination different from source.
         /// </summary>
-        Skipped,
+        PreviewOk,
 
         /// <summary>
-        /// Rename was skipped due to destination conflict.
+        /// Preview computed no effective change and was skipped.
         /// </summary>
-        ConflictSkipped,
+        PreviewNoChange,
 
         /// <summary>
-        /// Rename failed due to an error.
+        /// Preview failed with an error.
         /// </summary>
-        Error
+        PreviewError,
+
+        /// <summary>
+        /// Commit operation completed successfully.
+        /// </summary>
+        CommitOk,
+
+        /// <summary>
+        /// Commit was skipped.
+        /// </summary>
+        CommitSkipped,
+
+        /// <summary>
+        /// Commit was skipped due to destination conflict.
+        /// </summary>
+        CommitConflictSkipped,
+
+        /// <summary>
+        /// Commit failed due to an error.
+        /// </summary>
+        CommitError
     }
 
     /// <summary>
@@ -63,7 +83,7 @@ namespace Mfr.Models
         /// <summary>
         /// Gets the latest status for this item during preview/commit processing.
         /// </summary>
-        public RenameStatus Status { get; set; } = RenameStatus.Skipped;
+        public RenameStatus Status { get; set; } = RenameStatus.Init;
 
         /// <summary>
         /// Clears preview metadata so the next preview starts from original data.

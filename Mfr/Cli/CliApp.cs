@@ -124,9 +124,9 @@ namespace Mfr.Cli
         private static void _PrintTable(string presetName, int totalFiles, IReadOnlyList<RenameResultItem> results)
         {
             var errors = _CountErrors(results);
-            var renamed = _CountStatus(results, RenameStatus.Ok);
-            var skipped = _CountStatus(results, RenameStatus.Skipped);
-            var conflicts = _CountStatus(results, RenameStatus.ConflictSkipped);
+            var renamed = _CountStatus(results, RenameStatus.CommitOk);
+            var skipped = _CountSkipped(results);
+            var conflicts = _CountStatus(results, RenameStatus.CommitConflictSkipped);
             _PrintLine($"Preset: {presetName}");
             _PrintLine($"Total: {totalFiles}  Renamed: {renamed}  Skipped: {skipped}  Conflicts: {conflicts}  Errors: {errors}");
             _PrintLine(string.Empty);
@@ -141,9 +141,9 @@ namespace Mfr.Cli
         private static void _PrintJson(string presetName, int totalFiles, IReadOnlyList<RenameResultItem> results)
         {
             var errors = _CountErrors(results);
-            var renamed = _CountStatus(results, RenameStatus.Ok);
-            var skipped = _CountStatus(results, RenameStatus.Skipped);
-            var conflicts = _CountStatus(results, RenameStatus.ConflictSkipped);
+            var renamed = _CountStatus(results, RenameStatus.CommitOk);
+            var skipped = _CountSkipped(results);
+            var conflicts = _CountStatus(results, RenameStatus.CommitConflictSkipped);
             using var ms = new MemoryStream();
             using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions { Indented = true });
 
@@ -225,12 +225,17 @@ namespace Mfr.Cli
 
         private static int _CountErrors(IReadOnlyList<RenameResultItem> results)
         {
-            return results.Count(item => item.Status == RenameStatus.Error);
+            return results.Count(item => item.Status is RenameStatus.PreviewError or RenameStatus.CommitError);
         }
 
         private static int _CountStatus(IReadOnlyList<RenameResultItem> results, RenameStatus status)
         {
             return results.Count(item => item.Status == status);
+        }
+
+        private static int _CountSkipped(IReadOnlyList<RenameResultItem> results)
+        {
+            return results.Count(item => item.Status is RenameStatus.PreviewNoChange or RenameStatus.CommitSkipped);
         }
 
         private static List<RenameResultItem> _BuildPreviewResults(IReadOnlyList<RenameItem> renameItems)

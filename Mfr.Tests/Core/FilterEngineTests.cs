@@ -56,9 +56,9 @@ namespace Mfr.Tests.Core
             FilterEngine.Preview(preset, files, failFast: false);
             var result = FilterEngine.Commit(files, failFast: false);
 
-            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.ConflictSkipped));
-            Assert.Equal(RenameStatus.ConflictSkipped, result[0].Status);
-            Assert.Equal(RenameStatus.ConflictSkipped, result[1].Status);
+            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitConflictSkipped));
+            Assert.Equal(RenameStatus.CommitConflictSkipped, result[0].Status);
+            Assert.Equal(RenameStatus.CommitConflictSkipped, result[1].Status);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
             Assert.True(File.Exists(a), "source file 'a' should remain on conflict skip");
             Assert.True(File.Exists(b), "source file 'b' should remain on conflict skip");
@@ -106,9 +106,9 @@ namespace Mfr.Tests.Core
             FilterEngine.Preview(preset, files, failFast: false);
             var result = FilterEngine.Commit(files, failFast: false);
 
-            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.Ok));
-            Assert.Equal(RenameStatus.Ok, result[0].Status);
-            Assert.Equal(RenameStatus.Ok, result[1].Status);
+            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.Equal(RenameStatus.CommitOk, result[1].Status);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
             Assert.False(File.Exists(a));
@@ -163,10 +163,10 @@ namespace Mfr.Tests.Core
 
             var result = FilterEngine.Commit(files, failFast: true);
 
-            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.Error));
-            Assert.Equal(0, result.Count(x => x.Status == RenameStatus.Ok));
-            Assert.Equal(RenameStatus.Error, result[0].Status);
-            Assert.Equal(RenameStatus.Skipped, result[1].Status);
+            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitError));
+            Assert.Equal(0, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.Equal(RenameStatus.CommitError, result[0].Status);
+            Assert.Equal(RenameStatus.CommitSkipped, result[1].Status);
             var firstCommitError = files[0].CommitError!;
             Assert.NotNull(firstCommitError);
             Assert.NotNull(firstCommitError.Cause);
@@ -222,10 +222,10 @@ namespace Mfr.Tests.Core
 
             var result = FilterEngine.Commit(files, failFast: false);
 
-            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.Error));
-            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.Ok));
-            Assert.Equal(RenameStatus.Error, result[0].Status);
-            Assert.Equal(RenameStatus.Ok, result[1].Status);
+            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitError));
+            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.Equal(RenameStatus.CommitError, result[0].Status);
+            Assert.Equal(RenameStatus.CommitOk, result[1].Status);
             var firstCommitError = files[0].CommitError!;
             Assert.NotNull(firstCommitError);
             Assert.NotNull(firstCommitError.Cause);
