@@ -32,10 +32,4 @@ namespace Mfr8.Models
 
         internal abstract string Apply(string segment, FileEntryLite file);
     }
-
-    /// <summary>
-    /// Represents numeric count options used by extraction and trim filters.
-    /// </summary>
-    /// <param name="Count">Character count.</param>
-    public sealed record CountFilterOptions(int Count);
 }

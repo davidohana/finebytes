@@ -1,0 +1,22 @@
+namespace Mfr8.Models
+{
+    /// <summary>
+    /// Collapses runs of whitespace into single spaces.
+    /// </summary>
+    /// <param name="Enabled">Whether the filter is enabled.</param>
+    /// <param name="Target">The target that this filter applies to.</param>
+    public sealed record ShrinkSpacesFilter(
+        bool Enabled,
+        FilterTarget Target) : Filter(Enabled, Target)
+    {
+        /// <summary>
+        /// Gets the filter type discriminator.
+        /// </summary>
+        public override string Type => "ShrinkSpaces";
+
+        internal override string Apply(string segment, FileEntryLite file)
+        {
+            return TextFilterRegexCache.WhitespaceRegex.Replace(segment, " ");
+        }
+    }
+}
