@@ -1,4 +1,4 @@
-using Mfr8.Core;
+using Mfr8.Models;
 
 namespace Mfr8.Cli
 {

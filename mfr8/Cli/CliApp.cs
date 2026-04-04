@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 
 using Mfr8.Core;
+using Mfr8.Models;
 using Spectre.Console;
 
 namespace Mfr8.Cli

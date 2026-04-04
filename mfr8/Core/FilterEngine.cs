@@ -1,5 +1,7 @@
 using System.Text.RegularExpressions;
 
+using Mfr8.Models;
+
 namespace Mfr8.Core
 {
     public enum RenameStatus

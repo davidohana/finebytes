@@ -1,4 +1,5 @@
 using Mfr8.Core;
+using Mfr8.Models;
 
 namespace mfr8.Tests.Core
 {

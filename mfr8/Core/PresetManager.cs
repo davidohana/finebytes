@@ -1,5 +1,7 @@
 using System.Text.Json;
 
+using Mfr8.Models;
+
 namespace Mfr8.Core
 {
     /// <summary>
