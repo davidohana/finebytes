@@ -8,6 +8,9 @@ restore:
 build:
     dotnet build ./finebytes.slnx
 
+clean:
+    dotnet clean ./finebytes.slnx
+
 test:
     dotnet test ./mfr8.Tests/mfr8.Tests.csproj -c Debug
 
