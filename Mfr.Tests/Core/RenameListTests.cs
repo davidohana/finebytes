@@ -144,8 +144,7 @@ namespace Mfr.Tests.Core
         public void AddSource_Resolves_Glob_In_TopDirectoryOnly()
         {
             var topLevelMatch = _tempRoot.CombinePath("top.txt");
-            var nestedDir = _tempRoot.CombinePath("nested");
-            var nestedMatch = nestedDir.CombinePath("nested.txt");
+            var nestedMatch = _tempRoot.CombinePath("nested").CombinePath("nested.txt");
             _CreateDummyFile(topLevelMatch, "top");
             _CreateDummyFile(nestedMatch, "nested");
 
