@@ -19,3 +19,6 @@ format:
 
 run-help:
     dotnet run --project ./mfr8/mfr8.csproj -- --help
+
+run *args:
+    dotnet run --project ./mfr8/mfr8.csproj -- {{args}}
