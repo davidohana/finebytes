@@ -1,0 +1,29 @@
+using Mfr8.Models;
+
+namespace Mfr8.Tests.Models.Filters
+{
+    internal static class FilterTestHelpers
+    {
+        /// <summary>
+        /// Builds a <see cref="FileEntryLite"/> for filter tests with predictable paths and indices.
+        /// </summary>
+        /// <param name="prefix">File name without extension.</param>
+        /// <param name="extension">Extension including the leading dot.</param>
+        /// <param name="globalIndex">Zero-based index across all files.</param>
+        /// <param name="folderOccurrenceIndex">Zero-based index within the folder.</param>
+        /// <param name="directory">Parent directory path, or a default when null.</param>
+        /// <returns>A lightweight file entry.</returns>
+        public static FileEntryLite CreateFile(
+            string prefix = "track",
+            string extension = ".mp3",
+            int globalIndex = 0,
+            int folderOccurrenceIndex = 0,
+            string? directory = null)
+        {
+            directory ??= @"C:\Music\Album";
+            var fullName = prefix + extension;
+            var fullPath = Path.Combine(directory, fullName);
+            return new FileEntryLite(globalIndex, folderOccurrenceIndex, fullPath, directory, prefix, extension);
+        }
+    }
+}

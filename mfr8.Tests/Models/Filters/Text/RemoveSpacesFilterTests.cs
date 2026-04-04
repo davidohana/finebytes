@@ -1,0 +1,24 @@
+using Mfr8.Models;
+using Mfr8.Models.Filters.Text;
+
+namespace Mfr8.Tests.Models.Filters.Text
+{
+    /// <summary>
+    /// Tests for <see cref="RemoveSpacesFilter"/>.
+    /// </summary>
+    public class RemoveSpacesFilterTests
+    {
+        private static readonly FileNameTarget _Target = new(FileNameTargetMode.Prefix);
+
+        /// <summary>
+        /// Verifies all whitespace is removed.
+        /// </summary>
+        [Fact]
+        public void Apply_StripsAllWhitespace()
+        {
+            var f = new RemoveSpacesFilter(true, _Target);
+            var file = FilterTestHelpers.CreateFile();
+            Assert.Equal("ab", f.Apply("a \t\r\nb", file));
+        }
+    }
+}
