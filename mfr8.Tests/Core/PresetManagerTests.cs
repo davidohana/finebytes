@@ -4,6 +4,9 @@ using Mfr8.Core;
 
 namespace mfr8.Tests.Core
 {
+    /// <summary>
+    /// Tests loading and saving behavior for <see cref="PresetManager"/>.
+    /// </summary>
     public class PresetManagerTests
     {
         [Fact]

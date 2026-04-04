@@ -25,6 +25,9 @@ namespace Mfr8.Core
         int Errors,
         IReadOnlyList<RenameResultItem> Results);
 
+    /// <summary>
+    /// Applies configured filters to file names and commits non-conflicting rename operations.
+    /// </summary>
     public static partial class FilterEngine
     {
         /// <summary>

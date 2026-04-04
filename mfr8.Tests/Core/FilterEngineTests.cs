@@ -2,6 +2,9 @@ using Mfr8.Core;
 
 namespace mfr8.Tests.Core
 {
+    /// <summary>
+    /// Tests rename preview and commit behavior in the filter engine.
+    /// </summary>
     public class FilterEngineTests
     {
         [Fact]

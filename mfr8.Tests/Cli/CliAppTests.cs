@@ -2,6 +2,9 @@ using Mfr8.Cli;
 
 namespace mfr8.Tests.Cli
 {
+    /// <summary>
+    /// Tests command-line error handling and user-facing output behavior.
+    /// </summary>
     public class CliAppTests
     {
         [Fact]

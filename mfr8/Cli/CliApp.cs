@@ -6,6 +6,9 @@ using Spectre.Console;
 
 namespace Mfr8.Cli
 {
+    /// <summary>
+    /// Provides the command-line entry point and output formatting for the mfr8 application.
+    /// </summary>
     public static class CliApp
     {
         /// <summary>

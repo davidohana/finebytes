@@ -1,5 +1,8 @@
 namespace Mfr8.Core
 {
+    /// <summary>
+    /// Scans source paths and expands them into normalized file entries for renaming.
+    /// </summary>
     public static class FileScanner
     {
         /// <summary>
