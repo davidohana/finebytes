@@ -25,22 +25,22 @@ namespace Mfr.Models
             Preview = null;
         }
 
-        internal void SetPreviewSegment(FileNamePart part, string segment)
+        internal void SetPreviewValue(FileNamePart part, string partValue)
         {
-            var source = Preview ?? Original;
+            var sourceFileEntry = Preview ?? Original;
             switch (part)
             {
                 case FileNamePart.Prefix:
-                    _SetPreviewFileEntry(source, segment, source.Extension);
+                    _SetPreviewFileEntry(sourceFileEntry, partValue, sourceFileEntry.Extension);
                     return;
                 case FileNamePart.Extension:
-                    _SetPreviewFileEntry(source, source.Prefix, segment);
+                    _SetPreviewFileEntry(sourceFileEntry, sourceFileEntry.Prefix, partValue);
                     return;
                 case FileNamePart.Full:
-                    var fullName = Path.GetFileName(segment);
+                    var fullName = Path.GetFileName(partValue);
                     var extension = Path.GetExtension(fullName);
                     var prefix = Path.GetFileNameWithoutExtension(fullName);
-                    _SetPreviewFileEntry(source, prefix, extension);
+                    _SetPreviewFileEntry(sourceFileEntry, prefix, extension);
                     return;
                 default:
                     throw new InvalidOperationException($"Unknown fileNamePart '{part}'.");

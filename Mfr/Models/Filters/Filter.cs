@@ -55,7 +55,7 @@ namespace Mfr.Models.Filters
             };
 
             var transformedSegment = TransformSegment(partValue, item);
-            item.SetPreviewSegment(part, transformedSegment);
+            item.SetPreviewValue(part, transformedSegment);
         }
 
         internal abstract string TransformSegment(string segment, RenameItem item);
