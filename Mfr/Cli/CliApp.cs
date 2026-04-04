@@ -64,7 +64,7 @@ namespace Mfr.Cli
 
             var previewStats = FilterEngine.Preview(
                 preset: preset,
-                files: renameItems,
+                renameItems: renameItems,
                 failFast: options.FailFast);
             if (options.FailFast && previewStats.Errors > 0)
             {

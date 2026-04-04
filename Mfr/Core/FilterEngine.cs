@@ -34,53 +34,42 @@ namespace Mfr.Core
         /// Previews rename outcomes for a batch without touching the filesystem.
         /// </summary>
         /// <param name="preset">The rename preset (sequence of enabled filters).</param>
-        /// <param name="files">Candidate files to rename.</param>
+        /// <param name="renameItems">Candidate files to rename.</param>
         /// <param name="failFast">If <c>true</c>, stop previewing after the first per-item error.</param>
         /// <returns>Preview summary with computed destination paths and preview errors.</returns>
         public static RenameBatchResult Preview(
             FilterPreset preset,
-            IReadOnlyList<RenameItem> files,
+            IReadOnlyList<RenameItem> renameItems,
             bool failFast)
         {
-            var previewResults = new List<RenameResultItem>(files.Count);
-            foreach (var item in files)
+            var previewResults = new List<RenameResultItem>(renameItems.Count);
+            foreach (var renameItem in renameItems)
             {
                 try
                 {
-                    item.ApplyFilters(preset.Filters);
-                    var preview = item.Preview;
-                    if (preview is null)
-                    {
-                        previewResults.Add(new RenameResultItem(item.Original.FullPath, item.Original.FullPath, RenameStatus.Error, "Preview did not produce a destination path."));
-                        if (failFast)
-                        {
-                            return _Summarize(preset.Name, files.Count, previewResults);
-                        }
-
-                        continue;
-                    }
-
+                    renameItem.ApplyFilters(preset.Filters);
+                    var preview = renameItem.Preview ?? throw new InvalidOperationException("Preview not generated");
                     var destPath = preview.FullPath;
 
-                    if (string.Equals(destPath, item.Original.FullPath, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(destPath, renameItem.Original.FullPath, StringComparison.OrdinalIgnoreCase))
                     {
-                        previewResults.Add(new RenameResultItem(item.Original.FullPath, destPath, RenameStatus.Skipped, null));
+                        previewResults.Add(new RenameResultItem(renameItem.Original.FullPath, destPath, RenameStatus.Skipped, null));
                         continue;
                     }
 
-                    previewResults.Add(new RenameResultItem(item.Original.FullPath, destPath, RenameStatus.Skipped, null));
+                    previewResults.Add(new RenameResultItem(renameItem.Original.FullPath, destPath, RenameStatus.Skipped, null));
                 }
                 catch (Exception ex)
                 {
-                    previewResults.Add(new RenameResultItem(item.Original.FullPath, item.Original.FullPath, RenameStatus.Error, ex.Message));
+                    previewResults.Add(new RenameResultItem(renameItem.Original.FullPath, renameItem.Original.FullPath, RenameStatus.Error, ex.Message));
                     if (failFast)
                     {
-                        return _Summarize(preset.Name, files.Count, previewResults);
+                        return _Summarize(preset.Name, renameItems.Count, previewResults);
                     }
                 }
             }
 
-            return _Summarize(preset.Name, files.Count, previewResults);
+            return _Summarize(preset.Name, renameItems.Count, previewResults);
         }
 
         /// <summary>
