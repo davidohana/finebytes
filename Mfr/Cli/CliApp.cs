@@ -53,7 +53,9 @@ namespace Mfr.Cli
                 ? loadedPreset
                 : throw new UserException($"Preset not found: '{options.PresetName}'.");
 
-            var files = FileScanner.ScanSources(options.Sources, includeHidden: options.IncludeHidden);
+            var renameList = new RenameList(includeHidden: options.IncludeHidden);
+            renameList.AddSources(options.Sources);
+            var files = renameList.ResolvedItems;
 
             if (files.Count == 0)
             {

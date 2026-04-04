@@ -1,23 +1,22 @@
 using Mfr.Core;
-using Mfr.Models;
 
 namespace Mfr.Tests.Core
 {
     /// <summary>
-    /// Tests scanning and file-entry conversion behavior in <see cref="FileScanner"/>.
+    /// Tests source and file resolution behavior in <see cref="RenameList"/>.
     /// </summary>
-    public class FileScannerTests : IDisposable
+    public class RenameListTests : IDisposable
     {
         private readonly string _tempRoot;
 
         /// <summary>
         /// Initializes a new test instance with an isolated temporary directory under the current workspace.
         /// </summary>
-        public FileScannerTests()
+        public RenameListTests()
         {
             _tempRoot = Path.Combine(
                 Directory.GetCurrentDirectory(),
-                "mfr_filescanner_tests_" + Guid.NewGuid().ToString("N"));
+                "mfr_renamelist_tests_" + Guid.NewGuid().ToString("N"));
             _ = Directory.CreateDirectory(_tempRoot);
         }
 
@@ -52,9 +51,9 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
-        /// Verifies that mixed source types are expanded and deduplicated into ordered entries.
+        /// Verifies that mixed source types are expanded in source order and deduplicated.
         /// </summary>
-        public void ScanSources_Resolves_Mixed_Sources_Into_Distinct_Entries()
+        public void AddSources_Expands_Mixed_Sources_And_Preserves_Source_Order()
         {
             var alphaPath = Path.Combine(_tempRoot, "alpha.txt");
             var betaPath = Path.Combine(_tempRoot, "beta.log");
@@ -65,28 +64,47 @@ namespace Mfr.Tests.Core
 
             var sources = new[]
             {
-                Path.Combine(_tempRoot, "*.txt"),
                 betaPath,
-                _tempRoot
+                Path.Combine(_tempRoot, "*.txt"),
+                _tempRoot,
             };
 
-            var entries = FileScanner.ScanSources(sources, includeHidden: true);
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources(sources);
+            var entries = renameList.ResolvedItems;
 
             Assert.Equal(3, entries.Count);
             Assert.Equal(
-                [alphaPath, betaPath, gammaPath],
-                entries.Select(e => e.FullPath).ToArray());
-            Assert.Equal([0, 1, 2], entries.Select(e => e.GlobalIndex).ToArray());
-            Assert.Equal([0, 1, 2], entries.Select(e => e.FolderOccurrenceIndex).ToArray());
-            Assert.Equal(["alpha", "beta", "gamma"], entries.Select(e => e.Prefix).ToArray());
-            Assert.Equal([".txt", ".log", ".txt"], entries.Select(e => e.Extension).ToArray());
+                [betaPath, alphaPath, gammaPath],
+                entries.Select(e => e.FullPath));
+            Assert.Equal([0, 1, 2], entries.Select(e => e.GlobalIndex));
+            Assert.Equal([0, 1, 2], entries.Select(e => e.FolderOccurrenceIndex));
+            Assert.Equal(["beta", "alpha", "gamma"], entries.Select(e => e.Prefix));
+            Assert.Equal([".log", ".txt", ".txt"], entries.Select(e => e.Extension));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that duplicate source additions are allowed, while resolved items stay distinct.
+        /// </summary>
+        public void AddSource_Allows_Duplicate_Sources_But_ResolvedItems_Are_Deduplicated()
+        {
+            var source = Path.Combine(_tempRoot, "alpha.txt");
+            File.WriteAllText(source, "a");
+
+            var renameList = new RenameList(includeHidden: true);
+            Assert.True(renameList.AddSource(source));
+            Assert.True(renameList.AddSource(source));
+
+            _ = Assert.Single(renameList.ResolvedItems);
+            Assert.Equal(source, renameList.ResolvedItems[0].FullPath);
         }
 
         [Fact]
         /// <summary>
         /// Verifies that hidden files are skipped unless hidden inclusion is enabled.
         /// </summary>
-        public void ToFileEntryLiteList_Filters_Hidden_When_Disabled()
+        public void AddSource_Filters_Hidden_When_Disabled()
         {
             var visiblePath = Path.Combine(_tempRoot, "visible.txt");
             var hiddenPath = Path.Combine(_tempRoot, "hidden.txt");
@@ -96,20 +114,25 @@ namespace Mfr.Tests.Core
             var hiddenAttrs = File.GetAttributes(hiddenPath);
             File.SetAttributes(hiddenPath, hiddenAttrs | FileAttributes.Hidden);
 
-            var orderedPaths = new List<string> { hiddenPath, visiblePath };
+            var excludeHiddenList = new RenameList(includeHidden: false);
+            _ = excludeHiddenList.AddSource(hiddenPath);
+            _ = excludeHiddenList.AddSource(visiblePath);
+            var excludedHidden = excludeHiddenList.ResolvedItems.ToList();
 
-            var excludedHidden = FileScanner.ToFileEntryLiteList(orderedPaths, includeHidden: false);
-            var includedHidden = FileScanner.ToFileEntryLiteList(orderedPaths, includeHidden: true);
+            var includeHiddenList = new RenameList(includeHidden: true);
+            _ = includeHiddenList.AddSource(hiddenPath);
+            _ = includeHiddenList.AddSource(visiblePath);
+            var includedHidden = includeHiddenList.ResolvedItems.ToList();
 
-            Assert.Single(excludedHidden);
+            _ = Assert.Single(excludedHidden);
             Assert.Equal(visiblePath, excludedHidden[0].FullPath);
             Assert.Equal(1, excludedHidden[0].GlobalIndex);
             Assert.Equal(0, excludedHidden[0].FolderOccurrenceIndex);
 
             Assert.Equal(2, includedHidden.Count);
-            Assert.Equal([hiddenPath, visiblePath], includedHidden.Select(x => x.FullPath).ToArray());
-            Assert.Equal([0, 1], includedHidden.Select(x => x.GlobalIndex).ToArray());
-            Assert.Equal([0, 1], includedHidden.Select(x => x.FolderOccurrenceIndex).ToArray());
+            Assert.Equal([hiddenPath, visiblePath], includedHidden.Select(x => x.FullPath));
+            Assert.Equal([0, 1], includedHidden.Select(x => x.GlobalIndex));
+            Assert.Equal([0, 1], includedHidden.Select(x => x.FolderOccurrenceIndex));
         }
     }
 }
