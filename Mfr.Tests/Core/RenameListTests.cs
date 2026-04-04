@@ -73,7 +73,7 @@ namespace Mfr.Tests.Core
 
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources(sources);
-            var entries = renameList.ResolvedItems;
+            var entries = renameList.RenameItems;
 
             var tempRootParent = Path.GetDirectoryName(_tempRoot) ?? "";
             var tempRootName = Path.GetFileName(_tempRoot);
@@ -103,8 +103,8 @@ namespace Mfr.Tests.Core
             Assert.Equal(1, renameList.AddSource(source));
             Assert.Equal(0, renameList.AddSource(source));
 
-            _ = Assert.Single(renameList.ResolvedItems);
-            Assert.Equal(source, renameList.ResolvedItems[0].FullPath);
+            _ = Assert.Single(renameList.RenameItems);
+            Assert.Equal(source, renameList.RenameItems[0].FullPath);
         }
 
         [Fact]
@@ -121,12 +121,12 @@ namespace Mfr.Tests.Core
             var excludeHiddenList = new RenameList(includeHidden: false);
             _ = excludeHiddenList.AddSource(hiddenPath);
             _ = excludeHiddenList.AddSource(visiblePath);
-            var excludedHidden = excludeHiddenList.ResolvedItems.ToList();
+            var excludedHidden = excludeHiddenList.RenameItems.ToList();
 
             var includeHiddenList = new RenameList(includeHidden: true);
             _ = includeHiddenList.AddSource(hiddenPath);
             _ = includeHiddenList.AddSource(visiblePath);
-            var includedHidden = includeHiddenList.ResolvedItems.ToList();
+            var includedHidden = includeHiddenList.RenameItems.ToList();
 
             _ = Assert.Single(excludedHidden);
             Assert.Equal(visiblePath, excludedHidden[0].FullPath);
@@ -151,7 +151,7 @@ namespace Mfr.Tests.Core
             var addedCount = renameList.AddSource(_tempRoot.CombinePath("*.txt"));
 
             Assert.Equal(1, addedCount);
-            var entry = Assert.Single(renameList.ResolvedItems);
+            var entry = Assert.Single(renameList.RenameItems);
             Assert.Equal(topLevelMatch, entry.FullPath);
         }
 
@@ -167,7 +167,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(1, renameList.AddSource(_tempRoot.CombinePath("*.txt")));
             Assert.Equal(0, renameList.AddSource(alphaPath));
 
-            var entry = Assert.Single(renameList.ResolvedItems);
+            var entry = Assert.Single(renameList.RenameItems);
             Assert.Equal(alphaPath, entry.FullPath);
         }
 
@@ -189,7 +189,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(3, addedCount);
             Assert.Equal(
                 [topLevelMatch, nestedMatch, deeperMatch],
-                renameList.ResolvedItems.Select(entry => entry.FullPath));
+                renameList.RenameItems.Select(entry => entry.FullPath));
         }
 
         [Fact]
@@ -210,8 +210,8 @@ namespace Mfr.Tests.Core
             Assert.Equal(2, addedCount);
             Assert.Equal(
                 [nestedMatch, deeperMatch],
-                renameList.ResolvedItems.Select(entry => entry.FullPath));
-            Assert.DoesNotContain(nonMatch, renameList.ResolvedItems.Select(entry => entry.FullPath));
+                renameList.RenameItems.Select(entry => entry.FullPath));
+            Assert.DoesNotContain(nonMatch, renameList.RenameItems.Select(entry => entry.FullPath));
         }
 
     }

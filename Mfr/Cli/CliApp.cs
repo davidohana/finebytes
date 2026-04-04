@@ -55,7 +55,7 @@ namespace Mfr.Cli
 
             var renameList = new RenameList(includeHidden: options.IncludeHidden);
             renameList.AddSources(options.Sources);
-            var files = renameList.ResolvedItems;
+            var files = renameList.RenameItems;
 
             if (files.Count == 0)
             {

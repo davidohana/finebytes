@@ -22,7 +22,7 @@ namespace Mfr.Core
         /// <summary>
         /// Gets the resolved file items in insertion/discovery order.
         /// </summary>
-        public IReadOnlyList<FileEntryLite> ResolvedItems => _resolvedItems;
+        public IReadOnlyList<FileEntryLite> RenameItems => _resolvedItems;
 
         /// <summary>
         /// Adds and resolves a single source.
@@ -191,7 +191,7 @@ namespace Mfr.Core
         }
 
         /// <summary>
-        /// Appends resolved paths to <see cref="ResolvedItems"/> while enforcing deduplication and filtering.
+        /// Appends resolved paths to <see cref="RenameItems"/> while enforcing deduplication and filtering.
         /// </summary>
         /// <param name="resolvedPaths">Resolved file paths to append.</param>
         /// <returns>The count of newly added resolved items.</returns>
