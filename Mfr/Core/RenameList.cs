@@ -259,7 +259,7 @@ namespace Mfr.Core
                 var inFolderIndex = _folderCounts.GetValueOrDefault(directoryPath);
                 _folderCounts[directoryPath] = inFolderIndex + 1;
 
-                _renameItems.Add(new RenameItem(new FileEntryLite(
+                _renameItems.Add(new RenameItem(new FileMeta(
                     GlobalIndex: _renameItems.Count,
                     InFolderIndex: inFolderIndex,
                     FullPath: fullPath,

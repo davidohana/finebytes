@@ -1,12 +1,12 @@
 namespace Mfr.Models
 {
     /// <summary>
-    /// Lightweight file entry used during rename planning and execution.
+    /// Lightweight file metadata used during rename planning and execution.
     /// </summary>
-    public sealed class FileEntryLite
+    public sealed class FileMeta
     {
         /// <summary>
-        /// Initializes a lightweight file entry.
+        /// Initializes lightweight file metadata.
         /// </summary>
         /// <param name="GlobalIndex">Zero-based index across all scanned files.</param>
         /// <param name="InFolderIndex">Zero-based index within the parent folder.</param>
@@ -14,7 +14,7 @@ namespace Mfr.Models
         /// <param name="DirectoryPath">Absolute path to the parent directory.</param>
         /// <param name="Prefix">File name without extension.</param>
         /// <param name="Extension">File extension including the leading dot.</param>
-        public FileEntryLite(
+        public FileMeta(
             int GlobalIndex,
             int InFolderIndex,
             string FullPath,

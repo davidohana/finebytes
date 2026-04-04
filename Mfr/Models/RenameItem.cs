@@ -57,18 +57,18 @@ namespace Mfr.Models
     /// Represents one rename candidate with original and preview metadata.
     /// </summary>
     /// <param name="original">Original immutable file snapshot.</param>
-    public sealed class RenameItem(FileEntryLite original)
+    public sealed class RenameItem(FileMeta original)
     {
         /// <summary>
         /// Gets the original immutable file snapshot.
         /// </summary>
-        public FileEntryLite Original { get; private set; } = original;
+        public FileMeta Original { get; private set; } = original;
 
         /// <summary>
         /// Gets the current preview snapshot after filter application.
         /// A <c>null</c> value means no preview has been generated yet.
         /// </summary>
-        public FileEntryLite? Preview { get; private set; }
+        public FileMeta? Preview { get; private set; }
 
         /// <summary>
         /// Gets the latest error captured while generating preview for this item.
@@ -103,19 +103,19 @@ namespace Mfr.Models
 
         internal void SetPreviewValue(FileNamePart part, string partValue)
         {
-            var sourceFileEntry = _EnsurePreview();
+            var sourceFileMeta = _EnsurePreview();
             switch (part)
             {
                 case FileNamePart.Prefix:
-                    sourceFileEntry.Prefix = partValue;
+                    sourceFileMeta.Prefix = partValue;
                     break;
                 case FileNamePart.Extension:
-                    sourceFileEntry.Extension = partValue;
+                    sourceFileMeta.Extension = partValue;
                     break;
                 case FileNamePart.Full:
                     var fullName = Path.GetFileName(partValue);
-                    sourceFileEntry.Extension = Path.GetExtension(fullName);
-                    sourceFileEntry.Prefix = Path.GetFileNameWithoutExtension(fullName);
+                    sourceFileMeta.Extension = Path.GetExtension(fullName);
+                    sourceFileMeta.Prefix = Path.GetFileNameWithoutExtension(fullName);
                     break;
                 default:
                     throw new InvalidOperationException($"Unknown fileNamePart '{part}'.");
@@ -124,7 +124,7 @@ namespace Mfr.Models
 
         internal void CopyPreviewFromOriginal()
         {
-            Preview = _CloneFileEntry(Original);
+            Preview = _CloneFileMeta(Original);
         }
 
         /// <summary>
@@ -148,20 +148,29 @@ namespace Mfr.Models
             Preview = null;
         }
 
-        private FileEntryLite _EnsurePreview()
+        /// <summary>
+        /// Returns the current preview snapshot, cloning from original when missing.
+        /// </summary>
+        /// <returns>The existing or newly created preview snapshot.</returns>
+        private FileMeta _EnsurePreview()
         {
             if (Preview is not null)
             {
                 return Preview;
             }
 
-            Preview = _CloneFileEntry(Original);
+            Preview = _CloneFileMeta(Original);
             return Preview;
         }
 
-        private static FileEntryLite _CloneFileEntry(FileEntryLite source)
+        /// <summary>
+        /// Creates a detached copy of a file-entry snapshot.
+        /// </summary>
+        /// <param name="source">The source snapshot to copy.</param>
+        /// <returns>A cloned file-entry instance.</returns>
+        private static FileMeta _CloneFileMeta(FileMeta source)
         {
-            return new FileEntryLite(
+            return new FileMeta(
                 source.GlobalIndex,
                 source.InFolderIndex,
                 source.FullPath,
