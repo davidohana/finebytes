@@ -11,5 +11,6 @@ alwaysApply: true
 - Control flow: prefer early `return` and early `continue`/`break`; keep the happy path at base indentation.
 - Ternary usage: only use ternary for simple value selection (`condition ? valueA : valueB` with trivial operands).
 - Avoid complex ternary branches that call functions, construct objects, throw, or span multiple lines; use `if`/`else` instead.
+- Statement complexity: avoid complex single statements; split them into multiple statements with well-named local variables.
 - Named arguments: use named args when parameter meaning is not obvious by position (especially multiple same-type args).
 
