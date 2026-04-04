@@ -19,19 +19,14 @@ namespace Mfr.Core
 
             foreach (var filter in filters)
             {
-                if (!filter.Enabled)
-                {
-                    continue;
-                }
-
                 filter.Apply(item);
             }
-            if (item.Preview is not null)
-            {
-                return;
-            }
 
-            item.SetPreviewName(item.Original.Prefix, item.Original.Extension);
+            // If no preview was generated, copy from the original.
+            if (item.Preview is null)
+            {
+                item.CopyPreviewFromOriginal();
+            }
         }
     }
 }

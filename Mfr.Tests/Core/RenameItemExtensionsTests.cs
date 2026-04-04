@@ -18,7 +18,13 @@ namespace Mfr.Tests.Core
         public void ApplyFilters_AllFiltersDisabled_LeavesPreviewAtOriginal()
         {
             var item = FilterTestHelpers.CreateFile(prefix: "track", extension: ".mp3");
-            item.SetPreviewName("stale", ".wav");
+            item.ApplyFilters(
+            [
+                new ReplacerFilter(
+                    Enabled: true,
+                    Target: new FileNameTarget(FileNameTargetMode.Prefix),
+                    Options: new ReplacerOptions("track", "stale", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
+            ]);
             var filters = new List<Filter>
             {
                 new ReplacerFilter(

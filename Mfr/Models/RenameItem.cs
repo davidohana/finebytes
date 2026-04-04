@@ -25,16 +25,38 @@ namespace Mfr.Models
             Preview = null;
         }
 
-        /// <summary>
-        /// Updates preview metadata using the provided file-name parts.
-        /// </summary>
-        /// <param name="prefix">Preview file name without extension.</param>
-        /// <param name="extension">Preview extension including leading dot.</param>
-        public void SetPreviewName(string prefix, string extension)
+        internal void SetPreviewSegment(FileNameTargetMode mode, string segment)
+        {
+            var source = Preview ?? Original;
+            switch (mode)
+            {
+                case FileNameTargetMode.Prefix:
+                    _SetPreviewFileEntry(source, segment, source.Extension);
+                    return;
+                case FileNameTargetMode.Extension:
+                    _SetPreviewFileEntry(source, source.Prefix, segment);
+                    return;
+                case FileNameTargetMode.Full:
+                    var fullName = Path.GetFileName(segment);
+                    var extension = Path.GetExtension(fullName);
+                    var prefix = Path.GetFileNameWithoutExtension(fullName);
+                    _SetPreviewFileEntry(source, prefix, extension);
+                    return;
+                default:
+                    throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.");
+            }
+        }
+
+        internal void CopyPreviewFromOriginal()
+        {
+            Preview = Original;
+        }
+
+        private void _SetPreviewFileEntry(FileEntryLite source, string prefix, string extension)
         {
             var fullName = prefix + extension;
-            var fullPath = Path.Combine(Original.DirectoryPath, fullName);
-            Preview = Original with
+            var fullPath = Path.Combine(source.DirectoryPath, fullName);
+            Preview = source with
             {
                 FullPath = fullPath,
                 Prefix = prefix,

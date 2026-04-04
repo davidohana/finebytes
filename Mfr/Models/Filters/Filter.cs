@@ -34,6 +34,11 @@ namespace Mfr.Models.Filters
 
         internal void Apply(RenameItem item)
         {
+            if (!Enabled)
+            {
+                return;
+            }
+
             if (Target is not FileNameTarget fileTarget)
             {
                 throw new NotSupportedException($"Phase 1 only supports target.family='FileName'. Filter '{Type}' got '{Target.Family}'.");
@@ -50,23 +55,7 @@ namespace Mfr.Models.Filters
             };
 
             var transformedSegment = ApplySegment(segment, item);
-            switch (mode)
-            {
-                case FileNameTargetMode.Prefix:
-                    item.SetPreviewName(transformedSegment, sourceFileEntry.Extension);
-                    return;
-                case FileNameTargetMode.Extension:
-                    item.SetPreviewName(sourceFileEntry.Prefix, transformedSegment);
-                    return;
-                case FileNameTargetMode.Full:
-                    var fullName = Path.GetFileName(transformedSegment);
-                    var extension = Path.GetExtension(fullName);
-                    var prefix = Path.GetFileNameWithoutExtension(fullName);
-                    item.SetPreviewName(prefix, extension);
-                    return;
-                default:
-                    throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.");
-            }
+            item.SetPreviewSegment(mode, transformedSegment);
         }
 
         internal abstract string ApplySegment(string segment, RenameItem item);
