@@ -1,4 +1,4 @@
-namespace Mfr8.Models
+namespace Mfr8.Models.Filters.Text
 {
     /// <summary>
     /// Options for replacing spaces and replacing a chosen character with spaces.

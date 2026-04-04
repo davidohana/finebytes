@@ -1,4 +1,4 @@
-namespace Mfr8.Models
+namespace Mfr8.Models.Filters.Text
 {
     /// <summary>
     /// Extracts a fixed number of characters from the left.

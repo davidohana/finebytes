@@ -1,3 +1,5 @@
+using Mfr8.Models.Filters;
+
 namespace Mfr8.Models
 {
     /// <summary>

@@ -1,4 +1,4 @@
-namespace Mfr8.Models
+namespace Mfr8.Models.Filters.Text
 {
     /// <summary>
     /// Collapses runs of whitespace into single spaces.

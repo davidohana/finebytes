@@ -1,5 +1,6 @@
 using Mfr8.Core;
 using Mfr8.Models;
+using Mfr8.Models.Filters.Advanced;
 
 namespace mfr8.Tests.Core
 {

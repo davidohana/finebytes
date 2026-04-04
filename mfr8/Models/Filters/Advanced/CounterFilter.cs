@@ -1,6 +1,5 @@
 using System.Globalization;
-
-namespace Mfr8.Models
+namespace Mfr8.Models.Filters.Advanced
 {
     /// <summary>
     /// Positioning mode for counter insertion.

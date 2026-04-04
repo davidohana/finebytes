@@ -20,9 +20,9 @@ namespace Mfr8.Core
         {
             var results = new List<string>();
 
-            foreach (var raw in sources)
+            foreach (var rawSrc in sources)
             {
-                var src = raw.Trim();
+                var src = rawSrc.Trim();
                 if (src.Length == 0)
                 {
                     continue;

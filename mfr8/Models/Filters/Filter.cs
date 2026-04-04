@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
+using Mfr8.Models.Filters.Advanced;
+using Mfr8.Models.Filters.Text;
 
-namespace Mfr8.Models
+namespace Mfr8.Models.Filters
 {
     /// <summary>
     /// Represents a polymorphic filter.

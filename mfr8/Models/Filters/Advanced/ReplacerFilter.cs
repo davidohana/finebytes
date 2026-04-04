@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
-
-namespace Mfr8.Models
+namespace Mfr8.Models.Filters.Advanced
 {
     /// <summary>
     /// Matching mode for replacer patterns.

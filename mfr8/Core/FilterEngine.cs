@@ -1,4 +1,5 @@
 using Mfr8.Models;
+using Mfr8.Models.Filters;
 
 namespace Mfr8.Core
 {
