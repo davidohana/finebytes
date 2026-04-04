@@ -124,7 +124,7 @@ namespace Mfr.Models
 
         internal void CopyPreviewFromOriginal()
         {
-            Preview = _CloneFileMeta(Original);
+            Preview = Original.Clone();
         }
 
         /// <summary>
@@ -159,24 +159,8 @@ namespace Mfr.Models
                 return Preview;
             }
 
-            Preview = _CloneFileMeta(Original);
+            Preview = Original.Clone();
             return Preview;
-        }
-
-        /// <summary>
-        /// Creates a detached copy of a file-entry snapshot.
-        /// </summary>
-        /// <param name="source">The source snapshot to copy.</param>
-        /// <returns>A cloned file-entry instance.</returns>
-        private static FileMeta _CloneFileMeta(FileMeta source)
-        {
-            return new FileMeta(
-                source.GlobalIndex,
-                source.InFolderIndex,
-                source.FullPath,
-                source.DirectoryPath,
-                source.Prefix,
-                source.Extension);
         }
     }
 }

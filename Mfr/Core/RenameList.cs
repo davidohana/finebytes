@@ -260,12 +260,11 @@ namespace Mfr.Core
                 _folderCounts[directoryPath] = inFolderIndex + 1;
 
                 _renameItems.Add(new RenameItem(new FileMeta(
-                    GlobalIndex: _renameItems.Count,
-                    InFolderIndex: inFolderIndex,
-                    FullPath: fullPath,
-                    DirectoryPath: directoryPath,
-                    Prefix: prefix,
-                    Extension: extension)));
+                    globalIndex: _renameItems.Count,
+                    inFolderIndex: inFolderIndex,
+                    directoryPath: directoryPath,
+                    prefix: prefix,
+                    extension: extension)));
                 addedCount++;
             }
 

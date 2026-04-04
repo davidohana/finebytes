@@ -23,9 +23,7 @@ namespace Mfr.Tests.Models.Filters
             string? directory = null)
         {
             directory ??= @"C:\Music\Album";
-            var fullName = prefix + extension;
-            var fullPath = directory.CombinePath(fullName);
-            return new RenameItem(new FileMeta(globalIndex, inFolderIndex, fullPath, directory, prefix, extension));
+            return new RenameItem(new FileMeta(globalIndex, inFolderIndex, directory, prefix, extension));
         }
 
         /// <summary>
