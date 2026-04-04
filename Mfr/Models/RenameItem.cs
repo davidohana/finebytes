@@ -27,21 +27,20 @@ namespace Mfr.Models
 
         internal void SetPreviewValue(FileNamePart part, string partValue)
         {
-            var sourceFileEntry = Preview ?? Original;
+            var sourceFileEntry = _EnsurePreview();
             switch (part)
             {
                 case FileNamePart.Prefix:
-                    _SetPreviewFileEntry(sourceFileEntry, partValue, sourceFileEntry.Extension);
-                    return;
+                    sourceFileEntry.Prefix = partValue;
+                    break;
                 case FileNamePart.Extension:
-                    _SetPreviewFileEntry(sourceFileEntry, sourceFileEntry.Prefix, partValue);
-                    return;
+                    sourceFileEntry.Extension = partValue;
+                    break;
                 case FileNamePart.Full:
                     var fullName = Path.GetFileName(partValue);
-                    var extension = Path.GetExtension(fullName);
-                    var prefix = Path.GetFileNameWithoutExtension(fullName);
-                    _SetPreviewFileEntry(sourceFileEntry, prefix, extension);
-                    return;
+                    sourceFileEntry.Extension = Path.GetExtension(fullName);
+                    sourceFileEntry.Prefix = Path.GetFileNameWithoutExtension(fullName);
+                    break;
                 default:
                     throw new InvalidOperationException($"Unknown fileNamePart '{part}'.");
             }
@@ -49,19 +48,7 @@ namespace Mfr.Models
 
         internal void CopyPreviewFromOriginal()
         {
-            Preview = Original;
-        }
-
-        private void _SetPreviewFileEntry(FileEntryLite source, string prefix, string extension)
-        {
-            var fullName = prefix + extension;
-            var fullPath = Path.Combine(source.DirectoryPath, fullName);
-            Preview = source with
-            {
-                FullPath = fullPath,
-                Prefix = prefix,
-                Extension = extension,
-            };
+            Preview = _CloneFileEntry(Original);
         }
 
         /// <summary>
@@ -83,6 +70,28 @@ namespace Mfr.Models
             File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
             Original = Preview;
             Preview = null;
+        }
+
+        private FileEntryLite _EnsurePreview()
+        {
+            if (Preview is not null)
+            {
+                return Preview;
+            }
+
+            Preview = _CloneFileEntry(Original);
+            return Preview;
+        }
+
+        private static FileEntryLite _CloneFileEntry(FileEntryLite source)
+        {
+            return new FileEntryLite(
+                source.GlobalIndex,
+                source.InFolderIndex,
+                source.FullPath,
+                source.DirectoryPath,
+                source.Prefix,
+                source.Extension);
         }
     }
 }
