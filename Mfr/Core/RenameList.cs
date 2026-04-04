@@ -1,4 +1,6 @@
 using Mfr.Models;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
 namespace Mfr.Core
 {
@@ -73,16 +75,16 @@ namespace Mfr.Core
             var fullSource = Path.GetFullPath(source);
             if (Directory.Exists(fullSource))
             {
-                // Directory sources expand to top-level files only.
-                return Directory.EnumerateFiles(fullSource, "*", SearchOption.TopDirectoryOnly);
+                // Directory sources resolve to the directory path itself.
+                return [fullSource];
             }
 
             // Non-directory sources resolve relative to their parent directory.
             var parentDirectory = Path.GetDirectoryName(fullSource);
             parentDirectory = string.IsNullOrWhiteSpace(parentDirectory) ? Directory.GetCurrentDirectory() : parentDirectory;
-            if (_TryResolveRecursiveGlob(fullSource, out var recursiveMatches))
+            if (_TryResolveGlob(fullSource, out var globMatches))
             {
-                return recursiveMatches;
+                return globMatches;
             }
 
             if (!Directory.Exists(parentDirectory))
@@ -91,9 +93,9 @@ namespace Mfr.Core
             }
 
             var filePattern = Path.GetFileName(fullSource);
-            if (_ContainsWildcard(filePattern))
+            if (_ContainsGlobPattern(filePattern))
             {
-                // Wildcard sources expand inside the parent directory.
+                // Simple file-name wildcards expand in the parent directory only.
                 return Directory.EnumerateFiles(parentDirectory, filePattern, SearchOption.TopDirectoryOnly);
             }
 
@@ -108,58 +110,74 @@ namespace Mfr.Core
         }
 
         /// <summary>
-        /// Tries to resolve recursive glob sources that use <c>**</c> syntax.
+        /// Tries to resolve glob sources using standard matcher syntax.
         /// </summary>
         /// <param name="fullSource">The full source path to inspect.</param>
-        /// <param name="resolvedPaths">Resolved file paths when recursive syntax is recognized.</param>
-        /// <returns><c>true</c> if recursive glob syntax was detected; otherwise <c>false</c>.</returns>
-        private static bool _TryResolveRecursiveGlob(string fullSource, out IEnumerable<string> resolvedPaths)
+        /// <param name="resolvedPaths">Resolved file paths when glob syntax is recognized.</param>
+        /// <returns><c>true</c> if glob syntax was detected; otherwise <c>false</c>.</returns>
+        private static bool _TryResolveGlob(string fullSource, out IEnumerable<string> resolvedPaths)
         {
             resolvedPaths = [];
-            var normalizedSource = fullSource.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            var recursiveSegment = $"{Path.DirectorySeparatorChar}**{Path.DirectorySeparatorChar}";
-            var recursiveSegmentIndex = normalizedSource.IndexOf(recursiveSegment, StringComparison.Ordinal);
-
-            string rootDirectory;
-            string searchPattern;
-            if (recursiveSegmentIndex >= 0)
+            if (!_ContainsGlobPattern(fullSource))
             {
-                rootDirectory = normalizedSource[..recursiveSegmentIndex];
-                searchPattern = normalizedSource[(recursiveSegmentIndex + recursiveSegment.Length)..];
+                return false;
             }
-            else
+
+            var normalizedSource = fullSource.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var root = Path.GetPathRoot(normalizedSource) ?? Directory.GetCurrentDirectory();
+            var relativePath = normalizedSource[root.Length..];
+            var segments = relativePath.Split(
+                Path.DirectorySeparatorChar,
+                StringSplitOptions.RemoveEmptyEntries);
+
+            var baseSegments = new List<string>();
+            var globSegments = new List<string>();
+            var foundGlob = false;
+            foreach (var segment in segments)
             {
-                var trailingRecursiveSegment = $"{Path.DirectorySeparatorChar}**";
-                if (!normalizedSource.EndsWith(trailingRecursiveSegment, StringComparison.Ordinal))
+                if (!foundGlob && !_ContainsGlobPattern(segment))
                 {
-                    return false;
+                    baseSegments.Add(segment);
+                    continue;
                 }
 
-                rootDirectory = normalizedSource[..^trailingRecursiveSegment.Length];
-                searchPattern = "*";
+                foundGlob = true;
+                globSegments.Add(segment);
             }
 
-            if (string.IsNullOrWhiteSpace(rootDirectory))
+            if (!foundGlob)
             {
-                rootDirectory = Path.GetPathRoot(normalizedSource) ?? Directory.GetCurrentDirectory();
+                return false;
             }
 
-            if (!Directory.Exists(rootDirectory))
+            if (globSegments.Count == 1)
             {
-                throw new UserException($"Directory for source does not exist: '{rootDirectory}'.");
+                // Single-segment patterns are handled by Directory.EnumerateFiles in the caller.
+                return false;
             }
 
-            if (string.IsNullOrWhiteSpace(searchPattern))
+            var baseDirectory = root;
+            foreach (var segment in baseSegments)
             {
-                searchPattern = "*";
+                baseDirectory = Path.Combine(baseDirectory, segment);
             }
 
-            if (searchPattern.Contains(Path.DirectorySeparatorChar))
+            if (!Directory.Exists(baseDirectory))
             {
-                throw new UserException($"Recursive glob source '{fullSource}' supports file-name patterns only after '**'.");
+                throw new UserException($"Directory for source does not exist: '{baseDirectory}'.");
             }
 
-            resolvedPaths = Directory.EnumerateFiles(rootDirectory, searchPattern, SearchOption.AllDirectories);
+            var includePattern = globSegments.Count == 0 ? "*" : string.Join('/', globSegments);
+            var matcher = new Matcher(
+                OperatingSystem.IsWindows()
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal);
+            _ = matcher.AddInclude(includePattern);
+            var matchResult = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(baseDirectory)));
+
+            resolvedPaths = matchResult.Files
+                .Select(match => Path.GetFullPath(
+                    Path.Combine(baseDirectory, match.Path.Replace('/', Path.DirectorySeparatorChar))));
             return true;
         }
 
@@ -168,7 +186,7 @@ namespace Mfr.Core
         /// </summary>
         /// <param name="value">The value to inspect.</param>
         /// <returns><c>true</c> when wildcard characters are present; otherwise <c>false</c>.</returns>
-        private static bool _ContainsWildcard(string value)
+        private static bool _ContainsGlobPattern(string value)
         {
             return value.Contains('*') || value.Contains('?');
         }

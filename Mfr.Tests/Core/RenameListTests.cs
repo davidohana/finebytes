@@ -75,14 +75,20 @@ namespace Mfr.Tests.Core
             renameList.AddSources(sources);
             var entries = renameList.ResolvedItems;
 
-            Assert.Equal(3, entries.Count);
+            var tempRootParent = Path.GetDirectoryName(_tempRoot) ?? "";
+            var tempRootName = Path.GetFileName(_tempRoot);
+
+            Assert.Equal(4, entries.Count);
             Assert.Equal(
-                [betaPath, alphaPath, gammaPath],
+                [betaPath, alphaPath, gammaPath, _tempRoot],
                 entries.Select(e => e.FullPath));
-            Assert.Equal([0, 1, 2], entries.Select(e => e.GlobalIndex));
-            Assert.Equal([0, 1, 2], entries.Select(e => e.FolderOccurrenceIndex));
-            Assert.Equal(["beta", "alpha", "gamma"], entries.Select(e => e.Prefix));
-            Assert.Equal([".log", ".txt", ".txt"], entries.Select(e => e.Extension));
+            Assert.Equal([0, 1, 2, 3], entries.Select(e => e.GlobalIndex));
+            Assert.Equal([0, 1, 2, 0], entries.Select(e => e.FolderOccurrenceIndex));
+            Assert.Equal(["beta", "alpha", "gamma", tempRootName], entries.Select(e => e.Prefix));
+            Assert.Equal([".log", ".txt", ".txt", ""], entries.Select(e => e.Extension));
+            Assert.Equal(
+                [_tempRoot, _tempRoot, _tempRoot, tempRootParent],
+                entries.Select(e => e.DirectoryPath));
         }
 
         [Fact]
@@ -184,6 +190,28 @@ namespace Mfr.Tests.Core
             Assert.Equal(
                 [topLevelMatch, nestedMatch, deeperMatch],
                 renameList.ResolvedItems.Select(entry => entry.FullPath));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that matcher wildcard syntax resolves a nested path pattern with recursive traversal.
+        /// </summary>
+        public void AddSource_Resolves_Recursive_Nested_Path_Pattern()
+        {
+            var (nestedMatch, deeperMatch, nonMatch) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "nested/file1.txt",
+                "x/nested/file2.txt",
+                "x/other/file3.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            var addedCount = renameList.AddSource(_tempRoot.CombinePath("**", "nested", "*.txt"));
+
+            Assert.Equal(2, addedCount);
+            Assert.Equal(
+                [nestedMatch, deeperMatch],
+                renameList.ResolvedItems.Select(entry => entry.FullPath));
+            Assert.DoesNotContain(nonMatch, renameList.ResolvedItems.Select(entry => entry.FullPath));
         }
 
     }
