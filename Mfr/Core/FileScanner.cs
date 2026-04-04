@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace Mfr.Core
 {
@@ -19,47 +20,64 @@ namespace Mfr.Core
             bool includeHidden)
         {
             var results = new List<string>();
+            var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
+            var cwd = Path.GetFullPath(Directory.GetCurrentDirectory());
+
+            static string ToMatcherPath(string path)
+            {
+                return path.Replace('\\', '/');
+            }
+
+            string ToRelativeMatcherPath(string path)
+            {
+                var relativePath = Path.GetRelativePath(cwd, path);
+                return ToMatcherPath(relativePath);
+            }
 
             foreach (var rawSrc in sources)
             {
+                Console.WriteLine($"Raw source: {rawSrc}");
                 var src = rawSrc.Trim();
                 if (src.Length == 0)
                 {
                     continue;
                 }
 
-                if (src.Contains('*') || src.Contains('?'))
+                var fullSrc = Path.GetFullPath(src);
+                if (Directory.Exists(fullSrc))
                 {
-                    var dir = Path.GetDirectoryName(src);
-                    var pattern = Path.GetFileName(src);
-                    dir = string.IsNullOrWhiteSpace(dir) ? Directory.GetCurrentDirectory() : dir;
-
-                    if (!Directory.Exists(dir))
-                    {
-                        throw new UserException($"Directory for wildcard does not exist: '{dir}'.");
-                    }
-
-                    results.AddRange(Directory.EnumerateFiles(dir, pattern, SearchOption.TopDirectoryOnly));
+                    var relativeDirectoryPath = ToRelativeMatcherPath(fullSrc);
+                    var includePattern = relativeDirectoryPath == "." ? "*" : $"{relativeDirectoryPath}/*";
+                    _ = matcher.AddInclude(includePattern);
                     continue;
                 }
 
-                if (Directory.Exists(src))
+                var parentDir = Path.GetDirectoryName(fullSrc);
+                parentDir = string.IsNullOrWhiteSpace(parentDir) ? Directory.GetCurrentDirectory() : parentDir;
+                if (!Directory.Exists(parentDir))
                 {
-                    results.AddRange(Directory.EnumerateFiles(src, "*", SearchOption.TopDirectoryOnly));
-                    continue;
+                    throw new UserException($"Directory for source does not exist: '{parentDir}'.");
                 }
 
-                if (File.Exists(src))
-                {
-                    results.Add(src);
-                    continue;
-                }
-
-                throw new UserException($"Source not found: '{src}'.");
+                _ = matcher.AddInclude(ToRelativeMatcherPath(fullSrc));
             }
 
-            results = [.. results.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(p => p, StringComparer.OrdinalIgnoreCase)];
+            results.AddRange(matcher.GetResultsInFullPath(cwd));
 
+            results = [.. results.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(p => p, StringComparer.OrdinalIgnoreCase)];
+            return ToFileEntryLiteList(results, includeHidden);
+        }
+
+        /// <summary>
+        /// Converts full file paths into normalized <see cref="FileEntryLite"/> entries.
+        /// </summary>
+        /// <param name="results">Ordered file paths to convert.</param>
+        /// <param name="includeHidden">If <c>true</c>, includes hidden/system files.</param>
+        /// <returns>The converted file entry list.</returns>
+        public static List<FileEntryLite> ToFileEntryLiteList(
+            List<string> results,
+            bool includeHidden)
+        {
             var folderCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             var entries = new List<FileEntryLite>(results.Count);
 
@@ -67,21 +85,18 @@ namespace Mfr.Core
             {
                 var fullPath = results[i];
                 var attrs = File.GetAttributes(fullPath);
-                if (!includeHidden)
+                if (!includeHidden &&
+                    (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System)))
                 {
-                    if (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System))
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 var directoryPath = Path.GetDirectoryName(fullPath) ?? "";
                 var prefix = Path.GetFileNameWithoutExtension(fullPath);
                 var extension = Path.GetExtension(fullPath); // includes leading '.'
 
-                var folderKey = directoryPath;
-                var folderOccurrence = folderCounts.GetValueOrDefault(folderKey);
-                folderCounts[folderKey] = folderOccurrence + 1;
+                var folderOccurrence = folderCounts.GetValueOrDefault(directoryPath);
+                folderCounts[directoryPath] = folderOccurrence + 1;
 
                 entries.Add(new FileEntryLite(
                     GlobalIndex: i,
