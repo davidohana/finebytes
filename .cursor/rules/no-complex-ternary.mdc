@@ -15,12 +15,12 @@ Example:
 
 ```csharp
 // Avoid
-var result = hasErrors ? preview : FilterEngine.Commit(name, items, continueOnErrors);
+var result = hasErrors ? preview : FilterEngine.Commit(name, items, failFast);
 
 // Prefer
 var result = preview;
 if (!hasErrors)
 {
-    result = FilterEngine.Commit(name, items, continueOnErrors);
+    result = FilterEngine.Commit(name, items, failFast);
 }
 ```

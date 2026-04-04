@@ -53,8 +53,8 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            var preview = FilterEngine.Preview(preset, files, continueOnErrors: false);
-            var result = FilterEngine.Commit(preset.Name, files, continueOnErrors: false);
+            var preview = FilterEngine.Preview(preset, files, failFast: false);
+            var result = FilterEngine.Commit(preset.Name, files, failFast: false);
 
             Assert.Equal(2, result.Conflicts);
             Assert.Equal(RenameStatus.ConflictSkipped, result.Results[0].Status);
@@ -103,8 +103,8 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            var preview = FilterEngine.Preview(preset, files, continueOnErrors: false);
-            var result = FilterEngine.Commit(preset.Name, files, continueOnErrors: false);
+            var preview = FilterEngine.Preview(preset, files, failFast: false);
+            var result = FilterEngine.Commit(preset.Name, files, failFast: false);
 
             Assert.Equal(2, result.Renamed);
             Assert.Equal(RenameStatus.Ok, result.Results[0].Status);
@@ -115,6 +115,114 @@ namespace Mfr.Tests.Core
             Assert.False(File.Exists(b));
             Assert.True(File.Exists(dir.CombinePath("001.mp3")));
             Assert.True(File.Exists(dir.CombinePath("002.mp3")));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that commit stops immediately on the first rename error when fail-fast is enabled.
+        /// </summary>
+        public void Commit_StopsOnFirstRenameError_WhenFailFastTrue()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var firstSource = dir.CombinePath("first.mp3");
+            var secondSource = dir.CombinePath("second.mp3");
+            File.WriteAllText(firstSource, "x");
+            File.WriteAllText(secondSource, "y");
+
+            var files = new List<RenameItem>
+            {
+                new(new FileEntryLite(GlobalIndex: 0, InFolderIndex: 0, FullPath: firstSource, DirectoryPath: dir, Prefix: "first", Extension: ".mp3")),
+                new(new FileEntryLite(GlobalIndex: 1, InFolderIndex: 0, FullPath: secondSource, DirectoryPath: dir, Prefix: "second", Extension: ".mp3")),
+            };
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "counter",
+                Description = null,
+                Filters =
+                [
+                    new CounterFilter(
+                        Enabled: true,
+                        Target: new FileNameTarget(FileNameTargetMode.Prefix),
+                        Options: new CounterOptions(
+                            Start: 1,
+                            Step: 1,
+                            Width: 3,
+                            PadChar: "0",
+                            Position: CounterPosition.Replace,
+                            Separator: " - ",
+                            ResetPerFolder: false))
+                ]
+            };
+
+            var preview = FilterEngine.Preview(preset, files, failFast: false);
+            Assert.Equal(0, preview.Errors);
+
+            File.Delete(firstSource);
+
+            var result = FilterEngine.Commit(preset.Name, files, failFast: true);
+
+            Assert.Equal(1, result.Errors);
+            Assert.Equal(0, result.Renamed);
+            Assert.Equal(RenameStatus.Error, result.Results[0].Status);
+            Assert.Equal(RenameStatus.Skipped, result.Results[1].Status);
+            Assert.True(File.Exists(secondSource));
+            Assert.False(File.Exists(dir.CombinePath("002.mp3")));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that commit continues after a rename error when fail-fast is disabled.
+        /// </summary>
+        public void Commit_ContinuesAfterRenameError_WhenFailFastFalse()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var firstSource = dir.CombinePath("first.mp3");
+            var secondSource = dir.CombinePath("second.mp3");
+            File.WriteAllText(firstSource, "x");
+            File.WriteAllText(secondSource, "y");
+
+            var files = new List<RenameItem>
+            {
+                new(new FileEntryLite(GlobalIndex: 0, InFolderIndex: 0, FullPath: firstSource, DirectoryPath: dir, Prefix: "first", Extension: ".mp3")),
+                new(new FileEntryLite(GlobalIndex: 1, InFolderIndex: 0, FullPath: secondSource, DirectoryPath: dir, Prefix: "second", Extension: ".mp3")),
+            };
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "counter",
+                Description = null,
+                Filters =
+                [
+                    new CounterFilter(
+                        Enabled: true,
+                        Target: new FileNameTarget(FileNameTargetMode.Prefix),
+                        Options: new CounterOptions(
+                            Start: 1,
+                            Step: 1,
+                            Width: 3,
+                            PadChar: "0",
+                            Position: CounterPosition.Replace,
+                            Separator: " - ",
+                            ResetPerFolder: false))
+                ]
+            };
+
+            var preview = FilterEngine.Preview(preset, files, failFast: false);
+            Assert.Equal(0, preview.Errors);
+
+            File.Delete(firstSource);
+
+            var result = FilterEngine.Commit(preset.Name, files, failFast: false);
+
+            Assert.Equal(1, result.Errors);
+            Assert.Equal(1, result.Renamed);
+            Assert.Equal(RenameStatus.Error, result.Results[0].Status);
+            Assert.Equal(RenameStatus.Ok, result.Results[1].Status);
+            Assert.True(File.Exists(dir.CombinePath("002.mp3")));
+            Assert.False(File.Exists(secondSource));
         }
     }
 }

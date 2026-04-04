@@ -65,14 +65,20 @@ namespace Mfr.Cli
             var previewStats = FilterEngine.Preview(
                 preset: preset,
                 files: renameItems,
-                continueOnErrors: options.ContinueOnPreviewErrors);
+                failFast: options.FailFast);
             var stats = previewStats;
-            if (previewStats.Errors == 0)
+            var shouldCommit = previewStats.Errors == 0;
+            if (!options.FailFast && previewStats.Errors > 0)
+            {
+                shouldCommit = true;
+            }
+
+            if (shouldCommit)
             {
                 stats = FilterEngine.Commit(
                     presetName: preset.Name,
                     files: renameItems,
-                    continueOnErrors: options.ContinueOnPreviewErrors);
+                    failFast: options.FailFast);
             }
 
             if (!options.Silent)
@@ -80,7 +86,7 @@ namespace Mfr.Cli
                 _PrintResult(stats, options.OutputFormat);
             }
 
-            return stats.Errors > 0 && !options.ContinueOnPreviewErrors ? CliExitCode.UserError : CliExitCode.Success;
+            return stats.Errors > 0 && options.FailFast ? CliExitCode.UserError : CliExitCode.Success;
         }
 
         private static void _PrintResult(RenameBatchResult result, OutputFormat format)

@@ -36,12 +36,12 @@ namespace Mfr.Core
         /// </summary>
         /// <param name="preset">The rename preset (sequence of enabled filters).</param>
         /// <param name="files">Candidate files to rename.</param>
-        /// <param name="continueOnErrors">If <c>true</c>, continue previewing after per-item errors.</param>
+        /// <param name="failFast">If <c>true</c>, stop previewing after the first per-item error.</param>
         /// <returns>Preview summary with computed destination paths and preview errors.</returns>
         public static RenameBatchResult Preview(
             FilterPreset preset,
             IReadOnlyList<RenameItem> files,
-            bool continueOnErrors)
+            bool failFast)
         {
             var previewResults = new List<RenameResultItem>(files.Count);
             foreach (var item in files)
@@ -62,7 +62,7 @@ namespace Mfr.Core
                 catch (Exception ex)
                 {
                     previewResults.Add(new RenameResultItem(item.Original.FullPath, item.Original.FullPath, RenameStatus.Error, ex.Message));
-                    if (!continueOnErrors)
+                    if (failFast)
                     {
                         return _Summarize(preset.Name, files.Count, previewResults);
                     }
@@ -77,12 +77,12 @@ namespace Mfr.Core
         /// </summary>
         /// <param name="presetName">Preset name used for summary output.</param>
         /// <param name="files">Candidate files with preview paths already computed.</param>
-        /// <param name="continueOnErrors">If <c>true</c>, continue committing after per-item errors.</param>
+        /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
         /// <returns>Commit summary including renamed, skipped, conflict, and error counts.</returns>
         public static RenameBatchResult Commit(
             string presetName,
             IReadOnlyList<RenameItem> files,
-            bool continueOnErrors)
+            bool failFast)
         {
             var commitResults = new List<RenameResultItem>(files.Count);
             var pending = new List<RenameItem>(files.Count);
@@ -148,7 +148,7 @@ namespace Mfr.Core
                 catch (Exception ex)
                 {
                     commitResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.Error, ex.Message);
-                    if (!continueOnErrors)
+                    if (failFast)
                     {
                         break;
                     }

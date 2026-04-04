@@ -67,8 +67,8 @@ namespace Mfr.Cli
             [CommandLine.Option('i', "include-hidden", HelpText = "Include hidden/system files.")]
             public bool IncludeHidden { get; set; }
 
-            [CommandLine.Option('c', "continue-on-preview-errors", HelpText = "Continue even if preview errors exist.")]
-            public bool ContinueOnPreviewErrors { get; set; }
+            [CommandLine.Option('f', "fail-fast", HelpText = "Stop on first preview or rename error (default: true).", Default = true)]
+            public bool FailFast { get; set; } = true;
 
             [CommandLine.Option('s', "silent", HelpText = "Only exit code, no output.")]
             public bool Silent { get; set; }
@@ -113,7 +113,7 @@ namespace Mfr.Cli
                     Sources: [.. Sources],
                     OutputFormat: format,
                     IncludeHidden: IncludeHidden,
-                    ContinueOnPreviewErrors: ContinueOnPreviewErrors,
+                    FailFast: FailFast,
                     Silent: Silent,
                     Verbose: Verbose,
                     PresetsFilePath: presetsFilePath);

@@ -333,7 +333,7 @@ public sealed record RenameSettings
     public ConflictStrategy ConflictStrategy { get; init; } = ConflictStrategy.Skip;
     public bool CreateUndoJournal { get; init; } = true;
     public bool BackupOriginalContent { get; init; } = false;
-    public bool ContinueOnPreviewErrors { get; init; } = false;
+    public bool FailFast { get; init; } = true;
     public bool AddFiles { get; init; } = true;
     public bool AddFolders { get; init; } = false;
     public bool Recursive { get; init; } = false;
@@ -603,7 +603,7 @@ Each preset is stored in its **own file**. File name convention: `<slug>-<id>.js
     "conflictStrategy": "Skip",
     "createUndoJournal": true,
     "backupOriginalContent": false,
-    "continueOnPreviewErrors": false,
+    "failFast": true,
     "addFiles": true,
     "addFolders": false,
     "recursive": false,
@@ -755,7 +755,7 @@ Toggle the color legend overlay via the legend button in the toolbar.
 
 ### 5.3 Preview engine
 
-Recalculates on every filter stack change, debounced by `settings.json → ui.previewDebounceMs` (default 250ms). Auto-preview can be toggled off for large lists. Preview errors highlight the item in pink and exclude it from commit unless `continueOnPreviewErrors` is true.
+Recalculates on every filter stack change, debounced by `settings.json → ui.previewDebounceMs` (default 250ms). Auto-preview can be toggled off for large lists. When `failFast` is enabled (default), processing stops on the first preview or rename error.
 
 ### 5.4 Sorting
 
@@ -1970,7 +1970,7 @@ public sealed record RenameSettings
     public ConflictStrategy ConflictStrategy { get; init; } = ConflictStrategy.Skip;
     public bool CreateUndoJournal { get; init; } = true;
     public bool BackupOriginalContent { get; init; } = false;
-    public bool ContinueOnPreviewErrors { get; init; } = false;
+    public bool FailFast { get; init; } = true;
     public bool AddFiles { get; init; } = true;
     public bool AddFolders { get; init; } = false;
     public bool Recursive { get; init; } = false;
@@ -2138,7 +2138,7 @@ TagLibSharp `CorruptFileException` and `UnsupportedFormatException` are caught p
 
 ### Preview errors
 
-Items with preview errors are highlighted in pink and excluded from commit. The `/COPE` console flag skips them. `continueOnPreviewErrors` in settings provides the same behavior in GUI mode.
+Items with preview or rename errors can halt processing immediately when `failFast` is enabled (default). Disable `failFast` to continue processing remaining items.
 
 ### FreeDB / GeoNames network errors
 
