@@ -62,10 +62,7 @@ namespace Mfr.Core
         {
             foreach (var item in _renameItems)
             {
-                item.ResetPreview();
-                item.ResetPreviewError();
-                item.ResetCommitError();
-                item.Status = RenameStatus.Init;
+                item.ResetState();
             }
 
             foreach (var renameItem in _renameItems)

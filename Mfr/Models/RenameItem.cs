@@ -86,27 +86,19 @@ namespace Mfr.Models
         public RenameStatus Status { get; set; } = RenameStatus.Init;
 
         /// <summary>
-        /// Clears preview metadata so the next preview starts from original data.
+        /// Resets transient preview/commit state for a fresh processing cycle.
         /// </summary>
-        public void ResetPreview()
+        public void ResetState()
         {
             Preview = null;
-        }
-
-        /// <summary>
-        /// Clears preview error state before a new preview run.
-        /// </summary>
-        public void ResetPreviewError()
-        {
             PreviewError = null;
+            CommitError = null;
+            Status = RenameStatus.Init;
         }
 
-        /// <summary>
-        /// Clears commit error state before a new commit run.
-        /// </summary>
-        public void ResetCommitError()
+        internal void ClearPreview()
         {
-            CommitError = null;
+            Preview = null;
         }
 
         internal void SetPreviewValue(FileNamePart part, string partValue)

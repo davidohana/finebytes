@@ -15,7 +15,7 @@ namespace Mfr.Core
         /// <param name="filters">The configured filters to apply in order.</param>
         public static void ApplyFilters(this RenameItem item, IReadOnlyList<Filter> filters)
         {
-            item.ResetPreview();
+            item.ClearPreview();
 
             foreach (var filter in filters)
             {

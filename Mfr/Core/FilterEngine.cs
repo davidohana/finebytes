@@ -27,7 +27,7 @@ namespace Mfr.Core
             var pending = new List<RenameItem>(renameItem.Count);
             foreach (var item in renameItem)
             {
-                item.ResetCommitError();
+                item.CommitError = null;
                 var sourcePath = item.Original.FullPath;
                 var preview = item.Preview;
                 if (preview is null)
@@ -146,7 +146,7 @@ namespace Mfr.Core
 
             foreach (var item in renameItem)
             {
-                item.ResetPreview();
+                item.ClearPreview();
             }
 
             return commitResults;
