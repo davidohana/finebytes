@@ -162,7 +162,16 @@ namespace Mfr8.Cli
 
         private static void _PrintError(string text)
         {
-            Console.Error.WriteLine(text);
+            var originalColor = Console.ForegroundColor;
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Error.WriteLine(text);
+            }
+            finally
+            {
+                Console.ForegroundColor = originalColor;
+            }
         }
 
         private static string _CsvEscape(string value)
