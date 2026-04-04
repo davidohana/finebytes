@@ -12,7 +12,7 @@ test:
     dotnet test ./mfr8.Tests/mfr8.Tests.csproj -c Debug
 
 format:
-    dotnet format ./finebytes.slnx
+    dotnet format ./finebytes.slnx --verbosity diagnostic
 
 run-help:
     dotnet run --project ./mfr8/mfr8.csproj -- --help
