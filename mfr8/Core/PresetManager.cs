@@ -8,7 +8,7 @@ namespace Mfr8.Core
     /// <param name="presetsFilePath">Path to the JSON file containing all presets.</param>
     public sealed class PresetManager(string presetsFilePath)
     {
-        private Dictionary<string, FilterPreset>? _NameToPreset;
+        private Dictionary<string, FilterPreset> _NameToPreset = [];
 
         /// <summary>
         /// Gets the JSON file path containing all presets.
@@ -50,28 +50,14 @@ namespace Mfr8.Core
 
             var presets = container.Presets;
 
-            var loadedNameToPreset = new Dictionary<string, FilterPreset>(StringComparer.Ordinal);
             try
             {
-                foreach (var preset in presets)
-                {
-                    var normalizedName = _NormalizePresetName(preset.Name);
-                    if (!loadedNameToPreset.TryAdd(normalizedName, preset))
-                    {
-                        throw new UserException($"Duplicate preset name '{preset.Name}' in '{PresetsFilePath}'. Preset names must be unique.");
-                    }
-                }
+                _NameToPreset = presets.ToDictionary(preset => preset.Name, StringComparer.Ordinal);
             }
-            catch (UserException)
+            catch (ArgumentException ex)
             {
-                throw;
+                throw new UserException($"Duplicate preset names found in '{PresetsFilePath}'. Preset names must be unique.", ex);
             }
-            catch (Exception ex)
-            {
-                throw new UserException($"One or more presets in '{PresetsFilePath}' are invalid: {ex.Message}", ex);
-            }
-
-            _NameToPreset = loadedNameToPreset;
         }
 
         /// <summary>
@@ -79,11 +65,6 @@ namespace Mfr8.Core
         /// </summary>
         public void SavePresets()
         {
-            if (_NameToPreset is null)
-            {
-                throw new InvalidOperationException("Presets are not loaded. Call LoadPresets() before SavePresets().");
-            }
-
             try
             {
                 var directory = Path.GetDirectoryName(PresetsFilePath);
@@ -109,25 +90,11 @@ namespace Mfr8.Core
         /// <returns>The matching preset.</returns>
         public FilterPreset GetByName(string presetName)
         {
-            if (string.IsNullOrWhiteSpace(presetName))
-            {
-                throw new UserException("Preset name is required.");
-            }
-
-            if (_NameToPreset is null)
-            {
-                throw new InvalidOperationException("Presets are not loaded. Call LoadPresets() before GetByName().");
-            }
-
-            var normalizedName = _NormalizePresetName(presetName);
-            return _NameToPreset.TryGetValue(normalizedName, out var preset)
+            return string.IsNullOrWhiteSpace(presetName)
+                ? throw new UserException("Preset name is required.")
+                : _NameToPreset.TryGetValue(presetName, out var preset)
                 ? preset
                 : throw new UserException($"Preset not found: '{presetName}'.");
-        }
-
-        private static string _NormalizePresetName(string presetName)
-        {
-            return presetName.Trim().ToLowerInvariant();
         }
     }
 
