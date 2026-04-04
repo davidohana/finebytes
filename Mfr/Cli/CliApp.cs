@@ -55,16 +55,16 @@ namespace Mfr.Cli
 
             var renameList = new RenameList(includeHidden: options.IncludeHidden);
             renameList.AddSources(options.Sources);
-            var files = renameList.RenameItems;
+            var renameItems = renameList.RenameItems;
 
-            if (files.Count == 0)
+            if (renameItems.Count == 0)
             {
                 throw new UserException("No files matched the provided sources.");
             }
 
             var result = FilterEngine.PreviewAndCommit(
                 preset: preset,
-                files: files,
+                files: renameItems,
                 continueOnErrors: options.ContinueOnPreviewErrors);
 
             if (!options.Silent)

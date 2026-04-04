@@ -45,7 +45,7 @@ namespace Mfr.Models.Filters.Advanced
         /// </summary>
         public override string Type => "Replacer";
 
-        internal override string Apply(string segment, FileEntryLite file)
+        internal override string Apply(string segment, RenameItem item)
         {
             var regexOptions = Options.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
             var pattern = Options.Mode switch

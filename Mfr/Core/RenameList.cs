@@ -15,14 +15,14 @@ namespace Mfr.Core
             : StringComparer.Ordinal;
 
         private readonly HashSet<string> _resolvedPathKeys = new(_pathComparer);
-        private readonly List<FileEntryLite> _resolvedItems = [];
+        private readonly List<RenameItem> _renameItems = [];
         private readonly Dictionary<string, int> _folderCounts = new(_pathComparer);
         private readonly bool _includeHidden = includeHidden;
 
         /// <summary>
         /// Gets the resolved file items in insertion/discovery order.
         /// </summary>
-        public IReadOnlyList<FileEntryLite> RenameItems => _resolvedItems;
+        public IReadOnlyList<RenameItem> RenameItems => _renameItems;
 
         /// <summary>
         /// Adds and resolves a single source.
@@ -219,13 +219,13 @@ namespace Mfr.Core
                 var inFolderIndex = _folderCounts.GetValueOrDefault(directoryPath);
                 _folderCounts[directoryPath] = inFolderIndex + 1;
 
-                _resolvedItems.Add(new FileEntryLite(
-                    GlobalIndex: _resolvedItems.Count,
+                _renameItems.Add(new RenameItem(new FileEntryLite(
+                    GlobalIndex: _renameItems.Count,
                     InFolderIndex: inFolderIndex,
                     FullPath: fullPath,
                     DirectoryPath: directoryPath,
                     Prefix: prefix,
-                    Extension: extension));
+                    Extension: extension)));
                 addedCount++;
             }
 

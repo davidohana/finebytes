@@ -26,7 +26,7 @@ namespace Mfr.Models.Filters.Advanced
         /// </summary>
         public override string Type => "StripParentheses";
 
-        internal override string Apply(string segment, FileEntryLite file)
+        internal override string Apply(string segment, RenameItem item)
         {
             var pairs = new List<(char open, char close)>();
             foreach (var token in Options.Types.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))

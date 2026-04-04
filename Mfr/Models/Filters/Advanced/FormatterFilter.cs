@@ -24,12 +24,12 @@ namespace Mfr.Models.Filters.Advanced
         /// </summary>
         public override string Type => "Formatter";
 
-        internal override string Apply(string segment, FileEntryLite file)
+        internal override string Apply(string segment, RenameItem item)
         {
-            return _TokenRegex().Replace(Options.Template, m => _ResolveToken(m.Groups[1].Value, file));
+            return _TokenRegex().Replace(Options.Template, m => _ResolveToken(m.Groups[1].Value, item));
         }
 
-        private static string _ResolveToken(string tokenInner, FileEntryLite file)
+        private static string _ResolveToken(string tokenInner, RenameItem item)
         {
             var parts = tokenInner.Split(':', 2);
             var name = parts[0];
@@ -37,19 +37,19 @@ namespace Mfr.Models.Filters.Advanced
 
             return name switch
             {
-                "file-name" => file.Prefix,
-                "file-ext" => file.Extension,
-                "ext" => file.Extension,
-                "full-name" => file.Prefix + file.Extension,
-                "parent-folder" => Path.GetFileName(file.DirectoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)),
-                "full-path" => file.FullPath,
+                "file-name" => item.Original.Prefix,
+                "file-ext" => item.Original.Extension,
+                "ext" => item.Original.Extension,
+                "full-name" => item.Original.Prefix + item.Original.Extension,
+                "parent-folder" => Path.GetFileName(item.Original.DirectoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)),
+                "full-path" => item.Original.FullPath,
                 "now" => string.IsNullOrWhiteSpace(arg) ? DateTimeOffset.UtcNow.ToString("o") : DateTimeOffset.UtcNow.ToString(arg),
-                "counter" => _ResolveCounterToken(arg, file),
+                "counter" => _ResolveCounterToken(arg, item),
                 _ => throw new NotSupportedException($"Phase 1 formatter token '{name}' is not supported.")
             };
         }
 
-        private static string _ResolveCounterToken(string arg, FileEntryLite file)
+        private static string _ResolveCounterToken(string arg, RenameItem item)
         {
             var parts = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 5)
@@ -63,7 +63,7 @@ namespace Mfr.Models.Filters.Advanced
             var width = int.Parse(parts[3], CultureInfo.InvariantCulture);
             var pad = int.Parse(parts[4], CultureInfo.InvariantCulture);
 
-            var n = reset == 1 ? file.InFolderIndex : file.GlobalIndex;
+            var n = reset == 1 ? item.Original.InFolderIndex : item.Original.GlobalIndex;
             var value = start + ((long)step * n);
             var raw = value.ToString(CultureInfo.InvariantCulture);
             if (width <= 0)

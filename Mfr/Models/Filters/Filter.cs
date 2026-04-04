@@ -32,6 +32,6 @@ namespace Mfr.Models.Filters
         [JsonIgnore]
         public abstract string Type { get; }
 
-        internal abstract string Apply(string segment, FileEntryLite file);
+        internal abstract string Apply(string segment, RenameItem item);
     }
 }

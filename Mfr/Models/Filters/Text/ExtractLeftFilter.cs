@@ -16,7 +16,7 @@ namespace Mfr.Models.Filters.Text
         /// </summary>
         public override string Type => "ExtractLeft";
 
-        internal override string Apply(string segment, FileEntryLite file)
+        internal override string Apply(string segment, RenameItem item)
         {
             return Options.Count <= 0 ? "" : segment.Length <= Options.Count ? segment : segment[..Options.Count];
         }

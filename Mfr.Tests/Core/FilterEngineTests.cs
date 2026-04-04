@@ -33,10 +33,10 @@ namespace Mfr.Tests.Core
             File.WriteAllText(a, "x");
             File.WriteAllText(b, "y");
 
-            var files = new List<FileEntryLite>
+            var files = new List<RenameItem>
             {
-                new(GlobalIndex: 0, InFolderIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "a", Extension: ".mp3"),
-                new(GlobalIndex: 1, InFolderIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "b", Extension: ".mp3")
+                new(new FileEntryLite(GlobalIndex: 0, InFolderIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "a", Extension: ".mp3")),
+                new(new FileEntryLite(GlobalIndex: 1, InFolderIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "b", Extension: ".mp3"))
             };
 
             var preset = new FilterPreset
@@ -74,10 +74,10 @@ namespace Mfr.Tests.Core
             File.WriteAllText(a, "x");
             File.WriteAllText(b, "y");
 
-            var files = new List<FileEntryLite>
+            var files = new List<RenameItem>
             {
-                new(GlobalIndex: 0, InFolderIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "track01", Extension: ".mp3"),
-                new(GlobalIndex: 1, InFolderIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "track02", Extension: ".mp3"),
+                new(new FileEntryLite(GlobalIndex: 0, InFolderIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "track01", Extension: ".mp3")),
+                new(new FileEntryLite(GlobalIndex: 1, InFolderIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "track02", Extension: ".mp3")),
             };
 
             var preset = new FilterPreset

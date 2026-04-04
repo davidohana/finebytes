@@ -81,14 +81,14 @@ namespace Mfr.Tests.Core
             Assert.Equal(4, entries.Count);
             Assert.Equal(
                 [betaPath, alphaPath, gammaPath, _tempRoot],
-                entries.Select(e => e.FullPath));
-            Assert.Equal([0, 1, 2, 3], entries.Select(e => e.GlobalIndex));
-            Assert.Equal([0, 1, 2, 0], entries.Select(e => e.InFolderIndex));
-            Assert.Equal(["beta", "alpha", "gamma", tempRootName], entries.Select(e => e.Prefix));
-            Assert.Equal([".log", ".txt", ".txt", ""], entries.Select(e => e.Extension));
+                entries.Select(e => e.Original.FullPath));
+            Assert.Equal([0, 1, 2, 3], entries.Select(e => e.Original.GlobalIndex));
+            Assert.Equal([0, 1, 2, 0], entries.Select(e => e.Original.InFolderIndex));
+            Assert.Equal(["beta", "alpha", "gamma", tempRootName], entries.Select(e => e.Original.Prefix));
+            Assert.Equal([".log", ".txt", ".txt", ""], entries.Select(e => e.Original.Extension));
             Assert.Equal(
                 [_tempRoot, _tempRoot, _tempRoot, tempRootParent],
-                entries.Select(e => e.DirectoryPath));
+                entries.Select(e => e.Original.DirectoryPath));
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(0, renameList.AddSource(source));
 
             _ = Assert.Single(renameList.RenameItems);
-            Assert.Equal(source, renameList.RenameItems[0].FullPath);
+            Assert.Equal(source, renameList.RenameItems[0].Original.FullPath);
         }
 
         [Fact]
@@ -129,14 +129,14 @@ namespace Mfr.Tests.Core
             var includedHidden = includeHiddenList.RenameItems.ToList();
 
             _ = Assert.Single(excludedHidden);
-            Assert.Equal(visiblePath, excludedHidden[0].FullPath);
-            Assert.Equal(0, excludedHidden[0].GlobalIndex);
-            Assert.Equal(0, excludedHidden[0].InFolderIndex);
+            Assert.Equal(visiblePath, excludedHidden[0].Original.FullPath);
+            Assert.Equal(0, excludedHidden[0].Original.GlobalIndex);
+            Assert.Equal(0, excludedHidden[0].Original.InFolderIndex);
 
             Assert.Equal(2, includedHidden.Count);
-            Assert.Equal([hiddenPath, visiblePath], includedHidden.Select(x => x.FullPath));
-            Assert.Equal([0, 1], includedHidden.Select(x => x.GlobalIndex));
-            Assert.Equal([0, 1], includedHidden.Select(x => x.InFolderIndex));
+            Assert.Equal([hiddenPath, visiblePath], includedHidden.Select(x => x.Original.FullPath));
+            Assert.Equal([0, 1], includedHidden.Select(x => x.Original.GlobalIndex));
+            Assert.Equal([0, 1], includedHidden.Select(x => x.Original.InFolderIndex));
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace Mfr.Tests.Core
 
             Assert.Equal(1, addedCount);
             var entry = Assert.Single(renameList.RenameItems);
-            Assert.Equal(topLevelMatch, entry.FullPath);
+            Assert.Equal(topLevelMatch, entry.Original.FullPath);
         }
 
         [Fact]
@@ -168,7 +168,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(0, renameList.AddSource(alphaPath));
 
             var entry = Assert.Single(renameList.RenameItems);
-            Assert.Equal(alphaPath, entry.FullPath);
+            Assert.Equal(alphaPath, entry.Original.FullPath);
         }
 
         [Fact]
@@ -189,7 +189,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(3, addedCount);
             Assert.Equal(
                 [topLevelMatch, nestedMatch, deeperMatch],
-                renameList.RenameItems.Select(entry => entry.FullPath));
+                renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
 
         [Fact]
@@ -210,8 +210,8 @@ namespace Mfr.Tests.Core
             Assert.Equal(2, addedCount);
             Assert.Equal(
                 [nestedMatch, deeperMatch],
-                renameList.RenameItems.Select(entry => entry.FullPath));
-            Assert.DoesNotContain(nonMatch, renameList.RenameItems.Select(entry => entry.FullPath));
+                renameList.RenameItems.Select(entry => entry.Original.FullPath));
+            Assert.DoesNotContain(nonMatch, renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
 
     }

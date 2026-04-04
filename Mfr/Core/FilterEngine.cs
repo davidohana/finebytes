@@ -1,6 +1,5 @@
 using Mfr.Models;
 using Mfr.Models.Filters;
-using Mfr.Utils;
 
 namespace Mfr.Core
 {
@@ -41,34 +40,33 @@ namespace Mfr.Core
         /// <returns>Summary of rename outcomes (renamed, skipped, conflicts, errors).</returns>
         public static RenameBatchResult PreviewAndCommit(
             FilterPreset preset,
-            IReadOnlyList<FileEntryLite> files,
+            IReadOnlyList<RenameItem> files,
             bool continueOnErrors)
         {
             // Phase 1: Conflict strategy is `Skip` (no auto-number, no overwrite).
             var previewResults = new List<RenameResultItem>(files.Count);
-            var pending = new List<(FileEntryLite file, string destPath)>(files.Count);
+            var pending = new List<RenameItem>(files.Count);
 
             // 1) Preview and compute destinations (or preview errors).
-            foreach (var file in files)
+            foreach (var item in files)
             {
                 try
                 {
-                    (var prefix, var extension) = _ApplyFiltersToName(preset.Filters, file);
-                    var finalFileName = prefix + extension;
-                    var destPath = file.DirectoryPath.CombinePath(finalFileName);
+                    _ApplyFiltersToName(preset.Filters, item);
+                    var destPath = item.Preview.FullPath;
 
-                    if (string.Equals(destPath, file.FullPath, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(destPath, item.Original.FullPath, StringComparison.OrdinalIgnoreCase))
                     {
-                        previewResults.Add(new RenameResultItem(file.FullPath, destPath, RenameStatus.Skipped, null));
+                        previewResults.Add(new RenameResultItem(item.Original.FullPath, destPath, RenameStatus.Skipped, null));
                         continue;
                     }
 
-                    previewResults.Add(new RenameResultItem(file.FullPath, destPath, RenameStatus.Skipped, null));
-                    pending.Add((file, destPath));
+                    previewResults.Add(new RenameResultItem(item.Original.FullPath, destPath, RenameStatus.Skipped, null));
+                    pending.Add(item);
                 }
                 catch (Exception ex)
                 {
-                    previewResults.Add(new RenameResultItem(file.FullPath, file.FullPath, RenameStatus.Error, ex.Message));
+                    previewResults.Add(new RenameResultItem(item.Original.FullPath, item.Original.FullPath, RenameStatus.Error, ex.Message));
                     if (!continueOnErrors)
                     {
                         return _Summarize(preset.Name, files.Count, previewResults);
@@ -83,13 +81,14 @@ namespace Mfr.Core
             }
 
             // 2) Resolve conflicts among pending destinations and against disk.
-            var destToFiles = pending.GroupBy(p => p.destPath, StringComparer.OrdinalIgnoreCase)
+            var destToFiles = pending.GroupBy(p => p.Preview.FullPath, StringComparer.OrdinalIgnoreCase)
                 .Where(g => g.Count() > 1)
                 .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
 
             var conflictDestinations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach ((var file, var destPath) in pending)
+            foreach (var item in pending)
             {
+                var destPath = item.Preview.FullPath;
                 if (File.Exists(destPath))
                 {
                     _ = conflictDestinations.Add(destPath);
@@ -109,24 +108,26 @@ namespace Mfr.Core
                 resultIndex[previewResults[i].OriginalPath] = i;
             }
 
-            foreach ((var file, var destPath) in pending)
+            foreach (var item in pending)
             {
-                var idx = resultIndex[file.FullPath];
+                var sourcePath = item.Original.FullPath;
+                var destPath = item.Preview.FullPath;
+                var idx = resultIndex[sourcePath];
                 if (conflictDestinations.Contains(destPath))
                 {
-                    previewResults[idx] = new RenameResultItem(file.FullPath, destPath, RenameStatus.ConflictSkipped, null);
+                    previewResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.ConflictSkipped, null);
                     continue;
                 }
 
                 try
                 {
-                    _CommitMove(file.FullPath, destPath);
-                    previewResults[idx] = new RenameResultItem(file.FullPath, destPath, RenameStatus.Ok, null);
+                    item.Apply();
+                    previewResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.Ok, null);
                     renamedCount++;
                 }
                 catch (Exception ex)
                 {
-                    previewResults[idx] = new RenameResultItem(file.FullPath, destPath, RenameStatus.Error, ex.Message);
+                    previewResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.Error, ex.Message);
                     if (!continueOnErrors)
                     {
                         break;
@@ -150,10 +151,11 @@ namespace Mfr.Core
             return new RenameBatchResult(presetName, totalFiles, renamed, skipped, conflicts, errors, results);
         }
 
-        private static (string prefix, string extension) _ApplyFiltersToName(IReadOnlyList<Filter> filters, FileEntryLite file)
+        private static void _ApplyFiltersToName(IReadOnlyList<Filter> filters, RenameItem item)
         {
-            var prefix = file.Prefix;
-            var extension = file.Extension;
+            item.ResetPreview();
+            var prefix = item.Original.Prefix;
+            var extension = item.Original.Extension;
 
             foreach (var filter in filters)
             {
@@ -176,7 +178,7 @@ namespace Mfr.Core
                     _ => throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.")
                 };
 
-                var transformed = filter.Apply(segment, file);
+                var transformed = filter.Apply(segment, item);
 
                 switch (mode)
                 {
@@ -196,22 +198,7 @@ namespace Mfr.Core
                 }
             }
 
-            return (prefix, extension);
-        }
-
-        private static void _CommitMove(string sourcePath, string destPath)
-        {
-            // Keep it simple for phase 1: try Move first, fallback to Copy+Delete.
-            try
-            {
-                File.Move(sourcePath, destPath, overwrite: false);
-            }
-            catch (IOException)
-            {
-                // Cross-volume or other move failure -> fallback.
-                File.Copy(sourcePath, destPath, overwrite: false);
-                File.Delete(sourcePath);
-            }
+            item.SetPreviewName(prefix, extension);
         }
 
     }
