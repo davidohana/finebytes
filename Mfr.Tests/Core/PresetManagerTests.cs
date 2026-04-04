@@ -2,25 +2,30 @@ using System.Text.Json;
 
 using Mfr.Core;
 using Mfr.Models;
+using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Core
 {
     /// <summary>
     /// Tests loading and saving behavior for <see cref="PresetManager"/>.
     /// </summary>
-    public class PresetManagerTests
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="PresetManagerTests"/> class.
+    /// </remarks>
+    /// <param name="tempDirectoryFixture">Temporary-directory fixture for per-test folders.</param>
+    public class PresetManagerTests(TempDirectoryFixture tempDirectoryFixture) : IClassFixture<TempDirectoryFixture>
     {
+        private readonly TempDirectoryFixture _tempDirectoryFixture = tempDirectoryFixture;
+
         [Fact]
         /// <summary>
         /// Verifies that loading presets populates the <see cref="PresetManager.NameToPreset"/> dictionary.
         /// </summary>
         public void LoadPresets_Populates_NameToPreset()
         {
-            var dir = _CreateTempDir();
-            try
-            {
-                var presetsPath = Path.Combine(dir, "presets.json");
-                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var presetsPath = Path.Combine(dir, "presets.json");
+            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "5b5f7bbf-5fc4-45aa-9631-6ca18afae4f7", "name": "Rock", "filters": [] },
@@ -29,17 +34,12 @@ namespace Mfr.Tests.Core
                 }
                 """);
 
-                var manager = new PresetManager(presetsPath);
-                manager.LoadPresets();
+            var manager = new PresetManager(presetsPath);
+            manager.LoadPresets();
 
-                Assert.Equal(2, manager.NameToPreset.Count);
-                Assert.True(manager.NameToPreset.ContainsKey("Rock"));
-                Assert.True(manager.NameToPreset.ContainsKey("Pop"));
-            }
-            finally
-            {
-                Directory.Delete(dir, recursive: true);
-            }
+            Assert.Equal(2, manager.NameToPreset.Count);
+            Assert.True(manager.NameToPreset.ContainsKey("Rock"));
+            Assert.True(manager.NameToPreset.ContainsKey("Pop"));
         }
 
         [Fact]
@@ -48,11 +48,9 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void LoadPresets_Allows_DifferentCase_Names()
         {
-            var dir = _CreateTempDir();
-            try
-            {
-                var presetsPath = Path.Combine(dir, "presets.json");
-                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var presetsPath = Path.Combine(dir, "presets.json");
+            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "6d770366-7ac5-41f5-857f-08a4f6b7fdcc", "name": "Rock", "filters": [] },
@@ -61,17 +59,12 @@ namespace Mfr.Tests.Core
                 }
                 """);
 
-                var manager = new PresetManager(presetsPath);
-                manager.LoadPresets();
+            var manager = new PresetManager(presetsPath);
+            manager.LoadPresets();
 
-                Assert.Equal(2, manager.NameToPreset.Count);
-                Assert.True(manager.NameToPreset.ContainsKey("Rock"));
-                Assert.True(manager.NameToPreset.ContainsKey("rock"));
-            }
-            finally
-            {
-                Directory.Delete(dir, recursive: true);
-            }
+            Assert.Equal(2, manager.NameToPreset.Count);
+            Assert.True(manager.NameToPreset.ContainsKey("Rock"));
+            Assert.True(manager.NameToPreset.ContainsKey("rock"));
         }
 
         [Fact]
@@ -80,11 +73,9 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void LoadPresets_Rejects_Exact_Duplicate_Names()
         {
-            var dir = _CreateTempDir();
-            try
-            {
-                var presetsPath = Path.Combine(dir, "presets.json");
-                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var presetsPath = Path.Combine(dir, "presets.json");
+            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "8fd30889-4950-4c90-a5b3-81f5dd2ef825", "name": "Dup", "filters": [] },
@@ -93,14 +84,9 @@ namespace Mfr.Tests.Core
                 }
                 """);
 
-                var manager = new PresetManager(presetsPath);
-                var ex = Assert.Throws<UserException>(manager.LoadPresets);
-                Assert.Contains("Duplicate preset names found", ex.Message, StringComparison.Ordinal);
-            }
-            finally
-            {
-                Directory.Delete(dir, recursive: true);
-            }
+            var manager = new PresetManager(presetsPath);
+            var ex = Assert.Throws<UserException>(manager.LoadPresets);
+            Assert.Contains("Duplicate preset names found", ex.Message, StringComparison.Ordinal);
         }
 
         [Fact]
@@ -109,11 +95,9 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void LoadPresets_Reloads_From_Disk()
         {
-            var dir = _CreateTempDir();
-            try
-            {
-                var presetsPath = Path.Combine(dir, "presets.json");
-                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var presetsPath = Path.Combine(dir, "presets.json");
+            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "95d14a63-cfdd-425a-b44e-c946f4fd2a78", "name": "First", "filters": [] }
@@ -121,11 +105,11 @@ namespace Mfr.Tests.Core
                 }
                 """);
 
-                var manager = new PresetManager(presetsPath);
-                manager.LoadPresets();
-                Assert.True(manager.NameToPreset.ContainsKey("First"));
+            var manager = new PresetManager(presetsPath);
+            manager.LoadPresets();
+            Assert.True(manager.NameToPreset.ContainsKey("First"));
 
-                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "47f0f380-d44a-4f4d-baa9-0331816cce9f", "name": "Second", "filters": [] }
@@ -133,15 +117,10 @@ namespace Mfr.Tests.Core
                 }
                 """);
 
-                manager.LoadPresets();
+            manager.LoadPresets();
 
-                Assert.False(manager.NameToPreset.ContainsKey("First"));
-                Assert.True(manager.NameToPreset.ContainsKey("Second"));
-            }
-            finally
-            {
-                Directory.Delete(dir, recursive: true);
-            }
+            Assert.False(manager.NameToPreset.ContainsKey("First"));
+            Assert.True(manager.NameToPreset.ContainsKey("Second"));
         }
 
         [Fact]
@@ -150,41 +129,27 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void SavePresets_Writes_Sorted_By_Name()
         {
-            var dir = _CreateTempDir();
-            try
-            {
-                var presetsPath = Path.Combine(dir, "presets.json");
-                var manager = new PresetManager(presetsPath);
-                manager.NameToPreset["z"] = _CreatePreset("z");
-                manager.NameToPreset["A"] = _CreatePreset("A");
-                manager.NameToPreset["a"] = _CreatePreset("a");
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var presetsPath = Path.Combine(dir, "presets.json");
+            var manager = new PresetManager(presetsPath);
+            manager.NameToPreset["z"] = _CreatePreset("z");
+            manager.NameToPreset["A"] = _CreatePreset("A");
+            manager.NameToPreset["a"] = _CreatePreset("a");
 
-                manager.SavePresets();
+            manager.SavePresets();
 
-                using var doc = JsonDocument.Parse(File.ReadAllText(presetsPath));
-                var presetsProperty = doc.RootElement.EnumerateObject().First(p => string.Equals(p.Name, "presets", StringComparison.OrdinalIgnoreCase));
-                var names = presetsProperty.Value
-                    .EnumerateArray()
-                    .Select(p =>
-                    {
-                        var nameProperty = p.EnumerateObject().First(prop => string.Equals(prop.Name, "name", StringComparison.OrdinalIgnoreCase));
-                        return nameProperty.Value.GetString()!;
-                    })
-                    .ToArray();
+            using var doc = JsonDocument.Parse(File.ReadAllText(presetsPath));
+            var presetsProperty = doc.RootElement.EnumerateObject().First(p => string.Equals(p.Name, "presets", StringComparison.OrdinalIgnoreCase));
+            var names = presetsProperty.Value
+                .EnumerateArray()
+                .Select(p =>
+                {
+                    var nameProperty = p.EnumerateObject().First(prop => string.Equals(prop.Name, "name", StringComparison.OrdinalIgnoreCase));
+                    return nameProperty.Value.GetString()!;
+                })
+                .ToArray();
 
-                Assert.Equal(["A", "a", "z"], names);
-            }
-            finally
-            {
-                Directory.Delete(dir, recursive: true);
-            }
-        }
-
-        private static string _CreateTempDir()
-        {
-            var dir = Path.Combine(Path.GetTempPath(), "mfr8_tests_" + Guid.NewGuid().ToString("N"));
-            _ = Directory.CreateDirectory(dir);
-            return dir;
+            Assert.Equal(["A", "a", "z"], names);
         }
 
         private static void _WritePresetsJson(string path, string content)

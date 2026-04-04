@@ -25,7 +25,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
                     CustomCharsToRemove: "",
                     CustomReplacement: ""));
             var file = FilterTestHelpers.CreateFile();
-            Assert.Equal("a_b", f.Apply("a<b", file));
+            Assert.Equal("a_b", f.Apply("a/b", file));
         }
 
         /// <summary>

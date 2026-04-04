@@ -12,7 +12,7 @@ clean:
     dotnet clean ./finebytes.slnx
 
 test:
-    dotnet test ./Mfr.Tests/Mfr.Tests.csproj -c Debug
+    dotnet test ./Mfr.Tests/Mfr.Tests.csproj -c Debug  --logger "console;verbosity=detailed"
 
 format:
     dotnet format ./finebytes.slnx --verbosity diagnostic
