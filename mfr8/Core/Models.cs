@@ -35,6 +35,8 @@ namespace Mfr8.Core
         Full
     }
 
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "family")]
+    [JsonDerivedType(typeof(FileNameTarget), "FileName")]
     public abstract record FilterTarget
     {
         [JsonIgnore]
@@ -46,10 +48,32 @@ namespace Mfr8.Core
         public override FilterTargetFamily Family => FilterTargetFamily.FileName;
     }
 
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+    [JsonDerivedType(typeof(LettersCaseFilter), "LettersCase")]
+    [JsonDerivedType(typeof(SpaceCharacterFilter), "SpaceCharacter")]
+    [JsonDerivedType(typeof(RemoveSpacesFilter), "RemoveSpaces")]
+    [JsonDerivedType(typeof(ShrinkSpacesFilter), "ShrinkSpaces")]
+    [JsonDerivedType(typeof(TrimLeftFilter), "TrimLeft")]
+    [JsonDerivedType(typeof(TrimRightFilter), "TrimRight")]
+    [JsonDerivedType(typeof(ExtractLeftFilter), "ExtractLeft")]
+    [JsonDerivedType(typeof(ExtractRightFilter), "ExtractRight")]
+    [JsonDerivedType(typeof(ReplacerFilter), "Replacer")]
+    [JsonDerivedType(typeof(FormatterFilter), "Formatter")]
+    [JsonDerivedType(typeof(CounterFilter), "Counter")]
+    [JsonDerivedType(typeof(CleanerFilter), "Cleaner")]
+    [JsonDerivedType(typeof(FixLeadingZerosFilter), "FixLeadingZeros")]
+    [JsonDerivedType(typeof(StripParenthesesFilter), "StripParentheses")]
     public abstract record Filter(bool Enabled, FilterTarget Target)
     {
+        [JsonIgnore]
         public abstract string Type { get; }
     }
+    /// <summary>
+    /// Represents numeric count options used by extraction/trim filters.
+    /// </summary>
+    /// <param name="Count">Character count.</param>
+    public sealed record CountFilterOptions(int Count);
+
 
     public sealed record LettersCaseOptions(
         LettersCaseMode Mode,
@@ -101,7 +125,7 @@ namespace Mfr8.Core
     public sealed record TrimLeftFilter(
         bool Enabled,
         FilterTarget Target,
-        int Count) : Filter(Enabled, Target)
+        CountFilterOptions Options) : Filter(Enabled, Target)
     {
         public override string Type => "TrimLeft";
     }
@@ -109,7 +133,7 @@ namespace Mfr8.Core
     public sealed record TrimRightFilter(
         bool Enabled,
         FilterTarget Target,
-        int Count) : Filter(Enabled, Target)
+        CountFilterOptions Options) : Filter(Enabled, Target)
     {
         public override string Type => "TrimRight";
     }
@@ -117,7 +141,7 @@ namespace Mfr8.Core
     public sealed record ExtractLeftFilter(
         bool Enabled,
         FilterTarget Target,
-        int Count) : Filter(Enabled, Target)
+        CountFilterOptions Options) : Filter(Enabled, Target)
     {
         public override string Type => "ExtractLeft";
     }
@@ -125,7 +149,7 @@ namespace Mfr8.Core
     public sealed record ExtractRightFilter(
         bool Enabled,
         FilterTarget Target,
-        int Count) : Filter(Enabled, Target)
+        CountFilterOptions Options) : Filter(Enabled, Target)
     {
         public override string Type => "ExtractRight";
     }

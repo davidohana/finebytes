@@ -40,29 +40,31 @@ namespace Mfr8.Core
                 throw new UserException($"Presets file not found: '{PresetsFilePath}'.");
             }
 
-            JsonDocument doc;
+            PresetsDocument? document;
             try
             {
-                doc = JsonDocument.Parse(File.ReadAllText(PresetsFilePath));
+                var json = File.ReadAllText(PresetsFilePath);
+                document = JsonSerializer.Deserialize(json, PresetJsonSerializerContext.Default.PresetsDocument);
             }
             catch (Exception ex)
             {
                 throw new UserException($"Failed to read presets file '{PresetsFilePath}': {ex.Message}", ex);
             }
 
-            using (doc)
+            if (document?.Presets is null)
             {
-                var presetElements = _GetPresetElements(doc.RootElement);
-                if (presetElements.Count == 0)
-                {
-                    throw new UserException($"No presets found in '{PresetsFilePath}'.");
-                }
+                throw new UserException("Presets JSON must be an object containing a 'presets' array.");
+            }
 
-                var presets = presetElements
-                    .Select(presetElement => _ParsePreset(presetElement, PresetsFilePath, _GetString(presetElement, "name") ?? ""))
-                    .ToList();
+            var presets = document.Presets;
+            if (presets.Count == 0)
+            {
+                throw new UserException($"No presets found in '{PresetsFilePath}'.");
+            }
 
-                var presetsByName = new Dictionary<string, FilterPreset>(StringComparer.Ordinal);
+            var presetsByName = new Dictionary<string, FilterPreset>(StringComparer.Ordinal);
+            try
+            {
                 foreach (var preset in presets)
                 {
                     var normalizedName = _NormalizePresetName(preset.Name);
@@ -71,9 +73,17 @@ namespace Mfr8.Core
                         throw new UserException($"Duplicate preset name '{preset.Name}' in '{PresetsFilePath}'. Preset names must be unique.");
                     }
                 }
-
-                _loadedPresetsByName = presetsByName;
             }
+            catch (UserException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new UserException($"One or more presets in '{PresetsFilePath}' are invalid: {ex.Message}", ex);
+            }
+
+            _loadedPresetsByName = presetsByName;
         }
 
         /// <summary>
@@ -103,56 +113,7 @@ namespace Mfr8.Core
         {
             return presetName.Trim().ToLowerInvariant();
         }
-
-        private static IReadOnlyList<JsonElement> _GetPresetElements(JsonElement root)
-        {
-            return root.ValueKind == JsonValueKind.Object && root.TryGetProperty("presets", out var presetsEl)
-                ? presetsEl.ValueKind == JsonValueKind.Array
-                    ? [.. presetsEl.EnumerateArray()]
-                    : throw new UserException("The 'presets' property must be a JSON array.")
-                : throw new UserException("Presets JSON must be an object containing a 'presets' array.");
-        }
-
-        private static string? _GetString(JsonElement root, string name)
-        {
-            return root.TryGetProperty(name, out var prop) && prop.ValueKind == JsonValueKind.String ? prop.GetString() : null;
-        }
-
-        private static FilterPreset _ParsePreset(JsonElement root, string filePath, string presetName)
-        {
-            try
-            {
-                var id = Guid.Parse(_GetString(root, "id") ?? throw new UserException("Preset missing 'id'."));
-                var name = _GetString(root, "name") ?? throw new UserException("Preset missing 'name'.");
-                var description = _GetString(root, "description");
-
-                if (!root.TryGetProperty("filters", out var filtersEl) || filtersEl.ValueKind != JsonValueKind.Array)
-                {
-                    throw new UserException("Preset missing 'filters' array.");
-                }
-
-                var filters = new List<Filter>();
-                foreach (var filterEl in filtersEl.EnumerateArray())
-                {
-                    filters.Add(FilterParser.ParseFilter(filterEl));
-                }
-
-                return new FilterPreset
-                {
-                    Id = id,
-                    Name = name,
-                    Description = description,
-                    Filters = filters
-                };
-            }
-            catch (UserException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new UserException($"Preset '{presetName}' in '{filePath}' is invalid: {ex.Message}", ex);
-            }
-        }
     }
+
+    internal sealed record PresetsDocument(IReadOnlyList<FilterPreset> Presets);
 }

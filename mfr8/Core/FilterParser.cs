@@ -112,28 +112,28 @@ namespace Mfr8.Core
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("TrimLeft target must be FileNameTarget.");
             var count = _GetIntRequired(optionsEl, "count");
-            return new TrimLeftFilter(enabled, t, count);
+            return new TrimLeftFilter(enabled, t, new CountFilterOptions(count));
         }
 
         private static TrimRightFilter _ParseTrimRight(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("TrimRight target must be FileNameTarget.");
             var count = _GetIntRequired(optionsEl, "count");
-            return new TrimRightFilter(enabled, t, count);
+            return new TrimRightFilter(enabled, t, new CountFilterOptions(count));
         }
 
         private static ExtractLeftFilter _ParseExtractLeft(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("ExtractLeft target must be FileNameTarget.");
             var count = _GetIntRequired(optionsEl, "count");
-            return new ExtractLeftFilter(enabled, t, count);
+            return new ExtractLeftFilter(enabled, t, new CountFilterOptions(count));
         }
 
         private static ExtractRightFilter _ParseExtractRight(bool enabled, FilterTarget target, JsonElement optionsEl)
         {
             var t = target as FileNameTarget ?? throw new InvalidOperationException("ExtractRight target must be FileNameTarget.");
             var count = _GetIntRequired(optionsEl, "count");
-            return new ExtractRightFilter(enabled, t, count);
+            return new ExtractRightFilter(enabled, t, new CountFilterOptions(count));
         }
 
         private static ReplacerFilter _ParseReplacer(bool enabled, FilterTarget target, JsonElement optionsEl)
