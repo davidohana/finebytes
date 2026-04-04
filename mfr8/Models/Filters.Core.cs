@@ -29,6 +29,8 @@ namespace Mfr8.Models
         /// </summary>
         [JsonIgnore]
         public abstract string Type { get; }
+
+        internal abstract string Apply(string segment, FileEntryLite file);
     }
 
     /// <summary>
