@@ -16,7 +16,7 @@ namespace mfr8.Tests.Core
             try
             {
                 var presetsPath = Path.Combine(dir, "presets.json");
-                _WritePresetsJson(presetsPath, """
+                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "5b5f7bbf-5fc4-45aa-9631-6ca18afae4f7", "name": "Rock", "filters": [] },
@@ -48,7 +48,7 @@ namespace mfr8.Tests.Core
             try
             {
                 var presetsPath = Path.Combine(dir, "presets.json");
-                _WritePresetsJson(presetsPath, """
+                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "6d770366-7ac5-41f5-857f-08a4f6b7fdcc", "name": "Rock", "filters": [] },
@@ -80,7 +80,7 @@ namespace mfr8.Tests.Core
             try
             {
                 var presetsPath = Path.Combine(dir, "presets.json");
-                _WritePresetsJson(presetsPath, """
+                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "8fd30889-4950-4c90-a5b3-81f5dd2ef825", "name": "Dup", "filters": [] },
@@ -90,7 +90,7 @@ namespace mfr8.Tests.Core
                 """);
 
                 var manager = new PresetManager(presetsPath);
-                var ex = Assert.Throws<UserException>(() => manager.LoadPresets());
+                var ex = Assert.Throws<UserException>(manager.LoadPresets);
                 Assert.Contains("Duplicate preset names found", ex.Message, StringComparison.Ordinal);
             }
             finally
@@ -109,7 +109,7 @@ namespace mfr8.Tests.Core
             try
             {
                 var presetsPath = Path.Combine(dir, "presets.json");
-                _WritePresetsJson(presetsPath, """
+                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "95d14a63-cfdd-425a-b44e-c946f4fd2a78", "name": "First", "filters": [] }
@@ -121,7 +121,7 @@ namespace mfr8.Tests.Core
                 manager.LoadPresets();
                 Assert.True(manager.NameToPreset.ContainsKey("First"));
 
-                _WritePresetsJson(presetsPath, """
+                _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
                     { "id": "47f0f380-d44a-4f4d-baa9-0331816cce9f", "name": "Second", "filters": [] }

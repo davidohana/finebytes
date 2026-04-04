@@ -159,7 +159,12 @@ namespace Mfr8.Cli
 
         private static void _PrintError(string text)
         {
-            AnsiConsole.MarkupLine($"[red]{Markup.Escape(text)}[/]");
+            var errorConsole = AnsiConsole.Create(new AnsiConsoleSettings
+            {
+                Out = new AnsiConsoleOutput(Console.Error),
+            });
+
+            errorConsole.MarkupLine($"[red]{Markup.Escape(text)}[/]");
         }
 
         private static string _CsvEscape(string value)

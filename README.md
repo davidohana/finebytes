@@ -6,6 +6,25 @@
 
 - .NET 10 SDK installed (`dotnet --info`)
 
+### Task Runner (`just`)
+
+Install `just`:
+
+- Follow the official install options: <https://github.com/casey/just#installation>
+- Quick cross-platform option (if Rust/Cargo is installed): `cargo install just`
+
+After install, you can run common tasks with short commands from the repository root:
+
+```powershell
+just restore
+just build
+just test
+just format
+just run-help
+```
+
+Run `just` by itself to list available targets.
+
 ### Restore Dependencies
 
 Windows (PowerShell):

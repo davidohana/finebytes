@@ -1,5 +1,17 @@
 # Contributing
 
+## Task runner (`just`)
+
+Install instructions: <https://github.com/casey/just#installation>
+
+If you have `just` installed, you can use shortcuts for the most common workflows:
+
+- `just restore`
+- `just build`
+- `just test`
+- `just format`
+- `just run-help`
+
 ## C# formatting and linting
 
 This repository uses built-in .NET formatting and analyzers:
