@@ -8,13 +8,17 @@ namespace Mfr.Tests.Core
     /// <summary>
     /// Tests rename preview and commit behavior in the filter engine.
     /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of the <see cref="FilterEngineTests"/> class.
-    /// </remarks>
-    /// <param name="tempDirectoryFixture">Temporary-directory fixture for per-test folders.</param>
-    public class FilterEngineTests(TempDirectoryFixture tempDirectoryFixture) : IClassFixture<TempDirectoryFixture>
+    public class FilterEngineTests : IDisposable
     {
-        private readonly TempDirectoryFixture _tempDirectoryFixture = tempDirectoryFixture;
+        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
+
+        /// <summary>
+        /// Disposes temporary test resources created for this test method.
+        /// </summary>
+        public void Dispose()
+        {
+            _tempDirectoryFixture.Dispose();
+        }
 
         [Fact]
         /// <summary>

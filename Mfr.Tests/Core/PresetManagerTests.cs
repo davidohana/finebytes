@@ -9,13 +9,17 @@ namespace Mfr.Tests.Core
     /// <summary>
     /// Tests loading and saving behavior for <see cref="PresetManager"/>.
     /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of the <see cref="PresetManagerTests"/> class.
-    /// </remarks>
-    /// <param name="tempDirectoryFixture">Temporary-directory fixture for per-test folders.</param>
-    public class PresetManagerTests(TempDirectoryFixture tempDirectoryFixture) : IClassFixture<TempDirectoryFixture>
+    public class PresetManagerTests : IDisposable
     {
-        private readonly TempDirectoryFixture _tempDirectoryFixture = tempDirectoryFixture;
+        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
+
+        /// <summary>
+        /// Disposes temporary test resources created for this test method.
+        /// </summary>
+        public void Dispose()
+        {
+            _tempDirectoryFixture.Dispose();
+        }
 
         [Fact]
         /// <summary>

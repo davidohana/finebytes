@@ -1,46 +1,50 @@
 namespace Mfr.Tests.TestSupport
 {
     /// <summary>
-    /// Creates and tracks temporary directories for tests, then deletes them when disposed.
+    /// Creates one temporary directory for a test and deletes it when disposed.
     /// </summary>
     public sealed class TempDirectoryFixture : IDisposable
     {
-        private readonly List<string> _directories = [];
+        /// <summary>
+        /// Gets the full path to the temporary directory for the current fixture instance.
+        /// </summary>
+        public string TempDir { get; }
 
         /// <summary>
-        /// Creates a new unique temporary directory and tracks it for cleanup.
+        /// Initializes a new instance of the <see cref="TempDirectoryFixture"/> class.
         /// </summary>
-        /// <returns>The full path to the created temporary directory.</returns>
-        public string CreateTempDir()
+        public TempDirectoryFixture()
         {
-            Console.WriteLine("Creating temp directory: " + Path.GetTempPath());
-            var dir = Path.Combine(Path.GetTempPath(), "mfr8_tests_" + Guid.NewGuid().ToString("N"));
-            _ = Directory.CreateDirectory(dir);
-            _directories.Add(dir);
-            return dir;
+            TempDir = Path.Combine(Path.GetTempPath(), "mfr8_tests_" + Guid.NewGuid().ToString("N"));
+            _ = Directory.CreateDirectory(TempDir);
         }
 
         /// <summary>
-        /// Deletes all tracked temporary directories.
+        /// Gets the fixture's temporary directory path.
+        /// </summary>
+        /// <returns>The full path to the temporary directory.</returns>
+        public string CreateTempDir()
+        {
+            return TempDir;
+        }
+
+        /// <summary>
+        /// Deletes the temporary directory created by this fixture.
         /// </summary>
         public void Dispose()
         {
-            Console.WriteLine("Disposing of temp directories: " + string.Join(", ", _directories));
-            foreach (var dir in _directories)
+            try
             {
-                try
+                if (Directory.Exists(TempDir))
                 {
-                    if (Directory.Exists(dir))
-                    {
-                        Directory.Delete(dir, recursive: true);
-                    }
+                    Directory.Delete(TempDir, recursive: true);
                 }
-                catch (IOException)
-                {
-                }
-                catch (UnauthorizedAccessException)
-                {
-                }
+            }
+            catch (IOException)
+            {
+            }
+            catch (UnauthorizedAccessException)
+            {
             }
         }
     }
