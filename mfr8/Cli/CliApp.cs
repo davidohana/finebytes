@@ -40,7 +40,7 @@ namespace Mfr8.Cli
             }
 
             var presetManager = new PresetManager(options.PresetsFilePath);
-            presetManager.LoadAll();
+            presetManager.LoadPresets();
             var preset = presetManager.GetByName(options.PresetName);
 
             var files = FileScanner.ScanSources(options.Sources, includeHidden: options.IncludeHidden);

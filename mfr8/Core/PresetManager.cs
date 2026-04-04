@@ -8,7 +8,7 @@ namespace Mfr8.Core
     /// <param name="presetsFilePath">Path to the JSON file containing all presets.</param>
     public sealed class PresetManager(string presetsFilePath)
     {
-        private Dictionary<string, FilterPreset>? _loadedPresetsByName;
+        private Dictionary<string, FilterPreset>? _NameToPreset;
 
         /// <summary>
         /// Gets the JSON file path containing all presets.
@@ -28,48 +28,35 @@ namespace Mfr8.Core
         /// <summary>
         /// Loads and caches all presets from the configured presets file.
         /// </summary>
-        public void LoadAll()
+        public void LoadPresets()
         {
-            if (_loadedPresetsByName is not null)
-            {
-                return;
-            }
-
             if (!File.Exists(PresetsFilePath))
             {
                 throw new UserException($"Presets file not found: '{PresetsFilePath}'.");
             }
 
-            PresetContainer? document;
+            PresetContainer container;
             try
             {
                 var json = File.ReadAllText(PresetsFilePath);
                 // Use source-generated JSON metadata for trim/AOT-safe polymorphic deserialization.
-                document = JsonSerializer.Deserialize(json, PresetJsonSerializerContext.Default.PresetContainer);
+                container = JsonSerializer.Deserialize(json, PresetJsonSerializerContext.Default.PresetContainer)
+                    ?? throw new InvalidDataException("Presets JSON payload is null or invalid for the expected schema.");
             }
             catch (Exception ex)
             {
                 throw new UserException($"Failed to read presets file '{PresetsFilePath}': {ex.Message}", ex);
             }
 
-            if (document?.Presets is null)
-            {
-                throw new UserException("Presets JSON must be an object containing a 'presets' array.");
-            }
+            var presets = container.Presets;
 
-            var presets = document.Presets;
-            if (presets.Count == 0)
-            {
-                throw new UserException($"No presets found in '{PresetsFilePath}'.");
-            }
-
-            var presetsByName = new Dictionary<string, FilterPreset>(StringComparer.Ordinal);
+            var loadedNameToPreset = new Dictionary<string, FilterPreset>(StringComparer.Ordinal);
             try
             {
                 foreach (var preset in presets)
                 {
                     var normalizedName = _NormalizePresetName(preset.Name);
-                    if (!presetsByName.TryAdd(normalizedName, preset))
+                    if (!loadedNameToPreset.TryAdd(normalizedName, preset))
                     {
                         throw new UserException($"Duplicate preset name '{preset.Name}' in '{PresetsFilePath}'. Preset names must be unique.");
                     }
@@ -84,7 +71,35 @@ namespace Mfr8.Core
                 throw new UserException($"One or more presets in '{PresetsFilePath}' are invalid: {ex.Message}", ex);
             }
 
-            _loadedPresetsByName = presetsByName;
+            _NameToPreset = loadedNameToPreset;
+        }
+
+        /// <summary>
+        /// Saves currently loaded presets to the configured presets file.
+        /// </summary>
+        public void SavePresets()
+        {
+            if (_NameToPreset is null)
+            {
+                throw new InvalidOperationException("Presets are not loaded. Call LoadPresets() before SavePresets().");
+            }
+
+            try
+            {
+                var directory = Path.GetDirectoryName(PresetsFilePath);
+                if (!string.IsNullOrWhiteSpace(directory))
+                {
+                    _ = Directory.CreateDirectory(directory);
+                }
+
+                var container = new PresetContainer([.. _NameToPreset.Values]);
+                var json = JsonSerializer.Serialize(container, PresetJsonSerializerContext.Default.PresetContainer);
+                File.WriteAllText(PresetsFilePath, json);
+            }
+            catch (Exception ex)
+            {
+                throw new UserException($"Failed to save presets file '{PresetsFilePath}': {ex.Message}", ex);
+            }
         }
 
         /// <summary>
@@ -99,13 +114,13 @@ namespace Mfr8.Core
                 throw new UserException("Preset name is required.");
             }
 
-            if (_loadedPresetsByName is null)
+            if (_NameToPreset is null)
             {
-                throw new InvalidOperationException("Presets are not loaded. Call LoadAll() before GetByName().");
+                throw new InvalidOperationException("Presets are not loaded. Call LoadPresets() before GetByName().");
             }
 
             var normalizedName = _NormalizePresetName(presetName);
-            return _loadedPresetsByName.TryGetValue(normalizedName, out var preset)
+            return _NameToPreset.TryGetValue(normalizedName, out var preset)
                 ? preset
                 : throw new UserException($"Preset not found: '{presetName}'.");
         }
