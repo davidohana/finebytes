@@ -62,14 +62,14 @@ namespace Mfr.Cli
                 throw new UserException("No files matched the provided sources.");
             }
 
-            var preview = FilterEngine.Preview(
+            var previewStats = FilterEngine.Preview(
                 preset: preset,
                 files: renameItems,
                 continueOnErrors: options.ContinueOnPreviewErrors);
-            var result = preview;
-            if (preview.Errors == 0)
+            var stats = previewStats;
+            if (previewStats.Errors == 0)
             {
-                result = FilterEngine.Commit(
+                stats = FilterEngine.Commit(
                     presetName: preset.Name,
                     files: renameItems,
                     continueOnErrors: options.ContinueOnPreviewErrors);
@@ -77,10 +77,10 @@ namespace Mfr.Cli
 
             if (!options.Silent)
             {
-                _PrintResult(result, options.OutputFormat);
+                _PrintResult(stats, options.OutputFormat);
             }
 
-            return result.Errors > 0 && !options.ContinueOnPreviewErrors ? CliExitCode.UserError : CliExitCode.Success;
+            return stats.Errors > 0 && !options.ContinueOnPreviewErrors ? CliExitCode.UserError : CliExitCode.Success;
         }
 
         private static void _PrintResult(RenameBatchResult result, OutputFormat format)
