@@ -1,0 +1,15 @@
+---
+description: Consolidated C# code style rules
+globs: **/*.cs
+alwaysApply: true
+---
+
+# C# code style
+
+- Public API docs: add XML docs to every `public` member with `summary` and relevant `param`/`returns` tags.
+- Private methods: prefix every `private` method name with `_` (including `static` and `async`).
+- Control flow: prefer early `return` and early `continue`/`break`; keep the happy path at base indentation.
+- Ternary usage: only use ternary for simple value selection (`condition ? valueA : valueB` with trivial operands).
+- Avoid complex ternary branches that call functions, construct objects, throw, or span multiple lines; use `if`/`else` instead.
+- Named arguments: use named args when parameter meaning is not obvious by position (especially multiple same-type args).
+
