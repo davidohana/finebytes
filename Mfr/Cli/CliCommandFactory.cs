@@ -1,3 +1,5 @@
+using CommandLine.Text;
+
 using Mfr.Core;
 using Mfr.Models;
 
@@ -71,6 +73,30 @@ namespace Mfr.Cli
 
             [CommandLine.Option('v', "verbose", HelpText = "Reserved for future verbose diagnostics.")]
             public bool Verbose { get; set; }
+
+            [Usage(ApplicationAlias = "mfr")]
+            public static IEnumerable<Example> Examples
+            {
+                get
+                {
+                    yield return new Example(
+                        "Run with wildcard source",
+                        new CliArguments
+                        {
+                            Sources = [@"C:\Music\*.mp3"],
+                            PresetName = "clean-filenames"
+                        });
+
+                    yield return new Example(
+                        "Run with JSON output",
+                        new CliArguments
+                        {
+                            Sources = [@"C:\Music\*.mp3"],
+                            PresetName = "clean-filenames",
+                            Output = "json"
+                        });
+                }
+            }
 
             internal CliOptions ToOptions()
             {
