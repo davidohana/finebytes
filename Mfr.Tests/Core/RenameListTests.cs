@@ -83,7 +83,7 @@ namespace Mfr.Tests.Core
                 [betaPath, alphaPath, gammaPath, _tempRoot],
                 entries.Select(e => e.FullPath));
             Assert.Equal([0, 1, 2, 3], entries.Select(e => e.GlobalIndex));
-            Assert.Equal([0, 1, 2, 0], entries.Select(e => e.FolderOccurrenceIndex));
+            Assert.Equal([0, 1, 2, 0], entries.Select(e => e.InFolderIndex));
             Assert.Equal(["beta", "alpha", "gamma", tempRootName], entries.Select(e => e.Prefix));
             Assert.Equal([".log", ".txt", ".txt", ""], entries.Select(e => e.Extension));
             Assert.Equal(
@@ -130,13 +130,13 @@ namespace Mfr.Tests.Core
 
             _ = Assert.Single(excludedHidden);
             Assert.Equal(visiblePath, excludedHidden[0].FullPath);
-            Assert.Equal(1, excludedHidden[0].GlobalIndex);
-            Assert.Equal(0, excludedHidden[0].FolderOccurrenceIndex);
+            Assert.Equal(0, excludedHidden[0].GlobalIndex);
+            Assert.Equal(0, excludedHidden[0].InFolderIndex);
 
             Assert.Equal(2, includedHidden.Count);
             Assert.Equal([hiddenPath, visiblePath], includedHidden.Select(x => x.FullPath));
             Assert.Equal([0, 1], includedHidden.Select(x => x.GlobalIndex));
-            Assert.Equal([0, 1], includedHidden.Select(x => x.FolderOccurrenceIndex));
+            Assert.Equal([0, 1], includedHidden.Select(x => x.InFolderIndex));
         }
 
         [Fact]

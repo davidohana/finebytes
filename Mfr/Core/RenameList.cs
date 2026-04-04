@@ -18,7 +18,6 @@ namespace Mfr.Core
         private readonly List<FileEntryLite> _resolvedItems = [];
         private readonly Dictionary<string, int> _folderCounts = new(_pathComparer);
         private readonly bool _includeHidden = includeHidden;
-        private int _nextGlobalIndex;
 
         /// <summary>
         /// Gets the resolved file items in insertion/discovery order.
@@ -39,7 +38,7 @@ namespace Mfr.Core
 
             var trimmedSource = source.Trim();
             var resolvedPaths = _ResolveSource(trimmedSource).ToList();
-            return _ResolveAndAppendPaths(resolvedPaths);
+            return _AppendPaths(resolvedPaths);
         }
 
         /// <summary>
@@ -196,7 +195,7 @@ namespace Mfr.Core
         /// </summary>
         /// <param name="resolvedPaths">Resolved file paths to append.</param>
         /// <returns>The count of newly added resolved items.</returns>
-        private int _ResolveAndAppendPaths(IEnumerable<string> resolvedPaths)
+        private int _AppendPaths(IEnumerable<string> resolvedPaths)
         {
             var addedCount = 0;
             foreach (var fullPath in resolvedPaths)
@@ -211,25 +210,23 @@ namespace Mfr.Core
                 if (!_includeHidden &&
                     (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System)))
                 {
-                    _nextGlobalIndex++;
                     continue;
                 }
 
                 var directoryPath = Path.GetDirectoryName(fullPath) ?? "";
                 var prefix = Path.GetFileNameWithoutExtension(fullPath);
                 var extension = Path.GetExtension(fullPath);
-                var folderOccurrence = _folderCounts.GetValueOrDefault(directoryPath);
-                _folderCounts[directoryPath] = folderOccurrence + 1;
+                var inFolderIndex = _folderCounts.GetValueOrDefault(directoryPath);
+                _folderCounts[directoryPath] = inFolderIndex + 1;
 
                 _resolvedItems.Add(new FileEntryLite(
-                    GlobalIndex: _nextGlobalIndex,
-                    FolderOccurrenceIndex: folderOccurrence,
+                    GlobalIndex: _resolvedItems.Count,
+                    InFolderIndex: inFolderIndex,
                     FullPath: fullPath,
                     DirectoryPath: directoryPath,
                     Prefix: prefix,
                     Extension: extension));
                 addedCount++;
-                _nextGlobalIndex++;
             }
 
             return addedCount;

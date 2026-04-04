@@ -63,7 +63,7 @@ namespace Mfr.Models.Filters.Advanced
             var width = int.Parse(parts[3], CultureInfo.InvariantCulture);
             var pad = int.Parse(parts[4], CultureInfo.InvariantCulture);
 
-            var n = reset == 1 ? file.FolderOccurrenceIndex : file.GlobalIndex;
+            var n = reset == 1 ? file.InFolderIndex : file.GlobalIndex;
             var value = start + ((long)step * n);
             var raw = value.ToString(CultureInfo.InvariantCulture);
             if (width <= 0)

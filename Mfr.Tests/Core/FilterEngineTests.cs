@@ -35,8 +35,8 @@ namespace Mfr.Tests.Core
 
             var files = new List<FileEntryLite>
             {
-                new(GlobalIndex: 0, FolderOccurrenceIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "a", Extension: ".mp3"),
-                new(GlobalIndex: 1, FolderOccurrenceIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "b", Extension: ".mp3")
+                new(GlobalIndex: 0, InFolderIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "a", Extension: ".mp3"),
+                new(GlobalIndex: 1, InFolderIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "b", Extension: ".mp3")
             };
 
             var preset = new FilterPreset
@@ -76,8 +76,8 @@ namespace Mfr.Tests.Core
 
             var files = new List<FileEntryLite>
             {
-                new(GlobalIndex: 0, FolderOccurrenceIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "track01", Extension: ".mp3"),
-                new(GlobalIndex: 1, FolderOccurrenceIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "track02", Extension: ".mp3"),
+                new(GlobalIndex: 0, InFolderIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "track01", Extension: ".mp3"),
+                new(GlobalIndex: 1, InFolderIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "track02", Extension: ".mp3"),
             };
 
             var preset = new FilterPreset

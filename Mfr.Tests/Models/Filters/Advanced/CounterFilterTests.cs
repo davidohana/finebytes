@@ -53,16 +53,16 @@ namespace Mfr.Tests.Models.Filters.Advanced
         }
 
         /// <summary>
-        /// Verifies folder occurrence index when reset per folder is enabled.
+        /// Verifies in-folder index when reset per folder is enabled.
         /// </summary>
         [Fact]
-        public void Apply_ResetPerFolder_UsesFolderOccurrenceIndex()
+        public void Apply_ResetPerFolder_UsesInFolderIndex()
         {
             var f = new CounterFilter(
                 true,
                 _Target,
                 new CounterOptions(Start: 10, Step: 5, Width: 0, PadChar: "0", Position: CounterPosition.Replace, Separator: "", ResetPerFolder: true));
-            var file = FilterTestHelpers.CreateFile(globalIndex: 99, folderOccurrenceIndex: 2);
+            var file = FilterTestHelpers.CreateFile(globalIndex: 99, inFolderIndex: 2);
             Assert.Equal("20", f.Apply("x", file));
         }
     }

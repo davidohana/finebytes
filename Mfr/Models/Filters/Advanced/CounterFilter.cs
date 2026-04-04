@@ -48,7 +48,7 @@ namespace Mfr.Models.Filters.Advanced
 
         internal override string Apply(string segment, FileEntryLite file)
         {
-            var n = Options.ResetPerFolder ? file.FolderOccurrenceIndex : file.GlobalIndex;
+            var n = Options.ResetPerFolder ? file.InFolderIndex : file.GlobalIndex;
             var value = Options.Start + ((long)Options.Step * n);
 
             var pad = Options.PadChar switch
