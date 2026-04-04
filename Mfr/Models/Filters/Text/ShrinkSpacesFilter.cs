@@ -14,7 +14,7 @@ namespace Mfr.Models.Filters.Text
         /// </summary>
         public override string Type => "ShrinkSpaces";
 
-        internal override string ApplySegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item)
         {
             return TextFilterRegexCache.WhitespaceRegex.Replace(segment, " ");
         }

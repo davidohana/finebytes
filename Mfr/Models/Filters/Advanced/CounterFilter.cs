@@ -46,7 +46,7 @@ namespace Mfr.Models.Filters.Advanced
         /// </summary>
         public override string Type => "Counter";
 
-        internal override string ApplySegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item)
         {
             var n = Options.ResetPerFolder ? item.Original.InFolderIndex : item.Original.GlobalIndex;
             var value = Options.Start + ((long)Options.Step * n);

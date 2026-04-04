@@ -16,7 +16,7 @@ namespace Mfr.Models.Filters.Text
         /// </summary>
         public override string Type => "ExtractRight";
 
-        internal override string ApplySegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item)
         {
             return Options.Count <= 0 ? "" : segment.Length <= Options.Count ? segment : segment[^Options.Count..];
         }

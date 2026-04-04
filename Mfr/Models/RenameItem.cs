@@ -25,25 +25,25 @@ namespace Mfr.Models
             Preview = null;
         }
 
-        internal void SetPreviewSegment(FileNameTargetMode mode, string segment)
+        internal void SetPreviewSegment(FileNamePart part, string segment)
         {
             var source = Preview ?? Original;
-            switch (mode)
+            switch (part)
             {
-                case FileNameTargetMode.Prefix:
+                case FileNamePart.Prefix:
                     _SetPreviewFileEntry(source, segment, source.Extension);
                     return;
-                case FileNameTargetMode.Extension:
+                case FileNamePart.Extension:
                     _SetPreviewFileEntry(source, source.Prefix, segment);
                     return;
-                case FileNameTargetMode.Full:
+                case FileNamePart.Full:
                     var fullName = Path.GetFileName(segment);
                     var extension = Path.GetExtension(fullName);
                     var prefix = Path.GetFileNameWithoutExtension(fullName);
                     _SetPreviewFileEntry(source, prefix, extension);
                     return;
                 default:
-                    throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.");
+                    throw new InvalidOperationException($"Unknown fileNamePart '{part}'.");
             }
         }
 

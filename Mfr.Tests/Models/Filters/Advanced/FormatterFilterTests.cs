@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
     /// </summary>
     public class FormatterFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNameTargetMode.Full);
+        private static readonly FileNameTarget _Target = new(FileNamePart.Full);
 
         /// <summary>
         /// Verifies file-name token substitution.

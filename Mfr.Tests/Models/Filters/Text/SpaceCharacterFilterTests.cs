@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Text
     /// </summary>
     public class SpaceCharacterFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNameTargetMode.Prefix);
+        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies spaces are replaced and the mapped character becomes a space.

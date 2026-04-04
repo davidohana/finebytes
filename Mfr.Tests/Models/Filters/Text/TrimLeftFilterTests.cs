@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters.Text
     /// </summary>
     public class TrimLeftFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNameTargetMode.Prefix);
+        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies trimming from the left by count.

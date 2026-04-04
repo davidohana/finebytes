@@ -45,19 +45,19 @@ namespace Mfr.Models.Filters
             }
 
             var sourceFileEntry = item.Preview ?? item.Original;
-            var mode = fileTarget.FileNameMode;
-            var segment = mode switch
+            var part = fileTarget.FileNamePart;
+            var partValue = part switch
             {
-                FileNameTargetMode.Prefix => sourceFileEntry.Prefix,
-                FileNameTargetMode.Extension => sourceFileEntry.Extension,
-                FileNameTargetMode.Full => sourceFileEntry.Prefix + sourceFileEntry.Extension,
-                _ => throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.")
+                FileNamePart.Prefix => sourceFileEntry.Prefix,
+                FileNamePart.Extension => sourceFileEntry.Extension,
+                FileNamePart.Full => sourceFileEntry.Prefix + sourceFileEntry.Extension,
+                _ => throw new InvalidOperationException($"Unknown fileNamePart '{part}'.")
             };
 
-            var transformedSegment = ApplySegment(segment, item);
-            item.SetPreviewSegment(mode, transformedSegment);
+            var transformedSegment = TransformSegment(partValue, item);
+            item.SetPreviewSegment(part, transformedSegment);
         }
 
-        internal abstract string ApplySegment(string segment, RenameItem item);
+        internal abstract string TransformSegment(string segment, RenameItem item);
     }
 }

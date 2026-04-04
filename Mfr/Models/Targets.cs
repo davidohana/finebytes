@@ -26,7 +26,7 @@ namespace Mfr.Models
     /// <summary>
     /// Selects which file-name segment a file-name target addresses.
     /// </summary>
-    public enum FileNameTargetMode
+    public enum FileNamePart
     {
         Prefix,
         Extension,
@@ -48,10 +48,10 @@ namespace Mfr.Models
     }
 
     /// <summary>
-    /// Targets file-name content using a selected mode.
+    /// Targets file-name content using a selected part.
     /// </summary>
-    /// <param name="FileNameMode">The file-name segment to target.</param>
-    public sealed record FileNameTarget(FileNameTargetMode FileNameMode) : FilterTarget
+    /// <param name="FileNamePart">The file-name part to target.</param>
+    public sealed record FileNameTarget(FileNamePart FileNamePart) : FilterTarget
     {
         /// <summary>
         /// Gets the target family.

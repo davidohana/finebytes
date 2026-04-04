@@ -48,7 +48,7 @@ namespace Mfr.Tests.Core
                 [
                     new FormatterFilter(
                         Enabled: true,
-                        Target: new FileNameTarget(FileNameTargetMode.Full),
+                        Target: new FileNameTarget(FileNamePart.Full),
                         Options: new FormatterOptions("same.mp3"))
                 ]
             };
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Core
                 [
                     new CounterFilter(
                         Enabled: true,
-                        Target: new FileNameTarget(FileNameTargetMode.Prefix),
+                        Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
@@ -144,7 +144,7 @@ namespace Mfr.Tests.Core
                 [
                     new CounterFilter(
                         Enabled: true,
-                        Target: new FileNameTarget(FileNameTargetMode.Prefix),
+                        Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
@@ -198,7 +198,7 @@ namespace Mfr.Tests.Core
                 [
                     new CounterFilter(
                         Enabled: true,
-                        Target: new FileNameTarget(FileNameTargetMode.Prefix),
+                        Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,

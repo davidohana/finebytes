@@ -24,7 +24,7 @@ namespace Mfr.Models.Filters.Advanced
         /// </summary>
         public override string Type => "Formatter";
 
-        internal override string ApplySegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item)
         {
             return _TokenRegex().Replace(Options.Template, m => _ResolveToken(m.Groups[1].Value, item));
         }

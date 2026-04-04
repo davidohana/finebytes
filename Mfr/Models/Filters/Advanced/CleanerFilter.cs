@@ -29,7 +29,7 @@ namespace Mfr.Models.Filters.Advanced
         /// </summary>
         public override string Type => "Cleaner";
 
-        internal override string ApplySegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item)
         {
             var res = segment;
             if (Options.RemoveIllegalChars)
