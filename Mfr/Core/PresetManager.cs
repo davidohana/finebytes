@@ -1,6 +1,7 @@
 using System.Text.Json;
 
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Core
 {
@@ -27,7 +28,7 @@ namespace Mfr.Core
         public static string DefaultPresetsFilePath()
         {
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return Path.Combine(appData, "MagicFileRenamer", "presets.json");
+            return appData.CombinePath("MagicFileRenamer", "presets.json");
         }
 
         /// <summary>

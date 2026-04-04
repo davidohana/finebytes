@@ -1,4 +1,5 @@
 using Mfr.Core;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Core
 {
@@ -14,8 +15,7 @@ namespace Mfr.Tests.Core
         /// </summary>
         public RenameListTests()
         {
-            _tempRoot = Path.Combine(
-                Directory.GetCurrentDirectory(),
+            _tempRoot = Directory.GetCurrentDirectory().CombinePath(
                 "mfr_renamelist_tests_" + Guid.NewGuid().ToString("N"));
             _ = Directory.CreateDirectory(_tempRoot);
         }
@@ -55,17 +55,17 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSources_Expands_Mixed_Sources_And_Preserves_Source_Order()
         {
-            var alphaPath = Path.Combine(_tempRoot, "alpha.txt");
-            var betaPath = Path.Combine(_tempRoot, "beta.log");
-            var gammaPath = Path.Combine(_tempRoot, "gamma.txt");
-            File.WriteAllText(alphaPath, "a");
-            File.WriteAllText(betaPath, "b");
-            File.WriteAllText(gammaPath, "c");
+            var alphaPath = _tempRoot.CombinePath("alpha.txt");
+            var betaPath = _tempRoot.CombinePath("beta.log");
+            var gammaPath = _tempRoot.CombinePath("gamma.txt");
+            _CreateDummyFile(alphaPath, "a");
+            _CreateDummyFile(betaPath, "b");
+            _CreateDummyFile(gammaPath, "c");
 
             var sources = new[]
             {
                 betaPath,
-                Path.Combine(_tempRoot, "*.txt"),
+                _tempRoot.CombinePath("*.txt"),
                 _tempRoot,
             };
 
@@ -89,8 +89,8 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSource_Allows_Duplicate_Sources_But_ResolvedItems_Are_Deduplicated()
         {
-            var source = Path.Combine(_tempRoot, "alpha.txt");
-            File.WriteAllText(source, "a");
+            var source = _tempRoot.CombinePath("alpha.txt");
+            _CreateDummyFile(source, "a");
 
             var renameList = new RenameList(includeHidden: true);
             Assert.Equal(1, renameList.AddSource(source));
@@ -106,10 +106,10 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSource_Filters_Hidden_When_Disabled()
         {
-            var visiblePath = Path.Combine(_tempRoot, "visible.txt");
-            var hiddenPath = Path.Combine(_tempRoot, "hidden.txt");
-            File.WriteAllText(visiblePath, "visible");
-            File.WriteAllText(hiddenPath, "hidden");
+            var visiblePath = _tempRoot.CombinePath("visible.txt");
+            var hiddenPath = _tempRoot.CombinePath("hidden.txt");
+            _CreateDummyFile(visiblePath, "visible");
+            _CreateDummyFile(hiddenPath, "hidden");
 
             var hiddenAttrs = File.GetAttributes(hiddenPath);
             File.SetAttributes(hiddenPath, hiddenAttrs | FileAttributes.Hidden);
@@ -134,5 +134,54 @@ namespace Mfr.Tests.Core
             Assert.Equal([0, 1], includedHidden.Select(x => x.GlobalIndex));
             Assert.Equal([0, 1], includedHidden.Select(x => x.FolderOccurrenceIndex));
         }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that glob sources resolve files from the parent directory only.
+        /// </summary>
+        public void AddSource_Resolves_Glob_In_TopDirectoryOnly()
+        {
+            var topLevelMatch = _tempRoot.CombinePath("top.txt");
+            var nestedDir = _tempRoot.CombinePath("nested");
+            var nestedMatch = nestedDir.CombinePath("nested.txt");
+            _CreateDummyFile(topLevelMatch, "top");
+            _CreateDummyFile(nestedMatch, "nested");
+
+            var renameList = new RenameList(includeHidden: true);
+            var addedCount = renameList.AddSource(_tempRoot.CombinePath("*.txt"));
+
+            Assert.Equal(1, addedCount);
+            var entry = Assert.Single(renameList.ResolvedItems);
+            Assert.Equal(topLevelMatch, entry.FullPath);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that glob and exact-file sources deduplicate to a single resolved item.
+        /// </summary>
+        public void AddSource_GlobAndExactFile_Deduplicates_ResolvedItem()
+        {
+            var alphaPath = _tempRoot.CombinePath("alpha.txt");
+            _CreateDummyFile(alphaPath, "a");
+
+            var renameList = new RenameList(includeHidden: true);
+            Assert.Equal(1, renameList.AddSource(_tempRoot.CombinePath("*.txt")));
+            Assert.Equal(0, renameList.AddSource(alphaPath));
+
+            var entry = Assert.Single(renameList.ResolvedItems);
+            Assert.Equal(alphaPath, entry.FullPath);
+        }
+
+        private static void _CreateDummyFile(string path, string contents = "dummy")
+        {
+            var parentDirectory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrWhiteSpace(parentDirectory))
+            {
+                _ = Directory.CreateDirectory(parentDirectory);
+            }
+
+            File.WriteAllText(path, contents);
+        }
     }
+
 }

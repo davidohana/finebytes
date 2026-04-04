@@ -3,6 +3,7 @@ using System.Text.Json;
 using Mfr.Core;
 using Mfr.Models;
 using Mfr.Tests.TestSupport;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Core
 {
@@ -28,7 +29,7 @@ namespace Mfr.Tests.Core
         public void LoadPresets_Populates_NameToPreset()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            var presetsPath = Path.Combine(dir, "presets.json");
+            var presetsPath = dir.CombinePath("presets.json");
             _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
@@ -53,7 +54,7 @@ namespace Mfr.Tests.Core
         public void LoadPresets_Allows_DifferentCase_Names()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            var presetsPath = Path.Combine(dir, "presets.json");
+            var presetsPath = dir.CombinePath("presets.json");
             _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
@@ -78,7 +79,7 @@ namespace Mfr.Tests.Core
         public void LoadPresets_Rejects_Exact_Duplicate_Names()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            var presetsPath = Path.Combine(dir, "presets.json");
+            var presetsPath = dir.CombinePath("presets.json");
             _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
@@ -100,7 +101,7 @@ namespace Mfr.Tests.Core
         public void LoadPresets_Reloads_From_Disk()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            var presetsPath = Path.Combine(dir, "presets.json");
+            var presetsPath = dir.CombinePath("presets.json");
             _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
@@ -134,7 +135,7 @@ namespace Mfr.Tests.Core
         public void SavePresets_Writes_Sorted_By_Name()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            var presetsPath = Path.Combine(dir, "presets.json");
+            var presetsPath = dir.CombinePath("presets.json");
             var manager = new PresetManager(presetsPath);
             manager.NameToPreset["z"] = _CreatePreset("z");
             manager.NameToPreset["A"] = _CreatePreset("A");

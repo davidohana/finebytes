@@ -1,5 +1,6 @@
 using Mfr.Models;
 using Mfr.Models.Filters.Advanced;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Models.Filters.Advanced
 {
@@ -39,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         public void Apply_ParentFolderToken_UsesDirectoryName()
         {
             var f = new FormatterFilter(true, _Target, new FormatterOptions("<parent-folder>"));
-            var file = FilterTestHelpers.CreateFile(directory: Path.Combine("Music", "My Album"));
+            var file = FilterTestHelpers.CreateFile(directory: "Music".CombinePath("My Album"));
             Assert.Equal("My Album", f.Apply("ignored", file));
         }
     }

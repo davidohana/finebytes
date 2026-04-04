@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Models.Filters
 {
@@ -22,7 +23,7 @@ namespace Mfr.Tests.Models.Filters
         {
             directory ??= @"C:\Music\Album";
             var fullName = prefix + extension;
-            var fullPath = Path.Combine(directory, fullName);
+            var fullPath = directory.CombinePath(fullName);
             return new FileEntryLite(globalIndex, folderOccurrenceIndex, fullPath, directory, prefix, extension);
         }
     }

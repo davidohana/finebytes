@@ -1,5 +1,6 @@
 using Mfr.Models;
 using Mfr.Models.Filters;
+using Mfr.Utils;
 
 namespace Mfr.Core
 {
@@ -54,7 +55,7 @@ namespace Mfr.Core
                 {
                     (var prefix, var extension) = _ApplyFiltersToName(preset.Filters, file);
                     var finalFileName = prefix + extension;
-                    var destPath = Path.Combine(file.DirectoryPath, finalFileName);
+                    var destPath = file.DirectoryPath.CombinePath(finalFileName);
 
                     if (string.Equals(destPath, file.FullPath, StringComparison.OrdinalIgnoreCase))
                     {

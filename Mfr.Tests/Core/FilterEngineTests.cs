@@ -2,6 +2,7 @@ using Mfr.Core;
 using Mfr.Models;
 using Mfr.Models.Filters.Advanced;
 using Mfr.Tests.TestSupport;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Core
 {
@@ -27,8 +28,8 @@ namespace Mfr.Tests.Core
         public void ConflictSkipped_ForDuplicateDestinations()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            var a = Path.Combine(dir, "a.mp3");
-            var b = Path.Combine(dir, "b.mp3");
+            var a = dir.CombinePath("a.mp3");
+            var b = dir.CombinePath("b.mp3");
             File.WriteAllText(a, "x");
             File.WriteAllText(b, "y");
 
@@ -68,8 +69,8 @@ namespace Mfr.Tests.Core
         public void Renames_WithCounter()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            var a = Path.Combine(dir, "track01.mp3");
-            var b = Path.Combine(dir, "track02.mp3");
+            var a = dir.CombinePath("track01.mp3");
+            var b = dir.CombinePath("track02.mp3");
             File.WriteAllText(a, "x");
             File.WriteAllText(b, "y");
 
@@ -108,8 +109,8 @@ namespace Mfr.Tests.Core
 
             Assert.False(File.Exists(a));
             Assert.False(File.Exists(b));
-            Assert.True(File.Exists(Path.Combine(dir, "001.mp3")));
-            Assert.True(File.Exists(Path.Combine(dir, "002.mp3")));
+            Assert.True(File.Exists(dir.CombinePath("001.mp3")));
+            Assert.True(File.Exists(dir.CombinePath("002.mp3")));
         }
     }
 }
