@@ -74,7 +74,7 @@ namespace Mfr.Cli
 
             var stats = FilterEngine.Commit(
                 presetName: preset.Name,
-                files: renameItems,
+                renameItem: renameItems,
                 failFast: options.FailFast);
 
             _PrintResult(stats, options.OutputFormat, options.Silent);

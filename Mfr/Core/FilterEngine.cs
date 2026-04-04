@@ -75,17 +75,17 @@ namespace Mfr.Core
         /// Commits previously previewed rename operations, skipping conflicts.
         /// </summary>
         /// <param name="presetName">Preset name used for summary output.</param>
-        /// <param name="files">Candidate files with preview paths already computed.</param>
+        /// <param name="renameItem">Candidate files with preview paths already computed.</param>
         /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
         /// <returns>Commit summary including renamed, skipped, conflict, and error counts.</returns>
         public static RenameBatchResult Commit(
             string presetName,
-            IReadOnlyList<RenameItem> files,
+            IReadOnlyList<RenameItem> renameItem,
             bool failFast)
         {
-            var commitResults = new List<RenameResultItem>(files.Count);
-            var pending = new List<RenameItem>(files.Count);
-            foreach (var item in files)
+            var commitResults = new List<RenameResultItem>(renameItem.Count);
+            var pending = new List<RenameItem>(renameItem.Count);
+            foreach (var item in renameItem)
             {
                 var sourcePath = item.Original.FullPath;
                 var destPath = item.Preview.FullPath;
@@ -154,7 +154,7 @@ namespace Mfr.Core
                 }
             }
 
-            return _Summarize(presetName, files.Count, commitResults, renamedCount);
+            return _Summarize(presetName, renameItem.Count, commitResults, renamedCount);
         }
 
         private static RenameBatchResult _Summarize(
