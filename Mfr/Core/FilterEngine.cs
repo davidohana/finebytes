@@ -48,7 +48,19 @@ namespace Mfr.Core
                 try
                 {
                     item.ApplyFilters(preset.Filters);
-                    var destPath = item.Preview.FullPath;
+                    var preview = item.Preview;
+                    if (preview is null)
+                    {
+                        previewResults.Add(new RenameResultItem(item.Original.FullPath, item.Original.FullPath, RenameStatus.Error, "Preview did not produce a destination path."));
+                        if (failFast)
+                        {
+                            return _Summarize(preset.Name, files.Count, previewResults);
+                        }
+
+                        continue;
+                    }
+
+                    var destPath = preview.FullPath;
 
                     if (string.Equals(destPath, item.Original.FullPath, StringComparison.OrdinalIgnoreCase))
                     {
@@ -88,7 +100,14 @@ namespace Mfr.Core
             foreach (var item in renameItem)
             {
                 var sourcePath = item.Original.FullPath;
-                var destPath = item.Preview.FullPath;
+                var preview = item.Preview;
+                if (preview is null)
+                {
+                    commitResults.Add(new RenameResultItem(sourcePath, sourcePath, RenameStatus.Skipped, null));
+                    continue;
+                }
+
+                var destPath = preview.FullPath;
                 if (string.Equals(sourcePath, destPath, StringComparison.OrdinalIgnoreCase))
                 {
                     commitResults.Add(new RenameResultItem(sourcePath, destPath, RenameStatus.Skipped, null));
@@ -100,14 +119,21 @@ namespace Mfr.Core
             }
 
             // 2) Resolve conflicts among pending destinations and against disk.
-            var destToFiles = pending.GroupBy(p => p.Preview.FullPath, StringComparer.OrdinalIgnoreCase)
+            var destToFiles = pending.Where(p => p.Preview is not null)
+                .GroupBy(p => p.Preview!.FullPath, StringComparer.OrdinalIgnoreCase)
                 .Where(g => g.Count() > 1)
                 .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
 
             var conflictDestinations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var item in pending)
             {
-                var destPath = item.Preview.FullPath;
+                var preview = item.Preview;
+                if (preview is null)
+                {
+                    continue;
+                }
+
+                var destPath = preview.FullPath;
                 if (File.Exists(destPath))
                 {
                     _ = conflictDestinations.Add(destPath);
@@ -130,7 +156,13 @@ namespace Mfr.Core
             foreach (var item in pending)
             {
                 var sourcePath = item.Original.FullPath;
-                var destPath = item.Preview.FullPath;
+                var preview = item.Preview;
+                if (preview is null)
+                {
+                    continue;
+                }
+
+                var destPath = preview.FullPath;
                 var idx = resultIndex[sourcePath];
                 if (conflictDestinations.Contains(destPath))
                 {
@@ -152,6 +184,11 @@ namespace Mfr.Core
                         break;
                     }
                 }
+            }
+
+            foreach (var item in renameItem)
+            {
+                item.ResetPreview();
             }
 
             return _Summarize(presetName, renameItem.Count, commitResults, renamedCount);

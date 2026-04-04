@@ -9,19 +9,20 @@ namespace Mfr.Models
         /// <summary>
         /// Gets the original immutable file snapshot.
         /// </summary>
-        public FileEntryLite Original { get; } = original;
+        public FileEntryLite Original { get; private set; } = original;
 
         /// <summary>
         /// Gets the current preview snapshot after filter application.
+        /// A <c>null</c> value means no preview has been generated yet.
         /// </summary>
-        public FileEntryLite Preview { get; private set; } = original;
+        public FileEntryLite? Preview { get; private set; }
 
         /// <summary>
-        /// Resets preview metadata back to the original snapshot.
+        /// Clears preview metadata so the next preview starts from original data.
         /// </summary>
         public void ResetPreview()
         {
-            Preview = Original;
+            Preview = null;
         }
 
         /// <summary>
@@ -33,7 +34,7 @@ namespace Mfr.Models
         {
             var fullName = prefix + extension;
             var fullPath = Path.Combine(Original.DirectoryPath, fullName);
-            Preview = Preview with
+            Preview = Original with
             {
                 FullPath = fullPath,
                 Prefix = prefix,
@@ -46,12 +47,20 @@ namespace Mfr.Models
         /// </summary>
         public void Apply()
         {
+            if (Preview is null)
+            {
+                throw new InvalidOperationException("Preview is not set. Run preview before apply.");
+            }
+
             if (string.Equals(Original.FullPath, Preview.FullPath, StringComparison.OrdinalIgnoreCase))
             {
+                Preview = null;
                 return;
             }
 
             File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
+            Original = Preview;
+            Preview = null;
         }
     }
 }
