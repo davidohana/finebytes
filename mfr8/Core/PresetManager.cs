@@ -40,11 +40,12 @@ namespace Mfr8.Core
                 throw new UserException($"Presets file not found: '{PresetsFilePath}'.");
             }
 
-            PresetsDocument? document;
+            PresetContainer? document;
             try
             {
                 var json = File.ReadAllText(PresetsFilePath);
-                document = JsonSerializer.Deserialize(json, PresetJsonSerializerContext.Default.PresetsDocument);
+                // Use source-generated JSON metadata for trim/AOT-safe polymorphic deserialization.
+                document = JsonSerializer.Deserialize(json, PresetJsonSerializerContext.Default.PresetContainer);
             }
             catch (Exception ex)
             {
@@ -115,5 +116,5 @@ namespace Mfr8.Core
         }
     }
 
-    internal sealed record PresetsDocument(IReadOnlyList<FilterPreset> Presets);
+    internal sealed record PresetContainer(IReadOnlyList<FilterPreset> Presets);
 }
