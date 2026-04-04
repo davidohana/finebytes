@@ -62,26 +62,42 @@ namespace Mfr.Cli
                 throw new UserException("No files matched the provided sources.");
             }
 
-            var previewStats = FilterEngine.Preview(
+            FilterEngine.Preview(
                 preset: preset,
                 renameItems: renameItems,
                 failFast: options.FailFast);
-            if (options.FailFast && previewStats.Errors > 0)
+            var previewStats = _BuildPreviewResults(renameItems);
+            var previewErrors = _CountErrors(previewStats);
+            if (options.FailFast && previewErrors > 0)
             {
-                _PrintResult(previewStats, options.OutputFormat, options.Silent);
+                _PrintResult(
+                    presetName: preset.Name,
+                    totalFiles: renameItems.Count,
+                    results: previewStats,
+                    format: options.OutputFormat,
+                    silent: options.Silent);
                 return CliExitCode.UserError;
             }
 
             var stats = FilterEngine.Commit(
-                presetName: preset.Name,
                 renameItem: renameItems,
                 failFast: options.FailFast);
 
-            _PrintResult(stats, options.OutputFormat, options.Silent);
-            return stats.Errors > 0 ? CliExitCode.UserError : CliExitCode.Success;
+            _PrintResult(
+                presetName: preset.Name,
+                totalFiles: renameItems.Count,
+                results: stats,
+                format: options.OutputFormat,
+                silent: options.Silent);
+            return _CountErrors(stats) > 0 ? CliExitCode.UserError : CliExitCode.Success;
         }
 
-        private static void _PrintResult(RenameBatchResult result, OutputFormat format, bool silent)
+        private static void _PrintResult(
+            string presetName,
+            int totalFiles,
+            IReadOnlyList<RenameResultItem> results,
+            OutputFormat format,
+            bool silent)
         {
             if (silent)
             {
@@ -91,49 +107,57 @@ namespace Mfr.Cli
             switch (format)
             {
                 case OutputFormat.Table:
-                    _PrintTable(result);
+                    _PrintTable(presetName: presetName, totalFiles: totalFiles, results: results);
                     break;
                 case OutputFormat.Json:
-                    _PrintJson(result);
+                    _PrintJson(presetName: presetName, totalFiles: totalFiles, results: results);
                     break;
                 case OutputFormat.Csv:
-                    _PrintCsv(result);
+                    _PrintCsv(results);
                     break;
                 default:
-                    _PrintTable(result);
+                    _PrintTable(presetName: presetName, totalFiles: totalFiles, results: results);
                     break;
             }
         }
 
-        private static void _PrintTable(RenameBatchResult result)
+        private static void _PrintTable(string presetName, int totalFiles, IReadOnlyList<RenameResultItem> results)
         {
-            _PrintLine($"Preset: {result.PresetName}");
-            _PrintLine($"Total: {result.TotalFiles}  Renamed: {result.Renamed}  Skipped: {result.Skipped}  Conflicts: {result.Conflicts}  Errors: {result.Errors}");
+            var errors = _CountErrors(results);
+            var renamed = _CountStatus(results, RenameStatus.Ok);
+            var skipped = _CountStatus(results, RenameStatus.Skipped);
+            var conflicts = _CountStatus(results, RenameStatus.ConflictSkipped);
+            _PrintLine($"Preset: {presetName}");
+            _PrintLine($"Total: {totalFiles}  Renamed: {renamed}  Skipped: {skipped}  Conflicts: {conflicts}  Errors: {errors}");
             _PrintLine(string.Empty);
             _PrintLine(string.Format("{0,-60} {1,-60} {2,-16} {3}", "Original", "Result", "Status", "Error"));
 
-            foreach (var item in result.Results)
+            foreach (var item in results)
             {
                 _PrintLine($"{_Trunc(item.OriginalPath, 60),-60} {_Trunc(item.ResultPath, 60),-60} {item.Status,-16} {item.Error ?? ""}");
             }
         }
 
-        private static void _PrintJson(RenameBatchResult result)
+        private static void _PrintJson(string presetName, int totalFiles, IReadOnlyList<RenameResultItem> results)
         {
+            var errors = _CountErrors(results);
+            var renamed = _CountStatus(results, RenameStatus.Ok);
+            var skipped = _CountStatus(results, RenameStatus.Skipped);
+            var conflicts = _CountStatus(results, RenameStatus.ConflictSkipped);
             using var ms = new MemoryStream();
             using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions { Indented = true });
 
             writer.WriteStartObject();
-            writer.WriteString("preset", result.PresetName);
-            writer.WriteNumber("totalFiles", result.TotalFiles);
-            writer.WriteNumber("renamed", result.Renamed);
-            writer.WriteNumber("skipped", result.Skipped);
-            writer.WriteNumber("errors", result.Errors);
-            writer.WriteNumber("conflicts", result.Conflicts);
+            writer.WriteString("preset", presetName);
+            writer.WriteNumber("totalFiles", totalFiles);
+            writer.WriteNumber("renamed", renamed);
+            writer.WriteNumber("skipped", skipped);
+            writer.WriteNumber("errors", errors);
+            writer.WriteNumber("conflicts", conflicts);
 
             writer.WritePropertyName("results");
             writer.WriteStartArray();
-            foreach (var r in result.Results)
+            foreach (var r in results)
             {
                 writer.WriteStartObject();
                 writer.WriteString("original", r.OriginalPath);
@@ -157,11 +181,11 @@ namespace Mfr.Cli
             _PrintLine(Encoding.UTF8.GetString(ms.ToArray()));
         }
 
-        private static void _PrintCsv(RenameBatchResult result)
+        private static void _PrintCsv(IReadOnlyList<RenameResultItem> results)
         {
             var sb = new StringBuilder();
             _ = sb.AppendLine("original,result,status,error");
-            foreach (var item in result.Results)
+            foreach (var item in results)
             {
                 _ = sb.AppendLine($"{_CsvEscape(item.OriginalPath)},{_CsvEscape(item.ResultPath)},{_CsvEscape(item.Status.ToString())},{_CsvEscape(item.Error ?? "")}");
             }
@@ -197,6 +221,37 @@ namespace Mfr.Cli
         private static string _Trunc(string s, int max)
         {
             return s.Length <= max ? s : s[..max];
+        }
+
+        private static int _CountErrors(IReadOnlyList<RenameResultItem> results)
+        {
+            return results.Count(item => item.Status == RenameStatus.Error);
+        }
+
+        private static int _CountStatus(IReadOnlyList<RenameResultItem> results, RenameStatus status)
+        {
+            return results.Count(item => item.Status == status);
+        }
+
+        private static List<RenameResultItem> _BuildPreviewResults(IReadOnlyList<RenameItem> renameItems)
+        {
+            var results = new List<RenameResultItem>();
+            foreach (var item in renameItems)
+            {
+                if (item.Preview is null && item.PreviewError is null)
+                {
+                    continue;
+                }
+
+                var resultPath = item.Preview?.FullPath ?? item.Original.FullPath;
+                results.Add(new RenameResultItem(
+                    OriginalPath: item.Original.FullPath,
+                    ResultPath: resultPath,
+                    Status: item.Status,
+                    Error: item.PreviewError));
+            }
+
+            return results;
         }
     }
 

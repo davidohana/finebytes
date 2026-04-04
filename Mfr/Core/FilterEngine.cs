@@ -2,28 +2,11 @@ using Mfr.Models;
 
 namespace Mfr.Core
 {
-    public enum RenameStatus
-    {
-        Ok,
-        Skipped,
-        ConflictSkipped,
-        Error
-    }
-
     public sealed record RenameResultItem(
         string OriginalPath,
         string ResultPath,
         RenameStatus Status,
         string? Error);
-
-    public sealed record RenameBatchResult(
-        string PresetName,
-        int TotalFiles,
-        int Renamed,
-        int Skipped,
-        int Conflicts,
-        int Errors,
-        IReadOnlyList<RenameResultItem> Results);
 
     /// <summary>
     /// Applies configured filters to file names and commits non-conflicting rename operations.
@@ -36,63 +19,47 @@ namespace Mfr.Core
         /// <param name="preset">The rename preset (sequence of enabled filters).</param>
         /// <param name="renameItems">Candidate files to rename.</param>
         /// <param name="failFast">If <c>true</c>, stop previewing after the first per-item error.</param>
-        /// <returns>Preview summary with computed destination paths and preview errors.</returns>
-        public static RenameBatchResult Preview(
+        public static void Preview(
             FilterPreset preset,
             IReadOnlyList<RenameItem> renameItems,
             bool failFast)
         {
-            var previewResults = new List<RenameResultItem>(renameItems.Count);
+            foreach (var item in renameItems)
+            {
+                item.ResetPreview();
+                item.ResetPreviewError();
+                item.Status = RenameStatus.Skipped;
+            }
+
             foreach (var renameItem in renameItems)
             {
                 try
                 {
                     renameItem.ApplyFilters(preset.Filters);
-                    var preview = renameItem.Preview ?? throw new InvalidOperationException("Preview not generated");
-                    var destPath = preview.FullPath;
-
-                    if (string.Equals(destPath, renameItem.Original.FullPath, StringComparison.OrdinalIgnoreCase))
+                    if (renameItem.Preview is null)
                     {
-                        previewResults.Add(new RenameResultItem(
-                            OriginalPath: renameItem.Original.FullPath,
-                            ResultPath: destPath,
-                            Status: RenameStatus.Skipped,
-                            Error: null));
-                        continue;
+                        throw new InvalidOperationException("Preview not generated");
                     }
-
-                    previewResults.Add(new RenameResultItem(
-                        OriginalPath: renameItem.Original.FullPath,
-                        ResultPath: destPath,
-                        Status: RenameStatus.Skipped,
-                        Error: null));
                 }
                 catch (Exception ex)
                 {
-                    previewResults.Add(new RenameResultItem(
-                        OriginalPath: renameItem.Original.FullPath,
-                        ResultPath: renameItem.Original.FullPath,
-                        Status: RenameStatus.Error,
-                        Error: ex.Message));
+                    renameItem.PreviewError = ex.Message;
+                    renameItem.Status = RenameStatus.Error;
                     if (failFast)
                     {
-                        return _Summarize(preset.Name, renameItems.Count, previewResults);
+                        break;
                     }
                 }
             }
-
-            return _Summarize(preset.Name, renameItems.Count, previewResults);
         }
 
         /// <summary>
         /// Commits previously previewed rename operations, skipping conflicts.
         /// </summary>
-        /// <param name="presetName">Preset name used for summary output.</param>
         /// <param name="renameItem">Candidate files with preview paths already computed.</param>
         /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
-        /// <returns>Commit summary including renamed, skipped, conflict, and error counts.</returns>
-        public static RenameBatchResult Commit(
-            string presetName,
+        /// <returns>Per-item commit outcomes including success, skipped, conflict, and errors.</returns>
+        public static IReadOnlyList<RenameResultItem> Commit(
             IReadOnlyList<RenameItem> renameItem,
             bool failFast)
         {
@@ -100,10 +67,12 @@ namespace Mfr.Core
             var pending = new List<RenameItem>(renameItem.Count);
             foreach (var item in renameItem)
             {
+                item.ResetCommitError();
                 var sourcePath = item.Original.FullPath;
                 var preview = item.Preview;
                 if (preview is null)
                 {
+                    item.Status = RenameStatus.Skipped;
                     commitResults.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: sourcePath,
@@ -115,6 +84,7 @@ namespace Mfr.Core
                 var destPath = preview.FullPath;
                 if (string.Equals(sourcePath, destPath, StringComparison.OrdinalIgnoreCase))
                 {
+                    item.Status = RenameStatus.Skipped;
                     commitResults.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
@@ -123,6 +93,7 @@ namespace Mfr.Core
                     continue;
                 }
 
+                item.Status = RenameStatus.Skipped;
                 commitResults.Add(new RenameResultItem(
                     OriginalPath: sourcePath,
                     ResultPath: destPath,
@@ -159,7 +130,6 @@ namespace Mfr.Core
             }
 
             // 3) Commit non-conflicting renames.
-            var renamedCount = 0;
             var resultIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             for (var i = 0; i < commitResults.Count; i++)
             {
@@ -179,6 +149,7 @@ namespace Mfr.Core
                 var idx = resultIndex[sourcePath];
                 if (conflictDestinations.Contains(destPath))
                 {
+                    item.Status = RenameStatus.ConflictSkipped;
                     commitResults[idx] = new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
@@ -189,16 +160,18 @@ namespace Mfr.Core
 
                 try
                 {
-                    item.Apply();
+                    item.CommitPreview();
+                    item.Status = RenameStatus.Ok;
                     commitResults[idx] = new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
                         Status: RenameStatus.Ok,
                         Error: null);
-                    renamedCount++;
                 }
                 catch (Exception ex)
                 {
+                    item.CommitError = ex.Message;
+                    item.Status = RenameStatus.Error;
                     commitResults[idx] = new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
@@ -216,20 +189,7 @@ namespace Mfr.Core
                 item.ResetPreview();
             }
 
-            return _Summarize(presetName, renameItem.Count, commitResults, renamedCount);
-        }
-
-        private static RenameBatchResult _Summarize(
-            string presetName,
-            int totalFiles,
-            IReadOnlyList<RenameResultItem> results,
-            int renamedCount = 0)
-        {
-            var renamed = results.Count(r => r.Status == RenameStatus.Ok);
-            var skipped = results.Count(r => r.Status == RenameStatus.Skipped);
-            var conflicts = results.Count(r => r.Status == RenameStatus.ConflictSkipped);
-            var errors = results.Count(r => r.Status == RenameStatus.Error);
-            return new RenameBatchResult(presetName, totalFiles, renamed, skipped, conflicts, errors, results);
+            return commitResults;
         }
 
     }

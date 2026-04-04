@@ -1,6 +1,32 @@
 namespace Mfr.Models
 {
     /// <summary>
+    /// Represents the outcome state of a rename item.
+    /// </summary>
+    public enum RenameStatus
+    {
+        /// <summary>
+        /// Rename operation completed successfully.
+        /// </summary>
+        Ok,
+
+        /// <summary>
+        /// Rename was skipped.
+        /// </summary>
+        Skipped,
+
+        /// <summary>
+        /// Rename was skipped due to destination conflict.
+        /// </summary>
+        ConflictSkipped,
+
+        /// <summary>
+        /// Rename failed due to an error.
+        /// </summary>
+        Error
+    }
+
+    /// <summary>
     /// Represents one rename candidate with original and preview metadata.
     /// </summary>
     /// <param name="original">Original immutable file snapshot.</param>
@@ -18,11 +44,42 @@ namespace Mfr.Models
         public FileEntryLite? Preview { get; private set; }
 
         /// <summary>
+        /// Gets the latest error captured while generating preview for this item.
+        /// </summary>
+        public string? PreviewError { get; set; }
+
+        /// <summary>
+        /// Gets the latest error captured while committing this item.
+        /// </summary>
+        public string? CommitError { get; set; }
+
+        /// <summary>
+        /// Gets the latest status for this item during preview/commit processing.
+        /// </summary>
+        public RenameStatus Status { get; set; } = RenameStatus.Skipped;
+
+        /// <summary>
         /// Clears preview metadata so the next preview starts from original data.
         /// </summary>
         public void ResetPreview()
         {
             Preview = null;
+        }
+
+        /// <summary>
+        /// Clears preview error state before a new preview run.
+        /// </summary>
+        public void ResetPreviewError()
+        {
+            PreviewError = null;
+        }
+
+        /// <summary>
+        /// Clears commit error state before a new commit run.
+        /// </summary>
+        public void ResetCommitError()
+        {
+            CommitError = null;
         }
 
         internal void SetPreviewValue(FileNamePart part, string partValue)
@@ -54,7 +111,7 @@ namespace Mfr.Models
         /// <summary>
         /// Applies the preview rename on disk for this item.
         /// </summary>
-        public void Apply()
+        public void CommitPreview()
         {
             if (Preview is null)
             {
