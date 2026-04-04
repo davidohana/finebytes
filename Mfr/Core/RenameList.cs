@@ -54,6 +54,49 @@ namespace Mfr.Core
         }
 
         /// <summary>
+        /// Previews rename outcomes for the current list without touching the filesystem.
+        /// </summary>
+        /// <param name="preset">The rename preset (sequence of enabled filters).</param>
+        /// <param name="failFast">If <c>true</c>, stop previewing after the first per-item error.</param>
+        public void Preview(FilterPreset preset, bool failFast)
+        {
+            foreach (var item in _renameItems)
+            {
+                item.ResetPreview();
+                item.ResetPreviewError();
+                item.ResetCommitError();
+                item.Status = RenameStatus.Init;
+            }
+
+            foreach (var renameItem in _renameItems)
+            {
+                try
+                {
+                    renameItem.ApplyFilters(preset.Filters);
+                    if (renameItem.Preview is null)
+                    {
+                        throw new InvalidOperationException("Preview not generated");
+                    }
+
+                    var sourcePath = renameItem.Original.FullPath;
+                    var destPath = renameItem.Preview.FullPath;
+                    renameItem.Status = string.Equals(sourcePath, destPath, StringComparison.OrdinalIgnoreCase)
+                        ? RenameStatus.PreviewNoChange
+                        : RenameStatus.PreviewOk;
+                }
+                catch (Exception ex)
+                {
+                    renameItem.PreviewError = new RenameItemError(Message: ex.Message, Cause: ex);
+                    renameItem.Status = RenameStatus.PreviewError;
+                    if (failFast)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Normalizes a path into a platform-consistent comparison key.
         /// </summary>
         /// <param name="path">The path to normalize.</param>

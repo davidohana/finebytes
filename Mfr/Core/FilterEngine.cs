@@ -14,52 +14,6 @@ namespace Mfr.Core
     public static partial class FilterEngine
     {
         /// <summary>
-        /// Previews rename outcomes for a batch without touching the filesystem.
-        /// </summary>
-        /// <param name="preset">The rename preset (sequence of enabled filters).</param>
-        /// <param name="renameItems">Candidate files to rename.</param>
-        /// <param name="failFast">If <c>true</c>, stop previewing after the first per-item error.</param>
-        public static void Preview(
-            FilterPreset preset,
-            IReadOnlyList<RenameItem> renameItems,
-            bool failFast)
-        {
-            foreach (var item in renameItems)
-            {
-                item.ResetPreview();
-                item.ResetPreviewError();
-                item.Status = RenameStatus.Init;
-            }
-
-            foreach (var renameItem in renameItems)
-            {
-                try
-                {
-                    renameItem.ApplyFilters(preset.Filters);
-                    if (renameItem.Preview is null)
-                    {
-                        throw new InvalidOperationException("Preview not generated");
-                    }
-
-                    var sourcePath = renameItem.Original.FullPath;
-                    var destPath = renameItem.Preview.FullPath;
-                    renameItem.Status = string.Equals(sourcePath, destPath, StringComparison.OrdinalIgnoreCase)
-                        ? RenameStatus.PreviewNoChange
-                        : RenameStatus.PreviewOk;
-                }
-                catch (Exception ex)
-                {
-                    renameItem.PreviewError = new RenameItemError(Message: ex.Message, Cause: ex);
-                    renameItem.Status = RenameStatus.PreviewError;
-                    if (failFast)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Commits previously previewed rename operations, skipping conflicts.
         /// </summary>
         /// <param name="renameItem">Candidate files with preview paths already computed.</param>

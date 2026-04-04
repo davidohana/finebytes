@@ -33,11 +33,9 @@ namespace Mfr.Tests.Core
             File.WriteAllText(a, "x");
             File.WriteAllText(b, "y");
 
-            var files = new List<RenameItem>
-            {
-                new(new FileEntryLite(GlobalIndex: 0, InFolderIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "a", Extension: ".mp3")),
-                new(new FileEntryLite(GlobalIndex: 1, InFolderIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "b", Extension: ".mp3"))
-            };
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([a, b]);
+            var files = renameList.RenameItems;
 
             var preset = new FilterPreset
             {
@@ -53,7 +51,7 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            FilterEngine.Preview(preset, files, failFast: false);
+            renameList.Preview(preset, failFast: false);
             var result = FilterEngine.Commit(files, failFast: false);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitConflictSkipped));
@@ -76,11 +74,9 @@ namespace Mfr.Tests.Core
             File.WriteAllText(a, "x");
             File.WriteAllText(b, "y");
 
-            var files = new List<RenameItem>
-            {
-                new(new FileEntryLite(GlobalIndex: 0, InFolderIndex: 0, FullPath: a, DirectoryPath: dir, Prefix: "track01", Extension: ".mp3")),
-                new(new FileEntryLite(GlobalIndex: 1, InFolderIndex: 0, FullPath: b, DirectoryPath: dir, Prefix: "track02", Extension: ".mp3")),
-            };
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([a, b]);
+            var files = renameList.RenameItems;
 
             var preset = new FilterPreset
             {
@@ -103,7 +99,7 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            FilterEngine.Preview(preset, files, failFast: false);
+            renameList.Preview(preset, failFast: false);
             var result = FilterEngine.Commit(files, failFast: false);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
@@ -129,11 +125,9 @@ namespace Mfr.Tests.Core
             File.WriteAllText(firstSource, "x");
             File.WriteAllText(secondSource, "y");
 
-            var files = new List<RenameItem>
-            {
-                new(new FileEntryLite(GlobalIndex: 0, InFolderIndex: 0, FullPath: firstSource, DirectoryPath: dir, Prefix: "first", Extension: ".mp3")),
-                new(new FileEntryLite(GlobalIndex: 1, InFolderIndex: 0, FullPath: secondSource, DirectoryPath: dir, Prefix: "second", Extension: ".mp3")),
-            };
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([firstSource, secondSource]);
+            var files = renameList.RenameItems;
 
             var preset = new FilterPreset
             {
@@ -156,7 +150,7 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            FilterEngine.Preview(preset, files, failFast: false);
+            renameList.Preview(preset, failFast: false);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
             File.Delete(firstSource);
@@ -188,11 +182,9 @@ namespace Mfr.Tests.Core
             File.WriteAllText(firstSource, "x");
             File.WriteAllText(secondSource, "y");
 
-            var files = new List<RenameItem>
-            {
-                new(new FileEntryLite(GlobalIndex: 0, InFolderIndex: 0, FullPath: firstSource, DirectoryPath: dir, Prefix: "first", Extension: ".mp3")),
-                new(new FileEntryLite(GlobalIndex: 1, InFolderIndex: 0, FullPath: secondSource, DirectoryPath: dir, Prefix: "second", Extension: ".mp3")),
-            };
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([firstSource, secondSource]);
+            var files = renameList.RenameItems;
 
             var preset = new FilterPreset
             {
@@ -215,7 +207,7 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            FilterEngine.Preview(preset, files, failFast: false);
+            renameList.Preview(preset, failFast: false);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
             File.Delete(firstSource);
@@ -245,10 +237,9 @@ namespace Mfr.Tests.Core
             var source = dir.CombinePath("track.mp3");
             File.WriteAllText(source, "x");
 
-            var files = new List<RenameItem>
-            {
-                new(new FileEntryLite(GlobalIndex: 0, InFolderIndex: 0, FullPath: source, DirectoryPath: dir, Prefix: "track", Extension: ".mp3")),
-            };
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([source]);
+            var files = renameList.RenameItems;
 
             var failingPreset = new FilterPreset
             {
@@ -264,7 +255,7 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            FilterEngine.Preview(failingPreset, files, failFast: false);
+            renameList.Preview(failingPreset, failFast: false);
             var previewError = files[0].PreviewError!;
             Assert.NotNull(previewError);
             Assert.NotNull(previewError.Cause);
@@ -278,7 +269,7 @@ namespace Mfr.Tests.Core
                 Filters = []
             };
 
-            FilterEngine.Preview(successPreset, files, failFast: false);
+            renameList.Preview(successPreset, failFast: false);
             Assert.Null(files[0].PreviewError);
         }
 

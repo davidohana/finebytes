@@ -62,10 +62,7 @@ namespace Mfr.Cli
                 throw new UserException("No files matched the provided sources.");
             }
 
-            FilterEngine.Preview(
-                preset: preset,
-                renameItems: renameItems,
-                failFast: options.FailFast);
+            renameList.Preview(preset: preset, failFast: options.FailFast);
             var previewStats = _BuildPreviewResults(renameItems);
             var previewErrors = _CountErrors(previewStats);
             if (options.FailFast && previewErrors > 0)
