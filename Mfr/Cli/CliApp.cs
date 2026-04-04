@@ -1,18 +1,18 @@
 using System.Text;
 using System.Text.Json;
 
-using Mfr8.Core;
-using Mfr8.Models;
+using Mfr.Core;
+using Mfr.Models;
 
-namespace Mfr8.Cli
+namespace Mfr.Cli
 {
     /// <summary>
-    /// Provides the command-line entry point and output formatting for the mfr8 application.
+    /// Provides the command-line entry point and output formatting for the Mfr application.
     /// </summary>
     public static class CliApp
     {
         /// <summary>
-        /// Runs the CLI entry point for <c>mfr8</c>.
+        /// Runs the CLI entry point for <c>Mfr</c>.
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>The process exit code.</returns>

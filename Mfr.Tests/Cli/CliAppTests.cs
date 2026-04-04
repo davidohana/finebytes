@@ -1,6 +1,6 @@
-using Mfr8.Cli;
+using Mfr.Cli;
 
-namespace mfr8.Tests.Cli
+namespace Mfr.Tests.Cli
 {
     /// <summary>
     /// Tests command-line error handling and user-facing output behavior.

@@ -1,4 +1,4 @@
-namespace Mfr8.Core
+namespace Mfr.Core
 {
     /// <summary>
     /// Represents a non-recoverable error caused by invalid user input or configuration.

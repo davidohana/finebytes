@@ -1,8 +1,8 @@
 using System.Text.Json;
 
-using Mfr8.Models;
+using Mfr.Models;
 
-namespace Mfr8.Core
+namespace Mfr.Core
 {
     /// <summary>
     /// Creates a preset manager that reads and caches presets from a single JSON file.

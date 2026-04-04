@@ -1,6 +1,6 @@
-# mfr8 — Magic File Renamer 8 Design
+# Mfr — Magic File Renamer 8 Design
 
-**Version:** 8.0 (mfr8)  
+**Version:** 8.0 (Mfr)  
 **Stack:** C# 13 · .NET 10 · Avalonia UI 11  
 **Date:** 2026-04-02  
 **Based on:** MFR v7.4 feature parity + cross-platform rebuild, phased from CLI core to full UI
@@ -447,7 +447,7 @@ classDiagram
 
 ## 3. Implementation Phases
 
-The mfr8 implementation is intentionally phased to de-risk the feature set. Each phase is shippable and builds on the previous one.
+The Mfr implementation is intentionally phased to de-risk the feature set. Each phase is shippable and builds on the previous one.
 
 ### Phase 1 — CLI-only core, basic filters
 
@@ -505,7 +505,7 @@ Scope:
 - Enables filters targeting `FilterTargetFamily.ImageTag`.
 - Introduces EXIF-related formatter tokens and date filters.
 
-### Phase 6 — Avalonia UI (mfr8 GUI)
+### Phase 6 — Avalonia UI (Mfr GUI)
 
 - Adds the Avalonia UI layer on top of the stabilized core.
 - Includes:
@@ -1692,7 +1692,7 @@ The Log window (View → Log) shows all past sessions (enumerated from `undo/`) 
 
 ### 14.2 Undo retention policy
 
-To avoid unbounded disk growth, mfr8 enforces a **retention policy**:
+To avoid unbounded disk growth, Mfr enforces a **retention policy**:
 
 - Keep at most `Rename.MaxUndoSessions` files (default 50).
 - Delete any undo file older than `Rename.MaxUndoAgeDays` days (default 90).
@@ -2065,7 +2065,7 @@ steps:
 
 ## 21. Testing Strategy
 
-mfr8 uses **xUnit on .NET 10** for automated testing. Tests are organized in layers:
+Mfr uses **xUnit on .NET 10** for automated testing. Tests are organized in layers:
 
 - **Unit tests (Core):**
   - `FilterTarget` / `FilterTargetFamily` behavior (FileNameMode, DirectoryLevel).

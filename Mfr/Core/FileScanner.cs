@@ -1,6 +1,6 @@
-using Mfr8.Models;
+using Mfr.Models;
 
-namespace Mfr8.Core
+namespace Mfr.Core
 {
     /// <summary>
     /// Scans source paths and expands them into normalized file entries for renaming.

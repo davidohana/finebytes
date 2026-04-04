@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Mfr8.Models
+namespace Mfr.Models
 {
     /// <summary>
     /// Identifies the kind of target data a filter can operate on.

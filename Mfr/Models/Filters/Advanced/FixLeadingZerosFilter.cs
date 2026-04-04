@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-namespace Mfr8.Models.Filters.Advanced
+namespace Mfr.Models.Filters.Advanced
 {
     /// <summary>
     /// Options for normalizing numeric leading zeros.

@@ -1,6 +1,6 @@
-using Mfr8.Models;
+using Mfr.Models;
 
-namespace Mfr8.Tests.Models.Filters
+namespace Mfr.Tests.Models.Filters
 {
     internal static class FilterTestHelpers
     {

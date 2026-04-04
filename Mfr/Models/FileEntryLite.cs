@@ -1,4 +1,4 @@
-namespace Mfr8.Models
+namespace Mfr.Models
 {
     /// <summary>
     /// Lightweight file entry used during rename planning and execution.

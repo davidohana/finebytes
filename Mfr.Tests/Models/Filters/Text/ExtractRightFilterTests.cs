@@ -1,8 +1,8 @@
-using Mfr8.Models;
-using Mfr8.Models.Filters;
-using Mfr8.Models.Filters.Text;
+using Mfr.Models;
+using Mfr.Models.Filters;
+using Mfr.Models.Filters.Text;
 
-namespace Mfr8.Tests.Models.Filters.Text
+namespace Mfr.Tests.Models.Filters.Text
 {
     /// <summary>
     /// Tests for <see cref="ExtractRightFilter"/>.

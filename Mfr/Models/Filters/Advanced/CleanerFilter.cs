@@ -1,4 +1,4 @@
-namespace Mfr8.Models.Filters.Advanced
+namespace Mfr.Models.Filters.Advanced
 {
     /// <summary>
     /// Options for illegal/custom character cleanup.

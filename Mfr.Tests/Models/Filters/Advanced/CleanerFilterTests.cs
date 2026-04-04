@@ -1,7 +1,7 @@
-using Mfr8.Models;
-using Mfr8.Models.Filters.Advanced;
+using Mfr.Models;
+using Mfr.Models.Filters.Advanced;
 
-namespace Mfr8.Tests.Models.Filters.Advanced
+namespace Mfr.Tests.Models.Filters.Advanced
 {
     /// <summary>
     /// Tests for <see cref="CleanerFilter"/>.

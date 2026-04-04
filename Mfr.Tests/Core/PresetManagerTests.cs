@@ -1,9 +1,9 @@
 using System.Text.Json;
 
-using Mfr8.Core;
-using Mfr8.Models;
+using Mfr.Core;
+using Mfr.Models;
 
-namespace mfr8.Tests.Core
+namespace Mfr.Tests.Core
 {
     /// <summary>
     /// Tests loading and saving behavior for <see cref="PresetManager"/>.

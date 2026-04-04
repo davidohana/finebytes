@@ -30,15 +30,15 @@ Run `just` by itself to list available targets.
 Windows (PowerShell):
 
 ```powershell
-dotnet restore .\mfr8\mfr8.csproj
-dotnet restore .\mfr8.Tests\mfr8.Tests.csproj
+dotnet restore .\Mfr\Mfr.csproj
+dotnet restore .\Mfr.Tests\Mfr.Tests.csproj
 ```
 
 Linux (bash):
 
 ```bash
-dotnet restore ./mfr8/mfr8.csproj
-dotnet restore ./mfr8.Tests/mfr8.Tests.csproj
+dotnet restore ./Mfr/Mfr.csproj
+dotnet restore ./Mfr.Tests/Mfr.Tests.csproj
 ```
 
 ### Compile (Build)
@@ -46,15 +46,15 @@ dotnet restore ./mfr8.Tests/mfr8.Tests.csproj
 Windows (PowerShell):
 
 ```powershell
-dotnet build .\mfr8\mfr8.csproj -c Debug
-dotnet build .\mfr8.Tests\mfr8.Tests.csproj -c Debug
+dotnet build .\Mfr\Mfr.csproj -c Debug
+dotnet build .\Mfr.Tests\Mfr.Tests.csproj -c Debug
 ```
 
 Linux (bash):
 
 ```bash
-dotnet build ./mfr8/mfr8.csproj -c Debug
-dotnet build ./mfr8.Tests/mfr8.Tests.csproj -c Debug
+dotnet build ./Mfr/Mfr.csproj -c Debug
+dotnet build ./Mfr.Tests/Mfr.Tests.csproj -c Debug
 ```
 
 ### Run Unit Tests
@@ -62,13 +62,13 @@ dotnet build ./mfr8.Tests/mfr8.Tests.csproj -c Debug
 Windows (PowerShell):
 
 ```powershell
-dotnet test .\mfr8.Tests\mfr8.Tests.csproj -c Debug
+dotnet test .\Mfr.Tests\Mfr.Tests.csproj -c Debug
 ```
 
 Linux (bash):
 
 ```bash
-dotnet test ./mfr8.Tests/mfr8.Tests.csproj -c Debug
+dotnet test ./Mfr.Tests/Mfr.Tests.csproj -c Debug
 ```
 
 ### Run the CLI App
@@ -76,25 +76,25 @@ dotnet test ./mfr8.Tests/mfr8.Tests.csproj -c Debug
 Show usage/help (Windows PowerShell):
 
 ```powershell
-dotnet run --project .\mfr8\mfr8.csproj -- --help
+dotnet run --project .\Mfr\Mfr.csproj -- --help
 ```
 
 Show usage/help (Linux bash):
 
 ```bash
-dotnet run --project ./mfr8/mfr8.csproj -- --help
+dotnet run --project ./Mfr/Mfr.csproj -- --help
 ```
 
 Example run (Windows PowerShell):
 
 ```powershell
-dotnet run --project .\mfr8\mfr8.csproj -- "C:\Music\*.mp3" -p "my-preset"
+dotnet run --project .\Mfr\Mfr.csproj -- "C:\Music\*.mp3" -p "my-preset"
 ```
 
 Example run (Linux bash):
 
 ```bash
-dotnet run --project ./mfr8/mfr8.csproj -- "/home/user/music/*.mp3" -p "my-preset"
+dotnet run --project ./Mfr/Mfr.csproj -- "/home/user/music/*.mp3" -p "my-preset"
 ```
 
 ### Presets File

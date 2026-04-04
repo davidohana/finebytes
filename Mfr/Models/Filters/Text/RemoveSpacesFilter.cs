@@ -1,4 +1,4 @@
-namespace Mfr8.Models.Filters.Text
+namespace Mfr.Models.Filters.Text
 {
     /// <summary>
     /// Removes all whitespace from the target segment.

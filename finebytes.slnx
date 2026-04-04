@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="mfr8/mfr8.csproj" />
-  <Project Path="mfr8.Tests/mfr8.Tests.csproj" />
+  <Project Path="Mfr/Mfr.csproj" />
+  <Project Path="Mfr.Tests/Mfr.Tests.csproj" />
 </Solution>

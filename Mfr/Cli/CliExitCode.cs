@@ -1,4 +1,4 @@
-namespace Mfr8.Cli
+namespace Mfr.Cli
 {
     /// <summary>
     /// Represents process exit codes returned by the CLI.

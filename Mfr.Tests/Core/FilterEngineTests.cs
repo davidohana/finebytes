@@ -1,8 +1,8 @@
-using Mfr8.Core;
-using Mfr8.Models;
-using Mfr8.Models.Filters.Advanced;
+using Mfr.Core;
+using Mfr.Models;
+using Mfr.Models.Filters.Advanced;
 
-namespace mfr8.Tests.Core
+namespace Mfr.Tests.Core
 {
     /// <summary>
     /// Tests rename preview and commit behavior in the filter engine.

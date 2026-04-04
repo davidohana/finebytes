@@ -1,7 +1,7 @@
-using Mfr8.Models;
-using Mfr8.Models.Filters;
+using Mfr.Models;
+using Mfr.Models.Filters;
 
-namespace Mfr8.Core
+namespace Mfr.Core
 {
     public enum RenameStatus
     {

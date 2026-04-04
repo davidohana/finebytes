@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Mfr8.Core
+namespace Mfr.Core
 {
     // Source-generated serializer context avoids reflection-based JSON metadata at runtime.
     [JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true, UseStringEnumConverter = true, WriteIndented = true)]

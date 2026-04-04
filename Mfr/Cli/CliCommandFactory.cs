@@ -1,7 +1,7 @@
-using Mfr8.Core;
-using Mfr8.Models;
+using Mfr.Core;
+using Mfr.Models;
 
-namespace Mfr8.Cli
+namespace Mfr.Cli
 {
     internal static class CliCommandFactory
     {

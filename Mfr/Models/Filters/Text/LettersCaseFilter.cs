@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-namespace Mfr8.Models.Filters.Text
+namespace Mfr.Models.Filters.Text
 {
     /// <summary>
     /// Options for letter-case transformations.

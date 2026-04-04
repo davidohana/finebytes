@@ -1,4 +1,4 @@
-namespace Mfr8.Models
+namespace Mfr.Models
 {
     /// <summary>
     /// Output format for CLI result rendering.

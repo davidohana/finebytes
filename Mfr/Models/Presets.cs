@@ -1,6 +1,6 @@
-using Mfr8.Models.Filters;
+using Mfr.Models.Filters;
 
-namespace Mfr8.Models
+namespace Mfr.Models
 {
     /// <summary>
     /// Defines a named filter preset.

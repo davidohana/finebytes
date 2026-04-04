@@ -1,6 +1,6 @@
-using Mfr8.Models;
+using Mfr.Models;
 
-namespace Mfr8.Cli
+namespace Mfr.Cli
 {
     // Data carried from argument parsing into the CLI execution.
     public sealed record CliOptions(

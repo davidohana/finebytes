@@ -1,4 +1,4 @@
-namespace Mfr8.Models.Filters
+namespace Mfr.Models.Filters
 {
     /// <summary>
     /// Represents numeric count options used by extraction and trim filters.
