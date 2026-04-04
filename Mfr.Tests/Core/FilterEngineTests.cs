@@ -53,11 +53,13 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            var result = FilterEngine.PreviewAndCommit(preset, files, continueOnErrors: false);
+            var preview = FilterEngine.Preview(preset, files, continueOnErrors: false);
+            var result = FilterEngine.Commit(preset.Name, files, continueOnErrors: false);
 
             Assert.Equal(2, result.Conflicts);
             Assert.Equal(RenameStatus.ConflictSkipped, result.Results[0].Status);
             Assert.Equal(RenameStatus.ConflictSkipped, result.Results[1].Status);
+            Assert.Equal(0, preview.Errors);
             Assert.True(File.Exists(a), "source file 'a' should remain on conflict skip");
             Assert.True(File.Exists(b), "source file 'b' should remain on conflict skip");
         }
@@ -101,11 +103,13 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            var result = FilterEngine.PreviewAndCommit(preset, files, continueOnErrors: false);
+            var preview = FilterEngine.Preview(preset, files, continueOnErrors: false);
+            var result = FilterEngine.Commit(preset.Name, files, continueOnErrors: false);
 
             Assert.Equal(2, result.Renamed);
             Assert.Equal(RenameStatus.Ok, result.Results[0].Status);
             Assert.Equal(RenameStatus.Ok, result.Results[1].Status);
+            Assert.Equal(0, preview.Errors);
 
             Assert.False(File.Exists(a));
             Assert.False(File.Exists(b));

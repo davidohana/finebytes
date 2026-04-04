@@ -32,22 +32,18 @@ namespace Mfr.Core
     public static partial class FilterEngine
     {
         /// <summary>
-        /// Previews rename outcomes for a batch and then commits non-conflicting moves.
+        /// Previews rename outcomes for a batch without touching the filesystem.
         /// </summary>
         /// <param name="preset">The rename preset (sequence of enabled filters).</param>
         /// <param name="files">Candidate files to rename.</param>
-        /// <param name="continueOnErrors">If <c>true</c>, continue when preview/commit errors occur.</param>
-        /// <returns>Summary of rename outcomes (renamed, skipped, conflicts, errors).</returns>
-        public static RenameBatchResult PreviewAndCommit(
+        /// <param name="continueOnErrors">If <c>true</c>, continue previewing after per-item errors.</param>
+        /// <returns>Preview summary with computed destination paths and preview errors.</returns>
+        public static RenameBatchResult Preview(
             FilterPreset preset,
             IReadOnlyList<RenameItem> files,
             bool continueOnErrors)
         {
-            // Phase 1: Conflict strategy is `Skip` (no auto-number, no overwrite).
             var previewResults = new List<RenameResultItem>(files.Count);
-            var pending = new List<RenameItem>(files.Count);
-
-            // 1) Preview and compute destinations (or preview errors).
             foreach (var item in files)
             {
                 try
@@ -62,7 +58,6 @@ namespace Mfr.Core
                     }
 
                     previewResults.Add(new RenameResultItem(item.Original.FullPath, destPath, RenameStatus.Skipped, null));
-                    pending.Add(item);
                 }
                 catch (Exception ex)
                 {
@@ -74,10 +69,35 @@ namespace Mfr.Core
                 }
             }
 
-            // If there were preview errors and /COPE is not enabled, do not commit.
-            if (previewResults.Any(r => r.Status == RenameStatus.Error))
+            return _Summarize(preset.Name, files.Count, previewResults);
+        }
+
+        /// <summary>
+        /// Commits previously previewed rename operations, skipping conflicts.
+        /// </summary>
+        /// <param name="presetName">Preset name used for summary output.</param>
+        /// <param name="files">Candidate files with preview paths already computed.</param>
+        /// <param name="continueOnErrors">If <c>true</c>, continue committing after per-item errors.</param>
+        /// <returns>Commit summary including renamed, skipped, conflict, and error counts.</returns>
+        public static RenameBatchResult Commit(
+            string presetName,
+            IReadOnlyList<RenameItem> files,
+            bool continueOnErrors)
+        {
+            var commitResults = new List<RenameResultItem>(files.Count);
+            var pending = new List<RenameItem>(files.Count);
+            foreach (var item in files)
             {
-                return _Summarize(preset.Name, files.Count, previewResults);
+                var sourcePath = item.Original.FullPath;
+                var destPath = item.Preview.FullPath;
+                if (string.Equals(sourcePath, destPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    commitResults.Add(new RenameResultItem(sourcePath, destPath, RenameStatus.Skipped, null));
+                    continue;
+                }
+
+                commitResults.Add(new RenameResultItem(sourcePath, destPath, RenameStatus.Skipped, null));
+                pending.Add(item);
             }
 
             // 2) Resolve conflicts among pending destinations and against disk.
@@ -103,9 +123,9 @@ namespace Mfr.Core
             // 3) Commit non-conflicting renames.
             var renamedCount = 0;
             var resultIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            for (var i = 0; i < previewResults.Count; i++)
+            for (var i = 0; i < commitResults.Count; i++)
             {
-                resultIndex[previewResults[i].OriginalPath] = i;
+                resultIndex[commitResults[i].OriginalPath] = i;
             }
 
             foreach (var item in pending)
@@ -115,19 +135,19 @@ namespace Mfr.Core
                 var idx = resultIndex[sourcePath];
                 if (conflictDestinations.Contains(destPath))
                 {
-                    previewResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.ConflictSkipped, null);
+                    commitResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.ConflictSkipped, null);
                     continue;
                 }
 
                 try
                 {
                     item.Apply();
-                    previewResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.Ok, null);
+                    commitResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.Ok, null);
                     renamedCount++;
                 }
                 catch (Exception ex)
                 {
-                    previewResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.Error, ex.Message);
+                    commitResults[idx] = new RenameResultItem(sourcePath, destPath, RenameStatus.Error, ex.Message);
                     if (!continueOnErrors)
                     {
                         break;
@@ -135,7 +155,7 @@ namespace Mfr.Core
                 }
             }
 
-            return _Summarize(preset.Name, files.Count, previewResults, renamedCount);
+            return _Summarize(presetName, files.Count, commitResults, renamedCount);
         }
 
         private static RenameBatchResult _Summarize(

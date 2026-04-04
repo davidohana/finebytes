@@ -62,10 +62,18 @@ namespace Mfr.Cli
                 throw new UserException("No files matched the provided sources.");
             }
 
-            var result = FilterEngine.PreviewAndCommit(
+            var preview = FilterEngine.Preview(
                 preset: preset,
                 files: renameItems,
                 continueOnErrors: options.ContinueOnPreviewErrors);
+            var result = preview;
+            if (preview.Errors == 0)
+            {
+                result = FilterEngine.Commit(
+                    presetName: preset.Name,
+                    files: renameItems,
+                    continueOnErrors: options.ContinueOnPreviewErrors);
+            }
 
             if (!options.Silent)
             {
