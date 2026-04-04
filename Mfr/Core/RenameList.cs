@@ -80,6 +80,11 @@ namespace Mfr.Core
             // Non-directory sources resolve relative to their parent directory.
             var parentDirectory = Path.GetDirectoryName(fullSource);
             parentDirectory = string.IsNullOrWhiteSpace(parentDirectory) ? Directory.GetCurrentDirectory() : parentDirectory;
+            if (_TryResolveRecursiveGlob(fullSource, out var recursiveMatches))
+            {
+                return recursiveMatches;
+            }
+
             if (!Directory.Exists(parentDirectory))
             {
                 throw new UserException($"Directory for source does not exist: '{parentDirectory}'.");
@@ -100,6 +105,62 @@ namespace Mfr.Core
 
             // Missing exact files are ignored (no resolved items).
             return [];
+        }
+
+        /// <summary>
+        /// Tries to resolve recursive glob sources that use <c>**</c> syntax.
+        /// </summary>
+        /// <param name="fullSource">The full source path to inspect.</param>
+        /// <param name="resolvedPaths">Resolved file paths when recursive syntax is recognized.</param>
+        /// <returns><c>true</c> if recursive glob syntax was detected; otherwise <c>false</c>.</returns>
+        private static bool _TryResolveRecursiveGlob(string fullSource, out IEnumerable<string> resolvedPaths)
+        {
+            resolvedPaths = [];
+            var normalizedSource = fullSource.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var recursiveSegment = $"{Path.DirectorySeparatorChar}**{Path.DirectorySeparatorChar}";
+            var recursiveSegmentIndex = normalizedSource.IndexOf(recursiveSegment, StringComparison.Ordinal);
+
+            string rootDirectory;
+            string searchPattern;
+            if (recursiveSegmentIndex >= 0)
+            {
+                rootDirectory = normalizedSource[..recursiveSegmentIndex];
+                searchPattern = normalizedSource[(recursiveSegmentIndex + recursiveSegment.Length)..];
+            }
+            else
+            {
+                var trailingRecursiveSegment = $"{Path.DirectorySeparatorChar}**";
+                if (!normalizedSource.EndsWith(trailingRecursiveSegment, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+
+                rootDirectory = normalizedSource[..^trailingRecursiveSegment.Length];
+                searchPattern = "*";
+            }
+
+            if (string.IsNullOrWhiteSpace(rootDirectory))
+            {
+                rootDirectory = Path.GetPathRoot(normalizedSource) ?? Directory.GetCurrentDirectory();
+            }
+
+            if (!Directory.Exists(rootDirectory))
+            {
+                throw new UserException($"Directory for source does not exist: '{rootDirectory}'.");
+            }
+
+            if (string.IsNullOrWhiteSpace(searchPattern))
+            {
+                searchPattern = "*";
+            }
+
+            if (searchPattern.Contains(Path.DirectorySeparatorChar))
+            {
+                throw new UserException($"Recursive glob source '{fullSource}' supports file-name patterns only after '**'.");
+            }
+
+            resolvedPaths = Directory.EnumerateFiles(rootDirectory, searchPattern, SearchOption.AllDirectories);
+            return true;
         }
 
         /// <summary>
