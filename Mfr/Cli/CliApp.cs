@@ -63,17 +63,20 @@ namespace Mfr.Cli
             }
 
             renameList.Preview(preset: preset, failFast: options.FailFast);
-            var previewStats = _BuildPreviewResults(renameItems);
-            var previewErrors = _CountErrors(previewStats);
-            if (options.FailFast && previewErrors > 0)
+            if (options.FailFast)
             {
-                _PrintResult(
-                    presetName: preset.Name,
-                    totalFiles: renameItems.Count,
-                    results: previewStats,
-                    format: options.OutputFormat,
-                    silent: options.Silent);
-                return CliExitCode.UserError;
+                var previewStats = _BuildPreviewResults(renameItems);
+                var previewErrors = _CountErrors(previewStats);
+                if (previewErrors > 0)
+                {
+                    _PrintResult(
+                        presetName: preset.Name,
+                        totalFiles: renameItems.Count,
+                        results: previewStats,
+                        format: options.OutputFormat,
+                        silent: options.Silent);
+                    return CliExitCode.UserError;
+                }
             }
 
             var stats = FilterEngine.Commit(
