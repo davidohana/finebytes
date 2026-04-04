@@ -1,13 +1,19 @@
 ---
-description: Private methods are prefixed with `_`
+description: C# private naming and flow style
 globs: **/*.cs
 alwaysApply: true
 ---
 
-# Naming rule: `private` methods use `_` prefix
+# C# code style
 
-- Rename any `private` method (including `private static` / `private async`) to start with `_`.
-- Example:
-  - ❌ `private static void PrintJson(...)`
-  - ✅ `private static void _PrintJson(...)`
+## Private method naming
+
+- Prefix every `private` method (including `private static` / `private async`) with `_`.
+- Example: `PrintJson(...)` -> `_PrintJson(...)`
+
+## Control flow
+
+- Prefer early `return` over nested `if` blocks.
+- Prefer early `continue`/`break` in loops for skip/stop cases.
+- Keep the happy path at base indentation.
 

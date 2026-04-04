@@ -27,19 +27,21 @@ namespace Mfr.Tests.Core
         {
             try
             {
-                if (Directory.Exists(_tempRoot))
+                if (!Directory.Exists(_tempRoot))
                 {
-                    foreach (var file in Directory.EnumerateFiles(_tempRoot, "*", SearchOption.AllDirectories))
-                    {
-                        var attrs = File.GetAttributes(file);
-                        if (attrs.HasFlag(FileAttributes.Hidden))
-                        {
-                            File.SetAttributes(file, attrs & ~FileAttributes.Hidden);
-                        }
-                    }
-
-                    Directory.Delete(_tempRoot, recursive: true);
+                    return;
                 }
+
+                foreach (var file in Directory.EnumerateFiles(_tempRoot, "*", SearchOption.AllDirectories))
+                {
+                    var attrs = File.GetAttributes(file);
+                    if (attrs.HasFlag(FileAttributes.Hidden))
+                    {
+                        File.SetAttributes(file, attrs & ~FileAttributes.Hidden);
+                    }
+                }
+
+                Directory.Delete(_tempRoot, recursive: true);
             }
             catch (IOException)
             {
