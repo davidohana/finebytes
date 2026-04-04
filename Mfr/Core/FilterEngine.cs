@@ -1,5 +1,4 @@
 using Mfr.Models;
-using Mfr.Models.Filters;
 
 namespace Mfr.Core
 {
@@ -48,7 +47,7 @@ namespace Mfr.Core
             {
                 try
                 {
-                    _ApplyFiltersToName(preset.Filters, item);
+                    item.ApplyFilters(preset.Filters);
                     var destPath = item.Preview.FullPath;
 
                     if (string.Equals(destPath, item.Original.FullPath, StringComparison.OrdinalIgnoreCase))
@@ -169,56 +168,6 @@ namespace Mfr.Core
             var conflicts = results.Count(r => r.Status == RenameStatus.ConflictSkipped);
             var errors = results.Count(r => r.Status == RenameStatus.Error);
             return new RenameBatchResult(presetName, totalFiles, renamed, skipped, conflicts, errors, results);
-        }
-
-        private static void _ApplyFiltersToName(IReadOnlyList<Filter> filters, RenameItem item)
-        {
-            item.ResetPreview();
-            var prefix = item.Original.Prefix;
-            var extension = item.Original.Extension;
-
-            foreach (var filter in filters)
-            {
-                if (!filter.Enabled)
-                {
-                    continue;
-                }
-
-                if (filter.Target is not FileNameTarget fileTarget)
-                {
-                    throw new NotSupportedException($"Phase 1 only supports target.family='FileName'. Filter '{filter.Type}' got '{filter.Target.Family}'.");
-                }
-
-                var mode = fileTarget.FileNameMode;
-                var segment = mode switch
-                {
-                    FileNameTargetMode.Prefix => prefix,
-                    FileNameTargetMode.Extension => extension,
-                    FileNameTargetMode.Full => prefix + extension,
-                    _ => throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.")
-                };
-
-                var transformed = filter.Apply(segment, item);
-
-                switch (mode)
-                {
-                    case FileNameTargetMode.Prefix:
-                        prefix = transformed;
-                        break;
-                    case FileNameTargetMode.Extension:
-                        extension = transformed;
-                        break;
-                    case FileNameTargetMode.Full:
-                        var fullName = Path.GetFileName(transformed);
-                        extension = Path.GetExtension(fullName);
-                        prefix = Path.GetFileNameWithoutExtension(fullName);
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Unknown fileNameMode '{mode}'.");
-                }
-            }
-
-            item.SetPreviewName(prefix, extension);
         }
 
     }
