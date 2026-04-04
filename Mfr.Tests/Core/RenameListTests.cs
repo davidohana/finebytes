@@ -58,14 +58,11 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSources_Expands_Mixed_Sources_And_Preserves_Source_Order()
         {
-            var createdPaths = TestHelpers.CreateFiles(
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
                 _tempRoot,
                 "alpha.txt",
                 "beta.log",
                 "gamma.txt");
-            var alphaPath = createdPaths[0];
-            var betaPath = createdPaths[1];
-            var gammaPath = createdPaths[2];
 
             var sources = new[]
             {
@@ -94,7 +91,7 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSource_Allows_Duplicate_Sources_But_ResolvedItems_Are_Deduplicated()
         {
-            var source = TestHelpers.CreateFiles(_tempRoot, "alpha.txt")[0];
+            var source = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
             var renameList = new RenameList(includeHidden: true);
             Assert.Equal(1, renameList.AddSource(source));
@@ -110,9 +107,7 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSource_Filters_Hidden_When_Disabled()
         {
-            var createdPaths = TestHelpers.CreateFiles(_tempRoot, "visible.txt", "hidden.txt");
-            var visiblePath = createdPaths[0];
-            var hiddenPath = createdPaths[1];
+            var (visiblePath, hiddenPath) = TestHelpers.CreateFiles(_tempRoot, "visible.txt", "hidden.txt");
 
             var hiddenAttrs = File.GetAttributes(hiddenPath);
             File.SetAttributes(hiddenPath, hiddenAttrs | FileAttributes.Hidden);
@@ -144,8 +139,7 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSource_Resolves_Glob_In_TopDirectoryOnly()
         {
-            var createdPaths = TestHelpers.CreateFiles(_tempRoot, "top.txt", "nested/nested.txt");
-            var topLevelMatch = createdPaths[0];
+            var (topLevelMatch, _) = TestHelpers.CreateFiles(_tempRoot, "top.txt", "nested/nested.txt");
 
             var renameList = new RenameList(includeHidden: true);
             var addedCount = renameList.AddSource(_tempRoot.CombinePath("*.txt"));
@@ -161,7 +155,7 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSource_GlobAndExactFile_Deduplicates_ResolvedItem()
         {
-            var alphaPath = TestHelpers.CreateFiles(_tempRoot, "alpha.txt")[0];
+            var alphaPath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
             var renameList = new RenameList(includeHidden: true);
             Assert.Equal(1, renameList.AddSource(_tempRoot.CombinePath("*.txt")));
@@ -177,14 +171,11 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSource_Resolves_Recursive_Glob_With_DoubleStar_Syntax()
         {
-            var createdPaths = TestHelpers.CreateFiles(
+            var (topLevelMatch, nestedMatch, deeperMatch) = TestHelpers.CreateFiles(
                 _tempRoot,
                 "top.txt",
                 "nested/nested.txt",
                 "nested/deeper/deeper.txt");
-            var topLevelMatch = createdPaths[0];
-            var nestedMatch = createdPaths[1];
-            var deeperMatch = createdPaths[2];
 
             var renameList = new RenameList(includeHidden: true);
             var addedCount = renameList.AddSource(_tempRoot.CombinePath("**", "*.txt"));

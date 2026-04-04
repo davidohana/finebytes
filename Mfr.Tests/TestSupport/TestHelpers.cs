@@ -6,12 +6,51 @@ namespace Mfr.Tests.TestSupport
     internal static class TestHelpers
     {
         /// <summary>
-        /// Creates multiple files under a root directory using slash-separated relative paths.
+        /// Creates a single file under a root directory using a slash-separated relative path.
         /// </summary>
         /// <param name="rootDirectory">Root directory where files are created.</param>
-        /// <param name="relativePaths">Relative file paths using '/' or '\'.</param>
-        /// <returns>Absolute paths of files created, in the same order.</returns>
-        internal static IReadOnlyList<string> CreateFiles(string rootDirectory, params string[] relativePaths)
+        /// <param name="relativePath">Relative file path using '/' or '\'.</param>
+        /// <returns>Absolute path of the created file.</returns>
+        internal static string CreateFile(string rootDirectory, string relativePath)
+        {
+            return _CreateFiles(rootDirectory, relativePath)[0];
+        }
+
+        /// <summary>
+        /// Creates two files under a root directory and returns absolute paths as a tuple.
+        /// </summary>
+        /// <param name="rootDirectory">Root directory where files are created.</param>
+        /// <param name="firstRelativePath">First relative file path using '/' or '\'.</param>
+        /// <param name="secondRelativePath">Second relative file path using '/' or '\'.</param>
+        /// <returns>Absolute paths of the created files.</returns>
+        internal static (string First, string Second) CreateFiles(
+            string rootDirectory,
+            string firstRelativePath,
+            string secondRelativePath)
+        {
+            var createdPaths = _CreateFiles(rootDirectory, firstRelativePath, secondRelativePath);
+            return (createdPaths[0], createdPaths[1]);
+        }
+
+        /// <summary>
+        /// Creates three files under a root directory and returns absolute paths as a tuple.
+        /// </summary>
+        /// <param name="rootDirectory">Root directory where files are created.</param>
+        /// <param name="firstRelativePath">First relative file path using '/' or '\'.</param>
+        /// <param name="secondRelativePath">Second relative file path using '/' or '\'.</param>
+        /// <param name="thirdRelativePath">Third relative file path using '/' or '\'.</param>
+        /// <returns>Absolute paths of the created files.</returns>
+        internal static (string First, string Second, string Third) CreateFiles(
+            string rootDirectory,
+            string firstRelativePath,
+            string secondRelativePath,
+            string thirdRelativePath)
+        {
+            var createdPaths = _CreateFiles(rootDirectory, firstRelativePath, secondRelativePath, thirdRelativePath);
+            return (createdPaths[0], createdPaths[1], createdPaths[2]);
+        }
+
+        private static List<string> _CreateFiles(string rootDirectory, params string[] relativePaths)
         {
             if (string.IsNullOrWhiteSpace(rootDirectory))
             {
