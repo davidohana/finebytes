@@ -53,18 +53,13 @@ namespace Mfr8.Core
 
             var presets = container.Presets;
 
-            try
+            NameToPreset.Clear();
+            foreach (var preset in presets)
             {
-                var loadedNameToPreset = presets.ToDictionary(preset => preset.Name, StringComparer.Ordinal);
-                NameToPreset.Clear();
-                foreach (var kv in loadedNameToPreset)
+                if (!NameToPreset.TryAdd(preset.Name, preset))
                 {
-                    NameToPreset[kv.Key] = kv.Value;
+                    throw new UserException($"Duplicate preset names found in '{PresetsFilePath}'. Preset names must be unique.");
                 }
-            }
-            catch (ArgumentException ex)
-            {
-                throw new UserException($"Duplicate preset names found in '{PresetsFilePath}'. Preset names must be unique.", ex);
             }
         }
 
