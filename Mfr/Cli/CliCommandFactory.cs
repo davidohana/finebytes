@@ -12,7 +12,7 @@ namespace Mfr.Cli
         /// Prints help and validation errors to the console when parsing fails.
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
-        /// <returns>Parsed <see cref="CliOptions"/> on success; <c>null</c> when the user requested help (<c>--help</c> / <c>-h</c>).</returns>
+        /// <returns>Parsed <see cref="CliOptions"/> on success; <c>null</c> when the user requested help or version output.</returns>
         /// <exception cref="UserException">Thrown when argument parsing cannot produce options.</exception>
         public static CliOptions? ParseArgs(string[] args)
         {
@@ -27,7 +27,9 @@ namespace Mfr.Cli
             static CliOptions? _MapNotParsed(IEnumerable<CommandLine.Error> errors)
             {
                 var errorList = errors.ToList();
-                return errorList.All(e => e.Tag is CommandLine.ErrorType.HelpRequestedError or CommandLine.ErrorType.HelpVerbRequestedError)
+                return errorList.All(e => e.Tag is CommandLine.ErrorType.HelpRequestedError
+                    or CommandLine.ErrorType.HelpVerbRequestedError
+                    or CommandLine.ErrorType.VersionRequestedError)
                     ? null
                     : throw new UserException(_BuildErrorMessage(errorList));
             }
