@@ -93,8 +93,8 @@ namespace Mfr.Tests.Core
             File.WriteAllText(source, "a");
 
             var renameList = new RenameList(includeHidden: true);
-            Assert.True(renameList.AddSource(source));
-            Assert.True(renameList.AddSource(source));
+            Assert.Equal(1, renameList.AddSource(source));
+            Assert.Equal(0, renameList.AddSource(source));
 
             _ = Assert.Single(renameList.ResolvedItems);
             Assert.Equal(source, renameList.ResolvedItems[0].FullPath);

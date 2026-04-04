@@ -27,8 +27,8 @@ namespace Mfr.Core
         /// Adds and resolves a single source.
         /// </summary>
         /// <param name="source">A file path, directory path, or wildcard source.</param>
-        /// <returns><c>true</c> when the source input was accepted.</returns>
-        public bool AddSource(string source)
+        /// <returns>The count of newly added resolved items.</returns>
+        public int AddSource(string source)
         {
             if (string.IsNullOrWhiteSpace(source))
             {
@@ -37,8 +37,7 @@ namespace Mfr.Core
 
             var trimmedSource = source.Trim();
             var resolvedPaths = _ResolveSource(trimmedSource).ToList();
-            _ResolveAndAppendPaths(resolvedPaths);
-            return true;
+            return _ResolveAndAppendPaths(resolvedPaths);
         }
 
         /// <summary>
@@ -117,8 +116,10 @@ namespace Mfr.Core
         /// Appends resolved paths to <see cref="ResolvedItems"/> while enforcing deduplication and filtering.
         /// </summary>
         /// <param name="resolvedPaths">Resolved file paths to append.</param>
-        private void _ResolveAndAppendPaths(IEnumerable<string> resolvedPaths)
+        /// <returns>The count of newly added resolved items.</returns>
+        private int _ResolveAndAppendPaths(IEnumerable<string> resolvedPaths)
         {
+            var addedCount = 0;
             foreach (var fullPath in resolvedPaths)
             {
                 var normalizedResolvedPath = _NormalizePathKey(fullPath);
@@ -148,8 +149,11 @@ namespace Mfr.Core
                     DirectoryPath: directoryPath,
                     Prefix: prefix,
                     Extension: extension));
+                addedCount++;
                 _nextGlobalIndex++;
             }
+
+            return addedCount;
         }
     }
 }
