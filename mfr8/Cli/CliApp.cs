@@ -40,8 +40,15 @@ namespace Mfr8.Cli
             }
 
             var presetManager = new PresetManager(options.PresetsFilePath);
+            if (string.IsNullOrWhiteSpace(options.PresetName))
+            {
+                throw new UserException("Preset name is required.");
+            }
             presetManager.LoadPresets();
-            var preset = presetManager.GetByName(options.PresetName);
+
+            var preset = presetManager.NameToPreset.TryGetValue(options.PresetName, out var loadedPreset)
+                ? loadedPreset
+                : throw new UserException($"Preset not found: '{options.PresetName}'.");
 
             var files = FileScanner.ScanSources(options.Sources, includeHidden: options.IncludeHidden);
 

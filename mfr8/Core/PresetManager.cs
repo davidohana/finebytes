@@ -8,7 +8,10 @@ namespace Mfr8.Core
     /// <param name="presetsFilePath">Path to the JSON file containing all presets.</param>
     public sealed class PresetManager(string presetsFilePath)
     {
-        private Dictionary<string, FilterPreset> _NameToPreset = [];
+        /// <summary>
+        /// Gets loaded presets keyed by preset name.
+        /// </summary>
+        public Dictionary<string, FilterPreset> NameToPreset { get; } = [];
 
         /// <summary>
         /// Gets the JSON file path containing all presets.
@@ -52,7 +55,12 @@ namespace Mfr8.Core
 
             try
             {
-                _NameToPreset = presets.ToDictionary(preset => preset.Name, StringComparer.Ordinal);
+                var loadedNameToPreset = presets.ToDictionary(preset => preset.Name, StringComparer.Ordinal);
+                NameToPreset.Clear();
+                foreach (var kv in loadedNameToPreset)
+                {
+                    NameToPreset[kv.Key] = kv.Value;
+                }
             }
             catch (ArgumentException ex)
             {
@@ -73,7 +81,11 @@ namespace Mfr8.Core
                     _ = Directory.CreateDirectory(directory);
                 }
 
-                var container = new PresetContainer([.. _NameToPreset.Values]);
+                var sortedPresets = NameToPreset.Values
+                    .OrderBy(preset => preset.Name, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(preset => preset.Name, StringComparer.Ordinal)
+                    .ToList();
+                var container = new PresetContainer(sortedPresets);
                 var json = JsonSerializer.Serialize(container, PresetJsonSerializerContext.Default.PresetContainer);
                 File.WriteAllText(PresetsFilePath, json);
             }
@@ -83,19 +95,6 @@ namespace Mfr8.Core
             }
         }
 
-        /// <summary>
-        /// Gets a preset by its unique <c>name</c> from loaded presets.
-        /// </summary>
-        /// <param name="presetName">Preset name.</param>
-        /// <returns>The matching preset.</returns>
-        public FilterPreset GetByName(string presetName)
-        {
-            return string.IsNullOrWhiteSpace(presetName)
-                ? throw new UserException("Preset name is required.")
-                : _NameToPreset.TryGetValue(presetName, out var preset)
-                ? preset
-                : throw new UserException($"Preset not found: '{presetName}'.");
-        }
     }
 
     internal sealed record PresetContainer(IReadOnlyList<FilterPreset> Presets);
