@@ -12,8 +12,8 @@ namespace Mfr.Cli
         internal const int MaxSessionLogFiles = 100;
         private const string SessionLogPrefix = "session-";
         private const string SessionLogExtension = ".log";
-        private const string ConsoleOutputTemplate = "[{Level:u3}] {Message:lj}{NewLine}";
-        private const string FileOutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}";
+        private const string ConsoleOutputTemplate = "[{Level:u3}] {Message:lj}{NewLine}{Exception}";
+        private const string FileOutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
         internal static CliLoggerSession Start(LogEventLevel logLevel, string? logDirectoryPath)
         {
