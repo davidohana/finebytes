@@ -1,12 +1,24 @@
 using Mfr.Cli;
+using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Cli
 {
     /// <summary>
     /// Tests command-line error handling and user-facing output behavior.
     /// </summary>
-    public class CliAppTests
+    public class CliAppTests : IDisposable
     {
+        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
+
+        /// <summary>
+        /// Restores temporary resources used by CLI tests.
+        /// </summary>
+        public void Dispose()
+        {
+            Environment.SetEnvironmentVariable(CliLogging.LogDirectoryEnvVarName, null);
+            _tempDirectoryFixture.Dispose();
+        }
+
         [Fact]
         /// <summary>
         /// Verifies that missing positional <c>sources</c> reports a clear user-facing error.
@@ -15,9 +27,11 @@ namespace Mfr.Tests.Cli
         {
             using var errorWriter = new StringWriter();
             var originalError = Console.Error;
+            var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
 
             try
             {
+                Environment.SetEnvironmentVariable(CliLogging.LogDirectoryEnvVarName, logDirectoryPath);
                 Console.SetError(errorWriter);
 
                 var exitCode = CliApp.Run(["-p", "xxx"]);

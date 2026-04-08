@@ -1,6 +1,7 @@
 using Mfr.Models;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+using Serilog;
 
 namespace Mfr.Core
 {
@@ -38,7 +39,13 @@ namespace Mfr.Core
 
             var trimmedSource = source.Trim();
             var resolvedPaths = _ResolveSource(trimmedSource).ToList();
-            return _AppendPaths(resolvedPaths);
+            var addedCount = _AppendPaths(resolvedPaths);
+            Log.Debug(
+                "Resolved source '{Source}' to {ResolvedCount} path(s), added {AddedCount} new item(s).",
+                trimmedSource,
+                resolvedPaths.Count,
+                addedCount);
+            return addedCount;
         }
 
         /// <summary>
@@ -59,6 +66,11 @@ namespace Mfr.Core
         /// <param name="preset">The rename preset (sequence of enabled filters).</param>
         public void Preview(FilterPreset preset)
         {
+            Log.Debug(
+                "Starting preview for preset '{PresetName}' with {ItemCount} item(s).",
+                preset.Name,
+                _renameItems.Count);
+
             foreach (var item in _renameItems)
             {
                 item.ResetState();
@@ -79,10 +91,19 @@ namespace Mfr.Core
                 catch (Exception ex)
                 {
                     renameItem.SetPreviewError(message: ex.Message, cause: ex);
+                    Log.Warning(
+                        ex,
+                        "Preview failed for '{SourcePath}'.",
+                        renameItem.Original.FullPath);
                 }
             }
 
             _MarkPreviewConflicts();
+            var previewErrorCount = _renameItems.Count(item => item.Status == RenameStatus.PreviewError);
+            Log.Debug(
+                "Finished preview for preset '{PresetName}'. Errors: {PreviewErrorCount}.",
+                preset.Name,
+                previewErrorCount);
         }
 
         /// <summary>
@@ -92,6 +113,11 @@ namespace Mfr.Core
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
         public IReadOnlyList<RenameResultItem> Commit(bool failFast)
         {
+            Log.Debug(
+                "Starting commit for {ItemCount} item(s). FailFast: {FailFast}.",
+                _renameItems.Count,
+                failFast);
+
             var results = new List<RenameResultItem>(_renameItems.Count);
             var stopped = false;
 
@@ -126,6 +152,11 @@ namespace Mfr.Core
                 {
                     item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
                     item.Status = RenameStatus.CommitError;
+                    Log.Error(
+                        ex,
+                        "Commit failed for '{SourcePath}' -> '{DestinationPath}'.",
+                        sourcePath,
+                        destPath);
                     results.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
                         ResultPath: destPath,
@@ -139,6 +170,15 @@ namespace Mfr.Core
             {
                 item.ClearPreview();
             }
+
+            var commitOkCount = results.Count(item => item.Status == RenameStatus.CommitOk);
+            var commitSkippedCount = results.Count(item => item.Status == RenameStatus.CommitSkipped);
+            var commitErrorCount = results.Count(item => item.Status == RenameStatus.CommitError);
+            Log.Debug(
+                "Finished commit. Success: {CommitOkCount}, Skipped: {CommitSkippedCount}, Errors: {CommitErrorCount}.",
+                commitOkCount,
+                commitSkippedCount,
+                commitErrorCount);
 
             return results;
         }
@@ -307,6 +347,9 @@ namespace Mfr.Core
                     item.SetPreviewError(
                         message: $"Preview conflict for destination '{destinationPath}'.",
                         cause: null);
+                    Log.Warning(
+                        "Preview conflict for destination '{DestinationPath}' (duplicate destination).",
+                        destinationPath);
                     continue;
                 }
 
@@ -317,6 +360,9 @@ namespace Mfr.Core
                     item.SetPreviewError(
                         message: $"Preview conflict for destination '{destinationPath}'.",
                         cause: null);
+                    Log.Warning(
+                        "Preview conflict for destination '{DestinationPath}' (path already exists).",
+                        destinationPath);
                     continue;
                 }
             }

@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Serilog.Events;
 
 namespace Mfr.Cli
 {
@@ -10,8 +11,7 @@ namespace Mfr.Cli
     /// <param name="OutputFormat">The format in which output should be printed (table, JSON, CSV).</param>
     /// <param name="IncludeHidden">Whether to include hidden and system files.</param>
     /// <param name="ContinueOnRenameError">Whether commit should continue after per-item rename errors.</param>
-    /// <param name="Silent">Suppress all output except for the process exit code.</param>
-    /// <param name="Verbose">Reserved for future verbose output and diagnostics.</param>
+    /// <param name="LogLevel">Minimum log level to emit.</param>
     /// <param name="PresetsFilePath">Path to the JSON file containing presets.</param>
     public sealed record CliOptions(
         string PresetName,
@@ -19,8 +19,7 @@ namespace Mfr.Cli
         OutputFormat OutputFormat,
         bool IncludeHidden,
         bool ContinueOnRenameError,
-        bool Silent,
-        bool Verbose,
+        LogEventLevel LogLevel,
         string PresetsFilePath)
     ;
 }

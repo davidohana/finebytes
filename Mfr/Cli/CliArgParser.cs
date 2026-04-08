@@ -5,7 +5,7 @@ using Mfr.Models;
 
 namespace Mfr.Cli
 {
-    internal static class CliCommandFactory
+    internal static class CliArgParser
     {
         /// <summary>
         /// Parses command-line arguments into <see cref="CliOptions"/> using <c>CommandLineParser</c>.
@@ -81,11 +81,8 @@ namespace Mfr.Cli
             [CommandLine.Option("core", HelpText = "Continue on rename error (default: false).")]
             public bool ContinueOnRenameError { get; set; }
 
-            [CommandLine.Option('s', "silent", HelpText = "Only exit code, no output.")]
-            public bool Silent { get; set; }
-
-            [CommandLine.Option('v', "verbose", HelpText = "Reserved for future verbose diagnostics.")]
-            public bool Verbose { get; set; }
+            [CommandLine.Option('l', "log-level", HelpText = "Minimum log level: debug | info | warn | error.", Default = CliLogging.DefaultLogLevelName)]
+            public string LogLevel { get; set; } = CliLogging.DefaultLogLevelName;
 
             [Usage(ApplicationAlias = "mfr")]
             public static IEnumerable<Example> Examples
@@ -125,8 +122,7 @@ namespace Mfr.Cli
                     OutputFormat: format,
                     IncludeHidden: IncludeHidden,
                     ContinueOnRenameError: ContinueOnRenameError,
-                    Silent: Silent,
-                    Verbose: Verbose,
+                    LogLevel: CliLogging.ParseLogLevel(LogLevel),
                     PresetsFilePath: presetsFilePath);
             }
 
@@ -144,6 +140,7 @@ namespace Mfr.Cli
                     _ => throw new UserException($"Unknown output '{value}'. Use table|json|csv.")
                 };
             }
+
         }
     }
 

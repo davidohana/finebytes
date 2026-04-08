@@ -3,6 +3,7 @@ using System.Text.Json;
 
 using Mfr.Core;
 using Mfr.Models;
+using Serilog;
 
 namespace Mfr.Cli
 {
@@ -18,24 +19,47 @@ namespace Mfr.Cli
         /// <returns>The process exit code.</returns>
         public static CliExitCode Run(string[] args)
         {
+            CliOptions? options;
             try
             {
-                var options = CliCommandFactory.ParseArgs(args);
-                return options is null ? CliExitCode.Success : _Execute(options);
+                options = CliArgParser.ParseArgs(args);
             }
             catch (UserException ex)
             {
-                _PrintError(ex.Message);
+                Console.Error.WriteLine(ex.Message);
                 return CliExitCode.UserError;
             }
             catch (Exception ex)
             {
-                _PrintError(ex.ToString());
+                Console.Error.WriteLine(ex.ToString());
+                return CliExitCode.AppError;
+            }
+
+            // help or version requested
+            if (options is null)
+            {
+                return CliExitCode.Success;
+            }
+
+            using var loggerSession = CliLogging.Start(options.LogLevel);
+            var logger = loggerSession.Logger;
+            try
+            {
+                return _Execute(options, logger);
+            }
+            catch (UserException ex)
+            {
+                logger.Error("{Text}", ex.Message);
+                return CliExitCode.UserError;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("{Text}", ex.ToString());
                 return CliExitCode.AppError;
             }
         }
 
-        private static CliExitCode _Execute(CliOptions options)
+        private static CliExitCode _Execute(CliOptions options, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(options.PresetsFilePath))
             {
@@ -68,72 +92,67 @@ namespace Mfr.Cli
             if (previewErrors > 0)
             {
                 _PrintResult(
+                    logger: logger,
                     presetName: preset.Name,
                     totalFiles: renameItems.Count,
                     results: previewResults,
-                    format: options.OutputFormat,
-                    silent: options.Silent);
+                    format: options.OutputFormat);
                 return CliExitCode.UserError;
             }
 
             var commitFailFast = !options.ContinueOnRenameError;
-            var stats = renameList.Commit(failFast: commitFailFast);
+            var renameResults = renameList.Commit(failFast: commitFailFast);
 
             _PrintResult(
+                logger: logger,
                 presetName: preset.Name,
                 totalFiles: renameItems.Count,
-                results: stats,
-                format: options.OutputFormat,
-                silent: options.Silent);
-            return _CountErrors(stats) > 0 ? CliExitCode.UserError : CliExitCode.Success;
+                results: renameResults,
+                format: options.OutputFormat);
+            return _CountErrors(renameResults) > 0 ? CliExitCode.UserError : CliExitCode.Success;
         }
 
         private static void _PrintResult(
+            ILogger logger,
             string presetName,
             int totalFiles,
             IReadOnlyList<RenameResultItem> results,
-            OutputFormat format,
-            bool silent)
+            OutputFormat format)
         {
-            if (silent)
-            {
-                return;
-            }
-
             switch (format)
             {
                 case OutputFormat.Table:
-                    _PrintTable(presetName: presetName, totalFiles: totalFiles, results: results);
+                    _PrintTable(logger: logger, presetName: presetName, totalFiles: totalFiles, results: results);
                     break;
                 case OutputFormat.Json:
-                    _PrintJson(presetName: presetName, totalFiles: totalFiles, results: results);
+                    _PrintJson(logger: logger, presetName: presetName, totalFiles: totalFiles, results: results);
                     break;
                 case OutputFormat.Csv:
-                    _PrintCsv(results);
+                    _PrintCsv(logger: logger, results: results);
                     break;
                 default:
-                    _PrintTable(presetName: presetName, totalFiles: totalFiles, results: results);
+                    _PrintTable(logger: logger, presetName: presetName, totalFiles: totalFiles, results: results);
                     break;
             }
         }
 
-        private static void _PrintTable(string presetName, int totalFiles, IReadOnlyList<RenameResultItem> results)
+        private static void _PrintTable(ILogger logger, string presetName, int totalFiles, IReadOnlyList<RenameResultItem> results)
         {
             var errors = _CountErrors(results);
             var renamed = _CountStatus(results, RenameStatus.CommitOk);
             var skipped = _CountSkipped(results);
-            _PrintLine($"Preset: {presetName}");
-            _PrintLine($"Total: {totalFiles}  Renamed: {renamed}  Skipped: {skipped}  Errors: {errors}");
-            _PrintLine(string.Empty);
-            _PrintLine(string.Format("{0,-60} {1,-60} {2,-16} {3}", "Original", "Result", "Status", "Error"));
+            _PrintLine(logger, $"Preset: {presetName}");
+            _PrintLine(logger, $"Total: {totalFiles}  Renamed: {renamed}  Skipped: {skipped}  Errors: {errors}");
+            _PrintLine(logger, string.Empty);
+            _PrintLine(logger, string.Format("{0,-60} {1,-60} {2,-16} {3}", "Original", "Result", "Status", "Error"));
 
             foreach (var item in results)
             {
-                _PrintLine($"{_Trunc(item.OriginalPath, 60),-60} {_Trunc(item.ResultPath, 60),-60} {item.Status,-16} {item.Error ?? ""}");
+                _PrintLine(logger, $"{_Trunc(item.OriginalPath, 60),-60} {_Trunc(item.ResultPath, 60),-60} {item.Status,-16} {item.Error ?? ""}");
             }
         }
 
-        private static void _PrintJson(string presetName, int totalFiles, IReadOnlyList<RenameResultItem> results)
+        private static void _PrintJson(ILogger logger, string presetName, int totalFiles, IReadOnlyList<RenameResultItem> results)
         {
             var errors = _CountErrors(results);
             var renamed = _CountStatus(results, RenameStatus.CommitOk);
@@ -171,10 +190,10 @@ namespace Mfr.Cli
             writer.WriteEndObject();
 
             writer.Flush();
-            _PrintLine(Encoding.UTF8.GetString(ms.ToArray()));
+            _PrintLine(logger, Encoding.UTF8.GetString(ms.ToArray()));
         }
 
-        private static void _PrintCsv(IReadOnlyList<RenameResultItem> results)
+        private static void _PrintCsv(ILogger logger, IReadOnlyList<RenameResultItem> results)
         {
             var sb = new StringBuilder();
             _ = sb.AppendLine("original,result,status,error");
@@ -182,26 +201,12 @@ namespace Mfr.Cli
             {
                 _ = sb.AppendLine($"{_CsvEscape(item.OriginalPath)},{_CsvEscape(item.ResultPath)},{_CsvEscape(item.Status.ToString())},{_CsvEscape(item.Error ?? "")}");
             }
-            _PrintLine(sb.ToString());
+            _PrintLine(logger, sb.ToString());
         }
 
-        private static void _PrintLine(string text)
+        private static void _PrintLine(ILogger logger, string text)
         {
-            Console.WriteLine(text);
-        }
-
-        private static void _PrintError(string text)
-        {
-            var originalColor = Console.ForegroundColor;
-            try
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Error.WriteLine(text);
-            }
-            finally
-            {
-                Console.ForegroundColor = originalColor;
-            }
+            logger.Information("{Text}", text);
         }
 
         private static string _CsvEscape(string value)
