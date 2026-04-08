@@ -3,6 +3,7 @@ using System.Text.Json;
 
 using Mfr.Core;
 using Mfr.Models;
+using Mfr.Utils;
 using Serilog;
 
 namespace Mfr.Cli
@@ -61,13 +62,13 @@ namespace Mfr.Cli
 
         private static CliExitCode _Execute(CliOptions options, ILogger logger)
         {
-            if (string.IsNullOrWhiteSpace(options.PresetsFilePath))
+            if (options.PresetsFilePath.IsBlank())
             {
                 throw new UserException("Presets file path is required.");
             }
 
             var presetManager = new PresetManager(options.PresetsFilePath);
-            if (string.IsNullOrWhiteSpace(options.PresetName))
+            if (options.PresetName.IsBlank())
             {
                 throw new UserException("Preset name is required.");
             }

@@ -1,4 +1,5 @@
 using Mfr.Core;
+using Mfr.Utils;
 using Serilog;
 using Serilog.Events;
 
@@ -39,7 +40,7 @@ namespace Mfr.Cli
 
         internal static LogEventLevel ParseLogLevel(string? value)
         {
-            var normalized = string.IsNullOrWhiteSpace(value)
+            var normalized = value.IsBlank()
                 ? DefaultLogLevelName
                 : value.Trim().ToLowerInvariant();
 
@@ -80,7 +81,7 @@ namespace Mfr.Cli
 
         private static string _ResolveLogDirectoryPath(string? configuredLogDirectoryPath)
         {
-            if (!string.IsNullOrWhiteSpace(configuredLogDirectoryPath))
+            if (!configuredLogDirectoryPath.IsBlank())
             {
                 return configuredLogDirectoryPath.Trim();
             }

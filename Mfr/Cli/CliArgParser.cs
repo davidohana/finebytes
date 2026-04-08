@@ -2,6 +2,7 @@ using CommandLine.Text;
 
 using Mfr.Core;
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Cli
 {
@@ -115,7 +116,7 @@ namespace Mfr.Cli
             {
                 var format = _ParseOutputFormat(Output);
 
-                var presetsFilePath = string.IsNullOrWhiteSpace(PresetsFilePath)
+                var presetsFilePath = PresetsFilePath.IsBlank()
                     ? PresetManager.DefaultPresetsFilePath()
                     : PresetsFilePath;
 
@@ -126,13 +127,13 @@ namespace Mfr.Cli
                     IncludeHidden: IncludeHidden,
                     ContinueOnRenameError: ContinueOnRenameError,
                     LogLevel: CliLogging.ParseLogLevel(LogLevel),
-                    LogDirectoryPath: string.IsNullOrWhiteSpace(LogDirectoryPath) ? null : LogDirectoryPath.Trim(),
+                    LogDirectoryPath: LogDirectoryPath.IsBlank() ? null : LogDirectoryPath.Trim(),
                     PresetsFilePath: presetsFilePath);
             }
 
             private static OutputFormat _ParseOutputFormat(string? value)
             {
-                var normalized = string.IsNullOrWhiteSpace(value)
+                var normalized = value.IsBlank()
                     ? throw new UserException("Unknown output ''. Use table|json|csv.")
                     : value.Trim().ToLowerInvariant();
 
