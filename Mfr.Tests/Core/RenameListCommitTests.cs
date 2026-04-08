@@ -292,7 +292,7 @@ namespace Mfr.Tests.Core
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
             Assert.Equal(source, result[0].OriginalPath);
-            Assert.Equal(source, result[0].ResultPath);
+            Assert.Empty(result[0].Changes);
             Assert.Null(files[0].CommitError);
             Assert.True(File.Exists(source));
         }
@@ -324,7 +324,7 @@ namespace Mfr.Tests.Core
 
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
-            Assert.Equal(source, result[0].ResultPath);
+            Assert.Empty(result[0].Changes);
             Assert.Null(files[0].CommitError);
             Assert.True(File.Exists(source));
         }
@@ -370,7 +370,7 @@ namespace Mfr.Tests.Core
 
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitError, result[0].Status);
-            Assert.Equal(existingDestination, result[0].ResultPath);
+            Assert.Empty(result[0].Changes);
             Assert.True(File.Exists(source));
             Assert.True(File.Exists(existingDestination));
         }

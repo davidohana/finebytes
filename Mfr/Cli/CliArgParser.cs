@@ -1,7 +1,6 @@
 using CommandLine.Text;
 
 using Mfr.Core;
-using Mfr.Models;
 using Mfr.Utils;
 
 namespace Mfr.Cli
@@ -73,8 +72,8 @@ namespace Mfr.Cli
             [CommandLine.Option('d', "presets-file", HelpText = "Override presets JSON file path.")]
             public string? PresetsFilePath { get; set; }
 
-            [CommandLine.Option('o', "output", HelpText = "Output format: table | json | csv.", Default = "table")]
-            public string Output { get; set; } = "table";
+            [CommandLine.Option('f', "output-file", HelpText = "Optional JSON output file path.")]
+            public string? OutputFilePath { get; set; }
 
             [CommandLine.Option('i', "include-hidden", HelpText = "Include hidden/system files.")]
             public bool IncludeHidden { get; set; }
@@ -102,20 +101,18 @@ namespace Mfr.Cli
                         });
 
                     yield return new Example(
-                        "Run with JSON output",
+                        "Run with JSON output file",
                         new CliArguments
                         {
                             Sources = [@"C:\Music\*.mp3"],
                             PresetName = "clean-filenames",
-                            Output = "json"
+                            OutputFilePath = @"C:\temp\mfr-result.json"
                         });
                 }
             }
 
             internal CliOptions ToOptions()
             {
-                var format = _ParseOutputFormat(Output);
-
                 var presetsFilePath = PresetsFilePath.IsBlank()
                     ? PresetManager.DefaultPresetsFilePath()
                     : PresetsFilePath;
@@ -123,29 +120,13 @@ namespace Mfr.Cli
                 return new CliOptions(
                     PresetName: PresetName,
                     Sources: [.. Sources],
-                    OutputFormat: format,
+                    OutputFilePath: OutputFilePath.IsBlank() ? null : OutputFilePath.Trim(),
                     IncludeHidden: IncludeHidden,
                     ContinueOnRenameError: ContinueOnRenameError,
                     LogLevel: CliLogging.ParseLogLevel(LogLevel),
                     LogDirectoryPath: LogDirectoryPath.IsBlank() ? null : LogDirectoryPath.Trim(),
                     PresetsFilePath: presetsFilePath);
             }
-
-            private static OutputFormat _ParseOutputFormat(string? value)
-            {
-                var normalized = value.IsBlank()
-                    ? throw new UserException("Unknown output ''. Use table|json|csv.")
-                    : value.Trim().ToLowerInvariant();
-
-                return normalized switch
-                {
-                    "table" => OutputFormat.Table,
-                    "json" => OutputFormat.Json,
-                    "csv" => OutputFormat.Csv,
-                    _ => throw new UserException($"Unknown output '{value}'. Use table|json|csv.")
-                };
-            }
-
         }
     }
 

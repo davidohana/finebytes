@@ -131,9 +131,9 @@ namespace Mfr.Core
                     item.Status = RenameStatus.CommitSkipped;
                     results.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
-                        ResultPath: item.Preview?.FullPath ?? sourcePath,
                         Status: RenameStatus.CommitSkipped,
-                        Error: null));
+                        Error: null,
+                        Changes: []));
                     continue;
                 }
 
@@ -142,11 +142,12 @@ namespace Mfr.Core
                 {
                     item.Commit();
                     item.Status = RenameStatus.CommitOk;
+                    var changes = _BuildFileNameChanges(sourcePath: sourcePath, destinationPath: destPath);
                     results.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
-                        ResultPath: destPath,
                         Status: RenameStatus.CommitOk,
-                        Error: null));
+                        Error: null,
+                        Changes: changes));
                 }
                 catch (Exception ex)
                 {
@@ -159,9 +160,9 @@ namespace Mfr.Core
                         destPath);
                     results.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
-                        ResultPath: destPath,
                         Status: RenameStatus.CommitError,
-                        Error: item.CommitError.Message));
+                        Error: item.CommitError.Message,
+                        Changes: []));
                     stopped = failFast;
                 }
             }
@@ -181,6 +182,32 @@ namespace Mfr.Core
                 commitErrorCount);
 
             return results;
+        }
+
+        /// <summary>
+        /// Builds a file-name change list for a rename result.
+        /// </summary>
+        /// <param name="sourcePath">Original source path.</param>
+        /// <param name="destinationPath">Destination path.</param>
+        /// <returns>Collection containing the file name change when the file name was modified.</returns>
+        private static IReadOnlyList<RenamePropertyChange> _BuildFileNameChanges(string sourcePath, string destinationPath)
+        {
+            var sourceFileName = Path.GetFileName(sourcePath);
+            var destinationFileName = Path.GetFileName(destinationPath);
+            var changes = (IReadOnlyList<RenamePropertyChange>)[];
+            var fileNameChanged = !string.Equals(sourceFileName, destinationFileName, StringComparison.OrdinalIgnoreCase);
+            if (fileNameChanged)
+            {
+                changes =
+                [
+                    new RenamePropertyChange(
+                        Property: "FileName",
+                        OldValue: sourceFileName,
+                        NewValue: destinationFileName)
+                ];
+            }
+
+            return changes;
         }
 
         /// <summary>

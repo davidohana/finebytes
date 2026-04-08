@@ -1,4 +1,3 @@
-using Mfr.Models;
 using Serilog.Events;
 
 namespace Mfr.Cli
@@ -8,7 +7,7 @@ namespace Mfr.Cli
     /// </summary>
     /// <param name="PresetName">Name of the preset to apply for the file renaming.</param>
     /// <param name="Sources">List of source files, folders, or wildcard patterns to process.</param>
-    /// <param name="OutputFormat">The format in which output should be printed (table, JSON, CSV).</param>
+    /// <param name="OutputFilePath">Optional output file path where JSON results are written.</param>
     /// <param name="IncludeHidden">Whether to include hidden and system files.</param>
     /// <param name="ContinueOnRenameError">Whether commit should continue after per-item rename errors.</param>
     /// <param name="LogLevel">Minimum log level to emit.</param>
@@ -17,7 +16,7 @@ namespace Mfr.Cli
     public sealed record CliOptions(
         string PresetName,
         IReadOnlyList<string> Sources,
-        OutputFormat OutputFormat,
+        string? OutputFilePath,
         bool IncludeHidden,
         bool ContinueOnRenameError,
         LogEventLevel LogLevel,
