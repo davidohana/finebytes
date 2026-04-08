@@ -19,7 +19,6 @@ namespace Mfr.Cli
         {
             var resolvedLogDirectoryPath = _ResolveLogDirectoryPath(logDirectoryPath);
             _ = Directory.CreateDirectory(resolvedLogDirectoryPath);
-            _PruneSessionLogFiles(resolvedLogDirectoryPath, MaxSessionLogFiles);
 
             var fileName = $"{SessionLogPrefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{SessionLogExtension}";
             var logFilePath = Path.Combine(resolvedLogDirectoryPath, fileName);
@@ -38,6 +37,7 @@ namespace Mfr.Cli
                 .CreateLogger();
 
             Log.Logger = logger;
+            _PruneSessionLogFiles(resolvedLogDirectoryPath, MaxSessionLogFiles);
             logger.Debug(
                 "Logging initialized. Level: {LogLevel}. File: {LogFilePath}",
                 logLevel,
@@ -82,7 +82,17 @@ namespace Mfr.Cli
 
             foreach (var fileInfo in sessionLogFilePaths.Skip(maxSessionFiles))
             {
-                fileInfo.Delete();
+                try
+                {
+                    fileInfo.Delete();
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(
+                        ex,
+                        "Failed to delete old log file '{LogFilePath}' during pruning.",
+                        fileInfo.FullName);
+                }
             }
         }
 

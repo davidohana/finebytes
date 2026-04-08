@@ -66,7 +66,7 @@ namespace Mfr.Tests.Cli
                 .OrderBy(name => name, StringComparer.Ordinal)
                 .ToList();
 
-            Assert.Equal(CliLogging.MaxSessionLogFiles + 1, remainingNames.Count);
+            Assert.Equal(CliLogging.MaxSessionLogFiles, remainingNames.Count);
             Assert.DoesNotContain("session-000.log", remainingNames);
             Assert.DoesNotContain("session-001.log", remainingNames);
             Assert.DoesNotContain("session-002.log", remainingNames);
