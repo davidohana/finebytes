@@ -21,12 +21,6 @@ namespace Mfr.Core
             {
                 filter.Apply(item);
             }
-
-            // If no preview was generated, copy from the original.
-            if (!item.HasPreview())
-            {
-                item.CopyPreviewFromOriginal();
-            }
         }
     }
 }

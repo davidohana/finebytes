@@ -81,11 +81,6 @@ namespace Mfr.Core
                 try
                 {
                     renameItem.ApplyFilters(preset.Filters);
-                    if (!renameItem.HasPreview())
-                    {
-                        throw new InvalidOperationException("Preview not generated");
-                    }
-
                     renameItem.Status = RenameStatus.PreviewOk;
                 }
                 catch (Exception ex)
@@ -126,7 +121,7 @@ namespace Mfr.Core
                 item.CommitError = null;
                 var sourcePath = item.Original.FullPath;
 
-                if (stopped || !item.HasPreview() || item.IsPreviewPathSameAsOriginal())
+                if (stopped || item.IsPreviewPathSameAsOriginal())
                 {
                     item.Status = RenameStatus.CommitSkipped;
                     results.Add(new RenameResultItem(
@@ -137,7 +132,7 @@ namespace Mfr.Core
                     continue;
                 }
 
-                var destPath = item.Preview!.FullPath;
+                var destPath = item.Preview.FullPath;
                 try
                 {
                     item.Commit();
@@ -353,13 +348,13 @@ namespace Mfr.Core
         private void _MarkPreviewConflicts()
         {
             var candidateItems = _renameItems
-                .Where(item => item.HasPreview() && item.Status == RenameStatus.PreviewOk)
+                .Where(item => item.Status == RenameStatus.PreviewOk)
                 .ToList();
             var sourcePathToIsMoving = candidateItems
                 .Select(item => item.Original.FullPath)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
             var destinationPathToIsDuplicate = candidateItems
-                .Select(item => item.Preview!.FullPath)
+                .Select(item => item.Preview.FullPath)
                 .GroupBy(destinationPath => destinationPath, StringComparer.OrdinalIgnoreCase)
                 .Where(group => group.Count() > 1)
                 .Select(group => group.Key)
@@ -367,7 +362,7 @@ namespace Mfr.Core
 
             foreach (var item in candidateItems)
             {
-                var destinationPath = item.Preview!.FullPath;
+                var destinationPath = item.Preview.FullPath;
                 var destinationPathIsDuplicate = destinationPathToIsDuplicate.Contains(destinationPath);
                 if (destinationPathIsDuplicate)
                 {

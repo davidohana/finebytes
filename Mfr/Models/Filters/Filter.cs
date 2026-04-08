@@ -44,7 +44,7 @@ namespace Mfr.Models.Filters
                 throw new NotSupportedException($"Phase 1 only supports target.family='FileName'. Filter '{Type}' got '{Target.Family}'.");
             }
 
-            var sourceFileEntry = item.Preview ?? item.Original;
+            var sourceFileEntry = item.Preview;
             var part = fileTarget.FileNamePart;
             var partValue = part switch
             {

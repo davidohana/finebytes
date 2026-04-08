@@ -35,7 +35,6 @@ namespace Mfr.Tests.Core
 
             item.ApplyFilters(filters);
 
-            Assert.NotNull(item.Preview);
             Assert.Equal(item.Original.FullPath, item.Preview.FullPath);
             Assert.Equal(item.Original.Prefix, item.Preview.Prefix);
             Assert.Equal(item.Original.Extension, item.Preview.Extension);
@@ -62,7 +61,6 @@ namespace Mfr.Tests.Core
 
             item.ApplyFilters(filters);
 
-            Assert.NotNull(item.Preview);
             Assert.Equal("song new", item.Preview.Prefix);
             Assert.Equal(".mp3", item.Preview.Extension);
             Assert.Equal(Path.Combine(item.Original.DirectoryPath, "song new.mp3"), item.Preview.FullPath);
@@ -89,7 +87,6 @@ namespace Mfr.Tests.Core
 
             item.ApplyFilters(filters);
 
-            Assert.NotNull(item.Preview);
             Assert.Equal("renamed.final", item.Preview.Prefix);
             Assert.Equal(".wav", item.Preview.Extension);
             Assert.Equal(Path.Combine(item.Original.DirectoryPath, "renamed.final.wav"), item.Preview.FullPath);

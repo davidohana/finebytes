@@ -56,9 +56,8 @@ namespace Mfr.Models
 
         /// <summary>
         /// Gets the current preview snapshot after filter application.
-        /// A <c>null</c> value means no preview has been generated yet.
         /// </summary>
-        public FileMeta? Preview { get; private set; }
+        public FileMeta Preview { get; private set; } = original.Clone();
 
         /// <summary>
         /// Gets the latest error captured while generating preview for this item.
@@ -80,7 +79,7 @@ namespace Mfr.Models
         /// </summary>
         public void ResetState()
         {
-            Preview = null;
+            Preview = Original.Clone();
             PreviewError = null;
             CommitError = null;
             Status = RenameStatus.Init;
@@ -88,17 +87,12 @@ namespace Mfr.Models
 
         internal void ClearPreview()
         {
-            Preview = null;
+            Preview = Original.Clone();
         }
 
         internal void SetPreviewValue(FileNamePart part, string partValue)
         {
-            if (!HasPreview())
-            {
-                Preview = Original.Clone();
-            }
-
-            var previewFileMeta = Preview!;
+            var previewFileMeta = Preview;
             switch (part)
             {
                 case FileNamePart.Prefix:
@@ -117,27 +111,15 @@ namespace Mfr.Models
             }
         }
 
-        internal void CopyPreviewFromOriginal()
-        {
-            Preview = Original.Clone();
-        }
-
         internal void SetPreviewError(string message, Exception? cause)
         {
             PreviewError = new RenameItemError(Message: message, Cause: cause);
             Status = RenameStatus.PreviewError;
         }
 
-        internal bool HasPreview()
-        {
-            return Preview is not null;
-        }
-
         internal bool IsPreviewPathSameAsOriginal()
         {
-            var preview = Preview;
-            return HasPreview()
-                && string.Equals(Original.FullPath, preview!.FullPath, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(Original.FullPath, Preview.FullPath, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -145,21 +127,15 @@ namespace Mfr.Models
         /// </summary>
         public void Commit()
         {
-            if (!HasPreview())
-            {
-                throw new InvalidOperationException("Preview is not set. Run preview before apply.");
-            }
-
             if (IsPreviewPathSameAsOriginal())
             {
-                Preview = null;
+                Preview = Original.Clone();
                 return;
             }
 
-            var preview = Preview!;
-            File.Move(Original.FullPath, preview.FullPath, overwrite: false);
-            Original = preview;
-            Preview = null;
+            File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
+            Original = Preview;
+            Preview = Original.Clone();
         }
 
     }

@@ -45,9 +45,7 @@ namespace Mfr.Tests.Models.Filters
         {
             var file = CreateFile(inputPrefix, extension, globalIndex, inFolderIndex, directory);
             filter.Apply(file);
-            return file.Preview is null
-                ? throw new InvalidOperationException("Filter application did not produce a preview.")
-                : file.Preview.Prefix;
+            return file.Preview.Prefix;
         }
     }
 }
