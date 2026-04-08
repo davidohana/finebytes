@@ -35,6 +35,10 @@ namespace Mfr.Cli
                 .CreateLogger();
 
             Log.Logger = logger;
+            logger.Debug(
+                "Logging initialized. Level: {LogLevel}. File: {LogFilePath}",
+                logLevel,
+                logFilePath);
             return new CliLoggerSession(logger, logFilePath);
         }
 
