@@ -1,6 +1,7 @@
 using Mfr.Core;
 using Mfr.Utils;
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using Serilog.Events;
 
 namespace Mfr.Cli
@@ -11,7 +12,7 @@ namespace Mfr.Cli
         internal const int MaxSessionLogFiles = 100;
         private const string SessionLogPrefix = "session-";
         private const string SessionLogExtension = ".log";
-        private const string ConsoleOutputTemplate = "{Message:lj}{NewLine}";
+        private const string ConsoleOutputTemplate = "[{Level:u3}] {Message:lj}{NewLine}";
         private const string FileOutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}";
 
         internal static CliLoggerSession Start(LogEventLevel logLevel, string? logDirectoryPath)
@@ -27,6 +28,7 @@ namespace Mfr.Cli
                 .MinimumLevel.Is(logLevel)
                 .WriteTo.Console(
                     outputTemplate: ConsoleOutputTemplate,
+                    theme: AnsiConsoleTheme.Code,
                     standardErrorFromLevel: LogEventLevel.Error)
                 .WriteTo.File(
                     path: logFilePath,
