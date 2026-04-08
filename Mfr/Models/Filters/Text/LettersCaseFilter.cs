@@ -58,11 +58,11 @@ namespace Mfr.Models.Filters.Text
                 return input;
             }
 
-            var skip = new HashSet<string>(skipWords, StringComparer.OrdinalIgnoreCase);
+            var skipWordToIsExcluded = new HashSet<string>(skipWords, StringComparer.OrdinalIgnoreCase);
             return _WordRegex().Replace(input, m =>
             {
                 var word = m.Value;
-                return skip.Contains(word)
+                return skipWordToIsExcluded.Contains(word)
                     ? word.ToLowerInvariant()
                     : word.Length == 1 ? word.ToUpperInvariant() : char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant();
             });

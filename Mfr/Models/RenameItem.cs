@@ -23,11 +23,6 @@ namespace Mfr.Models
         PreviewOk,
 
         /// <summary>
-        /// Preview computed no effective change and was skipped.
-        /// </summary>
-        PreviewNoChange,
-
-        /// <summary>
         /// Preview failed with an error.
         /// </summary>
         PreviewError,
@@ -41,11 +36,6 @@ namespace Mfr.Models
         /// Commit was skipped.
         /// </summary>
         CommitSkipped,
-
-        /// <summary>
-        /// Commit was skipped due to destination conflict.
-        /// </summary>
-        CommitConflictSkipped,
 
         /// <summary>
         /// Commit failed due to an error.
@@ -103,19 +93,24 @@ namespace Mfr.Models
 
         internal void SetPreviewValue(FileNamePart part, string partValue)
         {
-            var sourceFileMeta = _EnsurePreview();
+            if (!HasPreview())
+            {
+                Preview = Original.Clone();
+            }
+
+            var previewFileMeta = Preview!;
             switch (part)
             {
                 case FileNamePart.Prefix:
-                    sourceFileMeta.Prefix = partValue;
+                    previewFileMeta.Prefix = partValue;
                     break;
                 case FileNamePart.Extension:
-                    sourceFileMeta.Extension = partValue;
+                    previewFileMeta.Extension = partValue;
                     break;
                 case FileNamePart.Full:
                     var fullName = Path.GetFileName(partValue);
-                    sourceFileMeta.Extension = Path.GetExtension(fullName);
-                    sourceFileMeta.Prefix = Path.GetFileNameWithoutExtension(fullName);
+                    previewFileMeta.Extension = Path.GetExtension(fullName);
+                    previewFileMeta.Prefix = Path.GetFileNameWithoutExtension(fullName);
                     break;
                 default:
                     throw new InvalidOperationException($"Unknown fileNamePart '{part}'.");
@@ -127,40 +122,45 @@ namespace Mfr.Models
             Preview = Original.Clone();
         }
 
+        internal void SetPreviewError(string message, Exception? cause)
+        {
+            PreviewError = new RenameItemError(Message: message, Cause: cause);
+            Status = RenameStatus.PreviewError;
+        }
+
+        internal bool HasPreview()
+        {
+            return Preview is not null;
+        }
+
+        internal bool IsPreviewPathSameAsOriginal()
+        {
+            var preview = Preview;
+            return HasPreview()
+                && string.Equals(Original.FullPath, preview!.FullPath, StringComparison.OrdinalIgnoreCase);
+        }
+
         /// <summary>
         /// Applies the preview rename on disk for this item.
         /// </summary>
-        public void CommitPreview()
+        public void Commit()
         {
-            if (Preview is null)
+            if (!HasPreview())
             {
                 throw new InvalidOperationException("Preview is not set. Run preview before apply.");
             }
 
-            if (string.Equals(Original.FullPath, Preview.FullPath, StringComparison.OrdinalIgnoreCase))
+            if (IsPreviewPathSameAsOriginal())
             {
                 Preview = null;
                 return;
             }
 
-            File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
-            Original = Preview;
+            var preview = Preview!;
+            File.Move(Original.FullPath, preview.FullPath, overwrite: false);
+            Original = preview;
             Preview = null;
         }
 
-        /// <summary>
-        /// Returns the current preview snapshot, cloning from original when missing.
-        /// </summary>
-        /// <returns>The existing or newly created preview snapshot.</returns>
-        private FileMeta _EnsurePreview()
-        {
-            if (Preview is not null)
-            {
-                return Preview;
-            }
-
-            Preview = Original.Clone();
-            return Preview;
-        }
     }
 }

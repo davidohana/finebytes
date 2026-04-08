@@ -9,7 +9,7 @@ namespace Mfr.Cli
     /// <param name="Sources">List of source files, folders, or wildcard patterns to process.</param>
     /// <param name="OutputFormat">The format in which output should be printed (table, JSON, CSV).</param>
     /// <param name="IncludeHidden">Whether to include hidden and system files.</param>
-    /// <param name="FailFast">Whether to stop processing on the first preview or rename error.</param>
+    /// <param name="ContinueOnRenameError">Whether commit should continue after per-item rename errors.</param>
     /// <param name="Silent">Suppress all output except for the process exit code.</param>
     /// <param name="Verbose">Reserved for future verbose output and diagnostics.</param>
     /// <param name="PresetsFilePath">Path to the JSON file containing presets.</param>
@@ -18,7 +18,7 @@ namespace Mfr.Cli
         IReadOnlyList<string> Sources,
         OutputFormat OutputFormat,
         bool IncludeHidden,
-        bool FailFast,
+        bool ContinueOnRenameError,
         bool Silent,
         bool Verbose,
         string PresetsFilePath)

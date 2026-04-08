@@ -16,13 +16,24 @@ namespace Mfr.Cli
         /// <exception cref="UserException">Thrown when argument parsing cannot produce options.</exception>
         public static CliOptions? ParseArgs(string[] args)
         {
-            var result = CommandLine.Parser.Default.ParseArguments<CliArguments>(args);
+            var normalizedArgs = args.Select(_NormalizeDashOptionAlias).ToArray();
+            var result = CommandLine.Parser.Default.ParseArguments<CliArguments>(normalizedArgs);
             return result switch
             {
                 CommandLine.Parsed<CliArguments> parsed => parsed.Value.ToOptions(),
                 CommandLine.NotParsed<CliArguments> notParsed => _MapNotParsed(notParsed.Errors),
                 _ => throw new UserException("Invalid arguments."),
             };
+
+            // Support multi-letter single-dash abbreviations (-core) by normalizing to long options.
+            static string _NormalizeDashOptionAlias(string arg)
+            {
+                return arg switch
+                {
+                    "-core" => "--core",
+                    _ => arg
+                };
+            }
 
             static CliOptions? _MapNotParsed(IEnumerable<CommandLine.Error> errors)
             {
@@ -67,8 +78,8 @@ namespace Mfr.Cli
             [CommandLine.Option('i', "include-hidden", HelpText = "Include hidden/system files.")]
             public bool IncludeHidden { get; set; }
 
-            [CommandLine.Option('f', "fail-fast", HelpText = "Stop on first preview or rename error (default: true).", Default = true)]
-            public bool FailFast { get; set; } = true;
+            [CommandLine.Option("core", HelpText = "Continue on rename error (default: false).")]
+            public bool ContinueOnRenameError { get; set; }
 
             [CommandLine.Option('s', "silent", HelpText = "Only exit code, no output.")]
             public bool Silent { get; set; }
@@ -113,7 +124,7 @@ namespace Mfr.Cli
                     Sources: [.. Sources],
                     OutputFormat: format,
                     IncludeHidden: IncludeHidden,
-                    FailFast: FailFast,
+                    ContinueOnRenameError: ContinueOnRenameError,
                     Silent: Silent,
                     Verbose: Verbose,
                     PresetsFilePath: presetsFilePath);

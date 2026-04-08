@@ -12,5 +12,7 @@ alwaysApply: true
 - Ternary usage: only use ternary for simple value selection (`condition ? valueA : valueB` with trivial operands).
 - Avoid complex ternary branches that call functions, construct objects, throw, or span multiple lines; use `if`/`else` instead.
 - Statement complexity: avoid complex single statements; split them into multiple statements with well-named local variables.
+- Boolean complexity: extract non-trivial boolean conditions into a well-named local (e.g. `isConflict`) before branching.
 - Named arguments: use named args when parameter meaning is not obvious by position (especially multiple same-type args).
+- Dictionary/HashSet naming: use `keyToVal`-style names (for sets, use boolean-style values like `pathToIsIncluded`).
 

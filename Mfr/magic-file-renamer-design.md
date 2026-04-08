@@ -81,8 +81,8 @@ Core capabilities:
 │        ┌───────────────────────┼───────────────────┐           │
 │        ▼                       ▼                   ▼           │
 │  ┌───────────┐         ┌─────────────┐    ┌──────────────┐    │
-│  │FileScanner│         │FilterEngine  │    │MetadataLayer │    │
-│  │Channel<T> │         │IFilterStep[] │    │TagLibSharp   │    │
+│  │FileScanner│         │RenameList    │    │MetadataLayer │    │
+│  │Channel<T> │         │Preview+Commit│    │TagLibSharp   │    │
 │  └───────────┘         └─────────────┘    │MetadataEx.   │    │
 │                                            │GeoNames API  │    │
 │                                            │FreeDB API    │    │
@@ -458,7 +458,7 @@ The Mfr implementation is intentionally phased to de-risk the feature set. Each 
 
 Scope:
 - `FileEntry` scanning.
-- `FilterEngine` with a small subset of filters (case, space, trimming, basic replace, formatter, counter).
+- `RenameList` preview/commit flow with a small subset of filters (case, space, trimming, basic replace, formatter, counter).
 - JSON contracts for presets and sessions.
 
 Out of scope:
@@ -809,7 +809,7 @@ Every filter has: `enabled` toggle, `target` field, and a type-specific `options
 - `fileNameMode` — how to interpret the filename (Prefix / Extension / Full) when `family` is `FileName`.
 - `directoryLevel` — which parent directory to target when `family` is `DirectorySegment` (0 = direct parent, 1 = parent-of-parent, etc.).
 
-In code, the JSON `type` discriminator maps to a concrete typed `Filter<TOptions>` record (one per filter), and the JSON `target.family` maps to a concrete derived `FilterTarget` record (one per family). `FilterEngine` passes the typed filter definition into `IFilterStep<TFilterDefinition>`.
+In code, the JSON `type` discriminator maps to a concrete typed `Filter<TOptions>` record (one per filter), and the JSON `target.family` maps to a concrete derived `FilterTarget` record (one per family). `RenameList.Preview(...)` applies each typed filter definition to build per-item preview paths.
 
 A **Filter Options** panel (gear icon on each filter row) provides:
 - **Apply Target** override without editing the JSON
@@ -1616,7 +1616,7 @@ public interface IUndoJournal
 }
 ```
 
-Concrete filters such as `LettersCaseFilter`, `FormatterFilter`, `ReplacerFilter`, etc. each implement `IFilterStep<TFilterDefinition>` for their corresponding typed `Filter` record, and are resolved by `FilterEngine` based on `Filter.Type`.
+Concrete filters such as `LettersCaseFilter`, `FormatterFilter`, `ReplacerFilter`, etc. each implement `IFilterStep<TFilterDefinition>` for their corresponding typed `Filter` record, and are resolved during preview based on `Filter.Type`.
 
 ### 11.3 Conflict detection rules
 

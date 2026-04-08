@@ -23,7 +23,7 @@ namespace Mfr.Core
             }
 
             // If no preview was generated, copy from the original.
-            if (item.Preview is null)
+            if (!item.HasPreview())
             {
                 item.CopyPreviewFromOriginal();
             }

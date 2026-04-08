@@ -7,9 +7,9 @@ using Mfr.Utils;
 namespace Mfr.Tests.Core
 {
     /// <summary>
-    /// Tests rename preview and commit behavior in the filter engine.
+    /// Tests rename preview and commit behavior through <see cref="RenameList"/>.
     /// </summary>
-    public class FilterEngineTests : IDisposable
+    public class RenameListCommitTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
 
@@ -23,9 +23,9 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
-        /// Verifies that duplicate destinations are treated as conflicts and skipped.
+        /// Verifies that duplicate destinations are surfaced as commit-time rename errors.
         /// </summary>
-        public void ConflictSkipped_ForDuplicateDestinations()
+        public void CommitError_ForDuplicateDestinations()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var a = dir.CombinePath("a.mp3");
@@ -51,15 +51,15 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            renameList.Preview(preset, failFast: false);
-            var result = FilterEngine.Commit(files, failFast: false);
+            renameList.Preview(preset);
+            var result = renameList.Commit(failFast: false);
 
-            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitConflictSkipped));
-            Assert.Equal(RenameStatus.CommitConflictSkipped, result[0].Status);
-            Assert.Equal(RenameStatus.CommitConflictSkipped, result[1].Status);
-            Assert.DoesNotContain(files, item => item.PreviewError is not null);
-            Assert.True(File.Exists(a), "source file 'a' should remain on conflict skip");
-            Assert.True(File.Exists(b), "source file 'b' should remain on conflict skip");
+            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitError));
+            Assert.Equal(2, files.Count(item => item.PreviewError is not null));
+            Assert.Equal(1, files.Count(item => item.CommitError is not null));
+            Assert.True(File.Exists(a) ^ File.Exists(b), "exactly one source file should remain after one succeeds and one fails");
+            Assert.True(File.Exists(dir.CombinePath("same.mp3")));
         }
 
         [Fact]
@@ -99,8 +99,8 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            renameList.Preview(preset, failFast: false);
-            var result = FilterEngine.Commit(files, failFast: false);
+            renameList.Preview(preset);
+            var result = renameList.Commit(failFast: false);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
@@ -150,12 +150,12 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            renameList.Preview(preset, failFast: false);
+            renameList.Preview(preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
             File.Delete(firstSource);
 
-            var result = FilterEngine.Commit(files, failFast: true);
+            var result = renameList.Commit(failFast: true);
 
             Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitError));
             Assert.Equal(0, result.Count(x => x.Status == RenameStatus.CommitOk));
@@ -207,12 +207,12 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            renameList.Preview(preset, failFast: false);
+            renameList.Preview(preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
             File.Delete(firstSource);
 
-            var result = FilterEngine.Commit(files, failFast: false);
+            var result = renameList.Commit(failFast: false);
 
             Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitError));
             Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitOk));
@@ -255,7 +255,7 @@ namespace Mfr.Tests.Core
                 ]
             };
 
-            renameList.Preview(failingPreset, failFast: false);
+            renameList.Preview(failingPreset);
             var previewError = files[0].PreviewError;
             Assert.NotNull(previewError);
             Assert.NotNull(previewError.Cause);
@@ -269,8 +269,158 @@ namespace Mfr.Tests.Core
                 Filters = []
             };
 
-            renameList.Preview(successPreset, failFast: false);
+            renameList.Preview(successPreset);
             Assert.Null(files[0].PreviewError);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that commit skips items when preview has not been run.
+        /// </summary>
+        public void Commit_SkipsItem_WhenPreviewIsMissing()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = dir.CombinePath("track.mp3");
+            File.WriteAllText(source, "x");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([source]);
+            var files = renameList.RenameItems;
+
+            var result = renameList.Commit(failFast: false);
+
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
+            Assert.Equal(source, result[0].OriginalPath);
+            Assert.Equal(source, result[0].ResultPath);
+            Assert.Null(files[0].CommitError);
+            Assert.True(File.Exists(source));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that commit skips items whose preview destination equals the source path.
+        /// </summary>
+        public void Commit_SkipsItem_WhenPreviewDestinationMatchesSource()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = dir.CombinePath("track.mp3");
+            File.WriteAllText(source, "x");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([source]);
+            var files = renameList.RenameItems;
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "no-change",
+                Description = null,
+                Filters = []
+            };
+
+            renameList.Preview(preset);
+            var result = renameList.Commit(failFast: false);
+
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
+            Assert.Equal(source, result[0].ResultPath);
+            Assert.Null(files[0].CommitError);
+            Assert.True(File.Exists(source));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that commit reports an error when destination already exists on disk.
+        /// </summary>
+        public void Commit_ErrorsItem_WhenDestinationAlreadyExists()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = dir.CombinePath("track.mp3");
+            var existingDestination = dir.CombinePath("001.mp3");
+            File.WriteAllText(source, "x");
+            File.WriteAllText(existingDestination, "occupied");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([source]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "counter",
+                Description = null,
+                Filters =
+                [
+                    new CounterFilter(
+                        Enabled: true,
+                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Options: new CounterOptions(
+                            Start: 1,
+                            Step: 1,
+                            Width: 3,
+                            PadChar: "0",
+                            Position: CounterPosition.Replace,
+                            Separator: " - ",
+                            ResetPerFolder: false))
+                ]
+            };
+
+            renameList.Preview(preset);
+            var result = renameList.Commit(failFast: false);
+
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitError, result[0].Status);
+            Assert.Equal(existingDestination, result[0].ResultPath);
+            Assert.True(File.Exists(source));
+            Assert.True(File.Exists(existingDestination));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that an existing destination is allowed when that path is also being moved away in this batch.
+        /// </summary>
+        public void Commit_AllowsExistingDestination_WhenItWillBeRenamedAway()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourceA = dir.CombinePath("a.mp3");
+            var sourceB = dir.CombinePath("b.mp3");
+            var destinationC = dir.CombinePath("c.mp3");
+            File.WriteAllText(sourceA, "x");
+            File.WriteAllText(sourceB, "y");
+
+            var renameList = new RenameList(includeHidden: true);
+            // Order matters for one-pass commit: move b->c first, then a->b.
+            renameList.AddSources([sourceB, sourceA]);
+            var files = renameList.RenameItems;
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "chain-shift",
+                Description = null,
+                Filters =
+                [
+                    new ReplacerFilter(
+                        Enabled: true,
+                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Options: new ReplacerOptions("b", "c", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false)),
+                    new ReplacerFilter(
+                        Enabled: true,
+                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Options: new ReplacerOptions("a", "b", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false))
+                ]
+            };
+
+            renameList.Preview(preset);
+            Assert.DoesNotContain(files, item => item.PreviewError is not null);
+
+            var result = renameList.Commit(failFast: false);
+
+            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.DoesNotContain(result, item => item.Status == RenameStatus.CommitError);
+            Assert.False(File.Exists(sourceA));
+            Assert.True(File.Exists(sourceB));
+            Assert.True(File.Exists(destinationC));
         }
 
         private sealed record UnsupportedTarget : FilterTarget

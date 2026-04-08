@@ -62,26 +62,22 @@ namespace Mfr.Cli
                 throw new UserException("No files matched the provided sources.");
             }
 
-            renameList.Preview(preset: preset, failFast: options.FailFast);
-            if (options.FailFast)
+            renameList.Preview(preset: preset);
+            var previewResults = _BuildPreviewResults(renameItems);
+            var previewErrors = _CountErrors(previewResults);
+            if (previewErrors > 0)
             {
-                var previewStats = _BuildPreviewResults(renameItems);
-                var previewErrors = _CountErrors(previewStats);
-                if (previewErrors > 0)
-                {
-                    _PrintResult(
-                        presetName: preset.Name,
-                        totalFiles: renameItems.Count,
-                        results: previewStats,
-                        format: options.OutputFormat,
-                        silent: options.Silent);
-                    return CliExitCode.UserError;
-                }
+                _PrintResult(
+                    presetName: preset.Name,
+                    totalFiles: renameItems.Count,
+                    results: previewResults,
+                    format: options.OutputFormat,
+                    silent: options.Silent);
+                return CliExitCode.UserError;
             }
 
-            var stats = FilterEngine.Commit(
-                renameItem: renameItems,
-                failFast: options.FailFast);
+            var commitFailFast = !options.ContinueOnRenameError;
+            var stats = renameList.Commit(failFast: commitFailFast);
 
             _PrintResult(
                 presetName: preset.Name,
@@ -126,9 +122,8 @@ namespace Mfr.Cli
             var errors = _CountErrors(results);
             var renamed = _CountStatus(results, RenameStatus.CommitOk);
             var skipped = _CountSkipped(results);
-            var conflicts = _CountStatus(results, RenameStatus.CommitConflictSkipped);
             _PrintLine($"Preset: {presetName}");
-            _PrintLine($"Total: {totalFiles}  Renamed: {renamed}  Skipped: {skipped}  Conflicts: {conflicts}  Errors: {errors}");
+            _PrintLine($"Total: {totalFiles}  Renamed: {renamed}  Skipped: {skipped}  Errors: {errors}");
             _PrintLine(string.Empty);
             _PrintLine(string.Format("{0,-60} {1,-60} {2,-16} {3}", "Original", "Result", "Status", "Error"));
 
@@ -143,7 +138,6 @@ namespace Mfr.Cli
             var errors = _CountErrors(results);
             var renamed = _CountStatus(results, RenameStatus.CommitOk);
             var skipped = _CountSkipped(results);
-            var conflicts = _CountStatus(results, RenameStatus.CommitConflictSkipped);
             using var ms = new MemoryStream();
             using var writer = new Utf8JsonWriter(ms, new JsonWriterOptions { Indented = true });
 
@@ -153,7 +147,6 @@ namespace Mfr.Cli
             writer.WriteNumber("renamed", renamed);
             writer.WriteNumber("skipped", skipped);
             writer.WriteNumber("errors", errors);
-            writer.WriteNumber("conflicts", conflicts);
 
             writer.WritePropertyName("results");
             writer.WriteStartArray();
@@ -235,7 +228,7 @@ namespace Mfr.Cli
 
         private static int _CountSkipped(IReadOnlyList<RenameResultItem> results)
         {
-            return results.Count(item => item.Status is RenameStatus.PreviewNoChange or RenameStatus.CommitSkipped);
+            return results.Count(item => item.Status == RenameStatus.CommitSkipped);
         }
 
         private static List<RenameResultItem> _BuildPreviewResults(IReadOnlyList<RenameItem> renameItems)
@@ -243,6 +236,7 @@ namespace Mfr.Cli
             var results = new List<RenameResultItem>();
             foreach (var item in renameItems)
             {
+                // In preview fail-fast mode, untouched trailing items have no preview or error and should be omitted.
                 if (item.Preview is null && item.PreviewError is null)
                 {
                     continue;

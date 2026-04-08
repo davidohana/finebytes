@@ -14,9 +14,9 @@ namespace Mfr.Core
             ? StringComparer.OrdinalIgnoreCase
             : StringComparer.Ordinal;
 
-        private readonly HashSet<string> _resolvedPathKeys = new(_pathComparer);
+        private readonly HashSet<string> _resolvedPathToIsIncluded = new(_pathComparer);
         private readonly List<RenameItem> _renameItems = [];
-        private readonly Dictionary<string, int> _folderCounts = new(_pathComparer);
+        private readonly Dictionary<string, int> _folderPathToCount = new(_pathComparer);
         private readonly bool _includeHidden = includeHidden;
 
         /// <summary>
@@ -57,8 +57,7 @@ namespace Mfr.Core
         /// Previews rename outcomes for the current list without touching the filesystem.
         /// </summary>
         /// <param name="preset">The rename preset (sequence of enabled filters).</param>
-        /// <param name="failFast">If <c>true</c>, stop previewing after the first per-item error.</param>
-        public void Preview(FilterPreset preset, bool failFast)
+        public void Preview(FilterPreset preset)
         {
             foreach (var item in _renameItems)
             {
@@ -70,27 +69,78 @@ namespace Mfr.Core
                 try
                 {
                     renameItem.ApplyFilters(preset.Filters);
-                    if (renameItem.Preview is null)
+                    if (!renameItem.HasPreview())
                     {
                         throw new InvalidOperationException("Preview not generated");
                     }
 
-                    var sourcePath = renameItem.Original.FullPath;
-                    var destPath = renameItem.Preview.FullPath;
-                    renameItem.Status = string.Equals(sourcePath, destPath, StringComparison.OrdinalIgnoreCase)
-                        ? RenameStatus.PreviewNoChange
-                        : RenameStatus.PreviewOk;
+                    renameItem.Status = RenameStatus.PreviewOk;
                 }
                 catch (Exception ex)
                 {
-                    renameItem.PreviewError = new RenameItemError(Message: ex.Message, Cause: ex);
-                    renameItem.Status = RenameStatus.PreviewError;
-                    if (failFast)
-                    {
-                        break;
-                    }
+                    renameItem.SetPreviewError(message: ex.Message, cause: ex);
                 }
             }
+
+            _MarkPreviewConflicts();
+        }
+
+        /// <summary>
+        /// Commits previously previewed rename operations.
+        /// </summary>
+        /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
+        /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
+        public IReadOnlyList<RenameResultItem> Commit(bool failFast)
+        {
+            var results = new List<RenameResultItem>(_renameItems.Count);
+            var stopped = false;
+
+            foreach (var item in _renameItems)
+            {
+                item.CommitError = null;
+                var sourcePath = item.Original.FullPath;
+
+                if (stopped || !item.HasPreview() || item.IsPreviewPathSameAsOriginal())
+                {
+                    item.Status = RenameStatus.CommitSkipped;
+                    results.Add(new RenameResultItem(
+                        OriginalPath: sourcePath,
+                        ResultPath: item.Preview?.FullPath ?? sourcePath,
+                        Status: RenameStatus.CommitSkipped,
+                        Error: null));
+                    continue;
+                }
+
+                var destPath = item.Preview!.FullPath;
+                try
+                {
+                    item.Commit();
+                    item.Status = RenameStatus.CommitOk;
+                    results.Add(new RenameResultItem(
+                        OriginalPath: sourcePath,
+                        ResultPath: destPath,
+                        Status: RenameStatus.CommitOk,
+                        Error: null));
+                }
+                catch (Exception ex)
+                {
+                    item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
+                    item.Status = RenameStatus.CommitError;
+                    results.Add(new RenameResultItem(
+                        OriginalPath: sourcePath,
+                        ResultPath: destPath,
+                        Status: RenameStatus.CommitError,
+                        Error: item.CommitError.Message));
+                    stopped = failFast;
+                }
+            }
+
+            foreach (var item in _renameItems)
+            {
+                item.ClearPreview();
+            }
+
+            return results;
         }
 
         /// <summary>
@@ -231,6 +281,48 @@ namespace Mfr.Core
         }
 
         /// <summary>
+        /// Marks preview conflicts (duplicate destinations or existing destination paths) as preview errors.
+        /// </summary>
+        private void _MarkPreviewConflicts()
+        {
+            var candidateItems = _renameItems
+                .Where(item => item.HasPreview() && item.Status == RenameStatus.PreviewOk)
+                .ToList();
+            var sourcePathToIsMoving = candidateItems
+                .Select(item => item.Original.FullPath)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var destinationPathToIsDuplicate = candidateItems
+                .Select(item => item.Preview!.FullPath)
+                .GroupBy(destinationPath => destinationPath, StringComparer.OrdinalIgnoreCase)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var item in candidateItems)
+            {
+                var destinationPath = item.Preview!.FullPath;
+                var destinationPathIsDuplicate = destinationPathToIsDuplicate.Contains(destinationPath);
+                if (destinationPathIsDuplicate)
+                {
+                    item.SetPreviewError(
+                        message: $"Preview conflict for destination '{destinationPath}'.",
+                        cause: null);
+                    continue;
+                }
+
+                var destinationExistsOutsideBatch = File.Exists(destinationPath)
+                    && !sourcePathToIsMoving.Contains(destinationPath);
+                if (destinationExistsOutsideBatch)
+                {
+                    item.SetPreviewError(
+                        message: $"Preview conflict for destination '{destinationPath}'.",
+                        cause: null);
+                    continue;
+                }
+            }
+        }
+
+        /// <summary>
         /// Appends resolved paths to <see cref="RenameItems"/> while enforcing deduplication and filtering.
         /// </summary>
         /// <param name="resolvedPaths">Resolved file paths to append.</param>
@@ -241,7 +333,7 @@ namespace Mfr.Core
             foreach (var fullPath in resolvedPaths)
             {
                 var normalizedResolvedPath = _NormalizePathKey(fullPath);
-                if (!_resolvedPathKeys.Add(normalizedResolvedPath))
+                if (!_resolvedPathToIsIncluded.Add(normalizedResolvedPath))
                 {
                     continue;
                 }
@@ -256,8 +348,8 @@ namespace Mfr.Core
                 var directoryPath = Path.GetDirectoryName(fullPath) ?? "";
                 var prefix = Path.GetFileNameWithoutExtension(fullPath);
                 var extension = Path.GetExtension(fullPath);
-                var inFolderIndex = _folderCounts.GetValueOrDefault(directoryPath);
-                _folderCounts[directoryPath] = inFolderIndex + 1;
+                var inFolderIndex = _folderPathToCount.GetValueOrDefault(directoryPath);
+                _folderPathToCount[directoryPath] = inFolderIndex + 1;
 
                 var globalIndex = _renameItems.Count;
                 var fileMeta = new FileMeta(
