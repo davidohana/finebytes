@@ -14,9 +14,9 @@ namespace Mfr.Cli
 
         internal static CliLoggerSession Start(LogEventLevel logLevel, string? logDirectoryPath)
         {
-            var resolvedLogDirectoryPath = ResolveLogDirectoryPath(logDirectoryPath);
+            var resolvedLogDirectoryPath = _ResolveLogDirectoryPath(logDirectoryPath);
             _ = Directory.CreateDirectory(resolvedLogDirectoryPath);
-            PruneSessionLogFiles(resolvedLogDirectoryPath, MaxSessionLogFiles);
+            _PruneSessionLogFiles(resolvedLogDirectoryPath, MaxSessionLogFiles);
 
             var fileName = $"{SessionLogPrefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{SessionLogExtension}";
             var logFilePath = Path.Combine(resolvedLogDirectoryPath, fileName);
@@ -53,7 +53,7 @@ namespace Mfr.Cli
             };
         }
 
-        internal static void PruneSessionLogFiles(string logDirectoryPath, int maxSessionFiles)
+        private static void _PruneSessionLogFiles(string logDirectoryPath, int maxSessionFiles)
         {
             if (!Directory.Exists(logDirectoryPath))
             {
@@ -78,7 +78,7 @@ namespace Mfr.Cli
             }
         }
 
-        internal static string ResolveLogDirectoryPath(string? configuredLogDirectoryPath)
+        private static string _ResolveLogDirectoryPath(string? configuredLogDirectoryPath)
         {
             if (!string.IsNullOrWhiteSpace(configuredLogDirectoryPath))
             {

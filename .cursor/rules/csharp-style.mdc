@@ -15,4 +15,5 @@ alwaysApply: true
 - Boolean complexity: extract non-trivial boolean conditions into a well-named local (e.g. `isConflict`) before branching.
 - Named arguments: use named args when parameter meaning is not obvious by position (especially multiple same-type args).
 - Dictionary/HashSet naming: use `keyToVal`-style names (for sets, use boolean-style values like `pathToIsIncluded`).
+- Access modifiers: prefer `private` over `internal` when members are not required outside the declaring type.
 
