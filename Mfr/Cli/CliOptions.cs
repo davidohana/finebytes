@@ -7,6 +7,8 @@ namespace Mfr.Cli
     /// </summary>
     /// <param name="PresetName">Name of the preset to apply for the file renaming.</param>
     /// <param name="Sources">List of source files, folders, or wildcard patterns to process.</param>
+    /// <param name="IncludeFiles">Whether file entries should be included from resolved sources.</param>
+    /// <param name="IncludeFolders">Whether folder entries should be included from resolved sources.</param>
     /// <param name="OutputFilePath">Optional output file path where JSON results are written.</param>
     /// <param name="IncludeHidden">Whether to include hidden and system files.</param>
     /// <param name="ContinueOnRenameError">Whether commit should continue after per-item rename errors.</param>
@@ -16,11 +18,12 @@ namespace Mfr.Cli
     public sealed record CliOptions(
         string PresetName,
         IReadOnlyList<string> Sources,
+        bool IncludeFiles,
+        bool IncludeFolders,
         string? OutputFilePath,
         bool IncludeHidden,
         bool ContinueOnRenameError,
         LogEventLevel LogLevel,
         string? LogDirectoryPath,
-        string PresetsFilePath)
-    ;
+        string PresetsFilePath);
 }

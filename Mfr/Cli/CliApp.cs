@@ -75,7 +75,10 @@ namespace Mfr.Cli
                 : throw new UserException($"Preset not found: '{options.PresetName}'.");
 
             var renameList = new RenameList(includeHidden: options.IncludeHidden);
-            renameList.AddSources(options.Sources);
+            renameList.AddSources(
+                sources: options.Sources,
+                includeFiles: options.IncludeFiles,
+                includeFolders: options.IncludeFolders);
             var renameItems = renameList.RenameItems;
 
             if (renameItems.Count == 0)

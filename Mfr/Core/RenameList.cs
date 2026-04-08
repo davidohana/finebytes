@@ -29,8 +29,10 @@ namespace Mfr.Core
         /// Adds and resolves a single source.
         /// </summary>
         /// <param name="source">A file path, directory path, or wildcard source.</param>
+        /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
+        /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <returns>The count of newly added resolved items.</returns>
-        public int AddSource(string source)
+        public int AddSource(string source, bool includeFiles = true, bool includeFolders = true)
         {
             if (string.IsNullOrWhiteSpace(source))
             {
@@ -39,7 +41,10 @@ namespace Mfr.Core
 
             var trimmedSource = source.Trim();
             var resolvedPaths = _ResolveSource(trimmedSource).ToList();
-            var addedCount = _AppendPaths(resolvedPaths);
+            var addedCount = _AppendPaths(
+                resolvedPaths: resolvedPaths,
+                includeFiles: includeFiles,
+                includeFolders: includeFolders);
             Log.Debug(
                 "Resolved source '{Source}' to {ResolvedCount} path(s), added {AddedCount} new item(s).",
                 trimmedSource,
@@ -52,11 +57,16 @@ namespace Mfr.Core
         /// Adds multiple sources while preserving insertion order.
         /// </summary>
         /// <param name="sources">Sources to add.</param>
-        public void AddSources(IEnumerable<string> sources)
+        /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
+        /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
+        public void AddSources(IEnumerable<string> sources, bool includeFiles = true, bool includeFolders = true)
         {
             foreach (var source in sources)
             {
-                _ = AddSource(source);
+                _ = AddSource(
+                    source: source,
+                    includeFiles: includeFiles,
+                    includeFolders: includeFolders);
             }
         }
 
@@ -394,8 +404,10 @@ namespace Mfr.Core
         /// Appends resolved paths to <see cref="RenameItems"/> while enforcing deduplication and filtering.
         /// </summary>
         /// <param name="resolvedPaths">Resolved file paths to append.</param>
+        /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
+        /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <returns>The count of newly added resolved items.</returns>
-        private int _AppendPaths(IEnumerable<string> resolvedPaths)
+        private int _AppendPaths(IEnumerable<string> resolvedPaths, bool includeFiles, bool includeFolders)
         {
             var addedCount = 0;
             foreach (var fullPath in resolvedPaths)
@@ -409,6 +421,17 @@ namespace Mfr.Core
                 var attrs = File.GetAttributes(fullPath);
                 if (!_includeHidden &&
                     (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System)))
+                {
+                    continue;
+                }
+
+                var isDirectory = attrs.HasFlag(FileAttributes.Directory);
+                if (isDirectory && !includeFolders)
+                {
+                    continue;
+                }
+
+                if (!isDirectory && !includeFiles)
                 {
                     continue;
                 }

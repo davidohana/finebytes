@@ -63,7 +63,7 @@ namespace Mfr.Cli
 
         private sealed class CliArguments
         {
-            [CommandLine.Value(0, MetaName = "sources", Required = true, HelpText = "Files, folders, or wildcards to rename (e.g. C:\\Music\\*.mp3).")]
+            [CommandLine.Value(0, MetaName = "sources", Required = true, HelpText = "Source paths or wildcards to rename (e.g. C:\\Music\\*.mp3).")]
             public IEnumerable<string> Sources { get; set; } = [];
 
             [CommandLine.Option('p', "preset", Required = true, HelpText = "Preset name (must be unique inside presets JSON).")]
@@ -77,6 +77,12 @@ namespace Mfr.Cli
 
             [CommandLine.Option('i', "include-hidden", HelpText = "Include hidden/system files.")]
             public bool IncludeHidden { get; set; }
+
+            [CommandLine.Option("files", HelpText = "Include files from sources: yes | no (default: yes).", Default = "yes")]
+            public string IncludeFiles { get; set; } = "yes";
+
+            [CommandLine.Option("folders", HelpText = "Include folders from sources: yes | no (default: no).", Default = "no")]
+            public string IncludeFolders { get; set; } = "no";
 
             [CommandLine.Option("core", HelpText = "Continue on rename error (default: false).")]
             public bool ContinueOnRenameError { get; set; }
@@ -116,16 +122,35 @@ namespace Mfr.Cli
                 var presetsFilePath = PresetsFilePath.IsBlank()
                     ? PresetManager.DefaultPresetsFilePath()
                     : PresetsFilePath;
+                var includeFiles = _ParseYesNoOption(optionName: "--files", value: IncludeFiles);
+                var includeFolders = _ParseYesNoOption(optionName: "--folders", value: IncludeFolders);
+                if (!includeFiles && !includeFolders)
+                {
+                    throw new UserException("At least one of --files or --folders must be yes.");
+                }
 
                 return new CliOptions(
                     PresetName: PresetName,
                     Sources: [.. Sources],
+                    IncludeFiles: includeFiles,
+                    IncludeFolders: includeFolders,
                     OutputFilePath: OutputFilePath.IsBlank() ? null : OutputFilePath.Trim(),
                     IncludeHidden: IncludeHidden,
                     ContinueOnRenameError: ContinueOnRenameError,
                     LogLevel: CliLogging.ParseLogLevel(LogLevel),
                     LogDirectoryPath: LogDirectoryPath.IsBlank() ? null : LogDirectoryPath.Trim(),
                     PresetsFilePath: presetsFilePath);
+            }
+
+            private static bool _ParseYesNoOption(string optionName, string value)
+            {
+                var normalizedValue = value.Trim().ToLowerInvariant();
+                return normalizedValue switch
+                {
+                    "yes" => true,
+                    "no" => false,
+                    _ => throw new UserException($"Invalid value for {optionName}: '{value}'. Expected yes or no.")
+                };
             }
         }
     }

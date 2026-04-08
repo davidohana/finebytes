@@ -141,6 +141,44 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
+        /// Verifies that file entries are excluded when file inclusion is disabled.
+        /// </summary>
+        public void AddSources_Excludes_Files_When_File_Inclusion_Is_Disabled()
+        {
+            var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources(
+                sources: [filePath, folderPath],
+                includeFiles: false,
+                includeFolders: true);
+
+            var entry = Assert.Single(renameList.RenameItems);
+            Assert.Equal(folderPath, entry.Original.FullPath);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that folder entries are excluded when folder inclusion is disabled.
+        /// </summary>
+        public void AddSources_Excludes_Folders_When_Folder_Inclusion_Is_Disabled()
+        {
+            var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources(
+                sources: [filePath, folderPath],
+                includeFiles: true,
+                includeFolders: false);
+
+            var entry = Assert.Single(renameList.RenameItems);
+            Assert.Equal(filePath, entry.Original.FullPath);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that glob sources resolve files from the parent directory only.
         /// </summary>
         public void AddSource_Resolves_Glob_In_TopDirectoryOnly()

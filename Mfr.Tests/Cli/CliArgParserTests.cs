@@ -58,5 +58,47 @@ namespace Mfr.Tests.Cli
             var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--log-dir", "C:\\logs\\mfr"])!;
             Assert.Equal("C:\\logs\\mfr", options.LogDirectoryPath);
         }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that source inclusion defaults to files enabled and folders disabled.
+        /// </summary>
+        public void ParseArgs_Defaults_To_Files_Yes_And_Folders_No()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean"])!;
+            Assert.True(options.IncludeFiles);
+            Assert.False(options.IncludeFolders);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that source inclusion flags parse yes/no values case-insensitively.
+        /// </summary>
+        public void ParseArgs_Accepts_Files_And_Folders_YesNo_Values()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "--files", "NO", "--folders", "YeS"])!;
+            Assert.False(options.IncludeFiles);
+            Assert.True(options.IncludeFolders);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that at least one source inclusion type must be enabled.
+        /// </summary>
+        public void ParseArgs_Rejects_Files_No_And_Folders_No()
+        {
+            var ex = Assert.Throws<UserException>(() => CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "--files", "no", "--folders", "no"]));
+            Assert.Contains("At least one of --files or --folders must be yes.", ex.Message, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that invalid yes/no values return a clear user-facing error.
+        /// </summary>
+        public void ParseArgs_Rejects_Invalid_Files_Or_Folders_Value()
+        {
+            var ex = Assert.Throws<UserException>(() => CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "--files", "maybe"]));
+            Assert.Contains("Invalid value for --files", ex.Message, StringComparison.Ordinal);
+        }
     }
 }
