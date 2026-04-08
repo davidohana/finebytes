@@ -17,7 +17,6 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void Dispose()
         {
-            Environment.SetEnvironmentVariable(CliLogging.LogDirectoryEnvVarName, null);
             _tempDirectoryFixture.Dispose();
         }
 
@@ -28,10 +27,9 @@ namespace Mfr.Tests.Cli
         public void Start_Creates_PerSession_LogFile()
         {
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
-            Environment.SetEnvironmentVariable(CliLogging.LogDirectoryEnvVarName, logDirectoryPath);
 
             string logFilePath;
-            using (var loggerSession = CliLogging.Start(LogEventLevel.Information))
+            using (var loggerSession = CliLogging.Start(LogEventLevel.Information, logDirectoryPath))
             {
                 logFilePath = loggerSession.LogFilePath;
                 Log.Information("hello from test");

@@ -41,7 +41,7 @@ namespace Mfr.Cli
                 return CliExitCode.Success;
             }
 
-            using var loggerSession = CliLogging.Start(options.LogLevel);
+            using var loggerSession = CliLogging.Start(options.LogLevel, options.LogDirectoryPath);
             var logger = loggerSession.Logger;
             try
             {

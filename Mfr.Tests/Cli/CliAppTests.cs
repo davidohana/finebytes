@@ -15,7 +15,6 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void Dispose()
         {
-            Environment.SetEnvironmentVariable(CliLogging.LogDirectoryEnvVarName, null);
             _tempDirectoryFixture.Dispose();
         }
 
@@ -31,10 +30,9 @@ namespace Mfr.Tests.Cli
 
             try
             {
-                Environment.SetEnvironmentVariable(CliLogging.LogDirectoryEnvVarName, logDirectoryPath);
                 Console.SetError(errorWriter);
 
-                var exitCode = CliApp.Run(["-p", "xxx"]);
+                var exitCode = CliApp.Run(["-p", "xxx", "--log-dir", logDirectoryPath]);
                 var output = errorWriter.ToString();
 
                 Assert.Equal(CliExitCode.UserError, exitCode);

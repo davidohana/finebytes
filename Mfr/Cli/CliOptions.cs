@@ -12,6 +12,7 @@ namespace Mfr.Cli
     /// <param name="IncludeHidden">Whether to include hidden and system files.</param>
     /// <param name="ContinueOnRenameError">Whether commit should continue after per-item rename errors.</param>
     /// <param name="LogLevel">Minimum log level to emit.</param>
+    /// <param name="LogDirectoryPath">Optional log directory override.</param>
     /// <param name="PresetsFilePath">Path to the JSON file containing presets.</param>
     public sealed record CliOptions(
         string PresetName,
@@ -20,6 +21,7 @@ namespace Mfr.Cli
         bool IncludeHidden,
         bool ContinueOnRenameError,
         LogEventLevel LogLevel,
+        string? LogDirectoryPath,
         string PresetsFilePath)
     ;
 }

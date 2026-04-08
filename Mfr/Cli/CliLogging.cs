@@ -8,19 +8,18 @@ namespace Mfr.Cli
     {
         internal const string DefaultLogLevelName = "info";
         internal const int MaxSessionLogFiles = 100;
-        internal const string LogDirectoryEnvVarName = "MFR_LOG_DIR";
         private const string SessionLogPrefix = "session-";
         private const string SessionLogExtension = ".log";
         private const string MessageOnlyTemplate = "{Message:lj}{NewLine}";
 
-        internal static CliLoggerSession Start(LogEventLevel logLevel)
+        internal static CliLoggerSession Start(LogEventLevel logLevel, string? logDirectoryPath)
         {
-            var logDirectoryPath = GetDefaultLogDirectoryPath();
-            _ = Directory.CreateDirectory(logDirectoryPath);
-            PruneSessionLogFiles(logDirectoryPath, MaxSessionLogFiles);
+            var resolvedLogDirectoryPath = ResolveLogDirectoryPath(logDirectoryPath);
+            _ = Directory.CreateDirectory(resolvedLogDirectoryPath);
+            PruneSessionLogFiles(resolvedLogDirectoryPath, MaxSessionLogFiles);
 
             var fileName = $"{SessionLogPrefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{SessionLogExtension}";
-            var logFilePath = Path.Combine(logDirectoryPath, fileName);
+            var logFilePath = Path.Combine(resolvedLogDirectoryPath, fileName);
 
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Is(logLevel)
@@ -79,9 +78,8 @@ namespace Mfr.Cli
             }
         }
 
-        internal static string GetDefaultLogDirectoryPath()
+        internal static string ResolveLogDirectoryPath(string? configuredLogDirectoryPath)
         {
-            var configuredLogDirectoryPath = Environment.GetEnvironmentVariable(LogDirectoryEnvVarName);
             if (!string.IsNullOrWhiteSpace(configuredLogDirectoryPath))
             {
                 return configuredLogDirectoryPath.Trim();

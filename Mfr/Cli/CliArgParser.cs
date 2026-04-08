@@ -84,6 +84,9 @@ namespace Mfr.Cli
             [CommandLine.Option('l', "log-level", HelpText = "Minimum log level: debug | info | warn | error.", Default = CliLogging.DefaultLogLevelName)]
             public string LogLevel { get; set; } = CliLogging.DefaultLogLevelName;
 
+            [CommandLine.Option("log-dir", HelpText = "Optional log directory path override.")]
+            public string? LogDirectoryPath { get; set; }
+
             [Usage(ApplicationAlias = "mfr")]
             public static IEnumerable<Example> Examples
             {
@@ -123,6 +126,7 @@ namespace Mfr.Cli
                     IncludeHidden: IncludeHidden,
                     ContinueOnRenameError: ContinueOnRenameError,
                     LogLevel: CliLogging.ParseLogLevel(LogLevel),
+                    LogDirectoryPath: string.IsNullOrWhiteSpace(LogDirectoryPath) ? null : LogDirectoryPath.Trim(),
                     PresetsFilePath: presetsFilePath);
             }
 

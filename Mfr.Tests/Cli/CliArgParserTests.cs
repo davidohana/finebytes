@@ -48,5 +48,15 @@ namespace Mfr.Tests.Cli
             var ex = Assert.Throws<UserException>(() => CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--log-level", "trace"]));
             Assert.Contains("Unknown log level", ex.Message, StringComparison.Ordinal);
         }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>--log-dir</c> is parsed and exposed on CLI options.
+        /// </summary>
+        public void ParseArgs_Accepts_LogDirectoryPath()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--log-dir", "C:\\logs\\mfr"])!;
+            Assert.Equal("C:\\logs\\mfr", options.LogDirectoryPath);
+        }
     }
 }
