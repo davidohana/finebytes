@@ -18,19 +18,12 @@ namespace Mfr.Cli
         public static CliOptions? ParseArgs(string[] args)
         {
             ParseCommandSettings? parsedSettings = null;
-            ParseCommand.CaptureSettings = settings => parsedSettings = settings;
-            var app = new CommandApp<ParseCommand>()
-                .WithDescription($"Magic File Renamer v{_GetAssemblyVersionString()}.");
-
-            app.Configure(config =>
-            {
-                _ = config
-                    .SetApplicationName("mfr")
-                    .PropagateExceptions();
-            });
-
             try
             {
+                ParseCommand.CaptureSettings = settings => parsedSettings = settings;
+                var app = new CommandApp<ParseCommand>();
+                app.Configure(_ConfigureCommandApp);
+                _ = app.WithDescription($"Magic File Renamer v{_GetAssemblyVersionString()}.");
                 _ = app.Run(args);
             }
             catch (CommandParseException exception)
@@ -92,6 +85,13 @@ namespace Mfr.Cli
                 LogLevel: CliLogging.ParseLogLevel(logLevel),
                 LogDirectoryPath: logDirectoryPath.IsBlank() ? null : logDirectoryPath.Trim(),
                 PresetsFilePath: presetsFilePath);
+        }
+
+        private static void _ConfigureCommandApp(IConfigurator configuration)
+        {
+            _ = configuration
+                .SetApplicationName("mfr")
+                .PropagateExceptions();
         }
 
         private static string _GetAssemblyVersionString()
@@ -157,7 +157,7 @@ namespace Mfr.Cli
             public string? IncludeFolders { get; init; }
 
             [CommandOption("--core")]
-            [Description("Continue on rename errors instead of stopping at the first failure.")]
+            [Description("Continue-On-Rename-Errors instead of stopping at the first failure.")]
             public bool ContinueOnRenameError { get; init; }
 
             [CommandOption("-l|--log-level <LEVEL>")]
