@@ -20,7 +20,7 @@ namespace Mfr.Tests.Cli
 
         [Fact]
         /// <summary>
-        /// Verifies that missing positional <c>sources</c> reports a clear user-facing error.
+        /// Verifies that missing required <c>--add</c> arguments report a clear user-facing error.
         /// </summary>
         public void Shows_Clear_Message_When_Sources_Are_Missing()
         {
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Cli
                 var output = errorWriter.ToString();
 
                 Assert.Equal(CliExitCode.UserError, exitCode);
-                Assert.Contains("Missing required argument: sources", output, StringComparison.Ordinal);
+                Assert.Contains("Missing required argument: --add", output, StringComparison.Ordinal);
             }
             finally
             {

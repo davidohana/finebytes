@@ -101,7 +101,7 @@ dotnet run --project ./Mfr/Mfr.csproj -- "/home/user/music/*.mp3" -p "my-preset"
 
 - Presets are loaded from a single JSON file.
 - Default path on Windows: `%APPDATA%\MagicFileRenamer\presets.json`
-- Override path with: `-d` / `--presets-file`
+- Override path with: `--presets-file` (long option only)
 - Preset names must be unique (case-insensitive).
 
 Minimal shape:
