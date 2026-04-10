@@ -2,20 +2,21 @@ default:
     @just --list
 
 restore:
-    dotnet restore ./Mfr/Mfr.csproj
-    dotnet restore ./Mfr.Tests/Mfr.Tests.csproj
+    dotnet restore
 
 build:
-    dotnet build ./finebytes.slnx
+    dotnet build 
 
 clean:
-    dotnet clean ./finebytes.slnx
+    dotnet nuget locals all --clear
+    rm -rf **/bin **/obj
+    dotnet clean
 
 test:
-    dotnet test ./Mfr.Tests/Mfr.Tests.csproj -c Debug  --logger "console;verbosity=detailed"
+    dotnet test -c Debug  --logger "console;verbosity=detailed"
 
 format:
-    dotnet format ./finebytes.slnx --verbosity diagnostic
+    dotnet format --verbosity diagnostic
 
 run-help:
     dotnet run --project ./Mfr/Mfr.csproj -- --help
