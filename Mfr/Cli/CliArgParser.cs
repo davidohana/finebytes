@@ -140,7 +140,7 @@ namespace Mfr.Cli
             [Description("Override presets file path.")]
             public string? PresetsFilePath { get; init; }
 
-            [CommandOption("-f|--output-file <PATH>")]
+            [CommandOption("-o|--output-file <PATH>")]
             [Description("Optional JSON output file path for rename results.")]
             public string? OutputFilePath { get; init; }
 

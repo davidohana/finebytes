@@ -113,10 +113,13 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void AddSource_Filters_Hidden_When_Disabled()
         {
-            var (visiblePath, hiddenPath) = TestHelpers.CreateFiles(_tempRoot, "visible.txt", "hidden.txt");
-
-            var hiddenAttrs = File.GetAttributes(hiddenPath);
-            File.SetAttributes(hiddenPath, hiddenAttrs | FileAttributes.Hidden);
+            var hiddenFileName = OperatingSystem.IsWindows() ? "hidden.txt" : ".hidden.txt";
+            var (visiblePath, hiddenPath) = TestHelpers.CreateFiles(_tempRoot, "visible.txt", hiddenFileName);
+            if (OperatingSystem.IsWindows())
+            {
+                var hiddenAttrs = File.GetAttributes(hiddenPath);
+                File.SetAttributes(hiddenPath, hiddenAttrs | FileAttributes.Hidden);
+            }
 
             var excludeHiddenList = new RenameList(includeHidden: false);
             _ = excludeHiddenList.AddSource(hiddenPath);
