@@ -211,6 +211,30 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
+        /// Verifies that a directory source expands recursively when folder inclusion is disabled and recursive add is enabled.
+        /// </summary>
+        public void AddSource_DirectorySource_WithFoldersDisabled_AndRecursiveEnabled_AddsNestedFiles()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var topLevelPath = TestHelpers.CreateFile(folderPath, "first.txt");
+            var nestedPath = TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
+            var deeperPath = TestHelpers.CreateFile(folderPath.CombinePath("Sub", "Deep"), "deep.log");
+
+            var renameList = new RenameList(includeHidden: true);
+            var addedCount = renameList.AddSource(
+                source: folderPath,
+                includeFiles: true,
+                includeFolders: false,
+                recursiveDirectoryFileAdd: true);
+
+            Assert.Equal(3, addedCount);
+            Assert.Equal(
+                [topLevelPath, nestedPath, deeperPath],
+                renameList.RenameItems.Select(entry => entry.Original.FullPath));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that glob sources resolve files from the parent directory only.
         /// </summary>
         public void AddSource_Resolves_Glob_In_TopDirectoryOnly()

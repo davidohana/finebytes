@@ -68,6 +68,7 @@ namespace Mfr.Tests.Cli
             var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean"])!;
             Assert.True(options.IncludeFiles);
             Assert.False(options.IncludeFolders);
+            Assert.False(options.RecursiveDirectoryFileAdd);
         }
 
         [Fact]
@@ -119,6 +120,26 @@ namespace Mfr.Tests.Cli
         {
             var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--core"])!;
             Assert.True(options.ContinueOnRenameError);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>--recursive</c> enables recursive directory-source file expansion.
+        /// </summary>
+        public void ParseArgs_Accepts_Recursive_Long_Option()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "--recursive"])!;
+            Assert.True(options.RecursiveDirectoryFileAdd);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>-r</c> enables recursive directory-source file expansion.
+        /// </summary>
+        public void ParseArgs_Accepts_Recursive_Short_Option()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "-r"])!;
+            Assert.True(options.RecursiveDirectoryFileAdd);
         }
 
     }

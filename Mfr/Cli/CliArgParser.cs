@@ -86,6 +86,7 @@ namespace Mfr.Cli
                 Sources: sources,
                 IncludeFiles: includeFiles,
                 IncludeFolders: includeFolders,
+                RecursiveDirectoryFileAdd: parsedSettings.RecursiveDirectoryFileAdd,
                 OutputFilePath: outputFilePath.IsBlank() ? null : outputFilePath.Trim(),
                 IncludeHidden: parsedSettings.IncludeHidden,
                 ContinueOnRenameError: parsedSettings.ContinueOnRenameError,
@@ -162,6 +163,10 @@ namespace Mfr.Cli
             [CommandOption("--folders <VALUE>")]
             [Description("Include folders from sources: yes | no (default: no).")]
             public string? IncludeFolders { get; init; }
+
+            [CommandOption("-r|--recursive")]
+            [Description("Expand directory sources recursively (when 'add folders' disabled).")]
+            public bool RecursiveDirectoryFileAdd { get; init; }
 
             [CommandOption("--core")]
             [Description("Continue-On-Rename-Errors instead of stopping at the first failure.")]

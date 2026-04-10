@@ -78,7 +78,8 @@ namespace Mfr.Cli
             renameList.AddSources(
                 sources: options.Sources,
                 includeFiles: options.IncludeFiles,
-                includeFolders: options.IncludeFolders);
+                includeFolders: options.IncludeFolders,
+                recursiveDirectoryFileAdd: options.RecursiveDirectoryFileAdd);
             var renameItems = renameList.RenameItems;
 
             if (renameItems.Count == 0)

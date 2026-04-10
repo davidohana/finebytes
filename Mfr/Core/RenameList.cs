@@ -31,8 +31,13 @@ namespace Mfr.Core
         /// <param name="source">A file path, directory path, or wildcard source.</param>
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
+        /// <param name="recursiveDirectoryFileAdd">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
         /// <returns>The count of newly added resolved items.</returns>
-        public int AddSource(string source, bool includeFiles = true, bool includeFolders = true)
+        public int AddSource(
+            string source,
+            bool includeFiles = true,
+            bool includeFolders = true,
+            bool recursiveDirectoryFileAdd = false)
         {
             if (string.IsNullOrWhiteSpace(source))
             {
@@ -42,7 +47,8 @@ namespace Mfr.Core
             var trimmedSource = source.Trim();
             var resolvedPaths = _ResolveSource(
                 source: trimmedSource,
-                includeFolders: includeFolders).ToList();
+                includeFolders: includeFolders,
+                recursiveDirectoryFileAdd: recursiveDirectoryFileAdd).ToList();
             var addedCount = _AppendPaths(
                 resolvedPaths: resolvedPaths,
                 includeFiles: includeFiles,
@@ -61,7 +67,12 @@ namespace Mfr.Core
         /// <param name="sources">Sources to add.</param>
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
-        public void AddSources(IEnumerable<string> sources, bool includeFiles = true, bool includeFolders = true)
+        /// <param name="recursiveDirectoryFileAdd">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
+        public void AddSources(
+            IEnumerable<string> sources,
+            bool includeFiles = true,
+            bool includeFolders = true,
+            bool recursiveDirectoryFileAdd = false)
         {
             var sourceList = sources.ToList();
             Log.Debug(
@@ -73,7 +84,8 @@ namespace Mfr.Core
                 _ = AddSource(
                     source: source,
                     includeFiles: includeFiles,
-                    includeFolders: includeFolders);
+                    includeFolders: includeFolders,
+                    recursiveDirectoryFileAdd: recursiveDirectoryFileAdd);
             }
         }
 
@@ -238,8 +250,12 @@ namespace Mfr.Core
         /// </summary>
         /// <param name="source">The source to resolve.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
+        /// <param name="recursiveDirectoryFileAdd">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
         /// <returns>Resolved file paths for the source.</returns>
-        private static IEnumerable<string> _ResolveSource(string source, bool includeFolders)
+        private static IEnumerable<string> _ResolveSource(
+            string source,
+            bool includeFolders,
+            bool recursiveDirectoryFileAdd)
         {
             var fullSource = Path.GetFullPath(source);
             if (Directory.Exists(fullSource))
@@ -250,8 +266,11 @@ namespace Mfr.Core
                     return [fullSource];
                 }
 
-                // When folder entries are excluded, expand directory sources to top-level files only.
-                return Directory.EnumerateFiles(fullSource, "*", SearchOption.TopDirectoryOnly);
+                // When folder entries are excluded, directory sources expand to files based on recursion mode.
+                var searchOption = recursiveDirectoryFileAdd
+                    ? SearchOption.AllDirectories
+                    : SearchOption.TopDirectoryOnly;
+                return Directory.EnumerateFiles(fullSource, "*", searchOption);
             }
 
             // Non-directory sources resolve relative to their parent directory.
