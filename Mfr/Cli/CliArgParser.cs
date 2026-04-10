@@ -74,12 +74,6 @@ namespace Mfr.Cli
                 throw new UserException("Missing required argument: SOURCES. Provide one or more source paths or wildcards.");
             }
 
-            var optionLikeSource = sources.FirstOrDefault(source => source.StartsWith('-'));
-            if (!optionLikeSource.IsBlank())
-            {
-                throw new UserException($"Unexpected option-like source: '{optionLikeSource}'. Sources are positional; pass only paths or wildcards.");
-            }
-
             var rawPresetsFilePath = _GetValueOrDefault(parsedSettings.PresetsFilePath, defaultValue: string.Empty);
             var presetsFilePath = rawPresetsFilePath.IsBlank()
                 ? PresetManager.DefaultPresetsFilePath()
