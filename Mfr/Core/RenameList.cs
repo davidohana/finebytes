@@ -61,7 +61,12 @@ namespace Mfr.Core
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         public void AddSources(IEnumerable<string> sources, bool includeFiles = true, bool includeFolders = true)
         {
-            foreach (var source in sources)
+            var sourceList = sources.ToList();
+            Log.Debug(
+                "Received {SourceCount} source(s) for resolution.",
+                sourceList.Count);
+
+            foreach (var source in sourceList)
             {
                 _ = AddSource(
                     source: source,
