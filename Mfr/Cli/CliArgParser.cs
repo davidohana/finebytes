@@ -99,7 +99,11 @@ namespace Mfr.Cli
         {
             _ = configuration
                 .SetApplicationName("mfr")
-                .PropagateExceptions();
+                .PropagateExceptions()
+                .AddExample(["C:\\Music\\*.mp3", "-p", "clean"])
+                .AddExample(["C:\\Music", "-p", "clean", "-r"])
+                .AddExample(["C:\\Music", "C:\\Podcasts", "-p", "clean", "--files", "yes", "--folders", "yes"])
+                .AddExample(["C:\\Music\\*.mp3", "-p", "clean", "--output-file", "C:\\Temp\\mfr-results.json"]);
         }
 
         private static string _GetAssemblyVersionString()
