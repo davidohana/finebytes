@@ -40,7 +40,9 @@ namespace Mfr.Core
             }
 
             var trimmedSource = source.Trim();
-            var resolvedPaths = _ResolveSource(trimmedSource).ToList();
+            var resolvedPaths = _ResolveSource(
+                source: trimmedSource,
+                includeFolders: includeFolders).ToList();
             var addedCount = _AppendPaths(
                 resolvedPaths: resolvedPaths,
                 includeFiles: includeFiles,
@@ -235,14 +237,21 @@ namespace Mfr.Core
         /// Resolves a single source into file paths.
         /// </summary>
         /// <param name="source">The source to resolve.</param>
+        /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <returns>Resolved file paths for the source.</returns>
-        private static IEnumerable<string> _ResolveSource(string source)
+        private static IEnumerable<string> _ResolveSource(string source, bool includeFolders)
         {
             var fullSource = Path.GetFullPath(source);
             if (Directory.Exists(fullSource))
             {
-                // Directory sources resolve to the directory path itself.
-                return [fullSource];
+                if (includeFolders)
+                {
+                    // Directory sources resolve to the directory path itself when folders are included.
+                    return [fullSource];
+                }
+
+                // When folder entries are excluded, expand directory sources to top-level files only.
+                return Directory.EnumerateFiles(fullSource, "*", SearchOption.TopDirectoryOnly);
             }
 
             // Non-directory sources resolve relative to their parent directory.

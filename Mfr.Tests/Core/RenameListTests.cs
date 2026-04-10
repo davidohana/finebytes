@@ -169,6 +169,8 @@ namespace Mfr.Tests.Core
         {
             var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var folderFilePath = TestHelpers.CreateFile(folderPath, "inside.txt");
+            _ = TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
 
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources(
@@ -176,8 +178,35 @@ namespace Mfr.Tests.Core
                 includeFiles: true,
                 includeFolders: false);
 
-            var entry = Assert.Single(renameList.RenameItems);
-            Assert.Equal(filePath, entry.Original.FullPath);
+            Assert.Equal(
+                [filePath, folderFilePath],
+                renameList.RenameItems.Select(entry => entry.Original.FullPath));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that a directory source expands to top-level files only when folder inclusion is disabled.
+        /// </summary>
+        public void AddSource_DirectorySource_WithFoldersDisabled_AddsTopLevelFilesOnly()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var topLevelFirstPath = TestHelpers.CreateFile(folderPath, "first.txt");
+            var topLevelSecondPath = TestHelpers.CreateFile(folderPath, "second.log");
+            var nestedFilePath = TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            var addedCount = renameList.AddSource(
+                source: folderPath,
+                includeFiles: true,
+                includeFolders: false);
+
+            Assert.Equal(2, addedCount);
+            Assert.Equal(
+                [topLevelFirstPath, topLevelSecondPath],
+                renameList.RenameItems.Select(entry => entry.Original.FullPath));
+            Assert.DoesNotContain(
+                nestedFilePath,
+                renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
 
         [Fact]
