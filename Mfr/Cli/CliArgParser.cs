@@ -33,6 +33,13 @@ namespace Mfr.Cli
                     : exception.Message;
                 throw new UserException(parserMessage);
             }
+            catch (CommandRuntimeException exception)
+            {
+                var parserMessage = exception.Message.IsBlank()
+                    ? "Invalid arguments."
+                    : exception.Message;
+                throw new UserException(parserMessage);
+            }
             finally
             {
                 ParseCommand.CaptureSettings = null;
@@ -58,13 +65,19 @@ namespace Mfr.Cli
                 throw new UserException("At least one of --files or --folders must be yes.");
             }
 
-            var sources = parsedSettings.AddSources
+            var sources = parsedSettings.Sources
                 .Where(source => !source.IsBlank())
                 .Select(source => source.Trim())
                 .ToList();
             if (sources.Count == 0)
             {
-                throw new UserException("Missing required argument: --add. Provide one or more --add values.");
+                throw new UserException("Missing required argument: SOURCES. Provide one or more source paths or wildcards.");
+            }
+
+            var optionLikeSource = sources.FirstOrDefault(source => source.StartsWith('-'));
+            if (!optionLikeSource.IsBlank())
+            {
+                throw new UserException($"Unexpected option-like source: '{optionLikeSource}'. Sources are positional; pass only paths or wildcards.");
             }
 
             var rawPresetsFilePath = _GetValueOrDefault(parsedSettings.PresetsFilePath, defaultValue: string.Empty);
@@ -128,9 +141,9 @@ namespace Mfr.Cli
 
         private sealed class ParseCommandSettings : CommandSettings
         {
-            [CommandOption("-a|--add <SOURCE>")]
-            [Description("Source path or wildcard to rename. Repeat --add for multiple sources.")]
-            public string[] AddSources { get; init; } = [];
+            [CommandArgument(0, "<SOURCES>")]
+            [Description("Source paths or wildcards to rename.")]
+            public string[] Sources { get; init; } = [];
 
             [CommandOption("-p|--preset <NAME>")]
             [Description("Preset name")]
