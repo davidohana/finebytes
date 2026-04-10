@@ -26,6 +26,38 @@ namespace Mfr.Core
         public IReadOnlyList<RenameItem> RenameItems => _renameItems;
 
         /// <summary>
+        /// Adds multiple sources while preserving insertion order.
+        /// </summary>
+        /// <param name="sources">Sources to add.</param>
+        /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
+        /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
+        /// <param name="recursiveDirectoryFileAdd">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
+        public void AddSources(
+            IEnumerable<string> sources,
+            bool includeFiles = true,
+            bool includeFolders = true,
+            bool recursiveDirectoryFileAdd = false)
+        {
+            var sourceList = sources.ToList();
+            Log.Debug(
+                "Received {SourceCount} source(s) for resolution. IncludeFiles: {IncludeFiles}, IncludeFolders: {IncludeFolders}, RecursiveDirectoryFileAdd: {RecursiveDirectoryFileAdd}, IncludeHidden: {IncludeHidden}.",
+                sourceList.Count,
+                includeFiles,
+                includeFolders,
+                recursiveDirectoryFileAdd,
+                _includeHidden);
+
+            foreach (var source in sourceList)
+            {
+                _ = AddSource(
+                    source: source,
+                    includeFiles: includeFiles,
+                    includeFolders: includeFolders,
+                    recursiveDirectoryFileAdd: recursiveDirectoryFileAdd);
+            }
+        }
+
+        /// <summary>
         /// Adds and resolves a single source.
         /// </summary>
         /// <param name="source">A file path, directory path, or wildcard source.</param>
@@ -59,34 +91,6 @@ namespace Mfr.Core
                 resolvedPaths.Count,
                 addedCount);
             return addedCount;
-        }
-
-        /// <summary>
-        /// Adds multiple sources while preserving insertion order.
-        /// </summary>
-        /// <param name="sources">Sources to add.</param>
-        /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
-        /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
-        /// <param name="recursiveDirectoryFileAdd">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
-        public void AddSources(
-            IEnumerable<string> sources,
-            bool includeFiles = true,
-            bool includeFolders = true,
-            bool recursiveDirectoryFileAdd = false)
-        {
-            var sourceList = sources.ToList();
-            Log.Debug(
-                "Received {SourceCount} source(s) for resolution.",
-                sourceList.Count);
-
-            foreach (var source in sourceList)
-            {
-                _ = AddSource(
-                    source: source,
-                    includeFiles: includeFiles,
-                    includeFolders: includeFolders,
-                    recursiveDirectoryFileAdd: recursiveDirectoryFileAdd);
-            }
         }
 
         /// <summary>
