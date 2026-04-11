@@ -5,8 +5,8 @@ namespace Mfr.Filters.Space
     internal static partial class TextFilterRegexCache
     {
         [GeneratedRegex(@"\s+", RegexOptions.Compiled)]
-        private static partial Regex _WhitespaceRegex();
+        private static partial Regex _whitespaceRegex();
 
-        internal static Regex WhitespaceRegex => _WhitespaceRegex();
+        internal static Regex WhitespaceRegex => _whitespaceRegex();
     }
 }
