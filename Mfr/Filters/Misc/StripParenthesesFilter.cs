@@ -4,12 +4,23 @@ using Mfr.Models;
 namespace Mfr.Filters.Misc
 {
     /// <summary>
+    /// Parenthesis/bracket types.
+    /// </summary>
+    public enum ParenthesisType
+    {
+        Round,
+        Square,
+        Curly,
+        Angle
+    }
+
+    /// <summary>
     /// Options for stripping bracket/parenthesis pairs.
     /// </summary>
-    /// <param name="Types">Pipe-separated pair types to target.</param>
+    /// <param name="Type">Pair type to target.</param>
     /// <param name="RemoveContents">Whether to remove bracketed contents or only delimiters.</param>
     public sealed record StripParenthesesOptions(
-        string Types,
+        ParenthesisType Type,
         bool RemoveContents);
 
     /// <summary>
@@ -30,58 +41,21 @@ namespace Mfr.Filters.Misc
 
         internal override string TransformSegment(string segment, RenameItem item)
         {
-            var pairs = new List<(char open, char close)>();
-            foreach (var token in Options.Types.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+            return Options.Type switch
             {
-                switch (token.Trim())
-                {
-                    case "Round":
-                        pairs.Add(('(', ')'));
-                        break;
-                    case "Square":
-                        pairs.Add(('[', ']'));
-                        break;
-                    case "Curly":
-                        pairs.Add(('{', '}'));
-                        break;
-                    case "Angle":
-                        pairs.Add(('<', '>'));
-                        break;
-                    default:
-                        break;
-                }
-            }
+                ParenthesisType.Round => Strip(segment, _RoundParenRegex(), "(", ")"),
+                ParenthesisType.Square => Strip(segment, _SquareParenRegex(), "[", "]"),
+                ParenthesisType.Curly => Strip(segment, _CurlyParenRegex(), "{", "}"),
+                ParenthesisType.Angle => Strip(segment, _AngleParenRegex(), "<", ">"),
+                _ => segment
+            };
 
-            var res = segment;
-            foreach ((var open, var close) in pairs)
+            string Strip(string s, Regex regex, string open, string close)
             {
-                if (open == '(' && close == ')')
-                {
-                    res = Options.RemoveContents
-                        ? _RoundParenRegex().Replace(res, "")
-                        : res.Replace("(", "").Replace(")", "");
-                }
-                else if (open == '[' && close == ']')
-                {
-                    res = Options.RemoveContents
-                        ? _SquareParenRegex().Replace(res, "")
-                        : res.Replace("[", "").Replace("]", "");
-                }
-                else if (open == '{' && close == '}')
-                {
-                    res = Options.RemoveContents
-                        ? _CurlyParenRegex().Replace(res, "")
-                        : res.Replace("{", "").Replace("}", "");
-                }
-                else if (open == '<' && close == '>')
-                {
-                    res = Options.RemoveContents
-                        ? _AngleParenRegex().Replace(res, "")
-                        : res.Replace("<", "").Replace(">", "");
-                }
+                return Options.RemoveContents
+                    ? regex.Replace(s, "")
+                    : s.Replace(open, "").Replace(close, "");
             }
-
-            return res;
         }
 
         [GeneratedRegex(@"\([^)]*\)", RegexOptions.Compiled)]
