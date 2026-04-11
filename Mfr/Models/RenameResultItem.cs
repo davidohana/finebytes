@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Mfr.Models
 {
     /// <summary>
@@ -9,7 +11,30 @@ namespace Mfr.Models
     public sealed record RenamePropertyChange(
         string Property,
         string OldValue,
-        string NewValue);
+        string NewValue)
+    {
+        /// <summary>
+        /// Formats this change using the same layout as console preview output.
+        /// </summary>
+        /// <returns>Multi-line text block for the change.</returns>
+        public string FormatPreviewChangeBlock()
+        {
+            const int valueLineIndentWidth = 10;
+            var valueLinePadding = new string(' ', valueLineIndentWidth);
+            var builder = new StringBuilder()
+                .Append("  ")
+                .Append(Property)
+                .Append(':')
+                .AppendLine()
+                .Append(valueLinePadding)
+                .Append(OldValue)
+                .Append(" -->")
+                .AppendLine()
+                .Append(valueLinePadding)
+                .Append(NewValue);
+            return builder.ToString();
+        }
+    }
 
     /// <summary>
     /// Represents the commit outcome for one rename item.

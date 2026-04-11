@@ -1,4 +1,3 @@
-using System.Text;
 using Mfr.Models;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
@@ -240,30 +239,6 @@ namespace Mfr.Core
         }
 
         /// <summary>
-        /// Formats preview property deltas for one rename item as plain text suitable for console output.
-        /// </summary>
-        /// <param name="renameItem">The previewed item to describe.</param>
-        /// <returns>
-        /// Non-empty text when the preview path differs from the original; otherwise an empty string.
-        /// When there are no per-property deltas but paths still differ, the full source and destination paths are shown.
-        /// </returns>
-        public static string FormatPreviewChangesForDisplay(RenameItem renameItem)
-        {
-            if (renameItem.IsPreviewPathSameAsOriginal())
-            {
-                return string.Empty;
-            }
-
-            var previewChanges = _BuildPreviewPropertyChanges(renameItem: renameItem);
-            if (previewChanges.Count == 0)
-            {
-                return $"{renameItem.Original.FullPath} --> {renameItem.Preview.FullPath}";
-            }
-
-            return string.Join(Environment.NewLine, previewChanges.Select(_BuildPreviewChangeBlock));
-        }
-
-        /// <summary>
         /// Builds a file-name change list for a rename result.
         /// </summary>
         /// <param name="sourcePath">Original source path.</param>
@@ -303,11 +278,11 @@ namespace Mfr.Core
             var originalFullPath = renameItem.Original.FullPath;
             Log.Debug("Preview changes for {OriginalFullPath}:", originalFullPath);
 
-            var previewChanges = _BuildPreviewPropertyChanges(renameItem: renameItem);
+            var previewChanges = renameItem.GetPreviewPropertyChanges();
             foreach (var change in previewChanges)
             {
                 // Property on its own line; old then new below with fixed indent (avoids console-prefix alignment math).
-                var changeBlock = _BuildPreviewChangeBlock(change: change);
+                var changeBlock = change.FormatPreviewChangeBlock();
                 Log.Debug("{PreviewChangeBlock}", changeBlock);
             }
 
@@ -318,57 +293,6 @@ namespace Mfr.Core
                     "  Error: '{PreviewErrorMessage}'",
                     previewErrorMessage);
             }
-        }
-
-        private static string _BuildPreviewChangeBlock(RenamePropertyChange change)
-        {
-            const int valueLineIndentWidth = 10;
-            var valueLinePadding = new string(' ', valueLineIndentWidth);
-            var builder = new StringBuilder()
-                .Append("  ")
-                .Append(change.Property)
-                .Append(':')
-                .AppendLine()
-                .Append(valueLinePadding)
-                .Append(change.OldValue)
-                .Append(" -->")
-                .AppendLine()
-                .Append(valueLinePadding)
-                .Append(change.NewValue);
-            return builder.ToString();
-        }
-
-        private static List<RenamePropertyChange> _BuildPreviewPropertyChanges(RenameItem renameItem)
-        {
-            var changes = new List<RenamePropertyChange>();
-            var prefixChanged = !string.Equals(renameItem.Original.Prefix, renameItem.Preview.Prefix, StringComparison.Ordinal);
-            if (prefixChanged)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "Prefix",
-                    OldValue: renameItem.Original.Prefix,
-                    NewValue: renameItem.Preview.Prefix));
-            }
-
-            var extensionChanged = !string.Equals(renameItem.Original.Extension, renameItem.Preview.Extension, StringComparison.Ordinal);
-            if (extensionChanged)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "Extension",
-                    OldValue: renameItem.Original.Extension,
-                    NewValue: renameItem.Preview.Extension));
-            }
-
-            var directoryChanged = !string.Equals(renameItem.Original.DirectoryPath, renameItem.Preview.DirectoryPath, StringComparison.OrdinalIgnoreCase);
-            if (directoryChanged)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "DirectoryPath",
-                    OldValue: renameItem.Original.DirectoryPath,
-                    NewValue: renameItem.Preview.DirectoryPath));
-            }
-
-            return changes;
         }
 
         /// <summary>

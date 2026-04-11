@@ -122,7 +122,7 @@ namespace Mfr.Cli
         private static bool _ConfirmApplyRenameItem(RenameItem item)
         {
             Console.WriteLine(item.Original.FullPath);
-            var detail = RenameList.FormatPreviewChangesForDisplay(item);
+            var detail = item.FormatPreviewChangesForDisplay();
             if (!detail.IsBlank())
             {
                 Console.WriteLine(detail);
