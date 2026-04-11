@@ -53,6 +53,62 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
+        /// Verifies weird-case with 0% chance lowercases all letters.
+        /// </summary>
+        [Fact]
+        public void Apply_WeirdCase_ZeroPercentUppercasesNone()
+        {
+            var f = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(
+                    Mode: LettersCaseMode.WeirdCase,
+                    SkipWords: [],
+                    WeirdUppercaseChancePercent: 0,
+                    WeirdFixedPlaces: false));
+            Assert.Equal("abc xyz", FilterTestHelpers.ApplyToPrefix(f, "AbC XyZ"));
+        }
+
+        /// <summary>
+        /// Verifies weird-case with 100% chance uppercases all letters.
+        /// </summary>
+        [Fact]
+        public void Apply_WeirdCase_HundredPercentUppercasesAll()
+        {
+            var f = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(
+                    Mode: LettersCaseMode.WeirdCase,
+                    SkipWords: [],
+                    WeirdUppercaseChancePercent: 100,
+                    WeirdFixedPlaces: false));
+            Assert.Equal("ABC XYZ", FilterTestHelpers.ApplyToPrefix(f, "AbC XyZ"));
+        }
+
+        /// <summary>
+        /// Verifies weird-case fixed places keep the same uppercase/lowercase positions across names.
+        /// </summary>
+        [Fact]
+        public void Apply_WeirdCase_FixedPlaces_UsesSamePositionsAcrossNames()
+        {
+            var f = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(
+                    Mode: LettersCaseMode.WeirdCase,
+                    SkipWords: [],
+                    WeirdUppercaseChancePercent: 50,
+                    WeirdFixedPlaces: true));
+            var a = FilterTestHelpers.ApplyToPrefix(f, "abcdefgh", globalIndex: 0);
+            var b = FilterTestHelpers.ApplyToPrefix(f, "qrstuvwx", globalIndex: 999);
+
+            Assert.Equal(
+                _BuildUpperMask(a),
+                _BuildUpperMask(b));
+        }
+
+        /// <summary>
         /// Verifies title-case respects skip words.
         /// </summary>
         [Fact]
@@ -176,6 +232,17 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.InvertCase, []));
             Assert.Equal("hELLO", FilterTestHelpers.ApplyToPrefix(f, "Hello"));
+        }
+
+        private static string _BuildUpperMask(string value)
+        {
+            var chars = new char[value.Length];
+            for (var i = 0; i < value.Length; i++)
+            {
+                chars[i] = char.IsUpper(value[i]) ? 'U' : 'L';
+            }
+
+            return new string(chars);
         }
     }
 }

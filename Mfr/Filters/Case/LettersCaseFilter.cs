@@ -9,9 +9,19 @@ namespace Mfr.Filters.Case
     /// </summary>
     /// <param name="Mode">Case transformation mode.</param>
     /// <param name="SkipWords">Words to leave lowercased in title case mode.</param>
+    /// <param name="WeirdUppercaseChancePercent">
+    /// Uppercase chance in percent for <see cref="LettersCaseMode.WeirdCase"/> (clamped to 0..100).
+    /// </param>
+    /// <param name="WeirdFixedPlaces">
+    /// For <see cref="LettersCaseMode.WeirdCase"/>: when true, casing decisions depend only on character
+    /// position so the same index gets the same case across different names; when false, per-name variation
+    /// is included.
+    /// </param>
     public sealed record LettersCaseOptions(
         LettersCaseMode Mode,
-        IReadOnlyList<string> SkipWords);
+        IReadOnlyList<string> SkipWords,
+        int WeirdUppercaseChancePercent = 50,
+        bool WeirdFixedPlaces = false);
 
     /// <summary>
     /// Supported letter-case transformation modes.
@@ -46,6 +56,14 @@ namespace Mfr.Filters.Case
         /// <para><c> 123_aBC</c> → <c> 123_abc</c> (leading character is unchanged because it is not a letter).</para>
         /// </example>
         FirstLetterUp,
+
+        /// <summary>
+        /// Applies mixed/random casing to letters using a configurable uppercase chance.
+        /// </summary>
+        /// <example>
+        /// <para><c>hello world</c> → <c>hElLo wOrLd</c> (example outcome)</para>
+        /// </example>
+        WeirdCase,
 
         /// <summary>
         /// Capitalizes the first letter of each segment between occurrences of the current word separator
@@ -99,6 +117,11 @@ namespace Mfr.Filters.Case
                 LettersCaseMode.UpperCase => segment.ToUpperInvariant(),
                 LettersCaseMode.LowerCase => segment.ToLowerInvariant(),
                 LettersCaseMode.FirstLetterUp => _FirstLetterUp(segment),
+                LettersCaseMode.WeirdCase => _ApplyWeirdCase(
+                    input: segment,
+                    item: item,
+                    weirdUppercaseChancePercent: Options.WeirdUppercaseChancePercent,
+                    weirdFixedPlaces: Options.WeirdFixedPlaces),
                 LettersCaseMode.TitleCase => _ApplyTitleCase(segment, Options.SkipWords, item.WordSeparator),
                 LettersCaseMode.SentenceCase => _ApplySentenceCase(segment, item.WordSeparator),
                 LettersCaseMode.InvertCase => _InvertCase(segment),
@@ -119,6 +142,58 @@ namespace Mfr.Filters.Case
             }
 
             return char.ToUpperInvariant(input[0]) + input[1..].ToLowerInvariant();
+        }
+
+        private static string _ApplyWeirdCase(
+            string input,
+            RenameItem item,
+            int weirdUppercaseChancePercent,
+            bool weirdFixedPlaces)
+        {
+            if (input.Length == 0)
+            {
+                return input;
+            }
+
+            var uppercaseChancePercent = Math.Clamp(weirdUppercaseChancePercent, 0, 100);
+            if (uppercaseChancePercent == 0)
+            {
+                return input.ToLowerInvariant();
+            }
+
+            if (uppercaseChancePercent == 100)
+            {
+                return input.ToUpperInvariant();
+            }
+
+            var chars = input.ToCharArray();
+            for (var i = 0; i < chars.Length; i++)
+            {
+                var c = chars[i];
+                if (!char.IsLetter(c))
+                {
+                    continue;
+                }
+
+                var itemSeed = weirdFixedPlaces ? 0 : item.Original.GlobalIndex;
+                var score = _GetPseudoRandomPercent(position: i, itemSeed: itemSeed);
+                chars[i] = score < uppercaseChancePercent
+                    ? char.ToUpperInvariant(c)
+                    : char.ToLowerInvariant(c);
+            }
+
+            return new string(chars);
+        }
+
+        private static int _GetPseudoRandomPercent(int position, int itemSeed)
+        {
+            unchecked
+            {
+                var hash = 2166136261u;
+                hash = (hash ^ (uint)position) * 16777619u;
+                hash = (hash ^ (uint)itemSeed) * 16777619u;
+                return (int)(hash % 100u);
+            }
         }
 
         private static string _ApplyTitleCase(string input, IReadOnlyList<string> skipWords, char wordSeparator)
