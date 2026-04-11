@@ -40,7 +40,7 @@ namespace Mfr.Core
             bool recursiveDirectoryFileAdd = false)
         {
             var sourceList = sources.ToList();
-            Log.Debug(
+            Log.Information(
                 "Received {SourceCount} source(s) for resolution. IncludeFiles: {IncludeFiles}, IncludeFolders: {IncludeFolders}, RecursiveDirectoryFileAdd: {RecursiveDirectoryFileAdd}, IncludeHidden: {IncludeHidden}.",
                 sourceList.Count,
                 includeFiles,
@@ -86,7 +86,7 @@ namespace Mfr.Core
                 resolvedPaths: resolvedPaths,
                 includeFiles: includeFiles,
                 includeFolders: includeFolders);
-            Log.Debug(
+            Log.Information(
                 "Resolved source '{Source}' to {ResolvedCount} path(s), added {AddedCount} new item(s).",
                 trimmedSource,
                 resolvedPaths.Count,
@@ -100,7 +100,7 @@ namespace Mfr.Core
         /// <param name="preset">The rename preset (sequence of enabled filters).</param>
         public void Preview(FilterPreset preset)
         {
-            Log.Debug(
+            Log.Information(
                 "Starting preview for preset '{PresetName}' with {ItemCount} item(s).",
                 preset.Name,
                 _renameItems.Count);
@@ -136,9 +136,8 @@ namespace Mfr.Core
             var previewChangedCount = _renameItems.Count(item => !item.IsPreviewPathSameAsOriginal());
             var previewUnchangedCount = _renameItems.Count(item => item.IsPreviewPathSameAsOriginal());
             var previewErrorCount = _renameItems.Count(item => item.Status == RenameStatus.PreviewError);
-            Log.Debug(
-                "Finished preview for preset '{PresetName}'. Changed: {PreviewChangedCount}, Unchanged: {PreviewUnchangedCount}, Errors: {PreviewErrorCount}.",
-                preset.Name,
+            Log.Information(
+                "Finished preview. Changed: {PreviewChangedCount}, Unchanged: {PreviewUnchangedCount}, Errors: {PreviewErrorCount}.",
                 previewChangedCount,
                 previewUnchangedCount,
                 previewErrorCount);
@@ -152,7 +151,7 @@ namespace Mfr.Core
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
         public IReadOnlyList<RenameResultItem> Commit(bool failFast, bool dryRun = false)
         {
-            Log.Debug(
+            Log.Information(
                 "Starting commit for {ItemCount} item(s). FailFast: {FailFast}. DryRun: {DryRun}.",
                 _renameItems.Count,
                 failFast,
@@ -219,7 +218,7 @@ namespace Mfr.Core
             var commitOkCount = results.Count(item => item.Status == RenameStatus.CommitOk);
             var commitSkippedCount = results.Count(item => item.Status == RenameStatus.CommitSkipped);
             var commitErrorCount = results.Count(item => item.Status == RenameStatus.CommitError);
-            Log.Debug(
+            Log.Information(
                 "Finished commit. Success: {CommitOkCount}, Skipped: {CommitSkippedCount}, Errors: {CommitErrorCount}.",
                 commitOkCount,
                 commitSkippedCount,

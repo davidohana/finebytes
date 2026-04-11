@@ -102,7 +102,7 @@ namespace Mfr.Cli
 
             if (!options.OutputFilePath.IsBlank())
             {
-                Log.Debug("Writing results JSON to {OutputFilePath}.", options.OutputFilePath);
+                Log.Information("Writing results JSON to {OutputFilePath}.", options.OutputFilePath);
                 RenameResultSummary.WriteJsonFile(
                     outputFilePath: options.OutputFilePath,
                     presetName: preset.Name,
