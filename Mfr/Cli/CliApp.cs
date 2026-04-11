@@ -1,6 +1,7 @@
 using Mfr.Core;
 using Mfr.Models;
 using Mfr.Utils;
+using Serilog;
 
 namespace Mfr.Cli
 {
@@ -101,6 +102,7 @@ namespace Mfr.Cli
 
             if (!options.OutputFilePath.IsBlank())
             {
+                Log.Debug("Writing results JSON to {OutputFilePath}.", options.OutputFilePath);
                 RenameResultSummary.WriteJsonFile(
                     outputFilePath: options.OutputFilePath,
                     presetName: preset.Name,
