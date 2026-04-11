@@ -65,6 +65,7 @@ namespace Mfr.Filters.Replace
             {
                 ReplacerMode.Literal => Regex.Escape(Options.Find),
                 ReplacerMode.Wildcard => _WildcardToRegex(Options.Find),
+                ReplacerMode.Regex => Options.Find,
                 _ => Options.Find
             };
 
