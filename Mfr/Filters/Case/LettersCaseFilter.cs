@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.RegularExpressions;
 using Mfr.Models;
 
 namespace Mfr.Filters.Case
@@ -17,11 +16,16 @@ namespace Mfr.Filters.Case
     /// position so the same index gets the same case across different names; when false, per-name variation
     /// is included.
     /// </param>
+    /// <param name="SentenceEndChars">
+    /// Characters that mark sentence endings for <see cref="LettersCaseMode.SentenceCase"/>.
+    /// When empty, sentence case only capitalizes at the start of the string.
+    /// </param>
     public sealed record LettersCaseOptions(
         LettersCaseMode Mode,
         IReadOnlyList<string> SkipWords,
         int WeirdUppercaseChancePercent = 50,
-        bool WeirdFixedPlaces = false);
+        bool WeirdFixedPlaces = false,
+        string SentenceEndChars = ".!?");
 
     /// <summary>
     /// Supported letter-case transformation modes.
@@ -78,8 +82,9 @@ namespace Mfr.Filters.Case
 
         /// <summary>
         /// Lowercases the string, then capitalizes the first letter of the whole string and the first
-        /// letter after <c>.</c>, <c>!</c>, or <c>?</c> when followed by one or more word-separator characters
-        /// (same as title case: default U+0020 SPACE; set by <c>SpaceCharacter</c> when used earlier in the chain).
+        /// letter after configured sentence-end characters (see <see cref="LettersCaseOptions.SentenceEndChars"/>)
+        /// when followed by one or more word-separator characters (same as title case: default U+0020 SPACE;
+        /// set by <c>SpaceCharacter</c> when used earlier in the chain).
         /// </summary>
         /// <example>
         /// <para>Default separator (space): <c>hello world. next line.</c> → <c>Hello world. Next line.</c></para>
@@ -123,7 +128,7 @@ namespace Mfr.Filters.Case
                     weirdUppercaseChancePercent: Options.WeirdUppercaseChancePercent,
                     weirdFixedPlaces: Options.WeirdFixedPlaces),
                 LettersCaseMode.TitleCase => _ApplyTitleCase(segment, Options.SkipWords, item.WordSeparator),
-                LettersCaseMode.SentenceCase => _ApplySentenceCase(segment, item.WordSeparator),
+                LettersCaseMode.SentenceCase => _ApplySentenceCase(segment, item.WordSeparator, Options.SentenceEndChars),
                 LettersCaseMode.InvertCase => _InvertCase(segment),
                 _ => segment
             };
@@ -249,25 +254,57 @@ namespace Mfr.Filters.Case
                 : char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant();
         }
 
-        private static string _ApplySentenceCase(string input, char wordSeparator)
+        private static string _ApplySentenceCase(string input, char wordSeparator, string sentenceEndChars)
         {
             if (string.IsNullOrEmpty(input))
             {
                 return input;
             }
 
-            var lower = input.ToLowerInvariant();
-            var sepEsc = Regex.Escape(wordSeparator.ToString());
-            var pattern = $"(^|[.!?]{sepEsc}+)([a-z])";
-            return Regex.Replace(
-                lower,
-                pattern,
-                m =>
+            var chars = input.ToLowerInvariant().ToCharArray();
+            if (_IsAsciiLowerLetter(chars[0]))
+            {
+                chars[0] = char.ToUpperInvariant(chars[0]);
+            }
+
+            if (sentenceEndChars.Length == 0)
+            {
+                return new string(chars);
+            }
+
+            var sentenceEndToIsIncluded = new HashSet<char>(sentenceEndChars);
+            for (var i = 0; i < chars.Length; i++)
+            {
+                if (!sentenceEndToIsIncluded.Contains(chars[i]))
                 {
-                    var prefix = m.Groups[1].Value;
-                    var ch = m.Groups[2].Value;
-                    return prefix + ch.ToUpperInvariant();
-                });
+                    continue;
+                }
+
+                var j = i + 1;
+                if (j >= chars.Length || chars[j] != wordSeparator)
+                {
+                    continue;
+                }
+
+                while (j < chars.Length && chars[j] == wordSeparator)
+                {
+                    j++;
+                }
+
+                if (j >= chars.Length || !_IsAsciiLowerLetter(chars[j]))
+                {
+                    continue;
+                }
+
+                chars[j] = char.ToUpperInvariant(chars[j]);
+            }
+
+            return new string(chars);
+        }
+
+        private static bool _IsAsciiLowerLetter(char c)
+        {
+            return c is >= 'a' and <= 'z';
         }
 
         private static string _InvertCase(string input)

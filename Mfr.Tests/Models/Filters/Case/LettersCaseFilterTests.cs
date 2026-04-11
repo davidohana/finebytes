@@ -132,6 +132,38 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
+        /// Verifies sentence case uses configured sentence-end characters.
+        /// </summary>
+        [Fact]
+        public void Apply_SentenceCase_UsesConfiguredSentenceEndCharacters()
+        {
+            var f = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(
+                    Mode: LettersCaseMode.SentenceCase,
+                    SkipWords: [],
+                    SentenceEndChars: ":;"));
+            Assert.Equal("Hello: Next; Again. no", FilterTestHelpers.ApplyToPrefix(f, "hello: next; again. no"));
+        }
+
+        /// <summary>
+        /// Verifies sentence case with empty sentence-end characters only capitalizes at string start.
+        /// </summary>
+        [Fact]
+        public void Apply_SentenceCase_WithNoSentenceEndCharacters_CapitalizesOnlyStart()
+        {
+            var f = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(
+                    Mode: LettersCaseMode.SentenceCase,
+                    SkipWords: [],
+                    SentenceEndChars: ""));
+            Assert.Equal("Hello. next line", FilterTestHelpers.ApplyToPrefix(f, "hello. next line"));
+        }
+
+        /// <summary>
         /// Verifies sentence case uses <see cref="RenameItem.WordSeparator"/> after <c>. ! ?</c>, not all Unicode whitespace.
         /// </summary>
         [Fact]
