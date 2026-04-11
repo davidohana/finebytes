@@ -9,8 +9,19 @@ namespace Mfr.Filters.Replace
     /// </summary>
     public enum ReplacerMode
     {
+        /// <summary>
+        /// Pattern is treated as literal text.
+        /// </summary>
         Literal,
+
+        /// <summary>
+        /// Pattern uses '*' (any characters) and '?' (single character) wildcards.
+        /// </summary>
         Wildcard,
+
+        /// <summary>
+        /// Pattern is a regular expression.
+        /// </summary>
         Regex
     }
 
@@ -54,7 +65,6 @@ namespace Mfr.Filters.Replace
             {
                 ReplacerMode.Literal => Regex.Escape(Options.Find),
                 ReplacerMode.Wildcard => _WildcardToRegex(Options.Find),
-                ReplacerMode.Regex => Options.Find,
                 _ => Options.Find
             };
 
