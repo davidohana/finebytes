@@ -115,6 +115,52 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
+        /// Verifies that dry-run commit reports success for changed items without moving files.
+        /// </summary>
+        public void Commit_DryRun_ReportsCommitOk_WithoutMovingFiles()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var firstSource = dir.CombinePath("track01.mp3");
+            var secondSource = dir.CombinePath("track02.mp3");
+            File.WriteAllText(firstSource, "x");
+            File.WriteAllText(secondSource, "y");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([firstSource, secondSource]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "counter",
+                Description = null,
+                Filters =
+                [
+                    new CounterFilter(
+                        Enabled: true,
+                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Options: new CounterOptions(
+                            Start: 1,
+                            Step: 1,
+                            Width: 3,
+                            PadChar: "0",
+                            Position: CounterPosition.Replace,
+                            Separator: " - ",
+                            ResetPerFolder: false))
+                ]
+            };
+
+            renameList.Preview(preset);
+            var result = renameList.Commit(failFast: false, dryRun: true);
+
+            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.True(File.Exists(firstSource));
+            Assert.True(File.Exists(secondSource));
+            Assert.False(File.Exists(dir.CombinePath("001.mp3")));
+            Assert.False(File.Exists(dir.CombinePath("002.mp3")));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that commit stops immediately on the first rename error when fail-fast is enabled.
         /// </summary>
         public void Commit_StopsOnFirstRenameError_WhenFailFastTrue()
@@ -321,6 +367,38 @@ namespace Mfr.Tests.Core
 
             renameList.Preview(preset);
             var result = renameList.Commit(failFast: false);
+
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
+            Assert.Empty(result[0].Changes);
+            Assert.Null(files[0].CommitError);
+            Assert.True(File.Exists(source));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that dry-run commit still skips items whose preview destination equals source.
+        /// </summary>
+        public void Commit_DryRun_SkipsItem_WhenPreviewDestinationMatchesSource()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = dir.CombinePath("track.mp3");
+            File.WriteAllText(source, "x");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([source]);
+            var files = renameList.RenameItems;
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "no-change",
+                Description = null,
+                Filters = []
+            };
+
+            renameList.Preview(preset);
+            var result = renameList.Commit(failFast: false, dryRun: true);
 
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);

@@ -148,13 +148,15 @@ namespace Mfr.Core
         /// Commits previously previewed rename operations.
         /// </summary>
         /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
+        /// <param name="dryRun">If <c>true</c>, simulates commit outcomes without applying filesystem changes.</param>
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
-        public IReadOnlyList<RenameResultItem> Commit(bool failFast)
+        public IReadOnlyList<RenameResultItem> Commit(bool failFast, bool dryRun = false)
         {
             Log.Debug(
-                "Starting commit for {ItemCount} item(s). FailFast: {FailFast}.",
+                "Starting commit for {ItemCount} item(s). FailFast: {FailFast}. DryRun: {DryRun}.",
                 _renameItems.Count,
-                failFast);
+                failFast,
+                dryRun);
 
             var results = new List<RenameResultItem>(_renameItems.Count);
             var stopped = false;
@@ -178,7 +180,11 @@ namespace Mfr.Core
                 var destPath = item.Preview.FullPath;
                 try
                 {
-                    item.Commit();
+                    if (!dryRun)
+                    {
+                        item.Commit();
+                    }
+
                     item.Status = RenameStatus.CommitOk;
                     var changes = _BuildFileNameChanges(sourcePath: sourcePath, destinationPath: destPath);
                     results.Add(new RenameResultItem(

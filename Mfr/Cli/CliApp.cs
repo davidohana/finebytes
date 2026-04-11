@@ -95,7 +95,9 @@ namespace Mfr.Cli
             }
 
             var commitFailFast = !options.ContinueOnRenameError;
-            var renameResults = renameList.Commit(failFast: commitFailFast);
+            var renameResults = renameList.Commit(
+                failFast: commitFailFast,
+                dryRun: options.DryRun);
 
             if (!options.OutputFilePath.IsBlank())
             {

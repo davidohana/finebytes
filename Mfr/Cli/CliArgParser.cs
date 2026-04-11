@@ -90,6 +90,7 @@ namespace Mfr.Cli
                 OutputFilePath: outputFilePath.IsBlank() ? null : outputFilePath.Trim(),
                 IncludeHidden: parsedSettings.IncludeHidden,
                 ContinueOnRenameError: parsedSettings.ContinueOnRenameError,
+                DryRun: parsedSettings.DryRun,
                 LogLevel: CliLogging.ParseLogLevel(logLevel),
                 LogDirectoryPath: logDirectoryPath.IsBlank() ? null : logDirectoryPath.Trim(),
                 PresetsFilePath: presetsFilePath);
@@ -100,7 +101,7 @@ namespace Mfr.Cli
             _ = configuration
                 .SetApplicationName("mfr")
                 .PropagateExceptions()
-                .AddExample(["C:\\Music\\*.mp3", "-p", "clean"])
+                .AddExample(["C:\\Music\\*.mp3", "-p", "clean", "--dry-run"])
                 .AddExample(["C:\\Music\\**\\*.flac", "-p", "lowercase-extension", "--log-level", "debug"])
                 .AddExample(["C:\\Music", "-p", "name_from_id3", "-r"])
                 .AddExample(["C:\\Music", "C:\\Podcasts", "-p", "my_preset", "--files", "yes", "--folders", "yes", "--output-file", "C:\\Temp\\mfr-results.json"]);
@@ -175,6 +176,10 @@ namespace Mfr.Cli
             [CommandOption("--core")]
             [Description("Continue-On-Rename-Errors instead of stopping at the first failure.")]
             public bool ContinueOnRenameError { get; init; }
+
+            [CommandOption("--dry-run")]
+            [Description("Preview and report commit outcomes without changing files on disk.")]
+            public bool DryRun { get; init; }
 
             [CommandOption("-l|--log-level <LEVEL>")]
             [Description("Minimum log level: debug | info | warn | error.")]

@@ -142,5 +142,25 @@ namespace Mfr.Tests.Cli
             Assert.True(options.RecursiveDirectoryFileAdd);
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies that omitted <c>--dry-run</c> defaults to <c>false</c>.
+        /// </summary>
+        public void ParseArgs_Defaults_DryRun_To_False()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean"])!;
+            Assert.False(options.DryRun);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>--dry-run</c> is accepted.
+        /// </summary>
+        public void ParseArgs_Accepts_DryRun_Long_Option()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--dry-run"])!;
+            Assert.True(options.DryRun);
+        }
+
     }
 }
