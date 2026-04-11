@@ -39,6 +39,15 @@ namespace Mfr.Filters.Case
         LowerCase,
 
         /// <summary>
+        /// Uppercases the first character (index 0) and lowercases the remainder of the segment.
+        /// </summary>
+        /// <example>
+        /// <para><c>hELLO world</c> → <c>Hello world</c></para>
+        /// <para><c> 123_aBC</c> → <c> 123_abc</c> (leading character is unchanged because it is not a letter).</para>
+        /// </example>
+        FirstLetterUp,
+
+        /// <summary>
         /// Capitalizes the first letter of each segment between occurrences of the current word separator
         /// (U+0020 SPACE by default; set by <c>SpaceCharacter</c> when used earlier in the chain);
         /// words in <see cref="LettersCaseOptions.SkipWords"/> stay lowercase.
@@ -89,11 +98,27 @@ namespace Mfr.Filters.Case
             {
                 LettersCaseMode.UpperCase => segment.ToUpperInvariant(),
                 LettersCaseMode.LowerCase => segment.ToLowerInvariant(),
+                LettersCaseMode.FirstLetterUp => _FirstLetterUp(segment),
                 LettersCaseMode.TitleCase => _ApplyTitleCase(segment, Options.SkipWords, item.WordSeparator),
                 LettersCaseMode.SentenceCase => _ApplySentenceCase(segment, item.WordSeparator),
                 LettersCaseMode.InvertCase => _InvertCase(segment),
                 _ => segment
             };
+        }
+
+        private static string _FirstLetterUp(string input)
+        {
+            if (input.Length == 0)
+            {
+                return input;
+            }
+
+            if (input.Length == 1)
+            {
+                return char.ToUpperInvariant(input[0]).ToString();
+            }
+
+            return char.ToUpperInvariant(input[0]) + input[1..].ToLowerInvariant();
         }
 
         private static string _ApplyTitleCase(string input, IReadOnlyList<string> skipWords, char wordSeparator)

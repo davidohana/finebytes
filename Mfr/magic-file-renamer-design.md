@@ -158,7 +158,7 @@ public abstract record Filter<TOptions> : Filter
 }
 
 // Example filter definitions (all 38 follow the same typed pattern).
-public enum LettersCaseMode { UpperCase, LowerCase, TitleCase, SentenceCase, InvertCase }
+public enum LettersCaseMode { UpperCase, LowerCase, FirstLetterUp, TitleCase, SentenceCase, InvertCase }
 public sealed record LettersCaseOptions
 {
     public LettersCaseMode Mode { get; init; } = LettersCaseMode.UpperCase;
@@ -826,7 +826,7 @@ A **Filter Options** panel (gear icon on each filter row) provides:
   "type": "LettersCase",
   "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
-    "mode": "UpperCase | LowerCase | TitleCase | SentenceCase | InvertCase",
+    "mode": "UpperCase | LowerCase | FirstLetterUp | TitleCase | SentenceCase | InvertCase",
     "skipWords": ["a", "an", "the", "of", "in", "at"]
   }
 }

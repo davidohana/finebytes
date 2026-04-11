@@ -33,6 +33,26 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
+        /// Verifies first-letter-up mode uppercases the first letter and lowercases remaining letters.
+        /// </summary>
+        [Fact]
+        public void Apply_FirstLetterUp_UppercasesFirstLetterOnly()
+        {
+            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.FirstLetterUp, []));
+            Assert.Equal("Hello world", FilterTestHelpers.ApplyToPrefix(f, "hELLO world"));
+        }
+
+        /// <summary>
+        /// Verifies first-letter-up mode applies to index 0 and lowercases the remainder.
+        /// </summary>
+        [Fact]
+        public void Apply_FirstLetterUp_UsesIndexZero()
+        {
+            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.FirstLetterUp, []));
+            Assert.Equal(" 123_abc", FilterTestHelpers.ApplyToPrefix(f, " 123_aBC"));
+        }
+
+        /// <summary>
         /// Verifies title-case respects skip words.
         /// </summary>
         [Fact]
