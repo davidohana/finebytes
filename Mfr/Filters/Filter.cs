@@ -1,6 +1,10 @@
 using System.Text.Json.Serialization;
-using Mfr.Filters.Advanced;
-using Mfr.Filters.Text;
+using Mfr.Filters.Case;
+using Mfr.Filters.Formatting;
+using Mfr.Filters.Misc;
+using Mfr.Filters.Replace;
+using Mfr.Filters.Space;
+using Mfr.Filters.Trimming;
 using Mfr.Models;
 
 namespace Mfr.Filters

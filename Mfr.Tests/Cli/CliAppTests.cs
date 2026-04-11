@@ -1,6 +1,6 @@
 using Mfr.Cli;
 using Mfr.Core;
-using Mfr.Filters.Advanced;
+using Mfr.Filters.Formatting;
 using Mfr.Models;
 using Mfr.Tests.TestSupport;
 using Mfr.Utils;
