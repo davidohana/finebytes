@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters.Text
     /// </summary>
     public class TrimRightFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies trimming from the right by count.
@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_RemovesRightCharacters()
         {
-            var f = new TrimRightFilter(true, _Target, new CountFilterOptions(2));
+            var f = new TrimRightFilter(true, _target, new CountFilterOptions(2));
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
         }
 
@@ -27,7 +27,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_NonPositiveCount_ReturnsOriginal()
         {
-            var f = new TrimRightFilter(true, _Target, new CountFilterOptions(0));
+            var f = new TrimRightFilter(true, _target, new CountFilterOptions(0));
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
 
@@ -37,7 +37,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_CountExceedsLength_ReturnsEmpty()
         {
-            var f = new TrimRightFilter(true, _Target, new CountFilterOptions(10));
+            var f = new TrimRightFilter(true, _target, new CountFilterOptions(10));
             Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "hi"));
         }
     }

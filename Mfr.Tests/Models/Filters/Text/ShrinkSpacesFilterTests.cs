@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Text
     /// </summary>
     public class ShrinkSpacesFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies runs of whitespace collapse to a single space.
@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_CollapsesWhitespaceRunsToSingleSpace()
         {
-            var f = new ShrinkSpacesFilter(true, _Target);
+            var f = new ShrinkSpacesFilter(true, _target);
             Assert.Equal("a b c", FilterTestHelpers.ApplyToPrefix(f, "a  \t b \n c"));
         }
     }

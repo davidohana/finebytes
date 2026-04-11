@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters.Text
     /// </summary>
     public class LettersCaseFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies upper-case mode.
@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_UpperCase_ConvertsToUpperInvariant()
         {
-            var f = new LettersCaseFilter(true, _Target, new LettersCaseOptions(LettersCaseMode.UpperCase, []));
+            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.UpperCase, []));
             Assert.Equal("HELLO", FilterTestHelpers.ApplyToPrefix(f, "hello"));
         }
 
@@ -27,7 +27,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_LowerCase_ConvertsToLowerInvariant()
         {
-            var f = new LettersCaseFilter(true, _Target, new LettersCaseOptions(LettersCaseMode.LowerCase, []));
+            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.LowerCase, []));
             Assert.Equal("hello", FilterTestHelpers.ApplyToPrefix(f, "HELLO"));
         }
 
@@ -39,7 +39,7 @@ namespace Mfr.Tests.Models.Filters.Text
         {
             var f = new LettersCaseFilter(
                 true,
-                _Target,
+                _target,
                 new LettersCaseOptions(LettersCaseMode.TitleCase, ["a", "the", "for"]));
             Assert.Equal("a Song for the World", FilterTestHelpers.ApplyToPrefix(f, "a song for the world"));
         }
@@ -50,7 +50,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_SentenceCase_CapitalizesAfterPunctuation()
         {
-            var f = new LettersCaseFilter(true, _Target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             Assert.Equal("Hello world. Next line.", FilterTestHelpers.ApplyToPrefix(f, "hello world. next line."));
         }
 
@@ -60,7 +60,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_InvertCase_SwapsCasing()
         {
-            var f = new LettersCaseFilter(true, _Target, new LettersCaseOptions(LettersCaseMode.InvertCase, []));
+            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.InvertCase, []));
             Assert.Equal("hELLO", FilterTestHelpers.ApplyToPrefix(f, "Hello"));
         }
     }

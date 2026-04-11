@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
     /// </summary>
     public class FixLeadingZerosFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies non-positive width leaves segment unchanged.
@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         [Fact]
         public void Apply_NonPositiveWidth_ReturnsOriginal()
         {
-            var f = new FixLeadingZerosFilter(true, _Target, new FixLeadingZerosOptions(Width: 0, RemoveExtraZeros: true));
+            var f = new FixLeadingZerosFilter(true, _target, new FixLeadingZerosOptions(Width: 0, RemoveExtraZeros: true));
             Assert.Equal("track12", FilterTestHelpers.ApplyToPrefix(f, "track12"));
         }
 
@@ -27,7 +27,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         [Fact]
         public void Apply_PadsNumericRuns()
         {
-            var f = new FixLeadingZerosFilter(true, _Target, new FixLeadingZerosOptions(Width: 4, RemoveExtraZeros: false));
+            var f = new FixLeadingZerosFilter(true, _target, new FixLeadingZerosOptions(Width: 4, RemoveExtraZeros: false));
             Assert.Equal("track0009", FilterTestHelpers.ApplyToPrefix(f, "track9"));
         }
 
@@ -37,7 +37,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         [Fact]
         public void Apply_RemoveExtraZeros_NormalizesThenPads()
         {
-            var f = new FixLeadingZerosFilter(true, _Target, new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true));
+            var f = new FixLeadingZerosFilter(true, _target, new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true));
             Assert.Equal("x007", FilterTestHelpers.ApplyToPrefix(f, "x0007"));
         }
     }

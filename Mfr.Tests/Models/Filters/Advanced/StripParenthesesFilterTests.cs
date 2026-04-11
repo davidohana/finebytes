@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
     /// </summary>
     public class StripParenthesesFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies round parentheses and contents are removed.
@@ -19,7 +19,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new StripParenthesesFilter(
                 true,
-                _Target,
+                _target,
                 new StripParenthesesOptions(Types: "Round", RemoveContents: true));
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a(rem)b"));
         }
@@ -32,7 +32,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new StripParenthesesFilter(
                 true,
-                _Target,
+                _target,
                 new StripParenthesesOptions(Types: "Round", RemoveContents: false));
             Assert.Equal("arem", FilterTestHelpers.ApplyToPrefix(f, "a(rem)"));
         }
@@ -45,7 +45,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new StripParenthesesFilter(
                 true,
-                _Target,
+                _target,
                 new StripParenthesesOptions(Types: "Square", RemoveContents: true));
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a[xx]b"));
         }

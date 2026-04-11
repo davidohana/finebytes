@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
     /// </summary>
     public class ReplacerFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies literal replace-all.
@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new ReplacerFilter(
                 true,
-                _Target,
+                _target,
                 new ReplacerOptions("a", "X", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
             Assert.Equal("XbX", FilterTestHelpers.ApplyToPrefix(f, "aba"));
         }
@@ -31,7 +31,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new ReplacerFilter(
                 true,
-                _Target,
+                _target,
                 new ReplacerOptions("a", "X", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false));
             Assert.Equal("Xba", FilterTestHelpers.ApplyToPrefix(f, "aba"));
         }
@@ -44,7 +44,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new ReplacerFilter(
                 true,
-                _Target,
+                _target,
                 new ReplacerOptions("f*o", "X", ReplacerMode.Wildcard, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
             Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "foo"));
         }
@@ -57,7 +57,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new ReplacerFilter(
                 true,
-                _Target,
+                _target,
                 new ReplacerOptions(@"\d+", "N", ReplacerMode.Regex, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
             Assert.Equal("aNb", FilterTestHelpers.ApplyToPrefix(f, "a12b"));
         }

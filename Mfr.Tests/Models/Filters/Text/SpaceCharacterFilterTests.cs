@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Text
     /// </summary>
     public class SpaceCharacterFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies spaces are replaced and the mapped character becomes a space.
@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters.Text
         {
             var f = new SpaceCharacterFilter(
                 true,
-                _Target,
+                _target,
                 new SpaceCharacterOptions(ReplaceSpaceWith: "_", ReplaceCharWithSpace: "-"));
             Assert.Equal("a_b c", FilterTestHelpers.ApplyToPrefix(f, "a b-c"));
         }

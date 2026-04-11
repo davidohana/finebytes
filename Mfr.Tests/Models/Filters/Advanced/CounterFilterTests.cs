@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
     /// </summary>
     public class CounterFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies replace mode outputs padded counter only.
@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new CounterFilter(
                 true,
-                _Target,
+                _target,
                 new CounterOptions(Start: 1, Step: 1, Width: 3, PadChar: "0", Position: CounterPosition.Replace, Separator: "", ResetPerFolder: false));
             Assert.Equal("005", FilterTestHelpers.ApplyToPrefix(f, "old", globalIndex: 4));
         }
@@ -31,7 +31,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new CounterFilter(
                 true,
-                _Target,
+                _target,
                 new CounterOptions(Start: 0, Step: 1, Width: 0, PadChar: "0", Position: CounterPosition.Prepend, Separator: "_", ResetPerFolder: false));
             Assert.Equal("2_name", FilterTestHelpers.ApplyToPrefix(f, "name", globalIndex: 2));
         }
@@ -44,7 +44,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new CounterFilter(
                 true,
-                _Target,
+                _target,
                 new CounterOptions(Start: 0, Step: 1, Width: 0, PadChar: "0", Position: CounterPosition.Append, Separator: "-", ResetPerFolder: false));
             Assert.Equal("name-1", FilterTestHelpers.ApplyToPrefix(f, "name", globalIndex: 1));
         }
@@ -57,7 +57,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new CounterFilter(
                 true,
-                _Target,
+                _target,
                 new CounterOptions(Start: 10, Step: 5, Width: 0, PadChar: "0", Position: CounterPosition.Replace, Separator: "", ResetPerFolder: true));
             Assert.Equal("20", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 99, inFolderIndex: 2));
         }

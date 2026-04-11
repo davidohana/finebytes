@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Text
     /// </summary>
     public class RemoveSpacesFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies all whitespace is removed.
@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_StripsAllWhitespace()
         {
-            var f = new RemoveSpacesFilter(true, _Target);
+            var f = new RemoveSpacesFilter(true, _target);
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a \t\r\nb"));
         }
     }

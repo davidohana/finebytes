@@ -10,7 +10,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
     /// </summary>
     public class FormatterFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Full);
+        private static readonly FileNameTarget _target = new(FileNamePart.Full);
 
         /// <summary>
         /// Verifies file-name token substitution.
@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         [Fact]
         public void Apply_FileNameToken_UsesPrefix()
         {
-            var f = new FormatterFilter(true, _Target, new FormatterOptions("<file-name>"));
+            var f = new FormatterFilter(true, _target, new FormatterOptions("<file-name>"));
             Assert.Equal("song", FilterTestHelpers.ApplyToPrefix(f, "song"));
         }
 
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         [Fact]
         public void Apply_CounterToken_UsesGlobalIndex()
         {
-            var f = new FormatterFilter(true, _Target, new FormatterOptions("<counter:10,2,0,4,0>"));
+            var f = new FormatterFilter(true, _target, new FormatterOptions("<counter:10,2,0,4,0>"));
             Assert.Equal("0016", FilterTestHelpers.ApplyToPrefix(f, "ignored", globalIndex: 3));
         }
 
@@ -38,7 +38,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         [Fact]
         public void Apply_ParentFolderToken_UsesDirectoryName()
         {
-            var f = new FormatterFilter(true, _Target, new FormatterOptions("<parent-folder>"));
+            var f = new FormatterFilter(true, _target, new FormatterOptions("<parent-folder>"));
             Assert.Equal("My Album", FilterTestHelpers.ApplyToPrefix(f, "ignored", directory: "Music".CombinePath("My Album")));
         }
     }

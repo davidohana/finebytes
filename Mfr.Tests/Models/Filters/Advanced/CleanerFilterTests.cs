@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
     /// </summary>
     public class CleanerFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies illegal file-name characters are replaced.
@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new CleanerFilter(
                 true,
-                _Target,
+                _target,
                 new CleanerOptions(
                     RemoveIllegalChars: true,
                     IllegalCharReplacement: "_",
@@ -35,7 +35,7 @@ namespace Mfr.Tests.Models.Filters.Advanced
         {
             var f = new CleanerFilter(
                 true,
-                _Target,
+                _target,
                 new CleanerOptions(
                     RemoveIllegalChars: false,
                     IllegalCharReplacement: "",

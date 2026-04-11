@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters.Text
     /// </summary>
     public class ExtractRightFilterTests
     {
-        private static readonly FileNameTarget _Target = new(FileNamePart.Prefix);
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
         /// Verifies right extraction by count.
@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_TakesRightSubstring()
         {
-            var f = new ExtractRightFilter(true, _Target, new CountFilterOptions(3));
+            var f = new ExtractRightFilter(true, _target, new CountFilterOptions(3));
             Assert.Equal("def", FilterTestHelpers.ApplyToPrefix(f, "abcdef"));
         }
 
@@ -27,7 +27,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_ZeroCount_ReturnsEmpty()
         {
-            var f = new ExtractRightFilter(true, _Target, new CountFilterOptions(0));
+            var f = new ExtractRightFilter(true, _target, new CountFilterOptions(0));
             Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "abc"));
         }
 
@@ -37,7 +37,7 @@ namespace Mfr.Tests.Models.Filters.Text
         [Fact]
         public void Apply_CountBeyondLength_ReturnsFullSegment()
         {
-            var f = new ExtractRightFilter(true, _Target, new CountFilterOptions(100));
+            var f = new ExtractRightFilter(true, _target, new CountFilterOptions(100));
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
     }
