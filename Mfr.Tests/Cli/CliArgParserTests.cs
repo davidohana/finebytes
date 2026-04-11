@@ -162,5 +162,15 @@ namespace Mfr.Tests.Cli
             Assert.True(options.DryRun);
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies that undefined flags or tokens fail parsing instead of being ignored.
+        /// </summary>
+        public void ParseArgs_Rejects_Unknown_Option()
+        {
+            var ex = Assert.Throws<UserException>(() => CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--not-a-real-option"]));
+            Assert.Contains("Unknown option", ex.Message, StringComparison.Ordinal);
+        }
+
     }
 }

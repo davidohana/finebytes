@@ -14,7 +14,7 @@ namespace Mfr.Cli
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>Parsed <see cref="CliOptions"/> on success; <c>null</c> when the user requested help output.</returns>
-        /// <exception cref="UserException">Thrown when argument parsing cannot produce options.</exception>
+        /// <exception cref="UserException">Thrown when argument parsing cannot produce options, including unknown flags or options.</exception>
         public static CliOptions? ParseArgs(string[] args)
         {
             ParseCommandSettings? parsedSettings = null;
@@ -101,6 +101,7 @@ namespace Mfr.Cli
             _ = configuration
                 .SetApplicationName("mfr")
                 .PropagateExceptions()
+                .UseStrictParsing()
                 .AddExample(["C:\\Music\\*.mp3", "-p", "clean", "--dry-run"])
                 .AddExample(["C:\\Music\\**\\*.flac", "-p", "lowercase-extension", "--log-level", "debug"])
                 .AddExample(["C:\\Music", "-p", "name_from_id3", "-r"])
