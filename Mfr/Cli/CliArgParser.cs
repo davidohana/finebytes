@@ -101,9 +101,9 @@ namespace Mfr.Cli
                 .SetApplicationName("mfr")
                 .PropagateExceptions()
                 .AddExample(["C:\\Music\\*.mp3", "-p", "clean"])
-                .AddExample(["C:\\Music", "-p", "clean", "-r"])
-                .AddExample(["C:\\Music", "C:\\Podcasts", "-p", "clean", "--files", "yes", "--folders", "yes"])
-                .AddExample(["C:\\Music\\*.mp3", "-p", "clean", "--output-file", "C:\\Temp\\mfr-results.json"]);
+                .AddExample(["C:\\Music\\**\\*.flac", "-p", "lowercase-extension", "--log-level", "debug"])
+                .AddExample(["C:\\Music", "-p", "name_from_id3", "-r"])
+                .AddExample(["C:\\Music", "C:\\Podcasts", "-p", "my_preset", "--files", "yes", "--folders", "yes", "--output-file", "C:\\Temp\\mfr-results.json"]);
         }
 
         private static string _GetAssemblyVersionString()
@@ -141,7 +141,7 @@ namespace Mfr.Cli
         private sealed class ParseCommandSettings : CommandSettings
         {
             [CommandArgument(0, "<SOURCES>")]
-            [Description("Source paths or wildcards to rename.")]
+            [Description("Files, directories, filemasks, globs to rename (space-seperated).")]
             public string[] Sources { get; init; } = [];
 
             [CommandOption("-p|--preset <NAME>")]
