@@ -1,5 +1,6 @@
 using Mfr.Models;
 using Mfr.Models.Filters;
+using Serilog;
 
 namespace Mfr.Core
 {
@@ -83,6 +84,37 @@ namespace Mfr.Core
             }
 
             return changes;
+        }
+
+        /// <summary>
+        /// Logs debug details for one item when preview produced a destination path change.
+        /// </summary>
+        /// <param name="renameItem">The previewed item to inspect.</param>
+        internal static void LogPreviewChangeDetail(this RenameItem renameItem)
+        {
+            if (renameItem.IsPreviewPathSameAsOriginal())
+            {
+                return;
+            }
+
+            var originalFullPath = renameItem.Original.FullPath;
+            Log.Debug("Preview changes for {OriginalFullPath}:", originalFullPath);
+
+            var previewChanges = renameItem.GetPreviewPropertyChanges();
+            foreach (var change in previewChanges)
+            {
+                // Property on its own line; old then new below with fixed indent (avoids console-prefix alignment math).
+                var changeBlock = change.FormatPreviewChangeBlock();
+                Log.Debug("{PreviewChangeBlock}", changeBlock);
+            }
+
+            if (renameItem.Status == RenameStatus.PreviewError)
+            {
+                var previewErrorMessage = renameItem.PreviewError?.Message ?? "Unknown preview error.";
+                Log.Debug(
+                    "  Error: '{PreviewErrorMessage}'",
+                    previewErrorMessage);
+            }
         }
     }
 }
