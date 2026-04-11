@@ -1,4 +1,4 @@
-using Mfr.Models.Filters;
+using Mfr.Filters;
 
 namespace Mfr.Models
 {

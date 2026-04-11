@@ -1,4 +1,6 @@
-namespace Mfr.Models.Filters.Advanced
+using Mfr.Models;
+
+namespace Mfr.Filters.Advanced
 {
     /// <summary>
     /// Options for illegal/custom character cleanup.

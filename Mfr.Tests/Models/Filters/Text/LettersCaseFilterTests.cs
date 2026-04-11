@@ -1,5 +1,6 @@
+using Mfr.Filters.Text;
 using Mfr.Models;
-using Mfr.Models.Filters.Text;
+using LettersCaseFilter = Mfr.Filters.Text.LettersCaseFilter;
 
 namespace Mfr.Tests.Models.Filters.Text
 {

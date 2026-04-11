@@ -1,5 +1,6 @@
+using Mfr.Filters.Advanced;
 using Mfr.Models;
-using Mfr.Models.Filters.Advanced;
+using FixLeadingZerosFilter = Mfr.Filters.Advanced.FixLeadingZerosFilter;
 
 namespace Mfr.Tests.Models.Filters.Advanced
 {

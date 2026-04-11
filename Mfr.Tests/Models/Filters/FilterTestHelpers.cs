@@ -1,5 +1,6 @@
+using Mfr.Filters;
 using Mfr.Models;
-using Mfr.Models.Filters;
+
 
 namespace Mfr.Tests.Models.Filters
 {

@@ -1,5 +1,7 @@
 using System.Text.RegularExpressions;
-namespace Mfr.Models.Filters.Advanced
+using Mfr.Models;
+
+namespace Mfr.Filters.Advanced
 {
     /// <summary>
     /// Options for stripping bracket/parenthesis pairs.

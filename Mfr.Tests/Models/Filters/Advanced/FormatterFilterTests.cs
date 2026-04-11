@@ -1,6 +1,7 @@
+using Mfr.Filters.Advanced;
 using Mfr.Models;
-using Mfr.Models.Filters.Advanced;
 using Mfr.Utils;
+using FormatterFilter = Mfr.Filters.Advanced.FormatterFilter;
 
 namespace Mfr.Tests.Models.Filters.Advanced
 {

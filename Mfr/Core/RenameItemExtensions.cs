@@ -1,5 +1,5 @@
+using Mfr.Filters;
 using Mfr.Models;
-using Mfr.Models.Filters;
 using Serilog;
 
 namespace Mfr.Core

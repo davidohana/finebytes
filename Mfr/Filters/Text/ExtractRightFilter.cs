@@ -1,4 +1,6 @@
-namespace Mfr.Models.Filters.Text
+using Mfr.Models;
+
+namespace Mfr.Filters.Text
 {
     /// <summary>
     /// Extracts a fixed number of characters from the right.

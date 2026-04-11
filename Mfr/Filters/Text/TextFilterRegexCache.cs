@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Mfr.Models.Filters.Text
+namespace Mfr.Filters.Text
 {
     internal static partial class TextFilterRegexCache
     {

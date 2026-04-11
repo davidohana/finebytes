@@ -1,5 +1,5 @@
+using Mfr.Filters.Advanced;
 using Mfr.Models;
-using Mfr.Models.Filters.Advanced;
 
 namespace Mfr.Tests.Models.Filters.Advanced
 {

@@ -1,8 +1,9 @@
 using Mfr.Core;
+using Mfr.Filters.Advanced;
 using Mfr.Models;
-using Mfr.Models.Filters.Advanced;
 using Mfr.Tests.TestSupport;
 using Mfr.Utils;
+using FormatterFilter = Mfr.Filters.Advanced.FormatterFilter;
 
 namespace Mfr.Tests.Core
 {
