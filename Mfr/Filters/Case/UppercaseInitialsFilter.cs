@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Mfr.Models;
 
 namespace Mfr.Filters.Case
@@ -16,10 +17,18 @@ namespace Mfr.Filters.Case
     /// </remarks>
     /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
-    public sealed record UppercaseInitialsFilter(
+    public sealed partial record UppercaseInitialsFilter(
         bool Enabled,
         FilterTarget Target) : Filter(Enabled, Target)
     {
+        // Keep this runtime-compiled regex for readability and to avoid GeneratedRegex partial-method
+        // analyzer noise in this project setup.
+#pragma warning disable SYSLIB1045
+        private static readonly Regex _regex = new(
+            @"(?<!\p{L})\p{L}(?:\.\p{L})+(?!\p{L})",
+            RegexOptions.Compiled);
+#pragma warning restore SYSLIB1045
+
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
@@ -32,84 +41,8 @@ namespace Mfr.Filters.Case
                 return segment;
             }
 
-            var chars = segment.ToCharArray();
-            var i = 0;
-
-            while (i < chars.Length)
-            {
-                if (!_TryGetInitialsEndIndex(chars, i, out var endExclusive))
-                {
-                    i++;
-                    continue;
-                }
-
-                for (var j = i; j < endExclusive; j++)
-                {
-                    if (char.IsLetter(chars[j]))
-                    {
-                        chars[j] = char.ToUpperInvariant(chars[j]);
-                    }
-                }
-
-                i = endExclusive;
-            }
-
-            return new string(chars);
+            return _regex.Replace(segment, m => m.Value.ToUpperInvariant());
         }
 
-        private static bool _TryGetInitialsEndIndex(char[] chars, int start, out int endExclusive)
-        {
-            endExclusive = start;
-            if (!char.IsLetter(chars[start]))
-            {
-                return false;
-            }
-
-            var hasLetterBefore = start > 0 && char.IsLetter(chars[start - 1]);
-            if (hasLetterBefore)
-            {
-                return false;
-            }
-
-            var index = start;
-            var segmentCount = 0;
-            while (index < chars.Length)
-            {
-                if (!char.IsLetter(chars[index]))
-                {
-                    break;
-                }
-
-                var nextIndex = index + 1;
-                if (nextIndex < chars.Length && char.IsLetter(chars[nextIndex]))
-                {
-                    break;
-                }
-
-                segmentCount++;
-                index = nextIndex;
-
-                if (index >= chars.Length || chars[index] != '.')
-                {
-                    break;
-                }
-
-                var hasLetterAfterDot = index + 1 < chars.Length && char.IsLetter(chars[index + 1]);
-                if (!hasLetterAfterDot)
-                {
-                    break;
-                }
-
-                index++;
-            }
-
-            if (segmentCount < 2)
-            {
-                return false;
-            }
-
-            endExclusive = index;
-            return true;
-        }
     }
 }

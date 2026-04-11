@@ -51,5 +51,27 @@ namespace Mfr.Tests.Models.Filters.Case
 
             Assert.Equal("alpha beta c and ab.cd stay as-is", result);
         }
+
+        [Theory]
+        [InlineData("u.s.a", "U.S.A")]
+        [InlineData("d.j.", "D.J.")]
+        [InlineData("a.b.c.d", "A.B.C.D")]
+        [InlineData("i.b.m.", "I.B.M.")]
+        [InlineData("a.b c.d", "A.B C.D")]
+        [InlineData("abc.d", "abc.d")]
+        [InlineData("a.bcd", "a.bcd")]
+        [InlineData(".a.b", ".A.B")]
+        [InlineData("a.b.", "A.B.")]
+        [InlineData("a.b.c", "A.B.C")]
+        [InlineData("the u.s.a. is great", "the U.S.A. is great")]
+        [InlineData("initials a.b and c.d.e", "initials A.B and C.D.E")]
+        [InlineData("1.2.3", "1.2.3")]
+        [InlineData("a.1", "a.1")]
+        public void Apply_VariousPatterns(string input, string expected)
+        {
+            var filter = new UppercaseInitialsFilter(true, _target);
+            var result = FilterTestHelpers.ApplyToPrefix(filter, input);
+            Assert.Equal(expected, result);
+        }
     }
 }
