@@ -7,6 +7,7 @@ namespace Mfr.Models
     /// Represents the top-level rename execution result for JSON serialization.
     /// </summary>
     /// <param name="Preset">Preset name used for this execution.</param>
+    /// <param name="DryRun">Whether the run was a dry run (no filesystem changes).</param>
     /// <param name="TotalCount">Total number of resolved files.</param>
     /// <param name="RenamedCount">Count of successfully renamed files.</param>
     /// <param name="SkippedCount">Count of skipped files.</param>
@@ -14,6 +15,7 @@ namespace Mfr.Models
     /// <param name="Results">Per-file rename results.</param>
     public sealed record RenameResultSummary(
         string Preset,
+        bool DryRun,
         int TotalCount,
         int RenamedCount,
         int SkippedCount,
@@ -33,11 +35,13 @@ namespace Mfr.Models
         /// </summary>
         /// <param name="outputFilePath">Destination JSON file path.</param>
         /// <param name="presetName">Preset name used for the rename run.</param>
+        /// <param name="dryRun">Whether the run was a dry run (no filesystem changes).</param>
         /// <param name="results">Per-item rename results.</param>
-        public static void WriteJsonFile(string outputFilePath, string presetName, IReadOnlyList<RenameResultItem> results)
+        public static void WriteJsonFile(string outputFilePath, string presetName, bool dryRun, IReadOnlyList<RenameResultItem> results)
         {
             var summary = new RenameResultSummary(
                 Preset: presetName,
+                DryRun: dryRun,
                 TotalCount: results.Count,
                 RenamedCount: _CountStatus(results, RenameStatus.CommitOk),
                 SkippedCount: _CountStatus(results, RenameStatus.CommitSkipped),

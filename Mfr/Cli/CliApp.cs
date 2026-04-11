@@ -106,6 +106,7 @@ namespace Mfr.Cli
                 RenameResultSummary.WriteJsonFile(
                     outputFilePath: options.OutputFilePath,
                     presetName: preset.Name,
+                    dryRun: options.DryRun,
                     results: renameResults);
             }
 
