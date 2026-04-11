@@ -20,7 +20,9 @@ namespace Mfr.Filters.Trimming
 
         internal override string TransformSegment(string segment, RenameItem item)
         {
-            return Options.Count <= 0 ? "" : segment.Length <= Options.Count ? segment : segment[..Options.Count];
+            // Ensure count is within [0, segment.Length] to avoid IndexOutOfRangeException
+            var count = Math.Clamp(Options.Count, 0, segment.Length);
+            return segment[..count];
         }
     }
 }
