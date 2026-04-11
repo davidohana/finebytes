@@ -76,7 +76,7 @@ namespace Mfr.Core
                 var directory = Path.GetDirectoryName(PresetsFilePath);
                 if (!string.IsNullOrWhiteSpace(directory))
                 {
-                    _ = Directory.CreateDirectory(directory);
+                    Directory.CreateDirectory(directory);
                 }
 
                 var sortedPresets = NameToPreset.Values

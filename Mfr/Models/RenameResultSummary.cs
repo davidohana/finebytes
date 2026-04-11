@@ -53,7 +53,7 @@ namespace Mfr.Models
             var outputDirectoryPath = Path.GetDirectoryName(outputFilePathTrimmed);
             if (!string.IsNullOrWhiteSpace(outputDirectoryPath))
             {
-                _ = Directory.CreateDirectory(outputDirectoryPath);
+                Directory.CreateDirectory(outputDirectoryPath);
             }
 
             File.WriteAllText(outputFilePathTrimmed, json);

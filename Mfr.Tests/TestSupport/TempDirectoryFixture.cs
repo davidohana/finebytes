@@ -18,7 +18,7 @@ namespace Mfr.Tests.TestSupport
         public TempDirectoryFixture()
         {
             TempDir = Path.GetTempPath().CombinePath("mfr8_tests_" + Guid.NewGuid().ToString("N"));
-            _ = Directory.CreateDirectory(TempDir);
+            Directory.CreateDirectory(TempDir);
         }
 
         /// <summary>

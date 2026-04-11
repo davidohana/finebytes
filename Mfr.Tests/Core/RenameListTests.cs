@@ -18,7 +18,7 @@ namespace Mfr.Tests.Core
         {
             _tempRoot = Directory.GetCurrentDirectory().CombinePath(
                 "mfr_renamelist_tests_" + Guid.NewGuid().ToString("N"));
-            _ = Directory.CreateDirectory(_tempRoot);
+            Directory.CreateDirectory(_tempRoot);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(1, renameList.AddSource(source));
             Assert.Equal(0, renameList.AddSource(source));
 
-            _ = Assert.Single(renameList.RenameItems);
+            Assert.Single(renameList.RenameItems);
             Assert.Equal(source, renameList.RenameItems[0].Original.FullPath);
         }
 
@@ -122,16 +122,16 @@ namespace Mfr.Tests.Core
             }
 
             var excludeHiddenList = new RenameList(includeHidden: false);
-            _ = excludeHiddenList.AddSource(hiddenPath);
-            _ = excludeHiddenList.AddSource(visiblePath);
+            excludeHiddenList.AddSource(hiddenPath);
+            excludeHiddenList.AddSource(visiblePath);
             var excludedHidden = excludeHiddenList.RenameItems.ToList();
 
             var includeHiddenList = new RenameList(includeHidden: true);
-            _ = includeHiddenList.AddSource(hiddenPath);
-            _ = includeHiddenList.AddSource(visiblePath);
+            includeHiddenList.AddSource(hiddenPath);
+            includeHiddenList.AddSource(visiblePath);
             var includedHidden = includeHiddenList.RenameItems.ToList();
 
-            _ = Assert.Single(excludedHidden);
+            Assert.Single(excludedHidden);
             Assert.Equal(visiblePath, excludedHidden[0].Original.FullPath);
             Assert.Equal(0, excludedHidden[0].Original.GlobalIndex);
             Assert.Equal(0, excludedHidden[0].Original.InFolderIndex);
@@ -170,7 +170,7 @@ namespace Mfr.Tests.Core
             var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
             var folderFilePath = TestHelpers.CreateFile(folderPath, "inside.txt");
-            _ = TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
+            TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
 
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources(

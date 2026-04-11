@@ -73,7 +73,7 @@ namespace Mfr.Tests.TestSupport
                 var parentDirectory = Path.GetDirectoryName(fullPath);
                 if (!string.IsNullOrWhiteSpace(parentDirectory))
                 {
-                    _ = Directory.CreateDirectory(parentDirectory);
+                    Directory.CreateDirectory(parentDirectory);
                 }
 
                 File.WriteAllText(fullPath, "dummy");

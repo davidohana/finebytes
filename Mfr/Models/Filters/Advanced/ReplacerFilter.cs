@@ -75,7 +75,7 @@ namespace Mfr.Models.Filters.Advanced
             var sb = new StringBuilder();
             foreach (var ch in wildcard)
             {
-                _ = sb.Append(ch switch
+                sb.Append(ch switch
                 {
                     '*' => ".*",
                     '?' => ".",

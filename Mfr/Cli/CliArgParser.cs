@@ -23,8 +23,8 @@ namespace Mfr.Cli
                 ParseCommand.CaptureSettings = settings => parsedSettings = settings;
                 var app = new CommandApp<ParseCommand>();
                 app.Configure(_ConfigureCommandApp);
-                _ = app.WithDescription($"Magic File Renamer v{_GetAssemblyVersionString()}.");
-                _ = app.Run(args);
+                app.WithDescription($"Magic File Renamer v{_GetAssemblyVersionString()}.");
+                app.Run(args);
             }
             catch (CommandParseException exception)
             {
@@ -99,7 +99,7 @@ namespace Mfr.Cli
 
         private static void _ConfigureCommandApp(IConfigurator configuration)
         {
-            _ = configuration
+            configuration
                 .SetApplicationName("mfr")
                 .PropagateExceptions()
                 .UseStrictParsing()

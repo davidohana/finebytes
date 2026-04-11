@@ -50,7 +50,7 @@ namespace Mfr.Core
 
             foreach (var source in sourceList)
             {
-                _ = AddSource(
+                AddSource(
                     source: source,
                     includeFiles: includeFiles,
                     includeFolders: includeFolders,
@@ -265,10 +265,10 @@ namespace Mfr.Core
             {
                 if (i > 0)
                 {
-                    _ = builder.AppendLine();
+                    builder.AppendLine();
                 }
 
-                _ = builder.Append(_BuildPreviewChangeBlock(change: previewChanges[i]));
+                builder.Append(_BuildPreviewChangeBlock(change: previewChanges[i]));
             }
 
             return builder.ToString();
@@ -514,7 +514,7 @@ namespace Mfr.Core
                 OperatingSystem.IsWindows()
                     ? StringComparison.OrdinalIgnoreCase
                     : StringComparison.Ordinal);
-            _ = matcher.AddInclude(includePattern);
+            matcher.AddInclude(includePattern);
             var matchResult = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(baseDirectory)));
 
             resolvedPaths = matchResult.Files

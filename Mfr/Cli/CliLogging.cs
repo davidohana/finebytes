@@ -18,7 +18,7 @@ namespace Mfr.Cli
         internal static CliLoggerSession Start(LogEventLevel logLevel, string? logDirectoryPath)
         {
             var resolvedLogDirectoryPath = _ResolveLogDirectoryPath(logDirectoryPath);
-            _ = Directory.CreateDirectory(resolvedLogDirectoryPath);
+            Directory.CreateDirectory(resolvedLogDirectoryPath);
 
             var fileName = $"{SessionLogPrefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{SessionLogExtension}";
             var logFilePath = Path.Combine(resolvedLogDirectoryPath, fileName);
