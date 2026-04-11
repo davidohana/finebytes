@@ -11,13 +11,14 @@ namespace Mfr.Tests.Models.Filters.Space
         private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
-        /// Verifies runs of whitespace collapse to a single space.
+        /// Verifies runs of the default word separator (U+0020 SPACE) collapse to a single space.
         /// </summary>
         [Fact]
-        public void Apply_CollapsesWhitespaceRunsToSingleSpace()
+        public void Apply_CollapsesSeparatorRuns()
         {
             var f = new ShrinkSpacesFilter(true, _target);
-            Assert.Equal("a b c", FilterTestHelpers.ApplyToPrefix(f, "a  \t b \n c"));
+            Assert.Equal("a b c", FilterTestHelpers.ApplyToPrefix(f, "a   b  c"));
+            Assert.Equal("a \t b", FilterTestHelpers.ApplyToPrefix(f, "a  \t b"));
         }
     }
 }

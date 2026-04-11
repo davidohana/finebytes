@@ -75,6 +75,13 @@ namespace Mfr.Models
         public RenameStatus Status { get; set; } = RenameStatus.Init;
 
         /// <summary>
+        /// Gets or sets the word-separator character for the current filter chain pass.
+        /// Reset to U+0020 SPACE at the start of each preview cycle; updated when a
+        /// <c>SpaceCharacter</c> filter runs.
+        /// </summary>
+        internal char WordSeparator { get; set; } = ' ';
+
+        /// <summary>
         /// Resets transient preview/commit state for a fresh processing cycle.
         /// </summary>
         public void ResetState()
@@ -83,11 +90,13 @@ namespace Mfr.Models
             PreviewError = null;
             CommitError = null;
             Status = RenameStatus.Init;
+            WordSeparator = ' ';
         }
 
         internal void ClearPreview()
         {
             Preview = Original.Clone();
+            WordSeparator = ' ';
         }
 
         internal void SetPreviewValue(FileNamePart part, string partValue)

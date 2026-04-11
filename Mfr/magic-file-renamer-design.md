@@ -883,23 +883,29 @@ Capitalizes the first letter after sentence-ending punctuation.
 ### Group 2 — Space Manipulating (6 filters)
 
 #### SpaceCharacter
-Replaces all spaces with a specified character, or a specified character with spaces.
+Defines the single character used as the word separator for filters that follow, and optionally maps common separators (space, underscore, percent-twenty, custom text) to that character.
 ```json
 {
   "type": "SpaceCharacter",
   "target": { "family": "FileName", "fileNameMode": "Full" },
-  "options": { "replaceSpaceWith": "_", "replaceCharWithSpace": "" }
+  "options": {
+    "SpaceCharacter": "_",
+    "ReplaceSpaces": false,
+    "ReplaceUnderscores": false,
+    "ReplacePercent20": true,
+    "CustomText": ""
+  }
 }
 ```
 
 #### RemoveSpaces
-Removes all whitespace.
+Removes all occurrences of the current word-separator character (default U+0020 SPACE when no `SpaceCharacter` filter ran).
 ```json
 { "type": "RemoveSpaces", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": {} }
 ```
 
 #### ShrinkSpaces
-Collapses consecutive whitespace to a single space.
+Collapses consecutive runs of the current word-separator character to a single occurrence (default U+0020 SPACE when no `SpaceCharacter` filter ran).
 ```json
 { "type": "ShrinkSpaces", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": {} }
 ```

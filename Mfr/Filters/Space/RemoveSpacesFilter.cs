@@ -3,7 +3,7 @@ using Mfr.Models;
 namespace Mfr.Filters.Space
 {
     /// <summary>
-    /// Removes all whitespace from the target segment.
+    /// Removes all occurrences of the current word-separator character.
     /// </summary>
     /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
@@ -18,7 +18,7 @@ namespace Mfr.Filters.Space
 
         internal override string TransformSegment(string segment, RenameItem item)
         {
-            return TextFilterRegexCache.WhitespaceRegex.Replace(segment, "");
+            return segment.Replace(item.WordSeparator.ToString(), "", StringComparison.Ordinal);
         }
     }
 }

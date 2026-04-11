@@ -3,20 +3,26 @@ using Mfr.Models;
 namespace Mfr.Filters.Space
 {
     /// <summary>
-    /// Options for replacing spaces and replacing a chosen character with spaces.
+    /// Options for defining the word-separator character and mapping common separators to it.
     /// </summary>
-    /// <param name="ReplaceSpaceWith">Replacement text for spaces.</param>
-    /// <param name="ReplaceCharWithSpace">Character/text to replace with a space.</param>
+    /// <param name="SpaceCharacter">Single character used as the word separator for later filters.</param>
+    /// <param name="ReplaceSpaces">When true, replaces U+0020 SPACE with the defined space character.</param>
+    /// <param name="ReplaceUnderscores">When true, replaces underscore with the defined space character.</param>
+    /// <param name="ReplacePercent20">When true, replaces the literal percent-twenty sequence with the defined space character.</param>
+    /// <param name="CustomText">When non-empty, replaces this substring with the defined space character; when empty, has no effect.</param>
     public sealed record SpaceCharacterOptions(
-        string ReplaceSpaceWith,
-        string ReplaceCharWithSpace);
+        char SpaceCharacter,
+        bool ReplaceSpaces,
+        bool ReplaceUnderscores,
+        bool ReplacePercent20,
+        string CustomText);
 
     /// <summary>
-    /// Replaces spaces and mapped characters.
+    /// Defines the word-separator character and optionally maps common separators to that character.
     /// </summary>
     /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
-    /// <param name="Options">Space replacement options.</param>
+    /// <param name="Options">Space definition and replacement options.</param>
     public sealed record SpaceCharacterFilter(
         bool Enabled,
         FilterTarget Target,
@@ -29,7 +35,41 @@ namespace Mfr.Filters.Space
 
         internal override string TransformSegment(string segment, RenameItem item)
         {
-            return segment.Replace(" ", Options.ReplaceSpaceWith).Replace(Options.ReplaceCharWithSpace, " ");
+            item.WordSeparator = Options.SpaceCharacter;
+            var sep = Options.SpaceCharacter.ToString();
+            var result = segment;
+            foreach (var from in _GetReplacementSourceStrings(Options))
+            {
+                result = result.Replace(from, sep, StringComparison.Ordinal);
+            }
+
+            return result;
+        }
+
+        private static List<string> _GetReplacementSourceStrings(SpaceCharacterOptions options)
+        {
+            var sources = new List<string>(capacity: 4);
+            if (options.ReplacePercent20)
+            {
+                sources.Add("%20");
+            }
+
+            if (options.ReplaceSpaces)
+            {
+                sources.Add(" ");
+            }
+
+            if (options.ReplaceUnderscores)
+            {
+                sources.Add("_");
+            }
+
+            if (options.CustomText.Length > 0)
+            {
+                sources.Add(options.CustomText);
+            }
+
+            return sources;
         }
     }
 }
