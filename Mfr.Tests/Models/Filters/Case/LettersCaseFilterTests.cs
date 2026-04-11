@@ -1,4 +1,6 @@
+using Mfr.Core;
 using Mfr.Filters.Case;
+using Mfr.Filters.Space;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Case
@@ -51,6 +53,27 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             Assert.Equal("Hello world. Next line.", FilterTestHelpers.ApplyToPrefix(f, "hello world. next line."));
+        }
+
+        /// <summary>
+        /// Verifies sentence case uses <see cref="RenameItem.WordSeparator"/> after <c>. ! ?</c>, not all Unicode whitespace.
+        /// </summary>
+        [Fact]
+        public void Apply_SentenceCase_UsesWordSeparatorAfterPunctuation()
+        {
+            var spaceCharFilter = new SpaceCharacterFilter(
+                true,
+                _target,
+                new SpaceCharacterOptions(
+                    SpaceCharacter: '_',
+                    ReplaceSpaces: false,
+                    ReplaceUnderscores: false,
+                    ReplacePercent20: false,
+                    CustomText: ""));
+            var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var file = FilterTestHelpers.CreateFile(prefix: "hello._world._again");
+            file.ApplyFilters([spaceCharFilter, sentenceFilter]);
+            Assert.Equal("Hello._World._Again", file.Preview.Prefix);
         }
 
         /// <summary>

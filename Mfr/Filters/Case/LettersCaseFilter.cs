@@ -19,8 +19,9 @@ namespace Mfr.Filters.Case
     /// <remarks>
     /// <para><b>Title case</b> and <b>sentence case</b> differ as follows: title case capitalizes
     /// each segment between occurrences of the current word separator (skip-words apply per segment).
-    /// Sentence case lowercases the whole string, then capitalizes only the first letter of the text
-    /// and the first letter after sentence-ending punctuation (<c>. ! ?</c>) followed by whitespace.</para>
+    /// Sentence case lowercases the whole string, then capitalizes the first letter of the text and
+    /// the first letter after <c>.</c> <c>!</c> or <c>?</c> when followed by one or more occurrences of
+    /// the current word separator (U+0020 SPACE by default).</para>
     /// <para>See each enum member for a concrete before/after example.</para>
     /// </remarks>
     public enum LettersCaseMode
@@ -50,10 +51,12 @@ namespace Mfr.Filters.Case
 
         /// <summary>
         /// Lowercases the string, then capitalizes the first letter of the whole string and the first
-        /// letter after <c>.</c>, <c>!</c>, or <c>?</c> when followed by whitespace (new sentences).
+        /// letter after <c>.</c>, <c>!</c>, or <c>?</c> when followed by one or more word-separator characters
+        /// (same as title case: default U+0020 SPACE; set by <c>SpaceCharacter</c> when used earlier in the chain).
         /// </summary>
         /// <example>
-        /// <para><c>hello world. next line.</c> → <c>Hello world. Next line.</c></para>
+        /// <para>Default separator (space): <c>hello world. next line.</c> → <c>Hello world. Next line.</c></para>
+        /// <para>Separator <c>_</c>: <c>hello._world._again</c> → <c>Hello._World._Again</c>.</para>
         /// </example>
         SentenceCase,
 
@@ -70,7 +73,7 @@ namespace Mfr.Filters.Case
     /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Case transformation options.</param>
-    public sealed partial record LettersCaseFilter(
+    public sealed record LettersCaseFilter(
         bool Enabled,
         FilterTarget Target,
         LettersCaseOptions Options) : Filter(Enabled, Target)
@@ -87,7 +90,7 @@ namespace Mfr.Filters.Case
                 LettersCaseMode.UpperCase => segment.ToUpperInvariant(),
                 LettersCaseMode.LowerCase => segment.ToLowerInvariant(),
                 LettersCaseMode.TitleCase => _ApplyTitleCase(segment, Options.SkipWords, item.WordSeparator),
-                LettersCaseMode.SentenceCase => _ApplySentenceCase(segment),
+                LettersCaseMode.SentenceCase => _ApplySentenceCase(segment, item.WordSeparator),
                 LettersCaseMode.InvertCase => _InvertCase(segment),
                 _ => segment
             };
@@ -146,7 +149,7 @@ namespace Mfr.Filters.Case
                 : char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant();
         }
 
-        private static string _ApplySentenceCase(string input)
+        private static string _ApplySentenceCase(string input, char wordSeparator)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -154,12 +157,17 @@ namespace Mfr.Filters.Case
             }
 
             var lower = input.ToLowerInvariant();
-            return _SentenceCaseRegex().Replace(lower, m =>
-            {
-                var prefix = m.Groups[1].Value;
-                var ch = m.Groups[2].Value;
-                return prefix + ch.ToUpperInvariant();
-            });
+            var sepEsc = Regex.Escape(wordSeparator.ToString());
+            var pattern = $"(^|[.!?]{sepEsc}+)([a-z])";
+            return Regex.Replace(
+                lower,
+                pattern,
+                m =>
+                {
+                    var prefix = m.Groups[1].Value;
+                    var ch = m.Groups[2].Value;
+                    return prefix + ch.ToUpperInvariant();
+                });
         }
 
         private static string _InvertCase(string input)
@@ -181,7 +189,5 @@ namespace Mfr.Filters.Case
             return new string(chars);
         }
 
-        [GeneratedRegex(@"(^|[.!?]\s+)([a-z])", RegexOptions.Compiled)]
-        private static partial Regex _SentenceCaseRegex();
     }
 }
