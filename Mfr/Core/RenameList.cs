@@ -260,18 +260,7 @@ namespace Mfr.Core
                 return $"{renameItem.Original.FullPath} --> {renameItem.Preview.FullPath}";
             }
 
-            var builder = new StringBuilder();
-            for (var i = 0; i < previewChanges.Count; i++)
-            {
-                if (i > 0)
-                {
-                    builder.AppendLine();
-                }
-
-                builder.Append(_BuildPreviewChangeBlock(change: previewChanges[i]));
-            }
-
-            return builder.ToString();
+            return string.Join(Environment.NewLine, previewChanges.Select(_BuildPreviewChangeBlock));
         }
 
         /// <summary>
