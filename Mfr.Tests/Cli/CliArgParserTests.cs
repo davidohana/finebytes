@@ -144,6 +144,36 @@ namespace Mfr.Tests.Cli
 
         [Fact]
         /// <summary>
+        /// Verifies that omitted <c>--confirm</c> defaults to <c>false</c>.
+        /// </summary>
+        public void ParseArgs_Defaults_ConfirmBeforeCommit_To_False()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean"])!;
+            Assert.False(options.ConfirmBeforeCommit);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>-c</c> enables per-rename confirmation.
+        /// </summary>
+        public void ParseArgs_Accepts_Confirm_Short_Option()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "-c"])!;
+            Assert.True(options.ConfirmBeforeCommit);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>--confirm</c> enables per-rename confirmation.
+        /// </summary>
+        public void ParseArgs_Accepts_Confirm_Long_Option()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--confirm"])!;
+            Assert.True(options.ConfirmBeforeCommit);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that omitted <c>--dry-run</c> defaults to <c>false</c>.
         /// </summary>
         public void ParseArgs_Defaults_DryRun_To_False()

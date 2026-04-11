@@ -2,6 +2,7 @@ using Mfr.Core;
 using Mfr.Models;
 using Mfr.Utils;
 using Serilog;
+using Spectre.Console;
 
 namespace Mfr.Cli
 {
@@ -96,9 +97,13 @@ namespace Mfr.Cli
             }
 
             var commitFailFast = !options.ContinueOnRenameError;
+            Func<RenameItem, bool>? confirmBeforeApply = options.ConfirmBeforeCommit
+                ? _ConfirmApplyRenameItem
+                : null;
             var renameResults = renameList.Commit(
                 failFast: commitFailFast,
-                dryRun: options.DryRun);
+                dryRun: options.DryRun,
+                confirmBeforeApply: confirmBeforeApply);
 
             if (!options.OutputFilePath.IsBlank())
             {
@@ -112,6 +117,20 @@ namespace Mfr.Cli
 
             var hasCommitErrors = renameResults.Any(item => item.Status is RenameStatus.PreviewError or RenameStatus.CommitError);
             return hasCommitErrors ? CliExitCode.UserError : CliExitCode.Success;
+        }
+
+        private static bool _ConfirmApplyRenameItem(RenameItem item)
+        {
+            Console.WriteLine(item.Original.FullPath);
+            var detail = RenameList.FormatPreviewChangesForDisplay(item);
+            if (!detail.IsBlank())
+            {
+                Console.WriteLine(detail);
+            }
+
+            var apply = AnsiConsole.Confirm("Apply rename?");
+            Console.WriteLine();
+            return apply;
         }
 
     }

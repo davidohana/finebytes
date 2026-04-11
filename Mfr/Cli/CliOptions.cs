@@ -13,6 +13,7 @@ namespace Mfr.Cli
     /// <param name="OutputFilePath">Optional output file path where JSON results are written.</param>
     /// <param name="IncludeHidden">Whether to include hidden and system files.</param>
     /// <param name="ContinueOnRenameError">Whether commit should continue after per-item rename errors.</param>
+    /// <param name="ConfirmBeforeCommit">Whether to prompt for confirmation before applying each rename.</param>
     /// <param name="DryRun">Whether commit operations should be simulated without modifying the filesystem.</param>
     /// <param name="LogLevel">Minimum log level to emit.</param>
     /// <param name="LogDirectoryPath">Optional log directory override.</param>
@@ -26,6 +27,7 @@ namespace Mfr.Cli
         string? OutputFilePath,
         bool IncludeHidden,
         bool ContinueOnRenameError,
+        bool ConfirmBeforeCommit,
         bool DryRun,
         LogEventLevel LogLevel,
         string? LogDirectoryPath,

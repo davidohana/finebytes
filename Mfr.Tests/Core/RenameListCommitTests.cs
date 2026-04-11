@@ -161,6 +161,99 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
+        /// Verifies that <c>confirmBeforeApply</c> returning <c>false</c> skips renames without moving files.
+        /// </summary>
+        public void Commit_ConfirmBeforeApply_AllFalse_SkipsAllRenames()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var firstSource = dir.CombinePath("track01.mp3");
+            var secondSource = dir.CombinePath("track02.mp3");
+            File.WriteAllText(firstSource, "x");
+            File.WriteAllText(secondSource, "y");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([firstSource, secondSource]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "counter",
+                Description = null,
+                Filters =
+                [
+                    new CounterFilter(
+                        Enabled: true,
+                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Options: new CounterOptions(
+                            Start: 1,
+                            Step: 1,
+                            Width: 3,
+                            PadChar: "0",
+                            Position: CounterPosition.Replace,
+                            Separator: " - ",
+                            ResetPerFolder: false))
+                ]
+            };
+
+            renameList.Preview(preset);
+            var result = renameList.Commit(failFast: false, dryRun: false, confirmBeforeApply: _ => false);
+
+            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitSkipped));
+            Assert.Equal(0, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.True(File.Exists(firstSource));
+            Assert.True(File.Exists(secondSource));
+            Assert.False(File.Exists(dir.CombinePath("001.mp3")));
+            Assert.False(File.Exists(dir.CombinePath("002.mp3")));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>confirmBeforeApply</c> returning <c>true</c> matches commit behavior without a callback.
+        /// </summary>
+        public void Commit_ConfirmBeforeApply_AllTrue_RenamesFiles()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var firstSource = dir.CombinePath("track01.mp3");
+            var secondSource = dir.CombinePath("track02.mp3");
+            File.WriteAllText(firstSource, "x");
+            File.WriteAllText(secondSource, "y");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([firstSource, secondSource]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "counter",
+                Description = null,
+                Filters =
+                [
+                    new CounterFilter(
+                        Enabled: true,
+                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Options: new CounterOptions(
+                            Start: 1,
+                            Step: 1,
+                            Width: 3,
+                            PadChar: "0",
+                            Position: CounterPosition.Replace,
+                            Separator: " - ",
+                            ResetPerFolder: false))
+                ]
+            };
+
+            renameList.Preview(preset);
+            var result = renameList.Commit(failFast: false, dryRun: false, confirmBeforeApply: _ => true);
+
+            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.False(File.Exists(firstSource));
+            Assert.False(File.Exists(secondSource));
+            Assert.True(File.Exists(dir.CombinePath("001.mp3")));
+            Assert.True(File.Exists(dir.CombinePath("002.mp3")));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that commit stops immediately on the first rename error when fail-fast is enabled.
         /// </summary>
         public void Commit_StopsOnFirstRenameError_WhenFailFastTrue()

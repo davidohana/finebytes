@@ -90,6 +90,7 @@ namespace Mfr.Cli
                 OutputFilePath: outputFilePath.IsBlank() ? null : outputFilePath.Trim(),
                 IncludeHidden: parsedSettings.IncludeHidden,
                 ContinueOnRenameError: parsedSettings.ContinueOnRenameError,
+                ConfirmBeforeCommit: parsedSettings.ConfirmBeforeCommit,
                 DryRun: parsedSettings.DryRun,
                 LogLevel: CliLogging.ParseLogLevel(logLevel),
                 LogDirectoryPath: logDirectoryPath.IsBlank() ? null : logDirectoryPath.Trim(),
@@ -177,6 +178,10 @@ namespace Mfr.Cli
             [CommandOption("--core")]
             [Description("Continue-On-Rename-Errors instead of stopping at the first failure.")]
             public bool ContinueOnRenameError { get; init; }
+
+            [CommandOption("-c|--confirm")]
+            [Description("Prompt for confirmation before applying each rename.")]
+            public bool ConfirmBeforeCommit { get; init; }
 
             [CommandOption("--dry-run")]
             [Description("Preview and report commit outcomes without changing files on disk.")]

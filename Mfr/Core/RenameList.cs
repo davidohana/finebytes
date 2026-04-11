@@ -148,14 +148,22 @@ namespace Mfr.Core
         /// </summary>
         /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
         /// <param name="dryRun">If <c>true</c>, simulates commit outcomes without applying filesystem changes.</param>
+        /// <param name="confirmBeforeApply">
+        /// Optional callback invoked only for items whose preview path differs from the original.
+        /// Return <c>false</c> to skip that item with status <see cref="RenameStatus.CommitSkipped"/> without treating it as an error.
+        /// </param>
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
-        public IReadOnlyList<RenameResultItem> Commit(bool failFast, bool dryRun = false)
+        public IReadOnlyList<RenameResultItem> Commit(
+            bool failFast,
+            bool dryRun = false,
+            Func<RenameItem, bool>? confirmBeforeApply = null)
         {
             Log.Information(
-                "Starting commit for {ItemCount} item(s). FailFast: {FailFast}. DryRun: {DryRun}.",
+                "Starting commit for {ItemCount} item(s). FailFast: {FailFast}. DryRun: {DryRun}. ConfirmBeforeApply: {HasConfirmBeforeApply}.",
                 _renameItems.Count,
                 failFast,
-                dryRun);
+                dryRun,
+                confirmBeforeApply is not null);
 
             var results = new List<RenameResultItem>(_renameItems.Count);
             var stopped = false;
@@ -165,7 +173,11 @@ namespace Mfr.Core
                 item.CommitError = null;
                 var sourcePath = item.Original.FullPath;
 
-                if (stopped || item.IsPreviewPathSameAsOriginal())
+                var shouldSkipCommit =
+                    stopped
+                    || item.IsPreviewPathSameAsOriginal()
+                    || (confirmBeforeApply is not null && !confirmBeforeApply(item));
+                if (shouldSkipCommit)
                 {
                     item.Status = RenameStatus.CommitSkipped;
                     results.Add(new RenameResultItem(
@@ -225,6 +237,41 @@ namespace Mfr.Core
                 commitErrorCount);
 
             return results;
+        }
+
+        /// <summary>
+        /// Formats preview property deltas for one rename item as plain text suitable for console output.
+        /// </summary>
+        /// <param name="renameItem">The previewed item to describe.</param>
+        /// <returns>
+        /// Non-empty text when the preview path differs from the original; otherwise an empty string.
+        /// When there are no per-property deltas but paths still differ, the full source and destination paths are shown.
+        /// </returns>
+        public static string FormatPreviewChangesForDisplay(RenameItem renameItem)
+        {
+            if (renameItem.IsPreviewPathSameAsOriginal())
+            {
+                return string.Empty;
+            }
+
+            var previewChanges = _BuildPreviewPropertyChanges(renameItem: renameItem);
+            if (previewChanges.Count == 0)
+            {
+                return $"{renameItem.Original.FullPath} --> {renameItem.Preview.FullPath}";
+            }
+
+            var builder = new StringBuilder();
+            for (var i = 0; i < previewChanges.Count; i++)
+            {
+                if (i > 0)
+                {
+                    _ = builder.AppendLine();
+                }
+
+                _ = builder.Append(_BuildPreviewChangeBlock(change: previewChanges[i]));
+            }
+
+            return builder.ToString();
         }
 
         /// <summary>
