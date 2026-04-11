@@ -39,5 +39,31 @@ namespace Mfr.Tests.Models.Filters.Misc
             var f = new FixLeadingZerosFilter(true, _target, new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true));
             Assert.Equal("x007", FilterTestHelpers.ApplyToPrefix(f, "x0007"));
         }
+
+        /// <summary>
+        /// Verifies whole word only requirement.
+        /// </summary>
+        [Fact]
+        public void Apply_WholeWordOnly_DoesNotChangePartWordNumbers()
+        {
+            var options = new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, WholeWordOnly: true);
+            var f = new FixLeadingZerosFilter(true, _target, options);
+            Assert.Equal("doc1_012", FilterTestHelpers.ApplyToPrefix(f, "doc1_12"));
+        }
+
+        /// <summary>
+        /// Verifies maximum count of numbers to fix.
+        /// </summary>
+        [Fact]
+        public void Apply_MaxCount_Works()
+        {
+            var options = new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, MaxCount: 1);
+            var f = new FixLeadingZerosFilter(true, _target, options);
+            Assert.Equal("005-Opus 40", FilterTestHelpers.ApplyToPrefix(f, "05-Opus 40"));
+
+            options = new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, MaxCount: 2);
+            f = new FixLeadingZerosFilter(true, _target, options);
+            Assert.Equal("005-Opus 040 (1)", FilterTestHelpers.ApplyToPrefix(f, "05-Opus 40 (1)"));
+        }
     }
 }

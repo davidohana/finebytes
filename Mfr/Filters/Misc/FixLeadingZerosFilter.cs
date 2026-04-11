@@ -8,9 +8,13 @@ namespace Mfr.Filters.Misc
     /// </summary>
     /// <param name="Width">Target numeric width.</param>
     /// <param name="RemoveExtraZeros">Whether extra leading zeros are removed before padding.</param>
+    /// <param name="MaxCount">Maximum count of numbers to fix (0 for all).</param>
+    /// <param name="WholeWordOnly">Whether to fix only numbers that form a whole word (not part of a word).</param>
     public sealed record FixLeadingZerosOptions(
         int Width,
-        bool RemoveExtraZeros);
+        bool RemoveExtraZeros,
+        int MaxCount = 0,
+        bool WholeWordOnly = false);
 
     /// <summary>
     /// Normalizes leading zeros in numeric sequences.
@@ -30,23 +34,53 @@ namespace Mfr.Filters.Misc
 
         internal override string TransformSegment(string segment, RenameItem item)
         {
-            return Options.Width <= 0
-                ? segment
-                : _DigitsRegex().Replace(segment, m =>
+            if (Options.Width <= 0)
+            {
+                return segment;
+            }
+
+            var count = 0;
+            return _DigitsRegex().Replace(segment, m =>
+            {
+                if (Options.WholeWordOnly)
                 {
-                    var digits = m.Value;
-                    if (Options.RemoveExtraZeros)
-                    {
-                        digits = digits.TrimStart('0');
-                    }
+                    var start = m.Index;
+                    var end = m.Index + m.Length;
 
-                    if (digits.Length == 0)
-                    {
-                        digits = "0";
-                    }
+                    bool isLetterBefore = start > 0 && char.IsLetter(segment[start - 1]);
+                    bool isLetterAfter = end < segment.Length && char.IsLetter(segment[end]);
 
-                    return digits.PadLeft(Options.Width, '0');
-                });
+                    if (isLetterBefore || isLetterAfter)
+                    {
+                        return m.Value;
+                    }
+                }
+
+                if (Options.MaxCount > 0 && count >= Options.MaxCount)
+                {
+                    return m.Value;
+                }
+
+                count++;
+
+                var digits = m.Value;
+                if (Options.RemoveExtraZeros)
+                {
+                    digits = digits.TrimStart('0');
+                }
+
+                if (digits.Length == 0)
+                {
+                    digits = "0";
+                }
+
+                if (digits.Length >= Options.Width)
+                {
+                    return digits;
+                }
+
+                return digits.PadLeft(Options.Width, '0');
+            });
         }
 
         [GeneratedRegex(@"\d+", RegexOptions.Compiled)]
