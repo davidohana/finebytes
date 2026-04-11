@@ -1,8 +1,9 @@
 using System.Text.Json.Serialization;
-using Mfr.Models.Filters.Advanced;
-using Mfr.Models.Filters.Text;
+using Mfr.Filters.Advanced;
+using Mfr.Filters.Text;
+using Mfr.Models;
 
-namespace Mfr.Models.Filters
+namespace Mfr.Filters
 {
     /// <summary>
     /// Represents a polymorphic filter.
