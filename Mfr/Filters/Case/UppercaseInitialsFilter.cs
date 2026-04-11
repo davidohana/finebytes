@@ -34,15 +34,16 @@ namespace Mfr.Filters.Case
 
             var chars = segment.ToCharArray();
             var i = 0;
+
             while (i < chars.Length)
             {
-                if (!_TryGetInitialsRange(chars, i, out var rangeEndExclusive))
+                if (!_TryGetInitialsEndIndex(chars, i, out var endExclusive))
                 {
                     i++;
                     continue;
                 }
 
-                for (var j = i; j < rangeEndExclusive; j++)
+                for (var j = i; j < endExclusive; j++)
                 {
                     if (char.IsLetter(chars[j]))
                     {
@@ -50,44 +51,51 @@ namespace Mfr.Filters.Case
                     }
                 }
 
-                i = rangeEndExclusive;
+                i = endExclusive;
             }
 
             return new string(chars);
         }
 
-        private static bool _TryGetInitialsRange(char[] chars, int start, out int rangeEndExclusive)
+        private static bool _TryGetInitialsEndIndex(char[] chars, int start, out int endExclusive)
         {
-            rangeEndExclusive = start;
+            endExclusive = start;
             if (!char.IsLetter(chars[start]))
+            {
+                return false;
+            }
+
+            var hasLetterBefore = start > 0 && char.IsLetter(chars[start - 1]);
+            if (hasLetterBefore)
             {
                 return false;
             }
 
             var index = start;
             var segmentCount = 0;
-
-            while (index < chars.Length && char.IsLetter(chars[index]))
+            while (index < chars.Length)
             {
-                var letterStart = index;
-                while (index < chars.Length && char.IsLetter(chars[index]))
+                if (!char.IsLetter(chars[index]))
                 {
-                    index++;
+                    break;
                 }
 
-                var letterCount = index - letterStart;
-                if (letterCount != 1)
+                var nextIndex = index + 1;
+                if (nextIndex < chars.Length && char.IsLetter(chars[nextIndex]))
                 {
                     break;
                 }
 
                 segmentCount++;
+                index = nextIndex;
+
                 if (index >= chars.Length || chars[index] != '.')
                 {
                     break;
                 }
 
-                if (index + 1 >= chars.Length || !char.IsLetter(chars[index + 1]))
+                var hasLetterAfterDot = index + 1 < chars.Length && char.IsLetter(chars[index + 1]);
+                if (!hasLetterAfterDot)
                 {
                     break;
                 }
@@ -100,7 +108,7 @@ namespace Mfr.Filters.Case
                 return false;
             }
 
-            rangeEndExclusive = index;
+            endExclusive = index;
             return true;
         }
     }
