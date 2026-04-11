@@ -164,6 +164,22 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
+        /// Verifies sentence case ignores sentence-end characters that equal the configured word separator.
+        /// </summary>
+        [Fact]
+        public void Apply_SentenceCase_IgnoresSentenceEndCharsMatchingSeparator()
+        {
+            var f = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(
+                    Mode: LettersCaseMode.SentenceCase,
+                    SkipWords: [],
+                    SentenceEndChars: ". "));
+            Assert.Equal("Hello world. Next line", FilterTestHelpers.ApplyToPrefix(f, "hello world. next line"));
+        }
+
+        /// <summary>
         /// Verifies sentence case uses <see cref="RenameItem.WordSeparator"/> after <c>. ! ?</c>, not all Unicode whitespace.
         /// </summary>
         [Fact]

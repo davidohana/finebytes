@@ -272,7 +272,12 @@ namespace Mfr.Filters.Case
                 return new string(chars);
             }
 
-            var sentenceEndToIsIncluded = new HashSet<char>(sentenceEndChars);
+            var sentenceEndToIsIncluded = new HashSet<char>(sentenceEndChars.Where(c => c != wordSeparator));
+            if (sentenceEndToIsIncluded.Count == 0)
+            {
+                return new string(chars);
+            }
+
             for (var i = 0; i < chars.Length; i++)
             {
                 if (!sentenceEndToIsIncluded.Contains(chars[i]))
