@@ -6,14 +6,12 @@ namespace Mfr.Filters.Replace
     /// Options for illegal/custom character cleanup.
     /// </summary>
     /// <param name="RemoveIllegalChars">Whether illegal file-name characters are removed/replaced.</param>
-    /// <param name="IllegalCharReplacement">Replacement value for illegal characters.</param>
     /// <param name="CustomCharsToRemove">Custom characters to remove/replace.</param>
-    /// <param name="CustomReplacement">Replacement value for custom characters.</param>
+    /// <param name="Replacement">Replacement value for both illegal and custom characters.</param>
     public sealed record CleanerOptions(
         bool RemoveIllegalChars,
-        string IllegalCharReplacement,
         string CustomCharsToRemove,
-        string CustomReplacement);
+        string Replacement);
 
     /// <summary>
     /// Cleans illegal and custom characters.
@@ -33,24 +31,29 @@ namespace Mfr.Filters.Replace
 
         internal override string TransformSegment(string segment, RenameItem item)
         {
-            var res = segment;
-            if (Options.RemoveIllegalChars)
+            var invalidChars = Options.RemoveIllegalChars ? Path.GetInvalidFileNameChars() : [];
+            var customChars = Options.CustomCharsToRemove ?? "";
+            var chars = invalidChars.Concat(customChars).ToHashSet();
+
+            if (chars.Count == 0)
             {
-                foreach (var c in Path.GetInvalidFileNameChars())
+                return segment;
+            }
+
+            var sb = new System.Text.StringBuilder(segment.Length);
+            foreach (var c in segment)
+            {
+                if (chars.Contains(c))
                 {
-                    res = res.Replace(c.ToString(), Options.IllegalCharReplacement);
+                    sb.Append(Options.Replacement);
+                }
+                else
+                {
+                    sb.Append(c);
                 }
             }
 
-            if (!string.IsNullOrEmpty(Options.CustomCharsToRemove))
-            {
-                foreach (var c in Options.CustomCharsToRemove)
-                {
-                    res = res.Replace(c.ToString(), Options.CustomReplacement);
-                }
-            }
-
-            return res;
+            return sb.ToString();
         }
     }
 }
