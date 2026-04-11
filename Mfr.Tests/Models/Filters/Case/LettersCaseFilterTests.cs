@@ -77,6 +77,78 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
+        /// Verifies title case uses the configured word separator and preserves repeated separators.
+        /// </summary>
+        [Fact]
+        public void Apply_TitleCase_UsesWordSeparatorAndPreservesRuns()
+        {
+            var spaceCharFilter = new SpaceCharacterFilter(
+                true,
+                _target,
+                new SpaceCharacterOptions(
+                    SpaceCharacter: '_',
+                    ReplaceSpaces: false,
+                    ReplaceUnderscores: false,
+                    ReplacePercent20: false,
+                    CustomText: ""));
+            var titleFilter = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"]));
+            var file = FilterTestHelpers.CreateFile(prefix: "__gone__with__the__wind__");
+
+            file.ApplyFilters([spaceCharFilter, titleFilter]);
+
+            Assert.Equal("__Gone__With__the__Wind__", file.Preview.Prefix);
+        }
+
+        /// <summary>
+        /// Verifies sentence case capitalizes after punctuation when one or more separator chars follow.
+        /// </summary>
+        [Fact]
+        public void Apply_SentenceCase_CapitalizesAfterPunctuationAndMultipleSeparators()
+        {
+            var spaceCharFilter = new SpaceCharacterFilter(
+                true,
+                _target,
+                new SpaceCharacterOptions(
+                    SpaceCharacter: '_',
+                    ReplaceSpaces: false,
+                    ReplaceUnderscores: false,
+                    ReplacePercent20: false,
+                    CustomText: ""));
+            var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var file = FilterTestHelpers.CreateFile(prefix: "hello.__world!___again?__done");
+
+            file.ApplyFilters([spaceCharFilter, sentenceFilter]);
+
+            Assert.Equal("Hello.__World!___Again?__Done", file.Preview.Prefix);
+        }
+
+        /// <summary>
+        /// Verifies sentence case does not capitalize after punctuation when separator does not follow.
+        /// </summary>
+        [Fact]
+        public void Apply_SentenceCase_DoesNotCapitalizeAfterPunctuationWithoutSeparator()
+        {
+            var spaceCharFilter = new SpaceCharacterFilter(
+                true,
+                _target,
+                new SpaceCharacterOptions(
+                    SpaceCharacter: '_',
+                    ReplaceSpaces: false,
+                    ReplaceUnderscores: false,
+                    ReplacePercent20: false,
+                    CustomText: ""));
+            var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var file = FilterTestHelpers.CreateFile(prefix: "hello.world");
+
+            file.ApplyFilters([spaceCharFilter, sentenceFilter]);
+
+            Assert.Equal("Hello.world", file.Preview.Prefix);
+        }
+
+        /// <summary>
         /// Verifies case inversion.
         /// </summary>
         [Fact]
