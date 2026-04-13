@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Mfr.Models;
 
-namespace Mfr.Filters.Replace
+namespace Mfr.Filters.Trimming
 {
     /// <summary>
     /// Options for <see cref="ShrinkDuplicateCharactersFilter"/>.

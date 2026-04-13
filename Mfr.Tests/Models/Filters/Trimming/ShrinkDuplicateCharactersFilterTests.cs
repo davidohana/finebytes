@@ -1,7 +1,7 @@
-using Mfr.Filters.Replace;
+using Mfr.Filters.Trimming;
 using Mfr.Models;
 
-namespace Mfr.Tests.Models.Filters.Replace
+namespace Mfr.Tests.Models.Filters.Trimming
 {
     /// <summary>
     /// Tests for <see cref="ShrinkDuplicateCharactersFilter"/>.
