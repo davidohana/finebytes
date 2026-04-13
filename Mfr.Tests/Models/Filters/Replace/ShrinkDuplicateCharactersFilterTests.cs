@@ -1,0 +1,57 @@
+using Mfr.Filters.Replace;
+using Mfr.Models;
+
+namespace Mfr.Tests.Models.Filters.Replace
+{
+    /// <summary>
+    /// Tests for <see cref="ShrinkDuplicateCharactersFilter"/>.
+    /// </summary>
+    public class ShrinkDuplicateCharactersFilterTests
+    {
+        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+
+        /// <summary>
+        /// Verifies adjacent duplicate occurrences of the configured character collapse to one.
+        /// </summary>
+        [Fact]
+        public void Apply_CollapsesAdjacentDuplicatesOfConfiguredCharacter()
+        {
+            var filter = new ShrinkDuplicateCharactersFilter(
+                true,
+                _target,
+                new ShrinkDuplicateCharactersOptions(Character: '-'));
+
+            Assert.Equal("I am Kloot - To You", FilterTestHelpers.ApplyToPrefix(filter, "I am Kloot --- To You"));
+            Assert.Equal("a-b-c", FilterTestHelpers.ApplyToPrefix(filter, "a--b---c"));
+        }
+
+        /// <summary>
+        /// Verifies only adjacent duplicates are affected and non-adjacent occurrences are retained.
+        /// </summary>
+        [Fact]
+        public void Apply_LeavesNonAdjacentOccurrencesUntouched()
+        {
+            var filter = new ShrinkDuplicateCharactersFilter(
+                true,
+                _target,
+                new ShrinkDuplicateCharactersOptions(Character: '>'));
+
+            Assert.Equal("a>b>c", FilterTestHelpers.ApplyToPrefix(filter, "a>>b>>>c"));
+            Assert.Equal(">a>b>", FilterTestHelpers.ApplyToPrefix(filter, ">>>a>>>b>>>"));
+        }
+
+        /// <summary>
+        /// Verifies unchanged output when the configured character is absent.
+        /// </summary>
+        [Fact]
+        public void Apply_NoTargetCharacter_ReturnsInputAsIs()
+        {
+            var filter = new ShrinkDuplicateCharactersFilter(
+                true,
+                _target,
+                new ShrinkDuplicateCharactersOptions(Character: '-'));
+
+            Assert.Equal("abc def", FilterTestHelpers.ApplyToPrefix(filter, "abc def"));
+        }
+    }
+}

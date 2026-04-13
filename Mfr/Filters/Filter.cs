@@ -24,6 +24,7 @@ namespace Mfr.Filters
     [JsonDerivedType(typeof(ExtractLeftFilter), "ExtractLeft")]
     [JsonDerivedType(typeof(ExtractRightFilter), "ExtractRight")]
     [JsonDerivedType(typeof(ReplacerFilter), "Replacer")]
+    [JsonDerivedType(typeof(ShrinkDuplicateCharactersFilter), "ShrinkDuplicateCharacters")]
     [JsonDerivedType(typeof(FormatterFilter), "Formatter")]
     [JsonDerivedType(typeof(CounterFilter), "Counter")]
     [JsonDerivedType(typeof(CleanerFilter), "Cleaner")]

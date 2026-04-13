@@ -991,13 +991,13 @@ Removes content between two delimiter strings.
 }
 ```
 
-#### RemoveDuplicateCharacters
-Collapses consecutive occurrences of specified characters to one.
+#### ShrinkDuplicateCharacters
+Collapses adjacent duplicate occurrences of a configured character to one.
 ```json
 {
-  "type": "RemoveDuplicateCharacters",
+  "type": "ShrinkDuplicateCharacters",
   "target": { "family": "FileName", "fileNameMode": "Full" },
-  "options": { "chars": " _-." }
+  "options": { "character": "-" }
 }
 ```
 
