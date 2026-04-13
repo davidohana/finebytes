@@ -32,6 +32,8 @@ namespace Mfr.Filters
     [JsonDerivedType(typeof(StripParenthesesFilter), "StripParentheses")]
     [JsonDerivedType(typeof(CapitalizeAfterFilter), "CapitalizeAfter")]
     [JsonDerivedType(typeof(UppercaseInitialsFilter), "UppercaseInitials")]
+    [JsonDerivedType(typeof(StripSpacesLeftFilter), "StripSpacesLeft")]
+    [JsonDerivedType(typeof(StripSpacesRightFilter), "StripSpacesRight")]
     public abstract record Filter(bool Enabled, FilterTarget Target)
     {
         /// <summary>
