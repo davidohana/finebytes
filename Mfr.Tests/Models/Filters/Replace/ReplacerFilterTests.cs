@@ -11,29 +11,18 @@ namespace Mfr.Tests.Models.Filters.Replace
         private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
 
         /// <summary>
-        /// Verifies literal replace-all.
+        /// Verifies literal replacement for replace-all and replace-once modes.
         /// </summary>
-        [Fact]
-        public void Apply_LiteralReplaceAll_ReplacesEveryOccurrence()
+        [Theory]
+        [InlineData(true, "XbX")]
+        [InlineData(false, "Xba")]
+        public void Apply_LiteralReplacement_RespectsReplaceAllOption(bool replaceAll, string expected)
         {
             var f = new ReplacerFilter(
                 true,
                 _target,
-                new ReplacerOptions("a", "X", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
-            Assert.Equal("XbX", FilterTestHelpers.ApplyToPrefix(f, "aba"));
-        }
-
-        /// <summary>
-        /// Verifies literal single replace.
-        /// </summary>
-        [Fact]
-        public void Apply_LiteralReplaceOnce_ReplacesFirstMatchOnly()
-        {
-            var f = new ReplacerFilter(
-                true,
-                _target,
-                new ReplacerOptions("a", "X", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false));
-            Assert.Equal("Xba", FilterTestHelpers.ApplyToPrefix(f, "aba"));
+                new ReplacerOptions("a", "X", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: replaceAll, WholeWord: false));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "aba"));
         }
 
         /// <summary>
@@ -50,16 +39,18 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
-        /// Verifies regex mode.
+        /// Verifies regex replacement for replace-all and replace-once modes.
         /// </summary>
-        [Fact]
-        public void Apply_Regex_UsesPattern()
+        [Theory]
+        [InlineData(true, "aNbcN")]
+        [InlineData(false, "aNbc34")]
+        public void Apply_RegexReplacement_RespectsReplaceAllOption(bool replaceAll, string expected)
         {
             var f = new ReplacerFilter(
                 true,
                 _target,
-                new ReplacerOptions(@"\d+", "N", ReplacerMode.Regex, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
-            Assert.Equal("aNb", FilterTestHelpers.ApplyToPrefix(f, "a12b"));
+                new ReplacerOptions(@"\d+", "N", ReplacerMode.Regex, CaseSensitive: true, ReplaceAll: replaceAll, WholeWord: false));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "a12bc34"));
         }
 
         /// <summary>
@@ -102,19 +93,6 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions("f?o", "X", ReplacerMode.Wildcard, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
             Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "foo"));
             Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "fao"));
-        }
-
-        /// <summary>
-        /// Verifies regex single replacement.
-        /// </summary>
-        [Fact]
-        public void Apply_RegexReplaceOnce_ReplacesFirstMatchOnly()
-        {
-            var f = new ReplacerFilter(
-                true,
-                _target,
-                new ReplacerOptions(@"\d+", "N", ReplacerMode.Regex, CaseSensitive: true, ReplaceAll: false, WholeWord: false));
-            Assert.Equal("Nab2", FilterTestHelpers.ApplyToPrefix(f, "1ab2"));
         }
 
         /// <summary>

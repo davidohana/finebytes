@@ -28,6 +28,7 @@ namespace Mfr.Filters
     [JsonDerivedType(typeof(FormatterFilter), "Formatter")]
     [JsonDerivedType(typeof(CounterFilter), "Counter")]
     [JsonDerivedType(typeof(CleanerFilter), "Cleaner")]
+    [JsonDerivedType(typeof(ReplaceListFilter), "ReplaceList")]
     [JsonDerivedType(typeof(FixLeadingZerosFilter), "FixLeadingZeros")]
     [JsonDerivedType(typeof(StripParenthesesFilter), "StripParentheses")]
     [JsonDerivedType(typeof(CapitalizeAfterFilter), "CapitalizeAfter")]
