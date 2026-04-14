@@ -25,6 +25,6 @@ namespace Mfr.Models
         /// <summary>
         /// Gets the ordered list of filters for this preset.
         /// </summary>
-        public required IReadOnlyList<Filter> Filters { get; init; }
+        public required IReadOnlyList<BaseFilter> Filters { get; init; }
     }
 }

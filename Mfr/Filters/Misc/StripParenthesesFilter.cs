@@ -32,7 +32,7 @@ namespace Mfr.Filters.Misc
     public sealed partial record StripParenthesesFilter(
         bool Enabled,
         FilterTarget Target,
-        StripParenthesesOptions Options) : Filter(Enabled, Target)
+        StripParenthesesOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

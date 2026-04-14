@@ -27,7 +27,7 @@ namespace Mfr.Filters.Replace
     public sealed record ReplaceListFilter(
         bool Enabled,
         FilterTarget Target,
-        ReplaceListOptions Options) : Filter(Enabled, Target)
+        ReplaceListOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

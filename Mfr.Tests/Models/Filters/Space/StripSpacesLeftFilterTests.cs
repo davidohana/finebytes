@@ -1,6 +1,5 @@
 ﻿using Mfr.Filters;
 using Mfr.Filters.Space;
-using Mfr.Filters.Trimming;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Space

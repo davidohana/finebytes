@@ -26,7 +26,7 @@ namespace Mfr.Filters.Space
     public sealed record SpaceCharacterFilter(
         bool Enabled,
         FilterTarget Target,
-        SpaceCharacterOptions Options) : Filter(Enabled, Target)
+        SpaceCharacterOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

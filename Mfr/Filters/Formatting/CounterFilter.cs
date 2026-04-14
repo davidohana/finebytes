@@ -41,7 +41,7 @@ namespace Mfr.Filters.Formatting
     public sealed record CounterFilter(
         bool Enabled,
         FilterTarget Target,
-        CounterOptions Options) : Filter(Enabled, Target)
+        CounterOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

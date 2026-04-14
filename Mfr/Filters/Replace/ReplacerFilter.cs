@@ -51,7 +51,7 @@ namespace Mfr.Filters.Replace
     public sealed record ReplacerFilter(
         bool Enabled,
         FilterTarget Target,
-        ReplacerOptions Options) : Filter(Enabled, Target)
+        ReplacerOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

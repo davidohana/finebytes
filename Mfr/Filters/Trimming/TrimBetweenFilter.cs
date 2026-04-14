@@ -36,7 +36,7 @@ namespace Mfr.Filters.Trimming
     public sealed record TrimBetweenFilter(
         bool Enabled,
         FilterTarget Target,
-        TrimBetweenFilterOptions Options) : Filter(Enabled, Target)
+        TrimBetweenFilterOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -50,8 +50,8 @@ namespace Mfr.Filters.Trimming
                 return segment;
             }
 
-            int startIndex = _GetAbsoluteIndex(Options.Start, segment.Length);
-            int endIndex = _GetAbsoluteIndex(Options.End, segment.Length);
+            var startIndex = _GetAbsoluteIndex(Options.Start, segment.Length);
+            var endIndex = _GetAbsoluteIndex(Options.End, segment.Length);
 
             // Reorder if start is after end
             if (startIndex > endIndex)
@@ -65,7 +65,7 @@ namespace Mfr.Filters.Trimming
 
         private static int _GetAbsoluteIndex(Position position, int length)
         {
-            int index = position.Anchor switch
+            var index = position.Anchor switch
             {
                 Side.Left => position.Value - 1,
                 Side.Right => length - position.Value,

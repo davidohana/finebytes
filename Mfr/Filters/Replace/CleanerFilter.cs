@@ -22,7 +22,7 @@ namespace Mfr.Filters.Replace
     public sealed record CleanerFilter(
         bool Enabled,
         FilterTarget Target,
-        CleanerOptions Options) : Filter(Enabled, Target)
+        CleanerOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

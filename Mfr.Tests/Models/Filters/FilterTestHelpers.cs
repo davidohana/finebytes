@@ -37,7 +37,7 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="directory">Parent directory path, or a default when null.</param>
         /// <returns>The resulting preview prefix after applying the filter.</returns>
         public static string ApplyToPrefix(
-            Filter filter,
+            BaseFilter filter,
             string inputPrefix,
             string extension = ".mp3",
             int globalIndex = 0,

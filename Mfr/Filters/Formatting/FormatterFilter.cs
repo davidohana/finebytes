@@ -17,7 +17,7 @@ namespace Mfr.Filters.Formatting
     public sealed partial record FormatterFilter(
         bool Enabled,
         FilterTarget Target,
-        FormatterOptions Options) : Filter(Enabled, Target)
+        FormatterOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

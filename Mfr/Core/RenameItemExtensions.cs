@@ -15,7 +15,7 @@ namespace Mfr.Core
         /// <param name="item">The rename item receiving transformed preview metadata.</param>
         /// <param name="filters">The configured filters to apply in order.</param>
         /// <param name="context">Per-chain cache/context shared across filters and items.</param>
-        public static void ApplyFilters(this RenameItem item, IReadOnlyList<Filter> filters, FilterChainContext? context = null)
+        public static void ApplyFilters(this RenameItem item, IReadOnlyList<BaseFilter> filters, FilterChainContext? context = null)
         {
             item.ClearPreview();
             var filterChainContext = context ?? new FilterChainContext();

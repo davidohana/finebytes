@@ -36,7 +36,7 @@ namespace Mfr.Filters
     [JsonDerivedType(typeof(StripSpacesLeftFilter), "StripSpacesLeft")]
     [JsonDerivedType(typeof(StripSpacesRightFilter), "StripSpacesRight")]
     [JsonDerivedType(typeof(TrimBetweenFilter), "TrimBetween")]
-    public abstract record Filter(bool Enabled, FilterTarget Target)
+    public abstract record BaseFilter(bool Enabled, FilterTarget Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

@@ -27,7 +27,7 @@ namespace Mfr.Tests.Core
                     Target: new FileNameTarget(FileNamePart.Prefix),
                     Options: new ReplacerOptions("track", "stale", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
             ]);
-            var filters = new List<Filter>
+            var filters = new List<BaseFilter>
             {
                 new ReplacerFilter(
                     Enabled: false,
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Core
         public void ApplyFilters_PrefixFilters_ApplyInOrder()
         {
             var item = FilterTestHelpers.CreateFile(prefix: "track old", extension: ".mp3");
-            var filters = new List<Filter>
+            var filters = new List<BaseFilter>
             {
                 new ReplacerFilter(
                     Enabled: true,
@@ -75,7 +75,7 @@ namespace Mfr.Tests.Core
         public void ApplyFilters_ExtensionAndFullModes_UpdatePreview()
         {
             var item = FilterTestHelpers.CreateFile(prefix: "track", extension: ".mp3");
-            var filters = new List<Filter>
+            var filters = new List<BaseFilter>
             {
                 new ReplacerFilter(
                     Enabled: true,
@@ -101,7 +101,7 @@ namespace Mfr.Tests.Core
         public void ApplyFilters_NonFileNameTarget_ThrowsNotSupported()
         {
             var item = FilterTestHelpers.CreateFile();
-            var filters = new List<Filter>
+            var filters = new List<BaseFilter>
             {
                 new ReplacerFilter(
                     Enabled: true,

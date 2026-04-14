@@ -13,7 +13,7 @@ namespace Mfr.Filters.Space
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed record StripSpacesRightFilter(
         bool Enabled,
-        FilterTarget Target) : Filter(Enabled, Target)
+        FilterTarget Target) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

@@ -1,5 +1,4 @@
 using Mfr.Filters.Formatting;
-using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Models.Filters.Formatting
 {

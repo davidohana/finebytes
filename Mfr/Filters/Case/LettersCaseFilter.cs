@@ -108,7 +108,7 @@ namespace Mfr.Filters.Case
     public sealed record LettersCaseFilter(
         bool Enabled,
         FilterTarget Target,
-        LettersCaseOptions Options) : Filter(Enabled, Target)
+        LettersCaseOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

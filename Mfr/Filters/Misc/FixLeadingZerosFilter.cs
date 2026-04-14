@@ -25,7 +25,7 @@ namespace Mfr.Filters.Misc
     public sealed partial record FixLeadingZerosFilter(
         bool Enabled,
         FilterTarget Target,
-        FixLeadingZerosOptions Options) : Filter(Enabled, Target)
+        FixLeadingZerosOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -47,8 +47,8 @@ namespace Mfr.Filters.Misc
                     var start = m.Index;
                     var end = m.Index + m.Length;
 
-                    bool isLetterBefore = start > 0 && char.IsLetter(segment[start - 1]);
-                    bool isLetterAfter = end < segment.Length && char.IsLetter(segment[end]);
+                    var isLetterBefore = start > 0 && char.IsLetter(segment[start - 1]);
+                    var isLetterAfter = end < segment.Length && char.IsLetter(segment[end]);
 
                     if (isLetterBefore || isLetterAfter)
                     {

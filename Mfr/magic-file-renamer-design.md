@@ -120,7 +120,7 @@ public sealed record FilterPreset
     public IReadOnlyList<string> Tags { get; init; } = [];
     public SortConfiguration Sort { get; init; } = new();
     public IReadOnlyList<ColumnConfiguration> Columns { get; init; } = [];
-    public IReadOnlyList<Filter> Filters { get; init; } = [];
+    public IReadOnlyList<BaseFilter> Filters { get; init; } = [];
 }
 
 public sealed record SortConfiguration
@@ -144,7 +144,7 @@ public sealed record ColumnConfiguration
 }
 
 // Each filter has its own type-safe options record and filter definition record.
-public abstract record Filter
+public abstract record BaseFilter
 {
     // Written to JSON as discriminator; used by FilterEngine to resolve implementation.
     public abstract string Type { get; }
@@ -152,7 +152,7 @@ public abstract record Filter
     public FilterTarget Target { get; init; } = default!;
 }
 
-public abstract record Filter<TOptions> : Filter
+public abstract record Filter<TOptions> : BaseFilter
 {
     public TOptions Options { get; init; } = default!;
 }
@@ -1585,7 +1585,7 @@ public interface IFilterStep
     ValueTask ApplyCommitAsync(FilterContext context, CancellationToken cancellationToken);
 }
 
-public interface IFilterStep<TFilterDefinition> where TFilterDefinition : Filter
+public interface IFilterStep<TFilterDefinition> where TFilterDefinition : BaseFilter
 {
     // Must match `TFilterDefinition.Type`.
     string Type { get; }

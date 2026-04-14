@@ -21,7 +21,7 @@ namespace Mfr.Filters.Case
     public sealed record CapitalizeAfterFilter(
         bool Enabled,
         FilterTarget Target,
-        CapitalizeAfterOptions Options) : Filter(Enabled, Target)
+        CapitalizeAfterOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

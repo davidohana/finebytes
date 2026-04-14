@@ -19,7 +19,7 @@ namespace Mfr.Filters.Trimming
     public sealed record ShrinkDuplicateCharactersFilter(
         bool Enabled,
         FilterTarget Target,
-        ShrinkDuplicateCharactersOptions Options) : Filter(Enabled, Target)
+        ShrinkDuplicateCharactersOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

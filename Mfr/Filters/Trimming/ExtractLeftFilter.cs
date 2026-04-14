@@ -11,7 +11,7 @@ namespace Mfr.Filters.Trimming
     public sealed record ExtractLeftFilter(
         bool Enabled,
         FilterTarget Target,
-        CountFilterOptions Options) : Filter(Enabled, Target)
+        CountFilterOptions Options) : BaseFilter(Enabled, Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

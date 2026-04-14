@@ -19,7 +19,7 @@ namespace Mfr.Filters.Case
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed partial record UppercaseInitialsFilter(
         bool Enabled,
-        FilterTarget Target) : Filter(Enabled, Target)
+        FilterTarget Target) : BaseFilter(Enabled, Target)
     {
         // Keep this runtime-compiled regex for readability and to avoid GeneratedRegex partial-method
         // analyzer noise in this project setup.
