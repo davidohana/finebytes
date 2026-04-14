@@ -19,7 +19,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         {
             var replaceListFilePath = _CreateReplaceListFile(
                 """
-                \\ replacement list
+                // replacement list
                 a
                 b
 
@@ -46,15 +46,15 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
-        /// Verifies that an empty replacement strips the search string.
+        /// Verifies that the &lt;EMPTY&gt; token strips the search string.
         /// </summary>
         [Fact]
-        public void Apply_EmptyReplacementLine_StripsMatchedSearchString()
+        public void Apply_EmptyReplacementToken_StripsMatchedSearchString()
         {
             var replaceListFilePath = _CreateReplaceListFile(
                 """
                 x
-
+                <EMPTY>
 
                 """);
             try
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         {
             var replaceListFilePath = _CreateReplaceListFile(
                 """
-                \\ START OF REPLACE LIST
+                // START OF REPLACE LIST
                 a
                 b
 
@@ -93,7 +93,7 @@ namespace Mfr.Tests.Models.Filters.Replace
 
                 [0-9]+
                 <counter:10,1,0,2,0>
-                \\ END OF REPLACE LIST
+                // END OF REPLACE LIST
                 """);
             try
             {

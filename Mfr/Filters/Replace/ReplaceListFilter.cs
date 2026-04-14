@@ -6,7 +6,7 @@ namespace Mfr.Filters.Replace
     /// <summary>
     /// Options for replace-list transformations loaded from a file.
     /// </summary>
-    /// <param name="FilePath">Path to the replace-list file.</param>
+    /// <param name="FilePath">Path to the replace-list file parsed by <see cref="ReplaceListParser"/>.</param>
     /// <param name="Mode">Pattern interpretation mode.</param>
     /// <param name="CaseSensitive">Whether matching is case-sensitive.</param>
     /// <param name="ReplaceAll">Whether all matches are replaced for each pair.</param>
@@ -21,6 +21,10 @@ namespace Mfr.Filters.Replace
     /// <summary>
     /// Applies sequential replacements from a replace-list file.
     /// </summary>
+    /// <remarks>
+    /// Replace entries are applied in file order. This is equivalent to chaining multiple
+    /// <see cref="ReplacerFilter"/> instances with the same mode/options.
+    /// </remarks>
     /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Replace-list options.</param>
@@ -43,11 +47,11 @@ namespace Mfr.Filters.Replace
             }
 
             var transformed = segment;
-            foreach (var (search, replaceTemplate) in searchToReplace)
+            foreach (var entry in searchToReplace)
             {
-                var replacement = FormatterTokenResolver.ResolveTemplate(replaceTemplate, item);
+                var replacement = FormatterTokenResolver.ResolveTemplate(entry.Replacement, item);
                 var replacerOptions = new ReplacerOptions(
-                    Find: search,
+                    Find: entry.Search,
                     Replacement: replacement,
                     Mode: Options.Mode,
                     CaseSensitive: Options.CaseSensitive,
@@ -63,7 +67,7 @@ namespace Mfr.Filters.Replace
             return transformed;
         }
 
-        private List<(string Search, string Replacement)> _GetOrLoadReplaceEntries(FilterChainContext context)
+        private List<ReplaceListEntry> _GetOrLoadReplaceEntries(FilterChainContext context)
         {
             if (string.IsNullOrWhiteSpace(Options.FilePath))
             {
@@ -71,70 +75,12 @@ namespace Mfr.Filters.Replace
             }
 
             var normalizedFilePath = Path.GetFullPath(Options.FilePath);
-            var cacheId = string.Join(
-                "|",
-                normalizedFilePath,
-                Options.Mode,
-                Options.CaseSensitive,
-                Options.ReplaceAll,
-                Options.WholeWord);
             var cacheKey = new FilterCacheKey(
-                Scope: "ReplaceListEntries",
-                Id: cacheId);
+                Scope: FilterCacheScope.ReplaceListEntries,
+                Id: normalizedFilePath);
             return context.GetOrAdd(
                 key: cacheKey,
-                factory: () => _LoadReplaceEntries(filePath: Options.FilePath));
-        }
-
-        private static List<(string Search, string Replacement)> _LoadReplaceEntries(string filePath)
-        {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new InvalidOperationException("Replace-list file path cannot be empty.");
-            }
-
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException($"Replace-list file not found: '{filePath}'.", filePath);
-            }
-
-            var entries = new List<(string Search, string Replacement)>();
-            var lines = File.ReadAllLines(filePath);
-            string? pendingSearch = null;
-
-            foreach (var line in lines)
-            {
-                if (_IsCommentLine(line))
-                {
-                    continue;
-                }
-
-                if (pendingSearch is null)
-                {
-                    if (string.IsNullOrEmpty(line))
-                    {
-                        continue;
-                    }
-
-                    pendingSearch = line;
-                    continue;
-                }
-
-                entries.Add((Search: pendingSearch, Replacement: line));
-                pendingSearch = null;
-            }
-
-            if (pendingSearch is not null)
-            {
-                entries.Add((Search: pendingSearch, Replacement: ""));
-            }
-
-            return entries;
-        }
-
-        private static bool _IsCommentLine(string line)
-        {
-            return line.TrimStart().StartsWith(@"\\", StringComparison.Ordinal);
+                factory: () => ReplaceListParser.ParseFile(filePath: Options.FilePath));
         }
     }
 }

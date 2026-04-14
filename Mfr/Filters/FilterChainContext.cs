@@ -1,6 +1,17 @@
 namespace Mfr.Filters
 {
     /// <summary>
+    /// Defines logical cache scopes used by <see cref="FilterChainContext"/>.
+    /// </summary>
+    public enum FilterCacheScope
+    {
+        /// <summary>
+        /// Scope for parsed replace-list file entries.
+        /// </summary>
+        ReplaceListEntries
+    }
+
+    /// <summary>
     /// Represents per-chain transient cache storage shared across filters.
     /// </summary>
     public sealed class FilterChainContext
@@ -41,5 +52,5 @@ namespace Mfr.Filters
     /// </summary>
     /// <param name="Scope">Logical cache scope.</param>
     /// <param name="Id">Scope-specific identifier.</param>
-    public readonly record struct FilterCacheKey(string Scope, string Id);
+    public readonly record struct FilterCacheKey(FilterCacheScope Scope, string Id);
 }
