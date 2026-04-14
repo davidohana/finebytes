@@ -59,6 +59,22 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
+        /// Verifies parser requires at least one replacement entry.
+        /// </summary>
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData("// comment only")]
+        [InlineData("# comment only")]
+        public void ParseFile_NoEntries_Throws(string content)
+        {
+            var path = _CreateFile(content);
+
+            var ex = Assert.Throws<UserException>(() => ReplaceListParser.ParseFile(path));
+            Assert.Contains("must contain at least one replacement entry", ex.Message);
+        }
+
+        /// <summary>
         /// Verifies parser rejects empty entries or missing prefixes.
         /// </summary>
         [Theory]

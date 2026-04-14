@@ -39,6 +39,9 @@ namespace Mfr.Filters.Replace
         /// <item>
         /// <description>Search and replacement lines must be at most 1000 characters each.</description>
         /// </item>
+        /// <item>
+        /// <description>At least one replacement entry must be present.</description>
+        /// </item>
         /// </list>
         /// Example file content:
         /// <code>
@@ -66,6 +69,11 @@ namespace Mfr.Filters.Replace
             }
 
             var lines = _ReadNonCommentAndNonEmptyLines(filePath);
+            if (lines.Count == 0)
+            {
+                throw new UserException("Replace-list file must contain at least one replacement entry.");
+            }
+
             _ValidateLineLength(lines);
 
             var entries = new List<ReplaceListEntry>();
