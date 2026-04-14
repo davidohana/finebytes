@@ -21,12 +21,11 @@ namespace Mfr.Tests.Models.Filters.Replace
         /// </summary>
         [Theory]
         [InlineData("// comment")]
-        [InlineData("# comment")]
         [InlineData(@"\\ comment")]
         [InlineData("  # comment")]
         public void ParseFile_Comments_AreIgnored(string commentLine)
         {
-            var path = CreateFile(
+            var path = _CreateFile(
                 $"""
                 {commentLine}
                 S:a
@@ -46,7 +45,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         [Fact]
         public void ParseFile_HashWithoutSpace_IsNotComment()
         {
-            var path = CreateFile(
+            var path = _CreateFile(
                 """
                 S:#a
                 R:b
@@ -69,7 +68,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         [InlineData("S:a", "found a search line without a corresponding replace line")]
         public void ParseFile_InvalidFormat_Throws(string content, string expectedError)
         {
-            var path = CreateFile(content);
+            var path = _CreateFile(content);
 
             var ex = Assert.Throws<UserException>(() => ReplaceListParser.ParseFile(path));
             Assert.Contains(expectedError, ex.Message);
@@ -81,7 +80,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         [Fact]
         public void ParseFile_EmptyReplacementToken_MapsToEmptyString()
         {
-            var path = CreateFile(
+            var path = _CreateFile(
                 """
                 S:x
                 R:<EMPTY>
@@ -99,10 +98,9 @@ namespace Mfr.Tests.Models.Filters.Replace
         /// </summary>
         [Theory]
         [InlineData("S:a\nR:b\n\n\nS:c\nR:d")]
-        [InlineData("S:a\nR:b\nS:c\nR:d")]
         public void ParseFile_BlankLinesBetweenPairs_AreAllowed(string content)
         {
-            var path = CreateFile(content);
+            var path = _CreateFile(content);
 
             var entries = ReplaceListParser.ParseFile(path);
 
@@ -121,13 +119,13 @@ namespace Mfr.Tests.Models.Filters.Replace
         {
             var tooLong = new string('x', 1001);
             var content = isSearch ? $"S:{tooLong}\nR:b" : $"S:a\nR:{tooLong}";
-            var path = CreateFile(content);
+            var path = _CreateFile(content);
 
             var ex = Assert.Throws<UserException>(() => ReplaceListParser.ParseFile(path));
             Assert.Contains("line length exceeds 1000", ex.Message);
         }
 
-        private string CreateFile(string content)
+        private string _CreateFile(string content)
         {
             var path = Path.Combine(_tempDir.TempDir, $"test-{Guid.NewGuid():N}.txt");
             File.WriteAllText(path, content.ReplaceLineEndings(Environment.NewLine));

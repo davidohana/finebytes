@@ -1,0 +1,10 @@
+---
+description: Refactoring policy for new project compatibility
+alwaysApply: true
+---
+
+# Refactoring compatibility policy
+
+- This project is new; when refactoring, do not preserve legacy behavior solely for backward compatibility.
+- Prefer clean, current designs over compatibility shims, adapter layers, or deprecated-path fallbacks.
+- If a breaking change is needed during refactor, implement the simpler forward path and update tests/docs accordingly.

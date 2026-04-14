@@ -20,11 +20,11 @@ namespace Mfr.Tests.Models.Filters.Replace
             var replaceListFilePath = _CreateReplaceListFile(
                 """
                 // replacement list
-                a
-                b
+                S:a
+                R:b
 
-                .
-                _
+                S:.
+                R:_
                 """);
             try
             {
@@ -53,8 +53,8 @@ namespace Mfr.Tests.Models.Filters.Replace
         {
             var replaceListFilePath = _CreateReplaceListFile(
                 """
-                x
-                <EMPTY>
+                S:x
+                R:<EMPTY>
 
                 """);
             try
@@ -85,14 +85,14 @@ namespace Mfr.Tests.Models.Filters.Replace
             var replaceListFilePath = _CreateReplaceListFile(
                 """
                 // START OF REPLACE LIST
-                a
-                b
+                S:a
+                R:b
 
-                \.
-                _
+                S:\.
+                R:_
 
-                [0-9]+
-                <counter:10,1,0,2,0>
+                S:[0-9]+
+                R:<counter:10,1,0,2,0>
                 // END OF REPLACE LIST
                 """);
             try
@@ -130,8 +130,8 @@ namespace Mfr.Tests.Models.Filters.Replace
         {
             var replaceListFilePath = _CreateReplaceListFile(
                 """
-                f*o
-                X
+                S:f*o
+                R:X
                 """);
             try
             {
@@ -160,8 +160,8 @@ namespace Mfr.Tests.Models.Filters.Replace
         {
             var replaceListFilePath = _CreateReplaceListFile(
                 """
-                a
-                x
+                S:a
+                R:x
                 """);
             try
             {
@@ -178,7 +178,7 @@ namespace Mfr.Tests.Models.Filters.Replace
 
                 File.WriteAllText(
                     path: replaceListFilePath,
-                    contents: "a" + Environment.NewLine + "y" + Environment.NewLine);
+                    contents: "S:a" + Environment.NewLine + "R:y" + Environment.NewLine);
 
                 var secondItemSameContext = FilterTestHelpers.CreateFile(prefix: "a");
                 filter.Apply(secondItemSameContext, firstChainContext);
