@@ -1,4 +1,5 @@
-﻿using Mfr.Filters.Space;
+﻿using Mfr.Filters;
+using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
 using Mfr.Models;
 
@@ -40,10 +41,11 @@ namespace Mfr.Tests.Models.Filters.Space
             var trimFilter = new StripSpacesLeftFilter(true, _target);
 
             var file = FilterTestHelpers.CreateFile(prefix: "__New_York__.jpg");
+            var filterChainContext = new FilterChainContext();
 
             // In a real scenario, filters are applied in sequence.
-            spaceFilter.Apply(file);
-            trimFilter.Apply(file);
+            spaceFilter.Apply(file, filterChainContext);
+            trimFilter.Apply(file, filterChainContext);
 
             Assert.Equal("New_York__.jpg", file.Preview.Prefix);
         }

@@ -24,7 +24,7 @@ namespace Mfr.Filters.Formatting
         /// </summary>
         public override string Type => "Formatter";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             return FormatterTokenResolver.ResolveTemplate(Options.Template, item);
         }

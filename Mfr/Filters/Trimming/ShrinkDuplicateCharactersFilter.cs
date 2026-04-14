@@ -26,7 +26,7 @@ namespace Mfr.Filters.Trimming
         /// </summary>
         public override string Type => "ShrinkDuplicateCharacters";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             var pattern = Regex.Escape(Options.Character.ToString()) + "+";
             return Regex.Replace(segment, pattern, _ => Options.Character.ToString());

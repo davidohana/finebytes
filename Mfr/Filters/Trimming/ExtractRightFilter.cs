@@ -18,7 +18,7 @@ namespace Mfr.Filters.Trimming
         /// </summary>
         public override string Type => "ExtractRight";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             // Ensure count is within [0, segment.Length] to avoid IndexOutOfRangeException
             var count = Math.Clamp(Options.Count, 0, segment.Length);

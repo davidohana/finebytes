@@ -33,7 +33,7 @@ namespace Mfr.Filters.Space
         /// </summary>
         public override string Type => "SpaceCharacter";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             item.WordSeparator = Options.SpaceCharacter;
             var sep = Options.SpaceCharacter.ToString();

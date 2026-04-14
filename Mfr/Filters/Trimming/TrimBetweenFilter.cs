@@ -43,7 +43,7 @@ namespace Mfr.Filters.Trimming
         /// </summary>
         public override string Type => "TrimBetween";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             if (string.IsNullOrEmpty(segment))
             {

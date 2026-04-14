@@ -1,6 +1,6 @@
+using Mfr.Filters;
 using Mfr.Filters.Replace;
 using Mfr.Models;
-using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Models.Filters.Replace
 {
@@ -145,6 +145,49 @@ namespace Mfr.Tests.Models.Filters.Replace
                 var result = FilterTestHelpers.ApplyToPrefix(filter, "foo");
 
                 Assert.Equal("X", result);
+            }
+            finally
+            {
+                _DeleteIfExists(replaceListFilePath);
+            }
+        }
+
+        /// <summary>
+        /// Verifies replace-list file is cached for a chain context and refreshed with a new context.
+        /// </summary>
+        [Fact]
+        public void Apply_ContextCache_ReusesWithinContextAndReloadsAcrossContexts()
+        {
+            var replaceListFilePath = _CreateReplaceListFile(
+                """
+                a
+                x
+                """);
+            try
+            {
+                var filter = _CreateFilter(
+                    filePath: replaceListFilePath,
+                    mode: ReplacerMode.Literal,
+                    caseSensitive: true,
+                    replaceAll: true,
+                    wholeWord: false);
+                var firstChainContext = new FilterChainContext();
+                var firstItem = FilterTestHelpers.CreateFile(prefix: "a");
+                filter.Apply(firstItem, firstChainContext);
+                Assert.Equal("x", firstItem.Preview.Prefix);
+
+                File.WriteAllText(
+                    path: replaceListFilePath,
+                    contents: "a" + Environment.NewLine + "y" + Environment.NewLine);
+
+                var secondItemSameContext = FilterTestHelpers.CreateFile(prefix: "a");
+                filter.Apply(secondItemSameContext, firstChainContext);
+                Assert.Equal("x", secondItemSameContext.Preview.Prefix);
+
+                var secondChainContext = new FilterChainContext();
+                var thirdItemNewContext = FilterTestHelpers.CreateFile(prefix: "a");
+                filter.Apply(thirdItemNewContext, secondChainContext);
+                Assert.Equal("y", thirdItemNewContext.Preview.Prefix);
             }
             finally
             {

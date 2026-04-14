@@ -44,7 +44,7 @@ namespace Mfr.Filters
         [JsonIgnore]
         public abstract string Type { get; }
 
-        internal void Apply(RenameItem item)
+        internal void Apply(RenameItem item, FilterChainContext context)
         {
             if (!Enabled)
             {
@@ -66,10 +66,10 @@ namespace Mfr.Filters
                 _ => throw new InvalidOperationException($"Unknown fileNamePart '{part}'.")
             };
 
-            var transformedSegment = TransformSegment(partValue, item);
+            var transformedSegment = TransformSegment(partValue, item, context);
             item.SetPreviewValue(part, transformedSegment);
         }
 
-        internal abstract string TransformSegment(string segment, RenameItem item);
+        internal abstract string TransformSegment(string segment, RenameItem item, FilterChainContext context);
     }
 }

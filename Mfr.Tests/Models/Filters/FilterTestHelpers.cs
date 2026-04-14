@@ -45,7 +45,8 @@ namespace Mfr.Tests.Models.Filters
             string? directory = null)
         {
             var file = CreateFile(inputPrefix, extension, globalIndex, inFolderIndex, directory);
-            filter.Apply(file);
+            var filterChainContext = new FilterChainContext();
+            filter.Apply(file, filterChainContext);
             return file.Preview.Prefix;
         }
     }

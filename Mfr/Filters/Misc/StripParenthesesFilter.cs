@@ -39,7 +39,7 @@ namespace Mfr.Filters.Misc
         /// </summary>
         public override string Type => "StripParentheses";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             return Options.Type switch
             {

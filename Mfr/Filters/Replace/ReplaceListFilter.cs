@@ -34,9 +34,9 @@ namespace Mfr.Filters.Replace
         /// </summary>
         public override string Type => "ReplaceList";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
-            var searchToReplace = _LoadReplaceEntries(filePath: Options.FilePath);
+            var searchToReplace = _GetOrLoadReplaceEntries(context);
             if (searchToReplace.Count == 0)
             {
                 return segment;
@@ -57,10 +57,33 @@ namespace Mfr.Filters.Replace
                     Enabled: true,
                     Target: Target,
                     Options: replacerOptions);
-                transformed = replacerFilter.TransformSegment(transformed, item);
+                transformed = replacerFilter.TransformSegment(transformed, item, context);
             }
 
             return transformed;
+        }
+
+        private List<(string Search, string Replacement)> _GetOrLoadReplaceEntries(FilterChainContext context)
+        {
+            if (string.IsNullOrWhiteSpace(Options.FilePath))
+            {
+                throw new InvalidOperationException("Replace-list file path cannot be empty.");
+            }
+
+            var normalizedFilePath = Path.GetFullPath(Options.FilePath);
+            var cacheId = string.Join(
+                "|",
+                normalizedFilePath,
+                Options.Mode,
+                Options.CaseSensitive,
+                Options.ReplaceAll,
+                Options.WholeWord);
+            var cacheKey = new FilterCacheKey(
+                Scope: "ReplaceListEntries",
+                Id: cacheId);
+            return context.GetOrAdd(
+                key: cacheKey,
+                factory: () => _LoadReplaceEntries(filePath: Options.FilePath));
         }
 
         private static List<(string Search, string Replacement)> _LoadReplaceEntries(string filePath)

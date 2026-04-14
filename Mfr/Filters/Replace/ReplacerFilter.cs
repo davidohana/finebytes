@@ -58,7 +58,7 @@ namespace Mfr.Filters.Replace
         /// </summary>
         public override string Type => "Replacer";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             var regexOptions = Options.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
             var pattern = Options.Mode switch

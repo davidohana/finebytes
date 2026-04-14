@@ -48,7 +48,7 @@ namespace Mfr.Filters.Formatting
         /// </summary>
         public override string Type => "Counter";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             var n = Options.ResetPerFolder ? item.Original.InFolderIndex : item.Original.GlobalIndex;
             var value = Options.Start + ((long)Options.Step * n);

@@ -16,7 +16,7 @@ namespace Mfr.Filters.Space
         /// </summary>
         public override string Type => "RemoveSpaces";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             return segment.Replace(item.WordSeparator.ToString(), "", StringComparison.Ordinal);
         }

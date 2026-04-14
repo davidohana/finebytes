@@ -34,7 +34,7 @@ namespace Mfr.Filters.Case
         /// </summary>
         public override string Type => "UppercaseInitials";
 
-        internal override string TransformSegment(string segment, RenameItem item)
+        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
         {
             if (string.IsNullOrEmpty(segment))
             {
