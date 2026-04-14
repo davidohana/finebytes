@@ -29,7 +29,7 @@ namespace Mfr.Filters.Replace
         /// </summary>
         public override string Type => "Cleaner";
 
-        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
+        protected override string _TransformSegment(string segment, RenameItem item)
         {
             var invalidChars = Options.RemoveIllegalChars ? Path.GetInvalidFileNameChars() : [];
             var customChars = Options.CustomCharsToRemove ?? "";

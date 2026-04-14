@@ -32,7 +32,7 @@ namespace Mfr.Filters.Misc
         /// </summary>
         public override string Type => "FixLeadingZeros";
 
-        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
+        protected override string _TransformSegment(string segment, RenameItem item)
         {
             if (Options.Width <= 0)
             {

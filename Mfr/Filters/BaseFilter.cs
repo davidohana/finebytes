@@ -38,13 +38,26 @@ namespace Mfr.Filters
     [JsonDerivedType(typeof(TrimBetweenFilter), "TrimBetween")]
     public abstract record BaseFilter(bool Enabled, FilterTarget Target)
     {
+        private bool _isSetupComplete;
+
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         [JsonIgnore]
         public abstract string Type { get; }
 
-        internal void Apply(RenameItem item, FilterChainContext context)
+        internal void Setup()
+        {
+            if (_isSetupComplete)
+            {
+                return;
+            }
+
+            _Setup();
+            _isSetupComplete = true;
+        }
+
+        internal void Apply(RenameItem item)
         {
             if (!Enabled)
             {
@@ -54,6 +67,11 @@ namespace Mfr.Filters
             if (Target is not FileNameTarget fileTarget)
             {
                 throw new NotSupportedException($"Phase 1 only supports target.family='FileName'. Filter '{Type}' got '{Target.Family}'.");
+            }
+
+            if (!_isSetupComplete)
+            {
+                throw new InvalidOperationException($"Filter '{Type}' setup must complete before transform.");
             }
 
             var sourceFileEntry = item.Preview;
@@ -66,10 +84,24 @@ namespace Mfr.Filters
                 _ => throw new InvalidOperationException($"Unknown fileNamePart '{part}'.")
             };
 
-            var transformedSegment = TransformSegment(partValue, item, context);
+            var transformedSegment = TransformSegment(partValue, item);
             item.SetPreviewValue(part, transformedSegment);
         }
 
-        internal abstract string TransformSegment(string segment, RenameItem item, FilterChainContext context);
+        internal string TransformSegment(string segment, RenameItem item)
+        {
+            if (!_isSetupComplete)
+            {
+                throw new InvalidOperationException($"Filter '{Type}' setup must complete before transform.");
+            }
+
+            return _TransformSegment(segment, item);
+        }
+
+        protected virtual void _Setup()
+        {
+        }
+
+        protected abstract string _TransformSegment(string segment, RenameItem item);
     }
 }

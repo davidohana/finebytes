@@ -1,4 +1,3 @@
-using Mfr.Filters;
 using Mfr.Models;
 using Serilog;
 
@@ -108,12 +107,11 @@ namespace Mfr.Core
                 item.ResetState();
             }
 
-            var filterChainContext = new FilterChainContext();
             foreach (var renameItem in _renameItems)
             {
                 try
                 {
-                    renameItem.ApplyFilters(preset.Filters, filterChainContext);
+                    renameItem.ApplyFilters(preset.Filters);
                     renameItem.Status = RenameStatus.PreviewOk;
                 }
                 catch (Exception ex)

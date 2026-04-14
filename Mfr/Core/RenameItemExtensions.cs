@@ -10,19 +10,29 @@ namespace Mfr.Core
     public static class RenameItemExtensions
     {
         /// <summary>
+        /// Runs setup for all filters before applying any transformations.
+        /// </summary>
+        /// <param name="filters">The configured filters.</param>
+        public static void SetupFilters(this IReadOnlyList<BaseFilter> filters)
+        {
+            foreach (var filter in filters)
+            {
+                filter.Setup();
+            }
+        }
+
+        /// <summary>
         /// Applies enabled filters to update the item's preview file name.
         /// </summary>
         /// <param name="item">The rename item receiving transformed preview metadata.</param>
         /// <param name="filters">The configured filters to apply in order.</param>
-        /// <param name="context">Per-chain cache/context shared across filters and items.</param>
-        public static void ApplyFilters(this RenameItem item, IReadOnlyList<BaseFilter> filters, FilterChainContext? context = null)
+        public static void ApplyFilters(this RenameItem item, IReadOnlyList<BaseFilter> filters)
         {
             item.ClearPreview();
-            var filterChainContext = context ?? new FilterChainContext();
-
+            filters.SetupFilters();
             foreach (var filter in filters)
             {
-                filter.Apply(item, filterChainContext);
+                filter.Apply(item);
             }
         }
 

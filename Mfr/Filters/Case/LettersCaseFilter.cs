@@ -115,7 +115,7 @@ namespace Mfr.Filters.Case
         /// </summary>
         public override string Type => "LettersCase";
 
-        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
+        protected override string _TransformSegment(string segment, RenameItem item)
         {
             return Options.Mode switch
             {

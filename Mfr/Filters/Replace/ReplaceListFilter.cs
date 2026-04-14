@@ -33,14 +33,22 @@ namespace Mfr.Filters.Replace
         FilterTarget Target,
         ReplaceListOptions Options) : BaseFilter(Enabled, Target)
     {
+        private List<ReplaceListEntry>? _replaceListEntries;
+
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "ReplaceList";
 
-        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
+        protected override void _Setup()
         {
-            var searchToReplace = _GetOrLoadReplaceEntries(context);
+            _replaceListEntries = _LoadReplaceEntries();
+        }
+
+        protected override string _TransformSegment(string segment, RenameItem item)
+        {
+            var searchToReplace = _replaceListEntries
+                ?? throw new InvalidOperationException("Replace-list setup must complete before transform.");
             if (searchToReplace.Count == 0)
             {
                 return segment;
@@ -57,30 +65,20 @@ namespace Mfr.Filters.Replace
                     CaseSensitive: Options.CaseSensitive,
                     ReplaceAll: Options.ReplaceAll,
                     WholeWord: Options.WholeWord);
-                var replacerFilter = new ReplacerFilter(
-                    Enabled: true,
-                    Target: Target,
-                    Options: replacerOptions);
-                transformed = replacerFilter.TransformSegment(transformed, item, context);
+                transformed = ReplacerFilter.ReplaceSegment(transformed, replacerOptions);
             }
 
             return transformed;
         }
 
-        private List<ReplaceListEntry> _GetOrLoadReplaceEntries(FilterChainContext context)
+        private List<ReplaceListEntry> _LoadReplaceEntries()
         {
             if (string.IsNullOrWhiteSpace(Options.FilePath))
             {
                 throw new InvalidOperationException("Replace-list file path cannot be empty.");
             }
 
-            var normalizedFilePath = Path.GetFullPath(Options.FilePath);
-            var cacheKey = new FilterCacheKey(
-                Scope: FilterCacheScope.ReplaceListEntries,
-                Id: normalizedFilePath);
-            return context.GetOrAdd(
-                key: cacheKey,
-                factory: () => ReplaceListParser.ParseFile(filePath: Options.FilePath));
+            return ReplaceListParser.ParseFile(filePath: Options.FilePath);
         }
     }
 }

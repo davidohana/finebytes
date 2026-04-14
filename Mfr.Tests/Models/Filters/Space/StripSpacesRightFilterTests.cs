@@ -40,11 +40,12 @@ namespace Mfr.Tests.Models.Filters.Space
             var trimFilter = new StripSpacesRightFilter(true, _target);
 
             var file = FilterTestHelpers.CreateFile(prefix: "__New_York__");
-            var filterChainContext = new FilterChainContext();
 
             // In a real scenario, filters are applied in sequence.
-            spaceFilter.Apply(file, filterChainContext);
-            trimFilter.Apply(file, filterChainContext);
+            spaceFilter.Setup();
+            trimFilter.Setup();
+            spaceFilter.Apply(file);
+            trimFilter.Apply(file);
 
             Assert.Equal("__New_York", file.Preview.Prefix);
         }

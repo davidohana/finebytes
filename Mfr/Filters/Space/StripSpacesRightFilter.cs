@@ -20,7 +20,7 @@ namespace Mfr.Filters.Space
         /// </summary>
         public override string Type => "StripSpacesRight";
 
-        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
+        protected override string _TransformSegment(string segment, RenameItem item)
         {
             if (string.IsNullOrEmpty(segment))
             {

@@ -17,7 +17,7 @@ namespace Mfr.Filters.Space
         /// </summary>
         public override string Type => "ShrinkSpaces";
 
-        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
+        protected override string _TransformSegment(string segment, RenameItem item)
         {
             var ch = item.WordSeparator;
             var pattern = Regex.Escape(ch.ToString()) + "+";

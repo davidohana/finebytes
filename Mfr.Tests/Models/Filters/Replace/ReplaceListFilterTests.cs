@@ -153,10 +153,10 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
-        /// Verifies replace-list file is cached for a chain context and refreshed with a new context.
+        /// Verifies replace-list file is cached for the filter instance lifetime.
         /// </summary>
         [Fact]
-        public void Apply_ContextCache_ReusesWithinContextAndReloadsAcrossContexts()
+        public void Apply_InstanceCache_ReusesAcrossApplyCalls()
         {
             var replaceListFilePath = _CreateReplaceListFile(
                 """
@@ -171,23 +171,18 @@ namespace Mfr.Tests.Models.Filters.Replace
                     caseSensitive: true,
                     replaceAll: true,
                     wholeWord: false);
-                var firstChainContext = new FilterChainContext();
+                filter.Setup();
                 var firstItem = FilterTestHelpers.CreateFile(prefix: "a");
-                filter.Apply(firstItem, firstChainContext);
+                filter.Apply(firstItem);
                 Assert.Equal("x", firstItem.Preview.Prefix);
 
                 File.WriteAllText(
                     path: replaceListFilePath,
                     contents: "S:a" + Environment.NewLine + "R:y" + Environment.NewLine);
 
-                var secondItemSameContext = FilterTestHelpers.CreateFile(prefix: "a");
-                filter.Apply(secondItemSameContext, firstChainContext);
-                Assert.Equal("x", secondItemSameContext.Preview.Prefix);
-
-                var secondChainContext = new FilterChainContext();
-                var thirdItemNewContext = FilterTestHelpers.CreateFile(prefix: "a");
-                filter.Apply(thirdItemNewContext, secondChainContext);
-                Assert.Equal("y", thirdItemNewContext.Preview.Prefix);
+                var secondItem = FilterTestHelpers.CreateFile(prefix: "a");
+                filter.Apply(secondItem);
+                Assert.Equal("x", secondItem.Preview.Prefix);
             }
             finally
             {

@@ -58,29 +58,39 @@ namespace Mfr.Filters.Replace
         /// </summary>
         public override string Type => "Replacer";
 
-        internal override string TransformSegment(string segment, RenameItem item, FilterChainContext context)
+        protected override string _TransformSegment(string segment, RenameItem item)
         {
-            var regexOptions = Options.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
-            var pattern = Options.Mode switch
+            return _ReplaceSegment(segment, Options);
+        }
+
+        internal static string ReplaceSegment(string segment, ReplacerOptions options)
+        {
+            return _ReplaceSegment(segment, options);
+        }
+
+        private static string _ReplaceSegment(string segment, ReplacerOptions options)
+        {
+            var regexOptions = options.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+            var pattern = options.Mode switch
             {
-                ReplacerMode.Literal => Regex.Escape(Options.Find),
-                ReplacerMode.Wildcard => _WildcardToRegex(Options.Find),
-                ReplacerMode.Regex => Options.Find,
-                _ => Options.Find
+                ReplacerMode.Literal => Regex.Escape(options.Find),
+                ReplacerMode.Wildcard => _WildcardToRegex(options.Find),
+                ReplacerMode.Regex => options.Find,
+                _ => options.Find
             };
 
-            if (Options.WholeWord)
+            if (options.WholeWord)
             {
                 pattern = $@"\b(?:{pattern})\b";
             }
 
-            if (Options.ReplaceAll)
+            if (options.ReplaceAll)
             {
-                return Regex.Replace(segment, pattern, Options.Replacement, regexOptions);
+                return Regex.Replace(segment, pattern, options.Replacement, regexOptions);
             }
 
             var regex = new Regex(pattern, regexOptions);
-            return regex.Replace(segment, Options.Replacement, 1);
+            return regex.Replace(segment, options.Replacement, 1);
         }
 
         private static string _WildcardToRegex(string wildcard)
