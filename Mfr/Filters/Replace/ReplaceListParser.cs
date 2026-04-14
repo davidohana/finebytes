@@ -28,16 +28,13 @@ namespace Mfr.Filters.Replace
         /// <description>Comment lines may appear anywhere and must start with <c>//</c>, <c>\\</c>, or <c># </c> (hash followed by a space, after optional leading whitespace).</description>
         /// </item>
         /// <item>
-        /// <description>Each replace entry is two lines: first line is search text, second line is replacement text.</description>
+        /// <description>Empty lines are ignored.</description>
         /// </item>
         /// <item>
-        /// <description>Search lines cannot be empty.</description>
+        /// <description>Each replace entry is two lines: search line starting with <c>S:</c> and replacement line starting with <c>R:</c>.</description>
         /// </item>
         /// <item>
-        /// <description>Exactly one empty line must separate consecutive entry pairs.</description>
-        /// </item>
-        /// <item>
-        /// <description>Replacement lines cannot be empty. Use <c>&lt;EMPTY&gt;</c> to strip the matched search text.</description>
+        /// <description>Search and replacement lines cannot be empty (excluding the prefix). Use <c>&lt;EMPTY&gt;</c> on replacement lines to strip the matched search text.</description>
         /// </item>
         /// <item>
         /// <description>Search and replacement lines must be at most 1000 characters each.</description>
@@ -46,11 +43,11 @@ namespace Mfr.Filters.Replace
         /// Example file content:
         /// <code>
         /// # START OF REPLACE LIST
-        /// a
-        /// b
+        /// S:a
+        /// R:b
         ///
-        /// .
-        /// _
+        /// S:.
+        /// R:_
         /// # END OF REPLACE LIST
         /// </code>
         /// </remarks>
@@ -68,105 +65,58 @@ namespace Mfr.Filters.Replace
                 throw new UserException($"Replace-list file not found: '{filePath}'.");
             }
 
-            var lines = _ReadNonCommentLines(filePath);
+            var lines = _ReadNonCommentAndNonEmptyLines(filePath);
             _ValidateLineLength(lines);
 
             var entries = new List<ReplaceListEntry>();
             var i = 0;
-            ReplaceListFileLine? _ReadNextLine()
-            {
-                i++;
-                if (i >= lines.Count)
-                {
-                    return null;
-                }
-
-                return lines[i];
-            }
-
-            ReplaceListFileLine _ReadRequiredNextLineOrThrow(int lineNumber, string detail)
-            {
-                var line = _ReadNextLine();
-                if (line is { } lineValue)
-                {
-                    return lineValue;
-                }
-
-                _ThrowInvalidFormat(lineNumber: lineNumber, detail: detail);
-                return default;
-            }
 
             while (i < lines.Count)
             {
-                var searchLine = lines[i];
-                if (string.IsNullOrEmpty(searchLine.Text))
+                var searchLine = lines[i++];
+                if (!searchLine.Text.StartsWith("S:", StringComparison.Ordinal))
                 {
-                    _ThrowInvalidFormat(lineNumber: searchLine.LineNumber, detail: "search line cannot be empty.");
+                    _ThrowInvalidFormat(searchLine.LineNumber, "search line must start with 'S:'.");
                 }
 
-                var replaceLineValue = _ReadRequiredNextLineOrThrow(
-                    lineNumber: searchLine.LineNumber,
-                    detail: "found a search line without a corresponding replace line.");
-
-                if (string.IsNullOrEmpty(replaceLineValue.Text))
+                if (i >= lines.Count)
                 {
-                    _ThrowInvalidFormat(
-                        lineNumber: replaceLineValue.LineNumber,
-                        detail: $"replace line cannot be empty. Use '{EmptyReplacementToken}' to strip matches.");
+                    _ThrowInvalidFormat(searchLine.LineNumber, "found a search line without a corresponding replace line.");
                 }
 
-                entries.Add(new ReplaceListEntry(
-                    Search: searchLine.Text,
-                    Replacement: _ResolveEmptyReplacementToken(replaceLineValue.Text)));
-                var separatorLine = _ReadNextLine();
-                if (separatorLine is not { } separatorLineValue)
+                var replaceLine = lines[i++];
+                if (!replaceLine.Text.StartsWith("R:", StringComparison.Ordinal))
                 {
-                    break;
+                    _ThrowInvalidFormat(replaceLine.LineNumber, "replace line must start with 'R:'.");
                 }
 
-                if (!string.IsNullOrEmpty(separatorLineValue.Text))
+                var searchText = searchLine.Text[2..];
+                var replaceText = replaceLine.Text[2..];
+
+                if (string.IsNullOrEmpty(searchText))
                 {
-                    _ThrowInvalidFormat(
-                        lineNumber: separatorLineValue.LineNumber,
-                        detail: "expected exactly one empty separator line between entry pairs.");
+                    _ThrowInvalidFormat(searchLine.LineNumber, "search line cannot be empty.");
                 }
 
-                var lineAfterSeparator = _ReadNextLine();
-                if (lineAfterSeparator is not { } lineAfterSeparatorValue)
+                if (string.IsNullOrEmpty(replaceText))
                 {
-                    break;
+                    _ThrowInvalidFormat(replaceLine.LineNumber, $"replace line cannot be empty. Use '{EmptyReplacementToken}' to strip matches.");
                 }
 
-                if (!string.IsNullOrEmpty(lineAfterSeparatorValue.Text))
-                {
-                    continue;
-                }
-
-                var firstExtraSeparatorLineNumber = lineAfterSeparatorValue.LineNumber;
-                while (lineAfterSeparator is { } currentLine && string.IsNullOrEmpty(currentLine.Text))
-                {
-                    lineAfterSeparator = _ReadNextLine();
-                }
-
-                if (lineAfterSeparator is not null)
-                {
-                    _ThrowInvalidFormat(
-                        lineNumber: firstExtraSeparatorLineNumber,
-                        detail: "expected exactly one empty separator line between entry pairs.");
-                }
+                entries.Add(new ReplaceListEntry(searchText, _ResolveEmptyReplacementToken(replaceText)));
             }
 
             return entries;
         }
 
-        private static List<ReplaceListFileLine> _ReadNonCommentLines(string filePath)
+        private static List<ReplaceListFileLine> _ReadNonCommentAndNonEmptyLines(string filePath)
         {
             var lines = File.ReadAllLines(filePath);
             return
             [
                 .. lines
                 .Select((text, index) => new ReplaceListFileLine(Text: text, LineNumber: index + 1))
-                .Where(line => !_IsCommentLine(line.Text))
+                .Where(line => !string.IsNullOrWhiteSpace(line.Text) && !_IsCommentLine(line.Text))
             ];
         }
 
