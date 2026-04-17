@@ -16,16 +16,11 @@ namespace Mfr.Filters.Case
     /// position so the same index gets the same case across different names; when false, per-name variation
     /// is included.
     /// </param>
-    /// <param name="SentenceEndChars">
-    /// Characters that mark sentence endings for <see cref="LettersCaseMode.SentenceCase"/>.
-    /// When empty, sentence case only capitalizes at the start of the string.
-    /// </param>
     public sealed record LettersCaseOptions(
         LettersCaseMode Mode,
         IReadOnlyList<string> SkipWords,
         int WeirdUppercaseChancePercent = 50,
-        bool WeirdFixedPlaces = false,
-        string SentenceEndChars = ".!?");
+        bool WeirdFixedPlaces = false);
 
     /// <summary>
     /// Supported letter-case transformation modes.
@@ -82,9 +77,10 @@ namespace Mfr.Filters.Case
 
         /// <summary>
         /// Lowercases the string, then capitalizes the first letter of the whole string and the first
-        /// letter after configured sentence-end characters (see <see cref="LettersCaseOptions.SentenceEndChars"/>)
-        /// when followed by one or more word-separator characters (same as title case: default U+0020 SPACE;
-        /// set by <c>SpaceCharacter</c> when used earlier in the chain).
+        /// letter after characters in <see cref="RenameItem.SentenceEndChars"/> (default <c>".!?"</c>;
+        /// set by <c>SentenceEndCharacters</c> when used earlier in the chain) when followed by one or more
+        /// word-separator characters (same as title case: default U+0020 SPACE; set by <c>SpaceCharacter</c>
+        /// when used earlier in the chain).
         /// </summary>
         /// <example>
         /// <para>Default separator (space): <c>hello world. next line.</c> → <c>Hello world. Next line.</c></para>
@@ -128,7 +124,7 @@ namespace Mfr.Filters.Case
                     weirdUppercaseChancePercent: Options.WeirdUppercaseChancePercent,
                     weirdFixedPlaces: Options.WeirdFixedPlaces),
                 LettersCaseMode.TitleCase => _ApplyTitleCase(segment, Options.SkipWords, item.WordSeparator),
-                LettersCaseMode.SentenceCase => _ApplySentenceCase(segment, item.WordSeparator, Options.SentenceEndChars),
+                LettersCaseMode.SentenceCase => _ApplySentenceCase(segment, item.WordSeparator, item.SentenceEndChars),
                 LettersCaseMode.InvertCase => _InvertCase(segment),
                 _ => segment
             };

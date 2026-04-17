@@ -8,15 +8,13 @@ namespace Mfr.Filters.Case
     /// </summary>
     /// <param name="FilePath">Path to the casing-list text file (one word per line).</param>
     /// <param name="UppercaseSentenceInitial">
-    /// When <c>true</c>, uppercases the first letter at string start and after sentence-end boundaries.
-    /// </param>
-    /// <param name="SentenceEndChars">
-    /// Characters that mark sentence endings when <see cref="UppercaseSentenceInitial"/> is enabled.
+    /// When <c>true</c>, uppercases the first letter at string start and after sentence-end boundaries
+    /// (see <see cref="RenameItem.SentenceEndChars"/>, set by <c>SentenceEndCharacters</c> when used earlier
+    /// in the chain; default <c>".!?"</c>).
     /// </param>
     public sealed record CasingListOptions(
         string FilePath,
-        bool UppercaseSentenceInitial = false,
-        string SentenceEndChars = ".!?");
+        bool UppercaseSentenceInitial = false);
 
     /// <summary>
     /// Changes each word's casing to match how it appears in a casing-list file.
@@ -70,7 +68,7 @@ namespace Mfr.Filters.Case
             return _UppercaseSentenceInitials(
                 input: transformed,
                 wordSeparator: item.WordSeparator,
-                sentenceEndChars: Options.SentenceEndChars);
+                sentenceEndChars: item.SentenceEndChars);
         }
 
         /// <summary>

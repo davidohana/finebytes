@@ -138,14 +138,20 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_SentenceCase_UsesConfiguredSentenceEndCharacters()
         {
-            var f = new LettersCaseFilter(
+            var sentenceEndFilter = new SentenceEndCharactersFilter(
                 true,
                 _target,
-                new LettersCaseOptions(
-                    Mode: LettersCaseMode.SentenceCase,
-                    SkipWords: [],
-                    SentenceEndChars: ":;"));
-            Assert.Equal("Hello: Next; Again. no", FilterTestHelpers.ApplyToPrefix(f, "hello: next; again. no"));
+                new SentenceEndCharactersOptions(Characters: ":;"));
+            var lettersFilter = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello: next; again. no");
+            var filters = new List<BaseFilter> { sentenceEndFilter, lettersFilter };
+            filters.SetupFilters();
+            item.ApplyFilters(filters);
+
+            Assert.Equal("Hello: Next; Again. no", item.Preview.Prefix);
         }
 
         /// <summary>
@@ -154,14 +160,20 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_SentenceCase_WithNoSentenceEndCharacters_CapitalizesOnlyStart()
         {
-            var f = new LettersCaseFilter(
+            var sentenceEndFilter = new SentenceEndCharactersFilter(
                 true,
                 _target,
-                new LettersCaseOptions(
-                    Mode: LettersCaseMode.SentenceCase,
-                    SkipWords: [],
-                    SentenceEndChars: ""));
-            Assert.Equal("Hello. next line", FilterTestHelpers.ApplyToPrefix(f, "hello. next line"));
+                new SentenceEndCharactersOptions(Characters: ""));
+            var lettersFilter = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello. next line");
+            var filters = new List<BaseFilter> { sentenceEndFilter, lettersFilter };
+            filters.SetupFilters();
+            item.ApplyFilters(filters);
+
+            Assert.Equal("Hello. next line", item.Preview.Prefix);
         }
 
         /// <summary>
@@ -170,14 +182,20 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_SentenceCase_IgnoresSentenceEndCharsMatchingSeparator()
         {
-            var f = new LettersCaseFilter(
+            var sentenceEndFilter = new SentenceEndCharactersFilter(
                 true,
                 _target,
-                new LettersCaseOptions(
-                    Mode: LettersCaseMode.SentenceCase,
-                    SkipWords: [],
-                    SentenceEndChars: ". "));
-            Assert.Equal("Hello world. Next line", FilterTestHelpers.ApplyToPrefix(f, "hello world. next line"));
+                new SentenceEndCharactersOptions(Characters: ". "));
+            var lettersFilter = new LettersCaseFilter(
+                true,
+                _target,
+                new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello world. next line");
+            var filters = new List<BaseFilter> { sentenceEndFilter, lettersFilter };
+            filters.SetupFilters();
+            item.ApplyFilters(filters);
+
+            Assert.Equal("Hello world. Next line", item.Preview.Prefix);
         }
 
         /// <summary>

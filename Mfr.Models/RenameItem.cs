@@ -82,6 +82,13 @@ namespace Mfr.Models
         internal char WordSeparator { get; set; } = ' ';
 
         /// <summary>
+        /// Gets or sets characters that mark sentence endings for the current filter chain pass.
+        /// Reset to <c>".!?"</c> at the start of each preview cycle; updated when a
+        /// <c>SentenceEndCharacters</c> filter runs.
+        /// </summary>
+        internal string SentenceEndChars { get; set; } = ".!?";
+
+        /// <summary>
         /// Resets transient preview/commit state for a fresh processing cycle.
         /// </summary>
         public void ResetState()
@@ -91,12 +98,14 @@ namespace Mfr.Models
             CommitError = null;
             Status = RenameStatus.Init;
             WordSeparator = ' ';
+            SentenceEndChars = ".!?";
         }
 
         internal void ClearPreview()
         {
             Preview = Original.Clone();
             WordSeparator = ' ';
+            SentenceEndChars = ".!?";
         }
 
         internal void SetPreviewValue(FileNamePart part, string partValue)

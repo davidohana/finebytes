@@ -30,8 +30,7 @@ namespace Mfr.Tests.Models.Filters.Case
             {
                 var filter = _CreateFilter(
                     filePath: casingListFilePath,
-                    uppercaseSentenceInitial: false,
-                    sentenceEndChars: ".!?");
+                    uppercaseSentenceInitial: false);
 
                 var result = FilterTestHelpers.ApplyToPrefix(filter, "03 - WiTH Or Without You Rmx");
 
@@ -58,12 +57,18 @@ namespace Mfr.Tests.Models.Filters.Case
                 """);
             try
             {
-                var filter = _CreateFilter(
+                var sentenceEndFilter = new SentenceEndCharactersFilter(
+                    Enabled: true,
+                    Target: _target,
+                    Options: new SentenceEndCharactersOptions(Characters: "-.!"));
+                var casingFilter = _CreateFilter(
                     filePath: casingListFilePath,
-                    uppercaseSentenceInitial: true,
-                    sentenceEndChars: "-.!");
-
-                var result = FilterTestHelpers.ApplyToPrefix(filter, "03 - WiTH Or Without You Rmx");
+                    uppercaseSentenceInitial: true);
+                var item = FilterTestHelpers.CreateRenameItem(prefix: "03 - WiTH Or Without You Rmx");
+                var filters = new List<BaseFilter> { sentenceEndFilter, casingFilter };
+                filters.SetupFilters();
+                item.ApplyFilters(filters);
+                var result = item.Preview.Prefix;
 
                 Assert.Equal("03 - With or Without You RMX", result);
             }
@@ -98,8 +103,7 @@ namespace Mfr.Tests.Models.Filters.Case
                         CustomText: ""));
                 var casingFilter = _CreateFilter(
                     filePath: casingListFilePath,
-                    uppercaseSentenceInitial: true,
-                    sentenceEndChars: ".!?");
+                    uppercaseSentenceInitial: true);
                 var filters = new List<BaseFilter> { spaceCharacterFilter, casingFilter };
 
                 var item = FilterTestHelpers.CreateRenameItem(prefix: "US_AND_THEM");
@@ -123,8 +127,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var missingFilePath = Path.Combine(Path.GetTempPath(), $"mfr-casing-list-missing-{Guid.NewGuid():N}.txt");
             var filter = _CreateFilter(
                 filePath: missingFilePath,
-                uppercaseSentenceInitial: false,
-                sentenceEndChars: ".!?");
+                uppercaseSentenceInitial: false);
 
             var ex = Assert.Throws<UserException>(filter.Setup);
             Assert.Contains("Casing-list file not found", ex.Message, StringComparison.Ordinal);
@@ -132,13 +135,11 @@ namespace Mfr.Tests.Models.Filters.Case
 
         private static CasingListFilter _CreateFilter(
             string filePath,
-            bool uppercaseSentenceInitial,
-            string sentenceEndChars)
+            bool uppercaseSentenceInitial)
         {
             var options = new CasingListOptions(
                 FilePath: filePath,
-                UppercaseSentenceInitial: uppercaseSentenceInitial,
-                SentenceEndChars: sentenceEndChars);
+                UppercaseSentenceInitial: uppercaseSentenceInitial);
             return new CasingListFilter(
                 Enabled: true,
                 Target: _target,
