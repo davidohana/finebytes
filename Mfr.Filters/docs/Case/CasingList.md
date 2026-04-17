@@ -18,6 +18,7 @@ Example list files use words like `and`, `or`, `with`, `RMX` or `and`, `us`, `th
 - One word per line; spaces inside a line are invalid.
 - Duplicate words (same letters, different casing): **last line wins** in the file.
 - At least one non-comment word is required.
+- Each line is limited to 1000 characters (same cap as name-list files).
 
 ## Examples
 

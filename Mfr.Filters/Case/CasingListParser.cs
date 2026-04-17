@@ -14,15 +14,7 @@ namespace Mfr.Filters.Case
         /// <returns>Case-insensitive map from lowercased word to canonical cased form.</returns>
         internal static Dictionary<string, string> ParseFile(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new UserException("Casing-list file path cannot be empty.");
-            }
-
-            if (!File.Exists(filePath))
-            {
-                throw new UserException($"Casing-list file not found: '{filePath}'.");
-            }
+            ListFileParseHelpers.ValidateListFilePath(filePath, listKindLabel: "Casing-list");
 
             var lowerWordToCasing = new Dictionary<string, string>(StringComparer.Ordinal);
             var lines = File.ReadAllLines(filePath);
@@ -30,9 +22,15 @@ namespace Mfr.Filters.Case
             {
                 var lineNumber = i + 1;
                 var rawLine = lines[i];
+                if (rawLine.Length > ListFileParseHelpers.MaxListFileLineLength)
+                {
+                    throw new UserException(
+                        $"Casing-list line {lineNumber} exceeds maximum length ({ListFileParseHelpers.MaxListFileLineLength}).");
+                }
+
                 var trimmed = rawLine.Trim();
                 // Allow empty lines and comments so list files stay easy to maintain.
-                if (trimmed.Length == 0 || _IsCommentLine(trimmed))
+                if (trimmed.Length == 0 || ListFileParseHelpers.IsListFileCommentLine(rawLine))
                 {
                     continue;
                 }
@@ -53,18 +51,6 @@ namespace Mfr.Filters.Case
             }
 
             return lowerWordToCasing;
-        }
-
-        /// <summary>
-        /// Returns whether the line should be treated as a comment.
-        /// </summary>
-        /// <param name="trimmedLine">Trimmed line content from the casing-list file.</param>
-        /// <returns><c>true</c> when the line starts with a supported comment marker.</returns>
-        private static bool _IsCommentLine(string trimmedLine)
-        {
-            return trimmedLine.StartsWith("//", StringComparison.Ordinal)
-                || trimmedLine.StartsWith(@"\\", StringComparison.Ordinal)
-                || trimmedLine.StartsWith("# ", StringComparison.Ordinal);
         }
     }
 }

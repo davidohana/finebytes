@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Models;
 using Mfr.Tests.TestSupport;
@@ -140,6 +141,19 @@ namespace Mfr.Tests.Models.Filters.Case
             var ex = Assert.Throws<UserException>(() => CasingListParser.ParseFile(path));
             Assert.Contains("line 2", ex.Message, StringComparison.Ordinal);
             Assert.Contains("exactly one word", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies overly long lines are rejected.
+        /// </summary>
+        [Fact]
+        public void ParseFile_LineTooLong_Throws()
+        {
+            var longWord = new string('x', ListFileParseHelpers.MaxListFileLineLength + 1);
+            var path = _CreateFile(longWord);
+
+            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseFile(path));
+            Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
         }
 
         public void Dispose()

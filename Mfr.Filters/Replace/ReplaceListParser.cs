@@ -58,15 +58,7 @@ namespace Mfr.Filters.Replace
         /// <returns>Parsed replace-list entries in file order.</returns>
         internal static List<ReplaceListEntry> ParseFile(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new UserException("Replace-list file path cannot be empty.");
-            }
-
-            if (!File.Exists(filePath))
-            {
-                throw new UserException($"Replace-list file not found: '{filePath}'.");
-            }
+            ListFileParseHelpers.ValidateListFilePath(filePath, listKindLabel: "Replace-list");
 
             var lines = _ReadNonCommentAndNonEmptyLines(filePath);
             if (lines.Count == 0)
@@ -124,7 +116,7 @@ namespace Mfr.Filters.Replace
             [
                 .. lines
                 .Select((text, index) => new ReplaceListFileLine(Text: text, LineNumber: index + 1))
-                .Where(line => !string.IsNullOrWhiteSpace(line.Text) && !_IsCommentLine(line.Text))
+                .Where(line => !string.IsNullOrWhiteSpace(line.Text) && !ListFileParseHelpers.IsListFileCommentLine(line.Text))
             ];
         }
 
@@ -139,14 +131,6 @@ namespace Mfr.Filters.Replace
             _ThrowInvalidFormat(
                 lineNumber: firstInvalidLine.LineNumber,
                 detail: $"line length exceeds {MaxEntryLineLength} characters.");
-        }
-
-        private static bool _IsCommentLine(string line)
-        {
-            var trimmed = line.TrimStart();
-            return trimmed.StartsWith("//", StringComparison.Ordinal)
-                || trimmed.StartsWith(@"\\", StringComparison.Ordinal)
-                || trimmed.StartsWith("# ", StringComparison.Ordinal);
         }
 
         private static string _ResolveEmptyReplacementToken(string replacement)

@@ -7,8 +7,6 @@ namespace Mfr.Filters.Formatting
     /// </summary>
     internal static class NameListParser
     {
-        internal const int MaxLineLength = 65536;
-
         /// <summary>
         /// Parses name-list entries from a text file (UTF-8, same as other list file parsers).
         /// </summary>
@@ -17,15 +15,7 @@ namespace Mfr.Filters.Formatting
         /// <returns>Ordered entries; index <c>k</c> maps to rename item <see cref="FileMeta.GlobalIndex"/> <c>k</c>.</returns>
         internal static IReadOnlyList<string> ParseFile(string filePath, bool skipEmptyLines)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new UserException("Name-list file path cannot be empty.");
-            }
-
-            if (!File.Exists(filePath))
-            {
-                throw new UserException($"Name-list file not found: '{filePath}'.");
-            }
+            ListFileParseHelpers.ValidateListFilePath(filePath, listKindLabel: "Name-list");
 
             var rawLines = File.ReadAllLines(filePath);
             var entries = new List<string>(rawLines.Length);
@@ -33,14 +23,13 @@ namespace Mfr.Filters.Formatting
             {
                 var lineNumber = i + 1;
                 var line = rawLines[i];
-                if (line.Length > MaxLineLength)
+                if (line.Length > ListFileParseHelpers.MaxListFileLineLength)
                 {
                     throw new UserException(
-                        $"Name-list line {lineNumber} exceeds maximum length ({MaxLineLength}).");
+                        $"Name-list line {lineNumber} exceeds maximum length ({ListFileParseHelpers.MaxListFileLineLength}).");
                 }
 
-                var trimmedForComment = line.Trim();
-                if (trimmedForComment.Length > 0 && _IsCommentLine(trimmedForComment))
+                if (ListFileParseHelpers.IsListFileCommentLine(line))
                 {
                     continue;
                 }
@@ -65,13 +54,6 @@ namespace Mfr.Filters.Formatting
             }
 
             return entries;
-        }
-
-        private static bool _IsCommentLine(string trimmedLine)
-        {
-            return trimmedLine.StartsWith("//", StringComparison.Ordinal)
-                || trimmedLine.StartsWith(@"\\", StringComparison.Ordinal)
-                || trimmedLine.StartsWith("# ", StringComparison.Ordinal);
         }
     }
 }
