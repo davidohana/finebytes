@@ -61,14 +61,12 @@ namespace Mfr.Filters.Case
                 return segment;
             }
 
-            // First pass: normalize only words found in the casing list.
             var transformed = _ApplyCasingList(segment, item.WordSeparator, lowerWordToCasing);
             if (!Options.UppercaseSentenceInitial)
             {
                 return transformed;
             }
 
-            // Optional second pass: force sentence starts to uppercase.
             return _UppercaseSentenceInitials(
                 input: transformed,
                 wordSeparator: item.WordSeparator,
@@ -84,45 +82,44 @@ namespace Mfr.Filters.Case
         /// <returns>Text with matched words replaced by canonical casing.</returns>
         private static string _ApplyCasingList(string input, char wordSeparator, IReadOnlyDictionary<string, string> lowerWordToCasing)
         {
+            ReadOnlySpan<char> remaining = input;
             var output = new StringBuilder(input.Length);
-            var token = new StringBuilder();
-
-            // Stream through once so separator runs are preserved exactly.
-            foreach (var c in input)
+            while (!remaining.IsEmpty)
             {
-                if (c == wordSeparator)
+                var sep = remaining.IndexOf(wordSeparator);
+                if (sep < 0)
                 {
-                    _AppendResolvedToken(output, token, lowerWordToCasing);
-                    output.Append(c);
-                    continue;
+                    _AppendResolvedWord(output, remaining, lowerWordToCasing);
+                    break;
                 }
 
-                token.Append(c);
+                _AppendResolvedWord(output, remaining[..sep], lowerWordToCasing);
+                output.Append(wordSeparator);
+                remaining = remaining[(sep + 1)..];
             }
 
-            _AppendResolvedToken(output, token, lowerWordToCasing);
             return output.ToString();
         }
 
         /// <summary>
-        /// Appends the buffered token to output, using list casing when a match exists.
+        /// Appends one token using list casing when a match exists; unknown words are unchanged.
         /// </summary>
         /// <param name="output">Destination text builder.</param>
-        /// <param name="token">Current token buffer to resolve and clear.</param>
+        /// <param name="word">Token text (may be empty between consecutive separators).</param>
         /// <param name="lowerWordToCasing">Lowercased-word to canonical-casing mapping.</param>
-        private static void _AppendResolvedToken(StringBuilder output, StringBuilder token, IReadOnlyDictionary<string, string> lowerWordToCasing)
+        private static void _AppendResolvedWord(
+            StringBuilder output,
+            ReadOnlySpan<char> word,
+            IReadOnlyDictionary<string, string> lowerWordToCasing)
         {
-            if (token.Length == 0)
+            if (word.IsEmpty)
             {
                 return;
             }
 
-            var originalWord = token.ToString();
+            var originalWord = word.ToString();
             var lowerWord = originalWord.ToLowerInvariant();
-            // Unknown words are emitted unchanged.
-            var resolvedWord = lowerWordToCasing.GetValueOrDefault(lowerWord, originalWord);
-            output.Append(resolvedWord);
-            token.Clear();
+            output.Append(lowerWordToCasing.GetValueOrDefault(lowerWord, originalWord));
         }
 
         /// <summary>
@@ -142,18 +139,12 @@ namespace Mfr.Filters.Case
             var chars = input.ToCharArray();
             _UppercaseFirstAsciiLetter(chars, startIndex: 0);
 
-            if (sentenceEndChars.Length == 0)
-            {
-                return new string(chars);
-            }
-
             var sentenceEndToIsIncluded = new HashSet<char>(sentenceEndChars.Where(c => c != wordSeparator));
             if (sentenceEndToIsIncluded.Count == 0)
             {
                 return new string(chars);
             }
 
-            // Find each sentence-end marker and uppercase the next word's first letter.
             for (var i = 0; i < chars.Length; i++)
             {
                 if (!sentenceEndToIsIncluded.Contains(chars[i]))
@@ -174,27 +165,24 @@ namespace Mfr.Filters.Case
         }
 
         /// <summary>
-        /// Uppercases the first lowercase ASCII letter from the specified index.
+        /// Uppercases the first lowercase ASCII letter from the specified index, or stops at the first uppercase letter.
         /// </summary>
         /// <param name="chars">Character buffer to mutate in place.</param>
         /// <param name="startIndex">Inclusive index where scanning begins.</param>
         private static void _UppercaseFirstAsciiLetter(char[] chars, int startIndex)
         {
-            // Uppercase the first lowercase ASCII letter, or stop if the first letter is already uppercase.
             for (var i = startIndex; i < chars.Length; i++)
             {
-                if (!char.IsAsciiLetterLower(chars[i]))
+                if (char.IsAsciiLetterLower(chars[i]))
                 {
-                    if (char.IsAsciiLetterUpper(chars[i]))
-                    {
-                        return;
-                    }
-
-                    continue;
+                    chars[i] = char.ToUpperInvariant(chars[i]);
+                    return;
                 }
 
-                chars[i] = char.ToUpperInvariant(chars[i]);
-                return;
+                if (char.IsAsciiLetterUpper(chars[i]))
+                {
+                    return;
+                }
             }
         }
     }
