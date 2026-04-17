@@ -7,7 +7,7 @@ namespace Mfr.Models
     /// </summary>
     /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
-    public abstract partial record BaseFilter(bool Enabled, FilterTarget Target)
+    public abstract record BaseFilter(bool Enabled, FilterTarget Target)
     {
         private bool _isSetupComplete;
 

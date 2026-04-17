@@ -1,4 +1,9 @@
 <Solution>
+  <Project Path="Mfr.App.Cli/Mfr.App.Cli.csproj" />
+  <Project Path="Mfr.Core/Mfr.Core.csproj" />
+  <Project Path="Mfr.Filters/Mfr.Filters.csproj" />
+  <Project Path="Mfr.Models/Mfr.Models.csproj" />
+  <Project Path="Mfr.Utils/Mfr.Utils.csproj" />
   <Project Path="Mfr/Mfr.csproj" />
   <Project Path="Mfr.Tests/Mfr.Tests.csproj" />
 </Solution>

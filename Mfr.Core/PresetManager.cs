@@ -45,8 +45,7 @@ namespace Mfr.Core
             try
             {
                 var json = File.ReadAllText(PresetsFilePath);
-                // Use source-generated JSON metadata for trim/AOT-safe polymorphic deserialization.
-                container = JsonSerializer.Deserialize(json, PresetJsonSerializerContext.Default.PresetContainer)
+                container = JsonSerializer.Deserialize<PresetContainer>(json, PresetJsonOptions.Default)
                     ?? throw new InvalidDataException("Presets JSON payload is null or invalid for the expected schema.");
             }
             catch (Exception ex)
@@ -84,7 +83,7 @@ namespace Mfr.Core
                     .ThenBy(preset => preset.Name, StringComparer.Ordinal)
                     .ToList();
                 var container = new PresetContainer(sortedPresets);
-                var json = JsonSerializer.Serialize(container, PresetJsonSerializerContext.Default.PresetContainer);
+                var json = JsonSerializer.Serialize(container, PresetJsonOptions.Default);
                 File.WriteAllText(PresetsFilePath, json);
             }
             catch (Exception ex)

@@ -10,11 +10,11 @@ description: Architectural layers, dependency direction, and conformity tracks f
 | Folder | Role (today) | Primary namespace |
 |--------|----------------|---------------------|
 | Root (`Program.cs`) | Composition root / entry | (default / implicit) |
-| [Cli/](../Mfr/App/Cli) | Spectre.Console CLI, argument parsing, logging setup | `Mfr.App.Cli` |
-| [Core/](../Mfr/Core) | Orchestration: rename pipeline (`RenameList`), presets I/O, source resolution, JSON source-gen for presets | `Mfr.Core` |
-| [Filters/](../Mfr/Filters) | Polymorphic `BaseFilter` + concrete filters; filter extension points | `Mfr.Filters` (+ sub-namespaces) |
-| [Models/](../Mfr/Models) | DTOs: `RenameItem`, targets, preset records, summaries | `Mfr.Models` |
-| [Utils/](../Mfr/Utils) | Path/string helpers | `Mfr.Utils` |
+| [Cli/](../Mfr.App.Cli) | Spectre.Console CLI, argument parsing, logging setup | `Mfr.App.Cli` |
+| [Core/](../Mfr.Core) | Orchestration: rename pipeline (`RenameList`), presets I/O, source resolution, JSON source-gen for presets | `Mfr.Core` |
+| [Filters/](../Mfr.Filters) | Polymorphic `BaseFilter` + concrete filters; filter extension points | `Mfr.Filters` (+ sub-namespaces) |
+| [Models/](../Mfr.Models) | DTOs: `RenameItem`, targets, preset records, summaries | `Mfr.Models` |
+| [Utils/](../Mfr.Utils) | Path/string helpers | `Mfr.Utils` |
 
 There is **no** multi-project solution file in the repo root from search; layering is **namespace/folder convention** only unless you split projects or add analyzers.
 
@@ -33,7 +33,7 @@ There is **no** multi-project solution file in the repo root from search; layeri
 
 **Entry (not a layer):** [`Program.cs`](../Mfr/Program.cs) stays at the **`Mfr/`** project root (next to [`Mfr.csproj`](../Mfr/Mfr.csproj)); it is a thin bootstrap into the **App** layer only — **no** separate **`Host/`** folder.
 
-**Current status vs this rule:** CLI now lives under [`App/Cli/`](../Mfr/App/Cli), so L4 uses a single root folder (`App/`) with subfolders for app surfaces.
+**Current status vs this rule:** CLI now lives under [`App/Cli/`](../Mfr.App.Cli), so L4 uses a single root folder (`App/`) with subfolders for app surfaces.
 
 **Track A and this rule:** `BaseFilter` **behavior** lives under **`Models/`**; the **`[JsonPolymorphic]`** partial may live in **`Core/`** as **glue** (two folders, one logical type). Prefer keeping **all** `Models` layer **source files** under the **`Models/`** tree where possible; if the JSON partial must stay in `Core/`, treat it as **application-owned serialization metadata** for L1 types (documented exception to “all code for a type in one folder”).
 
@@ -64,8 +64,8 @@ flowchart TB
 
 **Expected downward edges (no surprises):**
 
-- `Cli` → `Core`, `Models`, `Utils` ([CliApp.cs](../Mfr/App/Cli/CliApp.cs), [CliArgParser.cs](../Mfr/App/Cli/CliArgParser.cs), [CliLogging.cs](../Mfr/App/Cli/CliLogging.cs)).
-- `Core` → `Filters`, `Models` ([RenameList.cs](../Mfr/Core/RenameList.cs), [RenameItemExtensions.cs](../Mfr/Core/RenameItemExtensions.cs)); `Core` → `Utils` ([PresetManager.cs](../Mfr/Core/PresetManager.cs)).
+- `Cli` → `Core`, `Models`, `Utils` ([CliApp.cs](../Mfr.App.Cli/CliApp.cs), [CliArgParser.cs](../Mfr.App.Cli/CliArgParser.cs), [CliLogging.cs](../Mfr.App.Cli/CliLogging.cs)).
+- `Core` → `Filters`, `Models` ([RenameList.cs](../Mfr.Core/RenameList.cs), [RenameItemExtensions.cs](../Mfr.Core/RenameItemExtensions.cs)); `Core` → `Utils` ([PresetManager.cs](../Mfr.Core/PresetManager.cs)).
 - Most of `Filters` → `Models` (concrete filters).
 
 ## Violations relative to strict “Models at bottom”
@@ -73,10 +73,10 @@ flowchart TB
 Two edges break a clean **acyclic** layer stack if you define **Models** as the lowest domain layer:
 
 1. **`Models` → `Filters`** *(historical; now resolved)*  
-   Previously, [Presets.cs](../Mfr/Models/Presets.cs) referenced a base type declared in `Filters`, which created a Models ↔ Filters cycle. This was resolved by moving [BaseFilter.cs](../Mfr/Models/BaseFilter.cs) into `Models` and keeping JSON derived-type wiring in [`Core/BaseFilter.JsonSerialization.cs`](../Mfr/Core/BaseFilter.JsonSerialization.cs).
+   Previously, [Presets.cs](../Mfr.Models/Presets.cs) referenced a base type declared in `Filters`, which created a Models ↔ Filters cycle. This was resolved by moving [BaseFilter.cs](../Mfr.Models/BaseFilter.cs) into `Models` and keeping JSON derived-type wiring in [`Core/PresetJsonOptions.cs`](../Mfr.Core/PresetJsonOptions.cs).
 
 2. **`Filters` → `Core`** *(historical; now resolved)*  
-   Previously, [ReplaceListParser.cs](../Mfr/Filters/Replace/ReplaceListParser.cs) imported `Mfr.Core` to throw `UserException`. This was resolved by moving [UserException.cs](../Mfr/Models/UserException.cs) into `Models` and updating call sites.
+   Previously, [ReplaceListParser.cs](../Mfr.Filters/Replace/ReplaceListParser.cs) imported `Mfr.Core` to throw `UserException`. This was resolved by moving [UserException.cs](../Mfr.Models/UserException.cs) into `Models` and updating call sites.
 
 ## Target layers and new dependency graph (specification)
 
@@ -84,11 +84,11 @@ This is the **intended** layering after refactors: **acyclic**, **only downward*
 
 | Layer | Id | Folder(s) | Role | Allowed `using Mfr.*` targets |
 |-------|-----|-----------|------|--------------------------------|
-| **L4 — App** | `App` | **Single folder** `App/` containing [Cli/](../Mfr/App/Cli) (target: `App/Cli/`) and future `App/Ui/` | CLI commands, args, console UX; later Avalonia | `Mfr.Core`, `Mfr.Models`, `Mfr.Utils` — **not** `Mfr.Filters` |
-| **L3 — Application** | `Application` | [Core/](../Mfr/Core) | Use cases: `RenameList`, preset load/save, glob resolution, pipeline orchestration | `Mfr.Filters`, `Mfr.Models`, `Mfr.Utils` |
-| **L2 — Domain rules** | `DomainRules` | [Filters/](../Mfr/Filters) | Polymorphic filters, `BaseFilter`, concrete filter types | `Mfr.Models`, `Mfr.Utils` — **not** `Mfr.Core` |
-| **L1 — Domain model** | `DomainModel` | [Models/](../Mfr/Models) | Portable types: rename items, targets, summaries, **filter contract types if moved here** (e.g. `BaseFilter` base record) | `Mfr.Utils` only if needed — **not** `Mfr.Filters` or `Mfr.Core` |
-| **L0 — Shared utilities** | `SharedKernel` | [Utils/](../Mfr/Utils) | Path/string helpers with no domain meaning | **None** (no `Mfr.*` imports) |
+| **L4 — App** | `App` | **Single folder** `App/` containing [Cli/](../Mfr.App.Cli) (target: `App/Cli/`) and future `App/Ui/` | CLI commands, args, console UX; later Avalonia | `Mfr.Core`, `Mfr.Models`, `Mfr.Utils` — **not** `Mfr.Filters` |
+| **L3 — Application** | `Application` | [Core/](../Mfr.Core) | Use cases: `RenameList`, preset load/save, glob resolution, pipeline orchestration | `Mfr.Filters`, `Mfr.Models`, `Mfr.Utils` |
+| **L2 — Domain rules** | `DomainRules` | [Filters/](../Mfr.Filters) | Polymorphic filters, `BaseFilter`, concrete filter types | `Mfr.Models`, `Mfr.Utils` — **not** `Mfr.Core` |
+| **L1 — Domain model** | `DomainModel` | [Models/](../Mfr.Models) | Portable types: rename items, targets, summaries, **filter contract types if moved here** (e.g. `BaseFilter` base record) | `Mfr.Utils` only if needed — **not** `Mfr.Filters` or `Mfr.Core` |
+| **L0 — Shared utilities** | `SharedKernel` | [Utils/](../Mfr.Utils) | Path/string helpers with no domain meaning | **None** (no `Mfr.*` imports) |
 
 **Rule (single sentence):** Dependencies flow **App → Application → DomainRules → DomainModel → SharedKernel**; **Application** is the only layer that may aggregate **DomainRules** and **DomainModel** together.
 
@@ -130,11 +130,11 @@ This is the **full** intended stack after [magic-file-renamer-design.md](./magic
 
 | Order | Layer id | Folder / project (typical) | What belongs here |
 |-------|-----------|----------------------------|-------------------|
-| **1** | **L0 — Shared kernel** | [Utils/](../Mfr/Utils) | Generic helpers: path/string extensions; **no** MFR domain types. |
-| **2** | **L1 — Domain model** | [Models/](../Mfr/Models) | Portable records: `RenameItem`, `FilterTarget` hierarchy, result/summary types, **`BaseFilter` base contract** (after Track A), `FilterPreset`, session/settings DTOs, **`UserException`** (after Track C). **No** `Mfr.Filters` imports. |
-| **3** | **L2 — Domain rules** | [Filters/](../Mfr/Filters) | Concrete filter records, filter-specific parsers (e.g. replace-list), `FilterExtensions`; **implements** rename/tag/image **rules** against **L1** only — **no** `Mfr.Core`. |
+| **1** | **L0 — Shared kernel** | [Utils/](../Mfr.Utils) | Generic helpers: path/string extensions; **no** MFR domain types. |
+| **2** | **L1 — Domain model** | [Models/](../Mfr.Models) | Portable records: `RenameItem`, `FilterTarget` hierarchy, result/summary types, **`BaseFilter` base contract** (after Track A), `FilterPreset`, session/settings DTOs, **`UserException`** (after Track C). **No** `Mfr.Filters` imports. |
+| **3** | **L2 — Domain rules** | [Filters/](../Mfr.Filters) | Concrete filter records, filter-specific parsers (e.g. replace-list), `FilterExtensions`; **implements** rename/tag/image **rules** against **L1** only — **no** `Mfr.Core`. |
 | **4** | **L2.5 — Mfr.Metadata** *(future)* | Project/folder **`Mfr.Metadata`** | **Adapters** to the outside world: TagLibSharp + MetadataExtractor (audio/EXIF), `HttpClient` for FreeDB/GeoNames, OS icon providers, optional `FileSystemWatcher` for presets. **Depends on** **L1** (+ **L0**). **Referenced by** **L3** only; **L2** talks to capabilities via **interfaces or data** supplied by **L3** (see design §21.2). |
-| **5** | **L3 — Application** | [Core/](../Mfr/Core) | **Use cases:** `RenameList`, preset load/save, glob resolution, undo journal, **`IRenamePipeline`** when introduced, JSON **serializer context** / **BaseFilter** serialization partial (Track A). **Composes** **L2**, **L1**, **L0**, and **L2.5** when present. |
+| **5** | **L3 — Application** | [Core/](../Mfr.Core) | **Use cases:** `RenameList`, preset load/save, glob resolution, undo journal, **`IRenamePipeline`** when introduced, JSON **serializer context** / **BaseFilter** serialization partial (Track A). **Composes** **L2**, **L1**, **L0**, and **L2.5** when present. |
 | **6** | **L4 — App** | **Single folder** `App/` with **`App/Cli/`** (current location) and **`App/Ui/`** (Avalonia shell) | One **layer**; CLI and GUI are **subfolders**, not separate layer roots. Commands, binding, MVVM — **no** filter implementations. **May use** **L3**, **L1**, **L0** — **not** **L2** if the strict edge is kept. |
 
 **Future dependency sketch** (single box per layer; **Cli** and **Ui** live **inside** `App/`; **`Program.cs`** at **`Mfr/`** root is entry, not a layer):
@@ -258,7 +258,7 @@ Do these in order. **Minimum bar for conformity:** complete **Track A or B** (Mo
 
 ### Track A — BaseFilter contract in L1 (`Models`), JSON wiring in L3 (`Core`) **(preferred)**
 
-**Goal:** [`FilterPreset`](../Mfr/Models/Presets.cs) and the rest of **`Mfr.Models`** never `using Mfr.Filters`, while [`BaseFilter`](../Mfr/Models/BaseFilter.cs) remains the single polymorphic **definition** type for presets and the rename pipeline. **Concrete filter records** stay in **`Filters/`** and inherit the base.
+**Goal:** [`FilterPreset`](../Mfr.Models/Presets.cs) and the rest of **`Mfr.Models`** never `using Mfr.Filters`, while [`BaseFilter`](../Mfr.Models/BaseFilter.cs) remains the single polymorphic **definition** type for presets and the rename pipeline. **Concrete filter records** stay in **`Filters/`** and inherit the base.
 
 **Why not put `[JsonPolymorphic]` / `[JsonDerivedType]` on `BaseFilter` inside the `Models/` folder?**  
 Those attributes use `typeof(LettersCaseFilter)`, etc. That would force **`Models`** to import **`Mfr.Filters.*`** — recreating **L1 → L2**. So Track A uses a **split declaration** (same assembly, same namespace, two folders).
@@ -267,8 +267,8 @@ Those attributes use `typeof(LettersCaseFilter)`, etc. That would force **`Model
 
 - **Keep one logical type:** `public abstract record BaseFilter` stays in namespace **`Mfr.Models`** (not `Mfr.Filters`), so `FilterPreset` references **`BaseFilter`** with **no** filter-namespace import.
 - **Split across two source files** (both `partial`):
-  1. **[Models/BaseFilter.cs](../Mfr/Models)** (new location; delete from `Filters/` when done): **behavior only** — constructor `(bool Enabled, FilterTarget Target)`, `Type`, `Setup`, `Apply`, `TransformSegment`, `_Setup`, `_TransformSegment`, and **no** `using` to `Mfr.Filters`. Keep **`using Mfr.Models`** only for types already in Models (e.g. `RenameItem`, `FilterTarget`, `FileNameTarget`). This file must compile **without** referencing concrete filter types.
-  2. **`Core/BaseFilter.JsonSerialization.cs`** (name is illustrative): **`namespace Mfr.Models`**, **`partial record BaseFilter`** with **only** `[JsonPolymorphic]` / `[JsonDerivedType(typeof(...), "…")]`. This file **`using Mfr.Filters.Case`**, **`Trimming`**, etc., so **`typeof`** resolves — **Core → Filters** is allowed. No `Models` project file needs those usings.
+  1. **[Models/BaseFilter.cs](../Mfr.Models)** (new location; delete from `Filters/` when done): **behavior only** — constructor `(bool Enabled, FilterTarget Target)`, `Type`, `Setup`, `Apply`, `TransformSegment`, `_Setup`, `_TransformSegment`, and **no** `using` to `Mfr.Filters`. Keep **`using Mfr.Models`** only for types already in Models (e.g. `RenameItem`, `FilterTarget`, `FileNameTarget`). This file must compile **without** referencing concrete filter types.
+  2. **`Core/PresetJsonOptions.cs`** centralizes polymorphic derived-type registration for `BaseFilter` in the application layer. This file **`using Mfr.Filters.Case`**, **`Trimming`**, etc., so concrete filter `typeof(...)` mappings resolve in **Core** without creating a **Models → Filters** reference.
 
 **Layering check:** Any `.cs` under **`Models/`** has **no** `Mfr.Filters` imports. The serialization partial **lives under `Core/`** but **declares** `Mfr.Models.BaseFilter` — that is intentional (namespace ≠ folder).
 
@@ -276,24 +276,24 @@ Those attributes use `typeof(LettersCaseFilter)`, etc. That would force **`Model
 
 - Each concrete filter (e.g. `LettersCaseFilter`) stays in **`Mfr.Filters.*`** but inherits **`Mfr.Models.BaseFilter`** instead of **`Mfr.Filters.BaseFilter`**.
 - Replace `namespace` / usings: typically **`using Mfr.Models`** for the base; remove obsolete **`Mfr.Filters`** self-reference for the base type.
-- **[FilterExtensions.cs](../Mfr/Filters/FilterExtensions.cs)** and any **`BaseFilter`**-shaped APIs: update to **`Mfr.Models.BaseFilter`** if needed.
+- **[FilterExtensions.cs](../Mfr.Filters/FilterExtensions.cs)** and any **`BaseFilter`**-shaped APIs: update to **`Mfr.Models.BaseFilter`** if needed.
 
-#### A.3 — `PresetJsonSerializerContext` and AOT
+#### A.3 — JSON options and polymorphism wiring
 
-- Today [PresetJsonSerializerContext.cs](../Mfr/Core/PresetJsonSerializerContext.cs) only has `[JsonSerializable(typeof(PresetContainer))]`. Polymorphism is driven by attributes on **`BaseFilter`**.
+- Polymorphism is configured in [PresetJsonOptions.cs](../Mfr.Core/PresetJsonOptions.cs) using `JsonPolymorphismOptions` and `JsonDerivedType` entries for concrete filters.
 - After the move, **rebuild** and run tests; if **trim/AOT** or the source generator reports **missing metadata** for a concrete filter type, add **`[JsonSerializable(typeof(ConcreteFilter))]`** for each concrete type to the **same** `JsonSerializerContext` partial (or a second partial class merged into one context), per [System.Text.Json source generation](https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/source-generation) for polymorphic graphs.
-- **[PresetManager](../Mfr/Core/PresetManager.cs):** usually unchanged aside from namespace of `BaseFilter` if any fully-qualified name appeared (unlikely).
+- **[PresetManager](../Mfr.Core/PresetManager.cs):** usually unchanged aside from namespace of `BaseFilter` if any fully-qualified name appeared (unlikely).
 
 #### A.4 — `Presets.cs` and call sites
 
-- **[Presets.cs](../Mfr/Models/Presets.cs):** remove `using Mfr.Filters`; **`FilterPreset.Filters`** remains `IReadOnlyList<BaseFilter>` with **`BaseFilter`** resolved in **`Mfr.Models`**.
+- **[Presets.cs](../Mfr.Models/Presets.cs):** remove `using Mfr.Filters`; **`FilterPreset.Filters`** remains `IReadOnlyList<BaseFilter>` with **`BaseFilter`** resolved in **`Mfr.Models`**.
 - **Search** for `Mfr.Filters.BaseFilter` / `using Mfr.Filters` under **`Models/`** and fix.
-- **[Core/RenameList.cs](../Mfr/Core/RenameList.cs)**, **[RenameItemExtensions.cs](../Mfr/Core/RenameItemExtensions.cs):** they already reference **`Mfr.Filters`** for extension methods / usings — ensure they import **`Mfr.Models`** for **`BaseFilter`** if the unqualified name moved.
+- **[Core/RenameList.cs](../Mfr.Core/RenameList.cs)**, **[RenameItemExtensions.cs](../Mfr.Core/RenameItemExtensions.cs):** they already reference **`Mfr.Filters`** for extension methods / usings — ensure they import **`Mfr.Models`** for **`BaseFilter`** if the unqualified name moved.
 
 #### A.5 — Suggested order of work
 
 1. Add **`Models/BaseFilter.cs`** with **`namespace Mfr.Models`**, move **implementation** from current `Filters/BaseFilter.cs`, **omit** JSON attributes.
-2. Add **`Core/BaseFilter.JsonSerialization.cs`** with **`namespace Mfr.Models`**, **`partial`**, copy **only** `[JsonPolymorphic]` + `[JsonDerivedType]` lines and required **`using Mfr.Filters.…`**.
+2. Add/maintain **`Core/PresetJsonOptions.cs`** with `BaseFilter` polymorphism registration and required **`using Mfr.Filters.…`** entries.
 3. Delete old **`Filters/BaseFilter.cs`** (or strip to avoid duplicate type — prefer delete).
 4. Update **all** concrete filters to inherit **`Mfr.Models.BaseFilter`** and fix namespaces.
 5. Fix **`Presets.cs`** and run **`dotnet build`** / **`dotnet test`**; add **`[JsonSerializable]`** entries if the serializer context requires them.
@@ -306,29 +306,29 @@ Those attributes use `typeof(LettersCaseFilter)`, etc. That would force **`Model
 
 ### Track B — Move preset DTOs out of `Models` **(alternative to A)**
 
-1. Move **`FilterPreset`** (and any types only needed for preset files) from [Models/](../Mfr/Models) to **`Mfr.Core`** or **`Mfr.Filters`** (your choice of “preset lives with orchestration” vs “preset lives with filter graph”).
-2. Update [PresetManager.cs](../Mfr/Core/PresetManager.cs), [PresetJsonSerializerContext.cs](../Mfr/Core/PresetJsonSerializerContext.cs), CLI, and tests to the new namespace.
+1. Move **`FilterPreset`** (and any types only needed for preset files) from [Models/](../Mfr.Models) to **`Mfr.Core`** or **`Mfr.Filters`** (your choice of “preset lives with orchestration” vs “preset lives with filter graph”).
+2. Update [PresetManager.cs](../Mfr.Core/PresetManager.cs), [PresetJsonOptions.cs](../Mfr.Core/PresetJsonOptions.cs), CLI, and tests to the new namespace.
 3. Confirm **`Mfr.Models` no longer references `Mfr.Filters`** (`rg "using Mfr.Filters" Models`).
 
 ### Track C — Remove `Filters` → `Core`
 
 **Option C1 (smallest change):**
 
-1. Move [UserException.cs](../Mfr/Models/UserException.cs) to [Models/](../Mfr/Models) (namespace `Mfr.Models`), with XML docs preserved.
-2. Replace `using Mfr.Core` in [ReplaceListParser.cs](../Mfr/Filters/Replace/ReplaceListParser.cs) with `using Mfr.Models` (or the new namespace).
-3. Update all other `UserException` sites ([Cli/](../Mfr/App/Cli), [Core/](../Mfr/Core), etc.) to the new type location.
+1. Move [UserException.cs](../Mfr.Models/UserException.cs) to [Models/](../Mfr.Models) (namespace `Mfr.Models`), with XML docs preserved.
+2. Replace `using Mfr.Core` in [ReplaceListParser.cs](../Mfr.Filters/Replace/ReplaceListParser.cs) with `using Mfr.Models` (or the new namespace).
+3. Update all other `UserException` sites ([Cli/](../Mfr.App.Cli), [Core/](../Mfr.Core), etc.) to the new type location.
 
 **Option C2 (no shared exception in Filters):**
 
 1. Change `ReplaceListParser` APIs to return **parse results** (success + errors / line numbers) instead of throwing.
-2. Map to `UserException` in **Core** or **Cli** at call sites (e.g. [ReplaceListFilter](../Mfr/Filters/Replace/ReplaceListFilter.cs) or preset load path).
+2. Map to `UserException` in **Core** or **Cli** at call sites (e.g. [ReplaceListFilter](../Mfr.Filters/Replace/ReplaceListFilter.cs) or preset load path).
 
 ### Verification and tests
 
 1. **Grep gate (local CI or manual):**
-   - No `using Mfr.Filters` under [Models/](../Mfr/Models).
-   - No `using Mfr.Core` under [Filters/](../Mfr/Filters) (except if you deliberately keep a file in Filters that is classified as Core — avoid).
-   - No `using Mfr.Filters` under [Cli/](../Mfr/App/Cli).
+   - No `using Mfr.Filters` under [Models/](../Mfr.Models).
+   - No `using Mfr.Core` under [Filters/](../Mfr.Filters) (except if you deliberately keep a file in Filters that is classified as Core — avoid).
+   - No `using Mfr.Filters` under [Cli/](../Mfr.App.Cli).
 2. **Tests:** Move/update files under [Mfr.Tests](../Mfr.Tests) to match new namespaces (presets, `BaseFilter` location).
 3. **Run:** `dotnet test` on the solution / test project.
 
