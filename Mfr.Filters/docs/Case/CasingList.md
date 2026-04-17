@@ -21,10 +21,10 @@ Examples match [`CasingListFilterTests`](../../../Mfr.Tests/Models/Filters/Case/
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| List: `and`, `or`, `with`, `RMX`; `uppercaseSentenceInitial`: `false` | `03 - WiTH Or Without You Rmx` | `03 - with or Without You RMX` |
-| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `"-.!"` then list as above; `uppercaseSentenceInitial`: `true` | `03 - WiTH Or Without You Rmx` | `03 - With or Without You RMX` |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"`, `replaceSpaces`: `true`; list: `and`, `us`, `them`; `uppercaseSentenceInitial`: `true` | `US_AND_THEM` | `Us_and_them` |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| List: `and`, `or`, `with`, `RMX`; `uppercaseSentenceInitial`: `false` | `03 - WiTH Or Without You Rmx` | `03 - with or Without You RMX` | Words in file replace spelling; others unchanged. |
+| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `"-.!"` then list as above; `uppercaseSentenceInitial`: `true` | `03 - WiTH Or Without You Rmx` | `03 - With or Without You RMX` | Sentence initials after `-` and spaces. |
+| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"`, `replaceSpaces`: `true`; list: `and`, `us`, `them`; `uppercaseSentenceInitial`: `true` | `US_AND_THEM` | `Us_and_them` | Underscore-separated words; album-style title. |
 
 Put [SpaceCharacter](../Space/SpaceCharacter.md) first if words are separated by `_` or another character.

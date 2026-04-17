@@ -12,10 +12,10 @@ Examples match [`TrimRightFilterTests`](../../../Mfr.Tests/Models/Filters/Trimmi
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| `count`: `2` | `abcd` | `ab` |
-| `count`: `0` | `ab` | `ab` |
-| `count`: `10` (segment shorter) | `hi` | *(empty)* |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| `count`: `2` | `abcd` | `ab` | Drop two characters from the right. |
+| `count`: `0` | `ab` | `ab` | No characters removed. |
+| `count`: `10` (segment shorter) | `hi` | *(empty)* | Count exceeds length → empty. |
 
 To **keep** only the last N characters, use [ExtractRight](ExtractRight.md).

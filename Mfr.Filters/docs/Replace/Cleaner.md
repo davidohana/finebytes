@@ -16,10 +16,10 @@ If there is nothing to remove, the segment is unchanged.
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| `removeIllegalChars`: `true`, `customCharsToRemove`: `""`, `replacement`: `"_"` | `a/b` | `a_b` |
-| `removeIllegalChars`: `false`, `customCharsToRemove`: `"@#"`, `replacement`: `"-"` | `a@b#c` | `a-b-c` |
-| `removeIllegalChars`: `true`, `customCharsToRemove`: `"@#"`, `replacement`: `"X"` | `a/b@c#d&#124;e` | `aXbXcXdXe` |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| `removeIllegalChars`: `true`, `customCharsToRemove`: `""`, `replacement`: `"_"` | `a/b` | `a_b` | Path-like slash becomes safe on Windows. |
+| `removeIllegalChars`: `false`, `customCharsToRemove`: `"@#"`, `replacement`: `"-"` | `a@b#c` | `a-b-c` | Custom chars only. |
+| `removeIllegalChars`: `true`, `customCharsToRemove`: `"@#"`, `replacement`: `"X"` | `a/b@c#d&#124;e` | `aXbXcXdXe` | Each replaced position uses `X` (slashes, `@#`, and pipe). |
 
 Run **Cleaner** early if later filters assume a safe file name.

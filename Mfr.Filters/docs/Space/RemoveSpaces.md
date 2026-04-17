@@ -6,9 +6,9 @@ No `options` object. Examples match [`RemoveSpacesFilterTests`](../../../Mfr.Tes
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| (none), default space separator | `a b` | `ab` |
-| (none), default space separator (only U+0020 removed; tabs/newlines kept) | `a \t\r\nb` | `a\t\r\nb` |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| (none), default space separator | `a b` | `ab` | All spaces removed. |
+| (none), default space separator | `a \t\r\nb` | `a\t\r\nb` | Only U+0020 removed; tab/newline kept. |
 
 After [SpaceCharacter](SpaceCharacter.md) with `_` as separator, each `_` is removed the same way.

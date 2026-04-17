@@ -28,11 +28,11 @@ Examples match [`CounterFilterTests`](../../../Mfr.Tests/Models/Filters/Formatti
 
 Assume **global** index as in each row unless `resetPerFolder` is noted.
 
-| Options | Before | After |
-|---------|--------|-------|
-| `start`: `1`, `step`: `1`, `width`: `3`, `padChar`: `"0"`, `position`: `Replace`, `resetPerFolder`: `false` (global index `4`) | `old` | `005` |
-| `start`: `0`, `step`: `1`, `width`: `0`, `padChar`: `"0"`, `position`: `Prepend`, `separator`: `"_"`, global index `2` | `name` | `2_name` |
-| `start`: `0`, `step`: `1`, `width`: `0`, `padChar`: `"0"`, `position`: `Append`, `separator`: `"-"`, global index `1` | `name` | `name-1` |
-| `start`: `10`, `step`: `5`, `width`: `0`, `position`: `Replace`, `resetPerFolder`: `true` (in-folder index `2`) | `x` | `20` |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| `start`: `1`, `step`: `1`, `width`: `3`, `padChar`: `"0"`, `position`: `Replace`, `resetPerFolder`: `false` (global index `4`) | `old` | `005` | Replace mode: segment is only the padded number (`1 + 4` → `005`). |
+| `start`: `0`, `step`: `1`, `width`: `0`, `padChar`: `"0"`, `position`: `Prepend`, `separator`: `"_"`, global index `2` | `name` | `2_name` | Prepend with `_` separator; no width padding when `width` is `0`. |
+| `start`: `0`, `step`: `1`, `width`: `0`, `padChar`: `"0"`, `position`: `Append`, `separator`: `"-"`, global index `1` | `name` | `name-1` | Append counter after hyphen. |
+| `start`: `10`, `step`: `5`, `width`: `0`, `position`: `Replace`, `resetPerFolder`: `true` (in-folder index `2`) | `x` | `20` | Per-folder index `2`: `10 + 5×2 = 20`. |
 
 For templates with `<file-name>`-style tokens, see [Formatter](Formatter.md).

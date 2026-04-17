@@ -6,9 +6,9 @@ No `options` object. Examples match [`StripSpacesLeftFilterTests`](../../../Mfr.
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| (none), default space separator | `   New_York__.jpg` | `New_York__.jpg` |
-| (none), default space separator | `  a b ` | `a b ` (only leading separator removed) |
-| (none), default space separator | `    ` | *(empty)* |
-| Chain: [SpaceCharacter](SpaceCharacter.md) `spaceCharacter`: `"_"` then StripSpacesLeft | `__New_York__.jpg` | `New_York__.jpg` |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| (none), default space separator | `   New_York__.jpg` | `New_York__.jpg` | Leading spaces only. |
+| (none), default space separator | `  a b ` | `a b ` | Trailing spaces remain. |
+| (none), default space separator | `    ` | *(empty)* | All characters were separators. |
+| Chain: [SpaceCharacter](SpaceCharacter.md) `spaceCharacter`: `"_"` then StripSpacesLeft | `__New_York__.jpg` | `New_York__.jpg` | Leading underscores stripped when `_` is the separator. |

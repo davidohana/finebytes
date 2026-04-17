@@ -13,8 +13,8 @@ Examples match [`StripParenthesesFilterTests`](../../../Mfr.Tests/Models/Filters
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| `type`: `Round`, `removeContents`: `true` | `a(rem)b` | `ab` |
-| `type`: `Round`, `removeContents`: `false` | `a(rem)` | `arem` |
-| `type`: `Square`, `removeContents`: `true` | `a[xx]b` | `ab` |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| `type`: `Round`, `removeContents`: `true` | `a(rem)b` | `ab` | Remove `(rem)` entirely (e.g. remix tag). |
+| `type`: `Round`, `removeContents`: `false` | `a(rem)` | `arem` | Drop only `(` and `)`; keep inner text. |
+| `type`: `Square`, `removeContents`: `true` | `a[xx]b` | `ab` | Square brackets and contents removed. |

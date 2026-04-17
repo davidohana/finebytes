@@ -27,23 +27,23 @@ Examples below mirror [`LettersCaseFilterTests`](../../../Mfr.Tests/Models/Filte
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| `mode`: `UpperCase` | `hello` | `HELLO` |
-| `mode`: `LowerCase` | `HELLO` | `hello` |
-| `mode`: `FirstLetterUp` | `hELLO world` | `Hello world` |
-| `mode`: `FirstLetterUp` | ` 123_aBC` | ` 123_abc` (leading non-letter unchanged) |
-| `mode`: `WeirdCase`, `weirdUppercaseChancePercent`: `0` | `AbC XyZ` | `abc xyz` |
-| `mode`: `WeirdCase`, `weirdUppercaseChancePercent`: `100` | `AbC XyZ` | `ABC XYZ` |
-| `mode`: `TitleCase`, `skipWords`: `["a","the","for"]` | `a song for the world` | `a Song for the World` |
-| `mode`: `SentenceCase` (default sentence ends) | `hello world. next line.` | `Hello world. Next line.` |
-| `mode`: `InvertCase` | `Hello` | `hELLO` |
-| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `":;"` then `mode`: `SentenceCase` | `hello: next; again. no` | `Hello: Next; Again. no` |
-| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `""` then `SentenceCase` | `hello. next line` | `Hello. next line` |
-| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `". "` then `SentenceCase` | `hello world. next line` | `Hello world. Next line` |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"` then `SentenceCase` | `hello._world._again` | `Hello._World._Again` |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"`, `TitleCase`, `skipWords`: `["the"]` | `__gone__with__the__wind__` | `__Gone__With__the__Wind__` |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"` then `SentenceCase` | `hello.__world!___again?__done` | `Hello.__World!___Again?__Done` |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"` then `SentenceCase` | `hello.world` | `Hello.world` (no separator after `.`, so no capital after “sentence end”) |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| `mode`: `UpperCase` | `hello` | `HELLO` | All letters uppercased. |
+| `mode`: `LowerCase` | `HELLO` | `hello` | All letters lowercased. |
+| `mode`: `FirstLetterUp` | `hELLO world` | `Hello world` | First letter of segment only. |
+| `mode`: `FirstLetterUp` | ` 123_aBC` | ` 123_abc` | Leading non-letter run unchanged; first letter lowercased from there. |
+| `mode`: `WeirdCase`, `weirdUppercaseChancePercent`: `0` | `AbC XyZ` | `abc xyz` | Always lowercase letters. |
+| `mode`: `WeirdCase`, `weirdUppercaseChancePercent`: `100` | `AbC XyZ` | `ABC XYZ` | Always uppercase letters. |
+| `mode`: `TitleCase`, `skipWords`: `["a","the","for"]` | `a song for the world` | `a Song for the World` | Article words stay lower per list. |
+| `mode`: `SentenceCase` (default sentence ends) | `hello world. next line.` | `Hello world. Next line.` | Capital after `.` when followed by separator. |
+| `mode`: `InvertCase` | `Hello` | `hELLO` | Swap case per letter. |
+| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `":;"` then `mode`: `SentenceCase` | `hello: next; again. no` | `Hello: Next; Again. no` | Custom sentence ends `:` and `;`. |
+| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `""` then `SentenceCase` | `hello. next line` | `Hello. next line` | Empty set: only start of segment is capitalized. |
+| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `". "` then `SentenceCase` | `hello world. next line` | `Hello world. Next line` | Sentence end is `.` + space together. |
+| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"` then `SentenceCase` | `hello._world._again` | `Hello._World._Again` | Underscore is word separator. |
+| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"`, `TitleCase`, `skipWords`: `["the"]` | `__gone__with__the__wind__` | `__Gone__With__the__Wind__` | Title case with `%20`-style input normalized first. |
+| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"` then `SentenceCase` | `hello.__world!___again?__done` | `Hello.__World!___Again?__Done` | Mixed `_` and punctuation. |
+| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"` then `SentenceCase` | `hello.world` | `Hello.world` | No separator after `.`, so no capital after that “sentence end”. |
 
 Unused option properties for a given `mode` are ignored.

@@ -6,9 +6,9 @@ No `options` object. Examples match [`StripSpacesRightFilterTests`](../../../Mfr
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| (none), default space separator | `New_York__   ` | `New_York__` |
-| (none), default space separator | `  a b ` | `  a b` (only trailing separator removed) |
-| (none), default space separator | `    ` | *(empty)* |
-| Chain: [SpaceCharacter](SpaceCharacter.md) `spaceCharacter`: `"_"` then StripSpacesRight | `__New_York__` | `__New_York` |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| (none), default space separator | `New_York__   ` | `New_York__` | Trailing spaces only. |
+| (none), default space separator | `  a b ` | `  a b` | Leading spaces remain. |
+| (none), default space separator | `    ` | *(empty)* | All characters were separators. |
+| Chain: [SpaceCharacter](SpaceCharacter.md) `spaceCharacter`: `"_"` then StripSpacesRight | `__New_York__` | `__New_York` | Trailing underscores stripped. |

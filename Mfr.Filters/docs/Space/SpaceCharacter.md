@@ -18,12 +18,12 @@ Replacements are applied in order: `%20`, then space, then underscore, then cust
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| `spaceCharacter`: `"_"`, `replacePercent20`: `true`; others `false` | `Gone%20With%20The%20Wind` | `Gone_With_The_Wind` |
-| `spaceCharacter`: space, `replaceSpaces`, `replaceUnderscores`, `replacePercent20`: `true` | `a_b c%20d` | `a b c d` |
-| `spaceCharacter`: `"-"`, `customText`: `"++"`; others `false` | `a++b` | `a-b` |
-| `spaceCharacter`: `"_"`, `replacePercent20`: `true`; then [LettersCase](../Case/LettersCase.md) `TitleCase`, `skipWords`: `["the"]` | `gone%20with%20the%20wind` | `Gone_With_the_Wind` |
-| `spaceCharacter`: `"_"`, `replacePercent20`: `true`; others `false` | `my song` | `my song` (segment unchanged; `WordSeparator` still `_` for later filters) |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| `spaceCharacter`: `"_"`, `replacePercent20`: `true`; others `false` | `Gone%20With%20The%20Wind` | `Gone_With_The_Wind` | URL-encoded spaces → underscores (classic download names). |
+| `spaceCharacter`: space, `replaceSpaces`, `replaceUnderscores`, `replacePercent20`: `true` | `a_b c%20d` | `a b c d` | All three replacements normalize to spaces. |
+| `spaceCharacter`: `"-"`, `customText`: `"++"`; others `false` | `a++b` | `a-b` | Custom placeholder `++` → separator. |
+| `spaceCharacter`: `"_"`, `replacePercent20`: `true`; then [LettersCase](../Case/LettersCase.md) `TitleCase`, `skipWords`: `["the"]` | `gone%20with%20the%20wind` | `Gone_With_the_Wind` | Chain: separator then title case with article skip. |
+| `spaceCharacter`: `"_"`, `replacePercent20`: `true`; others `false` | `my song` | `my song` | Text unchanged, but `WordSeparator` is `_` for later filters. |
 
 Put this filter **before** any filter that should use a non-space word boundary.

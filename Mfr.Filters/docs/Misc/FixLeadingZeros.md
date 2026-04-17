@@ -15,11 +15,11 @@ Examples match [`FixLeadingZerosFilterTests`](../../../Mfr.Tests/Models/Filters/
 
 ## Examples
 
-| Options | Before | After |
-|---------|--------|-------|
-| `width`: `0`, `removeExtraZeros`: `true` | `track12` | `track12` (no-op) |
-| `width`: `4`, `removeExtraZeros`: `false` | `track9` | `track0009` |
-| `width`: `3`, `removeExtraZeros`: `true` | `x0007` | `x007` |
-| `width`: `3`, `removeExtraZeros`: `false`, `wholeWordOnly`: `true` | `doc1_12` | `doc1_012` |
-| `width`: `3`, `removeExtraZeros`: `false`, `maxCount`: `1` | `05-Opus 40` | `005-Opus 40` |
-| `width`: `3`, `removeExtraZeros`: `false`, `maxCount`: `2` | `05-Opus 40 (1)` | `005-Opus 040 (1)` |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| `width`: `0`, `removeExtraZeros`: `true` | `track12` | `track12` | Non-positive width leaves segment unchanged. |
+| `width`: `4`, `removeExtraZeros`: `false` | `track9` | `track0009` | Pad digit run to four digits. |
+| `width`: `3`, `removeExtraZeros`: `true` | `x0007` | `x007` | Strip extra leading zeros, then pad to width. |
+| `width`: `3`, `removeExtraZeros`: `false`, `wholeWordOnly`: `true` | `doc1_12` | `doc1_012` | Only `12` is a “whole word” digit group; `1` in `doc1` skipped. |
+| `width`: `3`, `removeExtraZeros`: `false`, `maxCount`: `1` | `05-Opus 40` | `005-Opus 40` | Only first digit group normalized. |
+| `width`: `3`, `removeExtraZeros`: `false`, `maxCount`: `2` | `05-Opus 40 (1)` | `005-Opus 040 (1)` | First two digit groups get width `3`. |

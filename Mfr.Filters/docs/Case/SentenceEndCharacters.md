@@ -10,12 +10,12 @@
 
 ## Examples
 
-Segment text is unchanged by this filter alone; the table shows **Before = After** for the segment. The last row shows the **effect on a following** [LettersCase](LettersCase.md) `SentenceCase` step (from [`SentenceEndCharactersFilterTests`](../../../Mfr.Tests/Models/Filters/Case/SentenceEndCharactersFilterTests.cs)).
+This filter alone does not change segment text (see **Comment** on the first two rows). The last row shows the **effect on a following** [LettersCase](LettersCase.md) `SentenceCase` step (from [`SentenceEndCharactersFilterTests`](../../../Mfr.Tests/Models/Filters/Case/SentenceEndCharactersFilterTests.cs)).
 
-| Options | Before | After |
-|---------|--------|-------|
-| `characters`: `":;"` | `hello: world` | `hello: world` |
-| `characters`: `"-.!"` | `hello` | `hello` |
-| Chain: this filter `characters`: `"-.!"` then `LettersCase` `SentenceCase` | `a - b. c` | `A - B. C` |
+| Options | Before | After | Comment |
+|---------|--------|-------|---------|
+| `characters`: `":;"` | `hello: world` | `hello: world` | This filter alone does not change text. |
+| `characters`: `"-.!"` | `hello` | `hello` | Same: segment unchanged by this step. |
+| Chain: this filter `characters`: `"-.!"` then `LettersCase` `SentenceCase` | `a - b. c` | `A - B. C` | Later `SentenceCase` uses `-`, `.`, `!` as sentence boundaries. |
 
 Place **before** [LettersCase](LettersCase.md) (sentence mode) or [CasingList](CasingList.md) (sentence initials).
