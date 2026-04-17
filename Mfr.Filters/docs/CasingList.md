@@ -19,20 +19,11 @@ Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceE
 
 ## Examples
 
-**List file**
+Assume list file lines: `and`, `or`, `RMX` (canonical casing).
 
-```text
-and
-or
-RMX
-```
+| Options | Before | After |
+|---------|--------|-------|
+| `filePath` → list as above, `uppercaseSentenceInitial`: `false` | `WiTH Or Rmx` | `with or RMX` |
+| `uppercaseSentenceInitial`: `true`, chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `"-.!"` then this filter (same list) | `03 - WiTH Or Without You Rmx` | `03 - With or Without You RMX` |
 
-**Effect:** `WiTH Or Rmx` → `with or RMX`
-
-**With sentence initials:** add [SentenceEndCharacters](SentenceEndCharacters.md) with `-.!` before this filter and set `uppercaseSentenceInitial` to `true`.
-
-**Tips:** Put [SpaceCharacter](SpaceCharacter.md) first if words are separated by `_` or another character.
-
-```json
-{ "filePath": "C:\\MFR\\MFRCaser.txt", "uppercaseSentenceInitial": true }
-```
+Put [SpaceCharacter](SpaceCharacter.md) first if words are split by `_` instead of spaces.

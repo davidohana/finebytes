@@ -6,4 +6,6 @@ No `options` object.
 
 ## Examples
 
-- `track u.s.a mix` → `track U.S.A mix`
+| Options | Before | After |
+|---------|--------|-------|
+| (none) | `track u.s.a mix` | `track U.S.A mix` |

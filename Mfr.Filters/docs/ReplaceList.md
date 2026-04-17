@@ -33,17 +33,9 @@ R:_
 
 ## Examples
 
-- Pairs apply in order: first `a`→`b`, then `.`→`_` on the resulting string.
-- `R:<EMPTY>` removes the search text.
+| Options | Before | After |
+|---------|--------|-------|
+| `mode`: `Literal`, `replaceAll`: `true`, file with pairs above (order: `a`→`b`, then `.`→`_`) | `a.a` | `b_b` |
+| File: `S:x` / `R:<EMPTY>`, `mode`: `Literal`, `replaceAll`: `true` | `abxcx` | `abc` |
 
 The list is loaded at filter **setup**; reload the preset or app after editing the file.
-
-```json
-{
-  "filePath": "C:\\MFR\\my-replacements.txt",
-  "mode": "Literal",
-  "caseSensitive": true,
-  "replaceAll": true,
-  "wholeWord": false
-}
-```

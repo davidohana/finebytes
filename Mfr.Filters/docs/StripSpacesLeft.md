@@ -6,4 +6,6 @@ No `options` object.
 
 ## Examples
 
-- `  hello` → `hello`
+| Options | Before | After |
+|---------|--------|-------|
+| (none), default space separator | `  hello` | `hello` |

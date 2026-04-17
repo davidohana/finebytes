@@ -23,18 +23,10 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 
 ## Examples
 
-- `find`: `" "`, `replacement`: `"_"`, `mode`: `Literal`, `replaceAll`: `true` — `my song` → `my_song`
-- `mode`: `Wildcard`, `find`: `"f*o"` — matches `foo`, `fxxo`, etc., per rules.
+| Options | Before | After |
+|---------|--------|-------|
+| `find`: `" "`, `replacement`: `"_"`, `mode`: `Literal`, `replaceAll`: `true`, `caseSensitive`: `true`, `wholeWord`: `false` | `my song` | `my_song` |
+| Same + `replaceAll`: `false` | `a b c` | `a_b c` (first space only) |
+| `mode`: `Wildcard`, `find`: `"f*o"`, `replacement`: `"X"`, `replaceAll`: `true` | `foo` | `X` |
 
 For many rules from a file, use [ReplaceList](ReplaceList.md).
-
-```json
-{
-  "find": " ",
-  "replacement": "_",
-  "mode": "Literal",
-  "caseSensitive": true,
-  "replaceAll": true,
-  "wholeWord": false
-}
-```

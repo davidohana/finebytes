@@ -10,10 +10,8 @@ Keeps only the **last** `count` characters of the segment; the leading part is r
 
 ## Examples
 
-- `count`: `3` — `ABCDEF` → `DEF`
+| Options | Before | After |
+|---------|--------|-------|
+| `count`: `3` | `ABCDEF` | `DEF` |
 
 See [TrimRight](TrimRight.md) to **drop** a fixed number of characters from the right instead.
-
-```json
-{ "count": 3 }
-```

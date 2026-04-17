@@ -25,11 +25,12 @@ Unknown token names cause an error at runtime.
 
 ## Examples
 
-- `template`: `"<file-name> (remaster)<ext>"` — if base is `song` and extension `.flac`, result is `song (remaster).flac` (when targeting the prefix segment).
-- `<counter:10,1,0,2,0>` — same counter pattern as in [ReplaceList](ReplaceList.md) replacements.
+Assume original file: `C:\Music\Album\song.flac` (prefix `song`, extension `.flac`, parent folder `Album`).
+
+| Options | Before | After |
+|---------|--------|-------|
+| `template`: `"<file-name> (remaster)<ext>"` | `song` (prefix segment) | `song (remaster).flac` |
+| `template`: `"<parent-folder> - <file-name>"` | `song` | `Album - song` |
+| `template`: `"<counter:10,1,0,2,0>"` (global index `0`) | `x` | `10` |
 
 For sequential numbering without a full template, see [Counter](Counter.md).
-
-```json
-{ "template": "<parent-folder> - <file-name>" }
-```

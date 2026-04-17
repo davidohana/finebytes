@@ -13,11 +13,6 @@ Deletes an **inclusive** range of character positions. Each end is a **1-based**
 
 ## Examples
 
-- Segment `ABCDEF`, `start` `{ "value": 3, "anchor": "Left" }`, `end` `{ "value": 5, "anchor": "Left" }` — removes positions 3–5 → `ABF`.
-
-```json
-{
-  "start": { "value": 3, "anchor": "Left" },
-  "end": { "value": 5, "anchor": "Left" }
-}
-```
+| Options | Before | After |
+|---------|--------|-------|
+| `start`: `{ "value": 3, "anchor": "Left" }`, `end`: `{ "value": 5, "anchor": "Left" }` | `ABCDEF` | `ABF` |

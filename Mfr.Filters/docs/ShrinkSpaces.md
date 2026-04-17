@@ -6,7 +6,9 @@ No `options` object.
 
 ## Examples
 
-- `hello    world` → `hello world`
-- With separator `_`: `a___b` → `a_b`
+| Options | Before | After |
+|---------|--------|-------|
+| (none), default space separator | `hello    world` | `hello world` |
+| (none), after [SpaceCharacter](SpaceCharacter.md) with `_` | `a___b` | `a_b` |
 
 Often used with [SpaceCharacter](SpaceCharacter.md) to normalize messy separators.

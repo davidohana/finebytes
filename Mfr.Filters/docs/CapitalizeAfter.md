@@ -10,10 +10,8 @@ Uppercases the **single character immediately after** any character that appears
 
 ## Examples
 
-- After `(`: `hello (world)` → `hello (World)` (default triggers).
-- `capitalizeAfterChars`: `"-"` — `hello-world` → `hello-World`.
-- `capitalizeAfterChars`: `""` — input unchanged.
-
-```json
-{ "capitalizeAfterChars": "(-[" }
-```
+| Options | Before | After |
+|---------|--------|-------|
+| `capitalizeAfterChars`: default `",!()[]{};-"` | `hello (world)` | `hello (World)` |
+| `capitalizeAfterChars`: `"-"` | `hello-world` | `hello-World` |
+| `capitalizeAfterChars`: `""` | `hello-world` | `hello-world` |

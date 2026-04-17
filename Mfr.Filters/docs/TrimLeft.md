@@ -10,12 +10,10 @@ Removes a fixed number of characters from the **left** end of the segment. The c
 
 ## Examples
 
-- `count`: `3` — `ABCDEF` → `DEF`
-- `count`: `0` — unchanged
-- `count` larger than length — empty string
+| Options | Before | After |
+|---------|--------|-------|
+| `count`: `3` | `ABCDEF` | `DEF` |
+| `count`: `0` | `ABCDEF` | `ABCDEF` |
+| `count`: `10` (segment length `6`) | `ABCDEF` | *(empty)* |
 
 To **keep** a prefix of length N instead of **dropping** N characters, use [ExtractLeft](ExtractLeft.md).
-
-```json
-{ "count": 3 }
-```

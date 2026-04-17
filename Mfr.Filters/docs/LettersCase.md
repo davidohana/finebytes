@@ -25,16 +25,15 @@ Changes letter casing on the target segment. **Sentence case** and **title case*
 
 ## Examples
 
-**Upper case:** `Hello` → `HELLO`
+| Options | Before | After |
+|---------|--------|-------|
+| `mode`: `UpperCase` | `Hello` | `HELLO` |
+| `mode`: `LowerCase` | `HeLLo` | `hello` |
+| `mode`: `FirstLetterUp` | `hELLO world` | `Hello world` |
+| `mode`: `TitleCase`, `skipWords`: `["a","the","for"]` | `a song for the world` | `a Song for the World` |
+| `mode`: `SentenceCase` (default [SentenceEndCharacters](SentenceEndCharacters.md)) | `hello world. next line.` | `Hello world. Next line.` |
+| `mode`: `InvertCase` | `Hello` | `hELLO` |
+| `mode`: `WeirdCase`, `weirdUppercaseChancePercent`: `0` | `AbC` | `abc` (letters lowercased) |
+| `mode`: `WeirdCase`, `weirdUppercaseChancePercent`: `100` | `AbC` | `ABC` (letters uppercased) |
 
-**Title case with skip words:** `skipWords`: `["a","the","for"]` — `a song for the world` → `a Song for the World`
-
-**Sentence case (defaults):** `hello world. next line.` → `Hello world. Next line.`
-
-**Weird case:** `weirdUppercaseChancePercent`: `0` → effectively all lowercase (for letters); `100` → all letters uppercase.
-
-`skipWords`, `weirdUppercaseChancePercent`, and `weirdFixedPlaces` apply only to modes that use them.
-
-```json
-{ "mode": "TitleCase", "skipWords": ["a", "the", "and"], "weirdUppercaseChancePercent": 50, "weirdFixedPlaces": false }
-```
+Unused option properties for a given `mode` are ignored.

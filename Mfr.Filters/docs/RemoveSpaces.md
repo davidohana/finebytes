@@ -6,5 +6,7 @@ No `options` object.
 
 ## Examples
 
-- Default separator: `a b c` → `abc`
-- After [SpaceCharacter](SpaceCharacter.md) with `_`: `a_b_c` → `abc`
+| Options | Before | After |
+|---------|--------|-------|
+| (none), default space separator | `a b c` | `abc` |
+| (none), after [SpaceCharacter](SpaceCharacter.md) with `_` as separator | `a_b_c` | `abc` |

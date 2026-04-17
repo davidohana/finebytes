@@ -11,10 +11,8 @@ Removes **one kind** of bracket pair: round `()`, square `[]`, curly `{}`, or an
 
 ## Examples
 
-- `type`: `Round`, `removeContents`: `true` — `Song (live)` → `Song ` (trailing space may remain).
-- `type`: `Round`, `removeContents`: `false` — `Song (live)` → `Song live`
-- `type`: `Square` — targets `[`…`]` regions.
-
-```json
-{ "type": "Round", "removeContents": true }
-```
+| Options | Before | After |
+|---------|--------|-------|
+| `type`: `Round`, `removeContents`: `true` | `Song (live)` | `Song ` (space may remain) |
+| `type`: `Round`, `removeContents`: `false` | `Song (live)` | `Song live` |
+| `type`: `Square`, `removeContents`: `true` | `Song [EP]` | `Song ` |

@@ -16,17 +16,10 @@ Replacements are applied in order: `%20`, then space, then underscore, then cust
 
 ## Examples
 
-- `spaceCharacter`: `"_"`, `replaceSpaces`: `true` — `my song` → `my_song`
-- With all replacements off, the segment may be unchanged but `WordSeparator` is still set for later filters.
+| Options | Before | After |
+|---------|--------|-------|
+| `spaceCharacter`: `"_"`, `replaceSpaces`: `true`, `replaceUnderscores`: `false`, `replacePercent20`: `false`, `customText`: `""` | `my song` | `my_song` |
+| `spaceCharacter`: `"_"`, `replaceSpaces`: `false`, `replaceUnderscores`: `true`, `replacePercent20`: `false`, `customText`: `""` | `my_song` | `my_song` |
+| `spaceCharacter`: `"_"`, all four replacements `false` | `my song` | `my song` (segment unchanged; `WordSeparator` still `_` for later filters) |
 
 Put this filter **before** any filter that should use a non-space word boundary.
-
-```json
-{
-  "spaceCharacter": "_",
-  "replaceSpaces": true,
-  "replaceUnderscores": false,
-  "replacePercent20": false,
-  "customText": ""
-}
-```

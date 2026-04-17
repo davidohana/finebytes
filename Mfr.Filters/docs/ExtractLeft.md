@@ -10,11 +10,9 @@ Keeps only the **first** `count` characters of the segment; the rest is removed.
 
 ## Examples
 
-- `count`: `4` — `ABCDEF` → `ABCD`
-- `count`: `0` — empty string
+| Options | Before | After |
+|---------|--------|-------|
+| `count`: `4` | `ABCDEF` | `ABCD` |
+| `count`: `0` | `ABCDEF` | *(empty)* |
 
 See [TrimLeft](TrimLeft.md) to **drop** a fixed number of characters from the left instead.
-
-```json
-{ "count": 4 }
-```

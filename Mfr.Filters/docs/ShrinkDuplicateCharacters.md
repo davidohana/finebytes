@@ -10,9 +10,7 @@ Collapses **runs** of the same chosen character into a **single** occurrence (fo
 
 ## Examples
 
-- `character`: `"-"` — `a---b` → `a-b`
-- `character`: `"."` — `foo...bar` → `foo.bar`
-
-```json
-{ "character": "-" }
-```
+| Options | Before | After |
+|---------|--------|-------|
+| `character`: `"-"` | `a---b` | `a-b` |
+| `character`: `"."` | `foo...bar` | `foo.bar` |

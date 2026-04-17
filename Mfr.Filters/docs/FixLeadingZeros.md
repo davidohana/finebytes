@@ -13,10 +13,8 @@ Finds **runs of digits** in the segment and rewrites them so their length matche
 
 ## Examples
 
-- `width`: `2` — `9` → `09`; `09` → `09`.
-- `removeExtraZeros`: `true`, `width`: `2` — e.g. `0009` normalized per rules.
-- `maxCount`: `1` — only the **first** digit sequence is updated.
-
-```json
-{ "width": 2, "removeExtraZeros": true, "maxCount": 0, "wholeWordOnly": true }
-```
+| Options | Before | After |
+|---------|--------|-------|
+| `width`: `2`, `removeExtraZeros`: `false`, `maxCount`: `0`, `wholeWordOnly`: `false` | `9` | `09` |
+| `width`: `2`, `removeExtraZeros`: `false` | `09` | `09` |
+| `width`: `2`, `removeExtraZeros`: `true`, `maxCount`: `0`, `wholeWordOnly`: `false` | `0009` | `09` |

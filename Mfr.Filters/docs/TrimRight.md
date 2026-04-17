@@ -10,10 +10,8 @@ Removes a fixed number of characters from the **right** end of the segment. The 
 
 ## Examples
 
-- `count`: `2` — `ABCDEF` → `ABCD`
+| Options | Before | After |
+|---------|--------|-------|
+| `count`: `2` | `ABCDEF` | `ABCD` |
 
 To **keep** only the last N characters, use [ExtractRight](ExtractRight.md).
-
-```json
-{ "count": 2 }
-```

@@ -14,11 +14,9 @@ If there is nothing to remove, the segment is unchanged.
 
 ## Examples
 
-- `removeIllegalChars`: `true`, `customCharsToRemove`: `""` — on Windows, `*` and `:` in the segment become `replacement`.
-- `customCharsToRemove`: "*:?", `replacement`: `"-"` — each listed character becomes `-`.
+| Options | Before | After |
+|---------|--------|-------|
+| `removeIllegalChars`: `true`, `customCharsToRemove`: `""`, `replacement`: `"_"` | `a*b` (on Windows) | `a_b` |
+| `removeIllegalChars`: `false`, `customCharsToRemove`: "*:?", `replacement`: `"-"` | `a:b*c` | `a-b-c` |
 
 Run **Cleaner** early if later filters assume a safe file name.
-
-```json
-{ "removeIllegalChars": true, "customCharsToRemove": "", "replacement": "_" }
-```

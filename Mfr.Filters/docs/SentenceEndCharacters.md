@@ -10,12 +10,12 @@
 
 ## Examples
 
-- Omit this filter → `.!?` used until another filter sets sentence ends.
-- `characters`: `"-.!"` — treat `-`, `.`, and `!` as boundaries for the next filter.
-- `characters`: `""` — only the first letter of the segment is capitalized by sentence-style rules.
+This filter does **not** change the segment text; it only updates settings for later filters.
 
-Place this filter **before** [LettersCase](LettersCase.md) (sentence mode) or [CasingList](CasingList.md) (with sentence initials).
+| Options | Before | After |
+|---------|--------|-------|
+| `characters`: `".!?"` (default) | `hello` | `hello` |
+| `characters`: `"-.!"` | `hello` | `hello` |
+| `characters`: `""` | `hello` | `hello` |
 
-```json
-{ "characters": "-.!" }
-```
+Place **before** [LettersCase](LettersCase.md) (sentence mode) or [CasingList](CasingList.md) (sentence initials). The **effect** shows up in those filters, not in the segment here.

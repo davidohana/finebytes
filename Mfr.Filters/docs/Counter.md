@@ -24,20 +24,13 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 
 ## Examples
 
-- `start`: `1`, `step`: `1`, `width`: `3`, `padChar`: `"0"`, `position`: `Replace` — first file `001`, second `002`, …
-- `position`: `Append`, `separator`: `"_"`, `width`: `2` — e.g. `song` → `song_01` (depending on indices).
-- `resetPerFolder`: `true` — each folder counts from `start` again.
+Assume **global** index `0` for the first row unless `resetPerFolder` is described.
+
+| Options | Before | After |
+|---------|--------|-------|
+| `start`: `1`, `step`: `1`, `width`: `3`, `padChar`: `"0"`, `position`: `Replace`, `resetPerFolder`: `false` (index `0`) | `track` | `001` |
+| Same + index `1` | `track` | `002` |
+| `position`: `Prepend`, `separator`: `" - "`, `start`: `1`, `step`: `1`, `width`: `2`, `padChar`: `"0"`, index `0` | `song` | `01 - song` |
+| `position`: `Append`, `separator`: `"_"`, `width`: `2`, `padChar`: `"0"`, `start`: `1`, `step`: `1`, index `0` | `song` | `song_01` |
 
 For templates with `<file-name>`-style tokens, see [Formatter](Formatter.md).
-
-```json
-{
-  "start": 1,
-  "step": 1,
-  "width": 3,
-  "padChar": "0",
-  "position": "Prepend",
-  "separator": " - ",
-  "resetPerFolder": false
-}
-```
