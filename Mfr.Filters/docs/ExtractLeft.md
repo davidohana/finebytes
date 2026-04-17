@@ -1,9 +1,38 @@
 # ExtractLeft
 
-Keeps only the **first** N characters (drops the rest).
+Keeps only the **first** `count` characters of the segment; the rest is removed.
 
-**Example**
+## Preset fields
 
-- Count `4`: `ABCDEF` → `ABCD`
+| Field | Type | Description |
+|--------|------|-------------|
+| `type` | string | Must be `ExtractLeft`. |
+| `enabled` | bool | When `false`, the filter does nothing. |
+| `target` | object | See [LettersCase](LettersCase.md). |
+| `options` | object | See below. |
 
-Use **ExtractLeft** when you want a **short prefix**. To remove a fixed count from the left instead, see [TrimLeft](TrimLeft.md).
+### Options (`options`)
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `count` | int | Number of characters to keep from the left (clamped 0…length). |
+
+## Examples
+
+- `count`: `4`, input `ABCDEF` → `ABCD`
+- `count`: `0` → empty string
+
+**Example preset fragment**
+
+```json
+{
+  "type": "ExtractLeft",
+  "enabled": true,
+  "target": { "family": "FileName", "fileNamePart": "Prefix" },
+  "options": {
+    "count": 4
+  }
+}
+```
+
+See [TrimLeft](TrimLeft.md) to **drop** a fixed number of characters from the left instead.

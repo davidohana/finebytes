@@ -1,6 +1,6 @@
 # MFR filter guides
 
-These notes describe the rename filters in this assembly. In preset JSON, each filter has a `type` field and a `target` that selects which part of the file name is processed.
+These notes describe the rename filters in this assembly. In preset JSON, each filter has a `type` field and a `target` that selects which part of the file name is processed. Property names in examples use **camelCase** (for example `fileNamePart`, `uppercaseSentenceInitial`), matching typical `System.Text.Json` serialization for this project. Enum values usually match the C# names (for example `TitleCase`, `Literal`, `Prefix`).
 
 **Order matters.** Some filters only affect *later* filters (for example `SpaceCharacter` sets the word separator; `SentenceEndCharacters` sets sentence-ending punctuation). Put those *before* the filters that should use the new settings.
 

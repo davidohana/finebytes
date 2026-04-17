@@ -1,7 +1,27 @@
 # StripSpacesLeft
 
-Trims the word-separator character from the **start** of the segment only. The separator comes from [SpaceCharacter](SpaceCharacter.md) when used earlier (default is ordinary space).
+Removes the **word separator** character from the **beginning** of the segment only (trim start). The separator is from [SpaceCharacter](SpaceCharacter.md) (default: space).
 
-**Example**
+This filter has **no options**—only `enabled` and `target`.
 
-- `  hello` → `hello`
+## Preset fields
+
+| Field | Type | Description |
+|--------|------|-------------|
+| `type` | string | Must be `StripSpacesLeft`. |
+| `enabled` | bool | When `false`, the filter does nothing. |
+| `target` | object | See [LettersCase](LettersCase.md). |
+
+## Examples
+
+- Input: `  hello` → `hello`
+
+**Example preset fragment**
+
+```json
+{
+  "type": "StripSpacesLeft",
+  "enabled": true,
+  "target": { "family": "FileName", "fileNamePart": "Prefix" }
+}
+```
