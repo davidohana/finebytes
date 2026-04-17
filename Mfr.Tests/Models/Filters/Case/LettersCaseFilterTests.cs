@@ -197,8 +197,9 @@ namespace Mfr.Tests.Models.Filters.Case
                     CustomText: ""));
             var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello._world._again");
-            new BaseFilter[] { spaceCharFilter, sentenceFilter }.SetupFilters();
-            item.ApplyFilters([spaceCharFilter, sentenceFilter]);
+            var filters = new List<BaseFilter> { spaceCharFilter, sentenceFilter };
+            filters.SetupFilters();
+            item.ApplyFilters(filters);
             Assert.Equal("Hello._World._Again", item.Preview.Prefix);
         }
 
@@ -223,8 +224,9 @@ namespace Mfr.Tests.Models.Filters.Case
                 new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"]));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "__gone__with__the__wind__");
 
-            new BaseFilter[] { spaceCharFilter, titleFilter }.SetupFilters();
-            item.ApplyFilters([spaceCharFilter, titleFilter]);
+            var filters = new List<BaseFilter> { spaceCharFilter, titleFilter };
+            filters.SetupFilters();
+            item.ApplyFilters(filters);
 
             Assert.Equal("__Gone__With__the__Wind__", item.Preview.Prefix);
         }
@@ -247,8 +249,9 @@ namespace Mfr.Tests.Models.Filters.Case
             var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello.__world!___again?__done");
 
-            new BaseFilter[] { spaceCharFilter, sentenceFilter }.SetupFilters();
-            item.ApplyFilters([spaceCharFilter, sentenceFilter]);
+            var filters = new List<BaseFilter> { spaceCharFilter, sentenceFilter };
+            filters.SetupFilters();
+            item.ApplyFilters(filters);
 
             Assert.Equal("Hello.__World!___Again?__Done", item.Preview.Prefix);
         }
@@ -271,8 +274,9 @@ namespace Mfr.Tests.Models.Filters.Case
             var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello.world");
 
-            new BaseFilter[] { spaceCharFilter, sentenceFilter }.SetupFilters();
-            item.ApplyFilters([spaceCharFilter, sentenceFilter]);
+            var filters = new List<BaseFilter> { spaceCharFilter, sentenceFilter };
+            filters.SetupFilters();
+            item.ApplyFilters(filters);
 
             Assert.Equal("Hello.world", item.Preview.Prefix);
         }

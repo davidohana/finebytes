@@ -88,8 +88,9 @@ namespace Mfr.Tests.Models.Filters.Space
                 new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"]));
 
             var item = FilterTestHelpers.CreateRenameItem(prefix: "gone%20with%20the%20wind");
-            new BaseFilter[] { spaceFilter, titleFilter }.SetupFilters();
-            item.ApplyFilters([spaceFilter, titleFilter]);
+            var filters = new List<BaseFilter> { spaceFilter, titleFilter };
+            filters.SetupFilters();
+            item.ApplyFilters(filters);
 
             Assert.Equal("Gone_With_the_Wind", item.Preview.Prefix);
         }
