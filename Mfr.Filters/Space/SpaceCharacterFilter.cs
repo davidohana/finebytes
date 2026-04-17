@@ -20,13 +20,11 @@ namespace Mfr.Filters.Space
     /// <summary>
     /// Defines the word-separator character and optionally maps common separators to that character.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Space definition and replacement options.</param>
     public sealed record SpaceCharacterFilter(
-        bool Enabled,
         FilterTarget Target,
-        SpaceCharacterOptions Options) : BaseFilter(Enabled, Target)
+        SpaceCharacterOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

@@ -1,5 +1,4 @@
 using Mfr.Core;
-using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Models;
 
@@ -19,7 +18,6 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_DoesNotChangeText()
         {
             var filter = new SentenceEndCharactersFilter(
-                Enabled: true,
                 Target: _target,
                 Options: new SentenceEndCharactersOptions(Characters: ":;"));
 
@@ -35,17 +33,15 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SetsSentenceEndCharsOnRenameItem()
         {
             var sentenceEndFilter = new SentenceEndCharactersFilter(
-                Enabled: true,
                 Target: _target,
                 Options: new SentenceEndCharactersOptions(Characters: "-.!"));
             var lettersCaseFilter = new LettersCaseFilter(
-                Enabled: true,
                 Target: _target,
                 Options: new LettersCaseOptions(LettersCaseMode.SentenceCase, SkipWords: []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a - b. c");
-            var filters = new List<BaseFilter> { sentenceEndFilter, lettersCaseFilter };
-            filters.SetupFilters();
-            item.ApplyFilters(filters);
+            var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersCaseFilter]);
+            chain.SetupFilters();
+            item.ApplyFilters(chain);
 
             Assert.Equal("A - B. C", item.Preview.Prefix);
         }

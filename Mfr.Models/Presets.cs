@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Mfr.Models
 {
     /// <summary>
@@ -8,21 +10,25 @@ namespace Mfr.Models
         /// <summary>
         /// Gets the unique preset identifier.
         /// </summary>
+        [JsonPropertyName("id")]
         public required Guid Id { get; init; }
 
         /// <summary>
         /// Gets the display name for this preset.
         /// </summary>
+        [JsonPropertyName("name")]
         public required string Name { get; init; }
 
         /// <summary>
         /// Gets an optional preset description.
         /// </summary>
+        [JsonPropertyName("description")]
         public string? Description { get; init; }
 
         /// <summary>
-        /// Gets the ordered list of filters for this preset.
+        /// Gets the ordered filter chain for this preset.
         /// </summary>
-        public required IReadOnlyList<BaseFilter> Filters { get; init; }
+        [JsonPropertyName("chain")]
+        public required FilterChain Chain { get; init; }
     }
 }

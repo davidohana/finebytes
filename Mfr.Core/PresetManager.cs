@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Mfr.Models;
 using Mfr.Utils;
@@ -94,5 +95,6 @@ namespace Mfr.Core
 
     }
 
-    internal sealed record PresetContainer(IReadOnlyList<FilterPreset> Presets);
+    internal sealed record PresetContainer(
+        [property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets);
 }

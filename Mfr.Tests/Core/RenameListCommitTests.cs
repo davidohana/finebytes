@@ -44,13 +44,12 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "duplicate",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new FormatterFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Full),
                         Options: new FormatterOptions("same.mp3"))
-                ]
+                ])
             };
 
             renameList.Preview(preset);
@@ -85,10 +84,9 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "counter",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
@@ -98,7 +96,7 @@ namespace Mfr.Tests.Core
                             Position: CounterPosition.Replace,
                             Separator: " - ",
                             ResetPerFolder: false))
-                ]
+                ])
             };
 
             renameList.Preview(preset);
@@ -135,10 +133,9 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "counter",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
@@ -148,7 +145,7 @@ namespace Mfr.Tests.Core
                             Position: CounterPosition.Replace,
                             Separator: " - ",
                             ResetPerFolder: false))
-                ]
+                ])
             };
 
             renameList.Preview(preset);
@@ -181,10 +178,9 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "counter",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
@@ -194,7 +190,7 @@ namespace Mfr.Tests.Core
                             Position: CounterPosition.Replace,
                             Separator: " - ",
                             ResetPerFolder: false))
-                ]
+                ])
             };
 
             renameList.Preview(preset);
@@ -228,10 +224,9 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "counter",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
@@ -241,7 +236,7 @@ namespace Mfr.Tests.Core
                             Position: CounterPosition.Replace,
                             Separator: " - ",
                             ResetPerFolder: false))
-                ]
+                ])
             };
 
             renameList.Preview(preset);
@@ -275,10 +270,9 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "counter",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
@@ -288,7 +282,7 @@ namespace Mfr.Tests.Core
                             Position: CounterPosition.Replace,
                             Separator: " - ",
                             ResetPerFolder: false))
-                ]
+                ])
             };
 
             renameList.Preview(preset);
@@ -332,10 +326,9 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "counter",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
@@ -345,7 +338,7 @@ namespace Mfr.Tests.Core
                             Position: CounterPosition.Replace,
                             Separator: " - ",
                             ResetPerFolder: false))
-                ]
+                ])
             };
 
             renameList.Preview(preset);
@@ -387,13 +380,12 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "failing-preview",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new ReplacerFilter(
-                        Enabled: true,
                         Target: new UnsupportedTarget(),
                         Options: new ReplacerOptions("a", "b", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
-                ]
+                ])
             };
 
             renameList.Preview(failingPreset);
@@ -407,7 +399,7 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "successful-preview",
                 Description = null,
-                Filters = []
+                Chain = new FilterChain { Steps = [] }
             };
 
             renameList.Preview(successPreset);
@@ -457,7 +449,7 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "no-change",
                 Description = null,
-                Filters = []
+                Chain = new FilterChain { Steps = [] }
             };
 
             renameList.Preview(preset);
@@ -489,7 +481,7 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "no-change",
                 Description = null,
-                Filters = []
+                Chain = new FilterChain { Steps = [] }
             };
 
             renameList.Preview(preset);
@@ -522,10 +514,9 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "counter",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
@@ -535,7 +526,7 @@ namespace Mfr.Tests.Core
                             Position: CounterPosition.Replace,
                             Separator: " - ",
                             ResetPerFolder: false))
-                ]
+                ])
             };
 
             renameList.Preview(preset);
@@ -571,17 +562,15 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = "chain-shift",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new ReplacerFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new ReplacerOptions("b", "c", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false)),
                     new ReplacerFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new ReplacerOptions("a", "b", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false))
-                ]
+                ])
             };
 
             renameList.Preview(preset);

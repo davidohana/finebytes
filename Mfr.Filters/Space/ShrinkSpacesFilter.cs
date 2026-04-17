@@ -6,11 +6,9 @@ namespace Mfr.Filters.Space
     /// <summary>
     /// Collapses runs of the current word-separator character to a single occurrence.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed record ShrinkSpacesFilter(
-        bool Enabled,
-        FilterTarget Target) : BaseFilter(Enabled, Target)
+        FilterTarget Target) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

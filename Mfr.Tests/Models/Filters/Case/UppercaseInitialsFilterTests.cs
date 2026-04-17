@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_UppercasesInitialsPattern()
         {
-            var filter = new UppercaseInitialsFilter(true, _target);
+            var filter = new UppercaseInitialsFilter(_target);
             var input = "bruce springsteen - born in the u.s.a";
 
             var result = FilterTestHelpers.ApplyToPrefix(filter, input);
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_UppercasesVariableLengthInitialsPatterns()
         {
-            var filter = new UppercaseInitialsFilter(true, _target);
+            var filter = new UppercaseInitialsFilter(_target);
             var input = "live in the u.k and the u.s.a and e.u";
 
             var result = FilterTestHelpers.ApplyToPrefix(filter, input);
@@ -44,7 +44,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_DoesNotChangeNonInitialWords()
         {
-            var filter = new UppercaseInitialsFilter(true, _target);
+            var filter = new UppercaseInitialsFilter(_target);
             var input = "alpha beta c and ab.cd stay as-is";
 
             var result = FilterTestHelpers.ApplyToPrefix(filter, input);
@@ -69,7 +69,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [InlineData("a.1", "a.1")]
         public void Apply_VariousPatterns(string input, string expected)
         {
-            var filter = new UppercaseInitialsFilter(true, _target);
+            var filter = new UppercaseInitialsFilter(_target);
             var result = FilterTestHelpers.ApplyToPrefix(filter, input);
             Assert.Equal(expected, result);
         }

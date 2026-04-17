@@ -1,4 +1,3 @@
-using Mfr.Filters;
 using Mfr.Models;
 using Serilog;
 
@@ -10,20 +9,25 @@ namespace Mfr.Core
     public static class RenameItemExtensions
     {
         /// <summary>
-        /// Applies enabled filters to update the item's preview file name.
+        /// Applies enabled steps in the chain to update the item's preview file name.
         /// </summary>
         /// <param name="item">The rename item receiving transformed preview metadata.</param>
-        /// <param name="filters">The configured filters to apply in order.</param>
+        /// <param name="chain">The configured filter chain.</param>
         /// <remarks>
-        /// Call <see cref="FilterExtensions.SetupFilters"/> once for <paramref name="filters"/> before the first apply
+        /// Call <see cref="FilterChain.SetupFilters"/> once for <paramref name="chain"/> before the first apply
         /// (for example from <c>RenameList.Preview</c>); this method does not run setup.
         /// </remarks>
-        public static void ApplyFilters(this RenameItem item, IReadOnlyList<BaseFilter> filters)
+        public static void ApplyFilters(this RenameItem item, FilterChain chain)
         {
             item.ClearPreview();
-            foreach (var filter in filters)
+            foreach (var step in chain.Steps)
             {
-                filter.Apply(item);
+                if (!step.Enabled)
+                {
+                    continue;
+                }
+
+                step.Filter.Apply(item);
             }
         }
 

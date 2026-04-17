@@ -98,13 +98,11 @@ namespace Mfr.Filters.Case
     /// <summary>
     /// Converts text letter casing.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Case transformation options.</param>
     public sealed record LettersCaseFilter(
-        bool Enabled,
         FilterTarget Target,
-        LettersCaseOptions Options) : BaseFilter(Enabled, Target)
+        LettersCaseOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

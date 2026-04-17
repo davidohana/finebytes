@@ -26,13 +26,11 @@ namespace Mfr.Filters.Misc
     /// <summary>
     /// Removes selected parenthesis/bracket delimiters and optionally their contents.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Parenthesis-strip options.</param>
     public sealed partial record StripParenthesesFilter(
-        bool Enabled,
         FilterTarget Target,
-        StripParenthesesOptions Options) : BaseFilter(Enabled, Target)
+        StripParenthesesOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

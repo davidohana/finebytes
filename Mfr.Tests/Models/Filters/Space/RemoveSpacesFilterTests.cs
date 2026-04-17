@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Space
         [Fact]
         public void Apply_StripsSeparatorChar()
         {
-            var f = new RemoveSpacesFilter(true, _target);
+            var f = new RemoveSpacesFilter(_target);
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a b"));
             Assert.Equal("a\t\r\nb", FilterTestHelpers.ApplyToPrefix(f, "a \t\r\nb"));
         }

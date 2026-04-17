@@ -67,10 +67,9 @@ namespace Mfr.Tests.Cli
                 Id = Guid.NewGuid(),
                 Name = "counter",
                 Description = null,
-                Filters =
+                Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Enabled: true,
                         Target: new FileNameTarget(FileNamePart.Prefix),
                         Options: new CounterOptions(
                             Start: 1,
@@ -80,7 +79,7 @@ namespace Mfr.Tests.Cli
                             Position: CounterPosition.Replace,
                             Separator: " - ",
                             ResetPerFolder: false))
-                ]
+                ])
             };
             presetManager.SavePresets();
 

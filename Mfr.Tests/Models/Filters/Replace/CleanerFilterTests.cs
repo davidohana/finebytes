@@ -17,8 +17,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_RemoveIllegalChars_ReplacesInvalidCharacters()
         {
             var f = new CleanerFilter(
-                true,
-                _target,
+                                _target,
                 new CleanerOptions(
                     RemoveIllegalChars: true,
                     CustomCharsToRemove: "",
@@ -33,8 +32,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_CustomChars_ReplacesConfiguredCharacters()
         {
             var f = new CleanerFilter(
-                true,
-                _target,
+                                _target,
                 new CleanerOptions(
                     RemoveIllegalChars: false,
                     CustomCharsToRemove: "@#",
@@ -49,8 +47,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_Both_ReplacesWithSameCharacter()
         {
             var f = new CleanerFilter(
-                true,
-                _target,
+                                _target,
                 new CleanerOptions(
                     RemoveIllegalChars: true,
                     CustomCharsToRemove: "@#",

@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Space
         [Fact]
         public void Apply_RemovesTrailingSpaces()
         {
-            var f = new StripSpacesRightFilter(true, _target);
+            var f = new StripSpacesRightFilter(_target);
             Assert.Equal("New_York__", FilterTestHelpers.ApplyToPrefix(f, "New_York__   "));
         }
 
@@ -27,8 +27,7 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_RemovesTrailingCustomSpaceCharacters()
         {
             var spaceFilter = new SpaceCharacterFilter(
-                true,
-                _target,
+                                _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: '_',
                     ReplaceSpaces: false,
@@ -36,7 +35,7 @@ namespace Mfr.Tests.Models.Filters.Space
                     ReplacePercent20: false,
                     CustomText: ""));
 
-            var trimFilter = new StripSpacesRightFilter(true, _target);
+            var trimFilter = new StripSpacesRightFilter(_target);
 
             var item = FilterTestHelpers.CreateRenameItem(prefix: "__New_York__");
 
@@ -55,7 +54,7 @@ namespace Mfr.Tests.Models.Filters.Space
         [Fact]
         public void Apply_OnlyRemovesTrailingCharacters()
         {
-            var f = new StripSpacesRightFilter(true, _target);
+            var f = new StripSpacesRightFilter(_target);
             Assert.Equal("  a b", FilterTestHelpers.ApplyToPrefix(f, "  a b "));
         }
 
@@ -65,7 +64,7 @@ namespace Mfr.Tests.Models.Filters.Space
         [Fact]
         public void Apply_AllSpaces_ReturnsEmpty()
         {
-            var f = new StripSpacesRightFilter(true, _target);
+            var f = new StripSpacesRightFilter(_target);
             Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "    "));
         }
     }

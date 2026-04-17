@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         [Fact]
         public void Apply_TakesLeftSubstring()
         {
-            var f = new ExtractLeftFilter(true, _target, new CountFilterOptions(3));
+            var f = new ExtractLeftFilter(_target, new CountFilterOptions(3));
             Assert.Equal("abc", FilterTestHelpers.ApplyToPrefix(f, "abcdef"));
         }
 
@@ -27,7 +27,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         [Fact]
         public void Apply_ZeroCount_ReturnsEmpty()
         {
-            var f = new ExtractLeftFilter(true, _target, new CountFilterOptions(0));
+            var f = new ExtractLeftFilter(_target, new CountFilterOptions(0));
             Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "abc"));
         }
 
@@ -37,7 +37,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         [Fact]
         public void Apply_CountBeyondLength_ReturnsFullSegment()
         {
-            var f = new ExtractLeftFilter(true, _target, new CountFilterOptions(100));
+            var f = new ExtractLeftFilter(_target, new CountFilterOptions(100));
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
     }

@@ -1,5 +1,4 @@
 using Mfr.Filters.Case;
-using Mfr.Filters;
 using Mfr.Filters.Space;
 using Mfr.Core;
 using Mfr.Models;
@@ -58,16 +57,15 @@ namespace Mfr.Tests.Models.Filters.Case
             try
             {
                 var sentenceEndFilter = new SentenceEndCharactersFilter(
-                    Enabled: true,
                     Target: _target,
                     Options: new SentenceEndCharactersOptions(Characters: "-.!"));
                 var casingFilter = _CreateFilter(
                     filePath: casingListFilePath,
                     uppercaseSentenceInitial: true);
                 var item = FilterTestHelpers.CreateRenameItem(prefix: "03 - WiTH Or Without You Rmx");
-                var filters = new List<BaseFilter> { sentenceEndFilter, casingFilter };
-                filters.SetupFilters();
-                item.ApplyFilters(filters);
+                var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, casingFilter]);
+                chain.SetupFilters();
+                item.ApplyFilters(chain);
                 var result = item.Preview.Prefix;
 
                 Assert.Equal("03 - With or Without You RMX", result);
@@ -93,7 +91,6 @@ namespace Mfr.Tests.Models.Filters.Case
             try
             {
                 var spaceCharacterFilter = new SpaceCharacterFilter(
-                    Enabled: true,
                     Target: _target,
                     Options: new SpaceCharacterOptions(
                         SpaceCharacter: '_',
@@ -104,11 +101,11 @@ namespace Mfr.Tests.Models.Filters.Case
                 var casingFilter = _CreateFilter(
                     filePath: casingListFilePath,
                     uppercaseSentenceInitial: true);
-                var filters = new List<BaseFilter> { spaceCharacterFilter, casingFilter };
+                var chain = FilterChain.CreateAllEnabled([spaceCharacterFilter, casingFilter]);
 
                 var item = FilterTestHelpers.CreateRenameItem(prefix: "US_AND_THEM");
-                filters.SetupFilters();
-                item.ApplyFilters(filters);
+                chain.SetupFilters();
+                item.ApplyFilters(chain);
 
                 Assert.Equal("Us_and_them", item.Preview.Prefix);
             }
@@ -141,7 +138,6 @@ namespace Mfr.Tests.Models.Filters.Case
                 FilePath: filePath,
                 UppercaseSentenceInitial: uppercaseSentenceInitial);
             return new CasingListFilter(
-                Enabled: true,
                 Target: _target,
                 Options: options);
         }

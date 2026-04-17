@@ -33,8 +33,8 @@ namespace Mfr.Tests.Core
             _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
-                    { "id": "5b5f7bbf-5fc4-45aa-9631-6ca18afae4f7", "name": "Rock", "filters": [] },
-                    { "id": "43fdc61b-0a2b-4c8f-a8f4-77c550ea317a", "name": "Pop", "filters": [] }
+                    { "id": "5b5f7bbf-5fc4-45aa-9631-6ca18afae4f7", "name": "Rock", "chain": { "steps": [] } },
+                    { "id": "43fdc61b-0a2b-4c8f-a8f4-77c550ea317a", "name": "Pop", "chain": { "steps": [] } }
                   ]
                 }
                 """);
@@ -58,8 +58,8 @@ namespace Mfr.Tests.Core
             _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
-                    { "id": "6d770366-7ac5-41f5-857f-08a4f6b7fdcc", "name": "Rock", "filters": [] },
-                    { "id": "1a0d6772-996e-4334-8755-054434f53b16", "name": "rock", "filters": [] }
+                    { "id": "6d770366-7ac5-41f5-857f-08a4f6b7fdcc", "name": "Rock", "chain": { "steps": [] } },
+                    { "id": "1a0d6772-996e-4334-8755-054434f53b16", "name": "rock", "chain": { "steps": [] } }
                   ]
                 }
                 """);
@@ -83,8 +83,8 @@ namespace Mfr.Tests.Core
             _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
-                    { "id": "8fd30889-4950-4c90-a5b3-81f5dd2ef825", "name": "Dup", "filters": [] },
-                    { "id": "27dff4b4-4e0b-4bb3-8e4d-1656e5727d70", "name": "Dup", "filters": [] }
+                    { "id": "8fd30889-4950-4c90-a5b3-81f5dd2ef825", "name": "Dup", "chain": { "steps": [] } },
+                    { "id": "27dff4b4-4e0b-4bb3-8e4d-1656e5727d70", "name": "Dup", "chain": { "steps": [] } }
                   ]
                 }
                 """);
@@ -105,7 +105,7 @@ namespace Mfr.Tests.Core
             _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
-                    { "id": "95d14a63-cfdd-425a-b44e-c946f4fd2a78", "name": "First", "filters": [] }
+                    { "id": "95d14a63-cfdd-425a-b44e-c946f4fd2a78", "name": "First", "chain": { "steps": [] } }
                   ]
                 }
                 """);
@@ -117,7 +117,7 @@ namespace Mfr.Tests.Core
             _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
                 {
                   "presets": [
-                    { "id": "47f0f380-d44a-4f4d-baa9-0331816cce9f", "name": "Second", "filters": [] }
+                    { "id": "47f0f380-d44a-4f4d-baa9-0331816cce9f", "name": "Second", "chain": { "steps": [] } }
                   ]
                 }
                 """);
@@ -169,7 +169,7 @@ namespace Mfr.Tests.Core
                 Id = Guid.NewGuid(),
                 Name = name,
                 Description = null,
-                Filters = []
+                Chain = new FilterChain { Steps = [] }
             };
         }
     }

@@ -15,7 +15,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Apply_SetupRunsOncePerInstanceLifetime()
         {
-            var filter = new SetupCountingFilter(Enabled: true, Target: _target);
+            var filter = new SetupCountingFilter(Target: _target);
             filter.Setup();
 
             var firstItem = FilterTestHelpers.CreateRenameItem(prefix: "first");
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void TransformSegment_SetupNotRun_ThrowsInvalidOperationException()
         {
-            var filter = new SetupCountingFilter(Enabled: true, Target: _target);
+            var filter = new SetupCountingFilter(Target: _target);
             var item = FilterTestHelpers.CreateRenameItem(prefix: "first");
 
             var ex = Assert.Throws<InvalidOperationException>(() => filter.TransformSegment(segment: "value", item: item));
@@ -47,7 +47,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Setup_WhenSetupThrows_PropagatesAndApplyStillFails()
         {
-            var filter = new ThrowingSetupFilter(Enabled: true, Target: _target);
+            var filter = new ThrowingSetupFilter(Target: _target);
             var item = FilterTestHelpers.CreateRenameItem(prefix: "first");
 
             var setupEx = Assert.Throws<InvalidOperationException>(filter.Setup);
@@ -57,7 +57,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.Contains("setup must complete before transform", applyEx.Message, StringComparison.OrdinalIgnoreCase);
         }
 
-        private sealed record SetupCountingFilter(bool Enabled, FilterTarget Target) : BaseFilter(Enabled, Target)
+        private sealed record SetupCountingFilter(FilterTarget Target) : BaseFilter(Target)
         {
             public override string Type => "SetupCounting";
 
@@ -74,7 +74,7 @@ namespace Mfr.Tests.Models.Filters
             }
         }
 
-        private sealed record ThrowingSetupFilter(bool Enabled, FilterTarget Target) : BaseFilter(Enabled, Target)
+        private sealed record ThrowingSetupFilter(FilterTarget Target) : BaseFilter(Target)
         {
             public override string Type => "ThrowingSetup";
 

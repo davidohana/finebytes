@@ -5,9 +5,8 @@ namespace Mfr.Models
     /// <summary>
     /// Represents a polymorphic filter.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
-    public abstract record BaseFilter(bool Enabled, FilterTarget Target)
+    public abstract record BaseFilter(FilterTarget Target)
     {
         private bool _isSetupComplete;
 
@@ -30,11 +29,6 @@ namespace Mfr.Models
 
         internal void Apply(RenameItem item)
         {
-            if (!Enabled)
-            {
-                return;
-            }
-
             if (Target is not FileNameTarget fileTarget)
             {
                 throw new NotSupportedException($"Phase 1 only supports target.family='FileName'. Filter '{Type}' got '{Target.Family}'.");

@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Space
         [Fact]
         public void Apply_CollapsesSeparatorRuns()
         {
-            var f = new ShrinkSpacesFilter(true, _target);
+            var f = new ShrinkSpacesFilter(_target);
             Assert.Equal("a b c", FilterTestHelpers.ApplyToPrefix(f, "a   b  c"));
             Assert.Equal("a \t b", FilterTestHelpers.ApplyToPrefix(f, "a  \t b"));
         }

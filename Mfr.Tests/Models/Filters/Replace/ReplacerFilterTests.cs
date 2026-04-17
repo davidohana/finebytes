@@ -19,8 +19,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_LiteralReplacement_RespectsReplaceAllOption(bool replaceAll, string expected)
         {
             var f = new ReplacerFilter(
-                true,
-                _target,
+                                _target,
                 new ReplacerOptions("a", "X", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: replaceAll, WholeWord: false));
             Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "aba"));
         }
@@ -32,8 +31,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_Wildcard_ReplacesPattern()
         {
             var f = new ReplacerFilter(
-                true,
-                _target,
+                                _target,
                 new ReplacerOptions("f*o", "X", ReplacerMode.Wildcard, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
             Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "foo"));
         }
@@ -47,8 +45,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_RegexReplacement_RespectsReplaceAllOption(bool replaceAll, string expected)
         {
             var f = new ReplacerFilter(
-                true,
-                _target,
+                                _target,
                 new ReplacerOptions(@"\d+", "N", ReplacerMode.Regex, CaseSensitive: true, ReplaceAll: replaceAll, WholeWord: false));
             Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "a12bc34"));
         }
@@ -60,8 +57,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_LiteralIgnoreCase_ReplacesRegardlessOfCasing()
         {
             var f = new ReplacerFilter(
-                true,
-                _target,
+                                _target,
                 new ReplacerOptions("a", "X", ReplacerMode.Literal, CaseSensitive: false, ReplaceAll: true, WholeWord: false));
             Assert.Equal("XbX", FilterTestHelpers.ApplyToPrefix(f, "AbA"));
         }
@@ -73,8 +69,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_WholeWord_ReplacesOnlyWholeWords()
         {
             var f = new ReplacerFilter(
-                true,
-                _target,
+                                _target,
                 new ReplacerOptions("cat", "dog", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: true));
             Assert.Equal("dog", FilterTestHelpers.ApplyToPrefix(f, "cat"));
             Assert.Equal("category", FilterTestHelpers.ApplyToPrefix(f, "category"));
@@ -88,8 +83,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_WildcardQuestionMark_ReplacesSingleCharacter()
         {
             var f = new ReplacerFilter(
-                true,
-                _target,
+                                _target,
                 new ReplacerOptions("f?o", "X", ReplacerMode.Wildcard, CaseSensitive: true, ReplaceAll: true, WholeWord: false));
             Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "foo"));
             Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "fao"));
@@ -102,8 +96,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_IgnoreCaseWholeWord_WorksCorrectly()
         {
             var f = new ReplacerFilter(
-                true,
-                _target,
+                                _target,
                 new ReplacerOptions("CAT", "dog", ReplacerMode.Literal, CaseSensitive: false, ReplaceAll: true, WholeWord: true));
             Assert.Equal("dog", FilterTestHelpers.ApplyToPrefix(f, "cat"));
             Assert.Equal("Category", FilterTestHelpers.ApplyToPrefix(f, "Category"));

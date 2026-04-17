@@ -1,4 +1,3 @@
-using Mfr.Filters;
 using Mfr.Models;
 using Serilog;
 
@@ -95,7 +94,7 @@ namespace Mfr.Core
         /// <summary>
         /// Previews rename outcomes for the current list without touching the filesystem.
         /// </summary>
-        /// <param name="preset">The rename preset (sequence of enabled filters).</param>
+        /// <param name="preset">The rename preset (ordered filter chain).</param>
         public void Preview(FilterPreset preset)
         {
             Log.Information(
@@ -108,13 +107,13 @@ namespace Mfr.Core
                 item.ResetState();
             }
 
-            preset.Filters.SetupFilters();
+            preset.Chain.SetupFilters();
 
             foreach (var renameItem in _renameItems)
             {
                 try
                 {
-                    renameItem.ApplyFilters(preset.Filters);
+                    renameItem.ApplyFilters(preset.Chain);
                     renameItem.Status = RenameStatus.PreviewOk;
                 }
                 catch (Exception ex)

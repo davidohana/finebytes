@@ -1,5 +1,4 @@
 using Mfr.Core;
-using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
 using Mfr.Models;
@@ -20,7 +19,6 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_Percent20WithUnderscoreSeparator_ReplacesEncodedSpaces()
         {
             var f = new SpaceCharacterFilter(
-                true,
                 _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: '_',
@@ -38,7 +36,6 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_MultipleReplaceFlags_NormalizesToSeparator()
         {
             var f = new SpaceCharacterFilter(
-                true,
                 _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: ' ',
@@ -56,7 +53,6 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_CustomReplacement_ReplacesCustomText()
         {
             var f = new SpaceCharacterFilter(
-                true,
                 _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: '-',
@@ -74,7 +70,6 @@ namespace Mfr.Tests.Models.Filters.Space
         public void ApplyFilters_AfterSpaceCharacter_TitleCaseRespectsWordSeparator()
         {
             var spaceFilter = new SpaceCharacterFilter(
-                true,
                 _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: '_',
@@ -83,14 +78,13 @@ namespace Mfr.Tests.Models.Filters.Space
                     ReplacePercent20: true,
                     CustomText: ""));
             var titleFilter = new LettersCaseFilter(
-                true,
                 _target,
                 new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"]));
 
             var item = FilterTestHelpers.CreateRenameItem(prefix: "gone%20with%20the%20wind");
-            var filters = new List<BaseFilter> { spaceFilter, titleFilter };
-            filters.SetupFilters();
-            item.ApplyFilters(filters);
+            var chain = FilterChain.CreateAllEnabled([spaceFilter, titleFilter]);
+            chain.SetupFilters();
+            item.ApplyFilters(chain);
 
             Assert.Equal("Gone_With_the_Wind", item.Preview.Prefix);
         }

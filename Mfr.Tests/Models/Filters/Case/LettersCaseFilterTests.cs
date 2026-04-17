@@ -1,5 +1,4 @@
 using Mfr.Core;
-using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
 using Mfr.Models;
@@ -19,7 +18,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_UpperCase_ConvertsToUpperInvariant()
         {
-            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.UpperCase, []));
+            var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []));
             Assert.Equal("HELLO", FilterTestHelpers.ApplyToPrefix(f, "hello"));
         }
 
@@ -29,7 +28,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_LowerCase_ConvertsToLowerInvariant()
         {
-            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.LowerCase, []));
+            var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.LowerCase, []));
             Assert.Equal("hello", FilterTestHelpers.ApplyToPrefix(f, "HELLO"));
         }
 
@@ -39,7 +38,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_FirstLetterUp_UppercasesFirstLetterOnly()
         {
-            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.FirstLetterUp, []));
+            var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.FirstLetterUp, []));
             Assert.Equal("Hello world", FilterTestHelpers.ApplyToPrefix(f, "hELLO world"));
         }
 
@@ -49,7 +48,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_FirstLetterUp_UsesIndexZero()
         {
-            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.FirstLetterUp, []));
+            var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.FirstLetterUp, []));
             Assert.Equal(" 123_abc", FilterTestHelpers.ApplyToPrefix(f, " 123_aBC"));
         }
 
@@ -60,8 +59,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_WeirdCase_ZeroPercentUppercasesNone()
         {
             var f = new LettersCaseFilter(
-                true,
-                _target,
+                                _target,
                 new LettersCaseOptions(
                     Mode: LettersCaseMode.WeirdCase,
                     SkipWords: [],
@@ -77,8 +75,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_WeirdCase_HundredPercentUppercasesAll()
         {
             var f = new LettersCaseFilter(
-                true,
-                _target,
+                                _target,
                 new LettersCaseOptions(
                     Mode: LettersCaseMode.WeirdCase,
                     SkipWords: [],
@@ -94,8 +91,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_WeirdCase_FixedPlaces_UsesSamePositionsAcrossNames()
         {
             var f = new LettersCaseFilter(
-                true,
-                _target,
+                                _target,
                 new LettersCaseOptions(
                     Mode: LettersCaseMode.WeirdCase,
                     SkipWords: [],
@@ -116,8 +112,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_TitleCase_SkipsConfiguredWords()
         {
             var f = new LettersCaseFilter(
-                true,
-                _target,
+                                _target,
                 new LettersCaseOptions(LettersCaseMode.TitleCase, ["a", "the", "for"]));
             Assert.Equal("a Song for the World", FilterTestHelpers.ApplyToPrefix(f, "a song for the world"));
         }
@@ -128,7 +123,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_SentenceCase_CapitalizesAfterPunctuation()
         {
-            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             Assert.Equal("Hello world. Next line.", FilterTestHelpers.ApplyToPrefix(f, "hello world. next line."));
         }
 
@@ -139,17 +134,15 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SentenceCase_UsesConfiguredSentenceEndCharacters()
         {
             var sentenceEndFilter = new SentenceEndCharactersFilter(
-                true,
-                _target,
+                                _target,
                 new SentenceEndCharactersOptions(Characters: ":;"));
             var lettersFilter = new LettersCaseFilter(
-                true,
-                _target,
+                                _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello: next; again. no");
-            var filters = new List<BaseFilter> { sentenceEndFilter, lettersFilter };
-            filters.SetupFilters();
-            item.ApplyFilters(filters);
+            var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersFilter]);
+            chain.SetupFilters();
+            item.ApplyFilters(chain);
 
             Assert.Equal("Hello: Next; Again. no", item.Preview.Prefix);
         }
@@ -161,17 +154,15 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SentenceCase_WithNoSentenceEndCharacters_CapitalizesOnlyStart()
         {
             var sentenceEndFilter = new SentenceEndCharactersFilter(
-                true,
-                _target,
+                                _target,
                 new SentenceEndCharactersOptions(Characters: ""));
             var lettersFilter = new LettersCaseFilter(
-                true,
-                _target,
+                                _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello. next line");
-            var filters = new List<BaseFilter> { sentenceEndFilter, lettersFilter };
-            filters.SetupFilters();
-            item.ApplyFilters(filters);
+            var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersFilter]);
+            chain.SetupFilters();
+            item.ApplyFilters(chain);
 
             Assert.Equal("Hello. next line", item.Preview.Prefix);
         }
@@ -183,17 +174,15 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SentenceCase_IgnoresSentenceEndCharsMatchingSeparator()
         {
             var sentenceEndFilter = new SentenceEndCharactersFilter(
-                true,
-                _target,
+                                _target,
                 new SentenceEndCharactersOptions(Characters: ". "));
             var lettersFilter = new LettersCaseFilter(
-                true,
-                _target,
+                                _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello world. next line");
-            var filters = new List<BaseFilter> { sentenceEndFilter, lettersFilter };
-            filters.SetupFilters();
-            item.ApplyFilters(filters);
+            var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersFilter]);
+            chain.SetupFilters();
+            item.ApplyFilters(chain);
 
             Assert.Equal("Hello world. Next line", item.Preview.Prefix);
         }
@@ -205,19 +194,18 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SentenceCase_UsesWordSeparatorAfterPunctuation()
         {
             var spaceCharFilter = new SpaceCharacterFilter(
-                true,
-                _target,
+                                _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: '_',
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: false,
                     CustomText: ""));
-            var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var sentenceFilter = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello._world._again");
-            var filters = new List<BaseFilter> { spaceCharFilter, sentenceFilter };
-            filters.SetupFilters();
-            item.ApplyFilters(filters);
+            var chain = FilterChain.CreateAllEnabled([spaceCharFilter, sentenceFilter]);
+            chain.SetupFilters();
+            item.ApplyFilters(chain);
             Assert.Equal("Hello._World._Again", item.Preview.Prefix);
         }
 
@@ -228,8 +216,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_TitleCase_UsesWordSeparatorAndPreservesRuns()
         {
             var spaceCharFilter = new SpaceCharacterFilter(
-                true,
-                _target,
+                                _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: '_',
                     ReplaceSpaces: false,
@@ -237,14 +224,13 @@ namespace Mfr.Tests.Models.Filters.Case
                     ReplacePercent20: false,
                     CustomText: ""));
             var titleFilter = new LettersCaseFilter(
-                true,
-                _target,
+                                _target,
                 new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"]));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "__gone__with__the__wind__");
 
-            var filters = new List<BaseFilter> { spaceCharFilter, titleFilter };
-            filters.SetupFilters();
-            item.ApplyFilters(filters);
+            var chain = FilterChain.CreateAllEnabled([spaceCharFilter, titleFilter]);
+            chain.SetupFilters();
+            item.ApplyFilters(chain);
 
             Assert.Equal("__Gone__With__the__Wind__", item.Preview.Prefix);
         }
@@ -256,20 +242,19 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SentenceCase_CapitalizesAfterPunctuationAndMultipleSeparators()
         {
             var spaceCharFilter = new SpaceCharacterFilter(
-                true,
-                _target,
+                                _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: '_',
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: false,
                     CustomText: ""));
-            var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var sentenceFilter = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello.__world!___again?__done");
 
-            var filters = new List<BaseFilter> { spaceCharFilter, sentenceFilter };
-            filters.SetupFilters();
-            item.ApplyFilters(filters);
+            var chain = FilterChain.CreateAllEnabled([spaceCharFilter, sentenceFilter]);
+            chain.SetupFilters();
+            item.ApplyFilters(chain);
 
             Assert.Equal("Hello.__World!___Again?__Done", item.Preview.Prefix);
         }
@@ -281,20 +266,19 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SentenceCase_DoesNotCapitalizeAfterPunctuationWithoutSeparator()
         {
             var spaceCharFilter = new SpaceCharacterFilter(
-                true,
-                _target,
+                                _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: '_',
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: false,
                     CustomText: ""));
-            var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            var sentenceFilter = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello.world");
 
-            var filters = new List<BaseFilter> { spaceCharFilter, sentenceFilter };
-            filters.SetupFilters();
-            item.ApplyFilters(filters);
+            var chain = FilterChain.CreateAllEnabled([spaceCharFilter, sentenceFilter]);
+            chain.SetupFilters();
+            item.ApplyFilters(chain);
 
             Assert.Equal("Hello.world", item.Preview.Prefix);
         }
@@ -305,7 +289,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_InvertCase_SwapsCasing()
         {
-            var f = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.InvertCase, []));
+            var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.InvertCase, []));
             Assert.Equal("hELLO", FilterTestHelpers.ApplyToPrefix(f, "Hello"));
         }
 

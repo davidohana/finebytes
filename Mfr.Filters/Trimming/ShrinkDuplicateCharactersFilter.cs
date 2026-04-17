@@ -13,13 +13,11 @@ namespace Mfr.Filters.Trimming
     /// <summary>
     /// Collapses adjacent duplicate occurrences of a configured character to a single occurrence.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Filter options.</param>
     public sealed record ShrinkDuplicateCharactersFilter(
-        bool Enabled,
         FilterTarget Target,
-        ShrinkDuplicateCharactersOptions Options) : BaseFilter(Enabled, Target)
+        ShrinkDuplicateCharactersOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

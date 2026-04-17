@@ -17,8 +17,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_Replace_ReturnsFormattedCounter()
         {
             var f = new CounterFilter(
-                true,
-                _target,
+                                _target,
                 new CounterOptions(Start: 1, Step: 1, Width: 3, PadChar: "0", Position: CounterPosition.Replace, Separator: "", ResetPerFolder: false));
             Assert.Equal("005", FilterTestHelpers.ApplyToPrefix(f, "old", globalIndex: 4));
         }
@@ -30,8 +29,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_Prepend_PrefixesCounter()
         {
             var f = new CounterFilter(
-                true,
-                _target,
+                                _target,
                 new CounterOptions(Start: 0, Step: 1, Width: 0, PadChar: "0", Position: CounterPosition.Prepend, Separator: "_", ResetPerFolder: false));
             Assert.Equal("2_name", FilterTestHelpers.ApplyToPrefix(f, "name", globalIndex: 2));
         }
@@ -43,8 +41,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_Append_AppendsCounter()
         {
             var f = new CounterFilter(
-                true,
-                _target,
+                                _target,
                 new CounterOptions(Start: 0, Step: 1, Width: 0, PadChar: "0", Position: CounterPosition.Append, Separator: "-", ResetPerFolder: false));
             Assert.Equal("name-1", FilterTestHelpers.ApplyToPrefix(f, "name", globalIndex: 1));
         }
@@ -56,8 +53,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_ResetPerFolder_UsesInFolderIndex()
         {
             var f = new CounterFilter(
-                true,
-                _target,
+                                _target,
                 new CounterOptions(Start: 10, Step: 5, Width: 0, PadChar: "0", Position: CounterPosition.Replace, Separator: "", ResetPerFolder: true));
             Assert.Equal("20", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 99, inFolderIndex: 2));
         }
@@ -69,8 +65,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_PadCharSpace_PadsWithSpaces()
         {
             var f = new CounterFilter(
-                true,
-                _target,
+                                _target,
                 new CounterOptions(Start: 7, Step: 1, Width: 4, PadChar: "1", Position: CounterPosition.Replace, Separator: "", ResetPerFolder: false));
             Assert.Equal("   7", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 0));
         }

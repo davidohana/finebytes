@@ -5,11 +5,9 @@ namespace Mfr.Filters.Space
     /// <summary>
     /// Removes all occurrences of the current word-separator character.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed record RemoveSpacesFilter(
-        bool Enabled,
-        FilterTarget Target) : BaseFilter(Enabled, Target)
+        FilterTarget Target) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

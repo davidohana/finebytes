@@ -30,13 +30,11 @@ namespace Mfr.Filters.Trimming
     /// Both positions can be anchored to the left or right side of names.
     /// Positions are 1-based and inclusive.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Trimming options.</param>
     public sealed record TrimBetweenFilter(
-        bool Enabled,
         FilterTarget Target,
-        TrimBetweenFilterOptions Options) : BaseFilter(Enabled, Target)
+        TrimBetweenFilterOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

@@ -9,11 +9,9 @@ namespace Mfr.Filters.Space
     /// The space character is <c>U+0020 SPACE</c> by default, but can be changed by
     /// a preceding <c>SpaceCharacter</c> filter in the applied filters list.
     /// </remarks>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed record StripSpacesRightFilter(
-        bool Enabled,
-        FilterTarget Target) : BaseFilter(Enabled, Target)
+        FilterTarget Target) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

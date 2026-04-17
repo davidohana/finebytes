@@ -19,13 +19,11 @@ namespace Mfr.Filters.Misc
     /// <summary>
     /// Normalizes leading zeros in numeric sequences.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Leading-zero normalization options.</param>
     public sealed partial record FixLeadingZerosFilter(
-        bool Enabled,
         FilterTarget Target,
-        FixLeadingZerosOptions Options) : BaseFilter(Enabled, Target)
+        FixLeadingZerosOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

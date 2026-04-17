@@ -15,13 +15,11 @@ namespace Mfr.Filters.Case
     /// Uppercases each letter which appears after one of the characters in the defined list.
     /// Other characters are left unchanged.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Filter options.</param>
     public sealed record CapitalizeAfterFilter(
-        bool Enabled,
         FilterTarget Target,
-        CapitalizeAfterOptions Options) : BaseFilter(Enabled, Target)
+        CapitalizeAfterOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

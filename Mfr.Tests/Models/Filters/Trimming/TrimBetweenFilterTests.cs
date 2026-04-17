@@ -22,7 +22,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new Position(13, Side.Left),
                 new Position(5, Side.Right)
             );
-            var f = new TrimBetweenFilter(true, _target, options);
+            var f = new TrimBetweenFilter(_target, options);
 
             // "Portishead - Glory Box"
             // Pos 13 (Left, 1-based) is 'G' (P-1, o-2, r-3, t-4, i-5, s-6, h-7, e-8, a-9, d-10, ' '-11, --12, ' '-13)
@@ -47,7 +47,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new Position(2, Side.Left),
                 new Position(4, Side.Left)
             );
-            var f = new TrimBetweenFilter(true, _target, options);
+            var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("a", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
         }
 
@@ -60,7 +60,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new Position(3, Side.Right),
                 new Position(1, Side.Right)
             );
-            var f = new TrimBetweenFilter(true, _target, options);
+            var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("a", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
         }
 
@@ -71,7 +71,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new Position(1, Side.Left),
                 new Position(1, Side.Right)
             );
-            var f = new TrimBetweenFilter(true, _target, options);
+            var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "anything"));
         }
 
@@ -83,7 +83,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new Position(4, Side.Left),
                 new Position(2, Side.Left)
             );
-            var f = new TrimBetweenFilter(true, _target, options);
+            var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("ae", FilterTestHelpers.ApplyToPrefix(f, "abcde"));
         }
 
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new Position(0, Side.Left), // Clamps to 1 (index 0)
                 new Position(100, Side.Left) // Clamps to length (index length-1)
             );
-            var f = new TrimBetweenFilter(true, _target, options);
+            var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "abc"));
         }
     }

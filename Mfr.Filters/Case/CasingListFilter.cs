@@ -20,13 +20,11 @@ namespace Mfr.Filters.Case
     /// Changes each word's casing to match how it appears in a casing-list file.
     /// Words not found in the list are left unchanged.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Casing-list options.</param>
     public sealed record CasingListFilter(
-        bool Enabled,
         FilterTarget Target,
-        CasingListOptions Options) : BaseFilter(Enabled, Target)
+        CasingListOptions Options) : BaseFilter(Target)
     {
         private Dictionary<string, string>? _lowerWordToCasing;
 

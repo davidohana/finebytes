@@ -15,11 +15,9 @@ namespace Mfr.Filters.Case
     /// Only letters inside detected initials patterns are uppercased; all other characters stay unchanged.
     /// </para>
     /// </remarks>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed partial record UppercaseInitialsFilter(
-        bool Enabled,
-        FilterTarget Target) : BaseFilter(Enabled, Target)
+        FilterTarget Target) : BaseFilter(Target)
     {
         // Keep this runtime-compiled regex for readability and to avoid GeneratedRegex partial-method
         // analyzer noise in this project setup.

@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_NonPositiveWidth_ReturnsOriginal()
         {
-            var f = new FixLeadingZerosFilter(true, _target, new FixLeadingZerosOptions(Width: 0, RemoveExtraZeros: true));
+            var f = new FixLeadingZerosFilter(_target, new FixLeadingZerosOptions(Width: 0, RemoveExtraZeros: true));
             Assert.Equal("track12", FilterTestHelpers.ApplyToPrefix(f, "track12"));
         }
 
@@ -26,7 +26,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_PadsNumericRuns()
         {
-            var f = new FixLeadingZerosFilter(true, _target, new FixLeadingZerosOptions(Width: 4, RemoveExtraZeros: false));
+            var f = new FixLeadingZerosFilter(_target, new FixLeadingZerosOptions(Width: 4, RemoveExtraZeros: false));
             Assert.Equal("track0009", FilterTestHelpers.ApplyToPrefix(f, "track9"));
         }
 
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_RemoveExtraZeros_NormalizesThenPads()
         {
-            var f = new FixLeadingZerosFilter(true, _target, new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true));
+            var f = new FixLeadingZerosFilter(_target, new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true));
             Assert.Equal("x007", FilterTestHelpers.ApplyToPrefix(f, "x0007"));
         }
 
@@ -47,7 +47,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_WholeWordOnly_DoesNotChangePartWordNumbers()
         {
             var options = new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, WholeWordOnly: true);
-            var f = new FixLeadingZerosFilter(true, _target, options);
+            var f = new FixLeadingZerosFilter(_target, options);
             Assert.Equal("doc1_012", FilterTestHelpers.ApplyToPrefix(f, "doc1_12"));
         }
 
@@ -58,11 +58,11 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_MaxCount_Works()
         {
             var options = new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, MaxCount: 1);
-            var f = new FixLeadingZerosFilter(true, _target, options);
+            var f = new FixLeadingZerosFilter(_target, options);
             Assert.Equal("005-Opus 40", FilterTestHelpers.ApplyToPrefix(f, "05-Opus 40"));
 
             options = new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, MaxCount: 2);
-            f = new FixLeadingZerosFilter(true, _target, options);
+            f = new FixLeadingZerosFilter(_target, options);
             Assert.Equal("005-Opus 040 (1)", FilterTestHelpers.ApplyToPrefix(f, "05-Opus 40 (1)"));
         }
     }

@@ -25,13 +25,11 @@ namespace Mfr.Filters.Replace
     /// Replace entries are applied in file order. This is equivalent to chaining multiple
     /// <see cref="ReplacerFilter"/> instances with the same mode/options.
     /// </remarks>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Replace-list options.</param>
     public sealed record ReplaceListFilter(
-        bool Enabled,
         FilterTarget Target,
-        ReplaceListOptions Options) : BaseFilter(Enabled, Target)
+        ReplaceListOptions Options) : BaseFilter(Target)
     {
         private List<ReplaceListEntry>? _replaceListEntries;
 

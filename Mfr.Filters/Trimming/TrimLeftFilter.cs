@@ -5,13 +5,11 @@ namespace Mfr.Filters.Trimming
     /// <summary>
     /// Trims a fixed number of characters from the left.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Trim options.</param>
     public sealed record TrimLeftFilter(
-        bool Enabled,
         FilterTarget Target,
-        CountFilterOptions Options) : BaseFilter(Enabled, Target)
+        CountFilterOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

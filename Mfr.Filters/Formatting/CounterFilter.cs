@@ -35,13 +35,11 @@ namespace Mfr.Filters.Formatting
     /// <summary>
     /// Injects generated counter values into a segment.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Counter options.</param>
     public sealed record CounterFilter(
-        bool Enabled,
         FilterTarget Target,
-        CounterOptions Options) : BaseFilter(Enabled, Target)
+        CounterOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

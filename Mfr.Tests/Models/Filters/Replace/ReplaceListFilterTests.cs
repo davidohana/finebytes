@@ -221,7 +221,6 @@ namespace Mfr.Tests.Models.Filters.Replace
                 ReplaceAll: replaceAll,
                 WholeWord: wholeWord);
             return new ReplaceListFilter(
-                Enabled: true,
                 Target: _target,
                 Options: options);
         }

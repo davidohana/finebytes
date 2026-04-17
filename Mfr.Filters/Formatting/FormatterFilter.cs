@@ -11,13 +11,11 @@ namespace Mfr.Filters.Formatting
     /// <summary>
     /// Applies formatter template tokens.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Formatter options.</param>
     public sealed partial record FormatterFilter(
-        bool Enabled,
         FilterTarget Target,
-        FormatterOptions Options) : BaseFilter(Enabled, Target)
+        FormatterOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

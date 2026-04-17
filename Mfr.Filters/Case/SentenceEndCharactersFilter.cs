@@ -16,13 +16,11 @@ namespace Mfr.Filters.Case
     /// <summary>
     /// Defines which characters separate sentences for later filters in the chain. Does not change the target text.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Sentence-end character list.</param>
     public sealed record SentenceEndCharactersFilter(
-        bool Enabled,
         FilterTarget Target,
-        SentenceEndCharactersOptions Options) : BaseFilter(Enabled, Target)
+        SentenceEndCharactersOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

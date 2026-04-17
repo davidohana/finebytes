@@ -16,13 +16,11 @@ namespace Mfr.Filters.Replace
     /// <summary>
     /// Cleans illegal and custom characters.
     /// </summary>
-    /// <param name="Enabled">Whether the filter is enabled.</param>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Cleaner options.</param>
     public sealed record CleanerFilter(
-        bool Enabled,
         FilterTarget Target,
-        CleanerOptions Options) : BaseFilter(Enabled, Target)
+        CleanerOptions Options) : BaseFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
