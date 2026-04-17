@@ -54,8 +54,7 @@ namespace Mfr.Models
         /// </summary>
         /// <param name="item">The rename item receiving transformed preview metadata.</param>
         /// <remarks>
-        /// Call <see cref="SetupFilters"/> once before the first apply
-        /// (for example from <c>RenameList.Preview</c>); this method does not run setup.
+        /// Call <see cref="SetupFilters"/> once before the first apply; this method does not run setup.
         /// </remarks>
         public void ApplyFilters(RenameItem item)
         {

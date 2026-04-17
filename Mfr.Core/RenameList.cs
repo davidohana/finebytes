@@ -95,6 +95,10 @@ namespace Mfr.Core
         /// Previews rename outcomes for the current list without touching the filesystem.
         /// </summary>
         /// <param name="preset">The rename preset (ordered filter chain).</param>
+        /// <remarks>
+        /// Call <see cref="FilterChain.SetupFilters"/> on <see cref="FilterPreset.Chain"/> before this method
+        /// so filter setup runs once for the chain (for example from the CLI before preview).
+        /// </remarks>
         public void Preview(FilterPreset preset)
         {
             Log.Information(
@@ -106,8 +110,6 @@ namespace Mfr.Core
             {
                 item.ResetState();
             }
-
-            preset.Chain.SetupFilters();
 
             foreach (var renameItem in _renameItems)
             {

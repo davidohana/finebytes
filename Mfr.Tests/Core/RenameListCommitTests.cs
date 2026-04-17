@@ -52,6 +52,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             var result = renameList.Commit(failFast: false);
 
@@ -99,6 +100,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             var result = renameList.Commit(failFast: false);
 
@@ -148,6 +150,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             var result = renameList.Commit(failFast: false, dryRun: true);
 
@@ -193,6 +196,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             var result = renameList.Commit(failFast: false, dryRun: false, confirmBeforeApply: _ => false);
 
@@ -239,6 +243,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             var result = renameList.Commit(failFast: false, dryRun: false, confirmBeforeApply: _ => true);
 
@@ -285,6 +290,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
@@ -341,6 +347,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
@@ -388,6 +395,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            failingPreset.Chain.SetupFilters();
             renameList.Preview(failingPreset);
             var previewError = files[0].PreviewError;
             Assert.NotNull(previewError);
@@ -402,6 +410,7 @@ namespace Mfr.Tests.Core
                 Chain = new FilterChain { Steps = [] }
             };
 
+            successPreset.Chain.SetupFilters();
             renameList.Preview(successPreset);
             Assert.Null(files[0].PreviewError);
         }
@@ -452,6 +461,7 @@ namespace Mfr.Tests.Core
                 Chain = new FilterChain { Steps = [] }
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             var result = renameList.Commit(failFast: false);
 
@@ -484,6 +494,7 @@ namespace Mfr.Tests.Core
                 Chain = new FilterChain { Steps = [] }
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             var result = renameList.Commit(failFast: false, dryRun: true);
 
@@ -529,6 +540,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             var result = renameList.Commit(failFast: false);
 
@@ -573,6 +585,7 @@ namespace Mfr.Tests.Core
                 ])
             };
 
+            preset.Chain.SetupFilters();
             renameList.Preview(preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
