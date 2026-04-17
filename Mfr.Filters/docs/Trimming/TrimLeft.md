@@ -16,6 +16,6 @@ Examples match [`TrimLeftFilterTests`](../../../Mfr.Tests/Models/Filters/Trimmin
 |---------|--------|-------|---------|
 | `count`: `2` | `abcd` | `cd` | |
 | `count`: `0` | `ab` | `ab` | |
-| `count`: `10` (segment shorter) | `hi` | *(empty)* | Count past length clears the segment. |
+| `count`: `10`<br>(segment shorter than count) | `hi` | *(empty)* | Count past length clears the segment. |
 
 To **keep** a prefix of length N instead of **dropping** N characters, use [ExtractLeft](ExtractLeft.md).

@@ -23,8 +23,8 @@ Examples match [`CasingListFilterTests`](../../../Mfr.Tests/Models/Filters/Case/
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| List: `and`, `or`, `with`, `RMX`; `uppercaseSentenceInitial`: `false` | `03 - WiTH Or Without You Rmx` | `03 - with or Without You RMX` | |
-| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `"-.!"` then list as above; `uppercaseSentenceInitial`: `true` | `03 - WiTH Or Without You Rmx` | `03 - With or Without You RMX` | |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"`, `replaceSpaces`: `true`; list: `and`, `us`, `them`; `uppercaseSentenceInitial`: `true` | `US_AND_THEM` | `Us_and_them` | Underscore word boundaries + casing list + sentence initial. |
+| `filePath`: list (`and`, `or`, `with`, `RMX`)<br>`uppercaseSentenceInitial`: `false` | `03 - WiTH Or Without You Rmx` | `03 - with or Without You RMX` | |
+| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `"-.!"`<br>`filePath`: same list as above<br>`uppercaseSentenceInitial`: `true` | `03 - WiTH Or Without You Rmx` | `03 - With or Without You RMX` | |
+| [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>`replaceSpaces`: `true`<br>`filePath`: list (`and`, `us`, `them`)<br>`uppercaseSentenceInitial`: `true` | `US_AND_THEM` | `Us_and_them` | Underscore word boundaries + casing list + sentence initial. |
 
 Put [SpaceCharacter](../Space/SpaceCharacter.md) first if words are separated by `_` or another character.

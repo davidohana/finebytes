@@ -37,10 +37,10 @@ R:_
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `mode`: `Literal`, `replaceAll`: `true`, file with `a`→`b` then `.`→`_` | `a.a` | `b_b` | Order matters: `a`→`b` first, then `.`→`_`. |
-| File: `S:x` / `R:<EMPTY>`, `mode`: `Literal`, `replaceAll`: `true` | `abxcx` | `abc` | |
-| `mode`: `Wildcard`, file: `S:f*o` / `R:X`, `replaceAll`: `true` | `foo` | `X` | |
-| `mode`: `Regex`, `caseSensitive`: `false`, `replaceAll`: `true`; file: `a`→`b`, `.`→`_`, `[0-9]+`→`<counter:10,1,0,2,0>`; global index `0` | `01.-.Blue.Train` | `10_-_Blue_Trbin` | Regex replaces digit runs; yields `Trbin` (see test). |
-| Same setup; global index `1` | `02.-.A.Moment's.Notice` | `11_-_b_Moment's_Notice` | |
+| `filePath`: pairs `a`→`b`, then `.`→`_`<br>`mode`: `Literal`<br>`replaceAll`: `true` | `a.a` | `b_b` | Order matters: `a`→`b` first, then `.`→`_`. |
+| `filePath`: `S:x` / `R:<EMPTY>`<br>`mode`: `Literal`<br>`replaceAll`: `true` | `abxcx` | `abc` | |
+| `filePath`: `S:f*o` / `R:X`<br>`mode`: `Wildcard`<br>`replaceAll`: `true` | `foo` | `X` | |
+| `filePath`: `a`→`b`, `.`→`_`, `[0-9]+`→`<counter:10,1,0,2,0>`<br>`mode`: `Regex`<br>`caseSensitive`: `false`<br>`replaceAll`: `true`<br>global index: `0` | `01.-.Blue.Train` | `10_-_Blue_Trbin` | Regex replaces digit runs; yields `Trbin` (see test). |
+| (same file as row above)<br>global index: `1` | `02.-.A.Moment's.Notice` | `11_-_b_Moment's_Notice` | |
 
 The list is loaded at filter **setup**; reload the preset or app after editing the file.

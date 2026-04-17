@@ -16,6 +16,6 @@ Examples match [`ExtractRightFilterTests`](../../../Mfr.Tests/Models/Filters/Tri
 |---------|--------|-------|---------|
 | `count`: `3` | `abcdef` | `def` | |
 | `count`: `0` | `abc` | *(empty)* | |
-| `count`: `100` (segment shorter) | `ab` | `ab` | |
+| `count`: `100`<br>(segment shorter than count) | `ab` | `ab` | |
 
 See [TrimRight](TrimRight.md) to **drop** a fixed number of characters from the right instead.

@@ -33,17 +33,17 @@ Examples below mirror [`LettersCaseFilterTests`](../../../Mfr.Tests/Models/Filte
 | `mode`: `LowerCase` | `HELLO` | `hello` | |
 | `mode`: `FirstLetterUp` | `hELLO world` | `Hello world` | |
 | `mode`: `FirstLetterUp` | ` 123_aBC` | ` 123_abc` | Leading non-letters unchanged; casing starts at first letter. |
-| `mode`: `WeirdCase`, `weirdUppercaseChancePercent`: `0` | `AbC XyZ` | `abc xyz` | 0% → all lowercase. |
-| `mode`: `WeirdCase`, `weirdUppercaseChancePercent`: `100` | `AbC XyZ` | `ABC XYZ` | 100% → all uppercase. |
-| `mode`: `TitleCase`, `skipWords`: `["a","the","for"]` | `a song for the world` | `a Song for the World` | `skipWords` stay lowercase. |
-| `mode`: `SentenceCase` (default sentence ends) | `hello world. next line.` | `Hello world. Next line.` | |
+| `mode`: `WeirdCase`<br>`weirdUppercaseChancePercent`: `0` | `AbC XyZ` | `abc xyz` | 0% → all lowercase. |
+| `mode`: `WeirdCase`<br>`weirdUppercaseChancePercent`: `100` | `AbC XyZ` | `ABC XYZ` | 100% → all uppercase. |
+| `mode`: `TitleCase`<br>`skipWords`: `["a","the","for"]` | `a song for the world` | `a Song for the World` | `skipWords` stay lowercase. |
+| `mode`: `SentenceCase`<br>(default [sentence-end characters](SentenceEndCharacters.md)) | `hello world. next line.` | `Hello world. Next line.` | |
 | `mode`: `InvertCase` | `Hello` | `hELLO` | |
-| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `":;"` then `mode`: `SentenceCase` | `hello: next; again. no` | `Hello: Next; Again. no` | |
-| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `""` then `SentenceCase` | `hello. next line` | `Hello. next line` | Empty set: no caps after punctuation, only at segment start. |
-| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `". "` then `SentenceCase` | `hello world. next line` | `Hello world. Next line` | Sentence end is the two-char sequence `. `, not `.` alone. |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"` then `SentenceCase` | `hello._world._again` | `Hello._World._Again` | |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"`, `TitleCase`, `skipWords`: `["the"]` | `__gone__with__the__wind__` | `__Gone__With__the__Wind__` | |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"` then `SentenceCase` | `hello.__world!___again?__done` | `Hello.__World!___Again?__Done` | |
-| Chain: [SpaceCharacter](../Space/SpaceCharacter.md) `spaceCharacter`: `"_"` then `SentenceCase` | `hello.world` | `Hello.world` | No word separator after `.`, so no capital after the period. |
+| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `":;"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello: next; again. no` | `Hello: Next; Again. no` | |
+| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `""`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello. next line` | `Hello. next line` | Empty set: no caps after punctuation, only at segment start. |
+| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `". "`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello world. next line` | `Hello world. Next line` | Sentence end is the two-char sequence `. `, not `.` alone. |
+| [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello._world._again` | `Hello._World._Again` | |
+| [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `TitleCase`<br>`skipWords`: `["the"]` | `__gone__with__the__wind__` | `__Gone__With__the__Wind__` | |
+| [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello.__world!___again?__done` | `Hello.__World!___Again?__Done` | |
+| [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello.world` | `Hello.world` | No word separator after `.`, so no capital after the period. |
 
 Unused option properties for a given `mode` are ignored.

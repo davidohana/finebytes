@@ -20,10 +20,10 @@ Replacements are applied in order: `%20`, then space, then underscore, then cust
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `spaceCharacter`: `"_"`, `replacePercent20`: `true`; others `false` | `Gone%20With%20The%20Wind` | `Gone_With_The_Wind` | |
-| `spaceCharacter`: space, `replaceSpaces`, `replaceUnderscores`, `replacePercent20`: `true` | `a_b c%20d` | `a b c d` | |
-| `spaceCharacter`: `"-"`, `customText`: `"++"`; others `false` | `a++b` | `a-b` | |
-| `spaceCharacter`: `"_"`, `replacePercent20`: `true`; then [LettersCase](../Case/LettersCase.md) `TitleCase`, `skipWords`: `["the"]` | `gone%20with%20the%20wind` | `Gone_With_the_Wind` | |
-| `spaceCharacter`: `"_"`, `replacePercent20`: `true`; others `false` | `my song` | `my song` | Text unchanged; `WordSeparator` still set to `_` for later filters. |
+| `spaceCharacter`: `"_"`<br>`replacePercent20`: `true`<br>other flags: `false` | `Gone%20With%20The%20Wind` | `Gone_With_The_Wind` | |
+| `spaceCharacter`: space<br>`replaceSpaces`: `true`<br>`replaceUnderscores`: `true`<br>`replacePercent20`: `true` | `a_b c%20d` | `a b c d` | |
+| `spaceCharacter`: `"-"`<br>`customText`: `"++"`<br>other flags: `false` | `a++b` | `a-b` | |
+| `spaceCharacter`: `"_"`<br>`replacePercent20`: `true`<br>[LettersCase](../Case/LettersCase.md)<br>`mode`: `TitleCase`<br>`skipWords`: `["the"]` | `gone%20with%20the%20wind` | `Gone_With_the_Wind` | |
+| `spaceCharacter`: `"_"`<br>`replacePercent20`: `true`<br>other flags: `false` | `my song` | `my song` | Text unchanged; `WordSeparator` still set to `_` for later filters. |
 
 Put this filter **before** any filter that should use a non-space word boundary.

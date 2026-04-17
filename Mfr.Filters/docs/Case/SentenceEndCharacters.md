@@ -16,6 +16,6 @@ The first two rows are no-ops on the segment (see **Comment**). The last row cha
 |---------|--------|-------|---------|
 | `characters`: `":;"` | `hello: world` | `hello: world` | No-op on text; only updates rename state. |
 | `characters`: `"-.!"` | `hello` | `hello` | Same. |
-| Chain: this filter `characters`: `"-.!"` then `LettersCase` `SentenceCase` | `a - b. c` | `A - B. C` | |
+| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `"-.!"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `a - b. c` | `A - B. C` | |
 
 Place **before** [LettersCase](LettersCase.md) (sentence mode) or [CasingList](CasingList.md) (sentence initials).

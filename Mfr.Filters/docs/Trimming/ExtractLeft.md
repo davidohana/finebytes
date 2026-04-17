@@ -16,6 +16,6 @@ Examples match [`ExtractLeftFilterTests`](../../../Mfr.Tests/Models/Filters/Trim
 |---------|--------|-------|---------|
 | `count`: `3` | `abcdef` | `abc` | |
 | `count`: `0` | `abc` | *(empty)* | |
-| `count`: `100` (segment shorter) | `ab` | `ab` | |
+| `count`: `100`<br>(segment shorter than count) | `ab` | `ab` | |
 
 See [TrimLeft](TrimLeft.md) to **drop** a fixed number of characters from the left instead.

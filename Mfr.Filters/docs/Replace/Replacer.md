@@ -27,16 +27,16 @@ Examples match [`ReplacerFilterTests`](../../../Mfr.Tests/Models/Filters/Replace
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `find`: `"a"`, `replacement`: `"X"`, `mode`: `Literal`, `caseSensitive`: `true`, `replaceAll`: `true` | `aba` | `XbX` | |
-| Same + `replaceAll`: `false` | `aba` | `Xba` | First match only. |
-| `find`: `"f*o"`, `replacement`: `"X"`, `mode`: `Wildcard`, `replaceAll`: `true` | `foo` | `X` | |
-| `find`: `"f?o"`, `replacement`: `"X"`, `mode`: `Wildcard`, `replaceAll`: `true` | `foo` or `fao` | `X` | |
-| `find`: `@"\d+"`, `replacement`: `"N"`, `mode`: `Regex`, `replaceAll`: `true` | `a12bc34` | `aNbcN` | |
-| Same + `replaceAll`: `false` | `a12bc34` | `aNbc34` | First digit run only. |
-| `find`: `"a"`, `replacement`: `"X"`, `mode`: `Literal`, `caseSensitive`: `false`, `replaceAll`: `true` | `AbA` | `XbX` | |
-| `find`: `"cat"`, `replacement`: `"dog"`, `mode`: `Literal`, `wholeWord`: `true`, `replaceAll`: `true` | `cat` | `dog` | |
-| Same | `category` | `category` | `cat` is a substring of `category`, not a whole word. |
-| Same | `a cat b` | `a dog b` | |
-| `find`: `"CAT"`, `replacement`: `"dog"`, `caseSensitive`: `false`, `wholeWord`: `true` | `Category` | `Category` | No standalone word `cat` in `Category` (substring doesn’t count). |
+| `find`: `"a"`<br>`replacement`: `"X"`<br>`mode`: `Literal`<br>`caseSensitive`: `true`<br>`replaceAll`: `true` | `aba` | `XbX` | |
+| `find`: `"a"`<br>`replacement`: `"X"`<br>`mode`: `Literal`<br>`caseSensitive`: `true`<br>`replaceAll`: `false` | `aba` | `Xba` | First match only. |
+| `find`: `"f*o"`<br>`replacement`: `"X"`<br>`mode`: `Wildcard`<br>`replaceAll`: `true` | `foo` | `X` | |
+| `find`: `"f?o"`<br>`replacement`: `"X"`<br>`mode`: `Wildcard`<br>`replaceAll`: `true` | `foo` or `fao` | `X` | |
+| `find`: `@"\d+"`<br>`replacement`: `"N"`<br>`mode`: `Regex`<br>`replaceAll`: `true` | `a12bc34` | `aNbcN` | |
+| `find`: `@"\d+"`<br>`replacement`: `"N"`<br>`mode`: `Regex`<br>`replaceAll`: `false` | `a12bc34` | `aNbc34` | First digit run only. |
+| `find`: `"a"`<br>`replacement`: `"X"`<br>`mode`: `Literal`<br>`caseSensitive`: `false`<br>`replaceAll`: `true` | `AbA` | `XbX` | |
+| `find`: `"cat"`<br>`replacement`: `"dog"`<br>`mode`: `Literal`<br>`wholeWord`: `true`<br>`replaceAll`: `true` | `cat` | `dog` | |
+| (same as row above) | `category` | `category` | `cat` is a substring of `category`, not a whole word. |
+| (same as row above) | `a cat b` | `a dog b` | |
+| `find`: `"CAT"`<br>`replacement`: `"dog"`<br>`mode`: `Literal`<br>`caseSensitive`: `false`<br>`wholeWord`: `true` | `Category` | `Category` | No standalone word `cat` in `Category` (substring doesn’t count). |
 
 For many rules from a file, use [ReplaceList](ReplaceList.md).

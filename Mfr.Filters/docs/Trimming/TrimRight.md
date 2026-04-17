@@ -16,6 +16,6 @@ Examples match [`TrimRightFilterTests`](../../../Mfr.Tests/Models/Filters/Trimmi
 |---------|--------|-------|---------|
 | `count`: `2` | `abcd` | `ab` | |
 | `count`: `0` | `ab` | `ab` | |
-| `count`: `10` (segment shorter) | `hi` | *(empty)* | Count past length clears the segment. |
+| `count`: `10`<br>(segment shorter than count) | `hi` | *(empty)* | Count past length clears the segment. |
 
 To **keep** only the last N characters, use [ExtractRight](ExtractRight.md).

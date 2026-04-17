@@ -15,6 +15,6 @@ Examples match [`StripParenthesesFilterTests`](../../../Mfr.Tests/Models/Filters
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `type`: `Round`, `removeContents`: `true` | `a(rem)b` | `ab` | |
-| `type`: `Round`, `removeContents`: `false` | `a(rem)` | `arem` | Delimiters removed; inner text kept. |
-| `type`: `Square`, `removeContents`: `true` | `a[xx]b` | `ab` | |
+| `type`: `Round`<br>`removeContents`: `true` | `a(rem)b` | `ab` | |
+| `type`: `Round`<br>`removeContents`: `false` | `a(rem)` | `arem` | Delimiters removed; inner text kept. |
+| `type`: `Square`<br>`removeContents`: `true` | `a[xx]b` | `ab` | |
