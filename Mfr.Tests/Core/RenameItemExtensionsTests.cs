@@ -20,13 +20,15 @@ namespace Mfr.Tests.Core
         public void ApplyFilters_AllFiltersDisabled_LeavesPreviewAtOriginal()
         {
             var item = FilterTestHelpers.CreateFile(prefix: "track", extension: ".mp3");
-            item.ApplyFilters(
-            [
+            var firstFilters = new BaseFilter[]
+            {
                 new ReplacerFilter(
                     Enabled: true,
                     Target: new FileNameTarget(FileNamePart.Prefix),
                     Options: new ReplacerOptions("track", "stale", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
-            ]);
+            };
+            firstFilters.SetupFilters();
+            item.ApplyFilters(firstFilters);
             var filters = new List<BaseFilter>
             {
                 new ReplacerFilter(
@@ -35,6 +37,7 @@ namespace Mfr.Tests.Core
                     Options: new ReplacerOptions("track", "song", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
             };
 
+            filters.SetupFilters();
             item.ApplyFilters(filters);
 
             Assert.Equal(item.Original.FullPath, item.Preview.FullPath);
@@ -61,6 +64,7 @@ namespace Mfr.Tests.Core
                     Options: new ReplacerOptions("old", "new", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
             };
 
+            filters.SetupFilters();
             item.ApplyFilters(filters);
 
             Assert.Equal("song new", item.Preview.Prefix);
@@ -87,6 +91,7 @@ namespace Mfr.Tests.Core
                     Options: new FormatterOptions("renamed.final.wav"))
             };
 
+            filters.SetupFilters();
             item.ApplyFilters(filters);
 
             Assert.Equal("renamed.final", item.Preview.Prefix);
@@ -109,6 +114,7 @@ namespace Mfr.Tests.Core
                     Options: new ReplacerOptions("a", "b", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
             };
 
+            filters.SetupFilters();
             var ex = Assert.Throws<NotSupportedException>(() => item.ApplyFilters(filters));
             Assert.Contains("target.family='FileName'", ex.Message);
         }

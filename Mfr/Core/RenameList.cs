@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Models;
 using Serilog;
 
@@ -106,6 +107,8 @@ namespace Mfr.Core
             {
                 item.ResetState();
             }
+
+            preset.Filters.SetupFilters();
 
             foreach (var renameItem in _renameItems)
             {

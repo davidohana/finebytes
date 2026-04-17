@@ -1,4 +1,5 @@
 using Mfr.Core;
+using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
 using Mfr.Models;
@@ -87,6 +88,7 @@ namespace Mfr.Tests.Models.Filters.Space
                 new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"]));
 
             var file = FilterTestHelpers.CreateFile(prefix: "gone%20with%20the%20wind");
+            new BaseFilter[] { spaceFilter, titleFilter }.SetupFilters();
             file.ApplyFilters([spaceFilter, titleFilter]);
 
             Assert.Equal("Gone_With_the_Wind", file.Preview.Prefix);
