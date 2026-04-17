@@ -2,8 +2,6 @@
 
 Removes **one kind** of bracket pair: round `()`, square `[]`, curly `{}`, or angle `<>`. Either delete **only the delimiters** or **the whole bracketed region** (delimiters + inside), depending on options.
 
-Examples match [`StripParenthesesFilterTests`](../../../Mfr.Tests/Models/Filters/Misc/StripParenthesesFilterTests.cs) (remix tags, editorial notes).
-
 ## Options
 
 | Property | Type | Description |

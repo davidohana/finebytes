@@ -2,8 +2,6 @@
 
 Uppercases the **single character immediately after** any character that appears in your configured list. Other characters are unchanged. If the list is empty, the segment is unchanged.
 
-Examples match [`CapitalizeAfterFilterTests`](../../../Mfr.Tests/Models/Filters/Case/CapitalizeAfterFilterTests.cs) (comma/punctuation in messy tags, custom `._` triggers).
-
 ## Options
 
 | Property | Type | Default | Description |

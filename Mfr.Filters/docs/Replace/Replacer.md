@@ -2,8 +2,6 @@
 
 Finds a **search** pattern in the target segment and replaces matches with **replacement** text. `mode` controls how `find` is interpreted.
 
-Examples match [`ReplacerFilterTests`](../../../Mfr.Tests/Models/Filters/Replace/ReplacerFilterTests.cs).
-
 ## Options
 
 | Property | Type | Description |

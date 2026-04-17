@@ -61,5 +61,18 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 new CounterOptions(Start: 10, Step: 5, Width: 0, PadChar: "0", Position: CounterPosition.Replace, Separator: "", ResetPerFolder: true));
             Assert.Equal("20", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 99, inFolderIndex: 2));
         }
+
+        /// <summary>
+        /// Verifies <c>padChar</c> <c>"1"</c> pads with space (documented in filter guide).
+        /// </summary>
+        [Fact]
+        public void Apply_PadCharSpace_PadsWithSpaces()
+        {
+            var f = new CounterFilter(
+                true,
+                _target,
+                new CounterOptions(Start: 7, Step: 1, Width: 4, PadChar: "1", Position: CounterPosition.Replace, Separator: "", ResetPerFolder: false));
+            Assert.Equal("   7", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 0));
+        }
     }
 }

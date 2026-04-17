@@ -1,3 +1,4 @@
+using System.Globalization;
 using Mfr.Filters.Formatting;
 
 namespace Mfr.Tests.Models.Filters.Formatting
@@ -85,6 +86,98 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     item: item));
 
             Assert.Contains("not supported", ex.Message);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-ext&gt;</c> matches documented <c>&lt;ext&gt;</c> behavior.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileExtToken_MatchesExtension()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(extension: ".flac");
+
+            var ext = FormatterTokenResolver.ResolveTemplate("<ext>", item);
+            var fileExt = FormatterTokenResolver.ResolveTemplate("<file-ext>", item);
+
+            Assert.Equal(".flac", ext);
+            Assert.Equal(".flac", fileExt);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;full-name&gt;</c> is prefix plus extension.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FullNameToken_ConcatenatesPrefixAndExtension()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a", extension: ".b");
+
+            var result = FormatterTokenResolver.ResolveTemplate("<full-name>", item);
+
+            Assert.Equal("a.b", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;full-path&gt;</c> matches combined directory and file name.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FullPathToken_MatchesFilePath()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                prefix: "song",
+                extension: ".mp3",
+                directory: @"D:\Music\Album");
+
+            var result = FormatterTokenResolver.ResolveTemplate("<full-path>", item);
+
+            Assert.Equal(item.Original.FullPath, result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;now&gt;</c> resolves to a round-trip ISO 8601 UTC string.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_NowToken_ProducesParseableUtcString()
+        {
+            var item = FilterTestHelpers.CreateRenameItem();
+
+            var result = FormatterTokenResolver.ResolveTemplate("<now>", item);
+
+            Assert.True(
+                DateTimeOffset.TryParse(
+                    result,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.RoundtripKind,
+                    out var parsed));
+            Assert.Equal(DateTimeKind.Utc, parsed.UtcDateTime.Kind);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;now:format&gt;</c> uses the format segment after the first colon.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_NowWithFormat_UsesSuppliedFormat()
+        {
+            var item = FilterTestHelpers.CreateRenameItem();
+
+            var result = FormatterTokenResolver.ResolveTemplate("<now:yyyy>", item);
+            var expectedYear = DateTimeOffset.UtcNow.ToString("yyyy", CultureInfo.InvariantCulture);
+
+            Assert.Equal(expectedYear, result);
+        }
+
+        /// <summary>
+        /// Verifies counter token pad mode <c>1</c> uses spaces (matches formatter docs).
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_CounterTokenPadModeSpace_PadsWithSpaces()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 0, inFolderIndex: 0);
+
+            var result = FormatterTokenResolver.ResolveTemplate(
+                template: "<counter:7,1,0,4,1>",
+                item: item);
+
+            Assert.Equal("   7", result);
         }
     }
 }

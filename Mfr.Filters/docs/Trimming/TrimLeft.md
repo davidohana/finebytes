@@ -2,8 +2,6 @@
 
 Removes a fixed number of characters from the **left** end of the segment. The count is clamped to the segment length.
 
-Examples match [`TrimLeftFilterTests`](../../../Mfr.Tests/Models/Filters/Trimming/TrimLeftFilterTests.cs).
-
 ## Options
 
 | Property | Type | Description |

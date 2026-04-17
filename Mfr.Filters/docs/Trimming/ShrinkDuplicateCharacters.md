@@ -2,8 +2,6 @@
 
 Collapses **runs** of the same chosen character into a **single** occurrence (for example `---` → `-`).
 
-Examples match [`ShrinkDuplicateCharactersFilterTests`](../../../Mfr.Tests/Models/Filters/Trimming/ShrinkDuplicateCharactersFilterTests.cs) (hyphenated artist–title strings).
-
 ## Options
 
 | Property | Type | Description |

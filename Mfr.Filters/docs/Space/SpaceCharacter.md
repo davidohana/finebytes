@@ -2,8 +2,6 @@
 
 Sets the **word separator** character for the rest of the rename pass and optionally **replaces** common stand-ins (normal spaces, underscores, `%20`, custom text) with that character. Later filters ([ShrinkSpaces](ShrinkSpaces.md), [RemoveSpaces](RemoveSpaces.md), strip-space filters, and case/casing-list word splitting) use `WordSeparator` (default is ordinary space until this filter runs).
 
-Examples match [`SpaceCharacterFilterTests`](../../../Mfr.Tests/Models/Filters/Space/SpaceCharacterFilterTests.cs) (URL-encoded spaces, mixed `_%20`, `++` placeholders, then title case).
-
 ## Options
 
 | Property | Type | Description |

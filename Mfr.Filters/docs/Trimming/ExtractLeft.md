@@ -2,8 +2,6 @@
 
 Keeps only the **first** `count` characters of the segment; the rest is removed.
 
-Examples match [`ExtractLeftFilterTests`](../../../Mfr.Tests/Models/Filters/Trimming/ExtractLeftFilterTests.cs).
-
 ## Options
 
 | Property | Type | Description |

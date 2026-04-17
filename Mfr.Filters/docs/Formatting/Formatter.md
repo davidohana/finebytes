@@ -2,8 +2,6 @@
 
 Replaces the **entire target segment** with the result of expanding a **template string**. Placeholders use angle brackets: `<token>` or `<name:arguments>`.
 
-Examples below match [`FormatterFilterTests`](../../../Mfr.Tests/Models/Filters/Formatting/FormatterFilterTests.cs) (album folder name, counter token with global index).
-
 ## Options
 
 | Property | Type | Description |
@@ -27,7 +25,7 @@ Unknown token names cause an error at runtime.
 
 ## Examples
 
-Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows use the **global** index passed to the filter (see tests).
+Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows use the **global** index passed to the filter.
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|

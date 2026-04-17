@@ -2,8 +2,6 @@
 
 Changes letter casing on the target segment. **Sentence case** and **title case** use the current [word separator](../Space/SpaceCharacter.md) (default: space). **Sentence case** also uses [sentence-end characters](SentenceEndCharacters.md) (default `.!?` until you add that filter).
 
-Examples below mirror [`LettersCaseFilterTests`](../../../Mfr.Tests/Models/Filters/Case/LettersCaseFilterTests.cs) (music-style titles where it helps).
-
 ## Options
 
 | Property | Type | Default | Description |

@@ -2,8 +2,6 @@
 
 Replaces **invalid file-name characters** (optional) and any **custom** characters you list with a single **replacement** string (often one safe character or empty).
 
-Examples match [`CleanerFilterTests`](../../../Mfr.Tests/Models/Filters/Replace/CleanerFilterTests.cs) (path separators, `@`/`#`, mixed illegal + custom).
-
 ## Options
 
 | Property | Type | Description |

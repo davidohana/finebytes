@@ -4,7 +4,7 @@ Loads a **casing list** text file: **one word per line** (after trim). Comments 
 
 Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceEndCharacters.md) and the word separator; place that filter **before** this one when you need custom sentence boundaries.
 
-Examples match [`CasingListFilterTests`](../../../Mfr.Tests/Models/Filters/Case/CasingListFilterTests.cs) (list file: `and`, `or`, `with`, `RMX` or `and`, `us`, `them` as noted).
+Example list files use words like `and`, `or`, `with`, `RMX` or `and`, `us`, `them` as noted in the rows below.
 
 ## Options
 

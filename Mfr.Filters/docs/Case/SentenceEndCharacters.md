@@ -10,7 +10,7 @@
 
 ## Examples
 
-The first two rows are no-ops on the segment (see **Comment**). The last row chains into [LettersCase](LettersCase.md) `SentenceCase` (from [`SentenceEndCharactersFilterTests`](../../../Mfr.Tests/Models/Filters/Case/SentenceEndCharactersFilterTests.cs)).
+The first two rows are no-ops on the segment (see **Comment**). The last row chains into [LettersCase](LettersCase.md) `SentenceCase`.
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|

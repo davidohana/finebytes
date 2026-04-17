@@ -2,7 +2,7 @@
 
 Collapses **each run** of the current **word separator** into a **single** character. The separator comes from [SpaceCharacter](SpaceCharacter.md) (default: space).
 
-No `options` object. Examples match [`ShrinkSpacesFilterTests`](../../../Mfr.Tests/Models/Filters/Space/ShrinkSpacesFilterTests.cs).
+No `options` object.
 
 ## Examples
 
