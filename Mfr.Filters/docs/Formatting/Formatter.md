@@ -2,7 +2,7 @@
 
 Replaces the **entire target segment** with the result of expanding a **template string**. Placeholders use angle brackets: `<token>` or `<name:arguments>`.
 
-Examples below match [`FormatterFilterTests`](../../Mfr.Tests/Models/Filters/Formatting/FormatterFilterTests.cs) (album folder name, counter token with global index).
+Examples below match [`FormatterFilterTests`](../../../Mfr.Tests/Models/Filters/Formatting/FormatterFilterTests.cs) (album folder name, counter token with global index).
 
 ## Options
 

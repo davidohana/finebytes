@@ -2,7 +2,7 @@
 
 Computes a numeric value from each file’s **global** or **per-folder** index and **prepends**, **appends**, or **replaces** the target segment with the formatted number.
 
-Examples match [`CounterFilterTests`](../../Mfr.Tests/Models/Filters/Formatting/CounterFilterTests.cs) (padded track numbers, `name_02`, per-folder reset).
+Examples match [`CounterFilterTests`](../../../Mfr.Tests/Models/Filters/Formatting/CounterFilterTests.cs) (padded track numbers, `name_02`, per-folder reset).
 
 ## Options
 

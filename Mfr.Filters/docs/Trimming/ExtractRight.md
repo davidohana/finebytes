@@ -2,7 +2,7 @@
 
 Keeps only the **last** `count` characters of the segment; the leading part is removed.
 
-Examples match [`ExtractRightFilterTests`](../../Mfr.Tests/Models/Filters/Trimming/ExtractRightFilterTests.cs).
+Examples match [`ExtractRightFilterTests`](../../../Mfr.Tests/Models/Filters/Trimming/ExtractRightFilterTests.cs).
 
 ## Options
 

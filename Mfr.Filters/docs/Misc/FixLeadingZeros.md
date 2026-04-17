@@ -2,7 +2,7 @@
 
 Finds **runs of digits** in the segment and rewrites them so their length matches the target **width** by adjusting **leading zeros**. If `width` is `0` or negative, the filter leaves the segment unchanged.
 
-Examples match [`FixLeadingZerosFilterTests`](../../Mfr.Tests/Models/Filters/Misc/FixLeadingZerosFilterTests.cs) (track numbers, `doc` + chapter, classical track titles).
+Examples match [`FixLeadingZerosFilterTests`](../../../Mfr.Tests/Models/Filters/Misc/FixLeadingZerosFilterTests.cs) (track numbers, `doc` + chapter, classical track titles).
 
 ## Options
 

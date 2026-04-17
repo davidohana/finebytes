@@ -2,7 +2,7 @@
 
 Deletes an **inclusive** range of character positions. Each end is a **1-based** index counted from the **left** or **right** side of the string. If the start lies after the end, the two positions are **swapped** before removal.
 
-The first example is the “Portishead” track-title case from [`TrimBetweenFilterTests.Apply_IssueExample`](../../Mfr.Tests/Models/Filters/Trimming/TrimBetweenFilterTests.cs).
+The first example is the “Portishead” track-title case from [`TrimBetweenFilterTests.Apply_IssueExample`](../../../Mfr.Tests/Models/Filters/Trimming/TrimBetweenFilterTests.cs).
 
 ## Options
 

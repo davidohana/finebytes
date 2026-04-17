@@ -2,7 +2,7 @@
 
 Loads a **replace list file** and applies **search/replace pairs** in file order—like multiple [Replacer](Replacer.md) steps sharing the same mode and flags. Replacement lines may include formatter tokens (for example `<counter:…>`) where supported.
 
-Examples match [`ReplaceListFilterTests`](../../Mfr.Tests/Models/Filters/Replace/ReplaceListFilterTests.cs) (ordered pairs, strip with `<EMPTY>`, regex + counter on track-style titles).
+Examples match [`ReplaceListFilterTests`](../../../Mfr.Tests/Models/Filters/Replace/ReplaceListFilterTests.cs) (ordered pairs, strip with `<EMPTY>`, regex + counter on track-style titles).
 
 ## Options
 

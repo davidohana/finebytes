@@ -21,41 +21,41 @@ Each filter page uses an **Examples** table with three columns: **Options**, **B
 
 ### Case
 
-- [CapitalizeAfter](CapitalizeAfter.md)
-- [CasingList](CasingList.md)
-- [LettersCase](LettersCase.md)
-- [SentenceEndCharacters](SentenceEndCharacters.md)
-- [UppercaseInitials](UppercaseInitials.md)
+- [CapitalizeAfter](Case/CapitalizeAfter.md)
+- [CasingList](Case/CasingList.md)
+- [LettersCase](Case/LettersCase.md)
+- [SentenceEndCharacters](Case/SentenceEndCharacters.md)
+- [UppercaseInitials](Case/UppercaseInitials.md)
 
 ### Formatting
 
-- [Counter](Counter.md)
-- [Formatter](Formatter.md)
+- [Counter](Formatting/Counter.md)
+- [Formatter](Formatting/Formatter.md)
 
 ### Misc
 
-- [FixLeadingZeros](FixLeadingZeros.md)
-- [StripParentheses](StripParentheses.md)
+- [FixLeadingZeros](Misc/FixLeadingZeros.md)
+- [StripParentheses](Misc/StripParentheses.md)
 
 ### Replace
 
-- [Cleaner](Cleaner.md)
-- [Replacer](Replacer.md)
-- [ReplaceList](ReplaceList.md)
+- [Cleaner](Replace/Cleaner.md)
+- [Replacer](Replace/Replacer.md)
+- [ReplaceList](Replace/ReplaceList.md)
 
 ### Space
 
-- [RemoveSpaces](RemoveSpaces.md)
-- [ShrinkSpaces](ShrinkSpaces.md)
-- [SpaceCharacter](SpaceCharacter.md)
-- [StripSpacesLeft](StripSpacesLeft.md)
-- [StripSpacesRight](StripSpacesRight.md)
+- [RemoveSpaces](Space/RemoveSpaces.md)
+- [ShrinkSpaces](Space/ShrinkSpaces.md)
+- [SpaceCharacter](Space/SpaceCharacter.md)
+- [StripSpacesLeft](Space/StripSpacesLeft.md)
+- [StripSpacesRight](Space/StripSpacesRight.md)
 
 ### Trimming
 
-- [ExtractLeft](ExtractLeft.md)
-- [ExtractRight](ExtractRight.md)
-- [ShrinkDuplicateCharacters](ShrinkDuplicateCharacters.md)
-- [TrimBetween](TrimBetween.md)
-- [TrimLeft](TrimLeft.md)
-- [TrimRight](TrimRight.md)
+- [ExtractLeft](Trimming/ExtractLeft.md)
+- [ExtractRight](Trimming/ExtractRight.md)
+- [ShrinkDuplicateCharacters](Trimming/ShrinkDuplicateCharacters.md)
+- [TrimBetween](Trimming/TrimBetween.md)
+- [TrimLeft](Trimming/TrimLeft.md)
+- [TrimRight](Trimming/TrimRight.md)

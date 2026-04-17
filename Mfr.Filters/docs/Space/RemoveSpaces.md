@@ -2,7 +2,7 @@
 
 Removes **every** occurrence of the current **word separator** character from the segment. The separator is set by [SpaceCharacter](SpaceCharacter.md); if that filter has not run, it is usually ordinary space.
 
-No `options` object. Examples match [`RemoveSpacesFilterTests`](../../Mfr.Tests/Models/Filters/Space/RemoveSpacesFilterTests.cs).
+No `options` object. Examples match [`RemoveSpacesFilterTests`](../../../Mfr.Tests/Models/Filters/Space/RemoveSpacesFilterTests.cs).
 
 ## Examples
 

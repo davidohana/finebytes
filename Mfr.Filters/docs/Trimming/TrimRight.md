@@ -2,7 +2,7 @@
 
 Removes a fixed number of characters from the **right** end of the segment. The count is clamped to the segment length.
 
-Examples match [`TrimRightFilterTests`](../../Mfr.Tests/Models/Filters/Trimming/TrimRightFilterTests.cs).
+Examples match [`TrimRightFilterTests`](../../../Mfr.Tests/Models/Filters/Trimming/TrimRightFilterTests.cs).
 
 ## Options
 

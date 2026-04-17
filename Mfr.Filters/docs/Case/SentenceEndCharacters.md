@@ -6,11 +6,11 @@
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `characters` | string | `".!?"` | Each character can end a sentence for sentence-style rules. Characters equal to the current [word separator](SpaceCharacter.md) are ignored when building the set. If empty, only the **start** of the segment gets a capital (for sentence case / sentence initials), not “after punctuation.” |
+| `characters` | string | `".!?"` | Each character can end a sentence for sentence-style rules. Characters equal to the current [word separator](../Space/SpaceCharacter.md) are ignored when building the set. If empty, only the **start** of the segment gets a capital (for sentence case / sentence initials), not “after punctuation.” |
 
 ## Examples
 
-Segment text is unchanged by this filter alone; the table shows **Before = After** for the segment. The last row shows the **effect on a following** [LettersCase](LettersCase.md) `SentenceCase` step (from [`SentenceEndCharactersFilterTests`](../../Mfr.Tests/Models/Filters/Case/SentenceEndCharactersFilterTests.cs)).
+Segment text is unchanged by this filter alone; the table shows **Before = After** for the segment. The last row shows the **effect on a following** [LettersCase](LettersCase.md) `SentenceCase` step (from [`SentenceEndCharactersFilterTests`](../../../Mfr.Tests/Models/Filters/Case/SentenceEndCharactersFilterTests.cs)).
 
 | Options | Before | After |
 |---------|--------|-------|
