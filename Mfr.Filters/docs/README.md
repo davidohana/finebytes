@@ -4,28 +4,45 @@ These notes describe the rename filters in this assembly. In preset JSON, each f
 
 **Order matters.** Some filters only affect *later* filters (for example `SpaceCharacter` sets the word separator; `SentenceEndCharacters` sets sentence-ending punctuation). Put those *before* the filters that should use the new settings.
 
-## Filters
+## Filters by group
+
+### Case
 
 - [CapitalizeAfter](CapitalizeAfter.md)
 - [CasingList](CasingList.md)
-- [Cleaner](Cleaner.md)
-- [Counter](Counter.md)
-- [ExtractLeft](ExtractLeft.md)
-- [ExtractRight](ExtractRight.md)
-- [FixLeadingZeros](FixLeadingZeros.md)
-- [Formatter](Formatter.md)
 - [LettersCase](LettersCase.md)
-- [RemoveSpaces](RemoveSpaces.md)
+- [SentenceEndCharacters](SentenceEndCharacters.md)
+- [UppercaseInitials](UppercaseInitials.md)
+
+### Formatting
+
+- [Counter](Counter.md)
+- [Formatter](Formatter.md)
+
+### Misc
+
+- [FixLeadingZeros](FixLeadingZeros.md)
+- [StripParentheses](StripParentheses.md)
+
+### Replace
+
+- [Cleaner](Cleaner.md)
 - [Replacer](Replacer.md)
 - [ReplaceList](ReplaceList.md)
-- [SentenceEndCharacters](SentenceEndCharacters.md)
-- [ShrinkDuplicateCharacters](ShrinkDuplicateCharacters.md)
+
+### Space
+
+- [RemoveSpaces](RemoveSpaces.md)
 - [ShrinkSpaces](ShrinkSpaces.md)
 - [SpaceCharacter](SpaceCharacter.md)
-- [StripParentheses](StripParentheses.md)
 - [StripSpacesLeft](StripSpacesLeft.md)
 - [StripSpacesRight](StripSpacesRight.md)
+
+### Trimming
+
+- [ExtractLeft](ExtractLeft.md)
+- [ExtractRight](ExtractRight.md)
+- [ShrinkDuplicateCharacters](ShrinkDuplicateCharacters.md)
 - [TrimBetween](TrimBetween.md)
 - [TrimLeft](TrimLeft.md)
 - [TrimRight](TrimRight.md)
-- [UppercaseInitials](UppercaseInitials.md)
