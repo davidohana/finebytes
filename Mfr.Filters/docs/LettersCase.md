@@ -2,26 +2,7 @@
 
 Changes letter casing on the target segment. **Sentence case** and **title case** use the current [word separator](SpaceCharacter.md) (default: space). **Sentence case** also uses [sentence-end characters](SentenceEndCharacters.md) (default `.!?` until you add that filter).
 
-## Preset fields
-
-| Field | Type | Description |
-|--------|------|-------------|
-| `type` | string | Must be `LettersCase`. |
-| `enabled` | bool | When `false`, the filter does nothing. |
-| `target` | object | See **Target** below. |
-| `options` | object | See **Options** below. |
-
-### Target
-
-`target` selects what is transformed. For file names, use `family` `FileName` and `fileNamePart`:
-
-| `fileNamePart` | Segment |
-|------------------|---------|
-| `Prefix` | Name without extension |
-| `Extension` | Extension including the leading dot |
-| `Full` | Full file name (prefix + extension) |
-
-### Options (`options`)
+## Options
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -42,40 +23,18 @@ Changes letter casing on the target segment. **Sentence case** and **title case*
 | `SentenceCase` | Whole segment lowercased, then first letter of segment and after sentence ends (see [SentenceEndCharacters](SentenceEndCharacters.md)), when followed by separator(s). |
 | `InvertCase` | Swap upper ↔ lower for letters. |
 
-## Examples (conceptual)
+## Examples
 
-**Upper case**
+**Upper case:** `Hello` → `HELLO`
 
-- Input: `Hello` → Output: `HELLO`
+**Title case with skip words:** `skipWords`: `["a","the","for"]` — `a song for the world` → `a Song for the World`
 
-**Title case with skip words**
+**Sentence case (defaults):** `hello world. next line.` → `Hello world. Next line.`
 
-- `skipWords`: `["a","the","for"]`  
-- Input: `a song for the world` → Output: `a Song for the World`
+**Weird case:** `weirdUppercaseChancePercent`: `0` → effectively all lowercase (for letters); `100` → all letters uppercase.
 
-**Sentence case (defaults)**
-
-- Input: `hello world. next line.` → Output: `Hello world. Next line.`
-
-**Weird case**
-
-- `weirdUppercaseChancePercent`: `0` → effectively all lowercase (for letters).  
-- `100` → all letters uppercase.
-
-**Example preset fragment (title case on prefix)**
+`skipWords`, `weirdUppercaseChancePercent`, and `weirdFixedPlaces` apply only to modes that use them.
 
 ```json
-{
-  "type": "LettersCase",
-  "enabled": true,
-  "target": { "family": "FileName", "fileNamePart": "Prefix" },
-  "options": {
-    "mode": "TitleCase",
-    "skipWords": [ "a", "the", "and" ],
-    "weirdUppercaseChancePercent": 50,
-    "weirdFixedPlaces": false
-  }
-}
+{ "mode": "TitleCase", "skipWords": ["a", "the", "and"], "weirdUppercaseChancePercent": 50, "weirdFixedPlaces": false }
 ```
-
-`skipWords`, `weirdUppercaseChancePercent`, and `weirdFixedPlaces` matter only for the modes that use them; other modes ignore them.

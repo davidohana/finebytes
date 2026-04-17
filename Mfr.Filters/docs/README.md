@@ -1,6 +1,17 @@
 # MFR filter guides
 
-These notes describe the rename filters in this assembly. In preset JSON, each filter has a `type` field and a `target` that selects which part of the file name is processed. Property names in examples use **camelCase** (for example `fileNamePart`, `uppercaseSentenceInitial`), matching typical `System.Text.Json` serialization for this project. Enum values usually match the C# names (for example `TitleCase`, `Literal`, `Prefix`).
+These pages document **per-filter `options`** (and behavior). Common preset fields are described once here.
+
+## Preset shape
+
+Each filter in a preset has:
+
+- `type` — discriminator string (same name as the filter, e.g. `LettersCase`).
+- `enabled` — if `false`, the filter is skipped.
+- `target` — what is transformed (for file names: `{ "family": "FileName", "fileNamePart": "Prefix" | "Extension" | "Full" }` — **Prefix** = name without extension, **Extension** = extension including the dot, **Full** = full file name).
+- `options` — optional object; filters with no settings omit it.
+
+Property names use **camelCase**; enum values usually match the C# names (e.g. `TitleCase`, `Literal`).
 
 **Order matters.** Some filters only affect *later* filters (for example `SpaceCharacter` sets the word separator; `SentenceEndCharacters` sets sentence-ending punctuation). Put those *before* the filters that should use the new settings.
 

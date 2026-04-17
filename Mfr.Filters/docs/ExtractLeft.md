@@ -2,16 +2,7 @@
 
 Keeps only the **first** `count` characters of the segment; the rest is removed.
 
-## Preset fields
-
-| Field | Type | Description |
-|--------|------|-------------|
-| `type` | string | Must be `ExtractLeft`. |
-| `enabled` | bool | When `false`, the filter does nothing. |
-| `target` | object | See [LettersCase](LettersCase.md). |
-| `options` | object | See below. |
-
-### Options (`options`)
+## Options
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -19,20 +10,11 @@ Keeps only the **first** `count` characters of the segment; the rest is removed.
 
 ## Examples
 
-- `count`: `4`, input `ABCDEF` → `ABCD`
-- `count`: `0` → empty string
-
-**Example preset fragment**
-
-```json
-{
-  "type": "ExtractLeft",
-  "enabled": true,
-  "target": { "family": "FileName", "fileNamePart": "Prefix" },
-  "options": {
-    "count": 4
-  }
-}
-```
+- `count`: `4` — `ABCDEF` → `ABCD`
+- `count`: `0` — empty string
 
 See [TrimLeft](TrimLeft.md) to **drop** a fixed number of characters from the left instead.
+
+```json
+{ "count": 4 }
+```

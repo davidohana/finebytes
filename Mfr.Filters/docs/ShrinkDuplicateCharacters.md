@@ -2,16 +2,7 @@
 
 Collapses **runs** of the same chosen character into a **single** occurrence (for example `---` → `-`).
 
-## Preset fields
-
-| Field | Type | Description |
-|--------|------|-------------|
-| `type` | string | Must be `ShrinkDuplicateCharacters`. |
-| `enabled` | bool | When `false`, the filter does nothing. |
-| `target` | object | See [LettersCase](LettersCase.md). |
-| `options` | object | See below. |
-
-### Options (`options`)
+## Options
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -19,18 +10,9 @@ Collapses **runs** of the same chosen character into a **single** occurrence (fo
 
 ## Examples
 
-- `character`: `"-"`, input `a---b` → `a-b`
-- `character`: `"."`, input `foo...bar` → `foo.bar`
-
-**Example preset fragment**
+- `character`: `"-"` — `a---b` → `a-b`
+- `character`: `"."` — `foo...bar` → `foo.bar`
 
 ```json
-{
-  "type": "ShrinkDuplicateCharacters",
-  "enabled": true,
-  "target": { "family": "FileName", "fileNamePart": "Prefix" },
-  "options": {
-    "character": "-"
-  }
-}
+{ "character": "-" }
 ```

@@ -2,16 +2,7 @@
 
 Removes a fixed number of characters from the **right** end of the segment. The count is clamped to the segment length.
 
-## Preset fields
-
-| Field | Type | Description |
-|--------|------|-------------|
-| `type` | string | Must be `TrimRight`. |
-| `enabled` | bool | When `false`, the filter does nothing. |
-| `target` | object | See [LettersCase](LettersCase.md). |
-| `options` | object | See below. |
-
-### Options (`options`)
+## Options
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -19,19 +10,10 @@ Removes a fixed number of characters from the **right** end of the segment. The 
 
 ## Examples
 
-- `count`: `2`, input `ABCDEF` → `ABCD`
-
-**Example preset fragment**
-
-```json
-{
-  "type": "TrimRight",
-  "enabled": true,
-  "target": { "family": "FileName", "fileNamePart": "Prefix" },
-  "options": {
-    "count": 2
-  }
-}
-```
+- `count`: `2` — `ABCDEF` → `ABCD`
 
 To **keep** only the last N characters, use [ExtractRight](ExtractRight.md).
+
+```json
+{ "count": 2 }
+```
