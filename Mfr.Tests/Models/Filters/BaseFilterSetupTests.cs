@@ -42,6 +42,22 @@ namespace Mfr.Tests.Models.Filters
             Assert.Contains("setup must complete before transform", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// Verifies that setup failures propagate and keep the filter unusable for transform/apply.
+        /// </summary>
+        [Fact]
+        public void Setup_WhenSetupThrows_PropagatesAndApplyStillFails()
+        {
+            var filter = new ThrowingSetupFilter(Enabled: true, Target: _target);
+            var item = FilterTestHelpers.CreateFile(prefix: "first");
+
+            var setupEx = Assert.Throws<InvalidOperationException>(filter.Setup);
+            Assert.Equal("Setup failed.", setupEx.Message);
+
+            var applyEx = Assert.Throws<InvalidOperationException>(() => filter.Apply(item));
+            Assert.Contains("setup must complete before transform", applyEx.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
         private sealed record SetupCountingFilter(bool Enabled, FilterTarget Target) : BaseFilter(Enabled, Target)
         {
             public override string Type => "SetupCounting";
@@ -56,6 +72,21 @@ namespace Mfr.Tests.Models.Filters
             protected override string _TransformSegment(string segment, RenameItem item)
             {
                 return $"{segment}-{SetupCount}";
+            }
+        }
+
+        private sealed record ThrowingSetupFilter(bool Enabled, FilterTarget Target) : BaseFilter(Enabled, Target)
+        {
+            public override string Type => "ThrowingSetup";
+
+            protected override void _Setup()
+            {
+                throw new InvalidOperationException("Setup failed.");
+            }
+
+            protected override string _TransformSegment(string segment, RenameItem item)
+            {
+                return segment;
             }
         }
     }

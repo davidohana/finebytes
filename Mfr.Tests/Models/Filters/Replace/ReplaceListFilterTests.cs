@@ -1,4 +1,4 @@
-using Mfr.Filters;
+using Mfr.Core;
 using Mfr.Filters.Replace;
 using Mfr.Models;
 
@@ -188,6 +188,24 @@ namespace Mfr.Tests.Models.Filters.Replace
             {
                 _DeleteIfExists(replaceListFilePath);
             }
+        }
+
+        /// <summary>
+        /// Verifies setup fails when file path is invalid.
+        /// </summary>
+        [Fact]
+        public void Setup_MissingFile_ThrowsUserException()
+        {
+            var missingFilePath = Path.Combine(Path.GetTempPath(), $"mfr-replace-list-missing-{Guid.NewGuid():N}.txt");
+            var filter = _CreateFilter(
+                filePath: missingFilePath,
+                mode: ReplacerMode.Literal,
+                caseSensitive: true,
+                replaceAll: true,
+                wholeWord: false);
+
+            var ex = Assert.Throws<UserException>(filter.Setup);
+            Assert.Contains("Replace-list file not found", ex.Message, StringComparison.Ordinal);
         }
 
         private static ReplaceListFilter _CreateFilter(
