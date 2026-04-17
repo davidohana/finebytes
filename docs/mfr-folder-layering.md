@@ -346,7 +346,7 @@ Reserve names and layout **before** implementation so the repo (or solution) can
 | Placeholder | Layer | Assembly / folder | Initial contents |
 |-------------|-------|-------------------|------------------|
 | **`Mfr.Metadata`** | L2.5 | Repo root: `Mfr.Metadata/` + `Mfr.Metadata.csproj` | Class library targeting same TFM as `Mfr`; single stub type with XML doc “Reserved for TagLib/EXIF/HTTP adapters”; **no** reference from `Mfr` until **Core → Mfr.Metadata** is wired. |
-| **`App/Ui/`** | L4 *(inside single **App** root)* | Under [`Mfr/`](../Mfr): **`Mfr/App/Ui/`** — **not** a second top-level layer folder next to **`App/`**. Optional `README` or empty `.csproj` fragment if using multi-target; namespace e.g. **`Mfr.App.Ui`** or **`Mfr.Ui`** per project choice. |
+| **`Mfr.App.Ui/`** | L4 *(inside single **App** root)* | Repo sibling folder **`Mfr.App.Ui/`** (project namespace e.g. **`Mfr.App.Ui`**) representing the UI app surface. |
 
 **`App/Cli/`** is the current home for CLI code (same **L4** root **`App/`**). **[`Program.cs`](../Mfr/Program.cs)** stays at **`Mfr/`** root — **no** **`Host/`** folder.
 
