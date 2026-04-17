@@ -1,6 +1,6 @@
 # finebytes
 
-## Common Developer Tasks
+## Quick Start
 
 ### Prerequisites
 
@@ -25,51 +25,7 @@ just run-help
 
 Run `just` by itself to list available targets.
 
-### Restore Dependencies
-
-Windows (PowerShell):
-
-```powershell
-dotnet restore .\Mfr\Mfr.csproj
-dotnet restore .\Mfr.Tests\Mfr.Tests.csproj
-```
-
-Linux (bash):
-
-```bash
-dotnet restore ./Mfr/Mfr.csproj
-dotnet restore ./Mfr.Tests/Mfr.Tests.csproj
-```
-
-### Compile (Build)
-
-Windows (PowerShell):
-
-```powershell
-dotnet build .\Mfr\Mfr.csproj -c Debug
-dotnet build .\Mfr.Tests\Mfr.Tests.csproj -c Debug
-```
-
-Linux (bash):
-
-```bash
-dotnet build ./Mfr/Mfr.csproj -c Debug
-dotnet build ./Mfr.Tests/Mfr.Tests.csproj -c Debug
-```
-
-### Run Unit Tests
-
-Windows (PowerShell):
-
-```powershell
-dotnet test .\Mfr.Tests\Mfr.Tests.csproj -c Debug
-```
-
-Linux (bash):
-
-```bash
-dotnet test ./Mfr.Tests/Mfr.Tests.csproj -c Debug
-```
+For contributor workflow, formatting/linting expectations, and pre-commit checks, see `CONTRIBUTING.md`.
 
 ### Run the CLI App
 
