@@ -4,7 +4,7 @@
 - Use `just` for common tasks: `restore`, `build`, `test`, `format`.
 - Before committing, run `dotnet format .\finebytes.slnx` then `dotnet build .\finebytes.slnx`.
 - Follow project code style from `.editorconfig`.
-- This project favors forward refactors over legacy compatibility shims.
+- Follow constraints in `.cursor/rules/*.mdc`.
 
 ## References
 - `CONTRIBUTING.md`
