@@ -60,6 +60,7 @@ namespace Mfr.Core
                     new JsonDerivedType(typeof(StripParenthesesFilter), "StripParentheses"),
                     new JsonDerivedType(typeof(CapitalizeAfterFilter), "CapitalizeAfter"),
                     new JsonDerivedType(typeof(UppercaseInitialsFilter), "UppercaseInitials"),
+                    new JsonDerivedType(typeof(CasingListFilter), "CasingList"),
                     new JsonDerivedType(typeof(StripSpacesLeftFilter), "StripSpacesLeft"),
                     new JsonDerivedType(typeof(StripSpacesRightFilter), "StripSpacesRight"),
                     new JsonDerivedType(typeof(TrimBetweenFilter), "TrimBetween")
