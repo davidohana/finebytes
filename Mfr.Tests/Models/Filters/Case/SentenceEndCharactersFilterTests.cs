@@ -1,4 +1,3 @@
-using Mfr.Core;
 using Mfr.Filters.Case;
 using Mfr.Models;
 
@@ -41,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a - b. c");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersCaseFilter]);
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("A - B. C", item.Preview.Prefix);
         }

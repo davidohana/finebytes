@@ -1,4 +1,3 @@
-using Mfr.Core;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
 using Mfr.Models;
@@ -142,7 +141,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello: next; again. no");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersFilter]);
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("Hello: Next; Again. no", item.Preview.Prefix);
         }
@@ -162,7 +161,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello. next line");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersFilter]);
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("Hello. next line", item.Preview.Prefix);
         }
@@ -182,7 +181,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello world. next line");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersFilter]);
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("Hello world. Next line", item.Preview.Prefix);
         }
@@ -205,7 +204,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var item = FilterTestHelpers.CreateRenameItem(prefix: "hello._world._again");
             var chain = FilterChain.CreateAllEnabled([spaceCharFilter, sentenceFilter]);
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
             Assert.Equal("Hello._World._Again", item.Preview.Prefix);
         }
 
@@ -230,7 +229,7 @@ namespace Mfr.Tests.Models.Filters.Case
 
             var chain = FilterChain.CreateAllEnabled([spaceCharFilter, titleFilter]);
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("__Gone__With__the__Wind__", item.Preview.Prefix);
         }
@@ -254,7 +253,7 @@ namespace Mfr.Tests.Models.Filters.Case
 
             var chain = FilterChain.CreateAllEnabled([spaceCharFilter, sentenceFilter]);
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("Hello.__World!___Again?__Done", item.Preview.Prefix);
         }
@@ -278,7 +277,7 @@ namespace Mfr.Tests.Models.Filters.Case
 
             var chain = FilterChain.CreateAllEnabled([spaceCharFilter, sentenceFilter]);
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("Hello.world", item.Preview.Prefix);
         }

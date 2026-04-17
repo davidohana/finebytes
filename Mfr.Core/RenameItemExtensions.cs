@@ -9,29 +9,6 @@ namespace Mfr.Core
     public static class RenameItemExtensions
     {
         /// <summary>
-        /// Applies enabled steps in the chain to update the item's preview file name.
-        /// </summary>
-        /// <param name="item">The rename item receiving transformed preview metadata.</param>
-        /// <param name="chain">The configured filter chain.</param>
-        /// <remarks>
-        /// Call <see cref="FilterChain.SetupFilters"/> once for <paramref name="chain"/> before the first apply
-        /// (for example from <c>RenameList.Preview</c>); this method does not run setup.
-        /// </remarks>
-        public static void ApplyFilters(this RenameItem item, FilterChain chain)
-        {
-            item.ClearPreview();
-            foreach (var step in chain.Steps)
-            {
-                if (!step.Enabled)
-                {
-                    continue;
-                }
-
-                step.Filter.Apply(item);
-            }
-        }
-
-        /// <summary>
         /// Logs debug details for one item when preview produced a destination path change.
         /// </summary>
         /// <param name="renameItem">The previewed item to inspect.</param>

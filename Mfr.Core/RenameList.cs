@@ -113,7 +113,7 @@ namespace Mfr.Core
             {
                 try
                 {
-                    renameItem.ApplyFilters(preset.Chain);
+                    preset.Chain.ApplyFilters(renameItem);
                     renameItem.Status = RenameStatus.PreviewOk;
                 }
                 catch (Exception ex)

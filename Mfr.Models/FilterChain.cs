@@ -48,5 +48,27 @@ namespace Mfr.Models
                 step.Filter.Setup();
             }
         }
+
+        /// <summary>
+        /// Clears preview and applies enabled steps in order to update the item's preview file name.
+        /// </summary>
+        /// <param name="item">The rename item receiving transformed preview metadata.</param>
+        /// <remarks>
+        /// Call <see cref="SetupFilters"/> once before the first apply
+        /// (for example from <c>RenameList.Preview</c>); this method does not run setup.
+        /// </remarks>
+        public void ApplyFilters(RenameItem item)
+        {
+            item.ClearPreview();
+            foreach (var step in Steps)
+            {
+                if (!step.Enabled)
+                {
+                    continue;
+                }
+
+                step.Filter.Apply(item);
+            }
+        }
     }
 }

@@ -1,4 +1,3 @@
-using Mfr.Core;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
 using Mfr.Models;
@@ -8,7 +7,7 @@ using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 namespace Mfr.Tests.Core
 {
     /// <summary>
-    /// Tests for <see cref="RenameItemExtensions"/>.
+    /// Tests for <see cref="FilterChain.ApplyFilters"/>.
     /// </summary>
     public class RenameItemExtensionsTests
     {
@@ -26,7 +25,7 @@ namespace Mfr.Tests.Core
                     Options: new ReplacerOptions("track", "stale", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
             ]);
             firstChain.SetupFilters();
-            item.ApplyFilters(firstChain);
+            firstChain.ApplyFilters(item);
             var chain = new FilterChain
             {
                 Steps =
@@ -40,7 +39,7 @@ namespace Mfr.Tests.Core
             };
 
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal(item.Original.FullPath, item.Preview.FullPath);
             Assert.Equal(item.Original.Prefix, item.Preview.Prefix);
@@ -65,7 +64,7 @@ namespace Mfr.Tests.Core
             ]);
 
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("song new", item.Preview.Prefix);
             Assert.Equal(".mp3", item.Preview.Extension);
@@ -90,7 +89,7 @@ namespace Mfr.Tests.Core
             ]);
 
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("renamed.final", item.Preview.Prefix);
             Assert.Equal(".wav", item.Preview.Extension);
@@ -112,7 +111,7 @@ namespace Mfr.Tests.Core
             ]);
 
             chain.SetupFilters();
-            var ex = Assert.Throws<NotSupportedException>(() => item.ApplyFilters(chain));
+            var ex = Assert.Throws<NotSupportedException>(() => chain.ApplyFilters(item));
             Assert.Contains("target.family='FileName'", ex.Message);
         }
 

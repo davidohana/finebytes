@@ -1,6 +1,5 @@
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
-using Mfr.Core;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Case
@@ -65,7 +64,7 @@ namespace Mfr.Tests.Models.Filters.Case
                 var item = FilterTestHelpers.CreateRenameItem(prefix: "03 - WiTH Or Without You Rmx");
                 var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, casingFilter]);
                 chain.SetupFilters();
-                item.ApplyFilters(chain);
+                chain.ApplyFilters(item);
                 var result = item.Preview.Prefix;
 
                 Assert.Equal("03 - With or Without You RMX", result);
@@ -105,7 +104,7 @@ namespace Mfr.Tests.Models.Filters.Case
 
                 var item = FilterTestHelpers.CreateRenameItem(prefix: "US_AND_THEM");
                 chain.SetupFilters();
-                item.ApplyFilters(chain);
+                chain.ApplyFilters(item);
 
                 Assert.Equal("Us_and_them", item.Preview.Prefix);
             }

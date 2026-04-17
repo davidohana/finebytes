@@ -1,4 +1,3 @@
-using Mfr.Core;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
 using Mfr.Models;
@@ -84,7 +83,7 @@ namespace Mfr.Tests.Models.Filters.Space
             var item = FilterTestHelpers.CreateRenameItem(prefix: "gone%20with%20the%20wind");
             var chain = FilterChain.CreateAllEnabled([spaceFilter, titleFilter]);
             chain.SetupFilters();
-            item.ApplyFilters(chain);
+            chain.ApplyFilters(item);
 
             Assert.Equal("Gone_With_the_Wind", item.Preview.Prefix);
         }
