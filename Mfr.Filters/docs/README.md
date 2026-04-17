@@ -2,21 +2,6 @@
 
 These pages document **per-filter `options`** (and behavior). Common preset fields are described once here.
 
-## Preset shape
-
-Each filter in a preset has:
-
-- `type` — discriminator string (same name as the filter, e.g. `LettersCase`).
-- `enabled` — if `false`, the filter is skipped.
-- `target` — what is transformed (for file names: `{ "family": "FileName", "fileNamePart": "Prefix" | "Extension" | "Full" }` — **Prefix** = name without extension, **Extension** = extension including the dot, **Full** = full file name).
-- `options` — optional object; filters with no settings omit it.
-
-Property names use **camelCase**; enum values usually match the C# names (e.g. `TitleCase`, `Literal`).
-
-Each filter page uses an **Examples** table with four columns: **Options**, **Before**, **After**, and **Comment**. Use **Comment** only when the row is non-obvious (edge case, chain order, or why the result differs from a first guess); otherwise leave it empty. In **Options**, put each option property on its **own line** (HTML `<br>` in the markdown source).
-
-**Order matters.** Some filters only affect *later* filters (for example `SpaceCharacter` sets the word separator; `SentenceEndCharacters` sets sentence-ending punctuation). Put those *before* the filters that should use the new settings.
-
 ## Filters by group
 
 ### Case
@@ -62,3 +47,71 @@ Each filter page uses an **Examples** table with four columns: **Options**, **Be
 - [TrimBetween](Trimming/TrimBetween.md)
 - [TrimLeft](Trimming/TrimLeft.md)
 - [TrimRight](Trimming/TrimRight.md)
+
+## Preset shape
+
+Each filter in a preset has:
+
+- `type` — discriminator string (same name as the filter, e.g. `LettersCase`).
+- `enabled` — if `false`, the filter is skipped.
+- `target` — what is transformed (for file names: `{ "family": "FileName", "fileNamePart": "Prefix" | "Extension" | "Full" }` — **Prefix** = name without extension, **Extension** = extension including the dot, **Full** = full file name).
+- `options` — optional object; filters with no settings omit it.
+
+Property names use **camelCase**; enum values usually match the C# names (e.g. `TitleCase`, `Literal`).
+
+Each filter page uses an **Examples** table with four columns: **Options**, **Before**, **After**, and **Comment**. Use **Comment** only when the row is non-obvious (edge case, chain order, or why the result differs from a first guess); otherwise leave it empty. In **Options**, put each option property on its **own line** (HTML `<br>` in the markdown source).
+
+**Order matters.** Some filters only affect *later* filters (for example `SpaceCharacter` sets the word separator; `SentenceEndCharacters` sets sentence-ending punctuation). Put those *before* the filters that should use the new settings.
+
+### Sample full preset
+
+Top-level object for `presets.json`: a `presets` array; each item has `id`, `name`, optional `description`, and `chain`. Each `chain.steps[]` entry has `enabled` and `filter` (the same JSON shape as on each filter page, wrapped in a step).
+
+```json
+{
+  "presets": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "name": "Word boundary then title case",
+      "description": "Underscore as separator, then title-case the prefix.",
+      "chain": {
+        "steps": [
+          {
+            "enabled": true,
+            "filter": {
+              "type": "SpaceCharacter",
+              "target": {
+                "family": "FileName",
+                "fileNamePart": "Prefix"
+              },
+              "options": {
+                "spaceCharacter": "_",
+                "replaceSpaces": true,
+                "replaceUnderscores": false,
+                "replacePercent20": false,
+                "customText": ""
+              }
+            }
+          },
+          {
+            "enabled": true,
+            "filter": {
+              "type": "LettersCase",
+              "target": {
+                "family": "FileName",
+                "fileNamePart": "Prefix"
+              },
+              "options": {
+                "mode": "TitleCase",
+                "skipWords": ["the", "a"],
+                "weirdUppercaseChancePercent": 50,
+                "weirdFixedPlaces": false
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```

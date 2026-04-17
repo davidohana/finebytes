@@ -4,14 +4,14 @@ using Mfr.Core;
 using Mfr.Filters.Space;
 using Mfr.Models;
 
-namespace Mfr.Tests.Core;
-
-public class PresetJsonShapeProbeTests
+namespace Mfr.Tests.Core
 {
-    [Fact]
-    public void CamelCase_preset_json_roundtrips()
+    public class PresetJsonShapeProbeTests
     {
-        var json = /*lang=json,strict*/ """
+        [Fact]
+        public void CamelCase_preset_json_roundtrips()
+        {
+            var json = /*lang=json,strict*/ """
             {
               "presets": [
                 {
@@ -36,14 +36,15 @@ public class PresetJsonShapeProbeTests
             }
             """;
 
-        var container = JsonSerializer.Deserialize<PresetContainerWrapper>(json, PresetJsonOptions.Default);
-        Assert.NotNull(container);
-        Assert.Single(container!.Presets);
-        var step = container.Presets[0].Chain.Steps[0];
-        Assert.True(step.Enabled);
-        Assert.IsType<SeparateCapitalizedTextFilter>(step.Filter);
-    }
+            var container = JsonSerializer.Deserialize<PresetContainerWrapper>(json, PresetJsonOptions.Default);
+            Assert.NotNull(container);
+            Assert.Single(container.Presets);
+            var step = container.Presets[0].Chain.Steps[0];
+            Assert.True(step.Enabled);
+            Assert.IsType<SeparateCapitalizedTextFilter>(step.Filter);
+        }
 
-    private sealed record PresetContainerWrapper(
-        [property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets);
+        private sealed record PresetContainerWrapper(
+            [property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets);
+    }
 }
