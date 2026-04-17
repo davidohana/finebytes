@@ -2,6 +2,8 @@
 
 Removes **one kind** of bracket pair: round `()`, square `[]`, curly `{}`, or angle `<>`. Either delete **only the delimiters** or **the whole bracketed region** (delimiters + inside), depending on options.
 
+Examples match [`StripParenthesesFilterTests`](../../Mfr.Tests/Models/Filters/Misc/StripParenthesesFilterTests.cs) (remix tags, editorial notes).
+
 ## Options
 
 | Property | Type | Description |
@@ -13,6 +15,6 @@ Removes **one kind** of bracket pair: round `()`, square `[]`, curly `{}`, or an
 
 | Options | Before | After |
 |---------|--------|-------|
-| `type`: `Round`, `removeContents`: `true` | `Song (live)` | `Song ` (space may remain) |
-| `type`: `Round`, `removeContents`: `false` | `Song (live)` | `Song live` |
-| `type`: `Square`, `removeContents`: `true` | `Song [EP]` | `Song ` |
+| `type`: `Round`, `removeContents`: `true` | `a(rem)b` | `ab` |
+| `type`: `Round`, `removeContents`: `false` | `a(rem)` | `arem` |
+| `type`: `Square`, `removeContents`: `true` | `a[xx]b` | `ab` |

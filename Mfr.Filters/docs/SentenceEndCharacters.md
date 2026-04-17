@@ -1,6 +1,6 @@
 # SentenceEndCharacters
 
-**Does not change the text.** It updates the rename item’s **sentence-end character set** for the rest of the filter chain. [LettersCase](LettersCase.md) in **sentence** mode and [CasingList](CasingList.md) with **uppercase sentence initial** read this set.
+**Does not change the segment text.** It updates the rename item’s **sentence-end character set** for the rest of the filter chain. [LettersCase](LettersCase.md) in **sentence** mode and [CasingList](CasingList.md) with **uppercase sentence initial** read this set.
 
 ## Options
 
@@ -10,12 +10,12 @@
 
 ## Examples
 
-This filter does **not** change the segment text; it only updates settings for later filters.
+Segment text is unchanged by this filter alone; the table shows **Before = After** for the segment. The last row shows the **effect on a following** [LettersCase](LettersCase.md) `SentenceCase` step (from [`SentenceEndCharactersFilterTests`](../../Mfr.Tests/Models/Filters/Case/SentenceEndCharactersFilterTests.cs)).
 
 | Options | Before | After |
 |---------|--------|-------|
-| `characters`: `".!?"` (default) | `hello` | `hello` |
+| `characters`: `":;"` | `hello: world` | `hello: world` |
 | `characters`: `"-.!"` | `hello` | `hello` |
-| `characters`: `""` | `hello` | `hello` |
+| Chain: this filter `characters`: `"-.!"` then `LettersCase` `SentenceCase` | `a - b. c` | `A - B. C` |
 
-Place **before** [LettersCase](LettersCase.md) (sentence mode) or [CasingList](CasingList.md) (sentence initials). The **effect** shows up in those filters, not in the segment here.
+Place **before** [LettersCase](LettersCase.md) (sentence mode) or [CasingList](CasingList.md) (sentence initials).

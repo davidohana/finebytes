@@ -2,6 +2,8 @@
 
 Replaces the **entire target segment** with the result of expanding a **template string**. Placeholders use angle brackets: `<token>` or `<name:arguments>`.
 
+Examples below match [`FormatterFilterTests`](../../Mfr.Tests/Models/Filters/Formatting/FormatterFilterTests.cs) (album folder name, counter token with global index).
+
 ## Options
 
 | Property | Type | Description |
@@ -25,12 +27,12 @@ Unknown token names cause an error at runtime.
 
 ## Examples
 
-Assume original file: `C:\Music\Album\song.flac` (prefix `song`, extension `.flac`, parent folder `Album`).
+Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows use the **global** index passed to the filter (see tests).
 
 | Options | Before | After |
 |---------|--------|-------|
-| `template`: `"<file-name> (remaster)<ext>"` | `song` (prefix segment) | `song (remaster).flac` |
-| `template`: `"<parent-folder> - <file-name>"` | `song` | `Album - song` |
-| `template`: `"<counter:10,1,0,2,0>"` (global index `0`) | `x` | `10` |
+| `template`: `"<file-name>"` | `song` | `song` |
+| `template`: `"<parent-folder>"` (file under `Music\My Album\`) | `ignored` | `My Album` |
+| `template`: `"<counter:10,2,0,4,0>"` (global index `3`) | `ignored` | `0016` |
 
 For sequential numbering without a full template, see [Counter](Counter.md).

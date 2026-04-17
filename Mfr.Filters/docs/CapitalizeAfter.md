@@ -2,6 +2,8 @@
 
 Uppercases the **single character immediately after** any character that appears in your configured list. Other characters are unchanged. If the list is empty, the segment is unchanged.
 
+Examples match [`CapitalizeAfterFilterTests`](../../Mfr.Tests/Models/Filters/Case/CapitalizeAfterFilterTests.cs) (comma/punctuation in messy tags, custom `._` triggers).
+
 ## Options
 
 | Property | Type | Default | Description |
@@ -12,6 +14,8 @@ Uppercases the **single character immediately after** any character that appears
 
 | Options | Before | After |
 |---------|--------|-------|
-| `capitalizeAfterChars`: default `",!()[]{};-"` | `hello (world)` | `hello (World)` |
-| `capitalizeAfterChars`: `"-"` | `hello-world` | `hello-World` |
-| `capitalizeAfterChars`: `""` | `hello-world` | `hello-world` |
+| `capitalizeAfterChars` default | `hello,world!(again)[is]it-fine?` | `hello,World!(Again)[Is]It-Fine?` |
+| `capitalizeAfterChars`: `"._"` | `hello.world_again` | `hello.World_Again` |
+| `capitalizeAfterChars`: `"._"` | `a,b` | `a,b` (`,` not in the custom set) |
+| `capitalizeAfterChars` default | `hello world` | `hello world` (no trigger before a letter) |
+| `capitalizeAfterChars` default | `hello!` | `hello!` (nothing after `!`) |

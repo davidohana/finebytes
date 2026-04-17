@@ -2,6 +2,8 @@
 
 Removes a fixed number of characters from the **right** end of the segment. The count is clamped to the segment length.
 
+Examples match [`TrimRightFilterTests`](../../Mfr.Tests/Models/Filters/Trimming/TrimRightFilterTests.cs).
+
 ## Options
 
 | Property | Type | Description |
@@ -12,6 +14,8 @@ Removes a fixed number of characters from the **right** end of the segment. The 
 
 | Options | Before | After |
 |---------|--------|-------|
-| `count`: `2` | `ABCDEF` | `ABCD` |
+| `count`: `2` | `abcd` | `ab` |
+| `count`: `0` | `ab` | `ab` |
+| `count`: `10` (segment shorter) | `hi` | *(empty)* |
 
 To **keep** only the last N characters, use [ExtractRight](ExtractRight.md).

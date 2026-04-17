@@ -2,6 +2,8 @@
 
 Computes a numeric value from each file’s **global** or **per-folder** index and **prepends**, **appends**, or **replaces** the target segment with the formatted number.
 
+Examples match [`CounterFilterTests`](../../Mfr.Tests/Models/Filters/Formatting/CounterFilterTests.cs) (padded track numbers, `name_02`, per-folder reset).
+
 ## Options
 
 | Property | Type | Description |
@@ -24,13 +26,13 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 
 ## Examples
 
-Assume **global** index `0` for the first row unless `resetPerFolder` is described.
+Assume **global** index as in each row unless `resetPerFolder` is noted.
 
 | Options | Before | After |
 |---------|--------|-------|
-| `start`: `1`, `step`: `1`, `width`: `3`, `padChar`: `"0"`, `position`: `Replace`, `resetPerFolder`: `false` (index `0`) | `track` | `001` |
-| Same + index `1` | `track` | `002` |
-| `position`: `Prepend`, `separator`: `" - "`, `start`: `1`, `step`: `1`, `width`: `2`, `padChar`: `"0"`, index `0` | `song` | `01 - song` |
-| `position`: `Append`, `separator`: `"_"`, `width`: `2`, `padChar`: `"0"`, `start`: `1`, `step`: `1`, index `0` | `song` | `song_01` |
+| `start`: `1`, `step`: `1`, `width`: `3`, `padChar`: `"0"`, `position`: `Replace`, `resetPerFolder`: `false` (global index `4`) | `old` | `005` |
+| `start`: `0`, `step`: `1`, `width`: `0`, `padChar`: `"0"`, `position`: `Prepend`, `separator`: `"_"`, global index `2` | `name` | `2_name` |
+| `start`: `0`, `step`: `1`, `width`: `0`, `padChar`: `"0"`, `position`: `Append`, `separator`: `"-"`, global index `1` | `name` | `name-1` |
+| `start`: `10`, `step`: `5`, `width`: `0`, `position`: `Replace`, `resetPerFolder`: `true` (in-folder index `2`) | `x` | `20` |
 
 For templates with `<file-name>`-style tokens, see [Formatter](Formatter.md).

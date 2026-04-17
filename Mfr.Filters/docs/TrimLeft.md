@@ -2,6 +2,8 @@
 
 Removes a fixed number of characters from the **left** end of the segment. The count is clamped to the segment length.
 
+Examples match [`TrimLeftFilterTests`](../../Mfr.Tests/Models/Filters/Trimming/TrimLeftFilterTests.cs).
+
 ## Options
 
 | Property | Type | Description |
@@ -12,8 +14,8 @@ Removes a fixed number of characters from the **left** end of the segment. The c
 
 | Options | Before | After |
 |---------|--------|-------|
-| `count`: `3` | `ABCDEF` | `DEF` |
-| `count`: `0` | `ABCDEF` | `ABCDEF` |
-| `count`: `10` (segment length `6`) | `ABCDEF` | *(empty)* |
+| `count`: `2` | `abcd` | `cd` |
+| `count`: `0` | `ab` | `ab` |
+| `count`: `10` (segment shorter) | `hi` | *(empty)* |
 
 To **keep** a prefix of length N instead of **dropping** N characters, use [ExtractLeft](ExtractLeft.md).

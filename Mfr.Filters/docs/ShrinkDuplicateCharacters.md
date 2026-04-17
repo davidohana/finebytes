@@ -2,6 +2,8 @@
 
 Collapses **runs** of the same chosen character into a **single** occurrence (for example `---` → `-`).
 
+Examples match [`ShrinkDuplicateCharactersFilterTests`](../../Mfr.Tests/Models/Filters/Trimming/ShrinkDuplicateCharactersFilterTests.cs) (hyphenated artist–title strings).
+
 ## Options
 
 | Property | Type | Description |
@@ -12,5 +14,6 @@ Collapses **runs** of the same chosen character into a **single** occurrence (fo
 
 | Options | Before | After |
 |---------|--------|-------|
-| `character`: `"-"` | `a---b` | `a-b` |
-| `character`: `"."` | `foo...bar` | `foo.bar` |
+| `character`: `"-"` | `I am Kloot --- To You` | `I am Kloot - To You` |
+| `character`: `"-"` | `a--b---c` | `a-b-c` |
+| `character`: `">"` | `a>>b>>>c` | `a>b>c` |

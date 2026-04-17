@@ -2,6 +2,8 @@
 
 Loads a **replace list file** and applies **search/replace pairs** in file order—like multiple [Replacer](Replacer.md) steps sharing the same mode and flags. Replacement lines may include formatter tokens (for example `<counter:…>`) where supported.
 
+Examples match [`ReplaceListFilterTests`](../../Mfr.Tests/Models/Filters/Replace/ReplaceListFilterTests.cs) (ordered pairs, strip with `<EMPTY>`, regex + counter on track-style titles).
+
 ## Options
 
 | Property | Type | Description |
@@ -35,7 +37,10 @@ R:_
 
 | Options | Before | After |
 |---------|--------|-------|
-| `mode`: `Literal`, `replaceAll`: `true`, file with pairs above (order: `a`→`b`, then `.`→`_`) | `a.a` | `b_b` |
+| `mode`: `Literal`, `replaceAll`: `true`, file with `a`→`b` then `.`→`_` | `a.a` | `b_b` |
 | File: `S:x` / `R:<EMPTY>`, `mode`: `Literal`, `replaceAll`: `true` | `abxcx` | `abc` |
+| `mode`: `Wildcard`, file: `S:f*o` / `R:X`, `replaceAll`: `true` | `foo` | `X` |
+| `mode`: `Regex`, `caseSensitive`: `false`, `replaceAll`: `true`; file: `a`→`b`, `.`→`_`, `[0-9]+`→`<counter:10,1,0,2,0>`; global index `0` | `01.-.Blue.Train` | `10_-_Blue_Trbin` |
+| Same setup; global index `1` | `02.-.A.Moment's.Notice` | `11_-_b_Moment's_Notice` |
 
 The list is loaded at filter **setup**; reload the preset or app after editing the file.

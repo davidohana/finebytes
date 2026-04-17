@@ -4,6 +4,8 @@ Loads a **casing list** text file: **one word per line** (after trim). Comments 
 
 Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceEndCharacters.md) and the word separator; place that filter **before** this one when you need custom sentence boundaries.
 
+Examples match [`CasingListFilterTests`](../../Mfr.Tests/Models/Filters/Case/CasingListFilterTests.cs) (list file: `and`, `or`, `with`, `RMX` or `and`, `us`, `them` as noted).
+
 ## Options
 
 | Property | Type | Default | Description |
@@ -19,11 +21,10 @@ Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceE
 
 ## Examples
 
-Assume list file lines: `and`, `or`, `RMX` (canonical casing).
-
 | Options | Before | After |
 |---------|--------|-------|
-| `filePath` → list as above, `uppercaseSentenceInitial`: `false` | `WiTH Or Rmx` | `with or RMX` |
-| `uppercaseSentenceInitial`: `true`, chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `"-.!"` then this filter (same list) | `03 - WiTH Or Without You Rmx` | `03 - With or Without You RMX` |
+| List: `and`, `or`, `with`, `RMX`; `uppercaseSentenceInitial`: `false` | `03 - WiTH Or Without You Rmx` | `03 - with or Without You RMX` |
+| Chain: [SentenceEndCharacters](SentenceEndCharacters.md) `characters`: `"-.!"` then list as above; `uppercaseSentenceInitial`: `true` | `03 - WiTH Or Without You Rmx` | `03 - With or Without You RMX` |
+| Chain: [SpaceCharacter](SpaceCharacter.md) `spaceCharacter`: `"_"`, `replaceSpaces`: `true`; list: `and`, `us`, `them`; `uppercaseSentenceInitial`: `true` | `US_AND_THEM` | `Us_and_them` |
 
-Put [SpaceCharacter](SpaceCharacter.md) first if words are split by `_` instead of spaces.
+Put [SpaceCharacter](SpaceCharacter.md) first if words are separated by `_` or another character.
