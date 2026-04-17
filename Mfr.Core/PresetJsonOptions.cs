@@ -56,6 +56,7 @@ namespace Mfr.Core
                     new JsonDerivedType(typeof(FormatterFilter), "Formatter"),
                     new JsonDerivedType(typeof(CounterFilter), "Counter"),
                     new JsonDerivedType(typeof(InserterFilter), "Inserter"),
+                    new JsonDerivedType(typeof(TokenMoverFilter), "TokenMover"),
                     new JsonDerivedType(typeof(CleanerFilter), "Cleaner"),
                     new JsonDerivedType(typeof(ReplaceListFilter), "ReplaceList"),
                     new JsonDerivedType(typeof(FixLeadingZerosFilter), "FixLeadingZeros"),

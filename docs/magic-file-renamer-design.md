@@ -1106,18 +1106,23 @@ Replaces each item's target field value with the corresponding line from a text 
 ```
 
 #### TokenMover
-Splits the target field by a delimiter and rearranges the parts. E.g. `Lastname, Firstname` → `Firstname Lastname`.
+Splits the target field by a fixed **substring** (`delimiter`) into tokens, moves the token at **one-based** `tokenNumber` by `moveBy` positions (positive = toward the end, negative = toward the start), then rejoins with the same `delimiter`. The destination index is **clamped** to the first or last token when the offset would go out of range (e.g. `moveBy: -1` on token 2 swaps it with the preceding token).
+
+Example: `Smith, John` with `delimiter` `", "` — `tokenNumber` `1`, `moveBy` `1` yields `John, Smith`.
+
 ```json
 {
   "type": "TokenMover",
   "target": { "family": "FileName", "fileNameMode": "Full" },
   "options": {
     "delimiter": ", ",
-    "outputOrder": [1, 0],
-    "outputSeparator": " "
+    "tokenNumber": 1,
+    "moveBy": 1
   }
 }
 ```
+
+Per-filter details: `Mfr.Filters/docs/Formatting/TokenMover.md`.
 
 #### Inserter
 Inserts text at a specified position within the target field.

@@ -32,6 +32,7 @@ Each filter page uses an **Examples** table with four columns: **Options**, **Be
 - [Counter](Formatting/Counter.md)
 - [Formatter](Formatting/Formatter.md)
 - [Inserter](Formatting/Inserter.md)
+- [TokenMover](Formatting/TokenMover.md)
 
 ### Misc
 
