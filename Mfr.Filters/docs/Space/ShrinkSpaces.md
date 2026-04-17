@@ -8,7 +8,7 @@ No `options` object. Examples match [`ShrinkSpacesFilterTests`](../../../Mfr.Tes
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| (none), default space separator | `a   b  c` | `a b c` | Collapse multiple spaces. |
-| (none), default space separator | `a  \t b` | `a \t b` | Space runs shrink; single tab preserved between spaces. |
+| (none), default space separator | `a   b  c` | `a b c` | |
+| (none), default space separator | `a  \t b` | `a \t b` | Tab is not the configured separator; spaces around it collapse separately. |
 
 Often used with [SpaceCharacter](SpaceCharacter.md) to normalize messy separators.

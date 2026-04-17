@@ -10,12 +10,12 @@
 
 ## Examples
 
-This filter alone does not change segment text (see **Comment** on the first two rows). The last row shows the **effect on a following** [LettersCase](LettersCase.md) `SentenceCase` step (from [`SentenceEndCharactersFilterTests`](../../../Mfr.Tests/Models/Filters/Case/SentenceEndCharactersFilterTests.cs)).
+The first two rows are no-ops on the segment (see **Comment**). The last row chains into [LettersCase](LettersCase.md) `SentenceCase` (from [`SentenceEndCharactersFilterTests`](../../../Mfr.Tests/Models/Filters/Case/SentenceEndCharactersFilterTests.cs)).
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `characters`: `":;"` | `hello: world` | `hello: world` | This filter alone does not change text. |
-| `characters`: `"-.!"` | `hello` | `hello` | Same: segment unchanged by this step. |
-| Chain: this filter `characters`: `"-.!"` then `LettersCase` `SentenceCase` | `a - b. c` | `A - B. C` | Later `SentenceCase` uses `-`, `.`, `!` as sentence boundaries. |
+| `characters`: `":;"` | `hello: world` | `hello: world` | No-op on text; only updates rename state. |
+| `characters`: `"-.!"` | `hello` | `hello` | Same. |
+| Chain: this filter `characters`: `"-.!"` then `LettersCase` `SentenceCase` | `a - b. c` | `A - B. C` | |
 
 Place **before** [LettersCase](LettersCase.md) (sentence mode) or [CasingList](CasingList.md) (sentence initials).

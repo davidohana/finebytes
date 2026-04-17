@@ -14,6 +14,6 @@ Examples match [`ShrinkDuplicateCharactersFilterTests`](../../../Mfr.Tests/Model
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `character`: `"-"` | `I am Kloot --- To You` | `I am Kloot - To You` | Triple hyphen → single (artist–title spacing). |
-| `character`: `"-"` | `a--b---c` | `a-b-c` | Each run collapses to one `-`. |
-| `character`: `">"` | `a>>b>>>c` | `a>b>c` | Non-adjacent single `>` preserved. |
+| `character`: `"-"` | `I am Kloot --- To You` | `I am Kloot - To You` | |
+| `character`: `"-"` | `a--b---c` | `a-b-c` | |
+| `character`: `">"` | `a>>b>>>c` | `a>b>c` | |

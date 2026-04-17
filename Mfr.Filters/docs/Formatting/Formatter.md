@@ -31,8 +31,8 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `template`: `"<file-name>"` | `song` | `song` | Prefix is substituted for `<file-name>`. |
-| `template`: `"<parent-folder>"` (file under `Music\My Album\`) | `ignored` | `My Album` | Parent folder is last path segment. |
-| `template`: `"<counter:10,2,0,4,0>"` (global index `3`) | `ignored` | `0016` | Global index `3`: `10 + 2×3 = 16`, width `4`, pad with `0`. |
+| `template`: `"<file-name>"` | `song` | `song` | |
+| `template`: `"<parent-folder>"` (file under `Music\My Album\`) | `ignored` | `My Album` | |
+| `template`: `"<counter:10,2,0,4,0>"` (global index `3`) | `ignored` | `0016` | `10 + 2×3`, width `4`, pad `0`. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).

@@ -14,8 +14,8 @@ Examples match [`CapitalizeAfterFilterTests`](../../../Mfr.Tests/Models/Filters/
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `capitalizeAfterChars` default | `hello,world!(again)[is]it-fine?` | `hello,World!(Again)[Is]It-Fine?` | Default triggers include `, ! ( ) [ ] ; -`. |
-| `capitalizeAfterChars`: `"._"` | `hello.world_again` | `hello.World_Again` | Only `.` and `_` trigger. |
-| `capitalizeAfterChars`: `"._"` | `a,b` | `a,b` | Comma not in custom set, so no change after `,`. |
-| `capitalizeAfterChars` default | `hello world` | `hello world` | No trigger character immediately before a letter to capitalize. |
+| `capitalizeAfterChars` default | `hello,world!(again)[is]it-fine?` | `hello,World!(Again)[Is]It-Fine?` | |
+| `capitalizeAfterChars`: `"._"` | `hello.world_again` | `hello.World_Again` | |
+| `capitalizeAfterChars`: `"._"` | `a,b` | `a,b` | Comma not in custom set—no trigger. |
+| `capitalizeAfterChars` default | `hello world` | `hello world` | No trigger immediately before a letter. |
 | `capitalizeAfterChars` default | `hello!` | `hello!` | Nothing after `!` to capitalize. |

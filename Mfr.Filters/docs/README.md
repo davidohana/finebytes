@@ -13,7 +13,7 @@ Each filter in a preset has:
 
 Property names use **camelCase**; enum values usually match the C# names (e.g. `TitleCase`, `Literal`).
 
-Each filter page uses an **Examples** table with four columns: **Options**, **Before**, **After**, and **Comment** (short note or context for the row).
+Each filter page uses an **Examples** table with four columns: **Options**, **Before**, **After**, and **Comment**. Use **Comment** only when the row is non-obvious (edge case, chain order, or why the result differs from a first guess); otherwise leave it empty.
 
 **Order matters.** Some filters only affect *later* filters (for example `SpaceCharacter` sets the word separator; `SentenceEndCharacters` sets sentence-ending punctuation). Put those *before* the filters that should use the new settings.
 

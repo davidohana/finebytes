@@ -14,8 +14,8 @@ Examples match [`TrimLeftFilterTests`](../../../Mfr.Tests/Models/Filters/Trimmin
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `count`: `2` | `abcd` | `cd` | Drop two characters from the left. |
-| `count`: `0` | `ab` | `ab` | No characters removed. |
-| `count`: `10` (segment shorter) | `hi` | *(empty)* | Count exceeds length → empty. |
+| `count`: `2` | `abcd` | `cd` | |
+| `count`: `0` | `ab` | `ab` | |
+| `count`: `10` (segment shorter) | `hi` | *(empty)* | Count past length clears the segment. |
 
 To **keep** a prefix of length N instead of **dropping** N characters, use [ExtractLeft](ExtractLeft.md).

@@ -14,8 +14,8 @@ Examples match [`TrimRightFilterTests`](../../../Mfr.Tests/Models/Filters/Trimmi
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `count`: `2` | `abcd` | `ab` | Drop two characters from the right. |
-| `count`: `0` | `ab` | `ab` | No characters removed. |
-| `count`: `10` (segment shorter) | `hi` | *(empty)* | Count exceeds length → empty. |
+| `count`: `2` | `abcd` | `ab` | |
+| `count`: `0` | `ab` | `ab` | |
+| `count`: `10` (segment shorter) | `hi` | *(empty)* | Count past length clears the segment. |
 
 To **keep** only the last N characters, use [ExtractRight](ExtractRight.md).

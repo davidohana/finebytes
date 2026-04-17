@@ -17,7 +17,7 @@ The first example is the “Portishead” track-title case from [`TrimBetweenFil
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `start`: `{ "value": 13, "anchor": "Left" }`, `end`: `{ "value": 5, "anchor": "Right" }` | `Portishead - Glory Box` | `Portishead - Box` | Drops middle title words (issue example). |
-| `start`: `{ "value": 2, "anchor": "Left" }`, `end`: `{ "value": 4, "anchor": "Left" }` | `abcd` | `a` | Remove positions 2–4 inclusive from left. |
-| `start`: `{ "value": 3, "anchor": "Right" }`, `end`: `{ "value": 1, "anchor": "Right" }` | `abcd` | `a` | Remove last three characters (`bcd`). |
-| `start`: `{ "value": 1, "anchor": "Left" }`, `end`: `{ "value": 1, "anchor": "Right" }` | `anything` | *(empty)* | Whole string is the inclusive range. |
+| `start`: `{ "value": 13, "anchor": "Left" }`, `end`: `{ "value": 5, "anchor": "Right" }` | `Portishead - Glory Box` | `Portishead - Box` | Left+right anchors remove the middle title segment. |
+| `start`: `{ "value": 2, "anchor": "Left" }`, `end`: `{ "value": 4, "anchor": "Left" }` | `abcd` | `a` | |
+| `start`: `{ "value": 3, "anchor": "Right" }`, `end`: `{ "value": 1, "anchor": "Right" }` | `abcd` | `a` | |
+| `start`: `{ "value": 1, "anchor": "Left" }`, `end`: `{ "value": 1, "anchor": "Right" }` | `anything` | *(empty)* | |

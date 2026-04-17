@@ -37,10 +37,10 @@ R:_
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `mode`: `Literal`, `replaceAll`: `true`, file with `a`→`b` then `.`→`_` | `a.a` | `b_b` | Pairs applied in order: `a`→`b`, then `.`→`_`. |
-| File: `S:x` / `R:<EMPTY>`, `mode`: `Literal`, `replaceAll`: `true` | `abxcx` | `abc` | Remove all `x`. |
-| `mode`: `Wildcard`, file: `S:f*o` / `R:X`, `replaceAll`: `true` | `foo` | `X` | Same wildcard behavior as Replacer. |
-| `mode`: `Regex`, `caseSensitive`: `false`, `replaceAll`: `true`; file: `a`→`b`, `.`→`_`, `[0-9]+`→`<counter:10,1,0,2,0>`; global index `0` | `01.-.Blue.Train` | `10_-_Blue_Trbin` | Digits replaced by counter token; `Trbin` from test. |
-| Same setup; global index `1` | `02.-.A.Moment's.Notice` | `11_-_b_Moment's_Notice` | Second file index increments counter. |
+| `mode`: `Literal`, `replaceAll`: `true`, file with `a`→`b` then `.`→`_` | `a.a` | `b_b` | Order matters: `a`→`b` first, then `.`→`_`. |
+| File: `S:x` / `R:<EMPTY>`, `mode`: `Literal`, `replaceAll`: `true` | `abxcx` | `abc` | |
+| `mode`: `Wildcard`, file: `S:f*o` / `R:X`, `replaceAll`: `true` | `foo` | `X` | |
+| `mode`: `Regex`, `caseSensitive`: `false`, `replaceAll`: `true`; file: `a`→`b`, `.`→`_`, `[0-9]+`→`<counter:10,1,0,2,0>`; global index `0` | `01.-.Blue.Train` | `10_-_Blue_Trbin` | Regex replaces digit runs; yields `Trbin` (see test). |
+| Same setup; global index `1` | `02.-.A.Moment's.Notice` | `11_-_b_Moment's_Notice` | |
 
 The list is loaded at filter **setup**; reload the preset or app after editing the file.
