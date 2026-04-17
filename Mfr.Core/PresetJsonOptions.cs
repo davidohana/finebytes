@@ -45,6 +45,7 @@ namespace Mfr.Core
                     new JsonDerivedType(typeof(LettersCaseFilter), "LettersCase"),
                     new JsonDerivedType(typeof(SpaceCharacterFilter), "SpaceCharacter"),
                     new JsonDerivedType(typeof(RemoveSpacesFilter), "RemoveSpaces"),
+                    new JsonDerivedType(typeof(SeparateCapitalizedTextFilter), "SeparateCapitalizedText"),
                     new JsonDerivedType(typeof(ShrinkSpacesFilter), "ShrinkSpaces"),
                     new JsonDerivedType(typeof(TrimLeftFilter), "TrimLeft"),
                     new JsonDerivedType(typeof(TrimRightFilter), "TrimRight"),

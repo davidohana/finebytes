@@ -931,12 +931,12 @@ Inserts a space before and after every occurrence of specified characters.
 ```
 
 #### SeparateCapitalizedText
-Inserts a separator before each capital letter (for CamelCase to spaced conversion).
+Inserts the current word separator between lowercase–uppercase boundaries, letter–digit, and digit–letter pairs (see `Mfr.Filters/docs/Space/SeparateCapitalizedText.md`). Default separator is U+0020 SPACE unless a `SpaceCharacter` filter ran earlier.
 ```json
 {
   "type": "SeparateCapitalizedText",
   "target": { "family": "FileName", "fileNameMode": "Full" },
-  "options": { "separator": " ", "skipConsecutiveCaps": true }
+  "options": {}
 }
 ```
 

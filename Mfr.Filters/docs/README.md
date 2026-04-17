@@ -46,6 +46,7 @@ Each filter page uses an **Examples** table with four columns: **Options**, **Be
 ### Space
 
 - [RemoveSpaces](Space/RemoveSpaces.md)
+- [SeparateCapitalizedText](Space/SeparateCapitalizedText.md)
 - [ShrinkSpaces](Space/ShrinkSpaces.md)
 - [SpaceCharacter](Space/SpaceCharacter.md)
 - [StripSpacesLeft](Space/StripSpacesLeft.md)
