@@ -1,6 +1,6 @@
 # LettersCase
 
-Changes letter casing on the target segment. **Sentence case** and **title case** use the current [word separator](../Space/SpaceCharacter.md) (default: space). **Sentence case** also uses [sentence-end characters](SentenceEndCharacters.md) (default `.!?` until you add that filter).
+Changes letter casing on the target segment. **Title case** and **sentence case** use the [word separator](../Space/SpaceCharacter.md) (default space). **Sentence case** uses [SentenceEndCharacters](SentenceEndCharacters.md) (default `.!?` until that filter runs).
 
 ## Options
 
@@ -30,18 +30,18 @@ Changes letter casing on the target segment. **Sentence case** and **title case*
 | `mode`: `UpperCase` | `hello` | `HELLO` | |
 | `mode`: `LowerCase` | `HELLO` | `hello` | |
 | `mode`: `FirstLetterUp` | `hELLO world` | `Hello world` | |
-| `mode`: `FirstLetterUp` | ` 123_aBC` | ` 123_abc` | Leading non-letters unchanged; casing starts at first letter. |
-| `mode`: `WeirdCase`<br>`weirdUppercaseChancePercent`: `0` | `AbC XyZ` | `abc xyz` | 0% → all lowercase. |
-| `mode`: `WeirdCase`<br>`weirdUppercaseChancePercent`: `100` | `AbC XyZ` | `ABC XYZ` | 100% → all uppercase. |
-| `mode`: `TitleCase`<br>`skipWords`: `["a","the","for"]` | `a song for the world` | `a Song for the World` | `skipWords` stay lowercase. |
+| `mode`: `FirstLetterUp` | ` 123_aBC` | ` 123_abc` | |
+| `mode`: `WeirdCase`<br>`weirdUppercaseChancePercent`: `0` | `AbC XyZ` | `abc xyz` | |
+| `mode`: `WeirdCase`<br>`weirdUppercaseChancePercent`: `100` | `AbC XyZ` | `ABC XYZ` | |
+| `mode`: `TitleCase`<br>`skipWords`: `["a","the","for"]` | `a song for the world` | `a Song for the World` | |
 | `mode`: `SentenceCase`<br>(default [sentence-end characters](SentenceEndCharacters.md)) | `hello world. next line.` | `Hello world. Next line.` | |
 | `mode`: `InvertCase` | `Hello` | `hELLO` | |
 | [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `":;"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello: next; again. no` | `Hello: Next; Again. no` | |
-| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `""`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello. next line` | `Hello. next line` | Empty set: no caps after punctuation, only at segment start. |
-| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `". "`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello world. next line` | `Hello world. Next line` | Sentence end is the two-char sequence `. `, not `.` alone. |
+| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `""`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello. next line` | `Hello. next line` | Empty `characters` → cap only at start. |
+| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `". "`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello world. next line` | `Hello world. Next line` | Same as `characters` `"."` when separator is space. |
 | [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello._world._again` | `Hello._World._Again` | |
 | [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `TitleCase`<br>`skipWords`: `["the"]` | `__gone__with__the__wind__` | `__Gone__With__the__Wind__` | |
 | [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello.__world!___again?__done` | `Hello.__World!___Again?__Done` | |
-| [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello.world` | `Hello.world` | No word separator after `.`, so no capital after the period. |
+| [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello.world` | `Hello.world` | No separator after `.` → no cap. |
 
 Unused option properties for a given `mode` are ignored.
