@@ -1,4 +1,4 @@
-using Mfr.Cli;
+using Mfr.App.Cli;
 using Mfr.Tests.TestSupport;
 using Serilog;
 using Serilog.Events;

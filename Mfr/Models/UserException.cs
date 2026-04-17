@@ -1,4 +1,4 @@
-namespace Mfr.Core
+namespace Mfr.Models
 {
     /// <summary>
     /// Represents a non-recoverable error caused by invalid user input or configuration.

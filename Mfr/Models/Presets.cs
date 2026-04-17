@@ -1,5 +1,3 @@
-using Mfr.Filters;
-
 namespace Mfr.Models
 {
     /// <summary>

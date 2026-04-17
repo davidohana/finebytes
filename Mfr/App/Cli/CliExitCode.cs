@@ -1,4 +1,4 @@
-namespace Mfr.Cli
+namespace Mfr.App.Cli
 {
     /// <summary>
     /// Represents process exit codes returned by the CLI.

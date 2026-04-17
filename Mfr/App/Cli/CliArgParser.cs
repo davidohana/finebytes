@@ -3,9 +3,10 @@ using System.ComponentModel;
 using Spectre.Console.Cli;
 
 using Mfr.Core;
+using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Cli
+namespace Mfr.App.Cli
 {
     internal static class CliArgParser
     {

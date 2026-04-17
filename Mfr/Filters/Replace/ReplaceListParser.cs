@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Mfr.Core;
+using Mfr.Models;
 
 namespace Mfr.Filters.Replace
 {

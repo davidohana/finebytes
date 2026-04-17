@@ -1,6 +1,6 @@
 using Serilog.Events;
 
-namespace Mfr.Cli
+namespace Mfr.App.Cli
 {
     /// <summary>
     /// Immutable options parsed from the command line and carried into the CLI execution.

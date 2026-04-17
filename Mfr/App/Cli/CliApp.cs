@@ -4,7 +4,7 @@ using Mfr.Utils;
 using Serilog;
 using Spectre.Console;
 
-namespace Mfr.Cli
+namespace Mfr.App.Cli
 {
     /// <summary>
     /// Provides the command-line entry point and output formatting for the Mfr application.

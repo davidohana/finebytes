@@ -1,10 +1,10 @@
-using Mfr.Core;
+using Mfr.Models;
 using Mfr.Utils;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using Serilog.Events;
 
-namespace Mfr.Cli
+namespace Mfr.App.Cli
 {
     internal static class CliLogging
     {
