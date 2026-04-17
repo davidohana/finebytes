@@ -37,6 +37,6 @@ Examples match [`ReplacerFilterTests`](../../../Mfr.Tests/Models/Filters/Replace
 | `find`: `"cat"`<br>`replacement`: `"dog"`<br>`mode`: `Literal`<br>`wholeWord`: `true`<br>`replaceAll`: `true` | `cat` | `dog` | |
 | (same as row above) | `category` | `category` | `cat` is a substring of `category`, not a whole word. |
 | (same as row above) | `a cat b` | `a dog b` | |
-| `find`: `"CAT"`<br>`replacement`: `"dog"`<br>`mode`: `Literal`<br>`caseSensitive`: `false`<br>`wholeWord`: `true` | `Category` | `Category` | No standalone word `cat` in `Category` (substring doesn’t count). |
+| `find`: `"CAT"`<br>`replacement`: `"dog"`<br>`mode`: `Literal`<br>`caseSensitive`: `false`<br>`wholeWord`: `true`<br>`replaceAll`: `true` | `Category` | `Category` | No standalone word `cat` in `Category` (substring doesn’t count). |
 
 For many rules from a file, use [ReplaceList](ReplaceList.md).

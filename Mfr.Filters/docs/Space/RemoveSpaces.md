@@ -8,7 +8,7 @@ No `options` object. Examples match [`RemoveSpacesFilterTests`](../../../Mfr.Tes
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| (none), default space separator | `a b` | `ab` | |
-| (none), default space separator | `a \t\r\nb` | `a\t\r\nb` | Only the word-separator char (space) removed, not `\t`/`\r`/`\n`. |
+| (no options)<br>default word separator | `a b` | `ab` | |
+| (no options)<br>default word separator | `a \t\r\nb` | `a\t\r\nb` | Only the word-separator char (space) removed, not `\t`/`\r`/`\n`. |
 
 After [SpaceCharacter](SpaceCharacter.md) with `_` as separator, each `_` is removed the same way.

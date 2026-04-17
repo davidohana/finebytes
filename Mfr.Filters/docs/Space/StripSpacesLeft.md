@@ -8,7 +8,7 @@ No `options` object. Examples match [`StripSpacesLeftFilterTests`](../../../Mfr.
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| (none), default space separator | `   New_York__.jpg` | `New_York__.jpg` | |
-| (none), default space separator | `  a b ` | `a b ` | |
-| (none), default space separator | `    ` | *(empty)* | |
-| Chain: [SpaceCharacter](SpaceCharacter.md) `spaceCharacter`: `"_"` then StripSpacesLeft | `__New_York__.jpg` | `New_York__.jpg` | |
+| (no options)<br>default word separator | `   New_York__.jpg` | `New_York__.jpg` | |
+| (no options)<br>default word separator | `  a b ` | `a b ` | |
+| (no options)<br>default word separator | `    ` | *(empty)* | |
+| [SpaceCharacter](SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>then StripSpacesLeft | `__New_York__.jpg` | `New_York__.jpg` | |
