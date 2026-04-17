@@ -42,3 +42,24 @@ R:_
 | (same file as row above)<br>global index: `1` | `02.-.A.Moment's.Notice` | `11_-_b_Moment's_Notice` | |
 
 The list is loaded at filter **setup**; reload the preset or app after editing the file.
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). Set `filePath` to your replace-list file.
+
+```json
+{
+  "type": "ReplaceList",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "filePath": "C:/Music/MFR/replace-list.txt",
+    "mode": "Literal",
+    "caseSensitive": true,
+    "replaceAll": true,
+    "wholeWord": false
+  }
+}
+```

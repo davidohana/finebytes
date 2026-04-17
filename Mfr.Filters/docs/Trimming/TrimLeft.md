@@ -17,3 +17,20 @@ Removes a fixed number of characters from the **left** end of the segment. The c
 | `count`: `10`<br>(segment shorter than count) | `hi` | *(empty)* | Count past length clears the segment. |
 
 To **keep** a prefix of length N instead of **dropping** N characters, use [ExtractLeft](ExtractLeft.md).
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "TrimLeft",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "count": 2
+  }
+}
+```

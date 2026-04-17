@@ -28,3 +28,21 @@ Example list files use words like `and`, `or`, `with`, `RMX` or `and`, `us`, `th
 | [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>`replaceSpaces`: `true`<br>`filePath`: list (`and`, `us`, `them`)<br>`uppercaseSentenceInitial`: `true` | `US_AND_THEM` | `Us_and_them` | Underscore word boundaries + casing list + sentence initial. |
 
 Put [SpaceCharacter](../Space/SpaceCharacter.md) first if words are separated by `_` or another character.
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). Set `filePath` to your casing-list file.
+
+```json
+{
+  "type": "CasingList",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "filePath": "C:/Music/MFR/casing-list.txt",
+    "uppercaseSentenceInitial": false
+  }
+}
+```

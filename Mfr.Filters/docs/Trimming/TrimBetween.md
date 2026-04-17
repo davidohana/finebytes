@@ -21,3 +21,21 @@ The first row is a track-title style trim (artist–title → shorter title).
 | `start`: `{ "value": 2, "anchor": "Left" }`<br>`end`: `{ "value": 4, "anchor": "Left" }` | `abcd` | `a` | |
 | `start`: `{ "value": 3, "anchor": "Right" }`<br>`end`: `{ "value": 1, "anchor": "Right" }` | `abcd` | `a` | |
 | `start`: `{ "value": 1, "anchor": "Left" }`<br>`end`: `{ "value": 1, "anchor": "Right" }` | `anything` | *(empty)* | |
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "TrimBetween",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "start": { "value": 13, "anchor": "Left" },
+    "end": { "value": 5, "anchor": "Right" }
+  }
+}
+```

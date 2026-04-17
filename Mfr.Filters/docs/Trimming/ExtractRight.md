@@ -17,3 +17,20 @@ Keeps only the **last** `count` characters of the segment; the leading part is r
 | `count`: `100`<br>(segment shorter than count) | `ab` | `ab` | |
 
 See [TrimRight](TrimRight.md) to **drop** a fixed number of characters from the right instead.
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "ExtractRight",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "count": 3
+  }
+}
+```

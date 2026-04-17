@@ -19,3 +19,20 @@ The first two rows are no-ops on the segment (see **Comment**). The last row cha
 | [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `"-.!"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `a - b. c` | `A - B. C` | |
 
 Place **before** [LettersCase](LettersCase.md) (sentence mode) or [CasingList](CasingList.md) (sentence initials).
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "SentenceEndCharacters",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "characters": ".!?"
+  }
+}
+```

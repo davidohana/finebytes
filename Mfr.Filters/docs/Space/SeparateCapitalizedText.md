@@ -21,3 +21,17 @@ No `options` object.
 | [SpaceCharacter](SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>other flags: `false`<br>then this filter | `aBc12x` | `a_Bc_12_x` | Same rules; inserts underscores. |
 
 Put [SpaceCharacter](SpaceCharacter.md) **before** this filter when you want a non-space separator.
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). No `options` property.
+
+```json
+{
+  "type": "SeparateCapitalizedText",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  }
+}
+```

@@ -17,3 +17,20 @@ Removes a fixed number of characters from the **right** end of the segment. The 
 | `count`: `10`<br>(segment shorter than count) | `hi` | *(empty)* | Count past length clears the segment. |
 
 To **keep** only the last N characters, use [ExtractRight](ExtractRight.md).
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "TrimRight",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "count": 2
+  }
+}
+```

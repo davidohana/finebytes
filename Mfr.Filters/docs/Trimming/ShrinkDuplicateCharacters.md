@@ -15,3 +15,20 @@ Collapses **runs** of the same chosen character into a **single** occurrence (fo
 | `character`: `"-"` | `I am Kloot --- To You` | `I am Kloot - To You` | |
 | `character`: `"-"` | `a--b---c` | `a-b-c` | |
 | `character`: `">"` | `a>>b>>>c` | `a>b>c` | |
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "ShrinkDuplicateCharacters",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "character": "-"
+  }
+}
+```

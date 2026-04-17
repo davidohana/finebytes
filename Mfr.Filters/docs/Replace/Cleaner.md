@@ -21,3 +21,22 @@ If there is nothing to remove, the segment is unchanged.
 | `removeIllegalChars`: `true`<br>`customCharsToRemove`: `"@#"`<br>`replacement`: `"X"` | `a/b@c#d&#124;e` | `aXbXcXdXe` | Illegal + custom chars in one pass. |
 
 Run **Cleaner** early if later filters assume a safe file name.
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "Cleaner",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "removeIllegalChars": true,
+    "customCharsToRemove": "",
+    "replacement": "_"
+  }
+}
+```

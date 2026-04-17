@@ -12,3 +12,17 @@ No `options` object.
 | (no options)<br>default word separator | `a \t\r\nb` | `a\t\r\nb` | Only the word-separator char (space) removed, not `\t`/`\r`/`\n`. |
 
 After [SpaceCharacter](SpaceCharacter.md) with `_` as separator, each `_` is removed the same way.
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). No `options` property.
+
+```json
+{
+  "type": "RemoveSpaces",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  }
+}
+```

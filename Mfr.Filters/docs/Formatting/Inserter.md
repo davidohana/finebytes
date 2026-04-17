@@ -32,3 +32,23 @@ When `true`, the segment becomes `original[..insertIndex) + inserted + original[
 | `text`: `"**"`<br>`position`: `2`<br>`startFrom`: `Beginning`<br>`overwrite`: `true` | `abcd` | `a**d` | Inserts at index before `b`, overwriting `bc`. |
 
 For token reference, see [Formatter](Formatter.md).
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "Inserter",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "text": "_-",
+    "position": 3,
+    "startFrom": "Beginning",
+    "overwrite": false
+  }
+}
+```

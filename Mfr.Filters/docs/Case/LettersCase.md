@@ -45,3 +45,23 @@ Changes letter casing on the target segment. **Title case** and **sentence case*
 | [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `hello.world` | `Hello.world` | No separator after `.` → no cap. |
 
 Unused option properties for a given `mode` are ignored.
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "LettersCase",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "mode": "TitleCase",
+    "skipWords": ["a", "an", "the", "of"],
+    "weirdUppercaseChancePercent": 50,
+    "weirdFixedPlaces": false
+  }
+}
+```

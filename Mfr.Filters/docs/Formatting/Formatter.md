@@ -34,3 +34,20 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 | `template`: `"<counter:10,2,0,4,0>"`<br>global index: `3` | `ignored` | `0016` | `10 + 2×3`, width `4`, pad `0`. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). When targeting **Prefix**, `<file-name>` is still the original prefix.
+
+```json
+{
+  "type": "Formatter",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "template": "<parent-folder> - <file-name>"
+  }
+}
+```

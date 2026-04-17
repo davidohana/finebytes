@@ -25,3 +25,24 @@ Replacements are applied in order: `%20`, then space, then underscore, then cust
 | `spaceCharacter`: `"_"`<br>`replacePercent20`: `true`<br>other flags: `false` | `my song` | `my song` | Text unchanged; `WordSeparator` still set to `_` for later filters. |
 
 Put this filter **before** any filter that should use a non-space word boundary.
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "SpaceCharacter",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "spaceCharacter": "_",
+    "replaceSpaces": false,
+    "replaceUnderscores": false,
+    "replacePercent20": true,
+    "customText": ""
+  }
+}
+```

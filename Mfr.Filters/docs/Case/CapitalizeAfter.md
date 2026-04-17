@@ -17,3 +17,20 @@ Uppercases the **single character immediately after** any character that appears
 | `capitalizeAfterChars`: `"._"` | `a,b` | `a,b` | Comma not in custom set—no trigger. |
 | `capitalizeAfterChars`: (default) | `hello world` | `hello world` | No trigger immediately before a letter. |
 | `capitalizeAfterChars`: (default) | `hello!` | `hello!` | Nothing after `!` to capitalize. |
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "CapitalizeAfter",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "capitalizeAfterChars": ",!()[]{};-"
+  }
+}
+```

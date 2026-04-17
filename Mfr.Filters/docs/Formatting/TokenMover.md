@@ -23,3 +23,22 @@ If the requested move would place the token **before** the first position or **a
 | `delimiter`: `","`<br>`tokenNumber`: `2`<br>`moveBy`: `3` | `milk,sugar,bread,potatoes,honey,salt,water` | `milk,bread,potatoes,honey,sugar,salt,water` | Move 2nd token three places right. |
 | `delimiter`: `","`<br>`tokenNumber`: `2`<br>`moveBy`: `3` | `milk,sugar,bread,potatoes` | `milk,bread,potatoes,sugar` | Same move; target position past end → last slot. |
 | `delimiter`: `"-"`<br>`tokenNumber`: `2`<br>`moveBy`: `-1` | `a-b-c` | `b-a-c` | One step left: swap with preceding token. |
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "TokenMover",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "delimiter": ",",
+    "tokenNumber": 2,
+    "moveBy": -1
+  }
+}
+```

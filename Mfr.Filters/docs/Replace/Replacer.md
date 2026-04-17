@@ -38,3 +38,25 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 | `find`: `"CAT"`<br>`replacement`: `"dog"`<br>`mode`: `Literal`<br>`caseSensitive`: `false`<br>`wholeWord`: `true`<br>`replaceAll`: `true` | `Category` | `Category` | No standalone word `cat` in `Category` (substring doesn’t count). |
 
 For many rules from a file, use [ReplaceList](ReplaceList.md).
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "Replacer",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "find": "a",
+    "replacement": "X",
+    "mode": "Literal",
+    "caseSensitive": true,
+    "replaceAll": true,
+    "wholeWord": false
+  }
+}
+```

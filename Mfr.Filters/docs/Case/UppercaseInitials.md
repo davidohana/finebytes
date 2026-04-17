@@ -13,3 +13,17 @@ No `options` object.
 | (no options) | `the u.s.a. is great` | `the U.S.A. is great` | |
 | (no options) | `alpha beta c and ab.cd stay as-is` | `alpha beta c and ab.cd stay as-is` | `ab.cd` is not letter-dot-letter initials. |
 | (no options) | `initials a.b and c.d.e` | `initials A.B and C.D.E` | |
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). No `options` property.
+
+```json
+{
+  "type": "UppercaseInitials",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  }
+}
+```

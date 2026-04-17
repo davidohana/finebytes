@@ -12,3 +12,17 @@ No `options` object.
 | (no options)<br>default word separator | `a  \t b` | `a \t b` | Tab is not the configured separator; spaces around it collapse separately. |
 
 Often used with [SpaceCharacter](SpaceCharacter.md) to normalize messy separators.
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). No `options` property.
+
+```json
+{
+  "type": "ShrinkSpaces",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  }
+}
+```

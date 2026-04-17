@@ -34,3 +34,26 @@ Assume **global** index as in each row unless `resetPerFolder` is noted.
 | `start`: `10`<br>`step`: `5`<br>`width`: `0`<br>`position`: `Replace`<br>`resetPerFolder`: `true`<br>in-folder index: `2` | `x` | `20` | Uses in-folder index, not global `n`. |
 
 For templates with `<file-name>`-style tokens, see [Formatter](Formatter.md).
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "Counter",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "start": 1,
+    "step": 1,
+    "width": 3,
+    "padChar": "0",
+    "position": "Prepend",
+    "separator": "_",
+    "resetPerFolder": false
+  }
+}
+```

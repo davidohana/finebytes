@@ -16,3 +16,21 @@ Removes **one kind** of bracket pair: round `()`, square `[]`, curly `{}`, or an
 | `type`: `Round`<br>`removeContents`: `true` | `a(rem)b` | `ab` | |
 | `type`: `Round`<br>`removeContents`: `false` | `a(rem)` | `arem` | Delimiters removed; inner text kept. |
 | `type`: `Square`<br>`removeContents`: `true` | `a[xx]b` | `ab` | |
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). The `type` under `options` is bracket style (not the filter discriminator).
+
+```json
+{
+  "type": "StripParentheses",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "type": "Round",
+    "removeContents": true
+  }
+}
+```

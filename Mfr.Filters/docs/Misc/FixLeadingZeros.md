@@ -21,3 +21,23 @@ Finds **runs of digits** in the segment and rewrites them so their length matche
 | `width`: `3`<br>`removeExtraZeros`: `false`<br>`wholeWordOnly`: `true` | `doc1_12` | `doc1_012` | `1` in `doc1` is not a whole-word digit group. |
 | `width`: `3`<br>`removeExtraZeros`: `false`<br>`maxCount`: `1` | `05-Opus 40` | `005-Opus 40` | Only first digit run affected. |
 | `width`: `3`<br>`removeExtraZeros`: `false`<br>`maxCount`: `2` | `05-Opus 40 (1)` | `005-Opus 040 (1)` | |
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
+
+```json
+{
+  "type": "FixLeadingZeros",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  },
+  "options": {
+    "width": 3,
+    "removeExtraZeros": true,
+    "maxCount": 0,
+    "wholeWordOnly": false
+  }
+}
+```

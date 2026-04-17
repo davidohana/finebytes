@@ -12,3 +12,17 @@ No `options` object.
 | (no options)<br>default word separator | `  a b ` | `  a b` | |
 | (no options)<br>default word separator | `    ` | *(empty)* | |
 | [SpaceCharacter](SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>then StripSpacesRight | `__New_York__` | `__New_York` | |
+
+## Sample preset (JSON)
+
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). No `options` property.
+
+```json
+{
+  "type": "StripSpacesRight",
+  "target": {
+    "family": "FileName",
+    "fileNamePart": "Prefix"
+  }
+}
+```
