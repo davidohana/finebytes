@@ -27,22 +27,6 @@ Primary direction:
 
 `Mfr (host) -> Mfr.App.Cli -> Mfr.Core -> Mfr.Filters -> Mfr.Models -> Mfr.Utils`
 
-Allowed extra downward edges:
-
-- `Mfr.App.Cli -> Mfr.Models`
-- `Mfr.App.Cli -> Mfr.Utils`
-- `Mfr.Core -> Mfr.Models`
-- `Mfr.Core -> Mfr.Utils`
-- `Mfr.Filters -> Mfr.Utils`
-- `Mfr.Models -> Mfr.Utils`
-
-## Forbidden dependencies
-
-- `Mfr.App.Cli` must not reference `Mfr.Filters`
-- `Mfr.Filters` must not reference `Mfr.Core`
-- `Mfr.Models` must not reference `Mfr.Filters` or `Mfr.Core`
-- `Mfr.Utils` must not reference any `Mfr.*` project
-
 ## Enforcement
 
 - Enforced by `.csproj` project references.
