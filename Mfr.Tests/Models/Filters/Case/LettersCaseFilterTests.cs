@@ -196,10 +196,10 @@ namespace Mfr.Tests.Models.Filters.Case
                     ReplacePercent20: false,
                     CustomText: ""));
             var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
-            var file = FilterTestHelpers.CreateFile(prefix: "hello._world._again");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello._world._again");
             new BaseFilter[] { spaceCharFilter, sentenceFilter }.SetupFilters();
-            file.ApplyFilters([spaceCharFilter, sentenceFilter]);
-            Assert.Equal("Hello._World._Again", file.Preview.Prefix);
+            item.ApplyFilters([spaceCharFilter, sentenceFilter]);
+            Assert.Equal("Hello._World._Again", item.Preview.Prefix);
         }
 
         /// <summary>
@@ -221,12 +221,12 @@ namespace Mfr.Tests.Models.Filters.Case
                 true,
                 _target,
                 new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"]));
-            var file = FilterTestHelpers.CreateFile(prefix: "__gone__with__the__wind__");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "__gone__with__the__wind__");
 
             new BaseFilter[] { spaceCharFilter, titleFilter }.SetupFilters();
-            file.ApplyFilters([spaceCharFilter, titleFilter]);
+            item.ApplyFilters([spaceCharFilter, titleFilter]);
 
-            Assert.Equal("__Gone__With__the__Wind__", file.Preview.Prefix);
+            Assert.Equal("__Gone__With__the__Wind__", item.Preview.Prefix);
         }
 
         /// <summary>
@@ -245,12 +245,12 @@ namespace Mfr.Tests.Models.Filters.Case
                     ReplacePercent20: false,
                     CustomText: ""));
             var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
-            var file = FilterTestHelpers.CreateFile(prefix: "hello.__world!___again?__done");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello.__world!___again?__done");
 
             new BaseFilter[] { spaceCharFilter, sentenceFilter }.SetupFilters();
-            file.ApplyFilters([spaceCharFilter, sentenceFilter]);
+            item.ApplyFilters([spaceCharFilter, sentenceFilter]);
 
-            Assert.Equal("Hello.__World!___Again?__Done", file.Preview.Prefix);
+            Assert.Equal("Hello.__World!___Again?__Done", item.Preview.Prefix);
         }
 
         /// <summary>
@@ -269,12 +269,12 @@ namespace Mfr.Tests.Models.Filters.Case
                     ReplacePercent20: false,
                     CustomText: ""));
             var sentenceFilter = new LettersCaseFilter(true, _target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
-            var file = FilterTestHelpers.CreateFile(prefix: "hello.world");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello.world");
 
             new BaseFilter[] { spaceCharFilter, sentenceFilter }.SetupFilters();
-            file.ApplyFilters([spaceCharFilter, sentenceFilter]);
+            item.ApplyFilters([spaceCharFilter, sentenceFilter]);
 
-            Assert.Equal("Hello.world", file.Preview.Prefix);
+            Assert.Equal("Hello.world", item.Preview.Prefix);
         }
 
         /// <summary>

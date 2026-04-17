@@ -19,9 +19,9 @@ namespace Mfr.Tests.Models.Filters
             var filter = new SetupCountingFilter(Enabled: true, Target: _target);
             filter.Setup();
 
-            var firstItem = FilterTestHelpers.CreateFile(prefix: "first");
+            var firstItem = FilterTestHelpers.CreateRenameItem(prefix: "first");
             filter.Apply(firstItem);
-            var secondItem = FilterTestHelpers.CreateFile(prefix: "second");
+            var secondItem = FilterTestHelpers.CreateRenameItem(prefix: "second");
             filter.Apply(secondItem);
 
             Assert.Equal(1, filter.SetupCount);
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models.Filters
         public void TransformSegment_SetupNotRun_ThrowsInvalidOperationException()
         {
             var filter = new SetupCountingFilter(Enabled: true, Target: _target);
-            var item = FilterTestHelpers.CreateFile(prefix: "first");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "first");
 
             var ex = Assert.Throws<InvalidOperationException>(() => filter.TransformSegment(segment: "value", item: item));
             Assert.Contains("setup must complete before transform", ex.Message, StringComparison.OrdinalIgnoreCase);
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Models.Filters
         public void Setup_WhenSetupThrows_PropagatesAndApplyStillFails()
         {
             var filter = new ThrowingSetupFilter(Enabled: true, Target: _target);
-            var item = FilterTestHelpers.CreateFile(prefix: "first");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "first");
 
             var setupEx = Assert.Throws<InvalidOperationException>(filter.Setup);
             Assert.Equal("Setup failed.", setupEx.Message);

@@ -19,7 +19,7 @@ namespace Mfr.Tests.Core
         [Fact]
         public void ApplyFilters_AllFiltersDisabled_LeavesPreviewAtOriginal()
         {
-            var item = FilterTestHelpers.CreateFile(prefix: "track", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: ".mp3");
             var firstFilters = new BaseFilter[]
             {
                 new ReplacerFilter(
@@ -51,7 +51,7 @@ namespace Mfr.Tests.Core
         [Fact]
         public void ApplyFilters_PrefixFilters_ApplyInOrder()
         {
-            var item = FilterTestHelpers.CreateFile(prefix: "track old", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track old", extension: ".mp3");
             var filters = new List<BaseFilter>
             {
                 new ReplacerFilter(
@@ -78,7 +78,7 @@ namespace Mfr.Tests.Core
         [Fact]
         public void ApplyFilters_ExtensionAndFullModes_UpdatePreview()
         {
-            var item = FilterTestHelpers.CreateFile(prefix: "track", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: ".mp3");
             var filters = new List<BaseFilter>
             {
                 new ReplacerFilter(
@@ -105,7 +105,7 @@ namespace Mfr.Tests.Core
         [Fact]
         public void ApplyFilters_NonFileNameTarget_ThrowsNotSupported()
         {
-            var item = FilterTestHelpers.CreateFile();
+            var item = FilterTestHelpers.CreateRenameItem();
             var filters = new List<BaseFilter>
             {
                 new ReplacerFilter(

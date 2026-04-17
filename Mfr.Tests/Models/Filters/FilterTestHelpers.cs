@@ -15,7 +15,7 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
         /// <param name="directory">Parent directory path, or a default when null.</param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
-        public static RenameItem CreateFile(
+        public static RenameItem CreateRenameItem(
             string prefix = "track",
             string extension = ".mp3",
             int globalIndex = 0,
@@ -44,10 +44,10 @@ namespace Mfr.Tests.Models.Filters
             int inFolderIndex = 0,
             string? directory = null)
         {
-            var file = CreateFile(inputPrefix, extension, globalIndex, inFolderIndex, directory);
+            var item = CreateRenameItem(inputPrefix, extension, globalIndex, inFolderIndex, directory);
             filter.Setup();
-            filter.Apply(file);
-            return file.Preview.Prefix;
+            filter.Apply(item);
+            return item.Preview.Prefix;
         }
     }
 }

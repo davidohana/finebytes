@@ -172,7 +172,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     replaceAll: true,
                     wholeWord: false);
                 filter.Setup();
-                var firstItem = FilterTestHelpers.CreateFile(prefix: "a");
+                var firstItem = FilterTestHelpers.CreateRenameItem(prefix: "a");
                 filter.Apply(firstItem);
                 Assert.Equal("x", firstItem.Preview.Prefix);
 
@@ -180,7 +180,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     path: replaceListFilePath,
                     contents: "S:a" + Environment.NewLine + "R:y" + Environment.NewLine);
 
-                var secondItem = FilterTestHelpers.CreateFile(prefix: "a");
+                var secondItem = FilterTestHelpers.CreateRenameItem(prefix: "a");
                 filter.Apply(secondItem);
                 Assert.Equal("x", secondItem.Preview.Prefix);
             }

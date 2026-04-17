@@ -87,11 +87,11 @@ namespace Mfr.Tests.Models.Filters.Space
                 _target,
                 new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"]));
 
-            var file = FilterTestHelpers.CreateFile(prefix: "gone%20with%20the%20wind");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "gone%20with%20the%20wind");
             new BaseFilter[] { spaceFilter, titleFilter }.SetupFilters();
-            file.ApplyFilters([spaceFilter, titleFilter]);
+            item.ApplyFilters([spaceFilter, titleFilter]);
 
-            Assert.Equal("Gone_With_the_Wind", file.Preview.Prefix);
+            Assert.Equal("Gone_With_the_Wind", item.Preview.Prefix);
         }
     }
 }

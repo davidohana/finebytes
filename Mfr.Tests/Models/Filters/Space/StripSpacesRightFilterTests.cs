@@ -38,15 +38,15 @@ namespace Mfr.Tests.Models.Filters.Space
 
             var trimFilter = new StripSpacesRightFilter(true, _target);
 
-            var file = FilterTestHelpers.CreateFile(prefix: "__New_York__");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "__New_York__");
 
             // In a real scenario, filters are applied in sequence.
             spaceFilter.Setup();
             trimFilter.Setup();
-            spaceFilter.Apply(file);
-            trimFilter.Apply(file);
+            spaceFilter.Apply(item);
+            trimFilter.Apply(item);
 
-            Assert.Equal("__New_York", file.Preview.Prefix);
+            Assert.Equal("__New_York", item.Preview.Prefix);
         }
 
         /// <summary>

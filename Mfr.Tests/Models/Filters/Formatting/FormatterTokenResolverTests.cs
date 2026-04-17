@@ -13,7 +13,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void ResolveTemplate_KnownTokens_ReplacesValues()
         {
-            var item = FilterTestHelpers.CreateFile(
+            var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
                 extension: ".mp3",
                 directory: @"C:\Music\My Album");
@@ -31,7 +31,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void ResolveTemplate_CounterTokenGlobalIndex_UsesGlobalIndex()
         {
-            var item = FilterTestHelpers.CreateFile(globalIndex: 2, inFolderIndex: 7);
+            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 2, inFolderIndex: 7);
 
             var result = FormatterTokenResolver.ResolveTemplate(
                 template: "<counter:10,1,0,2,0>",
@@ -46,7 +46,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void ResolveTemplate_CounterTokenFolderIndex_UsesInFolderIndex()
         {
-            var item = FilterTestHelpers.CreateFile(globalIndex: 2, inFolderIndex: 7);
+            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 2, inFolderIndex: 7);
 
             var result = FormatterTokenResolver.ResolveTemplate(
                 template: "<counter:10,1,1,2,0>",
@@ -61,7 +61,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void ResolveTemplate_InvalidCounterArgs_Throws()
         {
-            var item = FilterTestHelpers.CreateFile();
+            var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 FormatterTokenResolver.ResolveTemplate(
@@ -77,7 +77,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void ResolveTemplate_UnknownToken_Throws()
         {
-            var item = FilterTestHelpers.CreateFile();
+            var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<NotSupportedException>(() =>
                 FormatterTokenResolver.ResolveTemplate(
