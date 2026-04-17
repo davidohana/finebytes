@@ -20,4 +20,8 @@
     <InternalsVisibleTo Include="Mfr.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="docs\**\*.md" />
+  </ItemGroup>
+
 </Project>

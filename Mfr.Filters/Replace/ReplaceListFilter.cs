@@ -42,7 +42,7 @@ namespace Mfr.Filters.Replace
 
         protected override void _Setup()
         {
-            _replaceListEntries = _LoadReplaceEntries();
+            _replaceListEntries = ReplaceListParser.ParseFile(filePath: Options.FilePath);
         }
 
         protected override string _TransformSegment(string segment, RenameItem item)
@@ -69,16 +69,6 @@ namespace Mfr.Filters.Replace
             }
 
             return transformed;
-        }
-
-        private List<ReplaceListEntry> _LoadReplaceEntries()
-        {
-            if (string.IsNullOrWhiteSpace(Options.FilePath))
-            {
-                throw new InvalidOperationException("Replace-list file path cannot be empty.");
-            }
-
-            return ReplaceListParser.ParseFile(filePath: Options.FilePath);
         }
     }
 }
