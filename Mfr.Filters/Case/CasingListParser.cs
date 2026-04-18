@@ -18,14 +18,15 @@ namespace Mfr.Filters.Case
 
             var lowerWordToCasing = new Dictionary<string, string>(StringComparer.Ordinal);
             var lines = File.ReadAllLines(filePath);
+            var maxLineLen = ConfigLoader.Settings.MaxListFileLineLength;
             for (var i = 0; i < lines.Length; i++)
             {
                 var lineNumber = i + 1;
                 var rawLine = lines[i];
-                if (rawLine.Length > ListFileParseHelpers.MaxListFileLineLength)
+                if (rawLine.Length > maxLineLen)
                 {
                     throw new UserException(
-                        $"Casing-list line {lineNumber} exceeds maximum length ({ListFileParseHelpers.MaxListFileLineLength}).");
+                        $"Casing-list line {lineNumber} exceeds maximum length ({maxLineLen}).");
                 }
 
                 var trimmed = rawLine.Trim();

@@ -11,4 +11,8 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Mfr.Tests" />
+  </ItemGroup>
+
 </Project>

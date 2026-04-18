@@ -15,7 +15,6 @@ namespace Mfr.Filters.Replace
     /// </summary>
     internal static class ReplaceListParser
     {
-        internal const int MaxEntryLineLength = 1000;
         internal const string EmptyReplacementToken = "<EMPTY>";
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace Mfr.Filters.Replace
         /// <description>Search and replacement lines cannot be empty (excluding the prefix). Use <c>&lt;EMPTY&gt;</c> on replacement lines to strip the matched search text.</description>
         /// </item>
         /// <item>
-        /// <description>Search and replacement lines must be at most 1000 characters each.</description>
+        /// <description>Search and replacement lines must be at most the configured list-file line limit (default 1000 characters each).</description>
         /// </item>
         /// <item>
         /// <description>At least one replacement entry must be present.</description>
@@ -122,7 +121,8 @@ namespace Mfr.Filters.Replace
 
         private static void _ValidateLineLength(IReadOnlyList<ReplaceListFileLine> lines)
         {
-            var firstInvalidLine = lines.FirstOrDefault(line => line.Text.Length > MaxEntryLineLength);
+            var maxLen = ConfigLoader.Settings.MaxListFileLineLength;
+            var firstInvalidLine = lines.FirstOrDefault(line => line.Text.Length > maxLen);
             if (firstInvalidLine == default)
             {
                 return;
@@ -130,7 +130,7 @@ namespace Mfr.Filters.Replace
 
             _ThrowInvalidFormat(
                 lineNumber: firstInvalidLine.LineNumber,
-                detail: $"line length exceeds {MaxEntryLineLength} characters.");
+                detail: $"line length exceeds {maxLen} characters.");
         }
 
         private static string _ResolveEmptyReplacementToken(string replacement)

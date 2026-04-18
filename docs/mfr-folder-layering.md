@@ -23,7 +23,9 @@ Supporting:
 
 ## Allowed dependencies
 
-Primary direction:
+**Rule:** A project may reference **any** project in a **strictly lower** layer (all layers below), not only the adjacent one. No references upward or sideways within the same layer.
+
+Illustrative spine (typical flow, not exhaustive):
 
 `Mfr (host) -> Mfr.App.Cli -> Mfr.Core -> Mfr.Filters -> Mfr.Models -> Mfr.Utils`
 

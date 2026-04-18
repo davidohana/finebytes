@@ -19,14 +19,15 @@ namespace Mfr.Filters.Formatting
 
             var rawLines = File.ReadAllLines(filePath);
             var entries = new List<string>(rawLines.Length);
+            var maxLineLen = ConfigLoader.Settings.MaxListFileLineLength;
             for (var i = 0; i < rawLines.Length; i++)
             {
                 var lineNumber = i + 1;
                 var line = rawLines[i];
-                if (line.Length > ListFileParseHelpers.MaxListFileLineLength)
+                if (line.Length > maxLineLen)
                 {
                     throw new UserException(
-                        $"Name-list line {lineNumber} exceeds maximum length ({ListFileParseHelpers.MaxListFileLineLength}).");
+                        $"Name-list line {lineNumber} exceeds maximum length ({maxLineLen}).");
                 }
 
                 if (ListFileParseHelpers.IsListFileCommentLine(line))

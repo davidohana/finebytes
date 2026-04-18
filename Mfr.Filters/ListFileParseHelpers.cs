@@ -8,11 +8,6 @@ namespace Mfr.Filters
     internal static class ListFileParseHelpers
     {
         /// <summary>
-        /// Maximum length (characters) of a single line in name-list and casing-list text files.
-        /// </summary>
-        internal const int MaxListFileLineLength = 1000;
-
-        /// <summary>
         /// Validates that <paramref name="filePath"/> is non-empty and that the file exists.
         /// </summary>
         /// <param name="filePath">Path supplied by the user.</param>

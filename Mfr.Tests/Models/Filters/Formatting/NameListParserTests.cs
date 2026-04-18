@@ -126,7 +126,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void ParseFile_LineTooLong_Throws()
         {
-            var longLine = new string('x', ListFileParseHelpers.MaxListFileLineLength + 1);
+            var longLine = new string('x', ConfigLoader.Settings.MaxListFileLineLength + 1);
             var path = _CreateFile(longLine);
 
             var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path, skipEmptyLines: true));

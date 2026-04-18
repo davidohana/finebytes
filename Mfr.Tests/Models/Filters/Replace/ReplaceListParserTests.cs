@@ -133,12 +133,13 @@ namespace Mfr.Tests.Models.Filters.Replace
         [InlineData(false)]
         public void ParseFile_LineTooLong_Throws(bool isSearch)
         {
-            var tooLong = new string('x', 1001);
+            var settingsMaxListFileLineLength = ConfigLoader.Settings.MaxListFileLineLength;
+            var tooLong = new string('x', settingsMaxListFileLineLength + 1);
             var content = isSearch ? $"S:{tooLong}\nR:b" : $"S:a\nR:{tooLong}";
             var path = _CreateFile(content);
 
             var ex = Assert.Throws<UserException>(() => ReplaceListParser.ParseFile(path));
-            Assert.Contains("line length exceeds 1000", ex.Message);
+            Assert.Contains($"line length exceeds {settingsMaxListFileLineLength}", ex.Message);
         }
 
         private string _CreateFile(string content)

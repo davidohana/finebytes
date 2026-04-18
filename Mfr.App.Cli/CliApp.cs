@@ -60,6 +60,15 @@ namespace Mfr.App.Cli
 
         private static CliExitCode _Execute(CliOptions options)
         {
+            try
+            {
+                ConfigLoader.Load();
+            }
+            catch (InvalidDataException ex)
+            {
+                throw new UserException(ex.Message, ex);
+            }
+
             if (options.PresetsFilePath.IsBlank())
             {
                 throw new UserException("Presets file path is required.");
