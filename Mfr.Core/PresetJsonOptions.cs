@@ -50,7 +50,8 @@ namespace Mfr.Core
             new(typeof(TrimBetweenFilter), "TrimBetween"),
             new(typeof(AttributesSetterFilter), "AttributesSetter"),
             new(typeof(DateSetterFilter), "DateSetter"),
-            new(typeof(TimeSetterFilter), "TimeSetter")
+            new(typeof(TimeSetterFilter), "TimeSetter"),
+            new(typeof(TimeShifterFilter), "TimeShifter")
         ];
 
         internal static JsonSerializerOptions Default { get; } = _CreateOptions();

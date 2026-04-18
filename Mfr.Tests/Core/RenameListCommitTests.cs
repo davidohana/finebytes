@@ -727,6 +727,48 @@ namespace Mfr.Tests.Core
             Assert.Equal(item.Preview.LastWriteTime, after);
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies that last-write time preview commits apply <see cref="TimeShifterFilter"/> shifts.
+        /// </summary>
+        public void Commit_LastWriteTimeOnly_AppliesTimeShifter()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var path = dir.CombinePath("shifted.txt");
+            File.WriteAllText(path, "x");
+            var before = File.GetLastWriteTime(path);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "time-shifter",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new TimeShifterFilter(
+                        Timestamp: TimestampField.LastWrite,
+                        Options: new TimeShifterOptions(Amount: 7, Unit: TimeShiftUnit.Days))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            var item = renameList.RenameItems[0];
+            Assert.True(item.HasPreviewChanges());
+            Assert.Equal(before.AddDays(7), item.Preview.LastWriteTime);
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.Contains(result[0].Changes, c => c.Property == "LastWriteTime");
+
+            var after = File.GetLastWriteTime(path);
+            Assert.Equal(item.Preview.LastWriteTime, after);
+        }
+
         private sealed record UnsupportedTarget : FilterTarget;
     }
 }

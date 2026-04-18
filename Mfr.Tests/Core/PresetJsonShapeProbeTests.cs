@@ -89,6 +89,29 @@ namespace Mfr.Tests.Core
             typed.Setup();
         }
 
+        [Fact]
+        public void TimeShifter_roundtrips_with_timestamp_field()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "TimeShifter",
+              "timestamp": "lastWrite",
+              "options": {
+                "amount": -5,
+                "unit": "days"
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<TimeShifterFilter>(filter);
+            Assert.Equal(-5, typed.Options.Amount);
+            Assert.Equal(TimeShiftUnit.Days, typed.Options.Unit);
+            Assert.Equal(TimestampField.LastWrite, typed.Timestamp);
+            typed.Setup();
+        }
+
         private sealed record PresetContainerWrapper(
             [property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets);
     }

@@ -9,6 +9,7 @@ These pages document **per-filter `options`** (and behavior). Common preset fiel
 - [AttributesSetter](Attributes/AttributesSetter.md)
 - [DateSetter](Attributes/DateSetter.md)
 - [TimeSetter](Attributes/TimeSetter.md)
+- [TimeShifter](Attributes/TimeShifter.md)
 
 ### Case
 
@@ -61,7 +62,7 @@ Each filter in a preset has:
 - `type` — discriminator string (same name as the filter, e.g. `LettersCase`).
 - `enabled` — if `false`, the filter is skipped.
 - `target` — for **file-name** filters only: `{ "family": "FileName", "fileNamePart": "Prefix" | "Extension" | "Full" }` — **Prefix** = name without extension, **Extension** = extension including the dot, **Full** = full file name.
-- `timestamp` — for [DateSetter](Attributes/DateSetter.md) and [TimeSetter](Attributes/TimeSetter.md): which filesystem timestamp to edit — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings).
+- `timestamp` — for [DateSetter](Attributes/DateSetter.md), [TimeSetter](Attributes/TimeSetter.md), and [TimeShifter](Attributes/TimeShifter.md): which filesystem timestamp to edit — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings).
 - **AttributesSetter** has no `target`; it always updates filesystem attributes ([AttributesSetter](Attributes/AttributesSetter.md)).
 - `options` — optional object; filters with no settings omit it.
 
