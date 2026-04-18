@@ -58,18 +58,5 @@ namespace Mfr.Models
                 throw new InvalidDataException($"Config file '{path}': {ex.Message}", ex);
             }
         }
-
-        /// <summary>
-        /// Restores defaults (primarily for tests that call <see cref="Load"/>).
-        /// </summary>
-        internal static void ResetToDefaultsForTests()
-        {
-            _ResetToDefaults();
-        }
-
-        private static void _ResetToDefaults()
-        {
-            Settings = new MfrSettings();
-        }
     }
 }

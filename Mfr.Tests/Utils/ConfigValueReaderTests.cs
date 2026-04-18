@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Utils
@@ -8,21 +9,34 @@ namespace Mfr.Tests.Utils
     /// </summary>
     public sealed class ConfigValueReaderTests
     {
+        private const string IntSamplePropertyName = "intSetting";
+
+        private sealed class SampleIntConfig
+        {
+            [JsonPropertyName(IntSamplePropertyName)]
+            public required string AsString { get; init; }
+        }
+
+        private static string _IntPropertyJson(string value)
+        {
+            return JsonSerializer.Serialize(new SampleIntConfig { AsString = value });
+        }
+
         [Fact]
         public void ReadInt_from_JsonElement_missing_property_leaves_ref_unchanged()
         {
             using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
             var x = 1000;
-            ConfigValueReader.ReadInt(doc.RootElement, "maxListFileLineLength", ref x, 1, 10_000_000);
+            ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10_000_000);
             Assert.Equal(1000, x);
         }
 
         [Fact]
         public void ReadInt_from_JsonElement_sets_ref_when_present()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"maxListFileLineLength":"99"}""");
+            using var doc = JsonDocument.Parse(_IntPropertyJson("99"));
             var x = 0;
-            ConfigValueReader.ReadInt(doc.RootElement, "maxListFileLineLength", ref x, 1, 10_000_000);
+            ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10_000_000);
             Assert.Equal(99, x);
         }
 
@@ -38,30 +52,30 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void ReadInt_from_JsonElement_reads_large_value()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"maxListFileLineLength":"2048"}""");
+            using var doc = JsonDocument.Parse(_IntPropertyJson("2048"));
             var x = 1000;
-            ConfigValueReader.ReadInt(doc.RootElement, "maxListFileLineLength", ref x, 1, 10_000_000);
+            ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10_000_000);
             Assert.Equal(2048, x);
         }
 
         [Fact]
         public void ReadInt_from_JsonElement_non_integer_throws()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"maxListFileLineLength":"x"}""");
+            using var doc = JsonDocument.Parse(_IntPropertyJson("x"));
             var x = 0;
             var ex = Assert.Throws<InvalidDataException>(() =>
-                ConfigValueReader.ReadInt(doc.RootElement, "maxListFileLineLength", ref x, 1, 10_000_000));
-            Assert.Contains("maxListFileLineLength", ex.Message);
+                ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10_000_000));
+            Assert.Contains(IntSamplePropertyName, ex.Message);
             Assert.Contains("integer", ex.Message);
         }
 
         [Fact]
         public void ReadInt_from_JsonElement_out_of_range_throws()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"maxListFileLineLength":"0"}""");
+            using var doc = JsonDocument.Parse(_IntPropertyJson("0"));
             var x = 1;
             Assert.Throws<InvalidDataException>(() =>
-                ConfigValueReader.ReadInt(doc.RootElement, "maxListFileLineLength", ref x, 1, 10));
+                ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10));
         }
 
         [Fact]
