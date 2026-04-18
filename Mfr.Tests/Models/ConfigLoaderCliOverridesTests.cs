@@ -1,4 +1,3 @@
-using System.Text;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models
@@ -11,7 +10,7 @@ namespace Mfr.Tests.Models
         public ConfigLoaderCliOverridesTests()
         {
             var emptyConfigPath = Path.Combine(Path.GetTempPath(), "mfr-test-empty-config-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(emptyConfigPath, """{}""", Encoding.UTF8);
+            File.WriteAllText(emptyConfigPath, """{}""");
             ConfigLoader.Load(emptyConfigPath);
         }
 

@@ -1,4 +1,3 @@
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -46,7 +45,7 @@ namespace Mfr.Core
             PresetContainer container;
             try
             {
-                var json = File.ReadAllText(PresetsFilePath, Encoding.UTF8);
+                var json = File.ReadAllText(PresetsFilePath);
                 container = JsonSerializer.Deserialize<PresetContainer>(json, PresetJsonOptions.Default)
                     ?? throw new InvalidDataException("Presets JSON payload is null or invalid for the expected schema.");
             }
@@ -86,7 +85,7 @@ namespace Mfr.Core
                     .ToList();
                 var container = new PresetContainer(sortedPresets);
                 var json = JsonSerializer.Serialize(container, PresetJsonOptions.Default);
-                File.WriteAllText(PresetsFilePath, json, Encoding.UTF8);
+                File.WriteAllText(PresetsFilePath, json);
             }
             catch (Exception ex)
             {

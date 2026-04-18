@@ -1,4 +1,3 @@
-using System.Text;
 using System.Text.Json;
 using Mfr.Utils;
 using Mfr.Utils.Config;
@@ -20,7 +19,7 @@ namespace Mfr.Models
     /// <see cref="ConfigValueReader"/>; every leaf value is read from a JSON <strong>string</strong> (including integers, e.g. <c>"1000"</c>).
     /// </para>
     /// <para>
-    /// File I/O uses UTF-8. Config binding is covered by <see cref="ApplyCliOverrides"/> tests and
+    /// Config binding is covered by <see cref="ApplyCliOverrides"/> tests and
     /// <see cref="ConfigJsonApplier"/> unit tests rather than a dedicated <c>ConfigLoader</c> fixture type.
     /// </para>
     /// </remarks>
@@ -71,7 +70,7 @@ namespace Mfr.Models
 
             try
             {
-                var json = File.ReadAllText(path, Encoding.UTF8);
+                var json = File.ReadAllText(path);
                 using var doc = JsonDocument.Parse(json);
                 ConfigJsonApplier.Apply(doc.RootElement, settings);
             }
