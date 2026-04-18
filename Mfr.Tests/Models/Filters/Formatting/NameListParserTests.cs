@@ -1,4 +1,3 @@
-using Mfr.Filters;
 using Mfr.Filters.Formatting;
 using Mfr.Models;
 using Mfr.Tests.TestSupport;
