@@ -1,4 +1,3 @@
-using System.IO;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters

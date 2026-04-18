@@ -1,4 +1,3 @@
-using System.IO;
 using Mfr.Filters.Attributes;
 using Mfr.Models;
 
@@ -9,8 +8,10 @@ namespace Mfr.Tests.Models.Filters.Attributes
     /// </summary>
     public sealed class AttributesSetterFilterTests
     {
-        private static AttributesSetterFilter _Filter(AttributesSetterOptions options) =>
-            new(Options: options);
+        private static AttributesSetterFilter _Filter(AttributesSetterOptions options)
+        {
+            return new(Options: options);
+        }
 
         [Fact]
         public void Apply_SetHidden_adds_hidden()
