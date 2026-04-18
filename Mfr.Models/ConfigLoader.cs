@@ -12,7 +12,7 @@ namespace Mfr.Models
     /// <see cref="MfrSettings"/> field initializers.
     /// </para>
     /// <para>
-    /// The document root must be a JSON object. <see cref="ConfigAnnotatedFields.ApplyFromJsonObject"/> maps annotated
+    /// The document root must be a JSON object. <see cref="ConfigApplier.Apply"/> maps annotated
     /// <see cref="MfrSettings"/> fields using <see cref="ConfigValueReader"/>; every value is read from a JSON
     /// <strong>string</strong> (including integers, e.g. <c>"1000"</c>).
     /// </para>
@@ -62,7 +62,7 @@ namespace Mfr.Models
             {
                 var json = File.ReadAllText(path);
                 using var doc = JsonDocument.Parse(json);
-                ConfigAnnotatedFields.ApplyFromJsonObject(doc.RootElement, settings);
+                ConfigApplier.Apply(doc.RootElement, settings);
             }
             catch (Exception ex)
             {

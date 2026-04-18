@@ -7,7 +7,7 @@ namespace Mfr.Utils
     /// Applies JSON config values to public instance fields using <see cref="ConfigIntRangeAttribute"/> and
     /// <see cref="ConfigStringMaxLengthAttribute"/> together with <see cref="ConfigValueReader"/>.
     /// </summary>
-    public static class ConfigAnnotatedFields
+    public static class ConfigApplier
     {
         /// <summary>
         /// For each public instance field declared on the runtime type of <paramref name="target"/> that carries
@@ -25,7 +25,7 @@ namespace Mfr.Utils
         /// <exception cref="InvalidOperationException">
         /// A field has incompatible attributes or types, or both range and string-length attributes.
         /// </exception>
-        public static void ApplyFromJsonObject(
+        public static void Apply(
             JsonElement configObject,
             object target,
             JsonNamingPolicy? jsonPropertyNamingPolicy = null)

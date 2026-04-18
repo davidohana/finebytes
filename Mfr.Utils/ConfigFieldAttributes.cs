@@ -2,7 +2,7 @@ namespace Mfr.Utils
 {
     /// <summary>
     /// Declares inclusive integer bounds for a field when it is populated from JSON by
-    /// <see cref="ConfigAnnotatedFields.ApplyFromJsonObject"/>.
+    /// <see cref="ConfigApplier.Apply"/>.
     /// </summary>
     /// <param name="minInclusive">Minimum allowed value when the JSON property is present.</param>
     /// <param name="maxInclusive">Maximum allowed value when the JSON property is present.</param>
@@ -22,7 +22,7 @@ namespace Mfr.Utils
 
     /// <summary>
     /// Declares a maximum string length for a field when it is populated from JSON by
-    /// <see cref="ConfigAnnotatedFields.ApplyFromJsonObject"/>.
+    /// <see cref="ConfigApplier.Apply"/>.
     /// </summary>
     /// <param name="maxLengthInclusive">Maximum allowed length when the JSON property is present.</param>
     [AttributeUsage(AttributeTargets.Field)]
