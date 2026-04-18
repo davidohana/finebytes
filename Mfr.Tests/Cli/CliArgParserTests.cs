@@ -61,6 +61,16 @@ namespace Mfr.Tests.Cli
 
         [Fact]
         /// <summary>
+        /// Verifies that <c>--config</c> is parsed and trimmed.
+        /// </summary>
+        public void ParseArgs_Accepts_ConfigFilePath()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--config", "  C:\\Temp\\mfr.config.json  "])!;
+            Assert.Equal("C:\\Temp\\mfr.config.json", options.ConfigFilePath);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that repeated <c>--set</c> options are collected.
         /// </summary>
         public void ParseArgs_Accepts_ConfigOverrides()
@@ -88,6 +98,7 @@ namespace Mfr.Tests.Cli
             Assert.True(options.IncludeFiles);
             Assert.False(options.IncludeFolders);
             Assert.False(options.RecursiveDirectoryFileAdd);
+            Assert.Null(options.ConfigFilePath);
             Assert.Empty(options.ConfigOverrides);
         }
 

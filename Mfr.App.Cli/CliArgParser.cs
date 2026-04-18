@@ -82,6 +82,7 @@ namespace Mfr.App.Cli
             var outputFilePath = _GetValueOrDefault(parsedSettings.OutputFilePath, defaultValue: string.Empty);
             var logLevel = _GetValueOrDefault(parsedSettings.LogLevel, defaultValue: CliLogging.DefaultLogLevelName);
             var logDirectoryPath = _GetValueOrDefault(parsedSettings.LogDirectoryPath, defaultValue: string.Empty);
+            var configFilePath = _GetValueOrDefault(parsedSettings.ConfigFilePath, defaultValue: string.Empty);
             var configOverrides = parsedSettings.ConfigOverrides
                 .Where(o => !o.IsBlank())
                 .Select(o => o.Trim())
@@ -100,6 +101,7 @@ namespace Mfr.App.Cli
                 LogLevel: CliLogging.ParseLogLevel(logLevel),
                 LogDirectoryPath: logDirectoryPath.IsBlank() ? null : logDirectoryPath.Trim(),
                 PresetsFilePath: presetsFilePath,
+                ConfigFilePath: configFilePath.IsBlank() ? null : configFilePath.Trim(),
                 ConfigOverrides: configOverrides);
         }
 
@@ -113,7 +115,7 @@ namespace Mfr.App.Cli
                 .AddExample(["C:\\Music\\**\\*.flac", "-p", "lowercase-extension", "--log-level", "debug"])
                 .AddExample(["C:\\Music", "-p", "name_from_id3", "-r"])
                 .AddExample(["C:\\Music", "C:\\Podcasts", "-p", "my_preset", "--files", "yes", "--folders", "yes", "--output-file", "C:\\Temp\\mfr-results.json"])
-                .AddExample(["C:\\Music", "-p", "clean", "--set", "log.maxSessionFiles=50"]);
+                .AddExample(["C:\\Music", "-p", "clean", "--config", "C:\\Temp\\mfr.config.json", "--set", "log.maxSessionFiles=50"]);
         }
 
         private static string _GetAssemblyVersionString()
@@ -202,8 +204,12 @@ namespace Mfr.App.Cli
             [Description("Optional log directory path override.")]
             public string? LogDirectoryPath { get; init; }
 
+            [CommandOption("--config <PATH>")]
+            [Description("Optional mfr.config.json path (default: AppData). File must exist when this option is set.")]
+            public string? ConfigFilePath { get; init; }
+
             [CommandOption("--set <KEY=VALUE>")]
-            [Description("Override a config field (repeatable). Key is section.leaf, e.g. log.maxSessionFiles=200.")]
+            [Description("Override a config field (repeatable). Key is section.leaf (value is everything after the first '='), e.g. log.maxSessionFiles=200.")]
             public string[] ConfigOverrides { get; init; } = [];
         }
     }

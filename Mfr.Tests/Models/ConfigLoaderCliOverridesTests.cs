@@ -1,3 +1,4 @@
+using System.Text;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models
@@ -9,8 +10,17 @@ namespace Mfr.Tests.Models
     {
         public ConfigLoaderCliOverridesTests()
         {
-            var missingConfigPath = Path.Combine(Path.GetTempPath(), "mfr-test-no-config-" + Guid.NewGuid() + ".json");
-            ConfigLoader.Load(missingConfigPath);
+            var emptyConfigPath = Path.Combine(Path.GetTempPath(), "mfr-test-empty-config-" + Guid.NewGuid() + ".json");
+            File.WriteAllText(emptyConfigPath, """{}""", Encoding.UTF8);
+            ConfigLoader.Load(emptyConfigPath);
+        }
+
+        [Fact]
+        public void Load_Throws_When_Explicit_Config_Path_Missing()
+        {
+            var missing = Path.Combine(Path.GetTempPath(), "mfr-test-missing-config-" + Guid.NewGuid() + ".json");
+            var ex = Assert.Throws<InvalidDataException>(() => ConfigLoader.Load(missing));
+            Assert.Contains("not found", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]

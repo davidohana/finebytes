@@ -74,7 +74,8 @@ namespace Mfr.Utils.Config
                 return;
             }
 
-            using var doc = JsonDocument.Parse(merged.ToJsonString());
+            var utf8Json = JsonSerializer.SerializeToUtf8Bytes(merged);
+            using var doc = JsonDocument.Parse(utf8Json);
             ConfigJsonApplier.Apply(doc.RootElement, settings);
         }
 

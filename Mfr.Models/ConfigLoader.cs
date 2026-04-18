@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Mfr.Utils;
 using Mfr.Utils.Config;
@@ -19,8 +20,8 @@ namespace Mfr.Models
     /// <see cref="ConfigValueReader"/>; every leaf value is read from a JSON <strong>string</strong> (including integers, e.g. <c>"1000"</c>).
     /// </para>
     /// <para>
-    /// Do not add a dedicated test type for this class; config loading is exercised indirectly (for example via CLI and
-    /// consumers of <see cref="Settings"/>). This is intentional—keep it that way.
+    /// File I/O uses UTF-8. Config binding is covered by <see cref="ApplyCliOverrides"/> tests and
+    /// <see cref="ConfigJsonApplier"/> unit tests rather than a dedicated <c>ConfigLoader</c> fixture type.
     /// </para>
     /// </remarks>
     public static class ConfigLoader
@@ -48,21 +49,29 @@ namespace Mfr.Models
         /// <param name="configFilePath">
         /// Path to JSON. When <c>null</c> or whitespace, <see cref="DefaultConfigFilePath"/> is used.
         /// </param>
-        /// <exception cref="InvalidDataException">Thrown when the file exists but JSON is invalid or settings are out of range.</exception>
+        /// <exception cref="InvalidDataException">
+        /// Thrown when a user-supplied file path does not exist, or when the file exists but JSON is invalid or settings are out of range.
+        /// </exception>
         public static void Load(string? configFilePath = null)
         {
             var settings = new MfrSettings();
             Settings = settings;
 
-            var path = configFilePath.IsBlank() ? DefaultConfigFilePath() : configFilePath;
+            var useDefaultPath = configFilePath.IsBlank();
+            var path = useDefaultPath ? DefaultConfigFilePath() : configFilePath!.Trim();
             if (!File.Exists(path))
             {
+                if (!useDefaultPath)
+                {
+                    throw new InvalidDataException($"Config file not found: '{path}'.");
+                }
+
                 return;
             }
 
             try
             {
-                var json = File.ReadAllText(path);
+                var json = File.ReadAllText(path, Encoding.UTF8);
                 using var doc = JsonDocument.Parse(json);
                 ConfigJsonApplier.Apply(doc.RootElement, settings);
             }

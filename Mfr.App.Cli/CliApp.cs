@@ -42,7 +42,7 @@ namespace Mfr.App.Cli
 
             try
             {
-                ConfigLoader.Load();
+                ConfigLoader.Load(options.ConfigFilePath);
                 ConfigLoader.ApplyCliOverrides(options.ConfigOverrides);
             }
             catch (InvalidDataException ex)
