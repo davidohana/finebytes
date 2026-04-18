@@ -9,35 +9,35 @@ namespace Mfr.App.Cli
     internal static class CliLogging
     {
         internal const string DefaultLogLevelName = "info";
-        internal const int MaxSessionLogFiles = 100;
-        private const string SessionLogPrefix = "session-";
-        private const string SessionLogExtension = ".log";
-        private const string ConsoleOutputTemplate = "[{Level:u3}] {Message:lj}{NewLine}{Exception}";
-        private const string FileOutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
         internal static CliLoggerSession Start(LogEventLevel logLevel, string? logDirectoryPath)
         {
+            var logSettings = ConfigLoader.Settings;
             var resolvedLogDirectoryPath = _ResolveLogDirectoryPath(logDirectoryPath);
             Directory.CreateDirectory(resolvedLogDirectoryPath);
 
-            var fileName = $"{SessionLogPrefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{SessionLogExtension}";
+            var fileName = $"{logSettings.LogFilePrefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{logSettings.LogFileExtension}";
             var logFilePath = Path.Combine(resolvedLogDirectoryPath, fileName);
 
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Is(logLevel)
                 .WriteTo.Console(
-                    outputTemplate: ConsoleOutputTemplate,
+                    outputTemplate: logSettings.LogConsoleOutputTemplate,
                     theme: AnsiConsoleTheme.Code,
                     standardErrorFromLevel: LogEventLevel.Error)
                 .WriteTo.File(
                     path: logFilePath,
-                    outputTemplate: FileOutputTemplate,
+                    outputTemplate: logSettings.LogFileOutputTemplate,
                     rollingInterval: RollingInterval.Infinite,
                     shared: false)
                 .CreateLogger();
 
             Log.Logger = logger;
-            _PruneSessionLogFiles(resolvedLogDirectoryPath, MaxSessionLogFiles);
+            _PruneSessionLogFiles(
+                logDirectoryPath: resolvedLogDirectoryPath,
+                maxSessionFiles: logSettings.LogMaxSessionFiles,
+                sessionLogPrefix: logSettings.LogFilePrefix,
+                sessionLogExtension: logSettings.LogFileExtension);
             logger.Debug(
                 "Logging initialized. Level: {LogLevel}. File: {LogFilePath}",
                 logLevel,
@@ -61,7 +61,11 @@ namespace Mfr.App.Cli
             };
         }
 
-        private static void _PruneSessionLogFiles(string logDirectoryPath, int maxSessionFiles)
+        private static void _PruneSessionLogFiles(
+            string logDirectoryPath,
+            int maxSessionFiles,
+            string sessionLogPrefix,
+            string sessionLogExtension)
         {
             if (!Directory.Exists(logDirectoryPath))
             {
@@ -69,7 +73,10 @@ namespace Mfr.App.Cli
             }
 
             var sessionLogFilePaths = Directory
-                .EnumerateFiles(logDirectoryPath, $"{SessionLogPrefix}*{SessionLogExtension}", SearchOption.TopDirectoryOnly)
+                .EnumerateFiles(
+                    logDirectoryPath,
+                    $"{sessionLogPrefix}*{sessionLogExtension}",
+                    SearchOption.TopDirectoryOnly)
                 .Select(path => new FileInfo(path))
                 .OrderByDescending(fileInfo => fileInfo.CreationTimeUtc)
                 .ThenByDescending(fileInfo => fileInfo.Name, StringComparer.Ordinal)

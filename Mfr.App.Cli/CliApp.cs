@@ -40,6 +40,16 @@ namespace Mfr.App.Cli
                 return CliExitCode.Success;
             }
 
+            try
+            {
+                ConfigLoader.Load();
+            }
+            catch (InvalidDataException ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                return CliExitCode.UserError;
+            }
+
             using var loggerSession = CliLogging.Start(options.LogLevel, options.LogDirectoryPath);
             var logger = loggerSession.Logger;
             try
@@ -60,15 +70,6 @@ namespace Mfr.App.Cli
 
         private static CliExitCode _Execute(CliOptions options)
         {
-            try
-            {
-                ConfigLoader.Load();
-            }
-            catch (InvalidDataException ex)
-            {
-                throw new UserException(ex.Message, ex);
-            }
-
             if (options.PresetsFilePath.IsBlank())
             {
                 throw new UserException("Presets file path is required.");

@@ -1,4 +1,5 @@
 using Mfr.App.Cli;
+using Mfr.Models;
 using Mfr.Tests.TestSupport;
 using Serilog;
 using Serilog.Events;
@@ -11,6 +12,14 @@ namespace Mfr.Tests.Cli
     public class CliLoggingTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
+
+        /// <summary>
+        /// Resets <see cref="ConfigLoader.Settings"/> via <see cref="ConfigLoader.Load()"/> before each test class instance.
+        /// </summary>
+        public CliLoggingTests()
+        {
+            ConfigLoader.Load();
+        }
 
         /// <summary>
         /// Restores process-level environment variables and temporary resources.
@@ -66,7 +75,7 @@ namespace Mfr.Tests.Cli
                 .OrderBy(name => name, StringComparer.Ordinal)
                 .ToList();
 
-            Assert.Equal(CliLogging.MaxSessionLogFiles, remainingNames.Count);
+            Assert.Equal(ConfigLoader.Settings.LogMaxSessionFiles, remainingNames.Count);
             Assert.DoesNotContain("session-000.log", remainingNames);
             Assert.DoesNotContain("session-001.log", remainingNames);
             Assert.DoesNotContain("session-002.log", remainingNames);
