@@ -65,9 +65,12 @@ namespace Mfr.Filters.Case
         WeirdCase,
 
         /// <summary>
+        /// Title-cases each segment between word separators.
+        /// <para>
         /// Capitalizes the first letter of each segment between occurrences of the current word separator
         /// (U+0020 SPACE by default; set by <c>SpaceCharacter</c> when used earlier in the chain);
         /// words in <see cref="LettersCaseOptions.SkipWords"/> stay lowercase.
+        /// </para>
         /// </summary>
         /// <example>
         /// <para>Typical: <c>hello world</c> → <c>Hello World</c>.</para>
@@ -76,11 +79,14 @@ namespace Mfr.Filters.Case
         TitleCase,
 
         /// <summary>
+        /// Sentence case: lowercase, then capitalize sentence starts.
+        /// <para>
         /// Lowercases the string, then capitalizes the first letter of the whole string and the first
         /// letter after characters in <see cref="RenameItem.SentenceEndChars"/> (default <c>".!?"</c>;
         /// set by <c>SentenceEndCharacters</c> when used earlier in the chain) when followed by one or more
         /// word-separator characters (same as title case: default U+0020 SPACE; set by <c>SpaceCharacter</c>
         /// when used earlier in the chain).
+        /// </para>
         /// </summary>
         /// <example>
         /// <para>Default separator (space): <c>hello world. next line.</c> → <c>Hello world. Next line.</c></para>

@@ -1,19 +1,19 @@
 namespace Mfr.Models
 {
     /// <summary>
-    /// Represents a non-recoverable error caused by invalid user input or configuration.
+    /// Exception for invalid user input or configuration.
     /// </summary>
     public sealed class UserException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserException"/> class.
+        /// Initializes a <see cref="UserException"/> with default state.
         /// </summary>
         public UserException()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserException"/> class with a specified error message.
+        /// Initializes with an error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         public UserException(string? message)
@@ -22,8 +22,7 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserException"/> class with a specified
-        /// error message and a reference to the inner exception that is the cause of this exception.
+        /// Initializes with a message and an inner exception.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="innerException">The exception that is the cause of the current exception.</param>

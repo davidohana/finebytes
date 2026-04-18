@@ -13,7 +13,9 @@ namespace Mfr.Filters.Case
 
     /// <summary>
     /// Uppercases each letter which appears after one of the characters in the defined list.
+    /// <para>
     /// Other characters are left unchanged.
+    /// </para>
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Filter options.</param>

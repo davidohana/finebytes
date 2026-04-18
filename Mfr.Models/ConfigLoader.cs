@@ -5,7 +5,8 @@ using Mfr.Utils.Config;
 namespace Mfr.Models
 {
     /// <summary>
-    /// Process-wide settings optionally loaded from a user JSON file (see <see cref="DefaultConfigFilePath"/>).
+    /// Loads optional process-wide settings from JSON.
+    /// <para>Default file: <see cref="DefaultConfigFilePath"/>.</para>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -14,7 +15,7 @@ namespace Mfr.Models
     /// </para>
     /// <para>
     /// The document root must be a JSON object with nested sections (e.g. <c>filters</c>, <c>log</c>). Each section is a JSON object;
-    /// <see cref="ConfigApplier.Apply"/> maps annotated fields on <see cref="MfrSettings"/> and nested section types using
+    /// <see cref="ConfigJsonApplier.Apply"/> maps annotated fields on <see cref="MfrSettings"/> and nested section types using
     /// <see cref="ConfigValueReader"/>; every leaf value is read from a JSON <strong>string</strong> (including integers, e.g. <c>"1000"</c>).
     /// </para>
     /// <para>
@@ -30,8 +31,8 @@ namespace Mfr.Models
         public static MfrSettings Settings { get; private set; } = new();
 
         /// <summary>
-        /// Gets the default path to the optional JSON config file:
-        /// <c>%ApplicationData%/MagicFileRenamer/mfr.config.json</c>.
+        /// Gets the default JSON config file path.
+        /// <para><c>%ApplicationData%/MagicFileRenamer/mfr.config.json</c>.</para>
         /// </summary>
         /// <returns>An absolute file path.</returns>
         public static string DefaultConfigFilePath()
@@ -41,8 +42,8 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Reads process settings from a JSON file when it exists; otherwise assigns a new <see cref="MfrSettings"/> instance
-        /// with default field values. See remarks on <see cref="ConfigLoader"/> for the JSON schema.
+        /// Loads settings from a JSON file when it exists; otherwise uses defaults.
+        /// <para>Schema: see <see cref="ConfigLoader"/> remarks.</para>
         /// </summary>
         /// <param name="configFilePath">
         /// Path to JSON. When <c>null</c> or whitespace, <see cref="DefaultConfigFilePath"/> is used.
@@ -63,7 +64,7 @@ namespace Mfr.Models
             {
                 var json = File.ReadAllText(path);
                 using var doc = JsonDocument.Parse(json);
-                ConfigApplier.Apply(doc.RootElement, settings);
+                ConfigJsonApplier.Apply(doc.RootElement, settings);
             }
             catch (Exception ex)
             {
@@ -72,8 +73,8 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Applies <c>--set key=value</c> assignments on top of the current <see cref="Settings"/> (after <see cref="Load"/>).
-        /// Each key is a dotted path such as <c>log.maxSessionFiles</c> matching <c>mfr.config.json</c> property names.
+        /// Applies CLI <c>--set</c> overrides to <see cref="Settings"/> (after <see cref="Load"/>).
+        /// <para>Keys are dotted paths (e.g. <c>log.maxSessionFiles</c>) matching <c>mfr.config.json</c>.</para>
         /// </summary>
         /// <param name="assignments">Raw <c>key=value</c> strings from the CLI; blank entries are skipped.</param>
         /// <exception cref="InvalidDataException">Thrown when an assignment is malformed, the path is unknown, or a value is out of range.</exception>
@@ -92,7 +93,7 @@ namespace Mfr.Models
 
             try
             {
-                ConfigCliOverrides.Apply(list, Settings);
+                ConfigOverridesApplier.Apply(list, Settings);
             }
             catch (Exception ex)
             {

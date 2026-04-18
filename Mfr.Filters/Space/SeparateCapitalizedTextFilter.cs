@@ -4,8 +4,11 @@ using Mfr.Models;
 namespace Mfr.Filters.Space
 {
     /// <summary>
-    /// Inserts the current word-separator character between certain character pairs so that
-    /// camel-case words, and boundaries between letters and digits, become separated tokens.
+    /// Inserts word separators between camelCase and letter/digit boundaries.
+    /// <para>
+    /// Uses the current word-separator character (default U+0020 SPACE; see remarks) between pairs so
+    /// camel-case words and letter/digit boundaries become separate tokens.
+    /// </para>
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <remarks>

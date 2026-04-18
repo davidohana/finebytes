@@ -14,8 +14,11 @@ namespace Mfr.Filters.Formatting
         int MoveBy);
 
     /// <summary>
-    /// Splits the target segment by <see cref="TokenMoverOptions.Delimiter"/> and moves one token to a new position,
+    /// Moves one delimiter-separated token within the segment.
+    /// <para>
+    /// Splits by <see cref="TokenMoverOptions.Delimiter"/>, moves the selected token by <see cref="TokenMoverOptions.MoveBy"/>,
     /// clamping to the first or last slot when the offset would leave the token list.
+    /// </para>
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Token mover options.</param>

@@ -4,12 +4,15 @@ using System.Text.Json;
 namespace Mfr.Utils.Config
 {
     /// <summary>
-    /// Parses optional string fields from config JSON using defaults and constraints.
+    /// Reads optional config JSON string properties with validation.
     /// </summary>
     public static class ConfigValueReader
     {
         /// <summary>
-        /// When <paramref name="propertyName"/> is present as a JSON string, parses and assigns <paramref name="value"/>; when missing or JSON null, leaves <paramref name="value"/> unchanged.
+        /// Reads an optional integer from a JSON string property.
+        /// <para>
+        /// When <paramref name="propertyName"/> is missing or JSON null, <paramref name="value"/> is unchanged.
+        /// </para>
         /// </summary>
         /// <param name="configObject">A JSON object (typically the document root).</param>
         /// <param name="propertyName">Object property name; matching is case-insensitive.</param>
@@ -54,7 +57,10 @@ namespace Mfr.Utils.Config
         }
 
         /// <summary>
-        /// When <paramref name="propertyName"/> is present as a JSON string, assigns that string to <paramref name="value"/>; when missing or JSON null, leaves <paramref name="value"/> unchanged.
+        /// Reads an optional string property.
+        /// <para>
+        /// When <paramref name="propertyName"/> is missing or JSON null, <paramref name="value"/> is unchanged.
+        /// </para>
         /// </summary>
         /// <param name="configObject">A JSON object (typically the document root).</param>
         /// <param name="propertyName">Object property name; matching is case-insensitive.</param>

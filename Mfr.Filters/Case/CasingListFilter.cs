@@ -18,7 +18,9 @@ namespace Mfr.Filters.Case
 
     /// <summary>
     /// Changes each word's casing to match how it appears in a casing-list file.
+    /// <para>
     /// Words not found in the list are left unchanged.
+    /// </para>
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Casing-list options.</param>

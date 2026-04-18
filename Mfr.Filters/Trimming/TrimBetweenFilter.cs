@@ -27,8 +27,10 @@ namespace Mfr.Filters.Trimming
 
     /// <summary>
     /// Removes a range of characters defined by start and end positions.
+    /// <para>
     /// Both positions can be anchored to the left or right side of names.
     /// Positions are 1-based and inclusive.
+    /// </para>
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Trimming options.</param>

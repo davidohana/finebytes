@@ -10,7 +10,7 @@ namespace Mfr.Utils.Config
     /// <see cref="ConfigStringMaxLengthAttribute"/> for leaves (via <see cref="ConfigValueReader"/>; leaf values are JSON strings, including integers).
     /// </para>
     /// </summary>
-    public static class ConfigApplier
+    public static class ConfigJsonApplier
     {
         /// <summary>
         /// Binds <paramref name="configObject"/> onto <paramref name="target"/>.

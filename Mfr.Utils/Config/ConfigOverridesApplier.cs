@@ -5,15 +5,20 @@ using System.Text.Json.Nodes;
 namespace Mfr.Utils.Config
 {
     /// <summary>
-    /// Builds JSON from <c>--set section.leaf=value</c> assignments and applies them via <see cref="ConfigApplier"/>,
-    /// validating paths against the annotated public fields of the root settings type.
+    /// Applies CLI <c>--set</c> assignments to annotated settings.
+    /// <para>
+    /// Builds merged JSON from <c>section.leaf=value</c> keys, validates paths, then uses <see cref="ConfigJsonApplier"/>.
+    /// </para>
     /// </summary>
-    public static class ConfigCliOverrides
+    public static class ConfigOverridesApplier
     {
         private static readonly JsonNamingPolicy s_Naming = JsonNamingPolicy.CamelCase;
 
         /// <summary>
-        /// Parses assignments, validates dotted paths against <typeparamref name="TSettings"/>, merges JSON, and applies to <paramref name="settings"/>.
+        /// Applies parsed <c>--set</c> strings to <paramref name="settings"/>.
+        /// <para>
+        /// Validates dotted paths against <typeparamref name="TSettings"/>, merges JSON, then <see cref="ConfigJsonApplier.Apply"/>.
+        /// </para>
         /// </summary>
         /// <typeparam name="TSettings">Root settings type with <see cref="ConfigSectionAttribute"/> sections and leaf attributes.</typeparam>
         /// <param name="assignments">Raw <c>key=value</c> strings; blank entries are skipped.</param>
@@ -70,7 +75,7 @@ namespace Mfr.Utils.Config
             }
 
             using var doc = JsonDocument.Parse(merged.ToJsonString());
-            ConfigApplier.Apply(doc.RootElement, settings);
+            ConfigJsonApplier.Apply(doc.RootElement, settings);
         }
 
         private static void _MergeValidated(JsonObject parent, Type containerType, string[] segments, string value)

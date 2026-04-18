@@ -7,7 +7,7 @@ using Spectre.Console;
 namespace Mfr.App.Cli
 {
     /// <summary>
-    /// Provides the command-line entry point and output formatting for the Mfr application.
+    /// CLI entry point and console output for Mfr.
     /// </summary>
     public static class CliApp
     {
