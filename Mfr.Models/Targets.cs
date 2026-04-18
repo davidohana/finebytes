@@ -3,24 +3,27 @@ using System.Text.Json.Serialization;
 namespace Mfr.Models
 {
     /// <summary>
-    /// Identifies the kind of target data a filter can operate on.
+    /// Which filesystem timestamp field date/time filters modify.
     /// </summary>
-    public enum FilterTargetFamily
+    public enum TimestampField
     {
-        FileName,
-        FileExtension,
-        FullFileName,
-        FullFilePath,
-        DirectorySegment,
-        FileContents,
-        Attributes,
-        CreationDate,
-        LastWriteDate,
-        LastAccessDate,
-        AudioTag,
-        Id3v1,
-        Id3v2,
-        ImageTag
+        /// <summary>
+        /// Creation time.
+        /// </summary>
+        [JsonStringEnumMemberName("creation")]
+        Creation,
+
+        /// <summary>
+        /// Last write time.
+        /// </summary>
+        [JsonStringEnumMemberName("lastWrite")]
+        LastWrite,
+
+        /// <summary>
+        /// Last access time.
+        /// </summary>
+        [JsonStringEnumMemberName("lastAccess")]
+        LastAccess
     }
 
     /// <summary>
@@ -34,68 +37,15 @@ namespace Mfr.Models
     }
 
     /// <summary>
-    /// Represents a polymorphic filter target.
+    /// Represents a polymorphic filter target for file-name segment filters.
     /// </summary>
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "family")]
     [JsonDerivedType(typeof(FileNameTarget), "FileName")]
-    [JsonDerivedType(typeof(AttributesTarget), "Attributes")]
-    [JsonDerivedType(typeof(CreationDateTarget), "CreationDate")]
-    [JsonDerivedType(typeof(LastWriteDateTarget), "LastWriteDate")]
-    [JsonDerivedType(typeof(LastAccessDateTarget), "LastAccessDate")]
-    public abstract record FilterTarget
-    {
-        /// <summary>
-        /// Gets the target family for serialization and dispatch.
-        /// </summary>
-        [JsonIgnore]
-        public abstract FilterTargetFamily Family { get; }
-    }
+    public abstract record FilterTarget;
 
     /// <summary>
     /// Targets file-name content using a selected part.
     /// </summary>
     /// <param name="FileNamePart">The file-name part to target.</param>
-    public sealed record FileNameTarget(FileNamePart FileNamePart) : FilterTarget
-    {
-        /// <summary>
-        /// Gets the target family.
-        /// </summary>
-        public override FilterTargetFamily Family => FilterTargetFamily.FileName;
-    }
-
-    /// <summary>
-    /// Targets filesystem attributes (read-only, hidden, archive, system).
-    /// </summary>
-    public sealed record AttributesTarget : FilterTarget
-    {
-        /// <inheritdoc />
-        public override FilterTargetFamily Family => FilterTargetFamily.Attributes;
-    }
-
-    /// <summary>
-    /// Targets the filesystem creation timestamp (date and/or time filters).
-    /// </summary>
-    public sealed record CreationDateTarget : FilterTarget
-    {
-        /// <inheritdoc />
-        public override FilterTargetFamily Family => FilterTargetFamily.CreationDate;
-    }
-
-    /// <summary>
-    /// Targets the last-write timestamp (date and/or time filters).
-    /// </summary>
-    public sealed record LastWriteDateTarget : FilterTarget
-    {
-        /// <inheritdoc />
-        public override FilterTargetFamily Family => FilterTargetFamily.LastWriteDate;
-    }
-
-    /// <summary>
-    /// Targets the last-access timestamp (date and/or time filters).
-    /// </summary>
-    public sealed record LastAccessDateTarget : FilterTarget
-    {
-        /// <inheritdoc />
-        public override FilterTargetFamily Family => FilterTargetFamily.LastAccessDate;
-    }
+    public sealed record FileNameTarget(FileNamePart FileNamePart) : FilterTarget;
 }

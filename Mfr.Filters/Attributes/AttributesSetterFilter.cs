@@ -40,24 +40,12 @@ namespace Mfr.Filters.Attributes
     /// <summary>
     /// Sets or clears filesystem attributes on each rename item (preview and commit).
     /// </summary>
-    /// <param name="Target">Must serialize as <see cref="AttributesTarget"/>.</param>
     /// <param name="Options">Per-flag tri-state options.</param>
     public sealed record AttributesSetterFilter(
-        FilterTarget Target,
-        AttributesSetterOptions Options) : BaseFilter(Target)
+        AttributesSetterOptions Options) : BaseFilter
     {
         /// <inheritdoc />
         public override string Type => "AttributesSetter";
-
-        /// <inheritdoc />
-        protected override void _Setup()
-        {
-            if (Target is not AttributesTarget)
-            {
-                throw new InvalidOperationException(
-                    "AttributesSetter requires target with family 'Attributes'.");
-            }
-        }
 
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)

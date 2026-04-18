@@ -10,7 +10,7 @@ namespace Mfr.Tests.Models.Filters.Attributes
     public sealed class AttributesSetterFilterTests
     {
         private static AttributesSetterFilter _Filter(AttributesSetterOptions options) =>
-            new(Target: new AttributesTarget(), Options: options);
+            new(Options: options);
 
         [Fact]
         public void Apply_SetHidden_adds_hidden()

@@ -2,11 +2,11 @@
 
 Sets the **time-of-day** for **creation**, **last write**, or **last access** time on each item. The filter does **not** change the calendar date portion of that timestamp; use [DateSetter](DateSetter.md) for that.
 
-Choose which timestamp field to edit with `target.family`:
+Choose which timestamp field to edit with the `timestamp` property:
 
-- **`CreationDate`** — creation time
-- **`LastWriteDate`** — last modified
-- **`LastAccessDate`** — last accessed
+- **`creation`** — creation time
+- **`lastWrite`** — last modified
+- **`lastAccess`** — last accessed
 
 Preview updates the corresponding `DateTime` on `FileMeta`; commit applies `File.Set*` time APIs when the preview differs from the scan-time original.
 
@@ -14,15 +14,15 @@ Preview updates the corresponding `DateTime` on `FileMeta`; commit applies `File
 
 | Options | Before | After | Comment |
 |---------|--------|-------|---------|
-| `time`: `09:00:15`<br>target: `CreationDate` | Creation `2024-03-15 14:05:30` | Creation `2024-03-15 09:00:15` | Date preserved. |
-| `time`: `23:59:01`<br>target: `LastAccessDate` | Last access `2019-01-01 12:00:00` | Last access `2019-01-01 23:59:01` | |
+| `time`: `09:00:15`<br>`timestamp`: `creation` | Creation `2024-03-15 14:05:30` | Creation `2024-03-15 09:00:15` | Date preserved. |
+| `time`: `23:59:01`<br>`timestamp`: `lastAccess` | Last access `2019-01-01 12:00:00` | Last access `2019-01-01 23:59:01` | |
 
 ## Sample preset (JSON)
 
 ```json
 {
   "type": "TimeSetter",
-  "target": { "family": "CreationDate" },
+  "timestamp": "creation",
   "options": {
     "time": "09:00:15"
   }

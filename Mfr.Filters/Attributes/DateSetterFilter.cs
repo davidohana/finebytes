@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 using Mfr.Models;
 
@@ -13,39 +14,32 @@ namespace Mfr.Filters.Attributes
     /// <summary>
     /// Sets the calendar date for creation, last write, or last access time. Does not change the time-of-day part.
     /// </summary>
-    /// <param name="Target">One of <see cref="CreationDateTarget"/>, <see cref="LastWriteDateTarget"/>, <see cref="LastAccessDateTarget"/>.</param>
+    /// <param name="Timestamp">Which timestamp field to set.</param>
     /// <param name="Options">Date value for the chosen timestamp field.</param>
     public sealed record DateSetterFilter(
-        FilterTarget Target,
-        DateSetterOptions Options) : BaseFilter(Target)
+        [property: JsonPropertyName("timestamp")] TimestampField Timestamp,
+        DateSetterOptions Options) : BaseFilter
     {
         /// <inheritdoc />
         public override string Type => "DateSetter";
 
         /// <inheritdoc />
-        protected override void _Setup()
-        {
-            TimestampTargets.Require(Target);
-        }
-
-        /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
         {
             var preview = item.Preview;
-            switch (Target)
+            switch (Timestamp)
             {
-                case CreationDateTarget:
+                case TimestampField.Creation:
                     preview.CreationTime = _SetDatePreserveTime(preview.CreationTime, Options.Date);
                     break;
-                case LastWriteDateTarget:
+                case TimestampField.LastWrite:
                     preview.LastWriteTime = _SetDatePreserveTime(preview.LastWriteTime, Options.Date);
                     break;
-                case LastAccessDateTarget:
+                case TimestampField.LastAccess:
                     preview.LastAccessTime = _SetDatePreserveTime(preview.LastAccessTime, Options.Date);
                     break;
                 default:
-                    throw new InvalidOperationException(
-                        "DateSetter requires target family CreationDate, LastWriteDate, or LastAccessDate.");
+                    throw new UnreachableException();
             }
         }
 

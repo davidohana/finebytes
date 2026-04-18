@@ -622,7 +622,6 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new AttributesSetterFilter(
-                        Target: new AttributesTarget(),
                         Options: new AttributesSetterOptions(
                             ReadOnly: AttributeTriState.Keep,
                             Hidden: AttributeTriState.Set,
@@ -667,7 +666,6 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new AttributesSetterFilter(
-                        Target: new AttributesTarget(),
                         Options: new AttributesSetterOptions(
                             ReadOnly: AttributeTriState.Keep,
                             Hidden: AttributeTriState.Set,
@@ -709,7 +707,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new DateSetterFilter(
-                        Target: new LastWriteDateTarget(),
+                        Timestamp: TimestampField.LastWrite,
                         Options: new DateSetterOptions(Date: DateOnly.FromDateTime(before.AddDays(30))))
                 ])
             };
@@ -729,9 +727,6 @@ namespace Mfr.Tests.Core
             Assert.Equal(item.Preview.LastWriteTime, after);
         }
 
-        private sealed record UnsupportedTarget : FilterTarget
-        {
-            public override FilterTargetFamily Family => FilterTargetFamily.FileContents;
-        }
+        private sealed record UnsupportedTarget : FilterTarget;
     }
 }

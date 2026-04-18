@@ -2,10 +2,9 @@ namespace Mfr.Models
 {
     /// <summary>
     /// Filter that transforms a single string segment for <see cref="FileNameTarget"/> (prefix, extension, or full name).
-    /// Other targets (e.g. attributes, future ID3) use <see cref="BaseFilter"/> with a custom <see cref="BaseFilter.ApplyCore"/>.
     /// </summary>
     /// <param name="Target">The filter target (expected to be <see cref="FileNameTarget"/> at apply time).</param>
-    public abstract record FileNameSegmentFilter(FilterTarget Target) : BaseFilter(Target)
+    public abstract record FileNameSegmentFilter(FilterTarget Target) : BaseFilter
     {
         /// <inheritdoc />
         protected internal sealed override void ApplyCore(RenameItem item)
@@ -13,7 +12,7 @@ namespace Mfr.Models
             if (Target is not FileNameTarget fileTarget)
             {
                 throw new NotSupportedException(
-                    $"Filter '{Type}' does not support target.family='{Target.Family}'.");
+                    $"Filter '{Type}' requires a FileName target; got '{Target.GetType().Name}'.");
             }
 
             var sourceFileEntry = item.Preview;

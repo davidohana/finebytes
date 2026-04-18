@@ -5,8 +5,7 @@ namespace Mfr.Models
     /// <summary>
     /// Represents a polymorphic filter.
     /// </summary>
-    /// <param name="Target">The target that this filter applies to.</param>
-    public abstract record BaseFilter(FilterTarget Target)
+    public abstract record BaseFilter
     {
         private bool _isSetupComplete;
 

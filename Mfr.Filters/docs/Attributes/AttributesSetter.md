@@ -25,7 +25,6 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 ```json
 {
   "type": "AttributesSetter",
-  "target": { "family": "Attributes" },
   "options": {
     "readOnly": "Keep",
     "hidden": "Set",
