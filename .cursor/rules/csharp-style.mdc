@@ -6,7 +6,7 @@ alwaysApply: true
 
 # C# code style
 
-- Public API docs: add XML docs to every `public` member with `summary` and relevant `param`/`returns` tags.
+- Public API docs: every `public` member gets `summary` plus `param` / `returns` / `exception` as needed. Start `<summary>` with one short line; put extra detail in a following `<para>...</para>` block.
 - Private methods: prefix every `private` method name with `_` (including `static` and `async`).
 - Control flow: prefer early `return` and early `continue`/`break`; keep the happy path at base indentation.
 - Ternary usage: only use ternary for simple value selection (`condition ? valueA : valueB` with trivial operands).
