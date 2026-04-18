@@ -185,8 +185,8 @@ namespace Mfr.Core
                 }
 
                 var destPath = item.Preview.FullPath;
-                var attributesBeforeCommit = item.Original.Attributes;
-                var attributesAfterPreview = item.Preview.Attributes;
+                var originalSnapshot = item.Original;
+                var previewSnapshot = item.Preview;
                 try
                 {
                     if (!dryRun)
@@ -198,8 +198,8 @@ namespace Mfr.Core
                     var changes = _BuildCommitChanges(
                         sourcePath: sourcePath,
                         destinationPath: destPath,
-                        originalAttributes: attributesBeforeCommit,
-                        previewAttributes: attributesAfterPreview);
+                        originalSnapshot: originalSnapshot,
+                        previewSnapshot: previewSnapshot);
                     results.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
                         Status: RenameStatus.CommitOk,
@@ -246,14 +246,14 @@ namespace Mfr.Core
         /// </summary>
         /// <param name="sourcePath">Original source path.</param>
         /// <param name="destinationPath">Destination path.</param>
-        /// <param name="originalAttributes">Attributes before commit.</param>
-        /// <param name="previewAttributes">Attributes after preview (applied on commit).</param>
+        /// <param name="originalSnapshot">Original metadata before commit.</param>
+        /// <param name="previewSnapshot">Preview metadata to apply.</param>
         /// <returns>Property-level changes for result reporting.</returns>
         private static List<RenamePropertyChange> _BuildCommitChanges(
             string sourcePath,
             string destinationPath,
-            FileAttributes originalAttributes,
-            FileAttributes previewAttributes)
+            FileMeta originalSnapshot,
+            FileMeta previewSnapshot)
         {
             var changes = new List<RenamePropertyChange>();
             var sourceFileName = Path.GetFileName(sourcePath);
@@ -267,12 +267,36 @@ namespace Mfr.Core
                     NewValue: destinationFileName));
             }
 
-            if (originalAttributes != previewAttributes)
+            if (originalSnapshot.Attributes != previewSnapshot.Attributes)
             {
                 changes.Add(new RenamePropertyChange(
                     Property: "Attributes",
-                    OldValue: originalAttributes.ToString(),
-                    NewValue: previewAttributes.ToString()));
+                    OldValue: originalSnapshot.Attributes.ToString(),
+                    NewValue: previewSnapshot.Attributes.ToString()));
+            }
+
+            if (originalSnapshot.CreationTime != previewSnapshot.CreationTime)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "CreationTime",
+                    OldValue: originalSnapshot.CreationTime.ToString("O"),
+                    NewValue: previewSnapshot.CreationTime.ToString("O")));
+            }
+
+            if (originalSnapshot.LastWriteTime != previewSnapshot.LastWriteTime)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "LastWriteTime",
+                    OldValue: originalSnapshot.LastWriteTime.ToString("O"),
+                    NewValue: previewSnapshot.LastWriteTime.ToString("O")));
+            }
+
+            if (originalSnapshot.LastAccessTime != previewSnapshot.LastAccessTime)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "LastAccessTime",
+                    OldValue: originalSnapshot.LastAccessTime.ToString("O"),
+                    NewValue: previewSnapshot.LastAccessTime.ToString("O")));
             }
 
             return changes;
@@ -424,7 +448,10 @@ namespace Mfr.Core
                     directoryPath: directoryPath,
                     prefix: prefix,
                     extension: extension,
-                    attributes: attrs);
+                    attributes: attrs,
+                    creationTime: File.GetCreationTime(fullPath),
+                    lastWriteTime: File.GetLastWriteTime(fullPath),
+                    lastAccessTime: File.GetLastAccessTime(fullPath));
                 var renameItem = new RenameItem(fileMeta);
                 _renameItems.Add(renameItem);
                 addedCount++;

@@ -48,7 +48,9 @@ namespace Mfr.Core
             new(typeof(StripSpacesLeftFilter), "StripSpacesLeft"),
             new(typeof(StripSpacesRightFilter), "StripSpacesRight"),
             new(typeof(TrimBetweenFilter), "TrimBetween"),
-            new(typeof(AttributesSetterFilter), "AttributesSetter")
+            new(typeof(AttributesSetterFilter), "AttributesSetter"),
+            new(typeof(DateSetterFilter), "DateSetter"),
+            new(typeof(TimeSetterFilter), "TimeSetter")
         ];
 
         internal static JsonSerializerOptions Default { get; } = _CreateOptions();

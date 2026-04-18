@@ -141,15 +141,19 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Whether preview differs from the original snapshot (path or filesystem attributes).
+        /// Whether preview differs from the original snapshot (path, filesystem attributes, or timestamps).
         /// </summary>
         public bool HasPreviewChanges()
         {
-            return !IsPreviewPathSameAsOriginal() || Original.Attributes != Preview.Attributes;
+            return !IsPreviewPathSameAsOriginal()
+                || Original.Attributes != Preview.Attributes
+                || Original.CreationTime != Preview.CreationTime
+                || Original.LastWriteTime != Preview.LastWriteTime
+                || Original.LastAccessTime != Preview.LastAccessTime;
         }
 
         /// <summary>
-        /// Applies the preview rename and attribute changes on disk for this item.
+        /// Applies the preview rename, attribute, and timestamp changes on disk for this item.
         /// Updates <see cref="Original"/> to match the applied preview; <see cref="Preview"/> is left as-is until the host calls <see cref="ClearPreview"/>.
         /// </summary>
         public void Commit()
@@ -163,6 +167,21 @@ namespace Mfr.Models
             if (Original.Attributes != Preview.Attributes)
             {
                 File.SetAttributes(pathOnDisk, Preview.Attributes);
+            }
+
+            if (Original.CreationTime != Preview.CreationTime)
+            {
+                File.SetCreationTime(pathOnDisk, Preview.CreationTime);
+            }
+
+            if (Original.LastWriteTime != Preview.LastWriteTime)
+            {
+                File.SetLastWriteTime(pathOnDisk, Preview.LastWriteTime);
+            }
+
+            if (Original.LastAccessTime != Preview.LastAccessTime)
+            {
+                File.SetLastAccessTime(pathOnDisk, Preview.LastAccessTime);
             }
 
             if (HasPreviewChanges())

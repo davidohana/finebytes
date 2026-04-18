@@ -7,6 +7,8 @@ These pages document **per-filter `options`** (and behavior). Common preset fiel
 ### Attributes
 
 - [AttributesSetter](Attributes/AttributesSetter.md)
+- [DateSetter](Attributes/DateSetter.md)
+- [TimeSetter](Attributes/TimeSetter.md)
 
 ### Case
 
@@ -58,7 +60,7 @@ Each filter in a preset has:
 
 - `type` — discriminator string (same name as the filter, e.g. `LettersCase`).
 - `enabled` — if `false`, the filter is skipped.
-- `target` — what is transformed (for file names: `{ "family": "FileName", "fileNamePart": "Prefix" | "Extension" | "Full" }` — **Prefix** = name without extension, **Extension** = extension including the dot, **Full** = full file name). For attributes: `{ "family": "Attributes" }` ([AttributesSetter](Attributes/AttributesSetter.md)).
+- `target` — what is transformed (for file names: `{ "family": "FileName", "fileNamePart": "Prefix" | "Extension" | "Full" }` — **Prefix** = name without extension, **Extension** = extension including the dot, **Full** = full file name). For attributes: `{ "family": "Attributes" }` ([AttributesSetter](Attributes/AttributesSetter.md)). For date/time on timestamps: `{ "family": "CreationDate" }`, `{ "family": "LastWriteDate" }`, or `{ "family": "LastAccessDate" }` ([DateSetter](Attributes/DateSetter.md), [TimeSetter](Attributes/TimeSetter.md)).
 - `options` — optional object; filters with no settings omit it.
 
 Property names use **camelCase**; enum values usually match the C# names (e.g. `TitleCase`, `Literal`).

@@ -687,6 +687,48 @@ namespace Mfr.Tests.Core
             Assert.False(attrsAfter.HasFlag(FileAttributes.Hidden));
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies that last-write time preview commits call <see cref="File.SetLastWriteTime"/>.
+        /// </summary>
+        public void Commit_LastWriteTimeOnly_AppliesDateSetter()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var path = dir.CombinePath("dated.txt");
+            File.WriteAllText(path, "x");
+            var before = File.GetLastWriteTime(path);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "last-write",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new DateSetterFilter(
+                        Target: new LastWriteDateTarget(),
+                        Options: new DateSetterOptions(Date: DateOnly.FromDateTime(before.AddDays(30))))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            var item = renameList.RenameItems[0];
+            Assert.True(item.HasPreviewChanges());
+            Assert.NotEqual(before, item.Preview.LastWriteTime);
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.Contains(result[0].Changes, c => c.Property == "LastWriteTime");
+
+            var after = File.GetLastWriteTime(path);
+            Assert.Equal(item.Preview.LastWriteTime, after);
+        }
+
         private sealed record UnsupportedTarget : FilterTarget
         {
             public override FilterTargetFamily Family => FilterTargetFamily.FileContents;

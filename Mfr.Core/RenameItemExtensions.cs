@@ -44,7 +44,7 @@ namespace Mfr.Core
         /// </summary>
         /// <param name="renameItem">The previewed item to describe.</param>
         /// <returns>
-        /// Non-empty text when the preview differs from the original (path or attributes); otherwise an empty string.
+        /// Non-empty text when the preview differs from the original (path, attributes, or timestamps); otherwise an empty string.
         /// When there are no per-property deltas but paths still differ, the full source and destination paths are shown.
         /// </returns>
         public static string FormatPreviewChangesForDisplay(this RenameItem renameItem)
@@ -105,6 +105,30 @@ namespace Mfr.Core
                     Property: "Attributes",
                     OldValue: renameItem.Original.Attributes.ToString(),
                     NewValue: renameItem.Preview.Attributes.ToString()));
+            }
+
+            if (renameItem.Original.CreationTime != renameItem.Preview.CreationTime)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "CreationTime",
+                    OldValue: renameItem.Original.CreationTime.ToString("O"),
+                    NewValue: renameItem.Preview.CreationTime.ToString("O")));
+            }
+
+            if (renameItem.Original.LastWriteTime != renameItem.Preview.LastWriteTime)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "LastWriteTime",
+                    OldValue: renameItem.Original.LastWriteTime.ToString("O"),
+                    NewValue: renameItem.Preview.LastWriteTime.ToString("O")));
+            }
+
+            if (renameItem.Original.LastAccessTime != renameItem.Preview.LastAccessTime)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "LastAccessTime",
+                    OldValue: renameItem.Original.LastAccessTime.ToString("O"),
+                    NewValue: renameItem.Preview.LastAccessTime.ToString("O")));
             }
 
             return changes;

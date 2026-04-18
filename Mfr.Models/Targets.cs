@@ -39,6 +39,9 @@ namespace Mfr.Models
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "family")]
     [JsonDerivedType(typeof(FileNameTarget), "FileName")]
     [JsonDerivedType(typeof(AttributesTarget), "Attributes")]
+    [JsonDerivedType(typeof(CreationDateTarget), "CreationDate")]
+    [JsonDerivedType(typeof(LastWriteDateTarget), "LastWriteDate")]
+    [JsonDerivedType(typeof(LastAccessDateTarget), "LastAccessDate")]
     public abstract record FilterTarget
     {
         /// <summary>
@@ -67,5 +70,32 @@ namespace Mfr.Models
     {
         /// <inheritdoc />
         public override FilterTargetFamily Family => FilterTargetFamily.Attributes;
+    }
+
+    /// <summary>
+    /// Targets the filesystem creation timestamp (date and/or time filters).
+    /// </summary>
+    public sealed record CreationDateTarget : FilterTarget
+    {
+        /// <inheritdoc />
+        public override FilterTargetFamily Family => FilterTargetFamily.CreationDate;
+    }
+
+    /// <summary>
+    /// Targets the last-write timestamp (date and/or time filters).
+    /// </summary>
+    public sealed record LastWriteDateTarget : FilterTarget
+    {
+        /// <inheritdoc />
+        public override FilterTargetFamily Family => FilterTargetFamily.LastWriteDate;
+    }
+
+    /// <summary>
+    /// Targets the last-access timestamp (date and/or time filters).
+    /// </summary>
+    public sealed record LastAccessDateTarget : FilterTarget
+    {
+        /// <inheritdoc />
+        public override FilterTargetFamily Family => FilterTargetFamily.LastAccessDate;
     }
 }

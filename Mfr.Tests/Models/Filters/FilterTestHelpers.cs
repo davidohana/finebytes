@@ -14,6 +14,9 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
         /// <param name="directory">Parent directory path, or a default when null.</param>
         /// <param name="attributes">Filesystem attributes for the synthetic item.</param>
+        /// <param name="creationTime">Optional creation time; defaults to a fixed test value.</param>
+        /// <param name="lastWriteTime">Optional last write time; defaults to a fixed test value.</param>
+        /// <param name="lastAccessTime">Optional last access time; defaults to a fixed test value.</param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
             string prefix = "track",
@@ -21,10 +24,23 @@ namespace Mfr.Tests.Models.Filters
             int globalIndex = 0,
             int inFolderIndex = 0,
             string? directory = null,
-            FileAttributes attributes = FileAttributes.Normal)
+            FileAttributes attributes = FileAttributes.Normal,
+            DateTime? creationTime = null,
+            DateTime? lastWriteTime = null,
+            DateTime? lastAccessTime = null)
         {
             directory ??= @"C:\Music\Album";
-            return new RenameItem(new FileMeta(globalIndex, inFolderIndex, directory, prefix, extension, attributes));
+            var baseline = new DateTime(2024, 6, 1, 12, 30, 45, DateTimeKind.Unspecified);
+            return new RenameItem(new FileMeta(
+                globalIndex,
+                inFolderIndex,
+                directory,
+                prefix,
+                extension,
+                attributes,
+                creationTime: creationTime ?? baseline,
+                lastWriteTime: lastWriteTime ?? baseline,
+                lastAccessTime: lastAccessTime ?? baseline));
         }
 
         /// <summary>

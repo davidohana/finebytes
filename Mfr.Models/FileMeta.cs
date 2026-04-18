@@ -9,13 +9,19 @@ namespace Mfr.Models
     /// <param name="prefix">File name without extension.</param>
     /// <param name="extension">File extension including the leading dot.</param>
     /// <param name="attributes">Filesystem attributes for this entry.</param>
+    /// <param name="creationTime">File creation time (local), from scan or synthetic tests.</param>
+    /// <param name="lastWriteTime">Last write time (local), from scan or synthetic tests.</param>
+    /// <param name="lastAccessTime">Last access time (local), from scan or synthetic tests.</param>
     public sealed class FileMeta(
         int globalIndex,
         int inFolderIndex,
         string directoryPath,
         string prefix,
         string extension,
-        FileAttributes attributes = FileAttributes.Normal)
+        FileAttributes attributes = FileAttributes.Normal,
+        DateTime creationTime = default,
+        DateTime lastWriteTime = default,
+        DateTime lastAccessTime = default)
     {
         /// <summary>
         /// Gets or sets the zero-based index across all scanned files.
@@ -53,6 +59,21 @@ namespace Mfr.Models
         public FileAttributes Attributes { get; set; } = attributes;
 
         /// <summary>
+        /// Gets or sets the creation time (local) for preview/commit.
+        /// </summary>
+        public DateTime CreationTime { get; set; } = creationTime;
+
+        /// <summary>
+        /// Gets or sets the last write time (local) for preview/commit.
+        /// </summary>
+        public DateTime LastWriteTime { get; set; } = lastWriteTime;
+
+        /// <summary>
+        /// Gets or sets the last access time (local) for preview/commit.
+        /// </summary>
+        public DateTime LastAccessTime { get; set; } = lastAccessTime;
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -64,7 +85,10 @@ namespace Mfr.Models
                 directoryPath: DirectoryPath,
                 prefix: Prefix,
                 extension: Extension,
-                attributes: Attributes);
+                attributes: Attributes,
+                creationTime: CreationTime,
+                lastWriteTime: LastWriteTime,
+                lastAccessTime: LastAccessTime);
         }
     }
 }

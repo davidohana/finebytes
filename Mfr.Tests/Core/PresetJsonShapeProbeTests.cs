@@ -96,6 +96,27 @@ namespace Mfr.Tests.Core
             Assert.IsType<AttributesTarget>(typed.Target);
         }
 
+        [Fact]
+        public void DateSetter_roundtrips_with_LastWriteDate_target()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "DateSetter",
+              "target": { "family": "LastWriteDate" },
+              "options": {
+                "date": "2021-07-04"
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<DateSetterFilter>(filter);
+            Assert.Equal(new DateOnly(2021, 7, 4), typed.Options.Date);
+            typed.Setup();
+            Assert.IsType<LastWriteDateTarget>(typed.Target);
+        }
+
         private sealed record PresetContainerWrapper(
             [property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets);
     }
