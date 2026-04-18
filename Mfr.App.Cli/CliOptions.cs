@@ -18,6 +18,7 @@ namespace Mfr.App.Cli
     /// <param name="LogLevel">Minimum log level to emit.</param>
     /// <param name="LogDirectoryPath">Optional log directory override.</param>
     /// <param name="PresetsFilePath">Path to the JSON file containing presets.</param>
+    /// <param name="ConfigOverrides"><c>--set section.leaf=value</c> assignments applied after the config file.</param>
     public sealed record CliOptions(
         string PresetName,
         IReadOnlyList<string> Sources,
@@ -31,5 +32,6 @@ namespace Mfr.App.Cli
         bool DryRun,
         LogEventLevel LogLevel,
         string? LogDirectoryPath,
-        string PresetsFilePath);
+        string PresetsFilePath,
+        IReadOnlyList<string> ConfigOverrides);
 }

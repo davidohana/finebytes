@@ -69,5 +69,34 @@ namespace Mfr.Models
                 throw new InvalidDataException($"Config file '{path}': {ex.Message}", ex);
             }
         }
+
+        /// <summary>
+        /// Applies <c>--set key=value</c> assignments on top of the current <see cref="Settings"/> (after <see cref="Load"/>).
+        /// Each key is a dotted path such as <c>log.maxSessionFiles</c> matching <c>mfr.config.json</c> property names.
+        /// </summary>
+        /// <param name="assignments">Raw <c>key=value</c> strings from the CLI; blank entries are skipped.</param>
+        /// <exception cref="InvalidDataException">Thrown when an assignment is malformed, the path is unknown, or a value is out of range.</exception>
+        public static void ApplyCliOverrides(IEnumerable<string> assignments)
+        {
+            ArgumentNullException.ThrowIfNull(assignments);
+
+            var list = assignments
+                .Where(a => !a.IsBlank())
+                .Select(a => a.Trim())
+                .ToList();
+            if (list.Count == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                ConfigCliOverrides.Apply(list, Settings);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidDataException($"CLI config override: {ex.Message}", ex);
+            }
+        }
     }
 }

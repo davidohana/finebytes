@@ -61,6 +61,25 @@ namespace Mfr.Tests.Cli
 
         [Fact]
         /// <summary>
+        /// Verifies that repeated <c>--set</c> options are collected.
+        /// </summary>
+        public void ParseArgs_Accepts_ConfigOverrides()
+        {
+            var options = CliArgParser.ParseArgs(
+            [
+                "C:\\Music\\*.mp3",
+                "-p",
+                "clean",
+                "--set",
+                "log.maxSessionFiles=50",
+                "--set",
+                "filters.maxListFileLineLength=2000",
+            ])!;
+            Assert.Equal(["log.maxSessionFiles=50", "filters.maxListFileLineLength=2000"], options.ConfigOverrides);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that source inclusion defaults to files enabled and folders disabled.
         /// </summary>
         public void ParseArgs_Defaults_To_Files_Yes_And_Folders_No()
@@ -69,6 +88,7 @@ namespace Mfr.Tests.Cli
             Assert.True(options.IncludeFiles);
             Assert.False(options.IncludeFolders);
             Assert.False(options.RecursiveDirectoryFileAdd);
+            Assert.Empty(options.ConfigOverrides);
         }
 
         [Fact]

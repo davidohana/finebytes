@@ -82,6 +82,10 @@ namespace Mfr.App.Cli
             var outputFilePath = _GetValueOrDefault(parsedSettings.OutputFilePath, defaultValue: string.Empty);
             var logLevel = _GetValueOrDefault(parsedSettings.LogLevel, defaultValue: CliLogging.DefaultLogLevelName);
             var logDirectoryPath = _GetValueOrDefault(parsedSettings.LogDirectoryPath, defaultValue: string.Empty);
+            var configOverrides = parsedSettings.ConfigOverrides
+                .Where(o => !o.IsBlank())
+                .Select(o => o.Trim())
+                .ToList();
             return new CliOptions(
                 PresetName: presetName.Trim(),
                 Sources: sources,
@@ -95,7 +99,8 @@ namespace Mfr.App.Cli
                 DryRun: parsedSettings.DryRun,
                 LogLevel: CliLogging.ParseLogLevel(logLevel),
                 LogDirectoryPath: logDirectoryPath.IsBlank() ? null : logDirectoryPath.Trim(),
-                PresetsFilePath: presetsFilePath);
+                PresetsFilePath: presetsFilePath,
+                ConfigOverrides: configOverrides);
         }
 
         private static void _ConfigureCommandApp(IConfigurator configuration)
@@ -107,7 +112,8 @@ namespace Mfr.App.Cli
                 .AddExample(["C:\\Music\\*.mp3", "-p", "clean", "--dry-run"])
                 .AddExample(["C:\\Music\\**\\*.flac", "-p", "lowercase-extension", "--log-level", "debug"])
                 .AddExample(["C:\\Music", "-p", "name_from_id3", "-r"])
-                .AddExample(["C:\\Music", "C:\\Podcasts", "-p", "my_preset", "--files", "yes", "--folders", "yes", "--output-file", "C:\\Temp\\mfr-results.json"]);
+                .AddExample(["C:\\Music", "C:\\Podcasts", "-p", "my_preset", "--files", "yes", "--folders", "yes", "--output-file", "C:\\Temp\\mfr-results.json"])
+                .AddExample(["C:\\Music", "-p", "clean", "--set", "log.maxSessionFiles=50"]);
         }
 
         private static string _GetAssemblyVersionString()
@@ -195,6 +201,10 @@ namespace Mfr.App.Cli
             [CommandOption("--log-dir <PATH>")]
             [Description("Optional log directory path override.")]
             public string? LogDirectoryPath { get; init; }
+
+            [CommandOption("--set <KEY=VALUE>")]
+            [Description("Override a config field (repeatable). Key is section.leaf, e.g. log.maxSessionFiles=200.")]
+            public string[] ConfigOverrides { get; init; } = [];
         }
     }
 
