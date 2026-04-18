@@ -1,3 +1,5 @@
+using Mfr.Utils;
+
 namespace Mfr.Models
 {
     /// <summary>

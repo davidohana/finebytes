@@ -1,8 +1,8 @@
-namespace Mfr.Models
+namespace Mfr.Utils
 {
     /// <summary>
-    /// Declares inclusive integer bounds for an <see cref="MfrSettings"/> field when it is read from JSON by
-    /// <see cref="ConfigLoader"/>.
+    /// Declares inclusive integer bounds for a field when it is populated from JSON by
+    /// <see cref="ConfigAnnotatedFields.ApplyFromJsonObject"/>.
     /// </summary>
     /// <param name="minInclusive">Minimum allowed value when the JSON property is present.</param>
     /// <param name="maxInclusive">Maximum allowed value when the JSON property is present.</param>
@@ -21,8 +21,8 @@ namespace Mfr.Models
     }
 
     /// <summary>
-    /// Declares a maximum string length for an <see cref="MfrSettings"/> field when it is read from JSON by
-    /// <see cref="ConfigLoader"/>.
+    /// Declares a maximum string length for a field when it is populated from JSON by
+    /// <see cref="ConfigAnnotatedFields.ApplyFromJsonObject"/>.
     /// </summary>
     /// <param name="maxLengthInclusive">Maximum allowed length when the JSON property is present.</param>
     [AttributeUsage(AttributeTargets.Field)]

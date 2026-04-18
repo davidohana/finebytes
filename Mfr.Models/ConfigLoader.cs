@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json;
 using Mfr.Utils;
 
@@ -13,8 +12,9 @@ namespace Mfr.Models
     /// <see cref="MfrSettings"/> field initializers.
     /// </para>
     /// <para>
-    /// The document root must be a JSON object. <see cref="ConfigValueReader"/> reads every setting from a JSON
-    /// <strong>string</strong> value (including integers, e.g. <c>"1000"</c>).
+    /// The document root must be a JSON object. <see cref="ConfigAnnotatedFields.ApplyFromJsonObject"/> maps annotated
+    /// <see cref="MfrSettings"/> fields using <see cref="ConfigValueReader"/>; every value is read from a JSON
+    /// <strong>string</strong> (including integers, e.g. <c>"1000"</c>).
     /// </para>
     /// <para>
     /// Do not add a dedicated test type for this class; config loading is exercised indirectly (for example via CLI and
@@ -62,65 +62,11 @@ namespace Mfr.Models
             {
                 var json = File.ReadAllText(path);
                 using var doc = JsonDocument.Parse(json);
-                _ApplyJsonToSettings(doc.RootElement, settings);
+                ConfigAnnotatedFields.ApplyFromJsonObject(doc.RootElement, settings);
             }
             catch (Exception ex)
             {
                 throw new InvalidDataException($"Config file '{path}': {ex.Message}", ex);
-            }
-        }
-
-        private static void _ApplyJsonToSettings(JsonElement configRoot, MfrSettings settings)
-        {
-            var camel = JsonNamingPolicy.CamelCase;
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            foreach (var field in typeof(MfrSettings).GetFields(flags))
-            {
-                var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
-                var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
-                if (intRange is not null && strMax is not null)
-                {
-                    throw new InvalidOperationException(
-                        $"Field '{field.Name}' cannot specify both [{nameof(ConfigIntRangeAttribute)}] and [{nameof(ConfigStringMaxLengthAttribute)}].");
-                }
-
-                var jsonName = camel.ConvertName(field.Name);
-
-                if (intRange is not null)
-                {
-                    if (field.FieldType != typeof(int))
-                    {
-                        throw new InvalidOperationException(
-                            $"Field '{field.Name}' has [{nameof(ConfigIntRangeAttribute)}] but is not int.");
-                    }
-
-                    var value = (int)field.GetValue(settings)!;
-                    ConfigValueReader.ReadInt(
-                        configRoot,
-                        jsonName,
-                        ref value,
-                        minInclusive: intRange.MinInclusive,
-                        maxInclusive: intRange.MaxInclusive);
-                    field.SetValue(settings, value);
-                    continue;
-                }
-
-                if (strMax is not null)
-                {
-                    if (field.FieldType != typeof(string))
-                    {
-                        throw new InvalidOperationException(
-                            $"Field '{field.Name}' has [{nameof(ConfigStringMaxLengthAttribute)}] but is not string.");
-                    }
-
-                    var value = (string)field.GetValue(settings)!;
-                    ConfigValueReader.ReadString(
-                        configRoot,
-                        jsonName,
-                        ref value,
-                        maxLengthInclusive: strMax.MaxLengthInclusive);
-                    field.SetValue(settings, value);
-                }
             }
         }
     }
