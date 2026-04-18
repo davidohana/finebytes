@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Mfr.Utils;
+using Mfr.Utils.Config;
 
-namespace Mfr.Tests.Utils
+namespace Mfr.Tests.Utils.Config
 {
     /// <summary>
     /// Tests for <see cref="ConfigApplier"/>.

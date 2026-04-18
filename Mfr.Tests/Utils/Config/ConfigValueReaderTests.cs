@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Mfr.Utils;
+using Mfr.Utils.Config;
 
-namespace Mfr.Tests.Utils
+namespace Mfr.Tests.Utils.Config
 {
     /// <summary>
     /// Tests for <see cref="ConfigValueReader"/>.

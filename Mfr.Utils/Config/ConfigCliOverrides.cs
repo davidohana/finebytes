@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace Mfr.Utils
+namespace Mfr.Utils.Config
 {
     /// <summary>
     /// Builds JSON from <c>--set section.leaf=value</c> assignments and applies them via <see cref="ConfigApplier"/>,

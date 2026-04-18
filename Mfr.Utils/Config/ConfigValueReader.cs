@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 
-namespace Mfr.Utils
+namespace Mfr.Utils.Config
 {
     /// <summary>
     /// Parses optional string fields from config JSON using defaults and constraints.

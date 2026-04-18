@@ -1,4 +1,4 @@
-using Mfr.Utils;
+using Mfr.Utils.Config;
 
 namespace Mfr.Models
 {

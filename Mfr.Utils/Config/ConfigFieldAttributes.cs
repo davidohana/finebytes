@@ -1,4 +1,4 @@
-namespace Mfr.Utils
+namespace Mfr.Utils.Config
 {
     /// <summary>
     /// Declares inclusive integer bounds for a field when it is populated from JSON by

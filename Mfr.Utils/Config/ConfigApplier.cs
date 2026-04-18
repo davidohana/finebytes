@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 
-namespace Mfr.Utils
+namespace Mfr.Utils.Config
 {
     /// <summary>
     /// Applies JSON config values to public instance fields using <see cref="ConfigIntRangeAttribute"/> and
