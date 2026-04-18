@@ -9,12 +9,12 @@ namespace Mfr.Core
     public static class RenameItemExtensions
     {
         /// <summary>
-        /// Logs debug details for one item when preview produced a destination path change.
+        /// Logs debug details for one item when preview produced path or attribute changes.
         /// </summary>
         /// <param name="renameItem">The previewed item to inspect.</param>
         internal static void LogPreviewChangeDetail(this RenameItem renameItem)
         {
-            if (renameItem.IsPreviewPathSameAsOriginal())
+            if (!renameItem.HasPreviewChanges())
             {
                 return;
             }
@@ -44,12 +44,12 @@ namespace Mfr.Core
         /// </summary>
         /// <param name="renameItem">The previewed item to describe.</param>
         /// <returns>
-        /// Non-empty text when the preview path differs from the original; otherwise an empty string.
+        /// Non-empty text when the preview differs from the original (path or attributes); otherwise an empty string.
         /// When there are no per-property deltas but paths still differ, the full source and destination paths are shown.
         /// </returns>
         public static string FormatPreviewChangesForDisplay(this RenameItem renameItem)
         {
-            if (renameItem.IsPreviewPathSameAsOriginal())
+            if (!renameItem.HasPreviewChanges())
             {
                 return string.Empty;
             }
@@ -96,6 +96,15 @@ namespace Mfr.Core
                     Property: "DirectoryPath",
                     OldValue: renameItem.Original.DirectoryPath,
                     NewValue: renameItem.Preview.DirectoryPath));
+            }
+
+            var attributesChanged = renameItem.Original.Attributes != renameItem.Preview.Attributes;
+            if (attributesChanged)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "Attributes",
+                    OldValue: renameItem.Original.Attributes.ToString(),
+                    NewValue: renameItem.Preview.Attributes.ToString()));
             }
 
             return changes;

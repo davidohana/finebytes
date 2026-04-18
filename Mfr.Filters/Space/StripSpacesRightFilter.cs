@@ -1,4 +1,4 @@
-﻿using Mfr.Models;
+using Mfr.Models;
 
 namespace Mfr.Filters.Space
 {
@@ -11,7 +11,7 @@ namespace Mfr.Filters.Space
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed record StripSpacesRightFilter(
-        FilterTarget Target) : BaseFilter(Target)
+        FilterTarget Target) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

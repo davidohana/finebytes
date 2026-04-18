@@ -9,7 +9,7 @@ namespace Mfr.Filters.Trimming
     /// <param name="Options">Trim options.</param>
     public sealed record TrimLeftFilter(
         FilterTarget Target,
-        CountFilterOptions Options) : BaseFilter(Target)
+        CountFilterOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

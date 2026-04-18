@@ -134,14 +134,7 @@ namespace Mfr.Core
                 renameItem.LogPreviewChangeDetail();
             }
 
-            var previewChangedCount = _renameItems.Count(item => !item.IsPreviewPathSameAsOriginal());
-            var previewUnchangedCount = _renameItems.Count(item => item.IsPreviewPathSameAsOriginal());
-            var previewErrorCount = _renameItems.Count(item => item.Status == RenameStatus.PreviewError);
-            Log.Information(
-                "Finished preview. Changed: {PreviewChangedCount}, Unchanged: {PreviewUnchangedCount}, Errors: {PreviewErrorCount}.",
-                previewChangedCount,
-                previewUnchangedCount,
-                previewErrorCount);
+            _LogPreviewOutcomeSummary(_renameItems);
         }
 
         /// <summary>
@@ -176,8 +169,10 @@ namespace Mfr.Core
 
                 var shouldSkipCommit =
                     stopped
-                    || item.IsPreviewPathSameAsOriginal()
-                    || (confirmBeforeApply is not null && !confirmBeforeApply(item));
+                    || !item.HasPreviewChanges()
+                    || (confirmBeforeApply is not null
+                        && !item.IsPreviewPathSameAsOriginal()
+                        && !confirmBeforeApply(item));
                 if (shouldSkipCommit)
                 {
                     item.Status = RenameStatus.CommitSkipped;
@@ -190,6 +185,8 @@ namespace Mfr.Core
                 }
 
                 var destPath = item.Preview.FullPath;
+                var attributesBeforeCommit = item.Original.Attributes;
+                var attributesAfterPreview = item.Preview.Attributes;
                 try
                 {
                     if (!dryRun)
@@ -198,7 +195,11 @@ namespace Mfr.Core
                     }
 
                     item.Status = RenameStatus.CommitOk;
-                    var changes = _BuildFileNameChanges(sourcePath: sourcePath, destinationPath: destPath);
+                    var changes = _BuildCommitChanges(
+                        sourcePath: sourcePath,
+                        destinationPath: destPath,
+                        originalAttributes: attributesBeforeCommit,
+                        previewAttributes: attributesAfterPreview);
                     results.Add(new RenameResultItem(
                         OriginalPath: sourcePath,
                         Status: RenameStatus.CommitOk,
@@ -241,29 +242,78 @@ namespace Mfr.Core
         }
 
         /// <summary>
-        /// Builds a file-name change list for a rename result.
+        /// Builds property change rows for a committed item (file name and optional attributes).
         /// </summary>
         /// <param name="sourcePath">Original source path.</param>
         /// <param name="destinationPath">Destination path.</param>
-        /// <returns>Collection containing the file name change when the file name was modified.</returns>
-        private static IReadOnlyList<RenamePropertyChange> _BuildFileNameChanges(string sourcePath, string destinationPath)
+        /// <param name="originalAttributes">Attributes before commit.</param>
+        /// <param name="previewAttributes">Attributes after preview (applied on commit).</param>
+        /// <returns>Property-level changes for result reporting.</returns>
+        private static List<RenamePropertyChange> _BuildCommitChanges(
+            string sourcePath,
+            string destinationPath,
+            FileAttributes originalAttributes,
+            FileAttributes previewAttributes)
         {
+            var changes = new List<RenamePropertyChange>();
             var sourceFileName = Path.GetFileName(sourcePath);
             var destinationFileName = Path.GetFileName(destinationPath);
-            var changes = (IReadOnlyList<RenamePropertyChange>)[];
             var fileNameChanged = !string.Equals(sourceFileName, destinationFileName, StringComparison.OrdinalIgnoreCase);
             if (fileNameChanged)
             {
-                changes =
-                [
-                    new RenamePropertyChange(
-                        Property: "FileName",
-                        OldValue: sourceFileName,
-                        NewValue: destinationFileName)
-                ];
+                changes.Add(new RenamePropertyChange(
+                    Property: "FileName",
+                    OldValue: sourceFileName,
+                    NewValue: destinationFileName));
+            }
+
+            if (originalAttributes != previewAttributes)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "Attributes",
+                    OldValue: originalAttributes.ToString(),
+                    NewValue: previewAttributes.ToString()));
             }
 
             return changes;
+        }
+
+        /// <summary>
+        /// Counts preview results and writes the finished-preview log line.
+        /// </summary>
+        private static void _LogPreviewOutcomeSummary(IEnumerable<RenameItem> items)
+        {
+            var changed = 0;
+            var unchanged = 0;
+            var errors = 0;
+            foreach (var item in items)
+            {
+                if (item.Status == RenameStatus.PreviewError)
+                {
+                    errors++;
+                    continue;
+                }
+
+                if (item.Status != RenameStatus.PreviewOk)
+                {
+                    continue;
+                }
+
+                if (item.HasPreviewChanges())
+                {
+                    changed++;
+                }
+                else
+                {
+                    unchanged++;
+                }
+            }
+
+            Log.Information(
+                "Finished preview. Changed: {PreviewChangedCount}, Unchanged: {PreviewUnchangedCount}, Errors: {PreviewErrorCount}.",
+                changed,
+                unchanged,
+                errors);
         }
 
         /// <summary>
@@ -373,7 +423,8 @@ namespace Mfr.Core
                     inFolderIndex: inFolderIndex,
                     directoryPath: directoryPath,
                     prefix: prefix,
-                    extension: extension);
+                    extension: extension,
+                    attributes: attrs);
                 var renameItem = new RenameItem(fileMeta);
                 _renameItems.Add(renameItem);
                 addedCount++;

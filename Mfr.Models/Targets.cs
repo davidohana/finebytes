@@ -38,6 +38,7 @@ namespace Mfr.Models
     /// </summary>
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "family")]
     [JsonDerivedType(typeof(FileNameTarget), "FileName")]
+    [JsonDerivedType(typeof(AttributesTarget), "Attributes")]
     public abstract record FilterTarget
     {
         /// <summary>
@@ -57,5 +58,14 @@ namespace Mfr.Models
         /// Gets the target family.
         /// </summary>
         public override FilterTargetFamily Family => FilterTargetFamily.FileName;
+    }
+
+    /// <summary>
+    /// Targets filesystem attributes (read-only, hidden, archive, system).
+    /// </summary>
+    public sealed record AttributesTarget : FilterTarget
+    {
+        /// <inheritdoc />
+        public override FilterTargetFamily Family => FilterTargetFamily.Attributes;
     }
 }

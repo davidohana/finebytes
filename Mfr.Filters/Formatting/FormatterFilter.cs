@@ -15,7 +15,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Formatter options.</param>
     public sealed partial record FormatterFilter(
         FilterTarget Target,
-        FormatterOptions Options) : BaseFilter(Target)
+        FormatterOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

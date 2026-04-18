@@ -49,7 +49,7 @@ namespace Mfr.Filters.Replace
     /// <param name="Options">Replacement options.</param>
     public sealed record ReplacerFilter(
         FilterTarget Target,
-        ReplacerOptions Options) : BaseFilter(Target)
+        ReplacerOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

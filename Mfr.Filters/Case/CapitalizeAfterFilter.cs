@@ -1,4 +1,4 @@
-﻿using Mfr.Models;
+using Mfr.Models;
 
 namespace Mfr.Filters.Case
 {
@@ -21,7 +21,7 @@ namespace Mfr.Filters.Case
     /// <param name="Options">Filter options.</param>
     public sealed record CapitalizeAfterFilter(
         FilterTarget Target,
-        CapitalizeAfterOptions Options) : BaseFilter(Target)
+        CapitalizeAfterOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

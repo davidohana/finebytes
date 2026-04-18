@@ -1,4 +1,4 @@
-﻿using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting;
 using Mfr.Models;
 
 namespace Mfr.Filters.Replace
@@ -29,7 +29,7 @@ namespace Mfr.Filters.Replace
     /// <param name="Options">Replace-list options.</param>
     public sealed record ReplaceListFilter(
         FilterTarget Target,
-        ReplaceListOptions Options) : BaseFilter(Target)
+        ReplaceListOptions Options) : FileNameSegmentFilter(Target)
     {
         private List<ReplaceListEntry>? _replaceListEntries;
 

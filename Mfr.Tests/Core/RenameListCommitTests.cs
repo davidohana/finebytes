@@ -1,4 +1,5 @@
 using Mfr.Core;
+using Mfr.Filters.Attributes;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
 using Mfr.Models;
@@ -596,6 +597,94 @@ namespace Mfr.Tests.Core
             Assert.False(File.Exists(sourceA));
             Assert.True(File.Exists(sourceB));
             Assert.True(File.Exists(destinationC));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies attribute-only preview commits call <see cref="File.SetAttributes"/> on the source path.
+        /// </summary>
+        public void Commit_AttributesOnly_AppliesHidden()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var path = dir.CombinePath("x.txt");
+            File.WriteAllText(path, "x");
+            var attrsBefore = File.GetAttributes(path);
+            Assert.False(attrsBefore.HasFlag(FileAttributes.Hidden));
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "attrs",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new AttributesSetterFilter(
+                        Target: new AttributesTarget(),
+                        Options: new AttributesSetterOptions(
+                            ReadOnly: AttributeTriState.Keep,
+                            Hidden: AttributeTriState.Set,
+                            Archive: AttributeTriState.Keep,
+                            System: AttributeTriState.Keep))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            var item = renameList.RenameItems[0];
+            Assert.True(item.HasPreviewChanges());
+            Assert.True(item.Preview.Attributes.HasFlag(FileAttributes.Hidden));
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.Contains(result[0].Changes, c => c.Property == "Attributes");
+
+            var attrsAfter = File.GetAttributes(path);
+            Assert.True(attrsAfter.HasFlag(FileAttributes.Hidden));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies dry-run commit does not apply attribute changes on disk.
+        /// </summary>
+        public void Commit_AttributesOnly_DryRun_LeavesAttributes()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var path = dir.CombinePath("y.txt");
+            File.WriteAllText(path, "y");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "attrs-dry",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new AttributesSetterFilter(
+                        Target: new AttributesTarget(),
+                        Options: new AttributesSetterOptions(
+                            ReadOnly: AttributeTriState.Keep,
+                            Hidden: AttributeTriState.Set,
+                            Archive: AttributeTriState.Keep,
+                            System: AttributeTriState.Keep))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+
+            var result = renameList.Commit(failFast: false, dryRun: true);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+
+            var attrsAfter = File.GetAttributes(path);
+            Assert.False(attrsAfter.HasFlag(FileAttributes.Hidden));
         }
 
         private sealed record UnsupportedTarget : FilterTarget

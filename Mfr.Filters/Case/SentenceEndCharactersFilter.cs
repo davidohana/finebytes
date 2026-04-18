@@ -20,7 +20,7 @@ namespace Mfr.Filters.Case
     /// <param name="Options">Sentence-end character list.</param>
     public sealed record SentenceEndCharactersFilter(
         FilterTarget Target,
-        SentenceEndCharactersOptions Options) : BaseFilter(Target)
+        SentenceEndCharactersOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

@@ -38,7 +38,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Inserter options.</param>
     public sealed record InserterFilter(
         FilterTarget Target,
-        InserterOptions Options) : BaseFilter(Target)
+        InserterOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

@@ -20,7 +20,7 @@ namespace Mfr.Filters.Replace
     /// <param name="Options">Cleaner options.</param>
     public sealed record CleanerFilter(
         FilterTarget Target,
-        CleanerOptions Options) : BaseFilter(Target)
+        CleanerOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

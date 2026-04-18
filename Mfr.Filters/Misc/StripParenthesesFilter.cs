@@ -30,7 +30,7 @@ namespace Mfr.Filters.Misc
     /// <param name="Options">Parenthesis-strip options.</param>
     public sealed partial record StripParenthesesFilter(
         FilterTarget Target,
-        StripParenthesesOptions Options) : BaseFilter(Target)
+        StripParenthesesOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

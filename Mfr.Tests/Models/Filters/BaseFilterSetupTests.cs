@@ -57,7 +57,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.Contains("setup must complete before transform", applyEx.Message, StringComparison.OrdinalIgnoreCase);
         }
 
-        private sealed record SetupCountingFilter(FilterTarget Target) : BaseFilter(Target)
+        private sealed record SetupCountingFilter(FilterTarget Target) : FileNameSegmentFilter(Target)
         {
             public override string Type => "SetupCounting";
 
@@ -74,7 +74,7 @@ namespace Mfr.Tests.Models.Filters
             }
         }
 
-        private sealed record ThrowingSetupFilter(FilterTarget Target) : BaseFilter(Target)
+        private sealed record ThrowingSetupFilter(FilterTarget Target) : FileNameSegmentFilter(Target)
         {
             public override string Type => "ThrowingSetup";
 

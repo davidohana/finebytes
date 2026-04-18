@@ -22,7 +22,7 @@ namespace Mfr.Filters.Space
     /// <c>SpaceCharacter</c> filter).
     /// </remarks>
     public sealed record SeparateCapitalizedTextFilter(
-        FilterTarget Target) : BaseFilter(Target)
+        FilterTarget Target) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

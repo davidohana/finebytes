@@ -8,12 +8,14 @@ namespace Mfr.Models
     /// <param name="directoryPath">Absolute path to the parent directory.</param>
     /// <param name="prefix">File name without extension.</param>
     /// <param name="extension">File extension including the leading dot.</param>
+    /// <param name="attributes">Filesystem attributes for this entry.</param>
     public sealed class FileMeta(
         int globalIndex,
         int inFolderIndex,
         string directoryPath,
         string prefix,
-        string extension)
+        string extension,
+        FileAttributes attributes = FileAttributes.Normal)
     {
         /// <summary>
         /// Gets or sets the zero-based index across all scanned files.
@@ -46,6 +48,11 @@ namespace Mfr.Models
         public string Extension { get; set; } = extension;
 
         /// <summary>
+        /// Gets or sets filesystem attributes (preview may differ from scan-time original).
+        /// </summary>
+        public FileAttributes Attributes { get; set; } = attributes;
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -56,7 +63,8 @@ namespace Mfr.Models
                 inFolderIndex: InFolderIndex,
                 directoryPath: DirectoryPath,
                 prefix: Prefix,
-                extension: Extension);
+                extension: Extension,
+                attributes: Attributes);
         }
     }
 }

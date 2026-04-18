@@ -29,7 +29,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Name list and optional prefix/suffix templates.</param>
     public sealed record NameListFilter(
         FilterTarget Target,
-        NameListOptions Options) : BaseFilter(Target)
+        NameListOptions Options) : FileNameSegmentFilter(Target)
     {
         private IReadOnlyList<string>? _entries;
 

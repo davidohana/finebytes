@@ -23,7 +23,7 @@ namespace Mfr.Filters.Misc
     /// <param name="Options">Leading-zero normalization options.</param>
     public sealed partial record FixLeadingZerosFilter(
         FilterTarget Target,
-        FixLeadingZerosOptions Options) : BaseFilter(Target)
+        FixLeadingZerosOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

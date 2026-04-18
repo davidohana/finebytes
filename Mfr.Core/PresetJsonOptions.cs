@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Mfr.Filters.Attributes;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
@@ -46,7 +47,8 @@ namespace Mfr.Core
             new(typeof(SentenceEndCharactersFilter), "SentenceEndCharacters"),
             new(typeof(StripSpacesLeftFilter), "StripSpacesLeft"),
             new(typeof(StripSpacesRightFilter), "StripSpacesRight"),
-            new(typeof(TrimBetweenFilter), "TrimBetween")
+            new(typeof(TrimBetweenFilter), "TrimBetween"),
+            new(typeof(AttributesSetterFilter), "AttributesSetter")
         ];
 
         internal static JsonSerializerOptions Default { get; } = _CreateOptions();

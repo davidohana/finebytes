@@ -39,7 +39,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Counter options.</param>
     public sealed record CounterFilter(
         FilterTarget Target,
-        CounterOptions Options) : BaseFilter(Target)
+        CounterOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

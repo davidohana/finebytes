@@ -26,7 +26,7 @@ namespace Mfr.Filters.Case
     /// <param name="Options">Casing-list options.</param>
     public sealed record CasingListFilter(
         FilterTarget Target,
-        CasingListOptions Options) : BaseFilter(Target)
+        CasingListOptions Options) : FileNameSegmentFilter(Target)
     {
         private Dictionary<string, string>? _lowerWordToCasing;
 

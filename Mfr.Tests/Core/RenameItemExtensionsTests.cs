@@ -112,7 +112,7 @@ namespace Mfr.Tests.Core
 
             chain.SetupFilters();
             var ex = Assert.Throws<NotSupportedException>(() => chain.ApplyFilters(item));
-            Assert.Contains("target.family='FileName'", ex.Message);
+            Assert.Contains("does not support target.family='FileContents'", ex.Message);
         }
 
         private sealed record UnsupportedTarget : FilterTarget

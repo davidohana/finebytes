@@ -1,5 +1,5 @@
+using System.IO;
 using Mfr.Models;
-
 
 namespace Mfr.Tests.Models.Filters
 {
@@ -13,16 +13,18 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="globalIndex">Zero-based index across all files.</param>
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
         /// <param name="directory">Parent directory path, or a default when null.</param>
+        /// <param name="attributes">Filesystem attributes for the synthetic item.</param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
             string prefix = "track",
             string extension = ".mp3",
             int globalIndex = 0,
             int inFolderIndex = 0,
-            string? directory = null)
+            string? directory = null,
+            FileAttributes attributes = FileAttributes.Normal)
         {
             directory ??= @"C:\Music\Album";
-            return new RenameItem(new FileMeta(globalIndex, inFolderIndex, directory, prefix, extension));
+            return new RenameItem(new FileMeta(globalIndex, inFolderIndex, directory, prefix, extension, attributes));
         }
 
         /// <summary>

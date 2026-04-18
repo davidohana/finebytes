@@ -108,7 +108,7 @@ namespace Mfr.Filters.Case
     /// <param name="Options">Case transformation options.</param>
     public sealed record LettersCaseFilter(
         FilterTarget Target,
-        LettersCaseOptions Options) : BaseFilter(Target)
+        LettersCaseOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

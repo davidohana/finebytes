@@ -17,7 +17,7 @@ namespace Mfr.Filters.Case
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed partial record UppercaseInitialsFilter(
-        FilterTarget Target) : BaseFilter(Target)
+        FilterTarget Target) : FileNameSegmentFilter(Target)
     {
         // Keep this runtime-compiled regex for readability and to avoid GeneratedRegex partial-method
         // analyzer noise in this project setup.

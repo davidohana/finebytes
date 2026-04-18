@@ -17,7 +17,7 @@ namespace Mfr.Filters.Trimming
     /// <param name="Options">Filter options.</param>
     public sealed record ShrinkDuplicateCharactersFilter(
         FilterTarget Target,
-        ShrinkDuplicateCharactersOptions Options) : BaseFilter(Target)
+        ShrinkDuplicateCharactersOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

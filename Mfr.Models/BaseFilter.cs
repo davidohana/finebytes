@@ -29,44 +29,29 @@ namespace Mfr.Models
 
         internal void Apply(RenameItem item)
         {
-            if (Target is not FileNameTarget fileTarget)
-            {
-                throw new NotSupportedException($"Phase 1 only supports target.family='FileName'. Filter '{Type}' got '{Target.Family}'.");
-            }
-
-            if (!_isSetupComplete)
-            {
-                throw new InvalidOperationException($"Filter '{Type}' setup must complete before transform.");
-            }
-
-            var sourceFileEntry = item.Preview;
-            var part = fileTarget.FileNamePart;
-            var partValue = part switch
-            {
-                FileNamePart.Prefix => sourceFileEntry.Prefix,
-                FileNamePart.Extension => sourceFileEntry.Extension,
-                FileNamePart.Full => sourceFileEntry.Prefix + sourceFileEntry.Extension,
-                _ => throw new InvalidOperationException($"Unknown fileNamePart '{part}'.")
-            };
-
-            var transformedSegment = TransformSegment(partValue, item);
-            item.SetPreviewValue(part, transformedSegment);
+            VerifySetupComplete();
+            ApplyCore(item);
         }
 
-        internal string TransformSegment(string segment, RenameItem item)
+        /// <summary>
+        /// Ensures <see cref="Setup"/> has completed (for helpers such as <see cref="FileNameSegmentFilter.TransformSegment"/>).
+        /// </summary>
+        protected void VerifySetupComplete()
         {
             if (!_isSetupComplete)
             {
                 throw new InvalidOperationException($"Filter '{Type}' setup must complete before transform.");
             }
-
-            return _TransformSegment(segment, item);
         }
+
+        /// <summary>
+        /// Applies this filter to the rename item. File-name text filters use <see cref="FileNameSegmentFilter"/>.
+        /// </summary>
+        /// <param name="item">The item whose preview is updated.</param>
+        protected internal abstract void ApplyCore(RenameItem item);
 
         protected virtual void _Setup()
         {
         }
-
-        protected abstract string _TransformSegment(string segment, RenameItem item);
     }
 }

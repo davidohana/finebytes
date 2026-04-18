@@ -1,4 +1,4 @@
-﻿using Mfr.Models;
+using Mfr.Models;
 
 namespace Mfr.Filters.Trimming
 {
@@ -36,7 +36,7 @@ namespace Mfr.Filters.Trimming
     /// <param name="Options">Trimming options.</param>
     public sealed record TrimBetweenFilter(
         FilterTarget Target,
-        TrimBetweenFilterOptions Options) : BaseFilter(Target)
+        TrimBetweenFilterOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

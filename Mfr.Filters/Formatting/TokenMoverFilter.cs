@@ -24,7 +24,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Token mover options.</param>
     public sealed record TokenMoverFilter(
         FilterTarget Target,
-        TokenMoverOptions Options) : BaseFilter(Target)
+        TokenMoverOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

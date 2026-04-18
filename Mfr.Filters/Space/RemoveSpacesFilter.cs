@@ -7,7 +7,7 @@ namespace Mfr.Filters.Space
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed record RemoveSpacesFilter(
-        FilterTarget Target) : BaseFilter(Target)
+        FilterTarget Target) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.

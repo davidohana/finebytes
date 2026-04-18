@@ -141,20 +141,36 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Applies the preview rename on disk for this item.
+        /// Whether preview differs from the original snapshot (path or filesystem attributes).
+        /// </summary>
+        public bool HasPreviewChanges()
+        {
+            return !IsPreviewPathSameAsOriginal() || Original.Attributes != Preview.Attributes;
+        }
+
+        /// <summary>
+        /// Applies the preview rename and attribute changes on disk for this item.
+        /// Updates <see cref="Original"/> to match the applied preview; <see cref="Preview"/> is left as-is until the host calls <see cref="ClearPreview"/>.
         /// </summary>
         public void Commit()
         {
-            if (IsPreviewPathSameAsOriginal())
+            if (!IsPreviewPathSameAsOriginal())
             {
-                Preview = Original.Clone();
-                return;
+                File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
             }
 
-            File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
-            Original = Preview;
-            Preview = Original.Clone();
+            var pathOnDisk = Preview.FullPath;
+            if (Original.Attributes != Preview.Attributes)
+            {
+                File.SetAttributes(pathOnDisk, Preview.Attributes);
+            }
+
+            if (HasPreviewChanges())
+            {
+                Original = Preview.Clone();
+            }
         }
 
     }
 }
+

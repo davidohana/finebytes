@@ -24,7 +24,7 @@ namespace Mfr.Filters.Space
     /// <param name="Options">Space definition and replacement options.</param>
     public sealed record SpaceCharacterFilter(
         FilterTarget Target,
-        SpaceCharacterOptions Options) : BaseFilter(Target)
+        SpaceCharacterOptions Options) : FileNameSegmentFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
