@@ -74,8 +74,8 @@ namespace Mfr.Tests.Core
             var json = /*lang=json,strict*/ """
             {
               "type": "DateSetter",
-              "timestamp": "lastWrite",
               "options": {
+                "timestampField": "lastWrite",
                 "date": "2021-07-04"
               }
             }
@@ -85,7 +85,28 @@ namespace Mfr.Tests.Core
             Assert.NotNull(filter);
             var typed = Assert.IsType<DateSetterFilter>(filter);
             Assert.Equal(new DateOnly(2021, 7, 4), typed.Options.Date);
-            Assert.Equal(TimestampField.LastWrite, typed.Timestamp);
+            Assert.Equal(TimestampField.LastWrite, typed.Options.TimestampField);
+            typed.Setup();
+        }
+
+        [Fact]
+        public void TimeSetter_roundtrips_with_timestamp_field()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "TimeSetter",
+              "options": {
+                "timestampField": "lastAccess",
+                "time": "18:30:00"
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<TimeSetterFilter>(filter);
+            Assert.Equal(new TimeOnly(18, 30, 0), typed.Options.Time);
+            Assert.Equal(TimestampField.LastAccess, typed.Options.TimestampField);
             typed.Setup();
         }
 
@@ -95,8 +116,8 @@ namespace Mfr.Tests.Core
             var json = /*lang=json,strict*/ """
             {
               "type": "TimeShifter",
-              "timestamp": "lastWrite",
               "options": {
+                "timestampField": "lastWrite",
                 "amount": -5,
                 "unit": "days"
               }
@@ -108,7 +129,7 @@ namespace Mfr.Tests.Core
             var typed = Assert.IsType<TimeShifterFilter>(filter);
             Assert.Equal(-5, typed.Options.Amount);
             Assert.Equal(TimeShiftUnit.Days, typed.Options.Unit);
-            Assert.Equal(TimestampField.LastWrite, typed.Timestamp);
+            Assert.Equal(TimestampField.LastWrite, typed.Options.TimestampField);
             typed.Setup();
         }
 

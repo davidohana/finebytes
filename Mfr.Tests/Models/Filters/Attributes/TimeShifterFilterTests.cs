@@ -16,8 +16,10 @@ namespace Mfr.Tests.Models.Filters.Attributes
             var item = FilterTestHelpers.CreateRenameItem(
                 lastWriteTime: s_Base);
             var filter = new TimeShifterFilter(
-                Timestamp: TimestampField.LastWrite,
-                Options: new TimeShifterOptions(Amount: 1, Unit: TimeShiftUnit.Days));
+                Options: new TimeShifterOptions(
+                    TimestampField: TimestampField.LastWrite,
+                    Amount: 1,
+                    Unit: TimeShiftUnit.Days));
             filter.Setup();
             filter.Apply(item);
 
@@ -32,8 +34,10 @@ namespace Mfr.Tests.Models.Filters.Attributes
             var item = FilterTestHelpers.CreateRenameItem(
                 creationTime: s_Base);
             var filter = new TimeShifterFilter(
-                Timestamp: TimestampField.Creation,
-                Options: new TimeShifterOptions(Amount: -2, Unit: TimeShiftUnit.Hours));
+                Options: new TimeShifterOptions(
+                    TimestampField: TimestampField.Creation,
+                    Amount: -2,
+                    Unit: TimeShiftUnit.Hours));
             filter.Setup();
             filter.Apply(item);
 
@@ -46,11 +50,14 @@ namespace Mfr.Tests.Models.Filters.Attributes
             var item = FilterTestHelpers.CreateRenameItem(
                 lastAccessTime: s_Base);
             var setDate = new DateSetterFilter(
-                Timestamp: TimestampField.LastAccess,
-                Options: new DateSetterOptions(Date: new DateOnly(2019, 1, 1)));
+                Options: new DateSetterOptions(
+                    TimestampField: TimestampField.LastAccess,
+                    Date: new DateOnly(2019, 1, 1)));
             var shift = new TimeShifterFilter(
-                Timestamp: TimestampField.LastAccess,
-                Options: new TimeShifterOptions(Amount: 3, Unit: TimeShiftUnit.Days));
+                Options: new TimeShifterOptions(
+                    TimestampField: TimestampField.LastAccess,
+                    Amount: 3,
+                    Unit: TimeShiftUnit.Days));
             var chain = FilterChain.CreateAllEnabled([setDate, shift]);
             chain.SetupFilters();
             chain.ApplyFilters(item);

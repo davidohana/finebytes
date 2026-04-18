@@ -47,21 +47,21 @@ namespace Mfr.Filters.Attributes
     }
 
     /// <summary>
-    /// Signed integer amount and unit for shifting a timestamp.
+    /// Which timestamp to shift and the signed amount and unit.
     /// </summary>
+    /// <param name="TimestampField">Which filesystem timestamp to shift.</param>
     /// <param name="Amount">Positive shifts forward; negative shifts backward.</param>
     /// <param name="Unit">How to interpret <paramref name="Amount"/>.</param>
     public sealed record TimeShifterOptions(
+        [property: JsonPropertyName("timestampField")] TimestampField TimestampField,
         [property: JsonPropertyName("amount")] int Amount,
         [property: JsonPropertyName("unit")] TimeShiftUnit Unit);
 
     /// <summary>
     /// Shifts creation, last write, or last access time by an amount in the chosen unit.
     /// </summary>
-    /// <param name="Timestamp">Which timestamp field to shift.</param>
-    /// <param name="Options">Amount and unit for the shift.</param>
+    /// <param name="Options">Timestamp field, amount, and unit.</param>
     public sealed record TimeShifterFilter(
-        [property: JsonPropertyName("timestamp")] TimestampField Timestamp,
         TimeShifterOptions Options) : BaseFilter
     {
         /// <inheritdoc />
@@ -71,7 +71,7 @@ namespace Mfr.Filters.Attributes
         protected internal override void ApplyCore(RenameItem item)
         {
             var preview = item.Preview;
-            switch (Timestamp)
+            switch (Options.TimestampField)
             {
                 case TimestampField.Creation:
                     preview.CreationTime = _Shift(preview.CreationTime, Options.Amount, Options.Unit);

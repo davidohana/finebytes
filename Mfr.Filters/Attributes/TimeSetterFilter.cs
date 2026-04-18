@@ -5,19 +5,19 @@ using Mfr.Models;
 namespace Mfr.Filters.Attributes
 {
     /// <summary>
-    /// Time-of-day to apply; the calendar date on the preview timestamp is preserved.
+    /// Which timestamp to set and the time-of-day to apply; the calendar date on the preview timestamp is preserved.
     /// </summary>
+    /// <param name="TimestampField">Which filesystem timestamp to set.</param>
     /// <param name="Time">Local time to set.</param>
     public sealed record TimeSetterOptions(
+        [property: JsonPropertyName("timestampField")] TimestampField TimestampField,
         [property: JsonPropertyName("time")] TimeOnly Time);
 
     /// <summary>
     /// Sets the time-of-day for creation, last write, or last access time. Does not change the calendar date part.
     /// </summary>
-    /// <param name="Timestamp">Which timestamp field to set.</param>
-    /// <param name="Options">Time value for the chosen timestamp field.</param>
+    /// <param name="Options">Timestamp field and time value.</param>
     public sealed record TimeSetterFilter(
-        [property: JsonPropertyName("timestamp")] TimestampField Timestamp,
         TimeSetterOptions Options) : BaseFilter
     {
         /// <inheritdoc />
@@ -27,7 +27,7 @@ namespace Mfr.Filters.Attributes
         protected internal override void ApplyCore(RenameItem item)
         {
             var preview = item.Preview;
-            switch (Timestamp)
+            switch (Options.TimestampField)
             {
                 case TimestampField.Creation:
                     preview.CreationTime = _SetTimePreserveDate(preview.CreationTime, Options.Time);

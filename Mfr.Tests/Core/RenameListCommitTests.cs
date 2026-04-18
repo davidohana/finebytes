@@ -707,8 +707,9 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new DateSetterFilter(
-                        Timestamp: TimestampField.LastWrite,
-                        Options: new DateSetterOptions(Date: DateOnly.FromDateTime(before.AddDays(30))))
+                        Options: new DateSetterOptions(
+                            TimestampField: TimestampField.LastWrite,
+                            Date: DateOnly.FromDateTime(before.AddDays(30))))
                 ])
             };
 
@@ -749,8 +750,10 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new TimeShifterFilter(
-                        Timestamp: TimestampField.LastWrite,
-                        Options: new TimeShifterOptions(Amount: 7, Unit: TimeShiftUnit.Days))
+                        Options: new TimeShifterOptions(
+                            TimestampField: TimestampField.LastWrite,
+                            Amount: 7,
+                            Unit: TimeShiftUnit.Days))
                 ])
             };
 
