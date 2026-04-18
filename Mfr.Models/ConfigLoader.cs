@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using Mfr.Utils;
 
@@ -61,43 +62,65 @@ namespace Mfr.Models
             {
                 var json = File.ReadAllText(path);
                 using var doc = JsonDocument.Parse(json);
-                var camel = JsonNamingPolicy.CamelCase;
-                ConfigValueReader.ReadInt(
-                    configObject: doc.RootElement,
-                    propertyName: camel.ConvertName(nameof(MfrSettings.MaxListFileLineLength)),
-                    value: ref settings.MaxListFileLineLength,
-                    minInclusive: 1,
-                    maxInclusive: 60000);
-                ConfigValueReader.ReadInt(
-                    configObject: doc.RootElement,
-                    propertyName: camel.ConvertName(nameof(MfrSettings.LogMaxSessionFiles)),
-                    value: ref settings.LogMaxSessionFiles,
-                    minInclusive: 1,
-                    maxInclusive: 10000);
-                ConfigValueReader.ReadString(
-                    configObject: doc.RootElement,
-                    propertyName: camel.ConvertName(nameof(MfrSettings.LogFilePrefix)),
-                    value: ref settings.LogFilePrefix,
-                    maxLengthInclusive: 200);
-                ConfigValueReader.ReadString(
-                    configObject: doc.RootElement,
-                    propertyName: camel.ConvertName(nameof(MfrSettings.LogFileExtension)),
-                    value: ref settings.LogFileExtension,
-                    maxLengthInclusive: 32);
-                ConfigValueReader.ReadString(
-                    configObject: doc.RootElement,
-                    propertyName: camel.ConvertName(nameof(MfrSettings.LogConsoleOutputTemplate)),
-                    value: ref settings.LogConsoleOutputTemplate,
-                    maxLengthInclusive: 4096);
-                ConfigValueReader.ReadString(
-                    configObject: doc.RootElement,
-                    propertyName: camel.ConvertName(nameof(MfrSettings.LogFileOutputTemplate)),
-                    value: ref settings.LogFileOutputTemplate,
-                    maxLengthInclusive: 4096);
+                _ApplyJsonToSettings(doc.RootElement, settings);
             }
             catch (Exception ex)
             {
                 throw new InvalidDataException($"Config file '{path}': {ex.Message}", ex);
+            }
+        }
+
+        private static void _ApplyJsonToSettings(JsonElement configRoot, MfrSettings settings)
+        {
+            var camel = JsonNamingPolicy.CamelCase;
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+            foreach (var field in typeof(MfrSettings).GetFields(flags))
+            {
+                var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
+                var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
+                if (intRange is not null && strMax is not null)
+                {
+                    throw new InvalidOperationException(
+                        $"Field '{field.Name}' cannot specify both [{nameof(ConfigIntRangeAttribute)}] and [{nameof(ConfigStringMaxLengthAttribute)}].");
+                }
+
+                var jsonName = camel.ConvertName(field.Name);
+
+                if (intRange is not null)
+                {
+                    if (field.FieldType != typeof(int))
+                    {
+                        throw new InvalidOperationException(
+                            $"Field '{field.Name}' has [{nameof(ConfigIntRangeAttribute)}] but is not int.");
+                    }
+
+                    var value = (int)field.GetValue(settings)!;
+                    ConfigValueReader.ReadInt(
+                        configRoot,
+                        jsonName,
+                        ref value,
+                        minInclusive: intRange.MinInclusive,
+                        maxInclusive: intRange.MaxInclusive);
+                    field.SetValue(settings, value);
+                    continue;
+                }
+
+                if (strMax is not null)
+                {
+                    if (field.FieldType != typeof(string))
+                    {
+                        throw new InvalidOperationException(
+                            $"Field '{field.Name}' has [{nameof(ConfigStringMaxLengthAttribute)}] but is not string.");
+                    }
+
+                    var value = (string)field.GetValue(settings)!;
+                    ConfigValueReader.ReadString(
+                        configRoot,
+                        jsonName,
+                        ref value,
+                        maxLengthInclusive: strMax.MaxLengthInclusive);
+                    field.SetValue(settings, value);
+                }
             }
         }
     }
