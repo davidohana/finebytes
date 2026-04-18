@@ -4,18 +4,20 @@ using System.Text.Json;
 namespace Mfr.Utils.Config
 {
     /// <summary>
-    /// Applies JSON config values to public instance fields using <see cref="ConfigIntRangeAttribute"/> and
-    /// <see cref="ConfigStringMaxLengthAttribute"/> together with <see cref="ConfigValueReader"/>, and nested objects
-    /// marked with <see cref="ConfigSectionAttribute"/>.
+    /// Applies JSON configuration to annotated public instance fields.
+    /// <para>
+    /// Uses <see cref="ConfigSectionAttribute"/> for nested objects, <see cref="ConfigIntRangeAttribute"/> and
+    /// <see cref="ConfigStringMaxLengthAttribute"/> for leaves (via <see cref="ConfigValueReader"/>; leaf values are JSON strings, including integers).
+    /// </para>
     /// </summary>
     public static class ConfigApplier
     {
         /// <summary>
-        /// For each public instance field declared on the runtime type of <paramref name="target"/>:
-        /// fields with <see cref="ConfigSectionAttribute"/> load a nested JSON object and apply recursively;
-        /// fields with <see cref="ConfigIntRangeAttribute"/> or <see cref="ConfigStringMaxLengthAttribute"/> read the matching
-        /// JSON object property (values must be JSON strings, including integer settings) and update the field.
-        /// Omitted properties and JSON null leave the current field value unchanged.
+        /// Binds <paramref name="configObject"/> onto <paramref name="target"/>.
+        /// <para>
+        /// <see cref="ConfigSectionAttribute"/> fields recurse into nested JSON objects. <see cref="ConfigIntRangeAttribute"/> and
+        /// <see cref="ConfigStringMaxLengthAttribute"/> read matching properties as JSON strings. Omitted properties and JSON null leave fields unchanged.
+        /// </para>
         /// </summary>
         /// <param name="configObject">A JSON object (typically the document root).</param>
         /// <param name="target">The object whose annotated fields are updated.</param>
