@@ -33,4 +33,18 @@ namespace Mfr.Utils
         /// </summary>
         public int MaxLengthInclusive { get; } = maxLengthInclusive;
     }
+
+    /// <summary>
+    /// Marks a field whose value is a nested settings object mapped from a JSON object property.
+    /// <see cref="ConfigApplier.Apply"/> reads that property (by <see cref="JsonName"/> or the field name via the naming policy) and applies recursively.
+    /// </summary>
+    /// <param name="jsonName">Optional JSON object property name; when null, the name is derived from the field name using the applier naming policy.</param>
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class ConfigSectionAttribute(string? jsonName = null) : Attribute
+    {
+        /// <summary>
+        /// Gets the JSON property name when set; otherwise the applier derives the name from the field.
+        /// </summary>
+        public string? JsonName { get; } = jsonName;
+    }
 }

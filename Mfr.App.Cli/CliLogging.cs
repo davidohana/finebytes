@@ -12,22 +12,22 @@ namespace Mfr.App.Cli
 
         internal static CliLoggerSession Start(LogEventLevel logLevel, string? logDirectoryPath)
         {
-            var logSettings = ConfigLoader.Settings;
+            var logSettings = ConfigLoader.Settings.Log;
             var resolvedLogDirectoryPath = _ResolveLogDirectoryPath(logDirectoryPath);
             Directory.CreateDirectory(resolvedLogDirectoryPath);
 
-            var fileName = $"{logSettings.LogFilePrefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{logSettings.LogFileExtension}";
+            var fileName = $"{logSettings.FilePrefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{logSettings.FileExtension}";
             var logFilePath = Path.Combine(resolvedLogDirectoryPath, fileName);
 
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Is(logLevel)
                 .WriteTo.Console(
-                    outputTemplate: logSettings.LogConsoleOutputTemplate,
+                    outputTemplate: logSettings.ConsoleOutputTemplate,
                     theme: AnsiConsoleTheme.Code,
                     standardErrorFromLevel: LogEventLevel.Error)
                 .WriteTo.File(
                     path: logFilePath,
-                    outputTemplate: logSettings.LogFileOutputTemplate,
+                    outputTemplate: logSettings.FileOutputTemplate,
                     rollingInterval: RollingInterval.Infinite,
                     shared: false)
                 .CreateLogger();
@@ -35,9 +35,9 @@ namespace Mfr.App.Cli
             Log.Logger = logger;
             _PruneSessionLogFiles(
                 logDirectoryPath: resolvedLogDirectoryPath,
-                maxSessionFiles: logSettings.LogMaxSessionFiles,
-                sessionLogPrefix: logSettings.LogFilePrefix,
-                sessionLogExtension: logSettings.LogFileExtension);
+                maxSessionFiles: logSettings.MaxSessionFiles,
+                sessionLogPrefix: logSettings.FilePrefix,
+                sessionLogExtension: logSettings.FileExtension);
             logger.Debug(
                 "Logging initialized. Level: {LogLevel}. File: {LogFilePath}",
                 logLevel,

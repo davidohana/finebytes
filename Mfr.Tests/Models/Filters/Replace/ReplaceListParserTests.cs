@@ -133,7 +133,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         [InlineData(false)]
         public void ParseFile_LineTooLong_Throws(bool isSearch)
         {
-            var settingsMaxListFileLineLength = ConfigLoader.Settings.MaxListFileLineLength;
+            var settingsMaxListFileLineLength = ConfigLoader.Settings.Filters.MaxListFileLineLength;
             var tooLong = new string('x', settingsMaxListFileLineLength + 1);
             var content = isSearch ? $"S:{tooLong}\nR:b" : $"S:a\nR:{tooLong}";
             var path = _CreateFile(content);

@@ -48,6 +48,25 @@ namespace Mfr.Tests.Utils
             public int X = 1;
         }
 
+        private sealed class NestedLeafOptions
+        {
+            [ConfigIntRange(1, 100)]
+            public int Port = 10;
+        }
+
+        private sealed class RootWithNestedSection
+        {
+            [ConfigSection]
+            public NestedLeafOptions Outer = new();
+        }
+
+        private sealed class BadSectionWithLeaf
+        {
+            [ConfigSection]
+            [ConfigIntRange(1, 10)]
+            public NestedLeafOptions Inner = new();
+        }
+
         [Fact]
         public void Apply_sets_annotated_fields_uses_camel_case_names()
         {
@@ -133,6 +152,40 @@ namespace Mfr.Tests.Utils
             var o = new SampleOptions();
             ConfigApplier.Apply(doc.RootElement, o, new UpperInvariantNamingPolicy());
             Assert.Equal(77, o.Port);
+        }
+
+        [Fact]
+        public void Apply_nested_section_reads_leaf_fields()
+        {
+            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"outer":{"port":"77"}}""");
+            var o = new RootWithNestedSection();
+            ConfigApplier.Apply(doc.RootElement, o);
+            Assert.Equal(77, o.Outer.Port);
+        }
+
+        [Fact]
+        public void Apply_missing_nested_section_leaves_defaults()
+        {
+            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            var o = new RootWithNestedSection();
+            ConfigApplier.Apply(doc.RootElement, o);
+            Assert.Equal(10, o.Outer.Port);
+        }
+
+        [Fact]
+        public void Apply_nested_section_wrong_value_kind_throws_InvalidDataException()
+        {
+            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"outer":"not-an-object"}""");
+            var o = new RootWithNestedSection();
+            Assert.Throws<InvalidDataException>(() => ConfigApplier.Apply(doc.RootElement, o));
+        }
+
+        [Fact]
+        public void Apply_section_combined_with_leaf_attribute_throws_InvalidOperationException()
+        {
+            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            var o = new BadSectionWithLeaf();
+            Assert.Throws<InvalidOperationException>(() => ConfigApplier.Apply(doc.RootElement, o));
         }
     }
 }

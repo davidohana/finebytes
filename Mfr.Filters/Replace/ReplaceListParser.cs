@@ -121,7 +121,7 @@ namespace Mfr.Filters.Replace
 
         private static void _ValidateLineLength(IReadOnlyList<ReplaceListFileLine> lines)
         {
-            var maxLen = ConfigLoader.Settings.MaxListFileLineLength;
+            var maxLen = ConfigLoader.Settings.Filters.MaxListFileLineLength;
             var firstInvalidLine = lines.FirstOrDefault(line => line.Text.Length > maxLen);
             if (firstInvalidLine == default)
             {

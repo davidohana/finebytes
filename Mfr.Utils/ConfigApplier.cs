@@ -5,14 +5,16 @@ namespace Mfr.Utils
 {
     /// <summary>
     /// Applies JSON config values to public instance fields using <see cref="ConfigIntRangeAttribute"/> and
-    /// <see cref="ConfigStringMaxLengthAttribute"/> together with <see cref="ConfigValueReader"/>.
+    /// <see cref="ConfigStringMaxLengthAttribute"/> together with <see cref="ConfigValueReader"/>, and nested objects
+    /// marked with <see cref="ConfigSectionAttribute"/>.
     /// </summary>
     public static class ConfigApplier
     {
         /// <summary>
-        /// For each public instance field declared on the runtime type of <paramref name="target"/> that carries
-        /// <see cref="ConfigIntRangeAttribute"/> or <see cref="ConfigStringMaxLengthAttribute"/>, reads the matching
-        /// JSON object property (values must be JSON strings, including integer settings) and updates the field.
+        /// For each public instance field declared on the runtime type of <paramref name="target"/>:
+        /// fields with <see cref="ConfigSectionAttribute"/> load a nested JSON object and apply recursively;
+        /// fields with <see cref="ConfigIntRangeAttribute"/> or <see cref="ConfigStringMaxLengthAttribute"/> read the matching
+        /// JSON object property (values must be JSON strings, including integer settings) and update the field.
         /// Omitted properties and JSON null leave the current field value unchanged.
         /// </summary>
         /// <param name="configObject">A JSON object (typically the document root).</param>
@@ -36,8 +38,45 @@ namespace Mfr.Utils
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             foreach (var field in target.GetType().GetFields(flags))
             {
+                var sectionAttr = field.GetCustomAttribute<ConfigSectionAttribute>();
                 var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
                 var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
+
+                if (sectionAttr is not null)
+                {
+                    if (intRange is not null || strMax is not null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Field '{field.Name}' cannot combine [{nameof(ConfigSectionAttribute)}] with [{nameof(ConfigIntRangeAttribute)}] or [{nameof(ConfigStringMaxLengthAttribute)}].");
+                    }
+
+                    if (!field.FieldType.IsClass || field.FieldType == typeof(string))
+                    {
+                        throw new InvalidOperationException(
+                            $"Field '{field.Name}' has [{nameof(ConfigSectionAttribute)}] but is not a reference class type.");
+                    }
+
+                    var nested = field.GetValue(target);
+                    if (nested is null)
+                    {
+                        continue;
+                    }
+
+                    var sectionKey = sectionAttr.JsonName;
+                    if (string.IsNullOrEmpty(sectionKey))
+                    {
+                        sectionKey = naming.ConvertName(field.Name);
+                    }
+
+                    if (!_TryGetObjectProperty(configObject, sectionKey, out var nestedObject))
+                    {
+                        continue;
+                    }
+
+                    Apply(nestedObject, nested, jsonPropertyNamingPolicy);
+                    continue;
+                }
+
                 if (intRange is not null && strMax is not null)
                 {
                     throw new InvalidOperationException(
@@ -82,6 +121,46 @@ namespace Mfr.Utils
                     field.SetValue(target, value);
                 }
             }
+        }
+
+        /// <summary>
+        /// When <paramref name="propertyName"/> matches a property on <paramref name="root"/>, returns true and sets
+        /// <paramref name="value"/> to that property's element. Missing properties and JSON null return false.
+        /// When the property exists but is not an object or null, throws <see cref="InvalidDataException"/>.
+        /// </summary>
+        private static bool _TryGetObjectProperty(JsonElement root, string propertyName, out JsonElement value)
+        {
+            if (root.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidDataException("Root must be a JSON object.");
+            }
+
+            foreach (var prop in root.EnumerateObject())
+            {
+                if (!string.Equals(prop.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var kind = prop.Value.ValueKind;
+                if (kind == JsonValueKind.Null)
+                {
+                    value = default;
+                    return false;
+                }
+
+                if (kind != JsonValueKind.Object)
+                {
+                    throw new InvalidDataException(
+                        $"'{propertyName}' must be a JSON object or null.");
+                }
+
+                value = prop.Value;
+                return true;
+            }
+
+            value = default;
+            return false;
         }
     }
 }

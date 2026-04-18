@@ -148,7 +148,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void ParseFile_LineTooLong_Throws()
         {
-            var longWord = new string('x', ConfigLoader.Settings.MaxListFileLineLength + 1);
+            var longWord = new string('x', ConfigLoader.Settings.Filters.MaxListFileLineLength + 1);
             var path = _CreateFile(longWord);
 
             var ex = Assert.Throws<UserException>(() => CasingListParser.ParseFile(path));

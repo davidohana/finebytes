@@ -12,9 +12,9 @@ namespace Mfr.Models
     /// <see cref="MfrSettings"/> field initializers.
     /// </para>
     /// <para>
-    /// The document root must be a JSON object. <see cref="ConfigApplier.Apply"/> maps annotated
-    /// <see cref="MfrSettings"/> fields using <see cref="ConfigValueReader"/>; every value is read from a JSON
-    /// <strong>string</strong> (including integers, e.g. <c>"1000"</c>).
+    /// The document root must be a JSON object with nested sections (e.g. <c>filters</c>, <c>log</c>). Each section is a JSON object;
+    /// <see cref="ConfigApplier.Apply"/> maps annotated fields on <see cref="MfrSettings"/> and nested section types using
+    /// <see cref="ConfigValueReader"/>; every leaf value is read from a JSON <strong>string</strong> (including integers, e.g. <c>"1000"</c>).
     /// </para>
     /// <para>
     /// Do not add a dedicated test type for this class; config loading is exercised indirectly (for example via CLI and

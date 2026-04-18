@@ -18,7 +18,7 @@ namespace Mfr.Filters.Case
 
             var lowerWordToCasing = new Dictionary<string, string>(StringComparer.Ordinal);
             var lines = File.ReadAllLines(filePath);
-            var maxLineLen = ConfigLoader.Settings.MaxListFileLineLength;
+            var maxLineLen = ConfigLoader.Settings.Filters.MaxListFileLineLength;
             for (var i = 0; i < lines.Length; i++)
             {
                 var lineNumber = i + 1;
