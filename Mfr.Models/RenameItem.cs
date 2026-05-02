@@ -154,12 +154,26 @@ namespace Mfr.Models
 
         /// <summary>
         /// Applies the preview rename, attribute, and timestamp changes on disk for this item.
-        /// Updates <see cref="Original"/> to match the applied preview; <see cref="Preview"/> is left as-is until the host calls <see cref="ClearPreview"/>.
         /// </summary>
+        /// <para>
+        /// When <see cref="Preview"/> points to another directory, missing destination directories are created
+        /// before the file rename.
+        /// </para>
+        /// <remarks>
+        /// Updates <see cref="Original"/> to match the applied preview; <see cref="Preview"/> is left as-is until the host calls <see cref="ClearPreview"/>.
+        /// </remarks>
         public void Commit()
         {
             if (!IsPreviewPathSameAsOriginal())
             {
+                var destinationDirectoryPath = Path.GetDirectoryName(Preview.FullPath);
+                if (string.IsNullOrEmpty(destinationDirectoryPath))
+                {
+                    throw new InvalidOperationException(
+                        $"Cannot resolve a parent directory for destination path '{Preview.FullPath}'.");
+                }
+
+                Directory.CreateDirectory(destinationDirectoryPath);
                 File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
             }
 

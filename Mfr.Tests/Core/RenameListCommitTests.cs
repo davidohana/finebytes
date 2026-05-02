@@ -772,6 +772,98 @@ namespace Mfr.Tests.Core
             Assert.Equal(item.Preview.LastWriteTime, after);
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies commit creates missing destination directories when the preview path uses a new parent folder segment.
+        /// </summary>
+        public void Commit_CreatesFolders_WhenMovingFileToRenamedParentSegment()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var oldParent = dir.CombinePath("OldParent");
+            Directory.CreateDirectory(oldParent);
+            var filePath = oldParent.CombinePath("song.mp3");
+            File.WriteAllText(filePath, "x");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([filePath]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "parent-rename",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new ReplacerFilter(
+                        Target: new AncestorFolderTarget(Level: 1),
+                        Options: new ReplacerOptions(
+                            Find: "OldParent",
+                            Replacement: "NewParent",
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: false,
+                            WholeWord: false))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            var expectedDest = Path.Combine(dir, "NewParent", "song.mp3");
+            Assert.Equal(expectedDest, renameList.RenameItems[0].Preview.FullPath);
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.False(File.Exists(filePath));
+            Assert.True(File.Exists(expectedDest));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies dry-run does not create folders for a preview that points at a missing parent path.
+        /// </summary>
+        public void Commit_DryRun_DoesNotCreateFolder_ForRenamedParentSegment()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var oldParent = dir.CombinePath("OldParent");
+            Directory.CreateDirectory(oldParent);
+            var filePath = oldParent.CombinePath("song.mp3");
+            File.WriteAllText(filePath, "x");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([filePath]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "parent-rename-dry",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new ReplacerFilter(
+                        Target: new AncestorFolderTarget(Level: 1),
+                        Options: new ReplacerOptions(
+                            Find: "OldParent",
+                            Replacement: "NewParent",
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: false,
+                            WholeWord: false))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            var expectedNewParent = dir.CombinePath("NewParent");
+            Assert.False(Directory.Exists(expectedNewParent));
+
+            var result = renameList.Commit(failFast: false, dryRun: true);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.False(Directory.Exists(expectedNewParent));
+            Assert.True(File.Exists(filePath));
+        }
+
         private sealed record UnsupportedTarget : FilterTarget;
     }
 }

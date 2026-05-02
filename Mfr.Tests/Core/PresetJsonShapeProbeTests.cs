@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Mfr.Core;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Models;
 
@@ -130,6 +131,36 @@ namespace Mfr.Tests.Core
             Assert.Equal(-5, typed.Options.Amount);
             Assert.Equal(TimeShiftUnit.Days, typed.Options.Unit);
             Assert.Equal(TimestampField.LastWrite, typed.Options.TimestampField);
+            typed.Setup();
+        }
+
+        [Fact]
+        public void Replacer_JSON_round_trips_AncestorFolder_target()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "Replacer",
+              "target": {
+                "family": "AncestorFolder",
+                "level": 2
+              },
+              "options": {
+                "find": "a",
+                "replacement": "b",
+                "mode": "Literal",
+                "caseSensitive": true,
+                "replaceAll": true,
+                "wholeWord": false
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<ReplacerFilter>(filter);
+            var target = Assert.IsType<AncestorFolderTarget>(typed.Target);
+            Assert.Equal(2, target.Level);
+
             typed.Setup();
         }
 
