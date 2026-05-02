@@ -30,22 +30,22 @@ namespace Mfr.Filters.Misc
     /// <param name="Options">Parenthesis-strip options.</param>
     public sealed partial record StripParenthesesFilter(
         FilterTarget Target,
-        StripParenthesesOptions Options) : FileNameSegmentFilter(Target)
+        StripParenthesesOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "StripParentheses";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             return Options.Type switch
             {
-                ParenthesisType.Round => Strip(segment, _RoundParenRegex(), "(", ")"),
-                ParenthesisType.Square => Strip(segment, _SquareParenRegex(), "[", "]"),
-                ParenthesisType.Curly => Strip(segment, _CurlyParenRegex(), "{", "}"),
-                ParenthesisType.Angle => Strip(segment, _AngleParenRegex(), "<", ">"),
-                _ => segment
+                ParenthesisType.Round => Strip(value, _RoundParenRegex(), "(", ")"),
+                ParenthesisType.Square => Strip(value, _SquareParenRegex(), "[", "]"),
+                ParenthesisType.Curly => Strip(value, _CurlyParenRegex(), "{", "}"),
+                ParenthesisType.Angle => Strip(value, _AngleParenRegex(), "<", ">"),
+                _ => value
             };
 
             string Strip(string s, Regex regex, string open, string close)

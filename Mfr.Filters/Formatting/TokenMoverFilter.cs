@@ -24,7 +24,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Token mover options.</param>
     public sealed record TokenMoverFilter(
         FilterTarget Target,
-        TokenMoverOptions Options) : FileNameSegmentFilter(Target)
+        TokenMoverOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -32,26 +32,26 @@ namespace Mfr.Filters.Formatting
         public override string Type => "TokenMover";
 
         /// <inheritdoc />
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             if (string.IsNullOrEmpty(Options.Delimiter))
             {
-                return segment;
+                return value;
             }
 
-            var tokens = segment.Split(Options.Delimiter, StringSplitOptions.None);
+            var tokens = value.Split(Options.Delimiter, StringSplitOptions.None);
             var count = tokens.Length;
             var sourceIndex = Options.TokenNumber - 1;
             var tokenNumberIsInvalid = Options.TokenNumber < 1 || sourceIndex >= count;
             if (tokenNumberIsInvalid)
             {
-                return segment;
+                return value;
             }
 
             var targetIndex = Math.Clamp(sourceIndex + Options.MoveBy, 0, count - 1);
             if (sourceIndex == targetIndex)
             {
-                return segment;
+                return value;
             }
 
             return _MoveToken(tokens, sourceIndex, targetIndex, Options.Delimiter);

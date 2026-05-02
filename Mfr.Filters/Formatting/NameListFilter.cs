@@ -29,7 +29,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Name list and optional prefix/suffix templates.</param>
     public sealed record NameListFilter(
         FilterTarget Target,
-        NameListOptions Options) : FileNameSegmentFilter(Target)
+        NameListOptions Options) : StringTargetFilter(Target)
     {
         private IReadOnlyList<string>? _entries;
 
@@ -51,12 +51,12 @@ namespace Mfr.Filters.Formatting
         /// <summary>
         /// Replaces the segment with the list entry for this item, wrapped by resolved prefix and suffix templates.
         /// </summary>
-        /// <param name="segment">Current field text (ignored; the result is fully determined by the list and templates).</param>
+        /// <param name="value">Current field text (ignored; the result is fully determined by the list and templates).</param>
         /// <param name="item">Rename item providing list index and token context.</param>
         /// <returns>The new field value.</returns>
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
-            _ = segment;
+            _ = value;
             var entries = _entries
                 ?? throw new InvalidOperationException("Name-list setup must complete before transform.");
             var index = item.Original.GlobalIndex;

@@ -20,14 +20,14 @@ namespace Mfr.Filters.Replace
     /// <param name="Options">Cleaner options.</param>
     public sealed record CleanerFilter(
         FilterTarget Target,
-        CleanerOptions Options) : FileNameSegmentFilter(Target)
+        CleanerOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Cleaner";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             var invalidChars = Options.RemoveIllegalChars ? Path.GetInvalidFileNameChars() : [];
             var customChars = Options.CustomCharsToRemove ?? "";
@@ -35,11 +35,11 @@ namespace Mfr.Filters.Replace
 
             if (chars.Count == 0)
             {
-                return segment;
+                return value;
             }
 
-            var sb = new System.Text.StringBuilder(segment.Length);
-            foreach (var c in segment)
+            var sb = new System.Text.StringBuilder(value.Length);
+            foreach (var c in value)
             {
                 if (chars.Contains(c))
                 {

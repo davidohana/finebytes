@@ -24,18 +24,18 @@ namespace Mfr.Filters.Space
     /// <param name="Options">Space definition and replacement options.</param>
     public sealed record SpaceCharacterFilter(
         FilterTarget Target,
-        SpaceCharacterOptions Options) : FileNameSegmentFilter(Target)
+        SpaceCharacterOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "SpaceCharacter";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             item.WordSeparator = Options.SpaceCharacter;
             var sep = Options.SpaceCharacter.ToString();
-            var result = segment;
+            var result = value;
             foreach (var from in _GetReplacementSourceStrings(Options))
             {
                 result = result.Replace(from, sep, StringComparison.Ordinal);

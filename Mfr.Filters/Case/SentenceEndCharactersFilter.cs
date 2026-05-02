@@ -20,7 +20,7 @@ namespace Mfr.Filters.Case
     /// <param name="Options">Sentence-end character list.</param>
     public sealed record SentenceEndCharactersFilter(
         FilterTarget Target,
-        SentenceEndCharactersOptions Options) : FileNameSegmentFilter(Target)
+        SentenceEndCharactersOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -30,13 +30,13 @@ namespace Mfr.Filters.Case
         /// <summary>
         /// Updates <see cref="RenameItem.SentenceEndChars"/> and returns the segment unchanged.
         /// </summary>
-        /// <param name="segment">Input text segment (unchanged).</param>
+        /// <param name="value">Input text segment (unchanged).</param>
         /// <param name="item">Rename item whose sentence-end settings are updated.</param>
-        /// <returns>The same <paramref name="segment"/> value.</returns>
-        protected override string _TransformSegment(string segment, RenameItem item)
+        /// <returns>The same <paramref name="value"/> value.</returns>
+        protected override string _TransformValue(string value, RenameItem item)
         {
             item.SentenceEndChars = Options.Characters;
-            return segment;
+            return value;
         }
     }
 }

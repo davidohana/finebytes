@@ -15,15 +15,16 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Formatter options.</param>
     public sealed partial record FormatterFilter(
         FilterTarget Target,
-        FormatterOptions Options) : FileNameSegmentFilter(Target)
+        FormatterOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Formatter";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
+            _ = value;
             return FormatterTokenResolver.ResolveTemplate(Options.Template, item);
         }
     }

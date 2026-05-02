@@ -17,7 +17,7 @@ namespace Mfr.Filters.Case
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed partial record UppercaseInitialsFilter(
-        FilterTarget Target) : FileNameSegmentFilter(Target)
+        FilterTarget Target) : StringTargetFilter(Target)
     {
         // Keep this runtime-compiled regex for readability and to avoid GeneratedRegex partial-method
         // analyzer noise in this project setup.
@@ -32,14 +32,14 @@ namespace Mfr.Filters.Case
         /// </summary>
         public override string Type => "UppercaseInitials";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
-            if (string.IsNullOrEmpty(segment))
+            if (string.IsNullOrEmpty(value))
             {
-                return segment;
+                return value;
             }
 
-            return _regex.Replace(segment, m => m.Value.ToUpperInvariant());
+            return _regex.Replace(value, m => m.Value.ToUpperInvariant());
         }
 
     }

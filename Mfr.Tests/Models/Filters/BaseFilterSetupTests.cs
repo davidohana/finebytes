@@ -32,12 +32,12 @@ namespace Mfr.Tests.Models.Filters
         /// Verifies transform guard rejects direct transform calls before setup.
         /// </summary>
         [Fact]
-        public void TransformSegment_SetupNotRun_ThrowsInvalidOperationException()
+        public void TransformValue_SetupNotRun_ThrowsInvalidOperationException()
         {
             var filter = new SetupCountingFilter(Target: _target);
             var item = FilterTestHelpers.CreateRenameItem(prefix: "first");
 
-            var ex = Assert.Throws<InvalidOperationException>(() => filter.TransformSegment(segment: "value", item: item));
+            var ex = Assert.Throws<InvalidOperationException>(() => filter.TransformValue(value: "value", item: item));
             Assert.Contains("setup must complete before transform", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -57,7 +57,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.Contains("setup must complete before transform", applyEx.Message, StringComparison.OrdinalIgnoreCase);
         }
 
-        private sealed record SetupCountingFilter(FilterTarget Target) : FileNameSegmentFilter(Target)
+        private sealed record SetupCountingFilter(FilterTarget Target) : StringTargetFilter(Target)
         {
             public override string Type => "SetupCounting";
 
@@ -68,13 +68,13 @@ namespace Mfr.Tests.Models.Filters
                 SetupCount++;
             }
 
-            protected override string _TransformSegment(string segment, RenameItem item)
+            protected override string _TransformValue(string value, RenameItem item)
             {
-                return $"{segment}-{SetupCount}";
+                return $"{value}-{SetupCount}";
             }
         }
 
-        private sealed record ThrowingSetupFilter(FilterTarget Target) : FileNameSegmentFilter(Target)
+        private sealed record ThrowingSetupFilter(FilterTarget Target) : StringTargetFilter(Target)
         {
             public override string Type => "ThrowingSetup";
 
@@ -83,9 +83,9 @@ namespace Mfr.Tests.Models.Filters
                 throw new InvalidOperationException("Setup failed.");
             }
 
-            protected override string _TransformSegment(string segment, RenameItem item)
+            protected override string _TransformValue(string value, RenameItem item)
             {
-                return segment;
+                return value;
             }
         }
     }

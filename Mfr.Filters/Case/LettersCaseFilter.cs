@@ -108,29 +108,29 @@ namespace Mfr.Filters.Case
     /// <param name="Options">Case transformation options.</param>
     public sealed record LettersCaseFilter(
         FilterTarget Target,
-        LettersCaseOptions Options) : FileNameSegmentFilter(Target)
+        LettersCaseOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "LettersCase";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             return Options.Mode switch
             {
-                LettersCaseMode.UpperCase => segment.ToUpperInvariant(),
-                LettersCaseMode.LowerCase => segment.ToLowerInvariant(),
-                LettersCaseMode.FirstLetterUp => _FirstLetterUp(segment),
+                LettersCaseMode.UpperCase => value.ToUpperInvariant(),
+                LettersCaseMode.LowerCase => value.ToLowerInvariant(),
+                LettersCaseMode.FirstLetterUp => _FirstLetterUp(value),
                 LettersCaseMode.WeirdCase => _ApplyWeirdCase(
-                    input: segment,
+                    input: value,
                     item: item,
                     weirdUppercaseChancePercent: Options.WeirdUppercaseChancePercent,
                     weirdFixedPlaces: Options.WeirdFixedPlaces),
-                LettersCaseMode.TitleCase => _ApplyTitleCase(segment, Options.SkipWords, item.WordSeparator),
-                LettersCaseMode.SentenceCase => _ApplySentenceCase(segment, item.WordSeparator, item.SentenceEndChars),
-                LettersCaseMode.InvertCase => _InvertCase(segment),
-                _ => segment
+                LettersCaseMode.TitleCase => _ApplyTitleCase(value, Options.SkipWords, item.WordSeparator),
+                LettersCaseMode.SentenceCase => _ApplySentenceCase(value, item.WordSeparator, item.SentenceEndChars),
+                LettersCaseMode.InvertCase => _InvertCase(value),
+                _ => value
             };
         }
 

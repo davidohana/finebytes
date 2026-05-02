@@ -26,7 +26,7 @@ namespace Mfr.Filters.Case
     /// <param name="Options">Casing-list options.</param>
     public sealed record CasingListFilter(
         FilterTarget Target,
-        CasingListOptions Options) : FileNameSegmentFilter(Target)
+        CasingListOptions Options) : StringTargetFilter(Target)
     {
         private Dictionary<string, string>? _lowerWordToCasing;
 
@@ -46,20 +46,20 @@ namespace Mfr.Filters.Case
         /// <summary>
         /// Applies casing-list normalization and optional sentence-initial uppercasing.
         /// </summary>
-        /// <param name="segment">Input text segment to transform.</param>
+        /// <param name="value">Input text segment to transform.</param>
         /// <param name="item">Current rename item carrying separator context.</param>
         /// <returns>The transformed text segment.</returns>
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             var lowerWordToCasing = _lowerWordToCasing
                 ?? throw new InvalidOperationException("Casing-list setup must complete before transform.");
 
-            if (segment.Length == 0 || lowerWordToCasing.Count == 0)
+            if (value.Length == 0 || lowerWordToCasing.Count == 0)
             {
-                return segment;
+                return value;
             }
 
-            var transformed = _ApplyCasingList(segment, item.WordSeparator, lowerWordToCasing);
+            var transformed = _ApplyCasingList(value, item.WordSeparator, lowerWordToCasing);
             if (!Options.UppercaseSentenceInitial)
             {
                 return transformed;

@@ -13,12 +13,12 @@ description: >-
 1. **Location.** Add the filter class under `Mfr.Filters/<Group>/` (e.g. `Space/`, `Case/`). Filters sit in **L2**; they reference `Mfr.Models` only (see `docs/mfr-folder-layering.md`).
 
 2. **Shape.**
-   - **File-name text filters:** `public sealed record YourFilter(...) : FileNameSegmentFilter(Target)` (same as most built-ins).
+   - **String-target filters (prefix/extension/full today):** `public sealed record YourFilter(...) : StringTargetFilter(Target)` (same as most built-ins).
    - **Other targets** (attributes, future ID3, etc.): `public sealed record YourFilter(...) : BaseFilter(Target)` and `protected internal override void ApplyCore(RenameItem item)`.
 
 3. **`Type`.** `public override string Type => "YourFilterType";` — string must match the JSON `type` discriminator and `JsonDerivedType` registration **exactly**.
 
-4. **Transform (file-name filters only).** Implement `protected override string _TransformSegment(string segment, RenameItem item)`. Use `RenameItem` / `item.WordSeparator` when behavior depends on pipeline state (e.g. word separator set by an earlier `SpaceCharacter` filter). Override `protected virtual void _Setup()` only for one-time setup before transforms.
+4. **Transform (`StringTargetFilter`).** Implement `protected override string _TransformValue(string value, RenameItem item)`. Use `RenameItem` / `item.WordSeparator` when behavior depends on pipeline state (e.g. word separator set by an earlier `SpaceCharacter` filter). Override `protected virtual void _Setup()` only for one-time setup before transforms.
 
 5. **Options.** If the filter has settings, add a `YourOptions` `sealed record` in the same file or adjacent file, with camelCase JSON property names via record positional params / `[JsonPropertyName]` as needed.
 

@@ -33,7 +33,7 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Ensures <see cref="Setup"/> has completed (for helpers such as <see cref="FileNameSegmentFilter.TransformSegment"/>).
+        /// Ensures <see cref="Setup"/> has completed (for helpers such as <see cref="StringTargetFilter.TransformValue"/>).
         /// </summary>
         protected void VerifySetupComplete()
         {
@@ -44,7 +44,7 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Applies this filter to the rename item. File-name text filters use <see cref="FileNameSegmentFilter"/>.
+        /// Applies this filter to the rename item. String-valued field filters use <see cref="StringTargetFilter"/>.
         /// </summary>
         /// <param name="item">The item whose preview is updated.</param>
         protected internal abstract void ApplyCore(RenameItem item);

@@ -11,21 +11,21 @@ namespace Mfr.Filters.Space
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed record StripSpacesLeftFilter(
-        FilterTarget Target) : FileNameSegmentFilter(Target)
+        FilterTarget Target) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "StripSpacesLeft";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
-            if (string.IsNullOrEmpty(segment))
+            if (string.IsNullOrEmpty(value))
             {
-                return segment;
+                return value;
             }
 
-            return segment.TrimStart(item.WordSeparator);
+            return value.TrimStart(item.WordSeparator);
         }
     }
 }

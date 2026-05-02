@@ -23,30 +23,30 @@ namespace Mfr.Filters.Misc
     /// <param name="Options">Leading-zero normalization options.</param>
     public sealed partial record FixLeadingZerosFilter(
         FilterTarget Target,
-        FixLeadingZerosOptions Options) : FileNameSegmentFilter(Target)
+        FixLeadingZerosOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "FixLeadingZeros";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             if (Options.Width <= 0)
             {
-                return segment;
+                return value;
             }
 
             var count = 0;
-            return _DigitsRegex().Replace(segment, m =>
+            return _DigitsRegex().Replace(value, m =>
             {
                 if (Options.WholeWordOnly)
                 {
                     var start = m.Index;
                     var end = m.Index + m.Length;
 
-                    var isLetterBefore = start > 0 && char.IsLetter(segment[start - 1]);
-                    var isLetterAfter = end < segment.Length && char.IsLetter(segment[end]);
+                    var isLetterBefore = start > 0 && char.IsLetter(value[start - 1]);
+                    var isLetterAfter = end < value.Length && char.IsLetter(value[end]);
 
                     if (isLetterBefore || isLetterAfter)
                     {

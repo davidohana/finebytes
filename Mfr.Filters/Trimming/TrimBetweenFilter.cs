@@ -36,22 +36,22 @@ namespace Mfr.Filters.Trimming
     /// <param name="Options">Trimming options.</param>
     public sealed record TrimBetweenFilter(
         FilterTarget Target,
-        TrimBetweenFilterOptions Options) : FileNameSegmentFilter(Target)
+        TrimBetweenFilterOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "TrimBetween";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
-            if (string.IsNullOrEmpty(segment))
+            if (string.IsNullOrEmpty(value))
             {
-                return segment;
+                return value;
             }
 
-            var startIndex = _GetAbsoluteIndex(Options.Start, segment.Length);
-            var endIndex = _GetAbsoluteIndex(Options.End, segment.Length);
+            var startIndex = _GetAbsoluteIndex(Options.Start, value.Length);
+            var endIndex = _GetAbsoluteIndex(Options.End, value.Length);
 
             // Reorder if start is after end
             if (startIndex > endIndex)
@@ -60,7 +60,7 @@ namespace Mfr.Filters.Trimming
             }
 
             // Remove characters from startIndex to endIndex (inclusive)
-            return segment.Remove(startIndex, endIndex - startIndex + 1);
+            return value.Remove(startIndex, endIndex - startIndex + 1);
         }
 
         private static int _GetAbsoluteIndex(Position position, int length)

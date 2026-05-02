@@ -21,22 +21,22 @@ namespace Mfr.Filters.Case
     /// <param name="Options">Filter options.</param>
     public sealed record CapitalizeAfterFilter(
         FilterTarget Target,
-        CapitalizeAfterOptions Options) : FileNameSegmentFilter(Target)
+        CapitalizeAfterOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "CapitalizeAfter";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
-            if (string.IsNullOrEmpty(segment) || string.IsNullOrEmpty(Options.CapitalizeAfterChars))
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(Options.CapitalizeAfterChars))
             {
-                return segment;
+                return value;
             }
 
             var capitalizeAfterSet = new HashSet<char>(Options.CapitalizeAfterChars);
-            var chars = segment.ToCharArray();
+            var chars = value.ToCharArray();
             for (var i = 0; i < chars.Length - 1; i++)
             {
                 if (capitalizeAfterSet.Contains(chars[i]))

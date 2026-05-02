@@ -8,18 +8,18 @@ namespace Mfr.Filters.Space
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed record ShrinkSpacesFilter(
-        FilterTarget Target) : FileNameSegmentFilter(Target)
+        FilterTarget Target) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "ShrinkSpaces";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             var ch = item.WordSeparator;
             var pattern = Regex.Escape(ch.ToString()) + "+";
-            return Regex.Replace(segment, pattern, _ => ch.ToString());
+            return Regex.Replace(value, pattern, _ => ch.ToString());
         }
     }
 }

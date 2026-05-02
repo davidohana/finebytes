@@ -9,18 +9,18 @@ namespace Mfr.Filters.Trimming
     /// <param name="Options">Extraction options.</param>
     public sealed record ExtractRightFilter(
         FilterTarget Target,
-        CountFilterOptions Options) : FileNameSegmentFilter(Target)
+        CountFilterOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "ExtractRight";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
-            // Ensure count is within [0, segment.Length] to avoid IndexOutOfRangeException
-            var count = Math.Clamp(Options.Count, 0, segment.Length);
-            return segment[^count..];
+            // Ensure count is within [0, value.Length] to avoid IndexOutOfRangeException
+            var count = Math.Clamp(Options.Count, 0, value.Length);
+            return value[^count..];
         }
     }
 }

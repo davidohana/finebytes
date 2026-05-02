@@ -86,7 +86,7 @@ namespace Mfr.Tests.Models
             Assert.Equal(1, enabled.SetupCount);
         }
 
-        private sealed record SetupCountingFilter(FilterTarget Target) : FileNameSegmentFilter(Target)
+        private sealed record SetupCountingFilter(FilterTarget Target) : StringTargetFilter(Target)
         {
             public override string Type => "SetupCounting";
 
@@ -97,9 +97,9 @@ namespace Mfr.Tests.Models
                 SetupCount++;
             }
 
-            protected override string _TransformSegment(string segment, RenameItem item)
+            protected override string _TransformValue(string value, RenameItem item)
             {
-                return segment;
+                return value;
             }
         }
     }

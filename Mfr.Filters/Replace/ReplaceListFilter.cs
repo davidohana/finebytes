@@ -29,7 +29,7 @@ namespace Mfr.Filters.Replace
     /// <param name="Options">Replace-list options.</param>
     public sealed record ReplaceListFilter(
         FilterTarget Target,
-        ReplaceListOptions Options) : FileNameSegmentFilter(Target)
+        ReplaceListOptions Options) : StringTargetFilter(Target)
     {
         private List<ReplaceListEntry>? _replaceListEntries;
 
@@ -43,16 +43,16 @@ namespace Mfr.Filters.Replace
             _replaceListEntries = ReplaceListParser.ParseFile(filePath: Options.FilePath);
         }
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             var searchToReplace = _replaceListEntries
                 ?? throw new InvalidOperationException("Replace-list setup must complete before transform.");
             if (searchToReplace.Count == 0)
             {
-                return segment;
+                return value;
             }
 
-            var transformed = segment;
+            var transformed = value;
             foreach (var entry in searchToReplace)
             {
                 var replacement = FormatterTokenResolver.ResolveTemplate(entry.Replacement, item);

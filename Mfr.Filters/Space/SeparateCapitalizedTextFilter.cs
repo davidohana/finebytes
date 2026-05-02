@@ -22,27 +22,27 @@ namespace Mfr.Filters.Space
     /// <c>SpaceCharacter</c> filter).
     /// </remarks>
     public sealed record SeparateCapitalizedTextFilter(
-        FilterTarget Target) : FileNameSegmentFilter(Target)
+        FilterTarget Target) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "SeparateCapitalizedText";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
-            if (segment.Length <= 1)
+            if (value.Length <= 1)
             {
-                return segment;
+                return value;
             }
 
             var separator = item.WordSeparator.ToString();
-            var builder = new StringBuilder(segment.Length + 8);
-            builder.Append(segment[0]);
-            for (var i = 1; i < segment.Length; i++)
+            var builder = new StringBuilder(value.Length + 8);
+            builder.Append(value[0]);
+            for (var i = 1; i < value.Length; i++)
             {
-                var previous = segment[i - 1];
-                var current = segment[i];
+                var previous = value[i - 1];
+                var current = value[i];
                 if (_ShouldInsertSeparator(previous, current))
                 {
                     builder.Append(separator);

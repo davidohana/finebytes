@@ -39,17 +39,17 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Counter options.</param>
     public sealed record CounterFilter(
         FilterTarget Target,
-        CounterOptions Options) : FileNameSegmentFilter(Target)
+        CounterOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Counter";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             var n = Options.ResetPerFolder ? item.Original.InFolderIndex : item.Original.GlobalIndex;
-            var value = Options.Start + ((long)Options.Step * n);
+            var counter = Options.Start + ((long)Options.Step * n);
 
             var pad = Options.PadChar switch
             {
@@ -58,15 +58,15 @@ namespace Mfr.Filters.Formatting
                 _ => string.IsNullOrEmpty(Options.PadChar) ? '0' : Options.PadChar[0]
             };
 
-            var raw = value.ToString(CultureInfo.InvariantCulture);
+            var raw = counter.ToString(CultureInfo.InvariantCulture);
             var formatted = Options.Width > 0 ? raw.PadLeft(Options.Width, pad) : raw;
 
             return Options.Position switch
             {
                 CounterPosition.Replace => formatted,
-                CounterPosition.Prepend => formatted + Options.Separator + segment,
-                CounterPosition.Append => segment + Options.Separator + formatted,
-                _ => segment
+                CounterPosition.Prepend => formatted + Options.Separator + value,
+                CounterPosition.Append => value + Options.Separator + formatted,
+                _ => value
             };
         }
     }

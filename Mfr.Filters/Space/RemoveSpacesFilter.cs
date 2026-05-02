@@ -7,16 +7,16 @@ namespace Mfr.Filters.Space
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     public sealed record RemoveSpacesFilter(
-        FilterTarget Target) : FileNameSegmentFilter(Target)
+        FilterTarget Target) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "RemoveSpaces";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
-            return segment.Replace(item.WordSeparator.ToString(), "", StringComparison.Ordinal);
+            return value.Replace(item.WordSeparator.ToString(), "", StringComparison.Ordinal);
         }
     }
 }

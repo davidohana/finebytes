@@ -38,7 +38,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Inserter options.</param>
     public sealed record InserterFilter(
         FilterTarget Target,
-        InserterOptions Options) : FileNameSegmentFilter(Target)
+        InserterOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -46,21 +46,21 @@ namespace Mfr.Filters.Formatting
         public override string Type => "Inserter";
 
         /// <inheritdoc />
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             var inserted = FormatterTokenResolver.ResolveTemplate(Options.Text, item);
             if (inserted.Length == 0)
             {
-                return segment;
+                return value;
             }
 
-            var insertIndex = _ComputeInsertIndex(segment.Length, Options.Position, Options.StartFrom);
+            var insertIndex = _ComputeInsertIndex(value.Length, Options.Position, Options.StartFrom);
             if (Options.Overwrite)
             {
-                return _OverwriteAt(segment, insertIndex, inserted);
+                return _OverwriteAt(value, insertIndex, inserted);
             }
 
-            return string.Concat(segment.AsSpan(0, insertIndex), inserted, segment.AsSpan(insertIndex));
+            return string.Concat(value.AsSpan(0, insertIndex), inserted, value.AsSpan(insertIndex));
         }
 
         private static string _OverwriteAt(string segment, int insertIndex, string inserted)

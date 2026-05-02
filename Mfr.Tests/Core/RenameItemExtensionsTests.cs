@@ -97,7 +97,7 @@ namespace Mfr.Tests.Core
         }
 
         /// <summary>
-        /// Verifies non-file-name targets are rejected.
+        /// Verifies unsupported polymorphic targets are rejected at apply time.
         /// </summary>
         [Fact]
         public void ApplyFilters_NonFileNameTarget_ThrowsNotSupported()
@@ -112,7 +112,7 @@ namespace Mfr.Tests.Core
 
             chain.SetupFilters();
             var ex = Assert.Throws<NotSupportedException>(() => chain.ApplyFilters(item));
-            Assert.Contains("requires a FileName target", ex.Message);
+            Assert.Contains("Unsupported filter target", ex.Message);
             Assert.Contains("UnsupportedTarget", ex.Message);
         }
 

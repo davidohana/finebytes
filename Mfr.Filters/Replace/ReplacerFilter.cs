@@ -49,16 +49,16 @@ namespace Mfr.Filters.Replace
     /// <param name="Options">Replacement options.</param>
     public sealed record ReplacerFilter(
         FilterTarget Target,
-        ReplacerOptions Options) : FileNameSegmentFilter(Target)
+        ReplacerOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Replacer";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
-            return _ReplaceSegment(segment, Options);
+            return _ReplaceSegment(value, Options);
         }
 
         internal static string ReplaceSegment(string segment, ReplacerOptions options)

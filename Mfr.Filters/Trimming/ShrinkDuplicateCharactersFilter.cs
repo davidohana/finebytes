@@ -17,17 +17,17 @@ namespace Mfr.Filters.Trimming
     /// <param name="Options">Filter options.</param>
     public sealed record ShrinkDuplicateCharactersFilter(
         FilterTarget Target,
-        ShrinkDuplicateCharactersOptions Options) : FileNameSegmentFilter(Target)
+        ShrinkDuplicateCharactersOptions Options) : StringTargetFilter(Target)
     {
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "ShrinkDuplicateCharacters";
 
-        protected override string _TransformSegment(string segment, RenameItem item)
+        protected override string _TransformValue(string value, RenameItem item)
         {
             var pattern = Regex.Escape(Options.Character.ToString()) + "+";
-            return Regex.Replace(segment, pattern, _ => Options.Character.ToString());
+            return Regex.Replace(value, pattern, _ => Options.Character.ToString());
         }
     }
 }
