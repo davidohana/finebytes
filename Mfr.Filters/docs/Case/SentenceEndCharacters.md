@@ -28,8 +28,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "SentenceEndCharacters",
   "target": {
-    "family": "FileName",
-    "fileNamePart": "Prefix"
+    "targetType": "FilePrefix"
   },
   "options": {
     "characters": ".!?"

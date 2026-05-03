@@ -43,8 +43,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "Formatter",
   "target": {
-    "family": "FileName",
-    "fileNamePart": "Prefix"
+    "targetType": "FilePrefix"
   },
   "options": {
     "template": "<parent-folder> - <file-name>"

@@ -38,8 +38,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "CasingList",
   "target": {
-    "family": "FileName",
-    "fileNamePart": "Prefix"
+    "targetType": "FilePrefix"
   },
   "options": {
     "filePath": "C:/Music/MFR/casing-list.txt",

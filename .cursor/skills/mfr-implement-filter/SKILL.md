@@ -22,8 +22,8 @@ description: >-
 
 5. **Options.** If the filter has settings, add a `YourOptions` `sealed record` in the same file or adjacent file, with camelCase JSON property names via record positional params / `[JsonPropertyName]` as needed.
 
-6. **`Target` (`StringTargetFilter` / string-target presets).** `FilterTarget` is polymorphic; JSON discriminator is **`family`**:
-   | `family` value | Fields | Addresses |
+6. **`Target` (`StringTargetFilter` / string-target presets).** `FilterTarget` is polymorphic; JSON discriminator is **`targetType`**:
+   | `targetType` value | Fields | Addresses |
    |----------------|--------|-----------|
    | `FilePrefix` | (none) | Prefix (name without extension) |
    | `FileExtension` | (none) | Extension including leading dot |

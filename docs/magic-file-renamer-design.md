@@ -550,21 +550,20 @@ Each preset is stored in its **own file**. File name convention: `<slug>-<id>.js
     {
       "type": "SetFromFreeDB",
       "enabled": true,
-      "target": { "family": "AudioTag" },
+      "target": { "targetType": "AudioTag" },
       "options": { "promptOnMultipleMatches": true }
     },
     {
       "type": "Counter",
       "enabled": true,
-      "target": { "family": "AudioTag", "field": "TrackNumber" },
+      "target": { "targetType": "AudioTag", "field": "TrackNumber" },
       "options": { "start": 1, "step": 1, "width": 2, "padChar": "0" }
     },
     {
       "type": "Formatter",
       "enabled": true,
       "target": {
-        "family": "FileName",
-        "fileNameMode": "Full"
+        "targetType": "FileFullName"
       },
       "options": { "template": "<counter:1,1,0,2,0> - <id3-title:0><ext:0>" }
     },
@@ -572,7 +571,7 @@ Each preset is stored in its **own file**. File name convention: `<slug>-<id>.js
       "type": "Mover",
       "enabled": true,
       "target": {
-        "family": "DirectorySegment",
+        "targetType": "DirectorySegment",
         "directoryLevel": 0
       },
       "options": {
@@ -642,10 +641,9 @@ The `type` string discriminates deserialization. All filters share:
   "type": "<FilterTypeName>",
   "enabled": true,
   "target": {
-    "family": "FileName | FullFilePath | DirectorySegment | FileContents | Attributes | CreationDate | LastWriteDate | LastAccessDate | AudioTag | Id3v1 | Id3v2 | ImageTag",
-    "field": "<tag field name (optional; depends on filter) — only when family is AudioTag/Id3v1/Id3v2/ImageTag>",
-    "fileNameMode": "Prefix | Extension | Full",
-    "directoryLevel": 0
+    "targetType": "FilePrefix | FileExtension | FileFullName | AncestorFolder | FullPath | ParentDirectory | <future variants>",
+    "level": "<when targetType is AncestorFolder: positive integer>",
+    "field": "<tag field name (optional; future audio-tag variants)>"
   },
   "options": { }
 }
@@ -803,13 +801,9 @@ Rename List menu → Export → **Generate Batch File** → creates a `.bat` (Wi
 
 ## 6. Filter System — All 38 Filters
 
-Every filter has: `enabled` toggle, `target` field, and a type-specific `options` object. The `target` field is expressed via `FilterTarget` and `FilterTargetFamily`:
+Every filter has: `enabled` toggle, `target` field, and a type-specific `options` object. The `target` field is polymorphic via `FilterTarget`. Preset JSON includes a **`targetType`** discriminator naming the concrete target (for example **`FilePrefix`**, **`FileExtension`**, **`FileFullName`**, **`AncestorFolder`**, **`FullPath`**, **`ParentDirectory`**). **`AncestorFolder`** targets also supply **`level`**.
 
-- `family` — which **family** of data to operate on (FileName, DirectorySegment, AudioTag, etc.).
-- `fileNameMode` — how to interpret the filename (Prefix / Extension / Full) when `family` is `FileName`.
-- `directoryLevel` — which parent directory to target when `family` is `DirectorySegment` (0 = direct parent, 1 = parent-of-parent, etc.).
-
-In code, the JSON `type` discriminator maps to a concrete typed `Filter<TOptions>` record (one per filter), and the JSON `target.family` maps to a concrete derived `FilterTarget` record (one per family). `RenameList.Preview(...)` applies each typed filter definition to build per-item preview paths.
+In code, the JSON `type` discriminator maps to a concrete `BaseFilter`-derived filter record, and **`target.targetType`** selects the derived `FilterTarget` record.
 
 A **Filter Options** panel (gear icon on each filter row) provides:
 - **Apply Target** override without editing the JSON
@@ -824,7 +818,7 @@ A **Filter Options** panel (gear icon on each filter row) provides:
 ```json
 {
   "type": "LettersCase",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "mode": "UpperCase | LowerCase | FirstLetterUp | WeirdCase | TitleCase | SentenceCase | InvertCase",
     "skipWords": ["a", "an", "the", "of", "in", "at"]
@@ -837,7 +831,7 @@ Uppercases the first letter of each word using specified delimiters to identify 
 ```json
 {
   "type": "UppercaseInitials",
-  "target": { "family": "AudioTag", "field": "Title" },
+  "target": { "targetType": "AudioTag", "field": "Title" },
   "options": { "delimiters": " -_.", "keepExistingCase": false }
 }
 ```
@@ -847,7 +841,7 @@ Capitalizes the character after any occurrence of specified characters.
 ```json
 {
   "type": "CapitalizeAfter",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": { "chars": ".-_(", "uppercaseFirst": true }
 }
 ```
@@ -857,7 +851,7 @@ User-defined dictionary of words with fixed casing applied regardless of input c
 ```json
 {
   "type": "CasingList",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "entries": [
       { "match": "mfr", "replacement": "MFR" },
@@ -873,7 +867,7 @@ Capitalizes the first letter after sentence-ending punctuation.
 ```json
 {
   "type": "SentenceEndCharacters",
-  "target": { "family": "AudioTag", "field": "Comment" },
+  "target": { "targetType": "AudioTag", "field": "Comment" },
   "options": { "endChars": ".!?", "capitalizeFirst": true }
 }
 ```
@@ -887,7 +881,7 @@ Defines the single character used as the word separator for filters that follow,
 ```json
 {
   "type": "SpaceCharacter",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "SpaceCharacter": "_",
     "ReplaceSpaces": false,
@@ -901,13 +895,13 @@ Defines the single character used as the word separator for filters that follow,
 #### RemoveSpaces
 Removes all occurrences of the current word-separator character (default U+0020 SPACE when no `SpaceCharacter` filter ran).
 ```json
-{ "type": "RemoveSpaces", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": {} }
+{ "type": "RemoveSpaces", "target": { "targetType": "FileFullName" }, "options": {} }
 ```
 
 #### ShrinkSpaces
 Collapses consecutive runs of the current word-separator character to a single occurrence (default U+0020 SPACE when no `SpaceCharacter` filter ran).
 ```json
-{ "type": "ShrinkSpaces", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": {} }
+{ "type": "ShrinkSpaces", "target": { "targetType": "FileFullName" }, "options": {} }
 ```
 
 #### SpaceAfter
@@ -915,7 +909,7 @@ Inserts a space after every occurrence of specified characters.
 ```json
 {
   "type": "SpaceAfter",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": { "chars": ",-" }
 }
 ```
@@ -925,7 +919,7 @@ Inserts a space before and after every occurrence of specified characters.
 ```json
 {
   "type": "SpaceAround",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": { "chars": "-" }
 }
 ```
@@ -935,7 +929,7 @@ Inserts the current word separator between lowercase–uppercase boundaries, let
 ```json
 {
   "type": "SeparateCapitalizedText",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {}
 }
 ```
@@ -946,34 +940,34 @@ Inserts the current word separator between lowercase–uppercase boundaries, let
 
 #### TrimLeft
 ```json
-{ "type": "TrimLeft", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": { "count": 3 } }
+{ "type": "TrimLeft", "target": { "targetType": "FileFullName" }, "options": { "count": 3 } }
 ```
 
 #### TrimRight
 ```json
-{ "type": "TrimRight", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": { "count": 5 } }
+{ "type": "TrimRight", "target": { "targetType": "FileFullName" }, "options": { "count": 5 } }
 ```
 
 #### TrimSpacesLeft
 ```json
-{ "type": "TrimSpacesLeft", "target": { "family": "AudioTag", "field": "Title" }, "options": {} }
+{ "type": "TrimSpacesLeft", "target": { "targetType": "AudioTag", "field": "Title" }, "options": {} }
 ```
 
 #### TrimSpacesRight
 ```json
-{ "type": "TrimSpacesRight", "target": { "family": "AudioTag", "field": "Title" }, "options": {} }
+{ "type": "TrimSpacesRight", "target": { "targetType": "AudioTag", "field": "Title" }, "options": {} }
 ```
 
 #### ExtractLeft
 Keeps only the leftmost N characters.
 ```json
-{ "type": "ExtractLeft", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": { "count": 20 } }
+{ "type": "ExtractLeft", "target": { "targetType": "FileFullName" }, "options": { "count": 20 } }
 ```
 
 #### ExtractRight
 Keeps only the rightmost N characters.
 ```json
-{ "type": "ExtractRight", "target": { "family": "FileName", "fileNameMode": "Full" }, "options": { "count": 10 } }
+{ "type": "ExtractRight", "target": { "targetType": "FileFullName" }, "options": { "count": 10 } }
 ```
 
 #### TrimBetween
@@ -981,7 +975,7 @@ Removes content between two delimiter strings.
 ```json
 {
   "type": "TrimBetween",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "startDelimiter": "(",
     "endDelimiter": ")",
@@ -996,7 +990,7 @@ Collapses adjacent duplicate occurrences of a configured character to one.
 ```json
 {
   "type": "ShrinkDuplicateCharacters",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": { "character": "-" }
 }
 ```
@@ -1010,7 +1004,7 @@ Search and replace with literal, wildcard, or regex mode.
 ```json
 {
   "type": "Replacer",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "find": "(feat\\.)",
     "replacement": "ft.",
@@ -1027,7 +1021,7 @@ Applies a sequence of find/replace pairs from an embedded list or external file 
 ```json
 {
   "type": "ReplaceList",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "source": "Inline | File",
     "filePath": "",
@@ -1046,7 +1040,7 @@ Removes or replaces illegal or user-specified characters. `removeIllegalChars` s
 ```json
 {
   "type": "Cleaner",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "removeIllegalChars": true,
     "illegalCharReplacement": "_",
@@ -1065,7 +1059,7 @@ Renames any target field to a format string built from literals and formatting p
 ```json
 {
   "type": "Formatter",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "template": "<counter:1,1,0,2,0>.<image-width:0>x<image-height:0>.<image-format:0><ext:0>"
   }
@@ -1078,7 +1072,7 @@ Adds an auto-incrementing serial number to the target field.
 ```json
 {
   "type": "Counter",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "start": 1,
     "step": 1,
@@ -1096,7 +1090,7 @@ Replaces each item's target field value with the corresponding line from a text 
 ```json
 {
   "type": "NameList",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "filePath": "C:\\names.txt",
     "skipEmptyLines": true,
@@ -1113,7 +1107,7 @@ Example: `Smith, John` with `delimiter` `", "` — `tokenNumber` `1`, `moveBy` `
 ```json
 {
   "type": "TokenMover",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "delimiter": ", ",
     "tokenNumber": 1,
@@ -1129,7 +1123,7 @@ Inserts text at a specified position within the target field.
 ```json
 {
   "type": "Inserter",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "text": "PREFIX_",
     "position": "Start | End | Index | BeforeMatch | AfterMatch",
@@ -1149,7 +1143,7 @@ Sets a standard audio tag field (multi-format via TagLibSharp). Value can be a l
 ```json
 {
   "type": "AudioTagSetter",
-  "target": { "family": "AudioTag", "field": "Title" },
+  "target": { "targetType": "AudioTag", "field": "Title" },
   "options": { "value": "<file-name:0>", "useFormatter": true }
 }
 ```
@@ -1159,7 +1153,7 @@ Sets any specific ID3v2 frame by frame ID (e.g. TXXX, TIT1) for frames not acces
 ```json
 {
   "type": "Id3v2FieldSetter",
-  "target": { "family": "Id3v2" },
+  "target": { "targetType": "Id3v2" },
   "options": {
     "frameId": "TXXX",
     "value": "my custom value",
@@ -1173,7 +1167,7 @@ Deletes audio tags entirely or clears specific fields.
 ```json
 {
   "type": "AudioTagRemover",
-  "target": { "family": "AudioTag" },
+  "target": { "targetType": "AudioTag" },
   "options": {
     "removeId3v1": true,
     "removeId3v2": false,
@@ -1188,7 +1182,7 @@ Queries FreeDB.org using the disc ID computed from track lengths. Populates the 
 {
   "type": "SetFromFreeDB",
   "enabled": true,
-  "target": { "family": "AudioTag" },
+  "target": { "targetType": "AudioTag" },
   "options": {
     "preferredMatchIndex": 0,
     "promptOnMultipleMatches": true
@@ -1204,7 +1198,7 @@ Queries FreeDB.org using the disc ID computed from track lengths. Populates the 
 ```json
 {
   "type": "AttributesSetter",
-  "target": { "family": "Attributes" },
+  "target": { "targetType": "Attributes" },
   "options": {
     "readOnly":  "Set | Clear | Keep",
     "hidden":    "Set | Clear | Keep",
@@ -1219,7 +1213,7 @@ Sets a file date from a fixed value, EXIF date, ID3 year, or current time.
 ```json
 {
   "type": "DateSetter",
-  "target": { "family": "CreationDate" },
+  "target": { "targetType": "CreationDate" },
   "options": {
     "source": "Fixed | FileModified | ExifDateTaken | Id3Year | Now",
     "fixedDate": "2024-01-01"
@@ -1232,7 +1226,7 @@ Sets the time portion of a file datetime.
 ```json
 {
   "type": "TimeSetter",
-  "target": { "family": "LastWriteDate" },
+  "target": { "targetType": "LastWriteDate" },
   "options": {
     "source": "Fixed | Now | ExifDateTaken",
     "fixedTime": "12:00:00",
@@ -1250,7 +1244,7 @@ Moves files to a different folder. Destination = `rootFolder` + `subFolderTempla
 ```json
 {
   "type": "Mover",
-  "target": { "family": "DirectorySegment", "directoryLevel": 0 },
+  "target": { "targetType": "DirectorySegment", "directoryLevel": 0 },
   "options": {
     "rootFolder": "C:\\Music\\Organized",
     "subFolderTemplate": "<id3-artist:0> (<id3-year:0>)\\<id3-album:0>",
@@ -1265,7 +1259,7 @@ Normalizes numbers within the field to a consistent digit width.
 ```json
 {
   "type": "FixLeadingZeros",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": { "width": 2, "removeExtraZeros": true }
 }
 ```
@@ -1275,7 +1269,7 @@ Removes specified bracket types and their contents.
 ```json
 {
   "type": "StripParentheses",
-  "target": { "family": "FileName", "fileNameMode": "Full" },
+  "target": { "targetType": "FileFullName" },
   "options": {
     "types": "Round | Square | Curly | Angle",
     "removeContents": true
@@ -2101,7 +2095,7 @@ Filters are tested using JSON-defined fixtures:
   "filter": {
     "type": "LettersCase",
     "enabled": true,
-    "target": { "family": "FileName", "fileNameMode": "Full" },
+    "target": { "targetType": "FileFullName" },
     "options": { "mode": "UpperCase" }
   },
   "expected": {

@@ -54,8 +54,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "LettersCase",
   "target": {
-    "family": "FileName",
-    "fileNamePart": "Prefix"
+    "targetType": "FilePrefix"
   },
   "options": {
     "mode": "TitleCase",

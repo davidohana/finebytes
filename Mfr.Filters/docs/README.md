@@ -61,7 +61,7 @@ Each filter in a preset has:
 
 - `type` — discriminator string (same name as the filter, e.g. `LettersCase`).
 - `enabled` — if `false`, the filter is skipped.
-- `target` — for **file-name** filters only: `{ "family": "FileName", "fileNamePart": "Prefix" | "Extension" | "Full" }` — **Prefix** = name without extension, **Extension** = extension including the dot, **Full** = full file name.
+- `target` — for **string** filters acting on renamed metadata (most built-ins): a polymorphic object with discriminator **`targetType`** (values such as **`FilePrefix`**, **`FileExtension`**, **`FileFullName`**, **`AncestorFolder`**, **`FullPath`**, **`ParentDirectory`**). **`AncestorFolder`** adds **`level`**: positive integer counting up from the immediate parent folder.
 - For [DateSetter](Attributes/DateSetter.md), [TimeSetter](Attributes/TimeSetter.md), and [TimeShifter](Attributes/TimeShifter.md), `options` includes **`timestampField`**: which **filesystem timestamp field** to edit (not a clock value) — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings), together with the other filter-specific options.
 - **AttributesSetter** has no `target`; it always updates filesystem attributes ([AttributesSetter](Attributes/AttributesSetter.md)).
 - `options` — optional object; filters with no settings omit it.
@@ -90,8 +90,7 @@ Top-level object for `presets.json`: a `presets` array; each item has `id`, `nam
             "filter": {
               "type": "SpaceCharacter",
               "target": {
-                "family": "FileName",
-                "fileNamePart": "Prefix"
+                "targetType": "FilePrefix"
               },
               "options": {
                 "spaceCharacter": "_",
@@ -107,8 +106,7 @@ Top-level object for `presets.json`: a `presets` array; each item has `id`, `nam
             "filter": {
               "type": "LettersCase",
               "target": {
-                "family": "FileName",
-                "fileNamePart": "Prefix"
+                "targetType": "FilePrefix"
               },
               "options": {
                 "mode": "TitleCase",

@@ -27,7 +27,7 @@ namespace Mfr.Tests.Core
                         "filter": {
                           "type": "SeparateCapitalizedText",
                           "target": {
-                            "family": "FilePrefix"
+                            "targetType": "FilePrefix"
                           }
                         }
                       }
@@ -141,7 +141,7 @@ namespace Mfr.Tests.Core
             {
               "type": "Replacer",
               "target": {
-                "family": "AncestorFolder",
+                "targetType": "AncestorFolder",
                 "level": 2
               },
               "options": {
@@ -171,7 +171,7 @@ namespace Mfr.Tests.Core
             {
               "type": "Formatter",
               "target": {
-                "family": "FullPath"
+                "targetType": "FullPath"
               },
               "options": {
                 "template": "D:\\Staging\\<full-name>"
@@ -194,7 +194,7 @@ namespace Mfr.Tests.Core
             {
               "type": "Formatter",
               "target": {
-                "family": "ParentDirectory"
+                "targetType": "ParentDirectory"
               },
               "options": {
                 "template": "D:\\Archived"

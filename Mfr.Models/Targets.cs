@@ -27,9 +27,9 @@ namespace Mfr.Models
     }
 
     /// <summary>
-    /// Represents a polymorphic filter target (file-name slices, paths, ancestor segments).
+    /// Represents a polymorphic filter target (file-name slices, paths, ancestor segments); JSON uses property <c>targetType</c> as the discriminator.
     /// </summary>
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = "family")]
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "targetType")]
     [JsonDerivedType(typeof(FilePrefixTarget), "FilePrefix")]
     [JsonDerivedType(typeof(FileExtensionTarget), "FileExtension")]
     [JsonDerivedType(typeof(FileFullNameTarget), "FileFullName")]
