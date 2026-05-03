@@ -352,31 +352,34 @@ namespace Mfr.Core
         }
 
         /// <summary>
-        /// Marks preview conflicts (duplicate destinations or existing destination paths) as preview errors.
+        /// Marks preview conflicts (duplicate destinations, paths blocked by an existing folder, or occupied file paths outside the rename batch).
         /// </summary>
         private void _MarkPreviewConflicts()
         {
             var candidateItems = _renameItems
                 .Where(item => item.Status == RenameStatus.PreviewOk)
                 .ToList();
-            var sourcePathToIsMoving = candidateItems
-                .Select(item => item.Original.FullPath)
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            var destinationPathToIsDuplicate = candidateItems
-                .Select(item => item.Preview.FullPath)
-                .GroupBy(destinationPath => destinationPath, StringComparer.OrdinalIgnoreCase)
+
+            var movingSourceKeys = candidateItems
+                .Select(item => _NormalizePathKey(item.Original.FullPath))
+                .ToHashSet(StringComparer.Ordinal);
+
+            var normalizedDestinationDuplicates = candidateItems
+                .Select(item => _NormalizePathKey(item.Preview.FullPath))
+                .GroupBy(path => path, comparer: StringComparer.Ordinal)
                 .Where(group => group.Count() > 1)
                 .Select(group => group.Key)
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                .ToHashSet(StringComparer.Ordinal);
 
             foreach (var item in candidateItems)
             {
                 var destinationPath = item.Preview.FullPath;
-                var destinationPathIsDuplicate = destinationPathToIsDuplicate.Contains(destinationPath);
-                if (destinationPathIsDuplicate)
+                var destinationKey = _NormalizePathKey(destinationPath);
+                var destinationIsDuplicateAmongPreviews = normalizedDestinationDuplicates.Contains(destinationKey);
+                if (destinationIsDuplicateAmongPreviews)
                 {
                     item.SetPreviewError(
-                        message: $"Preview conflict for destination '{destinationPath}'.",
+                        message: $"More than one rename targets the same path '{destinationPath}'.",
                         cause: null);
                     Log.Warning(
                         "Preview conflict for destination '{DestinationPath}' (duplicate destination).",
@@ -384,12 +387,26 @@ namespace Mfr.Core
                     continue;
                 }
 
-                var destinationExistsOutsideBatch = File.Exists(destinationPath)
-                    && !sourcePathToIsMoving.Contains(destinationPath);
-                if (destinationExistsOutsideBatch)
+                var destinationOccupiedByExistingDirectory =
+                    Directory.Exists(destinationPath) && !File.Exists(destinationPath);
+                if (destinationOccupiedByExistingDirectory)
                 {
                     item.SetPreviewError(
-                        message: $"Preview conflict for destination '{destinationPath}'.",
+                        message: $"Destination '{destinationPath}' refers to an existing folder, not a file path.",
+                        cause: null);
+                    Log.Warning(
+                        "Preview conflict for destination '{DestinationPath}' (path is an existing directory).",
+                        destinationPath);
+                    continue;
+                }
+
+                var destinationOccupiedOutsideBatch =
+                    File.Exists(destinationPath)
+                    && !movingSourceKeys.Contains(destinationKey);
+                if (destinationOccupiedOutsideBatch)
+                {
+                    item.SetPreviewError(
+                        message: $"Destination '{destinationPath}' already exists as a file (not a source being renamed).",
                         cause: null);
                     Log.Warning(
                         "Preview conflict for destination '{DestinationPath}' (path already exists).",
