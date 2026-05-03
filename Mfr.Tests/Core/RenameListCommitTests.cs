@@ -864,6 +864,89 @@ namespace Mfr.Tests.Core
             Assert.True(File.Exists(filePath));
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies commit moves the file when the preview assigns a new parent directory via <see cref="ParentDirectoryTarget"/>.
+        /// </summary>
+        public void Commit_MovesFile_WhenPreviewUsesChangedParentDirectory()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var originalParent = dir.CombinePath("FromHere");
+            Directory.CreateDirectory(originalParent);
+            var filePath = originalParent.CombinePath("song.mp3");
+            File.WriteAllText(filePath, "x");
+
+            var archivedParent = dir.CombinePath("Archived");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([filePath]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "parent-dir-move",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new FormatterFilter(
+                        Target: new ParentDirectoryTarget(),
+                        Options: new FormatterOptions(archivedParent))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            var expectedDest = archivedParent.CombinePath("song.mp3");
+            Assert.Equal(expectedDest, renameList.RenameItems[0].Preview.FullPath);
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.False(File.Exists(filePath));
+            Assert.True(File.Exists(expectedDest));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies commit moves the file when the preview assigns a new absolute path via <see cref="FullPathTarget"/>.
+        /// </summary>
+        public void Commit_MovesFile_WhenPreviewUsesChangedFullPath()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var originalParent = dir.CombinePath("In");
+            Directory.CreateDirectory(originalParent);
+            var filePath = originalParent.CombinePath("song.mp3");
+            File.WriteAllText(filePath, "x");
+
+            var destinationFullPath = dir.CombinePath("Out", "song.mp3");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([filePath]);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "full-path-move",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new FormatterFilter(
+                        Target: new FullPathTarget(),
+                        Options: new FormatterOptions(destinationFullPath))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            Assert.Equal(destinationFullPath, renameList.RenameItems[0].Preview.FullPath);
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.False(File.Exists(filePath));
+            Assert.True(File.Exists(destinationFullPath));
+        }
+
         private sealed record UnsupportedTarget : FilterTarget;
     }
 }
