@@ -387,31 +387,20 @@ namespace Mfr.Core
                     continue;
                 }
 
-                var destinationBlockedByUntouchedExistingDirectory =
-                    Directory.Exists(destinationPath)
-                    && !File.Exists(destinationPath)
-                    && !movingSourceKeys.Contains(destinationKey);
-                if (destinationBlockedByUntouchedExistingDirectory)
+                if (movingSourceKeys.Contains(destinationKey))
                 {
-                    item.SetPreviewError(
-                        message: $"Destination '{destinationPath}' already exists as a folder (not vacated by another rename item in this batch).",
-                        cause: null);
-                    Log.Warning(
-                        "Preview conflict for destination '{DestinationPath}' (path is an existing directory).",
-                        destinationPath);
                     continue;
                 }
 
-                var destinationBlockedByUntouchedExistingFile =
-                    File.Exists(destinationPath)
-                    && !movingSourceKeys.Contains(destinationKey);
-                if (destinationBlockedByUntouchedExistingFile)
+                var destinationOccupiedOnDisk =
+                    Directory.Exists(destinationPath) || File.Exists(destinationPath);
+                if (destinationOccupiedOnDisk)
                 {
                     item.SetPreviewError(
-                        message: $"Destination '{destinationPath}' already exists as a file (not vacated by another rename item in this batch).",
+                        message: $"Destination '{destinationPath}' is already in use (not vacated by another rename item in this batch).",
                         cause: null);
                     Log.Warning(
-                        "Preview conflict for destination '{DestinationPath}' (path already exists).",
+                        "Preview conflict for destination '{DestinationPath}' (path occupied on disk).",
                         destinationPath);
                     continue;
                 }
