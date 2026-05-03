@@ -394,7 +394,7 @@ namespace Mfr.Core
                 if (destinationBlockedByUntouchedExistingDirectory)
                 {
                     item.SetPreviewError(
-                        message: $"Destination '{destinationPath}' already exists as a folder.",
+                        message: $"Destination '{destinationPath}' already exists as a folder (not vacated by another rename item in this batch).",
                         cause: null);
                     Log.Warning(
                         "Preview conflict for destination '{DestinationPath}' (path is an existing directory).",
@@ -408,7 +408,7 @@ namespace Mfr.Core
                 if (destinationBlockedByUntouchedExistingFile)
                 {
                     item.SetPreviewError(
-                        message: $"Destination '{destinationPath}' already exists as a file (not freed by another rename source in this batch).",
+                        message: $"Destination '{destinationPath}' already exists as a file (not vacated by another rename item in this batch).",
                         cause: null);
                     Log.Warning(
                         "Preview conflict for destination '{DestinationPath}' (path already exists).",
