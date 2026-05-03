@@ -40,21 +40,12 @@ namespace Mfr.Tests.Core
             renameList.AddSources([a, b]);
             var files = renameList.RenameItems;
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "duplicate",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new FormatterFilter(
-                        Target: new FileFullNameTarget(),
-                        Options: new FormatterOptions("same.mp3"))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CreatePresetAllEnabled(
+                "duplicate",
+                new FormatterFilter(
+                    Target: new FileFullNameTarget(),
+                    Options: new FormatterOptions("same.mp3")));
+            _SetupPreview(renameList, preset);
             var result = renameList.Commit(failFast: false);
 
             Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitOk));
@@ -81,28 +72,8 @@ namespace Mfr.Tests.Core
             renameList.AddSources([a, b]);
             var files = renameList.RenameItems;
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "counter",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new CounterFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new CounterOptions(
-                            Start: 1,
-                            Step: 1,
-                            Width: 3,
-                            PadChar: "0",
-                            Position: CounterPosition.Replace,
-                            Separator: " - ",
-                            ResetPerFolder: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CounterReplacePrefixPreset("counter");
+            _SetupPreview(renameList, preset);
             var result = renameList.Commit(failFast: false);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
@@ -131,28 +102,8 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([firstSource, secondSource]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "counter",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new CounterFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new CounterOptions(
-                            Start: 1,
-                            Step: 1,
-                            Width: 3,
-                            PadChar: "0",
-                            Position: CounterPosition.Replace,
-                            Separator: " - ",
-                            ResetPerFolder: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CounterReplacePrefixPreset("counter");
+            _SetupPreview(renameList, preset);
             var result = renameList.Commit(failFast: false, dryRun: true);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
@@ -177,28 +128,8 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([firstSource, secondSource]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "counter",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new CounterFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new CounterOptions(
-                            Start: 1,
-                            Step: 1,
-                            Width: 3,
-                            PadChar: "0",
-                            Position: CounterPosition.Replace,
-                            Separator: " - ",
-                            ResetPerFolder: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CounterReplacePrefixPreset("counter");
+            _SetupPreview(renameList, preset);
             var result = renameList.Commit(failFast: false, dryRun: false, confirmBeforeApply: _ => false);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitSkipped));
@@ -224,28 +155,8 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([firstSource, secondSource]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "counter",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new CounterFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new CounterOptions(
-                            Start: 1,
-                            Step: 1,
-                            Width: 3,
-                            PadChar: "0",
-                            Position: CounterPosition.Replace,
-                            Separator: " - ",
-                            ResetPerFolder: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CounterReplacePrefixPreset("counter");
+            _SetupPreview(renameList, preset);
             var result = renameList.Commit(failFast: false, dryRun: false, confirmBeforeApply: _ => true);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
@@ -271,28 +182,8 @@ namespace Mfr.Tests.Core
             renameList.AddSources([firstSource, secondSource]);
             var files = renameList.RenameItems;
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "counter",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new CounterFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new CounterOptions(
-                            Start: 1,
-                            Step: 1,
-                            Width: 3,
-                            PadChar: "0",
-                            Position: CounterPosition.Replace,
-                            Separator: " - ",
-                            ResetPerFolder: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CounterReplacePrefixPreset("counter");
+            _SetupPreview(renameList, preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
             File.Delete(firstSource);
@@ -328,28 +219,8 @@ namespace Mfr.Tests.Core
             renameList.AddSources([firstSource, secondSource]);
             var files = renameList.RenameItems;
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "counter",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new CounterFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new CounterOptions(
-                            Start: 1,
-                            Step: 1,
-                            Width: 3,
-                            PadChar: "0",
-                            Position: CounterPosition.Replace,
-                            Separator: " - ",
-                            ResetPerFolder: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CounterReplacePrefixPreset("counter");
+            _SetupPreview(renameList, preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
             File.Delete(firstSource);
@@ -383,36 +254,15 @@ namespace Mfr.Tests.Core
             renameList.AddSources([source]);
             var files = renameList.RenameItems;
 
-            var failingPreset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "failing-preview",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new ReplacerFilter(
-                        Target: new UnsupportedTarget(),
-                        Options: new ReplacerOptions("a", "b", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
-                ])
-            };
-
-            failingPreset.Chain.SetupFilters();
-            renameList.Preview(failingPreset);
+            var failingPreset = _FailingReplacerUnsupportedTargetPreset("failing-preview");
+            _SetupPreview(renameList, failingPreset);
             var previewError = files[0].PreviewError;
             Assert.NotNull(previewError);
             Assert.NotNull(previewError.Cause);
             Assert.Equal(previewError.Cause.Message, previewError.Message);
 
-            var successPreset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "successful-preview",
-                Description = null,
-                Chain = new FilterChain { Steps = [] }
-            };
-
-            successPreset.Chain.SetupFilters();
-            renameList.Preview(successPreset);
+            var successPreset = _CreateEmptyStepsPreset("successful-preview");
+            _SetupPreview(renameList, successPreset);
             Assert.Null(files[0].PreviewError);
         }
 
@@ -454,16 +304,8 @@ namespace Mfr.Tests.Core
             renameList.AddSources([source]);
             var files = renameList.RenameItems;
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "no-change",
-                Description = null,
-                Chain = new FilterChain { Steps = [] }
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CreateEmptyStepsPreset("no-change");
+            _SetupPreview(renameList, preset);
             var result = renameList.Commit(failFast: false);
 
             Assert.Single(result);
@@ -487,16 +329,8 @@ namespace Mfr.Tests.Core
             renameList.AddSources([source]);
             var files = renameList.RenameItems;
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "no-change",
-                Description = null,
-                Chain = new FilterChain { Steps = [] }
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CreateEmptyStepsPreset("no-change");
+            _SetupPreview(renameList, preset);
             var result = renameList.Commit(failFast: false, dryRun: true);
 
             Assert.Single(result);
@@ -521,28 +355,8 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([source]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "counter",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new CounterFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new CounterOptions(
-                            Start: 1,
-                            Step: 1,
-                            Width: 3,
-                            PadChar: "0",
-                            Position: CounterPosition.Replace,
-                            Separator: " - ",
-                            ResetPerFolder: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _CounterReplacePrefixPreset("counter");
+            _SetupPreview(renameList, preset);
             var result = renameList.Commit(failFast: false);
 
             Assert.Single(result);
@@ -570,24 +384,8 @@ namespace Mfr.Tests.Core
             renameList.AddSources([sourceB, sourceA]);
             var files = renameList.RenameItems;
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "chain-shift",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new ReplacerFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new ReplacerOptions("b", "c", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false)),
-                    new ReplacerFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new ReplacerOptions("a", "b", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _PrefixChainShiftBToCThenAToBPreset("chain-shift");
+            _SetupPreview(renameList, preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
             var result = renameList.Commit(failFast: false);
@@ -622,36 +420,8 @@ namespace Mfr.Tests.Core
             var items = renameList.RenameItems;
             Assert.Equal(2, items.Count);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "folder-chain-shift",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new ReplacerFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new ReplacerOptions(
-                            "b",
-                            "c",
-                            ReplacerMode.Literal,
-                            CaseSensitive: true,
-                            ReplaceAll: false,
-                            WholeWord: false)),
-                    new ReplacerFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new ReplacerOptions(
-                            "a",
-                            "b",
-                            ReplacerMode.Literal,
-                            CaseSensitive: true,
-                            ReplaceAll: false,
-                            WholeWord: false)),
-                ]),
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _PrefixChainShiftBToCThenAToBPreset("folder-chain-shift");
+            _SetupPreview(renameList, preset);
             Assert.DoesNotContain(items, item => item.PreviewError is not null);
 
             var result = renameList.Commit(failFast: false);
@@ -681,32 +451,14 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([path]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "attrs",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new AttributesSetterFilter(
-                        Options: new AttributesSetterOptions(
-                            ReadOnly: AttributeTriState.Keep,
-                            Hidden: AttributeTriState.Set,
-                            Archive: AttributeTriState.Keep,
-                            System: AttributeTriState.Keep))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _SetHiddenAttributesPreset("attrs");
+            _SetupPreview(renameList, preset);
             var item = renameList.RenameItems[0];
             Assert.True(item.HasPreviewChanges());
             Assert.True(item.Preview.Attributes.HasFlag(FileAttributes.Hidden));
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
-            Assert.Contains(result[0].Changes, c => c.Property == "Attributes");
+            _AssertSingleCommitOk(result, expectChangeProperty: "Attributes");
 
             var attrsAfter = File.GetAttributes(path);
             Assert.True(attrsAfter.HasFlag(FileAttributes.Hidden));
@@ -725,28 +477,11 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([path]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "attrs-dry",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new AttributesSetterFilter(
-                        Options: new AttributesSetterOptions(
-                            ReadOnly: AttributeTriState.Keep,
-                            Hidden: AttributeTriState.Set,
-                            Archive: AttributeTriState.Keep,
-                            System: AttributeTriState.Keep))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _SetHiddenAttributesPreset("attrs-dry");
+            _SetupPreview(renameList, preset);
 
             var result = renameList.Commit(failFast: false, dryRun: true);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            _AssertSingleCommitOk(result);
 
             var attrsAfter = File.GetAttributes(path);
             Assert.False(attrsAfter.HasFlag(FileAttributes.Hidden));
@@ -766,30 +501,14 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([path]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "last-write",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new DateSetterFilter(
-                        Options: new DateSetterOptions(
-                            TimestampField: TimestampField.LastWrite,
-                            Date: DateOnly.FromDateTime(before.AddDays(30))))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _LastWriteDateSetterPreset("last-write", DateOnly.FromDateTime(before.AddDays(30)));
+            _SetupPreview(renameList, preset);
             var item = renameList.RenameItems[0];
             Assert.True(item.HasPreviewChanges());
             Assert.NotEqual(before, item.Preview.LastWriteTime);
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
-            Assert.Contains(result[0].Changes, c => c.Property == "LastWriteTime");
+            _AssertSingleCommitOk(result, expectChangeProperty: "LastWriteTime");
 
             var after = File.GetLastWriteTime(path);
             Assert.Equal(item.Preview.LastWriteTime, after);
@@ -809,31 +528,14 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([path]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "time-shifter",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new TimeShifterFilter(
-                        Options: new TimeShifterOptions(
-                            TimestampField: TimestampField.LastWrite,
-                            Amount: 7,
-                            Unit: TimeShiftUnit.Days))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _LastWriteTimeShifterDaysPreset("time-shifter", days: 7);
+            _SetupPreview(renameList, preset);
             var item = renameList.RenameItems[0];
             Assert.True(item.HasPreviewChanges());
             Assert.Equal(before.AddDays(7), item.Preview.LastWriteTime);
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
-            Assert.Contains(result[0].Changes, c => c.Property == "LastWriteTime");
+            _AssertSingleCommitOk(result, expectChangeProperty: "LastWriteTime");
 
             var after = File.GetLastWriteTime(path);
             Assert.Equal(item.Preview.LastWriteTime, after);
@@ -854,33 +556,13 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([filePath]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "parent-rename",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new ReplacerFilter(
-                        Target: new AncestorFolderTarget(Level: 1),
-                        Options: new ReplacerOptions(
-                            Find: "OldParent",
-                            Replacement: "NewParent",
-                            Mode: ReplacerMode.Literal,
-                            CaseSensitive: true,
-                            ReplaceAll: false,
-                            WholeWord: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _RenameOldParentToNewParentPreset("parent-rename");
+            _SetupPreview(renameList, preset);
             var expectedDest = Path.Combine(dir, "NewParent", "song.mp3");
             Assert.Equal(expectedDest, renameList.RenameItems[0].Preview.FullPath);
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            _AssertSingleCommitOk(result);
             Assert.False(File.Exists(filePath));
             Assert.True(File.Exists(expectedDest));
         }
@@ -900,33 +582,13 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([filePath]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "parent-rename-dry",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new ReplacerFilter(
-                        Target: new AncestorFolderTarget(Level: 1),
-                        Options: new ReplacerOptions(
-                            Find: "OldParent",
-                            Replacement: "NewParent",
-                            Mode: ReplacerMode.Literal,
-                            CaseSensitive: true,
-                            ReplaceAll: false,
-                            WholeWord: false))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _RenameOldParentToNewParentPreset("parent-rename-dry");
+            _SetupPreview(renameList, preset);
             var expectedNewParent = dir.CombinePath("NewParent");
             Assert.False(Directory.Exists(expectedNewParent));
 
             var result = renameList.Commit(failFast: false, dryRun: true);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            _AssertSingleCommitOk(result);
             Assert.False(Directory.Exists(expectedNewParent));
             Assert.True(File.Exists(filePath));
         }
@@ -948,27 +610,13 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([filePath]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "parent-dir-move",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new FormatterFilter(
-                        Target: new ParentDirectoryTarget(),
-                        Options: new FormatterOptions(archivedParent))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _FormatterParentDirectoryPreset("parent-dir-move", archivedParent);
+            _SetupPreview(renameList, preset);
             var expectedDest = archivedParent.CombinePath("song.mp3");
             Assert.Equal(expectedDest, renameList.RenameItems[0].Preview.FullPath);
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            _AssertSingleCommitOk(result);
             Assert.False(File.Exists(filePath));
             Assert.True(File.Exists(expectedDest));
         }
@@ -990,26 +638,12 @@ namespace Mfr.Tests.Core
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([filePath]);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "full-path-move",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new FormatterFilter(
-                        Target: new FullPathTarget(),
-                        Options: new FormatterOptions(destinationFullPath))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _FormatterFullPathPreset("full-path-move", destinationFullPath);
+            _SetupPreview(renameList, preset);
             Assert.Equal(destinationFullPath, renameList.RenameItems[0].Preview.FullPath);
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            _AssertSingleCommitOk(result);
             Assert.False(File.Exists(filePath));
             Assert.True(File.Exists(destinationFullPath));
         }
@@ -1035,27 +669,13 @@ namespace Mfr.Tests.Core
                 includeFolders: true);
             Assert.Single(renameList.RenameItems);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "folder-full-path-move",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new FormatterFilter(
-                        Target: new FullPathTarget(),
-                        Options: new FormatterOptions(destinationFolderPath)),
-                ]),
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _FormatterFullPathPreset("folder-full-path-move", destinationFolderPath);
+            _SetupPreview(renameList, preset);
             Assert.Equal(destinationFolderPath, renameList.RenameItems[0].Preview.FullPath);
             Assert.DoesNotContain(renameList.RenameItems, item => item.PreviewError is not null);
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            _AssertSingleCommitOk(result);
             Assert.False(Directory.Exists(originalFolderPath));
             Assert.True(Directory.Exists(destinationFolderPath));
             Assert.True(File.Exists(destinationFolderPath.CombinePath("track.txt")));
@@ -1083,33 +703,15 @@ namespace Mfr.Tests.Core
             Assert.Single(renameList.RenameItems);
             Assert.True(renameList.RenameItems[0].Original.Attributes.HasFlag(FileAttributes.Directory));
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "attrs-folder",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new AttributesSetterFilter(
-                        Options: new AttributesSetterOptions(
-                            ReadOnly: AttributeTriState.Keep,
-                            Hidden: AttributeTriState.Set,
-                            Archive: AttributeTriState.Keep,
-                            System: AttributeTriState.Keep))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _SetHiddenAttributesPreset("attrs-folder");
+            _SetupPreview(renameList, preset);
             var item = renameList.RenameItems[0];
             Assert.True(item.HasPreviewChanges());
             Assert.True(item.Preview.Attributes.HasFlag(FileAttributes.Hidden));
             Assert.True(item.Preview.Attributes.HasFlag(FileAttributes.Directory));
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
-            Assert.Contains(result[0].Changes, c => c.Property == "Attributes");
+            _AssertSingleCommitOk(result, expectChangeProperty: "Attributes");
 
             var attrsAfter = File.GetAttributes(folderPath);
             Assert.True(attrsAfter.HasFlag(FileAttributes.Hidden));
@@ -1132,28 +734,11 @@ namespace Mfr.Tests.Core
                 includeFiles: false,
                 includeFolders: true);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "attrs-folder-dry",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new AttributesSetterFilter(
-                        Options: new AttributesSetterOptions(
-                            ReadOnly: AttributeTriState.Keep,
-                            Hidden: AttributeTriState.Set,
-                            Archive: AttributeTriState.Keep,
-                            System: AttributeTriState.Keep))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _SetHiddenAttributesPreset("attrs-folder-dry");
+            _SetupPreview(renameList, preset);
 
             var result = renameList.Commit(failFast: false, dryRun: true);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            _AssertSingleCommitOk(result);
 
             var attrsAfter = File.GetAttributes(folderPath);
             Assert.False(attrsAfter.HasFlag(FileAttributes.Hidden));
@@ -1176,30 +761,16 @@ namespace Mfr.Tests.Core
                 includeFiles: false,
                 includeFolders: true);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "last-write-folder",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new DateSetterFilter(
-                        Options: new DateSetterOptions(
-                            TimestampField: TimestampField.LastWrite,
-                            Date: DateOnly.FromDateTime(before.AddDays(30))))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _LastWriteDateSetterPreset(
+                "last-write-folder",
+                DateOnly.FromDateTime(before.AddDays(30)));
+            _SetupPreview(renameList, preset);
             var item = renameList.RenameItems[0];
             Assert.True(item.HasPreviewChanges());
             Assert.NotEqual(before, item.Preview.LastWriteTime);
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
-            Assert.Contains(result[0].Changes, c => c.Property == "LastWriteTime");
+            _AssertSingleCommitOk(result, expectChangeProperty: "LastWriteTime");
 
             var after = File.GetLastWriteTime(folderPath);
             Assert.Equal(item.Preview.LastWriteTime, after);
@@ -1222,34 +793,172 @@ namespace Mfr.Tests.Core
                 includeFiles: false,
                 includeFolders: true);
 
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "time-shifter-folder",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new TimeShifterFilter(
-                        Options: new TimeShifterOptions(
-                            TimestampField: TimestampField.LastWrite,
-                            Amount: 7,
-                            Unit: TimeShiftUnit.Days))
-                ])
-            };
-
-            preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            var preset = _LastWriteTimeShifterDaysPreset("time-shifter-folder", days: 7);
+            _SetupPreview(renameList, preset);
             var item = renameList.RenameItems[0];
             Assert.True(item.HasPreviewChanges());
             Assert.Equal(before.AddDays(7), item.Preview.LastWriteTime);
 
             var result = renameList.Commit(failFast: false);
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
-            Assert.Contains(result[0].Changes, c => c.Property == "LastWriteTime");
+            _AssertSingleCommitOk(result, expectChangeProperty: "LastWriteTime");
 
             var after = File.GetLastWriteTime(folderPath);
             Assert.Equal(item.Preview.LastWriteTime, after);
+        }
+
+        private static readonly CounterOptions _CounterReplacePrefixOptions = new(
+            Start: 1,
+            Step: 1,
+            Width: 3,
+            PadChar: "0",
+            Position: CounterPosition.Replace,
+            Separator: " - ",
+            ResetPerFolder: false);
+
+        private static FilterPreset _CreatePresetAllEnabled(string name, params BaseFilter[] filters)
+        {
+            return new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(filters),
+            };
+        }
+
+        private static FilterPreset _CreateEmptyStepsPreset(string name)
+        {
+            return new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Description = null,
+                Chain = new FilterChain { Steps = [] },
+            };
+        }
+
+        private static FilterPreset _CounterReplacePrefixPreset(string name)
+        {
+            return _CreatePresetAllEnabled(
+                name,
+                new CounterFilter(Target: new FilePrefixTarget(), Options: _CounterReplacePrefixOptions));
+        }
+
+        private static FilterPreset _SetHiddenAttributesPreset(string name)
+        {
+            return _CreatePresetAllEnabled(
+                name,
+                new AttributesSetterFilter(
+                    Options: new AttributesSetterOptions(
+                        ReadOnly: AttributeTriState.Keep,
+                        Hidden: AttributeTriState.Set,
+                        Archive: AttributeTriState.Keep,
+                        System: AttributeTriState.Keep)));
+        }
+
+        private static FilterPreset _LastWriteDateSetterPreset(string name, DateOnly date)
+        {
+            return _CreatePresetAllEnabled(
+                name,
+                new DateSetterFilter(
+                    Options: new DateSetterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        Date: date)));
+        }
+
+        private static FilterPreset _LastWriteTimeShifterDaysPreset(string name, int days)
+        {
+            return _CreatePresetAllEnabled(
+                name,
+                new TimeShifterFilter(
+                    Options: new TimeShifterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        Amount: days,
+                        Unit: TimeShiftUnit.Days)));
+        }
+
+        private static FilterPreset _PrefixChainShiftBToCThenAToBPreset(string name)
+        {
+            return _CreatePresetAllEnabled(
+                name,
+                new ReplacerFilter(
+                    Target: new FilePrefixTarget(),
+                    Options: new ReplacerOptions(
+                        "b",
+                        "c",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: false,
+                        WholeWord: false)),
+                new ReplacerFilter(
+                    Target: new FilePrefixTarget(),
+                    Options: new ReplacerOptions(
+                        "a",
+                        "b",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: false,
+                        WholeWord: false)));
+        }
+
+        private static FilterPreset _RenameOldParentToNewParentPreset(string name)
+        {
+            return _CreatePresetAllEnabled(
+                name,
+                new ReplacerFilter(
+                    Target: new AncestorFolderTarget(Level: 1),
+                    Options: new ReplacerOptions(
+                        Find: "OldParent",
+                        Replacement: "NewParent",
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: false,
+                        WholeWord: false)));
+        }
+
+        private static FilterPreset _FormatterParentDirectoryPreset(string name, string parentPath)
+        {
+            return _CreatePresetAllEnabled(
+                name,
+                new FormatterFilter(Target: new ParentDirectoryTarget(), Options: new FormatterOptions(parentPath)));
+        }
+
+        private static FilterPreset _FormatterFullPathPreset(string name, string fullPath)
+        {
+            return _CreatePresetAllEnabled(
+                name,
+                new FormatterFilter(Target: new FullPathTarget(), Options: new FormatterOptions(fullPath)));
+        }
+
+        private static void _SetupPreview(RenameList renameList, FilterPreset preset)
+        {
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+        }
+
+        private static void _AssertSingleCommitOk(IReadOnlyList<RenameResultItem> result, string? expectChangeProperty = null)
+        {
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            if (expectChangeProperty is not null)
+            {
+                Assert.Contains(result[0].Changes, c => c.Property == expectChangeProperty);
+            }
+        }
+
+        private static FilterPreset _FailingReplacerUnsupportedTargetPreset(string name)
+        {
+            return _CreatePresetAllEnabled(
+                name,
+                new ReplacerFilter(
+                    Target: new UnsupportedTarget(),
+                    Options: new ReplacerOptions(
+                        "a",
+                        "b",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false)));
         }
 
         private sealed record UnsupportedTarget : FilterTarget;
