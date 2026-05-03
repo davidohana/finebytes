@@ -149,24 +149,11 @@ namespace Mfr.Models
         {
             if (!IsPreviewPathSameAsOriginal())
             {
-                var destinationDirectoryPath = Path.GetDirectoryName(Preview.FullPath);
-                if (string.IsNullOrEmpty(destinationDirectoryPath))
-                {
-                    throw new InvalidOperationException(
-                        $"Cannot resolve a parent directory for destination path '{Preview.FullPath}'.");
-                }
-
-                Directory.CreateDirectory(destinationDirectoryPath);
-
-                var sourceIsDirectory = FilesystemAttributes.IsDirectory(Original.Attributes);
-                if (sourceIsDirectory)
-                {
-                    Directory.Move(Original.FullPath, Preview.FullPath);
-                }
-                else
-                {
-                    File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
-                }
+                _EnsureDestinationParentExists(Preview.FullPath);
+                _MoveEntry(
+                    sourceFullPath: Original.FullPath,
+                    destinationFullPath: Preview.FullPath,
+                    sourceIsDirectory: FilesystemAttributes.IsDirectory(Original.Attributes));
             }
 
             var pathOnDisk = Preview.FullPath;
@@ -176,46 +163,68 @@ namespace Mfr.Models
             }
 
             var pathIsDirectoryAfterApply = FilesystemAttributes.IsDirectory(pathOnDisk);
-
-            if (Original.CreationTime != Preview.CreationTime)
-            {
-                if (pathIsDirectoryAfterApply)
-                {
-                    Directory.SetCreationTime(pathOnDisk, Preview.CreationTime);
-                }
-                else
-                {
-                    File.SetCreationTime(pathOnDisk, Preview.CreationTime);
-                }
-            }
-
-            if (Original.LastWriteTime != Preview.LastWriteTime)
-            {
-                if (pathIsDirectoryAfterApply)
-                {
-                    Directory.SetLastWriteTime(pathOnDisk, Preview.LastWriteTime);
-                }
-                else
-                {
-                    File.SetLastWriteTime(pathOnDisk, Preview.LastWriteTime);
-                }
-            }
-
-            if (Original.LastAccessTime != Preview.LastAccessTime)
-            {
-                if (pathIsDirectoryAfterApply)
-                {
-                    Directory.SetLastAccessTime(pathOnDisk, Preview.LastAccessTime);
-                }
-                else
-                {
-                    File.SetLastAccessTime(pathOnDisk, Preview.LastAccessTime);
-                }
-            }
+            _ApplyTimestampChangesIfNeeded(
+                pathOnDisk,
+                Original,
+                Preview,
+                pathIsDirectoryAfterApply);
 
             if (HasPreviewChanges())
             {
                 Original = Preview.Clone();
+            }
+        }
+
+        private static void _EnsureDestinationParentExists(string destinationFullPath)
+        {
+            var destinationDirectoryPath = Path.GetDirectoryName(destinationFullPath);
+            if (string.IsNullOrEmpty(destinationDirectoryPath))
+            {
+                throw new InvalidOperationException(
+                    $"Cannot resolve a parent directory for destination path '{destinationFullPath}'.");
+            }
+
+            Directory.CreateDirectory(destinationDirectoryPath);
+        }
+
+        private static void _MoveEntry(string sourceFullPath, string destinationFullPath, bool sourceIsDirectory)
+        {
+            if (sourceIsDirectory)
+            {
+                Directory.Move(sourceFullPath, destinationFullPath);
+                return;
+            }
+
+            File.Move(sourceFullPath, destinationFullPath, overwrite: false);
+        }
+
+        // Uses Directory.Set* vs File.Set* based on entry kind (Windows directory paths may reject File.* time setters).
+        private static void _ApplyTimestampChangesIfNeeded(
+            string pathOnDisk,
+            FileMeta original,
+            FileMeta preview,
+            bool pathIsDirectory)
+        {
+            Action<string, DateTime> setCreationTime =
+                pathIsDirectory ? Directory.SetCreationTime : File.SetCreationTime;
+            Action<string, DateTime> setLastWriteTime =
+                pathIsDirectory ? Directory.SetLastWriteTime : File.SetLastWriteTime;
+            Action<string, DateTime> setLastAccessTime =
+                pathIsDirectory ? Directory.SetLastAccessTime : File.SetLastAccessTime;
+
+            if (original.CreationTime != preview.CreationTime)
+            {
+                setCreationTime(pathOnDisk, preview.CreationTime);
+            }
+
+            if (original.LastWriteTime != preview.LastWriteTime)
+            {
+                setLastWriteTime(pathOnDisk, preview.LastWriteTime);
+            }
+
+            if (original.LastAccessTime != preview.LastAccessTime)
+            {
+                setLastAccessTime(pathOnDisk, preview.LastAccessTime);
             }
         }
 
