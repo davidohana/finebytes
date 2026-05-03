@@ -37,11 +37,13 @@ namespace Mfr.Models
     }
 
     /// <summary>
-    /// Represents a polymorphic filter target (file name parts and folder-ancestor segments).
+    /// Represents a polymorphic filter target (file-name parts, full paths, ancestor segments).
     /// </summary>
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "family")]
     [JsonDerivedType(typeof(FileNameTarget), "FileName")]
     [JsonDerivedType(typeof(AncestorFolderTarget), "AncestorFolder")]
+    [JsonDerivedType(typeof(FullPathTarget), "FullPath")]
+    [JsonDerivedType(typeof(ParentDirectoryTarget), "ParentDirectory")]
     public abstract record FilterTarget;
 
     /// <summary>
@@ -60,4 +62,20 @@ namespace Mfr.Models
     /// </para>
     /// <param name="Level">Ancestor distance counting from immediate parent upward.</param>
     public sealed record AncestorFolderTarget(int Level) : FilterTarget;
+
+    /// <summary>
+    /// Targets the item’s preview full file path (<c>directory + prefix + extension</c>).
+    /// </summary>
+    /// <remarks>
+    /// Writes must assign a fully qualified path that includes directory and file name.
+    /// </remarks>
+    public sealed record FullPathTarget : FilterTarget;
+
+    /// <summary>
+    /// Targets the preview containing-directory absolute path (<c>DirectoryPath</c> on preview metadata).
+    /// </summary>
+    /// <remarks>
+    /// Writes assign the containing-folder path only; the preview prefix and extension stay unchanged.
+    /// </remarks>
+    public sealed record ParentDirectoryTarget : FilterTarget;
 }

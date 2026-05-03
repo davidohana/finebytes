@@ -9,9 +9,10 @@ namespace Mfr.Models
         /// <inheritdoc />
         protected internal sealed override void ApplyCore(RenameItem item)
         {
-            var current = FilterTargetStringResolver.GetPreviewString(item, Target);
+            var meta = item.Preview;
+            var current = meta.GetTargetString(Target);
             var transformed = TransformValue(current, item);
-            FilterTargetStringResolver.SetPreviewString(item, Target, transformed);
+            meta.SetTargetString(Target, transformed);
         }
 
         internal string TransformValue(string value, RenameItem item)

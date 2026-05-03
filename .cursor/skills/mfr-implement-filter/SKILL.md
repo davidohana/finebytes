@@ -22,11 +22,19 @@ description: >-
 
 5. **Options.** If the filter has settings, add a `YourOptions` `sealed record` in the same file or adjacent file, with camelCase JSON property names via record positional params / `[JsonPropertyName]` as needed.
 
-6. **JSON registration.** In `Mfr.Core/PresetJsonOptions.cs`, add `using Mfr.Filters.<Group>;` if missing and append `new JsonDerivedType(typeof(YourFilter), "YourFilterType")` to `DerivedTypes` (follow the ordering style already used in that list).
+6. **`Target` (`StringTargetFilter` / string-target presets).** `FilterTarget` is polymorphic; JSON discriminator is **`family`**:
+   | `family` value | Fields | Addresses |
+   |----------------|--------|-----------|
+   | `FileName` | `fileNamePart`: `Prefix`, `Extension`, `Full` | Preview file-name parts |
+   | `AncestorFolder` | `level`: positive integer | Single ancestor segment name vs preview directory |
+   | `FullPath` | (none) | Entire preview full path |
+   | `ParentDirectory` | (none) | Preview containing directory path |
+
+7. **JSON registration.** In `Mfr.Core/PresetJsonOptions.cs`, add `using Mfr.Filters.<Group>;` if missing and append `new JsonDerivedType(typeof(YourFilter), "YourFilterType")` to `DerivedTypes` (follow the ordering style already used in that list).
 
 ## Tests
 
-Add `Mfr.Tests/Models/Filters/<Group>/YourFilterTests.cs`. Use `FilterTestHelpers.ApplyToPrefix` and/or `CreateRenameItem` + `filter.Setup()` + `filter.Apply(item)`. Mirror edge cases and cross-filter ordering when relevant.
+Add `Mfr.Tests/Models/Filters/<Group>/YourFilterTests.cs`. Use `FilterTestHelpers.ApplyToPrefix`, `ApplyReturnItem`, and/or `CreateRenameItem` + `filter.Setup()` + `filter.Apply(item)`. Mirror edge cases and cross-filter ordering when relevant.
 
 ## Docs
 

@@ -108,27 +108,6 @@ namespace Mfr.Models
             SentenceEndChars = ".!?";
         }
 
-        internal void SetPreviewValue(FileNamePart part, string partValue)
-        {
-            var previewFileMeta = Preview;
-            switch (part)
-            {
-                case FileNamePart.Prefix:
-                    previewFileMeta.Prefix = partValue;
-                    break;
-                case FileNamePart.Extension:
-                    previewFileMeta.Extension = partValue;
-                    break;
-                case FileNamePart.Full:
-                    var fullName = Path.GetFileName(partValue);
-                    previewFileMeta.Extension = Path.GetExtension(fullName);
-                    previewFileMeta.Prefix = Path.GetFileNameWithoutExtension(fullName);
-                    break;
-                default:
-                    throw new InvalidOperationException($"Unknown fileNamePart '{part}'.");
-            }
-        }
-
         internal void SetPreviewError(string message, Exception? cause)
         {
             PreviewError = new RenameItemError(Message: message, Cause: cause);

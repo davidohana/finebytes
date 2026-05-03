@@ -65,5 +65,29 @@ namespace Mfr.Tests.Models.Filters
             filter.Apply(item);
             return item.Preview.Prefix;
         }
+
+        /// <summary>
+        /// Applies a filter and returns the item so callers can inspect any preview fields.
+        /// </summary>
+        /// <param name="filter">Filter to apply.</param>
+        /// <param name="inputPrefix">Input prefix used for the test item.</param>
+        /// <param name="extension">Input extension used for the test item.</param>
+        /// <param name="globalIndex">Zero-based index across all files.</param>
+        /// <param name="inFolderIndex">Zero-based index within the folder.</param>
+        /// <param name="directory">Parent directory path, or a default when null.</param>
+        /// <returns>The rename item after <see cref="BaseFilter.Setup"/> + <see cref="BaseFilter.Apply"/>.</returns>
+        public static RenameItem ApplyReturnItem(
+            BaseFilter filter,
+            string inputPrefix,
+            string extension = ".mp3",
+            int globalIndex = 0,
+            int inFolderIndex = 0,
+            string? directory = null)
+        {
+            var item = CreateRenameItem(inputPrefix, extension, globalIndex, inFolderIndex, directory);
+            filter.Setup();
+            filter.Apply(item);
+            return item;
+        }
     }
 }

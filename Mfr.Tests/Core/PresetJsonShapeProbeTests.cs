@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Mfr.Core;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Models;
@@ -161,6 +162,51 @@ namespace Mfr.Tests.Core
             var target = Assert.IsType<AncestorFolderTarget>(typed.Target);
             Assert.Equal(2, target.Level);
 
+            typed.Setup();
+        }
+
+        [Fact]
+        public void Formatter_JSON_round_trips_FullPath_target()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "Formatter",
+              "target": {
+                "family": "FullPath"
+              },
+              "options": {
+                "template": "D:\\Staging\\<full-name>"
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<FormatterFilter>(filter);
+            Assert.IsType<FullPathTarget>(typed.Target);
+            Assert.Equal("D:\\Staging\\<full-name>", typed.Options.Template);
+            typed.Setup();
+        }
+
+        [Fact]
+        public void Formatter_JSON_round_trips_ParentDirectory_target()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "Formatter",
+              "target": {
+                "family": "ParentDirectory"
+              },
+              "options": {
+                "template": "D:\\Archived"
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<FormatterFilter>(filter);
+            Assert.IsType<ParentDirectoryTarget>(typed.Target);
             typed.Setup();
         }
 
