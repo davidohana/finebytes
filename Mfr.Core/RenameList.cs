@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Mfr.Utils;
 using Serilog;
 
 namespace Mfr.Core
@@ -432,7 +433,7 @@ namespace Mfr.Core
                     continue;
                 }
 
-                var isDirectory = attrs.HasFlag(FileAttributes.Directory);
+                var isDirectory = FilesystemAttributes.IsDirectory(attrs);
                 if (isDirectory && !includeFolders)
                 {
                     continue;

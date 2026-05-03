@@ -1,3 +1,5 @@
+using Mfr.Utils;
+
 namespace Mfr.Models
 {
     /// <summary>
@@ -156,7 +158,7 @@ namespace Mfr.Models
 
                 Directory.CreateDirectory(destinationDirectoryPath);
 
-                var sourceIsDirectory = Original.Attributes.HasFlag(FileAttributes.Directory);
+                var sourceIsDirectory = FilesystemAttributes.IsDirectory(Original.Attributes);
                 if (sourceIsDirectory)
                 {
                     Directory.Move(Original.FullPath, Preview.FullPath);
@@ -173,7 +175,7 @@ namespace Mfr.Models
                 File.SetAttributes(pathOnDisk, Preview.Attributes);
             }
 
-            var pathIsDirectoryAfterApply = File.GetAttributes(pathOnDisk).HasFlag(FileAttributes.Directory);
+            var pathIsDirectoryAfterApply = FilesystemAttributes.IsDirectory(pathOnDisk);
 
             if (Original.CreationTime != Preview.CreationTime)
             {
