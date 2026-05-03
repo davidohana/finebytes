@@ -947,6 +947,54 @@ namespace Mfr.Tests.Core
             Assert.True(File.Exists(destinationFullPath));
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies commit renames an included directory item (same path-move path as files, via <see cref="FullPathTarget"/>).
+        /// </summary>
+        public void Commit_RenamesIncludedDirectory_WhenPreviewUsesChangedFullPath()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var originalFolderPath = dir.CombinePath("Album");
+            Directory.CreateDirectory(originalFolderPath);
+            var nestedFilePath = originalFolderPath.CombinePath("track.txt");
+            File.WriteAllText(nestedFilePath, "nested");
+
+            var destinationFolderPath = dir.CombinePath("AlbumRenamed");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(
+                source: originalFolderPath,
+                includeFiles: false,
+                includeFolders: true);
+            Assert.Single(renameList.RenameItems);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "folder-full-path-move",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new FormatterFilter(
+                        Target: new FullPathTarget(),
+                        Options: new FormatterOptions(destinationFolderPath)),
+                ]),
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            Assert.Equal(destinationFolderPath, renameList.RenameItems[0].Preview.FullPath);
+            Assert.DoesNotContain(renameList.RenameItems, item => item.PreviewError is not null);
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.False(Directory.Exists(originalFolderPath));
+            Assert.True(Directory.Exists(destinationFolderPath));
+            Assert.True(File.Exists(destinationFolderPath.CombinePath("track.txt")));
+            Assert.False(File.Exists(nestedFilePath));
+        }
+
         private sealed record UnsupportedTarget : FilterTarget;
     }
 }

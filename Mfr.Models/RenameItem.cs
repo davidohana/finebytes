@@ -135,8 +135,9 @@ namespace Mfr.Models
         /// Applies the preview rename, attribute, and timestamp changes on disk for this item.
         /// </summary>
         /// <para>
-        /// When <see cref="Preview"/> points to another directory, missing destination directories are created
-        /// before the file rename.
+        /// Path moves use <see cref="M:System.IO.File.Move(System.String,System.String,System.Boolean)"/> for file entries and
+        /// <see cref="M:System.IO.Directory.Move(System.String,System.String)"/> when the original entry is a directory.
+        /// When <see cref="Preview"/> introduces a parent path that does not exist yet, that parent folder is created first.
         /// </para>
         /// <remarks>
         /// Updates <see cref="Original"/> to match the applied preview; <see cref="Preview"/> is left as-is until the host calls <see cref="ClearPreview"/>.
@@ -153,7 +154,16 @@ namespace Mfr.Models
                 }
 
                 Directory.CreateDirectory(destinationDirectoryPath);
-                File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
+
+                var sourceIsDirectory = Original.Attributes.HasFlag(FileAttributes.Directory);
+                if (sourceIsDirectory)
+                {
+                    Directory.Move(Original.FullPath, Preview.FullPath);
+                }
+                else
+                {
+                    File.Move(Original.FullPath, Preview.FullPath, overwrite: false);
+                }
             }
 
             var pathOnDisk = Preview.FullPath;
