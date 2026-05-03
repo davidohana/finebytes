@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Replace
     /// </summary>
     public sealed class ReplaceListFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies that replacements from file are applied in order.

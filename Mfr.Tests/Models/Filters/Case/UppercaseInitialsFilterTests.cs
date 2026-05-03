@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Case
     /// </summary>
     public class UppercaseInitialsFilterTests
     {
-        private static readonly FilterTarget _target = new FileNameTarget(FileNamePart.Prefix);
+        private static readonly FilterTarget _target = new FilePrefixTarget();
 
         /// <summary>
         /// Verifies lowercase initials patterns are uppercased.

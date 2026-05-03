@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Replace
     /// </summary>
     public class CleanerFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies illegal file-name characters are replaced.

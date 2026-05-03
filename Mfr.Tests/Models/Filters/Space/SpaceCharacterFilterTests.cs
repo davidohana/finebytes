@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public class SpaceCharacterFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies %20 is replaced with the defined underscore separator (MFR7-style example).

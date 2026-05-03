@@ -27,8 +27,7 @@ namespace Mfr.Tests.Core
                         "filter": {
                           "type": "SeparateCapitalizedText",
                           "target": {
-                            "family": "FileName",
-                            "fileNamePart": "Prefix"
+                            "family": "FilePrefix"
                           }
                         }
                       }

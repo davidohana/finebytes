@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Misc
     /// </summary>
     public class StripParenthesesFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies round parentheses and contents are removed.

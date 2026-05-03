@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
     /// </summary>
     public class InserterFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies the documented example: insert before the third character without shifting past overwrite.

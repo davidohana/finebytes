@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public class SeparateCapitalizedTextFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies camel-case, letter–digit, and digit–letter boundaries insert the default separator.

@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
     /// </summary>
     public class TokenMoverFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies moving the second token three places right (documented milk example).

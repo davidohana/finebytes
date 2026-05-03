@@ -1,4 +1,4 @@
-﻿using Mfr.Filters.Space;
+using Mfr.Filters.Space;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Space
@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public class StripSpacesLeftFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies default trimming (space character) from the left.

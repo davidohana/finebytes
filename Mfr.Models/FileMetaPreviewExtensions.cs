@@ -20,7 +20,9 @@ namespace Mfr.Models
         {
             return target switch
             {
-                FileNameTarget fileNameTarget => meta.GetFileNamePart(fileNameTarget.FileNamePart),
+                FilePrefixTarget => meta.Prefix,
+                FileExtensionTarget => meta.Extension,
+                FileFullNameTarget => meta.Prefix + meta.Extension,
                 FullPathTarget => meta.FullPath,
                 ParentDirectoryTarget => meta.DirectoryPath,
                 AncestorFolderTarget ancestorFolderTarget =>
@@ -45,8 +47,14 @@ namespace Mfr.Models
         {
             switch (target)
             {
-                case FileNameTarget fileNameTarget:
-                    meta.ApplyFileNamePart(fileNameTarget.FileNamePart, value);
+                case FilePrefixTarget:
+                    meta.Prefix = value;
+                    return;
+                case FileExtensionTarget:
+                    meta.Extension = value;
+                    return;
+                case FileFullNameTarget:
+                    _SetFullFileNameFromValue(meta, value);
                     return;
                 case FullPathTarget:
                     meta.SetFromAbsoluteFullPath(value);
@@ -62,21 +70,11 @@ namespace Mfr.Models
             }
         }
 
-        /// <summary>
-        /// Returns the file-name substring that <see cref="FileNameTarget"/> addresses on this snapshot.
-        /// </summary>
-        /// <param name="meta">Metadata snapshot.</param>
-        /// <param name="part">Which file-name part to read.</param>
-        /// <returns>Prefix, extension, or concatenated full file name.</returns>
-        internal static string GetFileNamePart(this FileMeta meta, FileNamePart part)
+        private static void _SetFullFileNameFromValue(FileMeta meta, string fullValue)
         {
-            return part switch
-            {
-                FileNamePart.Prefix => meta.Prefix,
-                FileNamePart.Extension => meta.Extension,
-                FileNamePart.Full => meta.Prefix + meta.Extension,
-                _ => throw new InvalidOperationException($"Unknown FileNamePart '{part}'.")
-            };
+            var fullName = Path.GetFileName(fullValue);
+            meta.Extension = Path.GetExtension(fullName);
+            meta.Prefix = Path.GetFileNameWithoutExtension(fullName);
         }
 
         /// <summary>
@@ -89,32 +87,6 @@ namespace Mfr.Models
             return DirectoryPathAncestor.GetSegmentName(
                 containingDirectoryPath: meta.DirectoryPath,
                 level: level);
-        }
-
-        /// <summary>
-        /// Writes values for file-name-part targets into this snapshot.
-        /// </summary>
-        /// <param name="meta">Metadata snapshot to mutate.</param>
-        /// <param name="part">Which file-name segment to overwrite.</param>
-        /// <param name="partValue">New substring; <see cref="FileNamePart.Full"/> uses <see cref="Path.GetFileName(string)"/> rules.</param>
-        internal static void ApplyFileNamePart(this FileMeta meta, FileNamePart part, string partValue)
-        {
-            switch (part)
-            {
-                case FileNamePart.Prefix:
-                    meta.Prefix = partValue;
-                    return;
-                case FileNamePart.Extension:
-                    meta.Extension = partValue;
-                    return;
-                case FileNamePart.Full:
-                    var fullName = Path.GetFileName(partValue);
-                    meta.Extension = Path.GetExtension(fullName);
-                    meta.Prefix = Path.GetFileNameWithoutExtension(fullName);
-                    return;
-                default:
-                    throw new InvalidOperationException($"Unknown FileNamePart '{part}'.");
-            }
         }
 
         /// <summary>

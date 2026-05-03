@@ -48,7 +48,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new FormatterFilter(
-                        Target: new FileNameTarget(FileNamePart.Full),
+                        Target: new FileFullNameTarget(),
                         Options: new FormatterOptions("same.mp3"))
                 ])
             };
@@ -89,7 +89,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Target: new FilePrefixTarget(),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
@@ -139,7 +139,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Target: new FilePrefixTarget(),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
@@ -185,7 +185,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Target: new FilePrefixTarget(),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
@@ -232,7 +232,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Target: new FilePrefixTarget(),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
@@ -279,7 +279,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Target: new FilePrefixTarget(),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
@@ -336,7 +336,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Target: new FilePrefixTarget(),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
@@ -529,7 +529,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new CounterFilter(
-                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Target: new FilePrefixTarget(),
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
@@ -578,10 +578,10 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                 [
                     new ReplacerFilter(
-                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Target: new FilePrefixTarget(),
                         Options: new ReplacerOptions("b", "c", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false)),
                     new ReplacerFilter(
-                        Target: new FileNameTarget(FileNamePart.Prefix),
+                        Target: new FilePrefixTarget(),
                         Options: new ReplacerOptions("a", "b", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: false, WholeWord: false))
                 ])
             };

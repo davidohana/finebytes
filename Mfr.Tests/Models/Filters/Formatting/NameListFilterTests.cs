@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
     /// </summary>
     public sealed class NameListFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies list line N maps to global index N.

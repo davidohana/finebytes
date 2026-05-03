@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
     /// </summary>
     public class ShrinkDuplicateCharactersFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies adjacent duplicate occurrences of the configured character collapse to one.

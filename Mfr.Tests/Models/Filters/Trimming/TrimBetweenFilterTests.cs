@@ -1,4 +1,4 @@
-﻿using Mfr.Filters.Trimming;
+using Mfr.Filters.Trimming;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Trimming
@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
     /// </summary>
     public class TrimBetweenFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies example from issue:

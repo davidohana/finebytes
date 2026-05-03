@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public class RemoveSpacesFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies all occurrences of the default word separator (U+0020 SPACE) are removed.

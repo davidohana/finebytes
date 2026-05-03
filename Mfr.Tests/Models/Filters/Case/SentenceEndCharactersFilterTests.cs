@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Case
     /// </summary>
     public sealed class SentenceEndCharactersFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies the segment text is unchanged.

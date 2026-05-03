@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
     /// </summary>
     public class CounterFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies replace mode outputs padded counter only.

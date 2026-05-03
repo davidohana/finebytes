@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models
     /// </summary>
     public sealed class FilterChainTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies <see cref="FilterChain.CreateAllEnabled"/> with no filters yields an empty step list.

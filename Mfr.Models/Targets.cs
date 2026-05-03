@@ -27,30 +27,31 @@ namespace Mfr.Models
     }
 
     /// <summary>
-    /// Selects which file-name segment a file-name target addresses.
-    /// </summary>
-    public enum FileNamePart
-    {
-        Prefix,
-        Extension,
-        Full
-    }
-
-    /// <summary>
-    /// Represents a polymorphic filter target (file-name parts, full paths, ancestor segments).
+    /// Represents a polymorphic filter target (file-name slices, paths, ancestor segments).
     /// </summary>
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "family")]
-    [JsonDerivedType(typeof(FileNameTarget), "FileName")]
+    [JsonDerivedType(typeof(FilePrefixTarget), "FilePrefix")]
+    [JsonDerivedType(typeof(FileExtensionTarget), "FileExtension")]
+    [JsonDerivedType(typeof(FileFullNameTarget), "FileFullName")]
     [JsonDerivedType(typeof(AncestorFolderTarget), "AncestorFolder")]
     [JsonDerivedType(typeof(FullPathTarget), "FullPath")]
     [JsonDerivedType(typeof(ParentDirectoryTarget), "ParentDirectory")]
     public abstract record FilterTarget;
 
     /// <summary>
-    /// Targets file-name content using a selected part.
+    /// Targets the file name without extension (<c>prefix</c> segment).
     /// </summary>
-    /// <param name="FileNamePart">The file-name part to target.</param>
-    public sealed record FileNameTarget(FileNamePart FileNamePart) : FilterTarget;
+    public sealed record FilePrefixTarget : FilterTarget;
+
+    /// <summary>
+    /// Targets the file extension including the leading dot (<c>extension</c> segment).
+    /// </summary>
+    public sealed record FileExtensionTarget : FilterTarget;
+
+    /// <summary>
+    /// Targets the full file name (<c>prefix + extension</c>); writes parse with <see cref="M:System.IO.Path.GetFileName(System.String)"/> rules.
+    /// </summary>
+    public sealed record FileFullNameTarget : FilterTarget;
 
     /// <summary>
     /// Targets one ancestor folder segment name relative to the item’s preview directory path.

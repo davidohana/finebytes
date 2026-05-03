@@ -1,11 +1,11 @@
-﻿using Mfr.Filters.Case;
+using Mfr.Filters.Case;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Case
 {
     public class CapitalizeAfterFilterTests
     {
-        private readonly FilterTarget _target = new FileNameTarget(FileNamePart.Prefix);
+        private readonly FilterTarget _target = new FilePrefixTarget();
 
         [Fact]
         public void Apply_Default_CapitalizesAfterDefaultChars()

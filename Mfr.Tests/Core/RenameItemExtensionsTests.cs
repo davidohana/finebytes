@@ -21,7 +21,7 @@ namespace Mfr.Tests.Core
             var firstChain = FilterChain.CreateAllEnabled(
             [
                 new ReplacerFilter(
-                    Target: new FileNameTarget(FileNamePart.Prefix),
+                    Target: new FilePrefixTarget(),
                     Options: new ReplacerOptions("track", "stale", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
             ]);
             firstChain.SetupFilters();
@@ -33,7 +33,7 @@ namespace Mfr.Tests.Core
                     new FilterChainStep(
                         Enabled: false,
                         Filter: new ReplacerFilter(
-                            Target: new FileNameTarget(FileNamePart.Prefix),
+                            Target: new FilePrefixTarget(),
                             Options: new ReplacerOptions("track", "song", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false)))
                 ]
             };
@@ -56,10 +56,10 @@ namespace Mfr.Tests.Core
             var chain = FilterChain.CreateAllEnabled(
             [
                 new ReplacerFilter(
-                    Target: new FileNameTarget(FileNamePart.Prefix),
+                    Target: new FilePrefixTarget(),
                     Options: new ReplacerOptions("track", "song", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false)),
                 new ReplacerFilter(
-                    Target: new FileNameTarget(FileNamePart.Prefix),
+                    Target: new FilePrefixTarget(),
                     Options: new ReplacerOptions("old", "new", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
             ]);
 
@@ -81,10 +81,10 @@ namespace Mfr.Tests.Core
             var chain = FilterChain.CreateAllEnabled(
             [
                 new ReplacerFilter(
-                    Target: new FileNameTarget(FileNamePart.Extension),
+                    Target: new FileExtensionTarget(),
                     Options: new ReplacerOptions(".mp3", ".flac", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false)),
                 new FormatterFilter(
-                    Target: new FileNameTarget(FileNamePart.Full),
+                    Target: new FileFullNameTarget(),
                     Options: new FormatterOptions("renamed.final.wav"))
             ]);
 

@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Misc
     /// </summary>
     public class FixLeadingZerosFilterTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies non-positive width leaves segment unchanged.

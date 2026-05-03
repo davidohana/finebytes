@@ -25,7 +25,9 @@ description: >-
 6. **`Target` (`StringTargetFilter` / string-target presets).** `FilterTarget` is polymorphic; JSON discriminator is **`family`**:
    | `family` value | Fields | Addresses |
    |----------------|--------|-----------|
-   | `FileName` | `fileNamePart`: `Prefix`, `Extension`, `Full` | Preview file-name parts |
+   | `FilePrefix` | (none) | Prefix (name without extension) |
+   | `FileExtension` | (none) | Extension including leading dot |
+   | `FileFullName` | (none) | Full file name (prefix + extension); writes parse via `Path.GetFileName` rules |
    | `AncestorFolder` | `level`: positive integer | Single ancestor segment name vs preview directory |
    | `FullPath` | (none) | Entire preview full path |
    | `ParentDirectory` | (none) | Preview containing directory path |

@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters
     /// </summary>
     public sealed class BaseFilterSetupTests
     {
-        private static readonly FileNameTarget _target = new(FileNamePart.Prefix);
+        private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
         /// Verifies setup is invoked once per filter instance lifetime.
