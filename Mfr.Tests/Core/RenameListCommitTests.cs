@@ -601,6 +601,73 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
+        /// Mirrors <see cref="Commit_AllowsExistingDestination_WhenItWillBeRenamedAway"/> for directories: the second folder’s preview targets a path that still exists until the first moves away.
+        /// </summary>
+        public void Commit_AllowsExistingFolderDestination_WhenItWillBeRenamedAway()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourceFolderB = dir.CombinePath("b");
+            var sourceFolderA = dir.CombinePath("a");
+            var destinationFolderC = dir.CombinePath("c");
+            Directory.CreateDirectory(sourceFolderB);
+            Directory.CreateDirectory(sourceFolderA);
+            File.WriteAllText(sourceFolderB.CombinePath("inside-b.txt"), "x");
+            File.WriteAllText(sourceFolderA.CombinePath("inside-a.txt"), "y");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources(
+                sources: [sourceFolderB, sourceFolderA],
+                includeFiles: false,
+                includeFolders: true);
+            var items = renameList.RenameItems;
+            Assert.Equal(2, items.Count);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "folder-chain-shift",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new ReplacerFilter(
+                        Target: new FilePrefixTarget(),
+                        Options: new ReplacerOptions(
+                            "b",
+                            "c",
+                            ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: false,
+                            WholeWord: false)),
+                    new ReplacerFilter(
+                        Target: new FilePrefixTarget(),
+                        Options: new ReplacerOptions(
+                            "a",
+                            "b",
+                            ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: false,
+                            WholeWord: false)),
+                ]),
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            Assert.DoesNotContain(items, item => item.PreviewError is not null);
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.DoesNotContain(result, item => item.Status == RenameStatus.CommitError);
+            Assert.False(Directory.Exists(dir.CombinePath("a")));
+
+            var renamedFromAPath = dir.CombinePath("b");
+            Assert.False(File.Exists(renamedFromAPath.CombinePath("inside-b.txt")));
+            Assert.True(File.Exists(renamedFromAPath.CombinePath("inside-a.txt")));
+
+            Assert.True(File.Exists(destinationFolderC.CombinePath("inside-b.txt")));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies attribute-only preview commits call <see cref="File.SetAttributes"/> on the source path.
         /// </summary>
         public void Commit_AttributesOnly_AppliesHidden()

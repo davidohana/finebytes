@@ -352,7 +352,7 @@ namespace Mfr.Core
         }
 
         /// <summary>
-        /// Marks preview conflicts (duplicate destinations, paths blocked by an existing folder, or occupied file paths outside the rename batch).
+        /// Marks preview conflicts (duplicate destinations, rename targets blocked by disk state, ignoring paths freed by sources in this batch).
         /// </summary>
         private void _MarkPreviewConflicts()
         {
@@ -387,12 +387,14 @@ namespace Mfr.Core
                     continue;
                 }
 
-                var destinationOccupiedByExistingDirectory =
-                    Directory.Exists(destinationPath) && !File.Exists(destinationPath);
-                if (destinationOccupiedByExistingDirectory)
+                var destinationBlockedByUntouchedExistingDirectory =
+                    Directory.Exists(destinationPath)
+                    && !File.Exists(destinationPath)
+                    && !movingSourceKeys.Contains(destinationKey);
+                if (destinationBlockedByUntouchedExistingDirectory)
                 {
                     item.SetPreviewError(
-                        message: $"Destination '{destinationPath}' refers to an existing folder, not a file path.",
+                        message: $"Destination '{destinationPath}' already exists as a folder.",
                         cause: null);
                     Log.Warning(
                         "Preview conflict for destination '{DestinationPath}' (path is an existing directory).",
@@ -400,13 +402,13 @@ namespace Mfr.Core
                     continue;
                 }
 
-                var destinationOccupiedOutsideBatch =
+                var destinationBlockedByUntouchedExistingFile =
                     File.Exists(destinationPath)
                     && !movingSourceKeys.Contains(destinationKey);
-                if (destinationOccupiedOutsideBatch)
+                if (destinationBlockedByUntouchedExistingFile)
                 {
                     item.SetPreviewError(
-                        message: $"Destination '{destinationPath}' already exists as a file (not a source being renamed).",
+                        message: $"Destination '{destinationPath}' already exists as a file (not freed by another rename source in this batch).",
                         cause: null);
                     Log.Warning(
                         "Preview conflict for destination '{DestinationPath}' (path already exists).",
