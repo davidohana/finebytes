@@ -1062,6 +1062,196 @@ namespace Mfr.Tests.Core
             Assert.False(File.Exists(nestedFilePath));
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies attribute-only preview commits call <see cref="File.SetAttributes"/> on an included directory path.
+        /// </summary>
+        public void Commit_AttributesOnly_AppliesHidden_OnIncludedDirectory()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var folderPath = dir.CombinePath("folder");
+            Directory.CreateDirectory(folderPath);
+            var attrsBefore = File.GetAttributes(folderPath);
+            Assert.False(attrsBefore.HasFlag(FileAttributes.Hidden));
+            Assert.True(attrsBefore.HasFlag(FileAttributes.Directory));
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(
+                source: folderPath,
+                includeFiles: false,
+                includeFolders: true);
+            Assert.Single(renameList.RenameItems);
+            Assert.True(renameList.RenameItems[0].Original.Attributes.HasFlag(FileAttributes.Directory));
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "attrs-folder",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new AttributesSetterFilter(
+                        Options: new AttributesSetterOptions(
+                            ReadOnly: AttributeTriState.Keep,
+                            Hidden: AttributeTriState.Set,
+                            Archive: AttributeTriState.Keep,
+                            System: AttributeTriState.Keep))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            var item = renameList.RenameItems[0];
+            Assert.True(item.HasPreviewChanges());
+            Assert.True(item.Preview.Attributes.HasFlag(FileAttributes.Hidden));
+            Assert.True(item.Preview.Attributes.HasFlag(FileAttributes.Directory));
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.Contains(result[0].Changes, c => c.Property == "Attributes");
+
+            var attrsAfter = File.GetAttributes(folderPath);
+            Assert.True(attrsAfter.HasFlag(FileAttributes.Hidden));
+            Assert.True(attrsAfter.HasFlag(FileAttributes.Directory));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies dry-run commit skips attribute writes for an included directory.
+        /// </summary>
+        public void Commit_AttributesOnly_DryRun_LeavesAttributes_OnIncludedDirectory()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var folderPath = dir.CombinePath("folder-dry");
+            Directory.CreateDirectory(folderPath);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(
+                source: folderPath,
+                includeFiles: false,
+                includeFolders: true);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "attrs-folder-dry",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new AttributesSetterFilter(
+                        Options: new AttributesSetterOptions(
+                            ReadOnly: AttributeTriState.Keep,
+                            Hidden: AttributeTriState.Set,
+                            Archive: AttributeTriState.Keep,
+                            System: AttributeTriState.Keep))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+
+            var result = renameList.Commit(failFast: false, dryRun: true);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+
+            var attrsAfter = File.GetAttributes(folderPath);
+            Assert.False(attrsAfter.HasFlag(FileAttributes.Hidden));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies last-write commits on an included directory use <see cref="File.SetLastWriteTime"/>.
+        /// </summary>
+        public void Commit_LastWriteTimeOnly_AppliesDateSetter_OnIncludedDirectory()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var folderPath = dir.CombinePath("dated-folder");
+            Directory.CreateDirectory(folderPath);
+            var before = File.GetLastWriteTime(folderPath);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(
+                source: folderPath,
+                includeFiles: false,
+                includeFolders: true);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "last-write-folder",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new DateSetterFilter(
+                        Options: new DateSetterOptions(
+                            TimestampField: TimestampField.LastWrite,
+                            Date: DateOnly.FromDateTime(before.AddDays(30))))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            var item = renameList.RenameItems[0];
+            Assert.True(item.HasPreviewChanges());
+            Assert.NotEqual(before, item.Preview.LastWriteTime);
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.Contains(result[0].Changes, c => c.Property == "LastWriteTime");
+
+            var after = File.GetLastWriteTime(folderPath);
+            Assert.Equal(item.Preview.LastWriteTime, after);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies <see cref="TimeShifterFilter"/> last-write deltas commit for an included directory.
+        /// </summary>
+        public void Commit_LastWriteTimeOnly_AppliesTimeShifter_OnIncludedDirectory()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var folderPath = dir.CombinePath("shifted-folder");
+            Directory.CreateDirectory(folderPath);
+            var before = File.GetLastWriteTime(folderPath);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(
+                source: folderPath,
+                includeFiles: false,
+                includeFolders: true);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "time-shifter-folder",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new TimeShifterFilter(
+                        Options: new TimeShifterOptions(
+                            TimestampField: TimestampField.LastWrite,
+                            Amount: 7,
+                            Unit: TimeShiftUnit.Days))
+                ])
+            };
+
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+            var item = renameList.RenameItems[0];
+            Assert.True(item.HasPreviewChanges());
+            Assert.Equal(before.AddDays(7), item.Preview.LastWriteTime);
+
+            var result = renameList.Commit(failFast: false);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitOk, result[0].Status);
+            Assert.Contains(result[0].Changes, c => c.Property == "LastWriteTime");
+
+            var after = File.GetLastWriteTime(folderPath);
+            Assert.Equal(item.Preview.LastWriteTime, after);
+        }
+
         private sealed record UnsupportedTarget : FilterTarget;
     }
 }

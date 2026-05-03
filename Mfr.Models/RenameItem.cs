@@ -138,6 +138,7 @@ namespace Mfr.Models
         /// Path moves use <see cref="M:System.IO.File.Move(System.String,System.String,System.Boolean)"/> for file entries and
         /// <see cref="M:System.IO.Directory.Move(System.String,System.String)"/> when the original entry is a directory.
         /// When <see cref="Preview"/> introduces a parent path that does not exist yet, that parent folder is created first.
+        /// Creation, write, and access times apply through <see cref="M:System.IO.Directory.SetCreationTime(System.String,System.DateTime)"/> (and the related directory setters) when the target path is a directory, and through the corresponding <c>File.Set*</c> overloads otherwise, because directory paths can reject file-based setters on Windows.
         /// </para>
         /// <remarks>
         /// Updates <see cref="Original"/> to match the applied preview; <see cref="Preview"/> is left as-is until the host calls <see cref="ClearPreview"/>.
@@ -172,19 +173,42 @@ namespace Mfr.Models
                 File.SetAttributes(pathOnDisk, Preview.Attributes);
             }
 
+            var pathIsDirectoryAfterApply = File.GetAttributes(pathOnDisk).HasFlag(FileAttributes.Directory);
+
             if (Original.CreationTime != Preview.CreationTime)
             {
-                File.SetCreationTime(pathOnDisk, Preview.CreationTime);
+                if (pathIsDirectoryAfterApply)
+                {
+                    Directory.SetCreationTime(pathOnDisk, Preview.CreationTime);
+                }
+                else
+                {
+                    File.SetCreationTime(pathOnDisk, Preview.CreationTime);
+                }
             }
 
             if (Original.LastWriteTime != Preview.LastWriteTime)
             {
-                File.SetLastWriteTime(pathOnDisk, Preview.LastWriteTime);
+                if (pathIsDirectoryAfterApply)
+                {
+                    Directory.SetLastWriteTime(pathOnDisk, Preview.LastWriteTime);
+                }
+                else
+                {
+                    File.SetLastWriteTime(pathOnDisk, Preview.LastWriteTime);
+                }
             }
 
             if (Original.LastAccessTime != Preview.LastAccessTime)
             {
-                File.SetLastAccessTime(pathOnDisk, Preview.LastAccessTime);
+                if (pathIsDirectoryAfterApply)
+                {
+                    Directory.SetLastAccessTime(pathOnDisk, Preview.LastAccessTime);
+                }
+                else
+                {
+                    File.SetLastAccessTime(pathOnDisk, Preview.LastAccessTime);
+                }
             }
 
             if (HasPreviewChanges())
