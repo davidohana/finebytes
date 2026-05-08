@@ -26,6 +26,7 @@ namespace Mfr.Core
             new(typeof(RemoveSpacesFilter), "RemoveSpaces"),
             new(typeof(SeparateCapitalizedTextFilter), "SeparateCapitalizedText"),
             new(typeof(ShrinkSpacesFilter), "ShrinkSpaces"),
+            new(typeof(SpaceAfterFilter), "SpaceAfter"),
             new(typeof(TrimLeftFilter), "TrimLeft"),
             new(typeof(TrimRightFilter), "TrimRight"),
             new(typeof(ExtractLeftFilter), "ExtractLeft"),

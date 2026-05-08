@@ -43,6 +43,7 @@ These pages document **per-filter `options`** (and behavior). Common preset fiel
 - [RemoveSpaces](Space/RemoveSpaces.md)
 - [SeparateCapitalizedText](Space/SeparateCapitalizedText.md)
 - [ShrinkSpaces](Space/ShrinkSpaces.md)
+- [SpaceAfter](Space/SpaceAfter.md)
 - [SpaceCharacter](Space/SpaceCharacter.md)
 - [StripSpacesLeft](Space/StripSpacesLeft.md)
 - [StripSpacesRight](Space/StripSpacesRight.md)
