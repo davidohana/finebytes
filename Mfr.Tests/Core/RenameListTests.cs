@@ -163,6 +163,24 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
+        /// Verifies that a folder whose name contains a dot is not split into pseudo prefix and extension like a file.
+        /// </summary>
+        public void AddSource_Folder_WithDotInName_UsesFullSegmentAsPrefix()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("release.v2")).FullName;
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(folderPath, includeFiles: false, includeFolders: true);
+
+            var entry = Assert.Single(renameList.RenameItems);
+            Assert.Equal(folderPath, entry.Original.FullPath);
+            Assert.Equal("release.v2", entry.Original.Prefix);
+            Assert.Empty(entry.Original.Extension);
+            Assert.Equal(_tempRoot, entry.Original.DirectoryPath);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that folder entries are excluded when folder inclusion is disabled.
         /// </summary>
         public void AddSources_Excludes_Folders_When_Folder_Inclusion_Is_Disabled()

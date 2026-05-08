@@ -444,9 +444,18 @@ namespace Mfr.Core
                     continue;
                 }
 
-                var directoryPath = Path.GetDirectoryName(fullPath) ?? "";
-                var prefix = Path.GetFileNameWithoutExtension(fullPath);
-                var extension = Path.GetExtension(fullPath);
+                string directoryPath;
+                string prefix;
+                string extension;
+
+                if (isDirectory)
+                {
+                    (directoryPath, prefix, extension) = _SplitRenamePathForDirectory(fullPath);
+                }
+                else
+                {
+                    (directoryPath, prefix, extension) = _SplitRenamePathForFile(fullPath);
+                }
                 var inFolderIndex = _folderPathToCount.GetValueOrDefault(directoryPath);
                 _folderPathToCount[directoryPath] = inFolderIndex + 1;
 
@@ -467,6 +476,36 @@ namespace Mfr.Core
             }
 
             return addedCount;
+        }
+
+        /// <summary>
+        /// Splits a file path into rename metadata using file-style prefix and extension.
+        /// </summary>
+        private static (string DirectoryPath, string Prefix, string Extension) _SplitRenamePathForFile(
+            string fullPath)
+        {
+            var directoryPath = Path.GetDirectoryName(fullPath) ?? "";
+            var prefix = Path.GetFileNameWithoutExtension(fullPath);
+            var extension = Path.GetExtension(fullPath);
+            return (directoryPath, prefix, extension);
+        }
+
+        /// <summary>
+        /// Splits a directory path into parent directory, full final segment as prefix, and empty extension.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Dotted folder names (for example <c>release.v2</c>) must not be split the way
+        /// <see cref="Path.GetFileNameWithoutExtension(string)"/> splits file names.
+        /// </para>
+        /// </remarks>
+        private static (string DirectoryPath, string Prefix, string Extension) _SplitRenamePathForDirectory(
+            string fullPath)
+        {
+            var trimmed = fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var directoryPath = Path.GetDirectoryName(trimmed) ?? "";
+            var prefix = Path.GetFileName(trimmed);
+            return (directoryPath, prefix, string.Empty);
         }
     }
 }
