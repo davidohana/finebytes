@@ -1,4 +1,5 @@
 using Mfr.Core;
+using Mfr.Models;
 using Mfr.Tests.TestSupport;
 using Mfr.Utils;
 
@@ -105,6 +106,32 @@ namespace Mfr.Tests.Core
 
             Assert.Single(renameList.RenameItems);
             Assert.Equal(source, renameList.RenameItems[0].Original.FullPath);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that an explicit root path throws a <see cref="UserException"/> immediately.
+        /// </summary>
+        public void AddSource_Throws_UserException_For_Root_Path()
+        {
+            var rootPath = Path.GetPathRoot(Directory.GetCurrentDirectory())!;
+            var renameList = new RenameList(includeHidden: false);
+
+            var ex = Assert.Throws<UserException>(() => renameList.AddSource(rootPath));
+            Assert.Contains(rootPath.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), ex.Message);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that root paths passed via <see cref="RenameList.AddSources"/> also throw a <see cref="UserException"/>.
+        /// </summary>
+        public void AddSources_Throws_UserException_For_Root_Path()
+        {
+            var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+            var rootPath = Path.GetPathRoot(Directory.GetCurrentDirectory())!;
+            var renameList = new RenameList(includeHidden: false);
+
+            Assert.Throws<UserException>(() => renameList.AddSources([filePath, rootPath]));
         }
 
         [Fact]

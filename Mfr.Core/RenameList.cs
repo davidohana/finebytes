@@ -76,6 +76,16 @@ namespace Mfr.Core
             }
 
             var trimmedSource = source.Trim();
+            var fullSource = Path.GetFullPath(trimmedSource);
+            var isRootPath = string.Equals(
+                Path.GetPathRoot(fullSource),
+                fullSource,
+                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+            if (isRootPath)
+            {
+                throw new UserException($"Root paths cannot be added as rename sources: '{trimmedSource}'.");
+            }
+
             var resolvedPaths = RenameSourceResolver.Resolve(
                 source: trimmedSource,
                 includeFolders: includeFolders,
@@ -442,6 +452,20 @@ namespace Mfr.Core
                 if (!isDirectory && !includeFiles)
                 {
                     continue;
+                }
+
+                if (isDirectory)
+                {
+                    var resolvedRoot = Path.GetPathRoot(fullPath) ?? string.Empty;
+                    var isResolvedRootPath = string.Equals(
+                        _NormalizePathKey(resolvedRoot),
+                        normalizedResolvedPath,
+                        StringComparison.Ordinal);
+                    if (isResolvedRootPath)
+                    {
+                        Log.Warning("Skipping root path '{Path}': root paths cannot be renamed.", fullPath);
+                        continue;
+                    }
                 }
 
                 string directoryPath;
