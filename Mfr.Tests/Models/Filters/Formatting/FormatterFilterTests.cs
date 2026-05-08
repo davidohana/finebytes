@@ -27,7 +27,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_CounterToken_UsesGlobalIndex()
         {
-            var f = new FormatterFilter(_target, new FormatterOptions("<counter:10,2,0,4,0>"));
+            var f = new FormatterFilter(_target, new FormatterOptions("<counter:10,2,2,4,0>"));
             Assert.Equal("0016", FilterTestHelpers.ApplyToPrefix(f, "ignored", globalIndex: 3));
         }
 

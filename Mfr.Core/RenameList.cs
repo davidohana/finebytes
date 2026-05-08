@@ -110,6 +110,8 @@ namespace Mfr.Core
                 preset.Name,
                 _renameItems.Count);
 
+            _PopulateRenameListCounterContext();
+
             foreach (var item in _renameItems)
             {
                 item.ResetState();
@@ -299,6 +301,22 @@ namespace Mfr.Core
             }
 
             return addedCount;
+        }
+
+        /// <summary>
+        /// Fills rename-list sizing fields on each item so formatter tokens (for example <c>&lt;counter&gt;</c>
+        /// automatic width) can resolve consistently during preview.
+        /// </summary>
+        private void _PopulateRenameListCounterContext()
+        {
+            var total = _renameItems.Count;
+            foreach (var item in _renameItems)
+            {
+                var dir = item.Original.DirectoryPath;
+                var folderTotal = _folderPathToCount.TryGetValue(dir, out var n) ? n : 1;
+                item.Original.RenameListTotalCount = total;
+                item.Original.RenameListFolderSiblingCount = folderTotal;
+            }
         }
 
         /// <summary>

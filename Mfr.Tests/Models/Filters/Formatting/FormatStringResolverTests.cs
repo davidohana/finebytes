@@ -99,6 +99,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [InlineData("drive-letter")]
         [InlineData("label")]
         [InlineData("file-count")]
+        [InlineData("counter")]
         [InlineData("counter:1,1,0,0,0")]
         [InlineData("now")]
         public void ResolveTemplate_ShippedToken_ResolvesWithoutThrowing(string tokenInner)

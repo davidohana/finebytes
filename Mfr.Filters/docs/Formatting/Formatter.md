@@ -41,7 +41,8 @@ Replaces the **entire target segment** with the result of expanding a **template
 |--------|--------|
 | `<now>` | Current UTC time, ISO-8601 style. |
 | `<now:format>` | Current UTC time formatted with a .NET format string. |
-| `<counter:start,step,reset,width,pad>` | Five comma-separated integers: start, step, reset flag (1 = per folder index, other = global index), minimum width, pad mode (0 = `0`, 1 = space). |
+| `<counter>` | Same as `<counter:1,1,0,2,0>` (no leading zeros). |
+| `<counter:initial,step,leading-zeroes-mode,length,reset-folder>` | Position in rename list: `initial` + `step`×index. `leading-zeroes-mode`: `0` = none, `1` = automatic width from list size, `2` = pad to `length` (digits; minimum `1`). `reset-folder`: `0` = global index, `1` = index restarts per folder. |
 
 Unknown token names cause an error at runtime.
 
@@ -59,7 +60,7 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 | `template`: `"<file-size>"` | `ignored` | `1 KB` | Auto unit, 0 decimals. |
 | `template`: `"<file-size:mb,2>"` | `ignored` | `1.50 MB` | MB, 2 decimal places. |
 | `template`: `"<drive-letter>"` | `ignored` | `C:` | Drive letter of the file. |
-| `template`: `"<counter:10,2,0,4,0>"`<br>global index: `3` | `ignored` | `0016` | `10 + 2×3`, width `4`, pad `0`. |
+| `template`: `"<counter:10,2,2,4,0>"`<br>global index: `3` | `ignored` | `0016` | `10 + 2×3`, custom width `4`. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).
 

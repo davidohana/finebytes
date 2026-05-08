@@ -4,41 +4,123 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens.GeneralGroup
 {
     /// <summary>
-    /// Resolves the <c>&lt;counter:start,step,reset,width,pad&gt;</c> token.
+    /// Resolves the <c>&lt;counter&gt;</c> token (legacy Magic File Renamer counter parameters).
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Five comma-separated integers: <c>start</c>, <c>step</c>, <c>reset</c> (1 = per-folder index, otherwise global),
-    /// <c>width</c> (minimum padded width), and <c>pad</c> (0 = zero-pad, 1 = space-pad).
+    /// Full form:
+    /// <c>&lt;counter:initial-value,increment-by,leading-zeroes-mode,leading-zeroes-total-length,reset-on-folder-change&gt;</c>.
+    /// Bare <c>&lt;counter&gt;</c> is equivalent to <c>&lt;counter:1,1,0,2,0&gt;</c> (no leading zeros;
+    /// fourth value is ignored in that mode).
+    /// </para>
+    /// <para>
+    /// <c>leading-zeroes-mode</c>: <c>0</c> = none, <c>1</c> = automatic width from list scope,
+    /// <c>2</c> = fixed width from the fourth parameter (minimum <c>1</c>).
+    /// </para>
+    /// <para>
+    /// <c>reset-on-folder-change</c>: <c>1</c> uses per-folder ordering index and folder-local list counts;
+    /// <c>0</c> uses global ordering index and total rename-list count.
     /// </para>
     /// </remarks>
     internal sealed class CounterToken : IFormatToken
     {
+        private const string _DefaultArg = "1,1,0,2,0";
+
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["counter"];
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when <paramref name="arg"/> does not provide exactly five values.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when arguments are missing, invalid, or list sizing was not populated.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var parts = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            var normalizedArg = string.IsNullOrWhiteSpace(arg) ? _DefaultArg : arg;
+            var parts = normalizedArg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 5)
-                throw new InvalidOperationException($"Invalid counter token arg '{arg}'. Expected 5 comma-separated params.");
+            {
+                throw new InvalidOperationException(
+                    $"Invalid counter token arg '{normalizedArg}'. Expected 5 comma-separated params or use '<counter>'.");
+            }
 
             var start = int.Parse(parts[0], CultureInfo.InvariantCulture);
             var step = int.Parse(parts[1], CultureInfo.InvariantCulture);
-            var reset = int.Parse(parts[2], CultureInfo.InvariantCulture);
-            var width = int.Parse(parts[3], CultureInfo.InvariantCulture);
-            var pad = int.Parse(parts[4], CultureInfo.InvariantCulture);
+            var leadingZeroesMode = int.Parse(parts[2], CultureInfo.InvariantCulture);
+            var leadingZeroesTotalLength = int.Parse(parts[3], CultureInfo.InvariantCulture);
+            var resetOnFolderChange = int.Parse(parts[4], CultureInfo.InvariantCulture);
 
-            var n = reset == 1 ? item.Original.InFolderIndex : item.Original.GlobalIndex;
+            var usePerFolder = resetOnFolderChange == 1;
+            var n = usePerFolder ? item.Original.InFolderIndex : item.Original.GlobalIndex;
             var value = start + ((long)step * n);
             var raw = value.ToString(CultureInfo.InvariantCulture);
-            if (width <= 0)
+
+            var padWidth = _ResolvePadWidth(
+                leadingZeroesMode,
+                leadingZeroesTotalLength,
+                start,
+                step,
+                item,
+                usePerFolder);
+
+            if (padWidth <= 0 || padWidth <= raw.Length)
                 return raw;
 
-            var padChar = pad == 0 ? '0' : ' ';
-            return raw.PadLeft(width, padChar);
+            return raw.PadLeft(padWidth, '0');
+        }
+
+        private static int _ResolvePadWidth(
+            int leadingZeroesMode,
+            int leadingZeroesTotalLength,
+            int start,
+            int step,
+            RenameItem item,
+            bool usePerFolder)
+        {
+            switch (leadingZeroesMode)
+            {
+                case 0:
+                    return 0;
+                case 1:
+                    var listCount = usePerFolder
+                        ? item.Original.RenameListFolderSiblingCount
+                        : item.Original.RenameListTotalCount;
+                    if (listCount <= 0)
+                    {
+                        throw new InvalidOperationException(
+                            "Counter token automatic leading-zero mode requires rename-list counts on the item (run preview from a populated rename list).");
+                    }
+
+                    var maxIndex = Math.Max(listCount - 1, 0);
+                    return _AutomaticCounterWidth(start: start, step: step, maxIndex: maxIndex);
+                case 2:
+                    if (leadingZeroesTotalLength < 1)
+                    {
+                        throw new InvalidOperationException(
+                            $"Counter token custom leading-zero mode requires a positive total length (got {leadingZeroesTotalLength}).");
+                    }
+
+                    return leadingZeroesTotalLength;
+                default:
+                    throw new InvalidOperationException(
+                        $"Invalid counter leading-zeroes-mode '{leadingZeroesMode}' (expected 0, 1, or 2).");
+            }
+        }
+
+        /// <summary>
+        /// Width needed so every value <c>start + step×i</c> for <c>i</c> in <c>0…maxIndex</c> fits when formatted invariant.
+        /// </summary>
+        private static int _AutomaticCounterWidth(int start, int step, int maxIndex)
+        {
+            var v0 = start + ((long)step * 0);
+            var v1 = start + ((long)step * maxIndex);
+            var lo = Math.Min(v0, v1);
+            var hi = Math.Max(v0, v1);
+            var w0 = _InvariantFormattedLength(lo);
+            var w1 = _InvariantFormattedLength(hi);
+            return Math.Max(w0, w1);
+        }
+
+        private static int _InvariantFormattedLength(long value)
+        {
+            return value.ToString(CultureInfo.InvariantCulture).Length;
         }
     }
 }

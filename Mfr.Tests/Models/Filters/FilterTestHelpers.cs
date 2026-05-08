@@ -17,6 +17,14 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="lastWriteTime">Optional last write time; defaults to a fixed test value.</param>
         /// <param name="lastAccessTime">Optional last access time; defaults to a fixed test value.</param>
         /// <param name="fileSize">File size in bytes; defaults to 0.</param>
+        /// <param name="renameListTotalCount">
+        /// Rename-list length for <c>&lt;counter&gt;</c> automatic padding; when <c>null</c>, uses
+        /// <c>max(globalIndex + 1, 1)</c>.
+        /// </param>
+        /// <param name="renameListFolderSiblingCount">
+        /// Same-folder rename-list size for per-folder counter padding; when <c>null</c>, uses
+        /// <c>max(inFolderIndex + 1, 1)</c>.
+        /// </param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
             string prefix = "track",
@@ -28,10 +36,14 @@ namespace Mfr.Tests.Models.Filters
             DateTime? creationTime = null,
             DateTime? lastWriteTime = null,
             DateTime? lastAccessTime = null,
-            long fileSize = 0)
+            long fileSize = 0,
+            int? renameListTotalCount = null,
+            int? renameListFolderSiblingCount = null)
         {
             directory ??= @"C:\Music\Album";
             var baseline = new DateTime(2024, 6, 1, 12, 30, 45, DateTimeKind.Unspecified);
+            var resolvedTotal = renameListTotalCount ?? Math.Max(globalIndex + 1, 1);
+            var resolvedFolder = renameListFolderSiblingCount ?? Math.Max(inFolderIndex + 1, 1);
             return new RenameItem(new FileMeta(
                 globalIndex,
                 inFolderIndex,
@@ -42,7 +54,9 @@ namespace Mfr.Tests.Models.Filters
                 creationTime: creationTime ?? baseline,
                 lastWriteTime: lastWriteTime ?? baseline,
                 lastAccessTime: lastAccessTime ?? baseline,
-                fileSize: fileSize));
+                fileSize: fileSize,
+                renameListTotalCount: resolvedTotal,
+                renameListFolderSiblingCount: resolvedFolder));
         }
 
         /// <summary>

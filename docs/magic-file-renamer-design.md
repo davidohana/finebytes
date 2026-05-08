@@ -565,7 +565,7 @@ Each preset is stored in its **own file**. File name convention: `<slug>-<id>.js
       "target": {
         "targetType": "FileFullName"
       },
-      "options": { "template": "<counter:1,1,0,2,0> - <id3-title:0><ext:0>" }
+      "options": { "template": "<counter:1,1,2,2,0> - <id3-title:0><ext:0>" }
     },
     {
       "type": "Mover",
@@ -1310,13 +1310,14 @@ Date formats follow .NET format strings: `yyyy`, `MM`, `dd`, `HH`, `mm`, `ss`, e
 
 | Token | Description | Example |
 |-------|-------------|---------|
-| `<counter:start,step,reset,width,pad>` | Auto-incrementing counter | `<counter:1,1,0,3,0>` → `001` |
+| `<counter>` | Same as `<counter:1,1,0,2,0>` (no leading zeros). |
+| `<counter:initial,step,mode,length,reset>` | Counter: modes `0` none, `1` auto width, `2` custom length; `reset` `0` global, `1` per folder | `<counter:1,1,2,3,0>` → `001` |
 | `<random:length>` | Random alphanumeric string | `<random:6>` → `k3m9xw` |
 | `<clipboard:0>` | Current clipboard text | |
 | `<text-file:path,line>` | Line N from a text file | |
 | `<now:format>` | Current date/time | `<now:yyyy-MM-dd>` |
 
-Counter parameters: `start`, `step`, `reset` (0=no/1=per folder), `width`, `padchar` (0=zero/1=space).
+Counter parameters match Magic File Renamer: `initial`, `step`, leading-zero mode (`0` none, `1` automatic from list size, `2` custom width), `length` (used when mode is `2`), `reset` (`0` global / `1` per folder).
 
 ### 7.4 ID3 Group (MP3 ID3v2)
 
@@ -1875,7 +1876,7 @@ Dragging files onto the MFR desktop shortcut launches MFR with those items pre-l
 ≡ 3. Formatter                         [enabled ☑] [×] [Options ⚙]
    Apply to: [Filename ▾]   When: [Always ▾]   Part: [None ▾]
    ┌────────────────────────────────────────────────────────────────┐
-   │ <counter:1,1,0,2,0> - <id3-artist:0> - <id3-title:0><ext:0>  │
+   │ <counter:1,1,2,2,0> - <id3-artist:0> - <id3-title:0><ext:0>  │
    └────────────────────────────────────────────────────────────────┘
    [Token Picker ▾]   Preview: "01 - Queen - Bohemian Rhapsody.mp3"
 ```

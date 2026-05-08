@@ -13,6 +13,8 @@ namespace Mfr.Models
     /// <param name="lastWriteTime">Last write time (local), from scan or synthetic tests.</param>
     /// <param name="lastAccessTime">Last access time (local), from scan or synthetic tests.</param>
     /// <param name="fileSize">File size in bytes; 0 for directories or when not applicable.</param>
+    /// <param name="renameListTotalCount">Rename-list length when snapshot was taken; used by <c>&lt;counter&gt;</c> automatic padding.</param>
+    /// <param name="renameListFolderSiblingCount">Rename-list items sharing this directory; used when counter resets per folder.</param>
     public sealed class FileMeta(
         int globalIndex,
         int inFolderIndex,
@@ -23,7 +25,9 @@ namespace Mfr.Models
         DateTime creationTime = default,
         DateTime lastWriteTime = default,
         DateTime lastAccessTime = default,
-        long fileSize = 0)
+        long fileSize = 0,
+        int renameListTotalCount = 0,
+        int renameListFolderSiblingCount = 0)
     {
         /// <summary>
         /// Gets or sets the zero-based index across all scanned files.
@@ -81,6 +85,27 @@ namespace Mfr.Models
         public long FileSize { get; init; } = fileSize;
 
         /// <summary>
+        /// Gets or sets the total number of items in the rename list when this snapshot applies.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Zero means unset (tests or callers that did not populate context). Preview assigns this from
+        /// the rename list before filters run.
+        /// </para>
+        /// </remarks>
+        public int RenameListTotalCount { get; set; } = renameListTotalCount;
+
+        /// <summary>
+        /// Gets or sets how many rename-list items share <see cref="DirectoryPath"/>.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Zero means unset. Preview assigns this from the rename list before filters run.
+        /// </para>
+        /// </remarks>
+        public int RenameListFolderSiblingCount { get; set; } = renameListFolderSiblingCount;
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -96,7 +121,9 @@ namespace Mfr.Models
                 creationTime: CreationTime,
                 lastWriteTime: LastWriteTime,
                 lastAccessTime: LastAccessTime,
-                fileSize: FileSize);
+                fileSize: FileSize,
+                renameListTotalCount: RenameListTotalCount,
+                renameListFolderSiblingCount: RenameListFolderSiblingCount);
         }
     }
 }
