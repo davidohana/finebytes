@@ -51,6 +51,7 @@ Replaces the **entire target segment** with the result of expanding a **template
 | Token | Output |
 |-------|--------|
 | `<token:token-number,separator,include-next,include-prev,source-format-string>` | Splits `source-format-string` by `separator` and returns the 1-based `token-number`-th part. `include-next`: `1` = return from `token-number` to end (rejoined with `separator`). `include-prev`: `1` = return from start through `token-number` (rejoined). Both flags `1` = full source string. `source-format-string` may be any legal format token such as `<full-name>` or a literal string. |
+| `<substr:start-position,end-position,source-format-string>` | Extracts characters from `source-format-string` between two positions (inclusive). Positions are 1-based; negative positions count from the right (`-1` = last character). Out-of-range positions are clamped to the nearest boundary. When the resolved start exceeds the resolved end, the range `(end, start]` is returned. `source-format-string` may be any legal format token or a literal. |
 
 Unknown token names cause an error at runtime.
 
@@ -72,6 +73,9 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 | `template`: `"<token:1,-,0,0,<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `13_` | Track number prefix, split by `-`. |
 | `template`: `"<token:2,_-_,0,0,<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog` | Artist name, split by `_-_`. |
 | `template`: `"<token:2,_-_,1,0,<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog_-_Cold_Blooded_Old_Times.mp3` | Artist and title, include-next. |
+| `template`: `"<substr:1,5,<file-name>>"` | `MyTestFileName.123` | `MyTes` | First 5 chars of prefix. |
+| `template`: `"<substr:5,-6,<full-name>>"` | `MyTestFileName.123` | `stFileNam` | Positive start, negative end. |
+| `template`: `"<substr:-1,2,<file-extension>45>"` | `MyTestFileName.123` | `2345` | Crossed positions: extension `.123` + literal `45` → `.12345`; range `(2,6]`. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).
 
