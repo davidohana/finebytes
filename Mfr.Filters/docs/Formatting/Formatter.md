@@ -13,9 +13,10 @@ Replaces the **entire target segment** with the result of expanding a **template
 | Token | Output |
 |--------|--------|
 | `<file-name>` | Original prefix (no extension). |
-| `<file-ext>` or `<ext>` | Original extension (with dot). |
+| `<file-extension>` or `<ext>` | Original extension (with dot). |
 | `<full-name>` | Prefix + extension. |
-| `<parent-folder>` | Name of the parent folder (last segment of directory path). |
+| `<parent-folder>` | Name of the immediate parent folder (level 1). |
+| `<parent-folder:level>` | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth. |
 | `<full-path>` | Full path of the file. |
 | `<now>` | Current UTC time, ISO-8601 style. |
 | `<now:format>` | Current UTC time formatted with a .NET format string (after `:`). |
@@ -31,6 +32,7 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 |---------|--------|-------|---------|
 | `template`: `"<file-name>"` | `song` | `song` | |
 | `template`: `"<parent-folder>"`<br>file under `Music\My Album\` | `ignored` | `My Album` | |
+| `template`: `"<parent-folder:2>"`<br>file under `Music\My Album\` | `ignored` | `Music` | Level 2 = grandparent. |
 | `template`: `"<counter:10,2,0,4,0>"`<br>global index: `3` | `ignored` | `0016` | `10 + 2×3`, width `4`, pad `0`. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).

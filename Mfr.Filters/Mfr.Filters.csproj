@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mfr.Models\Mfr.Models.csproj" />
+    <ProjectReference Include="..\Mfr.Utils\Mfr.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting
 {
@@ -29,15 +30,27 @@ namespace Mfr.Filters.Formatting
             return name switch
             {
                 "file-name" => item.Original.Prefix,
-                "file-ext" => item.Original.Extension,
-                "ext" => item.Original.Extension,
+                "file-extension" or "ext" => item.Original.Extension,
                 "full-name" => item.Original.Prefix + item.Original.Extension,
-                "parent-folder" => Path.GetFileName(item.Original.DirectoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)),
+                "parent-folder" => _ResolveParentFolderToken(arg, item),
                 "full-path" => item.Original.FullPath,
                 "now" => string.IsNullOrWhiteSpace(arg) ? DateTimeOffset.UtcNow.ToString("o") : DateTimeOffset.UtcNow.ToString(arg),
                 "counter" => _ResolveCounterToken(arg, item),
                 _ => throw new NotSupportedException($"Phase 1 formatter token '{name}' is not supported.")
             };
+        }
+
+        private static string _ResolveParentFolderToken(string arg, RenameItem item)
+        {
+            var level = string.IsNullOrWhiteSpace(arg) ? 1 : int.Parse(arg, CultureInfo.InvariantCulture);
+            try
+            {
+                return DirectoryPathAncestor.GetSegmentName(item.Original.DirectoryPath, level);
+            }
+            catch (InvalidOperationException)
+            {
+                return string.Empty;
+            }
         }
 
         private static string _ResolveCounterToken(string arg, RenameItem item)

@@ -89,18 +89,18 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies <c>&lt;file-ext&gt;</c> matches documented <c>&lt;ext&gt;</c> behavior.
+        /// Verifies <c>&lt;file-extension&gt;</c> and <c>&lt;ext&gt;</c> both resolve to the extension.
         /// </summary>
         [Fact]
-        public void ResolveTemplate_FileExtToken_MatchesExtension()
+        public void ResolveTemplate_FileExtensionToken_MatchesExtension()
         {
             var item = FilterTestHelpers.CreateRenameItem(extension: ".flac");
 
             var ext = FormatStringResolver.ResolveTemplate("<ext>", item);
-            var fileExt = FormatStringResolver.ResolveTemplate("<file-ext>", item);
+            var fileExtension = FormatStringResolver.ResolveTemplate("<file-extension>", item);
 
             Assert.Equal(".flac", ext);
-            Assert.Equal(".flac", fileExt);
+            Assert.Equal(".flac", fileExtension);
         }
 
         /// <summary>
@@ -178,6 +178,32 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 item: item);
 
             Assert.Equal("   7", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;parent-folder:2&gt;</c> walks up two levels from the containing directory.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_ParentFolderLevel2_ReturnsGrandparentName()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Medical Data\apr03\patients");
+
+            var result = FormatStringResolver.ResolveTemplate("<parent-folder:2>", item);
+
+            Assert.Equal("apr03", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;parent-folder:N&gt;</c> returns empty string when level exceeds path depth.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_ParentFolderLevelTooHigh_ReturnsEmpty()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Medical Data\apr03\patients");
+
+            var result = FormatStringResolver.ResolveTemplate("<parent-folder:5>", item);
+
+            Assert.Equal(string.Empty, result);
         }
     }
 }
