@@ -151,6 +151,5 @@ namespace Mfr.Models
                 || Original.LastWriteTime != Preview.LastWriteTime
                 || Original.LastAccessTime != Preview.LastAccessTime;
         }
-
     }
 }

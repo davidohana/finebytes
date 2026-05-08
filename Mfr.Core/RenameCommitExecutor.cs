@@ -1,5 +1,4 @@
 using Mfr.Models;
-using Mfr.Utils;
 using Serilog;
 
 namespace Mfr.Core
@@ -212,19 +211,7 @@ namespace Mfr.Core
             {
                 if (!dryRun)
                 {
-                    var caseOnlyRename = PathRelations.DiffersOnlyInCase(
-                        item.Original.FullPath,
-                        item.Preview.FullPath);
-                    if (caseOnlyRename)
-                    {
-                        var tempPath = RenameItemMover.AllocateTempPath(item.Original.FullPath);
-                        RenameItemMover.StashSourceToTemp(item, tempPath);
-                        RenameItemMover.FinalizeCommit(item, tempPath);
-                    }
-                    else
-                    {
-                        RenameItemMover.FinalizeCommit(item, item.Original.FullPath);
-                    }
+                    RenameItemMover.FinalizeCommit(item, item.Original.FullPath);
                 }
 
                 item.Status = RenameStatus.CommitOk;

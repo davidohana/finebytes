@@ -168,6 +168,89 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
+        /// Verifies that <c>confirmBeforeApply</c> is invoked immediately before each item is committed,
+        /// rather than collected up-front, and that rejecting a single item does not affect the others.
+        /// </summary>
+        public void Commit_ConfirmBeforeApply_IsInvokedJustInTime_PerItem()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var firstSource = dir.CombinePath("track01.mp3");
+            var secondSource = dir.CombinePath("track02.mp3");
+            File.WriteAllText(firstSource, "x");
+            File.WriteAllText(secondSource, "y");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([firstSource, secondSource]);
+
+            var preset = _CounterReplacePrefixPreset("counter");
+            _SetupPreview(renameList, preset);
+
+            // Each callback runs immediately before the matching commit. When the callback runs the
+            // source must still exist and the destination must be free, otherwise the callback was not
+            // invoked just-in-time. Rejecting only the second item must leave the first commit free to land.
+            var invokedFor = new List<string>();
+            bool ConfirmAndObserve(RenameItem item)
+            {
+                invokedFor.Add(item.Original.FullPath);
+                Assert.True(File.Exists(item.Original.FullPath), "source must still exist when callback runs for it");
+                Assert.False(File.Exists(item.Preview.FullPath), "destination must be free when callback runs for it");
+                return !string.Equals(item.Original.FullPath, secondSource, StringComparison.Ordinal);
+            }
+
+            var result = renameList.Commit(failFast: false, dryRun: false, confirmBeforeApply: ConfirmAndObserve);
+
+            Assert.Equal(2, invokedFor.Count);
+            Assert.Contains(firstSource, invokedFor);
+            Assert.Contains(secondSource, invokedFor);
+            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitOk));
+            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitSkipped));
+            Assert.False(File.Exists(firstSource));
+            Assert.True(File.Exists(secondSource));
+            Assert.True(File.Exists(dir.CombinePath("001.mp3")));
+            Assert.False(File.Exists(dir.CombinePath("002.mp3")));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>confirmBeforeApply</c> is invoked for attribute-only changes
+        /// (no path move), and that returning <c>false</c> leaves the on-disk attributes untouched.
+        /// </summary>
+        public void Commit_ConfirmBeforeApply_IsInvokedForAttributeOnlyChange()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var folderPath = dir.CombinePath("folder-confirm");
+            Directory.CreateDirectory(folderPath);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(
+                source: folderPath,
+                includeFiles: false,
+                includeFolders: true);
+
+            var preset = _SetHiddenAttributesPreset("attrs-confirm");
+            _SetupPreview(renameList, preset);
+            Assert.True(renameList.RenameItems[0].HasPreviewChanges());
+            Assert.True(renameList.RenameItems[0].IsPreviewPathUnchanged());
+
+            var callbackInvocations = 0;
+            var result = renameList.Commit(
+                failFast: false,
+                dryRun: false,
+                confirmBeforeApply: _ =>
+                {
+                    callbackInvocations++;
+                    return false;
+                });
+
+            Assert.Equal(1, callbackInvocations);
+            Assert.Single(result);
+            Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
+            var attrsAfter = File.GetAttributes(folderPath);
+            Assert.False(attrsAfter.HasFlag(FileAttributes.Hidden));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that commit stops immediately on the first rename error when fail-fast is enabled.
         /// </summary>
         public void Commit_StopsOnFirstRenameError_WhenFailFastTrue()

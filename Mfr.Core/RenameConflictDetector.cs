@@ -65,7 +65,7 @@ namespace Mfr.Core
                 }
 
                 // A case-only rename targets the item's own path on a case-insensitive filesystem;
-                // the temp-name dance applied during commit makes this safe, so it's not a conflict.
+                // File.Move and Directory.Move accept this on .NET, so it's not a conflict.
                 var isCaseOnlySelfRename = PathRelations.DiffersOnlyInCase(
                     item.Original.FullPath,
                     destinationPath);
@@ -88,64 +88,24 @@ namespace Mfr.Core
 
         private static HashSet<string> _BuildMovingSourceSet(IReadOnlyList<RenameItem> candidateItems)
         {
-            var movingSources = new HashSet<string>(PathComparers.Os);
-            foreach (var item in candidateItems)
-            {
-                var pathChanges = !string.Equals(
-                    item.Original.FullPath,
-                    item.Preview.FullPath,
-                    StringComparison.Ordinal);
-                if (pathChanges)
-                {
-                    movingSources.Add(item.Original.FullPath);
-                }
-            }
-
-            return movingSources;
+            return candidateItems
+                .Where(item => !item.IsPreviewPathUnchanged())
+                .Select(item => item.Original.FullPath)
+                .ToHashSet(PathComparers.Os);
         }
 
         private static List<RenameItem> _BuildFolderRenameList(IReadOnlyList<RenameItem> candidateItems)
         {
-            var folderRenames = new List<RenameItem>();
-            foreach (var item in candidateItems)
-            {
-                if (!item.Original.Attributes.IsDirectory())
-                {
-                    continue;
-                }
-
-                var pathChanges = !string.Equals(
-                    item.Original.FullPath,
-                    item.Preview.FullPath,
-                    StringComparison.Ordinal);
-                if (pathChanges)
-                {
-                    folderRenames.Add(item);
-                }
-            }
-
-            return folderRenames;
+            return [.. candidateItems.Where(item => item.Original.Attributes.IsDirectory() && !item.IsPreviewPathUnchanged())];
         }
 
         private static HashSet<string> _BuildDuplicateDestinationSet(IReadOnlyList<RenameItem> candidateItems)
         {
-            var pathToCount = new Dictionary<string, int>(PathComparers.Os);
-            foreach (var item in candidateItems)
-            {
-                var destinationPath = item.Preview.FullPath;
-                pathToCount[destinationPath] = pathToCount.GetValueOrDefault(destinationPath) + 1;
-            }
-
-            var duplicates = new HashSet<string>(PathComparers.Os);
-            foreach (var (path, count) in pathToCount)
-            {
-                if (count > 1)
-                {
-                    duplicates.Add(path);
-                }
-            }
-
-            return duplicates;
+            return candidateItems
+                .GroupBy(item => item.Preview.FullPath, PathComparers.Os)
+                .Where(group => group.Count() > 1)
+                .Select(group => group.Key)
+                .ToHashSet(PathComparers.Os);
         }
 
         /// <summary>

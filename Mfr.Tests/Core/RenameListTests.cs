@@ -270,7 +270,7 @@ namespace Mfr.Tests.Core
                 source: folderPath,
                 includeFiles: true,
                 includeFolders: false,
-                recursiveDirectoryFileAdd: true);
+                includeSubdirs: true);
 
             Assert.Equal(3, addedCount);
             Assert.Equal(

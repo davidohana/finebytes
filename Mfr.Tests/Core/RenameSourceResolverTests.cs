@@ -6,16 +6,16 @@ using Mfr.Utils;
 namespace Mfr.Tests.Core
 {
     /// <summary>
-    /// Tests <see cref="RenameSourceResolver"/> in isolation from <see cref="RenameList"/>.
+    /// Tests <see cref="PathResolver"/> in isolation from <see cref="RenameList"/>.
     /// </summary>
-    public class RenameSourceResolverTests : IDisposable
+    public class PathResolverTests : IDisposable
     {
         private readonly string _tempRoot;
 
         /// <summary>
         /// Initializes a new test instance with an isolated temporary directory under the current workspace.
         /// </summary>
-        public RenameSourceResolverTests()
+        public PathResolverTests()
         {
             _tempRoot = Directory.GetCurrentDirectory().CombinePath(
                 "mfr_sourcesolver_tests_" + Guid.NewGuid().ToString("N"));
@@ -63,10 +63,10 @@ namespace Mfr.Tests.Core
             var source = missingParent.CombinePath("file.txt");
 
             var ex = Assert.Throws<UserException>(() =>
-                RenameSourceResolver.Resolve(
+                PathResolver.ResolveToPaths(
                         source: source,
                         includeFolders: true,
-                        recursiveDirectoryFileAdd: false)
+                        includeSubdirs: false)
                     .ToList());
 
             Assert.Contains("does not exist", ex.Message, StringComparison.Ordinal);
@@ -78,10 +78,10 @@ namespace Mfr.Tests.Core
         /// </summary>
         public void Resolve_MissingExactFile_ReturnsEmpty()
         {
-            var paths = RenameSourceResolver.Resolve(
+            var paths = PathResolver.ResolveToPaths(
                     source: _tempRoot.CombinePath("definitely_missing.bin"),
                     includeFolders: true,
-                    recursiveDirectoryFileAdd: false)
+                    includeSubdirs: false)
                 .ToList();
 
             Assert.Empty(paths);
@@ -95,10 +95,10 @@ namespace Mfr.Tests.Core
         {
             var filePath = TestHelpers.CreateFile(_tempRoot, "single.txt");
 
-            var paths = RenameSourceResolver.Resolve(
+            var paths = PathResolver.ResolveToPaths(
                     source: filePath,
                     includeFolders: true,
-                    recursiveDirectoryFileAdd: false)
+                    includeSubdirs: false)
                 .ToList();
 
             Assert.Equal([filePath], paths);
@@ -112,10 +112,10 @@ namespace Mfr.Tests.Core
         {
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
 
-            var paths = RenameSourceResolver.Resolve(
+            var paths = PathResolver.ResolveToPaths(
                     source: folderPath,
                     includeFolders: true,
-                    recursiveDirectoryFileAdd: false)
+                    includeSubdirs: false)
                 .ToList();
 
             Assert.Equal([folderPath], paths);
@@ -132,10 +132,10 @@ namespace Mfr.Tests.Core
             var topB = TestHelpers.CreateFile(folderPath, "b.log");
             TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
 
-            var paths = RenameSourceResolver.Resolve(
+            var paths = PathResolver.ResolveToPaths(
                     source: folderPath,
                     includeFolders: false,
-                    recursiveDirectoryFileAdd: false)
+                    includeSubdirs: false)
                 .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
@@ -154,10 +154,10 @@ namespace Mfr.Tests.Core
             var top = TestHelpers.CreateFile(_tempRoot, "keep.txt");
             TestHelpers.CreateFile(_tempRoot.CombinePath("nested"), "skip.txt");
 
-            var paths = RenameSourceResolver.Resolve(
+            var paths = PathResolver.ResolveToPaths(
                     source: _tempRoot.CombinePath("*.txt"),
                     includeFolders: true,
-                    recursiveDirectoryFileAdd: false)
+                    includeSubdirs: false)
                 .ToList();
 
             Assert.Equal([top], paths);
@@ -172,10 +172,10 @@ namespace Mfr.Tests.Core
             var source = _tempRoot.CombinePath("absent_subdir", "**", "*.txt");
 
             var ex = Assert.Throws<UserException>(() =>
-                RenameSourceResolver.Resolve(
+                PathResolver.ResolveToPaths(
                         source: source,
                         includeFolders: true,
-                        recursiveDirectoryFileAdd: false)
+                        includeSubdirs: false)
                     .ToList());
 
             Assert.Contains("does not exist", ex.Message, StringComparison.Ordinal);

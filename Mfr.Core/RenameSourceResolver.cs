@@ -7,19 +7,19 @@ namespace Mfr.Core
     /// <summary>
     /// Resolves user-provided rename sources (files, directories, and wildcard patterns) into concrete paths.
     /// </summary>
-    public static class RenameSourceResolver
+    public static class PathResolver
     {
         /// <summary>
         /// Resolves a single source into file paths.
         /// </summary>
         /// <param name="source">The source to resolve.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
-        /// <param name="recursiveDirectoryFileAdd">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
+        /// <param name="includeSubdirs">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
         /// <returns>Resolved file paths for the source.</returns>
-        public static IEnumerable<string> Resolve(
+        public static IEnumerable<string> ResolveToPaths(
             string source,
             bool includeFolders,
-            bool recursiveDirectoryFileAdd)
+            bool includeSubdirs)
         {
             var fullSource = Path.GetFullPath(source);
             if (Directory.Exists(fullSource))
@@ -31,7 +31,7 @@ namespace Mfr.Core
                 }
 
                 // When folder entries are excluded, directory sources expand to files based on recursion mode.
-                var searchOption = recursiveDirectoryFileAdd
+                var searchOption = includeSubdirs
                     ? SearchOption.AllDirectories
                     : SearchOption.TopDirectoryOnly;
                 return Directory.EnumerateFiles(fullSource, "*", searchOption);

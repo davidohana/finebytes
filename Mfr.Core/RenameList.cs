@@ -27,20 +27,20 @@ namespace Mfr.Core
         /// <param name="sources">Sources to add.</param>
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
-        /// <param name="recursiveDirectoryFileAdd">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
+        /// <param name="includeSubdirs">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
         public void AddSources(
             IEnumerable<string> sources,
             bool includeFiles = true,
             bool includeFolders = true,
-            bool recursiveDirectoryFileAdd = false)
+            bool includeSubdirs = false)
         {
             var sourceList = sources.ToList();
             Log.Information(
-                "Received {SourceCount} source(s) for resolution. IncludeFiles: {IncludeFiles}, IncludeFolders: {IncludeFolders}, RecursiveDirectoryFileAdd: {RecursiveDirectoryFileAdd}, IncludeHidden: {IncludeHidden}.",
+                "Received {SourceCount} source(s) for resolution. IncludeFiles: {IncludeFiles}, IncludeFolders: {IncludeFolders}, IncludeSubdirs: {IncludeSubdirs}, IncludeHidden: {IncludeHidden}.",
                 sourceList.Count,
                 includeFiles,
                 includeFolders,
-                recursiveDirectoryFileAdd,
+                includeSubdirs,
                 _includeHidden);
 
             foreach (var source in sourceList)
@@ -49,7 +49,7 @@ namespace Mfr.Core
                     source: source,
                     includeFiles: includeFiles,
                     includeFolders: includeFolders,
-                    recursiveDirectoryFileAdd: recursiveDirectoryFileAdd);
+                    includeSubdirs: includeSubdirs);
             }
         }
 
@@ -59,13 +59,13 @@ namespace Mfr.Core
         /// <param name="source">A file path, directory path, or wildcard source.</param>
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
-        /// <param name="recursiveDirectoryFileAdd">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
+        /// <param name="includeSubdirs">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
         /// <returns>The count of newly added resolved items.</returns>
         public int AddSource(
             string source,
             bool includeFiles = true,
             bool includeFolders = true,
-            bool recursiveDirectoryFileAdd = false)
+            bool includeSubdirs = false)
         {
             if (string.IsNullOrWhiteSpace(source))
             {
@@ -83,10 +83,10 @@ namespace Mfr.Core
                 throw new UserException($"Root paths cannot be added as rename sources: '{trimmedSource}'.");
             }
 
-            var resolvedPaths = RenameSourceResolver.Resolve(
+            var resolvedPaths = PathResolver.ResolveToPaths(
                 source: trimmedSource,
                 includeFolders: includeFolders,
-                recursiveDirectoryFileAdd: recursiveDirectoryFileAdd).ToList();
+                includeSubdirs: includeSubdirs).ToList();
             var addedCount = _AppendPaths(
                 resolvedPaths: resolvedPaths,
                 includeFiles: includeFiles,
