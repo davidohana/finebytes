@@ -1,0 +1,26 @@
+using System.Globalization;
+using Mfr.Models;
+
+namespace Mfr.Filters.Formatting.Tokens.GeneralGroup
+{
+    /// <summary>
+    /// Resolves the <c>&lt;item-count&gt;</c> token to the total number of items in the rename list.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The count is populated on each item during rename-list preview/commit flow. Synthetic tests without
+    /// that context observe <see cref="FileMeta.RenameListTotalCount"/> defaults (typically set via helpers).
+    /// </para>
+    /// </remarks>
+    internal sealed class ItemCountToken : IFormatToken
+    {
+        /// <inheritdoc />
+        public IReadOnlyList<string> Names { get; } = ["item-count"];
+
+        /// <inheritdoc />
+        public string Resolve(string arg, RenameItem item)
+        {
+            return item.Original.RenameListTotalCount.ToString(CultureInfo.InvariantCulture);
+        }
+    }
+}
