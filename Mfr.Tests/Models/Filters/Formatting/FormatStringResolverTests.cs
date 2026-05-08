@@ -85,7 +85,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     template: "<does-not-exist>",
                     item: item));
 
-            Assert.Contains("not supported", ex.Message);
+            Assert.Contains("Unknown formatter token", ex.Message);
+            Assert.Contains("does-not-exist", ex.Message);
         }
 
         /// <summary>
