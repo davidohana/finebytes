@@ -16,20 +16,42 @@ namespace Mfr.Filters.Formatting
     /// dropping a new class implementing <see cref="IFormatToken"/> under
     /// <c>Mfr.Filters.Formatting.Tokens.*</c>.
     /// </para>
+    /// <para>
+    /// Arbitrary nesting depth is supported. The regex matches tokens with at most one level of
+    /// inner nesting per pass; the resolver iterates until the template stabilizes, peeling one
+    /// layer of nesting per pass. Each token's <see cref="IFormatToken.Resolve"/> implementation
+    /// is responsible for calling <see cref="ResolveTemplate"/> on its own source argument when
+    /// that argument may itself contain tokens.
+    /// </para>
     /// </remarks>
     internal static partial class FormatStringResolver
     {
         private static readonly Dictionary<string, IFormatToken> _nameToToken = _DiscoverTokens();
 
+        private const int MaxResolutionPasses = 20;
+
         /// <summary>
-        /// Resolves all formatter tokens inside <paramref name="template"/>.
+        /// Resolves all formatter tokens inside <paramref name="template"/>, supporting arbitrary nesting depth.
         /// </summary>
         /// <param name="template">Template text that may contain tokens.</param>
         /// <param name="item">Rename item used to resolve item-aware tokens.</param>
-        /// <returns>Template text with tokens resolved.</returns>
+        /// <returns>Template text with all tokens fully resolved.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the template does not stabilize within <see cref="MaxResolutionPasses"/> passes,
+        /// which indicates a token whose resolved value introduces new tokens.
+        /// </exception>
         internal static string ResolveTemplate(string template, RenameItem item)
         {
-            return _TokenRegex().Replace(template, m => _ResolveToken(m.Groups[1].Value, item));
+            for (var pass = 0; pass < MaxResolutionPasses; pass++)
+            {
+                var resolved = _TokenRegex().Replace(template, m => _ResolveToken(m.Groups[1].Value, item));
+                if (string.Equals(resolved, template, StringComparison.Ordinal))
+                    return resolved;
+                template = resolved;
+            }
+            throw new InvalidOperationException(
+                $"Format template did not stabilize after {MaxResolutionPasses} resolution passes. " +
+                "A token may be producing output that contains new format tokens.");
         }
 
         private static string _ResolveToken(string tokenInner, RenameItem item)

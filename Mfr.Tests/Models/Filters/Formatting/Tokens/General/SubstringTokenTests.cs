@@ -138,6 +138,57 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             Assert.Equal(string.Empty, _token.Resolve("1,3,", item));
         }
 
+        // ── Deep nesting (multiple levels) ───────────────────────────────────
+
+        /// <summary>
+        /// Two <c>substr</c> tokens nested: the outer extracts chars 1–3 of what the
+        /// inner (<c>substr:2,5</c>) produces from <c>&lt;full-name&gt;</c>.
+        /// "Hello.txt" → inner: chars 2–5 = "ello" → outer: chars 1–3 = "ell".
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_SubstrInsideSubstr_TwoLevels()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
+            Assert.Equal("ell", FormatStringResolver.ResolveTemplate("<substr:1,3,<substr:2,5,<full-name>>>", item));
+        }
+
+        /// <summary>
+        /// Three <c>substr</c> tokens nested. "Hello.txt":
+        /// inner: chars 2–5 = "ello" → middle: chars 1–3 = "ell" → outer: chars 1–2 = "el".
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_SubstrInsideSubstrInsideSubstr_ThreeLevels()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
+            Assert.Equal("el", FormatStringResolver.ResolveTemplate("<substr:1,2,<substr:1,3,<substr:2,5,<full-name>>>>", item));
+        }
+
+        /// <summary>
+        /// <c>substr</c> wrapping <c>token</c> wrapping <c>&lt;full-name&gt;</c>.
+        /// File "13_-_Smog_-_Cold.mp3": token extracts part 1 split by "-" = "13_";
+        /// substr takes chars 1–2 = "13".
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_SubstrWrappingToken_TwoLevels()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                prefix: "13_-_Smog_-_Cold",
+                extension: ".mp3");
+            Assert.Equal("13", FormatStringResolver.ResolveTemplate("<substr:1,2,<token:1,-,0,0,<full-name>>>", item));
+        }
+
+        /// <summary>
+        /// <c>token</c> wrapping <c>substr</c> wrapping <c>&lt;full-name&gt;</c>.
+        /// File "My-Test-File.txt": substr takes chars 1–7 = "My-Test";
+        /// token extracts part 2 split by "-" = "Test".
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_TokenWrappingSubstr_TwoLevels()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "My-Test-File", extension: ".txt");
+            Assert.Equal("Test", FormatStringResolver.ResolveTemplate("<token:2,-,0,0,<substr:1,7,<full-name>>>", item));
+        }
+
         // ── Error cases ───────────────────────────────────────────────────────
 
         /// <summary>A missing argument string throws with a descriptive message.</summary>
