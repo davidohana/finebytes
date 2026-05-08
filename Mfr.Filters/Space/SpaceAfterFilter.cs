@@ -51,12 +51,8 @@ namespace Mfr.Filters.Space
                     continue;
 
                 var next = value[i + 1];
-                if (next == sep)
-                    continue;
-                if (onlyWhenNext && !char.IsLetterOrDigit(next))
-                    continue;
-
-                builder.Append(sep);
+                if (SpaceTriggerInsertion.ShouldInsertBeside(next, sep, onlyWhenNext))
+                    builder.Append(sep);
             }
 
             return builder.ToString();
