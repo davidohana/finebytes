@@ -4,6 +4,55 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
 {
     /// <summary>
+    /// Unit selector for <c>&lt;file-size&gt;</c>.
+    /// </summary>
+    internal enum FileSizeFormatUnitKind
+    {
+        Auto,
+        Bytes,
+        Kb,
+        Mb,
+        Gb
+    }
+
+    /// <summary>
+    /// Parsed arguments for <c>&lt;file-size&gt;</c>.
+    /// </summary>
+    /// <param name="Unit">Fixed unit or auto-scaled output.</param>
+    /// <param name="Decimals">Fractional digits for formatted values.</param>
+    internal sealed record FileSizeFormatOptions(FileSizeFormatUnitKind Unit, int Decimals)
+    {
+        /// <summary>
+        /// Parses <c>unit</c> or <c>unit,decimals</c>.
+        /// </summary>
+        /// <param name="arg">Raw argument text.</param>
+        /// <returns>Parsed unit and decimals.</returns>
+        /// <exception cref="NotSupportedException">Thrown when the unit token is unknown.</exception>
+        internal static FileSizeFormatOptions Parse(string arg)
+        {
+            var parts = arg.Split(',', 2, StringSplitOptions.TrimEntries);
+            var unitArg = parts.Length > 0 ? parts[0] : "";
+            var decimalArg = parts.Length > 1 ? parts[1] : "";
+
+            var decimals = string.IsNullOrWhiteSpace(decimalArg)
+                ? 0
+                : int.Parse(decimalArg, CultureInfo.InvariantCulture);
+
+            var unitKind = unitArg.ToLowerInvariant() switch
+            {
+                "" or "0" or "auto" => FileSizeFormatUnitKind.Auto,
+                "1" or "b" or "bytes" => FileSizeFormatUnitKind.Bytes,
+                "2" or "kb" => FileSizeFormatUnitKind.Kb,
+                "3" or "mb" => FileSizeFormatUnitKind.Mb,
+                "4" or "gb" => FileSizeFormatUnitKind.Gb,
+                _ => throw new NotSupportedException($"File size unit '{unitArg}' is not supported.")
+            };
+
+            return new FileSizeFormatOptions(Unit: unitKind, Decimals: decimals);
+        }
+    }
+
+    /// <summary>
     /// Resolves the <c>&lt;file-size&gt;</c> token.
     /// </summary>
     /// <remarks>
@@ -25,23 +74,17 @@ namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
         /// <exception cref="NotSupportedException">Thrown when an unrecognized unit is supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var parts = arg.Split(',', 2, StringSplitOptions.TrimEntries);
-            var unitArg = parts.Length > 0 ? parts[0] : "";
-            var decimalArg = parts.Length > 1 ? parts[1] : "";
-
-            var decimals = string.IsNullOrWhiteSpace(decimalArg)
-                ? 0
-                : int.Parse(decimalArg, CultureInfo.InvariantCulture);
+            var options = FileSizeFormatOptions.Parse(arg);
             var bytes = (double)item.Original.FileSize;
 
-            return unitArg.ToLowerInvariant() switch
+            return options.Unit switch
             {
-                "" or "0" or "auto" => _FormatAuto(bytes, decimals),
-                "1" or "b" or "bytes" => _Format(bytes, divisor: 1.0, unit: "B", decimals),
-                "2" or "kb" => _Format(bytes, divisor: Kb, unit: "KB", decimals),
-                "3" or "mb" => _Format(bytes, divisor: Mb, unit: "MB", decimals),
-                "4" or "gb" => _Format(bytes, divisor: Gb, unit: "GB", decimals),
-                _ => throw new NotSupportedException($"File size unit '{unitArg}' is not supported.")
+                FileSizeFormatUnitKind.Auto => _FormatAuto(bytes, options.Decimals),
+                FileSizeFormatUnitKind.Bytes => _Format(bytes, divisor: 1.0, unit: "B", options.Decimals),
+                FileSizeFormatUnitKind.Kb => _Format(bytes, divisor: Kb, unit: "KB", options.Decimals),
+                FileSizeFormatUnitKind.Mb => _Format(bytes, divisor: Mb, unit: "MB", options.Decimals),
+                FileSizeFormatUnitKind.Gb => _Format(bytes, divisor: Gb, unit: "GB", options.Decimals),
+                _ => throw new InvalidOperationException($"Unreachable file size unit '{options.Unit}'.")
             };
         }
 

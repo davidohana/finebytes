@@ -21,7 +21,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.GeneralGroup
                 var s = token.Resolve(arg: "0,9", item: item);
                 Assert.Single(s);
                 var c = s[0];
-                Assert.True(c >= '0' && c <= '9', $"Got '{c}' outside 0–9.");
+                Assert.True(c is >= '0' and <= '9', $"Got '{c}' outside 0–9.");
             }
         }
 
@@ -39,7 +39,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.GeneralGroup
                 var s = token.Resolve(arg: "A,Z", item: item);
                 Assert.Single(s);
                 var c = s[0];
-                Assert.True(c >= 'A' && c <= 'Z', $"Got '{c}' outside A–Z.");
+                Assert.True(c is >= 'A' and <= 'Z', $"Got '{c}' outside A–Z.");
             }
         }
 
@@ -57,7 +57,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.GeneralGroup
                 var s = token.Resolve(arg: "Z,A", item: item);
                 Assert.Single(s);
                 var c = s[0];
-                Assert.True(c >= 'A' && c <= 'Z');
+                Assert.True(c is >= 'A' and <= 'Z');
             }
         }
 

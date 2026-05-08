@@ -3,6 +3,18 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
 {
     /// <summary>
+    /// Parsed arguments for <c>&lt;drive-letter&gt;</c> (no parameters).
+    /// </summary>
+    internal readonly record struct DriveLetterFormatOptions
+    {
+        internal static DriveLetterFormatOptions Parse(string arg)
+        {
+            FormatOptionsParsing.RequireNoArgument(arg, "<drive-letter>");
+            return default;
+        }
+    }
+
+    /// <summary>
     /// Resolves the <c>&lt;drive-letter&gt;</c> token.
     /// </summary>
     /// <remarks>
@@ -16,8 +28,10 @@ namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
         public IReadOnlyList<string> Names { get; } = ["drive-letter"];
 
         /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
+            _ = DriveLetterFormatOptions.Parse(arg);
             var root = Path.GetPathRoot(item.Original.DirectoryPath) ?? string.Empty;
             if (root.StartsWith(@"\\", StringComparison.Ordinal))
                 return "$";

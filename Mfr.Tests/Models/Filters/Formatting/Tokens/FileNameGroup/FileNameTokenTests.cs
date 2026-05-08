@@ -19,5 +19,18 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileNameGroup
             Assert.Equal("song", token.Resolve(arg: "", item: item));
             Assert.Contains("file-name", token.Names);
         }
+
+        /// <summary>
+        /// Verifies stray arguments are rejected.
+        /// </summary>
+        [Fact]
+        public void Resolve_WithArgument_Throws()
+        {
+            var token = new FileNameToken();
+            var item = FilterTestHelpers.CreateRenameItem();
+
+            var ex = Assert.Throws<InvalidOperationException>(() => token.Resolve(arg: "x", item: item));
+            Assert.Contains("file-name", ex.Message);
+        }
     }
 }

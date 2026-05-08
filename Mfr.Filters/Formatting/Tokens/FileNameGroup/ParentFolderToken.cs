@@ -5,6 +5,23 @@ using Mfr.Utils;
 namespace Mfr.Filters.Formatting.Tokens.FileNameGroup
 {
     /// <summary>
+    /// Parsed arguments for <c>&lt;parent-folder&gt;</c>.
+    /// </summary>
+    /// <param name="Level">1-based ancestor segment index (<c>1</c> = immediate parent).</param>
+    internal sealed record ParentFolderFormatOptions(int Level)
+    {
+        /// <summary>
+        /// Parses optional level (defaults to <c>1</c>).
+        /// </summary>
+        /// <param name="arg">Raw argument text.</param>
+        internal static ParentFolderFormatOptions Parse(string arg)
+        {
+            var level = string.IsNullOrWhiteSpace(arg) ? 1 : int.Parse(arg, CultureInfo.InvariantCulture);
+            return new ParentFolderFormatOptions(Level: level);
+        }
+    }
+
+    /// <summary>
     /// Resolves the <c>&lt;parent-folder&gt;</c> and <c>&lt;parent-folder:level&gt;</c> tokens.
     /// </summary>
     /// <remarks>
@@ -21,10 +38,10 @@ namespace Mfr.Filters.Formatting.Tokens.FileNameGroup
         /// <inheritdoc />
         public string Resolve(string arg, RenameItem item)
         {
-            var level = string.IsNullOrWhiteSpace(arg) ? 1 : int.Parse(arg, CultureInfo.InvariantCulture);
+            var options = ParentFolderFormatOptions.Parse(arg);
             try
             {
-                return DirectoryPathAncestor.GetSegmentName(item.Original.DirectoryPath, level);
+                return DirectoryPathAncestor.GetSegmentName(item.Original.DirectoryPath, options.Level);
             }
             catch (InvalidOperationException)
             {

@@ -30,5 +30,18 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.GeneralGroup
 
             Assert.Equal("5", token.Resolve(arg: "", item: item));
         }
+
+        /// <summary>
+        /// Verifies stray arguments are rejected.
+        /// </summary>
+        [Fact]
+        public void Resolve_WithArgument_Throws()
+        {
+            var token = new ItemCountToken();
+            var item = FilterTestHelpers.CreateRenameItem();
+
+            var ex = Assert.Throws<InvalidOperationException>(() => token.Resolve(arg: "1", item: item));
+            Assert.Contains("item-count", ex.Message);
+        }
     }
 }

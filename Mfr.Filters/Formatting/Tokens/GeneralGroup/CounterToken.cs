@@ -4,6 +4,48 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens.GeneralGroup
 {
     /// <summary>
+    /// Parsed arguments for <c>&lt;counter&gt;</c>.
+    /// </summary>
+    /// <param name="InitialValue">Counter start value.</param>
+    /// <param name="IncrementBy">Step applied per index.</param>
+    /// <param name="LeadingZeroesMode"><c>0</c> none, <c>1</c> automatic width, <c>2</c> custom width.</param>
+    /// <param name="LeadingZeroesTotalLength">Minimum digit width when mode is custom.</param>
+    /// <param name="ResetOnFolderChange"><c>1</c> uses per-folder index.</param>
+    internal sealed record CounterFormatOptions(
+        int InitialValue,
+        int IncrementBy,
+        int LeadingZeroesMode,
+        int LeadingZeroesTotalLength,
+        int ResetOnFolderChange)
+    {
+        private const string DefaultArg = "1,1,0,2,0";
+
+        /// <summary>
+        /// Parses comma-separated counter parameters or the bare-token default.
+        /// </summary>
+        /// <param name="arg">Raw argument text.</param>
+        /// <returns>Parsed options.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the shape or values are invalid.</exception>
+        internal static CounterFormatOptions Parse(string arg)
+        {
+            var normalizedArg = string.IsNullOrWhiteSpace(arg) ? DefaultArg : arg;
+            var parts = normalizedArg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 5)
+            {
+                throw new InvalidOperationException(
+                    $"Invalid counter token arg '{normalizedArg}'. Expected 5 comma-separated params or use '<counter>'.");
+            }
+
+            return new CounterFormatOptions(
+                InitialValue: int.Parse(parts[0], CultureInfo.InvariantCulture),
+                IncrementBy: int.Parse(parts[1], CultureInfo.InvariantCulture),
+                LeadingZeroesMode: int.Parse(parts[2], CultureInfo.InvariantCulture),
+                LeadingZeroesTotalLength: int.Parse(parts[3], CultureInfo.InvariantCulture),
+                ResetOnFolderChange: int.Parse(parts[4], CultureInfo.InvariantCulture));
+        }
+    }
+
+    /// <summary>
     /// Resolves the <c>&lt;counter&gt;</c> token (legacy Magic File Renamer counter parameters).
     /// </summary>
     /// <remarks>
@@ -24,8 +66,6 @@ namespace Mfr.Filters.Formatting.Tokens.GeneralGroup
     /// </remarks>
     internal sealed class CounterToken : IFormatToken
     {
-        private const string _DefaultArg = "1,1,0,2,0";
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["counter"];
 
@@ -33,30 +73,17 @@ namespace Mfr.Filters.Formatting.Tokens.GeneralGroup
         /// <exception cref="InvalidOperationException">Thrown when arguments are missing, invalid, or list sizing was not populated.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var normalizedArg = string.IsNullOrWhiteSpace(arg) ? _DefaultArg : arg;
-            var parts = normalizedArg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 5)
-            {
-                throw new InvalidOperationException(
-                    $"Invalid counter token arg '{normalizedArg}'. Expected 5 comma-separated params or use '<counter>'.");
-            }
-
-            var start = int.Parse(parts[0], CultureInfo.InvariantCulture);
-            var step = int.Parse(parts[1], CultureInfo.InvariantCulture);
-            var leadingZeroesMode = int.Parse(parts[2], CultureInfo.InvariantCulture);
-            var leadingZeroesTotalLength = int.Parse(parts[3], CultureInfo.InvariantCulture);
-            var resetOnFolderChange = int.Parse(parts[4], CultureInfo.InvariantCulture);
-
-            var usePerFolder = resetOnFolderChange == 1;
+            var options = CounterFormatOptions.Parse(arg);
+            var usePerFolder = options.ResetOnFolderChange == 1;
             var n = usePerFolder ? item.Original.InFolderIndex : item.Original.GlobalIndex;
-            var value = start + ((long)step * n);
+            var value = options.InitialValue + ((long)options.IncrementBy * n);
             var raw = value.ToString(CultureInfo.InvariantCulture);
 
             var padWidth = _ResolvePadWidth(
-                leadingZeroesMode,
-                leadingZeroesTotalLength,
-                start,
-                step,
+                options.LeadingZeroesMode,
+                options.LeadingZeroesTotalLength,
+                options.InitialValue,
+                options.IncrementBy,
                 item,
                 usePerFolder);
 

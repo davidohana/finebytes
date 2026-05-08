@@ -4,6 +4,38 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
 {
     /// <summary>
+    /// Parsed arguments for <c>&lt;file-date&gt;</c>.
+    /// </summary>
+    /// <param name="Format">.NET date format string.</param>
+    /// <param name="DateType"><c>0</c> creation, <c>1</c> last write, <c>2</c> last access.</param>
+    internal sealed record FileDateFormatOptions(string Format, int DateType)
+    {
+        private const string DefaultFormat = "dd-MM-yyyy";
+
+        /// <summary>
+        /// Parses <c>format</c> or <c>format,date-type</c>, using the last comma as separator for <c>date-type</c>.
+        /// </summary>
+        /// <param name="arg">Raw argument text.</param>
+        internal static FileDateFormatOptions Parse(string arg)
+        {
+            if (string.IsNullOrWhiteSpace(arg))
+                return new FileDateFormatOptions(Format: DefaultFormat, DateType: 0);
+
+            var lastComma = arg.LastIndexOf(',');
+            if (lastComma < 0)
+                return new FileDateFormatOptions(Format: arg, DateType: 0);
+
+            var formatPart = arg[..lastComma];
+            var dateTypePart = arg[(lastComma + 1)..].Trim();
+            var format = string.IsNullOrWhiteSpace(formatPart) ? DefaultFormat : formatPart;
+            var dateType = string.IsNullOrEmpty(dateTypePart)
+                ? 0
+                : int.Parse(dateTypePart, CultureInfo.InvariantCulture);
+            return new FileDateFormatOptions(Format: format, DateType: dateType);
+        }
+    }
+
+    /// <summary>
     /// Resolves the <c>&lt;file-date&gt;</c> token.
     /// </summary>
     /// <remarks>
@@ -15,8 +47,6 @@ namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
     /// </remarks>
     internal sealed class FileDateToken : IFormatToken
     {
-        private const string DefaultFormat = "dd-MM-yyyy";
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["file-date"];
 
@@ -24,34 +54,16 @@ namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
         /// <exception cref="NotSupportedException">Thrown when an unsupported date type is supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var (format, dateType) = _ParseArg(arg);
-            var date = dateType switch
+            var options = FileDateFormatOptions.Parse(arg);
+            var date = options.DateType switch
             {
                 0 => item.Original.CreationTime,
                 1 => item.Original.LastWriteTime,
                 2 => item.Original.LastAccessTime,
-                _ => throw new NotSupportedException($"File date type '{dateType}' is not supported.")
+                _ => throw new NotSupportedException($"File date type '{options.DateType}' is not supported.")
             };
 
-            return date.ToString(format, CultureInfo.InvariantCulture);
-        }
-
-        private static (string Format, int DateType) _ParseArg(string arg)
-        {
-            if (string.IsNullOrWhiteSpace(arg))
-                return (DefaultFormat, 0);
-
-            var lastComma = arg.LastIndexOf(',');
-            if (lastComma < 0)
-                return (arg, 0);
-
-            var formatPart = arg[..lastComma];
-            var dateTypePart = arg[(lastComma + 1)..].Trim();
-            var format = string.IsNullOrWhiteSpace(formatPart) ? DefaultFormat : formatPart;
-            var dateType = string.IsNullOrEmpty(dateTypePart)
-                ? 0
-                : int.Parse(dateTypePart, CultureInfo.InvariantCulture);
-            return (format, dateType);
+            return date.ToString(options.Format, CultureInfo.InvariantCulture);
         }
     }
 }

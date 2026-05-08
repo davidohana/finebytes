@@ -4,6 +4,18 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens.GeneralGroup
 {
     /// <summary>
+    /// Parsed arguments for <c>&lt;item-count&gt;</c> (no parameters).
+    /// </summary>
+    internal readonly record struct ItemCountFormatOptions
+    {
+        internal static ItemCountFormatOptions Parse(string arg)
+        {
+            FormatOptionsParsing.RequireNoArgument(arg, "<item-count>");
+            return default;
+        }
+    }
+
+    /// <summary>
     /// Resolves the <c>&lt;item-count&gt;</c> token to the total number of items in the rename list.
     /// </summary>
     /// <remarks>
@@ -18,8 +30,10 @@ namespace Mfr.Filters.Formatting.Tokens.GeneralGroup
         public IReadOnlyList<string> Names { get; } = ["item-count"];
 
         /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
+            _ = ItemCountFormatOptions.Parse(arg);
             return item.Original.RenameListTotalCount.ToString(CultureInfo.InvariantCulture);
         }
     }
