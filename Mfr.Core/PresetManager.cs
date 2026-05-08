@@ -38,9 +38,8 @@ namespace Mfr.Core
         public void LoadPresets()
         {
             if (!File.Exists(PresetsFilePath))
-            {
                 throw new UserException($"Presets file not found: '{PresetsFilePath}'.");
-            }
+
 
             PresetContainer container;
             try
@@ -60,9 +59,8 @@ namespace Mfr.Core
             foreach (var preset in presets)
             {
                 if (!NameToPreset.TryAdd(preset.Name, preset))
-                {
                     throw new UserException($"Duplicate preset names found in '{PresetsFilePath}'. Preset names must be unique.");
-                }
+
             }
         }
 
@@ -75,9 +73,8 @@ namespace Mfr.Core
             {
                 var directory = Path.GetDirectoryName(PresetsFilePath);
                 if (!string.IsNullOrWhiteSpace(directory))
-                {
                     Directory.CreateDirectory(directory);
-                }
+
 
                 var sortedPresets = NameToPreset.Values
                     .OrderBy(preset => preset.Name, StringComparer.OrdinalIgnoreCase)

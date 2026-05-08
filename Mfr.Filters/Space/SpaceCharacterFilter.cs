@@ -48,24 +48,20 @@ namespace Mfr.Filters.Space
         {
             var sources = new List<string>(capacity: 4);
             if (options.ReplacePercent20)
-            {
                 sources.Add("%20");
-            }
+
 
             if (options.ReplaceSpaces)
-            {
                 sources.Add(" ");
-            }
+
 
             if (options.ReplaceUnderscores)
-            {
                 sources.Add("_");
-            }
+
 
             if (options.CustomText.Length > 0)
-            {
                 sources.Add(options.CustomText);
-            }
+
 
             return sources;
         }

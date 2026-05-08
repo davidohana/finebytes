@@ -28,9 +28,8 @@ namespace Mfr.Core
 
             var candidateItems = items.Where(item => item.Status == RenameStatus.PreviewOk).ToList();
             if (candidateItems.Count == 0)
-            {
                 return;
-            }
+
 
             var movingSourcePaths = _BuildMovingSourceSet(candidateItems);
             var folderRenameAncestors = _BuildFolderRenameList(candidateItems);
@@ -51,18 +50,16 @@ namespace Mfr.Core
                 // No rename happens for this item; the file existing at its own path is not a conflict.
                 // Case-only renames are still a "real change" so they fall through to occupancy checks below.
                 if (item.IsPreviewPathUnchanged())
-                {
                     continue;
-                }
+
 
                 var willBeVacatedByBatch = _WillBeVacatedByBatch(
                     destinationPath: destinationPath,
                     movingSourcePaths: movingSourcePaths,
                     folderRenameAncestors: folderRenameAncestors);
                 if (willBeVacatedByBatch)
-                {
                     continue;
-                }
+
 
                 // A case-only rename targets the item's own path on a case-insensitive filesystem;
                 // File.Move and Directory.Move accept this on .NET, so it's not a conflict.
@@ -70,9 +67,8 @@ namespace Mfr.Core
                     item.Original.FullPath,
                     destinationPath);
                 if (isCaseOnlySelfRename)
-                {
                     continue;
-                }
+
 
                 var destinationOccupiedOnDisk =
                     Directory.Exists(destinationPath) || File.Exists(destinationPath);
@@ -128,9 +124,8 @@ namespace Mfr.Core
             IReadOnlyList<RenameItem> folderRenameAncestors)
         {
             if (movingSourcePaths.Contains(destinationPath))
-            {
                 return true;
-            }
+
 
             // A descendant path is implicitly vacated when its ancestor folder is renamed away.
             return folderRenameAncestors.Any(folderRename =>

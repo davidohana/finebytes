@@ -66,9 +66,8 @@ namespace Mfr.Core
 
             var pathOnDisk = item.Preview.FullPath;
             if (item.Original.Attributes != item.Preview.Attributes)
-            {
                 File.SetAttributes(pathOnDisk, item.Preview.Attributes);
-            }
+
 
             var pathIsDirectoryAfterApply = pathOnDisk.IsDirectory();
             _ApplyTimestampChangesIfNeeded(
@@ -78,9 +77,8 @@ namespace Mfr.Core
                 pathIsDirectory: pathIsDirectoryAfterApply);
 
             if (item.HasPreviewChanges())
-            {
                 item.Original = item.Preview.Clone();
-            }
+
         }
 
         /// <summary>
@@ -96,9 +94,8 @@ namespace Mfr.Core
             var directory = Path.GetDirectoryName(nearPath) ?? string.Empty;
             var leaf = Path.GetFileName(Path.TrimEndingDirectorySeparator(nearPath));
             if (string.IsNullOrEmpty(leaf))
-            {
                 leaf = "entry";
-            }
+
 
             var suffix = _TempSuffixPrefix + Guid.NewGuid().ToString("N");
             var candidate = string.IsNullOrEmpty(directory)
@@ -152,19 +149,13 @@ namespace Mfr.Core
                 pathIsDirectory ? Directory.SetLastAccessTime : File.SetLastAccessTime;
 
             if (original.CreationTime != preview.CreationTime)
-            {
                 setCreationTime(pathOnDisk, preview.CreationTime);
-            }
 
             if (original.LastWriteTime != preview.LastWriteTime)
-            {
                 setLastWriteTime(pathOnDisk, preview.LastWriteTime);
-            }
 
             if (original.LastAccessTime != preview.LastAccessTime)
-            {
                 setLastAccessTime(pathOnDisk, preview.LastAccessTime);
-            }
         }
     }
 }

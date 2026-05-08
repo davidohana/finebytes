@@ -35,24 +35,21 @@ namespace Mfr.Filters.Formatting
         protected override string _TransformValue(string value, RenameItem item)
         {
             if (string.IsNullOrEmpty(Options.Delimiter))
-            {
                 return value;
-            }
+
 
             var tokens = value.Split(Options.Delimiter, StringSplitOptions.None);
             var count = tokens.Length;
             var sourceIndex = Options.TokenNumber - 1;
             var tokenNumberIsInvalid = Options.TokenNumber < 1 || sourceIndex >= count;
             if (tokenNumberIsInvalid)
-            {
                 return value;
-            }
+
 
             var targetIndex = Math.Clamp(sourceIndex + Options.MoveBy, 0, count - 1);
             if (sourceIndex == targetIndex)
-            {
                 return value;
-            }
+
 
             return _MoveToken(tokens, sourceIndex, targetIndex, Options.Delimiter);
         }

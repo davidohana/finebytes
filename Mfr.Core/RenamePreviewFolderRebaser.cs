@@ -42,9 +42,8 @@ namespace Mfr.Core
 
             var folderRenames = _CollectFolderRenames(items);
             if (folderRenames.Count == 0)
-            {
                 return;
-            }
+
 
             // Process items shallow-first so each ancestor's Preview.FullPath is finalized
             // before any descendant references it during its own rebase.
@@ -103,9 +102,8 @@ namespace Mfr.Core
                     newAncestor: ancestor.Preview.FullPath);
                 var pathChanged = !string.Equals(rebased, item.Preview.DirectoryPath, StringComparison.Ordinal);
                 if (pathChanged)
-                {
                     item.Preview.DirectoryPath = rebased;
-                }
+
             }
         }
 

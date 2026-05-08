@@ -38,9 +38,8 @@ namespace Mfr.Tests.TestSupport
             try
             {
                 if (Directory.Exists(TempDir))
-                {
                     Directory.Delete(TempDir, recursive: true);
-                }
+
             }
             catch (IOException)
             {

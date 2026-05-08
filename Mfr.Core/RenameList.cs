@@ -68,9 +68,8 @@ namespace Mfr.Core
             bool includeSubdirs = false)
         {
             if (string.IsNullOrWhiteSpace(source))
-            {
                 throw new UserException("Source cannot be empty.");
-            }
+
 
             var trimmedSource = source.Trim();
             var fullSource = Path.GetFullPath(trimmedSource);
@@ -79,9 +78,8 @@ namespace Mfr.Core
                 fullSource,
                 PathComparers.OsComparison);
             if (isRootPath)
-            {
                 throw new UserException($"Root paths cannot be added as rename sources: '{trimmedSource}'.");
-            }
+
 
             var resolvedPaths = PathResolver.ResolveToPaths(
                 source: trimmedSource,
@@ -242,9 +240,8 @@ namespace Mfr.Core
             {
                 var normalizedResolvedPath = _NormalizePathKey(fullPath);
                 if (!_resolvedPathToIsIncluded.Add(normalizedResolvedPath))
-                {
                     continue;
-                }
+
 
                 var attrs = File.GetAttributes(fullPath);
                 if (!_includeHidden &&
@@ -255,14 +252,12 @@ namespace Mfr.Core
 
                 var isDirectory = attrs.IsDirectory();
                 if (isDirectory && !includeFolders)
-                {
                     continue;
-                }
+
 
                 if (!isDirectory && !includeFiles)
-                {
                     continue;
-                }
+
 
                 if (isDirectory)
                 {
@@ -283,13 +278,11 @@ namespace Mfr.Core
                 string extension;
 
                 if (isDirectory)
-                {
                     (directoryPath, prefix, extension) = _SplitRenamePathForDirectory(fullPath);
-                }
+
                 else
-                {
                     (directoryPath, prefix, extension) = _SplitRenamePathForFile(fullPath);
-                }
+
                 var inFolderIndex = _folderPathToCount.GetValueOrDefault(directoryPath);
                 _folderPathToCount[directoryPath] = inFolderIndex + 1;
 

@@ -48,9 +48,8 @@ namespace Mfr.Filters.Replace
             var searchToReplace = _replaceListEntries
                 ?? throw new InvalidOperationException("Replace-list setup must complete before transform.");
             if (searchToReplace.Count == 0)
-            {
                 return value;
-            }
+
 
             var transformed = value;
             foreach (var entry in searchToReplace)

@@ -33,9 +33,8 @@ namespace Mfr.Filters.Misc
         protected override string _TransformValue(string value, RenameItem item)
         {
             if (Options.Width <= 0)
-            {
                 return value;
-            }
+
 
             var count = 0;
             return _DigitsRegex().Replace(value, m =>
@@ -49,33 +48,28 @@ namespace Mfr.Filters.Misc
                     var isLetterAfter = end < value.Length && char.IsLetter(value[end]);
 
                     if (isLetterBefore || isLetterAfter)
-                    {
                         return m.Value;
-                    }
+
                 }
 
                 if (Options.MaxCount > 0 && count >= Options.MaxCount)
-                {
                     return m.Value;
-                }
+
 
                 count++;
 
                 var digits = m.Value;
                 if (Options.RemoveExtraZeros)
-                {
                     digits = digits.TrimStart('0');
-                }
+
 
                 if (digits.Length == 0)
-                {
                     digits = "0";
-                }
+
 
                 if (digits.Length >= Options.Width)
-                {
                     return digits;
-                }
+
 
                 return digits.PadLeft(Options.Width, '0');
             });

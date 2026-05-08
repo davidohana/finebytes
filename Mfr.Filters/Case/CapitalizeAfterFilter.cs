@@ -31,18 +31,16 @@ namespace Mfr.Filters.Case
         protected override string _TransformValue(string value, RenameItem item)
         {
             if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(Options.CapitalizeAfterChars))
-            {
                 return value;
-            }
+
 
             var capitalizeAfterSet = new HashSet<char>(Options.CapitalizeAfterChars);
             var chars = value.ToCharArray();
             for (var i = 0; i < chars.Length - 1; i++)
             {
                 if (capitalizeAfterSet.Contains(chars[i]))
-                {
                     chars[i + 1] = char.ToUpperInvariant(chars[i + 1]);
-                }
+
             }
 
             return new string(chars);

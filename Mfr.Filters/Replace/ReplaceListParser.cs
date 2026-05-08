@@ -61,9 +61,8 @@ namespace Mfr.Filters.Replace
 
             var lines = _ReadNonCommentAndNonEmptyLines(filePath);
             if (lines.Count == 0)
-            {
                 throw new UserException("Replace-list file must contain at least one replacement entry.");
-            }
+
 
             _ValidateLineLength(lines);
 
@@ -74,33 +73,28 @@ namespace Mfr.Filters.Replace
             {
                 var searchLine = lines[i++];
                 if (!searchLine.Text.StartsWith("S:", StringComparison.Ordinal))
-                {
                     _ThrowInvalidFormat(searchLine.LineNumber, "search line must start with 'S:'.");
-                }
+
 
                 if (i >= lines.Count)
-                {
                     _ThrowInvalidFormat(searchLine.LineNumber, "found a search line without a corresponding replace line.");
-                }
+
 
                 var replaceLine = lines[i++];
                 if (!replaceLine.Text.StartsWith("R:", StringComparison.Ordinal))
-                {
                     _ThrowInvalidFormat(replaceLine.LineNumber, "replace line must start with 'R:'.");
-                }
+
 
                 var searchText = searchLine.Text[2..];
                 var replaceText = replaceLine.Text[2..];
 
                 if (string.IsNullOrEmpty(searchText))
-                {
                     _ThrowInvalidFormat(searchLine.LineNumber, "search line cannot be empty.");
-                }
+
 
                 if (string.IsNullOrEmpty(replaceText))
-                {
                     _ThrowInvalidFormat(replaceLine.LineNumber, $"replace line cannot be empty. Use '{EmptyReplacementToken}' to strip matches.");
-                }
+
 
                 entries.Add(new ReplaceListEntry(searchText, _ResolveEmptyReplacementToken(replaceText)));
             }
@@ -124,9 +118,8 @@ namespace Mfr.Filters.Replace
             var maxLen = ConfigLoader.Settings.Filters.MaxListFileLineLength;
             var firstInvalidLine = lines.FirstOrDefault(line => line.Text.Length > maxLen);
             if (firstInvalidLine == default)
-            {
                 return;
-            }
+
 
             _ThrowInvalidFormat(
                 lineNumber: firstInvalidLine.LineNumber,
@@ -136,9 +129,8 @@ namespace Mfr.Filters.Replace
         private static string _ResolveEmptyReplacementToken(string replacement)
         {
             if (string.Equals(replacement, EmptyReplacementToken, StringComparison.Ordinal))
-            {
                 return string.Empty;
-            }
+
 
             return replacement;
         }

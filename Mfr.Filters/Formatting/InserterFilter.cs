@@ -50,15 +50,13 @@ namespace Mfr.Filters.Formatting
         {
             var inserted = FormatStringResolver.ResolveTemplate(Options.Text, item);
             if (inserted.Length == 0)
-            {
                 return value;
-            }
+
 
             var insertIndex = _ComputeInsertIndex(value.Length, Options.Position, Options.StartFrom);
             if (Options.Overwrite)
-            {
                 return _OverwriteAt(value, insertIndex, inserted);
-            }
+
 
             return string.Concat(value.AsSpan(0, insertIndex), inserted, value.AsSpan(insertIndex));
         }
@@ -67,9 +65,8 @@ namespace Mfr.Filters.Formatting
         {
             var remainderStart = insertIndex + inserted.Length;
             if (remainderStart >= segment.Length)
-            {
                 return string.Concat(segment.AsSpan(0, insertIndex), inserted);
-            }
+
 
             return string.Concat(segment.AsSpan(0, insertIndex), inserted, segment.AsSpan(remainderStart));
         }
@@ -83,17 +80,15 @@ namespace Mfr.Filters.Formatting
                 var zeroBased = oneBased - 1;
                 var exceedsLength = zeroBased > length;
                 if (exceedsLength)
-                {
                     return length;
-                }
+
 
                 return zeroBased;
             }
 
             if (oneBased > length)
-            {
                 return 0;
-            }
+
 
             return length - oneBased;
         }

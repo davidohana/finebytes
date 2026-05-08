@@ -55,15 +55,13 @@ namespace Mfr.Filters.Case
                 ?? throw new InvalidOperationException("Casing-list setup must complete before transform.");
 
             if (value.Length == 0 || lowerWordToCasing.Count == 0)
-            {
                 return value;
-            }
+
 
             var transformed = _ApplyCasingList(value, item.WordSeparator, lowerWordToCasing);
             if (!Options.UppercaseSentenceInitial)
-            {
                 return transformed;
-            }
+
 
             return _UppercaseSentenceInitials(
                 input: transformed,
@@ -111,9 +109,8 @@ namespace Mfr.Filters.Case
             IReadOnlyDictionary<string, string> lowerWordToCasing)
         {
             if (word.IsEmpty)
-            {
                 return;
-            }
+
 
             var originalWord = word.ToString();
             var lowerWord = originalWord.ToLowerInvariant();
@@ -130,25 +127,22 @@ namespace Mfr.Filters.Case
         private static string _UppercaseSentenceInitials(string input, char wordSeparator, string sentenceEndChars)
         {
             if (input.Length == 0)
-            {
                 return input;
-            }
+
 
             var chars = input.ToCharArray();
             _UppercaseFirstAsciiLetter(chars, startIndex: 0);
 
             var sentenceEndToIsIncluded = new HashSet<char>(sentenceEndChars.Where(c => c != wordSeparator));
             if (sentenceEndToIsIncluded.Count == 0)
-            {
                 return new string(chars);
-            }
+
 
             for (var i = 0; i < chars.Length; i++)
             {
                 if (!sentenceEndToIsIncluded.Contains(chars[i]))
-                {
                     continue;
-                }
+
 
                 var nextIndex = i + 1;
                 while (nextIndex < chars.Length && chars[nextIndex] == wordSeparator)
@@ -178,9 +172,8 @@ namespace Mfr.Filters.Case
                 }
 
                 if (char.IsAsciiLetterUpper(chars[i]))
-                {
                     return;
-                }
+
             }
         }
     }

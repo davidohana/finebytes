@@ -49,9 +49,8 @@ namespace Mfr.Filters.Misc
             var root = Options.RootFolder;
             var rootIsBlank = string.IsNullOrWhiteSpace(root);
             if (rootIsBlank)
-            {
                 throw new InvalidOperationException("MoverFilter: RootFolder must not be empty.");
-            }
+
 
             var rootIsAbsolute = Path.IsPathFullyQualified(root);
             if (!rootIsAbsolute)
@@ -73,9 +72,8 @@ namespace Mfr.Filters.Misc
         {
             var subFolderIsEmpty = string.IsNullOrEmpty(Options.SubFolder);
             if (subFolderIsEmpty)
-            {
                 return Options.RootFolder;
-            }
+
 
             var resolved = FormatStringResolver.ResolveTemplate(Options.SubFolder, item);
             // Strip a leading slash so Path.Combine appends relative segments. Otherwise a value like
@@ -84,9 +82,8 @@ namespace Mfr.Filters.Misc
 
             var relativeIsEmpty = string.IsNullOrEmpty(relative);
             if (relativeIsEmpty)
-            {
                 return Options.RootFolder;
-            }
+
 
             return Path.Combine(Options.RootFolder, relative);
         }

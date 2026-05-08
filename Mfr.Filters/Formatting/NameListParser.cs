@@ -31,16 +31,14 @@ namespace Mfr.Filters.Formatting
                 }
 
                 if (ListFileParseHelpers.IsListFileCommentLine(line))
-                {
                     continue;
-                }
+
 
                 if (skipEmptyLines)
                 {
                     if (string.IsNullOrWhiteSpace(line))
-                    {
                         continue;
-                    }
+
 
                     entries.Add(line.TrimEnd());
                     continue;
@@ -50,9 +48,8 @@ namespace Mfr.Filters.Formatting
             }
 
             if (entries.Count == 0)
-            {
                 throw new UserException("Name-list file must contain at least one name entry.");
-            }
+
 
             return entries;
         }

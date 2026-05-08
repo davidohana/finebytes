@@ -44,9 +44,8 @@ namespace Mfr.Filters.Formatting
         {
             var parts = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 5)
-            {
                 throw new InvalidOperationException($"Invalid counter token arg '{arg}'. Expected 5 comma-separated params.");
-            }
+
 
             var start = int.Parse(parts[0], CultureInfo.InvariantCulture);
             var step = int.Parse(parts[1], CultureInfo.InvariantCulture);
@@ -58,9 +57,8 @@ namespace Mfr.Filters.Formatting
             var value = start + ((long)step * n);
             var raw = value.ToString(CultureInfo.InvariantCulture);
             if (width <= 0)
-            {
                 return raw;
-            }
+
 
             var padChar = pad == 0 ? '0' : ' ';
             return raw.PadLeft(width, padChar);

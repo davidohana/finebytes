@@ -32,9 +32,8 @@ namespace Mfr.Utils
         {
             var sameOnDisk = SameOnDisk(first, second);
             if (!sameOnDisk)
-            {
                 return false;
-            }
+
 
             return !string.Equals(first, second, StringComparison.Ordinal);
         }
@@ -85,24 +84,21 @@ namespace Mfr.Utils
 
             var trimmedAncestor = ancestor.TrimTrailingSeparator();
             if (trimmedAncestor.Length == 0)
-            {
                 return false;
-            }
+
 
             var trimmedCandidate = candidate.TrimTrailingSeparator();
             if (trimmedCandidate.Length <= trimmedAncestor.Length)
-            {
                 return false;
-            }
+
 
             var separatorChar = trimmedCandidate[trimmedAncestor.Length];
             var nextCharIsSeparator =
                 separatorChar == Path.DirectorySeparatorChar
                 || separatorChar == Path.AltDirectorySeparatorChar;
             if (!nextCharIsSeparator)
-            {
                 return false;
-            }
+
 
             var prefix = trimmedCandidate[..trimmedAncestor.Length];
             return comparer.Equals(prefix, trimmedAncestor);
@@ -124,14 +120,12 @@ namespace Mfr.Utils
             var trimmedOld = oldAncestor.TrimTrailingSeparator();
             var pathIsAncestorItself = PathComparers.Os.Equals(fullPath.TrimTrailingSeparator(), trimmedOld);
             if (pathIsAncestorItself)
-            {
                 return newAncestor;
-            }
+
 
             if (!IsDescendantOf(fullPath, oldAncestor))
-            {
                 return fullPath;
-            }
+
 
             var remainder = fullPath[trimmedOld.Length..];
             return newAncestor.TrimTrailingSeparator() + remainder;

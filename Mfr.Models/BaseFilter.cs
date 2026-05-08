@@ -18,9 +18,8 @@ namespace Mfr.Models
         internal void Setup()
         {
             if (_isSetupComplete)
-            {
                 return;
-            }
+
 
             _Setup();
             _isSetupComplete = true;
@@ -38,9 +37,8 @@ namespace Mfr.Models
         protected void VerifySetupComplete()
         {
             if (!_isSetupComplete)
-            {
                 throw new InvalidOperationException($"Filter '{Type}' setup must complete before transform.");
-            }
+
         }
 
         /// <summary>

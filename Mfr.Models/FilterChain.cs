@@ -59,9 +59,8 @@ namespace Mfr.Models
             foreach (var step in Steps)
             {
                 if (!step.Enabled)
-                {
                     continue;
-                }
+
 
                 step.Filter.Apply(item);
             }

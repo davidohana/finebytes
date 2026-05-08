@@ -68,9 +68,8 @@ namespace Mfr.Core
                 .Where(item => item.Status == RenameStatus.PreviewOk && item.HasPreviewChanges())
                 .ToList();
             if (participants.Count == 0)
-            {
                 return new CommitPlan(Steps: [], UnresolvableCycleItems: []);
-            }
+
 
             var dependsOn = _BuildDependencyEdges(participants);
             var steps = new List<CommitStep>();
@@ -145,16 +144,14 @@ namespace Mfr.Core
                 foreach (var other in participants)
                 {
                     if (ReferenceEquals(subject, other))
-                    {
                         continue;
-                    }
+
 
                     var containmentEdge = _IsAncestorRenameOf(ancestor: other, descendant: subject);
                     var pathShiftEdge = _SubjectPreviewClaimsOtherSource(subject: subject, other: other);
                     if (containmentEdge || pathShiftEdge)
-                    {
                         dependsOn[subject].Add(other);
-                    }
+
                 }
             }
 
@@ -164,18 +161,16 @@ namespace Mfr.Core
         private static bool _IsAncestorRenameOf(RenameItem ancestor, RenameItem descendant)
         {
             if (!ancestor.Original.Attributes.IsDirectory())
-            {
                 return false;
-            }
+
 
             var ancestorRenames = !string.Equals(
                 ancestor.Original.FullPath,
                 ancestor.Preview.FullPath,
                 StringComparison.Ordinal);
             if (!ancestorRenames)
-            {
                 return false;
-            }
+
 
             return PathRelations.IsDescendantOf(
                 candidate: descendant.Original.FullPath,
@@ -189,18 +184,16 @@ namespace Mfr.Core
                 subject.Preview.FullPath,
                 StringComparison.Ordinal);
             if (!subjectPathChanges)
-            {
                 return false;
-            }
+
 
             var otherPathChanges = !string.Equals(
                 other.Original.FullPath,
                 other.Preview.FullPath,
                 StringComparison.Ordinal);
             if (!otherPathChanges)
-            {
                 return false;
-            }
+
 
             return PathComparers.Os.Equals(subject.Preview.FullPath, other.Original.FullPath);
         }
@@ -223,9 +216,8 @@ namespace Mfr.Core
         {
             var cycle = _FindCycleNodes(remaining, dependsOn);
             if (cycle.Count == 0)
-            {
                 return false;
-            }
+
 
             // Stash any one cycle member; its destination is freed for others.
             var stashItem = cycle[0];
@@ -293,20 +285,17 @@ namespace Mfr.Core
                 }
 
                 if (current is null)
-                {
                     continue;
-                }
+
 
                 if (!pathSet.Contains(current))
-                {
                     continue;
-                }
+
 
                 var cycleStartIndex = pathOrder.IndexOf(current);
                 if (cycleStartIndex < 0)
-                {
                     continue;
-                }
+
 
                 var cycle = pathOrder.GetRange(cycleStartIndex, pathOrder.Count - cycleStartIndex);
                 return cycle;
@@ -340,15 +329,13 @@ namespace Mfr.Core
                     }
 
                     if (candidates.Contains(dependency))
-                    {
                         blocking++;
-                    }
+
                 }
 
                 if (blocking == 0)
-                {
                     return item;
-                }
+
             }
 
             return null;
@@ -360,9 +347,8 @@ namespace Mfr.Core
             Dictionary<RenameItem, string> stashedTempPaths)
         {
             if (stashedTempPaths.TryGetValue(item, out var stashedTempPath))
-            {
                 return stashedTempPath;
-            }
+
 
             // Apply ancestor renames innermost-first so chained ancestors compose correctly.
             var ancestors = participants

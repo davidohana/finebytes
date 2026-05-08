@@ -137,14 +137,12 @@ namespace Mfr.Filters.Case
         private static string _FirstLetterUp(string input)
         {
             if (input.Length == 0)
-            {
                 return input;
-            }
+
 
             if (input.Length == 1)
-            {
                 return char.ToUpperInvariant(input[0]).ToString();
-            }
+
 
             return char.ToUpperInvariant(input[0]) + input[1..].ToLowerInvariant();
         }
@@ -156,29 +154,25 @@ namespace Mfr.Filters.Case
             bool weirdFixedPlaces)
         {
             if (input.Length == 0)
-            {
                 return input;
-            }
+
 
             var uppercaseChancePercent = Math.Clamp(weirdUppercaseChancePercent, 0, 100);
             if (uppercaseChancePercent == 0)
-            {
                 return input.ToLowerInvariant();
-            }
+
 
             if (uppercaseChancePercent == 100)
-            {
                 return input.ToUpperInvariant();
-            }
+
 
             var chars = input.ToCharArray();
             for (var i = 0; i < chars.Length; i++)
             {
                 var c = chars[i];
                 if (!char.IsLetter(c))
-                {
                     continue;
-                }
+
 
                 var itemSeed = weirdFixedPlaces ? 0 : item.Original.GlobalIndex;
                 var score = _GetPseudoRandomPercent(position: i, itemSeed: itemSeed);
@@ -204,9 +198,8 @@ namespace Mfr.Filters.Case
         private static string _ApplyTitleCase(string input, IReadOnlyList<string> skipWords, char wordSeparator)
         {
             if (input.Length == 0)
-            {
                 return input;
-            }
+
 
             var skipWordToIsExcluded = new HashSet<string>(skipWords, StringComparer.OrdinalIgnoreCase);
             var sb = new StringBuilder(input.Length);
@@ -220,9 +213,8 @@ namespace Mfr.Filters.Case
                 }
 
                 if (i >= input.Length)
-                {
                     break;
-                }
+
 
                 var start = i;
                 while (i < input.Length && input[i] != wordSeparator)
@@ -240,14 +232,12 @@ namespace Mfr.Filters.Case
         private static string _TitleCaseOneWord(string word, HashSet<string> skipWordToIsExcluded)
         {
             if (skipWordToIsExcluded.Contains(word))
-            {
                 return word.ToLowerInvariant();
-            }
+
 
             if (word.Length == 0)
-            {
                 return word;
-            }
+
 
             return word.Length == 1
                 ? word.ToUpperInvariant()
@@ -257,39 +247,33 @@ namespace Mfr.Filters.Case
         private static string _ApplySentenceCase(string input, char wordSeparator, string sentenceEndChars)
         {
             if (string.IsNullOrEmpty(input))
-            {
                 return input;
-            }
+
 
             var chars = input.ToLowerInvariant().ToCharArray();
             if (_IsAsciiLowerLetter(chars[0]))
-            {
                 chars[0] = char.ToUpperInvariant(chars[0]);
-            }
+
 
             if (sentenceEndChars.Length == 0)
-            {
                 return new string(chars);
-            }
+
 
             var sentenceEndToIsIncluded = new HashSet<char>(sentenceEndChars.Where(c => c != wordSeparator));
             if (sentenceEndToIsIncluded.Count == 0)
-            {
                 return new string(chars);
-            }
+
 
             for (var i = 0; i < chars.Length; i++)
             {
                 if (!sentenceEndToIsIncluded.Contains(chars[i]))
-                {
                     continue;
-                }
+
 
                 var j = i + 1;
                 if (j >= chars.Length || chars[j] != wordSeparator)
-                {
                     continue;
-                }
+
 
                 while (j < chars.Length && chars[j] == wordSeparator)
                 {
@@ -297,9 +281,8 @@ namespace Mfr.Filters.Case
                 }
 
                 if (j >= chars.Length || !_IsAsciiLowerLetter(chars[j]))
-                {
                     continue;
-                }
+
 
                 chars[j] = char.ToUpperInvariant(chars[j]);
             }
@@ -319,9 +302,8 @@ namespace Mfr.Filters.Case
             {
                 var c = chars[i];
                 if (char.IsUpper(c))
-                {
                     chars[i] = char.ToLowerInvariant(c);
-                }
+
                 else if (char.IsLower(c))
                 {
                     chars[i] = char.ToUpperInvariant(c);

@@ -78,14 +78,12 @@ namespace Mfr.Filters.Replace
             };
 
             if (options.WholeWord)
-            {
                 pattern = $@"\b(?:{pattern})\b";
-            }
+
 
             if (options.ReplaceAll)
-            {
                 return Regex.Replace(segment, pattern, options.Replacement, regexOptions);
-            }
+
 
             var regex = new Regex(pattern, regexOptions);
             return regex.Replace(segment, options.Replacement, 1);

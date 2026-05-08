@@ -46,18 +46,16 @@ namespace Mfr.Filters.Trimming
         protected override string _TransformValue(string value, RenameItem item)
         {
             if (string.IsNullOrEmpty(value))
-            {
                 return value;
-            }
+
 
             var startIndex = _GetAbsoluteIndex(Options.Start, value.Length);
             var endIndex = _GetAbsoluteIndex(Options.End, value.Length);
 
             // Reorder if start is after end
             if (startIndex > endIndex)
-            {
                 (startIndex, endIndex) = (endIndex, startIndex);
-            }
+
 
             // Remove characters from startIndex to endIndex (inclusive)
             return value.Remove(startIndex, endIndex - startIndex + 1);

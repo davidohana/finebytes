@@ -47,33 +47,29 @@ namespace Mfr.App.Cli
             }
 
             if (parsedSettings is null)
-            {
                 return null;
-            }
+
 
             var presetName = _GetValueOrDefault(parsedSettings.PresetName, defaultValue: string.Empty);
             if (presetName.IsBlank())
-            {
                 throw new UserException("Missing required argument: --preset.");
-            }
+
 
             var includeFilesOptionValue = _GetValueOrDefault(parsedSettings.IncludeFiles, defaultValue: "yes");
             var includeFoldersOptionValue = _GetValueOrDefault(parsedSettings.IncludeFolders, defaultValue: "no");
             var includeFiles = _ParseYesNoOption(optionName: "--files", value: includeFilesOptionValue);
             var includeFolders = _ParseYesNoOption(optionName: "--folders", value: includeFoldersOptionValue);
             if (!includeFiles && !includeFolders)
-            {
                 throw new UserException("At least one of --files or --folders must be yes.");
-            }
+
 
             var sources = parsedSettings.Sources
                 .Where(source => !source.IsBlank())
                 .Select(source => source.Trim())
                 .ToList();
             if (sources.Count == 0)
-            {
                 throw new UserException("Missing required argument: SOURCES. Provide one or more source paths or wildcards.");
-            }
+
 
             var rawPresetsFilePath = _GetValueOrDefault(parsedSettings.PresetsFilePath, defaultValue: string.Empty);
             var presetsFilePath = rawPresetsFilePath.IsBlank()

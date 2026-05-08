@@ -34,18 +34,14 @@ namespace Mfr.Utils
             {
                 var parentDirectory = Path.GetDirectoryName(walker);
                 if (string.IsNullOrEmpty(parentDirectory))
-                {
                     _ThrowInsufficientDepth(level, containingDirectoryPath);
-                }
 
                 walker = parentDirectory;
             }
 
             var segment = Path.GetFileName(walker);
             if (string.IsNullOrEmpty(segment))
-            {
                 _ThrowInsufficientDepth(level, containingDirectoryPath);
-            }
 
             return segment;
         }
@@ -72,25 +68,19 @@ namespace Mfr.Utils
             {
                 var name = Path.GetFileName(walker);
                 if (string.IsNullOrEmpty(name))
-                {
                     _ThrowInsufficientDepth(level, containingDirectoryPath);
-                }
 
                 deeperBelowReplaced.Push(name);
                 var parentDirectory = Path.GetDirectoryName(walker);
                 if (string.IsNullOrEmpty(parentDirectory))
-                {
                     _ThrowInsufficientDepth(level, containingDirectoryPath);
-                }
 
                 walker = parentDirectory;
             }
 
             var directoryAboveReplace = Path.GetDirectoryName(walker);
             if (string.IsNullOrEmpty(directoryAboveReplace))
-            {
                 _ThrowInsufficientDepth(level, containingDirectoryPath);
-            }
 
             var rebuilt = Path.Combine(directoryAboveReplace, validatedSegmentName);
             while (deeperBelowReplaced.Count > 0)

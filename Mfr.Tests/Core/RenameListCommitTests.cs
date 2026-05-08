@@ -1018,9 +1018,8 @@ namespace Mfr.Tests.Core
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
             if (expectChangeProperty is not null)
-            {
                 Assert.Contains(result[0].Changes, c => c.Property == expectChangeProperty);
-            }
+
         }
 
         private static FilterPreset _FailingReplacerUnsupportedTargetPreset(string name)

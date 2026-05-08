@@ -35,9 +35,8 @@ namespace Mfr.Filters.Case
         protected override string _TransformValue(string value, RenameItem item)
         {
             if (string.IsNullOrEmpty(value))
-            {
                 return value;
-            }
+
 
             return _regex.Replace(value, m => m.Value.ToUpperInvariant());
         }

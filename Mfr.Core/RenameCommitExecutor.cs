@@ -94,14 +94,12 @@ namespace Mfr.Core
             foreach (var step in plan.Steps)
             {
                 if (stopped)
-                {
                     break;
-                }
+
 
                 if (step.Item.Status != RenameStatus.PreviewOk)
-                {
                     continue;
-                }
+
 
                 if (step is StashStep stashStep)
                 {
@@ -130,9 +128,8 @@ namespace Mfr.Core
                         outcomes: outcomes);
                     inFlightStashedItems.Remove(finalizeStep.Item);
                     if (stepFailed && failFast)
-                    {
                         stopped = true;
-                    }
+
                 }
             }
 
@@ -165,34 +162,29 @@ namespace Mfr.Core
             foreach (var item in allItems)
             {
                 if (stopped)
-                {
                     break;
-                }
+
 
                 if (item.Status != RenameStatus.PreviewError)
-                {
                     continue;
-                }
+
 
                 if (!item.HasPreviewChanges())
-                {
                     continue;
-                }
+
 
                 var confirmed = confirmBeforeApply is null || confirmBeforeApply(item);
                 if (!confirmed)
-                {
                     continue;
-                }
+
 
                 var stepFailed = !_AttemptDirectCommit(
                     item: item,
                     dryRun: dryRun,
                     outcomes: outcomes);
                 if (stepFailed && failFast)
-                {
                     stopped = true;
-                }
+
             }
         }
 
@@ -210,9 +202,8 @@ namespace Mfr.Core
             try
             {
                 if (!dryRun)
-                {
                     RenameItemMover.FinalizeCommit(item, item.Original.FullPath);
-                }
+
 
                 item.Status = RenameStatus.CommitOk;
                 var changes = _BuildCommitChanges(
@@ -253,9 +244,8 @@ namespace Mfr.Core
             Dictionary<RenameItem, PlanOutcome> outcomes)
         {
             if (dryRun)
-            {
                 return;
-            }
+
 
             try
             {
@@ -295,9 +285,8 @@ namespace Mfr.Core
             try
             {
                 if (!dryRun)
-                {
                     RenameItemMover.FinalizeCommit(item, step.ActualSourcePath);
-                }
+
 
                 item.Status = RenameStatus.CommitOk;
                 var changes = _BuildCommitChanges(
