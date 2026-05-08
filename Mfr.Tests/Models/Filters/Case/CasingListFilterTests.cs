@@ -153,7 +153,6 @@ namespace Mfr.Tests.Models.Filters.Case
             if (!File.Exists(filePath))
                 return;
 
-
             File.Delete(filePath);
         }
     }

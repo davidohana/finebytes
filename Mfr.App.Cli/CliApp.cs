@@ -38,7 +38,6 @@ namespace Mfr.App.Cli
             if (options is null)
                 return CliExitCode.Success;
 
-
             try
             {
                 ConfigLoader.Load(options.ConfigFilePath);
@@ -73,7 +72,6 @@ namespace Mfr.App.Cli
             if (options.PresetsFilePath.IsBlank())
                 throw new UserException("Presets file path is required.");
 
-
             var presetManager = new PresetManager(options.PresetsFilePath);
             if (options.PresetName.IsBlank())
                 throw new UserException("Preset name is required.");
@@ -97,12 +95,10 @@ namespace Mfr.App.Cli
             if (renameItems.Count == 0)
                 throw new UserException("No files matched the provided sources.");
 
-
             renameList.Preview(preset: preset);
             var hasPreviewErrors = renameItems.Any(item => item.Status == RenameStatus.PreviewError);
             if (hasPreviewErrors)
                 return CliExitCode.UserError;
-
 
             var commitFailFast = !options.ContinueOnRenameError;
             Func<RenameItem, bool>? confirmBeforeApply = options.ConfirmBeforeCommit
@@ -133,7 +129,6 @@ namespace Mfr.App.Cli
             var detail = item.FormatPreviewChangesForDisplay();
             if (!detail.IsBlank())
                 Console.WriteLine(detail);
-
 
             var apply = AnsiConsole.Confirm("Apply rename?");
             Console.WriteLine();

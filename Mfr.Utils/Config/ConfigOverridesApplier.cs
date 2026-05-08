@@ -36,7 +36,6 @@ namespace Mfr.Utils.Config
                 if (raw.IsBlank())
                     continue;
 
-
                 var trimmed = raw.Trim();
                 var equalsIndex = trimmed.IndexOf('=');
                 if (equalsIndex <= 0)
@@ -70,7 +69,6 @@ namespace Mfr.Utils.Config
 
             if (merged.Count == 0)
                 return;
-
 
             var utf8Json = JsonSerializer.SerializeToUtf8Bytes(merged);
             using var doc = JsonDocument.Parse(utf8Json);
@@ -117,10 +115,9 @@ namespace Mfr.Utils.Config
                 if (attr is null)
                     continue;
 
-
                 var jsonKey = string.IsNullOrEmpty(attr.JsonName)
-                    ? s_Naming.ConvertName(field.Name)
-                    : attr.JsonName;
+                                    ? s_Naming.ConvertName(field.Name)
+                                    : attr.JsonName;
                 if (string.Equals(jsonKey, segment, StringComparison.OrdinalIgnoreCase))
                     return field;
 
@@ -137,12 +134,10 @@ namespace Mfr.Utils.Config
                 if (field.GetCustomAttribute<ConfigSectionAttribute>() is not null)
                     continue;
 
-
                 var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
                 var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
                 if (intRange is null && strMax is null)
                     continue;
-
 
                 var jsonName = s_Naming.ConvertName(field.Name);
                 if (string.Equals(jsonName, segment, StringComparison.OrdinalIgnoreCase))

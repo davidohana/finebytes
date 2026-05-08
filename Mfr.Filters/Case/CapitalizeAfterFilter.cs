@@ -33,7 +33,6 @@ namespace Mfr.Filters.Case
             if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(Options.CapitalizeAfterChars))
                 return value;
 
-
             var capitalizeAfterSet = new HashSet<char>(Options.CapitalizeAfterChars);
             var chars = value.ToCharArray();
             for (var i = 0; i < chars.Length - 1; i++)

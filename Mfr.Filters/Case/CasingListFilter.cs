@@ -57,16 +57,14 @@ namespace Mfr.Filters.Case
             if (value.Length == 0 || lowerWordToCasing.Count == 0)
                 return value;
 
-
             var transformed = _ApplyCasingList(value, item.WordSeparator, lowerWordToCasing);
             if (!Options.UppercaseSentenceInitial)
                 return transformed;
 
-
             return _UppercaseSentenceInitials(
-                input: transformed,
-                wordSeparator: item.WordSeparator,
-                sentenceEndChars: item.SentenceEndChars);
+                            input: transformed,
+                            wordSeparator: item.WordSeparator,
+                            sentenceEndChars: item.SentenceEndChars);
         }
 
         /// <summary>
@@ -111,7 +109,6 @@ namespace Mfr.Filters.Case
             if (word.IsEmpty)
                 return;
 
-
             var originalWord = word.ToString();
             var lowerWord = originalWord.ToLowerInvariant();
             output.Append(lowerWordToCasing.GetValueOrDefault(lowerWord, originalWord));
@@ -129,7 +126,6 @@ namespace Mfr.Filters.Case
             if (input.Length == 0)
                 return input;
 
-
             var chars = input.ToCharArray();
             _UppercaseFirstAsciiLetter(chars, startIndex: 0);
 
@@ -137,12 +133,10 @@ namespace Mfr.Filters.Case
             if (sentenceEndToIsIncluded.Count == 0)
                 return new string(chars);
 
-
             for (var i = 0; i < chars.Length; i++)
             {
                 if (!sentenceEndToIsIncluded.Contains(chars[i]))
                     continue;
-
 
                 var nextIndex = i + 1;
                 while (nextIndex < chars.Length && chars[nextIndex] == wordSeparator)

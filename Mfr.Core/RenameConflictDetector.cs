@@ -30,7 +30,6 @@ namespace Mfr.Core
             if (candidateItems.Count == 0)
                 return;
 
-
             var movingSourcePaths = _BuildMovingSourceSet(candidateItems);
             var folderRenameAncestors = _BuildFolderRenameList(candidateItems);
             var duplicateDestinations = _BuildDuplicateDestinationSet(candidateItems);
@@ -52,14 +51,12 @@ namespace Mfr.Core
                 if (item.IsPreviewPathUnchanged())
                     continue;
 
-
                 var willBeVacatedByBatch = _WillBeVacatedByBatch(
-                    destinationPath: destinationPath,
-                    movingSourcePaths: movingSourcePaths,
-                    folderRenameAncestors: folderRenameAncestors);
+                                    destinationPath: destinationPath,
+                                    movingSourcePaths: movingSourcePaths,
+                                    folderRenameAncestors: folderRenameAncestors);
                 if (willBeVacatedByBatch)
                     continue;
-
 
                 // A case-only rename targets the item's own path on a case-insensitive filesystem;
                 // File.Move and Directory.Move accept this on .NET, so it's not a conflict.
@@ -69,9 +66,8 @@ namespace Mfr.Core
                 if (isCaseOnlySelfRename)
                     continue;
 
-
                 var destinationOccupiedOnDisk =
-                    Directory.Exists(destinationPath) || File.Exists(destinationPath);
+                                    Directory.Exists(destinationPath) || File.Exists(destinationPath);
                 if (destinationOccupiedOnDisk)
                 {
                     item.SetPreviewError(
@@ -125,7 +121,6 @@ namespace Mfr.Core
         {
             if (movingSourcePaths.Contains(destinationPath))
                 return true;
-
 
             // A descendant path is implicitly vacated when its ancestor folder is renamed away.
             return folderRenameAncestors.Any(folderRename =>

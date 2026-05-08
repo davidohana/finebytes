@@ -70,7 +70,6 @@ namespace Mfr.Core
             if (string.IsNullOrWhiteSpace(source))
                 throw new UserException("Source cannot be empty.");
 
-
             var trimmedSource = source.Trim();
             var fullSource = Path.GetFullPath(trimmedSource);
             var isRootPath = string.Equals(
@@ -80,11 +79,10 @@ namespace Mfr.Core
             if (isRootPath)
                 throw new UserException($"Root paths cannot be added as rename sources: '{trimmedSource}'.");
 
-
             var resolvedPaths = PathResolver.ResolveToPaths(
-                source: trimmedSource,
-                includeFolders: includeFolders,
-                includeSubdirs: includeSubdirs).ToList();
+                            source: trimmedSource,
+                            includeFolders: includeFolders,
+                            includeSubdirs: includeSubdirs).ToList();
             var addedCount = _AppendPaths(
                 resolvedPaths: resolvedPaths,
                 includeFiles: includeFiles,
@@ -242,7 +240,6 @@ namespace Mfr.Core
                 if (!_resolvedPathToIsIncluded.Add(normalizedResolvedPath))
                     continue;
 
-
                 var attrs = File.GetAttributes(fullPath);
                 if (!_includeHidden &&
                     (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System)))
@@ -254,10 +251,8 @@ namespace Mfr.Core
                 if (isDirectory && !includeFolders)
                     continue;
 
-
                 if (!isDirectory && !includeFiles)
                     continue;
-
 
                 if (isDirectory)
                 {

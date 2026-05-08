@@ -44,7 +44,6 @@ namespace Mfr.Core
             if (folderRenames.Count == 0)
                 return;
 
-
             // Process items shallow-first so each ancestor's Preview.FullPath is finalized
             // before any descendant references it during its own rebase.
             items

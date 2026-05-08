@@ -32,7 +32,6 @@ namespace Mfr.Tests.Core
                 if (!Directory.Exists(_tempRoot))
                     return;
 
-
                 foreach (var file in Directory.EnumerateFiles(_tempRoot, "*", SearchOption.AllDirectories))
                 {
                     var attrs = File.GetAttributes(file);

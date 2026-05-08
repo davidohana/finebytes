@@ -50,18 +50,14 @@ namespace Mfr.Filters.Space
             if (options.ReplacePercent20)
                 sources.Add("%20");
 
-
             if (options.ReplaceSpaces)
                 sources.Add(" ");
-
 
             if (options.ReplaceUnderscores)
                 sources.Add("_");
 
-
             if (options.CustomText.Length > 0)
                 sources.Add(options.CustomText);
-
 
             return sources;
         }

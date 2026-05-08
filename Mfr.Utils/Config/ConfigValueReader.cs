@@ -33,7 +33,6 @@ namespace Mfr.Utils.Config
             if (raw is null)
                 return;
 
-
             if (raw.IsBlank())
             {
                 throw new InvalidDataException(
@@ -78,7 +77,6 @@ namespace Mfr.Utils.Config
             if (raw is null)
                 return;
 
-
             if (raw.IsBlank())
             {
                 throw new InvalidDataException(
@@ -110,24 +108,20 @@ namespace Mfr.Utils.Config
             if (root.ValueKind != JsonValueKind.Object)
                 throw new InvalidDataException("Root must be a JSON object.");
 
-
             foreach (var prop in root.EnumerateObject())
             {
                 if (!string.Equals(prop.Name, propertyName, StringComparison.OrdinalIgnoreCase))
                     continue;
 
-
                 var kind = prop.Value.ValueKind;
                 if (kind == JsonValueKind.String)
                     return prop.Value.GetString();
 
-
                 if (kind == JsonValueKind.Null)
                     return null;
 
-
                 throw new InvalidDataException(
-                    $"'{propertyName}' must be a JSON string or null.");
+                                    $"'{propertyName}' must be a JSON string or null.");
             }
 
             return null;

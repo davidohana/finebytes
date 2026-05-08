@@ -23,7 +23,6 @@ namespace Mfr.Filters.Space
             if (string.IsNullOrEmpty(value))
                 return value;
 
-
             return value.TrimStart(item.WordSeparator);
         }
     }

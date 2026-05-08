@@ -20,7 +20,6 @@ namespace Mfr.Models
             if (_isSetupComplete)
                 return;
 
-
             _Setup();
             _isSetupComplete = true;
         }

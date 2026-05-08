@@ -61,7 +61,6 @@ namespace Mfr.Models
                 if (!step.Enabled)
                     continue;
 
-
                 step.Filter.Apply(item);
             }
         }

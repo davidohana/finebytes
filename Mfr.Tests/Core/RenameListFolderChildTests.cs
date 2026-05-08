@@ -137,7 +137,6 @@ namespace Mfr.Tests.Core
             if (!OperatingSystem.IsWindows())
                 return;
 
-
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("track.mp3");
             File.WriteAllText(sourcePath, "x");
@@ -172,7 +171,6 @@ namespace Mfr.Tests.Core
         {
             if (!OperatingSystem.IsWindows())
                 return;
-
 
             var dir = _tempDirectoryFixture.CreateTempDir();
             var oldFolder = dir.CombinePath("album");

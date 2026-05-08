@@ -106,7 +106,6 @@ namespace Mfr.Tests.Architecture
                 if (File.Exists(solutionPath))
                     return directory.FullName;
 
-
                 directory = directory.Parent;
             }
 

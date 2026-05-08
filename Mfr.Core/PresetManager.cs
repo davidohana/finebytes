@@ -40,7 +40,6 @@ namespace Mfr.Core
             if (!File.Exists(PresetsFilePath))
                 throw new UserException($"Presets file not found: '{PresetsFilePath}'.");
 
-
             PresetContainer container;
             try
             {
@@ -75,11 +74,10 @@ namespace Mfr.Core
                 if (!string.IsNullOrWhiteSpace(directory))
                     Directory.CreateDirectory(directory);
 
-
                 var sortedPresets = NameToPreset.Values
-                    .OrderBy(preset => preset.Name, StringComparer.OrdinalIgnoreCase)
-                    .ThenBy(preset => preset.Name, StringComparer.Ordinal)
-                    .ToList();
+                                    .OrderBy(preset => preset.Name, StringComparer.OrdinalIgnoreCase)
+                                    .ThenBy(preset => preset.Name, StringComparer.Ordinal)
+                                    .ToList();
                 var container = new PresetContainer(sortedPresets);
                 var json = JsonSerializer.Serialize(container, PresetJsonOptions.Default);
                 File.WriteAllText(PresetsFilePath, json);

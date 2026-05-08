@@ -17,7 +17,6 @@ namespace Mfr.Core
             if (!renameItem.HasPreviewChanges())
                 return;
 
-
             var originalFullPath = renameItem.Original.FullPath;
             Log.Debug("Preview changes for {OriginalFullPath}:", originalFullPath);
 
@@ -51,11 +50,9 @@ namespace Mfr.Core
             if (!renameItem.HasPreviewChanges())
                 return string.Empty;
 
-
             var previewChanges = renameItem.GetPreviewPropertyChanges();
             if (previewChanges.Count == 0)
                 return $"{renameItem.Original.FullPath} --> {renameItem.Preview.FullPath}";
-
 
             return string.Join(Environment.NewLine, previewChanges.Select(change => change.FormatPreviewChangeBlock()));
         }

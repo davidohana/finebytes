@@ -36,7 +36,6 @@ namespace Mfr.Filters.Replace
             if (chars.Count == 0)
                 return value;
 
-
             var sb = new System.Text.StringBuilder(value.Length);
             foreach (var c in value)
             {

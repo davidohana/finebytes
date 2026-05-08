@@ -96,10 +96,8 @@ namespace Mfr.Core
                 if (stopped)
                     break;
 
-
                 if (step.Item.Status != RenameStatus.PreviewOk)
                     continue;
-
 
                 if (step is StashStep stashStep)
                 {
@@ -164,24 +162,20 @@ namespace Mfr.Core
                 if (stopped)
                     break;
 
-
                 if (item.Status != RenameStatus.PreviewError)
                     continue;
 
-
                 if (!item.HasPreviewChanges())
                     continue;
-
 
                 var confirmed = confirmBeforeApply is null || confirmBeforeApply(item);
                 if (!confirmed)
                     continue;
 
-
                 var stepFailed = !_AttemptDirectCommit(
-                    item: item,
-                    dryRun: dryRun,
-                    outcomes: outcomes);
+                                    item: item,
+                                    dryRun: dryRun,
+                                    outcomes: outcomes);
                 if (stepFailed && failFast)
                     stopped = true;
 
@@ -203,7 +197,6 @@ namespace Mfr.Core
             {
                 if (!dryRun)
                     RenameItemMover.FinalizeCommit(item, item.Original.FullPath);
-
 
                 item.Status = RenameStatus.CommitOk;
                 var changes = _BuildCommitChanges(
@@ -246,7 +239,6 @@ namespace Mfr.Core
             if (dryRun)
                 return;
 
-
             try
             {
                 RenameItemMover.StashSourceToTemp(step.Item, step.TempPath);
@@ -286,7 +278,6 @@ namespace Mfr.Core
             {
                 if (!dryRun)
                     RenameItemMover.FinalizeCommit(item, step.ActualSourcePath);
-
 
                 item.Status = RenameStatus.CommitOk;
                 var changes = _BuildCommitChanges(

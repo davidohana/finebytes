@@ -37,7 +37,6 @@ namespace Mfr.Filters.Formatting
             if (string.IsNullOrEmpty(Options.Delimiter))
                 return value;
 
-
             var tokens = value.Split(Options.Delimiter, StringSplitOptions.None);
             var count = tokens.Length;
             var sourceIndex = Options.TokenNumber - 1;
@@ -45,11 +44,9 @@ namespace Mfr.Filters.Formatting
             if (tokenNumberIsInvalid)
                 return value;
 
-
             var targetIndex = Math.Clamp(sourceIndex + Options.MoveBy, 0, count - 1);
             if (sourceIndex == targetIndex)
                 return value;
-
 
             return _MoveToken(tokens, sourceIndex, targetIndex, Options.Delimiter);
         }

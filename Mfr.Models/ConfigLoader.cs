@@ -63,7 +63,6 @@ namespace Mfr.Models
                 if (!useDefaultPath)
                     throw new InvalidDataException($"Config file not found: '{path}'.");
 
-
                 return;
             }
 
@@ -95,7 +94,6 @@ namespace Mfr.Models
                 .ToList();
             if (list.Count == 0)
                 return;
-
 
             try
             {

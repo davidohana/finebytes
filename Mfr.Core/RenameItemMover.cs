@@ -68,7 +68,6 @@ namespace Mfr.Core
             if (item.Original.Attributes != item.Preview.Attributes)
                 File.SetAttributes(pathOnDisk, item.Preview.Attributes);
 
-
             var pathIsDirectoryAfterApply = pathOnDisk.IsDirectory();
             _ApplyTimestampChangesIfNeeded(
                 pathOnDisk: pathOnDisk,
@@ -95,7 +94,6 @@ namespace Mfr.Core
             var leaf = Path.GetFileName(Path.TrimEndingDirectorySeparator(nearPath));
             if (string.IsNullOrEmpty(leaf))
                 leaf = "entry";
-
 
             var suffix = _TempSuffixPrefix + Guid.NewGuid().ToString("N");
             var candidate = string.IsNullOrEmpty(directory)

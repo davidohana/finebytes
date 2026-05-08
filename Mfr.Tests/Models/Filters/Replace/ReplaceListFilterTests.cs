@@ -237,7 +237,6 @@ namespace Mfr.Tests.Models.Filters.Replace
             if (!File.Exists(filePath))
                 return;
 
-
             File.Delete(filePath);
         }
     }

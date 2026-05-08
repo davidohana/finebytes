@@ -54,7 +54,6 @@ namespace Mfr.Models
             if (!string.IsNullOrWhiteSpace(outputDirectoryPath))
                 Directory.CreateDirectory(outputDirectoryPath);
 
-
             File.WriteAllText(outputFilePathTrimmed, json);
         }
 

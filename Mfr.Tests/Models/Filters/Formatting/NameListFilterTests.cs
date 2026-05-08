@@ -69,7 +69,6 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 """
                 First
 
-
                 Second
                 """);
             try

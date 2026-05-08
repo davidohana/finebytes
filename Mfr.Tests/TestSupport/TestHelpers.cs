@@ -55,23 +55,20 @@ namespace Mfr.Tests.TestSupport
             if (string.IsNullOrWhiteSpace(rootDirectory))
                 throw new ArgumentException("Root directory cannot be empty.", nameof(rootDirectory));
 
-
             var createdPaths = new List<string>(relativePaths.Length);
             foreach (var relativePath in relativePaths)
             {
                 if (string.IsNullOrWhiteSpace(relativePath))
                     throw new ArgumentException("Relative file path cannot be empty.", nameof(relativePaths));
 
-
                 var normalizedRelativePath = relativePath
-                    .Replace('\\', Path.DirectorySeparatorChar)
-                    .Replace('/', Path.DirectorySeparatorChar)
-                    .TrimStart(Path.DirectorySeparatorChar);
+                                    .Replace('\\', Path.DirectorySeparatorChar)
+                                    .Replace('/', Path.DirectorySeparatorChar)
+                                    .TrimStart(Path.DirectorySeparatorChar);
                 var fullPath = Path.GetFullPath(Path.Combine(rootDirectory, normalizedRelativePath));
                 var parentDirectory = Path.GetDirectoryName(fullPath);
                 if (!string.IsNullOrWhiteSpace(parentDirectory))
                     Directory.CreateDirectory(parentDirectory);
-
 
                 File.WriteAllText(fullPath, "dummy");
                 createdPaths.Add(fullPath);

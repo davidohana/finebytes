@@ -34,7 +34,6 @@ namespace Mfr.Utils
             if (!sameOnDisk)
                 return false;
 
-
             return !string.Equals(first, second, StringComparison.Ordinal);
         }
 
@@ -86,11 +85,9 @@ namespace Mfr.Utils
             if (trimmedAncestor.Length == 0)
                 return false;
 
-
             var trimmedCandidate = candidate.TrimTrailingSeparator();
             if (trimmedCandidate.Length <= trimmedAncestor.Length)
                 return false;
-
 
             var separatorChar = trimmedCandidate[trimmedAncestor.Length];
             var nextCharIsSeparator =
@@ -98,7 +95,6 @@ namespace Mfr.Utils
                 || separatorChar == Path.AltDirectorySeparatorChar;
             if (!nextCharIsSeparator)
                 return false;
-
 
             var prefix = trimmedCandidate[..trimmedAncestor.Length];
             return comparer.Equals(prefix, trimmedAncestor);
@@ -122,10 +118,8 @@ namespace Mfr.Utils
             if (pathIsAncestorItself)
                 return newAncestor;
 
-
             if (!IsDescendantOf(fullPath, oldAncestor))
                 return fullPath;
-
 
             var remainder = fullPath[trimmedOld.Length..];
             return newAncestor.TrimTrailingSeparator() + remainder;

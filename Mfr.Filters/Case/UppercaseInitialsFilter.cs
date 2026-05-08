@@ -37,7 +37,6 @@ namespace Mfr.Filters.Case
             if (string.IsNullOrEmpty(value))
                 return value;
 
-
             return _regex.Replace(value, m => m.Value.ToUpperInvariant());
         }
 

@@ -77,7 +77,6 @@ namespace Mfr.Core
             if (typeInfo.Type != typeof(BaseFilter))
                 return;
 
-
             var poly = new JsonPolymorphismOptions { TypeDiscriminatorPropertyName = "type" };
             foreach (var derived in s_BaseFilterDerivedTypes)
             {

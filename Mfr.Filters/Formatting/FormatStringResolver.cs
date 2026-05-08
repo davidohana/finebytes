@@ -46,7 +46,6 @@ namespace Mfr.Filters.Formatting
             if (parts.Length != 5)
                 throw new InvalidOperationException($"Invalid counter token arg '{arg}'. Expected 5 comma-separated params.");
 
-
             var start = int.Parse(parts[0], CultureInfo.InvariantCulture);
             var step = int.Parse(parts[1], CultureInfo.InvariantCulture);
             var reset = int.Parse(parts[2], CultureInfo.InvariantCulture);
@@ -58,7 +57,6 @@ namespace Mfr.Filters.Formatting
             var raw = value.ToString(CultureInfo.InvariantCulture);
             if (width <= 0)
                 return raw;
-
 
             var padChar = pad == 0 ? '0' : ' ';
             return raw.PadLeft(width, padChar);

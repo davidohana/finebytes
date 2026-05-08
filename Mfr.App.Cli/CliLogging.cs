@@ -70,20 +70,18 @@ namespace Mfr.App.Cli
             if (!Directory.Exists(logDirectoryPath))
                 return;
 
-
             var sessionLogFilePaths = Directory
-                .EnumerateFiles(
-                    logDirectoryPath,
-                    $"{sessionLogPrefix}*{sessionLogExtension}",
-                    SearchOption.TopDirectoryOnly)
-                .Select(path => new FileInfo(path))
-                .OrderByDescending(fileInfo => fileInfo.CreationTimeUtc)
-                .ThenByDescending(fileInfo => fileInfo.Name, StringComparer.Ordinal)
-                .ToList();
+                            .EnumerateFiles(
+                                logDirectoryPath,
+                                $"{sessionLogPrefix}*{sessionLogExtension}",
+                                SearchOption.TopDirectoryOnly)
+                            .Select(path => new FileInfo(path))
+                            .OrderByDescending(fileInfo => fileInfo.CreationTimeUtc)
+                            .ThenByDescending(fileInfo => fileInfo.Name, StringComparer.Ordinal)
+                            .ToList();
 
             if (sessionLogFilePaths.Count <= maxSessionFiles)
                 return;
-
 
             foreach (var fileInfo in sessionLogFilePaths.Skip(maxSessionFiles))
             {
@@ -105,7 +103,6 @@ namespace Mfr.App.Cli
         {
             if (!configuredLogDirectoryPath.IsBlank())
                 return configuredLogDirectoryPath.Trim();
-
 
             var localAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             return Path.Combine(localAppDataPath, "finebytes", "mfr", "logs");

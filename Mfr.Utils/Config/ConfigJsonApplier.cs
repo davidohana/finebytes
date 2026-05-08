@@ -62,15 +62,12 @@ namespace Mfr.Utils.Config
                     if (nested is null)
                         continue;
 
-
                     var sectionKey = sectionAttr.JsonName;
                     if (string.IsNullOrEmpty(sectionKey))
                         sectionKey = naming.ConvertName(field.Name);
 
-
                     if (!_TryGetObjectProperty(configObject, sectionKey, out var nestedObject))
                         continue;
-
 
                     Apply(nestedObject, nested, jsonPropertyNamingPolicy);
                     continue;
@@ -132,12 +129,10 @@ namespace Mfr.Utils.Config
             if (root.ValueKind != JsonValueKind.Object)
                 throw new InvalidDataException("Root must be a JSON object.");
 
-
             foreach (var prop in root.EnumerateObject())
             {
                 if (!string.Equals(prop.Name, propertyName, StringComparison.OrdinalIgnoreCase))
                     continue;
-
 
                 var kind = prop.Value.ValueKind;
                 if (kind == JsonValueKind.Null)

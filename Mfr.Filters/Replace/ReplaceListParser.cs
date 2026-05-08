@@ -63,7 +63,6 @@ namespace Mfr.Filters.Replace
             if (lines.Count == 0)
                 throw new UserException("Replace-list file must contain at least one replacement entry.");
 
-
             _ValidateLineLength(lines);
 
             var entries = new List<ReplaceListEntry>();
@@ -75,15 +74,12 @@ namespace Mfr.Filters.Replace
                 if (!searchLine.Text.StartsWith("S:", StringComparison.Ordinal))
                     _ThrowInvalidFormat(searchLine.LineNumber, "search line must start with 'S:'.");
 
-
                 if (i >= lines.Count)
                     _ThrowInvalidFormat(searchLine.LineNumber, "found a search line without a corresponding replace line.");
-
 
                 var replaceLine = lines[i++];
                 if (!replaceLine.Text.StartsWith("R:", StringComparison.Ordinal))
                     _ThrowInvalidFormat(replaceLine.LineNumber, "replace line must start with 'R:'.");
-
 
                 var searchText = searchLine.Text[2..];
                 var replaceText = replaceLine.Text[2..];
@@ -91,10 +87,8 @@ namespace Mfr.Filters.Replace
                 if (string.IsNullOrEmpty(searchText))
                     _ThrowInvalidFormat(searchLine.LineNumber, "search line cannot be empty.");
 
-
                 if (string.IsNullOrEmpty(replaceText))
                     _ThrowInvalidFormat(replaceLine.LineNumber, $"replace line cannot be empty. Use '{EmptyReplacementToken}' to strip matches.");
-
 
                 entries.Add(new ReplaceListEntry(searchText, _ResolveEmptyReplacementToken(replaceText)));
             }
@@ -120,17 +114,15 @@ namespace Mfr.Filters.Replace
             if (firstInvalidLine == default)
                 return;
 
-
             _ThrowInvalidFormat(
-                lineNumber: firstInvalidLine.LineNumber,
-                detail: $"line length exceeds {maxLen} characters.");
+                            lineNumber: firstInvalidLine.LineNumber,
+                            detail: $"line length exceeds {maxLen} characters.");
         }
 
         private static string _ResolveEmptyReplacementToken(string replacement)
         {
             if (string.Equals(replacement, EmptyReplacementToken, StringComparison.Ordinal))
                 return string.Empty;
-
 
             return replacement;
         }

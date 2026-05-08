@@ -34,7 +34,6 @@ namespace Mfr.Filters.Space
             if (value.Length <= 1)
                 return value;
 
-
             var separator = item.WordSeparator.ToString();
             var builder = new StringBuilder(value.Length + 8);
             builder.Append(value[0]);
@@ -44,7 +43,6 @@ namespace Mfr.Filters.Space
                 var current = value[i];
                 if (_ShouldInsertSeparator(previous, current))
                     builder.Append(separator);
-
 
                 builder.Append(current);
             }

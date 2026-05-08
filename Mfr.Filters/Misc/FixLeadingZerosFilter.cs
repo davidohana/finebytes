@@ -35,7 +35,6 @@ namespace Mfr.Filters.Misc
             if (Options.Width <= 0)
                 return value;
 
-
             var count = 0;
             return _DigitsRegex().Replace(value, m =>
             {
@@ -55,21 +54,17 @@ namespace Mfr.Filters.Misc
                 if (Options.MaxCount > 0 && count >= Options.MaxCount)
                     return m.Value;
 
-
                 count++;
 
                 var digits = m.Value;
                 if (Options.RemoveExtraZeros)
                     digits = digits.TrimStart('0');
 
-
                 if (digits.Length == 0)
                     digits = "0";
 
-
                 if (digits.Length >= Options.Width)
                     return digits;
-
 
                 return digits.PadLeft(Options.Width, '0');
             });

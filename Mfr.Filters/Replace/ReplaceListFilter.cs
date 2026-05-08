@@ -50,7 +50,6 @@ namespace Mfr.Filters.Replace
             if (searchToReplace.Count == 0)
                 return value;
 
-
             var transformed = value;
             foreach (var entry in searchToReplace)
             {
