@@ -100,6 +100,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [InlineData("label")]
         [InlineData("file-count")]
         [InlineData("item-count")]
+        [InlineData("random-char:A,Z")]
+        [InlineData("random-char:0,9")]
         [InlineData("counter")]
         [InlineData("counter:1,1,0,0,0")]
         [InlineData("now")]
