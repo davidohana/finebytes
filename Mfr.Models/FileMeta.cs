@@ -12,6 +12,7 @@ namespace Mfr.Models
     /// <param name="creationTime">File creation time (local), from scan or synthetic tests.</param>
     /// <param name="lastWriteTime">Last write time (local), from scan or synthetic tests.</param>
     /// <param name="lastAccessTime">Last access time (local), from scan or synthetic tests.</param>
+    /// <param name="fileSize">File size in bytes; 0 for directories or when not applicable.</param>
     public sealed class FileMeta(
         int globalIndex,
         int inFolderIndex,
@@ -21,7 +22,8 @@ namespace Mfr.Models
         FileAttributes attributes = FileAttributes.Normal,
         DateTime creationTime = default,
         DateTime lastWriteTime = default,
-        DateTime lastAccessTime = default)
+        DateTime lastAccessTime = default,
+        long fileSize = 0)
     {
         /// <summary>
         /// Gets or sets the zero-based index across all scanned files.
@@ -74,6 +76,11 @@ namespace Mfr.Models
         public DateTime LastAccessTime { get; set; } = lastAccessTime;
 
         /// <summary>
+        /// Gets the file size in bytes. Zero for directories or when not yet populated.
+        /// </summary>
+        public long FileSize { get; init; } = fileSize;
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -88,7 +95,8 @@ namespace Mfr.Models
                 attributes: Attributes,
                 creationTime: CreationTime,
                 lastWriteTime: LastWriteTime,
-                lastAccessTime: LastAccessTime);
+                lastAccessTime: LastAccessTime,
+                fileSize: FileSize);
         }
     }
 }

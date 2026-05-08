@@ -291,7 +291,8 @@ namespace Mfr.Core
                     attributes: attrs,
                     creationTime: File.GetCreationTime(fullPath),
                     lastWriteTime: File.GetLastWriteTime(fullPath),
-                    lastAccessTime: File.GetLastAccessTime(fullPath));
+                    lastAccessTime: File.GetLastAccessTime(fullPath),
+                    fileSize: isDirectory ? 0 : new FileInfo(fullPath).Length);
                 var renameItem = new RenameItem(fileMeta);
                 _renameItems.Add(renameItem);
                 addedCount++;

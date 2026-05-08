@@ -10,6 +10,8 @@ Replaces the **entire target segment** with the result of expanding a **template
 
 ### Tokens
 
+#### File name
+
 | Token | Output |
 |--------|--------|
 | `<file-name>` | Original prefix (no extension). |
@@ -18,8 +20,27 @@ Replaces the **entire target segment** with the result of expanding a **template
 | `<parent-folder>` | Name of the immediate parent folder (level 1). |
 | `<parent-folder:level>` | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth. |
 | `<full-path>` | Full path of the file. |
+
+#### File properties
+
+| Token | Output |
+|--------|--------|
+| `<file-date>` | Creation date formatted as `dd-MM-yyyy` (default). |
+| `<file-date:format>` | Creation date using a .NET date format string. |
+| `<file-date:format,date-type>` | Date/time stamp. `date-type`: `0` = creation (default), `1` = last write, `2` = last access. |
+| `<drive-letter>` | Drive letter of the file's location (e.g. `C:`). Returns `$` for network (UNC) paths. |
+| `<label>` | Volume label of the drive that holds the file. |
+| `<file-count>` | Number of files and folders in the same directory (non-recursive). Empty when directory does not exist. |
+| `<file-size>` | File size, auto-selecting the largest unit (e.g. `1 KB`, `2 MB`). |
+| `<file-size:unit>` | File size in a specific unit. `unit`: `0`/`auto`, `1`/`b`/`bytes`, `2`/`kb`, `3`/`mb`, `4`/`gb`. |
+| `<file-size:unit,decimals>` | File size with the specified number of decimal places (default `0`). |
+
+#### Counter and time
+
+| Token | Output |
+|--------|--------|
 | `<now>` | Current UTC time, ISO-8601 style. |
-| `<now:format>` | Current UTC time formatted with a .NET format string (after `:`). |
+| `<now:format>` | Current UTC time formatted with a .NET format string. |
 | `<counter:start,step,reset,width,pad>` | Five comma-separated integers: start, step, reset flag (1 = per folder index, other = global index), minimum width, pad mode (0 = `0`, 1 = space). |
 
 Unknown token names cause an error at runtime.
@@ -33,6 +54,11 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 | `template`: `"<file-name>"` | `song` | `song` | |
 | `template`: `"<parent-folder>"`<br>file under `Music\My Album\` | `ignored` | `My Album` | |
 | `template`: `"<parent-folder:2>"`<br>file under `Music\My Album\` | `ignored` | `Music` | Level 2 = grandparent. |
+| `template`: `"<file-date>"` | `ignored` | `07-04-2023` | Creation date, default format. |
+| `template`: `"<file-date:yyyy,1>"` | `ignored` | `2021` | Last-write year. |
+| `template`: `"<file-size>"` | `ignored` | `1 KB` | Auto unit, 0 decimals. |
+| `template`: `"<file-size:mb,2>"` | `ignored` | `1.50 MB` | MB, 2 decimal places. |
+| `template`: `"<drive-letter>"` | `ignored` | `C:` | Drive letter of the file. |
 | `template`: `"<counter:10,2,0,4,0>"`<br>global index: `3` | `ignored` | `0016` | `10 + 2×3`, width `4`, pad `0`. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).

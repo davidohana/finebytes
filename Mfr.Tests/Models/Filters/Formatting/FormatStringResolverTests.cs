@@ -205,5 +205,174 @@ namespace Mfr.Tests.Models.Filters.Formatting
 
             Assert.Equal(string.Empty, result);
         }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-date&gt;</c> defaults to creation date formatted as dd-MM-yyyy.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileDateToken_DefaultsToCreationDateDdMmYyyy()
+        {
+            var creation = new DateTime(2023, 4, 7, 0, 0, 0, DateTimeKind.Unspecified);
+            var item = FilterTestHelpers.CreateRenameItem(creationTime: creation);
+
+            var result = FormatStringResolver.ResolveTemplate("<file-date>", item);
+
+            Assert.Equal("07-04-2023", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-date:yyyy,1&gt;</c> uses last-write date with the supplied format.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileDateTokenLastWrite_UsesLastWriteDate()
+        {
+            var lastWrite = new DateTime(2021, 11, 30, 0, 0, 0, DateTimeKind.Unspecified);
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: lastWrite);
+
+            var result = FormatStringResolver.ResolveTemplate("<file-date:yyyy,1>", item);
+
+            Assert.Equal("2021", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-date:HH-mm-ss,2&gt;</c> uses last-access time.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileDateTokenLastAccess_UsesLastAccessDate()
+        {
+            var lastAccess = new DateTime(2020, 1, 15, 9, 5, 3, DateTimeKind.Unspecified);
+            var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: lastAccess);
+
+            var result = FormatStringResolver.ResolveTemplate("<file-date:HH-mm-ss,2>", item);
+
+            Assert.Equal("09-05-03", result);
+        }
+
+        /// <summary>
+        /// Verifies unsupported date type throws.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileDateUnsupportedType_Throws()
+        {
+            var item = FilterTestHelpers.CreateRenameItem();
+
+            Assert.Throws<NotSupportedException>(() =>
+                FormatStringResolver.ResolveTemplate("<file-date:dd-MM-yyyy,3>", item));
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;drive-letter&gt;</c> extracts the drive letter from a local path.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_DriveLetter_ReturnsRootWithoutSeparator()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Medical Data\patients");
+
+            var result = FormatStringResolver.ResolveTemplate("<drive-letter>", item);
+
+            Assert.Equal("C:", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;drive-letter&gt;</c> returns <c>$</c> for UNC (network) paths.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_DriveLetterUncPath_ReturnsDollarSign()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(directory: @"\\server\share\docs");
+
+            var result = FormatStringResolver.ResolveTemplate("<drive-letter>", item);
+
+            Assert.Equal("$", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-size&gt;</c> auto-selects KB for a 2048-byte file.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileSizeAutoKb_FormatsWithKbUnit()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(fileSize: 2048);
+
+            var result = FormatStringResolver.ResolveTemplate("<file-size>", item);
+
+            Assert.Equal("2 KB", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-size:3,2&gt;</c> formats in MB with two decimal places.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileSizeExplicitMb_FormatsWithTwoDecimals()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(fileSize: 1572864);
+
+            var result = FormatStringResolver.ResolveTemplate("<file-size:3,2>", item);
+
+            Assert.Equal("1.50 MB", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-size:kb,1&gt;</c> accepts the string alias for kilobytes.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileSizeKbAlias_FormatsInKilobytes()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(fileSize: 3072);
+
+            var result = FormatStringResolver.ResolveTemplate("<file-size:kb,1>", item);
+
+            Assert.Equal("3.0 KB", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-size:b&gt;</c> returns raw bytes with B unit.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileSizeBytesAlias_ReturnsBytesWithUnit()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(fileSize: 512);
+
+            var result = FormatStringResolver.ResolveTemplate("<file-size:b>", item);
+
+            Assert.Equal("512 B", result);
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-count&gt;</c> returns the number of entries in an existing directory.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileCount_ReturnsEntryCountForRealDirectory()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tempDir);
+            try
+            {
+                File.WriteAllText(Path.Combine(tempDir, "a.txt"), "");
+                File.WriteAllText(Path.Combine(tempDir, "b.txt"), "");
+                var item = FilterTestHelpers.CreateRenameItem(directory: tempDir);
+
+                var result = FormatStringResolver.ResolveTemplate("<file-count>", item);
+
+                Assert.Equal("2", result);
+            }
+            finally
+            {
+                Directory.Delete(tempDir, recursive: true);
+            }
+        }
+
+        /// <summary>
+        /// Verifies <c>&lt;file-count&gt;</c> returns empty string when the directory does not exist.
+        /// </summary>
+        [Fact]
+        public void ResolveTemplate_FileCount_ReturnsEmptyForNonExistentDirectory()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\DoesNotExist\Never");
+
+            var result = FormatStringResolver.ResolveTemplate("<file-count>", item);
+
+            Assert.Equal(string.Empty, result);
+        }
     }
 }

@@ -34,6 +34,11 @@ namespace Mfr.Filters.Formatting
                 "full-name" => item.Original.Prefix + item.Original.Extension,
                 "parent-folder" => _ResolveParentFolderToken(arg, item),
                 "full-path" => item.Original.FullPath,
+                "file-date" => _ResolveFileDateToken(arg, item),
+                "label" => _ResolveLabelToken(item),
+                "drive-letter" => _ResolveDriveLetterToken(item),
+                "file-count" => _ResolveFileCountToken(item),
+                "file-size" => _ResolveFileSizeToken(arg, item),
                 "now" => string.IsNullOrWhiteSpace(arg) ? DateTimeOffset.UtcNow.ToString("o") : DateTimeOffset.UtcNow.ToString(arg),
                 "counter" => _ResolveCounterToken(arg, item),
                 _ => throw new NotSupportedException($"Phase 1 formatter token '{name}' is not supported.")
@@ -51,6 +56,114 @@ namespace Mfr.Filters.Formatting
             {
                 return string.Empty;
             }
+        }
+
+        private static string _ResolveFileDateToken(string arg, RenameItem item)
+        {
+            const string defaultFormat = "dd-MM-yyyy";
+
+            string format;
+            int dateType;
+
+            if (string.IsNullOrWhiteSpace(arg))
+            {
+                format = defaultFormat;
+                dateType = 0;
+            }
+            else
+            {
+                var lastComma = arg.LastIndexOf(',');
+                if (lastComma < 0)
+                {
+                    format = arg;
+                    dateType = 0;
+                }
+                else
+                {
+                    format = arg[..lastComma];
+                    var dateTypePart = arg[(lastComma + 1)..].Trim();
+                    dateType = string.IsNullOrEmpty(dateTypePart) ? 0 : int.Parse(dateTypePart, CultureInfo.InvariantCulture);
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(format))
+                format = defaultFormat;
+
+            var date = dateType switch
+            {
+                0 => item.Original.CreationTime,
+                1 => item.Original.LastWriteTime,
+                2 => item.Original.LastAccessTime,
+                _ => throw new NotSupportedException($"File date type '{dateType}' is not supported.")
+            };
+
+            return date.ToString(format, CultureInfo.InvariantCulture);
+        }
+
+        private static string _ResolveLabelToken(RenameItem item)
+        {
+            var root = Path.GetPathRoot(item.Original.DirectoryPath);
+            if (string.IsNullOrEmpty(root))
+                return string.Empty;
+            return new DriveInfo(root).VolumeLabel;
+        }
+
+        private static string _ResolveDriveLetterToken(RenameItem item)
+        {
+            var root = Path.GetPathRoot(item.Original.DirectoryPath) ?? string.Empty;
+            if (root.StartsWith(@"\\", StringComparison.Ordinal))
+                return "$";
+            return root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+
+        private static string _ResolveFileCountToken(RenameItem item)
+        {
+            var dir = item.Original.DirectoryPath;
+            if (!Directory.Exists(dir))
+                return string.Empty;
+            return Directory.GetFileSystemEntries(dir).Length.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static string _ResolveFileSizeToken(string arg, RenameItem item)
+        {
+            var parts = arg.Split(',', 2, StringSplitOptions.TrimEntries);
+            var unitArg = parts.Length > 0 ? parts[0] : "";
+            var decimalArg = parts.Length > 1 ? parts[1] : "";
+
+            var decimals = string.IsNullOrWhiteSpace(decimalArg) ? 0 : int.Parse(decimalArg, CultureInfo.InvariantCulture);
+            var bytes = (double)item.Original.FileSize;
+
+            return unitArg.ToLowerInvariant() switch
+            {
+                "" or "0" or "auto" => _FormatSizeAuto(bytes, decimals),
+                "1" or "b" or "bytes" => _FormatSize(bytes, divisor: 1.0, unit: "B", decimals),
+                "2" or "kb" => _FormatSize(bytes, divisor: 1024.0, unit: "KB", decimals),
+                "3" or "mb" => _FormatSize(bytes, divisor: 1024.0 * 1024, unit: "MB", decimals),
+                "4" or "gb" => _FormatSize(bytes, divisor: 1024.0 * 1024 * 1024, unit: "GB", decimals),
+                _ => throw new NotSupportedException($"File size unit '{unitArg}' is not supported.")
+            };
+        }
+
+        private static string _FormatSizeAuto(double bytes, int decimals)
+        {
+            const double kb = 1024;
+            const double mb = 1024 * 1024;
+            const double gb = 1024 * 1024 * 1024;
+
+            if (bytes >= gb)
+                return _FormatSize(bytes, gb, "GB", decimals);
+            if (bytes >= mb)
+                return _FormatSize(bytes, mb, "MB", decimals);
+            if (bytes >= kb)
+                return _FormatSize(bytes, kb, "KB", decimals);
+            return _FormatSize(bytes, 1.0, "B", decimals);
+        }
+
+        private static string _FormatSize(double bytes, double divisor, string unit, int decimals)
+        {
+            var value = bytes / divisor;
+            var fmt = $"F{Math.Max(0, decimals)}";
+            return $"{value.ToString(fmt, CultureInfo.InvariantCulture)} {unit}";
         }
 
         private static string _ResolveCounterToken(string arg, RenameItem item)

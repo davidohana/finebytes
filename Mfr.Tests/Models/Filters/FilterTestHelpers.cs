@@ -16,6 +16,7 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="creationTime">Optional creation time; defaults to a fixed test value.</param>
         /// <param name="lastWriteTime">Optional last write time; defaults to a fixed test value.</param>
         /// <param name="lastAccessTime">Optional last access time; defaults to a fixed test value.</param>
+        /// <param name="fileSize">File size in bytes; defaults to 0.</param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
             string prefix = "track",
@@ -26,7 +27,8 @@ namespace Mfr.Tests.Models.Filters
             FileAttributes attributes = FileAttributes.Normal,
             DateTime? creationTime = null,
             DateTime? lastWriteTime = null,
-            DateTime? lastAccessTime = null)
+            DateTime? lastAccessTime = null,
+            long fileSize = 0)
         {
             directory ??= @"C:\Music\Album";
             var baseline = new DateTime(2024, 6, 1, 12, 30, 45, DateTimeKind.Unspecified);
@@ -39,7 +41,8 @@ namespace Mfr.Tests.Models.Filters
                 attributes,
                 creationTime: creationTime ?? baseline,
                 lastWriteTime: lastWriteTime ?? baseline,
-                lastAccessTime: lastAccessTime ?? baseline));
+                lastAccessTime: lastAccessTime ?? baseline,
+                fileSize: fileSize));
         }
 
         /// <summary>
