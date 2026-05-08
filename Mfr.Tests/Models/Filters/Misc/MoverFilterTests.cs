@@ -1,4 +1,7 @@
 using Mfr.Filters.Misc;
+using Mfr.Models;
+using Mfr.Tests.Models.Filters;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Models.Filters.Misc
 {
@@ -160,6 +163,50 @@ namespace Mfr.Tests.Models.Filters.Misc
             var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: @"C:\Source");
 
             Assert.Equal(@"C:\Source", item.Original.DirectoryPath);
+        }
+
+        /// <summary>
+        /// Verifies folder list entries (<see cref="FileAttributes.Directory"/>, empty extension) get a preview
+        /// parent path under root + sub-folder and keep the folder name as <see cref="FileMeta.Prefix"/>
+        /// (same layout as filesystem directories resolved into the rename list).
+        /// </summary>
+        [Fact]
+        public void Apply_FolderEntry_MultipliesPreviewDirectoryAndKeepsFolderName()
+        {
+            var filter = new MoverFilter(new MoverOptions(@"C:\Archive", SubFolder: "Sorted"));
+            var item = FilterTestHelpers.CreateRenameItem(
+                prefix: "Photos",
+                extension: string.Empty,
+                directory: @"C:\Inbox",
+                attributes: FileAttributes.Directory);
+            filter.Setup();
+            filter.Apply(item);
+
+            var entryIsDirectoryAfterMove =
+                FilesystemAttributes.IsDirectory(item.Preview.Attributes)
+                && FilesystemAttributes.IsDirectory(item.Original.Attributes);
+            Assert.True(entryIsDirectoryAfterMove);
+            Assert.Equal(@"C:\Archive\Sorted", item.Preview.DirectoryPath);
+            Assert.Equal(@"C:\Archive\Sorted\Photos", item.Preview.FullPath);
+        }
+
+        /// <summary>
+        /// Verifies formatter tokens resolve from the folder entry's original path the same way as for files.
+        /// </summary>
+        [Fact]
+        public void Apply_FolderEntry_TemplateUsesOriginalParentSegment()
+        {
+            var filter = new MoverFilter(new MoverOptions(@"C:\Music", SubFolder: "<parent-folder>"));
+            var item = FilterTestHelpers.CreateRenameItem(
+                prefix: "TheTrinitySession",
+                extension: string.Empty,
+                directory: @"C:\Downloads\CowboyJunkies",
+                attributes: FileAttributes.Directory);
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(@"C:\Music\CowboyJunkies", item.Preview.DirectoryPath);
+            Assert.Equal(@"C:\Music\CowboyJunkies\TheTrinitySession", item.Preview.FullPath);
         }
     }
 }

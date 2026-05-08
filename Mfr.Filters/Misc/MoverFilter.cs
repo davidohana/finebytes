@@ -27,6 +27,10 @@ namespace Mfr.Filters.Misc
     /// <c>SubFolder</c> create nested directory levels.
     /// </para>
     /// <para>
+    /// Applies to filesystem directory rows in the rename list as well as files (directories use an empty extension
+    /// and keep the folder name in <see cref="FileMeta.Prefix"/>).
+    /// </para>
+    /// <para>
     /// This filter updates only the preview parent-directory path; actual filesystem creation and
     /// movement happen during commit. The filter does not erase original source folders.
     /// </para>

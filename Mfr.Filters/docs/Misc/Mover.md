@@ -1,6 +1,6 @@
 # Mover
 
-Moves items to a destination folder by combining a required static **root** with an optional dynamic **sub-folder** template.
+Moves items to a destination folder by combining a required static **root** with an optional dynamic **sub-folder** template. It applies to **files and folders** in the rename list the same way (folder rows store the folder name with an empty extension).
 
 The preview **Parent Directory** is replaced with `RootFolder` + `\` + resolved `SubFolder`. Only the preview path changes here; actual folder creation and movement happen on commit. Source folders are never deleted.
 
