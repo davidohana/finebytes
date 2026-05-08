@@ -93,8 +93,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
             if (source.Length == 0)
                 return string.Empty;
 
-            int start = _ResolvePosition(options.StartPosition, source.Length);
-            int end = _ResolvePosition(options.EndPosition, source.Length);
+            var start = _ResolvePosition(options.StartPosition, source.Length);
+            var end = _ResolvePosition(options.EndPosition, source.Length);
 
             if (start <= end)
                 return source[(start - 1)..end];
@@ -111,7 +111,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <returns>Clamped 1-based position in [1, length].</returns>
         private static int _ResolvePosition(int position, int length)
         {
-            int resolved = position < 0 ? length + position + 1 : position;
+            var resolved = position < 0 ? length + position + 1 : position;
             return Math.Clamp(resolved, 1, length);
         }
     }
