@@ -5,14 +5,18 @@ namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
     /// <summary>
     /// Resolves the <c>&lt;drive-letter&gt;</c> token.
     /// </summary>
-    internal static class DriveLetterResolver
+    /// <remarks>
+    /// <para>
+    /// Returns the drive letter (e.g. <c>C:</c>) for local paths, or <c>$</c> for UNC paths.
+    /// </para>
+    /// </remarks>
+    internal sealed class DriveLetterToken : IFormatToken
     {
-        /// <summary>
-        /// Returns the drive letter (e.g. <c>C:</c>) for local paths, or <c>$</c> for UNC paths.
-        /// </summary>
-        /// <param name="item">Rename item providing the directory path.</param>
-        /// <returns>The drive letter without a trailing separator, or <c>$</c> for network paths.</returns>
-        public static string Resolve(RenameItem item)
+        /// <inheritdoc />
+        public IReadOnlyList<string> Names { get; } = ["drive-letter"];
+
+        /// <inheritdoc />
+        public string Resolve(string arg, RenameItem item)
         {
             var root = Path.GetPathRoot(item.Original.DirectoryPath) ?? string.Empty;
             if (root.StartsWith(@"\\", StringComparison.Ordinal))

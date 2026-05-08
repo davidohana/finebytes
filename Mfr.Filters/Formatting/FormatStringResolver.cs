@@ -1,8 +1,5 @@
 using System.Text.RegularExpressions;
 using Mfr.Filters.Formatting.Tokens;
-using Mfr.Filters.Formatting.Tokens.FileNameGroup;
-using Mfr.Filters.Formatting.Tokens.FilePropertiesGroup;
-using Mfr.Filters.Formatting.Tokens.GeneralGroup;
 using Mfr.Models;
 
 namespace Mfr.Filters.Formatting
@@ -13,13 +10,16 @@ namespace Mfr.Filters.Formatting
     /// <remarks>
     /// <para>
     /// Tokens use angle-bracket syntax <c>&lt;name&gt;</c> or <c>&lt;name:arg&gt;</c>. The set of
-    /// recognized names comes from group modules under <see cref="Tokens"/>; add a new group by
-    /// implementing a <c>Register</c> method and wiring it in <see cref="_BuildRegistry"/>.
+    /// recognized names is discovered automatically: every concrete <see cref="IFormatToken"/>
+    /// implementation in this assembly with a parameterless constructor is instantiated once at
+    /// startup and registered under each of its <see cref="IFormatToken.Names"/>. Add a new token by
+    /// dropping a new class implementing <see cref="IFormatToken"/> under
+    /// <c>Mfr.Filters.Formatting.Tokens.*</c>.
     /// </para>
     /// </remarks>
     internal static partial class FormatStringResolver
     {
-        private static readonly FormatTokenRegistry _registry = _BuildRegistry();
+        private static readonly Dictionary<string, IFormatToken> _nameToToken = _DiscoverTokens();
 
         /// <summary>
         /// Resolves all formatter tokens inside <paramref name="template"/>.
@@ -37,16 +37,33 @@ namespace Mfr.Filters.Formatting
             var parts = tokenInner.Split(':', 2);
             var name = parts[0];
             var arg = parts.Length == 2 ? parts[1] : "";
-            return _registry.Resolve(name, arg, item);
+            if (!_nameToToken.TryGetValue(name, out var token))
+                throw new NotSupportedException($"Unknown formatter token '<{name}>'. See the Formatter docs for supported tokens.");
+            return token.Resolve(arg, item);
         }
 
-        private static FormatTokenRegistry _BuildRegistry()
+        private static Dictionary<string, IFormatToken> _DiscoverTokens()
         {
-            var registry = new FormatTokenRegistry();
-            FileNameGroupTokens.Register(registry);
-            FilePropertiesGroupTokens.Register(registry);
-            GeneralGroupTokens.Register(registry);
-            return registry;
+            var map = new Dictionary<string, IFormatToken>(StringComparer.Ordinal);
+            var tokenTypes = typeof(FormatStringResolver).Assembly
+                .GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract && typeof(IFormatToken).IsAssignableFrom(t));
+
+            foreach (var tokenType in tokenTypes)
+            {
+                var token = (IFormatToken)Activator.CreateInstance(tokenType)!;
+                foreach (var name in token.Names)
+                {
+                    if (map.TryGetValue(name, out var value))
+                    {
+                        throw new InvalidOperationException(
+                            $"Format token name '{name}' is registered by multiple types " +
+                            $"('{value.GetType().FullName}' and '{tokenType.FullName}').");
+                    }
+                    map[name] = token;
+                }
+            }
+            return map;
         }
 
         [GeneratedRegex(@"<([^<>]+)>", RegexOptions.Compiled)]

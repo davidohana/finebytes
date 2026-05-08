@@ -6,16 +6,20 @@ namespace Mfr.Filters.Formatting.Tokens.GeneralGroup
     /// <summary>
     /// Resolves the <c>&lt;counter:start,step,reset,width,pad&gt;</c> token.
     /// </summary>
-    internal static class CounterResolver
+    /// <remarks>
+    /// <para>
+    /// Five comma-separated integers: <c>start</c>, <c>step</c>, <c>reset</c> (1 = per-folder index, otherwise global),
+    /// <c>width</c> (minimum padded width), and <c>pad</c> (0 = zero-pad, 1 = space-pad).
+    /// </para>
+    /// </remarks>
+    internal sealed class CounterToken : IFormatToken
     {
-        /// <summary>
-        /// Computes a per-item counter value from the supplied parameters.
-        /// </summary>
-        /// <param name="arg">Five comma-separated integers: start, step, reset, width, pad.</param>
-        /// <param name="item">Rename item providing the index used to drive the counter.</param>
-        /// <returns>The formatted counter value.</returns>
+        /// <inheritdoc />
+        public IReadOnlyList<string> Names { get; } = ["counter"];
+
+        /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when <paramref name="arg"/> does not provide exactly five values.</exception>
-        public static string Resolve(string arg, RenameItem item)
+        public string Resolve(string arg, RenameItem item)
         {
             var parts = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 5)

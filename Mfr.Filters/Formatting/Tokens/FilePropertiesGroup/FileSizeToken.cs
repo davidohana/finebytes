@@ -12,20 +12,18 @@ namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
     /// <c>1</c>/<c>b</c>/<c>bytes</c>, <c>2</c>/<c>kb</c>, <c>3</c>/<c>mb</c>, <c>4</c>/<c>gb</c>.
     /// </para>
     /// </remarks>
-    internal static class FileSizeResolver
+    internal sealed class FileSizeToken : IFormatToken
     {
         private const double Kb = 1024;
         private const double Mb = 1024 * 1024;
         private const double Gb = 1024 * 1024 * 1024;
 
-        /// <summary>
-        /// Formats <see cref="FileMeta.FileSize"/> using the supplied unit and decimal precision.
-        /// </summary>
-        /// <param name="arg">Optional <c>unit</c> or <c>unit,decimals</c> string.</param>
-        /// <param name="item">Rename item providing the byte count.</param>
-        /// <returns>The formatted size string with trailing unit symbol.</returns>
+        /// <inheritdoc />
+        public IReadOnlyList<string> Names { get; } = ["file-size"];
+
+        /// <inheritdoc />
         /// <exception cref="NotSupportedException">Thrown when an unrecognized unit is supplied.</exception>
-        public static string Resolve(string arg, RenameItem item)
+        public string Resolve(string arg, RenameItem item)
         {
             var parts = arg.Split(',', 2, StringSplitOptions.TrimEntries);
             var unitArg = parts.Length > 0 ? parts[0] : "";

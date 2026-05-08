@@ -13,18 +13,16 @@ namespace Mfr.Filters.Formatting.Tokens.FilePropertiesGroup
     /// Default format when none supplied is <c>dd-MM-yyyy</c>.
     /// </para>
     /// </remarks>
-    internal static class FileDateResolver
+    internal sealed class FileDateToken : IFormatToken
     {
         private const string DefaultFormat = "dd-MM-yyyy";
 
-        /// <summary>
-        /// Formats one of the file's timestamps using the supplied .NET format string.
-        /// </summary>
-        /// <param name="arg">Optional <c>format</c> or <c>format,date-type</c> string.</param>
-        /// <param name="item">Rename item providing the timestamps.</param>
-        /// <returns>The formatted date string.</returns>
+        /// <inheritdoc />
+        public IReadOnlyList<string> Names { get; } = ["file-date"];
+
+        /// <inheritdoc />
         /// <exception cref="NotSupportedException">Thrown when an unsupported date type is supplied.</exception>
-        public static string Resolve(string arg, RenameItem item)
+        public string Resolve(string arg, RenameItem item)
         {
             var (format, dateType) = _ParseArg(arg);
             var date = dateType switch
