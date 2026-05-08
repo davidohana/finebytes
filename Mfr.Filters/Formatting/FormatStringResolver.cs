@@ -66,7 +66,7 @@ namespace Mfr.Filters.Formatting
             return map;
         }
 
-        [GeneratedRegex(@"<([^<>]+)>", RegexOptions.Compiled)]
+        [GeneratedRegex(@"<([^<>]+(?:<[^<>]+>[^<>]*)*)>")]
         private static partial Regex _TokenRegex();
     }
 }

@@ -46,6 +46,12 @@ Replaces the **entire target segment** with the result of expanding a **template
 | `<counter>` | Same as `<counter:1,1,0,2,0>` (no leading zeros). |
 | `<counter:initial,step,leading-zeroes-mode,length,reset-folder>` | Position in rename list: `initial` + `step`×index. `leading-zeroes-mode`: `0` = none, `1` = automatic width from list size, `2` = pad to `length` (digits; minimum `1`). `reset-folder`: `0` = global index, `1` = index restarts per folder. |
 
+#### Token extraction
+
+| Token | Output |
+|-------|--------|
+| `<token:token-number,separator,include-next,include-prev,source-format-string>` | Splits `source-format-string` by `separator` and returns the 1-based `token-number`-th part. `include-next`: `1` = return from `token-number` to end (rejoined with `separator`). `include-prev`: `1` = return from start through `token-number` (rejoined). Both flags `1` = full source string. `source-format-string` may be any legal format token such as `<full-name>` or a literal string. |
+
 Unknown token names cause an error at runtime.
 
 ## Examples
@@ -63,6 +69,9 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 | `template`: `"<file-size:mb,2>"` | `ignored` | `1.50 MB` | MB, 2 decimal places. |
 | `template`: `"<drive-letter>"` | `ignored` | `C:` | Drive letter of the file. |
 | `template`: `"<counter:10,2,2,4,0>"`<br>global index: `3` | `ignored` | `0016` | `10 + 2×3`, custom width `4`. |
+| `template`: `"<token:1,-,0,0,<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `13_` | Track number prefix, split by `-`. |
+| `template`: `"<token:2,_-_,0,0,<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog` | Artist name, split by `_-_`. |
+| `template`: `"<token:2,_-_,1,0,<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog_-_Cold_Blooded_Old_Times.mp3` | Artist and title, include-next. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).
 
