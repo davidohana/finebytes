@@ -10,14 +10,11 @@ namespace Mfr.Core
     /// <param name="includeHidden">If <c>true</c>, includes hidden/system files while resolving.</param>
     public sealed class RenameList(bool includeHidden)
     {
-        private static readonly StringComparer _pathComparer = OperatingSystem.IsWindows()
-            ? StringComparer.OrdinalIgnoreCase
-            : StringComparer.Ordinal;
-
-        private readonly HashSet<string> _resolvedPathToIsIncluded = new(_pathComparer);
+        private readonly HashSet<string> _resolvedPathToIsIncluded = new(PathComparers.Os);
         private readonly List<RenameItem> _renameItems = [];
-        private readonly Dictionary<string, int> _folderPathToCount = new(_pathComparer);
+        private readonly Dictionary<string, int> _folderPathToCount = new(PathComparers.Os);
         private readonly bool _includeHidden = includeHidden;
+        private CommitPlan? _commitPlan;
 
         /// <summary>
         /// Gets the resolved file items in insertion/discovery order.
@@ -80,7 +77,7 @@ namespace Mfr.Core
             var isRootPath = string.Equals(
                 Path.GetPathRoot(fullSource),
                 fullSource,
-                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                PathComparers.OsComparison);
             if (isRootPath)
             {
                 throw new UserException($"Root paths cannot be added as rename sources: '{trimmedSource}'.");
@@ -139,7 +136,17 @@ namespace Mfr.Core
                 }
             }
 
-            _MarkPreviewConflicts();
+            RenamePreviewFolderRebaser.RebaseDescendants(_renameItems);
+            RenameConflictDetector.MarkConflicts(_renameItems);
+
+            _commitPlan = RenameCommitPlanner.Build(_renameItems);
+            foreach (var unresolvableCycleItem in _commitPlan.UnresolvableCycleItems)
+            {
+                unresolvableCycleItem.SetPreviewError(
+                    message: $"Could not resolve rename cycle for '{unresolvableCycleItem.Original.FullPath}'.",
+                    cause: null);
+            }
+
             foreach (var renameItem in _renameItems)
             {
                 renameItem.LogPreviewChangeDetail();
@@ -154,8 +161,10 @@ namespace Mfr.Core
         /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
         /// <param name="dryRun">If <c>true</c>, simulates commit outcomes without applying filesystem changes.</param>
         /// <param name="confirmBeforeApply">
-        /// Optional callback invoked only for items whose preview path differs from the original.
+        /// Optional callback invoked immediately before each item is committed.
+        /// Receives every item that has preview changes, including attribute-only changes.
         /// Return <c>false</c> to skip that item with status <see cref="RenameStatus.CommitSkipped"/> without treating it as an error.
+        /// Items in an unresolvable cycle that are already in flight (stashed to a temp path) bypass this callback to avoid orphaned files.
         /// </param>
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
         public IReadOnlyList<RenameResultItem> Commit(
@@ -170,75 +179,24 @@ namespace Mfr.Core
                 dryRun,
                 confirmBeforeApply is not null);
 
-            var results = new List<RenameResultItem>(_renameItems.Count);
-            var stopped = false;
-
-            foreach (var item in _renameItems)
+            if (_commitPlan is null)
             {
-                item.CommitError = null;
-                var sourcePath = item.Original.FullPath;
-
-                var shouldSkipCommit =
-                    stopped
-                    || !item.HasPreviewChanges()
-                    || (confirmBeforeApply is not null
-                        && !item.IsPreviewPathSameAsOriginal()
-                        && !confirmBeforeApply(item));
-                if (shouldSkipCommit)
-                {
-                    item.Status = RenameStatus.CommitSkipped;
-                    results.Add(new RenameResultItem(
-                        OriginalPath: sourcePath,
-                        Status: RenameStatus.CommitSkipped,
-                        Error: null,
-                        Changes: []));
-                    continue;
-                }
-
-                var destPath = item.Preview.FullPath;
-                var originalSnapshot = item.Original;
-                var previewSnapshot = item.Preview;
-                try
-                {
-                    if (!dryRun)
-                    {
-                        item.Commit();
-                    }
-
-                    item.Status = RenameStatus.CommitOk;
-                    var changes = _BuildCommitChanges(
-                        sourcePath: sourcePath,
-                        destinationPath: destPath,
-                        originalSnapshot: originalSnapshot,
-                        previewSnapshot: previewSnapshot);
-                    results.Add(new RenameResultItem(
-                        OriginalPath: sourcePath,
-                        Status: RenameStatus.CommitOk,
-                        Error: null,
-                        Changes: changes));
-                }
-                catch (Exception ex)
-                {
-                    item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
-                    item.Status = RenameStatus.CommitError;
-                    Log.Error(
-                        ex,
-                        "Commit failed for '{SourcePath}' -> '{DestinationPath}'.",
-                        sourcePath,
-                        destPath);
-                    results.Add(new RenameResultItem(
-                        OriginalPath: sourcePath,
-                        Status: RenameStatus.CommitError,
-                        Error: item.CommitError.Message,
-                        Changes: []));
-                    stopped = failFast;
-                }
+                throw new InvalidOperationException(
+                    "Preview must be called before Commit.");
             }
+
+            var results = RenameCommitExecutor.Execute(
+                plan: _commitPlan,
+                allItems: _renameItems,
+                confirmBeforeApply: confirmBeforeApply,
+                failFast: failFast,
+                dryRun: dryRun);
 
             foreach (var item in _renameItems)
             {
                 item.ClearPreview();
             }
+            _commitPlan = null;
 
             var commitOkCount = results.Count(item => item.Status == RenameStatus.CommitOk);
             var commitSkippedCount = results.Count(item => item.Status == RenameStatus.CommitSkipped);
@@ -250,67 +208,6 @@ namespace Mfr.Core
                 commitErrorCount);
 
             return results;
-        }
-
-        /// <summary>
-        /// Builds property change rows for a committed item (file name and optional attributes).
-        /// </summary>
-        /// <param name="sourcePath">Original source path.</param>
-        /// <param name="destinationPath">Destination path.</param>
-        /// <param name="originalSnapshot">Original metadata before commit.</param>
-        /// <param name="previewSnapshot">Preview metadata to apply.</param>
-        /// <returns>Property-level changes for result reporting.</returns>
-        private static List<RenamePropertyChange> _BuildCommitChanges(
-            string sourcePath,
-            string destinationPath,
-            FileMeta originalSnapshot,
-            FileMeta previewSnapshot)
-        {
-            var changes = new List<RenamePropertyChange>();
-            var sourceFileName = Path.GetFileName(sourcePath);
-            var destinationFileName = Path.GetFileName(destinationPath);
-            var fileNameChanged = !string.Equals(sourceFileName, destinationFileName, StringComparison.OrdinalIgnoreCase);
-            if (fileNameChanged)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "FileName",
-                    OldValue: sourceFileName,
-                    NewValue: destinationFileName));
-            }
-
-            if (originalSnapshot.Attributes != previewSnapshot.Attributes)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "Attributes",
-                    OldValue: originalSnapshot.Attributes.ToString(),
-                    NewValue: previewSnapshot.Attributes.ToString()));
-            }
-
-            if (originalSnapshot.CreationTime != previewSnapshot.CreationTime)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "CreationTime",
-                    OldValue: originalSnapshot.CreationTime.ToString("O"),
-                    NewValue: previewSnapshot.CreationTime.ToString("O")));
-            }
-
-            if (originalSnapshot.LastWriteTime != previewSnapshot.LastWriteTime)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "LastWriteTime",
-                    OldValue: originalSnapshot.LastWriteTime.ToString("O"),
-                    NewValue: previewSnapshot.LastWriteTime.ToString("O")));
-            }
-
-            if (originalSnapshot.LastAccessTime != previewSnapshot.LastAccessTime)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "LastAccessTime",
-                    OldValue: originalSnapshot.LastAccessTime.ToString("O"),
-                    NewValue: previewSnapshot.LastAccessTime.ToString("O")));
-            }
-
-            return changes;
         }
 
         /// <summary>
@@ -352,73 +249,6 @@ namespace Mfr.Core
         }
 
         /// <summary>
-        /// Normalizes a path into a platform-consistent comparison key.
-        /// </summary>
-        /// <param name="path">The path to normalize.</param>
-        /// <returns>The normalized path key.</returns>
-        private static string _NormalizePathKey(string path)
-        {
-            var normalized = Path.GetFullPath(path);
-            return OperatingSystem.IsWindows() ? normalized.Replace('/', '\\') : normalized;
-        }
-
-        /// <summary>
-        /// Marks preview conflicts (duplicate destinations, rename targets blocked by disk state, ignoring paths freed by sources in this batch).
-        /// </summary>
-        private void _MarkPreviewConflicts()
-        {
-            var candidateItems = _renameItems
-                .Where(item => item.Status == RenameStatus.PreviewOk)
-                .ToList();
-
-            var movingSourceKeys = candidateItems
-                .Select(item => _NormalizePathKey(item.Original.FullPath))
-                .ToHashSet(StringComparer.Ordinal);
-
-            var normalizedDestinationDuplicates = candidateItems
-                .Select(item => _NormalizePathKey(item.Preview.FullPath))
-                .GroupBy(path => path, comparer: StringComparer.Ordinal)
-                .Where(group => group.Count() > 1)
-                .Select(group => group.Key)
-                .ToHashSet(StringComparer.Ordinal);
-
-            foreach (var item in candidateItems)
-            {
-                var destinationPath = item.Preview.FullPath;
-                var destinationKey = _NormalizePathKey(destinationPath);
-                var destinationIsDuplicateAmongPreviews = normalizedDestinationDuplicates.Contains(destinationKey);
-                if (destinationIsDuplicateAmongPreviews)
-                {
-                    item.SetPreviewError(
-                        message: $"More than one rename targets the same path '{destinationPath}'.",
-                        cause: null);
-                    Log.Warning(
-                        "Preview conflict for destination '{DestinationPath}' (duplicate destination).",
-                        destinationPath);
-                    continue;
-                }
-
-                if (movingSourceKeys.Contains(destinationKey))
-                {
-                    continue;
-                }
-
-                var destinationOccupiedOnDisk =
-                    Directory.Exists(destinationPath) || File.Exists(destinationPath);
-                if (destinationOccupiedOnDisk)
-                {
-                    item.SetPreviewError(
-                        message: $"Destination '{destinationPath}' is already in use (not vacated by another rename item in this batch).",
-                        cause: null);
-                    Log.Warning(
-                        "Preview conflict for destination '{DestinationPath}' (path occupied on disk).",
-                        destinationPath);
-                    continue;
-                }
-            }
-        }
-
-        /// <summary>
         /// Appends resolved paths to <see cref="RenameItems"/> while enforcing deduplication and filtering.
         /// </summary>
         /// <param name="resolvedPaths">Resolved file paths to append.</param>
@@ -443,7 +273,7 @@ namespace Mfr.Core
                     continue;
                 }
 
-                var isDirectory = FilesystemAttributes.IsDirectory(attrs);
+                var isDirectory = attrs.IsDirectory();
                 if (isDirectory && !includeFolders)
                 {
                     continue;
@@ -500,6 +330,17 @@ namespace Mfr.Core
             }
 
             return addedCount;
+        }
+
+        /// <summary>
+        /// Normalizes a path into a platform-consistent comparison key.
+        /// </summary>
+        /// <param name="path">The path to normalize.</param>
+        /// <returns>The normalized path key.</returns>
+        private static string _NormalizePathKey(string path)
+        {
+            var normalized = Path.GetFullPath(path);
+            return OperatingSystem.IsWindows() ? normalized.Replace('/', '\\') : normalized;
         }
 
         /// <summary>

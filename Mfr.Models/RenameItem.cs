@@ -54,7 +54,7 @@ namespace Mfr.Models
         /// <summary>
         /// Gets the original immutable file snapshot.
         /// </summary>
-        public FileMeta Original { get; private set; } = original;
+        public FileMeta Original { get; internal set; } = original;
 
         /// <summary>
         /// Gets the current preview snapshot after filter application.
@@ -116,118 +116,41 @@ namespace Mfr.Models
             Status = RenameStatus.PreviewError;
         }
 
-        internal bool IsPreviewPathSameAsOriginal()
+        /// <summary>
+        /// Whether the preview path equals the original path byte-for-byte (including case).
+        /// </summary>
+        /// <returns><c>true</c> when the strings are identical.</returns>
+        internal bool IsPreviewPathUnchanged()
         {
-            return string.Equals(Original.FullPath, Preview.FullPath, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(Original.FullPath, Preview.FullPath, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Whether the preview path resolves to the same on-disk entry as the original under the host filesystem.
+        /// </summary>
+        /// <returns><c>true</c> when both paths refer to the same on-disk entry, even when textual casing differs.</returns>
+        internal bool IsPreviewPathSameOnDisk()
+        {
+            return PathRelations.SameOnDisk(Original.FullPath, Preview.FullPath);
         }
 
         /// <summary>
         /// Whether preview differs from the original snapshot (path, filesystem attributes, or timestamps).
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Path differences are evaluated via ordinal comparison so case-only renames count as a change
+        /// even on case-insensitive filesystems.
+        /// </para>
+        /// </remarks>
         public bool HasPreviewChanges()
         {
-            return !IsPreviewPathSameAsOriginal()
+            return !IsPreviewPathUnchanged()
                 || Original.Attributes != Preview.Attributes
                 || Original.CreationTime != Preview.CreationTime
                 || Original.LastWriteTime != Preview.LastWriteTime
                 || Original.LastAccessTime != Preview.LastAccessTime;
         }
 
-        /// <summary>
-        /// Applies the preview rename, attribute, and timestamp changes on disk for this item.
-        /// </summary>
-        /// <para>
-        /// Path moves use <see cref="M:System.IO.File.Move(System.String,System.String,System.Boolean)"/> for file entries and
-        /// <see cref="M:System.IO.Directory.Move(System.String,System.String)"/> when the original entry is a directory.
-        /// When <see cref="Preview"/> introduces a parent path that does not exist yet, that parent folder is created first.
-        /// Creation, write, and access times apply through <see cref="M:System.IO.Directory.SetCreationTime(System.String,System.DateTime)"/> (and the related directory setters) when the target path is a directory, and through the corresponding <c>File.Set*</c> overloads otherwise, because directory paths can reject file-based setters on Windows.
-        /// </para>
-        /// <remarks>
-        /// Updates <see cref="Original"/> to match the applied preview; <see cref="Preview"/> is left as-is until the host calls <see cref="ClearPreview"/>.
-        /// </remarks>
-        public void Commit()
-        {
-            if (!IsPreviewPathSameAsOriginal())
-            {
-                _EnsureDestinationParentExists(Preview.FullPath);
-                _MoveEntry(
-                    sourceFullPath: Original.FullPath,
-                    destinationFullPath: Preview.FullPath,
-                    sourceIsDirectory: FilesystemAttributes.IsDirectory(Original.Attributes));
-            }
-
-            var pathOnDisk = Preview.FullPath;
-            if (Original.Attributes != Preview.Attributes)
-            {
-                File.SetAttributes(pathOnDisk, Preview.Attributes);
-            }
-
-            var pathIsDirectoryAfterApply = FilesystemAttributes.IsDirectory(pathOnDisk);
-            _ApplyTimestampChangesIfNeeded(
-                pathOnDisk,
-                Original,
-                Preview,
-                pathIsDirectoryAfterApply);
-
-            if (HasPreviewChanges())
-            {
-                Original = Preview.Clone();
-            }
-        }
-
-        private static void _EnsureDestinationParentExists(string destinationFullPath)
-        {
-            var destinationDirectoryPath = Path.GetDirectoryName(destinationFullPath);
-            if (string.IsNullOrEmpty(destinationDirectoryPath))
-            {
-                throw new InvalidOperationException(
-                    $"Cannot resolve a parent directory for destination path '{destinationFullPath}'.");
-            }
-
-            Directory.CreateDirectory(destinationDirectoryPath);
-        }
-
-        private static void _MoveEntry(string sourceFullPath, string destinationFullPath, bool sourceIsDirectory)
-        {
-            if (sourceIsDirectory)
-            {
-                Directory.Move(sourceFullPath, destinationFullPath);
-                return;
-            }
-
-            File.Move(sourceFullPath, destinationFullPath, overwrite: false);
-        }
-
-        // Uses Directory.Set* vs File.Set* based on entry kind (Windows directory paths may reject File.* time setters).
-        private static void _ApplyTimestampChangesIfNeeded(
-            string pathOnDisk,
-            FileMeta original,
-            FileMeta preview,
-            bool pathIsDirectory)
-        {
-            Action<string, DateTime> setCreationTime =
-                pathIsDirectory ? Directory.SetCreationTime : File.SetCreationTime;
-            Action<string, DateTime> setLastWriteTime =
-                pathIsDirectory ? Directory.SetLastWriteTime : File.SetLastWriteTime;
-            Action<string, DateTime> setLastAccessTime =
-                pathIsDirectory ? Directory.SetLastAccessTime : File.SetLastAccessTime;
-
-            if (original.CreationTime != preview.CreationTime)
-            {
-                setCreationTime(pathOnDisk, preview.CreationTime);
-            }
-
-            if (original.LastWriteTime != preview.LastWriteTime)
-            {
-                setLastWriteTime(pathOnDisk, preview.LastWriteTime);
-            }
-
-            if (original.LastAccessTime != preview.LastAccessTime)
-            {
-                setLastAccessTime(pathOnDisk, preview.LastAccessTime);
-            }
-        }
-
     }
 }
-

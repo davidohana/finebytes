@@ -1,6 +1,5 @@
 using Mfr.Filters.Misc;
 using Mfr.Models;
-using Mfr.Tests.Models.Filters;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Models.Filters.Misc
@@ -183,8 +182,8 @@ namespace Mfr.Tests.Models.Filters.Misc
             filter.Apply(item);
 
             var entryIsDirectoryAfterMove =
-                FilesystemAttributes.IsDirectory(item.Preview.Attributes)
-                && FilesystemAttributes.IsDirectory(item.Original.Attributes);
+                item.Preview.Attributes.IsDirectory()
+                && item.Original.Attributes.IsDirectory();
             Assert.True(entryIsDirectoryAfterMove);
             Assert.Equal(@"C:\Archive\Sorted", item.Preview.DirectoryPath);
             Assert.Equal(@"C:\Archive\Sorted\Photos", item.Preview.FullPath);

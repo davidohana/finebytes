@@ -268,9 +268,9 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
-        /// Verifies that commit skips items when preview has not been run.
+        /// Verifies that commit throws when preview has not been run.
         /// </summary>
-        public void Commit_SkipsItem_WhenPreviewIsMissing()
+        public void Commit_Throws_WhenPreviewIsMissing()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var source = dir.CombinePath("track.mp3");
@@ -278,15 +278,9 @@ namespace Mfr.Tests.Core
 
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([source]);
-            var files = renameList.RenameItems;
 
-            var result = renameList.Commit(failFast: false);
-
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
-            Assert.Equal(source, result[0].OriginalPath);
-            Assert.Empty(result[0].Changes);
-            Assert.Null(files[0].CommitError);
+            var ex = Assert.Throws<InvalidOperationException>(() => renameList.Commit(failFast: false));
+            Assert.Contains("Preview", ex.Message, StringComparison.OrdinalIgnoreCase);
             Assert.True(File.Exists(source));
         }
 
