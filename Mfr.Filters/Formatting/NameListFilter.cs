@@ -67,8 +67,8 @@ namespace Mfr.Filters.Formatting
             }
 
             var middle = entries[index];
-            var prefix = FormatterTokenResolver.ResolveTemplate(template: Options.Prefix, item: item);
-            var suffix = FormatterTokenResolver.ResolveTemplate(template: Options.Suffix, item: item);
+            var prefix = FormatStringResolver.ResolveTemplate(template: Options.Prefix, item: item);
+            var suffix = FormatStringResolver.ResolveTemplate(template: Options.Suffix, item: item);
             return prefix + middle + suffix;
         }
     }

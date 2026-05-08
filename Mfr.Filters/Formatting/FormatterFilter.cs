@@ -25,7 +25,7 @@ namespace Mfr.Filters.Formatting
         protected override string _TransformValue(string value, RenameItem item)
         {
             _ = value;
-            return FormatterTokenResolver.ResolveTemplate(Options.Template, item);
+            return FormatStringResolver.ResolveTemplate(Options.Template, item);
         }
     }
 }

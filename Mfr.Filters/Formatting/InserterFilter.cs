@@ -48,7 +48,7 @@ namespace Mfr.Filters.Formatting
         /// <inheritdoc />
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var inserted = FormatterTokenResolver.ResolveTemplate(Options.Text, item);
+            var inserted = FormatStringResolver.ResolveTemplate(Options.Text, item);
             if (inserted.Length == 0)
             {
                 return value;

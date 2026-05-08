@@ -7,7 +7,7 @@ namespace Mfr.Filters.Formatting
     /// <summary>
     /// Resolves formatter tokens in template text.
     /// </summary>
-    internal static partial class FormatterTokenResolver
+    internal static partial class FormatStringResolver
     {
         /// <summary>
         /// Resolves all formatter tokens inside <paramref name="template"/>.

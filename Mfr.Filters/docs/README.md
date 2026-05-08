@@ -29,6 +29,7 @@ These pages document **per-filter `options`** (and behavior). Common preset fiel
 ### Misc
 
 - [FixLeadingZeros](Misc/FixLeadingZeros.md)
+- [Mover](Misc/Mover.md)
 - [StripParentheses](Misc/StripParentheses.md)
 
 ### Replace

@@ -55,7 +55,7 @@ namespace Mfr.Filters.Replace
             var transformed = value;
             foreach (var entry in searchToReplace)
             {
-                var replacement = FormatterTokenResolver.ResolveTemplate(entry.Replacement, item);
+                var replacement = FormatStringResolver.ResolveTemplate(entry.Replacement, item);
                 var replacerOptions = new ReplacerOptions(
                     Find: entry.Search,
                     Replacement: replacement,

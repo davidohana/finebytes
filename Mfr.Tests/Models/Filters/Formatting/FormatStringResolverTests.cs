@@ -4,9 +4,9 @@ using Mfr.Filters.Formatting;
 namespace Mfr.Tests.Models.Filters.Formatting
 {
     /// <summary>
-    /// Tests for <see cref="FormatterTokenResolver"/>.
+    /// Tests for <see cref="FormatStringResolver"/>.
     /// </summary>
-    public sealed class FormatterTokenResolverTests
+    public sealed class FormatStringResolverTests
     {
         /// <summary>
         /// Verifies that multiple known tokens are replaced.
@@ -19,7 +19,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 extension: ".mp3",
                 directory: @"C:\Music\My Album");
 
-            var result = FormatterTokenResolver.ResolveTemplate(
+            var result = FormatStringResolver.ResolveTemplate(
                 template: "<file-name><ext>-<parent-folder>",
                 item: item);
 
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var item = FilterTestHelpers.CreateRenameItem(globalIndex: 2, inFolderIndex: 7);
 
-            var result = FormatterTokenResolver.ResolveTemplate(
+            var result = FormatStringResolver.ResolveTemplate(
                 template: "<counter:10,1,0,2,0>",
                 item: item);
 
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var item = FilterTestHelpers.CreateRenameItem(globalIndex: 2, inFolderIndex: 7);
 
-            var result = FormatterTokenResolver.ResolveTemplate(
+            var result = FormatStringResolver.ResolveTemplate(
                 template: "<counter:10,1,1,2,0>",
                 item: item);
 
@@ -65,7 +65,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<InvalidOperationException>(() =>
-                FormatterTokenResolver.ResolveTemplate(
+                FormatStringResolver.ResolveTemplate(
                     template: "<counter:1,2>",
                     item: item));
 
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<NotSupportedException>(() =>
-                FormatterTokenResolver.ResolveTemplate(
+                FormatStringResolver.ResolveTemplate(
                     template: "<does-not-exist>",
                     item: item));
 
@@ -96,8 +96,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var item = FilterTestHelpers.CreateRenameItem(extension: ".flac");
 
-            var ext = FormatterTokenResolver.ResolveTemplate("<ext>", item);
-            var fileExt = FormatterTokenResolver.ResolveTemplate("<file-ext>", item);
+            var ext = FormatStringResolver.ResolveTemplate("<ext>", item);
+            var fileExt = FormatStringResolver.ResolveTemplate("<file-ext>", item);
 
             Assert.Equal(".flac", ext);
             Assert.Equal(".flac", fileExt);
@@ -111,7 +111,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a", extension: ".b");
 
-            var result = FormatterTokenResolver.ResolveTemplate("<full-name>", item);
+            var result = FormatStringResolver.ResolveTemplate("<full-name>", item);
 
             Assert.Equal("a.b", result);
         }
@@ -127,7 +127,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 extension: ".mp3",
                 directory: @"D:\Music\Album");
 
-            var result = FormatterTokenResolver.ResolveTemplate("<full-path>", item);
+            var result = FormatStringResolver.ResolveTemplate("<full-path>", item);
 
             Assert.Equal(item.Original.FullPath, result);
         }
@@ -140,7 +140,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var result = FormatterTokenResolver.ResolveTemplate("<now>", item);
+            var result = FormatStringResolver.ResolveTemplate("<now>", item);
 
             Assert.True(
                 DateTimeOffset.TryParse(
@@ -159,7 +159,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var result = FormatterTokenResolver.ResolveTemplate("<now:yyyy>", item);
+            var result = FormatStringResolver.ResolveTemplate("<now:yyyy>", item);
             var expectedYear = DateTimeOffset.UtcNow.ToString("yyyy", CultureInfo.InvariantCulture);
 
             Assert.Equal(expectedYear, result);
@@ -173,7 +173,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var item = FilterTestHelpers.CreateRenameItem(globalIndex: 0, inFolderIndex: 0);
 
-            var result = FormatterTokenResolver.ResolveTemplate(
+            var result = FormatStringResolver.ResolveTemplate(
                 template: "<counter:7,1,0,4,1>",
                 item: item);
 
