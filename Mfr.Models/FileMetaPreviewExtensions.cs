@@ -188,15 +188,7 @@ namespace Mfr.Models
 
         private static bool _ContainsInvalidPathChar(string path)
         {
-            foreach (var c in Path.GetInvalidPathChars())
-            {
-                if (path.Contains(c))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return Path.GetInvalidPathChars().Any(path.Contains);
         }
     }
 }

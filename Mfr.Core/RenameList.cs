@@ -215,31 +215,11 @@ namespace Mfr.Core
         /// </summary>
         private static void _LogPreviewOutcomeSummary(IEnumerable<RenameItem> items)
         {
-            var changed = 0;
-            var unchanged = 0;
-            var errors = 0;
-            foreach (var item in items)
-            {
-                if (item.Status == RenameStatus.PreviewError)
-                {
-                    errors++;
-                    continue;
-                }
-
-                if (item.Status != RenameStatus.PreviewOk)
-                {
-                    continue;
-                }
-
-                if (item.HasPreviewChanges())
-                {
-                    changed++;
-                }
-                else
-                {
-                    unchanged++;
-                }
-            }
+            var itemList = items.ToList();
+            var errors = itemList.Count(i => i.Status == RenameStatus.PreviewError);
+            var okItems = itemList.Where(i => i.Status == RenameStatus.PreviewOk).ToList();
+            var changed = okItems.Count(i => i.HasPreviewChanges());
+            var unchanged = okItems.Count(i => !i.HasPreviewChanges());
 
             Log.Information(
                 "Finished preview. Changed: {PreviewChangedCount}, Unchanged: {PreviewUnchangedCount}, Errors: {PreviewErrorCount}.",

@@ -29,13 +29,10 @@ namespace Mfr.Models
         /// <returns>A new chain.</returns>
         public static FilterChain CreateAllEnabled(IReadOnlyList<BaseFilter> filters)
         {
-            var steps = new FilterChainStep[filters.Count];
-            for (var i = 0; i < filters.Count; i++)
+            return new FilterChain
             {
-                steps[i] = new FilterChainStep(Enabled: true, Filter: filters[i]);
-            }
-
-            return new FilterChain { Steps = steps };
+                Steps = [.. filters.Select(f => new FilterChainStep(Enabled: true, Filter: f))],
+            };
         }
 
         /// <summary>

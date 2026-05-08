@@ -101,10 +101,7 @@ namespace Mfr.Core
                     unresolvable: unresolvable);
                 if (!cycleHandled)
                 {
-                    foreach (var leftover in remaining)
-                    {
-                        unresolvable.Add(leftover);
-                    }
+                    unresolvable.AddRange(remaining);
                     break;
                 }
             }
@@ -212,24 +209,8 @@ namespace Mfr.Core
             HashSet<RenameItem> remaining,
             Dictionary<RenameItem, HashSet<RenameItem>> dependsOn)
         {
-            foreach (var item in remaining)
-            {
-                var blockingDependencies = 0;
-                foreach (var dependency in dependsOn[item])
-                {
-                    if (remaining.Contains(dependency))
-                    {
-                        blockingDependencies++;
-                    }
-                }
-
-                if (blockingDependencies == 0)
-                {
-                    return item;
-                }
-            }
-
-            return null;
+            return remaining.FirstOrDefault(
+                item => !dependsOn[item].Any(dependency => remaining.Contains(dependency)));
         }
 
         private static bool _TryHandleCycle(
@@ -339,15 +320,7 @@ namespace Mfr.Core
             Dictionary<RenameItem, HashSet<RenameItem>> dependsOn,
             HashSet<RenameItem> remaining)
         {
-            foreach (var dependency in dependsOn[item])
-            {
-                if (remaining.Contains(dependency))
-                {
-                    return dependency;
-                }
-            }
-
-            return null;
+            return dependsOn[item].FirstOrDefault(remaining.Contains);
         }
 
         private static RenameItem? _PickCycleReadyItem(
@@ -391,12 +364,13 @@ namespace Mfr.Core
                 return stashedTempPath;
             }
 
-            var actualSourcePath = item.Original.FullPath;
             // Apply ancestor renames innermost-first so chained ancestors compose correctly.
             var ancestors = participants
                 .Where(other => !ReferenceEquals(other, item))
                 .Where(other => _IsAncestorRenameOf(ancestor: other, descendant: item))
                 .OrderByDescending(other => other.Original.FullPath.Length);
+
+            var actualSourcePath = item.Original.FullPath;
             foreach (var ancestor in ancestors)
             {
                 actualSourcePath = PathRelations.ReplaceAncestor(

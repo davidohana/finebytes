@@ -133,19 +133,8 @@ namespace Mfr.Core
             }
 
             // A descendant path is implicitly vacated when its ancestor folder is renamed away.
-            foreach (var folderRename in folderRenameAncestors)
-            {
-                var ancestorOriginalPath = folderRename.Original.FullPath;
-                var destinationIsUnderRenamedAncestor = PathRelations.IsDescendantOf(
-                    candidate: destinationPath,
-                    ancestor: ancestorOriginalPath);
-                if (destinationIsUnderRenamedAncestor)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return folderRenameAncestors.Any(folderRename =>
+                PathRelations.IsDescendantOf(candidate: destinationPath, ancestor: folderRename.Original.FullPath));
         }
     }
 }
