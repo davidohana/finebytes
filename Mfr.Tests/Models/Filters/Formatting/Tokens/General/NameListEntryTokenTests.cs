@@ -128,6 +128,30 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         }
 
         /// <summary>
+        /// Verifies a second compile reads the file again so disk edits appear after recompilation.
+        /// </summary>
+        [Fact]
+        public void Compile_SecondCompile_RereadsFileFromDisk()
+        {
+            var token = new NameListEntryToken();
+            var filePath = _CreateFile(
+                """
+                Old
+                """);
+
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
+            Assert.Equal("Old", token.Compile(arg: filePath)(item));
+
+            File.WriteAllText(
+                filePath,
+                """
+                New
+                """.ReplaceLineEndings(Environment.NewLine));
+
+            Assert.Equal("New", token.Compile(arg: filePath)(item));
+        }
+
+        /// <summary>
         /// Verifies missing files produce a user-facing validation error.
         /// </summary>
         [Fact]

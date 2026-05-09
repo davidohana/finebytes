@@ -15,15 +15,14 @@ namespace Mfr.Filters.Formatting.Tokens.General
     /// When the rename-list index exceeds the number of parsed entries in the file, resolution fails
     /// with a user-facing validation error.
     /// </para>
+    /// <para>
+    /// The list file is parsed when the format string is compiled (for example on each preview
+    /// refresh), not held in a cross-compilation cache.
+    /// </para>
     /// </remarks>
     internal sealed class NameListEntryToken : IFormatToken
     {
         private const string TokenName = "name-list-entry";
-
-        private static readonly Dictionary<string, IReadOnlyList<string>> _pathToEntries =
-            new(StringComparer.OrdinalIgnoreCase);
-
-        private static readonly Lock _cacheLock = new();
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = [TokenName];
@@ -42,8 +41,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
                 $"{tokenDisplayName} requires one argument: name-list-file-path.",
                 nameof(arg));
 
-            var filePath = arg;
-            var entries = _GetEntries(filePath);
+            var normalizedPath = Path.GetFullPath(arg);
+            var entries = NameListParser.ParseFile(filePath: normalizedPath);
             return item =>
             {
                 var index = item.Original.RenameListIndex;
@@ -53,25 +52,11 @@ namespace Mfr.Filters.Formatting.Tokens.General
 
                 if (index >= entries.Count)
                     throw new UserException(
-                        $"{tokenDisplayName} index {index} is out of range for '{filePath}' " +
+                        $"{tokenDisplayName} index {index} is out of range for '{normalizedPath}' " +
                         $"({entries.Count} parsed entries).");
 
                 return entries[index];
             };
-        }
-
-        private static IReadOnlyList<string> _GetEntries(string filePath)
-        {
-            var normalizedPath = Path.GetFullPath(filePath);
-            lock (_cacheLock)
-            {
-                if (_pathToEntries.TryGetValue(normalizedPath, out var cachedEntries))
-                    return cachedEntries;
-
-                var loadedEntries = NameListParser.ParseFile(filePath: normalizedPath);
-                _pathToEntries[normalizedPath] = loadedEntries;
-                return loadedEntries;
-            }
         }
     }
 }
