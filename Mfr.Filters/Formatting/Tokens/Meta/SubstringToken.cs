@@ -51,8 +51,6 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
 
         private static readonly string[] _substrOptionKeys = ["start", "end", "source"];
 
-        private static readonly HashSet<string> _substrOptionSet = new(_substrOptionKeys, StringComparer.OrdinalIgnoreCase);
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["substr"];
 
@@ -88,15 +86,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
                 nameof(arg));
 
             var map = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
-            foreach (var key in map.Keys)
-            {
-                if (!_substrOptionSet.Contains(key))
-                {
-                    throw new ArgumentException(
-                        $"{tokenDisplayName} unknown option '{key}' (expected {FormatOptionsParsing.FormatExpectedKeywords(_substrOptionKeys)}).",
-                        nameof(arg));
-                }
-            }
+            FormatOptionsParsing.RequireKnownOptionKeysOnly(map, tokenDisplayName, _substrOptionKeys, nameof(arg));
 
             foreach (var req in _substrOptionKeys)
             {

@@ -44,8 +44,6 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
         private static readonly string[] _tokenExtractOptionKeys =
             ["tokenNumber", "separator", "includeNext", "includePrev", "source"];
 
-        private static readonly HashSet<string> _tokenExtractOptionSet = new(_tokenExtractOptionKeys, StringComparer.OrdinalIgnoreCase);
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["token"];
 
@@ -90,15 +88,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
                 nameof(arg));
 
             var map = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
-            foreach (var key in map.Keys)
-            {
-                if (!_tokenExtractOptionSet.Contains(key))
-                {
-                    throw new ArgumentException(
-                        $"{tokenDisplayName} unknown option '{key}' (expected {FormatOptionsParsing.FormatExpectedKeywords(_tokenExtractOptionKeys)}).",
-                        nameof(arg));
-                }
-            }
+            FormatOptionsParsing.RequireKnownOptionKeysOnly(map, tokenDisplayName, _tokenExtractOptionKeys, nameof(arg));
 
             foreach (var req in _tokenExtractOptionKeys)
             {

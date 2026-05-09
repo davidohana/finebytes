@@ -84,6 +84,32 @@ namespace Mfr.Filters.Formatting.Tokens
         }
 
         /// <summary>
+        /// Ensures every key in <paramref name="map"/> is listed in <paramref name="allowedOptionKeys"/> (case-insensitive).
+        /// </summary>
+        /// <param name="map">Parsed option keys from <see cref="ParseNamedKeyValuePairs"/>.</param>
+        /// <param name="tokenDisplayName">Token label for errors (for example <c>&lt;substr&gt;</c>).</param>
+        /// <param name="allowedOptionKeys">Canonical allowed names; order defines the phrase passed to <see cref="FormatExpectedKeywords"/>.</param>
+        /// <param name="argParamName">Parameter name for <see cref="ArgumentException.ParamName"/>.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="map"/> contains a key not in <paramref name="allowedOptionKeys"/>.</exception>
+        internal static void RequireKnownOptionKeysOnly(
+            Dictionary<string, string> map,
+            string tokenDisplayName,
+            IReadOnlyList<string> allowedOptionKeys,
+            string argParamName)
+        {
+            var allowed = new HashSet<string>(allowedOptionKeys, StringComparer.OrdinalIgnoreCase);
+            foreach (var key in map.Keys)
+            {
+                if (!allowed.Contains(key))
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} unknown option '{key}' (expected {FormatExpectedKeywords(allowedOptionKeys)}).",
+                        argParamName);
+                }
+            }
+        }
+
+        /// <summary>
         /// Formats keyword strings as a short English list for error messages (<c>x or y</c>; <c>x, y, or z</c>).
         /// </summary>
         /// <param name="keywords">Keywords to list (for example dictionary keys; insertion order is preserved).</param>

@@ -134,15 +134,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             else
             {
                 var parsed = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
-                foreach (var key in parsed.Keys)
-                {
-                    if (!_counterDefaults.ContainsKey(key))
-                    {
-                        throw new ArgumentException(
-                            $"{tokenDisplayName} unknown option '{key}' (expected {FormatOptionsParsing.FormatExpectedKeywords(_counterOptionKeys)}).",
-                            nameof(arg));
-                    }
-                }
+                FormatOptionsParsing.RequireKnownOptionKeysOnly(parsed, tokenDisplayName, _counterOptionKeys, nameof(arg));
 
                 merged = new Dictionary<string, string>(_counterDefaults, StringComparer.OrdinalIgnoreCase);
                 foreach (var kv in parsed)
