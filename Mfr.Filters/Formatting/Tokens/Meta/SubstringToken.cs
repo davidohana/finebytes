@@ -5,23 +5,28 @@ using Mfr.Utils;
 namespace Mfr.Filters.Formatting.Tokens.Meta
 {
     /// <summary>
-    /// Resolves the <c>&lt;substr:start-position,end-position,source-format-string&gt;</c> token.
+    /// Resolves the <c>&lt;substr:…&gt;</c> token (substring over resolved source text).
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// Named arguments (order-independent), for example
+    /// <c>&lt;substr:start=1, end=5, source=&lt;file-name&gt;&gt;</c>.
+    /// Whitespace around <c>=</c> and commas is ignored. Commas inside balanced <c>&lt;…&gt;</c> belong to nested templates, not to option boundaries.
+    /// </para>
     /// <para>
     /// Positions are 1-based. Negative positions count from the right: -1 is the last character,
     /// -2 is the second-to-last, and so on. Out-of-range positions are clamped to the nearest
     /// valid boundary.
     /// </para>
     /// <para>
-    /// When the resolved <c>start-position</c> is less than or equal to the resolved
-    /// <c>end-position</c>, the characters at positions [start, end] (inclusive) are returned.
-    /// When the resolved <c>start-position</c> exceeds the resolved <c>end-position</c> (i.e. the
-    /// arguments are "crossed"), the characters at positions (end, start] are returned — the range
-    /// between them, exclusive of end and inclusive of start.
+    /// When the resolved <c>start</c> position is less than or equal to the resolved
+    /// <c>end</c> position, the characters at positions [start, end] (inclusive) are returned.
+    /// When the resolved <c>start</c> exceeds the resolved <c>end</c> (crossed arguments),
+    /// the characters at positions (end, start] are returned — the range between them,
+    /// exclusive of end and inclusive of start.
     /// </para>
     /// <para>
-    /// <c>source-format-string</c> may itself be a nested format token such as <c>&lt;full-name&gt;</c>
+    /// <c>source</c> may be a nested format token such as <c>&lt;full-name&gt;</c>
     /// or a literal with embedded tokens; it is resolved before the substring is applied.
     /// </para>
     /// </remarks>
@@ -43,6 +48,10 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             int StartPosition,
             int EndPosition,
             string SourceFormatString);
+
+        private static readonly string[] _substrOptionKeys = ["start", "end", "source"];
+
+        private static readonly HashSet<string> _substrOptionSet = new(_substrOptionKeys, StringComparer.OrdinalIgnoreCase);
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["substr"];
@@ -73,31 +82,54 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
         private Options _ParseOptions(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
-            Require.That(!string.IsNullOrEmpty(arg), $"{tokenDisplayName} requires 3 arguments: start-position,end-position,source-format-string.", nameof(arg));
-
-            var parts = arg.Split(',', 3);
             Require.That(
-                parts.Length == 3,
-                $"{tokenDisplayName} requires exactly 3 comma-separated arguments (got {parts.Length}): '{arg}'.",
+                !string.IsNullOrEmpty(arg),
+                $"{tokenDisplayName} requires named options ({FormatOptionsParsing.FormatExpectedKeywords(_substrOptionKeys)}).",
                 nameof(arg));
 
+            var map = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
+            foreach (var key in map.Keys)
+            {
+                if (!_substrOptionSet.Contains(key))
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} unknown option '{key}' (expected {FormatOptionsParsing.FormatExpectedKeywords(_substrOptionKeys)}).",
+                        nameof(arg));
+                }
+            }
+
+            foreach (var req in _substrOptionKeys)
+            {
+                if (!map.ContainsKey(req))
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} missing required option '{req}' (expected all of {FormatOptionsParsing.FormatExpectedKeywords(_substrOptionKeys)}).",
+                        nameof(arg));
+                }
+            }
+
+            var startText = map["start"].Trim();
+            var startParsedOk = int.TryParse(startText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var startPosition);
             Require.That(
-                int.TryParse(parts[0].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var startPosition),
-                $"{tokenDisplayName} start-position must be a non-zero integer (got '{parts[0].Trim()}').",
+                startParsedOk,
+                $"{tokenDisplayName} start must be a non-zero integer (got '{startText}').",
                 nameof(arg));
 
+            var endText = map["end"].Trim();
+            var endParsedOk = int.TryParse(endText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var endPosition);
             Require.That(
-                int.TryParse(parts[1].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var endPosition),
-                $"{tokenDisplayName} end-position must be a non-zero integer (got '{parts[1].Trim()}').",
+                endParsedOk,
+                $"{tokenDisplayName} end must be a non-zero integer (got '{endText}').",
                 nameof(arg));
 
-            Require.That(startPosition != 0, $"{tokenDisplayName} start-position must not be zero.", nameof(arg));
+            Require.That(startPosition != 0, $"{tokenDisplayName} start must not be zero.", nameof(arg));
 
-            Require.That(endPosition != 0, $"{tokenDisplayName} end-position must not be zero.", nameof(arg));
+            Require.That(endPosition != 0, $"{tokenDisplayName} end must not be zero.", nameof(arg));
+
             return new Options(
                 StartPosition: startPosition,
                 EndPosition: endPosition,
-                SourceFormatString: parts[2]);
+                SourceFormatString: map["source"]);
         }
 
         /// <summary>

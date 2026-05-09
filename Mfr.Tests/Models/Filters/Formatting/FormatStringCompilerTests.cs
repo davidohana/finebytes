@@ -100,7 +100,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [InlineData("random-char:A,Z")]
         [InlineData("random-char:0,9")]
         [InlineData("counter")]
-        [InlineData("counter:1,1,none,0,global")]
+        [InlineData("counter:length=0,initial=1,step=1,padding=none,resetScope=global")]
         [InlineData("now")]
         public void ResolveTemplate_ShippedToken_ResolvesWithoutThrowing(string tokenInner)
         {

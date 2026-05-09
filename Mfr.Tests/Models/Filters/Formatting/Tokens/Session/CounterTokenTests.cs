@@ -8,8 +8,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
     /// </summary>
     public sealed class CounterTokenTests
     {
+        private const string _defaultsEquivalent =
+            "initial=1,step=1,padding=none,length=2,resetScope=global";
+
         /// <summary>
-        /// Verifies bare-arg default matches <c>&lt;counter:1,1,none,2,global&gt;</c> (no leading zeros).
+        /// Verifies bare-arg default matches encoded defaults (no leading zeros).
         /// </summary>
         [Fact]
         public void Resolve_EmptyArg_DefaultsToSimpleForm()
@@ -18,7 +21,21 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
 
             Assert.Equal("1", token.Compile(arg: "")(item));
-            Assert.Equal("1", token.Compile(arg: "1,1,none,2,global")(item));
+            Assert.Equal("1", token.Compile(arg: _defaultsEquivalent)(item));
+        }
+
+        /// <summary>
+        /// Verifies named options can appear in any order.
+        /// </summary>
+        [Fact]
+        public void Resolve_NamedOptions_OrderIndependent()
+        {
+            var token = new CounterToken();
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
+
+            Assert.Equal(
+                "1",
+                token.Compile(arg: "resetScope=global,length=2,padding=none,step=1,initial=1")(item));
         }
 
         /// <summary>
@@ -30,7 +47,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 2, inFolderIndex: 7);
 
-            Assert.Equal("17", token.Compile(arg: "10,1,none,2,perFolder")(item));
+            Assert.Equal(
+                "17",
+                token.Compile(arg: "initial=10,step=1,padding=none,length=2,resetScope=perFolder")(item));
         }
 
         /// <summary>
@@ -42,7 +61,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 2, inFolderIndex: 7);
 
-            Assert.Equal("12", token.Compile(arg: "10,1,none,2,global")(item));
+            Assert.Equal(
+                "12",
+                token.Compile(arg: "initial=10,step=1,padding=none,length=2,resetScope=global")(item));
         }
 
         /// <summary>
@@ -54,11 +75,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0, inFolderIndex: 0);
 
-            Assert.Equal("0007", token.Compile(arg: "7,1,fixed,4,global")(item));
+            Assert.Equal(
+                "0007",
+                token.Compile(arg: "initial=7,step=1,padding=fixed,length=4,resetScope=global")(item));
         }
 
         /// <summary>
-        /// Verifies padding none ignores the fourth parameter.
+        /// Verifies padding none ignores length.
         /// </summary>
         [Fact]
         public void Resolve_PaddingNone_SkipsPadding()
@@ -66,7 +89,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 5, inFolderIndex: 0);
 
-            Assert.Equal("15", token.Compile(arg: "10,1,none,99,global")(item));
+            Assert.Equal(
+                "15",
+                token.Compile(arg: "initial=10,step=1,padding=none,length=99,resetScope=global")(item));
         }
 
         /// <summary>
@@ -81,7 +106,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 renameListTotalCount: 100,
                 renameListFolderSiblingCount: 3);
 
-            Assert.Equal("006", token.Compile(arg: "1,1,auto,2,global")(item));
+            Assert.Equal(
+                "006",
+                token.Compile(arg: "initial=1,step=1,padding=auto,length=2,resetScope=global")(item));
         }
 
         /// <summary>
@@ -97,7 +124,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 renameListTotalCount: 100,
                 renameListFolderSiblingCount: 100);
 
-            Assert.Equal("006", token.Compile(arg: "1,1,auto,2,perFolder")(item));
+            Assert.Equal(
+                "006",
+                token.Compile(arg: "initial=1,step=1,padding=auto,length=2,resetScope=perFolder")(item));
         }
 
         /// <summary>
@@ -109,21 +138,24 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 3, inFolderIndex: 0);
 
-            Assert.Equal("4", token.Compile(arg: "10,-2,none,0,global")(item));
+            Assert.Equal(
+                "4",
+                token.Compile(arg: "initial=10,step=-2,padding=none,length=0,resetScope=global")(item));
         }
 
         /// <summary>
-        /// Verifies fewer than five comma-separated arguments throws.
+        /// Verifies positional-style fragments without <c>=</c> throw.
         /// </summary>
         [Fact]
-        public void Resolve_TooFewArgs_Throws()
+        public void Resolve_PositionalStyleArgs_Throws()
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<ArgumentException>(
                 () => token.Compile(arg: "1,2")(item));
-            Assert.Contains("Invalid <counter> token arg", ex.Message);
+            Assert.Contains("<counter>", ex.Message);
+            Assert.Contains("not a valid name=value pair", ex.Message);
         }
 
         /// <summary>
@@ -143,7 +175,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 renameListFolderSiblingCount: 0));
 
             var ex = Assert.Throws<InvalidOperationException>(
-                () => token.Compile(arg: "1,1,auto,2,global")(item));
+                () => token.Compile(arg: "initial=1,step=1,padding=auto,length=2,resetScope=global")(item));
             Assert.Contains("automatic padding", ex.Message);
         }
 
@@ -157,7 +189,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<ArgumentException>(
-                () => token.Compile(arg: "1,1,fixed,0,global")(item));
+                () => token.Compile(arg: "initial=1,step=1,padding=fixed,length=0,resetScope=global")(item));
             Assert.Contains("positive total length", ex.Message);
         }
 
@@ -171,7 +203,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<ArgumentException>(
-                () => token.Compile(arg: "1,1,nope,2,global")(item));
+                () => token.Compile(arg: "initial=1,step=1,padding=nope,length=2,resetScope=global")(item));
             Assert.Contains("padding", ex.Message);
         }
     }

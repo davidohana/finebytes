@@ -44,15 +44,15 @@ Replaces the **entire target segment** with the result of expanding a **template
 | `<item-count>` | Total items in the current rename list (no arguments). Populated during preview/commit. |
 | `<name-list-entry:name-list-file-path>` | Uses Name List parsing rules (comment lines are skipped; blank lines are preserved; at least one entry required), then returns the entry at the item's rename-list position. Throws a user-facing error when item index exceeds the parsed entry count. |
 | `<random-char:low,high>` | One random character, uniformly chosen between inclusive endpoints (first character of each side is used; order may be reversed). Examples: `<random-char:A,Z>`, `<random-char:0,9>`. |
-| `<counter>` | Same as `<counter:1,1,none,2,global>` (no leading zeros). |
-| `<counter:initial,step,padding,length,reset-scope>` | Position in rename list: `initial` + `step`×index. `padding`: `none`, `auto` (width from list scope), or `fixed` (pad to `length`, minimum digit width `1`). `reset-scope`: `global` index vs `perFolder` (restart per folder). |
+| `<counter>` | Same defaults as named form below with every option omitted (no leading zeros). |
+| `<counter:initial=…,step=…,padding=…,length=…,resetScope=…>` | Named options, **order-independent** (spaces around `,` and `=` optional). Omitted keys use the same defaults as bare `<counter>`. Position in rename list: `initial` + `step`×index. `padding`: `none`, `auto` (width from list scope), or `fixed` (pad to `length`, minimum digit width `1`). `resetScope`: `global` vs `perFolder` (restart per folder). |
 
 #### Token extraction
 
 | Token | Output |
 |-------|--------|
-| `<token:token-number,separator,include-next,include-prev,source-format-string>` | Splits `source-format-string` by `separator` and returns the 1-based `token-number`-th part. `include-next` / `include-prev`: `true`/`false` (case-insensitive). When include-next is true, returns from `token-number` to end (rejoined). When include-prev is true, returns from start through `token-number` (rejoined). Both true = full source string. Nested tokens/literals allowed in `source-format-string`. |
-| `<substr:start-position,end-position,source-format-string>` | Extracts characters from `source-format-string` between two positions (inclusive). Positions are 1-based; negative positions count from the right (`-1` = last character). Out-of-range positions are clamped to the nearest boundary. When the resolved start exceeds the resolved end, the range `(end, start]` is returned. `source-format-string` may be any legal format token or a literal. |
+| `<token:tokenNumber=…,separator=…,includeNext=…,includePrev=…,source=…>` | Same behavior as before; arguments are **named** and **order-independent** (spaces optional). `source` may contain nested `<…>` tokens; commas inside balanced angle brackets are not argument separators. `includeNext` / `includePrev`: `true`/`false` (case-insensitive). |
+| `<substr:start=…,end=…,source=…>` | Named options, **order-independent** (spaces optional). Extracts characters from `source` between two positions (inclusive). Positions are 1-based; negative positions count from the right (`-1` = last character). Out-of-range positions are clamped to the nearest boundary. When the resolved start exceeds the resolved end, the range `(end, start]` is returned. `source` may contain nested `<…>` tokens; commas inside balanced angle brackets are not option separators. |
 
 Unknown token names cause an error at runtime.
 
@@ -70,13 +70,13 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 | `template`: `"<file-size>"` | `ignored` | `1 KB` | Auto unit, 0 decimals. |
 | `template`: `"<file-size:mb,2>"` | `ignored` | `1.50 MB` | MB, 2 decimal places. |
 | `template`: `"<drive-letter>"` | `ignored` | `C:` | Drive letter of the file. |
-| `template`: `"<counter:10,2,fixed,4,global>"`<br>global index: `3` | `ignored` | `0016` | `10 + 2×3`, fixed width `4`. |
-| `template`: `"<token:1,-,false,false,<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `13_` | Track number prefix, split by `-`. |
-| `template`: `"<token:2,_-_,false,false,<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog` | Artist name, split by `_-_`. |
-| `template`: `"<token:2,_-_,true,false,<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog_-_Cold_Blooded_Old_Times.mp3` | Artist and title, include-next. |
-| `template`: `"<substr:1,5,<file-name>>"` | `MyTestFileName.123` | `MyTes` | First 5 chars of prefix. |
-| `template`: `"<substr:5,-6,<full-name>>"` | `MyTestFileName.123` | `stFileNam` | Positive start, negative end. |
-| `template`: `"<substr:-1,2,<file-extension>45>"` | `MyTestFileName.123` | `2345` | Crossed positions: extension `.123` + literal `45` → `.12345`; range `(2,6]`. |
+| `template`: `"<counter:initial=10,step=2,padding=fixed,length=4,resetScope=global>"`<br>global index: `3` | `ignored` | `0016` | `10 + 2×3`, fixed width `4`. |
+| `template`: `"<token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `13_` | Track number prefix, split by `-`. |
+| `template`: `"<token:tokenNumber=2,separator=_-_,includeNext=false,includePrev=false,source=<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog` | Artist name, split by `_-_`. |
+| `template`: `"<token:tokenNumber=2,separator=_-_,includeNext=true,includePrev=false,source=<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog_-_Cold_Blooded_Old_Times.mp3` | Artist and title, include-next. |
+| `template`: `"<substr:start=1,end=5,source=<file-name>>"` | `MyTestFileName.123` | `MyTes` | First 5 chars of prefix. |
+| `template`: `"<substr:start=5,end=-6,source=<full-name>>"` | `MyTestFileName.123` | `stFileNam` | Positive start, negative end. |
+| `template`: `"<substr:start=-1,end=2,source=<file-extension>45>"` | `MyTestFileName.123` | `2345` | Crossed positions: extension `.123` + literal `45` → `.12345`; range `(2,6]`. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).
 

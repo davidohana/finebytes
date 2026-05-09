@@ -91,7 +91,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 R:_
 
                 S:[0-9]+
-                R:<counter:10,1,none,2,global>
+                R:<counter:initial=10,step=1,padding=none,length=2,resetScope=global>
                 // END OF REPLACE LIST
                 """);
             try

@@ -48,7 +48,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Target: _target,
                     Options: new NameListOptions(
                         FilePath: path,
-                        Prefix: "<counter:10,1,none,2,global>_",
+                        Prefix: "<counter:initial=10,step=1,padding=none,length=2,resetScope=global>_",
                         Suffix: "_end"));
                 Assert.Equal("10_One_end", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
             }

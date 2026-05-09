@@ -5,19 +5,23 @@ using Mfr.Utils;
 namespace Mfr.Filters.Formatting.Tokens.Meta
 {
     /// <summary>
-    /// Resolves the <c>&lt;token:token-number,separator,include-next,include-prev,source-format-string&gt;</c> token.
+    /// Resolves the <c>&lt;token:…&gt;</c> meta-token (split resolved source by separator and pick a part).
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Splits the resolved <c>source-format-string</c> by <c>separator</c> and extracts the
-    /// 1-based <c>token-number</c> part. <c>include-next</c> and <c>include-prev</c> are <c>true</c> or <c>false</c> (case-insensitive).
+    /// Named arguments (order-independent), for example
+    /// <c>&lt;token:tokenNumber=1, separator=-, includeNext=false, includePrev=false, source=&lt;full-name&gt;&gt;</c>.
+    /// Whitespace around <c>=</c> and commas is ignored.
+    /// </para>
+    /// <para>
+    /// Splits the resolved <c>source</c> format string by <c>separator</c> and extracts the
+    /// 1-based <c>tokenNumber</c> part. <c>includeNext</c> and <c>includePrev</c> are <c>true</c> or <c>false</c> (case-insensitive).
     /// When include-next is true, all parts from <c>token-number</c> to the end are rejoined.
     /// When include-prev is true, all parts from the start through <c>token-number</c> are rejoined.
     /// When both are true the full source string is returned.
     /// </para>
     /// <para>
-    /// <c>source-format-string</c> may itself be a nested format token such as <c>&lt;full-name&gt;</c>;
-    /// it is resolved before the split is applied.
+    /// <c>source</c> may contain nested format tokens and commas inside <c>&lt;…&gt;</c>; commas at bracket depth 0 separate options.
     /// </para>
     /// </remarks>
     internal sealed class TokenExtractToken : IFormatToken
@@ -36,6 +40,11 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             bool IncludeNext,
             bool IncludePrev,
             string SourceFormatString);
+
+        private static readonly string[] _tokenExtractOptionKeys =
+            ["tokenNumber", "separator", "includeNext", "includePrev", "source"];
+
+        private static readonly HashSet<string> _tokenExtractOptionSet = new(_tokenExtractOptionKeys, StringComparer.OrdinalIgnoreCase);
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["token"];
@@ -75,21 +84,39 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
 
         private Options _ParseOptions(string tokenDisplayName, string arg)
         {
-            Require.That(!string.IsNullOrEmpty(arg), $"{tokenDisplayName} requires 5 arguments: token-number,separator,include-next,include-prev,source-format-string.", nameof(arg));
-
-            var parts = arg.Split(',', 5);
             Require.That(
-                parts.Length == 5,
-                $"{tokenDisplayName} requires exactly 5 comma-separated arguments (got {parts.Length}): '{arg}'.",
+                !string.IsNullOrEmpty(arg),
+                $"{tokenDisplayName} requires named options ({FormatOptionsParsing.FormatExpectedKeywords(_tokenExtractOptionKeys)}).",
                 nameof(arg));
 
-            var tokenNumber = int.Parse(parts[0].Trim(), CultureInfo.InvariantCulture);
-            var separator = parts[1];
-            var includeNext = _ParseIncludeFlag(tokenDisplayName, fieldLabel: "include-next", parts[2]);
-            var includePrev = _ParseIncludeFlag(tokenDisplayName, fieldLabel: "include-prev", parts[3]);
-            var sourceFormatString = parts[4];
+            var map = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
+            foreach (var key in map.Keys)
+            {
+                if (!_tokenExtractOptionSet.Contains(key))
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} unknown option '{key}' (expected {FormatOptionsParsing.FormatExpectedKeywords(_tokenExtractOptionKeys)}).",
+                        nameof(arg));
+                }
+            }
 
-            Require.That(tokenNumber >= 1, $"{tokenDisplayName} token-number must be 1 or greater (got {tokenNumber}).", nameof(arg));
+            foreach (var req in _tokenExtractOptionKeys)
+            {
+                if (!map.ContainsKey(req))
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} missing required option '{req}' (expected all of {FormatOptionsParsing.FormatExpectedKeywords(_tokenExtractOptionKeys)}).",
+                        nameof(arg));
+                }
+            }
+
+            var tokenNumber = int.Parse(map["tokenNumber"].Trim(), CultureInfo.InvariantCulture);
+            var separator = map["separator"];
+            var includeNext = _ParseIncludeFlag(tokenDisplayName, fieldLabel: "includeNext", map["includeNext"]);
+            var includePrev = _ParseIncludeFlag(tokenDisplayName, fieldLabel: "includePrev", map["includePrev"]);
+            var sourceFormatString = map["source"];
+
+            Require.That(tokenNumber >= 1, $"{tokenDisplayName} tokenNumber must be 1 or greater (got {tokenNumber}).", nameof(arg));
 
             Require.That(!string.IsNullOrEmpty(separator), $"{tokenDisplayName} separator must not be empty.", nameof(arg));
 
@@ -102,7 +129,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
         }
 
         /// <summary>
-        /// Parses an include-next or include-prev flag field (<c>true</c>/<c>false</c>, case-insensitive).
+        /// Parses <c>includeNext</c> / <c>includePrev</c> (<c>true</c>/<c>false</c>, case-insensitive).
         /// </summary>
         private static bool _ParseIncludeFlag(string tokenDisplayName, string fieldLabel, string raw)
         {

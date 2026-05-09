@@ -565,7 +565,7 @@ Each preset is stored in its **own file**. File name convention: `<slug>-<id>.js
       "target": {
         "targetType": "FileFullName"
       },
-      "options": { "template": "<counter:1,1,fixed,2,global> - <id3-title:0><ext:0>" }
+      "options": { "template": "<counter:initial=1,step=1,padding=fixed,length=2,resetScope=global> - <id3-title:0><ext:0>" }
     },
     {
       "type": "Mover",
@@ -1061,7 +1061,7 @@ Renames any target field to a format string built from literals and formatting p
   "type": "Formatter",
   "target": { "targetType": "FileFullName" },
   "options": {
-    "template": "<counter:1,1,none,2,global>.<image-width:0>x<image-height:0>.<image-format:0><ext:0>"
+    "template": "<counter:initial=1,step=1,padding=none,length=2,resetScope=global>.<image-width:0>x<image-height:0>.<image-format:0><ext:0>"
   }
 }
 ```
@@ -1310,8 +1310,8 @@ Date formats follow .NET format strings: `yyyy`, `MM`, `dd`, `HH`, `mm`, `ss`, e
 
 | Token | Description | Example |
 |-------|-------------|---------|
-| `<counter>` | Same as `<counter:1,1,none,2,global>` (no leading zeros). |
-| `<counter:initial,step,padding,length,reset-scope>` | Counter: `padding` `none`, `auto`, or `fixed` (pad to `length`); `reset-scope` `global` or `perFolder` | `<counter:1,1,fixed,3,global>` → `001` |
+| `<counter>` | Same defaults as `<counter:initial=1,step=1,padding=none,length=2,resetScope=global>` (no leading zeros). |
+| `<counter:initial=…,step=…,padding=…,length=…,resetScope=…>` | Named options (order-free). Counter: `padding` `none`, `auto`, or `fixed` (pad to `length`); `resetScope` `global` or `perFolder` | `<counter:initial=1,step=1,padding=fixed,length=3,resetScope=global>` → `001` |
 | `<random:length>` | Random alphanumeric string | `<random:6>` → `k3m9xw` |
 | `<clipboard:0>` | Current clipboard text | |
 | `<text-file:path,line>` | Line N from a text file | |
@@ -1876,7 +1876,7 @@ Dragging files onto the MFR desktop shortcut launches MFR with those items pre-l
 ≡ 3. Formatter                         [enabled ☑] [×] [Options ⚙]
    Apply to: [Filename ▾]   When: [Always ▾]   Part: [None ▾]
    ┌────────────────────────────────────────────────────────────────┐
-   │ <counter:1,1,fixed,2,global> - <id3-artist:0> - <id3-title:0><ext:0>  │
+   │ <counter:initial=1,step=1,padding=fixed,length=2,resetScope=global> - <id3-artist:0> - <id3-title:0><ext:0>  │
    └────────────────────────────────────────────────────────────────┘
    [Token Picker ▾]   Preview: "01 - Queen - Bohemian Rhapsody.mp3"
 ```

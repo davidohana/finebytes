@@ -18,7 +18,7 @@ namespace Mfr.Filters.Formatting
     /// </para>
     /// <para>
     /// Nesting is handled at compile time: tokens whose argument contains a nested format string
-    /// (e.g. <c>&lt;substr:1,3,&lt;full-name&gt;&gt;</c>) call <see cref="Compile"/> on that argument
+    /// (e.g. <c>&lt;substr:start=1,end=3,source=&lt;full-name&gt;&gt;</c>) call <see cref="Compile"/> on that argument
     /// inside their own <see cref="IFormatToken.Compile"/> implementation, so the inner template is
     /// compiled once alongside the outer one.
     /// </para>

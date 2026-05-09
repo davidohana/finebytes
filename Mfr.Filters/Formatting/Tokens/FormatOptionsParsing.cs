@@ -3,10 +3,86 @@ using Mfr.Utils;
 namespace Mfr.Filters.Formatting.Tokens
 {
     /// <summary>
-    /// Shared helpers used by multiple formatter tokens (display labels, keyword hints, and common preconditions).
+    /// Shared helpers used by multiple formatter tokens (display labels, keyword hints, named arguments, and common preconditions).
     /// </summary>
     internal static class FormatOptionsParsing
     {
+        /// <summary>
+        /// Splits <paramref name="arg"/> on commas that are not inside balanced <c>&lt;…&gt;</c> segments (depth tracked per character).
+        /// </summary>
+        /// <param name="arg">Raw formatter token argument text.</param>
+        /// <returns>Segments before trimming; callers typically trim each segment.</returns>
+        internal static List<string> SplitNamedArgumentSegments(string arg)
+        {
+            var segments = new List<string>();
+            var depth = 0;
+            var start = 0;
+            for (var i = 0; i < arg.Length; i++)
+            {
+                var c = arg[i];
+                if (c == '<')
+                    depth++;
+                else if (c == '>')
+                    depth = Math.Max(0, depth - 1);
+                else if (c == ',' && depth == 0)
+                {
+                    segments.Add(arg[start..i]);
+                    start = i + 1;
+                }
+            }
+
+            segments.Add(arg[start..]);
+            return segments;
+        }
+
+        /// <summary>
+        /// Parses <c>name=value</c> segments (comma-separated at bracket depth 0); surrounding whitespace on keys and values is trimmed.
+        /// </summary>
+        /// <param name="arg">Non-empty argument text after the first <c>:</c> in the token.</param>
+        /// <param name="tokenDisplayName">Token label for errors (for example <c>&lt;counter&gt;</c>).</param>
+        /// <returns>Case-insensitive keys mapped to trimmed values.</returns>
+        /// <exception cref="ArgumentException">Thrown when a segment is empty, missing <c>=</c>, or duplicates a key.</exception>
+        internal static Dictionary<string, string> ParseNamedKeyValuePairs(string arg, string tokenDisplayName)
+        {
+            var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var segment in SplitNamedArgumentSegments(arg))
+            {
+                var trimmed = segment.Trim();
+                if (trimmed.Length == 0)
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} has an empty name=value segment in '{arg}'.",
+                        nameof(arg));
+                }
+
+                var eq = trimmed.IndexOf('=');
+                if (eq <= 0)
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} segment '{trimmed}' is not a valid name=value pair.",
+                        nameof(arg));
+                }
+
+                var key = trimmed[..eq].Trim();
+                var value = trimmed[(eq + 1)..].Trim();
+                if (key.Length == 0)
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} segment '{trimmed}' is missing a key before '='.",
+                        nameof(arg));
+                }
+
+                if (!map.TryAdd(key, value))
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} duplicate option '{key}' in '{arg}'.",
+                        nameof(arg));
+                }
+            }
+
+            return map;
+        }
+
         /// <summary>
         /// Formats keyword strings as a short English list for error messages (<c>x or y</c>; <c>x, y, or z</c>).
         /// </summary>

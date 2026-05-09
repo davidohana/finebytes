@@ -10,17 +10,20 @@ namespace Mfr.Filters.Formatting.Tokens.Session
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Full form:
-    /// <c>&lt;counter:initial-value,increment-by,padding,length,reset-scope&gt;</c>.
-    /// Bare <c>&lt;counter&gt;</c> is equivalent to <c>&lt;counter:1,1,none,2,global&gt;</c> (no leading zeros;
-    /// fourth value is ignored in <c>none</c> padding mode).
+    /// Full form uses named options (order-independent), for example
+    /// <c>&lt;counter:initial=1, step=1, padding=none, length=2, resetScope=global&gt;</c>.
+    /// Bare <c>&lt;counter&gt;</c> uses the same defaults (no leading zeros; <c>length</c> is ignored when <c>padding</c> is <c>none</c>).
+    /// </para>
+    /// <para>
+    /// Options: <c>initial</c>, <c>step</c>, <c>padding</c>, <c>length</c>, <c>resetScope</c> (case-insensitive keys).
+    /// Whitespace around <c>=</c> and commas is ignored. Omitted options use the defaults above.
     /// </para>
     /// <para>
     /// <c>padding</c>: <c>none</c>, <c>auto</c> (width from list scope), or <c>fixed</c> (pad to <c>length</c>,
     /// minimum digit width <c>1</c>).
     /// </para>
     /// <para>
-    /// <c>reset-scope</c>: <c>global</c> uses rename-list index and total counts;
+    /// <c>resetScope</c>: <c>global</c> uses rename-list index and total counts;
     /// <c>perFolder</c> uses per-folder index and sibling counts.
     /// </para>
     /// </remarks>
@@ -42,7 +45,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         }
 
         /// <summary>
-        /// Padding keywords for the third comma-separated field (<c>none</c>, <c>auto</c>, <c>fixed</c>).
+        /// Padding keywords for <c>padding=…</c> (<c>none</c>, <c>auto</c>, <c>fixed</c>).
         /// </summary>
         private static readonly Dictionary<string, CounterPaddingMode> _keywordToPaddingMode = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -52,7 +55,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         };
 
         /// <summary>
-        /// Reset-scope keywords for the fifth comma-separated field (<c>global</c> vs <c>perFolder</c>).
+        /// Reset-scope keywords for <c>resetScope=…</c> (<c>global</c> vs <c>perFolder</c>).
         /// </summary>
         private static readonly Dictionary<string, int> _keywordToResetOnFolderChange = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -60,7 +63,19 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             ["perFolder"] = 1,
         };
 
-        private const string DefaultArg = "1,1,none,2,global";
+        /// <summary>
+        /// Default option values when <c>&lt;counter&gt;</c> has no argument or an option is omitted.
+        /// </summary>
+        private static readonly Dictionary<string, string> _counterDefaults = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["initial"] = "1",
+            ["step"] = "1",
+            ["padding"] = "none",
+            ["length"] = "2",
+            ["resetScope"] = "global",
+        };
+
+        private static readonly string[] _counterOptionKeys = ["initial", "step", "padding", "length", "resetScope"];
 
         /// <summary>
         /// Parsed arguments for <c>&lt;counter&gt;</c>.
@@ -111,26 +126,42 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         private Options _ParseOptions(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
-            var normalizedArg = string.IsNullOrWhiteSpace(arg) ? DefaultArg : arg;
-            var parts = normalizedArg.Split(',', StringSplitOptions.TrimEntries);
-            Require.That(
-                parts.Length == 5,
-                $"Invalid {tokenDisplayName} token arg '{normalizedArg}'. Expected 5 comma-separated params or use '{tokenDisplayName}'.",
-                nameof(arg));
+            Dictionary<string, string> merged;
+            if (string.IsNullOrWhiteSpace(arg))
+            {
+                merged = new Dictionary<string, string>(_counterDefaults, StringComparer.OrdinalIgnoreCase);
+            }
+            else
+            {
+                var parsed = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
+                foreach (var key in parsed.Keys)
+                {
+                    if (!_counterDefaults.ContainsKey(key))
+                    {
+                        throw new ArgumentException(
+                            $"{tokenDisplayName} unknown option '{key}' (expected {FormatOptionsParsing.FormatExpectedKeywords(_counterOptionKeys)}).",
+                            nameof(arg));
+                    }
+                }
 
-            var paddingMode = _ParsePaddingMode(tokenDisplayName, parts[2]);
-            var resetOnFolderChange = _ParseResetScope(tokenDisplayName, parts[4]);
+                merged = new Dictionary<string, string>(_counterDefaults, StringComparer.OrdinalIgnoreCase);
+                foreach (var kv in parsed)
+                    merged[kv.Key] = kv.Value;
+            }
+
+            var paddingMode = _ParsePaddingMode(tokenDisplayName, merged["padding"]);
+            var resetOnFolderChange = _ParseResetScope(tokenDisplayName, merged["resetScope"]);
 
             return new Options(
-                InitialValue: int.Parse(parts[0], CultureInfo.InvariantCulture),
-                IncrementBy: int.Parse(parts[1], CultureInfo.InvariantCulture),
+                InitialValue: int.Parse(merged["initial"], CultureInfo.InvariantCulture),
+                IncrementBy: int.Parse(merged["step"], CultureInfo.InvariantCulture),
                 PaddingMode: paddingMode,
-                LeadingZeroesTotalLength: int.Parse(parts[3], CultureInfo.InvariantCulture),
+                LeadingZeroesTotalLength: int.Parse(merged["length"], CultureInfo.InvariantCulture),
                 ResetOnFolderChange: resetOnFolderChange);
         }
 
         /// <summary>
-        /// Parses the third comma-separated field (padding keyword).
+        /// Parses <c>padding=…</c>.
         /// </summary>
         private static CounterPaddingMode _ParsePaddingMode(string tokenDisplayName, string raw)
         {
@@ -143,7 +174,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         }
 
         /// <summary>
-        /// Parses the fifth comma-separated field (reset scope keyword).
+        /// Parses <c>resetScope=…</c>.
         /// </summary>
         private static int _ParseResetScope(string tokenDisplayName, string raw)
         {

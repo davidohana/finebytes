@@ -10,6 +10,17 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
     {
         private static readonly TokenExtractToken _token = new();
 
+        private static string _Named(
+            int tokenNumber,
+            string separator,
+            bool includeNext,
+            bool includePrev,
+            string source)
+        {
+            return $"tokenNumber={tokenNumber},separator={separator},includeNext={includeNext.ToString().ToLowerInvariant()}," +
+            $"includePrev={includePrev.ToString().ToLowerInvariant()},source={source}";
+        }
+
         // ── Basic extraction ──────────────────────────────────────────────────
 
         /// <summary>
@@ -18,11 +29,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_Token1_SingleCharSeparator_ReturnsFirstPart()
         {
-            // "13_-_Smog_-_Cold_Blooded_Old_Times.mp3" split by "-" → ["13_", "_Smog_", "_Cold_Blooded_Old_Times.mp3"]
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
-            Assert.Equal("13_", _token.Compile("1,-,false,false,13_-_Smog_-_Cold_Blooded_Old_Times.mp3")(item));
+            Assert.Equal(
+                "13_",
+                _token.Compile(_Named(1, "-", false, false, "13_-_Smog_-_Cold_Blooded_Old_Times.mp3"))(item));
         }
 
         /// <summary>
@@ -31,11 +43,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_Token2_MultiCharSeparator_ReturnsMiddlePart()
         {
-            // "13_-_Smog_-_Cold_Blooded_Old_Times.mp3" split by "_-_" → ["13", "Smog", "Cold_Blooded_Old_Times.mp3"]
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
-            Assert.Equal("Smog", _token.Compile("2,_-_,false,false,13_-_Smog_-_Cold_Blooded_Old_Times.mp3")(item));
+            Assert.Equal(
+                "Smog",
+                _token.Compile(_Named(2, "_-_", false, false, "13_-_Smog_-_Cold_Blooded_Old_Times.mp3"))(item));
         }
 
         /// <summary>
@@ -45,7 +58,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void Resolve_LastToken_ReturnsLastPart()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("c.txt", _token.Compile("3,_,false,false,a_b_c.txt")(item));
+            Assert.Equal("c.txt", _token.Compile(_Named(3, "_", false, false, "a_b_c.txt"))(item));
         }
 
         // ── include-next ──────────────────────────────────────────────────────
@@ -56,13 +69,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_IncludeNext_ReturnsRightRemainder()
         {
-            // split by "_-_" → ["13", "Smog", "Cold_Blooded_Old_Times.mp3"]; from token 2 → rejoin
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
             Assert.Equal(
                 "Smog_-_Cold_Blooded_Old_Times.mp3",
-                _token.Compile("2,_-_,true,false,13_-_Smog_-_Cold_Blooded_Old_Times.mp3")(item));
+                _token.Compile(_Named(2, "_-_", true, false, "13_-_Smog_-_Cold_Blooded_Old_Times.mp3"))(item));
         }
 
         /// <summary>
@@ -72,7 +84,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void Resolve_IncludeNext_Token1_ReturnsFullSource()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("a_b_c.txt", _token.Compile("1,_,true,false,a_b_c.txt")(item));
+            Assert.Equal("a_b_c.txt", _token.Compile(_Named(1, "_", true, false, "a_b_c.txt"))(item));
         }
 
         // ── include-prev ──────────────────────────────────────────────────────
@@ -83,9 +95,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_IncludePrev_ReturnsLeftPortion()
         {
-            // split by "_" → ["a", "b", "c.txt"]; up to token 2 → "a_b"
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("a_b", _token.Compile("2,_,false,true,a_b_c.txt")(item));
+            Assert.Equal("a_b", _token.Compile(_Named(2, "_", false, true, "a_b_c.txt"))(item));
         }
 
         /// <summary>
@@ -95,7 +106,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void Resolve_IncludePrev_LastToken_ReturnsFullSource()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("a_b_c.txt", _token.Compile("3,_,false,true,a_b_c.txt")(item));
+            Assert.Equal("a_b_c.txt", _token.Compile(_Named(3, "_", false, true, "a_b_c.txt"))(item));
         }
 
         // ── both include flags ────────────────────────────────────────────────
@@ -107,14 +118,26 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void Resolve_BothIncludeFlags_ReturnsFullSource()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("a_b_c.txt", _token.Compile("2,_,true,true,a_b_c.txt")(item));
+            Assert.Equal("a_b_c.txt", _token.Compile(_Named(2, "_", true, true, "a_b_c.txt"))(item));
+        }
+
+        /// <summary>
+        /// Verifies named options can appear in any order.
+        /// </summary>
+        [Fact]
+        public void Resolve_NamedOptions_OrderIndependent()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
+            Assert.Equal(
+                "b",
+                _token.Compile(
+                    "source=a_b_c.txt,separator=_,tokenNumber=2,includePrev=false,includeNext=false")(item));
         }
 
         // ── nested format string via FormatStringCompiler ─────────────────────
 
         /// <summary>
         /// Verifies the full nested token form resolves the inner <c>&lt;full-name&gt;</c> token first.
-        /// Matches spec example: <c>&lt;token:1,-,false,false,&lt;full-name&gt;&gt;</c> → <c>13_</c>.
         /// </summary>
         [Fact]
         public void ResolveTemplate_NestedFullName_ResolvesInnerTokenFirst()
@@ -122,12 +145,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
-            var compiled = FormatStringCompiler.Compile("<token:1,-,false,false,<full-name>>");
+            var compiled = FormatStringCompiler.Compile(
+                "<token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<full-name>>");
             Assert.Equal("13_", compiled(item));
         }
 
         /// <summary>
-        /// Spec example 2: <c>&lt;token:2,_-_,false,false,&lt;full-name&gt;&gt;</c> → <c>Smog</c>.
+        /// Spec example: multi-char separator and nested full-name.
         /// </summary>
         [Fact]
         public void ResolveTemplate_Token2MultiSep_ExtractsArtist()
@@ -135,12 +159,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
-            var compiled = FormatStringCompiler.Compile("<token:2,_-_,false,false,<full-name>>");
+            var compiled = FormatStringCompiler.Compile(
+                "<token:tokenNumber=2,separator=_-_,includeNext=false,includePrev=false,source=<full-name>>");
             Assert.Equal("Smog", compiled(item));
         }
 
         /// <summary>
-        /// Spec example 3: <c>&lt;token:2,_-_,true,false,&lt;full-name&gt;&gt;</c> → right remainder.
+        /// Spec example: include-next with nested full-name.
         /// </summary>
         [Fact]
         public void ResolveTemplate_Token2MultiSepIncludeNext_ExtractsRemainder()
@@ -148,7 +173,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
-            var compiled = FormatStringCompiler.Compile("<token:2,_-_,true,false,<full-name>>");
+            var compiled = FormatStringCompiler.Compile(
+                "<token:tokenNumber=2,separator=_-_,includeNext=true,includePrev=false,source=<full-name>>");
             Assert.Equal(
                 "Smog_-_Cold_Blooded_Old_Times.mp3",
                 compiled(item));
@@ -168,14 +194,14 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         }
 
         /// <summary>
-        /// Verifies fewer than five comma-separated arguments throws.
+        /// Verifies incomplete named arguments throw.
         /// </summary>
         [Fact]
-        public void Resolve_TooFewArgs_Throws()
+        public void Resolve_IncompleteNamedArgs_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("1,-,false,false")(item));
-            Assert.Contains("5 comma-separated", ex.Message);
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("tokenNumber=1,separator=-")(item));
+            Assert.Contains("missing required option", ex.Message);
         }
 
         /// <summary>
@@ -185,7 +211,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void Resolve_TokenNumberZero_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
-            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("0,_,false,false,a_b.txt")(item));
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _token.Compile(_Named(0, "_", false, false, "a_b.txt"))(item));
             Assert.Contains("1 or greater", ex.Message);
         }
 
@@ -196,26 +223,31 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void Resolve_TokenNumberOutOfRange_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
-            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("5,_,false,false,a_b.txt")(item));
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _token.Compile(_Named(5, "_", false, false, "a_b.txt"))(item));
             Assert.Contains("exceeds the number of parts", ex.Message);
         }
 
         /// <summary>
-        /// Verifies numeric flags are rejected (<c>include-next</c> must use keywords).
+        /// Verifies numeric include flags are rejected.
         /// </summary>
         [Fact]
         public void Resolve_NumericIncludeFlag_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
-            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("1,_,1,0,a_b.txt")(item));
-            Assert.Contains("include-next", ex.Message);
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _token.Compile(
+                    "tokenNumber=1,separator=_,includeNext=1,includePrev=false,source=a_b.txt")(item));
+            Assert.Contains("includeNext", ex.Message);
         }
 
         [Fact]
         public void Resolve_EmptySeparator_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("1,,false,false,abc.txt")(item));
+            var ex = Assert.Throws<ArgumentException>(() =>
+                _token.Compile(
+                    "tokenNumber=1,separator=,includeNext=false,includePrev=false,source=abc.txt")(item));
             Assert.Contains("separator", ex.Message);
         }
     }
