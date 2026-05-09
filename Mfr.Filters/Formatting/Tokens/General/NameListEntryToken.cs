@@ -12,15 +12,16 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// Parses and validates the required file-path argument.
         /// </summary>
         /// <param name="arg">Raw argument text from the template.</param>
+        /// <param name="tokenDisplayName">Token display text used in validation errors.</param>
         /// <returns>Parsed options.</returns>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the required file path argument is missing.
         /// </exception>
-        internal static NameListEntryFormatOptions Parse(string arg)
+        internal static NameListEntryFormatOptions Parse(string arg, string tokenDisplayName)
         {
             if (string.IsNullOrWhiteSpace(arg))
                 throw new InvalidOperationException(
-                    "<name-list-entry> requires one argument: name-list-file-path.");
+                    $"{tokenDisplayName} requires one argument: name-list-file-path.");
 
             return new NameListEntryFormatOptions(NameListFilePath: arg);
         }
@@ -57,12 +58,13 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// </exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var options = NameListEntryFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            var options = NameListEntryFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             var entries = _GetEntries(options.NameListFilePath);
             var index = item.Original.GlobalIndex;
             if (index < 0)
                 throw new InvalidOperationException(
-                    $"<name-list-entry> requires non-negative global index (got {index}).");
+                    $"{tokenDisplayName} requires non-negative global index (got {index}).");
 
             if (index >= entries.Count)
                 return string.Empty;

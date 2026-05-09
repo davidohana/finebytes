@@ -7,9 +7,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// </summary>
     internal readonly record struct FullPathFormatOptions
     {
-        internal static FullPathFormatOptions Parse(string arg)
+        internal static FullPathFormatOptions Parse(string arg, string tokenDisplayName)
         {
-            FormatOptionsParsing.RequireNoArgument(arg, "<full-path>");
+            FormatOptionsParsing.RequireNoArgument(arg, tokenDisplayName);
             return default;
         }
     }
@@ -26,7 +26,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            _ = FullPathFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            _ = FullPathFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             return item.Original.FullPath;
         }
     }

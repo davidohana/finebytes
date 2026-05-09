@@ -24,16 +24,17 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// Parses comma-separated counter parameters or the bare-token default.
         /// </summary>
         /// <param name="arg">Raw argument text.</param>
+        /// <param name="tokenDisplayName">Token display text used in validation errors.</param>
         /// <returns>Parsed options.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the shape or values are invalid.</exception>
-        internal static CounterFormatOptions Parse(string arg)
+        internal static CounterFormatOptions Parse(string arg, string tokenDisplayName)
         {
             var normalizedArg = string.IsNullOrWhiteSpace(arg) ? DefaultArg : arg;
             var parts = normalizedArg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 5)
             {
                 throw new InvalidOperationException(
-                    $"Invalid counter token arg '{normalizedArg}'. Expected 5 comma-separated params or use '<counter>'.");
+                    $"Invalid {tokenDisplayName} token arg '{normalizedArg}'. Expected 5 comma-separated params or use '{tokenDisplayName}'.");
             }
 
             return new CounterFormatOptions(
@@ -73,7 +74,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <exception cref="InvalidOperationException">Thrown when arguments are missing, invalid, or list sizing was not populated.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var options = CounterFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            var options = CounterFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             var usePerFolder = options.ResetOnFolderChange == 1;
             var n = usePerFolder ? item.Original.InFolderIndex : item.Original.GlobalIndex;
             var value = options.InitialValue + ((long)options.IncrementBy * n);

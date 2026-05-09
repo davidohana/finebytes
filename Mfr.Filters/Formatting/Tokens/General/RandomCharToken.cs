@@ -13,15 +13,16 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// Parses <c>low,high</c> endpoints and normalizes order.
         /// </summary>
         /// <param name="arg">Raw argument text.</param>
+        /// <param name="tokenDisplayName">Token display text used in validation errors.</param>
         /// <returns>Parsed inclusive range.</returns>
         /// <exception cref="InvalidOperationException">Thrown when segments are missing or empty.</exception>
-        internal static RandomCharFormatOptions Parse(string arg)
+        internal static RandomCharFormatOptions Parse(string arg, string tokenDisplayName)
         {
             var segments = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             if (segments.Length != 2)
             {
                 throw new InvalidOperationException(
-                    $"Invalid random-char token arg '{arg}'. Expected '<random-char:low,high>' with two single-character endpoints.");
+                    $"Invalid {tokenDisplayName} token arg '{arg}'. Expected '{tokenDisplayName}:low,high' with two single-character endpoints.");
             }
 
             var lowSegment = segments[0];
@@ -29,7 +30,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
             if (lowSegment.Length == 0 || highSegment.Length == 0)
             {
                 throw new InvalidOperationException(
-                    "Invalid random-char token: each endpoint must contain at least one character.");
+                    $"Invalid {tokenDisplayName} token: each endpoint must contain at least one character.");
             }
 
             var low = lowSegment[0];
@@ -59,7 +60,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <exception cref="InvalidOperationException">Thrown when the argument is not exactly two comma-separated characters.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var range = RandomCharFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            var range = RandomCharFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             var loCode = (int)range.Low;
             var hiCode = (int)range.High;
             var picked = (char)Random.Shared.Next(loCode, hiCode + 1);

@@ -8,9 +8,9 @@ namespace Mfr.Filters.Formatting.Tokens.General
     /// </summary>
     internal readonly record struct ItemCountFormatOptions
     {
-        internal static ItemCountFormatOptions Parse(string arg)
+        internal static ItemCountFormatOptions Parse(string arg, string tokenDisplayName)
         {
-            FormatOptionsParsing.RequireNoArgument(arg, "<item-count>");
+            FormatOptionsParsing.RequireNoArgument(arg, tokenDisplayName);
             return default;
         }
     }
@@ -33,7 +33,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            _ = ItemCountFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            _ = ItemCountFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             return item.Original.RenameListTotalCount.ToString(CultureInfo.InvariantCulture);
         }
     }

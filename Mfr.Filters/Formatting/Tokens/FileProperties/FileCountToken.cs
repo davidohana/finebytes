@@ -8,9 +8,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// </summary>
     internal readonly record struct FileCountFormatOptions
     {
-        internal static FileCountFormatOptions Parse(string arg)
+        internal static FileCountFormatOptions Parse(string arg, string tokenDisplayName)
         {
-            FormatOptionsParsing.RequireNoArgument(arg, "<file-count>");
+            FormatOptionsParsing.RequireNoArgument(arg, tokenDisplayName);
             return default;
         }
     }
@@ -32,7 +32,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            _ = FileCountFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            _ = FileCountFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             var dir = item.Original.DirectoryPath;
             if (!Directory.Exists(dir))
                 return string.Empty;

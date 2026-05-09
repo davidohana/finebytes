@@ -7,9 +7,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// </summary>
     internal readonly record struct DriveLetterFormatOptions
     {
-        internal static DriveLetterFormatOptions Parse(string arg)
+        internal static DriveLetterFormatOptions Parse(string arg, string tokenDisplayName)
         {
-            FormatOptionsParsing.RequireNoArgument(arg, "<drive-letter>");
+            FormatOptionsParsing.RequireNoArgument(arg, tokenDisplayName);
             return default;
         }
     }
@@ -31,7 +31,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            _ = DriveLetterFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            _ = DriveLetterFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             var root = Path.GetPathRoot(item.Original.DirectoryPath) ?? string.Empty;
             if (root.StartsWith(@"\\", StringComparison.Ordinal))
                 return "$";

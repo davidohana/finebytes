@@ -123,7 +123,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
 
             var ex = Assert.Throws<InvalidOperationException>(
                 () => token.Resolve(arg: "1,2", item: item));
-            Assert.Contains("Invalid counter token arg", ex.Message);
+            Assert.Contains("Invalid <counter> token arg", ex.Message);
         }
 
         /// <summary>

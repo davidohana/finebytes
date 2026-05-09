@@ -7,9 +7,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// </summary>
     internal readonly record struct FileNameFormatOptions
     {
-        internal static FileNameFormatOptions Parse(string arg)
+        internal static FileNameFormatOptions Parse(string arg, string tokenDisplayName)
         {
-            FormatOptionsParsing.RequireNoArgument(arg, "<file-name>");
+            FormatOptionsParsing.RequireNoArgument(arg, tokenDisplayName);
             return default;
         }
     }
@@ -26,7 +26,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            _ = FileNameFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            _ = FileNameFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             return item.Original.Prefix;
         }
     }

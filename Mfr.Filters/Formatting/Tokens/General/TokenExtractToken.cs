@@ -22,18 +22,19 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// Parses the five comma-separated arguments for <c>&lt;token&gt;</c>.
         /// </summary>
         /// <param name="arg">Raw argument text from the template.</param>
+        /// <param name="tokenDisplayName">Token display text used in validation errors.</param>
         /// <returns>Parsed options.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the argument shape or values are invalid.</exception>
-        internal static TokenExtractFormatOptions Parse(string arg)
+        internal static TokenExtractFormatOptions Parse(string arg, string tokenDisplayName)
         {
             if (string.IsNullOrEmpty(arg))
                 throw new InvalidOperationException(
-                    "<token> requires 5 arguments: token-number,separator,include-next,include-prev,source-format-string.");
+                    $"{tokenDisplayName} requires 5 arguments: token-number,separator,include-next,include-prev,source-format-string.");
 
             var parts = arg.Split(',', 5);
             if (parts.Length != 5)
                 throw new InvalidOperationException(
-                    $"<token> requires exactly 5 comma-separated arguments (got {parts.Length}): '{arg}'.");
+                    $"{tokenDisplayName} requires exactly 5 comma-separated arguments (got {parts.Length}): '{arg}'.");
 
             var tokenNumber = int.Parse(parts[0].Trim(), CultureInfo.InvariantCulture);
             var separator = parts[1];
@@ -43,11 +44,11 @@ namespace Mfr.Filters.Formatting.Tokens.General
 
             if (tokenNumber < 1)
                 throw new InvalidOperationException(
-                    $"<token> token-number must be 1 or greater (got {tokenNumber}).");
+                    $"{tokenDisplayName} token-number must be 1 or greater (got {tokenNumber}).");
 
             if (string.IsNullOrEmpty(separator))
                 throw new InvalidOperationException(
-                    "<token> separator must not be empty.");
+                    $"{tokenDisplayName} separator must not be empty.");
 
             return new TokenExtractFormatOptions(
                 TokenNumber: tokenNumber,
@@ -85,13 +86,14 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// </exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var options = TokenExtractFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            var options = TokenExtractFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             var source = FormatStringResolver.ResolveTemplate(options.SourceFormatString, item);
             var parts = source.Split(options.Separator, StringSplitOptions.None);
 
             if (options.TokenNumber > parts.Length)
                 throw new InvalidOperationException(
-                    $"<token> token-number {options.TokenNumber} exceeds the number of parts ({parts.Length}) " +
+                    $"{tokenDisplayName} token-number {options.TokenNumber} exceeds the number of parts ({parts.Length}) " +
                     $"in '{source}' when split by '{options.Separator}'.");
 
             if (options.IncludeNext && options.IncludePrev)

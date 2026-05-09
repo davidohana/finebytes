@@ -24,32 +24,33 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// Parses the three comma-separated arguments for <c>&lt;substr&gt;</c>.
         /// </summary>
         /// <param name="arg">Raw argument text from the template.</param>
+        /// <param name="tokenDisplayName">Token display text used in validation errors.</param>
         /// <returns>Parsed options.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the argument shape or values are invalid.</exception>
-        internal static SubstringFormatOptions Parse(string arg)
+        internal static SubstringFormatOptions Parse(string arg, string tokenDisplayName)
         {
             if (string.IsNullOrEmpty(arg))
                 throw new InvalidOperationException(
-                    "<substr> requires 3 arguments: start-position,end-position,source-format-string.");
+                    $"{tokenDisplayName} requires 3 arguments: start-position,end-position,source-format-string.");
 
             var parts = arg.Split(',', 3);
             if (parts.Length != 3)
                 throw new InvalidOperationException(
-                    $"<substr> requires exactly 3 comma-separated arguments (got {parts.Length}): '{arg}'.");
+                    $"{tokenDisplayName} requires exactly 3 comma-separated arguments (got {parts.Length}): '{arg}'.");
 
             if (!int.TryParse(parts[0].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var startPosition))
                 throw new InvalidOperationException(
-                    $"<substr> start-position must be a non-zero integer (got '{parts[0].Trim()}').");
+                    $"{tokenDisplayName} start-position must be a non-zero integer (got '{parts[0].Trim()}').");
 
             if (!int.TryParse(parts[1].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var endPosition))
                 throw new InvalidOperationException(
-                    $"<substr> end-position must be a non-zero integer (got '{parts[1].Trim()}').");
+                    $"{tokenDisplayName} end-position must be a non-zero integer (got '{parts[1].Trim()}').");
 
             if (startPosition == 0)
-                throw new InvalidOperationException("<substr> start-position must not be zero.");
+                throw new InvalidOperationException($"{tokenDisplayName} start-position must not be zero.");
 
             if (endPosition == 0)
-                throw new InvalidOperationException("<substr> end-position must not be zero.");
+                throw new InvalidOperationException($"{tokenDisplayName} end-position must not be zero.");
 
             return new SubstringFormatOptions(
                 StartPosition: startPosition,
@@ -87,7 +88,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <inheritdoc />
         public string Resolve(string arg, RenameItem item)
         {
-            var options = SubstringFormatOptions.Parse(arg);
+            var tokenDisplayName = $"<{Names[0]}>";
+            var options = SubstringFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
             var source = FormatStringResolver.ResolveTemplate(options.SourceFormatString, item);
 
             if (source.Length == 0)
