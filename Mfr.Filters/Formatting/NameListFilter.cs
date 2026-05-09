@@ -6,15 +6,10 @@ namespace Mfr.Filters.Formatting
     /// Options for loading and applying a name list from a text file.
     /// </summary>
     /// <param name="FilePath">Path to the name-list file (one name per line).</param>
-    /// <param name="SkipEmptyLines">
-    /// When <c>true</c>, blank lines are ignored and do not advance the line-to-item mapping.
-    /// When <c>false</c>, each line in the file—including empty lines—is one entry in order.
-    /// </param>
     /// <param name="Prefix">Optional format string prepended to each list entry; supports formatter tokens (for example <c>&lt;counter:...&gt;</c>).</param>
     /// <param name="Suffix">Optional format string appended after each list entry; supports formatter tokens.</param>
     public sealed record NameListOptions(
         string FilePath,
-        bool SkipEmptyLines = true,
         string Prefix = "",
         string Suffix = "");
 
@@ -43,9 +38,7 @@ namespace Mfr.Filters.Formatting
         /// </summary>
         protected override void _Setup()
         {
-            _entries = NameListParser.ParseFile(
-                filePath: Options.FilePath,
-                skipEmptyLines: Options.SkipEmptyLines);
+            _entries = NameListParser.ParseFile(filePath: Options.FilePath);
         }
 
         /// <summary>

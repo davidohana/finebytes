@@ -18,10 +18,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies ordered entries are returned when empty lines are not skipped.
+        /// Verifies ordered entries preserve blank lines.
         /// </summary>
         [Fact]
-        public void ParseFile_SkipEmptyLinesFalse_PreservesLinesAndBlanks()
+        public void ParseFile_PreservesLinesAndBlanks()
         {
             var path = _CreateFile(
                 """
@@ -30,32 +30,12 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 B
                 """);
 
-            var entries = NameListParser.ParseFile(path, skipEmptyLines: false);
+            var entries = NameListParser.ParseFile(path);
 
             Assert.Equal(3, entries.Count);
             Assert.Equal("A", entries[0]);
             Assert.Equal(string.Empty, entries[1]);
             Assert.Equal("B", entries[2]);
-        }
-
-        /// <summary>
-        /// Verifies blank lines are omitted when requested.
-        /// </summary>
-        [Fact]
-        public void ParseFile_SkipEmptyLinesTrue_OmitsBlankLines()
-        {
-            var path = _CreateFile(
-                """
-                First
-
-                Second
-                """);
-
-            var entries = NameListParser.ParseFile(path, skipEmptyLines: true);
-
-            Assert.Equal(2, entries.Count);
-            Assert.Equal("First", entries[0]);
-            Assert.Equal("Second", entries[1]);
         }
 
         /// <summary>
@@ -72,7 +52,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 Real2
                 """);
 
-            var entries = NameListParser.ParseFile(path, skipEmptyLines: false);
+            var entries = NameListParser.ParseFile(path);
 
             Assert.Equal(2, entries.Count);
             Assert.Equal("Real1", entries[0]);
@@ -87,7 +67,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [InlineData("   ")]
         public void ParseFile_EmptyPath_Throws(string filePath)
         {
-            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(filePath, skipEmptyLines: true));
+            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(filePath));
             Assert.Contains("cannot be empty", ex.Message, StringComparison.Ordinal);
         }
 
@@ -99,7 +79,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var path = Path.Combine(_tempDir.TempDir, "does-not-exist.txt");
 
-            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path, skipEmptyLines: true));
+            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path));
             Assert.Contains("not found", ex.Message, StringComparison.Ordinal);
         }
 
@@ -114,7 +94,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var path = _CreateFile(content);
 
-            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path, skipEmptyLines: true));
+            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path));
             Assert.Contains("at least one name entry", ex.Message, StringComparison.Ordinal);
         }
 
@@ -127,7 +107,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var longLine = new string('x', ConfigLoader.Settings.Filters.MaxListFileLineLength + 1);
             var path = _CreateFile(longLine);
 
-            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path, skipEmptyLines: true));
+            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path));
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
         }
 

@@ -11,9 +11,8 @@ namespace Mfr.Filters.Formatting
         /// Parses name-list entries from a text file (UTF-8, same as other list file parsers).
         /// </summary>
         /// <param name="filePath">Path to the name-list file.</param>
-        /// <param name="skipEmptyLines">When <c>true</c>, lines that are empty or whitespace-only are omitted (they do not consume an index).</param>
         /// <returns>Ordered entries; index <c>k</c> maps to rename item <see cref="FileMeta.GlobalIndex"/> <c>k</c>.</returns>
-        internal static IReadOnlyList<string> ParseFile(string filePath, bool skipEmptyLines)
+        internal static IReadOnlyList<string> ParseFile(string filePath)
         {
             ListFileParseHelpers.ValidateListFilePath(filePath, listKindLabel: "Name-list");
 
@@ -32,15 +31,6 @@ namespace Mfr.Filters.Formatting
 
                 if (ListFileParseHelpers.IsListFileCommentLine(line))
                     continue;
-
-                if (skipEmptyLines)
-                {
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-
-                    entries.Add(line.TrimEnd());
-                    continue;
-                }
 
                 entries.Add(line);
             }

@@ -24,7 +24,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 """);
             try
             {
-                var f = _CreateFilter(path, skipEmptyLines: false);
+                var f = _CreateFilter(path);
                 Assert.Equal("Alpha", FilterTestHelpers.ApplyToPrefix(f, "old0", globalIndex: 0));
                 Assert.Equal("Beta", FilterTestHelpers.ApplyToPrefix(f, "old1", globalIndex: 1));
                 Assert.Equal("Gamma", FilterTestHelpers.ApplyToPrefix(f, "old2", globalIndex: 2));
@@ -48,7 +48,6 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Target: _target,
                     Options: new NameListOptions(
                         FilePath: path,
-                        SkipEmptyLines: true,
                         Prefix: "<counter:10,1,0,2,0>_",
                         Suffix: "_end"));
                 Assert.Equal("10_One_end", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 0));
@@ -60,10 +59,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies blank lines are omitted from the mapping when <c>SkipEmptyLines</c> is true.
+        /// Verifies blank lines are preserved as entries.
         /// </summary>
         [Fact]
-        public void Apply_SkipEmptyLines_IgnoresBlankLines()
+        public void Apply_BlankLines_AreEntries()
         {
             var path = _WriteTemp(
                 """
@@ -73,9 +72,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 """);
             try
             {
-                var f = _CreateFilter(path, skipEmptyLines: true);
+                var f = _CreateFilter(path);
                 Assert.Equal("First", FilterTestHelpers.ApplyToPrefix(f, "a", globalIndex: 0));
-                Assert.Equal("Second", FilterTestHelpers.ApplyToPrefix(f, "b", globalIndex: 1));
+                Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "b", globalIndex: 1));
+                Assert.Equal("Second", FilterTestHelpers.ApplyToPrefix(f, "c", globalIndex: 2));
             }
             finally
             {
@@ -84,10 +84,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies blank lines become empty entries when <c>SkipEmptyLines</c> is false.
+        /// Verifies blank-line entries still participate in index mapping.
         /// </summary>
         [Fact]
-        public void Apply_DoNotSkipEmptyLines_IncludesEmptyEntries()
+        public void Apply_BlankLineMapping_IncludesEmptyEntries()
         {
             var path = _WriteTemp(
                 """
@@ -97,7 +97,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 """);
             try
             {
-                var f = _CreateFilter(path, skipEmptyLines: false);
+                var f = _CreateFilter(path);
                 Assert.Equal("A", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 0));
                 Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 1));
                 Assert.Equal("B", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 2));
@@ -117,7 +117,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var path = _WriteTemp("Only");
             try
             {
-                var f = _CreateFilter(path, skipEmptyLines: true);
+                var f = _CreateFilter(path);
                 var ex = Assert.Throws<UserException>(() =>
                     FilterTestHelpers.ApplyToPrefix(f, "old", globalIndex: 1));
                 Assert.Contains("Name-list has", ex.Message, StringComparison.Ordinal);
@@ -143,7 +143,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 """);
             try
             {
-                var f = _CreateFilter(path, skipEmptyLines: false);
+                var f = _CreateFilter(path);
                 Assert.Equal("Real1", FilterTestHelpers.ApplyToPrefix(f, "a", globalIndex: 0));
                 Assert.Equal("Real2", FilterTestHelpers.ApplyToPrefix(f, "b", globalIndex: 1));
             }
@@ -153,13 +153,12 @@ namespace Mfr.Tests.Models.Filters.Formatting
             }
         }
 
-        private static NameListFilter _CreateFilter(string path, bool skipEmptyLines)
+        private static NameListFilter _CreateFilter(string path)
         {
             return new NameListFilter(
                 Target: _target,
                 Options: new NameListOptions(
                     FilePath: path,
-                    SkipEmptyLines: skipEmptyLines,
                     Prefix: "",
                     Suffix: ""));
         }
