@@ -32,7 +32,7 @@ Replaces the **entire target segment** with the result of expanding a **template
 | `<label>` | Volume label of the drive that holds the file. |
 | `<file-count>` | Number of files and folders in the same directory (non-recursive). Empty when directory does not exist. |
 | `<file-size>` | File size, auto-selecting the largest unit (e.g. `1 KB`, `2 MB`). |
-| `<file-size:unit>` | File size in a specific unit. `unit`: `0`/`auto`, `1`/`b`/`bytes`, `2`/`kb`, `3`/`mb`, `4`/`gb`. |
+| `<file-size:unit>` | File size in a specific unit. `unit`: omit or `auto` (auto-scale), `b`/`bytes`, `kb`, `mb`, `gb` (case-insensitive). |
 | `<file-size:unit,decimals>` | File size with the specified number of decimal places (default `0`). |
 
 #### Counter and time

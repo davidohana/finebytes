@@ -1298,7 +1298,7 @@ The Formatter filter, Mover sub-folder template, AudioTagSetter value, and date 
 
 | Token | Description |
 |-------|-------------|
-| `<file-size:0>` | File size in bytes |
+| `<file-size:bytes>` | File size in bytes |
 | `<create-date:format>` | Creation date (e.g. `<create-date:yyyy-MM-dd>`) |
 | `<mod-date:format>` | Last modified date |
 | `<access-date:format>` | Last access date |

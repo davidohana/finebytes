@@ -3,10 +3,27 @@ using Mfr.Utils;
 namespace Mfr.Filters.Formatting.Tokens
 {
     /// <summary>
-    /// Shared helpers used by multiple formatter tokens (display labels and common preconditions).
+    /// Shared helpers used by multiple formatter tokens (display labels, keyword hints, and common preconditions).
     /// </summary>
     internal static class FormatOptionsParsing
     {
+        /// <summary>
+        /// Formats keyword strings as a short English list for error messages (<c>x or y</c>; <c>x, y, or z</c>).
+        /// </summary>
+        /// <param name="keywords">Keywords to list (for example dictionary keys; insertion order is preserved).</param>
+        /// <returns>A phrase suitable after <c>expected</c> in a user-facing message.</returns>
+        internal static string FormatExpectedKeywords(IEnumerable<string> keywords)
+        {
+            var keys = keywords.ToArray();
+            return keys.Length switch
+            {
+                0 => "",
+                1 => keys[0],
+                2 => $"{keys[0]} or {keys[1]}",
+                _ => $"{string.Join(", ", keys[..^1])}, or {keys[^1]}",
+            };
+        }
+
         /// <summary>
         /// Gets canonical token label for messages (for example <c>&lt;file-name&gt;</c>).
         /// </summary>

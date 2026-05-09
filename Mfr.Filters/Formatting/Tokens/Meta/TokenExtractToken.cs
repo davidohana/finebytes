@@ -40,6 +40,8 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["token"];
 
+        private static readonly string[] _includeFlagKeywords = ["true", "false"];
+
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the format argument is invalid or <c>token-number</c> is inconsistent with resolved source text.</exception>
         public Func<RenameItem, string> Compile(string arg)
@@ -106,7 +108,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
         {
             if (!bool.TryParse(raw.Trim(), out var value))
                 throw new ArgumentException(
-                    $"{tokenDisplayName} {fieldLabel} '{raw}' is not supported (expected true or false).",
+                    $"{tokenDisplayName} {fieldLabel} '{raw}' is not supported (expected {FormatOptionsParsing.FormatExpectedKeywords(_includeFlagKeywords)}).",
                     paramName: nameof(raw));
 
             return value;

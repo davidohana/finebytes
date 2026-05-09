@@ -21,8 +21,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Argument shape: <c>unit</c> or <c>unit,decimals</c>. Supported units are <c>0</c>/<c>auto</c> (default),
-    /// <c>1</c>/<c>b</c>/<c>bytes</c>, <c>2</c>/<c>kb</c>, <c>3</c>/<c>mb</c>, <c>4</c>/<c>gb</c>.
+    /// Argument shape: <c>unit</c> or <c>unit,decimals</c>. Supported units are <c>(omit)</c>/<c>auto</c> (default),
+    /// <c>b</c>/<c>bytes</c>, <c>kb</c>, <c>mb</c>, <c>gb</c> (case-insensitive).
     /// </para>
     /// </remarks>
     internal sealed class FileSizeToken : IFormatToken
@@ -30,6 +30,29 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         private const double Kb = 1024;
         private const double Mb = 1024 * 1024;
         private const double Gb = 1024 * 1024 * 1024;
+
+        /// <summary>
+        /// Unit keywords for the first argument segment (case-insensitive).
+        /// </summary>
+        private static readonly Dictionary<string, FileSizeFormatUnitKind> _unitKeywordToKind = new(StringComparer.OrdinalIgnoreCase)
+        {
+            [""] = FileSizeFormatUnitKind.Auto,
+            ["auto"] = FileSizeFormatUnitKind.Auto,
+            ["b"] = FileSizeFormatUnitKind.Bytes,
+            ["bytes"] = FileSizeFormatUnitKind.Bytes,
+            ["kb"] = FileSizeFormatUnitKind.Kb,
+            ["mb"] = FileSizeFormatUnitKind.Mb,
+            ["gb"] = FileSizeFormatUnitKind.Gb,
+        };
+
+        /// <summary>
+        /// Maps unit dictionary keys to user-visible hint strings (empty segment → <c>(omit)</c>).
+        /// </summary>
+        private static IEnumerable<string> _UnitKeywordsForErrorHint()
+        {
+            foreach (var key in _unitKeywordToKind.Keys)
+                yield return key.Length == 0 ? "(omit)" : key;
+        }
 
         /// <summary>
         /// Parsed arguments for <c>&lt;file-size&gt;</c>.
@@ -72,15 +95,10 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
                 ? 0
                 : int.Parse(decimalArg, CultureInfo.InvariantCulture);
 
-            var unitKind = unitArg.ToLowerInvariant() switch
-            {
-                "" or "0" or "auto" => FileSizeFormatUnitKind.Auto,
-                "1" or "b" or "bytes" => FileSizeFormatUnitKind.Bytes,
-                "2" or "kb" => FileSizeFormatUnitKind.Kb,
-                "3" or "mb" => FileSizeFormatUnitKind.Mb,
-                "4" or "gb" => FileSizeFormatUnitKind.Gb,
-                _ => throw new NotSupportedException($"{tokenDisplayName} unit '{unitArg}' is not supported.")
-            };
+            if (!_unitKeywordToKind.TryGetValue(unitArg, out var unitKind))
+                throw new NotSupportedException(
+                    $"{tokenDisplayName} unit '{unitArg}' is not supported " +
+                    $"(expected {FormatOptionsParsing.FormatExpectedKeywords(_UnitKeywordsForErrorHint())}).");
 
             return new Options(Unit: unitKind, Decimals: decimals);
         }

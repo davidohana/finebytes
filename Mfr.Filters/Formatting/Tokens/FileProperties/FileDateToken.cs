@@ -19,6 +19,17 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         private const string DefaultFormat = "dd-MM-yyyy";
 
         /// <summary>
+        /// Case-insensitive keywords aligned with preset <c>timestampField</c> JSON names (<see cref="TimestampField"/>).
+        /// </summary>
+        private static readonly Dictionary<string, TimestampField> _keywordToTimestampField = new(
+            StringComparer.OrdinalIgnoreCase)
+        {
+            ["creation"] = TimestampField.Creation,
+            ["lastWrite"] = TimestampField.LastWrite,
+            ["lastAccess"] = TimestampField.LastAccess,
+        };
+
+        /// <summary>
         /// Parsed arguments for <c>&lt;file-date&gt;</c>.
         /// </summary>
         /// <param name="Format">.NET date format string.</param>
@@ -73,7 +84,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
             if (!_TryParseFileDateKindKeyword(dateKindPart, out var timestampField))
                 throw new NotSupportedException(
-                    $"{tokenDisplayName} invalid timestamp keyword {(string.IsNullOrWhiteSpace(dateKindPart) ? "(blank)" : $"'{dateKindPart}'")}.");
+                    $"{tokenDisplayName} invalid timestamp keyword '{dateKindPart}' " +
+                    $"(expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToTimestampField.Keys)}).");
 
             return new Options(Format: format, TimestampField: timestampField);
         }
@@ -87,20 +99,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             if (string.IsNullOrWhiteSpace(raw))
                 return false;
 
-            switch (raw.Trim().ToLowerInvariant())
-            {
-                case "creation":
-                    timestampField = TimestampField.Creation;
-                    return true;
-                case "lastwrite":
-                    timestampField = TimestampField.LastWrite;
-                    return true;
-                case "lastaccess":
-                    timestampField = TimestampField.LastAccess;
-                    return true;
-                default:
-                    return false;
-            }
+            return _keywordToTimestampField.TryGetValue(raw.Trim(), out timestampField);
         }
     }
 }

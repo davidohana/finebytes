@@ -41,6 +41,25 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             Fixed,
         }
 
+        /// <summary>
+        /// Padding keywords for the third comma-separated field (<c>none</c>, <c>auto</c>, <c>fixed</c>).
+        /// </summary>
+        private static readonly Dictionary<string, CounterPaddingMode> _keywordToPaddingMode = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["none"] = CounterPaddingMode.None,
+            ["auto"] = CounterPaddingMode.Auto,
+            ["fixed"] = CounterPaddingMode.Fixed,
+        };
+
+        /// <summary>
+        /// Reset-scope keywords for the fifth comma-separated field (<c>global</c> vs <c>perFolder</c>).
+        /// </summary>
+        private static readonly Dictionary<string, int> _keywordToResetOnFolderChange = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["global"] = 0,
+            ["perFolder"] = 1,
+        };
+
         private const string DefaultArg = "1,1,none,2,global";
 
         /// <summary>
@@ -115,17 +134,12 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         /// </summary>
         private static CounterPaddingMode _ParsePaddingMode(string tokenDisplayName, string raw)
         {
-            var key = raw.Trim();
-            if (key.Equals("none", StringComparison.OrdinalIgnoreCase))
-                return CounterPaddingMode.None;
-            if (key.Equals("auto", StringComparison.OrdinalIgnoreCase))
-                return CounterPaddingMode.Auto;
-            if (key.Equals("fixed", StringComparison.OrdinalIgnoreCase))
-                return CounterPaddingMode.Fixed;
+            if (!_keywordToPaddingMode.TryGetValue(raw.Trim(), out var mode))
+                throw new ArgumentException(
+                    $"{tokenDisplayName} padding '{raw}' is not supported (expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToPaddingMode.Keys)}).",
+                    paramName: nameof(raw));
 
-            throw new ArgumentException(
-                $"{tokenDisplayName} padding '{raw}' is not supported (expected none, auto, or fixed).",
-                paramName: nameof(raw));
+            return mode;
         }
 
         /// <summary>
@@ -133,15 +147,12 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         /// </summary>
         private static int _ParseResetScope(string tokenDisplayName, string raw)
         {
-            var key = raw.Trim();
-            if (key.Equals("global", StringComparison.OrdinalIgnoreCase))
-                return 0;
-            if (key.Equals("perFolder", StringComparison.OrdinalIgnoreCase))
-                return 1;
+            if (!_keywordToResetOnFolderChange.TryGetValue(raw.Trim(), out var resetOnFolderChange))
+                throw new ArgumentException(
+                    $"{tokenDisplayName} reset scope '{raw}' is not supported (expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToResetOnFolderChange.Keys)}).",
+                    paramName: nameof(raw));
 
-            throw new ArgumentException(
-                $"{tokenDisplayName} reset scope '{raw}' is not supported (expected global or perFolder).",
-                paramName: nameof(raw));
+            return resetOnFolderChange;
         }
 
         private static int _ResolvePadWidth(
