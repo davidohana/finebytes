@@ -89,16 +89,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
 
             var map = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
             FormatOptionsParsing.RequireKnownOptionKeysOnly(map, tokenDisplayName, _tokenExtractOptionKeys, nameof(arg));
-
-            foreach (var req in _tokenExtractOptionKeys)
-            {
-                if (!map.ContainsKey(req))
-                {
-                    throw new ArgumentException(
-                        $"{tokenDisplayName} missing required option '{req}' (expected all of {FormatOptionsParsing.FormatExpectedKeywords(_tokenExtractOptionKeys)}).",
-                        nameof(arg));
-                }
-            }
+            FormatOptionsParsing.RequireAllOptionKeysPresent(map, tokenDisplayName, _tokenExtractOptionKeys, nameof(arg));
 
             var tokenNumber = int.Parse(map["tokenNumber"].Trim(), CultureInfo.InvariantCulture);
             var separator = map["separator"];

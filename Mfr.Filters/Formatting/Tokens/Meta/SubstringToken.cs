@@ -87,16 +87,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
 
             var map = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
             FormatOptionsParsing.RequireKnownOptionKeysOnly(map, tokenDisplayName, _substrOptionKeys, nameof(arg));
-
-            foreach (var req in _substrOptionKeys)
-            {
-                if (!map.ContainsKey(req))
-                {
-                    throw new ArgumentException(
-                        $"{tokenDisplayName} missing required option '{req}' (expected all of {FormatOptionsParsing.FormatExpectedKeywords(_substrOptionKeys)}).",
-                        nameof(arg));
-                }
-            }
+            FormatOptionsParsing.RequireAllOptionKeysPresent(map, tokenDisplayName, _substrOptionKeys, nameof(arg));
 
             var startText = map["start"].Trim();
             var startParsedOk = int.TryParse(startText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var startPosition);

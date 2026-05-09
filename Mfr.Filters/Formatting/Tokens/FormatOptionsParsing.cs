@@ -110,6 +110,31 @@ namespace Mfr.Filters.Formatting.Tokens
         }
 
         /// <summary>
+        /// Ensures <paramref name="map"/> contains every key in <paramref name="requiredOptionKeys"/> (case-insensitive).
+        /// </summary>
+        /// <param name="map">Parsed option keys from <see cref="ParseNamedKeyValuePairs"/>.</param>
+        /// <param name="tokenDisplayName">Token label for errors (for example <c>&lt;substr&gt;</c>).</param>
+        /// <param name="requiredOptionKeys">Every name that must appear; order defines the phrase passed to <see cref="FormatExpectedKeywords"/>.</param>
+        /// <param name="argParamName">Parameter name for <see cref="ArgumentException.ParamName"/>.</param>
+        /// <exception cref="ArgumentException">Thrown when a required key is absent.</exception>
+        internal static void RequireAllOptionKeysPresent(
+            Dictionary<string, string> map,
+            string tokenDisplayName,
+            IReadOnlyList<string> requiredOptionKeys,
+            string argParamName)
+        {
+            foreach (var req in requiredOptionKeys)
+            {
+                if (!map.ContainsKey(req))
+                {
+                    throw new ArgumentException(
+                        $"{tokenDisplayName} missing required option '{req}' (expected all of {FormatExpectedKeywords(requiredOptionKeys)}).",
+                        argParamName);
+                }
+            }
+        }
+
+        /// <summary>
         /// Formats keyword strings as a short English list for error messages (<c>x or y</c>; <c>x, y, or z</c>).
         /// </summary>
         /// <param name="keywords">Keywords to list (for example dictionary keys; insertion order is preserved).</param>
