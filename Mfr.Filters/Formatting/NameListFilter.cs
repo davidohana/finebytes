@@ -23,9 +23,10 @@ namespace Mfr.Filters.Formatting
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Name list and optional prefix/suffix templates.</param>
+    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record NameListFilter(
         FilterTarget Target,
-        NameListOptions Options) : StringTargetFilter(Target)
+        NameListOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         private IReadOnlyList<string>? _entries;
         private Func<RenameItem, string>? _compiledPrefix;

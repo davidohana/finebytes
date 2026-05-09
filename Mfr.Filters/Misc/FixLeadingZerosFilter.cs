@@ -21,9 +21,10 @@ namespace Mfr.Filters.Misc
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Leading-zero normalization options.</param>
+    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed partial record FixLeadingZerosFilter(
         FilterTarget Target,
-        FixLeadingZerosOptions Options) : StringTargetFilter(Target)
+        FixLeadingZerosOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

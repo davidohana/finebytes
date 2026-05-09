@@ -106,9 +106,10 @@ namespace Mfr.Filters.Case
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Case transformation options.</param>
+    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record LettersCaseFilter(
         FilterTarget Target,
-        LettersCaseOptions Options) : StringTargetFilter(Target)
+        LettersCaseOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

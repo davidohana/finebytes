@@ -28,9 +28,10 @@ namespace Mfr.Filters.Replace
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Replace-list options.</param>
+    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record ReplaceListFilter(
         FilterTarget Target,
-        ReplaceListOptions Options) : StringTargetFilter(Target)
+        ReplaceListOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         private List<(string Search, Func<RenameItem, string> CompiledReplacement)>? _compiledEntries;
 

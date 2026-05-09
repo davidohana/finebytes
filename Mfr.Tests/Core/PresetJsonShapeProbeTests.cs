@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Mfr.Core;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
@@ -207,6 +208,53 @@ namespace Mfr.Tests.Core
             var typed = Assert.IsType<FormatterFilter>(filter);
             Assert.IsType<ParentDirectoryTarget>(typed.Target);
             typed.Setup();
+        }
+
+        [Fact]
+        public void LettersCase_JSON_round_trips_apply_scope_token()
+        {
+            var expected = new LettersCaseFilter(
+                new FilePrefixTarget(),
+                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
+                new TokenApplyScope(Separator: "-", TokenNumber: 2));
+            var canonicalJson = JsonSerializer.Serialize<BaseFilter>(expected, PresetJsonOptions.Default);
+            var fromObject = JsonSerializer.Deserialize<BaseFilter>(canonicalJson, PresetJsonOptions.Default);
+            Assert.NotNull(fromObject);
+            var typedFromObject = Assert.IsType<LettersCaseFilter>(fromObject);
+            Assert.IsType<TokenApplyScope>(typedFromObject.ApplyScope);
+
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "LettersCase",
+              "target": {
+                "targetType": "FilePrefix"
+              },
+              "options": {
+                "mode": "UpperCase",
+                "skipWords": [],
+                "weirdUppercaseChancePercent": 50,
+                "weirdFixedPlaces": false
+              },
+              "applyScope": {
+                "scopeType": "Token",
+                "separator": "-",
+                "tokenNumber": 2
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<LettersCaseFilter>(filter);
+            var tokenScope = Assert.IsType<TokenApplyScope>(typed.ApplyScope);
+            Assert.Equal("-", tokenScope.Separator);
+            Assert.Equal(2, tokenScope.TokenNumber);
+            typed.Setup();
+
+            var serialized = JsonSerializer.Serialize(typed, PresetJsonOptions.Default);
+            Assert.Contains("LettersCase", serialized, StringComparison.Ordinal);
+            Assert.Contains("applyScope", serialized, StringComparison.Ordinal);
+            Assert.Contains("Token", serialized, StringComparison.Ordinal);
         }
 
         private sealed record PresetContainerWrapper(

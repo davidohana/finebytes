@@ -23,9 +23,10 @@ namespace Mfr.Filters.Space
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Trigger characters and conditional insertion.</param>
+    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record SpaceAroundFilter(
         FilterTarget Target,
-        SpaceAroundOptions Options) : StringTargetFilter(Target)
+        SpaceAroundOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

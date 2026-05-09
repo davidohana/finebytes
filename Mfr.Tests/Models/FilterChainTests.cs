@@ -86,7 +86,8 @@ namespace Mfr.Tests.Models
             Assert.Equal(1, enabled.SetupCount);
         }
 
-        private sealed record SetupCountingFilter(FilterTarget Target) : StringTargetFilter(Target)
+        private sealed record SetupCountingFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)
+            : StringTargetFilter(Target, ApplyScope)
         {
             public override string Type => "SetupCounting";
 

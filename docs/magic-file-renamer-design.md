@@ -808,7 +808,14 @@ In code, the JSON `type` discriminator maps to a concrete `BaseFilter`-derived f
 A **Filter Options** panel (gear icon on each filter row) provides:
 - **Apply Target** override without editing the JSON
 - **Apply Condition** — only apply when a field matches a condition (equals/contains/matches/starts-with)
-- **Apply to Part** — apply only to a substring delimited by a character (e.g. apply LettersCase only to the part before ` - `)
+- **Apply scope** — in **preset JSON** (`applyScope` on string-target filters): run the filter only on the **whole** target (default, or omit `applyScope`), on a **substring** defined by **1-based inclusive** start/end positions from the **left** or **right** end, or on a **single token** after splitting by a **separator** string (same split rules as formatter `&lt;token:&gt;`). The transformed slice is spliced back into the full preview field. CLI / JSON only in this codebase (no separate UI for scope).
+
+String-target filters are every filter derived from `StringTargetFilter` in `Mfr.Models` (case, space, trimming, replacer, formatting filters that take a `FilterTarget`). Non-string filters (`MoverFilter`, attribute/time filters, etc.) do not use `applyScope`.
+
+`applyScope` JSON (discriminator `scopeType`, like `targetType` on `FilterTarget`):
+
+- **`Substring`** — `startPosition`, `endPosition` (1-based, clamped to the current string length), `startAnchor`, `endAnchor` (`"left"` or `"right"`).
+- **`Token`** — `separator` (non-empty), `tokenNumber` (1-based). If `tokenNumber` is greater than the number of parts after splitting, the filter is a **no-op** for that item (full string unchanged). `tokenNumber` less than 1 or an empty `separator` is invalid and fails when the scoped transform runs.
 
 ---
 
@@ -822,9 +829,16 @@ A **Filter Options** panel (gear icon on each filter row) provides:
   "options": {
     "mode": "UpperCase | LowerCase | FirstLetterUp | WeirdCase | TitleCase | SentenceCase | InvertCase",
     "skipWords": ["a", "an", "the", "of", "in", "at"]
+  },
+  "applyScope": {
+    "scopeType": "Token",
+    "separator": "-",
+    "tokenNumber": 2
   }
 }
 ```
+
+Omit `applyScope` (or set it to null) to transform the **entire** target string. The same optional `applyScope` shape applies to other **string-target** filters.
 
 #### UppercaseInitials
 Uppercases the first letter of each word using specified delimiters to identify word boundaries.

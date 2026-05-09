@@ -11,6 +11,7 @@ namespace Mfr.Filters.Space
     /// </para>
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
+    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     /// <remarks>
     /// A separator is inserted between two adjacent characters when:
     /// <list type="bullet">
@@ -22,7 +23,7 @@ namespace Mfr.Filters.Space
     /// <c>SpaceCharacter</c> filter).
     /// </remarks>
     public sealed record SeparateCapitalizedTextFilter(
-        FilterTarget Target) : StringTargetFilter(Target)
+        FilterTarget Target, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

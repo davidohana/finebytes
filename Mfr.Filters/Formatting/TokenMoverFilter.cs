@@ -22,9 +22,10 @@ namespace Mfr.Filters.Formatting
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Token mover options.</param>
+    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record TokenMoverFilter(
         FilterTarget Target,
-        TokenMoverOptions Options) : StringTargetFilter(Target)
+        TokenMoverOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

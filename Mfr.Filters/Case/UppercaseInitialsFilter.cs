@@ -16,8 +16,9 @@ namespace Mfr.Filters.Case
     /// </para>
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
+    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed partial record UppercaseInitialsFilter(
-        FilterTarget Target) : StringTargetFilter(Target)
+        FilterTarget Target, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         // Keep this runtime-compiled regex for readability and to avoid GeneratedRegex partial-method
         // analyzer noise in this project setup.

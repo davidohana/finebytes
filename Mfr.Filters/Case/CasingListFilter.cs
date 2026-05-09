@@ -25,9 +25,10 @@ namespace Mfr.Filters.Case
     /// </summary>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Casing-list options.</param>
+    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record CasingListFilter(
         FilterTarget Target,
-        CasingListOptions Options) : StringTargetFilter(Target)
+        CasingListOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         private Dictionary<string, string>? _lowerWordToCasing;
 
