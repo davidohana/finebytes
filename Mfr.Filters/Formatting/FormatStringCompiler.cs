@@ -137,12 +137,13 @@ namespace Mfr.Filters.Formatting
                 var token = (IFormatToken)Activator.CreateInstance(tokenType)!;
                 foreach (var name in token.Names)
                 {
-                    if (map.TryGetValue(name, out var value))
+                    if (map.TryGetValue(name, out var registeredToken))
                     {
                         throw new InvalidOperationException(
-                            $"Format token name '{name}' is registered by multiple types " +
-                            $"('{value.GetType().FullName}' and '{tokenType.FullName}').");
+                            $"Format token name '{name}' is registered by multiple types "
+                            + $"('{registeredToken.GetType().FullName}' and '{tokenType.FullName}').");
                     }
+
                     map[name] = token;
                 }
             }

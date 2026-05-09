@@ -1,5 +1,6 @@
 using System.Text;
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Case
 {
@@ -51,8 +52,9 @@ namespace Mfr.Filters.Case
         /// <returns>The transformed text segment.</returns>
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var lowerWordToCasing = _lowerWordToCasing
-                ?? throw new InvalidOperationException("Casing-list setup must complete before transform.");
+            var lowerWordToCasing = Check.NotNull(
+                _lowerWordToCasing,
+                "Casing-list setup must complete before transform.");
 
             if (value.Length == 0 || lowerWordToCasing.Count == 0)
                 return value;

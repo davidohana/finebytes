@@ -29,7 +29,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var token = new FileNameToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => token.Compile(arg: "x")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "x")(item));
             Assert.Contains("file-name", ex.Message);
         }
     }

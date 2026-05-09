@@ -1,5 +1,6 @@
 using Mfr.Filters.Formatting;
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Replace
 {
@@ -46,8 +47,9 @@ namespace Mfr.Filters.Replace
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var compiledEntries = _compiledEntries
-                ?? throw new InvalidOperationException("Replace-list setup must complete before transform.");
+            var compiledEntries = Check.NotNull(
+                _compiledEntries,
+                "Replace-list setup must complete before transform.");
             if (compiledEntries.Count == 0)
                 return value;
 

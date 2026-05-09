@@ -163,7 +163,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EmptyArg_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("")(item));
             Assert.Contains("<token>", ex.Message);
         }
 
@@ -174,7 +174,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_TooFewArgs_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("1,-,0,0")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("1,-,0,0")(item));
             Assert.Contains("5 comma-separated", ex.Message);
         }
 
@@ -185,7 +185,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_TokenNumberZero_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("0,_,0,0,a_b.txt")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("0,_,0,0,a_b.txt")(item));
             Assert.Contains("1 or greater", ex.Message);
         }
 
@@ -196,7 +196,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_TokenNumberOutOfRange_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("5,_,0,0,a_b.txt")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("5,_,0,0,a_b.txt")(item));
             Assert.Contains("exceeds the number of parts", ex.Message);
         }
 
@@ -207,7 +207,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EmptySeparator_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("1,,0,0,abc.txt")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("1,,0,0,abc.txt")(item));
             Assert.Contains("separator", ex.Message);
         }
     }

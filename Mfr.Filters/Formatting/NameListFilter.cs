@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting
 {
@@ -54,12 +55,9 @@ namespace Mfr.Filters.Formatting
         protected override string _TransformValue(string value, RenameItem item)
         {
             _ = value;
-            var entries = _entries
-                ?? throw new InvalidOperationException("Name-list setup must complete before transform.");
-            var compiledPrefix = _compiledPrefix
-                ?? throw new InvalidOperationException("Name-list setup must complete before transform.");
-            var compiledSuffix = _compiledSuffix
-                ?? throw new InvalidOperationException("Name-list setup must complete before transform.");
+            var entries = Check.NotNull(_entries, "Name-list setup must complete before transform.");
+            var compiledPrefix = Check.NotNull(_compiledPrefix, "Name-list setup must complete before transform.");
+            var compiledSuffix = Check.NotNull(_compiledSuffix, "Name-list setup must complete before transform.");
 
             var index = item.Original.RenameListIndex;
             if (index < 0 || index >= entries.Count)

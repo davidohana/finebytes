@@ -203,7 +203,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EmptyArg_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("")(item));
             Assert.Contains("<substr>", ex.Message);
         }
 
@@ -212,7 +212,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_TooFewArgs_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("1,5")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("1,5")(item));
             Assert.Contains("3 comma-separated", ex.Message);
         }
 
@@ -221,7 +221,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_StartPositionZero_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("0,3,abc")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("0,3,abc")(item));
             Assert.Contains("start-position", ex.Message);
         }
 
@@ -230,7 +230,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EndPositionZero_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("1,0,abc")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("1,0,abc")(item));
             Assert.Contains("end-position", ex.Message);
         }
 
@@ -239,7 +239,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_NonIntegerStart_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("x,3,abc")(item));
+            var ex = Assert.Throws<ArgumentException>(() => _token.Compile("x,3,abc")(item));
             Assert.Contains("start-position", ex.Message);
         }
     }

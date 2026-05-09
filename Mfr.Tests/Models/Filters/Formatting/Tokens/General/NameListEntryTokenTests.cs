@@ -122,7 +122,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new NameListEntryToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => token.Compile(arg: arg)(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: arg)(item));
 
             Assert.Contains("name-list-entry", ex.Message, StringComparison.Ordinal);
         }

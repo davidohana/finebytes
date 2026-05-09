@@ -1,3 +1,5 @@
+using Mfr.Utils;
+
 namespace Mfr.Filters.Formatting.Tokens
 {
     /// <summary>
@@ -16,15 +18,14 @@ namespace Mfr.Filters.Formatting.Tokens
         }
 
         /// <summary>
-        /// Throws when <paramref name="arg"/> is not empty or whitespace.
+        /// Validates that no extra formatter argument text is supplied (<see cref="Require"/> precondition).
         /// </summary>
         /// <param name="arg">Raw argument text after <c>:</c>.</param>
         /// <param name="tokenDisplayName">Token label for error messages.</param>
-        /// <exception cref="InvalidOperationException">Thrown when unexpected arguments are present.</exception>
+        /// <exception cref="ArgumentException">Thrown when unexpected arguments are present.</exception>
         internal static void RequireNoArgument(string arg, string tokenDisplayName)
         {
-            if (!string.IsNullOrWhiteSpace(arg))
-                throw new InvalidOperationException($"{tokenDisplayName} does not accept arguments.");
+            Require.That(string.IsNullOrWhiteSpace(arg), $"{tokenDisplayName} does not accept arguments.", nameof(arg));
         }
     }
 }

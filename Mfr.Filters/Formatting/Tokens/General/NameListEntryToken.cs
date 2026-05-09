@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.General
 {
@@ -28,18 +29,18 @@ namespace Mfr.Filters.Formatting.Tokens.General
         public IReadOnlyList<string> Names { get; } = [TokenName];
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when token arguments are invalid or item index is negative.
-        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when the format argument is missing or whitespace-only.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the item's global index is negative.</exception>
         /// <exception cref="UserException">
         /// Thrown when the list file path is invalid, missing, or a line exceeds configured limits.
         /// </exception>
         public Func<RenameItem, string> Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
-            if (string.IsNullOrWhiteSpace(arg))
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} requires one argument: name-list-file-path.");
+            Require.That(
+                !string.IsNullOrWhiteSpace(arg),
+                $"{tokenDisplayName} requires one argument: name-list-file-path.",
+                nameof(arg));
 
             var filePath = arg;
             var entries = _GetEntries(filePath);

@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting
 {
@@ -33,7 +34,7 @@ namespace Mfr.Filters.Formatting
         protected override string _TransformValue(string value, RenameItem item)
         {
             _ = value;
-            return (_compiledTemplate ?? throw new InvalidOperationException("FormatterFilter setup must complete before transform."))(item);
+            return Check.NotNull(_compiledTemplate, "FormatterFilter setup must complete before transform.")(item);
         }
     }
 }

@@ -127,7 +127,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var filter = new MoverFilter(new MoverOptions(""));
 
-            Assert.Throws<InvalidOperationException>(filter.Setup);
+            Assert.Throws<ArgumentException>(filter.Setup);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var filter = new MoverFilter(new MoverOptions("   "));
 
-            Assert.Throws<InvalidOperationException>(filter.Setup);
+            Assert.Throws<ArgumentException>(filter.Setup);
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var filter = new MoverFilter(new MoverOptions(@"relative\path"));
 
-            Assert.Throws<InvalidOperationException>(filter.Setup);
+            Assert.Throws<ArgumentException>(filter.Setup);
         }
 
         /// <summary>

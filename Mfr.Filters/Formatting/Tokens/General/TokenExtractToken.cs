@@ -1,5 +1,6 @@
 using System.Globalization;
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.General
 {
@@ -40,9 +41,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         public IReadOnlyList<string> Names { get; } = ["token"];
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when arguments are invalid or <c>token-number</c> exceeds the number of parts in the source.
-        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when the format argument is invalid or <c>token-number</c> is inconsistent with resolved source text.</exception>
         public Func<RenameItem, string> Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
@@ -53,10 +52,11 @@ namespace Mfr.Filters.Formatting.Tokens.General
                 var source = compiledSource(item);
                 var parts = source.Split(options.Separator, StringSplitOptions.None);
 
-                if (options.TokenNumber > parts.Length)
-                    throw new InvalidOperationException(
-                        $"{tokenDisplayName} token-number {options.TokenNumber} exceeds the number of parts ({parts.Length}) " +
-                        $"in '{source}' when split by '{options.Separator}'.");
+                Require.That(
+                    options.TokenNumber <= parts.Length,
+                    $"{tokenDisplayName} token-number {options.TokenNumber} exceeds the number of parts ({parts.Length}) " +
+                        $"in '{source}' when split by '{options.Separator}'.",
+                    nameof(arg));
 
                 if (options.IncludeNext && options.IncludePrev)
                     return source;
@@ -74,14 +74,13 @@ namespace Mfr.Filters.Formatting.Tokens.General
         private Options _ParseOptions(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
-            if (string.IsNullOrEmpty(arg))
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} requires 5 arguments: token-number,separator,include-next,include-prev,source-format-string.");
+            Require.That(!string.IsNullOrEmpty(arg), $"{tokenDisplayName} requires 5 arguments: token-number,separator,include-next,include-prev,source-format-string.", nameof(arg));
 
             var parts = arg.Split(',', 5);
-            if (parts.Length != 5)
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} requires exactly 5 comma-separated arguments (got {parts.Length}): '{arg}'.");
+            Require.That(
+                parts.Length == 5,
+                $"{tokenDisplayName} requires exactly 5 comma-separated arguments (got {parts.Length}): '{arg}'.",
+                nameof(arg));
 
             var tokenNumber = int.Parse(parts[0].Trim(), CultureInfo.InvariantCulture);
             var separator = parts[1];
@@ -89,13 +88,9 @@ namespace Mfr.Filters.Formatting.Tokens.General
             var includePrev = parts[3].Trim() == "1";
             var sourceFormatString = parts[4];
 
-            if (tokenNumber < 1)
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} token-number must be 1 or greater (got {tokenNumber}).");
+            Require.That(tokenNumber >= 1, $"{tokenDisplayName} token-number must be 1 or greater (got {tokenNumber}).", nameof(arg));
 
-            if (string.IsNullOrEmpty(separator))
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} separator must not be empty.");
+            Require.That(!string.IsNullOrEmpty(separator), $"{tokenDisplayName} separator must not be empty.", nameof(arg));
 
             return new Options(
                 TokenNumber: tokenNumber,

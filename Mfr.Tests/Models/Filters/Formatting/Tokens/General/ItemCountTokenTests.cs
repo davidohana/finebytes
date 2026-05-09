@@ -40,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new ItemCountToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => token.Compile(arg: "1")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "1")(item));
             Assert.Contains("item-count", ex.Message);
         }
     }

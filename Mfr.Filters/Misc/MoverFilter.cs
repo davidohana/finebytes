@@ -1,5 +1,6 @@
 using Mfr.Filters.Formatting;
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Misc
 {
@@ -46,19 +47,18 @@ namespace Mfr.Filters.Misc
         public override string Type => "Mover";
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentException">Thrown when <see cref="MoverOptions.RootFolder"/> is empty, whitespace-only, or not an absolute path.</exception>
         protected override void _Setup()
         {
             var root = Options.RootFolder;
             var rootIsBlank = string.IsNullOrWhiteSpace(root);
-            if (rootIsBlank)
-                throw new InvalidOperationException("MoverFilter: RootFolder must not be empty.");
+            Require.That(!rootIsBlank, "MoverFilter: RootFolder must not be empty.", nameof(MoverOptions.RootFolder));
 
             var rootIsAbsolute = Path.IsPathFullyQualified(root);
-            if (!rootIsAbsolute)
-            {
-                throw new InvalidOperationException(
-                    $"MoverFilter: RootFolder must be an absolute path (got '{root}').");
-            }
+            Require.That(
+                rootIsAbsolute,
+                $"MoverFilter: RootFolder must be an absolute path (got '{root}').",
+                nameof(MoverOptions.RootFolder));
 
             if (!string.IsNullOrEmpty(Options.SubFolder))
                 _compiledSubFolder = FormatStringCompiler.Compile(Options.SubFolder);

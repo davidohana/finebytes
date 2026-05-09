@@ -82,7 +82,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new RandomCharToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => token.Compile(arg: "A")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "A")(item));
             Assert.Contains("random-char", ex.Message);
         }
     }

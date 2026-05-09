@@ -121,7 +121,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(
+            var ex = Assert.Throws<ArgumentException>(
                 () => token.Compile(arg: "1,2")(item));
             Assert.Contains("Invalid <counter> token arg", ex.Message);
         }
@@ -156,7 +156,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(
+            var ex = Assert.Throws<ArgumentException>(
                 () => token.Compile(arg: "1,1,2,0,0")(item));
             Assert.Contains("positive total length", ex.Message);
         }
@@ -170,7 +170,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(
+            var ex = Assert.Throws<ArgumentException>(
                 () => token.Compile(arg: "1,1,9,2,0")(item));
             Assert.Contains("leading-zeroes-mode", ex.Message);
         }

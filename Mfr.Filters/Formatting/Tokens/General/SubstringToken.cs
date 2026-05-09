@@ -1,5 +1,6 @@
 using System.Globalization;
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.General
 {
@@ -47,6 +48,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         public IReadOnlyList<string> Names { get; } = ["substr"];
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentException">Thrown when the format argument is malformed.</exception>
         public Func<RenameItem, string> Compile(string arg)
         {
             var options = _ParseOptions(arg);
@@ -71,29 +73,27 @@ namespace Mfr.Filters.Formatting.Tokens.General
         private Options _ParseOptions(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
-            if (string.IsNullOrEmpty(arg))
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} requires 3 arguments: start-position,end-position,source-format-string.");
+            Require.That(!string.IsNullOrEmpty(arg), $"{tokenDisplayName} requires 3 arguments: start-position,end-position,source-format-string.", nameof(arg));
 
             var parts = arg.Split(',', 3);
-            if (parts.Length != 3)
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} requires exactly 3 comma-separated arguments (got {parts.Length}): '{arg}'.");
+            Require.That(
+                parts.Length == 3,
+                $"{tokenDisplayName} requires exactly 3 comma-separated arguments (got {parts.Length}): '{arg}'.",
+                nameof(arg));
 
-            if (!int.TryParse(parts[0].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var startPosition))
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} start-position must be a non-zero integer (got '{parts[0].Trim()}').");
+            Require.That(
+                int.TryParse(parts[0].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var startPosition),
+                $"{tokenDisplayName} start-position must be a non-zero integer (got '{parts[0].Trim()}').",
+                nameof(arg));
 
-            if (!int.TryParse(parts[1].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var endPosition))
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} end-position must be a non-zero integer (got '{parts[1].Trim()}').");
+            Require.That(
+                int.TryParse(parts[1].Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var endPosition),
+                $"{tokenDisplayName} end-position must be a non-zero integer (got '{parts[1].Trim()}').",
+                nameof(arg));
 
-            if (startPosition == 0)
-                throw new InvalidOperationException($"{tokenDisplayName} start-position must not be zero.");
+            Require.That(startPosition != 0, $"{tokenDisplayName} start-position must not be zero.", nameof(arg));
 
-            if (endPosition == 0)
-                throw new InvalidOperationException($"{tokenDisplayName} end-position must not be zero.");
-
+            Require.That(endPosition != 0, $"{tokenDisplayName} end-position must not be zero.", nameof(arg));
             return new Options(
                 StartPosition: startPosition,
                 EndPosition: endPosition,

@@ -1,5 +1,6 @@
 using System.Globalization;
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.General
 {
@@ -45,7 +46,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
         public IReadOnlyList<string> Names { get; } = ["counter"];
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when arguments are missing, invalid, or list sizing was not populated.</exception>
+        /// <exception cref="ArgumentException">Thrown when the format argument is missing required fields or has invalid values.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when automatic leading-zero mode needs list counts that are not populated.</exception>
         public Func<RenameItem, string> Compile(string arg)
         {
             var options = _ParseOptions(arg);
@@ -76,11 +78,10 @@ namespace Mfr.Filters.Formatting.Tokens.General
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var normalizedArg = string.IsNullOrWhiteSpace(arg) ? DefaultArg : arg;
             var parts = normalizedArg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 5)
-            {
-                throw new InvalidOperationException(
-                    $"Invalid {tokenDisplayName} token arg '{normalizedArg}'. Expected 5 comma-separated params or use '{tokenDisplayName}'.");
-            }
+            Require.That(
+                parts.Length == 5,
+                $"Invalid {tokenDisplayName} token arg '{normalizedArg}'. Expected 5 comma-separated params or use '{tokenDisplayName}'.",
+                nameof(arg));
 
             return new Options(
                 InitialValue: int.Parse(parts[0], CultureInfo.InvariantCulture),
@@ -98,6 +99,11 @@ namespace Mfr.Filters.Formatting.Tokens.General
             RenameItem item,
             bool usePerFolder)
         {
+            Require.That(
+                leadingZeroesMode is >= 0 and <= 2,
+                $"Invalid counter leading-zeroes-mode '{leadingZeroesMode}' (expected 0, 1, or 2).",
+                "arg");
+
             switch (leadingZeroesMode)
             {
                 case 0:
@@ -106,20 +112,17 @@ namespace Mfr.Filters.Formatting.Tokens.General
                     var listCount = usePerFolder
                         ? item.Original.RenameListFolderSiblingCount
                         : item.Original.RenameListTotalCount;
-                    if (listCount <= 0)
-                    {
-                        throw new InvalidOperationException(
-                            "Counter token automatic leading-zero mode requires rename-list counts on the item (run preview from a populated rename list).");
-                    }
+                    Check.That(
+                        listCount > 0,
+                        "Counter token automatic leading-zero mode requires rename-list counts on the item (run preview from a populated rename list).");
 
                     var maxIndex = Math.Max(listCount - 1, 0);
                     return _AutomaticCounterWidth(start: start, step: step, maxIndex: maxIndex);
                 case 2:
-                    if (leadingZeroesTotalLength < 1)
-                    {
-                        throw new InvalidOperationException(
-                            $"Counter token custom leading-zero mode requires a positive total length (got {leadingZeroesTotalLength}).");
-                    }
+                    Require.That(
+                        leadingZeroesTotalLength >= 1,
+                        $"Counter token custom leading-zero mode requires a positive total length (got {leadingZeroesTotalLength}).",
+                        "arg");
 
                     return leadingZeroesTotalLength;
                 default:

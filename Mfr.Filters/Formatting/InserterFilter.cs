@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting
 {
@@ -56,8 +57,9 @@ namespace Mfr.Filters.Formatting
         /// <inheritdoc />
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var compiledText = _compiledText
-                ?? throw new InvalidOperationException("InserterFilter setup must complete before transform.");
+            var compiledText = Check.NotNull(
+                _compiledText,
+                "InserterFilter setup must complete before transform.");
             var inserted = compiledText(item);
             if (inserted.Length == 0)
                 return value;

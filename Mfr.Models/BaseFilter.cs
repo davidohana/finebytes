@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Mfr.Utils;
+
 namespace Mfr.Models
 {
     /// <summary>
@@ -35,8 +37,7 @@ namespace Mfr.Models
         /// </summary>
         protected void VerifySetupComplete()
         {
-            if (!_isSetupComplete)
-                throw new InvalidOperationException($"Filter '{Type}' setup must complete before transform.");
+            Check.That(_isSetupComplete, $"Filter '{Type}' setup must complete before transform.");
 
         }
 

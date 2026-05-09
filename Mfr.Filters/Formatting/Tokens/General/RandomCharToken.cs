@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.General
 {
@@ -17,24 +18,22 @@ namespace Mfr.Filters.Formatting.Tokens.General
         public IReadOnlyList<string> Names { get; } = ["random-char"];
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the argument is not exactly two comma-separated characters.</exception>
+        /// <exception cref="ArgumentException">Thrown when the argument is not exactly two comma-separated characters.</exception>
         public Func<RenameItem, string> Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var segments = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            if (segments.Length != 2)
-            {
-                throw new InvalidOperationException(
-                    $"Invalid {tokenDisplayName} token arg '{arg}'. Expected '{tokenDisplayName}:low,high' with two single-character endpoints.");
-            }
+            Require.That(
+                segments.Length == 2,
+                $"Invalid {tokenDisplayName} token arg '{arg}'. Expected '{tokenDisplayName}:low,high' with two single-character endpoints.",
+                nameof(arg));
 
             var lowSegment = segments[0];
             var highSegment = segments[1];
-            if (lowSegment.Length == 0 || highSegment.Length == 0)
-            {
-                throw new InvalidOperationException(
-                    $"Invalid {tokenDisplayName} token: each endpoint must contain at least one character.");
-            }
+            Require.That(
+                lowSegment.Length != 0 && highSegment.Length != 0,
+                $"Invalid {tokenDisplayName} token: each endpoint must contain at least one character.",
+                nameof(arg));
 
             var low = lowSegment[0];
             var high = highSegment[0];
