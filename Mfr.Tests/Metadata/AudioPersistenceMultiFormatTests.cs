@@ -11,7 +11,10 @@ namespace Mfr.Tests.Metadata
     /// <see href="https://github.com/lieff/minimp3/blob/master/vectors/fuzz/l3-compl-cut.mp3">lieff/minimp3</see>
     /// (MIT); FLAC excerpt from xiph/flac <c>metaflac.flac.ok</c>
     /// (<see href="https://raw.githubusercontent.com/xiph/flac/master/test/metaflac.flac.ok">BSD</see>,
-    /// saved as .flac). WAV uses synthesized PCM skeleton bytes only (no external fixture file).
+    /// saved as .flac); OGG Vorbis <c>libnogg/bitrate-123.ogg</c> via
+    /// <see href="https://github.com/RustAudio/lewton-test-assets">lewton-test-assets</see>
+    /// / <see href="https://raw.githubusercontent.com/RustAudio/lewton-test-assets/master/libnogg/COPYING.libnogg">COPYING.libnogg</see>
+    /// (BSD-style terms). WAV uses synthesized PCM skeleton bytes only (no external fixture file).
     /// </para>
     /// </remarks>
     public sealed class AudioPersistenceMultiFormatTests : IDisposable
@@ -83,7 +86,8 @@ namespace Mfr.Tests.Metadata
             new TheoryData<PersistenceFormatCase>(
                 new PersistenceFormatCase("wav", PersistenceFormatSeed.SyntheticWav, null),
                 new PersistenceFormatCase("mp3", PersistenceFormatSeed.FixtureCopy, "l3-compl-cut.mp3"),
-                new PersistenceFormatCase("flac", PersistenceFormatSeed.FixtureCopy, "metaflac.flac"));
+                new PersistenceFormatCase("flac", PersistenceFormatSeed.FixtureCopy, "metaflac.flac"),
+                new PersistenceFormatCase("ogg", PersistenceFormatSeed.FixtureCopy, "libnogg-bitrate-123.ogg"));
 
         [Theory(DisplayName = nameof(Read_AfterTagWrite_ReturnsTitles))]
         [MemberData(nameof(FormatCases))]
