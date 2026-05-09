@@ -6,6 +6,16 @@ namespace Mfr.Filters.Formatting.Tokens
     internal static class FormatOptionsParsing
     {
         /// <summary>
+        /// Gets canonical token label for messages (for example <c>&lt;file-name&gt;</c>).
+        /// </summary>
+        /// <param name="token">Token instance.</param>
+        /// <returns>Display form of the first token name wrapped in angle brackets.</returns>
+        internal static string TokenDisplayName(IFormatToken token)
+        {
+            return $"<{token.Names[0]}>";
+        }
+
+        /// <summary>
         /// Throws when <paramref name="arg"/> is not empty or whitespace.
         /// </summary>
         /// <param name="arg">Raw argument text after <c>:</c>.</param>

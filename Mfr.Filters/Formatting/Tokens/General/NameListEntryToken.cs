@@ -3,31 +3,6 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens.General
 {
     /// <summary>
-    /// Parsed arguments for <c>&lt;name-list-entry:name-list-file-path&gt;</c>.
-    /// </summary>
-    /// <param name="NameListFilePath">Full path to the name-list text file.</param>
-    internal sealed record NameListEntryFormatOptions(string NameListFilePath)
-    {
-        /// <summary>
-        /// Parses and validates the required file-path argument.
-        /// </summary>
-        /// <param name="arg">Raw argument text from the template.</param>
-        /// <param name="tokenDisplayName">Token display text used in validation errors.</param>
-        /// <returns>Parsed options.</returns>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the required file path argument is missing.
-        /// </exception>
-        internal static NameListEntryFormatOptions Parse(string arg, string tokenDisplayName)
-        {
-            if (string.IsNullOrWhiteSpace(arg))
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} requires one argument: name-list-file-path.");
-
-            return new NameListEntryFormatOptions(NameListFilePath: arg);
-        }
-    }
-
-    /// <summary>
     /// Resolves the <c>&lt;name-list-entry:name-list-file-path&gt;</c> token.
     /// </summary>
     /// <remarks>
@@ -41,13 +16,21 @@ namespace Mfr.Filters.Formatting.Tokens.General
     /// </remarks>
     internal sealed class NameListEntryToken : IFormatToken
     {
+        private const string TokenName = "name-list-entry";
+
         private static readonly Dictionary<string, IReadOnlyList<string>> _pathToEntries =
             new(StringComparer.OrdinalIgnoreCase);
 
         private static readonly Lock _cacheLock = new();
 
+        /// <summary>
+        /// Parsed arguments for <c>&lt;name-list-entry:name-list-file-path&gt;</c>.
+        /// </summary>
+        /// <param name="NameListFilePath">Full path to the name-list text file.</param>
+        private sealed record NameListEntryFormatOptions(string NameListFilePath);
+
         /// <inheritdoc />
-        public IReadOnlyList<string> Names { get; } = ["name-list-entry"];
+        public IReadOnlyList<string> Names { get; } = [TokenName];
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
@@ -58,8 +41,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// </exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var tokenDisplayName = $"<{Names[0]}>";
-            var options = NameListEntryFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
+            var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
+            var options = _ParseOptions(arg);
             var entries = _GetEntries(options.NameListFilePath);
             var index = item.Original.GlobalIndex;
             if (index < 0)
@@ -70,6 +53,16 @@ namespace Mfr.Filters.Formatting.Tokens.General
                 return string.Empty;
 
             return entries[index];
+        }
+
+        private NameListEntryFormatOptions _ParseOptions(string arg)
+        {
+            var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
+            if (string.IsNullOrWhiteSpace(arg))
+                throw new InvalidOperationException(
+                    $"{tokenDisplayName} requires one argument: name-list-file-path.");
+
+            return new NameListEntryFormatOptions(NameListFilePath: arg);
         }
 
         private static IReadOnlyList<string> _GetEntries(string filePath)

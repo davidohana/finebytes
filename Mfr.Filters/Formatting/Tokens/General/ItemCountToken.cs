@@ -4,18 +4,6 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens.General
 {
     /// <summary>
-    /// Parsed arguments for <c>&lt;item-count&gt;</c> (no parameters).
-    /// </summary>
-    internal readonly record struct ItemCountFormatOptions
-    {
-        internal static ItemCountFormatOptions Parse(string arg, string tokenDisplayName)
-        {
-            FormatOptionsParsing.RequireNoArgument(arg, tokenDisplayName);
-            return default;
-        }
-    }
-
-    /// <summary>
     /// Resolves the <c>&lt;item-count&gt;</c> token to the total number of items in the rename list.
     /// </summary>
     /// <remarks>
@@ -26,6 +14,11 @@ namespace Mfr.Filters.Formatting.Tokens.General
     /// </remarks>
     internal sealed class ItemCountToken : IFormatToken
     {
+        /// <summary>
+        /// Parsed arguments for <c>&lt;item-count&gt;</c> (no parameters).
+        /// </summary>
+        private readonly record struct ItemCountFormatOptions;
+
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["item-count"];
 
@@ -33,9 +26,14 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var tokenDisplayName = $"<{Names[0]}>";
-            _ = ItemCountFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
+            _ = _ParseOptions(arg);
             return item.Original.RenameListTotalCount.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private ItemCountFormatOptions _ParseOptions(string arg)
+        {
+            FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
+            return default;
         }
     }
 }

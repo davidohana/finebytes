@@ -3,18 +3,6 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens.FileProperties
 {
     /// <summary>
-    /// Parsed arguments for <c>&lt;drive-letter&gt;</c> (no parameters).
-    /// </summary>
-    internal readonly record struct DriveLetterFormatOptions
-    {
-        internal static DriveLetterFormatOptions Parse(string arg, string tokenDisplayName)
-        {
-            FormatOptionsParsing.RequireNoArgument(arg, tokenDisplayName);
-            return default;
-        }
-    }
-
-    /// <summary>
     /// Resolves the <c>&lt;drive-letter&gt;</c> token.
     /// </summary>
     /// <remarks>
@@ -24,6 +12,11 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// </remarks>
     internal sealed class DriveLetterToken : IFormatToken
     {
+        /// <summary>
+        /// Parsed arguments for <c>&lt;drive-letter&gt;</c> (no parameters).
+        /// </summary>
+        private readonly record struct DriveLetterFormatOptions;
+
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["drive-letter"];
 
@@ -31,12 +24,17 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            var tokenDisplayName = $"<{Names[0]}>";
-            _ = DriveLetterFormatOptions.Parse(arg, tokenDisplayName: tokenDisplayName);
+            _ = _ParseOptions(arg);
             var root = Path.GetPathRoot(item.Original.DirectoryPath) ?? string.Empty;
             if (root.StartsWith(@"\\", StringComparison.Ordinal))
                 return "$";
             return root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+
+        private DriveLetterFormatOptions _ParseOptions(string arg)
+        {
+            FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
+            return default;
         }
     }
 }

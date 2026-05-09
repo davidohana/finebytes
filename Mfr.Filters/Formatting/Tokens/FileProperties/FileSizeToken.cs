@@ -16,19 +16,49 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     }
 
     /// <summary>
-    /// Parsed arguments for <c>&lt;file-size&gt;</c>.
+    /// Resolves the <c>&lt;file-size&gt;</c> token.
     /// </summary>
-    /// <param name="Unit">Fixed unit or auto-scaled output.</param>
-    /// <param name="Decimals">Fractional digits for formatted values.</param>
-    internal sealed record FileSizeFormatOptions(FileSizeFormatUnitKind Unit, int Decimals)
+    /// <remarks>
+    /// <para>
+    /// Argument shape: <c>unit</c> or <c>unit,decimals</c>. Supported units are <c>0</c>/<c>auto</c> (default),
+    /// <c>1</c>/<c>b</c>/<c>bytes</c>, <c>2</c>/<c>kb</c>, <c>3</c>/<c>mb</c>, <c>4</c>/<c>gb</c>.
+    /// </para>
+    /// </remarks>
+    internal sealed class FileSizeToken : IFormatToken
     {
+        private const double Kb = 1024;
+        private const double Mb = 1024 * 1024;
+        private const double Gb = 1024 * 1024 * 1024;
+
         /// <summary>
-        /// Parses <c>unit</c> or <c>unit,decimals</c>.
+        /// Parsed arguments for <c>&lt;file-size&gt;</c>.
         /// </summary>
-        /// <param name="arg">Raw argument text.</param>
-        /// <returns>Parsed unit and decimals.</returns>
-        /// <exception cref="NotSupportedException">Thrown when the unit token is unknown.</exception>
-        internal static FileSizeFormatOptions Parse(string arg)
+        /// <param name="Unit">Fixed unit or auto-scaled output.</param>
+        /// <param name="Decimals">Fractional digits for formatted values.</param>
+        private sealed record FileSizeFormatOptions(FileSizeFormatUnitKind Unit, int Decimals);
+
+        /// <inheritdoc />
+        public IReadOnlyList<string> Names { get; } = ["file-size"];
+
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Thrown when an unrecognized unit is supplied.</exception>
+        public string Resolve(string arg, RenameItem item)
+        {
+            var options = _ParseOptions(arg);
+            var bytes = (double)item.Original.FileSize;
+
+            return options.Unit switch
+            {
+                FileSizeFormatUnitKind.Auto => _FormatAuto(bytes, options.Decimals),
+                FileSizeFormatUnitKind.Bytes => _Format(bytes, divisor: 1.0, unit: "B", options.Decimals),
+                FileSizeFormatUnitKind.Kb => _Format(bytes, divisor: Kb, unit: "KB", options.Decimals),
+                FileSizeFormatUnitKind.Mb => _Format(bytes, divisor: Mb, unit: "MB", options.Decimals),
+                FileSizeFormatUnitKind.Gb => _Format(bytes, divisor: Gb, unit: "GB", options.Decimals),
+                _ => throw new InvalidOperationException($"Unreachable file size unit '{options.Unit}'.")
+            };
+        }
+
+        private static FileSizeFormatOptions _ParseOptions(string arg)
         {
             var parts = arg.Split(',', 2, StringSplitOptions.TrimEntries);
             var unitArg = parts.Length > 0 ? parts[0] : "";
@@ -49,43 +79,6 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             };
 
             return new FileSizeFormatOptions(Unit: unitKind, Decimals: decimals);
-        }
-    }
-
-    /// <summary>
-    /// Resolves the <c>&lt;file-size&gt;</c> token.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Argument shape: <c>unit</c> or <c>unit,decimals</c>. Supported units are <c>0</c>/<c>auto</c> (default),
-    /// <c>1</c>/<c>b</c>/<c>bytes</c>, <c>2</c>/<c>kb</c>, <c>3</c>/<c>mb</c>, <c>4</c>/<c>gb</c>.
-    /// </para>
-    /// </remarks>
-    internal sealed class FileSizeToken : IFormatToken
-    {
-        private const double Kb = 1024;
-        private const double Mb = 1024 * 1024;
-        private const double Gb = 1024 * 1024 * 1024;
-
-        /// <inheritdoc />
-        public IReadOnlyList<string> Names { get; } = ["file-size"];
-
-        /// <inheritdoc />
-        /// <exception cref="NotSupportedException">Thrown when an unrecognized unit is supplied.</exception>
-        public string Resolve(string arg, RenameItem item)
-        {
-            var options = FileSizeFormatOptions.Parse(arg);
-            var bytes = (double)item.Original.FileSize;
-
-            return options.Unit switch
-            {
-                FileSizeFormatUnitKind.Auto => _FormatAuto(bytes, options.Decimals),
-                FileSizeFormatUnitKind.Bytes => _Format(bytes, divisor: 1.0, unit: "B", options.Decimals),
-                FileSizeFormatUnitKind.Kb => _Format(bytes, divisor: Kb, unit: "KB", options.Decimals),
-                FileSizeFormatUnitKind.Mb => _Format(bytes, divisor: Mb, unit: "MB", options.Decimals),
-                FileSizeFormatUnitKind.Gb => _Format(bytes, divisor: Gb, unit: "GB", options.Decimals),
-                _ => throw new InvalidOperationException($"Unreachable file size unit '{options.Unit}'.")
-            };
         }
 
         private static string _FormatAuto(double bytes, int decimals)
