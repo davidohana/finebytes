@@ -25,9 +25,7 @@ Replaces the **entire target segment** with the result of expanding a **template
 
 | Token | Output |
 |--------|--------|
-| `<file-date>` | Creation date formatted as `dd-MM-yyyy` (default). |
-| `<file-date:format>` | Creation date using a .NET date format string. |
-| `<file-date:format,date-kind>` | Date/time stamp. `date-kind` (case-insensitive): `creation` (default when omitted), `lastWrite`, `lastAccess`. A lone keyword (no comma) uses the default format. |
+| `<file-date:format,date-kind>` | Arguments are **required**. **Both** parts: a .NET date format string, then a comma, then `date-kind`. Split uses the **last** comma so `format` may contain commas. `date-kind` (case-insensitive): `creation`, `lastWrite`, `lastAccess`. Example: `<file-date:dd-MM-yyyy,creation>`. |
 | `<drive-letter>` | Drive letter of the file's location (e.g. `C:`). Returns `$` for network (UNC) paths. |
 | `<label>` | Volume label of the drive that holds the file. |
 | `<file-count>` | Number of files and folders in the same directory (non-recursive). Empty when directory does not exist. |
@@ -65,7 +63,8 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 | `template`: `"<file-name>"` | `song` | `song` | |
 | `template`: `"<parent-folder>"`<br>file under `Music\My Album\` | `ignored` | `My Album` | |
 | `template`: `"<parent-folder:2>"`<br>file under `Music\My Album\` | `ignored` | `Music` | Level 2 = grandparent. |
-| `template`: `"<file-date>"` | `ignored` | `07-04-2023` | Creation date, default format. |
+| `template`: `"<file-date:dd-MM-yyyy,creation>"` | `ignored` | `07-04-2023` | Creation time, common date layout. |
+| `template`: `"<file-date:yyyy,creation>"` | `ignored` | `2024` | Creation year. |
 | `template`: `"<file-date:yyyy,lastWrite>"` | `ignored` | `2021` | Last-write year. |
 | `template`: `"<file-size>"` | `ignored` | `1 KB` | Auto unit, 0 decimals. |
 | `template`: `"<file-size:mb,2>"` | `ignored` | `1.50 MB` | MB, 2 decimal places. |

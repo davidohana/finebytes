@@ -1,23 +1,22 @@
 using System.Diagnostics;
 using System.Globalization;
 using Mfr.Models;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.FileProperties
 {
     /// <summary>
-    /// Resolves the <c>&lt;file-date&gt;</c> token.
+    /// Resolves the <c>&lt;file-date:…&gt;</c> token.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Argument shape: <c>format</c>; <c>format,kind</c>; or a lone kind keyword (<c>creation</c>,
-    /// <c>lastWrite</c>, <c>lastAccess</c>, case-insensitive — matching preset <c>timestampField</c> names).
-    /// Default format when none supplied is <c>dd-MM-yyyy</c>.
+    /// Supply <c>format,date-kind</c>: a .NET date format string, a comma, then <c>creation</c>, <c>lastWrite</c>,
+    /// or <c>lastAccess</c> (case-insensitive, aligned with preset <c>timestampField</c> JSON names).
+    /// The comma before <c>date-kind</c> is the last comma in the argument so format patterns may contain commas.
     /// </para>
     /// </remarks>
     internal sealed class FileDateToken : IFormatToken
     {
-        private const string DefaultFormat = "dd-MM-yyyy";
-
         /// <summary>
         /// Case-insensitive keywords aligned with preset <c>timestampField</c> JSON names (<see cref="TimestampField"/>).
         /// </summary>
@@ -40,7 +39,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         public IReadOnlyList<string> Names { get; } = ["file-date"];
 
         /// <inheritdoc />
-        /// <exception cref="NotSupportedException">Thrown when an unsupported date kind is supplied in the template argument.</exception>
+        /// <exception cref="ArgumentException">Thrown when the template argument is malformed or <c>date-kind</c> is not recognized.</exception>
         /// <exception cref="UnreachableException">Thrown when an unexpected enum value appears at runtime (should not happen for parsed options).</exception>
         public Func<RenameItem, string> Compile(string arg)
         {
@@ -60,34 +59,41 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
         private static Options _ParseOptions(string tokenDisplayName, string arg)
         {
-            if (string.IsNullOrWhiteSpace(arg))
-                return new Options(Format: DefaultFormat, TimestampField: TimestampField.Creation);
+            Require.That(
+                !string.IsNullOrWhiteSpace(arg),
+                $"{tokenDisplayName} requires arguments: a .NET format string and date-kind separated by a comma " +
+                    "(for example 'dd-MM-yyyy,creation').",
+                nameof(arg));
 
             var trimmed = arg.Trim();
 
-            // Without a comma we cannot split "format,kind". Treat the whole segment as either a lone
-            // TimestampField keyword (<file-date:lastWrite> → default format + that field) or as a .NET
-            // format pattern (<file-date:yyyy> → that pattern + creation time).
-            if (!trimmed.Contains(','))
-            {
-                if (_TryParseFileDateKindKeyword(trimmed, out var fieldOnly))
-                    return new Options(Format: DefaultFormat, TimestampField: fieldOnly);
-                return new Options(Format: trimmed, TimestampField: TimestampField.Creation);
-            }
-
             var lastComma = trimmed.LastIndexOf(',');
-            var formatPart = trimmed[..lastComma];
+            Require.That(
+                lastComma >= 0,
+                $"{tokenDisplayName} requires a .NET format string and date-kind separated by a comma " +
+                    "(for example 'dd-MM-yyyy,creation').",
+                nameof(arg));
+
+            var formatPart = trimmed[..lastComma].Trim();
             var dateKindPart = trimmed[(lastComma + 1)..].Trim();
-            var format = string.IsNullOrWhiteSpace(formatPart) ? DefaultFormat : formatPart;
-            if (string.IsNullOrEmpty(dateKindPart))
-                return new Options(Format: format, TimestampField: TimestampField.Creation);
+
+            Require.That(
+                formatPart.Length > 0,
+                $"{tokenDisplayName} format string must not be empty (expected 'format,date-kind').",
+                nameof(arg));
+
+            Require.That(
+                dateKindPart.Length > 0,
+                $"{tokenDisplayName} date-kind must not be empty after the comma (expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToTimestampField.Keys)}).",
+                nameof(arg));
 
             if (!_TryParseFileDateKindKeyword(dateKindPart, out var timestampField))
-                throw new NotSupportedException(
-                    $"{tokenDisplayName} invalid timestamp keyword '{dateKindPart}' " +
-                    $"(expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToTimestampField.Keys)}).");
+                throw new ArgumentException(
+                    $"{tokenDisplayName} invalid date-kind '{dateKindPart}' " +
+                        $"(expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToTimestampField.Keys)}).",
+                    nameof(arg));
 
-            return new Options(Format: format, TimestampField: timestampField);
+            return new Options(Format: formatPart, TimestampField: timestampField);
         }
 
         /// <summary>

@@ -91,7 +91,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [InlineData("full-name")]
         [InlineData("full-path")]
         [InlineData("parent-folder")]
-        [InlineData("file-date")]
+        [InlineData("file-date:dd-MM-yyyy,creation")]
         [InlineData("file-size")]
         [InlineData("drive-letter")]
         [InlineData("label")]

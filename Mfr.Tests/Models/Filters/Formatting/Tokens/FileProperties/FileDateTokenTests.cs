@@ -8,33 +8,46 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
     public sealed class FileDateTokenTests
     {
         /// <summary>
-        /// Verifies a missing argument formats creation date as <c>dd-MM-yyyy</c>.
+        /// Verifies an empty or whitespace argument throws.
         /// </summary>
         [Fact]
-        public void Resolve_NoArg_DefaultsToCreationDdMmYyyy()
+        public void Resolve_EmptyArg_Throws()
+        {
+            var token = new FileDateToken();
+            var item = FilterTestHelpers.CreateRenameItem();
+
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "")(item));
+            Assert.Contains("requires arguments", ex.Message);
+        }
+
+        /// <summary>
+        /// Verifies creation time with <c>dd-MM-yyyy</c> format produces expected output.
+        /// </summary>
+        [Fact]
+        public void Resolve_CreationDdMmYyyy_FormatsExpected()
         {
             var token = new FileDateToken();
             var creation = new DateTime(2023, 4, 7, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(creationTime: creation);
 
-            Assert.Equal("07-04-2023", token.Compile(arg: "")(item));
+            Assert.Equal("07-04-2023", token.Compile(arg: "dd-MM-yyyy,creation")(item));
         }
 
         /// <summary>
-        /// Verifies a format-only argument (no comma) defaults to creation date.
+        /// Verifies format-only argument (no comma) throws.
         /// </summary>
         [Fact]
-        public void Resolve_FormatOnly_UsesCreationDate()
+        public void Resolve_FormatOnly_Throws()
         {
             var token = new FileDateToken();
-            var creation = new DateTime(2024, 5, 9, 0, 0, 0, DateTimeKind.Unspecified);
-            var item = FilterTestHelpers.CreateRenameItem(creationTime: creation);
+            var item = FilterTestHelpers.CreateRenameItem();
 
-            Assert.Equal("2024", token.Compile(arg: "yyyy")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "yyyy")(item));
+            Assert.Contains("date-kind", ex.Message);
         }
 
         /// <summary>
-        /// Verifies date kind <c>creation</c> selects creation time.
+        /// Verifies date kind <c>creation</c> with explicit format selects creation time.
         /// </summary>
         [Fact]
         public void Resolve_DateKindCreation_UsesCreation()
@@ -73,16 +86,16 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
         }
 
         /// <summary>
-        /// Verifies lone keyword <c>lastWrite</c> uses default format.
+        /// Verifies lone keyword without format throws.
         /// </summary>
         [Fact]
-        public void Resolve_KeywordOnlyLastWrite_UsesDefaultFormat()
+        public void Resolve_KeywordOnly_Throws()
         {
             var token = new FileDateToken();
-            var lastWrite = new DateTime(2023, 4, 7, 0, 0, 0, DateTimeKind.Unspecified);
-            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: lastWrite);
+            var item = FilterTestHelpers.CreateRenameItem();
 
-            Assert.Equal("07-04-2023", token.Compile(arg: "lastWrite")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "lastWrite")(item));
+            Assert.Contains("comma", ex.Message);
         }
 
         /// <summary>
@@ -94,20 +107,34 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileDateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            Assert.Throws<NotSupportedException>(() => token.Compile(arg: "dd-MM-yyyy,bogus")(item));
+            Assert.Throws<ArgumentException>(() => token.Compile(arg: "dd-MM-yyyy,bogus")(item));
         }
 
         /// <summary>
-        /// Verifies an empty format part falls back to the default while still honoring the date type.
+        /// Verifies an empty format part throws.
         /// </summary>
         [Fact]
-        public void Resolve_EmptyFormatWithDateKind_UsesDefaultFormat()
+        public void Resolve_EmptyFormatPart_Throws()
         {
             var token = new FileDateToken();
-            var lastWrite = new DateTime(2023, 4, 7, 0, 0, 0, DateTimeKind.Unspecified);
-            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: lastWrite);
+            var item = FilterTestHelpers.CreateRenameItem();
 
-            Assert.Equal("07-04-2023", token.Compile(arg: ",lastWrite")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: ",lastWrite")(item));
+            Assert.Contains("format", ex.Message);
         }
+
+        /// <summary>
+        /// Verifies trailing comma (missing date-kind) throws.
+        /// </summary>
+        [Fact]
+        public void Resolve_EmptyDateKindPart_Throws()
+        {
+            var token = new FileDateToken();
+            var item = FilterTestHelpers.CreateRenameItem();
+
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "yyyy,")(item));
+            Assert.Contains("date-kind", ex.Message);
+        }
+
     }
 }
