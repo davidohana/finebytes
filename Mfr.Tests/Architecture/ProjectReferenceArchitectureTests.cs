@@ -12,7 +12,7 @@ namespace Mfr.Tests.Architecture
     /// <list type="bullet">
     /// <item>L4 App — <c>Mfr.App.Cli</c></item>
     /// <item>L3 Application — <c>Mfr.Core</c></item>
-    /// <item>L2 Domain rules — <c>Mfr.Filters</c></item>
+    /// <item>L2 Domain rules — <c>Mfr.Filters</c> and <c>Mfr.Metadata</c> (<c>Mfr.Metadata</c> sits between model and formatting rules)</item>
     /// <item>L1 Domain model — <c>Mfr.Models</c></item>
     /// <item>L0 Shared utilities — <c>Mfr.Utils</c></item>
     /// </list>
@@ -32,10 +32,11 @@ namespace Mfr.Tests.Architecture
         {
             [@"Mfr.Utils\Mfr.Utils.csproj"] = 0,
             [@"Mfr.Models\Mfr.Models.csproj"] = 1,
-            [@"Mfr.Filters\Mfr.Filters.csproj"] = 2,
-            [@"Mfr.Core\Mfr.Core.csproj"] = 3,
-            [@"Mfr.App.Cli\Mfr.App.Cli.csproj"] = 4,
-            [@"Mfr\Mfr.csproj"] = 5,
+            [@"Mfr.Metadata\Mfr.Metadata.csproj"] = 2,
+            [@"Mfr.Filters\Mfr.Filters.csproj"] = 3,
+            [@"Mfr.Core\Mfr.Core.csproj"] = 4,
+            [@"Mfr.App.Cli\Mfr.App.Cli.csproj"] = 5,
+            [@"Mfr\Mfr.csproj"] = 6,
         };
 
         private static readonly string[] _testsProjectExpectedReferences = [@"Mfr\Mfr.csproj"];

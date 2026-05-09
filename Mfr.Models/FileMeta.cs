@@ -106,6 +106,17 @@ namespace Mfr.Models
         public int RenameListFolderSiblingCount { get; set; } = renameListFolderSiblingCount;
 
         /// <summary>
+        /// Gets or sets preview/commit overlay for embedded audio tags (canonical fields mirrored from TagLib read/write).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Populated when a file row is appended through <c>Mfr.Core.RenameList</c> ingest (deterministic read at add time).
+        /// Stays empty for directories and unsupported or unreadable files.
+        /// </para>
+        /// </remarks>
+        public AudioTagOverlay AudioTags { get; set; } = new();
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -123,7 +134,10 @@ namespace Mfr.Models
                 lastAccessTime: LastAccessTime,
                 fileSize: FileSize,
                 renameListTotalCount: RenameListTotalCount,
-                renameListFolderSiblingCount: RenameListFolderSiblingCount);
+                renameListFolderSiblingCount: RenameListFolderSiblingCount)
+            {
+                AudioTags = AudioTags.Clone(),
+            };
         }
     }
 }

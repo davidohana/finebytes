@@ -1,3 +1,4 @@
+using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Utils;
 using Serilog;
@@ -284,7 +285,7 @@ namespace Mfr.Core
                 _folderPathToCount[directoryPath] = inFolderIndex + 1;
 
                 var renameListIndex = _renameItems.Count;
-                var fileMeta = new FileMeta(
+                var originalFileMeta = new FileMeta(
                     renameListIndex: renameListIndex,
                     inFolderIndex: inFolderIndex,
                     directoryPath: directoryPath,
@@ -295,7 +296,15 @@ namespace Mfr.Core
                     lastWriteTime: File.GetLastWriteTime(fullPath),
                     lastAccessTime: File.GetLastAccessTime(fullPath),
                     fileSize: isDirectory ? 0 : new FileInfo(fullPath).Length);
-                var renameItem = new RenameItem(fileMeta);
+
+                if (!isDirectory)
+                {
+                    var loadedAudioTags = AudioTagPersistence.Read(fullPath);
+                    if (loadedAudioTags is not null)
+                        originalFileMeta.AudioTags = loadedAudioTags;
+                }
+
+                var renameItem = new RenameItem(originalFileMeta);
                 _renameItems.Add(renameItem);
                 addedCount++;
             }
@@ -319,9 +328,6 @@ namespace Mfr.Core
             }
         }
 
-        /// <summary>
-        /// Normalizes a path into a platform-consistent comparison key.
-        /// </summary>
         /// <param name="path">The path to normalize.</param>
         /// <returns>The normalized path key.</returns>
         private static string _NormalizePathKey(string path)

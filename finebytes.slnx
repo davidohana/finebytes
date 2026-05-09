@@ -2,6 +2,7 @@
   <Project Path="Mfr.App.Cli/Mfr.App.Cli.csproj" />
   <Project Path="Mfr.Core/Mfr.Core.csproj" />
   <Project Path="Mfr.Filters/Mfr.Filters.csproj" />
+  <Project Path="Mfr.Metadata/Mfr.Metadata.csproj" />
   <Project Path="Mfr.Models/Mfr.Models.csproj" />
   <Project Path="Mfr.Utils/Mfr.Utils.csproj" />
   <Project Path="Mfr/Mfr.csproj" />

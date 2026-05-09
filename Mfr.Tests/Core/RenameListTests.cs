@@ -350,6 +350,41 @@ namespace Mfr.Tests.Core
             Assert.DoesNotContain(nonMatch, renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies embedded tags are read when a file enters the rename list.
+        /// </summary>
+        public void AddSource_FileEntry_LoadsAudioTags_FromDisk()
+        {
+            var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "ListIngestTitle", album: "ListIngestAlbum");
+
+            var renameList = new RenameList(includeHidden: true);
+            Assert.Equal(1, renameList.AddSource(path));
+
+            var item = Assert.Single(renameList.RenameItems);
+            Assert.Equal("ListIngestTitle", item.Original.AudioTags.Title);
+            Assert.Equal("ListIngestAlbum", item.Original.AudioTags.Album);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies directories never load embedded audio-tag metadata.
+        /// </summary>
+        public void AddSource_DirectoryEntry_LeavesAudioTagsEmpty()
+        {
+            var folder = Path.Combine(_tempRoot, "folder");
+            Directory.CreateDirectory(folder);
+
+            var renameList = new RenameList(includeHidden: true);
+            Assert.Equal(
+                1,
+                renameList.AddSource(folder, includeFiles: false, includeFolders: true));
+
+            var item = Assert.Single(renameList.RenameItems);
+            Assert.Equal(new AudioTagOverlay(), item.Original.AudioTags);
+        }
+
     }
 
 }

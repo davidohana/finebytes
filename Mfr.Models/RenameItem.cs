@@ -135,7 +135,7 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Whether preview differs from the original snapshot (path, filesystem attributes, or timestamps).
+        /// Whether preview differs from the original snapshot (path, filesystem attributes, timestamps, or audio tags).
         /// </summary>
         /// <remarks>
         /// <para>
@@ -149,7 +149,8 @@ namespace Mfr.Models
                 || Original.Attributes != Preview.Attributes
                 || Original.CreationTime != Preview.CreationTime
                 || Original.LastWriteTime != Preview.LastWriteTime
-                || Original.LastAccessTime != Preview.LastAccessTime;
+                || Original.LastAccessTime != Preview.LastAccessTime
+                || !Original.AudioTags.Equals(Preview.AudioTags);
         }
     }
 }
