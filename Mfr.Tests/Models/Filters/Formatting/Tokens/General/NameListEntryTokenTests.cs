@@ -33,7 +33,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 """);
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 1);
 
-            var result = token.Resolve(arg: filePath, item: item);
+            var result = token.Compile(arg: filePath)(item);
 
             Assert.Equal("Second", result);
         }
@@ -53,7 +53,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 """);
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 1);
 
-            var result = token.Resolve(arg: filePath, item: item);
+            var result = token.Compile(arg: filePath)(item);
 
             Assert.Equal(string.Empty, result);
         }
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 """);
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 4);
 
-            var ex = Assert.Throws<UserException>(() => token.Resolve(arg: filePath, item: item));
+            var ex = Assert.Throws<UserException>(() => token.Compile(arg: filePath)(item));
 
             Assert.Contains("out of range", ex.Message, StringComparison.Ordinal);
         }
@@ -87,7 +87,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var filePath = _CreateFile(string.Empty);
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
 
-            var ex = Assert.Throws<UserException>(() => token.Resolve(arg: filePath, item: item));
+            var ex = Assert.Throws<UserException>(() => token.Compile(arg: filePath)(item));
 
             Assert.Contains("at least one name entry", ex.Message, StringComparison.Ordinal);
         }
@@ -106,7 +106,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 """);
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
 
-            var result = token.Resolve(arg: filePath, item: item);
+            var result = token.Compile(arg: filePath)(item);
 
             Assert.Equal("second", result);
         }
@@ -122,7 +122,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new NameListEntryToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => token.Resolve(arg: arg, item: item));
+            var ex = Assert.Throws<InvalidOperationException>(() => token.Compile(arg: arg)(item));
 
             Assert.Contains("name-list-entry", ex.Message, StringComparison.Ordinal);
         }
@@ -137,7 +137,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem();
             var missingPath = Path.Combine(_tempDir.TempDir, "missing.txt");
 
-            var ex = Assert.Throws<UserException>(() => token.Resolve(arg: missingPath, item: item));
+            var ex = Assert.Throws<UserException>(() => token.Compile(arg: missingPath)(item));
 
             Assert.Contains("not found", ex.Message, StringComparison.Ordinal);
         }

@@ -22,7 +22,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
-            Assert.Equal("13_", _token.Resolve("1,-,0,0,13_-_Smog_-_Cold_Blooded_Old_Times.mp3", item));
+            Assert.Equal("13_", _token.Compile("1,-,0,0,13_-_Smog_-_Cold_Blooded_Old_Times.mp3")(item));
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
-            Assert.Equal("Smog", _token.Resolve("2,_-_,0,0,13_-_Smog_-_Cold_Blooded_Old_Times.mp3", item));
+            Assert.Equal("Smog", _token.Compile("2,_-_,0,0,13_-_Smog_-_Cold_Blooded_Old_Times.mp3")(item));
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_LastToken_ReturnsLastPart()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("c.txt", _token.Resolve("3,_,0,0,a_b_c.txt", item));
+            Assert.Equal("c.txt", _token.Compile("3,_,0,0,a_b_c.txt")(item));
         }
 
         // ── include-next ──────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 extension: ".mp3");
             Assert.Equal(
                 "Smog_-_Cold_Blooded_Old_Times.mp3",
-                _token.Resolve("2,_-_,1,0,13_-_Smog_-_Cold_Blooded_Old_Times.mp3", item));
+                _token.Compile("2,_-_,1,0,13_-_Smog_-_Cold_Blooded_Old_Times.mp3")(item));
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_IncludeNext_Token1_ReturnsFullSource()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("a_b_c.txt", _token.Resolve("1,_,1,0,a_b_c.txt", item));
+            Assert.Equal("a_b_c.txt", _token.Compile("1,_,1,0,a_b_c.txt")(item));
         }
 
         // ── include-prev ──────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         {
             // split by "_" → ["a", "b", "c.txt"]; up to token 2 → "a_b"
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("a_b", _token.Resolve("2,_,0,1,a_b_c.txt", item));
+            Assert.Equal("a_b", _token.Compile("2,_,0,1,a_b_c.txt")(item));
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_IncludePrev_LastToken_ReturnsFullSource()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("a_b_c.txt", _token.Resolve("3,_,0,1,a_b_c.txt", item));
+            Assert.Equal("a_b_c.txt", _token.Compile("3,_,0,1,a_b_c.txt")(item));
         }
 
         // ── both include flags ────────────────────────────────────────────────
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_BothIncludeFlags_ReturnsFullSource()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
-            Assert.Equal("a_b_c.txt", _token.Resolve("2,_,1,1,a_b_c.txt", item));
+            Assert.Equal("a_b_c.txt", _token.Compile("2,_,1,1,a_b_c.txt")(item));
         }
 
         // ── nested format string via FormatStringResolver ─────────────────────
@@ -160,7 +160,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EmptyArg_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("")(item));
             Assert.Contains("<token>", ex.Message);
         }
 
@@ -171,7 +171,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_TooFewArgs_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("1,-,0,0", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("1,-,0,0")(item));
             Assert.Contains("5 comma-separated", ex.Message);
         }
 
@@ -182,7 +182,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_TokenNumberZero_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("0,_,0,0,a_b.txt", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("0,_,0,0,a_b.txt")(item));
             Assert.Contains("1 or greater", ex.Message);
         }
 
@@ -193,7 +193,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_TokenNumberOutOfRange_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("5,_,0,0,a_b.txt", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("5,_,0,0,a_b.txt")(item));
             Assert.Contains("exceeds the number of parts", ex.Message);
         }
 
@@ -204,7 +204,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EmptySeparator_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("1,,0,0,abc.txt", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("1,,0,0,abc.txt")(item));
             Assert.Contains("separator", ex.Message);
         }
     }

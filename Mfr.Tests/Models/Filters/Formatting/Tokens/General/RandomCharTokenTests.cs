@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
 
             for (var i = 0; i < 64; i++)
             {
-                var s = token.Resolve(arg: "0,9", item: item);
+                var s = token.Compile(arg: "0,9")(item);
                 Assert.Single(s);
                 var c = s[0];
                 Assert.True(c is >= '0' and <= '9', $"Got '{c}' outside 0–9.");
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
 
             for (var i = 0; i < 64; i++)
             {
-                var s = token.Resolve(arg: "A,Z", item: item);
+                var s = token.Compile(arg: "A,Z")(item);
                 Assert.Single(s);
                 var c = s[0];
                 Assert.True(c is >= 'A' and <= 'Z', $"Got '{c}' outside A–Z.");
@@ -54,7 +54,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
 
             for (var i = 0; i < 32; i++)
             {
-                var s = token.Resolve(arg: "Z,A", item: item);
+                var s = token.Compile(arg: "Z,A")(item);
                 Assert.Single(s);
                 var c = s[0];
                 Assert.True(c is >= 'A' and <= 'Z');
@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new RandomCharToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            Assert.Equal("M", token.Resolve(arg: "M,M", item: item));
+            Assert.Equal("M", token.Compile(arg: "M,M")(item));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new RandomCharToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => token.Resolve(arg: "A", item: item));
+            var ex = Assert.Throws<InvalidOperationException>(() => token.Compile(arg: "A")(item));
             Assert.Contains("random-char", ex.Message);
         }
     }

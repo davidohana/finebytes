@@ -27,6 +27,8 @@ namespace Mfr.Filters.Formatting
         NameListOptions Options) : StringTargetFilter(Target)
     {
         private IReadOnlyList<string>? _entries;
+        private Func<RenameItem, string>? _compiledPrefix;
+        private Func<RenameItem, string>? _compiledSuffix;
 
         /// <summary>
         /// Gets the filter type discriminator.
@@ -34,11 +36,13 @@ namespace Mfr.Filters.Formatting
         public override string Type => "NameList";
 
         /// <summary>
-        /// Loads and validates the name-list file for this filter instance.
+        /// Loads and validates the name-list file for this filter instance, and compiles prefix/suffix templates.
         /// </summary>
         protected override void _Setup()
         {
             _entries = NameListParser.ParseFile(filePath: Options.FilePath);
+            _compiledPrefix = FormatStringResolver.Compile(Options.Prefix);
+            _compiledSuffix = FormatStringResolver.Compile(Options.Suffix);
         }
 
         /// <summary>
@@ -52,6 +56,11 @@ namespace Mfr.Filters.Formatting
             _ = value;
             var entries = _entries
                 ?? throw new InvalidOperationException("Name-list setup must complete before transform.");
+            var compiledPrefix = _compiledPrefix
+                ?? throw new InvalidOperationException("Name-list setup must complete before transform.");
+            var compiledSuffix = _compiledSuffix
+                ?? throw new InvalidOperationException("Name-list setup must complete before transform.");
+
             var index = item.Original.RenameListIndex;
             if (index < 0 || index >= entries.Count)
             {
@@ -60,9 +69,7 @@ namespace Mfr.Filters.Formatting
             }
 
             var middle = entries[index];
-            var prefix = FormatStringResolver.ResolveTemplate(template: Options.Prefix, item: item);
-            var suffix = FormatStringResolver.ResolveTemplate(template: Options.Suffix, item: item);
-            return prefix + middle + suffix;
+            return compiledPrefix(item) + middle + compiledSuffix(item);
         }
     }
 }

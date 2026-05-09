@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 512);
 
-            Assert.Equal("512 B", token.Resolve(arg: "", item: item));
+            Assert.Equal("512 B", token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 2048);
 
-            Assert.Equal("2 KB", token.Resolve(arg: "", item: item));
+            Assert.Equal("2 KB", token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 5L * 1024 * 1024);
 
-            Assert.Equal("5 MB", token.Resolve(arg: "", item: item));
+            Assert.Equal("5 MB", token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 3L * 1024 * 1024 * 1024);
 
-            Assert.Equal("3 GB", token.Resolve(arg: "", item: item));
+            Assert.Equal("3 GB", token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 0);
 
-            Assert.Equal("0 B", token.Resolve(arg: "", item: item));
+            Assert.Equal("0 B", token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 2048);
 
-            Assert.Equal("2 KB", token.Resolve(arg: unit, item: item));
+            Assert.Equal("2 KB", token.Compile(arg: unit)(item));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 512);
 
-            Assert.Equal("512 B", token.Resolve(arg: unit, item: item));
+            Assert.Equal("512 B", token.Compile(arg: unit)(item));
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 3072);
 
-            Assert.Equal("3 KB", token.Resolve(arg: unit, item: item));
+            Assert.Equal("3 KB", token.Compile(arg: unit)(item));
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 1024 * 1024);
 
-            Assert.Equal("1 MB", token.Resolve(arg: unit, item: item));
+            Assert.Equal("1 MB", token.Compile(arg: unit)(item));
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 1024L * 1024 * 1024);
 
-            Assert.Equal("1 GB", token.Resolve(arg: unit, item: item));
+            Assert.Equal("1 GB", token.Compile(arg: unit)(item));
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 1572864);
 
-            Assert.Equal("1.50 MB", token.Resolve(arg: "3,2", item: item));
+            Assert.Equal("1.50 MB", token.Compile(arg: "3,2")(item));
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileSizeToken();
             var item = FilterTestHelpers.CreateRenameItem(fileSize: 1024);
 
-            Assert.Throws<NotSupportedException>(() => token.Resolve(arg: "tb", item: item));
+            Assert.Throws<NotSupportedException>(() => token.Compile(arg: "tb")(item));
         }
     }
 }

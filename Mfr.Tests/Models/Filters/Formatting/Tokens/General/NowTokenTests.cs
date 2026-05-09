@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new NowToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var result = token.Resolve(arg: "", item: item);
+            var result = token.Compile(arg: "")(item);
 
             Assert.True(
                 DateTimeOffset.TryParse(
@@ -38,7 +38,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem();
             var expectedYear = DateTimeOffset.UtcNow.ToString("yyyy", CultureInfo.InvariantCulture);
 
-            Assert.Equal(expectedYear, token.Resolve(arg: "yyyy", item: item));
+            Assert.Equal(expectedYear, token.Compile(arg: "yyyy")(item));
         }
     }
 }

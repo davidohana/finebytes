@@ -15,33 +15,24 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// </remarks>
     internal sealed class ParentFolderToken : IFormatToken
     {
-        /// <summary>
-        /// Parsed arguments for <c>&lt;parent-folder&gt;</c>.
-        /// </summary>
-        /// <param name="Level">1-based ancestor segment index (<c>1</c> = immediate parent).</param>
-        private sealed record Options(int Level);
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["parent-folder"];
 
         /// <inheritdoc />
-        public string Resolve(string arg, RenameItem item)
-        {
-            var options = _ParseOptions(arg);
-            try
-            {
-                return DirectoryPathAncestor.GetSegmentName(item.Original.DirectoryPath, options.Level);
-            }
-            catch (InvalidOperationException)
-            {
-                return string.Empty;
-            }
-        }
-
-        private Options _ParseOptions(string arg)
+        public Func<RenameItem, string> Compile(string arg)
         {
             var level = string.IsNullOrWhiteSpace(arg) ? 1 : int.Parse(arg, CultureInfo.InvariantCulture);
-            return new Options(Level: level);
+            return item =>
+            {
+                try
+                {
+                    return DirectoryPathAncestor.GetSegmentName(item.Original.DirectoryPath, level);
+                }
+                catch (InvalidOperationException)
+                {
+                    return string.Empty;
+                }
+            };
         }
     }
 }

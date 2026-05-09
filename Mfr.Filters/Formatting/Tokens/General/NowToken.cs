@@ -12,31 +12,16 @@ namespace Mfr.Filters.Formatting.Tokens.General
     /// </remarks>
     internal sealed class NowToken : IFormatToken
     {
-        /// <summary>
-        /// Parsed arguments for <c>&lt;now&gt;</c>.
-        /// </summary>
-        /// <param name="Format">
-        /// When null or whitespace, emit ISO-8601 UTC; otherwise a .NET date/time format string.
-        /// </param>
-        private sealed record Options(string? Format);
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["now"];
 
         /// <inheritdoc />
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
-            var options = _ParseOptions(arg);
-            return options.Format is null
-                ? DateTimeOffset.UtcNow.ToString("o")
-                : DateTimeOffset.UtcNow.ToString(options.Format);
-        }
-
-        private static Options _ParseOptions(string arg)
-        {
-            return string.IsNullOrWhiteSpace(arg)
-                ? new Options(Format: null)
-                : new Options(Format: arg);
+            var format = string.IsNullOrWhiteSpace(arg) ? null : arg;
+            return format is null
+                ? _ => DateTimeOffset.UtcNow.ToString("o")
+                : _ => DateTimeOffset.UtcNow.ToString(format);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new LabelToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: "");
 
-            Assert.Equal(string.Empty, token.Resolve(arg: "", item: item));
+            Assert.Equal(string.Empty, token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new LabelToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"\\server\share\docs");
 
-            Assert.Equal(string.Empty, token.Resolve(arg: "", item: item));
+            Assert.Equal(string.Empty, token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new LabelToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: localDrive.RootDirectory.FullName);
 
-            Assert.Equal(localDrive.VolumeLabel, token.Resolve(arg: "", item: item));
+            Assert.Equal(localDrive.VolumeLabel, token.Compile(arg: "")(item));
         }
     }
 }

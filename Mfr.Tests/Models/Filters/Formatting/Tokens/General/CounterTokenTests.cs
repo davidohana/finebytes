@@ -17,8 +17,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
 
-            Assert.Equal("1", token.Resolve(arg: "", item: item));
-            Assert.Equal("1", token.Resolve(arg: "1,1,0,2,0", item: item));
+            Assert.Equal("1", token.Compile(arg: "")(item));
+            Assert.Equal("1", token.Compile(arg: "1,1,0,2,0")(item));
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 2, inFolderIndex: 7);
 
-            Assert.Equal("17", token.Resolve(arg: "10,1,0,2,1", item: item));
+            Assert.Equal("17", token.Compile(arg: "10,1,0,2,1")(item));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 2, inFolderIndex: 7);
 
-            Assert.Equal("12", token.Resolve(arg: "10,1,0,2,0", item: item));
+            Assert.Equal("12", token.Compile(arg: "10,1,0,2,0")(item));
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0, inFolderIndex: 0);
 
-            Assert.Equal("0007", token.Resolve(arg: "7,1,2,4,0", item: item));
+            Assert.Equal("0007", token.Compile(arg: "7,1,2,4,0")(item));
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 5, inFolderIndex: 0);
 
-            Assert.Equal("15", token.Resolve(arg: "10,1,0,99,0", item: item));
+            Assert.Equal("15", token.Compile(arg: "10,1,0,99,0")(item));
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 renameListTotalCount: 100,
                 renameListFolderSiblingCount: 3);
 
-            Assert.Equal("006", token.Resolve(arg: "1,1,1,2,0", item: item));
+            Assert.Equal("006", token.Compile(arg: "1,1,1,2,0")(item));
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 renameListTotalCount: 100,
                 renameListFolderSiblingCount: 100);
 
-            Assert.Equal("006", token.Resolve(arg: "1,1,1,2,1", item: item));
+            Assert.Equal("006", token.Compile(arg: "1,1,1,2,1")(item));
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 3, inFolderIndex: 0);
 
-            Assert.Equal("4", token.Resolve(arg: "10,-2,0,0,0", item: item));
+            Assert.Equal("4", token.Compile(arg: "10,-2,0,0,0")(item));
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<InvalidOperationException>(
-                () => token.Resolve(arg: "1,2", item: item));
+                () => token.Compile(arg: "1,2")(item));
             Assert.Contains("Invalid <counter> token arg", ex.Message);
         }
 
@@ -143,7 +143,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 renameListFolderSiblingCount: 0));
 
             var ex = Assert.Throws<InvalidOperationException>(
-                () => token.Resolve(arg: "1,1,1,2,0", item: item));
+                () => token.Compile(arg: "1,1,1,2,0")(item));
             Assert.Contains("automatic leading-zero mode", ex.Message);
         }
 
@@ -157,7 +157,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<InvalidOperationException>(
-                () => token.Resolve(arg: "1,1,2,0,0", item: item));
+                () => token.Compile(arg: "1,1,2,0,0")(item));
             Assert.Contains("positive total length", ex.Message);
         }
 
@@ -171,7 +171,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<InvalidOperationException>(
-                () => token.Resolve(arg: "1,1,9,2,0", item: item));
+                () => token.Compile(arg: "1,1,9,2,0")(item));
             Assert.Contains("leading-zeroes-mode", ex.Message);
         }
     }

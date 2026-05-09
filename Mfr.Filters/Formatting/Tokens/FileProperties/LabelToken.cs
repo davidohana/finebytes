@@ -12,15 +12,18 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
             FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
-            var root = Path.GetPathRoot(item.Original.DirectoryPath);
-            if (string.IsNullOrEmpty(root))
-                return string.Empty;
-            if (root.StartsWith(@"\\", StringComparison.Ordinal))
-                return string.Empty;
-            return new DriveInfo(root).VolumeLabel;
+            return item =>
+            {
+                var root = Path.GetPathRoot(item.Original.DirectoryPath);
+                if (string.IsNullOrEmpty(root))
+                    return string.Empty;
+                if (root.StartsWith(@"\\", StringComparison.Ordinal))
+                    return string.Empty;
+                return new DriveInfo(root).VolumeLabel;
+            };
         }
     }
 }

@@ -12,10 +12,10 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
             FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
-            return item.Original.Prefix + item.Original.Extension;
+            return item => item.Original.Prefix + item.Original.Extension;
         }
     }
 }

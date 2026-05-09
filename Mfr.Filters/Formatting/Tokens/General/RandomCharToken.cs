@@ -13,28 +13,12 @@ namespace Mfr.Filters.Formatting.Tokens.General
     /// </remarks>
     internal sealed class RandomCharToken : IFormatToken
     {
-        /// <summary>
-        /// Parsed inclusive character range for <c>&lt;random-char&gt;</c>.
-        /// </summary>
-        /// <param name="Low">Lower endpoint (inclusive).</param>
-        /// <param name="High">Upper endpoint (inclusive).</param>
-        private sealed record Options(char Low, char High);
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["random-char"];
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the argument is not exactly two comma-separated characters.</exception>
-        public string Resolve(string arg, RenameItem item)
-        {
-            var range = _ParseOptions(arg);
-            var loCode = (int)range.Low;
-            var hiCode = (int)range.High;
-            var picked = (char)Random.Shared.Next(loCode, hiCode + 1);
-            return picked.ToString();
-        }
-
-        private Options _ParseOptions(string arg)
+        public Func<RenameItem, string> Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var segments = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -57,7 +41,9 @@ namespace Mfr.Filters.Formatting.Tokens.General
             if (low > high)
                 (low, high) = (high, low);
 
-            return new Options(Low: low, High: high);
+            var loCode = (int)low;
+            var hiCode = (int)high;
+            return _ => ((char)Random.Shared.Next(loCode, hiCode + 1)).ToString();
         }
     }
 }

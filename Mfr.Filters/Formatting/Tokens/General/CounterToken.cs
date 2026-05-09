@@ -46,26 +46,29 @@ namespace Mfr.Filters.Formatting.Tokens.General
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when arguments are missing, invalid, or list sizing was not populated.</exception>
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
             var options = _ParseOptions(arg);
-            var usePerFolder = options.ResetOnFolderChange == 1;
-            var n = usePerFolder ? item.Original.InFolderIndex : item.Original.RenameListIndex;
-            var value = options.InitialValue + ((long)options.IncrementBy * n);
-            var raw = value.ToString(CultureInfo.InvariantCulture);
+            return item =>
+            {
+                var usePerFolder = options.ResetOnFolderChange == 1;
+                var n = usePerFolder ? item.Original.InFolderIndex : item.Original.RenameListIndex;
+                var value = options.InitialValue + ((long)options.IncrementBy * n);
+                var raw = value.ToString(CultureInfo.InvariantCulture);
 
-            var padWidth = _ResolvePadWidth(
-                options.LeadingZeroesMode,
-                options.LeadingZeroesTotalLength,
-                options.InitialValue,
-                options.IncrementBy,
-                item,
-                usePerFolder);
+                var padWidth = _ResolvePadWidth(
+                    options.LeadingZeroesMode,
+                    options.LeadingZeroesTotalLength,
+                    options.InitialValue,
+                    options.IncrementBy,
+                    item,
+                    usePerFolder);
 
-            if (padWidth <= 0 || padWidth <= raw.Length)
-                return raw;
+                if (padWidth <= 0 || padWidth <= raw.Length)
+                    return raw;
 
-            return raw.PadLeft(padWidth, '0');
+                return raw.PadLeft(padWidth, '0');
+            };
         }
 
         private Options _ParseOptions(string arg)

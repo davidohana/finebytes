@@ -23,7 +23,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_SpecExample1_PositiveRange_ReturnsFirstFiveChars()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "MyTestFileName", extension: ".123");
-            Assert.Equal("MyTes", _token.Resolve("1,5,MyTestFileName", item));
+            Assert.Equal("MyTes", _token.Compile("1,5,MyTestFileName")(item));
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_SpecExample2_NegativeEnd_ReturnsMiddleSlice()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "MyTestFileName", extension: ".123");
-            Assert.Equal("stFileNam", _token.Resolve("5,-6,MyTestFileName.123", item));
+            Assert.Equal("stFileNam", _token.Compile("5,-6,MyTestFileName.123")(item));
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_Start1_End1_ReturnsSingleFirstChar()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
-            Assert.Equal("H", _token.Resolve("1,1,Hello.txt", item));
+            Assert.Equal("H", _token.Compile("1,1,Hello.txt")(item));
         }
 
         /// <summary>Extracts the entire string when start=1 and end equals length.</summary>
@@ -64,7 +64,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_FullRange_ReturnsEntireSource()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            Assert.Equal("abc", _token.Resolve("1,3,abc", item));
+            Assert.Equal("abc", _token.Compile("1,3,abc")(item));
         }
 
         // ── Negative positions ────────────────────────────────────────────────
@@ -74,7 +74,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_NegativeStart1_ReturnsLastChar()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
-            Assert.Equal("o", _token.Resolve("-1,-1,Hello", item));
+            Assert.Equal("o", _token.Compile("-1,-1,Hello")(item));
         }
 
         /// <summary>Extracts using two negative positions that form a valid left-to-right range.</summary>
@@ -83,7 +83,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         {
             // "Hello" length 5. start=-4 → 2, end=-2 → 4. Range [2,4] = "ell".
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
-            Assert.Equal("ell", _token.Resolve("-4,-2,Hello", item));
+            Assert.Equal("ell", _token.Compile("-4,-2,Hello")(item));
         }
 
         // ── Out-of-range clamping ─────────────────────────────────────────────
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         {
             // start=99 → clamped to 5, end=99 → clamped to 5. Single last char.
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
-            Assert.Equal("o", _token.Resolve("99,99,Hello", item));
+            Assert.Equal("o", _token.Compile("99,99,Hello")(item));
         }
 
         /// <summary>A negative start beyond the left edge is clamped to position 1.</summary>
@@ -103,7 +103,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         {
             // start=-99 → clamped to 1, end=3. Range [1,3] = "Hel".
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
-            Assert.Equal("Hel", _token.Resolve("-99,3,Hello", item));
+            Assert.Equal("Hel", _token.Compile("-99,3,Hello")(item));
         }
 
         // ── Nested format string ───────────────────────────────────────────────
@@ -135,7 +135,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EmptySource_ReturnsEmpty()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: ".mp3");
-            Assert.Equal(string.Empty, _token.Resolve("1,3,", item));
+            Assert.Equal(string.Empty, _token.Compile("1,3,")(item));
         }
 
         // ── Deep nesting (multiple levels) ───────────────────────────────────
@@ -196,7 +196,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EmptyArg_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("")(item));
             Assert.Contains("<substr>", ex.Message);
         }
 
@@ -205,7 +205,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_TooFewArgs_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("1,5", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("1,5")(item));
             Assert.Contains("3 comma-separated", ex.Message);
         }
 
@@ -214,7 +214,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_StartPositionZero_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("0,3,abc", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("0,3,abc")(item));
             Assert.Contains("start-position", ex.Message);
         }
 
@@ -223,7 +223,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EndPositionZero_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("1,0,abc", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("1,0,abc")(item));
             Assert.Contains("end-position", ex.Message);
         }
 
@@ -232,7 +232,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_NonIntegerStart_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
-            var ex = Assert.Throws<InvalidOperationException>(() => _token.Resolve("x,3,abc", item));
+            var ex = Assert.Throws<InvalidOperationException>(() => _token.Compile("x,3,abc")(item));
             Assert.Contains("start-position", ex.Message);
         }
     }

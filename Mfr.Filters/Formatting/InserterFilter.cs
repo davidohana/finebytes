@@ -40,15 +40,25 @@ namespace Mfr.Filters.Formatting
         FilterTarget Target,
         InserterOptions Options) : StringTargetFilter(Target)
     {
+        private Func<RenameItem, string>? _compiledText;
+
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Inserter";
 
         /// <inheritdoc />
+        protected override void _Setup()
+        {
+            _compiledText = FormatStringResolver.Compile(Options.Text);
+        }
+
+        /// <inheritdoc />
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var inserted = FormatStringResolver.ResolveTemplate(Options.Text, item);
+            var compiledText = _compiledText
+                ?? throw new InvalidOperationException("InserterFilter setup must complete before transform.");
+            var inserted = compiledText(item);
             if (inserted.Length == 0)
                 return value;
 

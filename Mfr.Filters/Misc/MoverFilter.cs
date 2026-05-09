@@ -38,6 +38,8 @@ namespace Mfr.Filters.Misc
     /// <param name="Options">Mover options.</param>
     public sealed record MoverFilter(MoverOptions Options) : BaseFilter
     {
+        private Func<RenameItem, string>? _compiledSubFolder;
+
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
@@ -57,6 +59,9 @@ namespace Mfr.Filters.Misc
                 throw new InvalidOperationException(
                     $"MoverFilter: RootFolder must be an absolute path (got '{root}').");
             }
+
+            if (!string.IsNullOrEmpty(Options.SubFolder))
+                _compiledSubFolder = FormatStringResolver.Compile(Options.SubFolder);
         }
 
         /// <inheritdoc />
@@ -69,11 +74,10 @@ namespace Mfr.Filters.Misc
 
         private string _ResolveTargetDirectory(RenameItem item)
         {
-            var subFolderIsEmpty = string.IsNullOrEmpty(Options.SubFolder);
-            if (subFolderIsEmpty)
+            if (_compiledSubFolder is null)
                 return Options.RootFolder;
 
-            var resolved = FormatStringResolver.ResolveTemplate(Options.SubFolder, item);
+            var resolved = _compiledSubFolder(item);
             // Strip a leading slash so Path.Combine appends relative segments. Otherwise a value like
             // "\Sub" is rooted on Windows and Path.Combine ignores RootFolder entirely.
             var relative = resolved.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);

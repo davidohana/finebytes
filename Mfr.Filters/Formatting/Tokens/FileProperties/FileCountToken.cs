@@ -18,13 +18,16 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
             FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
-            var dir = item.Original.DirectoryPath;
-            if (!Directory.Exists(dir))
-                return string.Empty;
-            return Directory.GetFileSystemEntries(dir).Length.ToString(CultureInfo.InvariantCulture);
+            return item =>
+            {
+                var dir = item.Original.DirectoryPath;
+                if (!Directory.Exists(dir))
+                    return string.Empty;
+                return Directory.GetFileSystemEntries(dir).Length.ToString(CultureInfo.InvariantCulture);
+            };
         }
     }
 }

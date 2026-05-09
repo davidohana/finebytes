@@ -19,10 +19,10 @@ namespace Mfr.Filters.Formatting.Tokens.General
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
             FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
-            return item.Original.RenameListTotalCount.ToString(CultureInfo.InvariantCulture);
+            return item => item.Original.RenameListTotalCount.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

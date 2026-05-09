@@ -31,7 +31,7 @@ namespace Mfr.Filters.Replace
         FilterTarget Target,
         ReplaceListOptions Options) : StringTargetFilter(Target)
     {
-        private List<ReplaceListEntry>? _replaceListEntries;
+        private List<(string Search, Func<RenameItem, string> CompiledReplacement)>? _compiledEntries;
 
         /// <summary>
         /// Gets the filter type discriminator.
@@ -40,22 +40,23 @@ namespace Mfr.Filters.Replace
 
         protected override void _Setup()
         {
-            _replaceListEntries = ReplaceListParser.ParseFile(filePath: Options.FilePath);
+            var entries = ReplaceListParser.ParseFile(filePath: Options.FilePath);
+            _compiledEntries = [.. entries.Select(e => (e.Search, FormatStringResolver.Compile(e.Replacement)))];
         }
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var searchToReplace = _replaceListEntries
+            var compiledEntries = _compiledEntries
                 ?? throw new InvalidOperationException("Replace-list setup must complete before transform.");
-            if (searchToReplace.Count == 0)
+            if (compiledEntries.Count == 0)
                 return value;
 
             var transformed = value;
-            foreach (var entry in searchToReplace)
+            foreach (var (search, compiledReplacement) in compiledEntries)
             {
-                var replacement = FormatStringResolver.ResolveTemplate(entry.Replacement, item);
+                var replacement = compiledReplacement(item);
                 var replacerOptions = new ReplacerOptions(
-                    Find: entry.Search,
+                    Find: search,
                     Replacement: replacement,
                     Mode: Options.Mode,
                     CaseSensitive: Options.CaseSensitive,

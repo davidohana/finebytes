@@ -24,11 +24,10 @@ namespace Mfr.Filters.Formatting.Tokens
         IReadOnlyList<string> Names { get; }
 
         /// <summary>
-        /// Resolves this token against <paramref name="item"/>.
+        /// Parses <paramref name="arg"/> once and returns a delegate that resolves this token per item.
         /// </summary>
         /// <param name="arg">Raw argument text from the template (after the first <c>:</c>); empty when no argument was supplied.</param>
-        /// <param name="item">Rename item providing the source data.</param>
-        /// <returns>The resolved replacement text.</returns>
-        string Resolve(string arg, RenameItem item);
+        /// <returns>A function that resolves this token against a <see cref="RenameItem"/> at rename time.</returns>
+        Func<RenameItem, string> Compile(string arg);
     }
 }

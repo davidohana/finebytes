@@ -19,7 +19,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
                 extension: ".mp3",
                 directory: @"D:\Music\Album");
 
-            Assert.Equal(item.Original.FullPath, token.Resolve(arg: "", item: item));
+            Assert.Equal(item.Original.FullPath, token.Compile(arg: "")(item));
         }
     }
 }

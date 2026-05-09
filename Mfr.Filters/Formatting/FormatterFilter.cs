@@ -17,15 +17,23 @@ namespace Mfr.Filters.Formatting
         FilterTarget Target,
         FormatterOptions Options) : StringTargetFilter(Target)
     {
+        private Func<RenameItem, string>? _compiledTemplate;
+
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Formatter";
 
+        /// <inheritdoc />
+        protected override void _Setup()
+        {
+            _compiledTemplate = FormatStringResolver.Compile(Options.Template);
+        }
+
         protected override string _TransformValue(string value, RenameItem item)
         {
             _ = value;
-            return FormatStringResolver.ResolveTemplate(Options.Template, item);
+            return (_compiledTemplate ?? throw new InvalidOperationException("FormatterFilter setup must complete before transform."))(item);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new ItemCountToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListTotalCount: 42);
 
-            Assert.Equal("42", token.Resolve(arg: "", item: item));
+            Assert.Equal("42", token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new ItemCountToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 4);
 
-            Assert.Equal("5", token.Resolve(arg: "", item: item));
+            Assert.Equal("5", token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var token = new ItemCountToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<InvalidOperationException>(() => token.Resolve(arg: "1", item: item));
+            var ex = Assert.Throws<InvalidOperationException>(() => token.Compile(arg: "1")(item));
             Assert.Contains("item-count", ex.Message);
         }
     }

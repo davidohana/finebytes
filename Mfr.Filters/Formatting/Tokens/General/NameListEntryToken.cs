@@ -24,12 +24,6 @@ namespace Mfr.Filters.Formatting.Tokens.General
 
         private static readonly Lock _cacheLock = new();
 
-        /// <summary>
-        /// Parsed arguments for <c>&lt;name-list-entry:name-list-file-path&gt;</c>.
-        /// </summary>
-        /// <param name="NameListFilePath">Full path to the name-list text file.</param>
-        private sealed record Options(string NameListFilePath);
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = [TokenName];
 
@@ -40,32 +34,29 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <exception cref="UserException">
         /// Thrown when the list file path is invalid, missing, or a line exceeds configured limits.
         /// </exception>
-        public string Resolve(string arg, RenameItem item)
-        {
-            var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
-            var options = _ParseOptions(arg);
-            var entries = _GetEntries(options.NameListFilePath);
-            var index = item.Original.RenameListIndex;
-            if (index < 0)
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} requires non-negative global index (got {index}).");
-
-            if (index >= entries.Count)
-                throw new UserException(
-                    $"{tokenDisplayName} index {index} is out of range for '{options.NameListFilePath}' " +
-                    $"({entries.Count} parsed entries).");
-
-            return entries[index];
-        }
-
-        private Options _ParseOptions(string arg)
+        public Func<RenameItem, string> Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             if (string.IsNullOrWhiteSpace(arg))
                 throw new InvalidOperationException(
                     $"{tokenDisplayName} requires one argument: name-list-file-path.");
 
-            return new Options(NameListFilePath: arg);
+            var filePath = arg;
+            var entries = _GetEntries(filePath);
+            return item =>
+            {
+                var index = item.Original.RenameListIndex;
+                if (index < 0)
+                    throw new InvalidOperationException(
+                        $"{tokenDisplayName} requires non-negative global index (got {index}).");
+
+                if (index >= entries.Count)
+                    throw new UserException(
+                        $"{tokenDisplayName} index {index} is out of range for '{filePath}' " +
+                        $"({entries.Count} parsed entries).");
+
+                return entries[index];
+            };
         }
 
         private static IReadOnlyList<string> _GetEntries(string filePath)

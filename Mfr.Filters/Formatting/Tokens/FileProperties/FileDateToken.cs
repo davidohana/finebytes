@@ -29,18 +29,20 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Thrown when an unsupported date type is supplied.</exception>
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
             var options = _ParseOptions(arg);
-            var date = options.DateType switch
+            return item =>
             {
-                0 => item.Original.CreationTime,
-                1 => item.Original.LastWriteTime,
-                2 => item.Original.LastAccessTime,
-                _ => throw new NotSupportedException($"File date type '{options.DateType}' is not supported.")
+                var date = options.DateType switch
+                {
+                    0 => item.Original.CreationTime,
+                    1 => item.Original.LastWriteTime,
+                    2 => item.Original.LastAccessTime,
+                    _ => throw new NotSupportedException($"File date type '{options.DateType}' is not supported.")
+                };
+                return date.ToString(options.Format, CultureInfo.InvariantCulture);
             };
-
-            return date.ToString(options.Format, CultureInfo.InvariantCulture);
         }
 
         private static Options _ParseOptions(string arg)

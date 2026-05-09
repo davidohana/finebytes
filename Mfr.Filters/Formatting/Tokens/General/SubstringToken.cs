@@ -47,22 +47,25 @@ namespace Mfr.Filters.Formatting.Tokens.General
         public IReadOnlyList<string> Names { get; } = ["substr"];
 
         /// <inheritdoc />
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
             var options = _ParseOptions(arg);
-            var source = FormatStringResolver.ResolveTemplate(options.SourceFormatString, item);
+            var compiledSource = FormatStringResolver.Compile(options.SourceFormatString);
+            return item =>
+            {
+                var source = compiledSource(item);
+                if (source.Length == 0)
+                    return string.Empty;
 
-            if (source.Length == 0)
-                return string.Empty;
+                var start = _ResolvePosition(options.StartPosition, source.Length);
+                var end = _ResolvePosition(options.EndPosition, source.Length);
 
-            var start = _ResolvePosition(options.StartPosition, source.Length);
-            var end = _ResolvePosition(options.EndPosition, source.Length);
+                if (start <= end)
+                    return source[(start - 1)..end];
 
-            if (start <= end)
-                return source[(start - 1)..end];
-
-            // Crossed positions: return (end, start] — the range between them, end excluded.
-            return source[end..start];
+                // Crossed positions: return (end, start] — the range between them, end excluded.
+                return source[end..start];
+            };
         }
 
         private Options _ParseOptions(string arg)

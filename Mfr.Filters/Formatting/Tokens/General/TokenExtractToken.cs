@@ -43,28 +43,32 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <exception cref="InvalidOperationException">
         /// Thrown when arguments are invalid or <c>token-number</c> exceeds the number of parts in the source.
         /// </exception>
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var options = _ParseOptions(arg);
-            var source = FormatStringResolver.ResolveTemplate(options.SourceFormatString, item);
-            var parts = source.Split(options.Separator, StringSplitOptions.None);
+            var compiledSource = FormatStringResolver.Compile(options.SourceFormatString);
+            return item =>
+            {
+                var source = compiledSource(item);
+                var parts = source.Split(options.Separator, StringSplitOptions.None);
 
-            if (options.TokenNumber > parts.Length)
-                throw new InvalidOperationException(
-                    $"{tokenDisplayName} token-number {options.TokenNumber} exceeds the number of parts ({parts.Length}) " +
-                    $"in '{source}' when split by '{options.Separator}'.");
+                if (options.TokenNumber > parts.Length)
+                    throw new InvalidOperationException(
+                        $"{tokenDisplayName} token-number {options.TokenNumber} exceeds the number of parts ({parts.Length}) " +
+                        $"in '{source}' when split by '{options.Separator}'.");
 
-            if (options.IncludeNext && options.IncludePrev)
-                return source;
+                if (options.IncludeNext && options.IncludePrev)
+                    return source;
 
-            if (options.IncludeNext)
-                return string.Join(options.Separator, parts[(options.TokenNumber - 1)..]);
+                if (options.IncludeNext)
+                    return string.Join(options.Separator, parts[(options.TokenNumber - 1)..]);
 
-            if (options.IncludePrev)
-                return string.Join(options.Separator, parts[..options.TokenNumber]);
+                if (options.IncludePrev)
+                    return string.Join(options.Separator, parts[..options.TokenNumber]);
 
-            return parts[options.TokenNumber - 1];
+                return parts[options.TokenNumber - 1];
+            };
         }
 
         private Options _ParseOptions(string arg)

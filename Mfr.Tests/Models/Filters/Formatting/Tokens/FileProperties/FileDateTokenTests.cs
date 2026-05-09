@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var creation = new DateTime(2023, 4, 7, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(creationTime: creation);
 
-            Assert.Equal("07-04-2023", token.Resolve(arg: "", item: item));
+            Assert.Equal("07-04-2023", token.Compile(arg: "")(item));
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var creation = new DateTime(2024, 5, 9, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(creationTime: creation);
 
-            Assert.Equal("2024", token.Resolve(arg: "yyyy", item: item));
+            Assert.Equal("2024", token.Compile(arg: "yyyy")(item));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var creation = new DateTime(2022, 1, 2, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(creationTime: creation);
 
-            Assert.Equal("2022-01-02", token.Resolve(arg: "yyyy-MM-dd,0", item: item));
+            Assert.Equal("2022-01-02", token.Compile(arg: "yyyy-MM-dd,0")(item));
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var lastWrite = new DateTime(2021, 11, 30, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: lastWrite);
 
-            Assert.Equal("2021", token.Resolve(arg: "yyyy,1", item: item));
+            Assert.Equal("2021", token.Compile(arg: "yyyy,1")(item));
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var lastAccess = new DateTime(2020, 1, 15, 9, 5, 3, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: lastAccess);
 
-            Assert.Equal("09-05-03", token.Resolve(arg: "HH-mm-ss,2", item: item));
+            Assert.Equal("09-05-03", token.Compile(arg: "HH-mm-ss,2")(item));
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileDateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            Assert.Throws<NotSupportedException>(() => token.Resolve(arg: "dd-MM-yyyy,3", item: item));
+            Assert.Throws<NotSupportedException>(() => token.Compile(arg: "dd-MM-yyyy,3")(item));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var lastWrite = new DateTime(2023, 4, 7, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: lastWrite);
 
-            Assert.Equal("07-04-2023", token.Resolve(arg: ",1", item: item));
+            Assert.Equal("07-04-2023", token.Compile(arg: ",1")(item));
         }
     }
 }

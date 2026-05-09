@@ -42,19 +42,21 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Thrown when an unrecognized unit is supplied.</exception>
-        public string Resolve(string arg, RenameItem item)
+        public Func<RenameItem, string> Compile(string arg)
         {
             var options = _ParseOptions(arg);
-            var bytes = (double)item.Original.FileSize;
-
-            return options.Unit switch
+            return item =>
             {
-                FileSizeFormatUnitKind.Auto => _FormatAuto(bytes, options.Decimals),
-                FileSizeFormatUnitKind.Bytes => _Format(bytes, divisor: 1.0, unit: "B", options.Decimals),
-                FileSizeFormatUnitKind.Kb => _Format(bytes, divisor: Kb, unit: "KB", options.Decimals),
-                FileSizeFormatUnitKind.Mb => _Format(bytes, divisor: Mb, unit: "MB", options.Decimals),
-                FileSizeFormatUnitKind.Gb => _Format(bytes, divisor: Gb, unit: "GB", options.Decimals),
-                _ => throw new InvalidOperationException($"Unreachable file size unit '{options.Unit}'.")
+                var bytes = (double)item.Original.FileSize;
+                return options.Unit switch
+                {
+                    FileSizeFormatUnitKind.Auto => _FormatAuto(bytes, options.Decimals),
+                    FileSizeFormatUnitKind.Bytes => _Format(bytes, divisor: 1.0, unit: "B", options.Decimals),
+                    FileSizeFormatUnitKind.Kb => _Format(bytes, divisor: Kb, unit: "KB", options.Decimals),
+                    FileSizeFormatUnitKind.Mb => _Format(bytes, divisor: Mb, unit: "MB", options.Decimals),
+                    FileSizeFormatUnitKind.Gb => _Format(bytes, divisor: Gb, unit: "GB", options.Decimals),
+                    _ => throw new InvalidOperationException($"Unreachable file size unit '{options.Unit}'.")
+                };
             };
         }
 
