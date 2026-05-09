@@ -22,7 +22,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// </summary>
         /// <param name="Format">.NET date format string.</param>
         /// <param name="DateType"><c>0</c> creation, <c>1</c> last write, <c>2</c> last access.</param>
-        private sealed record FileDateFormatOptions(string Format, int DateType);
+        private sealed record Options(string Format, int DateType);
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["file-date"];
@@ -43,14 +43,14 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             return date.ToString(options.Format, CultureInfo.InvariantCulture);
         }
 
-        private static FileDateFormatOptions _ParseOptions(string arg)
+        private static Options _ParseOptions(string arg)
         {
             if (string.IsNullOrWhiteSpace(arg))
-                return new FileDateFormatOptions(Format: DefaultFormat, DateType: 0);
+                return new Options(Format: DefaultFormat, DateType: 0);
 
             var lastComma = arg.LastIndexOf(',');
             if (lastComma < 0)
-                return new FileDateFormatOptions(Format: arg, DateType: 0);
+                return new Options(Format: arg, DateType: 0);
 
             var formatPart = arg[..lastComma];
             var dateTypePart = arg[(lastComma + 1)..].Trim();
@@ -58,7 +58,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             var dateType = string.IsNullOrEmpty(dateTypePart)
                 ? 0
                 : int.Parse(dateTypePart, CultureInfo.InvariantCulture);
-            return new FileDateFormatOptions(Format: format, DateType: dateType);
+            return new Options(Format: format, DateType: dateType);
         }
     }
 }

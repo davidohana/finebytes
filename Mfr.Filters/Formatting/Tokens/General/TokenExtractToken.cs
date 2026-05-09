@@ -29,7 +29,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <param name="IncludeNext">When <see langword="true"/>, returns from <paramref name="TokenNumber"/> to the end of the source.</param>
         /// <param name="IncludePrev">When <see langword="true"/>, returns from the start of the source up to and including <paramref name="TokenNumber"/>.</param>
         /// <param name="SourceFormatString">Raw format string (may contain nested tokens) to extract from.</param>
-        private sealed record TokenExtractFormatOptions(
+        private sealed record Options(
             int TokenNumber,
             string Separator,
             bool IncludeNext,
@@ -67,7 +67,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
             return parts[options.TokenNumber - 1];
         }
 
-        private TokenExtractFormatOptions _ParseOptions(string arg)
+        private Options _ParseOptions(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             if (string.IsNullOrEmpty(arg))
@@ -93,7 +93,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
                 throw new InvalidOperationException(
                     $"{tokenDisplayName} separator must not be empty.");
 
-            return new TokenExtractFormatOptions(
+            return new Options(
                 TokenNumber: tokenNumber,
                 Separator: separator,
                 IncludeNext: includeNext,

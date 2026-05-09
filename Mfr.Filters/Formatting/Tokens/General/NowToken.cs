@@ -18,7 +18,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <param name="Format">
         /// When null or whitespace, emit ISO-8601 UTC; otherwise a .NET date/time format string.
         /// </param>
-        private sealed record NowFormatOptions(string? Format);
+        private sealed record Options(string? Format);
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["now"];
@@ -32,11 +32,11 @@ namespace Mfr.Filters.Formatting.Tokens.General
                 : DateTimeOffset.UtcNow.ToString(options.Format);
         }
 
-        private static NowFormatOptions _ParseOptions(string arg)
+        private static Options _ParseOptions(string arg)
         {
             return string.IsNullOrWhiteSpace(arg)
-                ? new NowFormatOptions(Format: null)
-                : new NowFormatOptions(Format: arg);
+                ? new Options(Format: null)
+                : new Options(Format: arg);
         }
     }
 }

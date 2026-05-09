@@ -14,11 +14,6 @@ namespace Mfr.Filters.Formatting.Tokens.General
     /// </remarks>
     internal sealed class ItemCountToken : IFormatToken
     {
-        /// <summary>
-        /// Parsed arguments for <c>&lt;item-count&gt;</c> (no parameters).
-        /// </summary>
-        private readonly record struct ItemCountFormatOptions;
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["item-count"];
 
@@ -26,14 +21,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            _ = _ParseOptions(arg);
-            return item.Original.RenameListTotalCount.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private ItemCountFormatOptions _ParseOptions(string arg)
-        {
             FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
-            return default;
+            return item.Original.RenameListTotalCount.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

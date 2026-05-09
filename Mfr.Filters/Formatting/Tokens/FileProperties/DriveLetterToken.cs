@@ -12,11 +12,6 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// </remarks>
     internal sealed class DriveLetterToken : IFormatToken
     {
-        /// <summary>
-        /// Parsed arguments for <c>&lt;drive-letter&gt;</c> (no parameters).
-        /// </summary>
-        private readonly record struct DriveLetterFormatOptions;
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["drive-letter"];
 
@@ -24,17 +19,11 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            _ = _ParseOptions(arg);
+            FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
             var root = Path.GetPathRoot(item.Original.DirectoryPath) ?? string.Empty;
             if (root.StartsWith(@"\\", StringComparison.Ordinal))
                 return "$";
             return root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        }
-
-        private DriveLetterFormatOptions _ParseOptions(string arg)
-        {
-            FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
-            return default;
         }
     }
 }

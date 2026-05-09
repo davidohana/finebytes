@@ -38,7 +38,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// Must be non-zero.
         /// </param>
         /// <param name="SourceFormatString">Raw format string (may contain nested tokens) to extract from.</param>
-        private sealed record SubstringFormatOptions(
+        private sealed record Options(
             int StartPosition,
             int EndPosition,
             string SourceFormatString);
@@ -65,7 +65,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
             return source[end..start];
         }
 
-        private SubstringFormatOptions _ParseOptions(string arg)
+        private Options _ParseOptions(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             if (string.IsNullOrEmpty(arg))
@@ -91,7 +91,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
             if (endPosition == 0)
                 throw new InvalidOperationException($"{tokenDisplayName} end-position must not be zero.");
 
-            return new SubstringFormatOptions(
+            return new Options(
                 StartPosition: startPosition,
                 EndPosition: endPosition,
                 SourceFormatString: parts[2]);

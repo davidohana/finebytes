@@ -7,11 +7,6 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// </summary>
     internal sealed class LabelToken : IFormatToken
     {
-        /// <summary>
-        /// Parsed arguments for <c>&lt;label&gt;</c> (no parameters).
-        /// </summary>
-        private readonly record struct LabelFormatOptions;
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["label"];
 
@@ -19,19 +14,13 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
         public string Resolve(string arg, RenameItem item)
         {
-            _ = _ParseOptions(arg);
+            FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
             var root = Path.GetPathRoot(item.Original.DirectoryPath);
             if (string.IsNullOrEmpty(root))
                 return string.Empty;
             if (root.StartsWith(@"\\", StringComparison.Ordinal))
                 return string.Empty;
             return new DriveInfo(root).VolumeLabel;
-        }
-
-        private LabelFormatOptions _ParseOptions(string arg)
-        {
-            FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
-            return default;
         }
     }
 }

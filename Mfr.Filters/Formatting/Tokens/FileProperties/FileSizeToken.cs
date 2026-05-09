@@ -35,7 +35,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// </summary>
         /// <param name="Unit">Fixed unit or auto-scaled output.</param>
         /// <param name="Decimals">Fractional digits for formatted values.</param>
-        private sealed record FileSizeFormatOptions(FileSizeFormatUnitKind Unit, int Decimals);
+        private sealed record Options(FileSizeFormatUnitKind Unit, int Decimals);
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["file-size"];
@@ -58,7 +58,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             };
         }
 
-        private static FileSizeFormatOptions _ParseOptions(string arg)
+        private static Options _ParseOptions(string arg)
         {
             var parts = arg.Split(',', 2, StringSplitOptions.TrimEntries);
             var unitArg = parts.Length > 0 ? parts[0] : "";
@@ -78,7 +78,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
                 _ => throw new NotSupportedException($"File size unit '{unitArg}' is not supported.")
             };
 
-            return new FileSizeFormatOptions(Unit: unitKind, Decimals: decimals);
+            return new Options(Unit: unitKind, Decimals: decimals);
         }
 
         private static string _FormatAuto(double bytes, int decimals)

@@ -34,7 +34,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// <param name="LeadingZeroesMode"><c>0</c> none, <c>1</c> automatic width, <c>2</c> custom width.</param>
         /// <param name="LeadingZeroesTotalLength">Minimum digit width when mode is custom.</param>
         /// <param name="ResetOnFolderChange"><c>1</c> uses per-folder index.</param>
-        private sealed record CounterFormatOptions(
+        private sealed record Options(
             int InitialValue,
             int IncrementBy,
             int LeadingZeroesMode,
@@ -68,7 +68,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
             return raw.PadLeft(padWidth, '0');
         }
 
-        private CounterFormatOptions _ParseOptions(string arg)
+        private Options _ParseOptions(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var normalizedArg = string.IsNullOrWhiteSpace(arg) ? DefaultArg : arg;
@@ -79,7 +79,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
                     $"Invalid {tokenDisplayName} token arg '{normalizedArg}'. Expected 5 comma-separated params or use '{tokenDisplayName}'.");
             }
 
-            return new CounterFormatOptions(
+            return new Options(
                 InitialValue: int.Parse(parts[0], CultureInfo.InvariantCulture),
                 IncrementBy: int.Parse(parts[1], CultureInfo.InvariantCulture),
                 LeadingZeroesMode: int.Parse(parts[2], CultureInfo.InvariantCulture),

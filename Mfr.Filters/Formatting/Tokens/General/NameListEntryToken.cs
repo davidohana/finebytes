@@ -27,7 +27,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// Parsed arguments for <c>&lt;name-list-entry:name-list-file-path&gt;</c>.
         /// </summary>
         /// <param name="NameListFilePath">Full path to the name-list text file.</param>
-        private sealed record NameListEntryFormatOptions(string NameListFilePath);
+        private sealed record Options(string NameListFilePath);
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = [TokenName];
@@ -55,14 +55,14 @@ namespace Mfr.Filters.Formatting.Tokens.General
             return entries[index];
         }
 
-        private NameListEntryFormatOptions _ParseOptions(string arg)
+        private Options _ParseOptions(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             if (string.IsNullOrWhiteSpace(arg))
                 throw new InvalidOperationException(
                     $"{tokenDisplayName} requires one argument: name-list-file-path.");
 
-            return new NameListEntryFormatOptions(NameListFilePath: arg);
+            return new Options(NameListFilePath: arg);
         }
 
         private static IReadOnlyList<string> _GetEntries(string filePath)

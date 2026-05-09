@@ -18,7 +18,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         /// </summary>
         /// <param name="Low">Lower endpoint (inclusive).</param>
         /// <param name="High">Upper endpoint (inclusive).</param>
-        private sealed record RandomCharFormatOptions(char Low, char High);
+        private sealed record Options(char Low, char High);
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["random-char"];
@@ -34,7 +34,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
             return picked.ToString();
         }
 
-        private RandomCharFormatOptions _ParseOptions(string arg)
+        private Options _ParseOptions(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var segments = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -57,7 +57,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
             if (low > high)
                 (low, high) = (high, low);
 
-            return new RandomCharFormatOptions(Low: low, High: high);
+            return new Options(Low: low, High: high);
         }
     }
 }

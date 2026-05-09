@@ -19,7 +19,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         /// Parsed arguments for <c>&lt;parent-folder&gt;</c>.
         /// </summary>
         /// <param name="Level">1-based ancestor segment index (<c>1</c> = immediate parent).</param>
-        private sealed record ParentFolderFormatOptions(int Level);
+        private sealed record Options(int Level);
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["parent-folder"];
@@ -38,10 +38,10 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
             }
         }
 
-        private ParentFolderFormatOptions _ParseOptions(string arg)
+        private Options _ParseOptions(string arg)
         {
             var level = string.IsNullOrWhiteSpace(arg) ? 1 : int.Parse(arg, CultureInfo.InvariantCulture);
-            return new ParentFolderFormatOptions(Level: level);
+            return new Options(Level: level);
         }
     }
 }
