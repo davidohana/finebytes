@@ -27,7 +27,7 @@ Replaces the **entire target segment** with the result of expanding a **template
 |--------|--------|
 | `<file-date>` | Creation date formatted as `dd-MM-yyyy` (default). |
 | `<file-date:format>` | Creation date using a .NET date format string. |
-| `<file-date:format,date-kind>` | Date/time stamp. `date-kind` (case-insensitive): `creation` (default when omitted), `lastWrite`, `lastAccess` — same strings as preset `timestampField`. A lone keyword (no comma) uses the default format. |
+| `<file-date:format,date-kind>` | Date/time stamp. `date-kind` (case-insensitive): `creation` (default when omitted), `lastWrite`, `lastAccess`. A lone keyword (no comma) uses the default format. |
 | `<drive-letter>` | Drive letter of the file's location (e.g. `C:`). Returns `$` for network (UNC) paths. |
 | `<label>` | Volume label of the drive that holds the file. |
 | `<file-count>` | Number of files and folders in the same directory (non-recursive). Empty when directory does not exist. |
@@ -44,14 +44,14 @@ Replaces the **entire target segment** with the result of expanding a **template
 | `<item-count>` | Total items in the current rename list (no arguments). Populated during preview/commit. |
 | `<name-list-entry:name-list-file-path>` | Uses Name List parsing rules (comment lines are skipped; blank lines are preserved; at least one entry required), then returns the entry at the item's rename-list position. Throws a user-facing error when item index exceeds the parsed entry count. |
 | `<random-char:low,high>` | One random character, uniformly chosen between inclusive endpoints (first character of each side is used; order may be reversed). Examples: `<random-char:A,Z>`, `<random-char:0,9>`. |
-| `<counter>` | Same defaults as named form below with every option omitted (no leading zeros). |
-| `<counter:initial=…,step=…,padding=…,length=…,resetScope=…>` | Named options, **order-independent** (spaces around `,` and `=` optional). Omitted keys use the same defaults as bare `<counter>`. Position in rename list: `initial` + `step`×index. `padding`: `none`, `auto` (width from list scope), or `fixed` (pad to `length`, minimum digit width `1`). `resetScope`: `global` vs `perFolder` (restart per folder). |
+| `<counter>` | Rename-list index as `initial` + `step`×index using defaults `initial=1`, `step=1`, `padding=none`, `length=2`, `resetScope=global`. With `padding=none`, output has no leading zeros. |
+| `<counter:initial=…,step=…,padding=…,length=…,resetScope=…>` | Named options, **order-independent** (spaces around `,` and `=` optional). Omitted options use `initial=1`, `step=1`, `padding=none`, `length=2`, `resetScope=global`. Value: `initial` + `step`×index. `padding`: `none`, `auto` (width from list scope), or `fixed` (pad to `length`, minimum digit width `1`). `resetScope`: `global` vs `perFolder` (restart per folder). |
 
 #### Token extraction
 
 | Token | Output |
 |-------|--------|
-| `<token:tokenNumber=…,separator=…,includeNext=…,includePrev=…,source=…>` | Same behavior as before; arguments are **named** and **order-independent** (spaces optional). `source` may contain nested `<…>` tokens; commas inside balanced angle brackets are not argument separators. `includeNext` / `includePrev`: `true`/`false` (case-insensitive). |
+| `<token:tokenNumber=…,separator=…,includeNext=…,includePrev=…,source=…>` | **Named** options, **order-independent** (spaces optional). Resolves `source`, splits by `separator`, then returns the 1-based `tokenNumber` part. With `includeNext=true`, returns that part through the end (rejoined with `separator`); with `includePrev=true`, returns from the start through that part (rejoined); both `true` returns the full resolved string. `source` may contain nested `<…>` tokens; commas inside balanced angle brackets are not option separators. `includeNext` / `includePrev`: `true` / `false` (case-insensitive). |
 | `<substr:start=…,end=…,source=…>` | Named options, **order-independent** (spaces optional). Extracts characters from `source` between two positions (inclusive). Positions are 1-based; negative positions count from the right (`-1` = last character). Out-of-range positions are clamped to the nearest boundary. When the resolved start exceeds the resolved end, the range `(end, start]` is returned. `source` may contain nested `<…>` tokens; commas inside balanced angle brackets are not option separators. |
 
 Unknown token names cause an error at runtime.
@@ -82,7 +82,7 @@ For sequential numbering without a full template, see [Counter](Counter.md).
 
 ## Sample preset (JSON)
 
-The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). When targeting **Prefix**, `<file-name>` is still the original prefix.
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). When targeting **Prefix**, `<file-name>` is the original file prefix.
 
 ```json
 {
