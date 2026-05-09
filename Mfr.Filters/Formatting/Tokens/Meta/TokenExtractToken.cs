@@ -107,7 +107,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             if (!bool.TryParse(raw.Trim(), out var value))
                 throw new ArgumentException(
                     $"{tokenDisplayName} {fieldLabel} '{raw}' is not supported (expected true or false).",
-                    paramName: "arg");
+                    paramName: nameof(raw));
 
             return value;
         }

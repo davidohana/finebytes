@@ -125,7 +125,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
 
             throw new ArgumentException(
                 $"{tokenDisplayName} padding '{raw}' is not supported (expected none, auto, or fixed).",
-                paramName: "arg");
+                paramName: nameof(raw));
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
 
             throw new ArgumentException(
                 $"{tokenDisplayName} reset scope '{raw}' is not supported (expected global or perFolder).",
-                paramName: "arg");
+                paramName: nameof(raw));
         }
 
         private static int _ResolvePadWidth(
