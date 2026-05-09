@@ -2,7 +2,7 @@ using System.Globalization;
 using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Filters.Formatting.Tokens.General
+namespace Mfr.Filters.Formatting.Tokens.Meta
 {
     /// <summary>
     /// Resolves the <c>&lt;substr:start-position,end-position,source-format-string&gt;</c> token.

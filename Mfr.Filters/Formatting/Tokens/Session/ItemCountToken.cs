@@ -1,7 +1,7 @@
 using System.Globalization;
 using Mfr.Models;
 
-namespace Mfr.Filters.Formatting.Tokens.General
+namespace Mfr.Filters.Formatting.Tokens.Session
 {
     /// <summary>
     /// Resolves the <c>&lt;item-count&gt;</c> token to the total number of items in the rename list.

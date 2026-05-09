@@ -1,7 +1,7 @@
 using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Filters.Formatting.Tokens.General
+namespace Mfr.Filters.Formatting.Tokens.Generators
 {
     /// <summary>
     /// Resolves the <c>&lt;random-char:low,high&gt;</c> token to one uniformly random character between endpoints (inclusive).

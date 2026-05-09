@@ -2,7 +2,7 @@ using System.Globalization;
 using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Filters.Formatting.Tokens.General
+namespace Mfr.Filters.Formatting.Tokens.Session
 {
     /// <summary>
     /// Resolves the <c>&lt;counter&gt;</c> token (legacy Magic File Renamer counter parameters).

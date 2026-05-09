@@ -1,6 +1,6 @@
 using Mfr.Models;
 
-namespace Mfr.Filters.Formatting.Tokens.General
+namespace Mfr.Filters.Formatting.Tokens.Generators
 {
     /// <summary>
     /// Resolves the <c>&lt;now&gt;</c> and <c>&lt;now:format&gt;</c> tokens.
