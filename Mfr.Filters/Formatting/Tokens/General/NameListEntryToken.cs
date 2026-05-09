@@ -11,7 +11,8 @@ namespace Mfr.Filters.Formatting.Tokens.General
     /// <see cref="FileMeta.GlobalIndex"/> as the line index.
     /// </para>
     /// <para>
-    /// When the rename-list index exceeds the number of lines in the file, an empty string is returned.
+    /// When the rename-list index exceeds the number of parsed entries in the file, resolution fails
+    /// with a user-facing validation error.
     /// </para>
     /// </remarks>
     internal sealed class NameListEntryToken : IFormatToken
@@ -50,7 +51,9 @@ namespace Mfr.Filters.Formatting.Tokens.General
                     $"{tokenDisplayName} requires non-negative global index (got {index}).");
 
             if (index >= entries.Count)
-                return string.Empty;
+                throw new UserException(
+                    $"{tokenDisplayName} index {index} is out of range for '{options.NameListFilePath}' " +
+                    $"({entries.Count} parsed entries).");
 
             return entries[index];
         }

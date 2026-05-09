@@ -42,7 +42,7 @@ Replaces the **entire target segment** with the result of expanding a **template
 | `<now>` | Current UTC time, ISO-8601 style. |
 | `<now:format>` | Current UTC time formatted with a .NET format string. |
 | `<item-count>` | Total items in the current rename list (no arguments). Populated during preview/commit. |
-| `<name-list-entry:name-list-file-path>` | Uses Name List parsing rules (comment lines are skipped; blank lines are preserved; at least one entry required), then returns the entry at the item's rename-list position. Returns empty when item index exceeds the parsed entry count. |
+| `<name-list-entry:name-list-file-path>` | Uses Name List parsing rules (comment lines are skipped; blank lines are preserved; at least one entry required), then returns the entry at the item's rename-list position. Throws a user-facing error when item index exceeds the parsed entry count. |
 | `<random-char:low,high>` | One random character, uniformly chosen between inclusive endpoints (first character of each side is used; order may be reversed). Examples: `<random-char:A,Z>`, `<random-char:0,9>`. |
 | `<counter>` | Same as `<counter:1,1,0,2,0>` (no leading zeros). |
 | `<counter:initial,step,leading-zeroes-mode,length,reset-folder>` | Position in rename list: `initial` + `step`×index. `leading-zeroes-mode`: `0` = none, `1` = automatic width from list size, `2` = pad to `length` (digits; minimum `1`). `reset-folder`: `0` = global index, `1` = index restarts per folder. |

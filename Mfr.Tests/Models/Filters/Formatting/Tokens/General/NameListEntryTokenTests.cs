@@ -59,10 +59,10 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         }
 
         /// <summary>
-        /// Verifies index values beyond file line count return empty text.
+        /// Verifies index values beyond parsed entry count produce a user-facing error.
         /// </summary>
         [Fact]
-        public void Resolve_IndexBeyondLineCount_ReturnsEmptyString()
+        public void Resolve_IndexBeyondLineCount_ThrowsUserException()
         {
             var token = new NameListEntryToken();
             var filePath = _CreateFile(
@@ -72,9 +72,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 """);
             var item = FilterTestHelpers.CreateRenameItem(globalIndex: 4);
 
-            var result = token.Resolve(arg: filePath, item: item);
+            var ex = Assert.Throws<UserException>(() => token.Resolve(arg: filePath, item: item));
 
-            Assert.Equal(string.Empty, result);
+            Assert.Contains("out of range", ex.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
