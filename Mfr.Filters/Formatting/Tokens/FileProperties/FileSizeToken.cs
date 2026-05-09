@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using Mfr.Models;
 
@@ -42,9 +43,10 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Thrown when an unrecognized unit is supplied.</exception>
+        /// <exception cref="UnreachableException">Thrown when an unexpected unit enum value appears at runtime.</exception>
         public Func<RenameItem, string> Compile(string arg)
         {
-            var options = _ParseOptions(arg);
+            var options = _ParseOptions(FormatOptionsParsing.TokenDisplayName(this), arg);
             return item =>
             {
                 var bytes = (double)item.Original.FileSize;
@@ -55,12 +57,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
                     FileSizeFormatUnitKind.Kb => _Format(bytes, divisor: Kb, unit: "KB", options.Decimals),
                     FileSizeFormatUnitKind.Mb => _Format(bytes, divisor: Mb, unit: "MB", options.Decimals),
                     FileSizeFormatUnitKind.Gb => _Format(bytes, divisor: Gb, unit: "GB", options.Decimals),
-                    _ => throw new InvalidOperationException($"Unreachable file size unit '{options.Unit}'.")
+                    _ => throw new UnreachableException()
                 };
             };
         }
 
-        private static Options _ParseOptions(string arg)
+        private static Options _ParseOptions(string tokenDisplayName, string arg)
         {
             var parts = arg.Split(',', 2, StringSplitOptions.TrimEntries);
             var unitArg = parts.Length > 0 ? parts[0] : "";
@@ -77,7 +79,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
                 "2" or "kb" => FileSizeFormatUnitKind.Kb,
                 "3" or "mb" => FileSizeFormatUnitKind.Mb,
                 "4" or "gb" => FileSizeFormatUnitKind.Gb,
-                _ => throw new NotSupportedException($"File size unit '{unitArg}' is not supported.")
+                _ => throw new NotSupportedException($"{tokenDisplayName} unit '{unitArg}' is not supported.")
             };
 
             return new Options(Unit: unitKind, Decimals: decimals);

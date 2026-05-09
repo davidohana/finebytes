@@ -9,71 +9,71 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
     public sealed class CounterTokenTests
     {
         /// <summary>
-        /// Verifies bare-arg default matches <c>&lt;counter:1,1,0,2,0&gt;</c> (no leading zeros).
+        /// Verifies bare-arg default matches <c>&lt;counter:1,1,none,2,global&gt;</c> (no leading zeros).
         /// </summary>
         [Fact]
-        public void Resolve_EmptyArg_DefaultsToLegacySimpleForm()
+        public void Resolve_EmptyArg_DefaultsToSimpleForm()
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
 
             Assert.Equal("1", token.Compile(arg: "")(item));
-            Assert.Equal("1", token.Compile(arg: "1,1,0,2,0")(item));
+            Assert.Equal("1", token.Compile(arg: "1,1,none,2,global")(item));
         }
 
         /// <summary>
-        /// Verifies reset-on-folder uses in-folder index when set to <c>1</c>.
+        /// Verifies per-folder reset uses in-folder index when set to <c>perFolder</c>.
         /// </summary>
         [Fact]
-        public void Resolve_ResetOnFolderOne_UsesInFolderIndex()
+        public void Resolve_ResetPerFolder_UsesInFolderIndex()
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 2, inFolderIndex: 7);
 
-            Assert.Equal("17", token.Compile(arg: "10,1,0,2,1")(item));
+            Assert.Equal("17", token.Compile(arg: "10,1,none,2,perFolder")(item));
         }
 
         /// <summary>
-        /// Verifies reset off uses global index.
+        /// Verifies global reset uses global index.
         /// </summary>
         [Fact]
-        public void Resolve_ResetOff_UsesGlobalIndex()
+        public void Resolve_ResetGlobal_UsesGlobalIndex()
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 2, inFolderIndex: 7);
 
-            Assert.Equal("12", token.Compile(arg: "10,1,0,2,0")(item));
+            Assert.Equal("12", token.Compile(arg: "10,1,none,2,global")(item));
         }
 
         /// <summary>
-        /// Verifies custom leading-zero mode pads with zeros to the requested length.
+        /// Verifies fixed padding pads with zeros to the requested length.
         /// </summary>
         [Fact]
-        public void Resolve_LeadingZeroesModeCustom_PadsWithZeros()
+        public void Resolve_PaddingFixed_PadsWithZeros()
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0, inFolderIndex: 0);
 
-            Assert.Equal("0007", token.Compile(arg: "7,1,2,4,0")(item));
+            Assert.Equal("0007", token.Compile(arg: "7,1,fixed,4,global")(item));
         }
 
         /// <summary>
-        /// Verifies leading-zeroes mode none ignores the fourth parameter.
+        /// Verifies padding none ignores the fourth parameter.
         /// </summary>
         [Fact]
-        public void Resolve_LeadingZeroesModeNone_SkipsPadding()
+        public void Resolve_PaddingNone_SkipsPadding()
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 5, inFolderIndex: 0);
 
-            Assert.Equal("15", token.Compile(arg: "10,1,0,99,0")(item));
+            Assert.Equal("15", token.Compile(arg: "10,1,none,99,global")(item));
         }
 
         /// <summary>
-        /// Verifies automatic mode derives width from global list size.
+        /// Verifies automatic padding derives width from global list size.
         /// </summary>
         [Fact]
-        public void Resolve_LeadingZeroesModeAutomaticGlobal_UnifiesWidth()
+        public void Resolve_PaddingAutomaticGlobal_UnifiesWidth()
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(
@@ -81,14 +81,14 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 renameListTotalCount: 100,
                 renameListFolderSiblingCount: 3);
 
-            Assert.Equal("006", token.Compile(arg: "1,1,1,2,0")(item));
+            Assert.Equal("006", token.Compile(arg: "1,1,auto,2,global")(item));
         }
 
         /// <summary>
-        /// Verifies automatic mode with per-folder reset uses folder-local counts.
+        /// Verifies automatic padding with per-folder reset uses folder-local counts.
         /// </summary>
         [Fact]
-        public void Resolve_LeadingZeroesModeAutomaticPerFolder_UnifiesWidthWithinFolder()
+        public void Resolve_PaddingAutomaticPerFolder_UnifiesWidthWithinFolder()
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(
@@ -97,11 +97,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 renameListTotalCount: 100,
                 renameListFolderSiblingCount: 100);
 
-            Assert.Equal("006", token.Compile(arg: "1,1,1,2,1")(item));
+            Assert.Equal("006", token.Compile(arg: "1,1,auto,2,perFolder")(item));
         }
 
         /// <summary>
-        /// Verifies a negative step decrements as expected (mode none).
+        /// Verifies a negative step decrements as expected with padding none.
         /// </summary>
         [Fact]
         public void Resolve_NegativeStep_Decrements()
@@ -109,7 +109,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 3, inFolderIndex: 0);
 
-            Assert.Equal("4", token.Compile(arg: "10,-2,0,0,0")(item));
+            Assert.Equal("4", token.Compile(arg: "10,-2,none,0,global")(item));
         }
 
         /// <summary>
@@ -143,8 +143,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 renameListFolderSiblingCount: 0));
 
             var ex = Assert.Throws<InvalidOperationException>(
-                () => token.Compile(arg: "1,1,1,2,0")(item));
-            Assert.Contains("automatic leading-zero mode", ex.Message);
+                () => token.Compile(arg: "1,1,auto,2,global")(item));
+            Assert.Contains("automatic padding", ex.Message);
         }
 
         /// <summary>
@@ -157,22 +157,22 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<ArgumentException>(
-                () => token.Compile(arg: "1,1,2,0,0")(item));
+                () => token.Compile(arg: "1,1,fixed,0,global")(item));
             Assert.Contains("positive total length", ex.Message);
         }
 
         /// <summary>
-        /// Verifies unknown leading-zeroes-mode throws.
+        /// Verifies unknown padding keyword throws.
         /// </summary>
         [Fact]
-        public void Resolve_InvalidLeadingZeroesMode_Throws()
+        public void Resolve_InvalidPadding_Throws()
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
             var ex = Assert.Throws<ArgumentException>(
-                () => token.Compile(arg: "1,1,9,2,0")(item));
-            Assert.Contains("leading-zeroes-mode", ex.Message);
+                () => token.Compile(arg: "1,1,nope,2,global")(item));
+            Assert.Contains("padding", ex.Message);
         }
     }
 }

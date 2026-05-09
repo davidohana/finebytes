@@ -10,10 +10,10 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
     /// <remarks>
     /// <para>
     /// Splits the resolved <c>source-format-string</c> by <c>separator</c> and extracts the
-    /// 1-based <c>token-number</c> part. When <c>include-next</c> is <c>1</c>, all parts from
-    /// <c>token-number</c> to the end are rejoined. When <c>include-prev</c> is <c>1</c>, all
-    /// parts from the start through <c>token-number</c> are rejoined. When both flags are <c>1</c>
-    /// the full source string is returned.
+    /// 1-based <c>token-number</c> part. <c>include-next</c> and <c>include-prev</c> are <c>true</c> or <c>false</c> (case-insensitive).
+    /// When include-next is true, all parts from <c>token-number</c> to the end are rejoined.
+    /// When include-prev is true, all parts from the start through <c>token-number</c> are rejoined.
+    /// When both are true the full source string is returned.
     /// </para>
     /// <para>
     /// <c>source-format-string</c> may itself be a nested format token such as <c>&lt;full-name&gt;</c>;
@@ -45,7 +45,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
         public Func<RenameItem, string> Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
-            var options = _ParseOptions(arg);
+            var options = _ParseOptions(tokenDisplayName, arg);
             var compiledSource = FormatStringCompiler.Compile(options.SourceFormatString);
             return item =>
             {
@@ -71,9 +71,8 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             };
         }
 
-        private Options _ParseOptions(string arg)
+        private Options _ParseOptions(string tokenDisplayName, string arg)
         {
-            var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             Require.That(!string.IsNullOrEmpty(arg), $"{tokenDisplayName} requires 5 arguments: token-number,separator,include-next,include-prev,source-format-string.", nameof(arg));
 
             var parts = arg.Split(',', 5);
@@ -84,8 +83,8 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
 
             var tokenNumber = int.Parse(parts[0].Trim(), CultureInfo.InvariantCulture);
             var separator = parts[1];
-            var includeNext = parts[2].Trim() == "1";
-            var includePrev = parts[3].Trim() == "1";
+            var includeNext = _ParseIncludeFlag(tokenDisplayName, fieldLabel: "include-next", parts[2]);
+            var includePrev = _ParseIncludeFlag(tokenDisplayName, fieldLabel: "include-prev", parts[3]);
             var sourceFormatString = parts[4];
 
             Require.That(tokenNumber >= 1, $"{tokenDisplayName} token-number must be 1 or greater (got {tokenNumber}).", nameof(arg));
@@ -98,6 +97,19 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
                 IncludeNext: includeNext,
                 IncludePrev: includePrev,
                 SourceFormatString: sourceFormatString);
+        }
+
+        /// <summary>
+        /// Parses an include-next or include-prev flag field (<c>true</c>/<c>false</c>, case-insensitive).
+        /// </summary>
+        private static bool _ParseIncludeFlag(string tokenDisplayName, string fieldLabel, string raw)
+        {
+            if (!bool.TryParse(raw.Trim(), out var value))
+                throw new ArgumentException(
+                    $"{tokenDisplayName} {fieldLabel} '{raw}' is not supported (expected true or false).",
+                    paramName: "arg");
+
+            return value;
         }
     }
 }

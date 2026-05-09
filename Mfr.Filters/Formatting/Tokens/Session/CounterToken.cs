@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using Mfr.Models;
 using Mfr.Utils;
@@ -5,40 +6,55 @@ using Mfr.Utils;
 namespace Mfr.Filters.Formatting.Tokens.Session
 {
     /// <summary>
-    /// Resolves the <c>&lt;counter&gt;</c> token (legacy Magic File Renamer counter parameters).
+    /// Resolves the <c>&lt;counter&gt;</c> token (rename-list index formatting).
     /// </summary>
     /// <remarks>
     /// <para>
     /// Full form:
-    /// <c>&lt;counter:initial-value,increment-by,leading-zeroes-mode,leading-zeroes-total-length,reset-on-folder-change&gt;</c>.
-    /// Bare <c>&lt;counter&gt;</c> is equivalent to <c>&lt;counter:1,1,0,2,0&gt;</c> (no leading zeros;
-    /// fourth value is ignored in that mode).
+    /// <c>&lt;counter:initial-value,increment-by,padding,length,reset-scope&gt;</c>.
+    /// Bare <c>&lt;counter&gt;</c> is equivalent to <c>&lt;counter:1,1,none,2,global&gt;</c> (no leading zeros;
+    /// fourth value is ignored in <c>none</c> padding mode).
     /// </para>
     /// <para>
-    /// <c>leading-zeroes-mode</c>: <c>0</c> = none, <c>1</c> = automatic width from list scope,
-    /// <c>2</c> = fixed width from the fourth parameter (minimum <c>1</c>).
+    /// <c>padding</c>: <c>none</c>, <c>auto</c> (width from list scope), or <c>fixed</c> (pad to <c>length</c>,
+    /// minimum digit width <c>1</c>).
     /// </para>
     /// <para>
-    /// <c>reset-on-folder-change</c>: <c>1</c> uses per-folder ordering index and folder-local list counts;
-    /// <c>0</c> uses global ordering index and total rename-list count.
+    /// <c>reset-scope</c>: <c>global</c> uses rename-list index and total counts;
+    /// <c>perFolder</c> uses per-folder index and sibling counts.
     /// </para>
     /// </remarks>
     internal sealed class CounterToken : IFormatToken
     {
-        private const string DefaultArg = "1,1,0,2,0";
+        /// <summary>
+        /// How <c>&lt;counter&gt;</c> pads numeric output with leading zeros.
+        /// </summary>
+        private enum CounterPaddingMode
+        {
+            /// <summary>No padding.</summary>
+            None,
+
+            /// <summary>Pad to the smallest width that fits all indices in the active list scope.</summary>
+            Auto,
+
+            /// <summary>Pad to <see cref="Options.LeadingZeroesTotalLength"/> digits.</summary>
+            Fixed,
+        }
+
+        private const string DefaultArg = "1,1,none,2,global";
 
         /// <summary>
         /// Parsed arguments for <c>&lt;counter&gt;</c>.
         /// </summary>
         /// <param name="InitialValue">Counter start value.</param>
         /// <param name="IncrementBy">Step applied per index.</param>
-        /// <param name="LeadingZeroesMode"><c>0</c> none, <c>1</c> automatic width, <c>2</c> custom width.</param>
-        /// <param name="LeadingZeroesTotalLength">Minimum digit width when mode is custom.</param>
-        /// <param name="ResetOnFolderChange"><c>1</c> uses per-folder index.</param>
+        /// <param name="PaddingMode">Leading-zero padding behavior.</param>
+        /// <param name="LeadingZeroesTotalLength">Minimum digit width when <paramref name="PaddingMode"/> is <see cref="CounterPaddingMode.Fixed"/>.</param>
+        /// <param name="ResetOnFolderChange"><c>1</c> when reset scope is <c>perFolder</c>; <c>0</c> when <c>global</c>.</param>
         private sealed record Options(
             int InitialValue,
             int IncrementBy,
-            int LeadingZeroesMode,
+            CounterPaddingMode PaddingMode,
             int LeadingZeroesTotalLength,
             int ResetOnFolderChange);
 
@@ -59,7 +75,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                 var raw = value.ToString(CultureInfo.InvariantCulture);
 
                 var padWidth = _ResolvePadWidth(
-                    options.LeadingZeroesMode,
+                    options.PaddingMode,
                     options.LeadingZeroesTotalLength,
                     options.InitialValue,
                     options.IncrementBy,
@@ -77,57 +93,88 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var normalizedArg = string.IsNullOrWhiteSpace(arg) ? DefaultArg : arg;
-            var parts = normalizedArg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            var parts = normalizedArg.Split(',', StringSplitOptions.TrimEntries);
             Require.That(
                 parts.Length == 5,
                 $"Invalid {tokenDisplayName} token arg '{normalizedArg}'. Expected 5 comma-separated params or use '{tokenDisplayName}'.",
                 nameof(arg));
 
+            var paddingMode = _ParsePaddingMode(tokenDisplayName, parts[2]);
+            var resetOnFolderChange = _ParseResetScope(tokenDisplayName, parts[4]);
+
             return new Options(
                 InitialValue: int.Parse(parts[0], CultureInfo.InvariantCulture),
                 IncrementBy: int.Parse(parts[1], CultureInfo.InvariantCulture),
-                LeadingZeroesMode: int.Parse(parts[2], CultureInfo.InvariantCulture),
+                PaddingMode: paddingMode,
                 LeadingZeroesTotalLength: int.Parse(parts[3], CultureInfo.InvariantCulture),
-                ResetOnFolderChange: int.Parse(parts[4], CultureInfo.InvariantCulture));
+                ResetOnFolderChange: resetOnFolderChange);
+        }
+
+        /// <summary>
+        /// Parses the third comma-separated field (padding keyword).
+        /// </summary>
+        private static CounterPaddingMode _ParsePaddingMode(string tokenDisplayName, string raw)
+        {
+            var key = raw.Trim();
+            if (key.Equals("none", StringComparison.OrdinalIgnoreCase))
+                return CounterPaddingMode.None;
+            if (key.Equals("auto", StringComparison.OrdinalIgnoreCase))
+                return CounterPaddingMode.Auto;
+            if (key.Equals("fixed", StringComparison.OrdinalIgnoreCase))
+                return CounterPaddingMode.Fixed;
+
+            throw new ArgumentException(
+                $"{tokenDisplayName} padding '{raw}' is not supported (expected none, auto, or fixed).",
+                paramName: "arg");
+        }
+
+        /// <summary>
+        /// Parses the fifth comma-separated field (reset scope keyword).
+        /// </summary>
+        private static int _ParseResetScope(string tokenDisplayName, string raw)
+        {
+            var key = raw.Trim();
+            if (key.Equals("global", StringComparison.OrdinalIgnoreCase))
+                return 0;
+            if (key.Equals("perFolder", StringComparison.OrdinalIgnoreCase))
+                return 1;
+
+            throw new ArgumentException(
+                $"{tokenDisplayName} reset scope '{raw}' is not supported (expected global or perFolder).",
+                paramName: "arg");
         }
 
         private static int _ResolvePadWidth(
-            int leadingZeroesMode,
+            CounterPaddingMode paddingMode,
             int leadingZeroesTotalLength,
             int start,
             int step,
             RenameItem item,
             bool usePerFolder)
         {
-            Require.That(
-                leadingZeroesMode is >= 0 and <= 2,
-                $"Invalid counter leading-zeroes-mode '{leadingZeroesMode}' (expected 0, 1, or 2).",
-                "arg");
-
-            switch (leadingZeroesMode)
+            switch (paddingMode)
             {
-                case 0:
+                case CounterPaddingMode.None:
                     return 0;
-                case 1:
+                case CounterPaddingMode.Auto:
                     var listCount = usePerFolder
                         ? item.Original.RenameListFolderSiblingCount
                         : item.Original.RenameListTotalCount;
                     Check.That(
                         listCount > 0,
-                        "Counter token automatic leading-zero mode requires rename-list counts on the item (run preview from a populated rename list).");
+                        "Counter token automatic padding requires rename-list counts on the item (run preview from a populated rename list).");
 
                     var maxIndex = Math.Max(listCount - 1, 0);
                     return _AutomaticCounterWidth(start: start, step: step, maxIndex: maxIndex);
-                case 2:
+                case CounterPaddingMode.Fixed:
                     Require.That(
                         leadingZeroesTotalLength >= 1,
-                        $"Counter token custom leading-zero mode requires a positive total length (got {leadingZeroesTotalLength}).",
+                        $"Counter token fixed padding requires a positive total length (got {leadingZeroesTotalLength}).",
                         "arg");
 
                     return leadingZeroesTotalLength;
                 default:
-                    throw new InvalidOperationException(
-                        $"Invalid counter leading-zeroes-mode '{leadingZeroesMode}' (expected 0, 1, or 2).");
+                    throw new UnreachableException();
             }
         }
 

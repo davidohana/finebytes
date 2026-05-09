@@ -3,7 +3,7 @@ using Mfr.Utils;
 namespace Mfr.Filters.Formatting.Tokens
 {
     /// <summary>
-    /// Shared helpers for formatter token argument parsing.
+    /// Shared helpers used by multiple formatter tokens (display labels and common preconditions).
     /// </summary>
     internal static class FormatOptionsParsing
     {

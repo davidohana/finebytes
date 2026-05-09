@@ -179,7 +179,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold",
                 extension: ".mp3");
-            var compiled = FormatStringCompiler.Compile("<substr:1,2,<token:1,-,0,0,<full-name>>>");
+            var compiled = FormatStringCompiler.Compile("<substr:1,2,<token:1,-,false,false,<full-name>>>");
             Assert.Equal("13", compiled(item));
         }
 
@@ -192,7 +192,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void ResolveTemplate_TokenWrappingSubstr_TwoLevels()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "My-Test-File", extension: ".txt");
-            var compiled = FormatStringCompiler.Compile("<token:2,-,0,0,<substr:1,7,<full-name>>>");
+            var compiled = FormatStringCompiler.Compile("<token:2,-,false,false,<substr:1,7,<full-name>>>");
             Assert.Equal("Test", compiled(item));
         }
 

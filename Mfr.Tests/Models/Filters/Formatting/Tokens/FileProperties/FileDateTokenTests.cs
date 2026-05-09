@@ -34,67 +34,80 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
         }
 
         /// <summary>
-        /// Verifies date-type <c>0</c> selects creation date.
+        /// Verifies date kind <c>creation</c> selects creation time.
         /// </summary>
         [Fact]
-        public void Resolve_DateTypeZero_UsesCreation()
+        public void Resolve_DateKindCreation_UsesCreation()
         {
             var token = new FileDateToken();
             var creation = new DateTime(2022, 1, 2, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(creationTime: creation);
 
-            Assert.Equal("2022-01-02", token.Compile(arg: "yyyy-MM-dd,0")(item));
+            Assert.Equal("2022-01-02", token.Compile(arg: "yyyy-MM-dd,creation")(item));
         }
 
         /// <summary>
-        /// Verifies date-type <c>1</c> selects last-write date.
+        /// Verifies date kind <c>lastWrite</c> selects last-write date.
         /// </summary>
         [Fact]
-        public void Resolve_DateTypeOne_UsesLastWrite()
+        public void Resolve_DateKindLastWrite_UsesLastWrite()
         {
             var token = new FileDateToken();
             var lastWrite = new DateTime(2021, 11, 30, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: lastWrite);
 
-            Assert.Equal("2021", token.Compile(arg: "yyyy,1")(item));
+            Assert.Equal("2021", token.Compile(arg: "yyyy,lastWrite")(item));
         }
 
         /// <summary>
-        /// Verifies date-type <c>2</c> selects last-access time.
+        /// Verifies date kind <c>lastAccess</c> selects last-access time.
         /// </summary>
         [Fact]
-        public void Resolve_DateTypeTwo_UsesLastAccess()
+        public void Resolve_DateKindLastAccess_UsesLastAccess()
         {
             var token = new FileDateToken();
             var lastAccess = new DateTime(2020, 1, 15, 9, 5, 3, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: lastAccess);
 
-            Assert.Equal("09-05-03", token.Compile(arg: "HH-mm-ss,2")(item));
+            Assert.Equal("09-05-03", token.Compile(arg: "HH-mm-ss,lastAccess")(item));
         }
 
         /// <summary>
-        /// Verifies an out-of-range date-type throws.
+        /// Verifies lone keyword <c>lastWrite</c> uses default format.
         /// </summary>
         [Fact]
-        public void Resolve_DateTypeOutOfRange_Throws()
+        public void Resolve_KeywordOnlyLastWrite_UsesDefaultFormat()
+        {
+            var token = new FileDateToken();
+            var lastWrite = new DateTime(2023, 4, 7, 0, 0, 0, DateTimeKind.Unspecified);
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: lastWrite);
+
+            Assert.Equal("07-04-2023", token.Compile(arg: "lastWrite")(item));
+        }
+
+        /// <summary>
+        /// Verifies an unknown date kind throws.
+        /// </summary>
+        [Fact]
+        public void Resolve_UnknownDateKind_Throws()
         {
             var token = new FileDateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            Assert.Throws<NotSupportedException>(() => token.Compile(arg: "dd-MM-yyyy,3")(item));
+            Assert.Throws<NotSupportedException>(() => token.Compile(arg: "dd-MM-yyyy,bogus")(item));
         }
 
         /// <summary>
         /// Verifies an empty format part falls back to the default while still honoring the date type.
         /// </summary>
         [Fact]
-        public void Resolve_EmptyFormatWithDateType_UsesDefaultFormat()
+        public void Resolve_EmptyFormatWithDateKind_UsesDefaultFormat()
         {
             var token = new FileDateToken();
             var lastWrite = new DateTime(2023, 4, 7, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: lastWrite);
 
-            Assert.Equal("07-04-2023", token.Compile(arg: ",1")(item));
+            Assert.Equal("07-04-2023", token.Compile(arg: ",lastWrite")(item));
         }
     }
 }
