@@ -5,7 +5,7 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting
 {
     /// <summary>
-    /// Compiles and resolves formatter tokens in template text.
+    /// Compiles formatter template text into a per-item delegate.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -17,13 +17,13 @@ namespace Mfr.Filters.Formatting
     /// <c>Mfr.Filters.Formatting.Tokens.*</c>.
     /// </para>
     /// <para>
-    /// Nesting is resolved at compile time: tokens whose argument contains a nested format string
+    /// Nesting is handled at compile time: tokens whose argument contains a nested format string
     /// (e.g. <c>&lt;substr:1,3,&lt;full-name&gt;&gt;</c>) call <see cref="Compile"/> on that argument
     /// inside their own <see cref="IFormatToken.Compile"/> implementation, so the inner template is
     /// compiled once alongside the outer one.
     /// </para>
     /// </remarks>
-    internal static class FormatStringResolver
+    internal static class FormatStringCompiler
     {
         private static readonly Dictionary<string, IFormatToken> _nameToToken = _DiscoverTokens();
 
@@ -38,7 +38,7 @@ namespace Mfr.Filters.Formatting
         /// </para>
         /// </remarks>
         /// <param name="template">Template text that may contain tokens.</param>
-        /// <returns>A function that resolves all tokens against a <see cref="RenameItem"/>.</returns>
+        /// <returns>A function that produces the fully expanded string for a <see cref="RenameItem"/>.</returns>
         internal static Func<RenameItem, string> Compile(string template)
         {
             var segments = new List<Func<RenameItem, string>>();
@@ -96,21 +96,6 @@ namespace Mfr.Filters.Formatting
         }
 
         /// <summary>
-        /// Resolves all formatter tokens inside <paramref name="template"/> for the given <paramref name="item"/>.
-        /// </summary>
-        /// <remarks>
-        /// Convenience wrapper over <see cref="Compile"/>; callers that process many items should call
-        /// <see cref="Compile"/> once and reuse the returned delegate.
-        /// </remarks>
-        /// <param name="template">Template text that may contain tokens.</param>
-        /// <param name="item">Rename item used to resolve item-aware tokens.</param>
-        /// <returns>Template text with all tokens fully resolved.</returns>
-        internal static string ResolveTemplate(string template, RenameItem item)
-        {
-            return Compile(template)(item);
-        }
-
-        /// <summary>
         /// Scans forward from the opening <c>&lt;</c> at <paramref name="openIndex"/> and returns the
         /// index of the matching closing <c>&gt;</c>, or <c>-1</c> when no balanced close is found.
         /// </summary>
@@ -143,7 +128,7 @@ namespace Mfr.Filters.Formatting
         private static Dictionary<string, IFormatToken> _DiscoverTokens()
         {
             var map = new Dictionary<string, IFormatToken>(StringComparer.Ordinal);
-            var tokenTypes = typeof(FormatStringResolver).Assembly
+            var tokenTypes = typeof(FormatStringCompiler).Assembly
                 .GetTypes()
                 .Where(t => t.IsClass && !t.IsAbstract && typeof(IFormatToken).IsAssignableFrom(t));
 

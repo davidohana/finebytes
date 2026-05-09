@@ -110,7 +110,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             Assert.Equal("a_b_c.txt", _token.Compile("2,_,1,1,a_b_c.txt")(item));
         }
 
-        // ── nested format string via FormatStringResolver ─────────────────────
+        // ── nested format string via FormatStringCompiler ─────────────────────
 
         /// <summary>
         /// Verifies the full nested token form resolves the inner <c>&lt;full-name&gt;</c> token first.
@@ -122,7 +122,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
-            Assert.Equal("13_", FormatStringResolver.ResolveTemplate("<token:1,-,0,0,<full-name>>", item));
+            var compiled = FormatStringCompiler.Compile("<token:1,-,0,0,<full-name>>");
+            Assert.Equal("13_", compiled(item));
         }
 
         /// <summary>
@@ -134,7 +135,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
-            Assert.Equal("Smog", FormatStringResolver.ResolveTemplate("<token:2,_-_,0,0,<full-name>>", item));
+            var compiled = FormatStringCompiler.Compile("<token:2,_-_,0,0,<full-name>>");
+            Assert.Equal("Smog", compiled(item));
         }
 
         /// <summary>
@@ -146,9 +148,10 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
                 extension: ".mp3");
+            var compiled = FormatStringCompiler.Compile("<token:2,_-_,1,0,<full-name>>");
             Assert.Equal(
                 "Smog_-_Cold_Blooded_Old_Times.mp3",
-                FormatStringResolver.ResolveTemplate("<token:2,_-_,1,0,<full-name>>", item));
+                compiled(item));
         }
 
         // ── error cases ───────────────────────────────────────────────────────

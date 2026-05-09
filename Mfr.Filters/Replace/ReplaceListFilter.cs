@@ -41,7 +41,7 @@ namespace Mfr.Filters.Replace
         protected override void _Setup()
         {
             var entries = ReplaceListParser.ParseFile(filePath: Options.FilePath);
-            _compiledEntries = [.. entries.Select(e => (e.Search, FormatStringResolver.Compile(e.Replacement)))];
+            _compiledEntries = [.. entries.Select(e => (e.Search, FormatStringCompiler.Compile(e.Replacement)))];
         }
 
         protected override string _TransformValue(string value, RenameItem item)

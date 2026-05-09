@@ -3,7 +3,7 @@ using Mfr.Models;
 namespace Mfr.Filters.Formatting.Tokens
 {
     /// <summary>
-    /// Contract for a single formatter token (e.g. <c>&lt;file-name&gt;</c>) handled by <see cref="FormatStringResolver"/>.
+    /// Contract for a single formatter token (e.g. <c>&lt;file-name&gt;</c>) handled by <see cref="FormatStringCompiler"/>.
     /// </summary>
     /// <remarks>
     /// <para>

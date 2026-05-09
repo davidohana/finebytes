@@ -61,7 +61,7 @@ namespace Mfr.Filters.Misc
             }
 
             if (!string.IsNullOrEmpty(Options.SubFolder))
-                _compiledSubFolder = FormatStringResolver.Compile(Options.SubFolder);
+                _compiledSubFolder = FormatStringCompiler.Compile(Options.SubFolder);
         }
 
         /// <inheritdoc />

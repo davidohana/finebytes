@@ -27,7 +27,7 @@ namespace Mfr.Filters.Formatting
         /// <inheritdoc />
         protected override void _Setup()
         {
-            _compiledTemplate = FormatStringResolver.Compile(Options.Template);
+            _compiledTemplate = FormatStringCompiler.Compile(Options.Template);
         }
 
         protected override string _TransformValue(string value, RenameItem item)

@@ -47,7 +47,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var options = _ParseOptions(arg);
-            var compiledSource = FormatStringResolver.Compile(options.SourceFormatString);
+            var compiledSource = FormatStringCompiler.Compile(options.SourceFormatString);
             return item =>
             {
                 var source = compiledSource(item);

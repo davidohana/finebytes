@@ -50,7 +50,7 @@ namespace Mfr.Filters.Formatting
         /// <inheritdoc />
         protected override void _Setup()
         {
-            _compiledText = FormatStringResolver.Compile(Options.Text);
+            _compiledText = FormatStringCompiler.Compile(Options.Text);
         }
 
         /// <inheritdoc />

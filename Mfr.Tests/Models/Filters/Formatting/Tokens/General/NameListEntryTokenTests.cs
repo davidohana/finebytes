@@ -155,9 +155,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 """);
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 1);
 
-            var result = FormatStringResolver.ResolveTemplate(
-                template: $"<name-list-entry:{filePath}>",
-                item: item);
+            var compiled = FormatStringCompiler.Compile(
+                template: $"<name-list-entry:{filePath}>");
+            var result = compiled(item);
 
             Assert.Equal("Two", result);
         }

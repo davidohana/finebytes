@@ -41,8 +41,8 @@ namespace Mfr.Filters.Formatting
         protected override void _Setup()
         {
             _entries = NameListParser.ParseFile(filePath: Options.FilePath);
-            _compiledPrefix = FormatStringResolver.Compile(Options.Prefix);
-            _compiledSuffix = FormatStringResolver.Compile(Options.Suffix);
+            _compiledPrefix = FormatStringCompiler.Compile(Options.Prefix);
+            _compiledSuffix = FormatStringCompiler.Compile(Options.Suffix);
         }
 
         /// <summary>

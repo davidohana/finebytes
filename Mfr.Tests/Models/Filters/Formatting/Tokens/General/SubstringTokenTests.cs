@@ -46,7 +46,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_SpecExample3_CrossedPositions_ReturnsCrossedRange()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "MyTestFileName", extension: ".123");
-            Assert.Equal("2345", FormatStringResolver.ResolveTemplate("<substr:-1,2,<file-extension>45>", item));
+            var compiled = FormatStringCompiler.Compile("<substr:-1,2,<file-extension>45>");
+            Assert.Equal("2345", compiled(item));
         }
 
         // ── Positive positions ─────────────────────────────────────────────────
@@ -115,7 +116,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void ResolveTemplate_NestedFileName_ResolvesInnerFirst()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "MyTestFileName", extension: ".123");
-            Assert.Equal("MyTes", FormatStringResolver.ResolveTemplate("<substr:1,5,<file-name>>", item));
+            var compiled = FormatStringCompiler.Compile("<substr:1,5,<file-name>>");
+            Assert.Equal("MyTes", compiled(item));
         }
 
         /// <summary>
@@ -125,7 +127,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void ResolveTemplate_SpecExample2_NestedFullName()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "MyTestFileName", extension: ".123");
-            Assert.Equal("stFileNam", FormatStringResolver.ResolveTemplate("<substr:5,-6,<full-name>>", item));
+            var compiled = FormatStringCompiler.Compile("<substr:5,-6,<full-name>>");
+            Assert.Equal("stFileNam", compiled(item));
         }
 
         // ── Empty source ───────────────────────────────────────────────────────
@@ -149,7 +152,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void ResolveTemplate_SubstrInsideSubstr_TwoLevels()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
-            Assert.Equal("ell", FormatStringResolver.ResolveTemplate("<substr:1,3,<substr:2,5,<full-name>>>", item));
+            var compiled = FormatStringCompiler.Compile("<substr:1,3,<substr:2,5,<full-name>>>");
+            Assert.Equal("ell", compiled(item));
         }
 
         /// <summary>
@@ -160,7 +164,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void ResolveTemplate_SubstrInsideSubstrInsideSubstr_ThreeLevels()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
-            Assert.Equal("el", FormatStringResolver.ResolveTemplate("<substr:1,2,<substr:1,3,<substr:2,5,<full-name>>>>", item));
+            var compiled = FormatStringCompiler.Compile("<substr:1,2,<substr:1,3,<substr:2,5,<full-name>>>>");
+            Assert.Equal("el", compiled(item));
         }
 
         /// <summary>
@@ -174,7 +179,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold",
                 extension: ".mp3");
-            Assert.Equal("13", FormatStringResolver.ResolveTemplate("<substr:1,2,<token:1,-,0,0,<full-name>>>", item));
+            var compiled = FormatStringCompiler.Compile("<substr:1,2,<token:1,-,0,0,<full-name>>>");
+            Assert.Equal("13", compiled(item));
         }
 
         /// <summary>
@@ -186,7 +192,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void ResolveTemplate_TokenWrappingSubstr_TwoLevels()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "My-Test-File", extension: ".txt");
-            Assert.Equal("Test", FormatStringResolver.ResolveTemplate("<token:2,-,0,0,<substr:1,7,<full-name>>>", item));
+            var compiled = FormatStringCompiler.Compile("<token:2,-,0,0,<substr:1,7,<full-name>>>");
+            Assert.Equal("Test", compiled(item));
         }
 
         // ── Error cases ───────────────────────────────────────────────────────
