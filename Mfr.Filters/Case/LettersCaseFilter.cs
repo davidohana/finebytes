@@ -168,7 +168,7 @@ namespace Mfr.Filters.Case
                 if (!char.IsLetter(c))
                     continue;
 
-                var itemSeed = weirdFixedPlaces ? 0 : item.Original.GlobalIndex;
+                var itemSeed = weirdFixedPlaces ? 0 : item.Original.RenameListIndex;
                 var score = _GetPseudoRandomPercent(position: i, itemSeed: itemSeed);
                 chars[i] = score < uppercaseChancePercent
                     ? char.ToUpperInvariant(c)

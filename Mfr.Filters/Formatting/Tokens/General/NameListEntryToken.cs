@@ -8,7 +8,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
     /// <remarks>
     /// <para>
     /// The token reads one line from the provided text file using the item's zero-based
-    /// <see cref="FileMeta.GlobalIndex"/> as the line index.
+    /// <see cref="FileMeta.RenameListIndex"/> as the line index.
     /// </para>
     /// <para>
     /// When the rename-list index exceeds the number of parsed entries in the file, resolution fails
@@ -45,7 +45,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var options = _ParseOptions(arg);
             var entries = _GetEntries(options.NameListFilePath);
-            var index = item.Original.GlobalIndex;
+            var index = item.Original.RenameListIndex;
             if (index < 0)
                 throw new InvalidOperationException(
                     $"{tokenDisplayName} requires non-negative global index (got {index}).");

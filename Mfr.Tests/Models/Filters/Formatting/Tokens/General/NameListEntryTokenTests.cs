@@ -31,7 +31,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 Second
                 Third
                 """);
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 1);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 1);
 
             var result = token.Resolve(arg: filePath, item: item);
 
@@ -51,7 +51,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
 
                 Gamma
                 """);
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 1);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 1);
 
             var result = token.Resolve(arg: filePath, item: item);
 
@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 A
                 B
                 """);
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 4);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 4);
 
             var ex = Assert.Throws<UserException>(() => token.Resolve(arg: filePath, item: item));
 
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         {
             var token = new NameListEntryToken();
             var filePath = _CreateFile(string.Empty);
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 0);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
 
             var ex = Assert.Throws<UserException>(() => token.Resolve(arg: filePath, item: item));
 
@@ -104,7 +104,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 //first
                 second
                 """);
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 0);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
 
             var result = token.Resolve(arg: filePath, item: item);
 
@@ -153,7 +153,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
                 One
                 Two
                 """);
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 1);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 1);
 
             var result = FormatStringResolver.ResolveTemplate(
                 template: $"<name-list-entry:{filePath}>",

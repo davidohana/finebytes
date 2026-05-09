@@ -50,7 +50,7 @@ namespace Mfr.Filters.Formatting.Tokens.General
         {
             var options = _ParseOptions(arg);
             var usePerFolder = options.ResetOnFolderChange == 1;
-            var n = usePerFolder ? item.Original.InFolderIndex : item.Original.GlobalIndex;
+            var n = usePerFolder ? item.Original.InFolderIndex : item.Original.RenameListIndex;
             var value = options.InitialValue + ((long)options.IncrementBy * n);
             var raw = value.ToString(CultureInfo.InvariantCulture);
 

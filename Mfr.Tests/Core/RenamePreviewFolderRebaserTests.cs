@@ -152,7 +152,7 @@ namespace Mfr.Tests.Core
         private static RenameItem _CreateItem(string fullPath, FileAttributes attributes)
         {
             var meta = new FileMeta(
-                globalIndex: 0,
+                renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: Path.GetDirectoryName(fullPath)!,
                 prefix: Path.GetFileNameWithoutExtension(fullPath),

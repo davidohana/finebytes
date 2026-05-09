@@ -96,8 +96,8 @@ namespace Mfr.Tests.Models.Filters.Case
                     SkipWords: [],
                     WeirdUppercaseChancePercent: 50,
                     WeirdFixedPlaces: true));
-            var a = FilterTestHelpers.ApplyToPrefix(f, "abcdefgh", globalIndex: 0);
-            var b = FilterTestHelpers.ApplyToPrefix(f, "qrstuvwx", globalIndex: 999);
+            var a = FilterTestHelpers.ApplyToPrefix(f, "abcdefgh", renameListIndex: 0);
+            var b = FilterTestHelpers.ApplyToPrefix(f, "qrstuvwx", renameListIndex: 999);
 
             Assert.Equal(
                 _BuildUpperMask(a),

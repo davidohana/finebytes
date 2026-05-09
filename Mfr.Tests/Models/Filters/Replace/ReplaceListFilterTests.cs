@@ -106,11 +106,11 @@ namespace Mfr.Tests.Models.Filters.Replace
                 var first = FilterTestHelpers.ApplyToPrefix(
                     filter: filter,
                     inputPrefix: "01.-.Blue.Train",
-                    globalIndex: 0);
+                    renameListIndex: 0);
                 var second = FilterTestHelpers.ApplyToPrefix(
                     filter: filter,
                     inputPrefix: "02.-.A.Moment's.Notice",
-                    globalIndex: 1);
+                    renameListIndex: 1);
 
                 Assert.Equal("10_-_Blue_Trbin", first);
                 Assert.Equal("11_-_b_Moment's_Notice", second);

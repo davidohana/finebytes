@@ -3,7 +3,7 @@ namespace Mfr.Models
     /// <summary>
     /// Lightweight file metadata used during rename planning and execution.
     /// </summary>
-    /// <param name="globalIndex">Zero-based index across all scanned files.</param>
+    /// <param name="renameListIndex">Zero-based index across all scanned files.</param>
     /// <param name="inFolderIndex">Zero-based index within the parent folder.</param>
     /// <param name="directoryPath">Absolute path to the parent directory.</param>
     /// <param name="prefix">File name without extension.</param>
@@ -16,7 +16,7 @@ namespace Mfr.Models
     /// <param name="renameListTotalCount">Rename-list length when snapshot was taken; used by <c>&lt;counter&gt;</c> automatic padding.</param>
     /// <param name="renameListFolderSiblingCount">Rename-list items sharing this directory; used when counter resets per folder.</param>
     public sealed class FileMeta(
-        int globalIndex,
+        int renameListIndex,
         int inFolderIndex,
         string directoryPath,
         string prefix,
@@ -32,7 +32,7 @@ namespace Mfr.Models
         /// <summary>
         /// Gets or sets the zero-based index across all scanned files.
         /// </summary>
-        public int GlobalIndex { get; set; } = globalIndex;
+        public int RenameListIndex { get; set; } = renameListIndex;
 
         /// <summary>
         /// Gets or sets the zero-based index within the parent folder.
@@ -112,7 +112,7 @@ namespace Mfr.Models
         public FileMeta Clone()
         {
             return new FileMeta(
-                globalIndex: GlobalIndex,
+                renameListIndex: RenameListIndex,
                 inFolderIndex: InFolderIndex,
                 directoryPath: DirectoryPath,
                 prefix: Prefix,

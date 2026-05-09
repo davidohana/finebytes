@@ -26,7 +26,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_DefaultHelperTotals_MatchesDerivedListLength()
         {
             var token = new ItemCountToken();
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 4);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 4);
 
             Assert.Equal("5", token.Resolve(arg: "", item: item));
         }

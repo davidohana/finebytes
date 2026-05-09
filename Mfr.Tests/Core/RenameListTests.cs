@@ -80,7 +80,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(
                 [betaPath, alphaPath, gammaPath, _tempRoot],
                 entries.Select(e => e.Original.FullPath));
-            Assert.Equal([0, 1, 2, 3], entries.Select(e => e.Original.GlobalIndex));
+            Assert.Equal([0, 1, 2, 3], entries.Select(e => e.Original.RenameListIndex));
             Assert.Equal([0, 1, 2, 0], entries.Select(e => e.Original.InFolderIndex));
             Assert.Equal(["beta", "alpha", "gamma", tempRootName], entries.Select(e => e.Original.Prefix));
             Assert.Equal([".log", ".txt", ".txt", ""], entries.Select(e => e.Original.Extension));
@@ -157,12 +157,12 @@ namespace Mfr.Tests.Core
 
             Assert.Single(excludedHidden);
             Assert.Equal(visiblePath, excludedHidden[0].Original.FullPath);
-            Assert.Equal(0, excludedHidden[0].Original.GlobalIndex);
+            Assert.Equal(0, excludedHidden[0].Original.RenameListIndex);
             Assert.Equal(0, excludedHidden[0].Original.InFolderIndex);
 
             Assert.Equal(2, includedHidden.Count);
             Assert.Equal([hiddenPath, visiblePath], includedHidden.Select(x => x.Original.FullPath));
-            Assert.Equal([0, 1], includedHidden.Select(x => x.Original.GlobalIndex));
+            Assert.Equal([0, 1], includedHidden.Select(x => x.Original.RenameListIndex));
             Assert.Equal([0, 1], includedHidden.Select(x => x.Original.InFolderIndex));
         }
 

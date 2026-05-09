@@ -25,9 +25,9 @@ namespace Mfr.Tests.Models.Filters.Formatting
             try
             {
                 var f = _CreateFilter(path);
-                Assert.Equal("Alpha", FilterTestHelpers.ApplyToPrefix(f, "old0", globalIndex: 0));
-                Assert.Equal("Beta", FilterTestHelpers.ApplyToPrefix(f, "old1", globalIndex: 1));
-                Assert.Equal("Gamma", FilterTestHelpers.ApplyToPrefix(f, "old2", globalIndex: 2));
+                Assert.Equal("Alpha", FilterTestHelpers.ApplyToPrefix(f, "old0", renameListIndex: 0));
+                Assert.Equal("Beta", FilterTestHelpers.ApplyToPrefix(f, "old1", renameListIndex: 1));
+                Assert.Equal("Gamma", FilterTestHelpers.ApplyToPrefix(f, "old2", renameListIndex: 2));
             }
             finally
             {
@@ -50,7 +50,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                         FilePath: path,
                         Prefix: "<counter:10,1,0,2,0>_",
                         Suffix: "_end"));
-                Assert.Equal("10_One_end", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 0));
+                Assert.Equal("10_One_end", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
             }
             finally
             {
@@ -73,9 +73,9 @@ namespace Mfr.Tests.Models.Filters.Formatting
             try
             {
                 var f = _CreateFilter(path);
-                Assert.Equal("First", FilterTestHelpers.ApplyToPrefix(f, "a", globalIndex: 0));
-                Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "b", globalIndex: 1));
-                Assert.Equal("Second", FilterTestHelpers.ApplyToPrefix(f, "c", globalIndex: 2));
+                Assert.Equal("First", FilterTestHelpers.ApplyToPrefix(f, "a", renameListIndex: 0));
+                Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "b", renameListIndex: 1));
+                Assert.Equal("Second", FilterTestHelpers.ApplyToPrefix(f, "c", renameListIndex: 2));
             }
             finally
             {
@@ -98,9 +98,9 @@ namespace Mfr.Tests.Models.Filters.Formatting
             try
             {
                 var f = _CreateFilter(path);
-                Assert.Equal("A", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 0));
-                Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 1));
-                Assert.Equal("B", FilterTestHelpers.ApplyToPrefix(f, "x", globalIndex: 2));
+                Assert.Equal("A", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
+                Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 1));
+                Assert.Equal("B", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 2));
             }
             finally
             {
@@ -119,7 +119,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             {
                 var f = _CreateFilter(path);
                 var ex = Assert.Throws<UserException>(() =>
-                    FilterTestHelpers.ApplyToPrefix(f, "old", globalIndex: 1));
+                    FilterTestHelpers.ApplyToPrefix(f, "old", renameListIndex: 1));
                 Assert.Contains("Name-list has", ex.Message, StringComparison.Ordinal);
             }
             finally
@@ -144,8 +144,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
             try
             {
                 var f = _CreateFilter(path);
-                Assert.Equal("Real1", FilterTestHelpers.ApplyToPrefix(f, "a", globalIndex: 0));
-                Assert.Equal("Real2", FilterTestHelpers.ApplyToPrefix(f, "b", globalIndex: 1));
+                Assert.Equal("Real1", FilterTestHelpers.ApplyToPrefix(f, "a", renameListIndex: 0));
+                Assert.Equal("Real2", FilterTestHelpers.ApplyToPrefix(f, "b", renameListIndex: 1));
             }
             finally
             {

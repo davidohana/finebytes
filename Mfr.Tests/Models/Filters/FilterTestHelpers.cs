@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters
         /// </summary>
         /// <param name="prefix">File name without extension.</param>
         /// <param name="extension">Extension including the leading dot.</param>
-        /// <param name="globalIndex">Zero-based index across all files.</param>
+        /// <param name="renameListIndex">Zero-based index across all files.</param>
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
         /// <param name="directory">Parent directory path, or a default when null.</param>
         /// <param name="attributes">Filesystem attributes for the synthetic item.</param>
@@ -19,7 +19,7 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="fileSize">File size in bytes; defaults to 0.</param>
         /// <param name="renameListTotalCount">
         /// Rename-list length for <c>&lt;counter&gt;</c> automatic padding; when <c>null</c>, uses
-        /// <c>max(globalIndex + 1, 1)</c>.
+        /// <c>max(renameListIndex + 1, 1)</c>.
         /// </param>
         /// <param name="renameListFolderSiblingCount">
         /// Same-folder rename-list size for per-folder counter padding; when <c>null</c>, uses
@@ -29,7 +29,7 @@ namespace Mfr.Tests.Models.Filters
         public static RenameItem CreateRenameItem(
             string prefix = "track",
             string extension = ".mp3",
-            int globalIndex = 0,
+            int renameListIndex = 0,
             int inFolderIndex = 0,
             string? directory = null,
             FileAttributes attributes = FileAttributes.Normal,
@@ -42,10 +42,10 @@ namespace Mfr.Tests.Models.Filters
         {
             directory ??= @"C:\Music\Album";
             var baseline = new DateTime(2024, 6, 1, 12, 30, 45, DateTimeKind.Unspecified);
-            var resolvedTotal = renameListTotalCount ?? Math.Max(globalIndex + 1, 1);
+            var resolvedTotal = renameListTotalCount ?? Math.Max(renameListIndex + 1, 1);
             var resolvedFolder = renameListFolderSiblingCount ?? Math.Max(inFolderIndex + 1, 1);
             return new RenameItem(new FileMeta(
-                globalIndex,
+                renameListIndex,
                 inFolderIndex,
                 directory,
                 prefix,
@@ -65,7 +65,7 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="filter">Filter to apply.</param>
         /// <param name="inputPrefix">Input prefix used for the test item.</param>
         /// <param name="extension">Input extension used for the test item.</param>
-        /// <param name="globalIndex">Zero-based index across all files.</param>
+        /// <param name="renameListIndex">Zero-based index across all files.</param>
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
         /// <param name="directory">Parent directory path, or a default when null.</param>
         /// <returns>The resulting preview prefix after applying the filter.</returns>
@@ -73,11 +73,11 @@ namespace Mfr.Tests.Models.Filters
             BaseFilter filter,
             string inputPrefix,
             string extension = ".mp3",
-            int globalIndex = 0,
+            int renameListIndex = 0,
             int inFolderIndex = 0,
             string? directory = null)
         {
-            var item = CreateRenameItem(inputPrefix, extension, globalIndex, inFolderIndex, directory);
+            var item = CreateRenameItem(inputPrefix, extension, renameListIndex, inFolderIndex, directory);
             filter.Setup();
             filter.Apply(item);
             return item.Preview.Prefix;
@@ -89,7 +89,7 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="filter">Filter to apply.</param>
         /// <param name="inputPrefix">Input prefix used for the test item.</param>
         /// <param name="extension">Input extension used for the test item.</param>
-        /// <param name="globalIndex">Zero-based index across all files.</param>
+        /// <param name="renameListIndex">Zero-based index across all files.</param>
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
         /// <param name="directory">Parent directory path, or a default when null.</param>
         /// <returns>The rename item after <see cref="BaseFilter.Setup"/> + <see cref="BaseFilter.Apply"/>.</returns>
@@ -97,11 +97,11 @@ namespace Mfr.Tests.Models.Filters
             BaseFilter filter,
             string inputPrefix,
             string extension = ".mp3",
-            int globalIndex = 0,
+            int renameListIndex = 0,
             int inFolderIndex = 0,
             string? directory = null)
         {
-            var item = CreateRenameItem(inputPrefix, extension, globalIndex, inFolderIndex, directory);
+            var item = CreateRenameItem(inputPrefix, extension, renameListIndex, inFolderIndex, directory);
             filter.Setup();
             filter.Apply(item);
             return item;

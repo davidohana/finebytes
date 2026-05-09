@@ -167,7 +167,7 @@ namespace Mfr.Tests.Core
             var prefix = Path.GetFileNameWithoutExtension(fileName);
             var extension = Path.GetExtension(fileName);
             var meta = new FileMeta(
-                globalIndex: 0,
+                renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
                 prefix: prefix,
@@ -180,7 +180,7 @@ namespace Mfr.Tests.Core
         private static RenameItem _CreateDirectoryItem(string directoryPath, string folderName)
         {
             var meta = new FileMeta(
-                globalIndex: 0,
+                renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
                 prefix: folderName,
@@ -199,7 +199,7 @@ namespace Mfr.Tests.Core
                 ? FileAttributes.Normal
                 : FileAttributes.Directory;
             var meta = new FileMeta(
-                globalIndex: 0,
+                renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
                 prefix: prefix,

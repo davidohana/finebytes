@@ -81,7 +81,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var f = new InserterFilter(
                 _target,
                 new InserterOptions(Text: "_<file-name>_", Position: 1, StartFrom: InserterOrigin.Beginning, Overwrite: false));
-            Assert.Equal("_new_new", FilterTestHelpers.ApplyToPrefix(f, "new", globalIndex: 0));
+            Assert.Equal("_new_new", FilterTestHelpers.ApplyToPrefix(f, "new", renameListIndex: 0));
         }
     }
 }

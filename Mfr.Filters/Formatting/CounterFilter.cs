@@ -48,7 +48,7 @@ namespace Mfr.Filters.Formatting
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var n = Options.ResetPerFolder ? item.Original.InFolderIndex : item.Original.GlobalIndex;
+            var n = Options.ResetPerFolder ? item.Original.InFolderIndex : item.Original.RenameListIndex;
             var counter = Options.Start + ((long)Options.Step * n);
 
             var pad = Options.PadChar switch

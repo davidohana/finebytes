@@ -11,7 +11,7 @@ namespace Mfr.Filters.Formatting
         /// Parses name-list entries from a text file (UTF-8, same as other list file parsers).
         /// </summary>
         /// <param name="filePath">Path to the name-list file.</param>
-        /// <returns>Ordered entries; index <c>k</c> maps to rename item <see cref="FileMeta.GlobalIndex"/> <c>k</c>.</returns>
+        /// <returns>Ordered entries; index <c>k</c> maps to rename item <see cref="FileMeta.RenameListIndex"/> <c>k</c>.</returns>
         internal static IReadOnlyList<string> ParseFile(string filePath)
         {
             ListFileParseHelpers.ValidateListFilePath(filePath, listKindLabel: "Name-list");

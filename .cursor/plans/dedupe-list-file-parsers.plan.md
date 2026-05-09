@@ -22,7 +22,7 @@
 
 ## What stays format-specific
 
-- NameList: skip empty lines, index mapping to `GlobalIndex`, “at least one name entry”.
+- NameList: skip empty lines, index mapping to `RenameListIndex`, “at least one name entry”.
 - CasingList: one word per line, last duplicate wins, dictionary output.
 - ReplaceList: `S:`/`R:` pairs, `<EMPTY>`, pair ordering, replace-specific length cap if kept stricter than the global max.
 

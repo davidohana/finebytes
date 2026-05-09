@@ -15,7 +15,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_EmptyArg_DefaultsToLegacySimpleForm()
         {
             var token = new CounterToken();
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 0);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
 
             Assert.Equal("1", token.Resolve(arg: "", item: item));
             Assert.Equal("1", token.Resolve(arg: "1,1,0,2,0", item: item));
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_ResetOnFolderOne_UsesInFolderIndex()
         {
             var token = new CounterToken();
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 2, inFolderIndex: 7);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 2, inFolderIndex: 7);
 
             Assert.Equal("17", token.Resolve(arg: "10,1,0,2,1", item: item));
         }
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_ResetOff_UsesGlobalIndex()
         {
             var token = new CounterToken();
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 2, inFolderIndex: 7);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 2, inFolderIndex: 7);
 
             Assert.Equal("12", token.Resolve(arg: "10,1,0,2,0", item: item));
         }
@@ -52,7 +52,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_LeadingZeroesModeCustom_PadsWithZeros()
         {
             var token = new CounterToken();
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 0, inFolderIndex: 0);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0, inFolderIndex: 0);
 
             Assert.Equal("0007", token.Resolve(arg: "7,1,2,4,0", item: item));
         }
@@ -64,7 +64,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_LeadingZeroesModeNone_SkipsPadding()
         {
             var token = new CounterToken();
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 5, inFolderIndex: 0);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 5, inFolderIndex: 0);
 
             Assert.Equal("15", token.Resolve(arg: "10,1,0,99,0", item: item));
         }
@@ -77,7 +77,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(
-                globalIndex: 5,
+                renameListIndex: 5,
                 renameListTotalCount: 100,
                 renameListFolderSiblingCount: 3);
 
@@ -92,7 +92,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         {
             var token = new CounterToken();
             var item = FilterTestHelpers.CreateRenameItem(
-                globalIndex: 50,
+                renameListIndex: 50,
                 inFolderIndex: 5,
                 renameListTotalCount: 100,
                 renameListFolderSiblingCount: 100);
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         public void Resolve_NegativeStep_Decrements()
         {
             var token = new CounterToken();
-            var item = FilterTestHelpers.CreateRenameItem(globalIndex: 3, inFolderIndex: 0);
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 3, inFolderIndex: 0);
 
             Assert.Equal("4", token.Resolve(arg: "10,-2,0,0,0", item: item));
         }
@@ -134,7 +134,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.General
         {
             var token = new CounterToken();
             var item = new RenameItem(new FileMeta(
-                globalIndex: 0,
+                renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: @"C:\Music\Album",
                 prefix: "x",

@@ -17,7 +17,7 @@ namespace Mfr.Filters.Formatting
     /// Replaces the target field with the name-list line matching the item's list position, with optional prefix and suffix templates.
     /// </summary>
     /// <remarks>
-    /// Entry index <c>k</c> in the loaded list applies to the rename item whose <see cref="FileMeta.GlobalIndex"/> is <c>k</c> (zero-based).
+    /// Entry index <c>k</c> in the loaded list applies to the rename item whose <see cref="FileMeta.RenameListIndex"/> is <c>k</c> (zero-based).
     /// This matches a column exported via Export Name List edited in-place.
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
@@ -52,7 +52,7 @@ namespace Mfr.Filters.Formatting
             _ = value;
             var entries = _entries
                 ?? throw new InvalidOperationException("Name-list setup must complete before transform.");
-            var index = item.Original.GlobalIndex;
+            var index = item.Original.RenameListIndex;
             if (index < 0 || index >= entries.Count)
             {
                 throw new UserException(

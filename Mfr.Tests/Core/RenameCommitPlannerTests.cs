@@ -181,7 +181,7 @@ namespace Mfr.Tests.Core
         private static RenameItem _CreateFileItem(string directoryPath, string fileName)
         {
             var meta = new FileMeta(
-                globalIndex: 0,
+                renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
                 prefix: Path.GetFileNameWithoutExtension(fileName),
@@ -193,7 +193,7 @@ namespace Mfr.Tests.Core
         private static RenameItem _CreateDirectoryItem(string directoryPath, string folderName)
         {
             var meta = new FileMeta(
-                globalIndex: 0,
+                renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
                 prefix: folderName,

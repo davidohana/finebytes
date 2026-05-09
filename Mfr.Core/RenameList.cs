@@ -283,9 +283,9 @@ namespace Mfr.Core
                 var inFolderIndex = _folderPathToCount.GetValueOrDefault(directoryPath);
                 _folderPathToCount[directoryPath] = inFolderIndex + 1;
 
-                var globalIndex = _renameItems.Count;
+                var renameListIndex = _renameItems.Count;
                 var fileMeta = new FileMeta(
-                    globalIndex: globalIndex,
+                    renameListIndex: renameListIndex,
                     inFolderIndex: inFolderIndex,
                     directoryPath: directoryPath,
                     prefix: prefix,
