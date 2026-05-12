@@ -165,14 +165,15 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
         public void Resolve_AutomaticWithoutListCounts_Throws()
         {
             var token = new CounterToken();
-            var item = new RenameItem(new FileMeta(
-                renameListIndex: 0,
-                inFolderIndex: 0,
-                directoryPath: @"C:\Music\Album",
-                prefix: "x",
-                extension: ".mp3",
-                renameListTotalCount: 0,
-                renameListFolderSiblingCount: 0));
+            var item = new RenameItem(
+                new FileMeta(
+                    renameListIndex: 0,
+                    inFolderIndex: 0,
+                    directoryPath: @"C:\Music\Album",
+                    prefix: "x",
+                    extension: ".mp3",
+                    renameListTotalCount: 0,
+                    renameListFolderSiblingCount: 0));
 
             var ex = Assert.Throws<InvalidOperationException>(
                 () => token.Compile(arg: "initial=1,step=1,padding=auto,length=2,resetScope=global")(item));

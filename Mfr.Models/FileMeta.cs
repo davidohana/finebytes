@@ -110,7 +110,7 @@ namespace Mfr.Models
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Populated when a file row is appended through <c>Mfr.Core.RenameList</c> ingest (deterministic read at add time).
+        /// Not populated at ingest. <see cref="RenameItem.AudioTagReader"/> returns TagLib overlays on demand; overlays clear after rename-list commit so later previews reload from disk.
         /// Stays empty for directories and unsupported or unreadable files.
         /// </para>
         /// </remarks>

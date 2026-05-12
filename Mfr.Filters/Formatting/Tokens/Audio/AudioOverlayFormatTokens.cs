@@ -18,7 +18,11 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
         {
             FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
 
-            return item => resolvePreview(item.Preview.AudioTags);
+            return item =>
+            {
+                item.EnsureAudioTagsLoaded();
+                return resolvePreview(item.Preview.AudioTags);
+            };
         }
 
         internal static string InvariantUintOrEmpty(uint? value)

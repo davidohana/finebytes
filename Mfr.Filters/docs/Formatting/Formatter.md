@@ -23,7 +23,7 @@ Replaces the **entire target segment** with the result of expanding a **template
 
 #### Audio tags (canonical overlay)
 
-Reads from **`Preview.AudioTags`** (TagLib-loaded metadata filled when rows are appended through **`RenameList`**). **Contrast:** file-name tokens use **`Original`** paths; audio tokens deliberately use **preview** so later filters can mutate tags before a formatter runs.
+Reads from **`Preview.AudioTags`**. Tag-backed fields load from disk (**`AudioTagPersistence`**) **on first `audio-*` token use** for that rename row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Contrast:** file-name tokens use **`Original`** paths; audio tokens deliberately use **preview** so later filters can mutate tags before a formatter runs.
 
 | Token | Output |
 |--------|--------|
@@ -45,7 +45,7 @@ Reads from **`Preview.AudioTags`** (TagLib-loaded metadata filled when rows are 
 
 **Arguments:** Unlike some design-draft examples (**`:0`** suffixes), these tokens accept **no** argument (`<audio-title>` only). A stray **`<audio-title:…>`** fails at compile with a formatter error listing the token name.
 
-**Rows without tag data:** Folders never load tags on ingest; unreadable/non-audio files keep the **default overlay**. All audio tokens yield **empty** output (no exception).
+**Rows without tag data:** Folders skip disk reads for tags; unreadable/non-audio files keep the **default overlay** after an attempted load. All audio tokens yield **empty** output (no exception).
 
 **Not implemented yet:** stream-only properties often shown in specs as `<audio-duration:…>`, `<audio-bitrate:…>`, `<audio-channels:…>`, `<audio-bpm>`—they require data beyond **`AudioTagOverlay`**.
 

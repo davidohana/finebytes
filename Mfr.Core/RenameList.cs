@@ -195,6 +195,12 @@ namespace Mfr.Core
             {
                 item.ClearPreview();
             }
+
+            foreach (var item in _renameItems)
+            {
+                item.ClearAudioTagsCache();
+            }
+
             _commitPlan = null;
 
             var commitOkCount = results.Count(item => item.Status == RenameStatus.CommitOk);
@@ -297,14 +303,7 @@ namespace Mfr.Core
                     lastAccessTime: File.GetLastAccessTime(fullPath),
                     fileSize: isDirectory ? 0 : new FileInfo(fullPath).Length);
 
-                if (!isDirectory)
-                {
-                    var loadedAudioTags = AudioTagPersistence.Read(fullPath);
-                    if (loadedAudioTags is not null)
-                        originalFileMeta.AudioTags = loadedAudioTags;
-                }
-
-                var renameItem = new RenameItem(originalFileMeta);
+                var renameItem = new RenameItem(originalFileMeta, AudioTagPersistence.Read);
                 _renameItems.Add(renameItem);
                 addedCount++;
             }

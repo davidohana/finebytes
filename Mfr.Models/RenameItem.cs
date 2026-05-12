@@ -48,18 +48,17 @@ namespace Mfr.Models
     /// <summary>
     /// Represents one rename candidate with original and preview metadata.
     /// </summary>
-    /// <param name="original">Original immutable file snapshot.</param>
-    public sealed class RenameItem(FileMeta original)
+    public sealed class RenameItem
     {
         /// <summary>
         /// Gets the original immutable file snapshot.
         /// </summary>
-        public FileMeta Original { get; internal set; } = original;
+        public FileMeta Original { get; internal set; }
 
         /// <summary>
         /// Gets the current preview snapshot after filter application.
         /// </summary>
-        public FileMeta Preview { get; private set; } = original.Clone();
+        public FileMeta Preview { get; private set; }
 
         /// <summary>
         /// Gets the latest error captured while generating preview for this item.
@@ -89,6 +88,71 @@ namespace Mfr.Models
         /// <c>SentenceEndCharacters</c> filter runs.
         /// </summary>
         internal string SentenceEndChars { get; set; } = ".!?";
+
+        private bool _audioTagsLoadAttempted;
+
+        /// <summary>Delegates reading embedded tags by absolute path.</summary>
+        /// <remarks>
+        /// <para>
+        /// Called with <see cref="FileMeta.FullPath"/> of <see cref="Original"/> for file rows where <see cref="EnsureAudioTagsLoaded"/> invokes it; directory rows skip the call.
+        /// Returning <see langword="null"/> keeps the default overlay on <see cref="Original"/>; a non-null overlay is cloned into snapshots.
+        /// </para>
+        /// </remarks>
+        internal AudioTagReader AudioTagReader { get; }
+
+        /// <summary>
+        /// Initializes a rename item with original metadata and optional embedded-tag disk reader delegate.
+        /// </summary>
+        /// <param name="original">Original immutable file snapshot.</param>
+        /// <param name="audioTagReader">
+        /// Maps an absolute filesystem path to an overlay; invoked from <see cref="EnsureAudioTagsLoaded"/>.
+        /// When omitted or <see langword="null"/>, uses no disk reads and yields <see langword="null"/> overlays.
+        /// </param>
+        public RenameItem(FileMeta original, AudioTagReader? audioTagReader = null)
+        {
+            Original = original;
+            Preview = original.Clone();
+            AudioTagReader = audioTagReader ?? AudioTagReaders.NullReader;
+        }
+
+        /// <summary>
+        /// Loads embedded tags from disk via <see cref="AudioTagReader"/> when not cached, until <see cref="ClearAudioTagsCache"/>.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Skips invoking <see cref="AudioTagReader"/> for directory rows. When it returns tags,
+        /// copies them into <see cref="Original"/><c>.AudioTags</c> then mirrors into <see cref="Preview"/><c>.AudioTags</c>
+        /// so previews match ClearPreview-derived preview metadata.
+        /// </para>
+        /// </remarks>
+        internal void EnsureAudioTagsLoaded()
+        {
+            if (_audioTagsLoadAttempted)
+                return;
+
+            _audioTagsLoadAttempted = true;
+
+            var isDirectory = Original.Attributes.IsDirectory();
+            if (!isDirectory)
+            {
+                var overlay = AudioTagReader(Original.FullPath);
+                if (overlay is not null)
+                {
+                    Original.AudioTags = overlay.Clone();
+                    Preview.AudioTags = Original.AudioTags.Clone();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clears overlays and resets load state after commit so subsequent previews reload from disk.
+        /// </summary>
+        internal void ClearAudioTagsCache()
+        {
+            _audioTagsLoadAttempted = false;
+            Original.AudioTags = new AudioTagOverlay();
+            Preview.AudioTags = new AudioTagOverlay();
+        }
 
         /// <summary>
         /// Resets transient preview/commit state for a fresh processing cycle.

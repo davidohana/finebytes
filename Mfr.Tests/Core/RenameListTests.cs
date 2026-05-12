@@ -1,7 +1,9 @@
 using Mfr.Core;
+using Mfr.Filters.Formatting;
 using Mfr.Models;
 using Mfr.Tests.TestSupport;
 using Mfr.Utils;
+using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 
 namespace Mfr.Tests.Core
 {
@@ -352,9 +354,9 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
-        /// Verifies embedded tags are read when a file enters the rename list.
+        /// Verifies ingest does not populate audio-tag overlays until a preview uses formatter audio tokens.
         /// </summary>
-        public void AddSource_FileEntry_LoadsAudioTags_FromDisk()
+        public void AddSource_FileEntry_Does_Not_Load_AudioTags_Before_Format_Preview()
         {
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "ListIngestTitle", album: "ListIngestAlbum");
@@ -363,8 +365,53 @@ namespace Mfr.Tests.Core
             Assert.Equal(1, renameList.AddSource(path));
 
             var item = Assert.Single(renameList.RenameItems);
+            Assert.Equal(new AudioTagOverlay(), item.Original.AudioTags);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies preview with audio formatter tokens fills tag overlays once from TagLib-backed disk read.
+        /// </summary>
+        public void Preview_AudioFormatter_Loads_AudioTags_From_Disk()
+        {
+            var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "ListIngestTitle", album: "ListIngestAlbum");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(path);
+            var item = Assert.Single(renameList.RenameItems);
+
+            _SetupPreview(renameList, preset: _CreateAudioTitleAlbumPreset());
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.Equal("ListIngestTitle", item.Original.AudioTags.Title);
             Assert.Equal("ListIngestAlbum", item.Original.AudioTags.Album);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies cached tag overlays reset after commit so later preview reloads embedded tags from disk.
+        /// </summary>
+        public void Commit_Clears_AudioTag_Cache_For_Repreview()
+        {
+            var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "RoundOneTitle", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(path);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreateAudioTitleAlbumPreset();
+            _SetupPreview(renameList, preset);
+            Assert.Equal("RoundOneTitle", item.Original.AudioTags.Title);
+
+            _ = renameList.Commit(failFast: false, dryRun: true);
+            Assert.Equal(new AudioTagOverlay(), item.Original.AudioTags);
+
+            TaggedMinimalWav.WriteTagged(path, title: "RoundTwoTitle", album: null);
+
+            _SetupPreview(renameList, preset);
+            Assert.Equal("RoundTwoTitle", item.Original.AudioTags.Title);
         }
 
         [Fact]
@@ -385,6 +432,27 @@ namespace Mfr.Tests.Core
             Assert.Equal(new AudioTagOverlay(), item.Original.AudioTags);
         }
 
+        private static FilterPreset _CreateAudioTitleAlbumPreset()
+        {
+            return new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "audio-title-album-preview",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                    [
+                        new FormatterFilter(
+                            Target: new FileFullNameTarget(),
+                            Options: new FormatterOptions("<audio-title>-<audio-album>")),
+                    ]),
+            };
+        }
+
+        private static void _SetupPreview(RenameList renameList, FilterPreset preset)
+        {
+            preset.Chain.SetupFilters();
+            renameList.Preview(preset);
+        }
     }
 
 }
