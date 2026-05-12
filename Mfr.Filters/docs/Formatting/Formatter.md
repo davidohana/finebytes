@@ -21,6 +21,34 @@ Replaces the **entire target segment** with the result of expanding a **template
 | `<parent-folder:level>` | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth. |
 | `<full-path>` | Full path of the file. |
 
+#### Audio tags (canonical overlay)
+
+Reads from **`Preview.AudioTags`** (TagLib-loaded metadata filled when rows are appended through **`RenameList`**). **Contrast:** file-name tokens use **`Original`** paths; audio tokens deliberately use **preview** so later filters can mutate tags before a formatter runs.
+
+| Token | Output |
+|--------|--------|
+| `<audio-title>` | Title; empty when unset. |
+| `<audio-artist>` | Performers (joined overlay string); empty when unset. |
+| `<audio-album-artist>` | Album artists; empty when unset. |
+| `<audio-album>` | Album; empty when unset. |
+| `<audio-year>` | Year as invariant decimal digits; empty when unset. |
+| `<audio-genre>` | Genre; empty when unset. |
+| `<audio-track>` | Track number; invariant digits; empty when unset. |
+| `<audio-track-count>` | Track count (of *n/m* pair); invariant digits; empty when unset. |
+| `<audio-disc>` | Disc number; invariant digits; empty when unset. |
+| `<audio-disc-count>` | Disc count; invariant digits; empty when unset. |
+| `<audio-comment>` | Comment; empty when unset. |
+| `<audio-composer>` | Composers; empty when unset. |
+| `<audio-lyrics>` | Lyrics text; empty when unset. |
+| `<audio-copyright>` | Copyright; empty when unset. |
+| `<audio-grouping>` | Grouping; empty when unset. |
+
+**Arguments:** Unlike some design-draft examples (**`:0`** suffixes), these tokens accept **no** argument (`<audio-title>` only). A stray **`<audio-title:…>`** fails at compile with a formatter error listing the token name.
+
+**Rows without tag data:** Folders never load tags on ingest; unreadable/non-audio files keep the **default overlay**. All audio tokens yield **empty** output (no exception).
+
+**Not implemented yet:** stream-only properties often shown in specs as `<audio-duration:…>`, `<audio-bitrate:…>`, `<audio-channels:…>`, `<audio-bpm>`—they require data beyond **`AudioTagOverlay`**.
+
 #### File properties
 
 | Token | Output |

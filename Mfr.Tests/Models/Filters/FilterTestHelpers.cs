@@ -25,6 +25,10 @@ namespace Mfr.Tests.Models.Filters
         /// Same-folder rename-list size for per-folder counter padding; when <c>null</c>, uses
         /// <c>max(inFolderIndex + 1, 1)</c>.
         /// </param>
+        /// <param name="configureOriginal">
+        /// Optional callback invoked on <see cref="FileMeta"/> after construction but before constructing
+        /// <see cref="RenameItem"/>—for stamping <see cref="FileMeta.AudioTags"/> and other overrides.
+        /// </param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
             string prefix = "track",
@@ -38,13 +42,14 @@ namespace Mfr.Tests.Models.Filters
             DateTime? lastAccessTime = null,
             long fileSize = 0,
             int? renameListTotalCount = null,
-            int? renameListFolderSiblingCount = null)
+            int? renameListFolderSiblingCount = null,
+            Action<FileMeta>? configureOriginal = null)
         {
             directory ??= @"C:\Music\Album";
             var baseline = new DateTime(2024, 6, 1, 12, 30, 45, DateTimeKind.Unspecified);
             var resolvedTotal = renameListTotalCount ?? Math.Max(renameListIndex + 1, 1);
             var resolvedFolder = renameListFolderSiblingCount ?? Math.Max(inFolderIndex + 1, 1);
-            return new RenameItem(new FileMeta(
+            var meta = new FileMeta(
                 renameListIndex,
                 inFolderIndex,
                 directory,
@@ -56,7 +61,10 @@ namespace Mfr.Tests.Models.Filters
                 lastAccessTime: lastAccessTime ?? baseline,
                 fileSize: fileSize,
                 renameListTotalCount: resolvedTotal,
-                renameListFolderSiblingCount: resolvedFolder));
+                renameListFolderSiblingCount: resolvedFolder);
+
+            configureOriginal?.Invoke(meta);
+            return new RenameItem(meta);
         }
 
         /// <summary>
