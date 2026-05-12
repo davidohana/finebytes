@@ -48,17 +48,25 @@ namespace Mfr.Models
     /// <summary>
     /// Represents one rename candidate with original and preview metadata.
     /// </summary>
-    public sealed class RenameItem
+    /// <remarks>
+    /// Initializes a rename item with original metadata and optional embedded-tag disk reader delegate.
+    /// </remarks>
+    /// <param name="original">Original immutable file snapshot.</param>
+    /// <param name="audioTagReader">
+    /// Maps an absolute filesystem path to an overlay; invoked from <see cref="EnsureAudioTagsLoaded"/>.
+    /// When omitted or <see langword="null"/>, uses no disk reads and yields <see langword="null"/> overlays.
+    /// </param>
+    public sealed class RenameItem(FileMeta original, AudioTagReader? audioTagReader = null)
     {
         /// <summary>
         /// Gets the original immutable file snapshot.
         /// </summary>
-        public FileMeta Original { get; internal set; }
+        public FileMeta Original { get; internal set; } = original;
 
         /// <summary>
         /// Gets the current preview snapshot after filter application.
         /// </summary>
-        public FileMeta Preview { get; private set; }
+        public FileMeta Preview { get; private set; } = original.Clone();
 
         /// <summary>
         /// Gets the latest error captured while generating preview for this item.
@@ -98,22 +106,7 @@ namespace Mfr.Models
         /// Returning <see langword="null"/> keeps the default overlay on <see cref="Original"/>; a non-null overlay is cloned into snapshots.
         /// </para>
         /// </remarks>
-        internal AudioTagReader AudioTagReader { get; }
-
-        /// <summary>
-        /// Initializes a rename item with original metadata and optional embedded-tag disk reader delegate.
-        /// </summary>
-        /// <param name="original">Original immutable file snapshot.</param>
-        /// <param name="audioTagReader">
-        /// Maps an absolute filesystem path to an overlay; invoked from <see cref="EnsureAudioTagsLoaded"/>.
-        /// When omitted or <see langword="null"/>, uses no disk reads and yields <see langword="null"/> overlays.
-        /// </param>
-        public RenameItem(FileMeta original, AudioTagReader? audioTagReader = null)
-        {
-            Original = original;
-            Preview = original.Clone();
-            AudioTagReader = audioTagReader ?? AudioTagReaders.NullReader;
-        }
+        internal AudioTagReader AudioTagReader { get; } = audioTagReader ?? AudioTagReaders.NullReader;
 
         /// <summary>
         /// Loads embedded tags from disk via <see cref="AudioTagReader"/> when not cached, until <see cref="ClearAudioTagsCache"/>.
