@@ -79,7 +79,6 @@ namespace Mfr.Tests.Metadata
             _ApplyTags(path, baselineTitle: "fmt-baseline", baselineAlbum: "fmt-album");
 
             var baseline = AudioTagPersistence.Read(path);
-            Assert.NotNull(baseline);
             Assert.Equal("fmt-baseline", baseline.Title);
             Assert.Equal("fmt-album", baseline.Album);
         }
@@ -93,7 +92,6 @@ namespace Mfr.Tests.Metadata
             _ApplyTags(path, baselineTitle: "round-a", baselineAlbum: "round-album");
 
             var baseline = AudioTagPersistence.Read(path);
-            Assert.NotNull(baseline);
 
             var preview = baseline.Clone();
             preview.Title = "round-b";
@@ -101,7 +99,6 @@ namespace Mfr.Tests.Metadata
             AudioTagPersistence.ApplyIfChanged(path, preview, baseline);
 
             var again = AudioTagPersistence.Read(path);
-            Assert.NotNull(again);
             Assert.Equal("round-b", again.Title);
             Assert.Equal("round-album", again.Album);
         }

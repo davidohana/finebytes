@@ -68,6 +68,15 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
+        /// Test double: an <see cref="AudioTagReader"/> that ignores the path and returns a detached copy of <paramref name="meta"/>'s current <see cref="FileMeta.AudioTags"/> whenever hydration runs.
+        /// </summary>
+        public static AudioTagReader AudioTagReaderSnapshot(FileMeta meta)
+        {
+            ArgumentNullException.ThrowIfNull(meta);
+            return _ => meta.AudioTags.Clone();
+        }
+
+        /// <summary>
         /// Applies a filter to a prefix-targeted rename item and returns the resulting preview prefix.
         /// </summary>
         /// <param name="filter">Filter to apply.</param>

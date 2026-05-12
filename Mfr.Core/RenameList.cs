@@ -123,7 +123,8 @@ namespace Mfr.Core
                 try
                 {
                     preset.Chain.ApplyFilters(renameItem);
-                    renameItem.Status = RenameStatus.PreviewOk;
+                    if (renameItem.PreviewError is null)
+                        renameItem.Status = RenameStatus.PreviewOk;
                 }
                 catch (Exception ex)
                 {

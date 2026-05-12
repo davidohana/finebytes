@@ -53,8 +53,9 @@ namespace Mfr.Models
     /// </remarks>
     /// <param name="original">Original immutable file snapshot.</param>
     /// <param name="audioTagReader">
-    /// Maps an absolute filesystem path to an overlay; invoked from <see cref="EnsureAudioTagsLoaded"/>.
-    /// When omitted or <see langword="null"/>, uses no disk reads and yields <see langword="null"/> overlays.
+    /// Optional reader that maps an absolute path to an overlay; invoked from <see cref="EnsureAudioTagsLoaded"/>.
+    /// When <see langword="null"/>, hydration does not read from disk and does not replace existing <see cref="FileMeta.AudioTags"/> on <see cref="Original"/> or <see cref="Preview"/> (for example unit rows and tests that seed tags in memory).
+    /// Hosts that load embedded tags from disk (for example <c>AudioTagPersistence.Read</c>) pass a non-null delegate.
     /// </param>
     public sealed class RenameItem(FileMeta original, AudioTagReader? audioTagReader = null)
     {
@@ -99,25 +100,21 @@ namespace Mfr.Models
 
         private bool _audioTagsLoadAttempted;
 
-        /// <summary>Delegates reading embedded tags by absolute path.</summary>
-        /// <remarks>
-        /// <para>
-        /// Called with <see cref="FileMeta.FullPath"/> of <see cref="Original"/> for file rows where <see cref="EnsureAudioTagsLoaded"/> invokes it; directory rows skip the call.
-        /// Returning <see langword="null"/> keeps the default overlay on <see cref="Original"/>; a non-null overlay is cloned into snapshots.
-        /// </para>
-        /// </remarks>
-        internal AudioTagReader AudioTagReader { get; } = audioTagReader ?? AudioTagReaders.NullReader;
+        private readonly AudioTagReader? _pathTagReader = audioTagReader;
 
         /// <summary>
-        /// Loads embedded tags from disk via <see cref="AudioTagReader"/> when not cached, until <see cref="ClearAudioTagsCache"/>.
+        /// Loads embedded tags via the optional constructor-configured <see cref="AudioTagReader"/> when not cached, until <see cref="ClearAudioTagsCache"/>.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Skips invoking <see cref="AudioTagReader"/> for directory rows. When it returns tags,
-        /// copies them into <see cref="Original"/><c>.AudioTags</c> then mirrors into <see cref="Preview"/><c>.AudioTags</c>
-        /// so previews match ClearPreview-derived preview metadata.
+        /// Directory rows throw <see cref="InvalidOperationException"/>.
+        /// When no reader was supplied, this method does not change tag snapshots (no disk I/O).
+        /// Otherwise the reader is called with <see cref="FileMeta.FullPath"/> of <see cref="Original"/>; its result is cloned into
+        /// <see cref="Original"/><c>.AudioTags</c> and <see cref="Preview"/><c>.AudioTags</c>.
+        /// Any exception from the reader propagates to callers (for example rename-list preview records it on the row’s <c>PreviewError</c>).
         /// </para>
         /// </remarks>
+        /// <exception cref="InvalidOperationException">The rename row is a directory; audio tags cannot be read for directories.</exception>
         internal void EnsureAudioTagsLoaded()
         {
             if (_audioTagsLoadAttempted)
@@ -125,16 +122,18 @@ namespace Mfr.Models
 
             _audioTagsLoadAttempted = true;
 
-            var isDirectory = Original.Attributes.IsDirectory();
-            if (!isDirectory)
+            if (Original.Attributes.IsDirectory())
             {
-                var overlay = AudioTagReader(Original.FullPath);
-                if (overlay is not null)
-                {
-                    Original.AudioTags = overlay.Clone();
-                    Preview.AudioTags = Original.AudioTags.Clone();
-                }
+                throw new InvalidOperationException(
+                    "Cannot read audio tags for a directory.");
             }
+
+            if (_pathTagReader is null)
+                return;
+
+            var overlay = _pathTagReader(Original.FullPath);
+            Original.AudioTags = overlay.Clone();
+            Preview.AudioTags = Original.AudioTags.Clone();
         }
 
         /// <summary>

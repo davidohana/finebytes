@@ -432,6 +432,48 @@ namespace Mfr.Tests.Core
             Assert.Equal(new AudioTagOverlay(), item.Original.AudioTags);
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies formatter audio tokens on a folder row surfaces preview failure instead of silently empty overlays.
+        /// </summary>
+        public void Preview_AudioFormatter_OnDirectory_HasPreviewError()
+        {
+            var folder = Path.Combine(_tempRoot, "folder");
+            Directory.CreateDirectory(folder);
+
+            var renameList = new RenameList(includeHidden: true);
+            Assert.Equal(1, renameList.AddSource(folder, includeFiles: false, includeFolders: true));
+
+            var item = Assert.Single(renameList.RenameItems);
+            var preset = _CreateAudioTitleAlbumPreset();
+            _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.NotNull(item.PreviewError);
+            Assert.Contains("directory", item.PreviewError.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies a non-container text file yields preview failure when audio formatter resolves TagLib-backed tags.
+        /// </summary>
+        public void Preview_AudioFormatter_OnNonAudioTextFile_HasPreviewError()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "note.txt");
+            File.WriteAllText(path, "plain text payload");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(path);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreateAudioTitleAlbumPreset();
+            _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.NotNull(item.PreviewError);
+            Assert.NotNull(item.PreviewError.Cause);
+        }
+
         private static FilterPreset _CreateAudioTitleAlbumPreset()
         {
             return new FilterPreset

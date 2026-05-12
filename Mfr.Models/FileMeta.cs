@@ -110,8 +110,8 @@ namespace Mfr.Models
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Not populated at ingest. <see cref="RenameItem.AudioTagReader"/> returns TagLib overlays on demand; overlays clear after rename-list commit so later previews reload from disk.
-        /// Stays empty for directories and unsupported or unreadable files.
+        /// Not populated at ingest. Hosted rename lists pass a TagLib-backed reader to the <see cref="RenameItem"/> constructor for on-disk hydration on first <c>audio-*</c> formatter use; overlays clear after commit so later previews reload.
+        /// Omitting that reader skips disk-backed hydration and leaves in-memory overlays unchanged until a reader is supplied. Directories combined with embedded-audio formatter tokens yield preview errors rather than silently empty overlays.
         /// </para>
         /// </remarks>
         public AudioTagOverlay AudioTags { get; set; } = new();

@@ -22,34 +22,18 @@ namespace Mfr.Metadata
         /// <summary>
         /// Reads embedded audio tags into a detached <see cref="AudioTagOverlay"/>.
         /// </summary>
-        /// <param name="absolutePath">Fully qualified filesystem path.</param>
-        /// <returns>A new overlay when read succeeds; <c>null</c> when the path is unusable or the format cannot be loaded.</returns>
-        public static AudioTagOverlay? Read(string absolutePath)
+        /// <param name="absolutePath">Fully qualified filesystem path to an existing file.</param>
+        /// <returns>A new overlay built from embedded tags.</returns>
+        /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
+        /// <exception cref="IOException">TagLib cannot open or read the file.</exception>
+        /// <exception cref="CorruptFileException">Thrown by TagLib when the embedded structure is unreadable.</exception>
+        /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
+        public static AudioTagOverlay Read(string absolutePath)
         {
-            if (!_IsCandidateAudioFile(absolutePath))
-                return null;
+            _ValidateExistingRegularFile(absolutePath);
 
-            try
-            {
-                using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
-                return _FromTag(file.Tag);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return null;
-            }
-            catch (IOException)
-            {
-                return null;
-            }
-            catch (CorruptFileException)
-            {
-                return null;
-            }
-            catch (UnsupportedFormatException)
-            {
-                return null;
-            }
+            using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
+            return _FromTag(file.Tag);
         }
 
         /// <summary>
@@ -113,24 +97,12 @@ namespace Mfr.Metadata
             file.Save();
         }
 
-        private static bool _IsCandidateAudioFile(string absolutePath)
+        private static void _ValidateWritableFilePath(string absolutePath)
         {
-            if (string.IsNullOrWhiteSpace(absolutePath))
-                return false;
-
-            if (!Path.IsPathFullyQualified(absolutePath))
-                return false;
-
-            if (Directory.Exists(absolutePath))
-                return false;
-
-            if (!System.IO.File.Exists(absolutePath))
-                return false;
-
-            return true;
+            _ValidateExistingRegularFile(absolutePath);
         }
 
-        private static void _ValidateWritableFilePath(string absolutePath)
+        private static void _ValidateExistingRegularFile(string absolutePath)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(absolutePath);
 
