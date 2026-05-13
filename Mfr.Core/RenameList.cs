@@ -80,7 +80,7 @@ namespace Mfr.Core
             if (isRootPath)
                 throw new UserException($"Root paths cannot be added as rename sources: '{trimmedSource}'.");
 
-            var resolvedPaths = PathResolver.ResolveToPaths(
+            var resolvedPaths = AddedSourceResolver.ResolveToPaths(
                             source: trimmedSource,
                             includeFolders: includeFolders,
                             includeSubdirs: includeSubdirs).ToList();
@@ -137,9 +137,9 @@ namespace Mfr.Core
             }
 
             RenamePreviewFolderRebaser.RebaseDescendants(_renameItems);
-            RenameConflictDetector.MarkConflicts(_renameItems);
+            PreviewConflictDetector.MarkConflicts(_renameItems);
 
-            _commitPlan = RenameCommitPlanner.Build(_renameItems);
+            _commitPlan = CommitPlanner.Build(_renameItems);
             foreach (var unresolvableCycleItem in _commitPlan.UnresolvableCycleItems)
             {
                 unresolvableCycleItem.SetPreviewError(
@@ -185,7 +185,7 @@ namespace Mfr.Core
                     "Preview must be called before Commit.");
             }
 
-            var results = RenameCommitExecutor.Execute(
+            var results = CommitExecutor.Execute(
                 plan: _commitPlan,
                 allItems: _renameItems,
                 confirmBeforeApply: confirmBeforeApply,

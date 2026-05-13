@@ -6,9 +6,9 @@ using Mfr.Utils;
 namespace Mfr.Tests.Core
 {
     /// <summary>
-    /// Tests for <see cref="RenameCommitPlanner.Build"/>.
+    /// Tests for <see cref="CommitPlanner.Build"/>.
     /// </summary>
-    public sealed class RenameCommitPlannerTests : IDisposable
+    public sealed class CommitPlannerTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
 
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Core
             var item = _CreateFileItem(dir, "file.txt");
             // No preview retarget; preview equals original.
 
-            var plan = RenameCommitPlanner.Build([item]);
+            var plan = CommitPlanner.Build([item]);
 
             Assert.Empty(plan.Steps);
             Assert.Empty(plan.UnresolvableCycleItems);
@@ -46,7 +46,7 @@ namespace Mfr.Tests.Core
             var item = _CreateFileItem(dir, "old.txt");
             _RetargetPreview(item, dir, "new.txt");
 
-            var plan = RenameCommitPlanner.Build([item]);
+            var plan = CommitPlanner.Build([item]);
 
             var step = Assert.Single(plan.Steps);
             var finalize = Assert.IsType<FinalizeStep>(step);
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Core
             fileItem.Preview.DirectoryPath = newFolder;
             fileItem.Preview.Prefix = "track-renamed";
 
-            var plan = RenameCommitPlanner.Build([fileItem, folderItem]);
+            var plan = CommitPlanner.Build([fileItem, folderItem]);
 
             Assert.Equal(2, plan.Steps.Count);
             var first = Assert.IsType<FinalizeStep>(plan.Steps[0]);
@@ -98,7 +98,7 @@ namespace Mfr.Tests.Core
             var itemA = _CreateFileItem(dir, "a.txt");
             _RetargetPreview(itemA, dir, "b.txt");
 
-            var plan = RenameCommitPlanner.Build([itemA, itemB]);
+            var plan = CommitPlanner.Build([itemA, itemB]);
 
             Assert.Equal(2, plan.Steps.Count);
             var first = Assert.IsType<FinalizeStep>(plan.Steps[0]);
@@ -120,7 +120,7 @@ namespace Mfr.Tests.Core
             _RetargetPreview(itemA, dir, "b.txt");
             _RetargetPreview(itemB, dir, "a.txt");
 
-            var plan = RenameCommitPlanner.Build([itemA, itemB]);
+            var plan = CommitPlanner.Build([itemA, itemB]);
 
             Assert.Empty(plan.UnresolvableCycleItems);
             Assert.Equal(3, plan.Steps.Count);
@@ -159,7 +159,7 @@ namespace Mfr.Tests.Core
             var fileItem = _CreateFileItem(oldInner, "track.txt");
             fileItem.Preview.DirectoryPath = newInner;
 
-            var plan = RenameCommitPlanner.Build([fileItem, innerItem, outerItem]);
+            var plan = CommitPlanner.Build([fileItem, innerItem, outerItem]);
 
             Assert.Empty(plan.UnresolvableCycleItems);
             Assert.Equal(3, plan.Steps.Count);

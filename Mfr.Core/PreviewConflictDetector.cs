@@ -16,7 +16,7 @@ namespace Mfr.Core
     /// so two previews like <c>D:\dst\foo</c> and <c>D:\dst\Foo</c> are recognized as duplicates on Windows.
     /// </para>
     /// </remarks>
-    internal static class RenameConflictDetector
+    internal static class PreviewConflictDetector
     {
         /// <summary>
         /// Marks each rename item with preview-time conflicts that would prevent commit.

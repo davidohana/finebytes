@@ -25,17 +25,17 @@ namespace Mfr.Core
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The executor is the runtime counterpart of <see cref="RenameCommitPlanner"/>: the planner
+    /// The executor is the runtime counterpart of <see cref="CommitPlanner"/>: the planner
     /// decides what order items commit in; the executor carries out those steps, tracks outcomes,
     /// and handles confirmation, dry-run, and fail-fast semantics.
     /// </para>
     /// </remarks>
-    internal static class RenameCommitExecutor
+    internal static class CommitExecutor
     {
         /// <summary>
         /// Runs a commit plan and returns one result per item in <paramref name="allItems"/>.
         /// </summary>
-        /// <param name="plan">The plan produced by <see cref="RenameCommitPlanner.Build"/>.</param>
+        /// <param name="plan">The plan produced by <see cref="CommitPlanner.Build"/>.</param>
         /// <param name="allItems">All items in the rename list, in insertion order.</param>
         /// <param name="confirmBeforeApply">
         /// Optional callback invoked immediately before each item is committed.

@@ -9,7 +9,7 @@ namespace Mfr.Metadata
     /// <remarks>
     /// <para>
     /// Call <see cref="Apply"/> only when the rename row’s embedded-tag preview differs from its original snapshot;
-    /// compare outside this type (for example in <c>RenameCommitExecutor</c>) before calling. <see cref="Apply"/>
+    /// compare outside this type (for example in <c>CommitExecutor</c>) before calling. <see cref="Apply"/>
     /// opens the file, builds an overlay snapshot from TagLib (<see cref="Read"/> normalization), compares it to the
     /// preview in full, returns without saving when they match, and otherwise writes every modeled property from the
     /// preview onto TagLib before saving.

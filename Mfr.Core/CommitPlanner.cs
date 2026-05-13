@@ -24,7 +24,7 @@ namespace Mfr.Core
     internal sealed record FinalizeStep(RenameItem Item, string ActualSourcePath) : CommitStep(Item);
 
     /// <summary>
-    /// The result of <see cref="RenameCommitPlanner.Build"/>: an ordered list of commit steps.
+    /// The result of <see cref="CommitPlanner.Build"/>: an ordered list of commit steps.
     /// </summary>
     /// <param name="Steps">Commit steps to apply in order.</param>
     /// <param name="UnresolvableCycleItems">Items that participate in a cycle the planner could not break with a single stash.</param>
@@ -53,7 +53,7 @@ namespace Mfr.Core
     /// the path <c>X</c> claims.
     /// </para>
     /// </remarks>
-    internal static class RenameCommitPlanner
+    internal static class CommitPlanner
     {
         /// <summary>
         /// Builds a commit plan for the given rename items.

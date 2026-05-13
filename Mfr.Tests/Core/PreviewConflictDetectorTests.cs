@@ -6,9 +6,9 @@ using Mfr.Utils;
 namespace Mfr.Tests.Core
 {
     /// <summary>
-    /// Tests for <see cref="RenameConflictDetector.MarkConflicts"/>.
+    /// Tests for <see cref="PreviewConflictDetector.MarkConflicts"/>.
     /// </summary>
-    public sealed class RenameConflictDetectorTests : IDisposable
+    public sealed class PreviewConflictDetectorTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
 
@@ -32,7 +32,7 @@ namespace Mfr.Tests.Core
             _RetargetPreview(firstItem, dir, "same.mp3");
             _RetargetPreview(secondItem, dir, "same.mp3");
 
-            RenameConflictDetector.MarkConflicts([firstItem, secondItem]);
+            PreviewConflictDetector.MarkConflicts([firstItem, secondItem]);
 
             Assert.Equal(RenameStatus.PreviewError, firstItem.Status);
             Assert.Equal(RenameStatus.PreviewError, secondItem.Status);
@@ -54,7 +54,7 @@ namespace Mfr.Tests.Core
             var item = _CreateItemFromExistingFile(sourcePath);
             _RetargetPreview(item, dir, "occupied.mp3");
 
-            RenameConflictDetector.MarkConflicts([item]);
+            PreviewConflictDetector.MarkConflicts([item]);
 
             Assert.Equal(RenameStatus.PreviewError, item.Status);
             Assert.Contains("already in use", item.PreviewError!.Message, StringComparison.OrdinalIgnoreCase);
@@ -77,7 +77,7 @@ namespace Mfr.Tests.Core
             _RetargetPreview(firstItem, dir, "second.mp3");
             _RetargetPreview(secondItem, dir, "third.mp3");
 
-            RenameConflictDetector.MarkConflicts([firstItem, secondItem]);
+            PreviewConflictDetector.MarkConflicts([firstItem, secondItem]);
 
             Assert.Null(firstItem.PreviewError);
             Assert.Null(secondItem.PreviewError);
@@ -96,7 +96,7 @@ namespace Mfr.Tests.Core
             var item = _CreateItemFromExistingFile(sourcePath);
             item.Status = RenameStatus.PreviewOk;
 
-            RenameConflictDetector.MarkConflicts([item]);
+            PreviewConflictDetector.MarkConflicts([item]);
 
             Assert.Null(item.PreviewError);
         }
@@ -114,7 +114,7 @@ namespace Mfr.Tests.Core
             var item = _CreateItemFromExistingFile(sourcePath);
             _RetargetPreview(item, dir, "Track.mp3");
 
-            RenameConflictDetector.MarkConflicts([item]);
+            PreviewConflictDetector.MarkConflicts([item]);
 
             Assert.Null(item.PreviewError);
         }
@@ -140,7 +140,7 @@ namespace Mfr.Tests.Core
             // Preview is rebased to the renamed parent folder.
             nestedItem.Preview.DirectoryPath = newFolder;
 
-            RenameConflictDetector.MarkConflicts([folderItem, nestedItem]);
+            PreviewConflictDetector.MarkConflicts([folderItem, nestedItem]);
 
             Assert.Null(folderItem.PreviewError);
             Assert.Null(nestedItem.PreviewError);
@@ -156,7 +156,7 @@ namespace Mfr.Tests.Core
             var item = _CreateFileItem(dir, "a.mp3");
             item.SetPreviewError("preexisting", null);
 
-            RenameConflictDetector.MarkConflicts([item]);
+            PreviewConflictDetector.MarkConflicts([item]);
 
             Assert.Equal(RenameStatus.PreviewError, item.Status);
             Assert.Equal("preexisting", item.PreviewError!.Message);
