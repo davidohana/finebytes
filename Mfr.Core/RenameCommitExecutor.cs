@@ -1,3 +1,5 @@
+using System.Text.Json;
+using Mfr.Metadata;
 using Mfr.Models;
 using Serilog;
 
@@ -195,8 +197,14 @@ namespace Mfr.Core
 
             try
             {
+                var shouldPersistEmbeddedTags = !dryRun
+                    && !previewSnapshot.AudioTagOverlay.Equals(originalSnapshot.AudioTagOverlay);
+
                 if (!dryRun)
                     RenameItemMover.FinalizeCommit(item, item.Original.FullPath);
+
+                if (shouldPersistEmbeddedTags)
+                    AudioTagPersistence.Apply(item.Preview.FullPath, previewSnapshot.AudioTagOverlay);
 
                 item.Status = RenameStatus.CommitOk;
                 var changes = _BuildCommitChanges(
@@ -276,8 +284,14 @@ namespace Mfr.Core
 
             try
             {
+                var shouldPersistEmbeddedTags = !dryRun
+                    && !previewSnapshot.AudioTagOverlay.Equals(originalSnapshot.AudioTagOverlay);
+
                 if (!dryRun)
                     RenameItemMover.FinalizeCommit(item, step.ActualSourcePath);
+
+                if (shouldPersistEmbeddedTags)
+                    AudioTagPersistence.Apply(item.Preview.FullPath, previewSnapshot.AudioTagOverlay);
 
                 item.Status = RenameStatus.CommitOk;
                 var changes = _BuildCommitChanges(
@@ -369,6 +383,14 @@ namespace Mfr.Core
                     Property: "LastAccessTime",
                     OldValue: originalSnapshot.LastAccessTime.ToString("O"),
                     NewValue: previewSnapshot.LastAccessTime.ToString("O")));
+            }
+
+            if (!originalSnapshot.AudioTagOverlay.Equals(previewSnapshot.AudioTagOverlay))
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "AudioTagOverlay",
+                    OldValue: JsonSerializer.Serialize(originalSnapshot.AudioTagOverlay),
+                    NewValue: JsonSerializer.Serialize(previewSnapshot.AudioTagOverlay)));
             }
 
             return changes;

@@ -53,21 +53,20 @@ namespace Mfr.Tests.Metadata
         }
 
         [Fact]
-        public void ApplyIfChanged_TargetDirectoryPath_Throws()
+        public void Apply_TargetDirectoryPath_Throws()
         {
             var tempDir = Directory.CreateTempSubdirectory(prefix: "mfr-meta-");
             _pathsToDelete.Add(tempDir.FullName);
 
             var preview = new AudioTagOverlay { Title = "x" };
-            var baseline = new AudioTagOverlay();
 
             var ex = Assert.Throws<ArgumentException>(() =>
-                AudioTagPersistence.ApplyIfChanged(tempDir.FullName, preview, baseline));
+                AudioTagPersistence.Apply(tempDir.FullName, preview));
             Assert.Contains("directory", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
-        public void RoundTrip_ApplyIfChanged_OverwritesBaselineTitle()
+        public void RoundTrip_Apply_OverwritesBaselineTitle()
         {
             var candidate = _AllocateMinimalWavPath();
 
@@ -85,7 +84,7 @@ namespace Mfr.Tests.Metadata
             var previewOverlay = readBaseline.Clone();
             previewOverlay.Title = "preview";
 
-            AudioTagPersistence.ApplyIfChanged(candidate, previewOverlay, readBaseline);
+            AudioTagPersistence.Apply(candidate, previewOverlay);
 
             var readAgain = AudioTagPersistence.Read(candidate);
             Assert.Equal("preview", readAgain.Title);

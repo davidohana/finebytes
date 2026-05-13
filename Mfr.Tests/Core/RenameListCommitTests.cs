@@ -2,6 +2,7 @@ using Mfr.Core;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
+using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Tests.TestSupport;
 using Mfr.Utils;
@@ -85,6 +86,67 @@ namespace Mfr.Tests.Core
             Assert.False(File.Exists(b));
             Assert.True(File.Exists(dir.CombinePath("001.mp3")));
             Assert.True(File.Exists(dir.CombinePath("002.mp3")));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies commit writes embedded title from preview overlay when targeting an audio field (tag-only change).
+        /// </summary>
+        public void Commit_Writes_AudioTagOverlay_FromFormatter_Target()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("tagged.wav");
+            TaggedMinimalWav.WriteTagged(sourcePath, title: "DiskTitleBefore", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "audio-overlay-title",
+                new FormatterFilter(
+                    Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                    Options: new FormatterOptions("DiskTitleAfter")));
+            _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("DiskTitleAfter", item.Preview.AudioTagOverlay.Title);
+
+            var results = renameList.Commit(failFast: false, dryRun: false);
+            Assert.Single(results);
+            Assert.Equal(RenameStatus.CommitOk, results[0].Status);
+            Assert.Contains(
+                results[0].Changes,
+                c => c.Property == "AudioTagOverlay");
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("DiskTitleAfter", readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies dry-run commit does not persist embedded tag overlay edits.
+        /// </summary>
+        public void Commit_DryRun_DoesNotWrite_AudioTagOverlay()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("tagged.wav");
+            TaggedMinimalWav.WriteTagged(sourcePath, title: "OnlyOnDisk", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+
+            var preset = _CreatePresetAllEnabled(
+                "audio-overlay-dry",
+                new FormatterFilter(
+                    Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                    Options: new FormatterOptions("PreviewOnly")));
+            _SetupPreview(renameList, preset);
+
+            _ = renameList.Commit(failFast: false, dryRun: true);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("OnlyOnDisk", readBack.Title);
         }
 
         [Fact]

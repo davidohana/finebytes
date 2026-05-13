@@ -8,11 +8,15 @@ namespace Mfr.Metadata
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Persisted writes go through <see cref="ApplyIfChanged"/> and merge only differing fields versus the baseline snapshot.
+    /// Call <see cref="Apply"/> only when the rename row’s embedded-tag preview differs from its original snapshot;
+    /// compare outside this type (for example in <c>RenameCommitExecutor</c>) before calling. <see cref="Apply"/>
+    /// opens the file, builds an overlay snapshot from TagLib (<see cref="Read"/> normalization), compares it to the
+    /// preview in full, returns without saving when they match, and otherwise writes every modeled property from the
+    /// preview onto TagLib before saving.
     /// </para>
     /// <para>
-    /// String fields cleared in the overlay are written as empty strings to TagLib collections; numerics cleared with
-    /// <c>0</c> when the preview value is <c>null</c> and no longer matches the baseline.
+    /// String fields cleared in the overlay are written as empty strings or null TagLib assigns; numerics use
+    /// <c>0</c> when the preview clears a value; multiline lists use overlay <c>; </c> join/split conventions.
     /// </para>
     /// </remarks>
     public static class AudioTagPersistence
@@ -37,69 +41,53 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Persists differing fields between overlays onto <paramref name="absolutePath"/>.
+        /// Loads the file’s normalized tag overlay via TagLib and, when <paramref name="previewOverlay"/> differs from that overlay, assigns every modeled field from <paramref name="previewOverlay"/> to TagLib tags and saves.
         /// </summary>
-        /// <param name="absolutePath">Destination file path.</param>
+        /// <param name="absolutePath">Path to an existing regular file (typically the post-move destination).</param>
         /// <param name="previewOverlay">Desired tag values.</param>
-        /// <param name="baselineOverlay">Previously established snapshot to diff against.</param>
         /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
         /// <exception cref="IOException">The file cannot be opened or saved.</exception>
-        public static void ApplyIfChanged(
-            string absolutePath,
-            AudioTagOverlay previewOverlay,
-            AudioTagOverlay baselineOverlay)
+        public static void Apply(string absolutePath, AudioTagOverlay previewOverlay)
         {
-            if (previewOverlay.Equals(baselineOverlay))
-                return;
-
-            _ValidateWritableFilePath(absolutePath);
+            _ValidateExistingRegularFile(absolutePath);
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             var tag = file.Tag;
+            var baselineOverlay = _FromTag(tag);
+            if (previewOverlay.Equals(baselineOverlay))
+                return;
 
-            _ApplyStringDifference(previewOverlay.Title, baselineOverlay.Title, v => tag.Title = v);
-
-            _ApplyStringDifference(previewOverlay.Album, baselineOverlay.Album, v => tag.Album = v);
-
-            _ApplyStringDifference(previewOverlay.Comment, baselineOverlay.Comment, v => tag.Comment = v);
-
-            _ApplyMultivalueDifference(
-                previewOverlay.Performers,
-                baselineOverlay.Performers,
-                v => tag.Performers = v);
-
-            _ApplyMultivalueDifference(
-                previewOverlay.AlbumArtists,
-                baselineOverlay.AlbumArtists,
-                v => tag.AlbumArtists = v);
-
-            _ApplyMultivalueDifference(
-                previewOverlay.Composers,
-                baselineOverlay.Composers,
-                v => tag.Composers = v);
-
-            _ApplyGenreDifference(previewOverlay.Genre, baselineOverlay.Genre, tag);
-
-            _ApplyStringDifference(previewOverlay.Lyrics, baselineOverlay.Lyrics, v => tag.Lyrics = v);
-
-            _ApplyStringDifference(previewOverlay.Copyright, baselineOverlay.Copyright, v => tag.Copyright = v);
-
-            _ApplyStringDifference(previewOverlay.Grouping, baselineOverlay.Grouping, v => tag.Grouping = v);
-
-            _ApplyUIntDifference(previewOverlay.Year, baselineOverlay.Year, v => tag.Year = v);
-
-            _ApplyUIntDifference(previewOverlay.Track, baselineOverlay.Track, v => tag.Track = v);
-            _ApplyUIntDifference(previewOverlay.TrackCount, baselineOverlay.TrackCount, v => tag.TrackCount = v);
-
-            _ApplyUIntDifference(previewOverlay.Disc, baselineOverlay.Disc, v => tag.Disc = v);
-            _ApplyUIntDifference(previewOverlay.DiscCount, baselineOverlay.DiscCount, v => tag.DiscCount = v);
+            _WriteOverlayToTag(tag, previewOverlay);
 
             file.Save();
         }
 
-        private static void _ValidateWritableFilePath(string absolutePath)
+        private static void _WriteOverlayToTag(Tag tag, AudioTagOverlay overlay)
         {
-            _ValidateExistingRegularFile(absolutePath);
+            tag.Title = _EmptyStringToNull(overlay.Title);
+            tag.Album = _EmptyStringToNull(overlay.Album);
+            tag.Performers = _SplitJoinedList(overlay.Performers);
+            tag.AlbumArtists = _SplitJoinedList(overlay.AlbumArtists);
+            tag.Composers = _SplitJoinedList(overlay.Composers);
+            tag.Genres = string.IsNullOrWhiteSpace(overlay.Genre)
+                ? []
+                : [overlay.Genre.Trim()];
+
+            tag.Comment = _EmptyStringToNull(overlay.Comment);
+            tag.Lyrics = _EmptyStringToNull(overlay.Lyrics);
+            tag.Copyright = _EmptyStringToNull(overlay.Copyright);
+            tag.Grouping = _EmptyStringToNull(overlay.Grouping);
+
+            tag.Year = overlay.Year ?? 0;
+            tag.Track = overlay.Track ?? 0;
+            tag.TrackCount = overlay.TrackCount ?? 0;
+            tag.Disc = overlay.Disc ?? 0;
+            tag.DiscCount = overlay.DiscCount ?? 0;
+        }
+
+        private static string? _EmptyStringToNull(string? text)
+        {
+            return string.IsNullOrEmpty(text) ? null : text;
         }
 
         private static void _ValidateExistingRegularFile(string absolutePath)
@@ -136,41 +124,6 @@ namespace Mfr.Metadata
                 Disc = tag.Disc == 0 ? null : tag.Disc,
                 DiscCount = tag.DiscCount == 0 ? null : tag.DiscCount,
             };
-        }
-
-        private static void _ApplyStringDifference(string? preview, string? baseline, Action<string?> assignOnTagLib)
-        {
-            if (string.Equals(preview, baseline, StringComparison.Ordinal))
-                return;
-
-            assignOnTagLib(string.IsNullOrEmpty(preview) ? null : preview);
-        }
-
-        private static void _ApplyMultivalueDifference(
-            string? previewJoined,
-            string? baselineJoined,
-            Action<string[]> assign)
-        {
-            if (string.Equals(previewJoined, baselineJoined, StringComparison.Ordinal))
-                return;
-
-            assign(_SplitJoinedList(previewJoined));
-        }
-
-        private static void _ApplyGenreDifference(string? previewGenre, string? baselineGenre, Tag tag)
-        {
-            if (string.Equals(previewGenre, baselineGenre, StringComparison.Ordinal))
-                return;
-
-            tag.Genres = string.IsNullOrWhiteSpace(previewGenre) ? [] : [previewGenre.Trim()];
-        }
-
-        private static void _ApplyUIntDifference(uint? previewNumeric, uint? baselineNumeric, Action<uint> assign)
-        {
-            if (previewNumeric == baselineNumeric)
-                return;
-
-            assign(previewNumeric ?? 0);
         }
 
         private static string[] _SplitJoinedList(string? joined)

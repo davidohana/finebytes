@@ -8,6 +8,12 @@ Replaces the **entire target segment** with the result of expanding a **template
 |----------|------|-------------|
 | `template` | string | Output text; see **Tokens** below. |
 
+### Target (`target`, string filters)
+
+Along with path and file-name targets ([preset shape](../README.md#preset-shape)), string filters accept **`AudioOverlayField`**: set **`field`** to a camelCase overlay name (`title`, `album`, `performers`, `albumArtists`, `composers`, `genre`, `comment`, `lyrics`, `copyright`, `grouping`, `year`, `track`, `trackCount`, `disc`, `discCount`). The filter reads and writes that single property on **`Preview.AudioTagOverlay`** (numeric fields use invariant integer strings; empty string clears nullable overlay fields).
+
+**Commit:** After a successful move, when **`Preview.AudioTagOverlay`** differs from the row’s **`Original.AudioTagOverlay`**, **`RenameList.Commit`** calls **`AudioTagPersistence.Apply`** on the destination file (which reads the file’s current TagLib state as the merge baseline, then writes). Rows with unchanged tag overlays skip this path.
+
 ### Tokens
 
 #### File name
@@ -23,11 +29,11 @@ Replaces the **entire target segment** with the result of expanding a **template
 
 #### Audio tags (canonical overlay)
 
-Reads from **`Preview.AudioTags`**. Tag-backed fields load from disk (**`AudioTagPersistence.Read`**) **on first `audio-*` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
+Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`AudioTagPersistence.Read`**) **on first `audio-*` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
 **Contrast:** file-name tokens use **`Original`** paths; audio tokens deliberately use **preview** so later filters can mutate tags before a formatter runs.
 
-Unit tests typically construct **`RenameItem`** with no tag reader (**`audioTagReader`** omitted) so first hydration does not touch pre-seeded **`AudioTags`**; tests that want to mimic a disk read can pass a closure or **`FilterTestHelpers.AudioTagReaderSnapshot(meta)`**.
+Unit tests typically construct **`RenameItem`** with no tag reader (**`audioTagReader`** omitted) so first hydration does not touch pre-seeded **`AudioTagOverlay`**; tests that want to mimic a disk read can pass a closure or **`FilterTestHelpers.AudioTagReaderSnapshot(meta)`**.
 
 | Token | Output |
 |--------|--------|

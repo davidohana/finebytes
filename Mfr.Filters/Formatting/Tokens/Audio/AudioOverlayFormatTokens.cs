@@ -21,7 +21,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
             return item =>
             {
                 item.EnsureAudioTagsLoaded();
-                return resolvePreview(item.Preview.AudioTags);
+                return resolvePreview(item.Preview.AudioTagOverlay);
             };
         }
 

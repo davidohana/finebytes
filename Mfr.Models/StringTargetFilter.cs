@@ -14,6 +14,9 @@ namespace Mfr.Models
         /// <inheritdoc />
         protected internal sealed override void ApplyCore(RenameItem item)
         {
+            if (Target is AudioOverlayFieldTarget)
+                item.EnsureAudioTagsLoaded();
+
             var meta = item.Preview;
             var current = meta.GetTargetString(Target);
             var transformed = TransformValue(current, item);

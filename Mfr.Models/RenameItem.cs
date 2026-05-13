@@ -54,7 +54,7 @@ namespace Mfr.Models
     /// <param name="original">Original immutable file snapshot.</param>
     /// <param name="audioTagReader">
     /// Optional reader that maps an absolute path to an overlay; invoked from <see cref="EnsureAudioTagsLoaded"/>.
-    /// When <see langword="null"/>, hydration does not read from disk and does not replace existing <see cref="FileMeta.AudioTags"/> on <see cref="Original"/> or <see cref="Preview"/> (for example unit rows and tests that seed tags in memory).
+    /// When <see langword="null"/>, hydration does not read from disk and does not replace existing <see cref="FileMeta.AudioTagOverlay"/> on <see cref="Original"/> or <see cref="Preview"/> (for example unit rows and tests that seed tags in memory).
     /// Hosts that load embedded tags from disk (for example <c>AudioTagPersistence.Read</c>) pass a non-null delegate.
     /// </param>
     public sealed class RenameItem(FileMeta original, AudioTagReader? audioTagReader = null)
@@ -110,7 +110,7 @@ namespace Mfr.Models
         /// Directory rows throw <see cref="InvalidOperationException"/>.
         /// When no reader was supplied, this method does not change tag snapshots (no disk I/O).
         /// Otherwise the reader is called with <see cref="FileMeta.FullPath"/> of <see cref="Original"/>; its result is cloned into
-        /// <see cref="Original"/><c>.AudioTags</c> and <see cref="Preview"/><c>.AudioTags</c>.
+        /// <see cref="Original"/><c>.AudioTagOverlay</c> and <see cref="Preview"/><c>.AudioTagOverlay</c>.
         /// Any exception from the reader propagates to callers (for example rename-list preview records it on the row’s <c>PreviewError</c>).
         /// </para>
         /// </remarks>
@@ -132,8 +132,8 @@ namespace Mfr.Models
                 return;
 
             var overlay = _pathTagReader(Original.FullPath);
-            Original.AudioTags = overlay.Clone();
-            Preview.AudioTags = Original.AudioTags.Clone();
+            Original.AudioTagOverlay = overlay.Clone();
+            Preview.AudioTagOverlay = Original.AudioTagOverlay.Clone();
         }
 
         /// <summary>
@@ -142,8 +142,8 @@ namespace Mfr.Models
         internal void ClearAudioTagsCache()
         {
             _audioTagsLoadAttempted = false;
-            Original.AudioTags = new AudioTagOverlay();
-            Preview.AudioTags = new AudioTagOverlay();
+            Original.AudioTagOverlay = new AudioTagOverlay();
+            Preview.AudioTagOverlay = new AudioTagOverlay();
         }
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace Mfr.Models
                 || Original.CreationTime != Preview.CreationTime
                 || Original.LastWriteTime != Preview.LastWriteTime
                 || Original.LastAccessTime != Preview.LastAccessTime
-                || !Original.AudioTags.Equals(Preview.AudioTags);
+                || !Original.AudioTagOverlay.Equals(Preview.AudioTagOverlay);
         }
     }
 }

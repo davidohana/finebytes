@@ -6,7 +6,7 @@ namespace Mfr.Tests.Models
     public sealed class RenameItemAudioTagsTests
     {
         /// <summary>
-        /// Verifies <see cref="FilterTestHelpers.AudioTagReaderSnapshot"/> drives hydration like a mocked disk read, copying current <see cref="FileMeta.AudioTags"/> onto both snapshots.
+        /// Verifies <see cref="FilterTestHelpers.AudioTagReaderSnapshot"/> drives hydration like a mocked disk read, copying current <see cref="FileMeta.AudioTagOverlay"/> onto both snapshots.
         /// </summary>
         [Fact]
         public void EnsureAudioTagsLoaded_AudioTagReaderSnapshot_MirrorsMetaTagsOntoSnapshots()
@@ -14,12 +14,12 @@ namespace Mfr.Tests.Models
             var meta = _CreateMetaWithAlbum(album: "SnapshotAlbum");
             var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
 
-            item.Preview.AudioTags.Album = "PreviewOnlyMutated";
+            item.Preview.AudioTagOverlay.Album = "PreviewOnlyMutated";
 
             item.EnsureAudioTagsLoaded();
 
-            Assert.Equal("SnapshotAlbum", item.Original.AudioTags.Album);
-            Assert.Equal("SnapshotAlbum", item.Preview.AudioTags.Album);
+            Assert.Equal("SnapshotAlbum", item.Original.AudioTagOverlay.Album);
+            Assert.Equal("SnapshotAlbum", item.Preview.AudioTagOverlay.Album);
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Models
 
             Assert.False(item.HasPreviewChanges());
 
-            item.Preview.AudioTags.Title = "PreviewTitle";
+            item.Preview.AudioTagOverlay.Title = "PreviewTitle";
 
             Assert.True(item.HasPreviewChanges());
             Assert.True(item.IsPreviewPathUnchanged());
@@ -41,10 +41,10 @@ namespace Mfr.Tests.Models
         {
             var first = _CreateMetaWithAlbum("A");
             var second = first.Clone();
-            second.AudioTags.Title = "B";
+            second.AudioTagOverlay.Title = "B";
 
-            Assert.Null(first.AudioTags.Title);
-            Assert.Equal("B", second.AudioTags.Title);
+            Assert.Null(first.AudioTagOverlay.Title);
+            Assert.Equal("B", second.AudioTagOverlay.Title);
         }
 
         private static FileMeta _CreateMetaWithAlbum(string album)
@@ -57,7 +57,7 @@ namespace Mfr.Tests.Models
                 extension: ".mp3",
                 renameListFolderSiblingCount: 1)
             {
-                AudioTags = new AudioTagOverlay { Album = album },
+                AudioTagOverlay = new AudioTagOverlay { Album = album },
             };
         }
     }

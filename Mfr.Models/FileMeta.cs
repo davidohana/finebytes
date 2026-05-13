@@ -114,7 +114,7 @@ namespace Mfr.Models
         /// Omitting that reader skips disk-backed hydration and leaves in-memory overlays unchanged until a reader is supplied. Directories combined with embedded-audio formatter tokens yield preview errors rather than silently empty overlays.
         /// </para>
         /// </remarks>
-        public AudioTagOverlay AudioTags { get; set; } = new();
+        public AudioTagOverlay AudioTagOverlay { get; set; } = new();
 
         /// <summary>
         /// Creates a detached copy of this metadata instance.
@@ -136,7 +136,7 @@ namespace Mfr.Models
                 renameListTotalCount: RenameListTotalCount,
                 renameListFolderSiblingCount: RenameListFolderSiblingCount)
             {
-                AudioTags = AudioTags.Clone(),
+                AudioTagOverlay = AudioTagOverlay.Clone(),
             };
         }
     }

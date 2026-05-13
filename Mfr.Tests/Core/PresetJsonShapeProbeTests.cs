@@ -211,6 +211,30 @@ namespace Mfr.Tests.Core
         }
 
         [Fact]
+        public void Formatter_JSON_round_trips_AudioOverlayField_target()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "Formatter",
+              "target": {
+                "targetType": "AudioOverlayField",
+                "field": "title"
+              },
+              "options": {
+                "template": "<file-name>"
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<FormatterFilter>(filter);
+            var target = Assert.IsType<AudioOverlayFieldTarget>(typed.Target);
+            Assert.Equal(AudioOverlayField.Title, target.Field);
+            typed.Setup();
+        }
+
+        [Fact]
         public void LettersCase_JSON_round_trips_apply_scope_token()
         {
             var expected = new LettersCaseFilter(

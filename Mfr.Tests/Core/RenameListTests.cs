@@ -365,7 +365,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(1, renameList.AddSource(path));
 
             var item = Assert.Single(renameList.RenameItems);
-            Assert.Equal(new AudioTagOverlay(), item.Original.AudioTags);
+            Assert.Equal(new AudioTagOverlay(), item.Original.AudioTagOverlay);
         }
 
         [Fact]
@@ -384,8 +384,8 @@ namespace Mfr.Tests.Core
             _SetupPreview(renameList, preset: _CreateAudioTitleAlbumPreset());
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("ListIngestTitle", item.Original.AudioTags.Title);
-            Assert.Equal("ListIngestAlbum", item.Original.AudioTags.Album);
+            Assert.Equal("ListIngestTitle", item.Original.AudioTagOverlay.Title);
+            Assert.Equal("ListIngestAlbum", item.Original.AudioTagOverlay.Album);
         }
 
         [Fact]
@@ -403,15 +403,15 @@ namespace Mfr.Tests.Core
 
             var preset = _CreateAudioTitleAlbumPreset();
             _SetupPreview(renameList, preset);
-            Assert.Equal("RoundOneTitle", item.Original.AudioTags.Title);
+            Assert.Equal("RoundOneTitle", item.Original.AudioTagOverlay.Title);
 
             _ = renameList.Commit(failFast: false, dryRun: true);
-            Assert.Equal(new AudioTagOverlay(), item.Original.AudioTags);
+            Assert.Equal(new AudioTagOverlay(), item.Original.AudioTagOverlay);
 
             TaggedMinimalWav.WriteTagged(path, title: "RoundTwoTitle", album: null);
 
             _SetupPreview(renameList, preset);
-            Assert.Equal("RoundTwoTitle", item.Original.AudioTags.Title);
+            Assert.Equal("RoundTwoTitle", item.Original.AudioTagOverlay.Title);
         }
 
         [Fact]
@@ -429,7 +429,7 @@ namespace Mfr.Tests.Core
                 renameList.AddSource(folder, includeFiles: false, includeFolders: true));
 
             var item = Assert.Single(renameList.RenameItems);
-            Assert.Equal(new AudioTagOverlay(), item.Original.AudioTags);
+            Assert.Equal(new AudioTagOverlay(), item.Original.AudioTagOverlay);
         }
 
         [Fact]
@@ -455,7 +455,39 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
-        /// Verifies a non-container text file yields preview failure when audio formatter resolves TagLib-backed tags.
+        /// Verifies audio overlay field filters on a folder row surface preview failure.
+        /// </summary>
+        public void Preview_AudioOverlayFieldTarget_OnDirectory_HasPreviewError()
+        {
+            var folder = Path.Combine(_tempRoot, "folder");
+            Directory.CreateDirectory(folder);
+
+            var renameList = new RenameList(includeHidden: true);
+            Assert.Equal(1, renameList.AddSource(folder, includeFiles: false, includeFolders: true));
+
+            var item = Assert.Single(renameList.RenameItems);
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "overlay-on-dir",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                    [
+                        new FormatterFilter(
+                            Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                            Options: new FormatterOptions("x")),
+                    ]),
+            };
+            _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.NotNull(item.PreviewError);
+            Assert.Contains("directory", item.PreviewError.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies a non-container text file yields preview failure when audio overlay target resolves TagLib-backed tags.
         /// </summary>
         public void Preview_AudioFormatter_OnNonAudioTextFile_HasPreviewError()
         {

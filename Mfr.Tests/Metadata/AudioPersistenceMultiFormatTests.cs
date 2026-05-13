@@ -83,9 +83,9 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("fmt-album", baseline.Album);
         }
 
-        [Theory(DisplayName = nameof(ApplyIfChanged_OverwritesTitle_AcrossFormats))]
+        [Theory(DisplayName = nameof(Apply_OverwritesTitle_AcrossFormats))]
         [MemberData(nameof(FormatCases))]
-        public void ApplyIfChanged_OverwritesTitle_AcrossFormats(PersistenceFormatCase format)
+        public void Apply_OverwritesTitle_AcrossFormats(PersistenceFormatCase format)
         {
             var path = _AllocateScratchPath(format);
 
@@ -96,7 +96,7 @@ namespace Mfr.Tests.Metadata
             var preview = baseline.Clone();
             preview.Title = "round-b";
 
-            AudioTagPersistence.ApplyIfChanged(path, preview, baseline);
+            AudioTagPersistence.Apply(path, preview);
 
             var again = AudioTagPersistence.Read(path);
             Assert.Equal("round-b", again.Title);

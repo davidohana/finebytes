@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_TitleToken_ReturnsPreviewValue()
         {
             var token = new AudioTitleToken();
-            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.AudioTags.Title = "Held");
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.AudioTagOverlay.Title = "Held");
 
             Assert.Equal("Held", token.Compile(string.Empty)(item));
             Assert.Contains("audio-title", token.Names);
@@ -59,8 +59,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_PrefersPreviewOverlayOverOriginal()
         {
             var token = new AudioTitleToken();
-            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.AudioTags.Title = "Orig");
-            item.Preview.AudioTags.Title = "Prev";
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.AudioTagOverlay.Title = "Orig");
+            item.Preview.AudioTagOverlay.Title = "Prev";
 
             Assert.Equal("Prev", token.Compile(string.Empty)(item));
         }
@@ -92,7 +92,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
             {
-                var t = m.AudioTags;
+                var t = m.AudioTagOverlay;
                 t.Year = 2024;
                 t.Track = 7;
                 t.TrackCount = 12;
@@ -123,8 +123,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
             {
-                m.AudioTags.Year = 0;
-                m.AudioTags.Track = 0;
+                m.AudioTagOverlay.Year = 0;
+                m.AudioTagOverlay.Track = 0;
             });
 
             Assert.Equal("0", new AudioYearToken().Compile(string.Empty)(item));
@@ -135,7 +135,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_AllStringFields_MappedFromSample()
         {
             var sample = FullTagSample();
-            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.AudioTags = sample.Clone());
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.AudioTagOverlay = sample.Clone());
 
             Assert.Equal("T1", new AudioTitleToken().Compile(string.Empty)(item));
             Assert.Equal("Alb", new AudioAlbumToken().Compile(string.Empty)(item));
@@ -158,8 +158,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                 prefix: "song",
                 configureOriginal: m =>
                 {
-                    m.AudioTags.Year = 1999;
-                    m.AudioTags.Title = "Blue";
+                    m.AudioTagOverlay.Year = 1999;
+                    m.AudioTagOverlay.Title = "Blue";
                 });
 
             filter.Setup();

@@ -27,7 +27,7 @@ namespace Mfr.Tests.Models.Filters
         /// </param>
         /// <param name="configureOriginal">
         /// Optional callback invoked on <see cref="FileMeta"/> after construction but before constructing
-        /// <see cref="RenameItem"/>—for stamping <see cref="FileMeta.AudioTags"/> and other overrides.
+        /// <see cref="RenameItem"/>—for stamping <see cref="FileMeta.AudioTagOverlay"/> and other overrides.
         /// </param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
@@ -68,12 +68,12 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
-        /// Test double: an <see cref="AudioTagReader"/> that ignores the path and returns a detached copy of <paramref name="meta"/>'s current <see cref="FileMeta.AudioTags"/> whenever hydration runs.
+        /// Test double: an <see cref="AudioTagReader"/> that ignores the path and returns a detached copy of <paramref name="meta"/>'s current <see cref="FileMeta.AudioTagOverlay"/> whenever hydration runs.
         /// </summary>
         public static AudioTagReader AudioTagReaderSnapshot(FileMeta meta)
         {
             ArgumentNullException.ThrowIfNull(meta);
-            return _ => meta.AudioTags.Clone();
+            return _ => meta.AudioTagOverlay.Clone();
         }
 
         /// <summary>
