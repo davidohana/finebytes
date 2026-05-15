@@ -14,7 +14,8 @@ namespace Mfr.Models.Tags
     /// </para>
     /// <para>
     /// For MPEG/MP3 files, <see cref="Id3v1"/> and <see cref="Id3v2"/> hold per-tag snapshots; semantic properties
-    /// mirror TagLib’s merged tag. Other formats leave both <see langword="null"/> until later phases add more containers.
+    /// mirror TagLib’s merged tag. <see cref="Xiph"/>, <see cref="Ape"/>, <see cref="Apple"/>, and <see cref="Asf"/>
+    /// hold detached per–<c>TagTypes</c> payloads when present on disk (see persistence documentation for null semantics).
     /// </para>
     /// </remarks>
     public sealed class AudioTagOverlay : IEquatable<AudioTagOverlay?>
@@ -28,6 +29,26 @@ namespace Mfr.Models.Tags
         /// Gets or sets the optional ID3v2 snapshot (full frame inventory) when the row is backed by MPEG/MP3 structured tags.
         /// </summary>
         public Id3v2TagData? Id3v2 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the optional Xiph comment block (FLAC, Ogg, Opus, etc.) as canonical serialized bytes.
+        /// </summary>
+        public SerializedTagBlob? Xiph { get; set; }
+
+        /// <summary>
+        /// Gets or sets the optional APEv2 tag block as canonical serialized bytes.
+        /// </summary>
+        public SerializedTagBlob? Ape { get; set; }
+
+        /// <summary>
+        /// Gets or sets the optional Apple <c>ilst</c> / MP4 metadata snapshot.
+        /// </summary>
+        public AppleTagData? Apple { get; set; }
+
+        /// <summary>
+        /// Gets or sets the optional ASF extended content descriptor snapshot when the file uses WMA/ASF tagging.
+        /// </summary>
+        public AsfTagData? Asf { get; set; }
 
         /// <summary>
         /// Gets or sets the track title.
@@ -121,6 +142,10 @@ namespace Mfr.Models.Tags
                         CanonicalTagBytes = Id3v2.CanonicalTagBytes,
                         Frames = Id3v2.Frames,
                     },
+                Xiph = Xiph is null ? null : new SerializedTagBlob { CanonicalTagBytes = Xiph.CanonicalTagBytes },
+                Ape = Ape is null ? null : new SerializedTagBlob { CanonicalTagBytes = Ape.CanonicalTagBytes },
+                Apple = Apple is null ? null : new AppleTagData { Atoms = Apple.Atoms },
+                Asf = Asf is null ? null : new AsfTagData { Descriptors = Asf.Descriptors },
                 Title = Title,
                 Album = Album,
                 Performers = Performers,
@@ -154,6 +179,18 @@ namespace Mfr.Models.Tags
             if (!Equals(Id3v2, other.Id3v2))
                 return false;
 
+            if (!Equals(Xiph, other.Xiph))
+                return false;
+
+            if (!Equals(Ape, other.Ape))
+                return false;
+
+            if (!Equals(Apple, other.Apple))
+                return false;
+
+            if (!Equals(Asf, other.Asf))
+                return false;
+
             return string.Equals(Title, other.Title, StringComparison.Ordinal)
                 && string.Equals(Album, other.Album, StringComparison.Ordinal)
                 && string.Equals(Performers, other.Performers, StringComparison.Ordinal)
@@ -183,6 +220,10 @@ namespace Mfr.Models.Tags
             var hashCode = new HashCode();
             hashCode.Add(Id3v1);
             hashCode.Add(Id3v2);
+            hashCode.Add(Xiph);
+            hashCode.Add(Ape);
+            hashCode.Add(Apple);
+            hashCode.Add(Asf);
             hashCode.Add(Title, StringComparer.Ordinal);
             hashCode.Add(Album, StringComparer.Ordinal);
             hashCode.Add(Performers, StringComparer.Ordinal);

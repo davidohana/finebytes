@@ -12,7 +12,7 @@ Phased work: (1) structured overlay + MP3 ID3v1/v2 round-trip and semantic mappi
 ## Checklist (phases)
 
 - [ ] **Phase 1:** Structured overlay (ID3v1/v2 blocks, frame inventory, deep equality); `AudioTagPersistence` Read/Apply for MP3 only; semantic projections + mappers; core/tests on MP3 slice.
-- [ ] **Phase 2:** Add Xiph, Apple/Mp4, Ape, Asf blocks + Read/Apply round-trips; extend mappers per container.
+- [x] **Phase 2:** Add Xiph, Apple/Mp4, Ape, Asf blocks + Read/Apply round-trips; extend mappers per container.
 - [ ] **Phase 3:** Wire `AudioTagSetter` + all `AudioOverlayField` paths; update `RenamePropertyChangeBuilder` / Commit / RenameList tests; `EmbeddedTagRemover` empty-overlay contract.
 - [ ] **Phase 4:** Absent optional blocks + per `TagTypes` removal on Apply; filter/UI hooks for deleting specific tag types or frames (keep AllTags nuclear remover).
 - [ ] **Phase 5:** `FilterTarget` variants + preview dispatch for specific frames/fields; Id3v2FieldSetter-style filter.
@@ -48,6 +48,7 @@ Work is split so each phase is shippable and reviewable; later phases assume the
 - **Phase 1 — MP3 vertical slice:** Structured `AudioTagOverlay` with **ID3v1 + ID3v2** blocks (frame inventory, deep **Clone/Equals**); [`AudioTagPersistence`](../Mfr.Metadata/AudioTagPersistence.cs) **Read/Apply for MP3 only**; **semantic properties** (`Title`, …) as projections + writers targeting ID3v2 (documented precedence vs ID3v1); update [`CommitExecutor`](../Mfr.Core/CommitExecutor.cs) and critical tests (commit, persistence, rename list) for this path. **Outcome:** end-to-end proof without boiling the ocean.
 
 - **Phase 2 — More TagLib tag types:** Add blocks and Read/Apply for **Xiph** (FLAC/Vorbis), **Apple** (MP4), **Ape**, **Asf**, etc.; golden round-trip tests per type. **Outcome:** “all formats” coverage from the product goal.
+  - **Status:** Implemented in `AudioTagOverlay` / `AudioTagPersistence` (Xiph and Ape use canonical `SerializedTagBlob` bytes; Apple uses sorted `ilst` text atoms with explicit ordinal equality on `AppleAtomRow`; Asf uses sorted content descriptors; ASF-only golden test deferred—no tiny fixture yet). Semantic mappers for non-ID3 containers remain Phase 3 parity.
 
 - **Phase 3 — Semantic and pipeline parity:** Ensure [`AudioTagSetterFilter`](../Mfr.Filters/Audio/AudioTagSetterFilter.cs), [`FileMetaPreviewExtensions`](../Mfr.Models/FileMetaPreviewExtensions.cs), formatter tokens, and [`EmbeddedTagRemover`](../Mfr.Filters/Audio/EmbeddedTagRemoverFilter.cs) behave correctly with structured overlay; adjust [`RenamePropertyChangeBuilder`](../Mfr.Core/RenamePropertyChangeBuilder.cs) as needed. **Outcome:** no regressions vs current feature set.
 

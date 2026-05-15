@@ -182,6 +182,120 @@ namespace Mfr.Tests.Metadata
             Assert.Equal(first, second);
         }
 
+        /// <summary>
+        /// Identity Apply on fixture OGG should be a no-op and keep <see cref="AudioTagOverlay.Xiph"/> stable.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_Ogg_Apply_ClonedRead_IsNoOpAndStable()
+        {
+            var path = _CopyFixtureToTemp("libnogg-bitrate-123.ogg");
+
+            var first = AudioTagPersistence.Read(path);
+            Assert.NotNull(first.Xiph);
+            Assert.NotEmpty(first.Xiph.CanonicalTagBytes);
+
+            AudioTagPersistence.Apply(path, first.Clone());
+            var second = AudioTagPersistence.Read(path);
+
+            Assert.Equal(first, second);
+        }
+
+        /// <summary>
+        /// Identity Apply on fixture FLAC should be a no-op and keep <see cref="AudioTagOverlay.Xiph"/> stable.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_Flac_Apply_ClonedRead_IsNoOpAndStable()
+        {
+            var path = _CopyFixtureToTemp("metaflac.flac");
+
+            using (var file = TagLib.File.Create(path))
+            {
+                var xiph = (TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true);
+                xiph.SetField("TRIPTEST", "probe");
+                file.Save();
+            }
+
+            var first = AudioTagPersistence.Read(path);
+            Assert.NotNull(first.Xiph);
+            Assert.NotEmpty(first.Xiph.CanonicalTagBytes);
+
+            AudioTagPersistence.Apply(path, first.Clone());
+            var second = AudioTagPersistence.Read(path);
+
+            Assert.Equal(first, second);
+        }
+
+        /// <summary>
+        /// Consecutive reads of the same M4A must yield equal overlays (deterministic Apple snapshot + façade).
+        /// </summary>
+        [Fact]
+        public void Read_M4a_Twice_ReturnsEqualOverlays()
+        {
+            var path = _CopyFixtureToTemp("homebrew-test.m4a");
+            var a = AudioTagPersistence.Read(path);
+            var b = AudioTagPersistence.Read(path);
+            Assert.Equal(a, b);
+            Assert.Equal(a, a.Clone());
+        }
+
+        /// <summary>
+        /// Identity Apply on fixture M4A should be a no-op and keep <see cref="AudioTagOverlay.Apple"/> stable.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_M4a_Apply_ClonedRead_IsNoOpAndStable()
+        {
+            var path = _CopyFixtureToTemp("homebrew-test.m4a");
+
+            var first = AudioTagPersistence.Read(path);
+            Assert.NotNull(first.Apple);
+            Assert.NotEmpty(first.Apple.Atoms);
+
+            AudioTagPersistence.Apply(path, first.Clone());
+            var second = AudioTagPersistence.Read(path);
+
+            Assert.Equal(first, second);
+        }
+
+        /// <summary>
+        /// Verifies APE tags round-trip on a scratch MP3 when TagLib attaches an APE block.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_Mp3_WithApe_Apply_ClonedRead_IsNoOpAndStable()
+        {
+            var path = _AllocateMp3ScratchPath();
+
+            using (var file = TagLib.File.Create(path))
+            {
+                var ape = (TagLib.Ape.Tag)file.GetTag(TagLib.TagTypes.Ape, true);
+                ape.SetValue("Title", "ape-title");
+                file.Save();
+            }
+
+            var first = AudioTagPersistence.Read(path);
+            Assert.NotNull(first.Ape);
+            Assert.NotEmpty(first.Ape.CanonicalTagBytes);
+
+            AudioTagPersistence.Apply(path, first.Clone());
+            var second = AudioTagPersistence.Read(path);
+
+            Assert.Equal(first, second);
+        }
+
+        private string _CopyFixtureToTemp(string fileName)
+        {
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
+            if (!File.Exists(fixturePath))
+            {
+                throw new InvalidOperationException(
+                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output.");
+            }
+
+            var dest = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}_{fileName}");
+            _pathsToDelete.Add(dest);
+            File.Copy(fixturePath, dest, overwrite: false);
+            return Path.GetFullPath(dest);
+        }
+
         private string _AllocateMp3ScratchPath()
         {
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "l3-compl-cut.mp3");

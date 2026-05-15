@@ -2,6 +2,8 @@ using System.Collections.Immutable;
 using Mfr.Models.Tags;
 using TagLib;
 using TagLib.Mpeg;
+using TagLib.Mpeg4;
+using TagLib.Ogg;
 
 namespace Mfr.Metadata
 {
@@ -16,8 +18,9 @@ namespace Mfr.Metadata
     /// preview in full, returns without saving when they match, and otherwise writes modeled fields onto TagLib before saving.
     /// </para>
     /// <para>
-    /// For MPEG/MP3 files, ID3v1 and ID3v2 are materialized separately in <see cref="AudioTagOverlay"/> (phase 1); other
-    /// formats still use the merged TagLib <see cref="Tag"/> façade only.
+    /// For MPEG/MP3 files, ID3v1 and ID3v2 are materialized separately in <see cref="AudioTagOverlay"/>; non-MPEG files
+    /// also capture optional <see cref="AudioTagOverlay.Xiph"/>, <see cref="AudioTagOverlay.Ape"/>,
+    /// <see cref="AudioTagOverlay.Apple"/>, and <see cref="AudioTagOverlay.Asf"/> blocks when present, in addition to the merged façade fields.
     /// </para>
     /// <para>
     /// String fields cleared in the overlay are written as empty strings or null TagLib assigns; numerics use
@@ -42,10 +45,7 @@ namespace Mfr.Metadata
             _ValidateExistingRegularFile(absolutePath);
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
-            if (file is AudioFile)
-                return _ReadMpegOverlay(file);
-
-            return _FromTag(file.Tag);
+            return _ReadOverlay(file);
         }
 
         /// <summary>
@@ -64,14 +64,12 @@ namespace Mfr.Metadata
                 return;
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
-            if (file is AudioFile)
-            {
-                _ApplyToMpeg(file, previewOverlay);
-                file.Save();
-                return;
-            }
+            _ApplyNativeTagBlocks(file, previewOverlay);
 
-            _WriteOverlayToTag(file.Tag, previewOverlay);
+            if (file is AudioFile)
+                _ApplyToMpeg(file, previewOverlay);
+            else
+                _WriteOverlayToTag(file.Tag, previewOverlay);
 
             file.Save();
         }
@@ -91,16 +89,206 @@ namespace Mfr.Metadata
             file.Save();
         }
 
-        private static AudioTagOverlay _ReadMpegOverlay(TagLib.File file)
+        /// <summary>
+        /// Builds a full overlay including per–<see cref="TagTypes"/> blocks, reading native tags before the merged façade where needed.
+        /// </summary>
+        private static AudioTagOverlay _ReadOverlay(TagLib.File file)
         {
-            // Read structured ID3 tags before touching merged file.Tag; TagLib can adjust Id3v2 render details
-            // once the façade Tag has been accessed.
-            var id3v2 = _ReadId3v2Snapshot(file);
-            var id3v1 = _ReadId3v1Snapshot(file);
+            Id3v1TagData? id3v1 = null;
+            Id3v2TagData? id3v2 = null;
+            if (file is AudioFile)
+            {
+                // Read structured ID3 tags before touching merged file.Tag; TagLib can adjust Id3v2 render details
+                // once the façade Tag has been accessed.
+                id3v2 = _ReadId3v2Snapshot(file);
+                id3v1 = _ReadId3v1Snapshot(file);
+            }
+
+            var xiph = _ReadXiph(file);
+            var ape = _ReadApe(file);
+            var apple = _ReadApple(file);
+            var asf = _ReadAsf(file);
+
             var overlay = _FromTag(file.Tag);
-            overlay.Id3v2 = id3v2;
             overlay.Id3v1 = id3v1;
+            overlay.Id3v2 = id3v2;
+            overlay.Xiph = xiph;
+            overlay.Ape = ape;
+            overlay.Apple = apple;
+            overlay.Asf = asf;
             return overlay;
+        }
+
+        private static SerializedTagBlob? _ReadXiph(TagLib.File file)
+        {
+            if (file.GetTag(TagTypes.Xiph, false) is not XiphComment xc || xc.IsEmpty)
+                return null;
+
+            var rendered = xc.Render(addFramingBit: false);
+            return new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(rendered.Data) };
+        }
+
+        private static SerializedTagBlob? _ReadApe(TagLib.File file)
+        {
+            if (file.GetTag(TagTypes.Ape, false) is not TagLib.Ape.Tag ape || ape.IsEmpty)
+                return null;
+
+            var rendered = ape.Render();
+            return new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(rendered.Data) };
+        }
+
+        private static AppleTagData? _ReadApple(TagLib.File file)
+        {
+            if (file.GetTag(TagTypes.Apple, false) is not AppleTag apple || apple.IsEmpty)
+                return null;
+
+            var uniqueTypes = new SortedDictionary<string, ByteVector>(StringComparer.Ordinal);
+
+            foreach (var box in apple)
+            {
+                var typeData = box.BoxType.Data;
+                if (typeData is null || typeData.Length != 4)
+                    continue;
+
+                var hex = Convert.ToHexString(typeData);
+                if (uniqueTypes.ContainsKey(hex))
+                    continue;
+
+                uniqueTypes[hex] = box.BoxType;
+            }
+
+            var rows = new List<AppleAtomRow>();
+
+            foreach (var kvp in uniqueTypes)
+            {
+                var boxType = kvp.Value;
+                var texts = apple.GetText(boxType);
+                if (texts is null || texts.Length == 0)
+                    continue;
+
+                var vals = ImmutableArray.CreateRange(texts.Select(static s => s.Trim()));
+                var atomType = ImmutableArray.Create(boxType.Data);
+                rows.Add(new AppleAtomRow { AtomType = atomType, Values = vals });
+            }
+
+            rows.Sort(static (a, b) =>
+            {
+                var byType = a.AtomType.AsSpan().SequenceCompareTo(b.AtomType.AsSpan());
+                if (byType != 0)
+                    return byType;
+
+                return _CompareImmutableStringSeq(a.Values, b.Values);
+            });
+
+            return new AppleTagData { Atoms = [.. rows] };
+        }
+
+        private static AsfTagData? _ReadAsf(TagLib.File file)
+        {
+            if (file.GetTag(TagTypes.Asf, false) is not TagLib.Asf.Tag asf || asf.IsEmpty)
+                return null;
+
+            var rows = new List<AsfDescriptorRow>();
+            foreach (var d in asf)
+                rows.Add(new AsfDescriptorRow(d.Name, d.ToString()));
+
+            rows.Sort(static (a, b) =>
+            {
+                var byName = string.CompareOrdinal(a.Name, b.Name);
+                if (byName != 0)
+                    return byName;
+
+                return string.CompareOrdinal(a.Value, b.Value);
+            });
+
+            return new AsfTagData { Descriptors = [.. rows] };
+        }
+
+        private static int _CompareImmutableStringSeq(ImmutableArray<string> a, ImmutableArray<string> b)
+        {
+            var len = Math.Min(a.Length, b.Length);
+            for (var i = 0; i < len; i++)
+            {
+                var c = string.CompareOrdinal(a[i], b[i]);
+                if (c != 0)
+                    return c;
+            }
+
+            return a.Length.CompareTo(b.Length);
+        }
+
+        private static void _ApplyNativeTagBlocks(TagLib.File file, AudioTagOverlay overlay)
+        {
+            _ApplyXiph(file, overlay);
+            _ApplyApe(file, overlay);
+            _ApplyApple(file, overlay);
+            _ApplyAsf(file, overlay);
+        }
+
+        private static void _ApplyXiph(TagLib.File file, AudioTagOverlay overlay)
+        {
+            if (overlay.Xiph is null)
+                return;
+
+            if (file.GetTag(TagTypes.Xiph, true) is not XiphComment live)
+                return;
+
+            var parsed = new XiphComment([.. overlay.Xiph.CanonicalTagBytes.ToArray()]);
+            live.Clear();
+
+            foreach (var key in parsed)
+            {
+                var values = parsed.GetField(key);
+                if (values.Length == 0)
+                    continue;
+
+                live.SetField(key, values);
+            }
+        }
+
+        private static void _ApplyApe(TagLib.File file, AudioTagOverlay overlay)
+        {
+            if (overlay.Ape is null)
+                return;
+
+            if (file.GetTag(TagTypes.Ape, true) is not TagLib.Ape.Tag live)
+                return;
+
+            var parsed = new TagLib.Ape.Tag([.. overlay.Ape.CanonicalTagBytes.ToArray()]);
+            live.Clear();
+
+            foreach (var key in parsed)
+            {
+                var item = parsed.GetItem(key);
+                if (item is not null)
+                    live.SetItem(item);
+            }
+        }
+
+        private static void _ApplyApple(TagLib.File file, AudioTagOverlay overlay)
+        {
+            if (overlay.Apple is null)
+                return;
+
+            if (file.GetTag(TagTypes.Apple, true) is not AppleTag apple)
+                return;
+
+            foreach (var row in overlay.Apple.Atoms)
+                apple.SetText([.. row.AtomType.ToArray()], [.. row.Values]);
+        }
+
+        private static void _ApplyAsf(TagLib.File file, AudioTagOverlay overlay)
+        {
+            if (overlay.Asf is null)
+                return;
+
+            if (file.GetTag(TagTypes.Asf, true) is not TagLib.Asf.Tag asf)
+                return;
+
+            asf.Clear();
+
+            foreach (var row in overlay.Asf.Descriptors)
+                asf.AddDescriptor(new TagLib.Asf.ContentDescriptor(row.Name, row.Value));
         }
 
         private static Id3v1TagData? _ReadId3v1Snapshot(TagLib.File file)
