@@ -19,15 +19,15 @@ namespace Mfr.Models
         /// <inheritdoc />
         protected internal sealed override void ApplyCore(RenameItem item)
         {
-            var meta = item.Preview;
+            var preview = item.Preview;
 
             if (Target is AudioOverlayFieldTarget audioOverlayTarget)
             {
                 item.EnsureAudioTagsLoaded();
-                var current = AudioOverlaySemanticIo.GetInvariantFieldString(meta.AudioTagOverlay, audioOverlayTarget.Field);
+                var current = AudioOverlaySemanticIo.GetInvariantFieldString(preview.AudioTagOverlay, audioOverlayTarget.Field);
                 var transformed = TransformValue(current, item);
                 AudioOverlaySemanticIo.MergeInvariantStringIntoOverlay(
-                    overlay: meta.AudioTagOverlay,
+                    overlay: preview.AudioTagOverlay,
                     field: audioOverlayTarget.Field,
                     invariantString: transformed,
                     embeddedTagSourcePath: item.Original.FullPath);
@@ -35,9 +35,9 @@ namespace Mfr.Models
                 return;
             }
 
-            var previewCurrent = meta.GetTargetString(Target);
+            var previewCurrent = preview.GetTargetString(Target);
             var transformedValue = TransformValue(previewCurrent, item);
-            meta.SetTargetString(Target, transformedValue);
+            preview.SetTargetString(Target, transformedValue);
         }
 
         internal string TransformValue(string value, RenameItem item)
