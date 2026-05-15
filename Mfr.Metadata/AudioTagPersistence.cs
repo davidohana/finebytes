@@ -62,6 +62,21 @@ namespace Mfr.Metadata
             file.Save();
         }
 
+        /// <summary>
+        /// Removes all embedded tag blobs TagLib associates with the file (ID3, Vorbis comments, MP4 tags, RIFF lists, image markers, etc.).
+        /// </summary>
+        /// <param name="absolutePath">Path to an existing regular file (typically after rename, at the preview destination).</param>
+        /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
+        /// <exception cref="IOException">The file cannot be opened or saved.</exception>
+        public static void RemoveAllEmbeddedTags(string absolutePath)
+        {
+            _ValidateExistingRegularFile(absolutePath);
+
+            using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
+            file.RemoveTags(TagTypes.AllTags);
+            file.Save();
+        }
+
         private static void _WriteOverlayToTag(Tag tag, AudioTagOverlay overlay)
         {
             tag.Title = _EmptyStringToNull(overlay.Title);

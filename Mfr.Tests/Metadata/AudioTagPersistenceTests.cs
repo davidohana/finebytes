@@ -114,6 +114,28 @@ namespace Mfr.Tests.Metadata
             Assert.Equal(s_AliceBobPerformers, file.Tag.Performers);
         }
 
+        /// <summary>
+        /// Verifies <see cref="AudioTagPersistence.RemoveAllEmbeddedTags"/> clears all modeled fields read back from disk.
+        /// </summary>
+        [Fact]
+        public void RemoveAllEmbeddedTags_ClearsAllTags_OnMinimalWav()
+        {
+            var candidate = _AllocateMinimalWavPath();
+
+            using (var stub = TagLib.File.Create(candidate))
+            {
+                stub.Tag.Title = "t";
+                stub.Tag.Album = "a";
+                stub.Save();
+            }
+
+            AudioTagPersistence.RemoveAllEmbeddedTags(candidate);
+
+            var readBack = AudioTagPersistence.Read(candidate);
+            Assert.Null(readBack.Title);
+            Assert.Null(readBack.Album);
+        }
+
         private string _AllocateMinimalWavPath()
         {
             var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}_mfr-phase1.wav");

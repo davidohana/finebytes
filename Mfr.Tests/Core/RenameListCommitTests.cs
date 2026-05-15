@@ -1,4 +1,5 @@
 using Mfr.Core;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
@@ -121,6 +122,90 @@ namespace Mfr.Tests.Core
 
             var readBack = AudioTagPersistence.Read(sourcePath);
             Assert.Equal("DiskTitleAfter", readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies embedded-tag strip (TagLib <c>RemoveTags(All)</c>) runs on commit for tagged audio.
+        /// </summary>
+        public void Commit_EmbeddedTagRemover_StripsAllTags_OnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("tagged.wav");
+            TaggedMinimalWav.WriteTagged(sourcePath, title: "DiskTitleBefore", album: "AlbumZ");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled("embed-strip", new EmbeddedTagRemoverFilter());
+            var plan = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.True(item.StripAllEmbeddedTagsOnCommit);
+            Assert.Null(item.Preview.AudioTagOverlay.Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Single(results);
+            Assert.Equal(RenameStatus.CommitOk, results[0].Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Null(readBack.Title);
+            Assert.Null(readBack.Album);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies strip-all then an overlay formatter writes the new title after tags were removed.
+        /// </summary>
+        public void Commit_EmbeddedTagRemover_Then_Formatter_OnTitle_WritesAfterStrip()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("chain.wav");
+            TaggedMinimalWav.WriteTagged(sourcePath, title: "OldTitle", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+
+            var preset = _CreatePresetAllEnabled(
+                "strip-then-title",
+                new EmbeddedTagRemoverFilter(),
+                new FormatterFilter(
+                    Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                    Options: new FormatterOptions("AfterStrip")));
+            var plan = _SetupPreview(renameList, preset);
+            var item = Assert.Single(renameList.RenameItems);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("AfterStrip", item.Preview.AudioTagOverlay.Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("AfterStrip", readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies dry-run commit does not strip embedded tags from disk.
+        /// </summary>
+        public void Commit_DryRun_DoesNotStrip_EmbeddedTags()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("tagged-strip-dry.wav");
+            TaggedMinimalWav.WriteTagged(sourcePath, title: "OnlyOnDisk", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+
+            var preset = _CreatePresetAllEnabled("embed-strip-dry", new EmbeddedTagRemoverFilter());
+            var plan = _SetupPreview(renameList, preset);
+            var results = renameList.Commit(plan, failFast: false, dryRun: true);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("OnlyOnDisk", readBack.Title);
         }
 
         [Fact]

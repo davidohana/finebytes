@@ -177,19 +177,22 @@ namespace Mfr.Core
 
             try
             {
-                var shouldPersistEmbeddedTags = !dryRun
+                var shouldStripAllEmbeddedTags = !dryRun && item.StripAllEmbeddedTagsOnCommit;
+                var shouldPersistEmbeddedTagOverlay = !dryRun
                     && !previewSnapshot.AudioTagOverlay.Equals(originalSnapshot.AudioTagOverlay);
+
+                var changes = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
                 if (!dryRun)
                     RenameItemMover.FinalizeCommit(item, step.ActualSourcePath);
 
-                if (shouldPersistEmbeddedTags)
+                if (shouldStripAllEmbeddedTags)
+                    AudioTagPersistence.RemoveAllEmbeddedTags(item.Preview.FullPath);
+
+                if (shouldPersistEmbeddedTagOverlay)
                     AudioTagPersistence.Apply(item.Preview.FullPath, previewSnapshot.AudioTagOverlay);
 
                 item.Status = RenameStatus.CommitOk;
-                var changes = RenamePropertyChangeBuilder.BuildChangeRows(
-                    originalSnapshot: originalSnapshot,
-                    previewSnapshot: previewSnapshot);
                 outcomes[item] = new PlanOutcome(
                     OriginalPathBeforeCommit: originalPathBeforeCommit,
                     DestinationPath: destinationPath,

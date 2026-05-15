@@ -17,9 +17,9 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_IdenticalSnapshots_ReturnsEmpty()
         {
             var original = _CloneBaseline();
-            var preview = original.Clone();
+            var item = new RenameItem(original);
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Empty(rows);
         }
@@ -31,10 +31,10 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_PrefixChange_ReturnsSingleOrdinalRow()
         {
             var original = _CloneBaseline();
-            var preview = original.Clone();
-            preview.Prefix = "Song";
+            var item = new RenameItem(original);
+            item.Preview.Prefix = "Song";
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
             Assert.Equal("Prefix", row.Property);
@@ -49,10 +49,10 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_ExtensionChange_ReturnsExtensionRow()
         {
             var original = _CloneBaseline();
-            var preview = original.Clone();
-            preview.Extension = ".flac";
+            var item = new RenameItem(original);
+            item.Preview.Extension = ".flac";
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
             Assert.Equal("Extension", row.Property);
@@ -67,10 +67,10 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_DirectoryChange_ReturnsDirectoryPathRow()
         {
             var original = _CloneBaseline();
-            var preview = original.Clone();
-            preview.DirectoryPath = @"D:\Out";
+            var item = new RenameItem(original);
+            item.Preview.DirectoryPath = @"D:\Out";
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
             Assert.Equal("DirectoryPath", row.Property);
@@ -85,10 +85,10 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_DirectoryPathCaseOnly_DoesNotEmitDirectoryRow()
         {
             var original = _CloneBaseline(directoryPath: @"D:\Music\Album");
-            var preview = original.Clone();
-            preview.DirectoryPath = @"d:\music\album";
+            var item = new RenameItem(original);
+            item.Preview.DirectoryPath = @"d:\music\album";
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Empty(rows);
         }
@@ -100,10 +100,10 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_AttributesChange_ReturnsAttributesRow()
         {
             var original = _CloneBaseline();
-            var preview = original.Clone();
-            preview.Attributes = FileAttributes.ReadOnly;
+            var item = new RenameItem(original);
+            item.Preview.Attributes = FileAttributes.ReadOnly;
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
             Assert.Equal("Attributes", row.Property);
@@ -122,12 +122,12 @@ namespace Mfr.Tests.Core
             var t2 = new DateTime(2024, 3, 3, 3, 3, 3, DateTimeKind.Unspecified);
             var t3 = new DateTime(2024, 4, 4, 4, 4, 4, DateTimeKind.Unspecified);
             var original = _CloneBaseline(creationTime: t0, lastWriteTime: t1, lastAccessTime: t2);
-            var preview = original.Clone();
-            preview.CreationTime = t1;
-            preview.LastWriteTime = t2;
-            preview.LastAccessTime = t3;
+            var item = new RenameItem(original);
+            item.Preview.CreationTime = t1;
+            item.Preview.LastWriteTime = t2;
+            item.Preview.LastAccessTime = t3;
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Equal(3, rows.Count);
             Assert.Equal("CreationTime", rows[0].Property);
@@ -144,10 +144,10 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_AudioTagTitleChange_UsesJsonEncodedScalars()
         {
             var original = _CloneBaseline();
-            var preview = original.Clone();
-            preview.AudioTagOverlay.Title = "Next";
+            var item = new RenameItem(original);
+            item.Preview.AudioTagOverlay.Title = "Next";
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
             Assert.Equal("AudioTag.Title", row.Property);
@@ -162,10 +162,10 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_AudioTagYearChange_EncodesUIntAndNull()
         {
             var original = _CloneBaseline(configureOverlay: o => o.AudioTagOverlay.Year = 1999);
-            var preview = original.Clone();
-            preview.AudioTagOverlay.Year = 2001;
+            var item = new RenameItem(original);
+            item.Preview.AudioTagOverlay.Year = 2001;
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
             Assert.Equal("AudioTag.Year", row.Property);
@@ -180,10 +180,10 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_AudioTagLyricsWithNewline_SerializesEscapedLineBreak()
         {
             var original = _CloneBaseline();
-            var preview = original.Clone();
-            preview.AudioTagOverlay.Lyrics = "a\nb";
+            var item = new RenameItem(original);
+            item.Preview.AudioTagOverlay.Lyrics = "a\nb";
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
             Assert.Equal("AudioTag.Lyrics", row.Property);
@@ -198,16 +198,36 @@ namespace Mfr.Tests.Core
         public void BuildChangeRows_MixedDifferences_FollowsStableCategoryOrdering()
         {
             var original = _CloneBaseline(directoryPath: @"D:\A");
-            var preview = original.Clone();
-            preview.DirectoryPath = @"D:\B";
-            preview.Attributes = FileAttributes.ReadOnly;
-            preview.AudioTagOverlay.Genre = "Rock";
+            var item = new RenameItem(original);
+            item.Preview.DirectoryPath = @"D:\B";
+            item.Preview.Attributes = FileAttributes.ReadOnly;
+            item.Preview.AudioTagOverlay.Genre = "Rock";
 
-            var rows = RenamePropertyChangeBuilder.BuildChangeRows(original, preview);
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Equal(
                 ["DirectoryPath", "Attributes", "AudioTag.Genre"],
                 [.. rows.Select(r => r.Property)]);
+        }
+
+        /// <summary>
+        /// Strip-all flag changes surface after timestamp rows in the scalar section.
+        /// </summary>
+        [Fact]
+        public void BuildChangeRows_StripAllEmbeddedTagsOnCommit_FlagEmitsRow()
+        {
+            var original = _CloneBaseline();
+            var item = new RenameItem(original)
+            {
+                StripAllEmbeddedTagsOnCommit = true
+            };
+
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
+
+            var stripRow = Assert.Single(rows);
+            Assert.Equal("StripAllEmbeddedTagsOnCommit", stripRow.Property);
+            Assert.Equal(JsonSerializer.Serialize(false), stripRow.OldValue);
+            Assert.Equal(JsonSerializer.Serialize(true), stripRow.NewValue);
         }
 
         private static FileMeta _CloneBaseline(
@@ -217,7 +237,7 @@ namespace Mfr.Tests.Core
             DateTime? lastAccessTime = null,
             Action<FileMeta>? configureOverlay = null)
         {
-            var item = FilterTestHelpers.CreateRenameItem(
+            var testItem = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
                 extension: ".mp3",
                 directory: directoryPath ?? @"D:\In",
@@ -227,7 +247,7 @@ namespace Mfr.Tests.Core
                 lastAccessTime: lastAccessTime ?? new DateTime(2024, 6, 1, 12, 30, 47, DateTimeKind.Unspecified),
                 configureOriginal: configureOverlay);
 
-            return item.Original.Clone();
+            return testItem.Original.Clone();
         }
     }
 }

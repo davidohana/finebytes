@@ -70,6 +70,16 @@ namespace Mfr.Models
         public FileMeta Preview { get; private set; } = original.Clone();
 
         /// <summary>
+        /// When <see langword="true"/>, commit removes all embedded TagLib metadata on the destination file before overlay apply.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Set by the <c>EmbeddedTagRemover</c> filter when the preview chain requests a full tag strip.
+        /// </para>
+        /// </remarks>
+        public bool StripAllEmbeddedTagsOnCommit { get; set; }
+
+        /// <summary>
         /// Gets the latest error captured while generating preview for this item.
         /// </summary>
         public RenameItemError? PreviewError { get; set; }
@@ -144,6 +154,7 @@ namespace Mfr.Models
             _audioTagsLoadAttempted = false;
             Original.AudioTagOverlay = new AudioTagOverlay();
             Preview.AudioTagOverlay = new AudioTagOverlay();
+            StripAllEmbeddedTagsOnCommit = false;
         }
 
         /// <summary>
@@ -157,6 +168,7 @@ namespace Mfr.Models
             Status = RenameStatus.Init;
             WordSeparator = ' ';
             SentenceEndChars = ".!?";
+            StripAllEmbeddedTagsOnCommit = false;
         }
 
         internal void ClearPreview()
@@ -164,6 +176,7 @@ namespace Mfr.Models
             Preview = Original.Clone();
             WordSeparator = ' ';
             SentenceEndChars = ".!?";
+            StripAllEmbeddedTagsOnCommit = false;
         }
 
         internal void SetPreviewError(string message, Exception? cause)
@@ -206,6 +219,7 @@ namespace Mfr.Models
                 || Original.CreationTime != Preview.CreationTime
                 || Original.LastWriteTime != Preview.LastWriteTime
                 || Original.LastAccessTime != Preview.LastAccessTime
+                || StripAllEmbeddedTagsOnCommit
                 || !Original.AudioTagOverlay.Equals(Preview.AudioTagOverlay);
         }
     }

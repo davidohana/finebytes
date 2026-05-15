@@ -20,9 +20,7 @@ namespace Mfr.Core
             var originalFullPath = renameItem.Original.FullPath;
             Log.Debug("Preview changes for {OriginalFullPath}:", originalFullPath);
 
-            var previewChanges = RenamePropertyChangeBuilder.BuildChangeRows(
-                originalSnapshot: renameItem.Original,
-                previewSnapshot: renameItem.Preview);
+            var previewChanges = RenamePropertyChangeBuilder.BuildChangeRows(renameItem);
             foreach (var change in previewChanges)
             {
                 // Property on its own line; old then new below with fixed indent (avoids console-prefix alignment math).
@@ -52,9 +50,7 @@ namespace Mfr.Core
             if (!renameItem.HasPreviewChanges())
                 return string.Empty;
 
-            var previewChanges = RenamePropertyChangeBuilder.BuildChangeRows(
-                originalSnapshot: renameItem.Original,
-                previewSnapshot: renameItem.Preview);
+            var previewChanges = RenamePropertyChangeBuilder.BuildChangeRows(renameItem);
             if (previewChanges.Count == 0)
                 return $"{renameItem.Original.FullPath} --> {renameItem.Preview.FullPath}";
 

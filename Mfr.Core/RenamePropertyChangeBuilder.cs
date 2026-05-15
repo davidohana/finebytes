@@ -14,17 +14,22 @@ namespace Mfr.Core
         /// <para>
         /// Used for successful commit outcomes and for preview logging/console output so both surfaces stay aligned.
         /// </para>
-        /// <param name="originalSnapshot">Original metadata before apply.</param>
-        /// <param name="previewSnapshot">Preview metadata after apply.</param>
+        /// <param name="renameItem">Rename row holding original and preview metadata plus embedded-strip commit intent.</param>
         /// <returns>Ordered property-level deltas.</returns>
-        internal static List<RenamePropertyChange> BuildChangeRows(
-            FileMeta originalSnapshot,
-            FileMeta previewSnapshot)
+        internal static List<RenamePropertyChange> BuildChangeRows(RenameItem renameItem)
         {
+            ArgumentNullException.ThrowIfNull(renameItem);
             var changes = new List<RenamePropertyChange>();
-            _AppendStructuredPathDifferences(changes, originalSnapshot, previewSnapshot);
-            _AppendFileMetaScalarDifferences(changes, originalSnapshot, previewSnapshot);
-            _AppendAudioTagOverlayDifferences(changes, originalSnapshot.AudioTagOverlay, previewSnapshot.AudioTagOverlay);
+            _AppendStructuredPathDifferences(changes, renameItem.Original, renameItem.Preview);
+            _AppendFileMetaScalarDifferences(
+                changes,
+                renameItem.Original,
+                renameItem.Preview,
+                renameItem.StripAllEmbeddedTagsOnCommit);
+            _AppendAudioTagOverlayDifferences(
+                changes,
+                renameItem.Original.AudioTagOverlay,
+                renameItem.Preview.AudioTagOverlay);
             return changes;
         }
 
@@ -58,7 +63,8 @@ namespace Mfr.Core
         private static void _AppendFileMetaScalarDifferences(
             List<RenamePropertyChange> changes,
             FileMeta original,
-            FileMeta preview)
+            FileMeta preview,
+            bool stripAllEmbeddedTagsOnCommit)
         {
             if (original.Attributes != preview.Attributes)
             {
@@ -83,6 +89,14 @@ namespace Mfr.Core
                 propertyName: "LastAccessTime",
                 originalValue: original.LastAccessTime,
                 previewValue: preview.LastAccessTime);
+
+            if (stripAllEmbeddedTagsOnCommit)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "StripAllEmbeddedTagsOnCommit",
+                    OldValue: JsonSerializer.Serialize(false),
+                    NewValue: JsonSerializer.Serialize(true)));
+            }
         }
 
         /// <summary>Appends one row per differing scalar embedded-tag field.</summary>

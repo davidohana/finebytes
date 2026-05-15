@@ -497,7 +497,7 @@ Out of scope:
 
 Scope:
 - `Id3Tags` record fully implemented.
-- Audio-related filters (`AudioTagSetter`, `Id3v2FieldSetter`, `AudioTagRemover`, `SetFromFreeDB`).
+- Audio-related filters (`AudioTagSetter`, `Id3v2FieldSetter`, `EmbeddedTagRemover`, `SetFromFreeDB`).
 
 ### Phase 5 — EXIF and image metadata
 
@@ -1180,17 +1180,12 @@ Sets any specific ID3v2 frame by frame ID (e.g. TXXX, TIT1) for frames not acces
 }
 ```
 
-#### AudioTagRemover
-Deletes audio tags entirely or clears specific fields.
+#### EmbeddedTagRemover
+Strips **all** embedded TagLib metadata blobs on each file row (any format TagLib supports). No `target` or `options`; tag removal is applied when changes are committed (preview clears the modeled overlay).
 ```json
 {
-  "type": "AudioTagRemover",
-  "target": { "targetType": "AudioTag" },
-  "options": {
-    "removeId3v1": true,
-    "removeId3v2": false,
-    "removeFields": ["Comment", "Lyrics"]
-  }
+  "type": "EmbeddedTagRemover",
+  "enabled": true
 }
 ```
 
