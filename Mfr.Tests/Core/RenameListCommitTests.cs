@@ -46,8 +46,7 @@ namespace Mfr.Tests.Core
                 new FormatterFilter(
                     Target: new FileFullNameTarget(),
                     Options: new FormatterOptions("same.mp3")));
-            var plan = _SetupPreview(renameList, preset);
-            var result = renameList.Commit(plan, failFast: false);
+            var result = _PreviewAndCommit(renameList, preset);
 
             Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitOk));
             Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitError));
@@ -74,8 +73,7 @@ namespace Mfr.Tests.Core
             var files = renameList.RenameItems;
 
             var preset = _CounterReplacePrefixPreset("counter");
-            var plan = _SetupPreview(renameList, preset);
-            var result = renameList.Commit(plan, failFast: false);
+            var result = _PreviewAndCommit(renameList, preset);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
@@ -141,9 +139,7 @@ namespace Mfr.Tests.Core
                 new FormatterFilter(
                     Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
                     Options: new FormatterOptions("PreviewOnly")));
-            var plan = _SetupPreview(renameList, preset);
-
-            _ = renameList.Commit(plan, failFast: false, dryRun: true);
+            _ = _PreviewAndCommit(renameList, preset, dryRun: true);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
             Assert.Equal("OnlyOnDisk", readBack.Title);
@@ -165,8 +161,7 @@ namespace Mfr.Tests.Core
             renameList.AddSources([firstSource, secondSource]);
 
             var preset = _CounterReplacePrefixPreset("counter");
-            var plan = _SetupPreview(renameList, preset);
-            var result = renameList.Commit(plan, failFast: false, dryRun: true);
+            var result = _PreviewAndCommit(renameList, preset, dryRun: true);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
             Assert.True(File.Exists(firstSource));
@@ -191,8 +186,7 @@ namespace Mfr.Tests.Core
             renameList.AddSources([firstSource, secondSource]);
 
             var preset = _CounterReplacePrefixPreset("counter");
-            var plan = _SetupPreview(renameList, preset);
-            var result = renameList.Commit(plan, failFast: false, dryRun: false, confirmBeforeApply: _ => false);
+            var result = _PreviewAndCommit(renameList, preset, confirmBeforeApply: _ => false);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitSkipped));
             Assert.Equal(0, result.Count(x => x.Status == RenameStatus.CommitOk));
@@ -218,8 +212,7 @@ namespace Mfr.Tests.Core
             renameList.AddSources([firstSource, secondSource]);
 
             var preset = _CounterReplacePrefixPreset("counter");
-            var plan = _SetupPreview(renameList, preset);
-            var result = renameList.Commit(plan, failFast: false, dryRun: false, confirmBeforeApply: _ => true);
+            var result = _PreviewAndCommit(renameList, preset, confirmBeforeApply: _ => true);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
             Assert.False(File.Exists(firstSource));
@@ -331,6 +324,7 @@ namespace Mfr.Tests.Core
             var plan = _SetupPreview(renameList, preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
+            // Plan is from preview while both sources still exist; commit applies that plan after one source is removed.
             File.Delete(firstSource);
 
             var result = renameList.Commit(plan, failFast: true);
@@ -368,6 +362,7 @@ namespace Mfr.Tests.Core
             var plan = _SetupPreview(renameList, preset);
             Assert.DoesNotContain(files, item => item.PreviewError is not null);
 
+            // Same pattern as <see cref="Commit_StopsOnFirstRenameError_WhenFailFastTrue"/>: commit runs against the pre-delete plan.
             File.Delete(firstSource);
 
             var result = renameList.Commit(plan, failFast: false);
@@ -444,8 +439,7 @@ namespace Mfr.Tests.Core
             var files = renameList.RenameItems;
 
             var preset = _CreateEmptyStepsPreset("no-change");
-            var plan = _SetupPreview(renameList, preset);
-            var result = renameList.Commit(plan, failFast: false);
+            var result = _PreviewAndCommit(renameList, preset);
 
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
@@ -469,8 +463,7 @@ namespace Mfr.Tests.Core
             var files = renameList.RenameItems;
 
             var preset = _CreateEmptyStepsPreset("no-change");
-            var plan = _SetupPreview(renameList, preset);
-            var result = renameList.Commit(plan, failFast: false, dryRun: true);
+            var result = _PreviewAndCommit(renameList, preset, dryRun: true);
 
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
@@ -495,8 +488,7 @@ namespace Mfr.Tests.Core
             renameList.AddSources([source]);
 
             var preset = _CounterReplacePrefixPreset("counter");
-            var plan = _SetupPreview(renameList, preset);
-            var result = renameList.Commit(plan, failFast: false);
+            var result = _PreviewAndCommit(renameList, preset);
 
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitError, result[0].Status);
@@ -617,9 +609,7 @@ namespace Mfr.Tests.Core
             renameList.AddSources([path]);
 
             var preset = _SetHiddenAttributesPreset("attrs-dry");
-            var plan = _SetupPreview(renameList, preset);
-
-            var result = renameList.Commit(plan, failFast: false, dryRun: true);
+            var result = _PreviewAndCommit(renameList, preset, dryRun: true);
             _AssertSingleCommitOk(result);
 
             var attrsAfter = File.GetAttributes(path);
@@ -874,9 +864,7 @@ namespace Mfr.Tests.Core
                 includeFolders: true);
 
             var preset = _SetHiddenAttributesPreset("attrs-folder-dry");
-            var plan = _SetupPreview(renameList, preset);
-
-            var result = renameList.Commit(plan, failFast: false, dryRun: true);
+            var result = _PreviewAndCommit(renameList, preset, dryRun: true);
             _AssertSingleCommitOk(result);
 
             var attrsAfter = File.GetAttributes(folderPath);
@@ -1069,6 +1057,32 @@ namespace Mfr.Tests.Core
                 new FormatterFilter(Target: new FullPathTarget(), Options: new FormatterOptions(fullPath)));
         }
 
+        /// <summary>
+        /// Calls <see cref="_SetupPreview"/> then <see cref="RenameList.Commit"/> for tests that need no steps between preview and commit.
+        /// </summary>
+        /// <param name="renameList">The list under test.</param>
+        /// <param name="preset">Preset whose chain is configured then previewed.</param>
+        /// <param name="failFast">Forwarded to <see cref="RenameList.Commit"/>.</param>
+        /// <param name="dryRun">Forwarded to <see cref="RenameList.Commit"/>.</param>
+        /// <param name="confirmBeforeApply">Forwarded to <see cref="RenameList.Commit"/>.</param>
+        /// <returns>The commit results.</returns>
+        private static IReadOnlyList<RenameResultItem> _PreviewAndCommit(
+            RenameList renameList,
+            FilterPreset preset,
+            bool failFast = false,
+            bool dryRun = false,
+            Func<RenameItem, bool>? confirmBeforeApply = null)
+        {
+            var plan = _SetupPreview(renameList, preset);
+            return renameList.Commit(plan, failFast, dryRun, confirmBeforeApply);
+        }
+
+        /// <summary>
+        /// Applies <see cref="FilterChain.SetupFilters"/> then runs <see cref="RenameList.Preview"/>.
+        /// </summary>
+        /// <param name="renameList">The list under test.</param>
+        /// <param name="preset">Preset whose chain will be set up.</param>
+        /// <returns>The commit plan to pass to <see cref="RenameList.Commit"/> when preview-only assertions or mutations must happen first.</returns>
         private static CommitPlan _SetupPreview(RenameList renameList, FilterPreset preset)
         {
             preset.Chain.SetupFilters();
