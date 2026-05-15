@@ -14,9 +14,9 @@ namespace Mfr.Filters.Formatting.Tokens.Generators
         public IReadOnlyList<string> Names { get; } = ["now"];
 
         /// <inheritdoc />
-        public Formatter Compile(string arg)
+        public Formatter Compile(string tokenArgs)
         {
-            var format = string.IsNullOrWhiteSpace(arg) ? null : arg;
+            var format = string.IsNullOrWhiteSpace(tokenArgs) ? null : tokenArgs;
             return format is null
                 ? _ => DateTimeOffset.UtcNow.ToString("o")
                 : _ => DateTimeOffset.UtcNow.ToString(format);

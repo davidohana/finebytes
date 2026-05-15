@@ -33,15 +33,15 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         /// <exception cref="UserException">
         /// Thrown when the list file path is invalid, missing, or a line exceeds configured limits.
         /// </exception>
-        public Formatter Compile(string arg)
+        public Formatter Compile(string tokenArgs)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             Require.That(
-                !string.IsNullOrWhiteSpace(arg),
+                !string.IsNullOrWhiteSpace(tokenArgs),
                 $"{tokenDisplayName} requires one argument: name-list-file-path.",
-                nameof(arg));
+                nameof(tokenArgs));
 
-            var normalizedPath = Path.GetFullPath(arg);
+            var normalizedPath = Path.GetFullPath(tokenArgs);
             var entries = NameListParser.ParseFile(filePath: normalizedPath);
             return item =>
             {

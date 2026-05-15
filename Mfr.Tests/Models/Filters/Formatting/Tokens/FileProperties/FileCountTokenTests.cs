@@ -23,7 +23,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
                 var token = new FileCountToken();
                 var item = FilterTestHelpers.CreateRenameItem(directory: tempDir);
 
-                Assert.Equal("2", token.Compile(arg: "")(item));
+                Assert.Equal("2", token.Compile(tokenArgs: "")(item));
             }
             finally
             {
@@ -44,7 +44,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
                 var token = new FileCountToken();
                 var item = FilterTestHelpers.CreateRenameItem(directory: tempDir);
 
-                Assert.Equal("0", token.Compile(arg: "")(item));
+                Assert.Equal("0", token.Compile(tokenArgs: "")(item));
             }
             finally
             {
@@ -61,7 +61,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileCountToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\DoesNotExist\Never");
 
-            Assert.Equal(string.Empty, token.Compile(arg: "")(item));
+            Assert.Equal(string.Empty, token.Compile(tokenArgs: "")(item));
         }
     }
 }

@@ -66,9 +66,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Thrown when an unrecognized unit is supplied.</exception>
         /// <exception cref="UnreachableException">Thrown when an unexpected unit enum value appears at runtime.</exception>
-        public Formatter Compile(string arg)
+        public Formatter Compile(string tokenArgs)
         {
-            var options = _ParseOptions(FormatOptionsParsing.TokenDisplayName(this), arg);
+            var options = _ParseOptions(FormatOptionsParsing.TokenDisplayName(this), tokenArgs);
             return item =>
             {
                 var bytes = (double)item.Original.FileSize;
@@ -84,9 +84,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             };
         }
 
-        private static Options _ParseOptions(string tokenDisplayName, string arg)
+        private static Options _ParseOptions(string tokenDisplayName, string tokenArgs)
         {
-            var parts = arg.Split(',', 2, StringSplitOptions.TrimEntries);
+            var parts = tokenArgs.Split(',', 2, StringSplitOptions.TrimEntries);
             var unitArg = parts.Length > 0 ? parts[0] : "";
             var decimalArg = parts.Length > 1 ? parts[1] : "";
 

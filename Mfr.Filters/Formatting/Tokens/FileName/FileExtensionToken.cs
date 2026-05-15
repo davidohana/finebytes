@@ -10,9 +10,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
-        public Formatter Compile(string arg)
+        public Formatter Compile(string tokenArgs)
         {
-            FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
+            FormatOptionsParsing.RequireNoArgument(tokenArgs, FormatOptionsParsing.TokenDisplayName(this));
             return item => item.Original.Extension;
         }
     }

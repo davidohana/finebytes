@@ -55,9 +55,9 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the format argument is malformed.</exception>
-        public Formatter Compile(string arg)
+        public Formatter Compile(string tokenArgs)
         {
-            var options = _ParseOptions(arg);
+            var options = _ParseOptions(tokenArgs);
             var compiledSource = FormatStringCompiler.Compile(options.SourceFormatString);
             return item =>
             {
@@ -76,35 +76,35 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             };
         }
 
-        private Options _ParseOptions(string arg)
+        private Options _ParseOptions(string tokenArgs)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             Require.That(
-                !string.IsNullOrEmpty(arg),
+                !string.IsNullOrEmpty(tokenArgs),
                 $"{tokenDisplayName} requires named options ({FormatOptionsParsing.FormatExpectedKeywords(_substrOptionKeys)}).",
-                nameof(arg));
+                nameof(tokenArgs));
 
-            var map = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
-            FormatOptionsParsing.RequireKnownOptionKeysOnly(map, tokenDisplayName, _substrOptionKeys, nameof(arg));
-            FormatOptionsParsing.RequireAllOptionKeysPresent(map, tokenDisplayName, _substrOptionKeys, nameof(arg));
+            var map = FormatOptionsParsing.ParseNamedKeyValuePairs(tokenArgs.Trim(), tokenDisplayName);
+            FormatOptionsParsing.RequireKnownOptionKeysOnly(map, tokenDisplayName, _substrOptionKeys, nameof(tokenArgs));
+            FormatOptionsParsing.RequireAllOptionKeysPresent(map, tokenDisplayName, _substrOptionKeys, nameof(tokenArgs));
 
             var startText = map["start"].Trim();
             var startParsedOk = int.TryParse(startText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var startPosition);
             Require.That(
                 startParsedOk,
                 $"{tokenDisplayName} start must be a non-zero integer (got '{startText}').",
-                nameof(arg));
+                nameof(tokenArgs));
 
             var endText = map["end"].Trim();
             var endParsedOk = int.TryParse(endText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var endPosition);
             Require.That(
                 endParsedOk,
                 $"{tokenDisplayName} end must be a non-zero integer (got '{endText}').",
-                nameof(arg));
+                nameof(tokenArgs));
 
-            Require.That(startPosition != 0, $"{tokenDisplayName} start must not be zero.", nameof(arg));
+            Require.That(startPosition != 0, $"{tokenDisplayName} start must not be zero.", nameof(tokenArgs));
 
-            Require.That(endPosition != 0, $"{tokenDisplayName} end must not be zero.", nameof(arg));
+            Require.That(endPosition != 0, $"{tokenDisplayName} end must not be zero.", nameof(tokenArgs));
 
             return new Options(
                 StartPosition: startPosition,

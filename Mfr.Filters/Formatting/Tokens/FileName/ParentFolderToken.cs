@@ -18,9 +18,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         public IReadOnlyList<string> Names { get; } = ["parent-folder"];
 
         /// <inheritdoc />
-        public Formatter Compile(string arg)
+        public Formatter Compile(string tokenArgs)
         {
-            var level = string.IsNullOrWhiteSpace(arg) ? 1 : int.Parse(arg, CultureInfo.InvariantCulture);
+            var level = string.IsNullOrWhiteSpace(tokenArgs) ? 1 : int.Parse(tokenArgs, CultureInfo.InvariantCulture);
             return item =>
             {
                 try

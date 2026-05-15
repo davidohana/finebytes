@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileDateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: "")(item));
             Assert.Contains("requires arguments", ex.Message);
         }
 
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var creation = new DateTime(2023, 4, 7, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(creationTime: creation);
 
-            Assert.Equal("07-04-2023", token.Compile(arg: "dd-MM-yyyy,creation")(item));
+            Assert.Equal("07-04-2023", token.Compile(tokenArgs: "dd-MM-yyyy,creation")(item));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileDateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "yyyy")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: "yyyy")(item));
             Assert.Contains("date-kind", ex.Message);
         }
 
@@ -56,7 +56,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var creation = new DateTime(2022, 1, 2, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(creationTime: creation);
 
-            Assert.Equal("2022-01-02", token.Compile(arg: "yyyy-MM-dd,creation")(item));
+            Assert.Equal("2022-01-02", token.Compile(tokenArgs: "yyyy-MM-dd,creation")(item));
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var lastWrite = new DateTime(2021, 11, 30, 0, 0, 0, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: lastWrite);
 
-            Assert.Equal("2021", token.Compile(arg: "yyyy,lastWrite")(item));
+            Assert.Equal("2021", token.Compile(tokenArgs: "yyyy,lastWrite")(item));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var lastAccess = new DateTime(2020, 1, 15, 9, 5, 3, DateTimeKind.Unspecified);
             var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: lastAccess);
 
-            Assert.Equal("09-05-03", token.Compile(arg: "HH-mm-ss,lastAccess")(item));
+            Assert.Equal("09-05-03", token.Compile(tokenArgs: "HH-mm-ss,lastAccess")(item));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileDateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "lastWrite")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: "lastWrite")(item));
             Assert.Contains("comma", ex.Message);
         }
 
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileDateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            Assert.Throws<ArgumentException>(() => token.Compile(arg: "dd-MM-yyyy,bogus")(item));
+            Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: "dd-MM-yyyy,bogus")(item));
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileDateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: ",lastWrite")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: ",lastWrite")(item));
             Assert.Contains("format", ex.Message);
         }
 
@@ -132,7 +132,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new FileDateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "yyyy,")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: "yyyy,")(item));
             Assert.Contains("date-kind", ex.Message);
         }
 

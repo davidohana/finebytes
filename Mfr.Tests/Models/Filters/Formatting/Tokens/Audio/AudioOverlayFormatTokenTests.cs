@@ -50,7 +50,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
 
             foreach (var bad in new[] { "0", "1", "x" })
             {
-                var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: bad)(item));
+                var ex = Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: bad)(item));
                 Assert.Contains("audio-title", ex.Message, StringComparison.OrdinalIgnoreCase);
             }
         }

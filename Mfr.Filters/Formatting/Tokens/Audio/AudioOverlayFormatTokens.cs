@@ -14,9 +14,9 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
         public IReadOnlyList<string> Names => names;
 
         /// <inheritdoc />
-        public Formatter Compile(string arg)
+        public Formatter Compile(string tokenArgs)
         {
-            FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
+            FormatOptionsParsing.RequireNoArgument(tokenArgs, FormatOptionsParsing.TokenDisplayName(this));
 
             return item =>
             {

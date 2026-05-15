@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var token = new FileNameToken();
             var item = FilterTestHelpers.CreateRenameItem(prefix: "song", extension: ".mp3");
 
-            Assert.Equal("song", token.Compile(arg: "")(item));
+            Assert.Equal("song", token.Compile(tokenArgs: "")(item));
             Assert.Contains("file-name", token.Names);
         }
 
@@ -29,7 +29,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var token = new FileNameToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
-            var ex = Assert.Throws<ArgumentException>(() => token.Compile(arg: "x")(item));
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: "x")(item));
             Assert.Contains("file-name", ex.Message);
         }
     }

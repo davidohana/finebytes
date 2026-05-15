@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var token = new ParentFolderToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Music\My Album");
 
-            Assert.Equal("My Album", token.Compile(arg: "")(item));
+            Assert.Equal("My Album", token.Compile(tokenArgs: "")(item));
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var token = new ParentFolderToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Music\My Album");
 
-            Assert.Equal("My Album", token.Compile(arg: "1")(item));
+            Assert.Equal("My Album", token.Compile(tokenArgs: "1")(item));
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var token = new ParentFolderToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Medical Data\apr03\patients");
 
-            Assert.Equal("apr03", token.Compile(arg: "2")(item));
+            Assert.Equal("apr03", token.Compile(tokenArgs: "2")(item));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var token = new ParentFolderToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Medical Data\apr03\patients");
 
-            Assert.Equal(string.Empty, token.Compile(arg: "5")(item));
+            Assert.Equal(string.Empty, token.Compile(tokenArgs: "5")(item));
         }
     }
 }

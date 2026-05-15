@@ -24,10 +24,10 @@ namespace Mfr.Filters.Formatting.Tokens
         IReadOnlyList<string> Names { get; }
 
         /// <summary>
-        /// Parses <paramref name="arg"/> once and returns a delegate that resolves this token per item.
+        /// Parses <paramref name="tokenArgs"/> once and returns a delegate that resolves this token per item.
         /// </summary>
-        /// <param name="arg">Raw argument text from the template (after the first <c>:</c>); empty when no argument was supplied.</param>
+        /// <param name="tokenArgs">Raw argument text after the first <c>:</c> in the token span; empty when omitted.</param>
         /// <returns>A <see cref="Formatter"/> that resolves this token against a <see cref="RenameItem"/> at rename time.</returns>
-        Formatter Compile(string arg);
+        Formatter Compile(string tokenArgs);
     }
 }

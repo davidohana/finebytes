@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var token = new FileExtensionToken();
             var item = FilterTestHelpers.CreateRenameItem(extension: ".flac");
 
-            Assert.Equal(".flac", token.Compile(arg: "")(item));
+            Assert.Equal(".flac", token.Compile(tokenArgs: "")(item));
         }
 
         /// <summary>

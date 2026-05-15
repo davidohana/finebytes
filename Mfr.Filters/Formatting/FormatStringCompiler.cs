@@ -176,10 +176,10 @@ namespace Mfr.Filters.Formatting
         {
             var colonIndex = tokenInner.IndexOf(':');
             var name = colonIndex < 0 ? tokenInner : tokenInner[..colonIndex];
-            var arg = colonIndex < 0 ? "" : tokenInner[(colonIndex + 1)..];
+            var tokenArgs = colonIndex < 0 ? "" : tokenInner[(colonIndex + 1)..];
             if (!_nameToToken.TryGetValue(name, out var token))
                 throw new NotSupportedException($"Unknown formatter token '<{name}>'. See the Formatter docs for supported tokens.");
-            return token.Compile(arg);
+            return token.Compile(tokenArgs);
         }
 
         private static Dictionary<string, IFormatToken> _DiscoverTokens()

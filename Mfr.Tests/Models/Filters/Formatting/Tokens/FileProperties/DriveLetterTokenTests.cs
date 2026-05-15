@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new DriveLetterToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Medical Data\patients");
 
-            Assert.Equal("C:", token.Compile(arg: "")(item));
+            Assert.Equal("C:", token.Compile(tokenArgs: "")(item));
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new DriveLetterToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"\\server\share\docs");
 
-            Assert.Equal("$", token.Compile(arg: "")(item));
+            Assert.Equal("$", token.Compile(tokenArgs: "")(item));
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var token = new DriveLetterToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: "");
 
-            Assert.Equal(string.Empty, token.Compile(arg: "")(item));
+            Assert.Equal(string.Empty, token.Compile(tokenArgs: "")(item));
         }
     }
 }

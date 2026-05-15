@@ -18,21 +18,21 @@ namespace Mfr.Filters.Formatting.Tokens.Generators
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the argument is not exactly two comma-separated characters.</exception>
-        public Formatter Compile(string arg)
+        public Formatter Compile(string tokenArgs)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
-            var segments = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            var segments = tokenArgs.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             Require.That(
                 segments.Length == 2,
-                $"Invalid {tokenDisplayName} token arg '{arg}'. Expected '{tokenDisplayName}:low,high' with two single-character endpoints.",
-                nameof(arg));
+                $"Invalid {tokenDisplayName} arguments '{tokenArgs}'. Expected '{tokenDisplayName}:low,high' with two single-character endpoints.",
+                nameof(tokenArgs));
 
             var lowSegment = segments[0];
             var highSegment = segments[1];
             Require.That(
                 lowSegment.Length != 0 && highSegment.Length != 0,
                 $"Invalid {tokenDisplayName} token: each endpoint must contain at least one character.",
-                nameof(arg));
+                nameof(tokenArgs));
 
             var low = lowSegment[0];
             var high = highSegment[0];

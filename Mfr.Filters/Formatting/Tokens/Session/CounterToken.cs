@@ -98,9 +98,9 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the format argument is missing required fields or has invalid values.</exception>
         /// <exception cref="InvalidOperationException">Thrown when automatic leading-zero mode needs list counts that are not populated.</exception>
-        public Formatter Compile(string arg)
+        public Formatter Compile(string tokenArgs)
         {
-            var options = _ParseOptions(arg);
+            var options = _ParseOptions(tokenArgs);
             return item =>
             {
                 var usePerFolder = options.ResetOnFolderChange == 1;
@@ -123,18 +123,18 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             };
         }
 
-        private Options _ParseOptions(string arg)
+        private Options _ParseOptions(string tokenArgs)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             Dictionary<string, string> merged;
-            if (string.IsNullOrWhiteSpace(arg))
+            if (string.IsNullOrWhiteSpace(tokenArgs))
             {
                 merged = new Dictionary<string, string>(_counterDefaults, StringComparer.OrdinalIgnoreCase);
             }
             else
             {
-                var parsed = FormatOptionsParsing.ParseNamedKeyValuePairs(arg.Trim(), tokenDisplayName);
-                FormatOptionsParsing.RequireKnownOptionKeysOnly(parsed, tokenDisplayName, _counterOptionKeys, nameof(arg));
+                var parsed = FormatOptionsParsing.ParseNamedKeyValuePairs(tokenArgs.Trim(), tokenDisplayName);
+                FormatOptionsParsing.RequireKnownOptionKeysOnly(parsed, tokenDisplayName, _counterOptionKeys, nameof(tokenArgs));
 
                 merged = new Dictionary<string, string>(_counterDefaults, StringComparer.OrdinalIgnoreCase);
                 foreach (var kv in parsed)
