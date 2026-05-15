@@ -40,7 +40,7 @@ namespace Mfr.Models
     /// Represents the commit outcome for one rename item.
     /// </summary>
     /// <param name="OriginalPath">Original source path before commit.</param>
-    /// <param name="Status">Final preview/commit status for this row.</param>
+    /// <param name="Status">Outcome status for this row (including <see cref="RenameStatus.PreviewError"/> when commit did not apply preview-flagged errors).</param>
     /// <param name="Error">Optional error message when commit fails.</param>
     /// <param name="Changes">Property-level changes that were applied for this item.</param>
     public sealed record RenameResultItem(

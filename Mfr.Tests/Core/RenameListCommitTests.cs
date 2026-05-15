@@ -27,9 +27,9 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
-        /// Verifies that duplicate destinations are surfaced as commit-time rename errors.
+        /// Verifies duplicate preview destinations produce preview-error results and no filesystem moves.
         /// </summary>
-        public void CommitError_ForDuplicateDestinations()
+        public void Commit_DoesNotApply_WhenDuplicatePreviewDestinations()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var a = dir.CombinePath("a.mp3");
@@ -48,12 +48,14 @@ namespace Mfr.Tests.Core
                     Options: new FormatterOptions("same.mp3")));
             var result = _PreviewAndCommit(renameList, preset);
 
-            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitOk));
-            Assert.Equal(1, result.Count(x => x.Status == RenameStatus.CommitError));
+            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.PreviewError));
+            Assert.Equal(0, result.Count(x => x.Status == RenameStatus.CommitOk));
             Assert.Equal(2, files.Count(item => item.PreviewError is not null));
-            Assert.Equal(1, files.Count(item => item.CommitError is not null));
-            Assert.True(File.Exists(a) ^ File.Exists(b), "exactly one source file should remain after one succeeds and one fails");
-            Assert.True(File.Exists(dir.CombinePath("same.mp3")));
+            Assert.Null(files[0].CommitError);
+            Assert.Null(files[1].CommitError);
+            Assert.True(File.Exists(a));
+            Assert.True(File.Exists(b));
+            Assert.False(File.Exists(dir.CombinePath("same.mp3")));
         }
 
         [Fact]
@@ -474,9 +476,9 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
-        /// Verifies that commit reports an error when destination already exists on disk.
+        /// Verifies occupied destinations surface as <see cref="RenameStatus.PreviewError"/> and commit applies nothing.
         /// </summary>
-        public void Commit_ErrorsItem_WhenDestinationAlreadyExists()
+        public void Commit_PreviewError_WhenDestinationAlreadyOccupied()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var source = dir.CombinePath("track.mp3");
@@ -491,7 +493,8 @@ namespace Mfr.Tests.Core
             var result = _PreviewAndCommit(renameList, preset);
 
             Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitError, result[0].Status);
+            Assert.Equal(RenameStatus.PreviewError, result[0].Status);
+            Assert.Contains("already in use", result[0].Error!, StringComparison.OrdinalIgnoreCase);
             Assert.Empty(result[0].Changes);
             Assert.True(File.Exists(source));
             Assert.True(File.Exists(existingDestination));

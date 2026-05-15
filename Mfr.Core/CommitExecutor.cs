@@ -28,6 +28,10 @@ namespace Mfr.Core
     /// decides what order items commit in; the executor carries out those steps, tracks outcomes,
     /// and handles confirmation, dry-run, and fail-fast semantics.
     /// </para>
+    /// <para>
+    /// Rows in <see cref="RenameStatus.PreviewError"/> are never committed; they appear in results as
+    /// <see cref="RenameStatus.PreviewError"/> with no filesystem changes.
+    /// </para>
     /// </remarks>
     internal static class CommitExecutor
     {
@@ -53,22 +57,12 @@ namespace Mfr.Core
         {
             var outcomes = new Dictionary<RenameItem, PlanOutcome>(ReferenceEqualityComparer.Instance);
 
-            var planStopped = _ExecutePlan(
+            _ExecutePlan(
                 plan: plan,
                 confirmBeforeApply: confirmBeforeApply,
                 failFast: failFast,
                 dryRun: dryRun,
                 outcomes: outcomes);
-
-            if (!planStopped)
-            {
-                _ExecutePreviewErrorFallback(
-                    allItems: allItems,
-                    confirmBeforeApply: confirmBeforeApply,
-                    failFast: failFast,
-                    dryRun: dryRun,
-                    outcomes: outcomes);
-            }
 
             return [.. allItems.Select(item => _BuildResultForItem(item: item, outcomes: outcomes))];
         }
@@ -81,8 +75,7 @@ namespace Mfr.Core
         /// <param name="failFast">Whether to stop on the first plan-step error.</param>
         /// <param name="dryRun">Whether to skip filesystem writes.</param>
         /// <param name="outcomes">Per-item outcome accumulator populated by this method.</param>
-        /// <returns><c>true</c> when execution stopped early because <paramref name="failFast"/> tripped.</returns>
-        private static bool _ExecutePlan(
+        private static void _ExecutePlan(
             CommitPlan plan,
             Func<RenameItem, bool>? confirmBeforeApply,
             bool failFast,
@@ -130,109 +123,6 @@ namespace Mfr.Core
                         stopped = true;
 
                 }
-            }
-
-            return stopped;
-        }
-
-        /// <summary>
-        /// Best-effort commit attempt for items whose preview was flagged as a conflict.
-        /// </summary>
-        /// <param name="allItems">All items in the rename list.</param>
-        /// <param name="confirmBeforeApply">Optional per-item confirmation callback; called immediately before each item commits.</param>
-        /// <param name="failFast">Whether to stop on the first per-item error.</param>
-        /// <param name="dryRun">Whether to skip filesystem writes.</param>
-        /// <param name="outcomes">Per-item outcome accumulator populated by this method.</param>
-        /// <remarks>
-        /// <para>
-        /// Conflict-flagged items are committed in insertion order
-        /// so the underlying filesystem produces the authoritative error (or, in the duplicate-destination
-        /// case, allows the first item to win and the second to fail with an OS-level message).
-        /// </para>
-        /// </remarks>
-        private static void _ExecutePreviewErrorFallback(
-            IReadOnlyList<RenameItem> allItems,
-            Func<RenameItem, bool>? confirmBeforeApply,
-            bool failFast,
-            bool dryRun,
-            Dictionary<RenameItem, PlanOutcome> outcomes)
-        {
-            var stopped = false;
-            foreach (var item in allItems)
-            {
-                if (stopped)
-                    break;
-
-                if (item.Status != RenameStatus.PreviewError)
-                    continue;
-
-                if (!item.HasPreviewChanges())
-                    continue;
-
-                var confirmed = confirmBeforeApply is null || confirmBeforeApply(item);
-                if (!confirmed)
-                    continue;
-
-                var stepFailed = !_AttemptDirectCommit(
-                                    item: item,
-                                    dryRun: dryRun,
-                                    outcomes: outcomes);
-                if (stepFailed && failFast)
-                    stopped = true;
-
-            }
-        }
-
-        private static bool _AttemptDirectCommit(
-            RenameItem item,
-            bool dryRun,
-            Dictionary<RenameItem, PlanOutcome> outcomes)
-        {
-            item.CommitError = null;
-            var originalPathBeforeCommit = item.Original.FullPath;
-            var destinationPath = item.Preview.FullPath;
-            var originalSnapshot = item.Original;
-            var previewSnapshot = item.Preview;
-
-            try
-            {
-                var shouldPersistEmbeddedTags = !dryRun
-                    && !previewSnapshot.AudioTagOverlay.Equals(originalSnapshot.AudioTagOverlay);
-
-                if (!dryRun)
-                    RenameItemMover.FinalizeCommit(item, item.Original.FullPath);
-
-                if (shouldPersistEmbeddedTags)
-                    AudioTagPersistence.Apply(item.Preview.FullPath, previewSnapshot.AudioTagOverlay);
-
-                item.Status = RenameStatus.CommitOk;
-                var changes = RenamePropertyChangeBuilder.BuildChangeRows(
-                    originalSnapshot: originalSnapshot,
-                    previewSnapshot: previewSnapshot);
-                outcomes[item] = new PlanOutcome(
-                    OriginalPathBeforeCommit: originalPathBeforeCommit,
-                    DestinationPath: destinationPath,
-                    Changes: changes,
-                    Status: RenameStatus.CommitOk,
-                    ErrorMessage: null);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
-                item.Status = RenameStatus.CommitError;
-                outcomes[item] = new PlanOutcome(
-                    OriginalPathBeforeCommit: originalPathBeforeCommit,
-                    DestinationPath: destinationPath,
-                    Changes: [],
-                    Status: RenameStatus.CommitError,
-                    ErrorMessage: ex.Message);
-                Log.Error(
-                    ex,
-                    "Direct commit failed for '{SourcePath}' -> '{DestinationPath}'.",
-                    originalPathBeforeCommit,
-                    destinationPath);
-                return false;
             }
         }
 
@@ -335,8 +225,18 @@ namespace Mfr.Core
                     Changes: outcome.Changes);
             }
 
+            if (item.Status == RenameStatus.PreviewError)
+            {
+                var previewMessage = item.PreviewError?.Message;
+                return new RenameResultItem(
+                    OriginalPath: item.Original.FullPath,
+                    Status: RenameStatus.PreviewError,
+                    Error: previewMessage,
+                    Changes: []);
+            }
+
             // No plan-walk outcome was recorded for this item. That covers preview-only no-change
-            // items, confirmation rejections, fail-fast skips, and unresolvable cycle members.
+            // items, confirmation rejections, and fail-fast skips.
             item.Status = RenameStatus.CommitSkipped;
             return new RenameResultItem(
                 OriginalPath: item.Original.FullPath,
