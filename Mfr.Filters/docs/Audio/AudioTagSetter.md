@@ -2,6 +2,8 @@
 
 Sets common embedded audio-tag fields on each **file** row in one step (legacy **Audio / ID3 Tag Setter** style). Values update the preview `AudioTagOverlay`; commit writes through the same path as other audio-tag changes.
 
+When the row’s source file exists on disk and at least one field is specified in **`options`**, the filter best-effort merges merged façade scalars into per–tag blocks immediately (same helper as **`AudioOverlayField`** string-target filters), so native snapshots stay aligned with semantic fields mid–filter-chain.
+
 **Directory rows** cannot load embedded tags; applying this filter to a folder row fails preview with an error (same as other audio-overlay operations).
 
 Omit a property under **`options`** (or set it to JSON **`null`**) to leave that tag field unchanged.

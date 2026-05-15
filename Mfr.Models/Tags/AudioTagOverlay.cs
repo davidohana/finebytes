@@ -218,24 +218,14 @@ namespace Mfr.Models.Tags
             if (ReferenceEquals(this, other))
                 return true;
 
-            if (!Equals(Id3v1, other.Id3v1))
+            if (!TagBlocksStructurallyEquals(other))
                 return false;
 
-            if (!Equals(Id3v2, other.Id3v2))
-                return false;
+            return _MergedSemanticFacadesEqual(other);
+        }
 
-            if (!Equals(Xiph, other.Xiph))
-                return false;
-
-            if (!Equals(Ape, other.Ape))
-                return false;
-
-            if (!Equals(Apple, other.Apple))
-                return false;
-
-            if (!Equals(Asf, other.Asf))
-                return false;
-
+        private bool _MergedSemanticFacadesEqual(AudioTagOverlay other)
+        {
             return string.Equals(Title, other.Title, StringComparison.Ordinal)
                 && string.Equals(Album, other.Album, StringComparison.Ordinal)
                 && string.Equals(Performers, other.Performers, StringComparison.Ordinal)

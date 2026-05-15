@@ -156,6 +156,24 @@ namespace Mfr.Filters.Audio
                     Options.Track.OnlyIfEmpty,
                     TrackFormatter,
                     tags);
+
+            if (_HasAnyConfiguredSemanticField())
+                RenameItemPreviewAudioSemantics.TryFlushPreviewAudioFacadeIntoNativeBlocks(item);
+        }
+
+        /// <summary>
+        /// Returns whether <see cref="Options"/> includes at least one field specification (not omitted from JSON).
+        /// </summary>
+        private bool _HasAnyConfiguredSemanticField()
+        {
+            return Options.Performers is not null
+                || Options.AlbumArtists is not null
+                || Options.Title is not null
+                || Options.Album is not null
+                || Options.Genre is not null
+                || Options.Comment is not null
+                || Options.Year is not null
+                || Options.Track is not null;
         }
 
         /// <summary>
