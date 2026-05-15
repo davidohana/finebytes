@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Mfr.Metadata;
 using Mfr.Models;
 using Serilog;
@@ -207,7 +206,7 @@ namespace Mfr.Core
                     AudioTagPersistence.Apply(item.Preview.FullPath, previewSnapshot.AudioTagOverlay);
 
                 item.Status = RenameStatus.CommitOk;
-                var changes = _BuildCommitChanges(
+                var changes = RenamePropertyChangeBuilder.BuildCommitChanges(
                     sourcePath: originalPathBeforeCommit,
                     destinationPath: destinationPath,
                     originalSnapshot: originalSnapshot,
@@ -294,7 +293,7 @@ namespace Mfr.Core
                     AudioTagPersistence.Apply(item.Preview.FullPath, previewSnapshot.AudioTagOverlay);
 
                 item.Status = RenameStatus.CommitOk;
-                var changes = _BuildCommitChanges(
+                var changes = RenamePropertyChangeBuilder.BuildCommitChanges(
                     sourcePath: originalPathBeforeCommit,
                     destinationPath: destinationPath,
                     originalSnapshot: originalSnapshot,
@@ -325,131 +324,6 @@ namespace Mfr.Core
                     step.ActualSourcePath);
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Builds property change rows for a committed item (file name and optional attributes/timestamps).
-        /// </summary>
-        /// <param name="sourcePath">Original source path.</param>
-        /// <param name="destinationPath">Destination path.</param>
-        /// <param name="originalSnapshot">Original metadata before commit.</param>
-        /// <param name="previewSnapshot">Preview metadata to apply.</param>
-        /// <returns>Property-level changes for result reporting.</returns>
-        private static List<RenamePropertyChange> _BuildCommitChanges(
-            string sourcePath,
-            string destinationPath,
-            FileMeta originalSnapshot,
-            FileMeta previewSnapshot)
-        {
-            var changes = new List<RenamePropertyChange>();
-            var sourceFileName = Path.GetFileName(sourcePath);
-            var destinationFileName = Path.GetFileName(destinationPath);
-            var fileNameChanged = !string.Equals(sourceFileName, destinationFileName, StringComparison.Ordinal);
-            if (fileNameChanged)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "FileName",
-                    OldValue: sourceFileName,
-                    NewValue: destinationFileName));
-            }
-
-            if (originalSnapshot.Attributes != previewSnapshot.Attributes)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "Attributes",
-                    OldValue: originalSnapshot.Attributes.ToString(),
-                    NewValue: previewSnapshot.Attributes.ToString()));
-            }
-
-            if (originalSnapshot.CreationTime != previewSnapshot.CreationTime)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "CreationTime",
-                    OldValue: originalSnapshot.CreationTime.ToString("O"),
-                    NewValue: previewSnapshot.CreationTime.ToString("O")));
-            }
-
-            if (originalSnapshot.LastWriteTime != previewSnapshot.LastWriteTime)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "LastWriteTime",
-                    OldValue: originalSnapshot.LastWriteTime.ToString("O"),
-                    NewValue: previewSnapshot.LastWriteTime.ToString("O")));
-            }
-
-            if (originalSnapshot.LastAccessTime != previewSnapshot.LastAccessTime)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "LastAccessTime",
-                    OldValue: originalSnapshot.LastAccessTime.ToString("O"),
-                    NewValue: previewSnapshot.LastAccessTime.ToString("O")));
-            }
-
-            if (!originalSnapshot.AudioTagOverlay.Equals(previewSnapshot.AudioTagOverlay))
-                _AppendAudioTagOverlayFieldChanges(
-                    changes: changes,
-                    original: originalSnapshot.AudioTagOverlay,
-                    preview: previewSnapshot.AudioTagOverlay);
-
-            return changes;
-        }
-
-        /// <summary>
-        /// Appends one <see cref="RenamePropertyChange"/> per differing scalar field between tag overlays.
-        /// </summary>
-        /// <param name="changes">Accumulator for commit change rows.</param>
-        /// <param name="original">Overlay before commit.</param>
-        /// <param name="preview">Overlay after preview.</param>
-        private static void _AppendAudioTagOverlayFieldChanges(
-            List<RenamePropertyChange> changes,
-            AudioTagOverlay original,
-            AudioTagOverlay preview)
-        {
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Title", original.Title, preview.Title);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Album", original.Album, preview.Album);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Performers", original.Performers, preview.Performers);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.AlbumArtists", original.AlbumArtists, preview.AlbumArtists);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Composers", original.Composers, preview.Composers);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Genre", original.Genre, preview.Genre);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Comment", original.Comment, preview.Comment);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Lyrics", original.Lyrics, preview.Lyrics);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Copyright", original.Copyright, preview.Copyright);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Grouping", original.Grouping, preview.Grouping);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Year", original.Year, preview.Year);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Track", original.Track, preview.Track);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.TrackCount", original.TrackCount, preview.TrackCount);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Disc", original.Disc, preview.Disc);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.DiscCount", original.DiscCount, preview.DiscCount);
-        }
-
-        private static void _AddRenamePropertyChangeIfOverlayStringDiffers(
-            List<RenamePropertyChange> changes,
-            string propertyName,
-            string? oldValue,
-            string? newValue)
-        {
-            if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
-                return;
-
-            changes.Add(new RenamePropertyChange(
-                Property: propertyName,
-                OldValue: JsonSerializer.Serialize(oldValue),
-                NewValue: JsonSerializer.Serialize(newValue)));
-        }
-
-        private static void _AddRenamePropertyChangeIfOverlayUIntDiffers(
-            List<RenamePropertyChange> changes,
-            string propertyName,
-            uint? oldValue,
-            uint? newValue)
-        {
-            if (oldValue == newValue)
-                return;
-
-            changes.Add(new RenamePropertyChange(
-                Property: propertyName,
-                OldValue: JsonSerializer.Serialize(oldValue),
-                NewValue: JsonSerializer.Serialize(newValue)));
         }
 
         private static RenameResultItem _BuildResultForItem(
