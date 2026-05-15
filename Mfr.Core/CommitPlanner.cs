@@ -7,28 +7,34 @@ namespace Mfr.Core
     /// Represents one operation in the commit plan for a rename batch.
     /// </summary>
     /// <param name="Item">The rename item this step operates on.</param>
-    internal abstract record CommitStep(RenameItem Item);
+    public abstract record CommitStep(RenameItem Item);
 
     /// <summary>
     /// Stashes an item's on-disk source to a unique temp path so that other items can claim its original path.
     /// </summary>
     /// <param name="Item">The item being stashed.</param>
     /// <param name="TempPath">The temp destination path.</param>
-    internal sealed record StashStep(RenameItem Item, string TempPath) : CommitStep(Item);
+    public sealed record StashStep(RenameItem Item, string TempPath) : CommitStep(Item);
 
     /// <summary>
     /// Finalizes an item's commit, optionally moving from a stashed source path.
     /// </summary>
     /// <param name="Item">The item being committed.</param>
     /// <param name="ActualSourcePath">The on-disk source path to move from (may equal <see cref="RenameItem.Original"/>'s full path or a stash temp path or an ancestor-rebased path).</param>
-    internal sealed record FinalizeStep(RenameItem Item, string ActualSourcePath) : CommitStep(Item);
+    public sealed record FinalizeStep(RenameItem Item, string ActualSourcePath) : CommitStep(Item);
 
     /// <summary>
-    /// The result of <see cref="CommitPlanner.Build"/>: an ordered list of commit steps.
+    /// Ordered rename operations produced by <see cref="CommitPlanner.Build"/>.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Pass the instance returned from <see cref="RenameList.Preview"/> into <see cref="RenameList.Commit"/> on the same
+    /// <see cref="RenameList"/>; steps reference that list's <see cref="RenameItem"/> instances.
+    /// </para>
+    /// </remarks>
     /// <param name="Steps">Commit steps to apply in order.</param>
     /// <param name="UnresolvableCycleItems">Items that participate in a cycle the planner could not break with a single stash.</param>
-    internal sealed record CommitPlan(
+    public sealed record CommitPlan(
         IReadOnlyList<CommitStep> Steps,
         IReadOnlyList<RenameItem> UnresolvableCycleItems);
 

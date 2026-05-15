@@ -95,7 +95,7 @@ namespace Mfr.App.Cli
             if (renameItems.Count == 0)
                 throw new UserException("No files matched the provided sources.");
 
-            renameList.Preview(preset: preset);
+            var commitPlan = renameList.Preview(preset: preset);
             var hasPreviewErrors = renameItems.Any(item => item.Status == RenameStatus.PreviewError);
             if (hasPreviewErrors)
                 return CliExitCode.UserError;
@@ -105,6 +105,7 @@ namespace Mfr.App.Cli
                 ? _ConfirmApplyRenameItem
                 : null;
             var renameResults = renameList.Commit(
+                plan: commitPlan,
                 failFast: commitFailFast,
                 dryRun: options.DryRun,
                 confirmBeforeApply: confirmBeforeApply);

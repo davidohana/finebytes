@@ -64,13 +64,13 @@ namespace Mfr.Tests.Core
                 "folder-and-child",
                 _LiteralPrefixReplacer("Album", "AlbumRenamed"),
                 _LiteralPrefixReplacer("track", "song"));
-            _SetupPreview(renameList, preset);
+            var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(newFolderPath, folderItem.Preview.FullPath);
             Assert.Equal(renamedFilePath, fileItem.Preview.FullPath);
             Assert.DoesNotContain(renameList.RenameItems, item => item.PreviewError is not null);
 
-            var result = renameList.Commit(failFast: false);
+            var result = renameList.Commit(plan, failFast: false);
             Assert.Equal(2, result.Count(r => r.Status == RenameStatus.CommitOk));
             Assert.False(Directory.Exists(oldFolderPath));
             Assert.True(Directory.Exists(newFolderPath));
@@ -108,7 +108,7 @@ namespace Mfr.Tests.Core
                 _LiteralPrefixReplacer("FolderA", "__SWAP_PLACEHOLDER__"),
                 _LiteralPrefixReplacer("FolderB", "FolderA"),
                 _LiteralPrefixReplacer("__SWAP_PLACEHOLDER__", "FolderB"));
-            _SetupPreview(renameList, preset);
+            var plan = _SetupPreview(renameList, preset);
 
             var itemA = renameList.RenameItems.Single(item => item.Original.FullPath == folderA);
             var itemB = renameList.RenameItems.Single(item => item.Original.FullPath == folderB);
@@ -116,7 +116,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(folderA, itemB.Preview.FullPath);
             Assert.DoesNotContain(renameList.RenameItems, item => item.PreviewError is not null);
 
-            var result = renameList.Commit(failFast: false);
+            var result = renameList.Commit(plan, failFast: false);
             Assert.Equal(2, result.Count(r => r.Status == RenameStatus.CommitOk));
 
             // a.txt now lives where b.txt used to (FolderB).
@@ -147,13 +147,13 @@ namespace Mfr.Tests.Core
             renameList.AddSources([sourcePath]);
 
             var preset = _FormatterFullPathPreset("case-only-rename", destinationPath);
-            _SetupPreview(renameList, preset);
+            var plan = _SetupPreview(renameList, preset);
             var item = renameList.RenameItems[0];
             Assert.True(item.HasPreviewChanges());
             Assert.Equal(destinationPath, item.Preview.FullPath);
             Assert.Null(item.PreviewError);
 
-            var result = renameList.Commit(failFast: false);
+            var result = renameList.Commit(plan, failFast: false);
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
             Assert.Contains(result[0].Changes, c => c.Property == "Prefix");
@@ -186,12 +186,12 @@ namespace Mfr.Tests.Core
                 includeFolders: true);
 
             var preset = _FormatterFullPathPreset("folder-case-rename", newFolder);
-            _SetupPreview(renameList, preset);
+            var plan = _SetupPreview(renameList, preset);
             var item = renameList.RenameItems[0];
             Assert.True(item.HasPreviewChanges());
             Assert.Null(item.PreviewError);
 
-            var result = renameList.Commit(failFast: false);
+            var result = renameList.Commit(plan, failFast: false);
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
 
@@ -232,7 +232,7 @@ namespace Mfr.Tests.Core
                 "mover-into-renamed",
                 new MoverFilter(new MoverOptions(RootFolder: newFolder)),
                 _LiteralPrefixReplacer("Sink", "SinkRenamed"));
-            _SetupPreview(renameList, preset);
+            var plan = _SetupPreview(renameList, preset);
 
             var folderItem = renameList.RenameItems.Single(item =>
                 string.Equals(item.Original.FullPath, oldFolder, StringComparison.Ordinal));
@@ -244,7 +244,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(newFolder, fileItem.Preview.DirectoryPath);
             Assert.DoesNotContain(renameList.RenameItems, item => item.PreviewError is not null);
 
-            var result = renameList.Commit(failFast: false);
+            var result = renameList.Commit(plan, failFast: false);
             Assert.Equal(2, result.Count(r => r.Status == RenameStatus.CommitOk));
             Assert.True(Directory.Exists(newFolder));
             Assert.True(File.Exists(newFolder.CombinePath("loose.txt")));
@@ -285,10 +285,10 @@ namespace Mfr.Tests.Core
                     Options: new FormatterOptions(fullPath)));
         }
 
-        private static void _SetupPreview(RenameList renameList, FilterPreset preset)
+        private static CommitPlan _SetupPreview(RenameList renameList, FilterPreset preset)
         {
             preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            return renameList.Preview(preset);
         }
     }
 }

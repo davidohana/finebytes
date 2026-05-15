@@ -15,7 +15,6 @@ namespace Mfr.Core
         private readonly List<RenameItem> _renameItems = [];
         private readonly Dictionary<string, int> _folderPathToCount = new(PathComparers.Os);
         private readonly bool _includeHidden = includeHidden;
-        private CommitPlan? _commitPlan;
 
         /// <summary>
         /// Gets the resolved file items in insertion/discovery order.
@@ -100,11 +99,12 @@ namespace Mfr.Core
         /// Previews rename outcomes for the current list without touching the filesystem.
         /// </summary>
         /// <param name="preset">The rename preset (ordered filter chain).</param>
+        /// <returns>The commit plan for the previewed items; pass this to <see cref="Commit"/>.</returns>
         /// <remarks>
         /// Call <see cref="FilterChain.SetupFilters"/> on <see cref="FilterPreset.Chain"/> before this method
         /// so filter setup runs once for the chain (for example from the CLI before preview).
         /// </remarks>
-        public void Preview(FilterPreset preset)
+        public CommitPlan Preview(FilterPreset preset)
         {
             Log.Information(
                 "Starting preview for preset '{PresetName}' with {ItemCount} item(s).",
@@ -139,8 +139,8 @@ namespace Mfr.Core
             RenamePreviewFolderRebaser.RebaseDescendants(_renameItems);
             PreviewConflictDetector.MarkConflicts(_renameItems);
 
-            _commitPlan = CommitPlanner.Build(_renameItems);
-            foreach (var unresolvableCycleItem in _commitPlan.UnresolvableCycleItems)
+            var commitPlan = CommitPlanner.Build(_renameItems);
+            foreach (var unresolvableCycleItem in commitPlan.UnresolvableCycleItems)
             {
                 unresolvableCycleItem.SetPreviewError(
                     message: $"Could not resolve rename cycle for '{unresolvableCycleItem.Original.FullPath}'.",
@@ -153,11 +153,14 @@ namespace Mfr.Core
             }
 
             _LogPreviewOutcomeSummary(_renameItems);
+
+            return commitPlan;
         }
 
         /// <summary>
         /// Commits previously previewed rename operations.
         /// </summary>
+        /// <param name="plan">The plan returned by <see cref="Preview"/> for this list.</param>
         /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
         /// <param name="dryRun">If <c>true</c>, simulates commit outcomes without applying filesystem changes.</param>
         /// <param name="confirmBeforeApply">
@@ -167,11 +170,15 @@ namespace Mfr.Core
         /// Items in an unresolvable cycle that are already in flight (stashed to a temp path) bypass this callback to avoid orphaned files.
         /// </param>
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="plan"/> is <c>null</c>.</exception>
         public IReadOnlyList<RenameResultItem> Commit(
+            CommitPlan plan,
             bool failFast,
             bool dryRun = false,
             Func<RenameItem, bool>? confirmBeforeApply = null)
         {
+            ArgumentNullException.ThrowIfNull(plan);
+
             Log.Information(
                 "Starting commit for {ItemCount} item(s). FailFast: {FailFast}. DryRun: {DryRun}. ConfirmBeforeApply: {HasConfirmBeforeApply}.",
                 _renameItems.Count,
@@ -179,14 +186,8 @@ namespace Mfr.Core
                 dryRun,
                 confirmBeforeApply is not null);
 
-            if (_commitPlan is null)
-            {
-                throw new InvalidOperationException(
-                    "Preview must be called before Commit.");
-            }
-
             var results = CommitExecutor.Execute(
-                plan: _commitPlan,
+                plan: plan,
                 allItems: _renameItems,
                 confirmBeforeApply: confirmBeforeApply,
                 failFast: failFast,
@@ -201,8 +202,6 @@ namespace Mfr.Core
             {
                 item.ClearAudioTagsCache();
             }
-
-            _commitPlan = null;
 
             var commitOkCount = results.Count(item => item.Status == RenameStatus.CommitOk);
             var commitSkippedCount = results.Count(item => item.Status == RenameStatus.CommitSkipped);

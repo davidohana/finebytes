@@ -381,7 +381,7 @@ namespace Mfr.Tests.Core
             renameList.AddSource(path);
             var item = Assert.Single(renameList.RenameItems);
 
-            _SetupPreview(renameList, preset: _CreateAudioTitleAlbumPreset());
+            _ = _SetupPreview(renameList, preset: _CreateAudioTitleAlbumPreset());
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.Equal("ListIngestTitle", item.Original.AudioTagOverlay.Title);
@@ -402,15 +402,15 @@ namespace Mfr.Tests.Core
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreateAudioTitleAlbumPreset();
-            _SetupPreview(renameList, preset);
+            var plan = _SetupPreview(renameList, preset);
             Assert.Equal("RoundOneTitle", item.Original.AudioTagOverlay.Title);
 
-            _ = renameList.Commit(failFast: false, dryRun: true);
+            _ = renameList.Commit(plan, failFast: false, dryRun: true);
             Assert.Equal(new AudioTagOverlay(), item.Original.AudioTagOverlay);
 
             TaggedMinimalWav.WriteTagged(path, title: "RoundTwoTitle", album: null);
 
-            _SetupPreview(renameList, preset);
+            _ = _SetupPreview(renameList, preset);
             Assert.Equal("RoundTwoTitle", item.Original.AudioTagOverlay.Title);
         }
 
@@ -446,7 +446,7 @@ namespace Mfr.Tests.Core
 
             var item = Assert.Single(renameList.RenameItems);
             var preset = _CreateAudioTitleAlbumPreset();
-            _SetupPreview(renameList, preset);
+            _ = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewError, item.Status);
             Assert.NotNull(item.PreviewError);
@@ -478,7 +478,7 @@ namespace Mfr.Tests.Core
                             Options: new FormatterOptions("x")),
                     ]),
             };
-            _SetupPreview(renameList, preset);
+            _ = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewError, item.Status);
             Assert.NotNull(item.PreviewError);
@@ -499,7 +499,7 @@ namespace Mfr.Tests.Core
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreateAudioTitleAlbumPreset();
-            _SetupPreview(renameList, preset);
+            _ = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewError, item.Status);
             Assert.NotNull(item.PreviewError);
@@ -522,10 +522,10 @@ namespace Mfr.Tests.Core
             };
         }
 
-        private static void _SetupPreview(RenameList renameList, FilterPreset preset)
+        private static CommitPlan _SetupPreview(RenameList renameList, FilterPreset preset)
         {
             preset.Chain.SetupFilters();
-            renameList.Preview(preset);
+            return renameList.Preview(preset);
         }
     }
 
