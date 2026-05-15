@@ -11,6 +11,10 @@ These pages document **per-filter `options`** (and behavior). Common preset fiel
 - [TimeSetter](Attributes/TimeSetter.md)
 - [TimeShifter](Attributes/TimeShifter.md)
 
+### Audio
+
+- [AudioTagSetter](Audio/AudioTagSetter.md)
+
 ### Case
 
 - [CapitalizeAfter](Case/CapitalizeAfter.md)
@@ -68,6 +72,7 @@ Each filter in a preset has:
 - **`applyScope`** (optional; string-target filters only) — limits the filter to a **substring** or **token** of the resolved target string, then splices the result back (discriminator **`scopeType`**: **`Substring`** or **`Token`**). Omit for default “whole field” behavior. See [docs/magic-file-renamer-design.md](../../docs/magic-file-renamer-design.md) §6 (filter system).
 - For [DateSetter](Attributes/DateSetter.md), [TimeSetter](Attributes/TimeSetter.md), and [TimeShifter](Attributes/TimeShifter.md), `options` includes **`timestampField`**: which **filesystem timestamp field** to edit (not a clock value) — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings), together with the other filter-specific options.
 - **AttributesSetter** has no `target`; it always updates filesystem attributes ([AttributesSetter](Attributes/AttributesSetter.md)).
+- **AudioTagSetter** has no `target`; it updates multiple embedded audio tag fields from `options` ([AudioTagSetter](Audio/AudioTagSetter.md)).
 - `options` — optional object; filters with no settings omit it.
 
 Property names use **camelCase**; enum values usually match the C# names (e.g. `TitleCase`, `Literal`).

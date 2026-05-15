@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
@@ -52,6 +53,7 @@ namespace Mfr.Core
             new(typeof(StripSpacesRightFilter), "StripSpacesRight"),
             new(typeof(TrimBetweenFilter), "TrimBetween"),
             new(typeof(AttributesSetterFilter), "AttributesSetter"),
+            new(typeof(AudioTagSetterFilter), "AudioTagSetter"),
             new(typeof(DateSetterFilter), "DateSetter"),
             new(typeof(TimeSetterFilter), "TimeSetter"),
             new(typeof(TimeShifterFilter), "TimeShifter")

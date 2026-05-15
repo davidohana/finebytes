@@ -1153,12 +1153,16 @@ Inserts text at a specified position within the target field.
 ### Group 6 — Audio (4 filters)
 
 #### AudioTagSetter
-Sets a standard audio tag field (multi-format via TagLibSharp). Value can be a literal or a format string.
+Sets common embedded audio-tag fields in one step (multi-format via TagLibSharp). String `text` values are literals unless they contain a balanced formatter `<token>` span (same template language as Formatter). No `target`; omit a field to leave it unchanged. Optional **`onlyIfEmpty`** on each field object fills only when the overlay value is empty; otherwise **`text`** overwrites. **`year`** and **`track`** use that shape; **`trackAutoIncrement`** adds each item’s rename-list index to the parsed track base (clamp 255).
 ```json
 {
   "type": "AudioTagSetter",
-  "target": { "targetType": "AudioTag", "field": "Title" },
-  "options": { "value": "<file-name:0>", "useFormatter": true }
+  "options": {
+    "title": { "text": "<file-name>" },
+    "track": { "text": "1" },
+    "trackAutoIncrement": true,
+    "year": { "text": "2004", "onlyIfEmpty": true }
+  }
 }
 ```
 

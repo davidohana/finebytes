@@ -1,4 +1,5 @@
 using Mfr.Core;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
 using Mfr.Models;
 using Mfr.Tests.TestSupport;
@@ -504,6 +505,38 @@ namespace Mfr.Tests.Core
             Assert.Equal(RenameStatus.PreviewError, item.Status);
             Assert.NotNull(item.PreviewError);
             Assert.NotNull(item.PreviewError.Cause);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="AudioTagSetterFilter"/> invalid year text surfaces as a row preview error.
+        /// </summary>
+        [Fact]
+        public void Preview_AudioTagSetter_InvalidYear_SetsPreviewError()
+        {
+            var path = Path.Combine(_tempRoot, "track.wav");
+            MinimalWavFixture.CopyScratchTo(path);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(path);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "bad-year",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled(
+                [
+                    new AudioTagSetterFilter(new AudioTagSetterOptions(
+                        Year: new AudioTagStringFieldOptions(Text: "nope"))),
+                ]),
+            };
+
+            _ = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.NotNull(item.PreviewError);
+            Assert.Contains("1-9999", item.PreviewError.Message, StringComparison.Ordinal);
         }
 
         private static FilterPreset _CreateAudioTitleAlbumPreset()

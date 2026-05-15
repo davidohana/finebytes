@@ -1,12 +1,12 @@
 # Inserter
 
-Inserts **resolved text** at a fixed **one-based character position** in the target segment. The insert string is expanded with the same **formatter tokens** as [Formatter](Formatter.md) (e.g. `<file-name>`, `<counter:…>`).
+Inserts **resolved text** at a fixed **one-based character position** in the target segment. The insert string is either **literal** or a **formatter template**: a template is used only when `text` contains at least one balanced `<…>` span whose name matches the formatter token-name heuristic (same auto-detection as [AudioTagSetter](../Audio/AudioTagSetter.md) `text`). Otherwise comparisons like `a < b` stay literal.
 
 ## Options
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `text` | string | Text to insert; may contain `<…>` formatter tokens. |
+| `text` | string | Text to insert; formatter tokens apply only when `text` matches the template heuristic (see intro). |
 | `position` | int | One-based index (see **Origin** below). Values below `1` are treated as `1`. |
 | `startFrom` | string (enum) | `Beginning` or `End` — see **Origin**. |
 | `overwrite` | bool | If `true`, inserted text **replaces** existing characters at the insert index instead of shifting the rest of the segment. |

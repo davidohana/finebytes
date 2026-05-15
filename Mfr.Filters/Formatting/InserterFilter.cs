@@ -22,7 +22,10 @@ namespace Mfr.Filters.Formatting
     /// <summary>
     /// Options for inserting resolved text at a fixed index.
     /// </summary>
-    /// <param name="Text">Literal text or formatter template (angle-bracket tokens).</param>
+    /// <param name="Text">
+    /// Text to insert. Treated as a formatter template only when the string contains at least one qualifying
+    /// <c>&lt;…&gt;</c> span (balanced brackets and token-name heuristic; comparisons like <c>a &lt; b</c> stay literal).
+    /// </param>
     /// <param name="Position">One-based index; see <see cref="InserterOrigin"/>.</param>
     /// <param name="StartFrom">Whether <paramref name="Position"/> counts from the start or end of the segment.</param>
     /// <param name="Overwrite">If <see langword="true"/>, inserted text overwrites existing characters instead of shifting them.</param>
@@ -52,7 +55,15 @@ namespace Mfr.Filters.Formatting
         /// <inheritdoc />
         protected override void _Setup()
         {
-            _compiledText = FormatStringCompiler.Compile(Options.Text);
+            _compiledText = _CompileInsertText(Options.Text);
+        }
+
+        private static Func<RenameItem, string> _CompileInsertText(string text)
+        {
+            if (!FormatStringCompiler.ContainsLikelyFormatTokens(text))
+                return _ => text;
+
+            return FormatStringCompiler.Compile(text);
         }
 
         /// <inheritdoc />

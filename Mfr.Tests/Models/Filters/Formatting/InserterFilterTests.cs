@@ -73,6 +73,18 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
+        /// Verifies comparison-like <c>&lt;</c> without a formatter token span inserts literal text.
+        /// </summary>
+        [Fact]
+        public void Apply_TextComparisonLikeBrackets_InsertsLiteral()
+        {
+            var f = new InserterFilter(
+                _target,
+                new InserterOptions(Text: "a < b", Position: 1, StartFrom: InserterOrigin.Beginning, Overwrite: false));
+            Assert.Equal("a < bhello", FilterTestHelpers.ApplyToPrefix(f, "hello"));
+        }
+
+        /// <summary>
         /// Verifies formatter tokens are expanded in the insert text using original file-name metadata.
         /// </summary>
         [Fact]

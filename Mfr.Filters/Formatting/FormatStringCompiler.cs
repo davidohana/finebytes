@@ -28,6 +28,11 @@ namespace Mfr.Filters.Formatting
         private static readonly Dictionary<string, IFormatToken> _nameToToken = _DiscoverTokens();
 
         /// <summary>
+        /// Formatter that always yields <see cref="string.Empty"/> (e.g. when a preset omits a field or uses a literal with no template).
+        /// </summary>
+        internal static readonly Func<RenameItem, string> EmptyFormatter = static _ => "";
+
+        /// <summary>
         /// Compiles <paramref name="template"/> into a delegate that is evaluated per item at rename time.
         /// </summary>
         /// <remarks>
@@ -93,6 +98,58 @@ namespace Mfr.Filters.Formatting
                     sb.Append(seg(item));
                 return sb.ToString();
             };
+        }
+
+        /// <summary>
+        /// Returns whether <paramref name="text"/> likely contains formatter tokens: at least one balanced
+        /// <c>&lt;...&gt;</c> span whose leading name matches the formatter token-name heuristic (ASCII letter, then
+        /// letters/digits/<c>-</c>/<c>_</c>, at least two characters before an optional <c>:</c>).
+        /// </summary>
+        /// <param name="text">Candidate template text.</param>
+        /// <returns><see langword="true"/> when a qualifying span exists.</returns>
+        internal static bool ContainsLikelyFormatTokens(string text)
+        {
+            ArgumentNullException.ThrowIfNull(text);
+
+            for (var i = 0; i < text.Length; i++)
+            {
+                if (text[i] != '<')
+                    continue;
+
+                var close = _FindMatchingClose(text, i);
+                if (close < 0 || close <= i + 1)
+                    continue;
+
+                var inner = text.AsSpan(i + 1, close - (i + 1)).Trim();
+                if (inner.Length == 0)
+                    continue;
+
+                var innerStr = inner.ToString();
+                var colonIndex = innerStr.IndexOf(':');
+                var namePart = colonIndex < 0 ? innerStr : innerStr[..colonIndex];
+                namePart = namePart.Trim();
+                if (_LooksLikeFormatterTokenName(namePart))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool _LooksLikeFormatterTokenName(string name)
+        {
+            if (name.Length < 2 || !char.IsAsciiLetter(name[0]))
+                return false;
+
+            for (var k = 1; k < name.Length; k++)
+            {
+                var c = name[k];
+                if (char.IsAsciiLetterOrDigit(c) || c is '-' or '_')
+                    continue;
+
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>

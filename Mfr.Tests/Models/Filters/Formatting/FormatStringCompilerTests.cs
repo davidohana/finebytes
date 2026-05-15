@@ -111,5 +111,22 @@ namespace Mfr.Tests.Models.Filters.Formatting
 
             Assert.Null(ex);
         }
+
+        /// <summary>
+        /// Verifies <see cref="FormatStringCompiler.ContainsLikelyFormatTokens"/> detects real token spans.
+        /// </summary>
+        [Theory]
+        [InlineData("<file-name>", true)]
+        [InlineData("Pre <file-name> post", true)]
+        [InlineData("<substr:source=x>", true)]
+        [InlineData("plain text", false)]
+        [InlineData("a < b", false)]
+        [InlineData("a < b > c", false)]
+        [InlineData("<3>", false)]
+        [InlineData("<>", false)]
+        public void ContainsLikelyFormatTokens_Classifies(string text, bool expected)
+        {
+            Assert.Equal(expected, FormatStringCompiler.ContainsLikelyFormatTokens(text));
+        }
     }
 }
