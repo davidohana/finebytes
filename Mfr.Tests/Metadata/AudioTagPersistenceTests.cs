@@ -257,6 +257,26 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
+        /// Preview that only changes façade <see cref="AudioTagOverlay.Title"/> must coalesce into the Xiph block so Apply + Read stay consistent.
+        /// </summary>
+        [Fact]
+        public void Apply_Flac_SemanticTitleChange_CoalescesXiphAndRoundTripsRead()
+        {
+            var path = _CopyFixtureToTemp("metaflac.flac");
+
+            var disk = AudioTagPersistence.Read(path);
+            var preview = disk.Clone();
+            preview.Title = "SemanticTitleOnlyPhase3";
+
+            AudioTagPersistence.Apply(path, preview);
+
+            var after = AudioTagPersistence.Read(path);
+            Assert.Equal("SemanticTitleOnlyPhase3", after.Title);
+            Assert.NotNull(after.Xiph);
+            Assert.Equal(after, AudioTagPersistence.Read(path));
+        }
+
+        /// <summary>
         /// Identity Apply on fixture WMA should be a no-op and keep <see cref="AudioTagOverlay.Asf"/> stable.
         /// </summary>
         /// <remarks>

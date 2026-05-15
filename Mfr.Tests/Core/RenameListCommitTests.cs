@@ -127,6 +127,105 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
+        /// Verifies <see cref="AudioTagSetterFilter"/> semantic title updates persist for FLAC (Xiph block coalesced with façade).
+        /// </summary>
+        public void Commit_AudioTagSetter_WritesTitle_OnFlac_OnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
+            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
+            var sourcePath = dir.CombinePath("phase3.flac");
+            File.Copy(fixturePath, sourcePath, overwrite: false);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "flac-audio-tag-setter-title",
+                new AudioTagSetterFilter(new AudioTagSetterOptions(
+                    Title: new AudioTagStringFieldOptions(Text: "Phase3FlacTitle"))));
+            var plan = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("Phase3FlacTitle", item.Preview.AudioTagOverlay.Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Single(results);
+            Assert.Equal(RenameStatus.CommitOk, results[0].Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("Phase3FlacTitle", readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies <see cref="AudioTagSetterFilter"/> semantic title updates persist for M4A (Apple block coalesced with façade).
+        /// </summary>
+        public void Commit_AudioTagSetter_WritesTitle_OnM4a_OnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "homebrew-test.m4a");
+            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
+            var sourcePath = dir.CombinePath("phase3.m4a");
+            File.Copy(fixturePath, sourcePath, overwrite: false);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "m4a-audio-tag-setter-title",
+                new AudioTagSetterFilter(new AudioTagSetterOptions(
+                    Title: new AudioTagStringFieldOptions(Text: "Phase3M4aTitle"))));
+            var plan = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("Phase3M4aTitle", item.Preview.AudioTagOverlay.Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Single(results);
+            Assert.Equal(RenameStatus.CommitOk, results[0].Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("Phase3M4aTitle", readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies <see cref="AudioTagSetterFilter"/> semantic title updates persist for WMA (ASF block coalesced with façade).
+        /// </summary>
+        public void Commit_AudioTagSetter_WritesTitle_OnWma_OnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "taglib-sharp-sample.wma");
+            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
+            var sourcePath = dir.CombinePath("phase3.wma");
+            File.Copy(fixturePath, sourcePath, overwrite: false);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "wma-audio-tag-setter-title",
+                new AudioTagSetterFilter(new AudioTagSetterOptions(
+                    Title: new AudioTagStringFieldOptions(Text: "Phase3WmaTitle"))));
+            var plan = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("Phase3WmaTitle", item.Preview.AudioTagOverlay.Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Single(results);
+            Assert.Equal(RenameStatus.CommitOk, results[0].Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("Phase3WmaTitle", readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies embedded-tag strip (TagLib <c>RemoveTags(All)</c>) runs on commit for tagged audio.
         /// </summary>
         public void Commit_EmbeddedTagRemover_StripsAllTags_OnDisk()

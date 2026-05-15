@@ -13,7 +13,7 @@ Phased work: (1) structured overlay + MP3 ID3v1/v2 round-trip and semantic mappi
 
 - [ ] **Phase 1:** Structured overlay (ID3v1/v2 blocks, frame inventory, deep equality); `AudioTagPersistence` Read/Apply for MP3 only; semantic projections + mappers; core/tests on MP3 slice.
 - [x] **Phase 2:** Add Xiph, Apple/Mp4, Ape, Asf blocks + Read/Apply round-trips; extend mappers per container.
-- [ ] **Phase 3:** Wire `AudioTagSetter` + all `AudioOverlayField` paths; update `RenamePropertyChangeBuilder` / Commit / RenameList tests; `EmbeddedTagRemover` empty-overlay contract.
+- [x] **Phase 3:** Wire `AudioTagSetter` + all `AudioOverlayField` paths; update `RenamePropertyChangeBuilder` / Commit / RenameList tests; `EmbeddedTagRemover` empty-overlay contract.
 - [ ] **Phase 4:** Absent optional blocks + per `TagTypes` removal on Apply; filter/UI hooks for deleting specific tag types or frames (keep AllTags nuclear remover).
 - [ ] **Phase 5:** `FilterTarget` variants + preview dispatch for specific frames/fields; Id3v2FieldSetter-style filter.
 
@@ -51,6 +51,7 @@ Work is split so each phase is shippable and reviewable; later phases assume the
   - **Status:** Implemented in `AudioTagOverlay` / `AudioTagPersistence` (Xiph and Ape use canonical `SerializedTagBlob` bytes; Apple uses sorted `ilst` text atoms with explicit ordinal equality on `AppleAtomRow`; Asf uses sorted content descriptors; WMA round-trip covered by TagLib# sample fixture `taglib-sharp-sample.wma`). Semantic mappers for non-ID3 containers remain Phase 3 parity.
 
 - **Phase 3 — Semantic and pipeline parity:** Ensure [`AudioTagSetterFilter`](../Mfr.Filters/Audio/AudioTagSetterFilter.cs), [`FileMetaPreviewExtensions`](../Mfr.Models/FileMetaPreviewExtensions.cs), formatter tokens, and [`EmbeddedTagRemover`](../Mfr.Filters/Audio/EmbeddedTagRemoverFilter.cs) behave correctly with structured overlay; adjust [`RenamePropertyChangeBuilder`](../Mfr.Core/RenamePropertyChangeBuilder.cs) as needed. **Outcome:** no regressions vs current feature set.
+  - **Status:** `AudioTagPersistence.Apply` merges façade fields into loaded per-`TagTypes` blocks (ID3v1/v2, Xiph, Ape, Apple, Asf) before writing so filter/commit paths stay consistent; integration tests cover `AudioTagSetter` commit on FLAC/M4A/WMA plus FLAC semantic-only persistence.
 
 - **Phase 4 — Selective deletion:** Optional absent blocks = **remove that TagTypes** on disk; **frame-level** removal inside ID3v2 list; optional dedicated filter or UI later; **EmbeddedTagRemover** stays **all tags**. **Outcome:** user can drop e.g. ID3v1 only.
 

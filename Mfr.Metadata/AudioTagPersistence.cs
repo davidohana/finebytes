@@ -2,8 +2,8 @@ using System.Collections.Immutable;
 using Mfr.Models.Tags;
 using TagLib;
 using TagLib.Mpeg;
-using TagLib.Mpeg4;
 using TagLib.Ogg;
+using AppleTag = TagLib.Mpeg4.AppleTag;
 
 namespace Mfr.Metadata
 {
@@ -25,6 +25,10 @@ namespace Mfr.Metadata
     /// <para>
     /// String fields cleared in the overlay are written as empty strings or null TagLib assigns; numerics use
     /// <c>0</c> when the preview clears a value; multiline lists use overlay <c>; </c> join/split conventions.
+    /// </para>
+    /// <para>
+    /// Before writing, façade fields on <see cref="AudioTagOverlay"/> are merged into any loaded per–<c>TagTypes</c>
+    /// blocks (ID3v1/v2, Xiph, APE, Apple, ASF) so semantic edits from filters stay consistent with serialized snapshots.
     /// </para>
     /// </remarks>
     public static class AudioTagPersistence
@@ -64,12 +68,17 @@ namespace Mfr.Metadata
                 return;
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
-            _ApplyNativeTagBlocks(file, previewOverlay);
+            var coalescedOverlay = previewOverlay.Clone();
+            _CoalesceSemanticIntoNativeBlocks(file, coalescedOverlay);
+            _ApplyNativeTagBlocks(file, coalescedOverlay);
 
+            // MPEG/MP3: persist structured Id3v2 frame list + Id3v1 snapshot; those paths also assign merged façade
+            // fields onto the file’s combined tag (TagLib routes them into ID3 as appropriate).
+            // Other formats: Xiph/APE/Apple/ASF blocks were already written above; only the merged TagLib façade remains.
             if (file is AudioFile)
-                _ApplyToMpeg(file, previewOverlay);
+                _ApplyToMpeg(file, coalescedOverlay);
             else
-                _WriteOverlayToTag(file.Tag, previewOverlay);
+                _WriteOverlayToTag(file.Tag, coalescedOverlay);
 
             file.Save();
         }
@@ -106,8 +115,8 @@ namespace Mfr.Metadata
 
             var xiph = _ReadXiph(file);
             var ape = _ReadApe(file);
-            var apple = _ReadApple(file);
-            var asf = _ReadAsf(file);
+            var apple = _ReadAppleSnapshot(file);
+            var asf = _ReadAsfSnapshot(file);
 
             var overlay = _FromTag(file.Tag);
             overlay.Id3v1 = id3v1;
@@ -137,9 +146,91 @@ namespace Mfr.Metadata
             return new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(rendered.Data) };
         }
 
-        private static AppleTagData? _ReadApple(TagLib.File file)
+        private static AppleTagData? _ReadAppleSnapshot(TagLib.File file)
         {
             if (file.GetTag(TagTypes.Apple, false) is not AppleTag apple || apple.IsEmpty)
+                return null;
+
+            return _ReadAppleTagData(apple);
+        }
+
+        /// <summary>
+        /// Copies visible <see cref="AudioTagOverlay"/> façade fields into tag-type blocks when those blocks are present,
+        /// so preview-only semantic edits stay aligned with serialized Xiph/APE/MP4/ASF/ID3 payloads before save.
+        /// </summary>
+        private static void _CoalesceSemanticIntoNativeBlocks(TagLib.File file, AudioTagOverlay coalescedOverlay)
+        {
+            if (coalescedOverlay.Id3v1 is not null)
+                _CoalesceId3v1FromFacade(coalescedOverlay);
+
+            if (coalescedOverlay.Id3v2 is not null)
+            {
+                var id3 = new TagLib.Id3v2.Tag(new ByteVector([.. coalescedOverlay.Id3v2.CanonicalTagBytes.ToArray()]));
+                _WriteOverlayToTag(id3, coalescedOverlay);
+                coalescedOverlay.Id3v2 = _SnapshotId3v2Data(id3);
+            }
+
+            if (coalescedOverlay.Xiph is not null)
+            {
+                var xc = new XiphComment([.. coalescedOverlay.Xiph.CanonicalTagBytes.ToArray()]);
+                _WriteOverlayToTag(xc, coalescedOverlay);
+                var rendered = xc.Render(addFramingBit: false);
+                coalescedOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(rendered.Data) };
+            }
+
+            if (coalescedOverlay.Ape is not null)
+            {
+                var ape = new TagLib.Ape.Tag(new ByteVector([.. coalescedOverlay.Ape.CanonicalTagBytes.ToArray()]));
+                _WriteOverlayToTag(ape, coalescedOverlay);
+                coalescedOverlay.Ape = new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(ape.Render().Data) };
+            }
+
+            if (coalescedOverlay.Asf is not null)
+            {
+                var asf = new TagLib.Asf.Tag();
+                foreach (var row in coalescedOverlay.Asf.Descriptors)
+                    asf.AddDescriptor(new TagLib.Asf.ContentDescriptor(row.Name, row.Value));
+
+                _WriteOverlayToTag(asf, coalescedOverlay);
+                coalescedOverlay.Asf = _ReadAsfTagData(asf);
+            }
+
+            if (coalescedOverlay.Apple is not null && file.GetTag(TagTypes.Apple, true) is AppleTag apple)
+            {
+                foreach (var row in coalescedOverlay.Apple.Atoms)
+                    apple.SetText([.. row.AtomType.ToArray()], [.. row.Values]);
+
+                _WriteOverlayToTag(apple, coalescedOverlay);
+                coalescedOverlay.Apple = _ReadAppleTagData(apple) ?? new AppleTagData();
+            }
+        }
+
+        private static void _CoalesceId3v1FromFacade(AudioTagOverlay coalescedOverlay)
+        {
+            var parts = _SplitJoinedList(coalescedOverlay.Performers);
+            var artist = parts.Length > 0 ? parts[0] : null;
+
+            var genreByte = string.IsNullOrWhiteSpace(coalescedOverlay.Genre)
+                ? (byte)0
+                : Genres.AudioToIndex(coalescedOverlay.Genre.Trim());
+
+            byte? track = coalescedOverlay.Track is null ? null : (byte)System.Math.Min(coalescedOverlay.Track.Value, 255u);
+
+            coalescedOverlay.Id3v1 = new Id3v1TagData
+            {
+                Title = _NullIfEmpty(coalescedOverlay.Title),
+                Artist = _NullIfEmpty(artist),
+                Album = _NullIfEmpty(coalescedOverlay.Album),
+                Year = coalescedOverlay.Year,
+                Comment = _NullIfEmpty(coalescedOverlay.Comment),
+                Track = track,
+                Genre = genreByte,
+            };
+        }
+
+        private static AppleTagData? _ReadAppleTagData(AppleTag apple)
+        {
+            if (apple.IsEmpty)
                 return null;
 
             var uniqueTypes = new SortedDictionary<string, ByteVector>(StringComparer.Ordinal);
@@ -183,11 +274,16 @@ namespace Mfr.Metadata
             return new AppleTagData { Atoms = [.. rows] };
         }
 
-        private static AsfTagData? _ReadAsf(TagLib.File file)
+        private static AsfTagData? _ReadAsfSnapshot(TagLib.File file)
         {
             if (file.GetTag(TagTypes.Asf, false) is not TagLib.Asf.Tag asf || asf.IsEmpty)
                 return null;
 
+            return _ReadAsfTagData(asf);
+        }
+
+        private static AsfTagData _ReadAsfTagData(TagLib.Asf.Tag asf)
+        {
             var rows = new List<AsfDescriptorRow>();
             foreach (var d in asf)
                 rows.Add(new AsfDescriptorRow(d.Name, d.ToString()));
@@ -333,6 +429,14 @@ namespace Mfr.Metadata
             if (raw is not TagLib.Id3v2.Tag id3v2)
                 return null;
 
+            return _SnapshotId3v2Data(id3v2);
+        }
+
+        /// <summary>
+        /// Serializes a live ID3v2 tag into the overlay model (canonical header bytes + sorted frames).
+        /// </summary>
+        private static Id3v2TagData _SnapshotId3v2Data(TagLib.Id3v2.Tag id3v2)
+        {
             var fullRender = id3v2.Render();
             var canonicalTagBytes = ImmutableArray.Create(fullRender.Data);
             var canonicalTag = new TagLib.Id3v2.Tag(fullRender);
