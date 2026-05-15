@@ -55,7 +55,9 @@ Unit tests typically construct **`RenameItem`** with no tag reader (**`audioTagR
 
 **Arguments:** Unlike some design-draft examples (**`:0`** suffixes), these tokens accept **no** argument (`<audio-title>` only). A stray **`<audio-title:…>`** fails at compile with a formatter error listing the token name.
 
-**Rows without tag data:** Folders skip disk reads for tags; unreadable/non-audio files keep the **default overlay** after an attempted load. All audio tokens yield **empty** output (no exception).
+**Rows without readable tag data (real `RenameList` rows):** Matches the disk-read rule above: **directory rows** cannot load tags (`InvalidOperationException`), and **file rows** where TagLib cannot open or read embedded metadata (typical plain text or other non-tagged files) surface **`RenameStatus.PreviewError`** with the exception as **`Cause`**. There is no “empty token” fallback on that path.
+
+**Unit tests:** Constructing **`RenameItem`** without an **`audioTagReader`** skips **`AudioTagPersistence.Read`**; the overlay stays at its initial state (usually the default empty overlay), so **`<audio-*>`** tokens expand to **empty** strings without touching disk.
 
 **Not implemented yet:** stream-only properties often shown in specs as `<audio-duration:…>`, `<audio-bitrate:…>`, `<audio-channels:…>`, `<audio-bpm>`—they require data beyond **`AudioTagOverlay`**.
 
