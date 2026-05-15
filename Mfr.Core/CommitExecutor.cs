@@ -5,21 +5,6 @@ using Serilog;
 namespace Mfr.Core
 {
     /// <summary>
-    /// Per-item outcome captured while walking a commit plan.
-    /// </summary>
-    /// <param name="OriginalPathBeforeCommit">The item's original path when the plan step ran.</param>
-    /// <param name="DestinationPath">The item's preview path when the plan step ran.</param>
-    /// <param name="Changes">Property-level changes captured before <see cref="RenameItem.Original"/> was overwritten.</param>
-    /// <param name="Status">The status this item finished the plan walk with.</param>
-    /// <param name="ErrorMessage">Optional error message when the plan step failed.</param>
-    internal sealed record PlanOutcome(
-        string OriginalPathBeforeCommit,
-        string DestinationPath,
-        IReadOnlyList<RenamePropertyChange> Changes,
-        RenameStatus Status,
-        string? ErrorMessage);
-
-    /// <summary>
     /// Executes a <see cref="CommitPlan"/> against the filesystem and produces per-item results.
     /// </summary>
     /// <remarks>
@@ -35,6 +20,21 @@ namespace Mfr.Core
     /// </remarks>
     internal static class CommitExecutor
     {
+        /// <summary>
+        /// Per-item outcome captured while walking a commit plan.
+        /// </summary>
+        /// <param name="OriginalPathBeforeCommit">The item's original path when the plan step ran.</param>
+        /// <param name="DestinationPath">The item's preview path when the plan step ran.</param>
+        /// <param name="Changes">Property-level changes captured before <see cref="RenameItem.Original"/> was overwritten.</param>
+        /// <param name="Status">The status this item finished the plan walk with.</param>
+        /// <param name="ErrorMessage">Optional error message when the plan step failed.</param>
+        private sealed record PlanOutcome(
+            string OriginalPathBeforeCommit,
+            string DestinationPath,
+            IReadOnlyList<RenamePropertyChange> Changes,
+            RenameStatus Status,
+            string? ErrorMessage);
+
         /// <summary>
         /// Runs a commit plan and returns one result per item in <paramref name="allItems"/>.
         /// </summary>
@@ -95,8 +95,10 @@ namespace Mfr.Core
 
                 if (step is StashStep stashStep)
                 {
-                    _ExecuteStashStep(step: stashStep, dryRun: dryRun, outcomes: outcomes);
-                    inFlightStashedItems.Add(stashStep.Item);
+                    var stashSucceeded = _TryExecuteStashStep(step: stashStep, dryRun: dryRun, outcomes: outcomes);
+                    if (stashSucceeded)
+                        inFlightStashedItems.Add(stashStep.Item);
+
                     continue;
                 }
 
@@ -126,33 +128,37 @@ namespace Mfr.Core
             }
         }
 
-        private static void _ExecuteStashStep(
+        /// <summary>
+        /// Runs stash when not dry-run; records outcome on failure.
+        /// </summary>
+        /// <returns><c>false</c> when stash failed with an exception.</returns>
+        private static bool _TryExecuteStashStep(
             StashStep step,
             bool dryRun,
             Dictionary<RenameItem, PlanOutcome> outcomes)
         {
             if (dryRun)
-                return;
+                return true;
 
             try
             {
                 RenameItemMover.StashSourceToTemp(step.Item, step.TempPath);
+                return true;
             }
             catch (Exception ex)
             {
-                step.Item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
-                step.Item.Status = RenameStatus.CommitError;
-                outcomes[step.Item] = new PlanOutcome(
-                    OriginalPathBeforeCommit: step.Item.Original.FullPath,
-                    DestinationPath: step.Item.Preview.FullPath,
-                    Changes: [],
-                    Status: RenameStatus.CommitError,
-                    ErrorMessage: ex.Message);
+                _RecordCommitStepFailure(
+                    item: step.Item,
+                    outcomes: outcomes,
+                    originalPathBeforeCommit: step.Item.Original.FullPath,
+                    destinationPath: step.Item.Preview.FullPath,
+                    ex: ex);
                 Log.Error(
                     ex,
                     "Stash failed for '{SourcePath}' -> '{TempPath}'.",
                     step.Item.Original.FullPath,
                     step.TempPath);
+                return false;
             }
         }
 
@@ -194,14 +200,12 @@ namespace Mfr.Core
             }
             catch (Exception ex)
             {
-                item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
-                item.Status = RenameStatus.CommitError;
-                outcomes[item] = new PlanOutcome(
-                    OriginalPathBeforeCommit: originalPathBeforeCommit,
-                    DestinationPath: destinationPath,
-                    Changes: [],
-                    Status: RenameStatus.CommitError,
-                    ErrorMessage: ex.Message);
+                _RecordCommitStepFailure(
+                    item: item,
+                    outcomes: outcomes,
+                    originalPathBeforeCommit: originalPathBeforeCommit,
+                    destinationPath: destinationPath,
+                    ex: ex);
                 Log.Error(
                     ex,
                     "Commit failed for '{SourcePath}' -> '{DestinationPath}' (actual source '{ActualSourcePath}').",
@@ -210,6 +214,26 @@ namespace Mfr.Core
                     step.ActualSourcePath);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Writes commit-error state to <paramref name="item"/> and stores the matching <see cref="PlanOutcome"/>.
+        /// </summary>
+        private static void _RecordCommitStepFailure(
+            RenameItem item,
+            Dictionary<RenameItem, PlanOutcome> outcomes,
+            string originalPathBeforeCommit,
+            string destinationPath,
+            Exception ex)
+        {
+            item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
+            item.Status = RenameStatus.CommitError;
+            outcomes[item] = new PlanOutcome(
+                OriginalPathBeforeCommit: originalPathBeforeCommit,
+                DestinationPath: destinationPath,
+                Changes: [],
+                Status: RenameStatus.CommitError,
+                ErrorMessage: ex.Message);
         }
 
         private static RenameResultItem _BuildResultForItem(
