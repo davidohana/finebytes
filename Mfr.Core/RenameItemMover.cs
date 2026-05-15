@@ -11,6 +11,15 @@ namespace Mfr.Core
         private const string _TempSuffixPrefix = ".mfrtmp-";
 
         /// <summary>
+        /// When set, replaces <see cref="StashSourceToTemp"/> behavior for tests that assert stash failures.
+        /// </summary>
+        /// <remarks>
+        /// Production code leaves this <c>null</c>; safer alternatives (filesystem mocking) would split IO behind injectable
+        /// interfaces across many rename callers, which this helper avoids for one targeted assertion path.
+        /// </remarks>
+        internal static Action<RenameItem, string>? StashSourceToTempSubstitute;
+
+        /// <summary>
         /// Moves an item's source to <paramref name="tempPath"/> without applying attribute or timestamp changes.
         /// </summary>
         /// <param name="item">The item whose source should be stashed.</param>
@@ -24,6 +33,12 @@ namespace Mfr.Core
         internal static void StashSourceToTemp(RenameItem item, string tempPath)
         {
             ArgumentNullException.ThrowIfNull(tempPath);
+            if (StashSourceToTempSubstitute is not null)
+            {
+                StashSourceToTempSubstitute(item, tempPath);
+                return;
+            }
+
             _MoveEntry(
                 sourceFullPath: item.Original.FullPath,
                 destinationFullPath: tempPath,
