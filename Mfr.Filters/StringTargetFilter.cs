@@ -24,8 +24,8 @@ namespace Mfr.Models
             if (Target is AudioOverlayFieldTarget audioOverlayTarget)
             {
                 item.EnsureAudioTagsLoaded();
-                var current = AudioOverlaySemanticIo.GetInvariantFieldString(preview.AudioTagOverlay, audioOverlayTarget.Field);
-                var transformed = TransformValue(current, item);
+                var currentValue = AudioOverlaySemanticIo.GetInvariantFieldString(preview.AudioTagOverlay, audioOverlayTarget.Field);
+                var transformed = TransformValue(currentValue, item);
                 AudioOverlaySemanticIo.MergeInvariantStringIntoOverlay(
                     overlay: preview.AudioTagOverlay,
                     field: audioOverlayTarget.Field,
