@@ -4,5 +4,5 @@ namespace Mfr.Models.Tags
     /// Targets one field on <see cref="FileMeta.AudioTagOverlay"/>; string filters read/write invariant text or numeric strings.
     /// </summary>
     /// <param name="Field">Which overlay property is addressed.</param>
-    public sealed record AudioOverlayFieldTarget(AudioOverlayField Field) : Mfr.Models.FilterTarget;
+    public sealed record AudioOverlayFieldTarget(AudioOverlayField Field) : FilterTarget;
 }

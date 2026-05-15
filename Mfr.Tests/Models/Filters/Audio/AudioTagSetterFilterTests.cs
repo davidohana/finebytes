@@ -2,7 +2,6 @@ using System.Text.Json;
 using Mfr.Core;
 using Mfr.Filters.Audio;
 using Mfr.Models;
-using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Models.Filters.Audio
 {
