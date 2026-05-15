@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mfr.Metadata\Mfr.Metadata.csproj" />
     <ProjectReference Include="..\Mfr.Models\Mfr.Models.csproj" />
     <ProjectReference Include="..\Mfr.Utils\Mfr.Utils.csproj" />
   </ItemGroup>

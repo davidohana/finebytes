@@ -17,6 +17,10 @@ namespace Mfr.Models.Tags
     /// mirror TagLib’s merged tag. <see cref="Xiph"/>, <see cref="Ape"/>, <see cref="Apple"/>, and <see cref="Asf"/>
     /// hold detached per–<c>TagTypes</c> payloads when present on disk (see persistence documentation for null semantics).
     /// </para>
+    /// <para>
+    /// <see cref="TagBlocksStructurallyEquals"/> compares only those detached blocks—the intended durable tag payloads for
+    /// Phase 4+ tooling—while scalar properties remain a merged façade synced by persistence/preview helpers.
+    /// </para>
     /// </remarks>
     public sealed class AudioTagOverlay : IEquatable<AudioTagOverlay?>
     {
@@ -124,6 +128,47 @@ namespace Mfr.Models.Tags
         /// Gets or sets total disc count when supplied by tags.
         /// </summary>
         public uint? DiscCount { get; set; }
+
+        /// <summary>
+        /// Returns whether this overlay and <paramref name="other"/> carry the same per–tag snapshots (blocks only).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Ignores merged façade scalars (<see cref="Title"/>, <see cref="Album"/>, …). Used for comparisons where native
+        /// blocks are the authoritative persisted shape (Phase 4+); full <see cref="Equals(AudioTagOverlay?)"/> still
+        /// includes scalars until façade storage is removed.
+        /// </para>
+        /// </remarks>
+        /// <param name="other">Other overlay.</param>
+        /// <returns>
+        /// <see langword="true"/> when all of <see cref="Id3v1"/>, <see cref="Id3v2"/>, <see cref="Xiph"/>,
+        /// <see cref="Ape"/>, <see cref="Apple"/>, <see cref="Asf"/> are pairwise equal (including both <c>null</c>).
+        /// </returns>
+        public bool TagBlocksStructurallyEquals(AudioTagOverlay? other)
+        {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            if (!Equals(Id3v1, other.Id3v1))
+                return false;
+
+            if (!Equals(Id3v2, other.Id3v2))
+                return false;
+
+            if (!Equals(Xiph, other.Xiph))
+                return false;
+
+            if (!Equals(Ape, other.Ape))
+                return false;
+
+            if (!Equals(Apple, other.Apple))
+                return false;
+
+            return Equals(Asf, other.Asf);
+        }
 
         /// <summary>
         /// Creates a detached copy suitable for cloning <see cref="FileMeta"/>.

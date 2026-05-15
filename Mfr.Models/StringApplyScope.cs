@@ -21,7 +21,7 @@ namespace Mfr.Models
     }
 
     /// <summary>
-    /// Optional restriction for <see cref="StringTargetFilter"/> — run the filter on a substring or token only,
+    /// Optional restriction for <c>StringTargetFilter</c> — run the filter on a substring or token only,
     /// then splice the result back into the full preview field.
     /// </summary>
     /// <remarks>

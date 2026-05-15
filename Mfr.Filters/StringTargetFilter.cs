@@ -1,5 +1,10 @@
 using System.Text.Json.Serialization;
+using Mfr.Filters.Audio;
 using Mfr.Models.Tags;
+
+// Namespace stays Mfr.Models for JSON preset compatibility; this file lives under Mfr.Filters so string-target filters
+// can call Mfr.Metadata without a Models↔Metadata cycle.
+#pragma warning disable IDE0130
 
 namespace Mfr.Models
 {
@@ -22,6 +27,9 @@ namespace Mfr.Models
             var current = meta.GetTargetString(Target);
             var transformed = TransformValue(current, item);
             meta.SetTargetString(Target, transformed);
+
+            if (Target is AudioOverlayFieldTarget)
+                RenameItemPreviewAudioSemantics.TryFlushPreviewAudioFacadeIntoNativeBlocks(item);
         }
 
         internal string TransformValue(string value, RenameItem item)

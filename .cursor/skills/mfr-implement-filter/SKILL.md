@@ -13,7 +13,7 @@ description: >-
 1. **Location.** Add the filter class under `Mfr.Filters/<Group>/` (e.g. `Space/`, `Case/`). Filters sit in **L2**; they reference `Mfr.Models` only (see `docs/mfr-folder-layering.md`).
 
 2. **Shape.**
-   - **String-target filters (prefix/extension/full today):** `public sealed record YourFilter(...) : StringTargetFilter(Target)` (same as most built-ins).
+   - **String-target filters (prefix/extension/full today):** `public sealed record YourFilter(...) : StringTargetFilter(Target)` in **`Mfr.Filters`** (same as most built-ins; `StringTargetFilter` lives in **`Mfr.Models` namespace** inside the Filters project).
    - **Other targets** (attributes, future ID3, etc.): `public sealed record YourFilter(...) : BaseFilter(Target)` and `protected internal override void ApplyCore(RenameItem item)`.
 
 3. **`Type`.** `public override string Type => "YourFilterType";` — string must match the JSON `type` discriminator and `JsonDerivedType` registration **exactly**.
