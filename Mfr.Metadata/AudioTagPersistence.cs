@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using Mfr.Models;
+using Mfr.Models.Tags;
 using TagLib;
 using TagLib.Mpeg;
 

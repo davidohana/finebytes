@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Mfr.Models
+namespace Mfr.Models.Tags
 {
     /// <summary>
     /// One ID3v2 frame serialized for overlay round-trip (full TagLib frame render, including header).

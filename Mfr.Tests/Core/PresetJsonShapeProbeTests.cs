@@ -7,6 +7,7 @@ using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Models;
+using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Core
 {

@@ -20,7 +20,7 @@ Phased work: (1) structured overlay + MP3 ID3v1/v2 round-trip and semantic mappi
 ## Current behavior (problem)
 
 - [`Mfr.Metadata/AudioTagPersistence.cs`](../Mfr.Metadata/AudioTagPersistence.cs) reads and writes only TagLib’s merged [`Tag`](https://github.com/mono/taglib-sharp) via `file.Tag`. That collapses ID3v1 vs ID3v2, hides duplicate/conflicting frames, and drops fields that are not mapped to the common surface (e.g. many TXXX variants, APIC, arbitrary Vorbis keys).
-- [`Mfr.Models/AudioTagOverlay.cs`](../Mfr.Models/AudioTagOverlay.cs) is a single flat “canonical” snapshot, so the app never represents multiple coexisting tag blocks or raw frame lists.
+- [`Mfr.Models/Tags/AudioTagOverlay.cs`](../Mfr.Models/Tags/AudioTagOverlay.cs) is a single flat “canonical” snapshot, so the app never represents multiple coexisting tag blocks or raw frame lists.
 
 ## Target behavior
 
@@ -38,7 +38,7 @@ flowchart LR
 ```
 
 1. **Load**: For each relevant `TagTypes` instance present on the opened [`File`](https://github.com/mono/taglib-sharp), materialize a **detached** model of that tag (full ID3v2 frame list where applicable; full Vorbis comment key/value multiset; Apple `ilst` atoms; etc.). No silent merge at the overlay level—keep each block separate so ID3v1 vs ID3v2 remain visible and round-trippable.
-2. **Semantic edits** (today’s `Title`, `Album`, [`AudioOverlayField`](../Mfr.Models/Targets.cs), [`AudioTagSetterFilter`](../Mfr.Filters/Audio/AudioTagSetterFilter.cs)): do **not** write through `file.Tag` properties. Instead, apply a **small mapping layer per container** (MP3/ID3v2 → `TIT2`, `TPE1`, …; Vorbis → `TITLE`, `ARTIST`, …; MP4 → `©nam`, `©ART`, …) so the same logical field updates the correct underlying storage for that file’s format(s).
+2. **Semantic edits** (today’s `Title`, `Album`, [`AudioOverlayField`](../Mfr.Models/Tags/AudioOverlayField.cs), [`AudioTagSetterFilter`](../Mfr.Filters/Audio/AudioTagSetterFilter.cs)): do **not** write through `file.Tag` properties. Instead, apply a **small mapping layer per container** (MP3/ID3v2 → `TIT2`, `TPE1`, …; Vorbis → `TITLE`, `ARTIST`, …; MP4 → `©nam`, `©ART`, …) so the same logical field updates the correct underlying storage for that file’s format(s).
 3. **Commit**: [`AudioTagPersistence.Apply`](../Mfr.Metadata/AudioTagPersistence.cs) compares the **full structured overlay** to a fresh read from disk (same as today’s “no-op if equal”), then writes by **reattaching** each tag block to TagLib (clear/replace as needed) and `Save()`.
 
 ## Phased delivery

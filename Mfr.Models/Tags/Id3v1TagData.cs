@@ -1,4 +1,4 @@
-namespace Mfr.Models
+namespace Mfr.Models.Tags
 {
     /// <summary>
     /// Detached snapshot of an ID3v1 tag (fixed 128-byte style fields) for MP3 overlay persistence.

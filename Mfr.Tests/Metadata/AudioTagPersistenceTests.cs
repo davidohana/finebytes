@@ -1,5 +1,6 @@
 using Mfr.Metadata;
 using Mfr.Models;
+using Mfr.Models.Tags;
 using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Metadata

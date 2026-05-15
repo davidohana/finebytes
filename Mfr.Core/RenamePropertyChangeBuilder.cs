@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Mfr.Models;
+using Mfr.Models.Tags;
 
 namespace Mfr.Core
 {

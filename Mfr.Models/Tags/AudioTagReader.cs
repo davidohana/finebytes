@@ -1,4 +1,4 @@
-namespace Mfr.Models
+namespace Mfr.Models.Tags
 {
     /// <summary>
     /// Loads embedded-tag values for one absolute filesystem path without mutating callers' snapshots.

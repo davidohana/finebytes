@@ -1,6 +1,7 @@
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
 using Mfr.Models;
+using Mfr.Models.Tags;
 using ReplacerFilter = Mfr.Filters.Replace.ReplacerFilter;
 
 namespace Mfr.Tests.Models.Filters

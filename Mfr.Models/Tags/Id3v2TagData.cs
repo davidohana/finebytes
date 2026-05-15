@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Mfr.Models
+namespace Mfr.Models.Tags
 {
     /// <summary>
     /// Detached snapshot of an ID3v2 tag (full frame inventory for MP3 overlay persistence).

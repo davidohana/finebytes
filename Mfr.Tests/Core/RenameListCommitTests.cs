@@ -5,6 +5,7 @@ using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
 using Mfr.Metadata;
 using Mfr.Models;
+using Mfr.Models.Tags;
 using Mfr.Tests.TestSupport;
 using Mfr.Utils;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;

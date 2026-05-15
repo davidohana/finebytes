@@ -2,6 +2,7 @@ using System.Globalization;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.Tokens.Audio;
 using Mfr.Models;
+using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
 {

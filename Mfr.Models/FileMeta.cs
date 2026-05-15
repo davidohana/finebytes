@@ -1,3 +1,5 @@
+using Mfr.Models.Tags;
+
 namespace Mfr.Models
 {
     /// <summary>

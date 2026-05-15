@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Models.Filters
 {

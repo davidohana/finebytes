@@ -1,73 +1,8 @@
 using System.Text.Json.Serialization;
+using Mfr.Models.Tags;
 
 namespace Mfr.Models
 {
-    /// <summary>
-    /// Which embedded audio-tag overlay field a <see cref="AudioOverlayFieldTarget"/> addresses on <see cref="FileMeta.AudioTagOverlay"/>.
-    /// </summary>
-    public enum AudioOverlayField
-    {
-        /// <summary>Track title.</summary>
-        [JsonStringEnumMemberName("title")]
-        Title,
-
-        /// <summary>Album name.</summary>
-        [JsonStringEnumMemberName("album")]
-        Album,
-
-        /// <summary>Primary performers (joined display string).</summary>
-        [JsonStringEnumMemberName("performers")]
-        Performers,
-
-        /// <summary>Album artists (joined display string).</summary>
-        [JsonStringEnumMemberName("albumArtists")]
-        AlbumArtists,
-
-        /// <summary>Composers (joined display string).</summary>
-        [JsonStringEnumMemberName("composers")]
-        Composers,
-
-        /// <summary>Genre.</summary>
-        [JsonStringEnumMemberName("genre")]
-        Genre,
-
-        /// <summary>Comment.</summary>
-        [JsonStringEnumMemberName("comment")]
-        Comment,
-
-        /// <summary>Lyrics.</summary>
-        [JsonStringEnumMemberName("lyrics")]
-        Lyrics,
-
-        /// <summary>Copyright.</summary>
-        [JsonStringEnumMemberName("copyright")]
-        Copyright,
-
-        /// <summary>Grouping.</summary>
-        [JsonStringEnumMemberName("grouping")]
-        Grouping,
-
-        /// <summary>Release year when expressed as a tag number.</summary>
-        [JsonStringEnumMemberName("year")]
-        Year,
-
-        /// <summary>Track index (number).</summary>
-        [JsonStringEnumMemberName("track")]
-        Track,
-
-        /// <summary>Track count (of n/m).</summary>
-        [JsonStringEnumMemberName("trackCount")]
-        TrackCount,
-
-        /// <summary>Disc index.</summary>
-        [JsonStringEnumMemberName("disc")]
-        Disc,
-
-        /// <summary>Disc count.</summary>
-        [JsonStringEnumMemberName("discCount")]
-        DiscCount,
-    }
-
     /// <summary>
     /// Which filesystem timestamp field date/time filters modify.
     /// </summary>
@@ -104,12 +39,6 @@ namespace Mfr.Models
     [JsonDerivedType(typeof(ParentDirectoryTarget), "ParentDirectory")]
     [JsonDerivedType(typeof(AudioOverlayFieldTarget), "AudioOverlayField")]
     public abstract record FilterTarget;
-
-    /// <summary>
-    /// Targets one field on <see cref="FileMeta.AudioTagOverlay"/>; string filters read/write invariant text or numeric strings.
-    /// </summary>
-    /// <param name="Field">Which overlay property is addressed.</param>
-    public sealed record AudioOverlayFieldTarget(AudioOverlayField Field) : FilterTarget;
 
     /// <summary>
     /// Targets the file name without extension (<c>prefix</c> segment).

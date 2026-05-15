@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Mfr.Core;
 using Mfr.Models;
+using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Core

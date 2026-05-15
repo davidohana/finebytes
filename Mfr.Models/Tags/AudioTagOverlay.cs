@@ -1,4 +1,4 @@
-namespace Mfr.Models
+namespace Mfr.Models.Tags
 {
     /// <summary>
     /// Canonical in-memory overlay for embedded audio tags, shared by preview snapshots and TagLib façade I/O.

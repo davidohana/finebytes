@@ -1,4 +1,5 @@
 using System.Globalization;
+using Mfr.Models.Tags;
 using Mfr.Utils;
 
 namespace Mfr.Models
