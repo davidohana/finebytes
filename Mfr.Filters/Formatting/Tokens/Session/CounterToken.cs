@@ -98,7 +98,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the format argument is missing required fields or has invalid values.</exception>
         /// <exception cref="InvalidOperationException">Thrown when automatic leading-zero mode needs list counts that are not populated.</exception>
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             var options = _ParseOptions(arg);
             return item =>

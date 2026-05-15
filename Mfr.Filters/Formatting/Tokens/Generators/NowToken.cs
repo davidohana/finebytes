@@ -1,5 +1,3 @@
-using Mfr.Models;
-
 namespace Mfr.Filters.Formatting.Tokens.Generators
 {
     /// <summary>
@@ -16,7 +14,7 @@ namespace Mfr.Filters.Formatting.Tokens.Generators
         public IReadOnlyList<string> Names { get; } = ["now"];
 
         /// <inheritdoc />
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             var format = string.IsNullOrWhiteSpace(arg) ? null : arg;
             return format is null

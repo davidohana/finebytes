@@ -1,5 +1,3 @@
-using Mfr.Models;
-
 namespace Mfr.Filters.Formatting.Tokens.FileProperties
 {
     /// <summary>
@@ -17,7 +15,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
             return item =>

@@ -19,7 +19,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             FormatOptionsParsing.RequireNoArgument(arg, FormatOptionsParsing.TokenDisplayName(this));
             return item => item.Original.RenameListTotalCount.ToString(CultureInfo.InvariantCulture);

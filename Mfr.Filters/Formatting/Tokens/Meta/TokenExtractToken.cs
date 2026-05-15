@@ -1,5 +1,4 @@
 using System.Globalization;
-using Mfr.Models;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.Meta
@@ -51,7 +50,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the format argument is invalid or <c>token-number</c> is inconsistent with resolved source text.</exception>
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var options = _ParseOptions(tokenDisplayName, arg);

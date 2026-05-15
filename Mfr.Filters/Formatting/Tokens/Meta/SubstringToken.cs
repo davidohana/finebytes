@@ -1,5 +1,4 @@
 using System.Globalization;
-using Mfr.Models;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.Meta
@@ -56,7 +55,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the format argument is malformed.</exception>
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             var options = _ParseOptions(arg);
             var compiledSource = FormatStringCompiler.Compile(options.SourceFormatString);

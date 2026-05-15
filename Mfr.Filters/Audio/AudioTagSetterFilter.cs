@@ -69,14 +69,14 @@ namespace Mfr.Filters.Audio
         /// <summary>
         /// Formatter used when a field is omitted from options: always expands to empty string (field is not applied).
         /// </summary>
-        private Func<RenameItem, string> PerformersFormatter = FormatStringCompiler.EmptyFormatter;
-        private Func<RenameItem, string> AlbumArtistsFormatter = FormatStringCompiler.EmptyFormatter;
-        private Func<RenameItem, string> TitleFormatter = FormatStringCompiler.EmptyFormatter;
-        private Func<RenameItem, string> AlbumFormatter = FormatStringCompiler.EmptyFormatter;
-        private Func<RenameItem, string> GenreFormatter = FormatStringCompiler.EmptyFormatter;
-        private Func<RenameItem, string> CommentFormatter = FormatStringCompiler.EmptyFormatter;
-        private Func<RenameItem, string> YearFormatter = FormatStringCompiler.EmptyFormatter;
-        private Func<RenameItem, string> TrackFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter PerformersFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter AlbumArtistsFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter TitleFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter AlbumFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter GenreFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter CommentFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter YearFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter TrackFormatter = FormatStringCompiler.EmptyFormatter;
 
         /// <inheritdoc />
         public override string Type => "AudioTagSetter";
@@ -170,7 +170,7 @@ namespace Mfr.Filters.Audio
         /// or returns a delegate that yields the literal <c>text</c>.
         /// </para>
         /// </remarks>
-        private static Func<RenameItem, string> _CreateFormatter(AudioTagStringFieldOptions? spec)
+        private static Formatter _CreateFormatter(AudioTagStringFieldOptions? spec)
         {
             if (spec is null)
                 return FormatStringCompiler.EmptyFormatter;
@@ -186,7 +186,7 @@ namespace Mfr.Filters.Audio
             RenameItem item,
             bool onlyIfEmpty,
             string? currentValue,
-            Func<RenameItem, string> formatter,
+            Formatter formatter,
             Action<string?> assign)
         {
             var overlayAlreadyHasValue = !string.IsNullOrWhiteSpace(currentValue);
@@ -200,7 +200,7 @@ namespace Mfr.Filters.Audio
         private void _ApplyYear(
             RenameItem item,
             bool onlyIfEmpty,
-            Func<RenameItem, string> formatter,
+            Formatter formatter,
             AudioTagOverlay tags)
         {
             if (onlyIfEmpty && tags.Year is not null)
@@ -238,7 +238,7 @@ namespace Mfr.Filters.Audio
         private void _ApplyTrackField(
             RenameItem item,
             bool onlyIfEmpty,
-            Func<RenameItem, string> formatter,
+            Formatter formatter,
             AudioTagOverlay tags)
         {
             if (onlyIfEmpty && tags.Track is not null)

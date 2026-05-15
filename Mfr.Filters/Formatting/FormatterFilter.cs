@@ -19,7 +19,7 @@ namespace Mfr.Filters.Formatting
         FilterTarget Target,
         FormatterOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
-        private Func<RenameItem, string>? _compiledTemplate;
+        private Formatter? _compiledTemplate;
 
         /// <summary>
         /// Gets the filter type discriminator.

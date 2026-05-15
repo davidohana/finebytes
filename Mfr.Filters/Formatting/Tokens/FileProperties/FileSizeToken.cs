@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using Mfr.Models;
 
 namespace Mfr.Filters.Formatting.Tokens.FileProperties
 {
@@ -67,7 +66,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Thrown when an unrecognized unit is supplied.</exception>
         /// <exception cref="UnreachableException">Thrown when an unexpected unit enum value appears at runtime.</exception>
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             var options = _ParseOptions(FormatOptionsParsing.TokenDisplayName(this), arg);
             return item =>

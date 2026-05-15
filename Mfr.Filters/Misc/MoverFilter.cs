@@ -39,7 +39,7 @@ namespace Mfr.Filters.Misc
     /// <param name="Options">Mover options.</param>
     public sealed record MoverFilter(MoverOptions Options) : BaseFilter
     {
-        private Func<RenameItem, string>? _compiledSubFolder;
+        private Formatter? _compiledSubFolder;
 
         /// <summary>
         /// Gets the filter type discriminator.

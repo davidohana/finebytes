@@ -41,7 +41,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the template argument is malformed or <c>date-kind</c> is not recognized.</exception>
         /// <exception cref="UnreachableException">Thrown when an unexpected enum value appears at runtime (should not happen for parsed options).</exception>
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             var options = _ParseOptions(FormatOptionsParsing.TokenDisplayName(this), arg);
             return item =>

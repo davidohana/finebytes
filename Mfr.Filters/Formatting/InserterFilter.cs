@@ -45,7 +45,7 @@ namespace Mfr.Filters.Formatting
         FilterTarget Target,
         InserterOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
-        private Func<RenameItem, string>? _compiledText;
+        private Formatter? _compiledText;
 
         /// <summary>
         /// Gets the filter type discriminator.
@@ -58,7 +58,7 @@ namespace Mfr.Filters.Formatting
             _compiledText = _CompileInsertText(Options.Text);
         }
 
-        private static Func<RenameItem, string> _CompileInsertText(string text)
+        private static Formatter _CompileInsertText(string text)
         {
             if (!FormatStringCompiler.ContainsLikelyFormatTokens(text))
                 return _ => text;

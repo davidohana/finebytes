@@ -30,7 +30,7 @@ namespace Mfr.Filters.Formatting
         /// <summary>
         /// Formatter that always yields <see cref="string.Empty"/> (e.g. when a preset omits a field or uses a literal with no template).
         /// </summary>
-        internal static readonly Func<RenameItem, string> EmptyFormatter = static _ => "";
+        internal static readonly Formatter EmptyFormatter = static _ => "";
 
         /// <summary>
         /// Compiles <paramref name="template"/> into a delegate that is evaluated per item at rename time.
@@ -43,10 +43,10 @@ namespace Mfr.Filters.Formatting
         /// </para>
         /// </remarks>
         /// <param name="template">Template text that may contain tokens.</param>
-        /// <returns>A function that produces the fully expanded string for a <see cref="RenameItem"/>.</returns>
-        internal static Func<RenameItem, string> Compile(string template)
+        /// <returns>A <see cref="Formatter"/> that produces the fully expanded string for a <see cref="RenameItem"/>.</returns>
+        internal static Formatter Compile(string template)
         {
-            var segments = new List<Func<RenameItem, string>>();
+            var segments = new List<Formatter>();
             var i = 0;
             var literalStart = 0;
 
@@ -172,7 +172,7 @@ namespace Mfr.Filters.Formatting
             return -1;
         }
 
-        private static Func<RenameItem, string> _CompileToken(string tokenInner)
+        private static Formatter _CompileToken(string tokenInner)
         {
             var colonIndex = tokenInner.IndexOf(':');
             var name = colonIndex < 0 ? tokenInner : tokenInner[..colonIndex];

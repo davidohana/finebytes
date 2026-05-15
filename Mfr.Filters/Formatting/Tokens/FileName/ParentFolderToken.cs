@@ -1,5 +1,4 @@
 using System.Globalization;
-using Mfr.Models;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.FileName
@@ -19,7 +18,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         public IReadOnlyList<string> Names { get; } = ["parent-folder"];
 
         /// <inheritdoc />
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             var level = string.IsNullOrWhiteSpace(arg) ? 1 : int.Parse(arg, CultureInfo.InvariantCulture);
             return item =>

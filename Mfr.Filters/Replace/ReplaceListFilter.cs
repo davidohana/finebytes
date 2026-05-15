@@ -33,7 +33,7 @@ namespace Mfr.Filters.Replace
         FilterTarget Target,
         ReplaceListOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
-        private List<(string Search, Func<RenameItem, string> CompiledReplacement)>? _compiledEntries;
+        private List<(string Search, Formatter CompiledReplacement)>? _compiledEntries;
 
         /// <summary>
         /// Gets the filter type discriminator.

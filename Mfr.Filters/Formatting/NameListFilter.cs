@@ -29,8 +29,8 @@ namespace Mfr.Filters.Formatting
         NameListOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
     {
         private IReadOnlyList<string>? _entries;
-        private Func<RenameItem, string>? _compiledPrefix;
-        private Func<RenameItem, string>? _compiledSuffix;
+        private Formatter? _compiledPrefix;
+        private Formatter? _compiledSuffix;
 
         /// <summary>
         /// Gets the filter type discriminator.

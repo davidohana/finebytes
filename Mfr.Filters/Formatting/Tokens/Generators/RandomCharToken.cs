@@ -1,4 +1,3 @@
-using Mfr.Models;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.Generators
@@ -19,7 +18,7 @@ namespace Mfr.Filters.Formatting.Tokens.Generators
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the argument is not exactly two comma-separated characters.</exception>
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             var segments = arg.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);

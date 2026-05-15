@@ -27,7 +27,7 @@ namespace Mfr.Filters.Formatting.Tokens
         /// Parses <paramref name="arg"/> once and returns a delegate that resolves this token per item.
         /// </summary>
         /// <param name="arg">Raw argument text from the template (after the first <c>:</c>); empty when no argument was supplied.</param>
-        /// <returns>A function that resolves this token against a <see cref="RenameItem"/> at rename time.</returns>
-        Func<RenameItem, string> Compile(string arg);
+        /// <returns>A <see cref="Formatter"/> that resolves this token against a <see cref="RenameItem"/> at rename time.</returns>
+        Formatter Compile(string arg);
     }
 }

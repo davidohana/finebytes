@@ -33,7 +33,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         /// <exception cref="UserException">
         /// Thrown when the list file path is invalid, missing, or a line exceeds configured limits.
         /// </exception>
-        public Func<RenameItem, string> Compile(string arg)
+        public Formatter Compile(string arg)
         {
             var tokenDisplayName = FormatOptionsParsing.TokenDisplayName(this);
             Require.That(
