@@ -11,7 +11,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
     /// </summary>
     public sealed class AudioOverlayFormatTokenTests
     {
-        private static AudioTagOverlay FullTagSample()
+        private static AudioTagOverlay _FullTagSample()
         {
             return new AudioTagOverlay
             {
@@ -135,7 +135,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         [Fact]
         public void Resolve_AllStringFields_MappedFromSample()
         {
-            var sample = FullTagSample();
+            var sample = _FullTagSample();
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.AudioTagOverlay = sample.Clone());
 
             Assert.Equal("T1", new AudioTitleToken().Compile(string.Empty)(item));
