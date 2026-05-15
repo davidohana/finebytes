@@ -68,6 +68,23 @@ namespace Mfr.Tests.Models.Filters.Audio
         }
 
         /// <summary>
+        /// Verifies performer <c>text</c> may list several names separated by <c>;</c> on the preview overlay
+        /// (normalized to separate TagLib values on save via <see cref="Mfr.Metadata.AudioTagPersistence"/>).
+        /// </summary>
+        [Fact]
+        public void Apply_Performers_SemicolonSeparated_SetsJoinedPreviewString()
+        {
+            var item = _CreateAudioItem();
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Performers: new AudioTagStringFieldOptions(Text: "Alice ; Bob")));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("Alice ; Bob", item.Preview.AudioTagOverlay.Performers);
+        }
+
+        /// <summary>
         /// Verifies <see cref="AudioTagStringFieldOptions.OnlyIfEmpty"/> leaves a non-empty title unchanged.
         /// </summary>
         [Fact]

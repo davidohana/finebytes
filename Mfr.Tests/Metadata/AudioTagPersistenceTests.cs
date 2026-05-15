@@ -6,6 +6,8 @@ namespace Mfr.Tests.Metadata
 {
     public sealed class AudioTagPersistenceTests : IDisposable
     {
+        private static readonly string[] s_AliceBobPerformers = ["Alice", "Bob"];
+
         private readonly List<string> _pathsToDelete = [];
 
         /// <inheritdoc />
@@ -89,6 +91,27 @@ namespace Mfr.Tests.Metadata
             var readAgain = AudioTagPersistence.Read(candidate);
             Assert.Equal("preview", readAgain.Title);
             Assert.Equal("AlbumX", readAgain.Album);
+        }
+
+        /// <summary>
+        /// Verifies overlay performer strings split on <c>;</c> for TagLib and rejoin as <c>; </c> on read.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_Apply_PerformersJoinedWithSemicolon()
+        {
+            var candidate = _AllocateMinimalWavPath();
+
+            var readBaseline = AudioTagPersistence.Read(candidate);
+            var previewOverlay = readBaseline.Clone();
+            previewOverlay.Performers = "Alice;Bob";
+
+            AudioTagPersistence.Apply(candidate, previewOverlay);
+
+            var readAgain = AudioTagPersistence.Read(candidate);
+            Assert.Equal("Alice; Bob", readAgain.Performers);
+
+            using var file = TagLib.File.Create(candidate);
+            Assert.Equal(s_AliceBobPerformers, file.Tag.Performers);
         }
 
         private string _AllocateMinimalWavPath()
