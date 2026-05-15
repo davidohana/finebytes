@@ -12,9 +12,23 @@ namespace Mfr.Models
     /// Multi-value frames (performers, album artists, composers) are stored as display strings separated by
     /// <c>; </c>; parsing and joining are handled in <c>Mfr.Metadata</c>.
     /// </para>
+    /// <para>
+    /// For MPEG/MP3 files, <see cref="Id3v1"/> and <see cref="Id3v2"/> hold per-tag snapshots; semantic properties
+    /// mirror TagLib’s merged tag. Other formats leave both <see langword="null"/> until later phases add more containers.
+    /// </para>
     /// </remarks>
     public sealed class AudioTagOverlay : IEquatable<AudioTagOverlay?>
     {
+        /// <summary>
+        /// Gets or sets the optional ID3v1 snapshot when the row is backed by MPEG/MP3 structured tags.
+        /// </summary>
+        public Id3v1TagData? Id3v1 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the optional ID3v2 snapshot (full frame inventory) when the row is backed by MPEG/MP3 structured tags.
+        /// </summary>
+        public Id3v2TagData? Id3v2 { get; set; }
+
         /// <summary>
         /// Gets or sets the track title.
         /// </summary>
@@ -98,6 +112,15 @@ namespace Mfr.Models
         {
             return new AudioTagOverlay
             {
+                Id3v1 = Id3v1 is null ? null : Id3v1 with { },
+                Id3v2 = Id3v2 is null
+                    ? null
+                    : new Id3v2TagData
+                    {
+                        Version = Id3v2.Version,
+                        CanonicalTagBytes = Id3v2.CanonicalTagBytes,
+                        Frames = Id3v2.Frames,
+                    },
                 Title = Title,
                 Album = Album,
                 Performers = Performers,
@@ -124,6 +147,12 @@ namespace Mfr.Models
 
             if (ReferenceEquals(this, other))
                 return true;
+
+            if (!Equals(Id3v1, other.Id3v1))
+                return false;
+
+            if (!Equals(Id3v2, other.Id3v2))
+                return false;
 
             return string.Equals(Title, other.Title, StringComparison.Ordinal)
                 && string.Equals(Album, other.Album, StringComparison.Ordinal)
@@ -152,6 +181,8 @@ namespace Mfr.Models
         public override int GetHashCode()
         {
             var hashCode = new HashCode();
+            hashCode.Add(Id3v1);
+            hashCode.Add(Id3v2);
             hashCode.Add(Title, StringComparer.Ordinal);
             hashCode.Add(Album, StringComparer.Ordinal);
             hashCode.Add(Performers, StringComparer.Ordinal);

@@ -136,6 +136,67 @@ namespace Mfr.Tests.Metadata
             Assert.Null(readBack.Album);
         }
 
+        /// <summary>
+        /// Verifies MP3/MPEG reads expose <see cref="AudioTagOverlay.Id3v2"/> with at least one frame after TagLib writes.
+        /// </summary>
+        [Fact]
+        public void Read_Mp3_WithWrittenTags_PopulatesId3v2Frames()
+        {
+            var candidate = _AllocateMp3ScratchPath();
+
+            using (var file = TagLib.File.Create(candidate))
+            {
+                file.Tag.Title = "mpeg-title";
+                file.Tag.Album = "mpeg-album";
+                file.Save();
+            }
+
+            var overlay = AudioTagPersistence.Read(candidate);
+            Assert.NotNull(overlay.Id3v2);
+            Assert.NotEmpty(overlay.Id3v2.Frames);
+            Assert.All(overlay.Id3v2.Frames, f => Assert.Equal(4, f.FrameId.Length));
+        }
+
+        /// <summary>
+        /// Verifies identity Apply after full MP3 read leaves <see cref="AudioTagPersistence.Read"/> output equal.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_Mp3_Apply_ClonedRead_IsNoOpAndStable()
+        {
+            var candidate = _AllocateMp3ScratchPath();
+
+            using (var file = TagLib.File.Create(candidate))
+            {
+                file.Tag.Title = "stable";
+                file.Tag.Album = "alb";
+                file.Save();
+            }
+
+            var first = AudioTagPersistence.Read(candidate);
+            Assert.Equal(first, first.Clone());
+            Assert.Equal(first, AudioTagPersistence.Read(candidate));
+
+            AudioTagPersistence.Apply(candidate, first.Clone());
+            var second = AudioTagPersistence.Read(candidate);
+
+            Assert.Equal(first, second);
+        }
+
+        private string _AllocateMp3ScratchPath()
+        {
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "l3-compl-cut.mp3");
+            if (!File.Exists(fixturePath))
+            {
+                throw new InvalidOperationException(
+                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output.");
+            }
+
+            var dest = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}_mfr-mp3.mp3");
+            _pathsToDelete.Add(dest);
+            File.Copy(fixturePath, dest, overwrite: false);
+            return Path.GetFullPath(dest);
+        }
+
         private string _AllocateMinimalWavPath()
         {
             var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}_mfr-phase1.wav");
