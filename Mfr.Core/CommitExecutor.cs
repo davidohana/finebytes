@@ -206,9 +206,7 @@ namespace Mfr.Core
                     AudioTagPersistence.Apply(item.Preview.FullPath, previewSnapshot.AudioTagOverlay);
 
                 item.Status = RenameStatus.CommitOk;
-                var changes = RenamePropertyChangeBuilder.BuildCommitChanges(
-                    sourcePath: originalPathBeforeCommit,
-                    destinationPath: destinationPath,
+                var changes = RenamePropertyChangeBuilder.BuildChangeRows(
                     originalSnapshot: originalSnapshot,
                     previewSnapshot: previewSnapshot);
                 outcomes[item] = new PlanOutcome(
@@ -293,9 +291,7 @@ namespace Mfr.Core
                     AudioTagPersistence.Apply(item.Preview.FullPath, previewSnapshot.AudioTagOverlay);
 
                 item.Status = RenameStatus.CommitOk;
-                var changes = RenamePropertyChangeBuilder.BuildCommitChanges(
-                    sourcePath: originalPathBeforeCommit,
-                    destinationPath: destinationPath,
+                var changes = RenamePropertyChangeBuilder.BuildChangeRows(
                     originalSnapshot: originalSnapshot,
                     previewSnapshot: previewSnapshot);
                 outcomes[item] = new PlanOutcome(

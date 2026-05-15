@@ -156,7 +156,7 @@ namespace Mfr.Tests.Core
             var result = renameList.Commit(failFast: false);
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
-            Assert.Contains(result[0].Changes, c => c.Property == "FileName");
+            Assert.Contains(result[0].Changes, c => c.Property == "Prefix");
 
             var enumeratedNames = Directory.EnumerateFiles(dir).Select(Path.GetFileName).ToList();
             Assert.Contains("TRACK.mp3", enumeratedNames);

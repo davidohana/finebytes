@@ -9,51 +9,22 @@ namespace Mfr.Core
     internal static class RenamePropertyChangeBuilder
     {
         /// <summary>
-        /// Builds change rows for a committed item using path-derived file names plus scalar and tag deltas.
+        /// Builds property-change rows from original/preview snapshots (structured path, filesystem scalars, embedded tags).
         /// </summary>
-        /// <param name="sourcePath">Original source path.</param>
-        /// <param name="destinationPath">Destination path.</param>
-        /// <param name="originalSnapshot">Original metadata before commit.</param>
-        /// <param name="previewSnapshot">Preview metadata to apply.</param>
-        /// <returns>Property-level changes for result reporting.</returns>
-        internal static List<RenamePropertyChange> BuildCommitChanges(
-            string sourcePath,
-            string destinationPath,
-            FileMeta originalSnapshot,
-            FileMeta previewSnapshot)
-        {
-            var changes = new List<RenamePropertyChange>();
-            _AppendFileNameDifference(changes, sourcePath, destinationPath);
-            _AppendFileMetaScalarDifferences(changes, originalSnapshot, previewSnapshot);
-            _AppendAudioTagOverlayDifferences(
-                changes,
-                originalSnapshot.AudioTagOverlay,
-                previewSnapshot.AudioTagOverlay);
-            return changes;
-        }
-
-        /// <summary>
-        /// Returns structured path, filesystem scalar, and embedded audio-tag deltas between <see cref="RenameItem.Original"/> and <see cref="RenameItem.Preview"/>.
-        /// </summary>
-        /// <param name="renameItem">The item to inspect.</param>
-        /// <returns>Property-level changes; may be empty when paths differ only in ways not modeled here.</returns>
-        internal static IReadOnlyList<RenamePropertyChange> GetPreviewPropertyChanges(RenameItem renameItem)
-        {
-            return _BuildPreviewChanges(renameItem.Original, renameItem.Preview);
-        }
-
-        /// <summary>Builds preview rows from structured path fields plus scalar and tag deltas.</summary>
-        private static List<RenamePropertyChange> _BuildPreviewChanges(
+        /// <para>
+        /// Used for successful commit outcomes and for preview logging/console output so both surfaces stay aligned.
+        /// </para>
+        /// <param name="originalSnapshot">Original metadata before apply.</param>
+        /// <param name="previewSnapshot">Preview metadata after apply.</param>
+        /// <returns>Ordered property-level deltas.</returns>
+        internal static List<RenamePropertyChange> BuildChangeRows(
             FileMeta originalSnapshot,
             FileMeta previewSnapshot)
         {
             var changes = new List<RenamePropertyChange>();
             _AppendStructuredPathDifferences(changes, originalSnapshot, previewSnapshot);
             _AppendFileMetaScalarDifferences(changes, originalSnapshot, previewSnapshot);
-            _AppendAudioTagOverlayDifferences(
-                changes,
-                originalSnapshot.AudioTagOverlay,
-                previewSnapshot.AudioTagOverlay);
+            _AppendAudioTagOverlayDifferences(changes, originalSnapshot.AudioTagOverlay, previewSnapshot.AudioTagOverlay);
             return changes;
         }
 
@@ -63,53 +34,24 @@ namespace Mfr.Core
             FileMeta original,
             FileMeta preview)
         {
-            var prefixChanged = !string.Equals(original.Prefix, preview.Prefix, StringComparison.Ordinal);
-            if (prefixChanged)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "Prefix",
-                    OldValue: original.Prefix,
-                    NewValue: preview.Prefix));
-            }
-
-            var extensionChanged = !string.Equals(original.Extension, preview.Extension, StringComparison.Ordinal);
-            if (extensionChanged)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "Extension",
-                    OldValue: original.Extension,
-                    NewValue: preview.Extension));
-            }
-
-            var directoryChanged = !string.Equals(
-                original.DirectoryPath,
-                preview.DirectoryPath,
-                StringComparison.OrdinalIgnoreCase);
-            if (directoryChanged)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "DirectoryPath",
-                    OldValue: original.DirectoryPath,
-                    NewValue: preview.DirectoryPath));
-            }
-        }
-
-        /// <summary>Appends a file-name delta derived from full paths (commit reporting).</summary>
-        private static void _AppendFileNameDifference(
-            List<RenamePropertyChange> changes,
-            string sourcePath,
-            string destinationPath)
-        {
-            var sourceFileName = Path.GetFileName(sourcePath);
-            var destinationFileName = Path.GetFileName(destinationPath);
-            var fileNameChanged = !string.Equals(sourceFileName, destinationFileName, StringComparison.Ordinal);
-            if (!fileNameChanged)
-                return;
-
-            changes.Add(new RenamePropertyChange(
-                Property: "FileName",
-                OldValue: sourceFileName,
-                NewValue: destinationFileName));
+            _AddRenamePropertyChangeIfStringDiffers(
+                changes,
+                propertyName: "Prefix",
+                oldValue: original.Prefix,
+                newValue: preview.Prefix,
+                comparison: StringComparison.Ordinal);
+            _AddRenamePropertyChangeIfStringDiffers(
+                changes,
+                propertyName: "Extension",
+                oldValue: original.Extension,
+                newValue: preview.Extension,
+                comparison: StringComparison.Ordinal);
+            _AddRenamePropertyChangeIfStringDiffers(
+                changes,
+                propertyName: "DirectoryPath",
+                oldValue: original.DirectoryPath,
+                newValue: preview.DirectoryPath,
+                comparison: StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>Appends attributes and timestamp deltas between two snapshots.</summary>
@@ -126,29 +68,21 @@ namespace Mfr.Core
                     NewValue: preview.Attributes.ToString()));
             }
 
-            if (original.CreationTime != preview.CreationTime)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "CreationTime",
-                    OldValue: original.CreationTime.ToString("O"),
-                    NewValue: preview.CreationTime.ToString("O")));
-            }
-
-            if (original.LastWriteTime != preview.LastWriteTime)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "LastWriteTime",
-                    OldValue: original.LastWriteTime.ToString("O"),
-                    NewValue: preview.LastWriteTime.ToString("O")));
-            }
-
-            if (original.LastAccessTime != preview.LastAccessTime)
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "LastAccessTime",
-                    OldValue: original.LastAccessTime.ToString("O"),
-                    NewValue: preview.LastAccessTime.ToString("O")));
-            }
+            _AddRenamePropertyChangeIfLocalTimestampDiffers(
+                changes,
+                propertyName: "CreationTime",
+                originalValue: original.CreationTime,
+                previewValue: preview.CreationTime);
+            _AddRenamePropertyChangeIfLocalTimestampDiffers(
+                changes,
+                propertyName: "LastWriteTime",
+                originalValue: original.LastWriteTime,
+                previewValue: preview.LastWriteTime);
+            _AddRenamePropertyChangeIfLocalTimestampDiffers(
+                changes,
+                propertyName: "LastAccessTime",
+                originalValue: original.LastAccessTime,
+                previewValue: preview.LastAccessTime);
         }
 
         /// <summary>Appends one row per differing scalar embedded-tag field.</summary>
@@ -160,14 +94,6 @@ namespace Mfr.Core
             if (original.Equals(preview))
                 return;
 
-            _AppendAudioTagOverlayFieldChanges(changes, original, preview);
-        }
-
-        private static void _AppendAudioTagOverlayFieldChanges(
-            List<RenamePropertyChange> changes,
-            AudioTagOverlay original,
-            AudioTagOverlay preview)
-        {
             _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Title", original.Title, preview.Title);
             _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Album", original.Album, preview.Album);
             _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Performers", original.Performers, preview.Performers);
@@ -183,6 +109,37 @@ namespace Mfr.Core
             _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.TrackCount", original.TrackCount, preview.TrackCount);
             _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Disc", original.Disc, preview.Disc);
             _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.DiscCount", original.DiscCount, preview.DiscCount);
+        }
+
+        private static void _AddRenamePropertyChangeIfStringDiffers(
+            List<RenamePropertyChange> changes,
+            string propertyName,
+            string oldValue,
+            string newValue,
+            StringComparison comparison)
+        {
+            if (string.Equals(oldValue, newValue, comparison))
+                return;
+
+            changes.Add(new RenamePropertyChange(
+                Property: propertyName,
+                OldValue: oldValue,
+                NewValue: newValue));
+        }
+
+        private static void _AddRenamePropertyChangeIfLocalTimestampDiffers(
+            List<RenamePropertyChange> changes,
+            string propertyName,
+            DateTime originalValue,
+            DateTime previewValue)
+        {
+            if (originalValue == previewValue)
+                return;
+
+            changes.Add(new RenamePropertyChange(
+                Property: propertyName,
+                OldValue: originalValue.ToString("O"),
+                NewValue: previewValue.ToString("O")));
         }
 
         private static void _AddRenamePropertyChangeIfOverlayStringDiffers(
