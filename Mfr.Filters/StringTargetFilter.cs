@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Mfr.Filters.Audio;
+using Mfr.Metadata;
 using Mfr.Models.Tags;
 
 // Namespace stays Mfr.Models for JSON preset compatibility; this file lives under Mfr.Filters so string-target filters
@@ -24,7 +25,11 @@ namespace Mfr.Models
                 item.EnsureAudioTagsLoaded();
 
             var meta = item.Preview;
-            var current = meta.GetTargetString(Target);
+            var current = Target is AudioOverlayFieldTarget ao
+                ? AudioOverlaySemanticFieldStrings.Format(
+                    AudioTagSemanticSurface.FromOverlay(meta.AudioTagOverlay),
+                    ao.Field)
+                : meta.GetTargetString(Target);
             var transformed = TransformValue(current, item);
             meta.SetTargetString(Target, transformed);
 
