@@ -207,7 +207,7 @@ namespace Mfr.Tests.Core
 
             Assert.Equal(
                 ["DirectoryPath", "Attributes", "AudioTag.Genre"],
-                rows.Select(r => r.Property).ToArray());
+                [.. rows.Select(r => r.Property)]);
         }
 
         private static FileMeta _CloneBaseline(
