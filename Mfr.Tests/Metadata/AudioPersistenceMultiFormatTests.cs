@@ -83,6 +83,43 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("fmt-album", baseline.Album);
         }
 
+        /// <summary>
+        /// Effective semantics from block-first projection match merged TagLib values for explicit title/album writes.
+        /// </summary>
+        /// <remarks>
+        /// MP4 track/disc/year sometimes live in binary atoms not captured by the text-only Apple snapshot model; numeric
+        /// comparisons are skipped for that fixture until projection reads those payloads. Other fields may differ between
+        /// stored blocks and merged façade (for example dormant ID3 genres on noisy fixtures); title/album remain stable.
+        /// </remarks>
+        [Theory(DisplayName = nameof(Read_AfterTagWrite_SemanticProjectionMatchesMergedFaçade))]
+        [MemberData(nameof(FormatCases))]
+        public void Read_AfterTagWrite_SemanticProjectionMatchesMergedFaçade(PersistenceFormatCase format)
+        {
+            var path = _AllocateScratchPath(format);
+
+            _ApplyTags(path, baselineTitle: "fmt-baseline", baselineAlbum: "fmt-album");
+
+            var overlay = AudioTagPersistence.Read(path);
+            var projected = AudioTagSemanticSurface.FromOverlay(overlay);
+
+            Assert.Equal("fmt-baseline", projected.Title);
+            Assert.Equal("fmt-album", projected.Album);
+            Assert.Equal(overlay.Title, projected.Title);
+            Assert.Equal(overlay.Album, projected.Album);
+
+            var compareNumerics =
+                !string.Equals(format.Label, "m4a", StringComparison.OrdinalIgnoreCase);
+
+            if (!compareNumerics)
+                return;
+
+            Assert.Equal(overlay.Year, projected.Year);
+            Assert.Equal(overlay.Track, projected.Track);
+            Assert.Equal(overlay.TrackCount, projected.TrackCount);
+            Assert.Equal(overlay.Disc, projected.Disc);
+            Assert.Equal(overlay.DiscCount, projected.DiscCount);
+        }
+
         [Theory(DisplayName = nameof(Apply_OverwritesTitle_AcrossFormats))]
         [MemberData(nameof(FormatCases))]
         public void Apply_OverwritesTitle_AcrossFormats(PersistenceFormatCase format)
