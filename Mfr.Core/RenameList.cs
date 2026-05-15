@@ -101,8 +101,15 @@ namespace Mfr.Core
         /// <param name="preset">The rename preset (ordered filter chain).</param>
         /// <returns>The commit plan for the previewed items; pass this to <see cref="Commit"/>.</returns>
         /// <remarks>
+        /// <para>
         /// Call <see cref="FilterChain.SetupFilters"/> on <see cref="FilterPreset.Chain"/> before this method
         /// so filter setup runs once for the chain (for example from the CLI before preview).
+        /// </para>
+        /// <para>
+        /// For regular files that exist on disk, each item calls
+        /// <see cref="AudioTagPersistence.TryMaterializePreviewFacadeIntoNativeBlocks"/> to merge façade fields into per–tag blocks
+        /// (best-effort when TagLib cannot open the path as an audio container).
+        /// </para>
         /// </remarks>
         public CommitPlan Preview(FilterPreset preset)
         {
@@ -123,6 +130,14 @@ namespace Mfr.Core
                 try
                 {
                     preset.Chain.ApplyFilters(renameItem);
+                    if (!renameItem.Original.Attributes.IsDirectory() &&
+                        File.Exists(renameItem.Original.FullPath))
+                    {
+                        _ = AudioTagPersistence.TryMaterializePreviewFacadeIntoNativeBlocks(
+                            renameItem.Preview.AudioTagOverlay,
+                            renameItem.Original.FullPath);
+                    }
+
                     if (renameItem.PreviewError is null)
                         renameItem.Status = RenameStatus.PreviewOk;
                 }

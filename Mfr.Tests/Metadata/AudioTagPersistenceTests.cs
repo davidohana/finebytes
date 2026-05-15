@@ -257,6 +257,49 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
+        /// Verifies <see cref="AudioTagPersistence.MaterializePreviewFacadeIntoNativeBlocks"/> merges a façade title into the Xiph
+        /// snapshot without saving (same rules as <see cref="AudioTagPersistence.Apply"/> coalesce).
+        /// </summary>
+        [Fact]
+        public void MaterializePreview_Ogg_MergesTitleIntoXiphSnapshot()
+        {
+            var path = _CopyFixtureToTemp("libnogg-bitrate-123.ogg");
+
+            var disk = AudioTagPersistence.Read(path);
+            var uniqueTitle = $"MaterializeOgg_{Guid.NewGuid():N}";
+            var preview = disk.Clone();
+            preview.Title = uniqueTitle;
+
+            AudioTagPersistence.MaterializePreviewFacadeIntoNativeBlocks(preview, path);
+
+            Assert.NotNull(disk.Xiph);
+            Assert.NotNull(preview.Xiph);
+            Assert.NotEqual(disk.Xiph.CanonicalTagBytes, preview.Xiph.CanonicalTagBytes);
+            Assert.Equal(uniqueTitle, preview.Title);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="AudioTagPersistence.MaterializePreviewFacadeIntoNativeBlocks"/> merges façade fields into the Apple
+        /// snapshot for M4A when given the on-disk source path.
+        /// </summary>
+        [Fact]
+        public void MaterializePreview_M4a_MergesTitleIntoAppleSnapshot()
+        {
+            var path = _CopyFixtureToTemp("homebrew-test.m4a");
+
+            var disk = AudioTagPersistence.Read(path);
+            Assert.NotNull(disk.Apple);
+
+            var preview = disk.Clone();
+            preview.Title = "MaterializedM4aTitle";
+
+            AudioTagPersistence.MaterializePreviewFacadeIntoNativeBlocks(preview, path);
+
+            Assert.NotEqual(disk.Apple, preview.Apple);
+            Assert.Equal("MaterializedM4aTitle", preview.Title);
+        }
+
+        /// <summary>
         /// Preview that only changes façade <see cref="AudioTagOverlay.Title"/> must coalesce into the Xiph block so Apply + Read stay consistent.
         /// </summary>
         [Fact]

@@ -30,6 +30,10 @@ namespace Mfr.Metadata
     /// Before writing, façade fields on <see cref="AudioTagOverlay"/> are merged into any loaded per–<c>TagTypes</c>
     /// blocks (ID3v1/v2, Xiph, APE, Apple, ASF) so semantic edits from filters stay consistent with serialized snapshots.
     /// </para>
+    /// <para>
+    /// After preview, hosts may call <see cref="MaterializePreviewFacadeIntoNativeBlocks"/> on the preview overlay using the
+    /// on-disk source path so façade fields and per-block snapshots stay aligned before commit (for example <c>Mfr.Core</c> rename preview).
+    /// </para>
     /// </remarks>
     public static class AudioTagPersistence
     {
@@ -50,6 +54,68 @@ namespace Mfr.Metadata
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             return _ReadOverlay(file);
+        }
+
+        /// <summary>
+        /// Like <see cref="MaterializePreviewFacadeIntoNativeBlocks"/> but returns <see langword="false"/> when TagLib cannot
+        /// treat <paramref name="embeddedTagSourcePath"/> as an audio container (for example plain text or an unsupported stub).
+        /// </summary>
+        /// <param name="overlay">Overlay to mutate in place when this returns <see langword="true"/>.</param>
+        /// <param name="embeddedTagSourcePath">Path to open read-only for tag merge.</param>
+        /// <returns>
+        /// <see langword="true"/> when the merge ran; <see langword="false"/> when opening or reading tags failed in a way that
+        /// should not fail the whole preview (commit still runs <see cref="Apply"/>, which merges façade into blocks again).
+        /// </returns>
+        public static bool TryMaterializePreviewFacadeIntoNativeBlocks(AudioTagOverlay overlay, string embeddedTagSourcePath)
+        {
+            ArgumentNullException.ThrowIfNull(overlay);
+
+            if (string.IsNullOrWhiteSpace(embeddedTagSourcePath))
+                return false;
+
+            try
+            {
+                MaterializePreviewFacadeIntoNativeBlocks(overlay, embeddedTagSourcePath);
+                return true;
+            }
+            catch (UnsupportedFormatException)
+            {
+                return false;
+            }
+            catch (CorruptFileException)
+            {
+                return false;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Copies merged semantic façade fields on <paramref name="overlay"/> into structured per–<c>TagTypes</c> blocks
+        /// using the same rules as <see cref="Apply"/>, opening <paramref name="embeddedTagSourcePath"/> (typically the rename row’s
+        /// source file) once so Apple and other TagLib-backed merges match on-disk tag state.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Call after preview filters mutate façade fields. Hosts should skip this when no file is available (for example a unit-test
+        /// row that does not refer to a real path on disk); <see cref="Apply"/> still merges façade into blocks before save.
+        /// </para>
+        /// </remarks>
+        /// <param name="overlay">Overlay to mutate in place.</param>
+        /// <param name="embeddedTagSourcePath">
+        /// Absolute path to the file whose embedded tags were loaded into the overlay (same file TagLib would open for reads).
+        /// </param>
+        /// <exception cref="ArgumentException"><paramref name="embeddedTagSourcePath"/> is missing or not a regular file.</exception>
+        public static void MaterializePreviewFacadeIntoNativeBlocks(AudioTagOverlay overlay, string embeddedTagSourcePath)
+        {
+            ArgumentNullException.ThrowIfNull(overlay);
+
+            _ValidateExistingRegularFile(embeddedTagSourcePath);
+
+            using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(embeddedTagSourcePath));
+            _CoalesceSemanticIntoNativeBlocks(file, overlay);
         }
 
         /// <summary>
