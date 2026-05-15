@@ -386,14 +386,70 @@ namespace Mfr.Core
             }
 
             if (!originalSnapshot.AudioTagOverlay.Equals(previewSnapshot.AudioTagOverlay))
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "AudioTagOverlay",
-                    OldValue: JsonSerializer.Serialize(originalSnapshot.AudioTagOverlay),
-                    NewValue: JsonSerializer.Serialize(previewSnapshot.AudioTagOverlay)));
-            }
+                _AppendAudioTagOverlayFieldChanges(
+                    changes: changes,
+                    original: originalSnapshot.AudioTagOverlay,
+                    preview: previewSnapshot.AudioTagOverlay);
 
             return changes;
+        }
+
+        /// <summary>
+        /// Appends one <see cref="RenamePropertyChange"/> per differing scalar field between tag overlays.
+        /// </summary>
+        /// <param name="changes">Accumulator for commit change rows.</param>
+        /// <param name="original">Overlay before commit.</param>
+        /// <param name="preview">Overlay after preview.</param>
+        private static void _AppendAudioTagOverlayFieldChanges(
+            List<RenamePropertyChange> changes,
+            AudioTagOverlay original,
+            AudioTagOverlay preview)
+        {
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Title", original.Title, preview.Title);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Album", original.Album, preview.Album);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Performers", original.Performers, preview.Performers);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.AlbumArtists", original.AlbumArtists, preview.AlbumArtists);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Composers", original.Composers, preview.Composers);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Genre", original.Genre, preview.Genre);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Comment", original.Comment, preview.Comment);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Lyrics", original.Lyrics, preview.Lyrics);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Copyright", original.Copyright, preview.Copyright);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Grouping", original.Grouping, preview.Grouping);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Year", original.Year, preview.Year);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Track", original.Track, preview.Track);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.TrackCount", original.TrackCount, preview.TrackCount);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Disc", original.Disc, preview.Disc);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.DiscCount", original.DiscCount, preview.DiscCount);
+        }
+
+        private static void _AddRenamePropertyChangeIfOverlayStringDiffers(
+            List<RenamePropertyChange> changes,
+            string propertyName,
+            string? oldValue,
+            string? newValue)
+        {
+            if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                return;
+
+            changes.Add(new RenamePropertyChange(
+                Property: propertyName,
+                OldValue: JsonSerializer.Serialize(oldValue),
+                NewValue: JsonSerializer.Serialize(newValue)));
+        }
+
+        private static void _AddRenamePropertyChangeIfOverlayUIntDiffers(
+            List<RenamePropertyChange> changes,
+            string propertyName,
+            uint? oldValue,
+            uint? newValue)
+        {
+            if (oldValue == newValue)
+                return;
+
+            changes.Add(new RenamePropertyChange(
+                Property: propertyName,
+                OldValue: JsonSerializer.Serialize(oldValue),
+                NewValue: JsonSerializer.Serialize(newValue)));
         }
 
         private static RenameResultItem _BuildResultForItem(
