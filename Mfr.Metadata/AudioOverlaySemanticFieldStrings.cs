@@ -7,15 +7,15 @@ namespace Mfr.Metadata
     /// Invariant embedded-tag strings from <see cref="AudioTagSemanticSurface"/> rows (Phase 4 block-aware preview reads).
     /// </summary>
     /// <remarks>
-    /// Mirrors the string conventions used when reading <see cref="AudioOverlayFieldTarget"/> previews in Models (empty strings for absent fields);
-    /// callers should normally build surfaces with <see cref="AudioTagSemanticSurface.FromOverlay"/>.
+    /// Mirrors the string conventions used when reading <see cref="AudioOverlayFieldTarget"/> previews (empty strings for absent fields);
+    /// callers should normally build surfaces with <see cref="AudioTagSemanticSurface.FromBlocks"/>.
     /// </remarks>
     public static class AudioOverlaySemanticFieldStrings
     {
         /// <summary>
         /// Formats <paramref name="field"/> using <paramref name="semantic"/> snapshot values (empty strings replace absent semantics).
         /// </summary>
-        /// <param name="semantic">Projected semantics; typically from <see cref="AudioTagSemanticSurface.FromOverlay"/>.</param>
+        /// <param name="semantic">Projected semantics; typically from <see cref="AudioTagSemanticSurface.FromBlocks"/>.</param>
         /// <param name="field">Which embedded field to format.</param>
         /// <returns>Invariant-compatible string suitable for previews and substring filters.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="field"/> is unrecognized.</exception>

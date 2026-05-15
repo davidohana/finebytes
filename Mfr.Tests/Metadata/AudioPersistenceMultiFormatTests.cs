@@ -1,5 +1,4 @@
 using Mfr.Metadata;
-using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Metadata
 {
@@ -79,17 +78,17 @@ namespace Mfr.Tests.Metadata
             _ApplyTags(path, baselineTitle: "fmt-baseline", baselineAlbum: "fmt-album");
 
             var baseline = AudioTagPersistence.Read(path);
-            Assert.Equal("fmt-baseline", baseline.Title);
-            Assert.Equal("fmt-album", baseline.Album);
+            Assert.Equal("fmt-baseline", baseline.Semantic().Title);
+            Assert.Equal("fmt-album", baseline.Semantic().Album);
         }
 
         /// <summary>
-        /// Effective semantics from block-first projection match merged TagLib values for explicit title/album writes.
+        /// Effective semantics from block-first projection remain stable for explicit title/album writes.
         /// </summary>
         /// <remarks>
         /// MP4 track/disc/year sometimes live in binary atoms not captured by the text-only Apple snapshot model; numeric
         /// comparisons are skipped for that fixture until projection reads those payloads. Other fields may differ between
-        /// stored blocks and merged façade (for example dormant ID3 genres on noisy fixtures); title/album remain stable.
+        /// stored blocks and surface projection (for example dormant ID3 genres on noisy fixtures); title/album remain stable.
         /// </remarks>
         [Theory(DisplayName = nameof(Read_AfterTagWrite_SemanticProjectionMatchesMergedFaçade))]
         [MemberData(nameof(FormatCases))]
@@ -100,12 +99,10 @@ namespace Mfr.Tests.Metadata
             _ApplyTags(path, baselineTitle: "fmt-baseline", baselineAlbum: "fmt-album");
 
             var overlay = AudioTagPersistence.Read(path);
-            var projected = AudioTagSemanticSurface.FromOverlay(overlay);
+            var projected = AudioTagSemanticSurface.FromBlocks(overlay);
 
             Assert.Equal("fmt-baseline", projected.Title);
             Assert.Equal("fmt-album", projected.Album);
-            Assert.Equal(overlay.Title, projected.Title);
-            Assert.Equal(overlay.Album, projected.Album);
 
             var compareNumerics =
                 !string.Equals(format.Label, "m4a", StringComparison.OrdinalIgnoreCase);
@@ -113,11 +110,12 @@ namespace Mfr.Tests.Metadata
             if (!compareNumerics)
                 return;
 
-            Assert.Equal(overlay.Year, projected.Year);
-            Assert.Equal(overlay.Track, projected.Track);
-            Assert.Equal(overlay.TrackCount, projected.TrackCount);
-            Assert.Equal(overlay.Disc, projected.Disc);
-            Assert.Equal(overlay.DiscCount, projected.DiscCount);
+            var sem = overlay.Semantic();
+            Assert.Equal(sem.Year, projected.Year);
+            Assert.Equal(sem.Track, projected.Track);
+            Assert.Equal(sem.TrackCount, projected.TrackCount);
+            Assert.Equal(sem.Disc, projected.Disc);
+            Assert.Equal(sem.DiscCount, projected.DiscCount);
         }
 
         [Theory(DisplayName = nameof(Apply_OverwritesTitle_AcrossFormats))]
@@ -131,13 +129,14 @@ namespace Mfr.Tests.Metadata
             var baseline = AudioTagPersistence.Read(path);
 
             var preview = baseline.Clone();
-            preview.Title = "round-b";
+            var mergedRound = AudioTagSemanticSurface.FromBlocks(preview) with { Title = "round-b" };
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, mergedRound, path);
 
             AudioTagPersistence.Apply(path, preview);
 
             var again = AudioTagPersistence.Read(path);
-            Assert.Equal("round-b", again.Title);
-            Assert.Equal("round-album", again.Album);
+            Assert.Equal("round-b", again.Semantic().Title);
+            Assert.Equal("round-album", again.Semantic().Album);
         }
 
         private string _AllocateScratchPath(PersistenceFormatCase format)

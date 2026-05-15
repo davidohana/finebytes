@@ -1,7 +1,6 @@
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.Tokens.Session;
 using Mfr.Models;
-using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
 {

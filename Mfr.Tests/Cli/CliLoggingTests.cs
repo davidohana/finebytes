@@ -1,6 +1,5 @@
 using Mfr.App.Cli;
 using Mfr.Models;
-using Mfr.Tests.TestSupport;
 using Serilog;
 using Serilog.Events;
 

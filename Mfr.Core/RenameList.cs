@@ -107,8 +107,8 @@ namespace Mfr.Core
         /// </para>
         /// <para>
         /// For regular files that exist on disk, each item calls
-        /// <see cref="AudioTagPersistence.TryMaterializePreviewFacadeIntoNativeBlocks"/> to merge façade fields into per–tag blocks
-        /// (best-effort when TagLib cannot open the path as an audio container).
+        /// <see cref="AudioTagPersistence.TryNormalizeNativeBlocks"/> to reconcile per-block snapshots with the
+        /// <see cref="AudioTagSemanticSurface.FromBlocks"/> projection after the filter chain (best-effort when TagLib cannot open the path).
         /// </para>
         /// </remarks>
         public CommitPlan Preview(FilterPreset preset)
@@ -133,7 +133,7 @@ namespace Mfr.Core
                     if (!renameItem.Original.Attributes.IsDirectory() &&
                         File.Exists(renameItem.Original.FullPath))
                     {
-                        _ = AudioTagPersistence.TryMaterializePreviewFacadeIntoNativeBlocks(
+                        _ = AudioTagPersistence.TryNormalizeNativeBlocks(
                             renameItem.Preview.AudioTagOverlay,
                             renameItem.Original.FullPath);
                     }

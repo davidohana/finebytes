@@ -65,7 +65,20 @@ namespace Mfr.Tests.Models.Filters
                 renameListFolderSiblingCount: resolvedFolder);
 
             configureOriginal?.Invoke(meta);
+            EnsureSyntheticAudioOverlayWhenTagless(meta);
             return new RenameItem(meta);
+        }
+
+        /// <summary>
+        /// Ensures purely synthetic MP3-ish rows carry at least one ID3v2 block so semantic merges used by preview filters persist.
+        /// </summary>
+        internal static void EnsureSyntheticAudioOverlayWhenTagless(FileMeta meta)
+        {
+            var o = meta.AudioTagOverlay;
+            if (o.Id3v2 is not null || o.Xiph is not null || o.Ape is not null || o.Apple is not null || o.Asf is not null)
+                return;
+
+            meta.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay();
         }
 
         /// <summary>

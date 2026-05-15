@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
 
@@ -109,21 +110,24 @@ namespace Mfr.Core
             if (original.Equals(preview))
                 return;
 
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Title", original.Title, preview.Title);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Album", original.Album, preview.Album);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Performers", original.Performers, preview.Performers);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.AlbumArtists", original.AlbumArtists, preview.AlbumArtists);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Composers", original.Composers, preview.Composers);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Genre", original.Genre, preview.Genre);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Comment", original.Comment, preview.Comment);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Lyrics", original.Lyrics, preview.Lyrics);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Copyright", original.Copyright, preview.Copyright);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Grouping", original.Grouping, preview.Grouping);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Year", original.Year, preview.Year);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Track", original.Track, preview.Track);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.TrackCount", original.TrackCount, preview.TrackCount);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Disc", original.Disc, preview.Disc);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.DiscCount", original.DiscCount, preview.DiscCount);
+            var originalSemantic = AudioTagSemanticSurface.FromBlocks(original);
+            var previewSemantic = AudioTagSemanticSurface.FromBlocks(preview);
+
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Title", originalSemantic.Title, previewSemantic.Title);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Album", originalSemantic.Album, previewSemantic.Album);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Performers", originalSemantic.Performers, previewSemantic.Performers);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.AlbumArtists", originalSemantic.AlbumArtists, previewSemantic.AlbumArtists);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Composers", originalSemantic.Composers, previewSemantic.Composers);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Genre", originalSemantic.Genre, previewSemantic.Genre);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Comment", originalSemantic.Comment, previewSemantic.Comment);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Lyrics", originalSemantic.Lyrics, previewSemantic.Lyrics);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Copyright", originalSemantic.Copyright, previewSemantic.Copyright);
+            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Grouping", originalSemantic.Grouping, previewSemantic.Grouping);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Year", originalSemantic.Year, previewSemantic.Year);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Track", originalSemantic.Track, previewSemantic.Track);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.TrackCount", originalSemantic.TrackCount, previewSemantic.TrackCount);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Disc", originalSemantic.Disc, previewSemantic.Disc);
+            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.DiscCount", originalSemantic.DiscCount, previewSemantic.DiscCount);
 
             _AppendAudioTagNativeBlockLayoutDifferences(changes, original, preview);
         }
@@ -169,6 +173,14 @@ namespace Mfr.Core
                     Property: "AudioTag.Native.Ape",
                     OldValue: _SummarizeSerializedBlob(original.Ape),
                     NewValue: _SummarizeSerializedBlob(preview.Ape)));
+            }
+
+            if (!Equals(original.RiffInfo, preview.RiffInfo))
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "AudioTag.Native.RiffInfo",
+                    OldValue: _SummarizeSerializedBlob(original.RiffInfo),
+                    NewValue: _SummarizeSerializedBlob(preview.RiffInfo)));
             }
 
             if (!Equals(original.Apple, preview.Apple))

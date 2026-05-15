@@ -3,7 +3,6 @@ using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
 using Mfr.Models;
 using Mfr.Models.Tags;
-using Mfr.Tests.TestSupport;
 using Mfr.Utils;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 
@@ -386,8 +385,8 @@ namespace Mfr.Tests.Core
             _ = _SetupPreview(renameList, preset: _CreateAudioTitleAlbumPreset());
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("ListIngestTitle", item.Original.AudioTagOverlay.Title);
-            Assert.Equal("ListIngestAlbum", item.Original.AudioTagOverlay.Album);
+            Assert.Equal("ListIngestTitle", item.Original.AudioTagOverlay.Semantic().Title);
+            Assert.Equal("ListIngestAlbum", item.Original.AudioTagOverlay.Semantic().Album);
         }
 
         [Fact]
@@ -405,7 +404,7 @@ namespace Mfr.Tests.Core
 
             var preset = _CreateAudioTitleAlbumPreset();
             var plan = _SetupPreview(renameList, preset);
-            Assert.Equal("RoundOneTitle", item.Original.AudioTagOverlay.Title);
+            Assert.Equal("RoundOneTitle", item.Original.AudioTagOverlay.Semantic().Title);
 
             _ = renameList.Commit(plan, failFast: false, dryRun: true);
             Assert.Equal(new AudioTagOverlay(), item.Original.AudioTagOverlay);
@@ -413,7 +412,7 @@ namespace Mfr.Tests.Core
             TaggedMinimalWav.WriteTagged(path, title: "RoundTwoTitle", album: null);
 
             _ = _SetupPreview(renameList, preset);
-            Assert.Equal("RoundTwoTitle", item.Original.AudioTagOverlay.Title);
+            Assert.Equal("RoundTwoTitle", item.Original.AudioTagOverlay.Semantic().Title);
         }
 
         [Fact]

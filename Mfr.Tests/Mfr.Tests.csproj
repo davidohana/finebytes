@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="Mfr.Tests.TestSupport" />
   </ItemGroup>
 
 </Project>

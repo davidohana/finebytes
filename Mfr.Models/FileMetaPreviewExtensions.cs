@@ -1,5 +1,3 @@
-using System.Globalization;
-using Mfr.Models.Tags;
 using Mfr.Utils;
 
 namespace Mfr.Models
@@ -29,8 +27,6 @@ namespace Mfr.Models
                 ParentDirectoryTarget => meta.DirectoryPath,
                 AncestorFolderTarget ancestorFolderTarget =>
                     meta.GetAncestorFolderSegmentName(ancestorFolderTarget.Level),
-                AudioOverlayFieldTarget audioTarget =>
-                    _GetAudioOverlayFieldString(meta.AudioTagOverlay, audioTarget.Field),
                 _ => throw new NotSupportedException($"Unsupported filter target '{target.GetType().Name}'.")
             };
         }
@@ -68,9 +64,6 @@ namespace Mfr.Models
                     return;
                 case AncestorFolderTarget ancestorFolderTarget:
                     meta.ReplaceAncestorFolderSegment(ancestorFolderTarget.Level, value);
-                    return;
-                case AudioOverlayFieldTarget audioTarget:
-                    _SetAudioOverlayFieldFromString(meta.AudioTagOverlay, audioTarget.Field, value);
                     return;
                 default:
                     throw new NotSupportedException($"Unsupported filter target '{target.GetType().Name}'.");
@@ -180,104 +173,6 @@ namespace Mfr.Models
         private static bool _ContainsInvalidPathChar(string path)
         {
             return Path.GetInvalidPathChars().Any(path.Contains);
-        }
-
-        private static string _GetAudioOverlayFieldString(AudioTagOverlay tags, AudioOverlayField field)
-        {
-            return field switch
-            {
-                AudioOverlayField.Title => tags.Title ?? string.Empty,
-                AudioOverlayField.Album => tags.Album ?? string.Empty,
-                AudioOverlayField.Performers => tags.Performers ?? string.Empty,
-                AudioOverlayField.AlbumArtists => tags.AlbumArtists ?? string.Empty,
-                AudioOverlayField.Composers => tags.Composers ?? string.Empty,
-                AudioOverlayField.Genre => tags.Genre ?? string.Empty,
-                AudioOverlayField.Comment => tags.Comment ?? string.Empty,
-                AudioOverlayField.Lyrics => tags.Lyrics ?? string.Empty,
-                AudioOverlayField.Copyright => tags.Copyright ?? string.Empty,
-                AudioOverlayField.Grouping => tags.Grouping ?? string.Empty,
-                AudioOverlayField.Year => tags.Year?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
-                AudioOverlayField.Track => tags.Track?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
-                AudioOverlayField.TrackCount => tags.TrackCount?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
-                AudioOverlayField.Disc => tags.Disc?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
-                AudioOverlayField.DiscCount => tags.DiscCount?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
-                _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
-            };
-        }
-
-        private static void _SetAudioOverlayFieldFromString(AudioTagOverlay tags, AudioOverlayField field, string value)
-        {
-            var trimmed = value.Trim();
-            switch (field)
-            {
-                case AudioOverlayField.Title:
-                    tags.Title = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.Album:
-                    tags.Album = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.Performers:
-                    tags.Performers = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.AlbumArtists:
-                    tags.AlbumArtists = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.Composers:
-                    tags.Composers = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.Genre:
-                    tags.Genre = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.Comment:
-                    tags.Comment = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.Lyrics:
-                    tags.Lyrics = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.Copyright:
-                    tags.Copyright = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.Grouping:
-                    tags.Grouping = _NullIfEmptyString(trimmed);
-                    return;
-                case AudioOverlayField.Year:
-                    tags.Year = _ParseNullableUInt(trimmed, nameof(value));
-                    return;
-                case AudioOverlayField.Track:
-                    tags.Track = _ParseNullableUInt(trimmed, nameof(value));
-                    return;
-                case AudioOverlayField.TrackCount:
-                    tags.TrackCount = _ParseNullableUInt(trimmed, nameof(value));
-                    return;
-                case AudioOverlayField.Disc:
-                    tags.Disc = _ParseNullableUInt(trimmed, nameof(value));
-                    return;
-                case AudioOverlayField.DiscCount:
-                    tags.DiscCount = _ParseNullableUInt(trimmed, nameof(value));
-                    return;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(field), field, null);
-            }
-        }
-
-        private static string? _NullIfEmptyString(string trimmed)
-        {
-            return trimmed.Length == 0 ? null : trimmed;
-        }
-
-        private static uint? _ParseNullableUInt(string trimmed, string valueParamName)
-        {
-            if (trimmed.Length == 0)
-                return null;
-
-            if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
-            {
-                throw new ArgumentException(
-                    $"Value must be empty or a non-negative integer (invariant), got '{trimmed}'.",
-                    valueParamName);
-            }
-
-            return parsed;
         }
     }
 }

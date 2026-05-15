@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Mfr.Core;
 using Mfr.Filters.Audio;
+using Mfr.Metadata;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Audio
@@ -33,6 +34,7 @@ namespace Mfr.Tests.Models.Filters.Audio
                 renameListFolderSiblingCount: 1);
 
             configureOriginal?.Invoke(meta);
+            FilterTestHelpers.EnsureSyntheticAudioOverlayWhenTagless(meta);
             return new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
         }
 
@@ -58,18 +60,19 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Apply_Title_AlwaysOverwrites()
         {
-            var item = _CreateAudioItem(configureOriginal: m => m.AudioTagOverlay.Title = "Old");
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Old"));
             var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "New")));
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("New", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("New", item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
         /// Verifies performer <c>text</c> may list several names separated by <c>;</c> on the preview overlay
-        /// (normalized to separate TagLib values on save via <see cref="Mfr.Metadata.AudioTagPersistence"/>).
+        /// (normalized to separate TagLib values on save via <see cref="AudioTagPersistence"/>).
         /// </summary>
         [Fact]
         public void Apply_Performers_SemicolonSeparated_SetsJoinedPreviewString()
@@ -81,7 +84,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("Alice ; Bob", item.Preview.AudioTagOverlay.Performers);
+            Assert.Equal("Alice; Bob", item.Preview.AudioTagOverlay.Semantic().Performers);
         }
 
         /// <summary>
@@ -90,14 +93,15 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void IfEmpty_Title_LeavesNonEmpty()
         {
-            var item = _CreateAudioItem(configureOriginal: m => m.AudioTagOverlay.Title = "Kept");
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Kept"));
             var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
                 Title: new AudioTagStringFieldOptions(Text: "Other", OnlyIfEmpty: true)));
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("Kept", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("Kept", item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
@@ -113,7 +117,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("Filled", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("Filled", item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
@@ -122,13 +126,14 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void OmittedTitle_LeavesTitleUnchanged()
         {
-            var item = _CreateAudioItem(configureOriginal: m => m.AudioTagOverlay.Title = "Stay");
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Stay"));
             var filter = new AudioTagSetterFilter(new AudioTagSetterOptions());
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("Stay", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("Stay", item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
@@ -144,7 +149,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("TrackNine", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("TrackNine", item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
@@ -161,7 +166,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(literal, item.Preview.AudioTagOverlay.Title);
+            Assert.Equal(literal, item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
@@ -178,7 +183,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(14u, item.Preview.AudioTagOverlay.Track);
+            Assert.Equal(14u, item.Preview.AudioTagOverlay.Semantic().Track);
         }
 
         /// <summary>
@@ -195,7 +200,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(255u, item.Preview.AudioTagOverlay.Track);
+            Assert.Equal(255u, item.Preview.AudioTagOverlay.Semantic().Track);
         }
 
         /// <summary>
@@ -211,7 +216,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(42u, item.Preview.AudioTagOverlay.Track);
+            Assert.Equal(42u, item.Preview.AudioTagOverlay.Semantic().Track);
         }
 
         /// <summary>
@@ -228,7 +233,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(13u, item.Preview.AudioTagOverlay.Track);
+            Assert.Equal(13u, item.Preview.AudioTagOverlay.Semantic().Track);
         }
 
         /// <summary>
@@ -252,14 +257,15 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Track_ZeroWithoutIncrement_Clears()
         {
-            var item = _CreateAudioItem(configureOriginal: m => m.AudioTagOverlay.Track = 7);
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 7));
             var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
                 Track: new AudioTagStringFieldOptions(Text: "0")));
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Null(item.Preview.AudioTagOverlay.Track);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Track);
         }
 
         /// <summary>
@@ -268,14 +274,15 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Track_IfEmpty_KeepsExisting()
         {
-            var item = _CreateAudioItem(configureOriginal: m => m.AudioTagOverlay.Track = 3);
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 3));
             var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
                 Track: new AudioTagStringFieldOptions(Text: "9", OnlyIfEmpty: true)));
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(3u, item.Preview.AudioTagOverlay.Track);
+            Assert.Equal(3u, item.Preview.AudioTagOverlay.Semantic().Track);
         }
 
         /// <summary>
@@ -314,14 +321,15 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Year_Zero_Clears()
         {
-            var item = _CreateAudioItem(configureOriginal: m => m.AudioTagOverlay.Year = 1999);
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999));
             var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
                 Year: new AudioTagStringFieldOptions(Text: "0")));
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Null(item.Preview.AudioTagOverlay.Year);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Year);
         }
 
         /// <summary>
@@ -352,7 +360,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(1999u, item.Preview.AudioTagOverlay.Year);
+            Assert.Equal(1999u, item.Preview.AudioTagOverlay.Semantic().Year);
         }
 
         /// <summary>
@@ -398,7 +406,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(2005u, item.Preview.AudioTagOverlay.Year);
+            Assert.Equal(2005u, item.Preview.AudioTagOverlay.Semantic().Year);
         }
 
         /// <summary>
@@ -423,7 +431,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void DirectoryItem_Apply_ThrowsInvalidOperation()
         {
             var item = _CreateDirectoryItem();
-            item.Preview.AudioTagOverlay.Title = "PreviewOnly";
+            item.Preview.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PreviewOnly");
 
             var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
                 Title: new AudioTagStringFieldOptions(Text: "X")));
@@ -431,7 +439,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Setup();
             var ex = Assert.Throws<InvalidOperationException>(() => filter.Apply(item));
             Assert.Contains("directory", ex.Message, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal("PreviewOnly", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("PreviewOnly", item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
@@ -468,9 +476,9 @@ namespace Mfr.Tests.Models.Filters.Audio
 
             var item = _CreateAudioItem(renameListIndex: 2, prefix: "P");
             typed.Apply(item);
-            Assert.Equal("P", item.Preview.AudioTagOverlay.Title);
-            Assert.Equal(2004u, item.Preview.AudioTagOverlay.Year);
-            Assert.Equal(3u, item.Preview.AudioTagOverlay.Track);
+            Assert.Equal("P", item.Preview.AudioTagOverlay.Semantic().Title);
+            Assert.Equal(2004u, item.Preview.AudioTagOverlay.Semantic().Year);
+            Assert.Equal(3u, item.Preview.AudioTagOverlay.Semantic().Track);
         }
     }
 }

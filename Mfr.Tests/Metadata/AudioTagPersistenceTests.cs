@@ -1,6 +1,5 @@
 using Mfr.Metadata;
 using Mfr.Models.Tags;
-using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Metadata
 {
@@ -60,7 +59,7 @@ namespace Mfr.Tests.Metadata
             var tempDir = Directory.CreateTempSubdirectory(prefix: "mfr-meta-");
             _pathsToDelete.Add(tempDir.FullName);
 
-            var preview = new AudioTagOverlay { Title = "x" };
+            var preview = new AudioTagOverlay();
 
             var ex = Assert.Throws<ArgumentException>(() =>
                 AudioTagPersistence.Apply(tempDir.FullName, preview));
@@ -81,16 +80,17 @@ namespace Mfr.Tests.Metadata
 
             var readBaseline = AudioTagPersistence.Read(candidate);
 
-            Assert.Equal("baseline", readBaseline.Title);
+            Assert.Equal("baseline", readBaseline.Semantic().Title);
 
             var previewOverlay = readBaseline.Clone();
-            previewOverlay.Title = "preview";
+            var merged = AudioTagSemanticSurface.FromBlocks(previewOverlay) with { Title = "preview" };
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(previewOverlay, merged, candidate);
 
             AudioTagPersistence.Apply(candidate, previewOverlay);
 
             var readAgain = AudioTagPersistence.Read(candidate);
-            Assert.Equal("preview", readAgain.Title);
-            Assert.Equal("AlbumX", readAgain.Album);
+            Assert.Equal("preview", readAgain.Semantic().Title);
+            Assert.Equal("AlbumX", readAgain.Semantic().Album);
         }
 
         /// <summary>
@@ -103,12 +103,16 @@ namespace Mfr.Tests.Metadata
 
             var readBaseline = AudioTagPersistence.Read(candidate);
             var previewOverlay = readBaseline.Clone();
-            previewOverlay.Performers = "Alice;Bob";
+            var merged = AudioTagSemanticSurface.FromBlocks(previewOverlay)
+                with
+            { Performers = "Alice;Bob" };
+
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(previewOverlay, merged, candidate);
 
             AudioTagPersistence.Apply(candidate, previewOverlay);
 
             var readAgain = AudioTagPersistence.Read(candidate);
-            Assert.Equal("Alice; Bob", readAgain.Performers);
+            Assert.Equal("Alice; Bob", readAgain.Semantic().Performers);
 
             using var file = TagLib.File.Create(candidate);
             Assert.Equal(s_AliceBobPerformers, file.Tag.Performers);
@@ -132,8 +136,8 @@ namespace Mfr.Tests.Metadata
             AudioTagPersistence.RemoveAllEmbeddedTags(candidate);
 
             var readBack = AudioTagPersistence.Read(candidate);
-            Assert.Null(readBack.Title);
-            Assert.Null(readBack.Album);
+            Assert.Null(readBack.Semantic().Title);
+            Assert.Null(readBack.Semantic().Album);
         }
 
         /// <summary>
@@ -226,7 +230,7 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// Consecutive reads of the same M4A must yield equal overlays (deterministic Apple snapshot + façade).
+        /// Consecutive reads of the same M4A must yield equal overlays (deterministic Apple snapshot).
         /// </summary>
         [Fact]
         public void Read_M4a_Twice_ReturnsEqualOverlays()
@@ -257,33 +261,30 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// Verifies <see cref="AudioTagPersistence.MaterializePreviewFacadeIntoNativeBlocks"/> merges a façade title into the Xiph
-        /// snapshot without saving (same rules as <see cref="AudioTagPersistence.Apply"/> coalesce).
+        /// Verifies <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/> pushes a semantic title into the Xiph snapshot without saving.
         /// </summary>
         [Fact]
-        public void MaterializePreview_Ogg_MergesTitleIntoXiphSnapshot()
+        public void MergeSemanticOntoNativeBlocks_Ogg_MergesTitleIntoXiphSnapshot()
         {
             var path = _CopyFixtureToTemp("libnogg-bitrate-123.ogg");
 
             var disk = AudioTagPersistence.Read(path);
-            var uniqueTitle = $"MaterializeOgg_{Guid.NewGuid():N}";
+            var uniqueTitle = $"MergeOgg_{Guid.NewGuid():N}";
             var preview = disk.Clone();
-            preview.Title = uniqueTitle;
-
-            AudioTagPersistence.MaterializePreviewFacadeIntoNativeBlocks(preview, path);
+            var merged = AudioTagSemanticSurface.FromBlocks(preview) with { Title = uniqueTitle };
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
 
             Assert.NotNull(disk.Xiph);
             Assert.NotNull(preview.Xiph);
             Assert.NotEqual(disk.Xiph.CanonicalTagBytes, preview.Xiph.CanonicalTagBytes);
-            Assert.Equal(uniqueTitle, preview.Title);
+            Assert.Equal(uniqueTitle, preview.Semantic().Title);
         }
 
         /// <summary>
-        /// Verifies <see cref="AudioTagPersistence.MaterializePreviewFacadeIntoNativeBlocks"/> merges façade fields into the Apple
-        /// snapshot for M4A when given the on-disk source path.
+        /// Verifies <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/> merges a semantic title into the Apple snapshot for M4A when given the on-disk source path.
         /// </summary>
         [Fact]
-        public void MaterializePreview_M4a_MergesTitleIntoAppleSnapshot()
+        public void MergeSemanticOntoNativeBlocks_M4a_MergesTitleIntoAppleSnapshot()
         {
             var path = _CopyFixtureToTemp("homebrew-test.m4a");
 
@@ -291,30 +292,31 @@ namespace Mfr.Tests.Metadata
             Assert.NotNull(disk.Apple);
 
             var preview = disk.Clone();
-            preview.Title = "MaterializedM4aTitle";
+            var merged = AudioTagSemanticSurface.FromBlocks(preview) with { Title = "MaterializedM4aTitle" };
 
-            AudioTagPersistence.MaterializePreviewFacadeIntoNativeBlocks(preview, path);
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
 
             Assert.NotEqual(disk.Apple, preview.Apple);
-            Assert.Equal("MaterializedM4aTitle", preview.Title);
+            Assert.Equal("MaterializedM4aTitle", preview.Semantic().Title);
         }
 
         /// <summary>
-        /// Preview that only changes façade <see cref="AudioTagOverlay.Title"/> must coalesce into the Xiph block so Apply + Read stay consistent.
+        /// A semantic-only title preview must merge into the Xiph block before <see cref="AudioTagPersistence.Apply"/> so Apply + Read stay consistent.
         /// </summary>
         [Fact]
-        public void Apply_Flac_SemanticTitleChange_CoalescesXiphAndRoundTripsRead()
+        public void Apply_Flac_SemanticTitleChange_MergesXiphAndRoundTripsRead()
         {
             var path = _CopyFixtureToTemp("metaflac.flac");
 
             var disk = AudioTagPersistence.Read(path);
             var preview = disk.Clone();
-            preview.Title = "SemanticTitleOnlyPhase3";
+            var merged = AudioTagSemanticSurface.FromBlocks(preview) with { Title = "SemanticTitleOnlyPhase3" };
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
 
             AudioTagPersistence.Apply(path, preview);
 
             var after = AudioTagPersistence.Read(path);
-            Assert.Equal("SemanticTitleOnlyPhase3", after.Title);
+            Assert.Equal("SemanticTitleOnlyPhase3", after.Semantic().Title);
             Assert.NotNull(after.Xiph);
             Assert.Equal(after, AudioTagPersistence.Read(path));
         }

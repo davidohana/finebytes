@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Mfr.Core;
+using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
@@ -146,14 +147,21 @@ namespace Mfr.Tests.Core
         {
             var original = _CloneBaseline();
             var item = new RenameItem(original);
-            item.Preview.AudioTagOverlay.Title = "Next";
+            var pv = item.Preview.AudioTagOverlay;
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+                pv,
+                AudioTagSemanticSurface.FromBlocks(pv) with { Title = "Next" },
+                embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
-            var row = Assert.Single(rows);
-            Assert.Equal("AudioTag.Title", row.Property);
-            Assert.Equal(JsonSerializer.Serialize((string?)null), row.OldValue);
-            Assert.Equal(JsonSerializer.Serialize("Next"), row.NewValue);
+            Assert.Equal(2, rows.Count);
+            Assert.Contains(rows, static r => r.Property == "AudioTag.Title");
+            Assert.Contains(rows, static r => r.Property == "AudioTag.Native.Id3v2");
+
+            var titleRow = Assert.Single(rows, static r => r.Property == "AudioTag.Title");
+            Assert.Equal(JsonSerializer.Serialize((string?)null), titleRow.OldValue);
+            Assert.Equal(JsonSerializer.Serialize("Next"), titleRow.NewValue);
         }
 
         /// <summary>
@@ -162,16 +170,21 @@ namespace Mfr.Tests.Core
         [Fact]
         public void BuildChangeRows_AudioTagYearChange_EncodesUIntAndNull()
         {
-            var original = _CloneBaseline(configureOverlay: o => o.AudioTagOverlay.Year = 1999);
+            var original = _CloneBaseline(configureOverlay: o =>
+                o.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999));
             var item = new RenameItem(original);
-            item.Preview.AudioTagOverlay.Year = 2001;
+            var pv = item.Preview.AudioTagOverlay;
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+                pv,
+                AudioTagSemanticSurface.FromBlocks(pv) with { Year = 2001 },
+                embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
-            var row = Assert.Single(rows);
-            Assert.Equal("AudioTag.Year", row.Property);
-            Assert.Equal(JsonSerializer.Serialize((uint?)1999), row.OldValue);
-            Assert.Equal(JsonSerializer.Serialize((uint?)2001), row.NewValue);
+            Assert.Equal(2, rows.Count);
+            var yearRow = Assert.Single(rows, static r => r.Property == "AudioTag.Year");
+            Assert.Equal(JsonSerializer.Serialize((uint?)1999), yearRow.OldValue);
+            Assert.Equal(JsonSerializer.Serialize((uint?)2001), yearRow.NewValue);
         }
 
         /// <summary>
@@ -182,18 +195,21 @@ namespace Mfr.Tests.Core
         {
             var original = _CloneBaseline();
             var item = new RenameItem(original);
-            item.Preview.AudioTagOverlay.Lyrics = "a\nb";
+            var pv = item.Preview.AudioTagOverlay;
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+                pv,
+                AudioTagSemanticSurface.FromBlocks(pv) with { Lyrics = "a\nb" },
+                embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
-            var row = Assert.Single(rows);
-            Assert.Equal("AudioTag.Lyrics", row.Property);
-            Assert.False(row.NewValue.Contains('\n', StringComparison.Ordinal));
-            Assert.Contains("\\n", row.NewValue, StringComparison.Ordinal);
+            var lyricsRow = Assert.Single(rows, static r => r.Property == "AudioTag.Lyrics");
+            Assert.False(lyricsRow.NewValue.Contains('\n', StringComparison.Ordinal));
+            Assert.Contains("\\n", lyricsRow.NewValue, StringComparison.Ordinal);
         }
 
         /// <summary>
-        /// When native tag bytes differ but merged semantic façades match, emit a compact native summary row.
+        /// When native tag bytes differ but projected semantics match, emit a compact native summary row.
         /// </summary>
         [Fact]
         public void BuildChangeRows_AudioTagNativeXiphChange_AppendsSummaryRow()
@@ -225,8 +241,12 @@ namespace Mfr.Tests.Core
             });
             var item = new RenameItem(original);
             item.Preview.DirectoryPath = @"D:\B";
-            item.Preview.AudioTagOverlay.Genre = "Rock";
             item.Preview.AudioTagOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2] };
+            var pv = item.Preview.AudioTagOverlay;
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+                pv,
+                AudioTagSemanticSurface.FromBlocks(pv) with { Genre = "Rock" },
+                embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
@@ -245,12 +265,16 @@ namespace Mfr.Tests.Core
             var item = new RenameItem(original);
             item.Preview.DirectoryPath = @"D:\B";
             item.Preview.Attributes = FileAttributes.ReadOnly;
-            item.Preview.AudioTagOverlay.Genre = "Rock";
+            var pv = item.Preview.AudioTagOverlay;
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+                pv,
+                AudioTagSemanticSurface.FromBlocks(pv) with { Genre = "Rock" },
+                embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Equal(
-                ["DirectoryPath", "Attributes", "AudioTag.Genre"],
+                ["DirectoryPath", "Attributes", "AudioTag.Genre", "AudioTag.Native.Id3v2"],
                 [.. rows.Select(r => r.Property)]);
         }
 

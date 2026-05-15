@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
 using Mfr.Filters.Formatting;
+using Mfr.Metadata;
 using Mfr.Models;
-using Mfr.Models.Tags;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Audio
@@ -100,65 +100,72 @@ namespace Mfr.Filters.Audio
         {
             item.EnsureAudioTagsLoaded();
             var tags = item.Preview.AudioTagOverlay;
+            var merged = AudioTagSemanticSurface.FromBlocks(tags);
 
             if (Options.Performers is not null)
-                _ApplyStringField(
+                merged = _ApplyStringSemantics(
                     item,
+                    merged,
                     Options.Performers.OnlyIfEmpty,
-                    tags.Performers,
+                    merged.Performers,
                     PerformersFormatter,
-                    v => tags.Performers = v);
+                    static (m, v) => m with { Performers = v });
+
             if (Options.AlbumArtists is not null)
-                _ApplyStringField(
+                merged = _ApplyStringSemantics(
                     item,
+                    merged,
                     Options.AlbumArtists.OnlyIfEmpty,
-                    tags.AlbumArtists,
+                    merged.AlbumArtists,
                     AlbumArtistsFormatter,
-                    v => tags.AlbumArtists = v);
+                    static (m, v) => m with { AlbumArtists = v });
+
             if (Options.Title is not null)
-                _ApplyStringField(
+                merged = _ApplyStringSemantics(
                     item,
+                    merged,
                     Options.Title.OnlyIfEmpty,
-                    tags.Title,
+                    merged.Title,
                     TitleFormatter,
-                    v => tags.Title = v);
+                    static (m, v) => m with { Title = v });
+
             if (Options.Album is not null)
-                _ApplyStringField(
+                merged = _ApplyStringSemantics(
                     item,
+                    merged,
                     Options.Album.OnlyIfEmpty,
-                    tags.Album,
+                    merged.Album,
                     AlbumFormatter,
-                    v => tags.Album = v);
+                    static (m, v) => m with { Album = v });
+
             if (Options.Genre is not null)
-                _ApplyStringField(
+                merged = _ApplyStringSemantics(
                     item,
+                    merged,
                     Options.Genre.OnlyIfEmpty,
-                    tags.Genre,
+                    merged.Genre,
                     GenreFormatter,
-                    v => tags.Genre = v);
+                    static (m, v) => m with { Genre = v });
+
             if (Options.Comment is not null)
-                _ApplyStringField(
+                merged = _ApplyStringSemantics(
                     item,
+                    merged,
                     Options.Comment.OnlyIfEmpty,
-                    tags.Comment,
+                    merged.Comment,
                     CommentFormatter,
-                    v => tags.Comment = v);
+                    static (m, v) => m with { Comment = v });
 
             if (Options.Year is not null)
-                _ApplyYear(
-                    item,
-                    Options.Year.OnlyIfEmpty,
-                    YearFormatter,
-                    tags);
-            if (Options.Track is not null)
-                _ApplyTrackField(
-                    item,
-                    Options.Track.OnlyIfEmpty,
-                    TrackFormatter,
-                    tags);
+                merged = _ApplyYearSemantics(item, merged, Options.Year.OnlyIfEmpty, YearFormatter);
 
-            if (_HasAnyConfiguredSemanticField())
-                RenameItemPreviewAudioSemantics.TryFlushPreviewAudioFacadeIntoNativeBlocks(item);
+            if (Options.Track is not null)
+                merged = _ApplyTrackSemantics(item, merged, Options.Track.OnlyIfEmpty, TrackFormatter);
+
+            if (!_HasAnyConfiguredSemanticField())
+                return;
+
+            _ = AudioTagPersistence.TryMergeSemanticOntoNativeBlocks(tags, merged, item.Original.FullPath);
         }
 
         /// <summary>
@@ -201,37 +208,35 @@ namespace Mfr.Filters.Audio
             return _ => literal;
         }
 
-        private static void _ApplyStringField(
+        private static AudioTagSemanticSurface _ApplyStringSemantics(
             RenameItem item,
+            AudioTagSemanticSurface merged,
             bool onlyIfEmpty,
             string? currentValue,
             Formatter formatter,
-            Action<string?> assign)
+            Func<AudioTagSemanticSurface, string?, AudioTagSemanticSurface> assignUpdated)
         {
             var overlayAlreadyHasValue = !string.IsNullOrWhiteSpace(currentValue);
             if (onlyIfEmpty && overlayAlreadyHasValue)
-                return;
+                return merged;
 
-            var expanded = formatter(item);
-            assign(expanded.TrimmedOrNull());
+            var expanded = formatter(item).TrimmedOrNull();
+            return assignUpdated(merged, expanded);
         }
 
-        private void _ApplyYear(
+        private AudioTagSemanticSurface _ApplyYearSemantics(
             RenameItem item,
+            AudioTagSemanticSurface merged,
             bool onlyIfEmpty,
-            Formatter formatter,
-            AudioTagOverlay tags)
+            Formatter formatter)
         {
-            if (onlyIfEmpty && tags.Year is not null)
-                return;
+            if (onlyIfEmpty && merged.Year is not null)
+                return merged;
 
             var resolved = formatter(item);
             var trimmed = resolved.Trim();
             if (trimmed.Length == 0)
-            {
-                tags.Year = null;
-                return;
-            }
+                return merged with { Year = null };
 
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var yearValue))
             {
@@ -246,30 +251,24 @@ namespace Mfr.Filters.Audio
             }
 
             if (yearValue == 0)
-            {
-                tags.Year = null;
-                return;
-            }
+                return merged with { Year = null };
 
-            tags.Year = yearValue;
+            return merged with { Year = yearValue };
         }
 
-        private void _ApplyTrackField(
+        private AudioTagSemanticSurface _ApplyTrackSemantics(
             RenameItem item,
+            AudioTagSemanticSurface merged,
             bool onlyIfEmpty,
-            Formatter formatter,
-            AudioTagOverlay tags)
+            Formatter formatter)
         {
-            if (onlyIfEmpty && tags.Track is not null)
-                return;
+            if (onlyIfEmpty && merged.Track is not null)
+                return merged;
 
             var resolved = formatter(item);
             var trimmed = resolved.Trim();
             if (trimmed.Length == 0)
-            {
-                tags.Track = null;
-                return;
-            }
+                return merged with { Track = null };
 
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var baseTrack))
             {
@@ -288,12 +287,9 @@ namespace Mfr.Filters.Audio
                 raw += item.Original.RenameListIndex;
 
             if (raw <= 0)
-            {
-                tags.Track = null;
-                return;
-            }
+                return merged with { Track = null };
 
-            tags.Track = (uint)Math.Min(raw, 255);
+            return merged with { Track = (uint)Math.Min(raw, 255) };
         }
     }
 }

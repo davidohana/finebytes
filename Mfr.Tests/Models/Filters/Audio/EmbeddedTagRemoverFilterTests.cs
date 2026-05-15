@@ -23,8 +23,10 @@ namespace Mfr.Tests.Models.Filters.Audio
                 "x",
                 ".wav",
                 renameListTotalCount: 1,
-                renameListFolderSiblingCount: 1);
-            meta.AudioTagOverlay.Title = "PreservedForTest";
+                renameListFolderSiblingCount: 1)
+            {
+                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PreservedForTest")
+            };
 
             var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
             var filter = new EmbeddedTagRemoverFilter();
@@ -32,8 +34,8 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Apply(item);
 
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
-            Assert.Null(item.Preview.AudioTagOverlay.Title);
-            Assert.Equal("PreservedForTest", item.Original.AudioTagOverlay.Title);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Title);
+            Assert.Equal("PreservedForTest", item.Original.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
@@ -49,8 +51,10 @@ namespace Mfr.Tests.Models.Filters.Audio
                 "x",
                 ".wav",
                 renameListTotalCount: 1,
-                renameListFolderSiblingCount: 1);
-            meta.AudioTagOverlay.Title = "Start";
+                renameListFolderSiblingCount: 1)
+            {
+                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Start")
+            };
 
             var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
             var formatter = new FormatterFilter(
@@ -59,13 +63,13 @@ namespace Mfr.Tests.Models.Filters.Audio
             var remover = new EmbeddedTagRemoverFilter();
             formatter.Setup();
             formatter.Apply(item);
-            Assert.Equal("Formatted", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("Formatted", item.Preview.AudioTagOverlay.Semantic().Title);
 
             remover.Setup();
             remover.Apply(item);
 
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
-            Assert.Null(item.Preview.AudioTagOverlay.Title);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
@@ -81,8 +85,10 @@ namespace Mfr.Tests.Models.Filters.Audio
                 "x",
                 ".wav",
                 renameListTotalCount: 1,
-                renameListFolderSiblingCount: 1);
-            meta.AudioTagOverlay.Title = "Disk";
+                renameListFolderSiblingCount: 1)
+            {
+                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Disk")
+            };
 
             var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
             var setter = new AudioTagSetterFilter(new AudioTagSetterOptions(
@@ -90,13 +96,13 @@ namespace Mfr.Tests.Models.Filters.Audio
             var remover = new EmbeddedTagRemoverFilter();
             setter.Setup();
             setter.Apply(item);
-            Assert.Equal("FromSetter", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("FromSetter", item.Preview.AudioTagOverlay.Semantic().Title);
 
             remover.Setup();
             remover.Apply(item);
 
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
-            Assert.Null(item.Preview.AudioTagOverlay.Title);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>

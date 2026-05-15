@@ -2,18 +2,15 @@ using System.Collections.Immutable;
 using Mfr.Models.Tags;
 using TagLib;
 using TagLib.Ogg;
+using TagLib.Riff;
 
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Semantic values derived from <see cref="AudioTagOverlay"/> native blocks (Phase 4), with optional merged façade fill-in via <see cref="FromOverlay"/>.
+    /// Semantic values derived exclusively from structured <see cref="AudioTagOverlay"/> native blocks (Phase 4).
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// <see cref="FromOverlay(AudioTagOverlay)"/> prefers structured blocks (ID3v2 over ID3v1, then Xiph, APE,
-    /// Apple text atoms, ASF descriptors); when blocks omit a field, merged façade scalars fill the remainder.
-    /// Use <see cref="FromNativeBlocksOnly(AudioTagOverlay)"/> when callers must ignore stored façade duplicates.
-    /// </para>
+    /// Precedence mirrors TagLib merged-tag behavior: ID3v2 over ID3v1, then Xiph, APE, RIFF INFO (WAV LIST), Apple text atoms, ASF descriptors.
     /// </remarks>
     /// <param name="Title">Visible title, if any native block supplies one.</param>
     /// <param name="Album">Album name.</param>
@@ -48,156 +45,18 @@ namespace Mfr.Metadata
         uint? DiscCount)
     {
         /// <summary>
-        /// Builds effective semantics from native blocks on <paramref name="overlay"/>, then fills remaining fields from merged façade scalars.
-        /// </summary>
-        /// <param name="overlay">Overlay whose blocks and façade are interpreted; must not be <see langword="null"/>.</param>
-        /// <returns>Projected surface; façade values apply only where no native block supplied a value.</returns>
-        public static AudioTagSemanticSurface FromOverlay(AudioTagOverlay overlay)
-        {
-            ArgumentNullException.ThrowIfNull(overlay);
-
-            var id3v2 = _TryParseId3v2(overlay.Id3v2);
-            var xiph = _TryParseXiph(overlay.Xiph);
-            var ape = _TryParseApe(overlay.Ape);
-            var asf = _TryBuildAsfTag(overlay.Asf);
-
-            var id3v1 = overlay.Id3v1;
-
-            return new AudioTagSemanticSurface(
-                Title: _CoalesceUnicode(
-                    _TagTitle(id3v2),
-                    _Id3v1String(id3v1?.Title),
-                    _TagTitle(xiph),
-                    _TagTitle(ape),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
-                    _AsfUnicode(asf, "WM/Title"),
-                    _NullIfWhitespace(overlay.Title)),
-                Album: _CoalesceUnicode(
-                    _TagAlbum(id3v2),
-                    _Id3v1String(id3v1?.Album),
-                    _TagAlbum(xiph),
-                    _TagAlbum(ape),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.AlbumAtom),
-                    _AsfUnicode(asf, "WM/AlbumTitle"),
-                    _NullIfWhitespace(overlay.Album)),
-                Performers: _CoalesceJoinedList(
-                    id3v2?.Performers,
-                    _Id3v1SplitPerformer(id3v1?.Artist),
-                    xiph?.Performers,
-                    ape?.Performers,
-                    _AppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom),
-                    _AsfJoinedPerformers(asf),
-                    _SplitJoinedListForOverlay(overlay.Performers)),
-                AlbumArtists: _CoalesceJoinedList(
-                    id3v2?.AlbumArtists,
-                    null,
-                    xiph?.AlbumArtists,
-                    ape?.AlbumArtists,
-                    _AppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom),
-                    _AsfJoinedList(asf, "WM/AlbumArtist"),
-                    _SplitJoinedListForOverlay(overlay.AlbumArtists)),
-                Composers: _CoalesceJoinedList(
-                    id3v2?.Composers,
-                    null,
-                    xiph?.Composers,
-                    ape?.Composers,
-                    _AppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom),
-                    _AsfJoinedList(asf, "WM/Composer"),
-                    _SplitJoinedListForOverlay(overlay.Composers)),
-                Genre: _CoalesceUnicode(
-                    _TagFirstGenre(id3v2),
-                    _Id3v1Genre(id3v1),
-                    _TagFirstGenre(xiph),
-                    _TagFirstGenre(ape),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
-                    _AsfUnicode(asf, "WM/Genre"),
-                    _NullIfWhitespace(overlay.Genre)),
-                Comment: _CoalesceUnicode(
-                    _TagComment(id3v2),
-                    _Id3v1String(id3v1?.Comment),
-                    _TagComment(xiph),
-                    _TagComment(ape),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
-                    _AsfUnicode(asf, "WM/Description"),
-                    _NullIfWhitespace(overlay.Comment)),
-                Lyrics: _CoalesceUnicode(
-                    _TagLyrics(id3v2),
-                    null,
-                    _TagLyrics(xiph),
-                    _TagLyrics(ape),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
-                    _AsfUnicode(asf, "WM/Lyrics"),
-                    _NullIfWhitespace(overlay.Lyrics)),
-                Copyright: _CoalesceUnicode(
-                    _TagCopyright(id3v2),
-                    null,
-                    _TagCopyright(xiph),
-                    _TagCopyright(ape),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
-                    _AsfUnicode(asf, "WM/ProviderCopyright"),
-                    _NullIfWhitespace(overlay.Copyright)),
-                Grouping: _CoalesceUnicode(
-                    _TagGrouping(id3v2),
-                    null,
-                    _TagGrouping(xiph),
-                    _TagGrouping(ape),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.GroupingAtom),
-                    _AsfUnicode(asf, "WM/ContentGroupDescription"),
-                    _NullIfWhitespace(overlay.Grouping)),
-                Year: _CoalesceUInt(
-                    _TagYear(id3v2),
-                    id3v1?.Year,
-                    _TagYear(xiph),
-                    _TagYear(ape),
-                    _AppleYear(overlay.Apple),
-                    _AsfUInt(asf, "WM/Year"),
-                    overlay.Year),
-                Track: _CoalesceUInt(
-                    _TagTrack(id3v2),
-                    id3v1?.Track is null ? null : id3v1.Track,
-                    _TagTrack(xiph),
-                    _TagTrack(ape),
-                    _AppleTrack(overlay.Apple),
-                    _AsfUInt(asf, "WM/TrackNumber"),
-                    overlay.Track),
-                TrackCount: _CoalesceUInt(
-                    _TagTrackCount(id3v2),
-                    null,
-                    _TagTrackCount(xiph),
-                    _TagTrackCount(ape),
-                    _AppleTrackCount(overlay.Apple),
-                    _AsfUInt(asf, "WM/TrackTotal"),
-                    overlay.TrackCount),
-                Disc: _CoalesceUInt(
-                    _TagDisc(id3v2),
-                    null,
-                    _TagDisc(xiph),
-                    _TagDisc(ape),
-                    _AppleDisc(overlay.Apple),
-                    _AsfUInt(asf, "WM/PartOfSet"),
-                    overlay.Disc),
-                DiscCount: _CoalesceUInt(
-                    _TagDiscCount(id3v2),
-                    null,
-                    _TagDiscCount(xiph),
-                    _TagDiscCount(ape),
-                    _AppleDiscCount(overlay.Apple),
-                    _AsfUInt(asf, "WM/TotalDiscs"),
-                    overlay.DiscCount));
-        }
-
-        /// <summary>
-        /// Like <see cref="FromOverlay"/> but uses only structured tag blocks (no merged façade fallback).
+        /// Projects merged semantic values from structured tag blocks only.
         /// </summary>
         /// <param name="overlay">Overlay whose blocks are interpreted; must not be <see langword="null"/>.</param>
-        /// <returns>Projected surface from blocks alone.</returns>
-        public static AudioTagSemanticSurface FromNativeBlocksOnly(AudioTagOverlay overlay)
+        /// <returns>Projected semantic surface.</returns>
+        public static AudioTagSemanticSurface FromBlocks(AudioTagOverlay overlay)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
             var id3v2 = _TryParseId3v2(overlay.Id3v2);
             var xiph = _TryParseXiph(overlay.Xiph);
             var ape = _TryParseApe(overlay.Ape);
+            var riff = _TryParseRiffInfo(overlay.RiffInfo);
             var asf = _TryBuildAsfTag(overlay.Asf);
 
             var id3v1 = overlay.Id3v1;
@@ -208,13 +67,16 @@ namespace Mfr.Metadata
                     _Id3v1String(id3v1?.Title),
                     _TagTitle(xiph),
                     _TagTitle(ape),
+                    _TagTitle(riff),
                     _ApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
-                    _AsfUnicode(asf, "WM/Title")),
+                    _AsfUnicode(asf, "WM/Title"),
+                    _TagTitle(asf)),
                 Album: _CoalesceUnicode(
                     _TagAlbum(id3v2),
                     _Id3v1String(id3v1?.Album),
                     _TagAlbum(xiph),
                     _TagAlbum(ape),
+                    _TagAlbum(riff),
                     _ApplePlainText(overlay.Apple, AppleAtomConstants.AlbumAtom),
                     _AsfUnicode(asf, "WM/AlbumTitle")),
                 Performers: _CoalesceJoinedList(
@@ -222,6 +84,7 @@ namespace Mfr.Metadata
                     _Id3v1SplitPerformer(id3v1?.Artist),
                     xiph?.Performers,
                     ape?.Performers,
+                    riff?.Performers,
                     _AppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom),
                     _AsfJoinedPerformers(asf)),
                 AlbumArtists: _CoalesceJoinedList(
@@ -229,6 +92,7 @@ namespace Mfr.Metadata
                     null,
                     xiph?.AlbumArtists,
                     ape?.AlbumArtists,
+                    riff?.AlbumArtists,
                     _AppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom),
                     _AsfJoinedList(asf, "WM/AlbumArtist")),
                 Composers: _CoalesceJoinedList(
@@ -236,6 +100,7 @@ namespace Mfr.Metadata
                     null,
                     xiph?.Composers,
                     ape?.Composers,
+                    riff?.Composers,
                     _AppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom),
                     _AsfJoinedList(asf, "WM/Composer")),
                 Genre: _CoalesceUnicode(
@@ -243,6 +108,7 @@ namespace Mfr.Metadata
                     _Id3v1Genre(id3v1),
                     _TagFirstGenre(xiph),
                     _TagFirstGenre(ape),
+                    _TagFirstGenre(riff),
                     _ApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
                     _AsfUnicode(asf, "WM/Genre")),
                 Comment: _CoalesceUnicode(
@@ -250,6 +116,7 @@ namespace Mfr.Metadata
                     _Id3v1String(id3v1?.Comment),
                     _TagComment(xiph),
                     _TagComment(ape),
+                    _TagComment(riff),
                     _ApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
                     _AsfUnicode(asf, "WM/Description")),
                 Lyrics: _CoalesceUnicode(
@@ -257,6 +124,7 @@ namespace Mfr.Metadata
                     null,
                     _TagLyrics(xiph),
                     _TagLyrics(ape),
+                    _TagLyrics(riff),
                     _ApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
                     _AsfUnicode(asf, "WM/Lyrics")),
                 Copyright: _CoalesceUnicode(
@@ -264,6 +132,7 @@ namespace Mfr.Metadata
                     null,
                     _TagCopyright(xiph),
                     _TagCopyright(ape),
+                    _TagCopyright(riff),
                     _ApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
                     _AsfUnicode(asf, "WM/ProviderCopyright")),
                 Grouping: _CoalesceUnicode(
@@ -271,6 +140,7 @@ namespace Mfr.Metadata
                     null,
                     _TagGrouping(xiph),
                     _TagGrouping(ape),
+                    _TagGrouping(riff),
                     _ApplePlainText(overlay.Apple, AppleAtomConstants.GroupingAtom),
                     _AsfUnicode(asf, "WM/ContentGroupDescription")),
                 Year: _CoalesceUInt(
@@ -278,6 +148,7 @@ namespace Mfr.Metadata
                     id3v1?.Year,
                     _TagYear(xiph),
                     _TagYear(ape),
+                    _TagYear(riff),
                     _AppleYear(overlay.Apple),
                     _AsfUInt(asf, "WM/Year")),
                 Track: _CoalesceUInt(
@@ -285,6 +156,7 @@ namespace Mfr.Metadata
                     id3v1?.Track is null ? null : id3v1.Track,
                     _TagTrack(xiph),
                     _TagTrack(ape),
+                    _TagTrack(riff),
                     _AppleTrack(overlay.Apple),
                     _AsfUInt(asf, "WM/TrackNumber")),
                 TrackCount: _CoalesceUInt(
@@ -292,6 +164,7 @@ namespace Mfr.Metadata
                     null,
                     _TagTrackCount(xiph),
                     _TagTrackCount(ape),
+                    _TagTrackCount(riff),
                     _AppleTrackCount(overlay.Apple),
                     _AsfUInt(asf, "WM/TrackTotal")),
                 Disc: _CoalesceUInt(
@@ -299,6 +172,7 @@ namespace Mfr.Metadata
                     null,
                     _TagDisc(xiph),
                     _TagDisc(ape),
+                    _TagDisc(riff),
                     _AppleDisc(overlay.Apple),
                     _AsfUInt(asf, "WM/PartOfSet")),
                 DiscCount: _CoalesceUInt(
@@ -306,20 +180,93 @@ namespace Mfr.Metadata
                     null,
                     _TagDiscCount(xiph),
                     _TagDiscCount(ape),
+                    _TagDiscCount(riff),
                     _AppleDiscCount(overlay.Apple),
                     _AsfUInt(asf, "WM/TotalDiscs")));
         }
 
-        private static readonly string[] _OverlayListSeparators = [";"];
-
-        private static string[]? _SplitJoinedListForOverlay(string? joined)
+        /// <summary>
+        /// Materializes semantics from TagLib's merged façade tag fields (covers RIFF/WAV LIST payloads not modeled as native blocks alone).
+        /// </summary>
+        /// <param name="tag">Active combined TagLib façade.</param>
+        /// <returns>Semantic surface reconstructed from façade strings/lists and numerics.</returns>
+        public static AudioTagSemanticSurface FromCombinedTag(Tag tag)
         {
-            if (string.IsNullOrWhiteSpace(joined))
-                return null;
+            ArgumentNullException.ThrowIfNull(tag);
 
-            var parts = joined.Split(_OverlayListSeparators, StringSplitOptions.TrimEntries);
-            var filtered = parts.Where(static p => !string.IsNullOrWhiteSpace(p)).Select(static p => p.Trim()).ToArray();
-            return filtered.Length == 0 ? null : filtered;
+            return new AudioTagSemanticSurface(
+                Title: _NullIfWhitespace(tag.Title),
+                Album: _NullIfWhitespace(tag.Album),
+                Performers: _JoinPerformerList(tag.Performers),
+                AlbumArtists: _JoinPerformerList(tag.AlbumArtists),
+                Composers: _JoinPerformerList(tag.Composers),
+                Genre: tag.Genres.Length == 0 ? null : _NullIfWhitespace(tag.Genres[0]),
+                Comment: _NullIfWhitespace(tag.Comment),
+                Lyrics: _NullIfWhitespace(tag.Lyrics),
+                Copyright: _NullIfWhitespace(tag.Copyright),
+                Grouping: _NullIfWhitespace(tag.Grouping),
+                Year: tag.Year == 0 ? null : tag.Year,
+                Track: tag.Track == 0 ? null : tag.Track,
+                TrackCount: tag.TrackCount == 0 ? null : tag.TrackCount,
+                Disc: tag.Disc == 0 ? null : tag.Disc,
+                DiscCount: tag.DiscCount == 0 ? null : tag.DiscCount);
+        }
+
+        /// <summary>
+        /// Returns whether any semantic scalar or list projection is populated.
+        /// </summary>
+        /// <returns><see langword="true"/> when at least one field is non-absent.</returns>
+        public bool ContainsRenderableSemantics()
+        {
+            return Title is not null
+                || Album is not null
+                || Performers is not null
+                || AlbumArtists is not null
+                || Composers is not null
+                || Genre is not null
+                || Comment is not null
+                || Lyrics is not null
+                || Copyright is not null
+                || Grouping is not null
+                || Year is not null
+                || Track is not null
+                || TrackCount is not null
+                || Disc is not null
+                || DiscCount is not null;
+        }
+
+        /// <summary>
+        /// Copies each field from <paramref name="ambient"/> only where this surface has no substantive value per field (whitespace is treated like absent strings).
+        /// </summary>
+        /// <param name="ambient">Typically <see cref="FromCombinedTag"/> values not yet reflected in native blocks.</param>
+        /// <returns>Combined surface; equal to <see langword="this"/> when nothing was missing.</returns>
+        public AudioTagSemanticSurface WithMissingFieldsFilledFrom(AudioTagSemanticSurface ambient)
+        {
+            return new AudioTagSemanticSurface(
+                Title: _CoalesceAbsentOrWhitespaceString(Title, ambient.Title),
+                Album: _CoalesceAbsentOrWhitespaceString(Album, ambient.Album),
+                Performers: _CoalesceAbsentOrWhitespaceString(Performers, ambient.Performers),
+                AlbumArtists: _CoalesceAbsentOrWhitespaceString(AlbumArtists, ambient.AlbumArtists),
+                Composers: _CoalesceAbsentOrWhitespaceString(Composers, ambient.Composers),
+                Genre: _CoalesceAbsentOrWhitespaceString(Genre, ambient.Genre),
+                Comment: _CoalesceAbsentOrWhitespaceString(Comment, ambient.Comment),
+                Lyrics: _CoalesceAbsentOrWhitespaceString(Lyrics, ambient.Lyrics),
+                Copyright: _CoalesceAbsentOrWhitespaceString(Copyright, ambient.Copyright),
+                Grouping: _CoalesceAbsentOrWhitespaceString(Grouping, ambient.Grouping),
+                Year: Year ?? ambient.Year,
+                Track: Track ?? ambient.Track,
+                TrackCount: TrackCount ?? ambient.TrackCount,
+                Disc: Disc ?? ambient.Disc,
+                DiscCount: DiscCount ?? ambient.DiscCount);
+        }
+
+        /// <summary>Returns <paramref name="projected"/> unless it is absent or whitespace-only, otherwise uses <paramref name="ambient"/> (trimmed).</summary>
+        private static string? _CoalesceAbsentOrWhitespaceString(string? projected, string? ambient)
+        {
+            if (!string.IsNullOrWhiteSpace(projected))
+                return projected;
+
+            return string.IsNullOrWhiteSpace(ambient) ? null : ambient.Trim();
         }
 
         private static TagLib.Id3v2.Tag? _TryParseId3v2(Id3v2TagData? data)
@@ -350,6 +297,11 @@ namespace Mfr.Metadata
             {
                 return null;
             }
+            catch (ArgumentOutOfRangeException)
+            {
+                // TagLib can throw when comment packets are truncated or opaque (test doubles, partial reads).
+                return null;
+            }
         }
 
         private static TagLib.Ape.Tag? _TryParseApe(SerializedTagBlob? blob)
@@ -362,6 +314,29 @@ namespace Mfr.Metadata
                 return new TagLib.Ape.Tag(new ByteVector([.. blob.CanonicalTagBytes]));
             }
             catch (CorruptFileException)
+            {
+                return null;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return null;
+            }
+        }
+
+        private static InfoTag? _TryParseRiffInfo(SerializedTagBlob? blob)
+        {
+            if (blob is null || blob.CanonicalTagBytes.IsDefaultOrEmpty)
+                return null;
+
+            try
+            {
+                return new InfoTag(new ByteVector([.. blob.CanonicalTagBytes]));
+            }
+            catch (CorruptFileException)
+            {
+                return null;
+            }
+            catch (ArgumentOutOfRangeException)
             {
                 return null;
             }

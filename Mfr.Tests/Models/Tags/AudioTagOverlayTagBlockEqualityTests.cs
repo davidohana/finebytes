@@ -3,79 +3,46 @@ using Mfr.Models.Tags;
 namespace Mfr.Tests.Models.Tags
 {
     /// <summary>
-    /// Tests for block vs merged-façade equality helpers on <see cref="AudioTagOverlay"/>.
+    /// Tests structural equality on <see cref="AudioTagOverlay"/> (blocks only; Phase 4).
     /// </summary>
     public sealed class AudioTagOverlayTagBlockEqualityTests
     {
         /// <summary>
-        /// Verifies block-only equality ignores façade scalars.
+        /// Verifies <see cref="AudioTagOverlay.Equals"/> matches identical native blocks.
         /// </summary>
         [Fact]
-        public void TagBlocksStructurallyEquals_IgnoresMergedScalars()
+        public void Equals_WithIdenticalBlocks_ReturnsTrue()
         {
-            var a = new AudioTagOverlay
-            {
-                Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2, 3] },
-                Title = "A",
-            };
+            var xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2, 3] };
+            var a = new AudioTagOverlay { Xiph = xiph };
+            var b = new AudioTagOverlay { Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2, 3] } };
 
-            var b = new AudioTagOverlay
-            {
-                Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2, 3] },
-                Title = "B",
-            };
-
+            Assert.True(a.Equals(b));
             Assert.True(a.TagBlocksStructurallyEquals(b));
-            Assert.False(a.Equals(b));
         }
 
         /// <summary>
-        /// Verifies differing blocks are reported even when façade matches.
+        /// Verifies differing blocks are detected even when blobs are close in size.
         /// </summary>
         [Fact]
-        public void TagBlocksStructurallyEquals_DetectsBlockDifferences()
+        public void Equals_DetectsBlockDifferences()
         {
-            var a = new AudioTagOverlay
-            {
-                Xiph = new SerializedTagBlob { CanonicalTagBytes = [1] },
-                Title = "Same",
-            };
+            var a = new AudioTagOverlay { Xiph = new SerializedTagBlob { CanonicalTagBytes = [1] } };
+            var b = new AudioTagOverlay { Xiph = new SerializedTagBlob { CanonicalTagBytes = [2] } };
 
-            var b = new AudioTagOverlay
-            {
-                Xiph = new SerializedTagBlob { CanonicalTagBytes = [2] },
-                Title = "Same",
-            };
-
+            Assert.False(a.Equals(b));
             Assert.False(a.TagBlocksStructurallyEquals(b));
         }
 
         /// <summary>
-        /// Verifies façade-only equality ignores detached blocks.
+        /// Verifies reference equality short-circuits.
         /// </summary>
         [Fact]
-        public void MergedSemanticFacadesEqual_IgnoresBlocks()
+        public void Equals_SameReference_ReturnsTrue()
         {
-            var a = new AudioTagOverlay { Title = "T", Xiph = new SerializedTagBlob { CanonicalTagBytes = [1] } };
-            var b = new AudioTagOverlay { Title = "T", Xiph = new SerializedTagBlob { CanonicalTagBytes = [9] } };
+            var a = new AudioTagOverlay { Xiph = new SerializedTagBlob { CanonicalTagBytes = [9] } };
 
-            Assert.True(a.MergedSemanticFacadesEqual(b));
-            Assert.False(a.TagBlocksStructurallyEquals(b));
-            Assert.False(a.Equals(b));
-        }
-
-        /// <summary>
-        /// Verifies <see cref="AudioTagOverlay.Equals"/> matches both helpers together.
-        /// </summary>
-        [Fact]
-        public void Equals_RequiresBlocksAndFacades()
-        {
-            var a = new AudioTagOverlay { Album = "X" };
-            var b = new AudioTagOverlay { Album = "Y" };
-
-            Assert.True(a.TagBlocksStructurallyEquals(b));
-            Assert.False(a.MergedSemanticFacadesEqual(b));
-            Assert.False(a.Equals(b));
+            Assert.True(a.Equals(a));
         }
     }
 }

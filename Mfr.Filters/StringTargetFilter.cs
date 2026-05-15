@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
-using Mfr.Filters.Audio;
 using Mfr.Metadata;
 using Mfr.Models.Tags;
-
 // Namespace stays Mfr.Models for JSON preset compatibility; this file lives under Mfr.Filters so string-target filters
 // can call Mfr.Metadata without a Models↔Metadata cycle.
 #pragma warning disable IDE0130
@@ -21,20 +19,25 @@ namespace Mfr.Models
         /// <inheritdoc />
         protected internal sealed override void ApplyCore(RenameItem item)
         {
-            if (Target is AudioOverlayFieldTarget)
-                item.EnsureAudioTagsLoaded();
-
             var meta = item.Preview;
-            var current = Target is AudioOverlayFieldTarget ao
-                ? AudioOverlaySemanticFieldStrings.Format(
-                    AudioTagSemanticSurface.FromOverlay(meta.AudioTagOverlay),
-                    ao.Field)
-                : meta.GetTargetString(Target);
-            var transformed = TransformValue(current, item);
-            meta.SetTargetString(Target, transformed);
 
-            if (Target is AudioOverlayFieldTarget)
-                RenameItemPreviewAudioSemantics.TryFlushPreviewAudioFacadeIntoNativeBlocks(item);
+            if (Target is AudioOverlayFieldTarget ao)
+            {
+                item.EnsureAudioTagsLoaded();
+                var current = AudioOverlaySemanticIo.GetInvariantFieldString(meta.AudioTagOverlay, ao.Field);
+                var transformed = TransformValue(current, item);
+                AudioOverlaySemanticIo.MergeInvariantStringIntoOverlay(
+                    overlay: meta.AudioTagOverlay,
+                    field: ao.Field,
+                    invariantString: transformed,
+                    embeddedTagSourcePath: item.Original.FullPath);
+
+                return;
+            }
+
+            var previewCurrent = meta.GetTargetString(Target);
+            var transformedValue = TransformValue(previewCurrent, item);
+            meta.SetTargetString(Target, transformedValue);
         }
 
         internal string TransformValue(string value, RenameItem item)

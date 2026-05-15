@@ -1,6 +1,7 @@
 using System.Globalization;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.Tokens.Audio;
+using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
 
@@ -13,31 +14,30 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
     {
         private static AudioTagOverlay _FullTagSample()
         {
-            return new AudioTagOverlay
-            {
-                Title = "T1",
-                Album = "Alb",
-                Performers = "P1; P2",
-                AlbumArtists = "AA",
-                Genre = "Rock",
-                Comment = "Co",
-                Composers = "Comp",
-                Lyrics = "Ly",
-                Copyright = "Cop",
-                Grouping = "Grp",
-                Year = 2024,
-                Track = 7,
-                TrackCount = 12,
-                Disc = 2,
-                DiscCount = 3,
-            };
+            return AudioTagOverlayTestBuilder.Id3Overlay(
+                title: "T1",
+                album: "Alb",
+                performersJoined: "P1; P2",
+                albumArtistsJoined: "AA",
+                genre: "Rock",
+                comment: "Co",
+                composersJoined: "Comp",
+                lyrics: "Ly",
+                copyright: "Cop",
+                grouping: "Grp",
+                year: 2024,
+                track: 7,
+                trackCount: 12,
+                disc: 2,
+                discCount: 3);
         }
 
         [Fact]
         public void Resolve_TitleToken_ReturnsPreviewValue()
         {
             var token = new AudioTitleToken();
-            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.AudioTagOverlay.Title = "Held");
+            var item = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Held"));
 
             Assert.Equal("Held", token.Compile(string.Empty)(item));
             Assert.Contains("audio-title", token.Names);
@@ -60,8 +60,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_PrefersPreviewOverlayOverOriginal()
         {
             var token = new AudioTitleToken();
-            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.AudioTagOverlay.Title = "Orig");
-            item.Preview.AudioTagOverlay.Title = "Prev";
+            var item = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Orig"));
+
+            var merged = AudioTagSemanticSurface.FromBlocks(item.Preview.AudioTagOverlay) with { Title = "Prev" };
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(item.Preview.AudioTagOverlay, merged, embeddedTagSourcePath: null);
 
             Assert.Equal("Prev", token.Compile(string.Empty)(item));
         }
@@ -93,12 +96,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
             {
-                var t = m.AudioTagOverlay;
-                t.Year = 2024;
-                t.Track = 7;
-                t.TrackCount = 12;
-                t.Disc = 2;
-                t.DiscCount = 3;
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(
+                    year: 2024,
+                    track: 7,
+                    trackCount: 12,
+                    disc: 2,
+                    discCount: 3);
             });
 
             Assert.Equal("2024", new AudioYearToken().Compile(string.Empty)(item));
@@ -120,16 +123,15 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         }
 
         [Fact]
-        public void Resolve_NumericZeroWhenSet_YieldsZeroString()
+        public void Resolve_NumericStoredAsZero_YieldsEmpty_NotZeroLiteral()
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
             {
-                m.AudioTagOverlay.Year = 0;
-                m.AudioTagOverlay.Track = 0;
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 0, track: 0);
             });
 
-            Assert.Equal("0", new AudioYearToken().Compile(string.Empty)(item));
-            Assert.Equal("0", new AudioTrackToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new AudioYearToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new AudioTrackToken().Compile(string.Empty)(item));
         }
 
         [Fact]
@@ -159,8 +161,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                 prefix: "song",
                 configureOriginal: m =>
                 {
-                    m.AudioTagOverlay.Year = 1999;
-                    m.AudioTagOverlay.Title = "Blue";
+                    m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Blue", year: 1999);
                 });
 
             filter.Setup();

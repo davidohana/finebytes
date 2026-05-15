@@ -6,7 +6,6 @@ using Mfr.Filters.Replace;
 using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
-using Mfr.Tests.TestSupport;
 using Mfr.Utils;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 
@@ -112,7 +111,7 @@ namespace Mfr.Tests.Core
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("DiskTitleAfter", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("DiskTitleAfter", item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Single(results);
@@ -122,7 +121,7 @@ namespace Mfr.Tests.Core
                 c => c.Property == "AudioTag.Title");
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("DiskTitleAfter", readBack.Title);
+            Assert.Equal("DiskTitleAfter", readBack.Semantic().Title);
         }
 
         [Fact]
@@ -148,14 +147,14 @@ namespace Mfr.Tests.Core
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("Phase3FlacTitle", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("Phase3FlacTitle", item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Single(results);
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("Phase3FlacTitle", readBack.Title);
+            Assert.Equal("Phase3FlacTitle", readBack.Semantic().Title);
         }
 
         [Fact]
@@ -181,14 +180,14 @@ namespace Mfr.Tests.Core
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("Phase3M4aTitle", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("Phase3M4aTitle", item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Single(results);
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("Phase3M4aTitle", readBack.Title);
+            Assert.Equal("Phase3M4aTitle", readBack.Semantic().Title);
         }
 
         [Fact]
@@ -214,14 +213,14 @@ namespace Mfr.Tests.Core
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("Phase3WmaTitle", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("Phase3WmaTitle", item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Single(results);
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("Phase3WmaTitle", readBack.Title);
+            Assert.Equal("Phase3WmaTitle", readBack.Semantic().Title);
         }
 
         [Fact]
@@ -243,15 +242,15 @@ namespace Mfr.Tests.Core
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
-            Assert.Null(item.Preview.AudioTagOverlay.Title);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Single(results);
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Null(readBack.Title);
-            Assert.Null(readBack.Album);
+            Assert.Null(readBack.Semantic().Title);
+            Assert.Null(readBack.Semantic().Album);
         }
 
         [Fact]
@@ -277,13 +276,13 @@ namespace Mfr.Tests.Core
             var item = Assert.Single(renameList.RenameItems);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("AfterStrip", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("AfterStrip", item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("AfterStrip", readBack.Title);
+            Assert.Equal("AfterStrip", readBack.Semantic().Title);
         }
 
         [Fact]
@@ -310,13 +309,13 @@ namespace Mfr.Tests.Core
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
-            Assert.Null(item.Preview.AudioTagOverlay.Title);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Null(readBack.Title);
+            Assert.Null(readBack.Semantic().Title);
         }
 
         [Fact]
@@ -342,13 +341,13 @@ namespace Mfr.Tests.Core
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
-            Assert.Null(item.Preview.AudioTagOverlay.Title);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Null(readBack.Title);
+            Assert.Null(readBack.Semantic().Title);
         }
 
         [Fact]
@@ -377,14 +376,14 @@ namespace Mfr.Tests.Core
             var item = Assert.Single(renameList.RenameItems);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("Final", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("Final", item.Preview.AudioTagOverlay.Semantic().Title);
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("Final", readBack.Title);
+            Assert.Equal("Final", readBack.Semantic().Title);
         }
 
         [Fact]
@@ -418,7 +417,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.Equal("song", item.Preview.Prefix);
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
-            Assert.Null(item.Preview.AudioTagOverlay.Title);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
@@ -428,7 +427,7 @@ namespace Mfr.Tests.Core
             Assert.False(File.Exists(sourcePath));
 
             var readBack = AudioTagPersistence.Read(destPath);
-            Assert.Null(readBack.Title);
+            Assert.Null(readBack.Semantic().Title);
         }
 
         [Fact]
@@ -450,7 +449,7 @@ namespace Mfr.Tests.Core
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("OnlyOnDisk", readBack.Title);
+            Assert.Equal("OnlyOnDisk", readBack.Semantic().Title);
         }
 
         [Fact]
@@ -474,7 +473,7 @@ namespace Mfr.Tests.Core
             _ = _PreviewAndCommit(renameList, preset, dryRun: true);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("OnlyOnDisk", readBack.Title);
+            Assert.Equal("OnlyOnDisk", readBack.Semantic().Title);
         }
 
         [Fact]

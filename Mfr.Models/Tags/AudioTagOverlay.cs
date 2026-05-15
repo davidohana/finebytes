@@ -1,25 +1,12 @@
 namespace Mfr.Models.Tags
 {
     /// <summary>
-    /// Canonical in-memory overlay for embedded audio tags, shared by preview snapshots and TagLib façade I/O.
+    /// Structured embedded audio tags (per-<c>TagTypes</c> blocks only; Phase 4 single source of truth).
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>null</c> means the field was not populated or should be left unchanged on save (see façades documentation).
-    /// Non-null strings may be empty to represent an intentional clear where the persistence layer supports it.
-    /// </para>
-    /// <para>
-    /// Multi-value frames (performers, album artists, composers) are stored as display strings separated by
-    /// <c>; </c>; parsing and joining are handled in <c>Mfr.Metadata</c>.
-    /// </para>
-    /// <para>
-    /// For MPEG/MP3 files, <see cref="Id3v1"/> and <see cref="Id3v2"/> hold per-tag snapshots; semantic properties
-    /// mirror TagLib’s merged tag. <see cref="Xiph"/>, <see cref="Ape"/>, <see cref="Apple"/>, and <see cref="Asf"/>
-    /// hold detached per–<c>TagTypes</c> payloads when present on disk (see persistence documentation for null semantics).
-    /// </para>
-    /// <para>
-    /// <see cref="TagBlocksStructurallyEquals"/> compares only detached blocks;
-    /// <see cref="MergedSemanticFacadesEqual"/> compares only merged façade scalars (<see cref="Title"/>, …).
+    /// Semantic values (title, album, performers, …) are obtained by projecting blocks in <c>Mfr.Metadata</c> (for example
+    /// <c>AudioTagSemanticSurface.FromBlocks</c>). There are no mirrored scalar properties on this type.
     /// </para>
     /// </remarks>
     public sealed class AudioTagOverlay : IEquatable<AudioTagOverlay?>
@@ -55,95 +42,11 @@ namespace Mfr.Models.Tags
         public AsfTagData? Asf { get; set; }
 
         /// <summary>
-        /// Gets or sets the track title.
+        /// Gets or sets the optional RIFF LIST INFO block (classic WAV LIST/INAM, etc.) as canonical serialized bytes.
         /// </summary>
-        public string? Title { get; set; }
+        public SerializedTagBlob? RiffInfo { get; set; }
 
-        /// <summary>
-        /// Gets or sets the album name.
-        /// </summary>
-        public string? Album { get; set; }
-
-        /// <summary>
-        /// Gets or sets the display string for primary performers (joint <c>; </c> list).
-        /// </summary>
-        public string? Performers { get; set; }
-
-        /// <summary>
-        /// Gets or sets the display string for album artists (joint <c>; </c> list).
-        /// </summary>
-        public string? AlbumArtists { get; set; }
-
-        /// <summary>
-        /// Gets or sets the display string for composers (joint <c>; </c> list).
-        /// </summary>
-        public string? Composers { get; set; }
-
-        /// <summary>
-        /// Gets or sets the genre tag text.
-        /// </summary>
-        public string? Genre { get; set; }
-
-        /// <summary>
-        /// Gets or sets the generic comment/description text.
-        /// </summary>
-        public string? Comment { get; set; }
-
-        /// <summary>
-        /// Gets or sets lyrical text when present as a conventional tag property.
-        /// </summary>
-        public string? Lyrics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the copyright notice.
-        /// </summary>
-        public string? Copyright { get; set; }
-
-        /// <summary>
-        /// Gets or sets grouping label metadata when supported by the container.
-        /// </summary>
-        public string? Grouping { get; set; }
-
-        /// <summary>
-        /// Gets or sets calendar year metadata when supplied by the backing file format.
-        /// </summary>
-        public uint? Year { get; set; }
-
-        /// <summary>
-        /// Gets or sets the primary track/disc index when supplied by tags.
-        /// </summary>
-        public uint? Track { get; set; }
-
-        /// <summary>
-        /// Gets or sets track count portion (e.g. <c>n</c> of <c>m</c>).
-        /// </summary>
-        public uint? TrackCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets disc index when supplied by tags.
-        /// </summary>
-        public uint? Disc { get; set; }
-
-        /// <summary>
-        /// Gets or sets total disc count when supplied by tags.
-        /// </summary>
-        public uint? DiscCount { get; set; }
-
-        /// <summary>
-        /// Returns whether this overlay and <paramref name="other"/> carry the same per–tag snapshots (blocks only).
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Ignores merged façade scalars (<see cref="Title"/>, <see cref="Album"/>, …). Used for comparisons where native
-        /// blocks are the authoritative persisted shape (Phase 4+); full <see cref="Equals(AudioTagOverlay?)"/> still
-        /// includes scalars until façade storage is removed.
-        /// </para>
-        /// </remarks>
-        /// <param name="other">Other overlay.</param>
-        /// <returns>
-        /// <see langword="true"/> when all of <see cref="Id3v1"/>, <see cref="Id3v2"/>, <see cref="Xiph"/>,
-        /// <see cref="Ape"/>, <see cref="Apple"/>, <see cref="Asf"/> are pairwise equal (including both <c>null</c>).
-        /// </returns>
+        /// <inheritdoc cref="Equals(AudioTagOverlay?)" />
         public bool TagBlocksStructurallyEquals(AudioTagOverlay? other)
         {
             if (other is null)
@@ -164,50 +67,13 @@ namespace Mfr.Models.Tags
             if (!Equals(Ape, other.Ape))
                 return false;
 
+            if (!Equals(RiffInfo, other.RiffInfo))
+                return false;
+
             if (!Equals(Apple, other.Apple))
                 return false;
 
             return Equals(Asf, other.Asf);
-        }
-
-        /// <summary>
-        /// Returns whether merged façade scalars (<see cref="Title"/>, <see cref="Album"/>, …) match
-        /// <paramref name="other"/>, ignoring per–tag block snapshots.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Pair with <see cref="TagBlocksStructurallyEquals"/> when Phase 4 code needs to reason about façade vs native block
-        /// drift independently; full <see cref="Equals(AudioTagOverlay?)"/> requires both to agree.
-        /// </para>
-        /// </remarks>
-        /// <param name="other">Other overlay.</param>
-        /// <returns>
-        /// <see langword="true"/> when every merged scalar matches; <see langword="false"/> when <paramref name="other"/>
-        /// is <see langword="null"/> or any scalar differs.
-        /// </returns>
-        public bool MergedSemanticFacadesEqual(AudioTagOverlay? other)
-        {
-            if (other is null)
-                return false;
-
-            if (ReferenceEquals(this, other))
-                return true;
-
-            return string.Equals(Title, other.Title, StringComparison.Ordinal)
-                && string.Equals(Album, other.Album, StringComparison.Ordinal)
-                && string.Equals(Performers, other.Performers, StringComparison.Ordinal)
-                && string.Equals(AlbumArtists, other.AlbumArtists, StringComparison.Ordinal)
-                && string.Equals(Composers, other.Composers, StringComparison.Ordinal)
-                && string.Equals(Genre, other.Genre, StringComparison.Ordinal)
-                && string.Equals(Comment, other.Comment, StringComparison.Ordinal)
-                && string.Equals(Lyrics, other.Lyrics, StringComparison.Ordinal)
-                && string.Equals(Copyright, other.Copyright, StringComparison.Ordinal)
-                && string.Equals(Grouping, other.Grouping, StringComparison.Ordinal)
-                && Year == other.Year
-                && Track == other.Track
-                && TrackCount == other.TrackCount
-                && Disc == other.Disc
-                && DiscCount == other.DiscCount;
         }
 
         /// <summary>
@@ -229,39 +95,16 @@ namespace Mfr.Models.Tags
                     },
                 Xiph = Xiph is null ? null : new SerializedTagBlob { CanonicalTagBytes = Xiph.CanonicalTagBytes },
                 Ape = Ape is null ? null : new SerializedTagBlob { CanonicalTagBytes = Ape.CanonicalTagBytes },
+                RiffInfo = RiffInfo is null ? null : new SerializedTagBlob { CanonicalTagBytes = RiffInfo.CanonicalTagBytes },
                 Apple = Apple is null ? null : new AppleTagData { Atoms = Apple.Atoms },
                 Asf = Asf is null ? null : new AsfTagData { Descriptors = Asf.Descriptors },
-                Title = Title,
-                Album = Album,
-                Performers = Performers,
-                AlbumArtists = AlbumArtists,
-                Composers = Composers,
-                Genre = Genre,
-                Comment = Comment,
-                Lyrics = Lyrics,
-                Copyright = Copyright,
-                Grouping = Grouping,
-                Year = Year,
-                Track = Track,
-                TrackCount = TrackCount,
-                Disc = Disc,
-                DiscCount = DiscCount,
             };
         }
 
         /// <inheritdoc />
         public bool Equals(AudioTagOverlay? other)
         {
-            if (other is null)
-                return false;
-
-            if (ReferenceEquals(this, other))
-                return true;
-
-            if (!TagBlocksStructurallyEquals(other))
-                return false;
-
-            return MergedSemanticFacadesEqual(other);
+            return TagBlocksStructurallyEquals(other);
         }
 
         /// <inheritdoc />
@@ -278,23 +121,9 @@ namespace Mfr.Models.Tags
             hashCode.Add(Id3v2);
             hashCode.Add(Xiph);
             hashCode.Add(Ape);
+            hashCode.Add(RiffInfo);
             hashCode.Add(Apple);
             hashCode.Add(Asf);
-            hashCode.Add(Title, StringComparer.Ordinal);
-            hashCode.Add(Album, StringComparer.Ordinal);
-            hashCode.Add(Performers, StringComparer.Ordinal);
-            hashCode.Add(AlbumArtists, StringComparer.Ordinal);
-            hashCode.Add(Composers, StringComparer.Ordinal);
-            hashCode.Add(Genre, StringComparer.Ordinal);
-            hashCode.Add(Comment, StringComparer.Ordinal);
-            hashCode.Add(Lyrics, StringComparer.Ordinal);
-            hashCode.Add(Copyright, StringComparer.Ordinal);
-            hashCode.Add(Grouping, StringComparer.Ordinal);
-            hashCode.Add(Year);
-            hashCode.Add(Track);
-            hashCode.Add(TrackCount);
-            hashCode.Add(Disc);
-            hashCode.Add(DiscCount);
             return hashCode.ToHashCode();
         }
     }

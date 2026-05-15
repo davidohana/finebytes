@@ -20,12 +20,12 @@ namespace Mfr.Tests.Models.Filters
                 new AudioOverlayFieldTarget(AudioOverlayField.Title),
                 new FormatterOptions("NextTitle"));
             var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay.Title = "PrevTitle");
+                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PrevTitle"));
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("NextTitle", item.Preview.AudioTagOverlay.Title);
+            Assert.Equal("NextTitle", item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>
@@ -56,11 +56,11 @@ namespace Mfr.Tests.Models.Filters
             const string nonNumericTheoryMessage = "Theory must only use numeric AudioOverlayField values.";
             var actual = field switch
             {
-                AudioOverlayField.Year => item.Preview.AudioTagOverlay.Year,
-                AudioOverlayField.Track => item.Preview.AudioTagOverlay.Track,
-                AudioOverlayField.TrackCount => item.Preview.AudioTagOverlay.TrackCount,
-                AudioOverlayField.Disc => item.Preview.AudioTagOverlay.Disc,
-                AudioOverlayField.DiscCount => item.Preview.AudioTagOverlay.DiscCount,
+                AudioOverlayField.Year => item.Preview.AudioTagOverlay.Semantic().Year,
+                AudioOverlayField.Track => item.Preview.AudioTagOverlay.Semantic().Track,
+                AudioOverlayField.TrackCount => item.Preview.AudioTagOverlay.Semantic().TrackCount,
+                AudioOverlayField.Disc => item.Preview.AudioTagOverlay.Semantic().Disc,
+                AudioOverlayField.DiscCount => item.Preview.AudioTagOverlay.Semantic().DiscCount,
                 AudioOverlayField.Title => throw new InvalidOperationException(nonNumericTheoryMessage),
                 AudioOverlayField.Album => throw new InvalidOperationException(nonNumericTheoryMessage),
                 AudioOverlayField.Performers => throw new InvalidOperationException(nonNumericTheoryMessage),
@@ -87,12 +87,12 @@ namespace Mfr.Tests.Models.Filters
                 new AudioOverlayFieldTarget(AudioOverlayField.Year),
                 new FormatterOptions(string.Empty));
             var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay.Year = 2001);
+                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 2001));
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Null(item.Preview.AudioTagOverlay.Year);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Year);
         }
 
         /// <summary>
@@ -105,12 +105,12 @@ namespace Mfr.Tests.Models.Filters
                 new AudioOverlayFieldTarget(AudioOverlayField.Track),
                 new FormatterOptions("   "));
             var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay.Track = 9);
+                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 9));
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Null(item.Preview.AudioTagOverlay.Track);
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Track);
         }
 
         /// <summary>
@@ -149,13 +149,13 @@ namespace Mfr.Tests.Models.Filters
             var item = FilterTestHelpers.CreateRenameItem(
                 configureOriginal: m =>
                 {
-                    m.AudioTagOverlay.Year = 1999;
+                    m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999);
                 });
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(2009u, item.Preview.AudioTagOverlay.Year);
+            Assert.Equal(2009u, item.Preview.AudioTagOverlay.Semantic().Year);
         }
 
         /// <summary>
@@ -175,12 +175,12 @@ namespace Mfr.Tests.Models.Filters
                     WholeWord: false));
 
             var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay.Genre = "Hard Rock");
+                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(genre: "Hard Rock"));
 
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("Hard Metal", item.Preview.AudioTagOverlay.Genre);
+            Assert.Equal("Hard Metal", item.Preview.AudioTagOverlay.Semantic().Genre);
         }
 
         /// <summary>

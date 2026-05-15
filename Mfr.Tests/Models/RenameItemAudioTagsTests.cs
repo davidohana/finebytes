@@ -1,5 +1,5 @@
+using Mfr.Metadata;
 using Mfr.Models;
-using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Models
@@ -15,12 +15,15 @@ namespace Mfr.Tests.Models
             var meta = _CreateMetaWithAlbum(album: "SnapshotAlbum");
             var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
 
-            item.Preview.AudioTagOverlay.Album = "PreviewOnlyMutated";
+            var mutated = AudioTagSemanticSurface.FromBlocks(item.Preview.AudioTagOverlay)
+                with
+            { Album = "PreviewOnlyMutated" };
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(item.Preview.AudioTagOverlay, mutated, embeddedTagSourcePath: null);
 
             item.EnsureAudioTagsLoaded();
 
-            Assert.Equal("SnapshotAlbum", item.Original.AudioTagOverlay.Album);
-            Assert.Equal("SnapshotAlbum", item.Preview.AudioTagOverlay.Album);
+            Assert.Equal("SnapshotAlbum", item.Original.AudioTagOverlay.Semantic().Album);
+            Assert.Equal("SnapshotAlbum", item.Preview.AudioTagOverlay.Semantic().Album);
         }
 
         [Fact]
@@ -31,7 +34,8 @@ namespace Mfr.Tests.Models
 
             Assert.False(item.HasPreviewChanges());
 
-            item.Preview.AudioTagOverlay.Title = "PreviewTitle";
+            var mergedPreview = AudioTagSemanticSurface.FromBlocks(item.Preview.AudioTagOverlay) with { Title = "PreviewTitle" };
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(item.Preview.AudioTagOverlay, mergedPreview, embeddedTagSourcePath: null);
 
             Assert.True(item.HasPreviewChanges());
             Assert.True(item.IsPreviewPathUnchanged());
@@ -42,10 +46,11 @@ namespace Mfr.Tests.Models
         {
             var first = _CreateMetaWithAlbum("A");
             var second = first.Clone();
-            second.AudioTagOverlay.Title = "B";
+            var merged = AudioTagSemanticSurface.FromBlocks(second.AudioTagOverlay) with { Title = "B" };
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(second.AudioTagOverlay, merged, embeddedTagSourcePath: null);
 
-            Assert.Null(first.AudioTagOverlay.Title);
-            Assert.Equal("B", second.AudioTagOverlay.Title);
+            Assert.Null(first.AudioTagOverlay.Semantic().Title);
+            Assert.Equal("B", second.AudioTagOverlay.Semantic().Title);
         }
 
         private static FileMeta _CreateMetaWithAlbum(string album)
@@ -58,7 +63,7 @@ namespace Mfr.Tests.Models
                 extension: ".mp3",
                 renameListFolderSiblingCount: 1)
             {
-                AudioTagOverlay = new AudioTagOverlay { Album = album },
+                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(album: album),
             };
         }
     }

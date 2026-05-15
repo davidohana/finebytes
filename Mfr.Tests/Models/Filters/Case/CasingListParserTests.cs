@@ -1,6 +1,5 @@
 using Mfr.Filters.Case;
 using Mfr.Models;
-using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Models.Filters.Case
 {
