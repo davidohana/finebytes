@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Mfr.Core;
 using Mfr.Models;
+using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Core
@@ -189,6 +190,49 @@ namespace Mfr.Tests.Core
             Assert.Equal("AudioTag.Lyrics", row.Property);
             Assert.False(row.NewValue.Contains('\n', StringComparison.Ordinal));
             Assert.Contains("\\n", row.NewValue, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// When native tag bytes differ but merged semantic façades match, emit a compact native summary row.
+        /// </summary>
+        [Fact]
+        public void BuildChangeRows_AudioTagNativeXiphChange_AppendsSummaryRow()
+        {
+            var original = _CloneBaseline(configureOverlay: o =>
+            {
+                o.AudioTagOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2] };
+            });
+            var item = new RenameItem(original);
+            item.Preview.AudioTagOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2, 3] };
+
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
+
+            var row = Assert.Single(rows);
+            Assert.Equal("AudioTag.Native.Xiph", row.Property);
+            Assert.Contains("2 bytes", row.OldValue, StringComparison.Ordinal);
+            Assert.Contains("3 bytes", row.NewValue, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Native block rows follow merged embedded-tag scalar rows in stable order.
+        /// </summary>
+        [Fact]
+        public void BuildChangeRows_MixedScalarAndNativeBlock_FollowsStableOrdering()
+        {
+            var original = _CloneBaseline(directoryPath: @"D:\A", configureOverlay: o =>
+            {
+                o.AudioTagOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = [1] };
+            });
+            var item = new RenameItem(original);
+            item.Preview.DirectoryPath = @"D:\B";
+            item.Preview.AudioTagOverlay.Genre = "Rock";
+            item.Preview.AudioTagOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2] };
+
+            var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
+
+            Assert.Equal(
+                ["DirectoryPath", "AudioTag.Genre", "AudioTag.Native.Xiph"],
+                [.. rows.Select(r => r.Property)]);
         }
 
         /// <summary>

@@ -124,6 +124,100 @@ namespace Mfr.Core
             _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.TrackCount", original.TrackCount, preview.TrackCount);
             _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Disc", original.Disc, preview.Disc);
             _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.DiscCount", original.DiscCount, preview.DiscCount);
+
+            _AppendAudioTagNativeBlockLayoutDifferences(changes, original, preview);
+        }
+
+        /// <summary>
+        /// Appends compact rows when structured per–tag snapshots differ (Phase 4 native block awareness).
+        /// </summary>
+        private static void _AppendAudioTagNativeBlockLayoutDifferences(
+            List<RenamePropertyChange> changes,
+            AudioTagOverlay original,
+            AudioTagOverlay preview)
+        {
+            if (original.TagBlocksStructurallyEquals(preview))
+                return;
+
+            if (!Equals(original.Id3v1, preview.Id3v1))
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "AudioTag.Native.Id3v1",
+                    OldValue: JsonSerializer.Serialize(original.Id3v1),
+                    NewValue: JsonSerializer.Serialize(preview.Id3v1)));
+            }
+
+            if (!Equals(original.Id3v2, preview.Id3v2))
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "AudioTag.Native.Id3v2",
+                    OldValue: _SummarizeId3v2Block(original.Id3v2),
+                    NewValue: _SummarizeId3v2Block(preview.Id3v2)));
+            }
+
+            if (!Equals(original.Xiph, preview.Xiph))
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "AudioTag.Native.Xiph",
+                    OldValue: _SummarizeSerializedBlob(original.Xiph),
+                    NewValue: _SummarizeSerializedBlob(preview.Xiph)));
+            }
+
+            if (!Equals(original.Ape, preview.Ape))
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "AudioTag.Native.Ape",
+                    OldValue: _SummarizeSerializedBlob(original.Ape),
+                    NewValue: _SummarizeSerializedBlob(preview.Ape)));
+            }
+
+            if (!Equals(original.Apple, preview.Apple))
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "AudioTag.Native.Apple",
+                    OldValue: _SummarizeAppleBlock(original.Apple),
+                    NewValue: _SummarizeAppleBlock(preview.Apple)));
+            }
+
+            if (!Equals(original.Asf, preview.Asf))
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: "AudioTag.Native.Asf",
+                    OldValue: _SummarizeAsfBlock(original.Asf),
+                    NewValue: _SummarizeAsfBlock(preview.Asf)));
+            }
+        }
+
+        private static string _SummarizeId3v2Block(Id3v2TagData? data)
+        {
+            if (data is null)
+                return "absent";
+
+            return $"{data.Frames.Length} frames, {data.CanonicalTagBytes.Length} canonical bytes (ID3v2 v{data.Version})";
+        }
+
+        private static string _SummarizeSerializedBlob(SerializedTagBlob? blob)
+        {
+            if (blob is null)
+                return "absent";
+
+            return $"{blob.CanonicalTagBytes.Length} bytes";
+        }
+
+        private static string _SummarizeAppleBlock(AppleTagData? data)
+        {
+            if (data is null)
+                return "absent";
+
+            return $"{data.Atoms.Length} atoms";
+        }
+
+        private static string _SummarizeAsfBlock(AsfTagData? data)
+        {
+            if (data is null)
+                return "absent";
+
+            return $"{data.Descriptors.Length} descriptors";
         }
 
         private static void _AddRenamePropertyChangeIfStringDiffers(
