@@ -199,6 +199,54 @@ namespace Mfr.Tests.Models.Filters.Audio
         }
 
         /// <summary>
+        /// Verifies <c>track.text</c> with a formatter span expands and parses like a literal track integer.
+        /// </summary>
+        [Fact]
+        public void Track_TemplateSpan_CompilesFileNameToken()
+        {
+            var item = _CreateAudioItem(prefix: "42");
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Track: new AudioTagStringFieldOptions(Text: "<file-name>")));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(42u, item.Preview.AudioTagOverlay.Track);
+        }
+
+        /// <summary>
+        /// Verifies track template expansion composes with <see cref="AudioTagSetterOptions.TrackAutoIncrement"/>.
+        /// </summary>
+        [Fact]
+        public void Track_TemplateSpan_AutoIncrement_AddsRenameListIndex()
+        {
+            var item = _CreateAudioItem(renameListIndex: 3, prefix: "10");
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Track: new AudioTagStringFieldOptions(Text: "<file-name>"),
+                TrackAutoIncrement: true));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(13u, item.Preview.AudioTagOverlay.Track);
+        }
+
+        /// <summary>
+        /// Verifies non-numeric <c>track.text</c> after formatter expansion throws <see cref="FormatException"/>.
+        /// </summary>
+        [Fact]
+        public void Track_TemplateSpan_NonNumeric_ThrowsFormatException()
+        {
+            var item = _CreateAudioItem(prefix: "Noise");
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Track: new AudioTagStringFieldOptions(Text: "<file-name>")));
+
+            filter.Setup();
+            var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
+            Assert.Contains("0-255", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// Verifies track value 0 clears the overlay track.
         /// </summary>
         [Fact]
@@ -285,6 +333,52 @@ namespace Mfr.Tests.Models.Filters.Audio
             var item = _CreateAudioItem();
             var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
                 Year: new AudioTagStringFieldOptions(Text: "12000")));
+
+            filter.Setup();
+            var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
+            Assert.Contains("9999", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies <c>year.text</c> with a formatter span expands and parses like a literal year integer.
+        /// </summary>
+        [Fact]
+        public void Year_TemplateSpan_CompilesFileNameToken()
+        {
+            var item = _CreateAudioItem(prefix: "1999");
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Year: new AudioTagStringFieldOptions(Text: "<file-name>")));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(1999u, item.Preview.AudioTagOverlay.Year);
+        }
+
+        /// <summary>
+        /// Verifies non-numeric <c>year.text</c> after formatter expansion throws <see cref="FormatException"/>.
+        /// </summary>
+        [Fact]
+        public void Year_TemplateSpan_NonNumeric_ThrowsFormatException()
+        {
+            var item = _CreateAudioItem(prefix: "Noise");
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Year: new AudioTagStringFieldOptions(Text: "<file-name>")));
+
+            filter.Setup();
+            var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
+            Assert.Contains("1-9999", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies year &gt; 9999 after formatter expansion throws <see cref="FormatException"/>.
+        /// </summary>
+        [Fact]
+        public void Year_TemplateSpan_Above9999_ThrowsFormatException()
+        {
+            var item = _CreateAudioItem(prefix: "12000");
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Year: new AudioTagStringFieldOptions(Text: "<file-name>")));
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
