@@ -257,6 +257,31 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
+        /// Identity Apply on fixture WMA should be a no-op and keep <see cref="AudioTagOverlay.Asf"/> stable.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Fixture <c>taglib-sharp-sample.wma</c> is the TagLib# test asset
+        /// <see href="https://github.com/mono/taglib-sharp/blob/main/tests/TaglibSharp.Tests/samples/sample.wma">sample.wma</see>
+        /// (same project as TagLibSharp on NuGet).
+        /// </para>
+        /// </remarks>
+        [Fact]
+        public void RoundTrip_Wma_Asf_Apply_ClonedRead_IsNoOpAndStable()
+        {
+            var path = _CopyFixtureToTemp("taglib-sharp-sample.wma");
+
+            var first = AudioTagPersistence.Read(path);
+            Assert.NotNull(first.Asf);
+            Assert.NotEmpty(first.Asf.Descriptors);
+
+            AudioTagPersistence.Apply(path, first.Clone());
+            var second = AudioTagPersistence.Read(path);
+
+            Assert.Equal(first, second);
+        }
+
+        /// <summary>
         /// Verifies APE tags round-trip on a scratch MP3 when TagLib attaches an APE block.
         /// </summary>
         [Fact]
