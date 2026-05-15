@@ -1,4 +1,5 @@
 using Mfr.Filters.Audio;
+using Mfr.Filters.Formatting;
 using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Audio
@@ -32,6 +33,69 @@ namespace Mfr.Tests.Models.Filters.Audio
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
             Assert.Null(item.Preview.AudioTagOverlay.Title);
             Assert.Equal("PreservedForTest", item.Original.AudioTagOverlay.Title);
+        }
+
+        /// <summary>
+        /// Verifies apply after a title <see cref="FormatterFilter"/> clears the overlay and sets the strip flag.
+        /// </summary>
+        [Fact]
+        public void Apply_AfterFormatterOnTitle_ClearsFormatterOverlay_And_SetsStripFlag()
+        {
+            var meta = new FileMeta(
+                0,
+                0,
+                @"C:\Music",
+                "x",
+                ".wav",
+                renameListTotalCount: 1,
+                renameListFolderSiblingCount: 1);
+            meta.AudioTagOverlay.Title = "Start";
+
+            var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
+            var formatter = new FormatterFilter(
+                Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                Options: new FormatterOptions("Formatted"));
+            var remover = new EmbeddedTagRemoverFilter();
+            formatter.Setup();
+            formatter.Apply(item);
+            Assert.Equal("Formatted", item.Preview.AudioTagOverlay.Title);
+
+            remover.Setup();
+            remover.Apply(item);
+
+            Assert.True(item.StripAllEmbeddedTagsOnCommit);
+            Assert.Null(item.Preview.AudioTagOverlay.Title);
+        }
+
+        /// <summary>
+        /// Verifies apply after <see cref="AudioTagSetterFilter"/> clears the setter overlay and sets the strip flag.
+        /// </summary>
+        [Fact]
+        public void Apply_AfterAudioTagSetter_ClearsSetterOverlay_And_SetsStripFlag()
+        {
+            var meta = new FileMeta(
+                0,
+                0,
+                @"C:\Music",
+                "x",
+                ".wav",
+                renameListTotalCount: 1,
+                renameListFolderSiblingCount: 1);
+            meta.AudioTagOverlay.Title = "Disk";
+
+            var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
+            var setter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Title: new AudioTagStringFieldOptions(Text: "FromSetter")));
+            var remover = new EmbeddedTagRemoverFilter();
+            setter.Setup();
+            setter.Apply(item);
+            Assert.Equal("FromSetter", item.Preview.AudioTagOverlay.Title);
+
+            remover.Setup();
+            remover.Apply(item);
+
+            Assert.True(item.StripAllEmbeddedTagsOnCommit);
+            Assert.Null(item.Preview.AudioTagOverlay.Title);
         }
 
         /// <summary>

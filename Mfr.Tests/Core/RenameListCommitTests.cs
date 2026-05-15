@@ -188,6 +188,151 @@ namespace Mfr.Tests.Core
 
         [Fact]
         /// <summary>
+        /// Verifies a title formatter followed by tag strip clears the preview overlay and leaves no title on disk.
+        /// </summary>
+        public void Commit_Formatter_OnTitle_Then_EmbeddedTagRemover_ClearsPreviewOverlay_OnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("fmt-then-strip.wav");
+            TaggedMinimalWav.WriteTagged(sourcePath, title: "Disk", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+
+            var preset = _CreatePresetAllEnabled(
+                "fmt-strip",
+                new FormatterFilter(
+                    Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                    Options: new FormatterOptions("PreviewStyled")),
+                new EmbeddedTagRemoverFilter());
+            var plan = _SetupPreview(renameList, preset);
+            var item = Assert.Single(renameList.RenameItems);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.True(item.StripAllEmbeddedTagsOnCommit);
+            Assert.Null(item.Preview.AudioTagOverlay.Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Null(readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies <see cref="AudioTagSetterFilter"/> output is cleared by a later strip step in preview and on disk.
+        /// </summary>
+        public void Commit_AudioTagSetter_Then_EmbeddedTagRemover_ClearsSetterInPreview_OnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("setter-strip.wav");
+            TaggedMinimalWav.WriteTagged(sourcePath, title: "DiskOnly", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+
+            var preset = _CreatePresetAllEnabled(
+                "setter-strip",
+                new AudioTagSetterFilter(new AudioTagSetterOptions(
+                    Title: new AudioTagStringFieldOptions(Text: "FromSetter"))),
+                new EmbeddedTagRemoverFilter());
+            var plan = _SetupPreview(renameList, preset);
+            var item = Assert.Single(renameList.RenameItems);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.True(item.StripAllEmbeddedTagsOnCommit);
+            Assert.Null(item.Preview.AudioTagOverlay.Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Null(readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies formatter → strip → formatter leaves the last formatter’s title in preview and on disk after commit.
+        /// </summary>
+        public void Commit_Formatter_Then_Remover_Then_Formatter_WritesFinalTitle_OnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("triple.wav");
+            TaggedMinimalWav.WriteTagged(sourcePath, title: "Old", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+
+            var preset = _CreatePresetAllEnabled(
+                "triple-chain",
+                new FormatterFilter(
+                    Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                    Options: new FormatterOptions("Intermediate")),
+                new EmbeddedTagRemoverFilter(),
+                new FormatterFilter(
+                    Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                    Options: new FormatterOptions("Final")));
+            var plan = _SetupPreview(renameList, preset);
+            var item = Assert.Single(renameList.RenameItems);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("Final", item.Preview.AudioTagOverlay.Title);
+            Assert.True(item.StripAllEmbeddedTagsOnCommit);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("Final", readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies a non-tag replacer step before strip still renames the file and removes embedded tags on disk.
+        /// </summary>
+        public void Commit_Replacer_OnPrefix_Then_EmbeddedTagRemover_RenamesAndStrips_OnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("track.wav");
+            TaggedMinimalWav.WriteTagged(sourcePath, title: "Tagged", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+
+            var preset = _CreatePresetAllEnabled(
+                "prefix-strip",
+                new ReplacerFilter(
+                    Target: new FilePrefixTarget(),
+                    Options: new ReplacerOptions(
+                        Find: "track",
+                        Replacement: "song",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: false,
+                        WholeWord: false)),
+                new EmbeddedTagRemoverFilter());
+            var plan = _SetupPreview(renameList, preset);
+            var item = Assert.Single(renameList.RenameItems);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("song", item.Preview.Prefix);
+            Assert.True(item.StripAllEmbeddedTagsOnCommit);
+            Assert.Null(item.Preview.AudioTagOverlay.Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var destPath = dir.CombinePath("song.wav");
+            Assert.True(File.Exists(destPath));
+            Assert.False(File.Exists(sourcePath));
+
+            var readBack = AudioTagPersistence.Read(destPath);
+            Assert.Null(readBack.Title);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies dry-run commit does not strip embedded tags from disk.
         /// </summary>
         public void Commit_DryRun_DoesNotStrip_EmbeddedTags()
