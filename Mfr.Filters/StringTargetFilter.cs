@@ -21,14 +21,14 @@ namespace Mfr.Models
         {
             var meta = item.Preview;
 
-            if (Target is AudioOverlayFieldTarget ao)
+            if (Target is AudioOverlayFieldTarget audioOverlayTarget)
             {
                 item.EnsureAudioTagsLoaded();
-                var current = AudioOverlaySemanticIo.GetInvariantFieldString(meta.AudioTagOverlay, ao.Field);
+                var current = AudioOverlaySemanticIo.GetInvariantFieldString(meta.AudioTagOverlay, audioOverlayTarget.Field);
                 var transformed = TransformValue(current, item);
                 AudioOverlaySemanticIo.MergeInvariantStringIntoOverlay(
                     overlay: meta.AudioTagOverlay,
-                    field: ao.Field,
+                    field: audioOverlayTarget.Field,
                     invariantString: transformed,
                     embeddedTagSourcePath: item.Original.FullPath);
 
