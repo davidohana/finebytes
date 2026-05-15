@@ -134,7 +134,7 @@ namespace Mfr.Metadata
                 return null;
 
             var rendered = xc.Render(addFramingBit: false);
-            return new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(rendered.Data) };
+            return _SerializedBlob(rendered.Data);
         }
 
         private static SerializedTagBlob? _ReadApe(TagLib.File file)
@@ -143,7 +143,7 @@ namespace Mfr.Metadata
                 return null;
 
             var rendered = ape.Render();
-            return new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(rendered.Data) };
+            return _SerializedBlob(rendered.Data);
         }
 
         private static AppleTagData? _ReadAppleSnapshot(TagLib.File file)
@@ -163,46 +163,65 @@ namespace Mfr.Metadata
             if (coalescedOverlay.Id3v1 is not null)
                 _CoalesceId3v1FromFacade(coalescedOverlay);
 
-            if (coalescedOverlay.Id3v2 is not null)
-            {
-                var id3 = new TagLib.Id3v2.Tag(new ByteVector([.. coalescedOverlay.Id3v2.CanonicalTagBytes.ToArray()]));
-                _WriteOverlayToTag(id3, coalescedOverlay);
-                coalescedOverlay.Id3v2 = _SnapshotId3v2Data(id3);
-            }
+            _CoalesceId3v2FromFacade(coalescedOverlay);
+            _CoalesceXiphFromFacade(coalescedOverlay);
+            _CoalesceApeFromFacade(coalescedOverlay);
+            _CoalesceAsfFromFacade(coalescedOverlay);
+            _CoalesceAppleFromFacade(file, coalescedOverlay);
+        }
 
-            if (coalescedOverlay.Xiph is not null)
-            {
-                var xc = new XiphComment([.. coalescedOverlay.Xiph.CanonicalTagBytes.ToArray()]);
-                _WriteOverlayToTag(xc, coalescedOverlay);
-                var rendered = xc.Render(addFramingBit: false);
-                coalescedOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(rendered.Data) };
-            }
+        private static void _CoalesceId3v2FromFacade(AudioTagOverlay coalescedOverlay)
+        {
+            if (coalescedOverlay.Id3v2 is null)
+                return;
 
-            if (coalescedOverlay.Ape is not null)
-            {
-                var ape = new TagLib.Ape.Tag(new ByteVector([.. coalescedOverlay.Ape.CanonicalTagBytes.ToArray()]));
-                _WriteOverlayToTag(ape, coalescedOverlay);
-                coalescedOverlay.Ape = new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(ape.Render().Data) };
-            }
+            var id3 = new TagLib.Id3v2.Tag(_ToByteVector(coalescedOverlay.Id3v2.CanonicalTagBytes));
+            _WriteOverlayToTag(id3, coalescedOverlay);
+            coalescedOverlay.Id3v2 = _SnapshotId3v2Data(id3);
+        }
 
-            if (coalescedOverlay.Asf is not null)
-            {
-                var asf = new TagLib.Asf.Tag();
-                foreach (var row in coalescedOverlay.Asf.Descriptors)
-                    asf.AddDescriptor(new TagLib.Asf.ContentDescriptor(row.Name, row.Value));
+        private static void _CoalesceXiphFromFacade(AudioTagOverlay coalescedOverlay)
+        {
+            if (coalescedOverlay.Xiph is null)
+                return;
 
-                _WriteOverlayToTag(asf, coalescedOverlay);
-                coalescedOverlay.Asf = _ReadAsfTagData(asf);
-            }
+            var xc = new XiphComment(_ToByteVector(coalescedOverlay.Xiph.CanonicalTagBytes));
+            _WriteOverlayToTag(xc, coalescedOverlay);
+            var rendered = xc.Render(addFramingBit: false);
+            coalescedOverlay.Xiph = _SerializedBlob(rendered.Data);
+        }
 
-            if (coalescedOverlay.Apple is not null && file.GetTag(TagTypes.Apple, true) is AppleTag apple)
-            {
-                foreach (var row in coalescedOverlay.Apple.Atoms)
-                    apple.SetText([.. row.AtomType.ToArray()], [.. row.Values]);
+        private static void _CoalesceApeFromFacade(AudioTagOverlay coalescedOverlay)
+        {
+            if (coalescedOverlay.Ape is null)
+                return;
 
-                _WriteOverlayToTag(apple, coalescedOverlay);
-                coalescedOverlay.Apple = _ReadAppleTagData(apple) ?? new AppleTagData();
-            }
+            var ape = new TagLib.Ape.Tag(_ToByteVector(coalescedOverlay.Ape.CanonicalTagBytes));
+            _WriteOverlayToTag(ape, coalescedOverlay);
+            coalescedOverlay.Ape = _SerializedBlob(ape.Render().Data);
+        }
+
+        private static void _CoalesceAsfFromFacade(AudioTagOverlay coalescedOverlay)
+        {
+            if (coalescedOverlay.Asf is null)
+                return;
+
+            var asf = new TagLib.Asf.Tag();
+            foreach (var row in coalescedOverlay.Asf.Descriptors)
+                asf.AddDescriptor(new TagLib.Asf.ContentDescriptor(row.Name, row.Value));
+
+            _WriteOverlayToTag(asf, coalescedOverlay);
+            coalescedOverlay.Asf = _ReadAsfTagData(asf);
+        }
+
+        private static void _CoalesceAppleFromFacade(TagLib.File file, AudioTagOverlay coalescedOverlay)
+        {
+            if (coalescedOverlay.Apple is null || file.GetTag(TagTypes.Apple, true) is not AppleTag apple)
+                return;
+
+            _SetAppleAtomTextRows(apple, coalescedOverlay.Apple);
+            _WriteOverlayToTag(apple, coalescedOverlay);
+            coalescedOverlay.Apple = _ReadAppleTagData(apple) ?? new AppleTagData();
         }
 
         private static void _CoalesceId3v1FromFacade(AudioTagOverlay coalescedOverlay)
@@ -321,6 +340,9 @@ namespace Mfr.Metadata
             _ApplyAsf(file, overlay);
         }
 
+        /// <summary>
+        /// Copies fields from a parsed in-memory tag into the on-disk Xiph comment (same key set as the overlay blob).
+        /// </summary>
         private static void _ApplyXiph(TagLib.File file, AudioTagOverlay overlay)
         {
             if (overlay.Xiph is null)
@@ -329,7 +351,7 @@ namespace Mfr.Metadata
             if (file.GetTag(TagTypes.Xiph, true) is not XiphComment live)
                 return;
 
-            var parsed = new XiphComment([.. overlay.Xiph.CanonicalTagBytes.ToArray()]);
+            var parsed = new XiphComment(_ToByteVector(overlay.Xiph.CanonicalTagBytes));
             live.Clear();
 
             foreach (var key in parsed)
@@ -342,6 +364,9 @@ namespace Mfr.Metadata
             }
         }
 
+        /// <summary>
+        /// Copies items from a parsed in-memory APE tag into the on-disk APE block.
+        /// </summary>
         private static void _ApplyApe(TagLib.File file, AudioTagOverlay overlay)
         {
             if (overlay.Ape is null)
@@ -350,7 +375,7 @@ namespace Mfr.Metadata
             if (file.GetTag(TagTypes.Ape, true) is not TagLib.Ape.Tag live)
                 return;
 
-            var parsed = new TagLib.Ape.Tag([.. overlay.Ape.CanonicalTagBytes.ToArray()]);
+            var parsed = new TagLib.Ape.Tag(_ToByteVector(overlay.Ape.CanonicalTagBytes));
             live.Clear();
 
             foreach (var key in parsed)
@@ -369,7 +394,12 @@ namespace Mfr.Metadata
             if (file.GetTag(TagTypes.Apple, true) is not AppleTag apple)
                 return;
 
-            foreach (var row in overlay.Apple.Atoms)
+            _SetAppleAtomTextRows(apple, overlay.Apple);
+        }
+
+        private static void _SetAppleAtomTextRows(AppleTag apple, AppleTagData appleData)
+        {
+            foreach (var row in appleData.Atoms)
                 apple.SetText([.. row.AtomType.ToArray()], [.. row.Values]);
         }
 
@@ -483,7 +513,7 @@ namespace Mfr.Metadata
                 foreach (var blob in overlay.Id3v2.Frames)
                 {
                     var offset = 0;
-                    var vec = new ByteVector([.. blob.Data]);
+                    var vec = _ToByteVector(blob.Data);
                     var frame = TagLib.Id3v2.FrameFactory.CreateFrame(vec, file, ref offset, overlay.Id3v2.Version, false);
                     if (frame is not null)
                         id3v2.AddFrame(frame);
@@ -536,6 +566,16 @@ namespace Mfr.Metadata
         private static string? _EmptyStringToNull(string? text)
         {
             return string.IsNullOrEmpty(text) ? null : text;
+        }
+
+        private static SerializedTagBlob _SerializedBlob(byte[] data)
+        {
+            return new SerializedTagBlob { CanonicalTagBytes = ImmutableArray.Create(data) };
+        }
+
+        private static ByteVector _ToByteVector(ImmutableArray<byte> bytes)
+        {
+            return new ByteVector([.. bytes]);
         }
 
         private static void _ValidateExistingRegularFile(string absolutePath)
