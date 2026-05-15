@@ -27,7 +27,7 @@ namespace Mfr.Models
         /// </summary>
         /// <param name="filters">Filters to wrap as enabled steps.</param>
         /// <returns>A new chain.</returns>
-        public static FilterChain CreateAllEnabled(IReadOnlyList<BaseFilter> filters)
+        internal static FilterChain CreateAllEnabled(IReadOnlyList<BaseFilter> filters)
         {
             return new FilterChain
             {

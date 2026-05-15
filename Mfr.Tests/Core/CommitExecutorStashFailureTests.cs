@@ -1,4 +1,3 @@
-using System.IO;
 using Mfr.Core;
 using Mfr.Models;
 using Mfr.Tests.TestSupport;

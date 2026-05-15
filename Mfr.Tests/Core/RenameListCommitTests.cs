@@ -494,7 +494,7 @@ namespace Mfr.Tests.Core
 
             Assert.Single(result);
             Assert.Equal(RenameStatus.PreviewError, result[0].Status);
-            Assert.Contains("already in use", result[0].Error!, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("already in use", result[0].Error, StringComparison.OrdinalIgnoreCase);
             Assert.Empty(result[0].Changes);
             Assert.True(File.Exists(source));
             Assert.True(File.Exists(existingDestination));

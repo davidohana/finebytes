@@ -10,6 +10,8 @@ namespace Mfr.App.Cli
 {
     internal static class CliArgParser
     {
+        private static Action<ParseCommandSettings>? _parseCommandCaptureSettings;
+
         /// <summary>
         /// Parses command-line arguments into <see cref="CliOptions"/>.
         /// </summary>
@@ -21,7 +23,7 @@ namespace Mfr.App.Cli
             ParseCommandSettings? parsedSettings = null;
             try
             {
-                ParseCommand.CaptureSettings = settings => parsedSettings = settings;
+                _parseCommandCaptureSettings = settings => parsedSettings = settings;
                 var app = new CommandApp<ParseCommand>();
                 app.Configure(_ConfigureCommandApp);
                 app.WithDescription($"Magic File Renamer v{_GetAssemblyVersionString()}.");
@@ -43,7 +45,7 @@ namespace Mfr.App.Cli
             }
             finally
             {
-                ParseCommand.CaptureSettings = null;
+                _parseCommandCaptureSettings = null;
             }
 
             if (parsedSettings is null)
@@ -133,11 +135,9 @@ namespace Mfr.App.Cli
 
         private sealed class ParseCommand : Command<ParseCommandSettings>
         {
-            public static Action<ParseCommandSettings>? CaptureSettings { get; set; }
-
             protected override int Execute(CommandContext context, ParseCommandSettings settings, CancellationToken cancellationToken)
             {
-                CaptureSettings?.Invoke(settings);
+                _parseCommandCaptureSettings?.Invoke(settings);
                 return 0;
             }
         }

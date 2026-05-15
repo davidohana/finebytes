@@ -6,7 +6,7 @@ namespace Mfr.Models
 {
     /// <summary>
     /// Loads optional process-wide settings from JSON.
-    /// <para>Default file: <see cref="DefaultConfigFilePath"/>.</para>
+    /// <para>Default file: <see cref="_DefaultConfigFilePath"/>.</para>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -31,11 +31,9 @@ namespace Mfr.Models
         public static MfrSettings Settings { get; private set; } = new();
 
         /// <summary>
-        /// Gets the default JSON config file path.
-        /// <para><c>%ApplicationData%/MagicFileRenamer/mfr.config.json</c>.</para>
+        /// Default JSON config path (<c>%ApplicationData%/MagicFileRenamer/mfr.config.json</c>).
         /// </summary>
-        /// <returns>An absolute file path.</returns>
-        public static string DefaultConfigFilePath()
+        private static string _DefaultConfigFilePath()
         {
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             return appData.CombinePath("MagicFileRenamer", "mfr.config.json");
@@ -46,7 +44,7 @@ namespace Mfr.Models
         /// <para>Schema: see <see cref="ConfigLoader"/> remarks.</para>
         /// </summary>
         /// <param name="configFilePath">
-        /// Path to JSON. When <c>null</c> or whitespace, <see cref="DefaultConfigFilePath"/> is used.
+        /// Path to JSON. When <c>null</c> or whitespace, the default AppData path from <see cref="_DefaultConfigFilePath"/> is used.
         /// </param>
         /// <exception cref="InvalidDataException">
         /// Thrown when a user-supplied file path does not exist, or when the file exists but JSON is invalid or settings are out of range.
@@ -57,7 +55,7 @@ namespace Mfr.Models
             Settings = settings;
 
             var useDefaultPath = configFilePath.IsBlank();
-            var path = useDefaultPath ? DefaultConfigFilePath() : configFilePath!.Trim();
+            var path = useDefaultPath ? _DefaultConfigFilePath() : configFilePath!.Trim();
             if (!File.Exists(path))
             {
                 if (!useDefaultPath)

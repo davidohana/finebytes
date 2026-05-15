@@ -7,7 +7,7 @@ namespace Mfr.Core
     /// <summary>
     /// Resolves user-added rename sources (files, directories, and wildcard patterns) into concrete paths.
     /// </summary>
-    public static class AddedSourceResolver
+    internal static class AddedSourceResolver
     {
         /// <summary>
         /// Resolves a single source into file paths.
@@ -16,7 +16,7 @@ namespace Mfr.Core
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <param name="includeSubdirs">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
         /// <returns>Resolved file paths for the source.</returns>
-        public static IEnumerable<string> ResolveToPaths(
+        internal static IEnumerable<string> ResolveToPaths(
             string source,
             bool includeFolders,
             bool includeSubdirs)
