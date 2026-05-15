@@ -18,8 +18,8 @@ namespace Mfr.Models.Tags
     /// hold detached per–<c>TagTypes</c> payloads when present on disk (see persistence documentation for null semantics).
     /// </para>
     /// <para>
-    /// <see cref="TagBlocksStructurallyEquals"/> compares only those detached blocks—the intended durable tag payloads for
-    /// Phase 4+ tooling—while scalar properties remain a merged façade synced by persistence/preview helpers.
+    /// <see cref="TagBlocksStructurallyEquals"/> compares only detached blocks;
+    /// <see cref="MergedSemanticFacadesEqual"/> compares only merged façade scalars (<see cref="Title"/>, …).
     /// </para>
     /// </remarks>
     public sealed class AudioTagOverlay : IEquatable<AudioTagOverlay?>
@@ -171,6 +171,46 @@ namespace Mfr.Models.Tags
         }
 
         /// <summary>
+        /// Returns whether merged façade scalars (<see cref="Title"/>, <see cref="Album"/>, …) match
+        /// <paramref name="other"/>, ignoring per–tag block snapshots.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Pair with <see cref="TagBlocksStructurallyEquals"/> when Phase 4 code needs to reason about façade vs native block
+        /// drift independently; full <see cref="Equals(AudioTagOverlay?)"/> requires both to agree.
+        /// </para>
+        /// </remarks>
+        /// <param name="other">Other overlay.</param>
+        /// <returns>
+        /// <see langword="true"/> when every merged scalar matches; <see langword="false"/> when <paramref name="other"/>
+        /// is <see langword="null"/> or any scalar differs.
+        /// </returns>
+        public bool MergedSemanticFacadesEqual(AudioTagOverlay? other)
+        {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return string.Equals(Title, other.Title, StringComparison.Ordinal)
+                && string.Equals(Album, other.Album, StringComparison.Ordinal)
+                && string.Equals(Performers, other.Performers, StringComparison.Ordinal)
+                && string.Equals(AlbumArtists, other.AlbumArtists, StringComparison.Ordinal)
+                && string.Equals(Composers, other.Composers, StringComparison.Ordinal)
+                && string.Equals(Genre, other.Genre, StringComparison.Ordinal)
+                && string.Equals(Comment, other.Comment, StringComparison.Ordinal)
+                && string.Equals(Lyrics, other.Lyrics, StringComparison.Ordinal)
+                && string.Equals(Copyright, other.Copyright, StringComparison.Ordinal)
+                && string.Equals(Grouping, other.Grouping, StringComparison.Ordinal)
+                && Year == other.Year
+                && Track == other.Track
+                && TrackCount == other.TrackCount
+                && Disc == other.Disc
+                && DiscCount == other.DiscCount;
+        }
+
+        /// <summary>
         /// Creates a detached copy suitable for cloning <see cref="FileMeta"/>.
         /// </summary>
         /// <returns>New instance with copied values.</returns>
@@ -221,26 +261,7 @@ namespace Mfr.Models.Tags
             if (!TagBlocksStructurallyEquals(other))
                 return false;
 
-            return _MergedSemanticFacadesEqual(other);
-        }
-
-        private bool _MergedSemanticFacadesEqual(AudioTagOverlay other)
-        {
-            return string.Equals(Title, other.Title, StringComparison.Ordinal)
-                && string.Equals(Album, other.Album, StringComparison.Ordinal)
-                && string.Equals(Performers, other.Performers, StringComparison.Ordinal)
-                && string.Equals(AlbumArtists, other.AlbumArtists, StringComparison.Ordinal)
-                && string.Equals(Composers, other.Composers, StringComparison.Ordinal)
-                && string.Equals(Genre, other.Genre, StringComparison.Ordinal)
-                && string.Equals(Comment, other.Comment, StringComparison.Ordinal)
-                && string.Equals(Lyrics, other.Lyrics, StringComparison.Ordinal)
-                && string.Equals(Copyright, other.Copyright, StringComparison.Ordinal)
-                && string.Equals(Grouping, other.Grouping, StringComparison.Ordinal)
-                && Year == other.Year
-                && Track == other.Track
-                && TrackCount == other.TrackCount
-                && Disc == other.Disc
-                && DiscCount == other.DiscCount;
+            return MergedSemanticFacadesEqual(other);
         }
 
         /// <inheritdoc />

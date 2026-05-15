@@ -3,7 +3,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Tests.Models.Tags
 {
     /// <summary>
-    /// Tests for <see cref="AudioTagOverlay.TagBlocksStructurallyEquals"/>.
+    /// Tests for block vs merged-façade equality helpers on <see cref="AudioTagOverlay"/>.
     /// </summary>
     public sealed class AudioTagOverlayTagBlockEqualityTests
     {
@@ -48,6 +48,34 @@ namespace Mfr.Tests.Models.Tags
             };
 
             Assert.False(a.TagBlocksStructurallyEquals(b));
+        }
+
+        /// <summary>
+        /// Verifies façade-only equality ignores detached blocks.
+        /// </summary>
+        [Fact]
+        public void MergedSemanticFacadesEqual_IgnoresBlocks()
+        {
+            var a = new AudioTagOverlay { Title = "T", Xiph = new SerializedTagBlob { CanonicalTagBytes = [1] } };
+            var b = new AudioTagOverlay { Title = "T", Xiph = new SerializedTagBlob { CanonicalTagBytes = [9] } };
+
+            Assert.True(a.MergedSemanticFacadesEqual(b));
+            Assert.False(a.TagBlocksStructurallyEquals(b));
+            Assert.False(a.Equals(b));
+        }
+
+        /// <summary>
+        /// Verifies <see cref="AudioTagOverlay.Equals"/> matches both helpers together.
+        /// </summary>
+        [Fact]
+        public void Equals_RequiresBlocksAndFacades()
+        {
+            var a = new AudioTagOverlay { Album = "X" };
+            var b = new AudioTagOverlay { Album = "Y" };
+
+            Assert.True(a.TagBlocksStructurallyEquals(b));
+            Assert.False(a.MergedSemanticFacadesEqual(b));
+            Assert.False(a.Equals(b));
         }
     }
 }
