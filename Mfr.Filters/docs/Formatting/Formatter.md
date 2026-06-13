@@ -10,7 +10,7 @@ Replaces the **entire target segment** with the result of expanding a **template
 
 ### Target (`target`, string filters)
 
-Along with path and file-name targets ([preset shape](../README.md#preset-shape)), string filters accept **`AudioOverlayField`**: set **`field`** to a camelCase overlay name (`title`, `album`, `performers`, `albumArtists`, `composers`, `genre`, `comment`, `lyrics`, `copyright`, `grouping`, `year`, `track`, `trackCount`, `disc`, `discCount`). The filter reads and writes that single property on **`Preview.AudioTagOverlay`** (numeric fields use invariant integer strings; empty string clears nullable overlay fields).
+Along with path and file-name targets ([preset shape](../README.md#preset-shape)), string filters accept **`AudioOverlayField`**: set **`field`** to a camelCase overlay name (`title`, `album`, `performers`, `albumArtists`, `composers`, `genre`, `comment`, `lyrics`, `copyright`, `grouping`, `year`, `track`, `trackCount`, `disc`, `discCount`). The filter reads and writes that single property on **`Preview.AudioTagOverlay`** (numeric fields use decimal-digit strings; empty string clears nullable overlay fields).
 
 **Commit:** After a successful move, when **`Preview.AudioTagOverlay`** differs from the row’s **`Original.AudioTagOverlay`**, **`RenameList.Commit`** calls **`AudioTagPersistence.Apply`** on the destination file (which reads the file’s current TagLib state as the merge baseline, then writes). Rows with unchanged tag overlays skip this path.
 
@@ -41,12 +41,12 @@ Unit tests typically construct **`RenameItem`** with no tag reader (**`audioTagR
 | `<audio-artist>` | Performers (joined overlay string); empty when unset. |
 | `<audio-album-artist>` | Album artists; empty when unset. |
 | `<audio-album>` | Album; empty when unset. |
-| `<audio-year>` | Year as invariant decimal digits; empty when unset. |
+| `<audio-year>` | Year as decimal digits; empty when unset. |
 | `<audio-genre>` | Genre; empty when unset. |
-| `<audio-track>` | Track number; invariant digits; empty when unset. |
-| `<audio-track-count>` | Track count (of *n/m* pair); invariant digits; empty when unset. |
-| `<audio-disc>` | Disc number; invariant digits; empty when unset. |
-| `<audio-disc-count>` | Disc count; invariant digits; empty when unset. |
+| `<audio-track>` | Track number; decimal digits; empty when unset. |
+| `<audio-track-count>` | Track count (of *n/m* pair); decimal digits; empty when unset. |
+| `<audio-disc>` | Disc number; decimal digits; empty when unset. |
+| `<audio-disc-count>` | Disc count; decimal digits; empty when unset. |
 | `<audio-comment>` | Comment; empty when unset. |
 | `<audio-composer>` | Composers; empty when unset. |
 | `<audio-lyrics>` | Lyrics text; empty when unset. |

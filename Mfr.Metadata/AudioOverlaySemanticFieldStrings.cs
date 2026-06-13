@@ -4,7 +4,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Invariant embedded-tag strings from <see cref="AudioTagSemanticSurface"/> rows (Phase 4 block-aware preview reads).
+    /// Filter/preview field strings from <see cref="AudioTagSemanticSurface"/> rows (Phase 4 block-aware preview reads).
     /// </summary>
     /// <remarks>
     /// Mirrors the string conventions used when reading <see cref="AudioOverlayFieldTarget"/> previews (empty strings for absent fields);
@@ -17,7 +17,7 @@ namespace Mfr.Metadata
         /// </summary>
         /// <param name="semantic">Projected semantics; typically from <see cref="AudioTagSemanticSurface.FromBlocks"/>.</param>
         /// <param name="field">Which embedded field to format.</param>
-        /// <returns>Invariant-compatible string suitable for previews and substring filters.</returns>
+        /// <returns>Filter/preview string for the field (empty when unset).</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="field"/> is unrecognized.</exception>
         public static string Format(AudioTagSemanticSurface semantic, AudioOverlayField field)
         {
@@ -33,16 +33,16 @@ namespace Mfr.Metadata
                 AudioOverlayField.Lyrics => semantic.Lyrics ?? string.Empty,
                 AudioOverlayField.Copyright => semantic.Copyright ?? string.Empty,
                 AudioOverlayField.Grouping => semantic.Grouping ?? string.Empty,
-                AudioOverlayField.Year => _InvariantUintOrEmpty(semantic.Year),
-                AudioOverlayField.Track => _InvariantUintOrEmpty(semantic.Track),
-                AudioOverlayField.TrackCount => _InvariantUintOrEmpty(semantic.TrackCount),
-                AudioOverlayField.Disc => _InvariantUintOrEmpty(semantic.Disc),
-                AudioOverlayField.DiscCount => _InvariantUintOrEmpty(semantic.DiscCount),
+                AudioOverlayField.Year => _DecimalDigitsOrEmpty(semantic.Year),
+                AudioOverlayField.Track => _DecimalDigitsOrEmpty(semantic.Track),
+                AudioOverlayField.TrackCount => _DecimalDigitsOrEmpty(semantic.TrackCount),
+                AudioOverlayField.Disc => _DecimalDigitsOrEmpty(semantic.Disc),
+                AudioOverlayField.DiscCount => _DecimalDigitsOrEmpty(semantic.DiscCount),
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
         }
 
-        private static string _InvariantUintOrEmpty(uint? value)
+        private static string _DecimalDigitsOrEmpty(uint? value)
         {
             return value is null ? string.Empty : value.Value.ToString(CultureInfo.InvariantCulture);
         }

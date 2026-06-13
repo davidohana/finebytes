@@ -29,7 +29,7 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
-        /// Verifies formatter sets each numeric overlay field from an invariant non-negative integer string.
+        /// Verifies formatter sets each numeric overlay field from a non-negative integer decimal string.
         /// </summary>
         /// <param name="field">Which <see cref="AudioOverlayField"/> is targeted.</param>
         /// <param name="template">Template output (single integer token).</param>

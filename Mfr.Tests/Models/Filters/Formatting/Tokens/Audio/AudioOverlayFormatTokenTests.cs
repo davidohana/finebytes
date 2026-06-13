@@ -92,7 +92,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         }
 
         [Fact]
-        public void Resolve_NumericSet_UsesInvariantFormatting()
+        public void Resolve_NumericSet_UsesDecimalDigitFormatting()
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
             {
