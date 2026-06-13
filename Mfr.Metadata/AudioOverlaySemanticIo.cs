@@ -20,7 +20,7 @@ namespace Mfr.Metadata
         /// <param name="overlay">Structured tag blocks.</param>
         /// <param name="field">Logical audio field.</param>
         /// <returns>Same formatting as <see cref="AudioOverlaySemanticFieldStrings.Format"/>.</returns>
-        public static string GetInvariantFieldString(AudioTagOverlay overlay, AudioOverlayField field)
+        public static string GetFieldString(AudioTagOverlay overlay, AudioOverlayField field)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
