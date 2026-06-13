@@ -26,10 +26,10 @@ namespace Mfr.Models
                 item.EnsureAudioTagsLoaded();
                 var currentValue = AudioOverlaySemanticIo.GetFieldString(preview.AudioTagOverlay, audioOverlayTarget.Field);
                 var transformed = TransformValue(currentValue, item);
-                AudioOverlaySemanticIo.MergeInvariantStringIntoOverlay(
+                AudioOverlaySemanticIo.MergeFieldStringIntoOverlay(
                     overlay: preview.AudioTagOverlay,
                     field: audioOverlayTarget.Field,
-                    invariantString: transformed,
+                    fieldString: transformed,
                     embeddedTagSourcePath: item.Original.FullPath);
 
                 return;

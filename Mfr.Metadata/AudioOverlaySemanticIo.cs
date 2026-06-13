@@ -15,11 +15,11 @@ namespace Mfr.Metadata
     public static class AudioOverlaySemanticIo
     {
         /// <summary>
-        /// Returns the invariant string for <paramref name="field"/> from the block projection of <paramref name="overlay"/>.
+        /// Returns the filter/preview string for <paramref name="field"/> from the block projection of <paramref name="overlay"/>.
         /// </summary>
         /// <param name="overlay">Structured tag blocks.</param>
         /// <param name="field">Logical audio field.</param>
-        /// <returns>Same formatting as <see cref="AudioOverlaySemanticFieldStrings.Format"/>.</returns>
+        /// <returns>Same formatting as <see cref="AudioOverlaySemanticFieldStrings.Format"/> (empty when unset).</returns>
         public static string GetFieldString(AudioTagOverlay overlay, AudioOverlayField field)
         {
             ArgumentNullException.ThrowIfNull(overlay);
@@ -28,24 +28,24 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Parses <paramref name="invariantString"/> for <paramref name="field"/>, merges the updated semantic surface into
+        /// Parses <paramref name="fieldString"/> for <paramref name="field"/>, merges the updated semantic surface into
         /// <paramref name="overlay"/> blocks, and optionally uses <paramref name="embeddedTagSourcePath"/> for Apple atom coalescence.
         /// </summary>
         /// <param name="overlay">Overlay whose blocks are updated in place.</param>
         /// <param name="field">Which semantic field to replace.</param>
-        /// <param name="invariantString">Trimmed or raw value (numeric fields use invariant integer rules).</param>
+        /// <param name="fieldString">Text as-is, or decimal digits for numeric fields; empty clears nullable fields.</param>
         /// <param name="embeddedTagSourcePath">On-disk file path for TagLib, or <see langword="null"/> to skip live-file Apple merge.</param>
         /// <exception cref="ArgumentException">Thrown when a numeric field string is not empty and not a valid non-negative integer.</exception>
-        public static void MergeInvariantStringIntoOverlay(
+        public static void MergeFieldStringIntoOverlay(
             AudioTagOverlay overlay,
             AudioOverlayField field,
-            string invariantString,
+            string fieldString,
             string? embeddedTagSourcePath)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
             var merged = AudioTagSemanticSurface.FromBlocks(overlay);
-            var trimmed = invariantString.Trim();
+            var trimmed = fieldString.Trim();
 
             merged = field switch
             {
@@ -59,11 +59,11 @@ namespace Mfr.Metadata
                 AudioOverlayField.Lyrics => merged with { Lyrics = _NullIfEmptyString(trimmed) },
                 AudioOverlayField.Copyright => merged with { Copyright = _NullIfEmptyString(trimmed) },
                 AudioOverlayField.Grouping => merged with { Grouping = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Year => merged with { Year = _ParseNullableUInt(trimmed, nameof(invariantString)) },
-                AudioOverlayField.Track => merged with { Track = _ParseNullableUInt(trimmed, nameof(invariantString)) },
-                AudioOverlayField.TrackCount => merged with { TrackCount = _ParseNullableUInt(trimmed, nameof(invariantString)) },
-                AudioOverlayField.Disc => merged with { Disc = _ParseNullableUInt(trimmed, nameof(invariantString)) },
-                AudioOverlayField.DiscCount => merged with { DiscCount = _ParseNullableUInt(trimmed, nameof(invariantString)) },
+                AudioOverlayField.Year => merged with { Year = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                AudioOverlayField.Track => merged with { Track = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                AudioOverlayField.TrackCount => merged with { TrackCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                AudioOverlayField.Disc => merged with { Disc = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                AudioOverlayField.DiscCount => merged with { DiscCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 
@@ -83,7 +83,7 @@ namespace Mfr.Metadata
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
                 throw new ArgumentException(
-                    $"Value must be empty or a non-negative integer (invariant), got '{trimmed}'.",
+                    $"Value must be empty or a non-negative integer, got '{trimmed}'.",
                     valueParamName);
             }
 
