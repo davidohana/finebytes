@@ -133,7 +133,7 @@ namespace Mfr.Core
         }
 
         /// <summary>
-        /// Appends compact rows when structured per–tag snapshots differ (Phase 4 native block awareness).
+        /// Appends compact rows when structured per–tag snapshots differ.
         /// </summary>
         private static void _AppendAudioTagNativeBlockLayoutDifferences(
             List<RenamePropertyChange> changes,

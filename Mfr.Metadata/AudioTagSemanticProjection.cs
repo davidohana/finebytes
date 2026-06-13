@@ -7,7 +7,7 @@ using TagLib.Riff;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Semantic values derived exclusively from structured <see cref="AudioTagOverlay"/> native blocks (Phase 4).
+    /// Semantic values derived from structured <see cref="AudioTagOverlay"/> native blocks.
     /// </summary>
     /// <remarks>
     /// Precedence mirrors TagLib merged-tag behavior: ID3v2 over ID3v1, then Xiph, APE, RIFF INFO (WAV LIST), Apple text atoms, ASF descriptors.

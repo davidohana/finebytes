@@ -133,7 +133,7 @@ namespace Mfr.Tests.Core
             var dir = _tempDirectoryFixture.CreateTempDir();
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
             Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
-            var sourcePath = dir.CombinePath("phase3.flac");
+            var sourcePath = dir.CombinePath("commit-flac.flac");
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
@@ -143,18 +143,18 @@ namespace Mfr.Tests.Core
             var preset = _CreatePresetAllEnabled(
                 "flac-audio-tag-setter-title",
                 new AudioTagSetterFilter(new AudioTagSetterOptions(
-                    Title: new AudioTagStringFieldOptions(Text: "Phase3FlacTitle"))));
+                    Title: new AudioTagStringFieldOptions(Text: "CommitFlacTitle"))));
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("Phase3FlacTitle", item.Preview.AudioTagOverlay.Semantic().Title);
+            Assert.Equal("CommitFlacTitle", item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Single(results);
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("Phase3FlacTitle", readBack.Semantic().Title);
+            Assert.Equal("CommitFlacTitle", readBack.Semantic().Title);
         }
 
         [Fact]
@@ -166,7 +166,7 @@ namespace Mfr.Tests.Core
             var dir = _tempDirectoryFixture.CreateTempDir();
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "homebrew-test.m4a");
             Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
-            var sourcePath = dir.CombinePath("phase3.m4a");
+            var sourcePath = dir.CombinePath("commit-m4a.m4a");
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
@@ -176,18 +176,18 @@ namespace Mfr.Tests.Core
             var preset = _CreatePresetAllEnabled(
                 "m4a-audio-tag-setter-title",
                 new AudioTagSetterFilter(new AudioTagSetterOptions(
-                    Title: new AudioTagStringFieldOptions(Text: "Phase3M4aTitle"))));
+                    Title: new AudioTagStringFieldOptions(Text: "CommitM4aTitle"))));
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("Phase3M4aTitle", item.Preview.AudioTagOverlay.Semantic().Title);
+            Assert.Equal("CommitM4aTitle", item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Single(results);
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("Phase3M4aTitle", readBack.Semantic().Title);
+            Assert.Equal("CommitM4aTitle", readBack.Semantic().Title);
         }
 
         [Fact]
@@ -199,7 +199,7 @@ namespace Mfr.Tests.Core
             var dir = _tempDirectoryFixture.CreateTempDir();
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "taglib-sharp-sample.wma");
             Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
-            var sourcePath = dir.CombinePath("phase3.wma");
+            var sourcePath = dir.CombinePath("commit-wma.wma");
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
@@ -209,18 +209,18 @@ namespace Mfr.Tests.Core
             var preset = _CreatePresetAllEnabled(
                 "wma-audio-tag-setter-title",
                 new AudioTagSetterFilter(new AudioTagSetterOptions(
-                    Title: new AudioTagStringFieldOptions(Text: "Phase3WmaTitle"))));
+                    Title: new AudioTagStringFieldOptions(Text: "CommitWmaTitle"))));
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("Phase3WmaTitle", item.Preview.AudioTagOverlay.Semantic().Title);
+            Assert.Equal("CommitWmaTitle", item.Preview.AudioTagOverlay.Semantic().Title);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Single(results);
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.Equal("Phase3WmaTitle", readBack.Semantic().Title);
+            Assert.Equal("CommitWmaTitle", readBack.Semantic().Title);
         }
 
         [Fact]

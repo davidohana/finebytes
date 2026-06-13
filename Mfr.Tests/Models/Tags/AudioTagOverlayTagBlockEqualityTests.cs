@@ -3,7 +3,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Tests.Models.Tags
 {
     /// <summary>
-    /// Tests structural equality on <see cref="AudioTagOverlay"/> (blocks only; Phase 4).
+    /// Tests structural equality on <see cref="AudioTagOverlay"/> native blocks.
     /// </summary>
     public sealed class AudioTagOverlayTagBlockEqualityTests
     {

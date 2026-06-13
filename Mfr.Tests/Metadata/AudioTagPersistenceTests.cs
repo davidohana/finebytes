@@ -310,13 +310,13 @@ namespace Mfr.Tests.Metadata
 
             var disk = AudioTagPersistence.Read(path);
             var preview = disk.Clone();
-            var merged = AudioTagSemanticSurface.FromBlocks(preview) with { Title = "SemanticTitleOnlyPhase3" };
+            var merged = AudioTagSemanticSurface.FromBlocks(preview) with { Title = "SemanticTitleMergeOnly" };
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
 
             AudioTagPersistence.Apply(path, preview);
 
             var after = AudioTagPersistence.Read(path);
-            Assert.Equal("SemanticTitleOnlyPhase3", after.Semantic().Title);
+            Assert.Equal("SemanticTitleMergeOnly", after.Semantic().Title);
             Assert.NotNull(after.Xiph);
             Assert.Equal(after, AudioTagPersistence.Read(path));
         }
@@ -403,7 +403,7 @@ namespace Mfr.Tests.Metadata
 
         private string _AllocateMinimalWavPath()
         {
-            var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}_mfr-phase1.wav");
+            var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}_mfr-minimal.wav");
             _pathsToDelete.Add(path);
 
             MinimalWavFixture.CopyScratchTo(path);

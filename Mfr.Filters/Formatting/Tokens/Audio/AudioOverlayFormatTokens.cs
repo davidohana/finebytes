@@ -4,7 +4,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Filters.Formatting.Tokens.Audio
 {
     /// <summary>
-    /// Shared implementation for formatter tokens backed by preview <see cref="AudioTagOverlay"/> using block-aware semantics.
+    /// Shared implementation for formatter tokens backed by preview <see cref="AudioTagOverlay"/> semantic projection.
     /// </summary>
     internal abstract class AudioOverlayTokenBase(IReadOnlyList<string> names, AudioOverlayField field) : IFormatToken
     {

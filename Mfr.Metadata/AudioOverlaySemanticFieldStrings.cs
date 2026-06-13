@@ -4,7 +4,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Filter/preview field strings from <see cref="AudioTagSemanticSurface"/> rows (Phase 4 block-aware preview reads).
+    /// Filter/preview field strings from <see cref="AudioTagSemanticSurface"/> rows.
     /// </summary>
     /// <remarks>
     /// Mirrors the string conventions used when reading <see cref="AudioOverlayFieldTarget"/> previews (empty strings for absent fields);

@@ -1,7 +1,7 @@
 namespace Mfr.Models.Tags
 {
     /// <summary>
-    /// Structured embedded audio tags (per-<c>TagTypes</c> blocks only; Phase 4 single source of truth).
+    /// Structured embedded audio tags: one snapshot per <c>TagTypes</c> block (no mirrored scalar fields).
     /// </summary>
     /// <remarks>
     /// <para>
