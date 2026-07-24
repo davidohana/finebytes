@@ -1,5 +1,6 @@
+using Mfr.Filters;
 using Mfr.Models;
-using Mfr.Models.Tags;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Models.Filters
 {
@@ -66,7 +67,21 @@ namespace Mfr.Tests.Models.Filters
 
             configureOriginal?.Invoke(meta);
             EnsureSyntheticAudioOverlayWhenTagless(meta);
-            return new RenameItem(meta);
+            var item = new RenameItem(meta);
+            if (!attributes.IsDirectory())
+                item.MarkEmbeddedTagsLoadAttempted();
+
+            return item;
+        }
+
+        /// <summary>
+        /// Uses a snapshot reader that returns a copy of <paramref name="meta"/>'s current overlay (synthetic paths without disk I/O).
+        /// </summary>
+        /// <param name="meta">Source row metadata whose overlay is returned on load.</param>
+        public static void UseEmbeddedTagReaderSnapshot(FileMeta meta)
+        {
+            ArgumentNullException.ThrowIfNull(meta);
+            RenameItemEmbeddedTags.TestTagReaderOverride.Value = _ => meta.AudioTagOverlay.Clone();
         }
 
         /// <summary>
@@ -80,16 +95,6 @@ namespace Mfr.Tests.Models.Filters
 
             meta.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay();
         }
-
-        /// <summary>
-        /// Test double: an <see cref="AudioTagReader"/> that ignores the path and returns a detached copy of <paramref name="meta"/>'s current <see cref="FileMeta.AudioTagOverlay"/> whenever hydration runs.
-        /// </summary>
-        public static AudioTagReader AudioTagReaderSnapshot(FileMeta meta)
-        {
-            ArgumentNullException.ThrowIfNull(meta);
-            return _ => meta.AudioTagOverlay.Clone();
-        }
-
         /// <summary>
         /// Applies a filter to a prefix-targeted rename item and returns the resulting preview prefix.
         /// </summary>

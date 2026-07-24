@@ -49,16 +49,8 @@ namespace Mfr.Models
     /// <summary>
     /// Represents one rename candidate with original and preview metadata.
     /// </summary>
-    /// <remarks>
-    /// Initializes a rename item with original metadata and optional embedded-tag disk reader delegate.
-    /// </remarks>
     /// <param name="original">Original immutable file snapshot.</param>
-    /// <param name="audioTagReader">
-    /// Optional reader that maps an absolute path to an overlay; invoked from <see cref="EnsureAudioTagsLoaded"/>.
-    /// When <see langword="null"/>, hydration does not read from disk and does not replace existing <see cref="FileMeta.AudioTagOverlay"/> on <see cref="Original"/> or <see cref="Preview"/> (for example unit rows and tests that seed tags in memory).
-    /// Hosts that load embedded tags from disk (for example <c>AudioTagPersistence.Read</c>) pass a non-null delegate.
-    /// </param>
-    public sealed class RenameItem(FileMeta original, AudioTagReader? audioTagReader = null)
+    public sealed class RenameItem(FileMeta original)
     {
         /// <summary>
         /// Gets the original immutable file snapshot.
@@ -109,40 +101,27 @@ namespace Mfr.Models
         /// </summary>
         internal string SentenceEndChars { get; set; } = ".!?";
 
-        private bool _audioTagsLoadAttempted;
-
-        private readonly AudioTagReader? _pathTagReader = audioTagReader;
+        /// <summary>
+        /// Gets whether embedded tags were loaded for this preview cycle.
+        /// </summary>
+        internal bool EmbeddedTagsLoadAttempted { get; private set; }
 
         /// <summary>
-        /// Loads embedded tags via the optional constructor-configured <see cref="AudioTagReader"/> when not cached, until <see cref="ClearAudioTagsCache"/>.
+        /// Marks embedded-tag load as attempted for this preview cycle.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Directory rows throw <see cref="InvalidOperationException"/>.
-        /// When no reader was supplied, this method does not change tag snapshots (no disk I/O).
-        /// Otherwise the reader is called with <see cref="FileMeta.FullPath"/> of <see cref="Original"/>; its result is cloned into
-        /// <see cref="Original"/><c>.AudioTagOverlay</c> and <see cref="Preview"/><c>.AudioTagOverlay</c>.
-        /// Any exception from the reader propagates to callers (for example rename-list preview records it on the row’s <c>PreviewError</c>).
-        /// </para>
-        /// </remarks>
-        /// <exception cref="InvalidOperationException">The rename row is a directory; audio tags cannot be read for directories.</exception>
-        internal void EnsureAudioTagsLoaded()
+        internal void MarkEmbeddedTagsLoadAttempted()
         {
-            if (_audioTagsLoadAttempted)
-                return;
+            EmbeddedTagsLoadAttempted = true;
+        }
 
-            _audioTagsLoadAttempted = true;
+        /// <summary>
+        /// Replaces embedded-tag overlays on <see cref="Original"/> and <see cref="Preview"/> from one disk read.
+        /// </summary>
+        /// <param name="overlay">Overlay read from the row's source path.</param>
+        internal void SetEmbeddedTagOverlays(AudioTagOverlay overlay)
+        {
+            ArgumentNullException.ThrowIfNull(overlay);
 
-            if (Original.Attributes.IsDirectory())
-            {
-                throw new InvalidOperationException(
-                    "Cannot read audio tags for a directory.");
-            }
-
-            if (_pathTagReader is null)
-                return;
-
-            var overlay = _pathTagReader(Original.FullPath);
             Original.AudioTagOverlay = overlay.Clone();
             Preview.AudioTagOverlay = Original.AudioTagOverlay.Clone();
         }
@@ -150,9 +129,9 @@ namespace Mfr.Models
         /// <summary>
         /// Clears overlays and resets load state after commit so subsequent previews reload from disk.
         /// </summary>
-        internal void ClearAudioTagsCache()
+        internal void ClearEmbeddedTagsCache()
         {
-            _audioTagsLoadAttempted = false;
+            EmbeddedTagsLoadAttempted = false;
             Original.AudioTagOverlay = new AudioTagOverlay();
             Preview.AudioTagOverlay = new AudioTagOverlay();
             StripAllEmbeddedTagsOnCommit = false;

@@ -11,7 +11,7 @@ namespace Mfr.Tests.Models.Filters.Audio
     public sealed class EmbeddedTagRemoverFilterTests
     {
         /// <summary>
-        /// Verifies preview clears the overlay and sets the commit strip flag after tag hydration.
+        /// Verifies preview clears the overlay and sets the commit strip flag.
         /// </summary>
         [Fact]
         public void Apply_ClearsOverlay_And_SetsStripFlag_WhenReaderPresent()
@@ -28,7 +28,8 @@ namespace Mfr.Tests.Models.Filters.Audio
                 AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PreservedForTest")
             };
 
-            var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
+            var item = new RenameItem(meta);
+            item.MarkEmbeddedTagsLoadAttempted();
             var filter = new EmbeddedTagRemoverFilter();
             filter.Setup();
             filter.Apply(item);
@@ -56,7 +57,8 @@ namespace Mfr.Tests.Models.Filters.Audio
                 AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Start")
             };
 
-            var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
+            var item = new RenameItem(meta);
+            item.MarkEmbeddedTagsLoadAttempted();
             var formatter = new FormatterFilter(
                 Target: new AudioFieldTarget(AudioOverlayField.Title),
                 Options: new FormatterOptions("Formatted"));
@@ -90,7 +92,8 @@ namespace Mfr.Tests.Models.Filters.Audio
                 AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Disk")
             };
 
-            var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
+            var item = new RenameItem(meta);
+            item.MarkEmbeddedTagsLoadAttempted();
             var setter = new AudioTagSetterFilter(new AudioTagSetterOptions(
                 Title: new AudioTagStringFieldOptions(Text: "FromSetter")));
             var remover = new EmbeddedTagRemoverFilter();

@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Tests.Models.Filters;
@@ -7,20 +8,21 @@ namespace Mfr.Tests.Models
     public sealed class RenameItemAudioTagsTests
     {
         /// <summary>
-        /// Verifies <see cref="FilterTestHelpers.AudioTagReaderSnapshot"/> drives hydration like a mocked disk read, copying current <see cref="FileMeta.AudioTagOverlay"/> onto both snapshots.
+        /// Verifies the test snapshot reader copies current <see cref="FileMeta.AudioTagOverlay"/> onto both snapshots when embedded tags are loaded.
         /// </summary>
         [Fact]
-        public void EnsureAudioTagsLoaded_AudioTagReaderSnapshot_MirrorsMetaTagsOntoSnapshots()
+        public void EnsureEmbeddedTagsLoaded_SnapshotReader_MirrorsMetaTagsOntoSnapshots()
         {
             var meta = _CreateMetaWithAlbum(album: "SnapshotAlbum");
-            var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
+            FilterTestHelpers.UseEmbeddedTagReaderSnapshot(meta);
+            var item = new RenameItem(meta);
 
             var mutated = AudioTagSemanticSurface.FromBlocks(item.Preview.AudioTagOverlay)
                 with
             { Album = "PreviewOnlyMutated" };
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(item.Preview.AudioTagOverlay, mutated, embeddedTagSourcePath: null);
 
-            item.EnsureAudioTagsLoaded();
+            RenameItemEmbeddedTags.EnsureLoaded(item);
 
             Assert.Equal("SnapshotAlbum", item.Original.AudioTagOverlay.Semantic().Album);
             Assert.Equal("SnapshotAlbum", item.Preview.AudioTagOverlay.Semantic().Album);

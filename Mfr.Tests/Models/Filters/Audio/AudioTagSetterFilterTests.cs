@@ -35,7 +35,9 @@ namespace Mfr.Tests.Models.Filters.Audio
 
             configureOriginal?.Invoke(meta);
             FilterTestHelpers.EnsureSyntheticAudioOverlayWhenTagless(meta);
-            return new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
+            var item = new RenameItem(meta);
+            item.MarkEmbeddedTagsLoadAttempted();
+            return item;
         }
 
         private static RenameItem _CreateDirectoryItem()

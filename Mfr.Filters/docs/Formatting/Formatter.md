@@ -33,7 +33,7 @@ Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`A
 
 **Contrast:** file-name tokens use **`Original`** paths; audio tokens deliberately use **preview** so later filters can mutate tags before a formatter runs.
 
-Unit tests typically construct **`RenameItem`** with no tag reader (**`audioTagReader`** omitted) so first hydration does not touch pre-seeded **`AudioTagOverlay`**; tests that want to mimic a disk read can pass a closure or **`FilterTestHelpers.AudioTagReaderSnapshot(meta)`**.
+Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateRenameItem`**, which marks embedded tags as already loaded so **`RenameItemEmbeddedTags.EnsureLoaded`** does not touch pre-seeded **`AudioTagOverlay`**; tests that mimic a disk read call **`FilterTestHelpers.UseEmbeddedTagReaderSnapshot(meta)`** before **`RenameItemEmbeddedTags.EnsureLoaded`**.
 
 | Token | Output |
 |--------|--------|
@@ -57,7 +57,7 @@ Unit tests typically construct **`RenameItem`** with no tag reader (**`audioTagR
 
 **Rows without readable tag data (real `RenameList` rows):** Matches the disk-read rule above: **directory rows** cannot load tags (`InvalidOperationException`), and **file rows** where TagLib cannot open or read embedded metadata (typical plain text or other non-tagged files) surface **`RenameStatus.PreviewError`** with the exception as **`Cause`**. There is no “empty token” fallback on that path.
 
-**Unit tests:** Constructing **`RenameItem`** without an **`audioTagReader`** skips **`AudioTagPersistence.Read`**; the overlay stays at its initial state (usually the default empty overlay), so **`<audio-*>`** tokens expand to **empty** strings without touching disk.
+**Unit tests:** **`FilterTestHelpers.CreateRenameItem`** marks embedded tags as already loaded, so **`RenameItemEmbeddedTags.EnsureLoaded`** is skipped and the overlay stays at its initial state (usually the default empty overlay), meaning **`<audio-*>`** tokens expand to **empty** strings without touching disk.
 
 **Not implemented yet:** stream-only properties often shown in specs as `<audio-duration:…>`, `<audio-bitrate:…>`, `<audio-channels:…>`, `<audio-bpm>`—they require data beyond **`AudioTagOverlay`**.
 

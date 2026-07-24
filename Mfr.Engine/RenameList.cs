@@ -215,7 +215,7 @@ namespace Mfr.Engine
 
             foreach (var item in _renameItems)
             {
-                item.ClearAudioTagsCache();
+                item.ClearEmbeddedTagsCache();
             }
 
             var commitOkCount = results.Count(item => item.Status == RenameStatus.CommitOk);
@@ -318,7 +318,7 @@ namespace Mfr.Engine
                     lastAccessTime: File.GetLastAccessTime(fullPath),
                     fileSize: isDirectory ? 0 : new FileInfo(fullPath).Length);
 
-                var renameItem = new RenameItem(originalFileMeta, AudioTagPersistence.Read);
+                var renameItem = new RenameItem(originalFileMeta);
                 _renameItems.Add(renameItem);
                 addedCount++;
             }
