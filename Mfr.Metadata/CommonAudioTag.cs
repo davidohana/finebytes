@@ -60,7 +60,7 @@ namespace Mfr.Metadata
             var asf = _TryBuildAsfTag(overlay.Asf);
             var id3v1 = overlay.Id3v1;
 
-            var title = _CoalesceUnicode(
+            var title = _CoalesceString(
                 _TagTitle(id3v2),
                 _Id3v1String(id3v1?.Title),
                 _TagTitle(xiph),
@@ -69,7 +69,7 @@ namespace Mfr.Metadata
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
                 _AsfUnicode(asf, "WM/Title"),
                 _TagTitle(asf));
-            var album = _CoalesceUnicode(
+            var album = _CoalesceString(
                 _TagAlbum(id3v2),
                 _Id3v1String(id3v1?.Album),
                 _TagAlbum(xiph),
@@ -101,7 +101,7 @@ namespace Mfr.Metadata
                 riff?.Composers,
                 _AppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom),
                 _AsfJoinedList(asf, "WM/Composer"));
-            var genre = _CoalesceUnicode(
+            var genre = _CoalesceString(
                 _TagFirstGenre(id3v2),
                 _Id3v1Genre(id3v1),
                 _TagFirstGenre(xiph),
@@ -109,7 +109,7 @@ namespace Mfr.Metadata
                 _TagFirstGenre(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
                 _AsfUnicode(asf, "WM/Genre"));
-            var comment = _CoalesceUnicode(
+            var comment = _CoalesceString(
                 _TagComment(id3v2),
                 _Id3v1String(id3v1?.Comment),
                 _TagComment(xiph),
@@ -117,7 +117,7 @@ namespace Mfr.Metadata
                 _TagComment(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
                 _AsfUnicode(asf, "WM/Description"));
-            var lyrics = _CoalesceUnicode(
+            var lyrics = _CoalesceString(
                 _TagLyrics(id3v2),
                 null,
                 _TagLyrics(xiph),
@@ -125,7 +125,7 @@ namespace Mfr.Metadata
                 _TagLyrics(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
                 _AsfUnicode(asf, "WM/Lyrics"));
-            var copyright = _CoalesceUnicode(
+            var copyright = _CoalesceString(
                 _TagCopyright(id3v2),
                 null,
                 _TagCopyright(xiph),
@@ -133,7 +133,7 @@ namespace Mfr.Metadata
                 _TagCopyright(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
                 _AsfUnicode(asf, "WM/ProviderCopyright"));
-            var grouping = _CoalesceUnicode(
+            var grouping = _CoalesceString(
                 _TagGrouping(id3v2),
                 null,
                 _TagGrouping(xiph),
@@ -470,7 +470,7 @@ namespace Mfr.Metadata
             return _NullIfWhitespace(name);
         }
 
-        private static string? _CoalesceUnicode(params string?[] candidates)
+        private static string? _CoalesceString(params string?[] candidates)
         {
             foreach (var c in candidates)
             {
