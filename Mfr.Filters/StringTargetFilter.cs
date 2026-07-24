@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Mfr.Metadata;
-using Mfr.Models.Tags;
 // Namespace stays Mfr.Models for JSON preset compatibility; this file lives under Mfr.Filters so string-target filters
 // can call Mfr.Metadata without a Models↔Metadata cycle.
 #pragma warning disable IDE0130

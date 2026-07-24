@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Mfr.Models.Tags
 {
     /// <summary>
-    /// Which embedded audio-tag overlay field a <see cref="AudioOverlayFieldTarget"/> addresses on <see cref="FileMeta.AudioTagOverlay"/>.
+    /// Which embedded audio-tag overlay field a <see cref="Mfr.Models.AudioOverlayFieldTarget"/> addresses on <see cref="FileMeta.AudioTagOverlay"/>.
     /// </summary>
     public enum AudioOverlayField
     {

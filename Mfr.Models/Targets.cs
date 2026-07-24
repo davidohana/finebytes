@@ -4,7 +4,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Models
 {
     /// <summary>
-    /// Represents a polymorphic filter target (file-name slices, paths, ancestor segments); JSON uses property <c>targetType</c> as the discriminator.
+    /// Represents a polymorphic filter target (file-name slices, paths, ancestor segments, audio overlay fields); JSON uses property <c>targetType</c> as the discriminator.
     /// </summary>
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "targetType")]
     [JsonDerivedType(typeof(FilePrefixTarget), "FilePrefix")]
@@ -57,4 +57,10 @@ namespace Mfr.Models
     /// Writes assign the containing-folder path only; the preview prefix and extension stay unchanged.
     /// </remarks>
     public sealed record ParentDirectoryTarget : FilterTarget;
+
+    /// <summary>
+    /// Targets one field on <see cref="FileMeta.AudioTagOverlay"/>; string filters read/write text or decimal-digit numeric strings.
+    /// </summary>
+    /// <param name="Field">Which overlay property is addressed.</param>
+    public sealed record AudioOverlayFieldTarget(AudioOverlayField Field) : FilterTarget;
 }
