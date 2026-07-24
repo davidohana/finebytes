@@ -475,7 +475,7 @@ namespace Mfr.Metadata
             if (c.Id3v2 is null)
                 return;
 
-            var id3 = new TagLib.Id3v2.Tag(_ToByteVector(c.Id3v2.CanonicalTagBytes));
+            var id3 = TagBlockCodec.TryParseId3v2(c.Id3v2) ?? new TagLib.Id3v2.Tag();
             _WriteCommonAudioTagToTag(id3, c.ToCommonAudioTag());
             c.Id3v2 = _SnapshotId3v2Data(id3);
         }
@@ -485,21 +485,8 @@ namespace Mfr.Metadata
             if (c.Xiph is null)
                 return;
 
-            XiphComment xc;
-            try
-            {
-                xc = new XiphComment(_ToByteVector(c.Xiph.CanonicalTagBytes));
-            }
-            catch (CorruptFileException)
-            {
-                xc = new XiphComment();
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                // Same as FromOverlay projection: bogus test doubles / truncated packets must not abort merge.
-                xc = new XiphComment();
-            }
-
+            // Same as FromOverlay projection: bogus test doubles / truncated packets must not abort merge.
+            var xc = TagBlockCodec.TryParseXiph(c.Xiph) ?? new XiphComment();
             _WriteCommonAudioTagToTag(xc, c.ToCommonAudioTag());
             var rendered = xc.Render(addFramingBit: false);
             c.Xiph = _SerializedBlob(rendered.Data);
@@ -510,20 +497,7 @@ namespace Mfr.Metadata
             if (c.Ape is null)
                 return;
 
-            TagLib.Ape.Tag ape;
-            try
-            {
-                ape = new TagLib.Ape.Tag(_ToByteVector(c.Ape.CanonicalTagBytes));
-            }
-            catch (CorruptFileException)
-            {
-                ape = new TagLib.Ape.Tag();
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                ape = new TagLib.Ape.Tag();
-            }
-
+            var ape = TagBlockCodec.TryParseApe(c.Ape) ?? new TagLib.Ape.Tag();
             _WriteCommonAudioTagToTag(ape, c.ToCommonAudioTag());
             c.Ape = _SerializedBlob(ape.Render().Data);
         }
@@ -533,20 +507,7 @@ namespace Mfr.Metadata
             if (c.RiffInfo is null)
                 return;
 
-            InfoTag info;
-            try
-            {
-                info = new InfoTag(_ToByteVector(c.RiffInfo.CanonicalTagBytes));
-            }
-            catch (CorruptFileException)
-            {
-                info = new InfoTag();
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                info = new InfoTag();
-            }
-
+            var info = TagBlockCodec.TryParseRiffInfo(c.RiffInfo) ?? new InfoTag();
             _WriteCommonAudioTagToTag(info, c.ToCommonAudioTag());
             c.RiffInfo = _SerializedBlob(info.Render().Data);
         }
@@ -557,10 +518,7 @@ namespace Mfr.Metadata
                 return;
 
             var common = c.ToCommonAudioTag();
-            var asf = new TagLib.Asf.Tag();
-            foreach (var row in c.Asf.Descriptors)
-                asf.AddDescriptor(new TagLib.Asf.ContentDescriptor(row.Name, row.Value));
-
+            var asf = TagBlockCodec.BuildAsfTag(c.Asf);
             _WriteCommonAudioTagToTag(asf, common);
             if (!string.IsNullOrWhiteSpace(common.Title))
                 asf.SetDescriptorString(common.Title.Trim(), "WM/Title");
@@ -713,7 +671,10 @@ namespace Mfr.Metadata
             if (file.GetTag(TagTypes.Xiph, true) is not XiphComment live)
                 return;
 
-            var parsed = new XiphComment(_ToByteVector(overlay.Xiph.CanonicalTagBytes));
+            var parsed = TagBlockCodec.TryParseXiph(overlay.Xiph);
+            if (parsed is null)
+                return;
+
             live.Clear();
 
             foreach (var key in parsed)
@@ -737,7 +698,10 @@ namespace Mfr.Metadata
             if (file.GetTag(TagTypes.Ape, true) is not TagLib.Ape.Tag live)
                 return;
 
-            var parsed = new TagLib.Ape.Tag(_ToByteVector(overlay.Ape.CanonicalTagBytes));
+            var parsed = TagBlockCodec.TryParseApe(overlay.Ape);
+            if (parsed is null)
+                return;
+
             live.Clear();
 
             foreach (var key in parsed)
@@ -759,19 +723,9 @@ namespace Mfr.Metadata
             if (file.GetTag(TagTypes.RiffInfo, true) is not InfoTag live)
                 return;
 
-            InfoTag parsed;
-            try
-            {
-                parsed = new InfoTag(_ToByteVector(overlay.RiffInfo.CanonicalTagBytes));
-            }
-            catch (CorruptFileException)
-            {
+            var parsed = TagBlockCodec.TryParseRiffInfo(overlay.RiffInfo);
+            if (parsed is null)
                 return;
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                return;
-            }
 
             live.Clear();
             _WriteCommonAudioTagToTag(live, CommonAudioTag.FromCombinedTag(parsed));

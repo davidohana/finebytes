@@ -2,8 +2,6 @@ using System.Collections.Immutable;
 using Mfr.Models.Tags;
 using Mfr.Utils;
 using TagLib;
-using TagLib.Ogg;
-using TagLib.Riff;
 
 namespace Mfr.Metadata
 {
@@ -54,12 +52,12 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var id3v2 = _TryParseId3v2(overlay.Id3v2);
+            var id3v2 = TagBlockCodec.TryParseId3v2(overlay.Id3v2);
             var id3v1 = overlay.Id3v1;
-            var xiph = _TryParseXiph(overlay.Xiph);
-            var ape = _TryParseApe(overlay.Ape);
-            var riff = _TryParseRiffInfo(overlay.RiffInfo);
-            var asf = _TryBuildAsfTag(overlay.Asf);
+            var xiph = TagBlockCodec.TryParseXiph(overlay.Xiph);
+            var ape = TagBlockCodec.TryParseApe(overlay.Ape);
+            var riff = TagBlockCodec.TryParseRiffInfo(overlay.RiffInfo);
+            var asf = TagBlockCodec.TryBuildAsfTag(overlay.Asf);
 
             var title = Nullables.FirstNonNull(
                 _ReadTagTitle(id3v2),
@@ -275,91 +273,6 @@ namespace Mfr.Metadata
                 return projected;
 
             return string.IsNullOrWhiteSpace(ambient) ? null : ambient.Trim();
-        }
-
-        private static TagLib.Id3v2.Tag? _TryParseId3v2(Id3v2TagData? data)
-        {
-            if (data is null || data.CanonicalTagBytes.IsDefaultOrEmpty)
-                return null;
-
-            try
-            {
-                return new TagLib.Id3v2.Tag(new ByteVector([.. data.CanonicalTagBytes]));
-            }
-            catch (CorruptFileException)
-            {
-                return null;
-            }
-        }
-
-        private static XiphComment? _TryParseXiph(SerializedTagBlob? blob)
-        {
-            if (blob is null || blob.CanonicalTagBytes.IsDefaultOrEmpty)
-                return null;
-
-            try
-            {
-                return new XiphComment(new ByteVector([.. blob.CanonicalTagBytes]));
-            }
-            catch (CorruptFileException)
-            {
-                return null;
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                // TagLib can throw when comment packets are truncated or opaque (test doubles, partial reads).
-                return null;
-            }
-        }
-
-        private static TagLib.Ape.Tag? _TryParseApe(SerializedTagBlob? blob)
-        {
-            if (blob is null || blob.CanonicalTagBytes.IsDefaultOrEmpty)
-                return null;
-
-            try
-            {
-                return new TagLib.Ape.Tag(new ByteVector([.. blob.CanonicalTagBytes]));
-            }
-            catch (CorruptFileException)
-            {
-                return null;
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                return null;
-            }
-        }
-
-        private static InfoTag? _TryParseRiffInfo(SerializedTagBlob? blob)
-        {
-            if (blob is null || blob.CanonicalTagBytes.IsDefaultOrEmpty)
-                return null;
-
-            try
-            {
-                return new InfoTag(new ByteVector([.. blob.CanonicalTagBytes]));
-            }
-            catch (CorruptFileException)
-            {
-                return null;
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                return null;
-            }
-        }
-
-        private static TagLib.Asf.Tag? _TryBuildAsfTag(AsfTagData? data)
-        {
-            if (data is null || data.Descriptors.IsDefaultOrEmpty)
-                return null;
-
-            var asf = new TagLib.Asf.Tag();
-            foreach (var row in data.Descriptors)
-                asf.AddDescriptor(new TagLib.Asf.ContentDescriptor(row.Name, row.Value));
-
-            return asf;
         }
 
         private static string? _ReadTagTitle(Tag? tag)
