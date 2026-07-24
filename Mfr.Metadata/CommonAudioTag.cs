@@ -62,126 +62,126 @@ namespace Mfr.Metadata
             var id3v1 = overlay.Id3v1;
 
             var title = Nullables.FirstNonNull(
-                _TagTitle(id3v2),
-                _Id3v1String(id3v1?.Title),
-                _TagTitle(xiph),
-                _TagTitle(ape),
-                _TagTitle(riff),
-                _ApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
-                _AsfUnicode(asf, "WM/Title"),
-                _TagTitle(asf));
+                _ReadTagTitle(id3v2),
+                _ReadId3v1String(id3v1?.Title),
+                _ReadTagTitle(xiph),
+                _ReadTagTitle(ape),
+                _ReadTagTitle(riff),
+                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
+                _ReadAsfString(asf, "WM/Title"),
+                _ReadTagTitle(asf));
             var album = Nullables.FirstNonNull(
-                _TagAlbum(id3v2),
-                _Id3v1String(id3v1?.Album),
-                _TagAlbum(xiph),
-                _TagAlbum(ape),
-                _TagAlbum(riff),
-                _ApplePlainText(overlay.Apple, AppleAtomConstants.AlbumAtom),
-                _AsfUnicode(asf, "WM/AlbumTitle"));
+                _ReadTagAlbum(id3v2),
+                _ReadId3v1String(id3v1?.Album),
+                _ReadTagAlbum(xiph),
+                _ReadTagAlbum(ape),
+                _ReadTagAlbum(riff),
+                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.AlbumAtom),
+                _ReadAsfString(asf, "WM/AlbumTitle"));
             var performers = Nullables.FirstNonNull(
                 _JoinList(id3v2?.Performers),
-                _JoinList(_Id3v1SplitPerformer(id3v1?.Artist)),
+                _JoinList(_SplitId3v1Performer(id3v1?.Artist)),
                 _JoinList(xiph?.Performers),
                 _JoinList(ape?.Performers),
                 _JoinList(riff?.Performers),
-                _JoinList(_AppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom)),
-                _JoinList(_AsfJoinedPerformers(asf)));
+                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom)),
+                _JoinList(_ReadAsfJoinedPerformers(asf)));
             var albumArtists = Nullables.FirstNonNull(
                 _JoinList(id3v2?.AlbumArtists),
                 null,
                 _JoinList(xiph?.AlbumArtists),
                 _JoinList(ape?.AlbumArtists),
                 _JoinList(riff?.AlbumArtists),
-                _JoinList(_AppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom)),
-                _JoinList(_AsfJoinedList(asf, "WM/AlbumArtist")));
+                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom)),
+                _JoinList(_ReadAsfJoinedList(asf, "WM/AlbumArtist")));
             var composers = Nullables.FirstNonNull(
                 _JoinList(id3v2?.Composers),
                 null,
                 _JoinList(xiph?.Composers),
                 _JoinList(ape?.Composers),
                 _JoinList(riff?.Composers),
-                _JoinList(_AppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom)),
-                _JoinList(_AsfJoinedList(asf, "WM/Composer")));
+                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom)),
+                _JoinList(_ReadAsfJoinedList(asf, "WM/Composer")));
             var genre = Nullables.FirstNonNull(
-                _TagFirstGenre(id3v2),
-                _Id3v1Genre(id3v1),
-                _TagFirstGenre(xiph),
-                _TagFirstGenre(ape),
-                _TagFirstGenre(riff),
-                _ApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
-                _AsfUnicode(asf, "WM/Genre"));
+                _ReadTagFirstGenre(id3v2),
+                _ReadId3v1Genre(id3v1),
+                _ReadTagFirstGenre(xiph),
+                _ReadTagFirstGenre(ape),
+                _ReadTagFirstGenre(riff),
+                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
+                _ReadAsfString(asf, "WM/Genre"));
             var comment = Nullables.FirstNonNull(
-                _TagComment(id3v2),
-                _Id3v1String(id3v1?.Comment),
-                _TagComment(xiph),
-                _TagComment(ape),
-                _TagComment(riff),
-                _ApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
-                _AsfUnicode(asf, "WM/Description"));
+                _ReadTagComment(id3v2),
+                _ReadId3v1String(id3v1?.Comment),
+                _ReadTagComment(xiph),
+                _ReadTagComment(ape),
+                _ReadTagComment(riff),
+                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
+                _ReadAsfString(asf, "WM/Description"));
             var lyrics = Nullables.FirstNonNull(
-                _TagLyrics(id3v2),
+                _ReadTagLyrics(id3v2),
                 null,
-                _TagLyrics(xiph),
-                _TagLyrics(ape),
-                _TagLyrics(riff),
-                _ApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
-                _AsfUnicode(asf, "WM/Lyrics"));
+                _ReadTagLyrics(xiph),
+                _ReadTagLyrics(ape),
+                _ReadTagLyrics(riff),
+                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
+                _ReadAsfString(asf, "WM/Lyrics"));
             var copyright = Nullables.FirstNonNull(
-                _TagCopyright(id3v2),
+                _ReadTagCopyright(id3v2),
                 null,
-                _TagCopyright(xiph),
-                _TagCopyright(ape),
-                _TagCopyright(riff),
-                _ApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
-                _AsfUnicode(asf, "WM/ProviderCopyright"));
+                _ReadTagCopyright(xiph),
+                _ReadTagCopyright(ape),
+                _ReadTagCopyright(riff),
+                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
+                _ReadAsfString(asf, "WM/ProviderCopyright"));
             var grouping = Nullables.FirstNonNull(
-                _TagGrouping(id3v2),
+                _ReadTagGrouping(id3v2),
                 null,
-                _TagGrouping(xiph),
-                _TagGrouping(ape),
-                _TagGrouping(riff),
-                _ApplePlainText(overlay.Apple, AppleAtomConstants.GroupingAtom),
-                _AsfUnicode(asf, "WM/ContentGroupDescription"));
+                _ReadTagGrouping(xiph),
+                _ReadTagGrouping(ape),
+                _ReadTagGrouping(riff),
+                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.GroupingAtom),
+                _ReadAsfString(asf, "WM/ContentGroupDescription"));
             var year = Nullables.FirstNonNull(
-                _TagYear(id3v2),
+                _ReadTagYear(id3v2),
                 id3v1?.Year,
-                _TagYear(xiph),
-                _TagYear(ape),
-                _TagYear(riff),
-                _AppleYear(overlay.Apple),
-                _AsfUInt(asf, "WM/Year"));
+                _ReadTagYear(xiph),
+                _ReadTagYear(ape),
+                _ReadTagYear(riff),
+                _ReadAppleYear(overlay.Apple),
+                _ReadAsfUInt(asf, "WM/Year"));
             var track = Nullables.FirstNonNull(
-                _TagTrack(id3v2),
+                _ReadTagTrack(id3v2),
                 id3v1?.Track is null ? null : id3v1.Track,
-                _TagTrack(xiph),
-                _TagTrack(ape),
-                _TagTrack(riff),
-                _AppleTrack(overlay.Apple),
-                _AsfUInt(asf, "WM/TrackNumber"));
+                _ReadTagTrack(xiph),
+                _ReadTagTrack(ape),
+                _ReadTagTrack(riff),
+                _ReadAppleTrack(overlay.Apple),
+                _ReadAsfUInt(asf, "WM/TrackNumber"));
             var trackCount = Nullables.FirstNonNull(
-                _TagTrackCount(id3v2),
+                _ReadTagTrackCount(id3v2),
                 null,
-                _TagTrackCount(xiph),
-                _TagTrackCount(ape),
-                _TagTrackCount(riff),
-                _AppleTrackCount(overlay.Apple),
-                _AsfUInt(asf, "WM/TrackTotal"));
+                _ReadTagTrackCount(xiph),
+                _ReadTagTrackCount(ape),
+                _ReadTagTrackCount(riff),
+                _ReadAppleTrackCount(overlay.Apple),
+                _ReadAsfUInt(asf, "WM/TrackTotal"));
             var disc = Nullables.FirstNonNull(
-                _TagDisc(id3v2),
+                _ReadTagDisc(id3v2),
                 null,
-                _TagDisc(xiph),
-                _TagDisc(ape),
-                _TagDisc(riff),
-                _AppleDisc(overlay.Apple),
-                _AsfUInt(asf, "WM/PartOfSet"));
+                _ReadTagDisc(xiph),
+                _ReadTagDisc(ape),
+                _ReadTagDisc(riff),
+                _ReadAppleDisc(overlay.Apple),
+                _ReadAsfUInt(asf, "WM/PartOfSet"));
             var discCount = Nullables.FirstNonNull(
-                _TagDiscCount(id3v2),
+                _ReadTagDiscCount(id3v2),
                 null,
-                _TagDiscCount(xiph),
-                _TagDiscCount(ape),
-                _TagDiscCount(riff),
-                _AppleDiscCount(overlay.Apple),
-                _AsfUInt(asf, "WM/TotalDiscs"));
+                _ReadTagDiscCount(xiph),
+                _ReadTagDiscCount(ape),
+                _ReadTagDiscCount(riff),
+                _ReadAppleDiscCount(overlay.Apple),
+                _ReadAsfUInt(asf, "WM/TotalDiscs"));
 
             return new CommonAudioTag(
                 Title: title,
@@ -370,37 +370,37 @@ namespace Mfr.Metadata
             return asf;
         }
 
-        private static string? _TagTitle(Tag? tag)
+        private static string? _ReadTagTitle(Tag? tag)
         {
             return tag is null ? null : _NullIfWhitespace(tag.Title);
         }
 
-        private static string? _TagAlbum(Tag? tag)
+        private static string? _ReadTagAlbum(Tag? tag)
         {
             return tag is null ? null : _NullIfWhitespace(tag.Album);
         }
 
-        private static string? _TagComment(Tag? tag)
+        private static string? _ReadTagComment(Tag? tag)
         {
             return tag is null ? null : _NullIfWhitespace(tag.Comment);
         }
 
-        private static string? _TagLyrics(Tag? tag)
+        private static string? _ReadTagLyrics(Tag? tag)
         {
             return tag is null ? null : _NullIfWhitespace(tag.Lyrics);
         }
 
-        private static string? _TagCopyright(Tag? tag)
+        private static string? _ReadTagCopyright(Tag? tag)
         {
             return tag is null ? null : _NullIfWhitespace(tag.Copyright);
         }
 
-        private static string? _TagGrouping(Tag? tag)
+        private static string? _ReadTagGrouping(Tag? tag)
         {
             return tag is null ? null : _NullIfWhitespace(tag.Grouping);
         }
 
-        private static string? _TagFirstGenre(Tag? tag)
+        private static string? _ReadTagFirstGenre(Tag? tag)
         {
             if (tag is null)
                 return null;
@@ -408,7 +408,7 @@ namespace Mfr.Metadata
             return _NullIfWhitespace(tag.FirstGenre);
         }
 
-        private static uint? _TagYear(Tag? tag)
+        private static uint? _ReadTagYear(Tag? tag)
         {
             if (tag is null || tag.Year == 0)
                 return null;
@@ -416,7 +416,7 @@ namespace Mfr.Metadata
             return tag.Year;
         }
 
-        private static uint? _TagTrack(Tag? tag)
+        private static uint? _ReadTagTrack(Tag? tag)
         {
             if (tag is null || tag.Track == 0)
                 return null;
@@ -424,7 +424,7 @@ namespace Mfr.Metadata
             return tag.Track;
         }
 
-        private static uint? _TagTrackCount(Tag? tag)
+        private static uint? _ReadTagTrackCount(Tag? tag)
         {
             if (tag is null || tag.TrackCount == 0)
                 return null;
@@ -432,7 +432,7 @@ namespace Mfr.Metadata
             return tag.TrackCount;
         }
 
-        private static uint? _TagDisc(Tag? tag)
+        private static uint? _ReadTagDisc(Tag? tag)
         {
             if (tag is null || tag.Disc == 0)
                 return null;
@@ -440,7 +440,7 @@ namespace Mfr.Metadata
             return tag.Disc;
         }
 
-        private static uint? _TagDiscCount(Tag? tag)
+        private static uint? _ReadTagDiscCount(Tag? tag)
         {
             if (tag is null || tag.DiscCount == 0)
                 return null;
@@ -448,12 +448,12 @@ namespace Mfr.Metadata
             return tag.DiscCount;
         }
 
-        private static string? _Id3v1String(string? text)
+        private static string? _ReadId3v1String(string? text)
         {
             return _NullIfWhitespace(text);
         }
 
-        private static string[]? _Id3v1SplitPerformer(string? artist)
+        private static string[]? _SplitId3v1Performer(string? artist)
         {
             var trimmed = _NullIfWhitespace(artist);
             if (trimmed is null)
@@ -462,7 +462,7 @@ namespace Mfr.Metadata
             return [trimmed];
         }
 
-        private static string? _Id3v1Genre(Id3v1TagData? data)
+        private static string? _ReadId3v1Genre(Id3v1TagData? data)
         {
             if (data is null)
                 return null;
@@ -487,7 +487,7 @@ namespace Mfr.Metadata
             return string.Join("; ", filtered);
         }
 
-        private static string? _AsfUnicode(TagLib.Asf.Tag? asfTag, string descriptorName)
+        private static string? _ReadAsfString(TagLib.Asf.Tag? asfTag, string descriptorName)
         {
             if (asfTag is null)
                 return null;
@@ -503,45 +503,45 @@ namespace Mfr.Metadata
             return null;
         }
 
-        private static string[]? _AsfJoinedList(TagLib.Asf.Tag? tag, string descriptorName)
+        private static string[]? _ReadAsfJoinedList(TagLib.Asf.Tag? tag, string descriptorName)
         {
-            var text = _AsfUnicode(tag, descriptorName);
+            var text = _ReadAsfString(tag, descriptorName);
             if (text is null)
                 return null;
 
             return [text];
         }
 
-        private static string[]? _AsfJoinedPerformers(TagLib.Asf.Tag? tag)
+        private static string[]? _ReadAsfJoinedPerformers(TagLib.Asf.Tag? tag)
         {
-            var author = _AsfUnicode(tag, "WM/Author");
+            var author = _ReadAsfString(tag, "WM/Author");
             if (author is not null)
                 return [author];
 
-            return _AsfJoinedList(tag, "WM/AlbumArtist");
+            return _ReadAsfJoinedList(tag, "WM/AlbumArtist");
         }
 
-        private static uint? _AsfUInt(TagLib.Asf.Tag? tag, string descriptorName)
+        private static uint? _ReadAsfUInt(TagLib.Asf.Tag? tag, string descriptorName)
         {
-            var text = _AsfUnicode(tag, descriptorName);
+            var text = _ReadAsfString(tag, descriptorName);
             if (text is null)
                 return null;
 
             return uint.TryParse(text.Trim(), out var u) ? u : null;
         }
 
-        private static string? _ApplePlainText(AppleTagData? apple, ReadOnlySpan<byte> atomType)
+        private static string? _ReadApplePlainText(AppleTagData? apple, ReadOnlySpan<byte> atomType)
         {
-            var values = _AppleAtomValues(apple, atomType);
+            var values = _ReadAppleAtomValues(apple, atomType);
             if (values.IsDefaultOrEmpty)
                 return null;
 
             return _NullIfWhitespace(values[0]);
         }
 
-        private static string[]? _AppleJoinedList(AppleTagData? apple, ReadOnlySpan<byte> atomType)
+        private static string[]? _ReadAppleJoinedList(AppleTagData? apple, ReadOnlySpan<byte> atomType)
         {
-            var values = _AppleAtomValues(apple, atomType);
+            var values = _ReadAppleAtomValues(apple, atomType);
             if (values.IsDefaultOrEmpty)
                 return null;
 
@@ -556,7 +556,7 @@ namespace Mfr.Metadata
             return filtered.Count == 0 ? null : [.. filtered];
         }
 
-        private static ImmutableArray<string> _AppleAtomValues(AppleTagData? apple, ReadOnlySpan<byte> atomType)
+        private static ImmutableArray<string> _ReadAppleAtomValues(AppleTagData? apple, ReadOnlySpan<byte> atomType)
         {
             if (apple is null || apple.Atoms.IsDefaultOrEmpty || atomType.Length != 4)
                 return default;
@@ -572,34 +572,34 @@ namespace Mfr.Metadata
             return default;
         }
 
-        private static uint? _AppleYear(AppleTagData? apple)
+        private static uint? _ReadAppleYear(AppleTagData? apple)
         {
-            var day = _ApplePlainText(apple, AppleAtomConstants.DayAtom);
+            var day = _ReadApplePlainText(apple, AppleAtomConstants.DayAtom);
             return day is not null && uint.TryParse(day.Trim(), out var y) ? y : null;
         }
 
         /// <remarks>
         /// MP4 track/disc atoms are binary; omit Apple when TagLib-derived numbers are unavailable from text atoms alone.
         /// </remarks>
-        private static uint? _AppleTrack(AppleTagData? apple)
+        private static uint? _ReadAppleTrack(AppleTagData? apple)
         {
             _ = apple;
             return null;
         }
 
-        private static uint? _AppleTrackCount(AppleTagData? apple)
+        private static uint? _ReadAppleTrackCount(AppleTagData? apple)
         {
             _ = apple;
             return null;
         }
 
-        private static uint? _AppleDisc(AppleTagData? apple)
+        private static uint? _ReadAppleDisc(AppleTagData? apple)
         {
             _ = apple;
             return null;
         }
 
-        private static uint? _AppleDiscCount(AppleTagData? apple)
+        private static uint? _ReadAppleDiscCount(AppleTagData? apple)
         {
             _ = apple;
             return null;
