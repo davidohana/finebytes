@@ -1,6 +1,5 @@
 using Mfr.Metadata;
 using Mfr.Models;
-using Mfr.Models.Tags;
 using Mfr.Utils;
 
 namespace Mfr.Filters
@@ -10,11 +9,6 @@ namespace Mfr.Filters
     /// </summary>
     public static class RenameItemEmbeddedTags
     {
-        /// <summary>
-        /// Maps an absolute path to a detached embedded-tag overlay; defaults to <see cref="AudioTagPersistence.Read"/>.
-        /// </summary>
-        internal static Func<string, AudioTagOverlay> TagReader { get; set; } = AudioTagPersistence.Read;
-
         /// <summary>
         /// Ensures <see cref="RenameItem.Original"/> and <see cref="RenameItem.Preview"/> carry embedded tags read from disk.
         /// </summary>
@@ -35,7 +29,7 @@ namespace Mfr.Filters
                     "Cannot read audio tags for a directory.");
             }
 
-            var overlay = TagReader(item.Original.FullPath);
+            var overlay = AudioTagPersistence.Read(item.Original.FullPath);
             item.SetEmbeddedTagOverlays(overlay);
         }
     }

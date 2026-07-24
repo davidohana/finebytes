@@ -2,20 +2,44 @@ using Mfr.Filters;
 using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Tests.TestSupport;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Models
 {
-    public sealed class RenameItemAudioTagsTests
+    public sealed class RenameItemAudioTagsTests : IDisposable
     {
+        private readonly string _tempRoot;
+
+        public RenameItemAudioTagsTests()
+        {
+            _tempRoot = Directory.GetCurrentDirectory().CombinePath(
+                "mfr_renameitem_audiotags_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempRoot);
+        }
+
+        public void Dispose()
+        {
+            if (Directory.Exists(_tempRoot))
+                Directory.Delete(_tempRoot, recursive: true);
+        }
+
         /// <summary>
-        /// Verifies the test snapshot reader copies current <see cref="FileMeta.AudioTagOverlay"/> onto both snapshots when embedded tags are loaded.
+        /// Verifies <see cref="RenameItemEmbeddedTags.EnsureLoaded"/> reads disk tags onto both snapshots.
         /// </summary>
         [Fact]
-        public void EnsureEmbeddedTagsLoaded_SnapshotReader_MirrorsMetaTagsOntoSnapshots()
+        public void EnsureEmbeddedTagsLoaded_ReadsFromDisk_MirrorsOntoBothSnapshots()
         {
-            var meta = _CreateMetaWithAlbum(album: "SnapshotAlbum");
-            using var readerScope = EmbeddedTagReaderScope.ForMetaSnapshot(meta);
-            var item = new RenameItem(meta);
+            var path = Path.Combine(_tempRoot, "tagged.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "DiskTitle", album: "SnapshotAlbum");
+
+            var directory = Path.GetDirectoryName(path)!;
+            var item = new RenameItem(new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: directory,
+                prefix: Path.GetFileNameWithoutExtension(path),
+                extension: Path.GetExtension(path),
+                renameListFolderSiblingCount: 1));
 
             var mutated = AudioTagSemanticSurface.FromBlocks(item.Preview.AudioTagOverlay)
                 with
