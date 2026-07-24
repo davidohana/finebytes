@@ -150,7 +150,7 @@ namespace Mfr.Tests.Core
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(
                 pv,
-                AudioTagSemanticSurface.FromBlocks(pv) with { Title = "Next" },
+                CommonAudioTag.FromBlocks(pv) with { Title = "Next" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
@@ -176,7 +176,7 @@ namespace Mfr.Tests.Core
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(
                 pv,
-                AudioTagSemanticSurface.FromBlocks(pv) with { Year = 2001 },
+                CommonAudioTag.FromBlocks(pv) with { Year = 2001 },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
@@ -198,7 +198,7 @@ namespace Mfr.Tests.Core
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(
                 pv,
-                AudioTagSemanticSurface.FromBlocks(pv) with { Lyrics = "a\nb" },
+                CommonAudioTag.FromBlocks(pv) with { Lyrics = "a\nb" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
@@ -245,7 +245,7 @@ namespace Mfr.Tests.Core
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(
                 pv,
-                AudioTagSemanticSurface.FromBlocks(pv) with { Genre = "Rock" },
+                CommonAudioTag.FromBlocks(pv) with { Genre = "Rock" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
@@ -268,7 +268,7 @@ namespace Mfr.Tests.Core
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(
                 pv,
-                AudioTagSemanticSurface.FromBlocks(pv) with { Genre = "Rock" },
+                CommonAudioTag.FromBlocks(pv) with { Genre = "Rock" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);

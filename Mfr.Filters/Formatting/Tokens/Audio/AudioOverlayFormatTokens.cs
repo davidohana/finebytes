@@ -19,7 +19,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
             return item =>
             {
                 item.EnsureEmbeddedTagsLoaded();
-                var semantic = AudioTagSemanticSurface.FromBlocks(item.Preview.AudioTagOverlay);
+                var semantic = CommonAudioTag.FromBlocks(item.Preview.AudioTagOverlay);
                 return AudioOverlaySemanticFieldStrings.Format(semantic, field);
             };
         }

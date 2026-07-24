@@ -110,8 +110,8 @@ namespace Mfr.Engine
             if (original.Equals(preview))
                 return;
 
-            var originalSemantic = AudioTagSemanticSurface.FromBlocks(original);
-            var previewSemantic = AudioTagSemanticSurface.FromBlocks(preview);
+            var originalSemantic = CommonAudioTag.FromBlocks(original);
+            var previewSemantic = CommonAudioTag.FromBlocks(preview);
 
             _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Title", originalSemantic.Title, previewSemantic.Title);
             _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Album", originalSemantic.Album, previewSemantic.Album);

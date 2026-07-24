@@ -4,11 +4,11 @@ using Mfr.Models.Tags;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Reads and writes <see cref="AudioOverlayField"/> values through the block-derived <see cref="AudioTagSemanticSurface"/> layer.
+    /// Reads and writes <see cref="AudioOverlayField"/> values through the block-derived <see cref="CommonAudioTag"/> layer.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Embeds use <see cref="AudioTagSemanticSurface.FromBlocks"/> for reads; writes merge an updated surface back into native
+    /// Embeds use <see cref="CommonAudioTag.FromBlocks"/> for reads; writes merge an updated <see cref="CommonAudioTag"/> back into native
     /// blocks via <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/>.
     /// </para>
     /// </remarks>
@@ -24,12 +24,12 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var surface = AudioTagSemanticSurface.FromBlocks(overlay);
-            return AudioOverlaySemanticFieldStrings.Format(surface, field);
+            var common = CommonAudioTag.FromBlocks(overlay);
+            return AudioOverlaySemanticFieldStrings.Format(common, field);
         }
 
         /// <summary>
-        /// Parses <paramref name="fieldString"/> for <paramref name="field"/>, merges the updated semantic surface into
+        /// Parses <paramref name="fieldString"/> for <paramref name="field"/>, merges the updated <see cref="CommonAudioTag"/> into
         /// <paramref name="overlay"/> blocks, and optionally uses <paramref name="embeddedTagSourcePath"/> for Apple atom coalescence.
         /// </summary>
         /// <param name="overlay">Overlay whose blocks are updated in place.</param>
@@ -45,7 +45,7 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var merged = AudioTagSemanticSurface.FromBlocks(overlay);
+            var merged = CommonAudioTag.FromBlocks(overlay);
             var trimmed = fieldString.Trim();
 
             merged = field switch

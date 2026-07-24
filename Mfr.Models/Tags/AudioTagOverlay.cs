@@ -6,7 +6,7 @@ namespace Mfr.Models.Tags
     /// <remarks>
     /// <para>
     /// Semantic values (title, album, performers, …) are obtained by projecting blocks in <c>Mfr.Metadata</c> (for example
-    /// <c>AudioTagSemanticSurface.FromBlocks</c>). There are no mirrored scalar properties on this type.
+    /// <c>CommonAudioTag.FromBlocks</c>). There are no mirrored scalar properties on this type.
     /// </para>
     /// </remarks>
     public sealed class AudioTagOverlay : IEquatable<AudioTagOverlay?>

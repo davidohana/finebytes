@@ -99,7 +99,7 @@ namespace Mfr.Tests.Metadata
             _ApplyTags(path, baselineTitle: "fmt-baseline", baselineAlbum: "fmt-album");
 
             var overlay = AudioTagPersistence.Read(path);
-            var projected = AudioTagSemanticSurface.FromBlocks(overlay);
+            var projected = CommonAudioTag.FromBlocks(overlay);
 
             Assert.Equal("fmt-baseline", projected.Title);
             Assert.Equal("fmt-album", projected.Album);
@@ -129,7 +129,7 @@ namespace Mfr.Tests.Metadata
             var baseline = AudioTagPersistence.Read(path);
 
             var preview = baseline.Clone();
-            var mergedRound = AudioTagSemanticSurface.FromBlocks(preview) with { Title = "round-b" };
+            var mergedRound = CommonAudioTag.FromBlocks(preview) with { Title = "round-b" };
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, mergedRound, path);
 
             AudioTagPersistence.Apply(path, preview);

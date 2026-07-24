@@ -100,7 +100,7 @@ namespace Mfr.Filters.Audio
         {
             item.EnsureEmbeddedTagsLoaded();
             var tags = item.Preview.AudioTagOverlay;
-            var merged = AudioTagSemanticSurface.FromBlocks(tags);
+            var merged = CommonAudioTag.FromBlocks(tags);
 
             if (Options.Performers is not null)
                 merged = _ApplyStringSemantics(
@@ -208,13 +208,13 @@ namespace Mfr.Filters.Audio
             return _ => literal;
         }
 
-        private static AudioTagSemanticSurface _ApplyStringSemantics(
+        private static CommonAudioTag _ApplyStringSemantics(
             RenameItem item,
-            AudioTagSemanticSurface merged,
+            CommonAudioTag merged,
             bool onlyIfEmpty,
             string? currentValue,
             Formatter formatter,
-            Func<AudioTagSemanticSurface, string?, AudioTagSemanticSurface> assignUpdated)
+            Func<CommonAudioTag, string?, CommonAudioTag> assignUpdated)
         {
             var overlayAlreadyHasValue = !string.IsNullOrWhiteSpace(currentValue);
             if (onlyIfEmpty && overlayAlreadyHasValue)
@@ -224,9 +224,9 @@ namespace Mfr.Filters.Audio
             return assignUpdated(merged, expanded);
         }
 
-        private AudioTagSemanticSurface _ApplyYearSemantics(
+        private CommonAudioTag _ApplyYearSemantics(
             RenameItem item,
-            AudioTagSemanticSurface merged,
+            CommonAudioTag merged,
             bool onlyIfEmpty,
             Formatter formatter)
         {
@@ -256,9 +256,9 @@ namespace Mfr.Filters.Audio
             return merged with { Year = yearValue };
         }
 
-        private AudioTagSemanticSurface _ApplyTrackSemantics(
+        private CommonAudioTag _ApplyTrackSemantics(
             RenameItem item,
-            AudioTagSemanticSurface merged,
+            CommonAudioTag merged,
             bool onlyIfEmpty,
             Formatter formatter)
         {

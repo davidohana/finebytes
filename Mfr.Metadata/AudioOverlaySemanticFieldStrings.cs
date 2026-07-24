@@ -4,22 +4,22 @@ using Mfr.Models.Tags;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Filter/preview field strings from <see cref="AudioTagSemanticSurface"/> rows.
+    /// Filter/preview field strings from <see cref="CommonAudioTag"/> rows.
     /// </summary>
     /// <remarks>
     /// Mirrors the string conventions used when reading <see cref="Mfr.Models.AudioFieldTarget"/> previews (empty strings for absent fields);
-    /// callers should normally build surfaces with <see cref="AudioTagSemanticSurface.FromBlocks"/>.
+    /// callers should normally build values with <see cref="CommonAudioTag.FromBlocks"/>.
     /// </remarks>
     public static class AudioOverlaySemanticFieldStrings
     {
         /// <summary>
         /// Formats <paramref name="field"/> using <paramref name="semantic"/> snapshot values (empty strings replace absent semantics).
         /// </summary>
-        /// <param name="semantic">Projected semantics; typically from <see cref="AudioTagSemanticSurface.FromBlocks"/>.</param>
+        /// <param name="semantic">Projected semantics; typically from <see cref="CommonAudioTag.FromBlocks"/>.</param>
         /// <param name="field">Which embedded field to format.</param>
         /// <returns>Filter/preview string for the field (empty when unset).</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="field"/> is unrecognized.</exception>
-        public static string Format(AudioTagSemanticSurface semantic, AudioOverlayField field)
+        public static string Format(CommonAudioTag semantic, AudioOverlayField field)
         {
             return field switch
             {

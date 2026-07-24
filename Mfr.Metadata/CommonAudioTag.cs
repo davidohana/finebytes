@@ -7,7 +7,7 @@ using TagLib.Riff;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Semantic values derived from structured <see cref="AudioTagOverlay"/> native blocks.
+    /// Common cross-format audio fields derived from structured <see cref="AudioTagOverlay"/> native blocks.
     /// </summary>
     /// <remarks>
     /// Precedence mirrors TagLib merged-tag behavior: ID3v2 over ID3v1, then Xiph, APE, RIFF INFO (WAV LIST), Apple text atoms, ASF descriptors.
@@ -27,7 +27,7 @@ namespace Mfr.Metadata
     /// <param name="TrackCount">Track count.</param>
     /// <param name="Disc">Disc number.</param>
     /// <param name="DiscCount">Disc count.</param>
-    public sealed record AudioTagSemanticSurface(
+    public sealed record CommonAudioTag(
         string? Title,
         string? Album,
         string? Performers,
@@ -48,8 +48,8 @@ namespace Mfr.Metadata
         /// Projects merged semantic values from structured tag blocks only.
         /// </summary>
         /// <param name="overlay">Overlay whose blocks are interpreted; must not be <see langword="null"/>.</param>
-        /// <returns>Projected semantic surface.</returns>
-        public static AudioTagSemanticSurface FromBlocks(AudioTagOverlay overlay)
+        /// <returns>Projected common fields.</returns>
+        public static CommonAudioTag FromBlocks(AudioTagOverlay overlay)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
@@ -61,7 +61,7 @@ namespace Mfr.Metadata
 
             var id3v1 = overlay.Id3v1;
 
-            return new AudioTagSemanticSurface(
+            return new CommonAudioTag(
                 Title: _CoalesceUnicode(
                     _TagTitle(id3v2),
                     _Id3v1String(id3v1?.Title),
@@ -189,12 +189,12 @@ namespace Mfr.Metadata
         /// Materializes semantics from TagLib's merged façade tag fields (covers RIFF/WAV LIST payloads not modeled as native blocks alone).
         /// </summary>
         /// <param name="tag">Active combined TagLib façade.</param>
-        /// <returns>Semantic surface reconstructed from façade strings/lists and numerics.</returns>
-        public static AudioTagSemanticSurface FromCombinedTag(Tag tag)
+        /// <returns>Common fields reconstructed from façade strings/lists and numerics.</returns>
+        public static CommonAudioTag FromCombinedTag(Tag tag)
         {
             ArgumentNullException.ThrowIfNull(tag);
 
-            return new AudioTagSemanticSurface(
+            return new CommonAudioTag(
                 Title: _NullIfWhitespace(tag.Title),
                 Album: _NullIfWhitespace(tag.Album),
                 Performers: _JoinPerformerList(tag.Performers),
@@ -236,13 +236,13 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Copies each field from <paramref name="ambient"/> only where this surface has no substantive value per field (whitespace is treated like absent strings).
+        /// Copies each field from <paramref name="ambient"/> only where this instance has no substantive value per field (whitespace is treated like absent strings).
         /// </summary>
         /// <param name="ambient">Typically <see cref="FromCombinedTag"/> values not yet reflected in native blocks.</param>
-        /// <returns>Combined surface; equal to <see langword="this"/> when nothing was missing.</returns>
-        public AudioTagSemanticSurface WithMissingFieldsFilledFrom(AudioTagSemanticSurface ambient)
+        /// <returns>Combined common tag; equal to <see langword="this"/> when nothing was missing.</returns>
+        public CommonAudioTag WithMissingFieldsFilledFrom(CommonAudioTag ambient)
         {
-            return new AudioTagSemanticSurface(
+            return new CommonAudioTag(
                 Title: _CoalesceAbsentOrWhitespaceString(Title, ambient.Title),
                 Album: _CoalesceAbsentOrWhitespaceString(Album, ambient.Album),
                 Performers: _CoalesceAbsentOrWhitespaceString(Performers, ambient.Performers),

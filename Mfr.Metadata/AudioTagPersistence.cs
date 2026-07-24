@@ -31,7 +31,7 @@ namespace Mfr.Metadata
     /// </para>
     /// <para>
     /// After preview, hosts may call <see cref="TryNormalizeNativeBlocks"/> on the preview overlay using the on-disk
-    /// source path so per-block snapshots match the <see cref="AudioTagSemanticSurface.FromBlocks"/> projection (for example
+    /// source path so per-block snapshots match the <see cref="CommonAudioTag.FromBlocks"/> projection (for example
     /// <c>Mfr.Engine</c> rename preview end-of-chain reconcile).
     /// </para>
     /// </remarks>
@@ -53,7 +53,7 @@ namespace Mfr.Metadata
             _ValidateExistingRegularFile(absolutePath);
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
-            var ambientCombinedBeforeBlockReads = AudioTagSemanticSurface.FromCombinedTag(file.Tag);
+            var ambientCombinedBeforeBlockReads = CommonAudioTag.FromCombinedTag(file.Tag);
             var overlay = _ReadOverlay(file);
             _MergeAmbientCombinedTagFacadeIntoBlocks(file, overlay, absolutePath, ambientCombinedBeforeBlockReads);
             return overlay;
@@ -95,14 +95,14 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
             _ValidateExistingRegularFile(embeddedTagSourcePath);
-            var merged = AudioTagSemanticSurface.FromBlocks(overlay);
+            var merged = CommonAudioTag.FromBlocks(overlay);
             MergeSemanticOntoNativeBlocks(overlay, merged, embeddedTagSourcePath);
         }
 
         /// <summary>
         /// Like <see cref="MergeSemanticOntoNativeBlocks"/> but ignores TagLib failures (same swallow policy as preview materialize historically).
         /// </summary>
-        public static bool TryMergeSemanticOntoNativeBlocks(AudioTagOverlay overlay, AudioTagSemanticSurface merged, string embeddedTagSourcePath)
+        public static bool TryMergeSemanticOntoNativeBlocks(AudioTagOverlay overlay, CommonAudioTag merged, string embeddedTagSourcePath)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
@@ -135,14 +135,14 @@ namespace Mfr.Metadata
         /// <remarks>
         /// When <paramref name="embeddedTagSourcePath"/> is missing or the file cannot be opened, Mp4 apple atom coalescence is skipped; other containers still update using parsed blobs alone.
         /// <para>
-        /// When a live file is available and the incoming overlay had no native blocks at all, the merged semantic surface is
+        /// When a live file is available and the incoming overlay had no native blocks at all, the merged <see cref="CommonAudioTag"/> is
         /// written to TagLib's merged façade and snapshots are re-read (materializes RIFF INFO for façade-only hosts). When
         /// blocks already exist (ASF, Xiph, …), that extra pass is skipped so per-block merges remain authoritative.
         /// </para>
         /// </remarks>
         public static void MergeSemanticOntoNativeBlocks(
             AudioTagOverlay overlay,
-            AudioTagSemanticSurface merged,
+            CommonAudioTag merged,
             string? embeddedTagSourcePath)
         {
             ArgumentNullException.ThrowIfNull(overlay);
@@ -187,10 +187,10 @@ namespace Mfr.Metadata
             {
                 _MergeSemanticCarrierIntoBlocks(file, carrier);
                 if (file is not null
-                    && carrier.ToSemanticSurface().ContainsRenderableSemantics()
+                    && carrier.ToCommonAudioTag().ContainsRenderableSemantics()
                     && !hadAnyNativeBlockBeforeSemanticMerge)
                 {
-                    _WriteSemanticSurfaceToTag(file.Tag, carrier.ToSemanticSurface());
+                    _WriteCommonAudioTagToTag(file.Tag, carrier.ToCommonAudioTag());
                     try
                     {
                         _RefreshCarrierNativeSnapshotsFromFile(file, carrier);
@@ -234,7 +234,7 @@ namespace Mfr.Metadata
             if (file is AudioFile)
                 _ApplyToMpeg(file, previewOverlay);
             else
-                _WriteSemanticSurfaceToTag(file.Tag, AudioTagSemanticSurface.FromBlocks(previewOverlay));
+                _WriteCommonAudioTagToTag(file.Tag, CommonAudioTag.FromBlocks(previewOverlay));
 
             file.Save();
         }
@@ -302,13 +302,13 @@ namespace Mfr.Metadata
             TagLib.File file,
             AudioTagOverlay overlay,
             string absolutePath,
-            AudioTagSemanticSurface ambientCombinedBeforeBlockReads)
+            CommonAudioTag ambientCombinedBeforeBlockReads)
         {
             var ambient = ambientCombinedBeforeBlockReads;
             if (!ambient.ContainsRenderableSemantics())
                 return;
 
-            var projected = AudioTagSemanticSurface.FromBlocks(overlay);
+            var projected = CommonAudioTag.FromBlocks(overlay);
             var merged = projected.WithMissingFieldsFilledFrom(ambient);
             if (merged.Equals(projected))
                 return;
@@ -317,7 +317,7 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Re-reads per–<see cref="TagTypes"/> snapshots from <paramref name="file"/> after the merged semantic surface is applied to the live TagLib façade.
+        /// Re-reads per–<see cref="TagTypes"/> snapshots from <paramref name="file"/> after the merged <see cref="CommonAudioTag"/> is applied to the live TagLib façade.
         /// </summary>
         private static void _RefreshCarrierNativeSnapshotsFromFile(TagLib.File file, CoalesceCarrier carrier)
         {
@@ -404,9 +404,9 @@ namespace Mfr.Metadata
                 };
             }
 
-            public AudioTagSemanticSurface ToSemanticSurface()
+            public CommonAudioTag ToCommonAudioTag()
             {
-                return new AudioTagSemanticSurface(
+                return new CommonAudioTag(
                     Title,
                     Album,
                     Performers,
@@ -424,7 +424,7 @@ namespace Mfr.Metadata
                     DiscCount);
             }
 
-            public void ApplySemantic(AudioTagSemanticSurface s)
+            public void ApplySemantic(CommonAudioTag s)
             {
                 Title = s.Title;
                 Album = s.Album;
@@ -476,7 +476,7 @@ namespace Mfr.Metadata
                 return;
 
             var id3 = new TagLib.Id3v2.Tag(_ToByteVector(c.Id3v2.CanonicalTagBytes));
-            _WriteSemanticSurfaceToTag(id3, c.ToSemanticSurface());
+            _WriteCommonAudioTagToTag(id3, c.ToCommonAudioTag());
             c.Id3v2 = _SnapshotId3v2Data(id3);
         }
 
@@ -500,7 +500,7 @@ namespace Mfr.Metadata
                 xc = new XiphComment();
             }
 
-            _WriteSemanticSurfaceToTag(xc, c.ToSemanticSurface());
+            _WriteCommonAudioTagToTag(xc, c.ToCommonAudioTag());
             var rendered = xc.Render(addFramingBit: false);
             c.Xiph = _SerializedBlob(rendered.Data);
         }
@@ -524,7 +524,7 @@ namespace Mfr.Metadata
                 ape = new TagLib.Ape.Tag();
             }
 
-            _WriteSemanticSurfaceToTag(ape, c.ToSemanticSurface());
+            _WriteCommonAudioTagToTag(ape, c.ToCommonAudioTag());
             c.Ape = _SerializedBlob(ape.Render().Data);
         }
 
@@ -547,7 +547,7 @@ namespace Mfr.Metadata
                 info = new InfoTag();
             }
 
-            _WriteSemanticSurfaceToTag(info, c.ToSemanticSurface());
+            _WriteCommonAudioTagToTag(info, c.ToCommonAudioTag());
             c.RiffInfo = _SerializedBlob(info.Render().Data);
         }
 
@@ -556,14 +556,14 @@ namespace Mfr.Metadata
             if (c.Asf is null)
                 return;
 
-            var surface = c.ToSemanticSurface();
+            var common = c.ToCommonAudioTag();
             var asf = new TagLib.Asf.Tag();
             foreach (var row in c.Asf.Descriptors)
                 asf.AddDescriptor(new TagLib.Asf.ContentDescriptor(row.Name, row.Value));
 
-            _WriteSemanticSurfaceToTag(asf, surface);
-            if (!string.IsNullOrWhiteSpace(surface.Title))
-                asf.SetDescriptorString(surface.Title.Trim(), "WM/Title");
+            _WriteCommonAudioTagToTag(asf, common);
+            if (!string.IsNullOrWhiteSpace(common.Title))
+                asf.SetDescriptorString(common.Title.Trim(), "WM/Title");
 
             c.Asf = _ReadAsfTagData(asf);
         }
@@ -571,7 +571,7 @@ namespace Mfr.Metadata
         private static void _MergeSemanticIntoApple(AppleTag apple, CoalesceCarrier c)
         {
             _SetAppleAtomTextRows(apple, c.Apple!);
-            _WriteSemanticSurfaceToTag(apple, c.ToSemanticSurface());
+            _WriteCommonAudioTagToTag(apple, c.ToCommonAudioTag());
             c.Apple = _ReadAppleTagData(apple) ?? new AppleTagData();
         }
 
@@ -774,7 +774,7 @@ namespace Mfr.Metadata
             }
 
             live.Clear();
-            _WriteSemanticSurfaceToTag(live, AudioTagSemanticSurface.FromCombinedTag(parsed));
+            _WriteCommonAudioTagToTag(live, CommonAudioTag.FromCombinedTag(parsed));
         }
 
         private static void _ApplyApple(TagLib.File file, AudioTagOverlay overlay)
@@ -920,7 +920,7 @@ namespace Mfr.Metadata
             if (overlay.Id3v1 is not null)
                 _WriteId3v1Tag(file, overlay.Id3v1);
 
-            _WriteSemanticSurfaceToTag(file.Tag, AudioTagSemanticSurface.FromBlocks(overlay));
+            _WriteCommonAudioTagToTag(file.Tag, CommonAudioTag.FromBlocks(overlay));
         }
 
         private static void _WriteId3v1Tag(TagLib.File file, Id3v1TagData data)
@@ -940,27 +940,27 @@ namespace Mfr.Metadata
         /// <summary>
         /// Applies merged semantic scalar fields onto TagLib's combined façade tag (routing into container-specific payloads).
         /// </summary>
-        private static void _WriteSemanticSurfaceToTag(Tag tag, AudioTagSemanticSurface surface)
+        private static void _WriteCommonAudioTagToTag(Tag tag, CommonAudioTag common)
         {
-            tag.Title = _EmptyStringToNull(surface.Title);
-            tag.Album = _EmptyStringToNull(surface.Album);
-            tag.Performers = _SplitJoinedList(surface.Performers);
-            tag.AlbumArtists = _SplitJoinedList(surface.AlbumArtists);
-            tag.Composers = _SplitJoinedList(surface.Composers);
-            tag.Genres = string.IsNullOrWhiteSpace(surface.Genre)
+            tag.Title = _EmptyStringToNull(common.Title);
+            tag.Album = _EmptyStringToNull(common.Album);
+            tag.Performers = _SplitJoinedList(common.Performers);
+            tag.AlbumArtists = _SplitJoinedList(common.AlbumArtists);
+            tag.Composers = _SplitJoinedList(common.Composers);
+            tag.Genres = string.IsNullOrWhiteSpace(common.Genre)
                 ? []
-                : [surface.Genre.Trim()];
+                : [common.Genre.Trim()];
 
-            tag.Comment = _EmptyStringToNull(surface.Comment);
-            tag.Lyrics = _EmptyStringToNull(surface.Lyrics);
-            tag.Copyright = _EmptyStringToNull(surface.Copyright);
-            tag.Grouping = _EmptyStringToNull(surface.Grouping);
+            tag.Comment = _EmptyStringToNull(common.Comment);
+            tag.Lyrics = _EmptyStringToNull(common.Lyrics);
+            tag.Copyright = _EmptyStringToNull(common.Copyright);
+            tag.Grouping = _EmptyStringToNull(common.Grouping);
 
-            tag.Year = surface.Year ?? 0;
-            tag.Track = surface.Track ?? 0;
-            tag.TrackCount = surface.TrackCount ?? 0;
-            tag.Disc = surface.Disc ?? 0;
-            tag.DiscCount = surface.DiscCount ?? 0;
+            tag.Year = common.Year ?? 0;
+            tag.Track = common.Track ?? 0;
+            tag.TrackCount = common.TrackCount ?? 0;
+            tag.Disc = common.Disc ?? 0;
+            tag.DiscCount = common.DiscCount ?? 0;
         }
 
         private static string? _EmptyStringToNull(string? text)
