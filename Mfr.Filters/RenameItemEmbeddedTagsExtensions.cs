@@ -30,7 +30,7 @@ namespace Mfr.Filters
             }
 
             var overlay = AudioTagPersistence.Read(item.Original.FullPath);
-            item.SetEmbeddedTagOverlays(overlay);
+            item.SetEmbeddedTagOverlay(overlay);
         }
     }
 }

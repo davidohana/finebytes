@@ -118,12 +118,12 @@ namespace Mfr.Models
         /// Replaces embedded-tag overlays on <see cref="Original"/> and <see cref="Preview"/> from one disk read.
         /// </summary>
         /// <param name="overlay">Overlay read from the row's source path.</param>
-        internal void SetEmbeddedTagOverlays(AudioTagOverlay overlay)
+        internal void SetEmbeddedTagOverlay(AudioTagOverlay overlay)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
             Original.AudioTagOverlay = overlay.Clone();
-            Preview.AudioTagOverlay = Original.AudioTagOverlay.Clone();
+            Preview.AudioTagOverlay = overlay.Clone();
         }
 
         /// <summary>
