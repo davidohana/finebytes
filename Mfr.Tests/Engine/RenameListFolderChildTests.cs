@@ -6,7 +6,7 @@ using Mfr.Models;
 using Mfr.Utils;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 
-namespace Mfr.Tests.Core
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// End-to-end tests covering rename batches that mix folder renames with their descendants,

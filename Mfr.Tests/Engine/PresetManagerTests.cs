@@ -4,7 +4,7 @@ using Mfr.Engine;
 using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Tests.Core
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Tests loading and saving behavior for <see cref="PresetManager"/>.

@@ -1,7 +1,6 @@
 using Mfr.Filters;
 using Mfr.Metadata;
 using Mfr.Models;
-using Mfr.Tests.TestSupport;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Models

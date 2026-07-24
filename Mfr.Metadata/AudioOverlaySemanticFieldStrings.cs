@@ -7,7 +7,7 @@ namespace Mfr.Metadata
     /// Filter/preview field strings from <see cref="CommonAudioTag"/> rows.
     /// </summary>
     /// <remarks>
-    /// Mirrors the string conventions used when reading <see cref="Mfr.Models.AudioFieldTarget"/> previews (empty strings for absent fields);
+    /// Mirrors the string conventions used when reading <see cref="Models.AudioFieldTarget"/> previews (empty strings for absent fields);
     /// callers should normally build values with <see cref="CommonAudioTag.FromOverlay"/>.
     /// </remarks>
     public static class AudioOverlaySemanticFieldStrings

@@ -2,7 +2,7 @@ using Mfr.Engine;
 using Mfr.Filters.Case;
 using Mfr.Models;
 
-namespace Mfr.Tests.Core
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Guards <see cref="PresetJsonOptions"/> against drift when new <see cref="BaseFilter"/> types ship.

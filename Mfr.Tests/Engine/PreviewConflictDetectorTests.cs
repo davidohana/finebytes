@@ -2,7 +2,7 @@ using Mfr.Engine;
 using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Tests.Core
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Tests for <see cref="PreviewConflictDetector.MarkConflicts"/>.

@@ -6,7 +6,7 @@ using Mfr.Models.Tags;
 using Mfr.Utils;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 
-namespace Mfr.Tests.Core
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Tests source and file resolution behavior in <see cref="RenameList"/>.

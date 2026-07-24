@@ -4,7 +4,7 @@ using Mfr.Models;
 using Mfr.Tests.Models.Filters;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 
-namespace Mfr.Tests.Core
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Tests for <see cref="FilterChain.ApplyFilters"/>.

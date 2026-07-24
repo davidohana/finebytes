@@ -9,7 +9,7 @@ using Mfr.Models.Tags;
 using Mfr.Utils;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 
-namespace Mfr.Tests.Core
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Tests rename preview and commit behavior through <see cref="RenameList"/>.

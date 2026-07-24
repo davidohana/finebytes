@@ -9,7 +9,7 @@ using Mfr.Filters.Space;
 using Mfr.Models;
 using Mfr.Models.Tags;
 
-namespace Mfr.Tests.Core
+namespace Mfr.Tests.Engine
 {
     public class PresetJsonShapeProbeTests
     {

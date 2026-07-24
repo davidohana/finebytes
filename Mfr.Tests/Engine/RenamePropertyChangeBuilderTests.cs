@@ -5,7 +5,7 @@ using Mfr.Models;
 using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
 
-namespace Mfr.Tests.Core
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Tests for <see cref="RenamePropertyChangeBuilder.BuildChangeRows"/>.
