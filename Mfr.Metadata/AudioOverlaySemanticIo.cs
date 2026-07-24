@@ -24,7 +24,8 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            return AudioOverlaySemanticFieldStrings.Format(AudioTagSemanticSurface.FromBlocks(overlay), field);
+            var surface = AudioTagSemanticSurface.FromBlocks(overlay);
+            return AudioOverlaySemanticFieldStrings.Format(surface, field);
         }
 
         /// <summary>
