@@ -32,25 +32,25 @@ For contributor workflow, formatting/linting expectations, and pre-commit checks
 Show usage/help (Windows PowerShell):
 
 ```powershell
-dotnet run --project .\Mfr\Mfr.csproj -- --help
+dotnet run --project .\Mfr.App.Cli\Mfr.App.Cli.csproj -- --help
 ```
 
 Show usage/help (Linux bash):
 
 ```bash
-dotnet run --project ./Mfr/Mfr.csproj -- --help
+dotnet run --project ./Mfr.App.Cli/Mfr.App.Cli.csproj -- --help
 ```
 
 Example run (Windows PowerShell):
 
 ```powershell
-dotnet run --project .\Mfr\Mfr.csproj -- "C:\Music\*.mp3" -p "my-preset"
+dotnet run --project .\Mfr.App.Cli\Mfr.App.Cli.csproj -- "C:\Music\*.mp3" -p "my-preset"
 ```
 
 Example run (Linux bash):
 
 ```bash
-dotnet run --project ./Mfr/Mfr.csproj -- "/home/user/music/*.mp3" -p "my-preset"
+dotnet run --project ./Mfr.App.Cli/Mfr.App.Cli.csproj -- "/home/user/music/*.mp3" -p "my-preset"
 ```
 
 ### Presets File

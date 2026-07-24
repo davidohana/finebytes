@@ -19,7 +19,7 @@ format:
     dotnet format --verbosity diagnostic
 
 run-help:
-    dotnet run --project ./Mfr/Mfr.csproj -- --help
+    dotnet run --project ./Mfr.App.Cli/Mfr.App.Cli.csproj -- --help
 
 run *args:
-    dotnet run --project ./Mfr/Mfr.csproj -- {{args}}
+    dotnet run --project ./Mfr.App.Cli/Mfr.App.Cli.csproj -- {{args}}

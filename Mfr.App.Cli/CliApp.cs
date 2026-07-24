@@ -12,7 +12,7 @@ namespace Mfr.App.Cli
     public static class CliApp
     {
         /// <summary>
-        /// Runs the CLI entry point for <c>Mfr</c>.
+        /// Runs the CLI application.
         /// </summary>
         /// <param name="args">Command-line arguments.</param>
         /// <returns>The process exit code.</returns>

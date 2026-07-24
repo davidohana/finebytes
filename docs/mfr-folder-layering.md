@@ -9,9 +9,8 @@ description: Current layers and allowed project dependencies.
 
 | Layer | Project |
 |---|---|
-| L6 Host | [`Mfr/`](../Mfr) |
-| L5 App | [`Mfr.App.Cli/`](../Mfr.App.Cli) |
-| L4 Application | [`Mfr.Core/`](../Mfr.Core) |
+| L5 Entry | [`Mfr.App.Cli/`](../Mfr.App.Cli), [`Mfr.App.Ui/`](../Mfr.App.Ui) |
+| L4 Core | [`Mfr.Core/`](../Mfr.Core) |
 | L3 Domain rules | [`Mfr.Filters/`](../Mfr.Filters) |
 | L2 Tagged media I/O | [`Mfr.Metadata/`](../Mfr.Metadata) |
 | L1 Domain model | [`Mfr.Models/`](../Mfr.Models) |
@@ -19,8 +18,8 @@ description: Current layers and allowed project dependencies.
 
 Supporting:
 
-- Tests: [`Mfr.Tests/`](../Mfr.Tests) (guardrails + regression, TagLib-backed `AudioTagPersistence` integration in `Metadata/`; refs host `Mfr` only per architecture test)
-- UI placeholder: [`Mfr.App.Ui/`](../Mfr.App.Ui)
+- Tests: [`Mfr.Tests/`](../Mfr.Tests) (guardrails + regression, TagLib-backed `AudioTagPersistence` integration in `Metadata/`; refs entry points only per architecture test)
+- UI placeholder: [`Mfr.App.Ui/`](../Mfr.App.Ui) (Avalonia shell reserved for future work)
 
 ## Allowed dependencies
 
@@ -28,7 +27,9 @@ Supporting:
 
 Illustrative spine (typical flow, not exhaustive):
 
-`Mfr (host) -> Mfr.App.Cli -> Mfr.Core -> Mfr.Filters -> Mfr.Models -> Mfr.Utils`
+`Mfr.App.Cli -> Mfr.Core -> Mfr.Filters -> Mfr.Models -> Mfr.Utils`
+
+`Mfr.App.Ui -> Mfr.Core -> ...` (same lower layers as CLI)
 
 `Mfr.Metadata` bridges TagLib Sharp to canonical tag records in `Mfr.Models` (for example overlay types used by previews). `Mfr.Core` references it for future commit hooks; formatter tokens in `Mfr.Filters` may reference it in later phases following the layer map enforced in `ProjectReferenceArchitectureTests`.
 

@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mfr\Mfr.csproj" />
+    <ProjectReference Include="..\Mfr.App.Cli\Mfr.App.Cli.csproj" />
+    <ProjectReference Include="..\Mfr.App.Ui\Mfr.App.Ui.csproj" />
   </ItemGroup>
 
   <ItemGroup>

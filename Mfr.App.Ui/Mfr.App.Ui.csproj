@@ -18,19 +18,10 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
-    <PublishAot Condition="'$(Configuration)' == 'Release'">true</PublishAot>
-    <InvariantGlobalization>true</InvariantGlobalization>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Program.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Mfr.App.Cli\Mfr.App.Cli.csproj" />
     <ProjectReference Include="..\Mfr.Core\Mfr.Core.csproj" />
-    <ProjectReference Include="..\Mfr.Filters\Mfr.Filters.csproj" />
     <ProjectReference Include="..\Mfr.Models\Mfr.Models.csproj" />
     <ProjectReference Include="..\Mfr.Utils\Mfr.Utils.csproj" />
   </ItemGroup>
