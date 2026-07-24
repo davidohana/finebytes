@@ -8,7 +8,7 @@ namespace Mfr.Metadata
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Embeds use <see cref="CommonAudioTag.FromBlocks"/> for reads; writes merge an updated <see cref="CommonAudioTag"/> back into native
+    /// Embeds use <see cref="CommonAudioTag.FromOverlay"/> for reads; writes merge an updated <see cref="CommonAudioTag"/> back into native
     /// blocks via <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/>.
     /// </para>
     /// </remarks>
@@ -24,7 +24,7 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var common = CommonAudioTag.FromBlocks(overlay);
+            var common = CommonAudioTag.FromOverlay(overlay);
             return AudioOverlaySemanticFieldStrings.Format(common, field);
         }
 
@@ -45,7 +45,7 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var merged = CommonAudioTag.FromBlocks(overlay);
+            var merged = CommonAudioTag.FromOverlay(overlay);
             var trimmed = fieldString.Trim();
 
             merged = field switch

@@ -31,7 +31,7 @@ namespace Mfr.Metadata
     /// </para>
     /// <para>
     /// After preview, hosts may call <see cref="TryNormalizeNativeBlocks"/> on the preview overlay using the on-disk
-    /// source path so per-block snapshots match the <see cref="CommonAudioTag.FromBlocks"/> projection (for example
+    /// source path so per-block snapshots match the <see cref="CommonAudioTag.FromOverlay"/> projection (for example
     /// <c>Mfr.Engine</c> rename preview end-of-chain reconcile).
     /// </para>
     /// </remarks>
@@ -95,7 +95,7 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
             _ValidateExistingRegularFile(embeddedTagSourcePath);
-            var merged = CommonAudioTag.FromBlocks(overlay);
+            var merged = CommonAudioTag.FromOverlay(overlay);
             MergeSemanticOntoNativeBlocks(overlay, merged, embeddedTagSourcePath);
         }
 
@@ -234,7 +234,7 @@ namespace Mfr.Metadata
             if (file is AudioFile)
                 _ApplyToMpeg(file, previewOverlay);
             else
-                _WriteCommonAudioTagToTag(file.Tag, CommonAudioTag.FromBlocks(previewOverlay));
+                _WriteCommonAudioTagToTag(file.Tag, CommonAudioTag.FromOverlay(previewOverlay));
 
             file.Save();
         }
@@ -308,7 +308,7 @@ namespace Mfr.Metadata
             if (!ambient.ContainsRenderableSemantics())
                 return;
 
-            var projected = CommonAudioTag.FromBlocks(overlay);
+            var projected = CommonAudioTag.FromOverlay(overlay);
             var merged = projected.WithMissingFieldsFilledFrom(ambient);
             if (merged.Equals(projected))
                 return;
@@ -496,7 +496,7 @@ namespace Mfr.Metadata
             }
             catch (ArgumentOutOfRangeException)
             {
-                // Same as FromBlocks projection: bogus test doubles / truncated packets must not abort merge.
+                // Same as FromOverlay projection: bogus test doubles / truncated packets must not abort merge.
                 xc = new XiphComment();
             }
 
@@ -920,7 +920,7 @@ namespace Mfr.Metadata
             if (overlay.Id3v1 is not null)
                 _WriteId3v1Tag(file, overlay.Id3v1);
 
-            _WriteCommonAudioTagToTag(file.Tag, CommonAudioTag.FromBlocks(overlay));
+            _WriteCommonAudioTagToTag(file.Tag, CommonAudioTag.FromOverlay(overlay));
         }
 
         private static void _WriteId3v1Tag(TagLib.File file, Id3v1TagData data)

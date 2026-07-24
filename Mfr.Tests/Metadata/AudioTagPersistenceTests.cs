@@ -83,7 +83,7 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("baseline", readBaseline.Semantic().Title);
 
             var previewOverlay = readBaseline.Clone();
-            var merged = CommonAudioTag.FromBlocks(previewOverlay) with { Title = "preview" };
+            var merged = CommonAudioTag.FromOverlay(previewOverlay) with { Title = "preview" };
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(previewOverlay, merged, candidate);
 
             AudioTagPersistence.Apply(candidate, previewOverlay);
@@ -103,7 +103,7 @@ namespace Mfr.Tests.Metadata
 
             var readBaseline = AudioTagPersistence.Read(candidate);
             var previewOverlay = readBaseline.Clone();
-            var merged = CommonAudioTag.FromBlocks(previewOverlay)
+            var merged = CommonAudioTag.FromOverlay(previewOverlay)
                 with
             { Performers = "Alice;Bob" };
 
@@ -271,7 +271,7 @@ namespace Mfr.Tests.Metadata
             var disk = AudioTagPersistence.Read(path);
             var uniqueTitle = $"MergeOgg_{Guid.NewGuid():N}";
             var preview = disk.Clone();
-            var merged = CommonAudioTag.FromBlocks(preview) with { Title = uniqueTitle };
+            var merged = CommonAudioTag.FromOverlay(preview) with { Title = uniqueTitle };
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
 
             Assert.NotNull(disk.Xiph);
@@ -292,7 +292,7 @@ namespace Mfr.Tests.Metadata
             Assert.NotNull(disk.Apple);
 
             var preview = disk.Clone();
-            var merged = CommonAudioTag.FromBlocks(preview) with { Title = "MaterializedM4aTitle" };
+            var merged = CommonAudioTag.FromOverlay(preview) with { Title = "MaterializedM4aTitle" };
 
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
 
@@ -310,7 +310,7 @@ namespace Mfr.Tests.Metadata
 
             var disk = AudioTagPersistence.Read(path);
             var preview = disk.Clone();
-            var merged = CommonAudioTag.FromBlocks(preview) with { Title = "SemanticTitleMergeOnly" };
+            var merged = CommonAudioTag.FromOverlay(preview) with { Title = "SemanticTitleMergeOnly" };
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
 
             AudioTagPersistence.Apply(path, preview);

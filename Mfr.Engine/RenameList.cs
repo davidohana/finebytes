@@ -108,7 +108,7 @@ namespace Mfr.Engine
         /// <para>
         /// For regular files that exist on disk, each item calls
         /// <see cref="AudioTagPersistence.TryNormalizeNativeBlocks"/> to reconcile per-block snapshots with the
-        /// <see cref="CommonAudioTag.FromBlocks"/> projection after the filter chain (best-effort when TagLib cannot open the path).
+        /// <see cref="CommonAudioTag.FromOverlay"/> projection after the filter chain (best-effort when TagLib cannot open the path).
         /// </para>
         /// </remarks>
         public CommitPlan Preview(FilterPreset preset)

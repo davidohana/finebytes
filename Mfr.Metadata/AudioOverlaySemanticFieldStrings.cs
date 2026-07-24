@@ -8,14 +8,14 @@ namespace Mfr.Metadata
     /// </summary>
     /// <remarks>
     /// Mirrors the string conventions used when reading <see cref="Mfr.Models.AudioFieldTarget"/> previews (empty strings for absent fields);
-    /// callers should normally build values with <see cref="CommonAudioTag.FromBlocks"/>.
+    /// callers should normally build values with <see cref="CommonAudioTag.FromOverlay"/>.
     /// </remarks>
     public static class AudioOverlaySemanticFieldStrings
     {
         /// <summary>
         /// Formats <paramref name="field"/> using <paramref name="semantic"/> snapshot values (empty strings replace absent semantics).
         /// </summary>
-        /// <param name="semantic">Projected semantics; typically from <see cref="CommonAudioTag.FromBlocks"/>.</param>
+        /// <param name="semantic">Projected semantics; typically from <see cref="CommonAudioTag.FromOverlay"/>.</param>
         /// <param name="field">Which embedded field to format.</param>
         /// <returns>Filter/preview string for the field (empty when unset).</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="field"/> is unrecognized.</exception>

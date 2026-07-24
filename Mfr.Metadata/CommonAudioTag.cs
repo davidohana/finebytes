@@ -49,7 +49,7 @@ namespace Mfr.Metadata
         /// </summary>
         /// <param name="overlay">Overlay whose blocks are interpreted; must not be <see langword="null"/>.</param>
         /// <returns>Projected common fields.</returns>
-        public static CommonAudioTag FromBlocks(AudioTagOverlay overlay)
+        public static CommonAudioTag FromOverlay(AudioTagOverlay overlay)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
@@ -58,131 +58,146 @@ namespace Mfr.Metadata
             var ape = _TryParseApe(overlay.Ape);
             var riff = _TryParseRiffInfo(overlay.RiffInfo);
             var asf = _TryBuildAsfTag(overlay.Asf);
-
             var id3v1 = overlay.Id3v1;
 
+            var title = _CoalesceUnicode(
+                _TagTitle(id3v2),
+                _Id3v1String(id3v1?.Title),
+                _TagTitle(xiph),
+                _TagTitle(ape),
+                _TagTitle(riff),
+                _ApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
+                _AsfUnicode(asf, "WM/Title"),
+                _TagTitle(asf));
+            var album = _CoalesceUnicode(
+                _TagAlbum(id3v2),
+                _Id3v1String(id3v1?.Album),
+                _TagAlbum(xiph),
+                _TagAlbum(ape),
+                _TagAlbum(riff),
+                _ApplePlainText(overlay.Apple, AppleAtomConstants.AlbumAtom),
+                _AsfUnicode(asf, "WM/AlbumTitle"));
+            var performers = _CoalesceJoinedList(
+                id3v2?.Performers,
+                _Id3v1SplitPerformer(id3v1?.Artist),
+                xiph?.Performers,
+                ape?.Performers,
+                riff?.Performers,
+                _AppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom),
+                _AsfJoinedPerformers(asf));
+            var albumArtists = _CoalesceJoinedList(
+                id3v2?.AlbumArtists,
+                null,
+                xiph?.AlbumArtists,
+                ape?.AlbumArtists,
+                riff?.AlbumArtists,
+                _AppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom),
+                _AsfJoinedList(asf, "WM/AlbumArtist"));
+            var composers = _CoalesceJoinedList(
+                id3v2?.Composers,
+                null,
+                xiph?.Composers,
+                ape?.Composers,
+                riff?.Composers,
+                _AppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom),
+                _AsfJoinedList(asf, "WM/Composer"));
+            var genre = _CoalesceUnicode(
+                _TagFirstGenre(id3v2),
+                _Id3v1Genre(id3v1),
+                _TagFirstGenre(xiph),
+                _TagFirstGenre(ape),
+                _TagFirstGenre(riff),
+                _ApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
+                _AsfUnicode(asf, "WM/Genre"));
+            var comment = _CoalesceUnicode(
+                _TagComment(id3v2),
+                _Id3v1String(id3v1?.Comment),
+                _TagComment(xiph),
+                _TagComment(ape),
+                _TagComment(riff),
+                _ApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
+                _AsfUnicode(asf, "WM/Description"));
+            var lyrics = _CoalesceUnicode(
+                _TagLyrics(id3v2),
+                null,
+                _TagLyrics(xiph),
+                _TagLyrics(ape),
+                _TagLyrics(riff),
+                _ApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
+                _AsfUnicode(asf, "WM/Lyrics"));
+            var copyright = _CoalesceUnicode(
+                _TagCopyright(id3v2),
+                null,
+                _TagCopyright(xiph),
+                _TagCopyright(ape),
+                _TagCopyright(riff),
+                _ApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
+                _AsfUnicode(asf, "WM/ProviderCopyright"));
+            var grouping = _CoalesceUnicode(
+                _TagGrouping(id3v2),
+                null,
+                _TagGrouping(xiph),
+                _TagGrouping(ape),
+                _TagGrouping(riff),
+                _ApplePlainText(overlay.Apple, AppleAtomConstants.GroupingAtom),
+                _AsfUnicode(asf, "WM/ContentGroupDescription"));
+            var year = _CoalesceUInt(
+                _TagYear(id3v2),
+                id3v1?.Year,
+                _TagYear(xiph),
+                _TagYear(ape),
+                _TagYear(riff),
+                _AppleYear(overlay.Apple),
+                _AsfUInt(asf, "WM/Year"));
+            var track = _CoalesceUInt(
+                _TagTrack(id3v2),
+                id3v1?.Track is null ? null : id3v1.Track,
+                _TagTrack(xiph),
+                _TagTrack(ape),
+                _TagTrack(riff),
+                _AppleTrack(overlay.Apple),
+                _AsfUInt(asf, "WM/TrackNumber"));
+            var trackCount = _CoalesceUInt(
+                _TagTrackCount(id3v2),
+                null,
+                _TagTrackCount(xiph),
+                _TagTrackCount(ape),
+                _TagTrackCount(riff),
+                _AppleTrackCount(overlay.Apple),
+                _AsfUInt(asf, "WM/TrackTotal"));
+            var disc = _CoalesceUInt(
+                _TagDisc(id3v2),
+                null,
+                _TagDisc(xiph),
+                _TagDisc(ape),
+                _TagDisc(riff),
+                _AppleDisc(overlay.Apple),
+                _AsfUInt(asf, "WM/PartOfSet"));
+            var discCount = _CoalesceUInt(
+                _TagDiscCount(id3v2),
+                null,
+                _TagDiscCount(xiph),
+                _TagDiscCount(ape),
+                _TagDiscCount(riff),
+                _AppleDiscCount(overlay.Apple),
+                _AsfUInt(asf, "WM/TotalDiscs"));
+
             return new CommonAudioTag(
-                Title: _CoalesceUnicode(
-                    _TagTitle(id3v2),
-                    _Id3v1String(id3v1?.Title),
-                    _TagTitle(xiph),
-                    _TagTitle(ape),
-                    _TagTitle(riff),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
-                    _AsfUnicode(asf, "WM/Title"),
-                    _TagTitle(asf)),
-                Album: _CoalesceUnicode(
-                    _TagAlbum(id3v2),
-                    _Id3v1String(id3v1?.Album),
-                    _TagAlbum(xiph),
-                    _TagAlbum(ape),
-                    _TagAlbum(riff),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.AlbumAtom),
-                    _AsfUnicode(asf, "WM/AlbumTitle")),
-                Performers: _CoalesceJoinedList(
-                    id3v2?.Performers,
-                    _Id3v1SplitPerformer(id3v1?.Artist),
-                    xiph?.Performers,
-                    ape?.Performers,
-                    riff?.Performers,
-                    _AppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom),
-                    _AsfJoinedPerformers(asf)),
-                AlbumArtists: _CoalesceJoinedList(
-                    id3v2?.AlbumArtists,
-                    null,
-                    xiph?.AlbumArtists,
-                    ape?.AlbumArtists,
-                    riff?.AlbumArtists,
-                    _AppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom),
-                    _AsfJoinedList(asf, "WM/AlbumArtist")),
-                Composers: _CoalesceJoinedList(
-                    id3v2?.Composers,
-                    null,
-                    xiph?.Composers,
-                    ape?.Composers,
-                    riff?.Composers,
-                    _AppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom),
-                    _AsfJoinedList(asf, "WM/Composer")),
-                Genre: _CoalesceUnicode(
-                    _TagFirstGenre(id3v2),
-                    _Id3v1Genre(id3v1),
-                    _TagFirstGenre(xiph),
-                    _TagFirstGenre(ape),
-                    _TagFirstGenre(riff),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
-                    _AsfUnicode(asf, "WM/Genre")),
-                Comment: _CoalesceUnicode(
-                    _TagComment(id3v2),
-                    _Id3v1String(id3v1?.Comment),
-                    _TagComment(xiph),
-                    _TagComment(ape),
-                    _TagComment(riff),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
-                    _AsfUnicode(asf, "WM/Description")),
-                Lyrics: _CoalesceUnicode(
-                    _TagLyrics(id3v2),
-                    null,
-                    _TagLyrics(xiph),
-                    _TagLyrics(ape),
-                    _TagLyrics(riff),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
-                    _AsfUnicode(asf, "WM/Lyrics")),
-                Copyright: _CoalesceUnicode(
-                    _TagCopyright(id3v2),
-                    null,
-                    _TagCopyright(xiph),
-                    _TagCopyright(ape),
-                    _TagCopyright(riff),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
-                    _AsfUnicode(asf, "WM/ProviderCopyright")),
-                Grouping: _CoalesceUnicode(
-                    _TagGrouping(id3v2),
-                    null,
-                    _TagGrouping(xiph),
-                    _TagGrouping(ape),
-                    _TagGrouping(riff),
-                    _ApplePlainText(overlay.Apple, AppleAtomConstants.GroupingAtom),
-                    _AsfUnicode(asf, "WM/ContentGroupDescription")),
-                Year: _CoalesceUInt(
-                    _TagYear(id3v2),
-                    id3v1?.Year,
-                    _TagYear(xiph),
-                    _TagYear(ape),
-                    _TagYear(riff),
-                    _AppleYear(overlay.Apple),
-                    _AsfUInt(asf, "WM/Year")),
-                Track: _CoalesceUInt(
-                    _TagTrack(id3v2),
-                    id3v1?.Track is null ? null : id3v1.Track,
-                    _TagTrack(xiph),
-                    _TagTrack(ape),
-                    _TagTrack(riff),
-                    _AppleTrack(overlay.Apple),
-                    _AsfUInt(asf, "WM/TrackNumber")),
-                TrackCount: _CoalesceUInt(
-                    _TagTrackCount(id3v2),
-                    null,
-                    _TagTrackCount(xiph),
-                    _TagTrackCount(ape),
-                    _TagTrackCount(riff),
-                    _AppleTrackCount(overlay.Apple),
-                    _AsfUInt(asf, "WM/TrackTotal")),
-                Disc: _CoalesceUInt(
-                    _TagDisc(id3v2),
-                    null,
-                    _TagDisc(xiph),
-                    _TagDisc(ape),
-                    _TagDisc(riff),
-                    _AppleDisc(overlay.Apple),
-                    _AsfUInt(asf, "WM/PartOfSet")),
-                DiscCount: _CoalesceUInt(
-                    _TagDiscCount(id3v2),
-                    null,
-                    _TagDiscCount(xiph),
-                    _TagDiscCount(ape),
-                    _TagDiscCount(riff),
-                    _AppleDiscCount(overlay.Apple),
-                    _AsfUInt(asf, "WM/TotalDiscs")));
+                Title: title,
+                Album: album,
+                Performers: performers,
+                AlbumArtists: albumArtists,
+                Composers: composers,
+                Genre: genre,
+                Comment: comment,
+                Lyrics: lyrics,
+                Copyright: copyright,
+                Grouping: grouping,
+                Year: year,
+                Track: track,
+                TrackCount: trackCount,
+                Disc: disc,
+                DiscCount: discCount);
         }
 
         /// <summary>

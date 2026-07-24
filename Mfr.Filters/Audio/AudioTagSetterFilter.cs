@@ -100,7 +100,7 @@ namespace Mfr.Filters.Audio
         {
             item.EnsureEmbeddedTagsLoaded();
             var tags = item.Preview.AudioTagOverlay;
-            var merged = CommonAudioTag.FromBlocks(tags);
+            var merged = CommonAudioTag.FromOverlay(tags);
 
             if (Options.Performers is not null)
                 merged = _ApplyStringSemantics(
