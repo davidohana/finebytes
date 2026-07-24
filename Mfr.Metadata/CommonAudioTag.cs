@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Mfr.Models.Tags;
+using Mfr.Utils;
 using TagLib;
 using TagLib.Ogg;
 using TagLib.Riff;
@@ -60,7 +61,7 @@ namespace Mfr.Metadata
             var asf = _TryBuildAsfTag(overlay.Asf);
             var id3v1 = overlay.Id3v1;
 
-            var title = _CoalesceString(
+            var title = Nullables.FirstNonNull(
                 _TagTitle(id3v2),
                 _Id3v1String(id3v1?.Title),
                 _TagTitle(xiph),
@@ -69,7 +70,7 @@ namespace Mfr.Metadata
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
                 _AsfUnicode(asf, "WM/Title"),
                 _TagTitle(asf));
-            var album = _CoalesceString(
+            var album = Nullables.FirstNonNull(
                 _TagAlbum(id3v2),
                 _Id3v1String(id3v1?.Album),
                 _TagAlbum(xiph),
@@ -77,31 +78,31 @@ namespace Mfr.Metadata
                 _TagAlbum(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.AlbumAtom),
                 _AsfUnicode(asf, "WM/AlbumTitle"));
-            var performers = _CoalesceJoinedList(
-                id3v2?.Performers,
-                _Id3v1SplitPerformer(id3v1?.Artist),
-                xiph?.Performers,
-                ape?.Performers,
-                riff?.Performers,
-                _AppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom),
-                _AsfJoinedPerformers(asf));
-            var albumArtists = _CoalesceJoinedList(
-                id3v2?.AlbumArtists,
+            var performers = Nullables.FirstNonNull(
+                _JoinList(id3v2?.Performers),
+                _JoinList(_Id3v1SplitPerformer(id3v1?.Artist)),
+                _JoinList(xiph?.Performers),
+                _JoinList(ape?.Performers),
+                _JoinList(riff?.Performers),
+                _JoinList(_AppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom)),
+                _JoinList(_AsfJoinedPerformers(asf)));
+            var albumArtists = Nullables.FirstNonNull(
+                _JoinList(id3v2?.AlbumArtists),
                 null,
-                xiph?.AlbumArtists,
-                ape?.AlbumArtists,
-                riff?.AlbumArtists,
-                _AppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom),
-                _AsfJoinedList(asf, "WM/AlbumArtist"));
-            var composers = _CoalesceJoinedList(
-                id3v2?.Composers,
+                _JoinList(xiph?.AlbumArtists),
+                _JoinList(ape?.AlbumArtists),
+                _JoinList(riff?.AlbumArtists),
+                _JoinList(_AppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom)),
+                _JoinList(_AsfJoinedList(asf, "WM/AlbumArtist")));
+            var composers = Nullables.FirstNonNull(
+                _JoinList(id3v2?.Composers),
                 null,
-                xiph?.Composers,
-                ape?.Composers,
-                riff?.Composers,
-                _AppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom),
-                _AsfJoinedList(asf, "WM/Composer"));
-            var genre = _CoalesceString(
+                _JoinList(xiph?.Composers),
+                _JoinList(ape?.Composers),
+                _JoinList(riff?.Composers),
+                _JoinList(_AppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom)),
+                _JoinList(_AsfJoinedList(asf, "WM/Composer")));
+            var genre = Nullables.FirstNonNull(
                 _TagFirstGenre(id3v2),
                 _Id3v1Genre(id3v1),
                 _TagFirstGenre(xiph),
@@ -109,7 +110,7 @@ namespace Mfr.Metadata
                 _TagFirstGenre(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
                 _AsfUnicode(asf, "WM/Genre"));
-            var comment = _CoalesceString(
+            var comment = Nullables.FirstNonNull(
                 _TagComment(id3v2),
                 _Id3v1String(id3v1?.Comment),
                 _TagComment(xiph),
@@ -117,7 +118,7 @@ namespace Mfr.Metadata
                 _TagComment(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
                 _AsfUnicode(asf, "WM/Description"));
-            var lyrics = _CoalesceString(
+            var lyrics = Nullables.FirstNonNull(
                 _TagLyrics(id3v2),
                 null,
                 _TagLyrics(xiph),
@@ -125,7 +126,7 @@ namespace Mfr.Metadata
                 _TagLyrics(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
                 _AsfUnicode(asf, "WM/Lyrics"));
-            var copyright = _CoalesceString(
+            var copyright = Nullables.FirstNonNull(
                 _TagCopyright(id3v2),
                 null,
                 _TagCopyright(xiph),
@@ -133,7 +134,7 @@ namespace Mfr.Metadata
                 _TagCopyright(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
                 _AsfUnicode(asf, "WM/ProviderCopyright"));
-            var grouping = _CoalesceString(
+            var grouping = Nullables.FirstNonNull(
                 _TagGrouping(id3v2),
                 null,
                 _TagGrouping(xiph),
@@ -141,7 +142,7 @@ namespace Mfr.Metadata
                 _TagGrouping(riff),
                 _ApplePlainText(overlay.Apple, AppleAtomConstants.GroupingAtom),
                 _AsfUnicode(asf, "WM/ContentGroupDescription"));
-            var year = _CoalesceUInt(
+            var year = Nullables.FirstNonNull(
                 _TagYear(id3v2),
                 id3v1?.Year,
                 _TagYear(xiph),
@@ -149,7 +150,7 @@ namespace Mfr.Metadata
                 _TagYear(riff),
                 _AppleYear(overlay.Apple),
                 _AsfUInt(asf, "WM/Year"));
-            var track = _CoalesceUInt(
+            var track = Nullables.FirstNonNull(
                 _TagTrack(id3v2),
                 id3v1?.Track is null ? null : id3v1.Track,
                 _TagTrack(xiph),
@@ -157,7 +158,7 @@ namespace Mfr.Metadata
                 _TagTrack(riff),
                 _AppleTrack(overlay.Apple),
                 _AsfUInt(asf, "WM/TrackNumber"));
-            var trackCount = _CoalesceUInt(
+            var trackCount = Nullables.FirstNonNull(
                 _TagTrackCount(id3v2),
                 null,
                 _TagTrackCount(xiph),
@@ -165,7 +166,7 @@ namespace Mfr.Metadata
                 _TagTrackCount(riff),
                 _AppleTrackCount(overlay.Apple),
                 _AsfUInt(asf, "WM/TrackTotal"));
-            var disc = _CoalesceUInt(
+            var disc = Nullables.FirstNonNull(
                 _TagDisc(id3v2),
                 null,
                 _TagDisc(xiph),
@@ -173,7 +174,7 @@ namespace Mfr.Metadata
                 _TagDisc(riff),
                 _AppleDisc(overlay.Apple),
                 _AsfUInt(asf, "WM/PartOfSet"));
-            var discCount = _CoalesceUInt(
+            var discCount = Nullables.FirstNonNull(
                 _TagDiscCount(id3v2),
                 null,
                 _TagDiscCount(xiph),
@@ -468,40 +469,6 @@ namespace Mfr.Metadata
 
             var name = Genres.IndexToAudio(data.Genre);
             return _NullIfWhitespace(name);
-        }
-
-        private static string? _CoalesceString(params string?[] candidates)
-        {
-            foreach (var c in candidates)
-            {
-                if (c is not null)
-                    return c;
-            }
-
-            return null;
-        }
-
-        private static uint? _CoalesceUInt(params uint?[] candidates)
-        {
-            foreach (var c in candidates)
-            {
-                if (c is not null)
-                    return c;
-            }
-
-            return null;
-        }
-
-        private static string? _CoalesceJoinedList(params string[]?[] sources)
-        {
-            foreach (var arr in sources)
-            {
-                var joined = _JoinList(arr);
-                if (joined is not null)
-                    return joined;
-            }
-
-            return null;
         }
 
         private static string? _JoinList(string[]? values)
