@@ -212,9 +212,9 @@ namespace Mfr.Metadata
             return new CommonAudioTag(
                 Title: _NullIfWhitespace(tag.Title),
                 Album: _NullIfWhitespace(tag.Album),
-                Performers: _JoinPerformerList(tag.Performers),
-                AlbumArtists: _JoinPerformerList(tag.AlbumArtists),
-                Composers: _JoinPerformerList(tag.Composers),
+                Performers: _JoinList(tag.Performers),
+                AlbumArtists: _JoinList(tag.AlbumArtists),
+                Composers: _JoinList(tag.Composers),
                 Genre: tag.Genres.Length == 0 ? null : _NullIfWhitespace(tag.Genres[0]),
                 Comment: _NullIfWhitespace(tag.Comment),
                 Lyrics: _NullIfWhitespace(tag.Lyrics),
@@ -496,7 +496,7 @@ namespace Mfr.Metadata
         {
             foreach (var arr in sources)
             {
-                var joined = _JoinPerformerList(arr);
+                var joined = _JoinList(arr);
                 if (joined is not null)
                     return joined;
             }
@@ -504,7 +504,7 @@ namespace Mfr.Metadata
             return null;
         }
 
-        private static string? _JoinPerformerList(string[]? values)
+        private static string? _JoinList(string[]? values)
         {
             if (values is null || values.Length == 0)
                 return null;
