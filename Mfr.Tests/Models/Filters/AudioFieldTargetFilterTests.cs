@@ -7,9 +7,9 @@ using ReplacerFilter = Mfr.Filters.Replace.ReplacerFilter;
 namespace Mfr.Tests.Models.Filters
 {
     /// <summary>
-    /// Tests <see cref="AudioOverlayFieldTarget"/> with string-target filters.
+    /// Tests <see cref="AudioFieldTarget"/> with string-target filters.
     /// </summary>
-    public class AudioOverlayFieldTargetFilterTests
+    public class AudioFieldTargetFilterTests
     {
         /// <summary>
         /// Verifies formatter output replaces the addressed overlay string field.
@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters
         public void Formatter_SetsTitleOnPreviewAudioOverlay()
         {
             var filter = new FormatterFilter(
-                new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                new AudioFieldTarget(AudioOverlayField.Title),
                 new FormatterOptions("NextTitle"));
             var item = FilterTestHelpers.CreateRenameItem(
                 configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PrevTitle"));
@@ -47,7 +47,7 @@ namespace Mfr.Tests.Models.Filters
             uint expected)
         {
             var filter = new FormatterFilter(
-                new AudioOverlayFieldTarget(field),
+                new AudioFieldTarget(field),
                 new FormatterOptions(template));
             var item = FilterTestHelpers.CreateRenameItem();
 
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Models.Filters
         public void Formatter_EmptyTemplate_ClearsNumericOverlayField()
         {
             var filter = new FormatterFilter(
-                new AudioOverlayFieldTarget(AudioOverlayField.Year),
+                new AudioFieldTarget(AudioOverlayField.Year),
                 new FormatterOptions(string.Empty));
             var item = FilterTestHelpers.CreateRenameItem(
                 configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 2001));
@@ -103,7 +103,7 @@ namespace Mfr.Tests.Models.Filters
         public void Formatter_WhitespaceOnlyTemplate_ClearsNumericOverlayField()
         {
             var filter = new FormatterFilter(
-                new AudioOverlayFieldTarget(AudioOverlayField.Track),
+                new AudioFieldTarget(AudioOverlayField.Track),
                 new FormatterOptions("   "));
             var item = FilterTestHelpers.CreateRenameItem(
                 configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 9));
@@ -121,7 +121,7 @@ namespace Mfr.Tests.Models.Filters
         public void Formatter_InvalidNumericTemplate_ThrowsArgumentException()
         {
             var filter = new FormatterFilter(
-                new AudioOverlayFieldTarget(AudioOverlayField.Disc),
+                new AudioFieldTarget(AudioOverlayField.Disc),
                 new FormatterOptions("not-a-number"));
 
             var item = FilterTestHelpers.CreateRenameItem();
@@ -138,7 +138,7 @@ namespace Mfr.Tests.Models.Filters
         public void Replacer_ReplacesNumericYearStringOnPreviewAudioOverlay()
         {
             var filter = new ReplacerFilter(
-                new AudioOverlayFieldTarget(AudioOverlayField.Year),
+                new AudioFieldTarget(AudioOverlayField.Year),
                 new ReplacerOptions(
                     Find: "199",
                     Replacement: "200",
@@ -166,7 +166,7 @@ namespace Mfr.Tests.Models.Filters
         public void Replacer_ReplacesGenreOnPreviewAudioOverlay()
         {
             var filter = new ReplacerFilter(
-                new AudioOverlayFieldTarget(AudioOverlayField.Genre),
+                new AudioFieldTarget(AudioOverlayField.Genre),
                 new ReplacerOptions(
                     Find: "Rock",
                     Replacement: "Metal",
@@ -191,7 +191,7 @@ namespace Mfr.Tests.Models.Filters
         public void Apply_ToDirectory_ThrowsInvalidOperation()
         {
             var filter = new FormatterFilter(
-                new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                new AudioFieldTarget(AudioOverlayField.Title),
                 new FormatterOptions("x"));
 
             var item = FilterTestHelpers.CreateRenameItem(

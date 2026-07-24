@@ -13,7 +13,7 @@ namespace Mfr.Models
     [JsonDerivedType(typeof(AncestorFolderTarget), "AncestorFolder")]
     [JsonDerivedType(typeof(FullPathTarget), "FullPath")]
     [JsonDerivedType(typeof(ParentDirectoryTarget), "ParentDirectory")]
-    [JsonDerivedType(typeof(AudioOverlayFieldTarget), "AudioOverlayField")]
+    [JsonDerivedType(typeof(AudioFieldTarget), "AudioField")]
     public abstract record FilterTarget;
 
     /// <summary>
@@ -62,5 +62,5 @@ namespace Mfr.Models
     /// Targets one field on <see cref="FileMeta.AudioTagOverlay"/>; string filters read/write text or decimal-digit numeric strings.
     /// </summary>
     /// <param name="Field">Which overlay property is addressed.</param>
-    public sealed record AudioOverlayFieldTarget(AudioOverlayField Field) : FilterTarget;
+    public sealed record AudioFieldTarget(AudioOverlayField Field) : FilterTarget;
 }

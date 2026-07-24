@@ -212,13 +212,13 @@ namespace Mfr.Tests.Core
         }
 
         [Fact]
-        public void Formatter_JSON_round_trips_AudioOverlayField_target()
+        public void Formatter_JSON_round_trips_AudioField_target()
         {
             var json = /*lang=json,strict*/ """
             {
               "type": "Formatter",
               "target": {
-                "targetType": "AudioOverlayField",
+                "targetType": "AudioField",
                 "field": "title"
               },
               "options": {
@@ -230,7 +230,7 @@ namespace Mfr.Tests.Core
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
             var typed = Assert.IsType<FormatterFilter>(filter);
-            var target = Assert.IsType<AudioOverlayFieldTarget>(typed.Target);
+            var target = Assert.IsType<AudioFieldTarget>(typed.Target);
             Assert.Equal(AudioOverlayField.Title, target.Field);
             typed.Setup();
         }

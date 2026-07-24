@@ -458,7 +458,7 @@ namespace Mfr.Tests.Core
         /// <summary>
         /// Verifies audio overlay field filters on a folder row surface preview failure.
         /// </summary>
-        public void Preview_AudioOverlayFieldTarget_OnDirectory_HasPreviewError()
+        public void Preview_AudioFieldTarget_OnDirectory_HasPreviewError()
         {
             var folder = Path.Combine(_tempRoot, "folder");
             Directory.CreateDirectory(folder);
@@ -475,7 +475,7 @@ namespace Mfr.Tests.Core
                 Chain = FilterChain.CreateAllEnabled(
                     [
                         new FormatterFilter(
-                            Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                            Target: new AudioFieldTarget(AudioOverlayField.Title),
                             Options: new FormatterOptions("x")),
                     ]),
             };

@@ -10,7 +10,7 @@ Replaces the **entire target segment** with the result of expanding a **template
 
 ### Target (`target`, string filters)
 
-Along with path and file-name targets ([preset shape](../README.md#preset-shape)), string filters accept **`AudioOverlayField`**: set **`field`** to a camelCase overlay name (`title`, `album`, `performers`, `albumArtists`, `composers`, `genre`, `comment`, `lyrics`, `copyright`, `grouping`, `year`, `track`, `trackCount`, `disc`, `discCount`). The filter reads and writes that single property on **`Preview.AudioTagOverlay`** (numeric fields use decimal-digit strings; empty string clears nullable overlay fields).
+Along with path and file-name targets ([preset shape](../README.md#preset-shape)), string filters accept **`AudioField`**: set **`field`** to a camelCase overlay name (`title`, `album`, `performers`, `albumArtists`, `composers`, `genre`, `comment`, `lyrics`, `copyright`, `grouping`, `year`, `track`, `trackCount`, `disc`, `discCount`). The filter reads and writes that single property on **`Preview.AudioTagOverlay`** (numeric fields use decimal-digit strings; empty string clears nullable overlay fields).
 
 **Commit:** After a successful move, when **`Preview.AudioTagOverlay`** differs from the row’s **`Original.AudioTagOverlay`**, **`RenameList.Commit`** calls **`AudioTagPersistence.Apply`** on the destination file (which reads the file’s current TagLib state as the merge baseline, then writes). Rows with unchanged tag overlays skip this path.
 

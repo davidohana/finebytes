@@ -58,7 +58,7 @@ namespace Mfr.Tests.Models.Filters.Audio
 
             var item = new RenameItem(meta, FilterTestHelpers.AudioTagReaderSnapshot(meta));
             var formatter = new FormatterFilter(
-                Target: new AudioOverlayFieldTarget(AudioOverlayField.Title),
+                Target: new AudioFieldTarget(AudioOverlayField.Title),
                 Options: new FormatterOptions("Formatted"));
             var remover = new EmbeddedTagRemoverFilter();
             formatter.Setup();
