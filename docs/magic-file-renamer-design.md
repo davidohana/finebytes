@@ -74,7 +74,7 @@ Core capabilities:
 │                     Host Process (.NET 10)                      │
 │                                                                 │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────┐  │
-│  │   Avalonia UI     │  │   Core Services  │  │ Console Mode │  │
+│  │   Avalonia UI     │  │   Engine         │  │ Console Mode │
 │  │ (MVVM/ReactiveUI) │  │  (no UI deps)    │  │ mfr-console  │  │
 │  └──────────────────┘  └───────┬──────────┘  └──────────────┘  │
 │                                │                                │
@@ -99,11 +99,11 @@ Core capabilities:
 ### Key design principles
 
 - **Single process, no IPC.** All work runs on the .NET ThreadPool via `Channel<T>` pipelines.
-- **UI depends on Core; Core has no UI dependency.** Console mode and GUI share identical service classes.
+- **UI depends on Engine; Engine has no UI dependency.** Console mode and GUI share identical service classes.
 - **Every domain object is a plain C# record**, serializable to/from JSON with `System.Text.Json` source generators.
 - **Immutable filter definitions.** `Filter` records are never mutated; edits produce new filter snapshots for undo.
 - **Lazy metadata loading.** EXIF, ID3, and media properties are loaded only when a filter or column actually needs them.
-- **CLI-first, UI-later.** Core pipeline, filters, presets, and logging are implemented and tested in console mode before the Avalonia UI is added on top.
+- **CLI-first, UI-later.** Engine pipeline, filters, presets, and logging are implemented and tested in console mode before the Avalonia UI is added on top.
 
 ### 2.1 Core data model
 
@@ -2086,7 +2086,7 @@ steps:
 
 Mfr uses **xUnit on .NET 10** for automated testing. Tests are organized in layers:
 
-- **Unit tests (Core):**
+- **Unit tests (Engine):**
   - `FilterTarget` / `FilterTargetFamily` behavior (FileNameMode, DirectoryLevel).
   - Individual `IFilterStep` implementations (LettersCase, Replacer, Formatter, Counter, Mover, etc.).
   - Preset loading/saving for individual `presets/*.json` files.

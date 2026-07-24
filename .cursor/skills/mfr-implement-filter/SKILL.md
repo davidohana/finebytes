@@ -32,7 +32,7 @@ description: >-
    | `FullPath` | (none) | Entire preview full path |
    | `ParentDirectory` | (none) | Preview containing directory path |
 
-7. **JSON registration.** In `Mfr.Core/PresetJsonOptions.cs`, add `using Mfr.Filters.<Group>;` if missing and append `new JsonDerivedType(typeof(YourFilter), "YourFilterType")` to `DerivedTypes` (follow the ordering style already used in that list).
+7. **JSON registration.** In `Mfr.Engine/PresetJsonOptions.cs`, add `using Mfr.Filters.<Group>;` if missing and append `new JsonDerivedType(typeof(YourFilter), "YourFilterType")` to `DerivedTypes` (follow the ordering style already used in that list).
 
 ## Tests
 

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Core
+namespace Mfr.Engine
 {
     /// <summary>
     /// Creates a preset manager that reads and caches presets from a single JSON file.

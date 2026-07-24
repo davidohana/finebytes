@@ -1,7 +1,7 @@
 using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Core
+namespace Mfr.Engine
 {
     /// <summary>
     /// Surfaces preview-time conflicts that block a clean batch commit.

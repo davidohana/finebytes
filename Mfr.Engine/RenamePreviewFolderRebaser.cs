@@ -1,7 +1,7 @@
 using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Core
+namespace Mfr.Engine
 {
     /// <summary>
     /// Rebases descendant items' preview directory paths so they follow ancestor folders being renamed in the same batch.

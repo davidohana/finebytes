@@ -1,7 +1,7 @@
 <Solution>
   <Project Path="Mfr.App.Cli/Mfr.App.Cli.csproj" />
   <Project Path="Mfr.App.Ui/Mfr.App.Ui.csproj" />
-  <Project Path="Mfr.Core/Mfr.Core.csproj" />
+  <Project Path="Mfr.Engine/Mfr.Engine.csproj" />
   <Project Path="Mfr.Filters/Mfr.Filters.csproj" />
   <Project Path="Mfr.Metadata/Mfr.Metadata.csproj" />
   <Project Path="Mfr.Models/Mfr.Models.csproj" />

@@ -3,7 +3,7 @@ using Mfr.Models;
 using Mfr.Utils;
 using Serilog;
 
-namespace Mfr.Core
+namespace Mfr.Engine
 {
     /// <summary>
     /// Maintains ordered rename sources and resolves them into file entries.

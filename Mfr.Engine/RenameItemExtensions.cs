@@ -1,7 +1,7 @@
 using Mfr.Models;
 using Serilog;
 
-namespace Mfr.Core
+namespace Mfr.Engine
 {
     /// <summary>
     /// Provides rename-item helpers for filter-based preview name transformation and preview formatting.

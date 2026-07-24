@@ -10,7 +10,7 @@ description: Current layers and allowed project dependencies.
 | Layer | Project |
 |---|---|
 | L5 Entry | [`Mfr.App.Cli/`](../Mfr.App.Cli), [`Mfr.App.Ui/`](../Mfr.App.Ui) |
-| L4 Core | [`Mfr.Core/`](../Mfr.Core) |
+| L4 Engine | [`Mfr.Engine/`](../Mfr.Engine) |
 | L3 Domain rules | [`Mfr.Filters/`](../Mfr.Filters) |
 | L2 Tagged media I/O | [`Mfr.Metadata/`](../Mfr.Metadata) |
 | L1 Domain model | [`Mfr.Models/`](../Mfr.Models) |
@@ -27,11 +27,11 @@ Supporting:
 
 Illustrative spine (typical flow, not exhaustive):
 
-`Mfr.App.Cli -> Mfr.Core -> Mfr.Filters -> Mfr.Models -> Mfr.Utils`
+`Mfr.App.Cli -> Mfr.Engine -> Mfr.Filters -> Mfr.Models -> Mfr.Utils`
 
-`Mfr.App.Ui -> Mfr.Core -> ...` (same lower layers as CLI)
+`Mfr.App.Ui -> Mfr.Engine -> ...` (same lower layers as CLI)
 
-`Mfr.Metadata` bridges TagLib Sharp to canonical tag records in `Mfr.Models` (for example overlay types used by previews). `Mfr.Core` references it for future commit hooks; formatter tokens in `Mfr.Filters` may reference it in later phases following the layer map enforced in `ProjectReferenceArchitectureTests`.
+`Mfr.Metadata` bridges TagLib Sharp to canonical tag records in `Mfr.Models` (for example overlay types used by previews). `Mfr.Engine` references it for future commit hooks; formatter tokens in `Mfr.Filters` may reference it in later phases following the layer map enforced in `ProjectReferenceArchitectureTests`.
 
 ## Enforcement
 

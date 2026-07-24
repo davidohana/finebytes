@@ -24,7 +24,7 @@ namespace Mfr.Tests.Architecture
 
     /// <item>L5 Entry — <c>Mfr.App.Cli</c> and <c>Mfr.App.Ui</c></item>
 
-    /// <item>L4 Core — <c>Mfr.Core</c></item>
+    /// <item>L4 Engine — <c>Mfr.Engine</c></item>
 
     /// <item>L3 Domain rules — <c>Mfr.Filters</c> and <c>Mfr.Metadata</c> (<c>Mfr.Metadata</c> sits between model and formatting rules)</item>
 
@@ -70,7 +70,7 @@ namespace Mfr.Tests.Architecture
 
             [@"Mfr.Filters\Mfr.Filters.csproj"] = 3,
 
-            [@"Mfr.Core\Mfr.Core.csproj"] = 4,
+            [@"Mfr.Engine\Mfr.Engine.csproj"] = 4,
 
             [@"Mfr.App.Cli\Mfr.App.Cli.csproj"] = 5,
 

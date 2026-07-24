@@ -32,7 +32,7 @@ namespace Mfr.Metadata
     /// <para>
     /// After preview, hosts may call <see cref="TryNormalizeNativeBlocks"/> on the preview overlay using the on-disk
     /// source path so per-block snapshots match the <see cref="AudioTagSemanticSurface.FromBlocks"/> projection (for example
-    /// <c>Mfr.Core</c> rename preview end-of-chain reconcile).
+    /// <c>Mfr.Engine</c> rename preview end-of-chain reconcile).
     /// </para>
     /// </remarks>
     public static class AudioTagPersistence

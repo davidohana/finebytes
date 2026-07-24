@@ -3,7 +3,7 @@ using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
 
-namespace Mfr.Core
+namespace Mfr.Engine
 {
     /// <summary>
     /// Builds <see cref="RenamePropertyChange"/> rows shared between preview formatting and commit outcomes.

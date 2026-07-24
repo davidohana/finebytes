@@ -11,7 +11,7 @@ using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
 using Mfr.Models;
 
-namespace Mfr.Core
+namespace Mfr.Engine
 {
     internal static class PresetJsonOptions
     {

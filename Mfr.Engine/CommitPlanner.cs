@@ -1,7 +1,7 @@
 using Mfr.Models;
 using Mfr.Utils;
 
-namespace Mfr.Core
+namespace Mfr.Engine
 {
     /// <summary>
     /// Represents one operation in the commit plan for a rename batch.

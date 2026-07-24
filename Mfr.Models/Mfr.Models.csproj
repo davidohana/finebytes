@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Mfr.Core" />
+    <InternalsVisibleTo Include="Mfr.Engine" />
     <InternalsVisibleTo Include="Mfr.Filters" />
     <InternalsVisibleTo Include="Mfr.Tests" />
   </ItemGroup>

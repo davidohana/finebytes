@@ -2,7 +2,7 @@ using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using Mfr.Models;
 
-namespace Mfr.Core
+namespace Mfr.Engine
 {
     /// <summary>
     /// Resolves user-added rename sources (files, directories, and wildcard patterns) into concrete paths.
