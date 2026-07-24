@@ -33,7 +33,7 @@ Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`A
 
 **Contrast:** file-name tokens use **`Original`** paths; audio tokens deliberately use **preview** so later filters can mutate tags before a formatter runs.
 
-Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateRenameItem`**, which marks embedded tags as already loaded so **`RenameItemEmbeddedTags.EnsureLoaded`** does not touch pre-seeded **`AudioTagOverlay`**; tests that mimic a disk read call **`FilterTestHelpers.UseEmbeddedTagReaderSnapshot(meta)`** before **`RenameItemEmbeddedTags.EnsureLoaded`**.
+Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateRenameItem`**, which marks embedded tags as already loaded so **`RenameItemEmbeddedTags.EnsureLoaded`** does not touch pre-seeded **`AudioTagOverlay`**; tests that mimic a disk read wrap the call in **`EmbeddedTagReaderScope.ForMetaSnapshot(meta)`** (test assembly only).
 
 | Token | Output |
 |--------|--------|

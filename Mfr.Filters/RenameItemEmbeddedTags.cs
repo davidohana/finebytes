@@ -11,14 +11,9 @@ namespace Mfr.Filters
     public static class RenameItemEmbeddedTags
     {
         /// <summary>
-        /// Reads embedded tags from disk for production preview/commit paths.
+        /// Maps an absolute path to a detached embedded-tag overlay; defaults to <see cref="AudioTagPersistence.Read"/>.
         /// </summary>
         internal static Func<string, AudioTagOverlay> TagReader { get; set; } = AudioTagPersistence.Read;
-
-        /// <summary>
-        /// Optional per-async-context reader override for unit tests with synthetic paths.
-        /// </summary>
-        internal static AsyncLocal<Func<string, AudioTagOverlay>?> TestTagReaderOverride { get; } = new();
 
         /// <summary>
         /// Ensures <see cref="RenameItem.Original"/> and <see cref="RenameItem.Preview"/> carry embedded tags read from disk.
@@ -40,8 +35,7 @@ namespace Mfr.Filters
                     "Cannot read audio tags for a directory.");
             }
 
-            var reader = TestTagReaderOverride.Value ?? TagReader;
-            var overlay = reader(item.Original.FullPath);
+            var overlay = TagReader(item.Original.FullPath);
             item.SetEmbeddedTagOverlays(overlay);
         }
     }

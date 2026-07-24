@@ -1,7 +1,7 @@
 using Mfr.Filters;
 using Mfr.Metadata;
 using Mfr.Models;
-using Mfr.Tests.Models.Filters;
+using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Models
 {
@@ -14,7 +14,7 @@ namespace Mfr.Tests.Models
         public void EnsureEmbeddedTagsLoaded_SnapshotReader_MirrorsMetaTagsOntoSnapshots()
         {
             var meta = _CreateMetaWithAlbum(album: "SnapshotAlbum");
-            FilterTestHelpers.UseEmbeddedTagReaderSnapshot(meta);
+            using var readerScope = EmbeddedTagReaderScope.ForMetaSnapshot(meta);
             var item = new RenameItem(meta);
 
             var mutated = AudioTagSemanticSurface.FromBlocks(item.Preview.AudioTagOverlay)

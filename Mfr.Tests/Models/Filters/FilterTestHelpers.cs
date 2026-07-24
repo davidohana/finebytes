@@ -1,4 +1,3 @@
-using Mfr.Filters;
 using Mfr.Models;
 using Mfr.Utils;
 
@@ -72,16 +71,6 @@ namespace Mfr.Tests.Models.Filters
                 item.MarkEmbeddedTagsLoadAttempted();
 
             return item;
-        }
-
-        /// <summary>
-        /// Uses a snapshot reader that returns a copy of <paramref name="meta"/>'s current overlay (synthetic paths without disk I/O).
-        /// </summary>
-        /// <param name="meta">Source row metadata whose overlay is returned on load.</param>
-        public static void UseEmbeddedTagReaderSnapshot(FileMeta meta)
-        {
-            ArgumentNullException.ThrowIfNull(meta);
-            RenameItemEmbeddedTags.TestTagReaderOverride.Value = _ => meta.AudioTagOverlay.Clone();
         }
 
         /// <summary>
