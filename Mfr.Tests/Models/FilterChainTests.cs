@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Filters.Replace;
 using Mfr.Models;
 using Mfr.Tests.Models.Filters;

@@ -1,10 +1,8 @@
 using System.Text.Json.Serialization;
-using Mfr.Filters;
 using Mfr.Metadata;
-// can call Mfr.Metadata without a Models↔Metadata cycle.
-#pragma warning disable IDE0130
+using Mfr.Models;
 
-namespace Mfr.Models
+namespace Mfr.Filters
 {
     /// <summary>
     /// Filter that transforms one string-valued preview field identified by <see cref="FilterTarget"/>.

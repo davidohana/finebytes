@@ -43,7 +43,7 @@ namespace Mfr.Models
 
         /// <summary>
         /// Applies this filter to the rename item. String-valued field filters subclass <c>StringTargetFilter</c>
-        /// (implemented in assembly <c>Mfr.Filters</c>, namespace <c>Mfr.Models</c>, for JSON compatibility).
+        /// (in assembly <c>Mfr.Filters</c>, so preview audio fields can call <c>Mfr.Metadata</c> without a Models↔Metadata cycle).
         /// </summary>
         /// <param name="item">The item whose preview is updated.</param>
         protected internal abstract void ApplyCore(RenameItem item);
