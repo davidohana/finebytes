@@ -7,14 +7,14 @@ namespace Mfr.Filters
     /// <summary>
     /// Loads embedded tag overlays onto rename rows before audio-targeting filters run.
     /// </summary>
-    public static class RenameItemEmbeddedTags
+    internal static class RenameItemEmbeddedTagsExtensions
     {
         /// <summary>
         /// Ensures <see cref="RenameItem.Original"/> and <see cref="RenameItem.Preview"/> carry embedded tags read from disk.
         /// </summary>
         /// <param name="item">Rename row to load.</param>
         /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
-        internal static void EnsureLoaded(RenameItem item)
+        internal static void EnsureEmbeddedTagsLoaded(this RenameItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
 

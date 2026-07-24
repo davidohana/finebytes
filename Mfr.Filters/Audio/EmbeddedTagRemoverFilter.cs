@@ -24,7 +24,7 @@ namespace Mfr.Filters.Audio
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
         {
-            RenameItemEmbeddedTags.EnsureLoaded(item);
+            item.EnsureEmbeddedTagsLoaded();
             item.Preview.AudioTagOverlay = new AudioTagOverlay();
             item.StripAllEmbeddedTagsOnCommit = true;
         }

@@ -24,7 +24,7 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies <see cref="RenameItemEmbeddedTags.EnsureLoaded"/> reads disk tags onto both snapshots.
+        /// Verifies <see cref="RenameItemEmbeddedTagsExtensions.EnsureEmbeddedTagsLoaded"/> reads disk tags onto both snapshots.
         /// </summary>
         [Fact]
         public void EnsureEmbeddedTagsLoaded_ReadsFromDisk_MirrorsOntoBothSnapshots()
@@ -46,7 +46,7 @@ namespace Mfr.Tests.Models
             { Album = "PreviewOnlyMutated" };
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(item.Preview.AudioTagOverlay, mutated, embeddedTagSourcePath: null);
 
-            RenameItemEmbeddedTags.EnsureLoaded(item);
+            item.EnsureEmbeddedTagsLoaded();
 
             Assert.Equal("SnapshotAlbum", item.Original.AudioTagOverlay.Semantic().Album);
             Assert.Equal("SnapshotAlbum", item.Preview.AudioTagOverlay.Semantic().Album);

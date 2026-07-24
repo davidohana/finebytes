@@ -22,7 +22,7 @@ namespace Mfr.Models
 
             if (Target is AudioFieldTarget audioFieldTarget)
             {
-                RenameItemEmbeddedTags.EnsureLoaded(item);
+                item.EnsureEmbeddedTagsLoaded();
                 var currentValue = AudioOverlaySemanticIo.GetFieldString(preview.AudioTagOverlay, audioFieldTarget.Field);
                 var transformed = TransformValue(currentValue, item);
                 AudioOverlaySemanticIo.MergeFieldStringIntoOverlay(
