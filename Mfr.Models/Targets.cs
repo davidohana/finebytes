@@ -4,30 +4,6 @@ using Mfr.Models.Tags;
 namespace Mfr.Models
 {
     /// <summary>
-    /// Which filesystem timestamp field date/time filters modify.
-    /// </summary>
-    public enum TimestampField
-    {
-        /// <summary>
-        /// Creation time.
-        /// </summary>
-        [JsonStringEnumMemberName("creation")]
-        Creation,
-
-        /// <summary>
-        /// Last write time.
-        /// </summary>
-        [JsonStringEnumMemberName("lastWrite")]
-        LastWrite,
-
-        /// <summary>
-        /// Last access time.
-        /// </summary>
-        [JsonStringEnumMemberName("lastAccess")]
-        LastAccess
-    }
-
-    /// <summary>
     /// Represents a polymorphic filter target (file-name slices, paths, ancestor segments); JSON uses property <c>targetType</c> as the discriminator.
     /// </summary>
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "targetType")]
