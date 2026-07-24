@@ -55,11 +55,11 @@ namespace Mfr.Metadata
             ArgumentNullException.ThrowIfNull(overlay);
 
             var id3v2 = _TryParseId3v2(overlay.Id3v2);
+            var id3v1 = overlay.Id3v1;
             var xiph = _TryParseXiph(overlay.Xiph);
             var ape = _TryParseApe(overlay.Ape);
             var riff = _TryParseRiffInfo(overlay.RiffInfo);
             var asf = _TryBuildAsfTag(overlay.Asf);
-            var id3v1 = overlay.Id3v1;
 
             var title = Nullables.FirstNonNull(
                 _ReadTagTitle(id3v2),
@@ -88,7 +88,6 @@ namespace Mfr.Metadata
                 _JoinList(_ReadAsfJoinedPerformers(asf)));
             var albumArtists = Nullables.FirstNonNull(
                 _JoinList(id3v2?.AlbumArtists),
-                null,
                 _JoinList(xiph?.AlbumArtists),
                 _JoinList(ape?.AlbumArtists),
                 _JoinList(riff?.AlbumArtists),
@@ -96,7 +95,6 @@ namespace Mfr.Metadata
                 _JoinList(_ReadAsfJoinedList(asf, "WM/AlbumArtist")));
             var composers = Nullables.FirstNonNull(
                 _JoinList(id3v2?.Composers),
-                null,
                 _JoinList(xiph?.Composers),
                 _JoinList(ape?.Composers),
                 _JoinList(riff?.Composers),
@@ -120,7 +118,6 @@ namespace Mfr.Metadata
                 _ReadAsfString(asf, "WM/Description"));
             var lyrics = Nullables.FirstNonNull(
                 _ReadTagLyrics(id3v2),
-                null,
                 _ReadTagLyrics(xiph),
                 _ReadTagLyrics(ape),
                 _ReadTagLyrics(riff),
@@ -128,7 +125,6 @@ namespace Mfr.Metadata
                 _ReadAsfString(asf, "WM/Lyrics"));
             var copyright = Nullables.FirstNonNull(
                 _ReadTagCopyright(id3v2),
-                null,
                 _ReadTagCopyright(xiph),
                 _ReadTagCopyright(ape),
                 _ReadTagCopyright(riff),
@@ -136,7 +132,6 @@ namespace Mfr.Metadata
                 _ReadAsfString(asf, "WM/ProviderCopyright"));
             var grouping = Nullables.FirstNonNull(
                 _ReadTagGrouping(id3v2),
-                null,
                 _ReadTagGrouping(xiph),
                 _ReadTagGrouping(ape),
                 _ReadTagGrouping(riff),
@@ -160,7 +155,6 @@ namespace Mfr.Metadata
                 _ReadAsfUInt(asf, "WM/TrackNumber"));
             var trackCount = Nullables.FirstNonNull(
                 _ReadTagTrackCount(id3v2),
-                null,
                 _ReadTagTrackCount(xiph),
                 _ReadTagTrackCount(ape),
                 _ReadTagTrackCount(riff),
@@ -168,7 +162,6 @@ namespace Mfr.Metadata
                 _ReadAsfUInt(asf, "WM/TrackTotal"));
             var disc = Nullables.FirstNonNull(
                 _ReadTagDisc(id3v2),
-                null,
                 _ReadTagDisc(xiph),
                 _ReadTagDisc(ape),
                 _ReadTagDisc(riff),
@@ -176,7 +169,6 @@ namespace Mfr.Metadata
                 _ReadAsfUInt(asf, "WM/PartOfSet"));
             var discCount = Nullables.FirstNonNull(
                 _ReadTagDiscCount(id3v2),
-                null,
                 _ReadTagDiscCount(xiph),
                 _ReadTagDiscCount(ape),
                 _ReadTagDiscCount(riff),
