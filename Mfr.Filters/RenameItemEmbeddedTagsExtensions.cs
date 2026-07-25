@@ -1,5 +1,6 @@
 using Mfr.Metadata;
 using Mfr.Models;
+using Mfr.Models.Tags;
 using Mfr.Utils;
 
 namespace Mfr.Filters
@@ -29,8 +30,22 @@ namespace Mfr.Filters
                     "Cannot read audio tags for a directory.");
             }
 
-            var overlay = AudioTagPersistence.Read(item.Original.FullPath);
-            item.SetEmbeddedTagOverlay(overlay);
+            var overlay = AudioTagPersistence.Read(item.Original.FullPath, out var containerFormat);
+            item.SetEmbeddedTagOverlay(overlay, containerFormat);
+        }
+
+        /// <summary>
+        /// Ensures the row's container can hold <paramref name="blockKind"/> before a format-specific tag edit runs.
+        /// </summary>
+        /// <param name="item">Rename row whose container was detected by <see cref="EnsureEmbeddedTagsLoaded"/>.</param>
+        /// <param name="blockKind">Tag block the caller is about to read or write.</param>
+        /// <exception cref="NotSupportedException">The row's container does not support that block type.</exception>
+        internal static void EnsureAudioTagBlockSupported(this RenameItem item, AudioTagBlockKind blockKind)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            item.EnsureEmbeddedTagsLoaded();
+            AudioTagContainerPolicy.EnsureSupported(item.AudioContainer, blockKind);
         }
     }
 }

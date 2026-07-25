@@ -46,6 +46,51 @@ namespace Mfr.Models.Tags
         /// </summary>
         public RiffInfoTagData? RiffInfo { get; set; }
 
+        /// <summary>
+        /// Whether the block for <paramref name="kind"/> is present (non-null) on this overlay.
+        /// </summary>
+        /// <param name="kind">Block type to probe.</param>
+        /// <returns><see langword="true"/> when the logical tag carries that block.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="kind"/> is not a known block type.</exception>
+        public bool HasBlock(AudioTagBlockKind kind)
+        {
+            return kind switch
+            {
+                AudioTagBlockKind.Id3v1 => Id3v1 is not null,
+                AudioTagBlockKind.Id3v2 => Id3v2 is not null,
+                AudioTagBlockKind.Xiph => Xiph is not null,
+                AudioTagBlockKind.Ape => Ape is not null,
+                AudioTagBlockKind.Apple => Apple is not null,
+                AudioTagBlockKind.Asf => Asf is not null,
+                AudioTagBlockKind.RiffInfo => RiffInfo is not null,
+                _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown audio tag block kind."),
+            };
+        }
+
+        /// <summary>
+        /// Whether any tag block is present on this overlay.
+        /// </summary>
+        /// <returns><see langword="true"/> when at least one block is non-null.</returns>
+        public bool HasAnyBlock()
+        {
+            return Id3v1 is not null
+                || Id3v2 is not null
+                || Xiph is not null
+                || Ape is not null
+                || Apple is not null
+                || Asf is not null
+                || RiffInfo is not null;
+        }
+
+        /// <summary>
+        /// Lists the block types currently present on this overlay, in <see cref="AudioTagBlockKind"/> declaration order.
+        /// </summary>
+        /// <returns>Present block types; empty when the overlay carries no tags.</returns>
+        public IReadOnlyList<AudioTagBlockKind> GetPresentBlockKinds()
+        {
+            return [.. Enum.GetValues<AudioTagBlockKind>().Where(HasBlock)];
+        }
+
         /// <inheritdoc cref="Equals(AudioTagOverlay?)" />
         public bool TagBlocksStructurallyEquals(AudioTagOverlay? other)
         {

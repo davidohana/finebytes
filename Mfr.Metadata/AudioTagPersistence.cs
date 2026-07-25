@@ -15,13 +15,16 @@ namespace Mfr.Metadata
     /// <para>
     /// Call <see cref="Apply"/> only when the rename row’s embedded-tag preview differs from its original snapshot;
     /// compare outside this type (for example in <c>CommitExecutor</c>) before calling. <see cref="Apply"/>
-    /// opens the file, builds an overlay snapshot from TagLib (<see cref="Read"/> normalization), compares it to the
-    /// preview in full, returns without saving when they match, and otherwise writes blocks and merged TagLib-visible
-    /// semantics before saving.
+    /// opens the file, builds an overlay snapshot from TagLib (<see cref="Read(string)"/> normalization), compares it to
+    /// the preview in full, returns without saving when they match, and otherwise writes blocks and merged
+    /// TagLib-visible semantics before saving.
     /// </para>
     /// <para>
     /// Overlay blocks hold parsed fields (not binary blobs). Unmodeled frames/keys stay on disk until a whole tag type
     /// is removed or Phase E field-patch Apply replaces coarse writers.
+    /// </para>
+    /// <para>
+    /// A preview may not introduce a tag block the container cannot hold; see <see cref="AudioTagContainerPolicy"/>.
     /// </para>
     /// </remarks>
     public static class AudioTagPersistence
@@ -37,9 +40,25 @@ namespace Mfr.Metadata
         /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
         public static AudioTagOverlay Read(string absolutePath)
         {
+            return Read(absolutePath, out _);
+        }
+
+        /// <summary>
+        /// Reads embedded audio tags and reports the container detected during the same open.
+        /// </summary>
+        /// <param name="absolutePath">Fully qualified filesystem path to an existing file.</param>
+        /// <param name="containerFormat">Receives the detected container, used for capability checks and recommended creates.</param>
+        /// <returns>A new overlay built from embedded tags.</returns>
+        /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
+        /// <exception cref="IOException">TagLib cannot open or read the file.</exception>
+        /// <exception cref="CorruptFileException">Thrown by TagLib when the embedded structure is unreadable.</exception>
+        /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
+        public static AudioTagOverlay Read(string absolutePath, out AudioContainerFormat containerFormat)
+        {
             _ValidateExistingRegularFile(absolutePath);
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
+            containerFormat = AudioTagContainerPolicy.DetectFrom(file);
             var ambientCombinedBeforeBlockReads = CommonAudioTag.FromCombinedTag(file.Tag);
             var overlay = _ReadOverlay(file);
             _MergeAmbientCombinedTagFacadeIntoBlocks(file, overlay, absolutePath, ambientCombinedBeforeBlockReads);
@@ -130,14 +149,7 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var hadAnyNativeBlockBeforeSemanticMerge =
-                overlay.Id3v1 is not null
-                || overlay.Id3v2 is not null
-                || overlay.Xiph is not null
-                || overlay.Ape is not null
-                || overlay.RiffInfo is not null
-                || overlay.Apple is not null
-                || overlay.Asf is not null;
+            var hadAnyNativeBlockBeforeSemanticMerge = overlay.HasAnyBlock();
 
             TagBlockFieldMapper.MergeSemanticIntoBlocks(overlay, merged);
 
@@ -203,34 +215,44 @@ namespace Mfr.Metadata
         /// <param name="previewOverlay">Desired tag values.</param>
         /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
         /// <exception cref="IOException">The file cannot be opened or saved.</exception>
+        /// <exception cref="NotSupportedException">The preview introduces a tag block the container cannot hold.</exception>
         public static void Apply(string absolutePath, AudioTagOverlay previewOverlay)
         {
             _ValidateExistingRegularFile(absolutePath);
 
-            var baselineOverlay = Read(absolutePath);
+            var baselineOverlay = Read(absolutePath, out var containerFormat);
             if (previewOverlay.Equals(baselineOverlay))
                 return;
+
+            _EnsureIntroducedBlocksSupported(containerFormat, baselineOverlay, previewOverlay);
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             _ApplyNativeTagBlocks(file, previewOverlay);
 
             if (file is AudioFile)
                 _ApplyToMpeg(file, previewOverlay);
-            else if (!_HasAnyNativeBlock(previewOverlay))
+            else if (!previewOverlay.HasAnyBlock())
                 TagBlockFieldMapper.WriteCommonToTag(file.Tag, CommonAudioTag.FromOverlay(previewOverlay));
 
             file.Save();
         }
 
-        private static bool _HasAnyNativeBlock(AudioTagOverlay overlay)
+        /// <remarks>
+        /// Only blocks the preview adds are checked. A block already on disk stays writable even when the container
+        /// policy would not create it, so an odd-but-existing tag is patched rather than rejected.
+        /// </remarks>
+        private static void _EnsureIntroducedBlocksSupported(
+            AudioContainerFormat containerFormat,
+            AudioTagOverlay baselineOverlay,
+            AudioTagOverlay previewOverlay)
         {
-            return overlay.Id3v1 is not null
-                || overlay.Id3v2 is not null
-                || overlay.Xiph is not null
-                || overlay.Ape is not null
-                || overlay.RiffInfo is not null
-                || overlay.Apple is not null
-                || overlay.Asf is not null;
+            foreach (var kind in previewOverlay.GetPresentBlockKinds())
+            {
+                if (baselineOverlay.HasBlock(kind))
+                    continue;
+
+                AudioTagContainerPolicy.EnsureSupported(containerFormat, kind);
+            }
         }
 
         /// <summary>
