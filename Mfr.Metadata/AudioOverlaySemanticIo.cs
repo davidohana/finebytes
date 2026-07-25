@@ -36,15 +36,13 @@ namespace Mfr.Metadata
         /// <param name="field">Which semantic field to replace.</param>
         /// <param name="fieldString">Text as-is, or decimal digits for numeric fields; empty clears nullable fields.</param>
         /// <param name="embeddedTagSourcePath">On-disk file path used to detect the container when
-        /// <paramref name="containerFormat"/> is unknown; otherwise unused.</param>
-        /// <param name="containerFormat">Known container for recommended-block create when the overlay is empty.</param>
+        /// <see cref="AudioTagOverlay.ContainerFormat"/> is unknown; otherwise unused.</param>
         /// <exception cref="ArgumentException">Thrown when a numeric field string is not empty and not a valid non-negative integer.</exception>
         public static void MergeFieldStringIntoOverlay(
             AudioTagOverlay overlay,
             AudioOverlayField field,
             string fieldString,
-            string? embeddedTagSourcePath,
-            AudioContainerFormat containerFormat = AudioContainerFormat.Unknown)
+            string? embeddedTagSourcePath)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
@@ -71,11 +69,7 @@ namespace Mfr.Metadata
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(
-                overlay,
-                merged,
-                embeddedTagSourcePath,
-                containerFormat);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath);
         }
 
         private static string? _NullIfEmptyString(string trimmed)

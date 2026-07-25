@@ -67,12 +67,14 @@ namespace Mfr.Tests.Models.Filters
 
             configureOriginal?.Invoke(meta);
             EnsureSyntheticAudioOverlayWhenTagless(meta);
+
+            var isFileRow = !attributes.IsDirectory();
+            if (isFileRow)
+                meta.AudioTagOverlay.ContainerFormat = _InferAudioContainer(extension);
+
             var item = new RenameItem(meta);
-            if (!attributes.IsDirectory())
-            {
+            if (isFileRow)
                 item.MarkEmbeddedTagsLoadAttempted();
-                item.SetAudioContainer(_InferAudioContainer(extension));
-            }
 
             return item;
         }

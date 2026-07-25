@@ -46,5 +46,38 @@ namespace Mfr.Tests.Models.Tags
 
             Assert.True(a.Equals(a));
         }
+
+        /// <summary>
+        /// The container describes the file, not its tag content, so it must not make a preview look dirty.
+        /// </summary>
+        [Fact]
+        public void Equals_IgnoresContainerFormat()
+        {
+            var fields = ImmutableArray.Create(new TextFieldRow("TITLE", ["a"]));
+            var a = new AudioTagOverlay
+            {
+                ContainerFormat = AudioContainerFormat.Flac,
+                Xiph = new XiphTagData { Fields = fields },
+            };
+            var b = new AudioTagOverlay
+            {
+                ContainerFormat = AudioContainerFormat.Ogg,
+                Xiph = new XiphTagData { Fields = fields },
+            };
+
+            Assert.True(a.Equals(b));
+            Assert.Equal(a.GetHashCode(), b.GetHashCode());
+        }
+
+        /// <summary>
+        /// Cloning must carry the container so preview and original snapshots keep their capability checks.
+        /// </summary>
+        [Fact]
+        public void Clone_CarriesContainerFormat()
+        {
+            var overlay = new AudioTagOverlay { ContainerFormat = AudioContainerFormat.Mpeg4 };
+
+            Assert.Equal(AudioContainerFormat.Mpeg4, overlay.Clone().ContainerFormat);
+        }
     }
 }

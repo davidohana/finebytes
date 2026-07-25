@@ -107,20 +107,6 @@ namespace Mfr.Models
         internal bool EmbeddedTagsLoadAttempted { get; private set; }
 
         /// <summary>
-        /// Gets the audio container detected when embedded tags loaded, driving tag-block capability checks.
-        /// </summary>
-        internal AudioContainerFormat AudioContainer { get; private set; } = AudioContainerFormat.Unknown;
-
-        /// <summary>
-        /// Sets <see cref="AudioContainer"/> when tags are already loaded without a disk read (synthetic test rows).
-        /// </summary>
-        /// <param name="containerFormat">Container the row should pretend to be.</param>
-        internal void SetAudioContainer(AudioContainerFormat containerFormat)
-        {
-            AudioContainer = containerFormat;
-        }
-
-        /// <summary>
         /// Marks embedded-tag load as attempted for this preview cycle.
         /// </summary>
         internal void MarkEmbeddedTagsLoadAttempted()
@@ -131,15 +117,19 @@ namespace Mfr.Models
         /// <summary>
         /// Replaces embedded-tag overlays on <see cref="Original"/> and <see cref="Preview"/> from one disk read.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Both snapshots keep the container stamped on <paramref name="overlay"/>, so capability checks read it from
+        /// the overlay rather than from separate row state.
+        /// </para>
+        /// </remarks>
         /// <param name="overlay">Overlay read from the row's source path.</param>
-        /// <param name="containerFormat">Container detected during that same read.</param>
-        internal void SetEmbeddedTagOverlay(AudioTagOverlay overlay, AudioContainerFormat containerFormat)
+        internal void SetEmbeddedTagOverlay(AudioTagOverlay overlay)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
             Original.AudioTagOverlay = overlay.Clone();
             Preview.AudioTagOverlay = overlay.Clone();
-            AudioContainer = containerFormat;
         }
 
         /// <summary>
@@ -148,7 +138,6 @@ namespace Mfr.Models
         internal void ClearEmbeddedTagsCache()
         {
             EmbeddedTagsLoadAttempted = false;
-            AudioContainer = AudioContainerFormat.Unknown;
             Original.AudioTagOverlay = new AudioTagOverlay();
             Preview.AudioTagOverlay = new AudioTagOverlay();
             StripAllEmbeddedTagsOnCommit = false;

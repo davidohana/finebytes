@@ -20,6 +20,20 @@ namespace Mfr.Models.Tags
     public sealed class AudioTagOverlay : IEquatable<AudioTagOverlay?>
     {
         /// <summary>
+        /// Gets or sets the container the tags were read from, which decides the blocks the file can hold.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Stamped once when the overlay is read from disk and carried through <see cref="Clone"/>, so preview and
+        /// original snapshots describe their own capabilities. Filters edit blocks, never this value.
+        /// </para>
+        /// <para>
+        /// Excluded from equality: preview dirty-checks compare tag content, not the file's format.
+        /// </para>
+        /// </remarks>
+        public AudioContainerFormat ContainerFormat { get; set; } = AudioContainerFormat.Unknown;
+
+        /// <summary>
         /// Gets or sets the optional ID3v1 snapshot when the row is backed by MPEG/MP3 structured tags.
         /// </summary>
         public Id3v1TagData? Id3v1 { get; set; }
@@ -223,6 +237,7 @@ namespace Mfr.Models.Tags
         {
             return new AudioTagOverlay
             {
+                ContainerFormat = ContainerFormat,
                 Id3v1 = Id3v1 is null ? null : Id3v1 with { },
                 Id3v2 = Id3v2 is null
                     ? null

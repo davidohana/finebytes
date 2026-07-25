@@ -31,6 +31,7 @@ namespace Mfr.Tests.TestSupport
         {
             var overlay = new AudioTagOverlay
             {
+                ContainerFormat = AudioContainerFormat.Mpeg,
                 Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
             };
 

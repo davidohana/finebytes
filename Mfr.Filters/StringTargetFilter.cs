@@ -28,8 +28,7 @@ namespace Mfr.Filters
                     overlay: preview.AudioTagOverlay,
                     field: audioFieldTarget.Field,
                     fieldString: transformed,
-                    embeddedTagSourcePath: item.Original.FullPath,
-                    containerFormat: item.AudioContainer);
+                    embeddedTagSourcePath: item.Original.FullPath);
 
                 return;
             }

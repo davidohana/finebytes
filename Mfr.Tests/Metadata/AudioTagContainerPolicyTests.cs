@@ -123,10 +123,10 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// The read that loads the overlay must also report the container so filters never reopen the file.
+        /// The read that loads the overlay must also stamp the container so filters never reopen the file.
         /// </summary>
         [Fact]
-        public void Read_Flac_ReportsContainerFromSameOpen()
+        public void Read_Flac_StampsContainerFromSameOpen()
         {
             var path = _CopyFixtureToTempDir("metaflac.flac");
             using (var file = TagLib.File.Create(path))
@@ -135,9 +135,9 @@ namespace Mfr.Tests.Metadata
                 file.Save();
             }
 
-            var overlay = AudioTagPersistence.Read(path, out var container);
+            var overlay = AudioTagPersistence.Read(path);
 
-            Assert.Equal(AudioContainerFormat.Flac, container);
+            Assert.Equal(AudioContainerFormat.Flac, overlay.ContainerFormat);
             Assert.True(overlay.HasBlock(AudioTagBlockKind.Xiph));
             Assert.False(overlay.HasBlock(AudioTagBlockKind.Id3v2));
         }
@@ -183,28 +183,29 @@ namespace Mfr.Tests.Metadata
 
             AudioTagPersistence.Apply(path, preview);
 
-            var after = AudioTagPersistence.Read(path, out var container);
-            Assert.Equal(AudioContainerFormat.Flac, container);
+            var after = AudioTagPersistence.Read(path);
+            Assert.Equal(AudioContainerFormat.Flac, after.ContainerFormat);
             Assert.Equal("PolicyAllowsGenericTitle", after.Semantic().Title);
             Assert.NotNull(after.Xiph);
             Assert.Null(after.Id3v2);
         }
 
         /// <summary>
-        /// Loading embedded tags caches the container on the row so later filters can run capability checks for free.
+        /// Loading embedded tags caches the container on both overlays so later filters can run capability checks for free.
         /// </summary>
         [Fact]
-        public void EnsureEmbeddedTagsLoaded_CachesDetectedContainerOnItem()
+        public void EnsureEmbeddedTagsLoaded_CachesDetectedContainerOnOverlays()
         {
             var path = _CopyFixtureToTempDir("metaflac.flac");
             var item = _CreateRenameItemFor(path);
 
             item.EnsureEmbeddedTagsLoaded();
 
-            Assert.Equal(AudioContainerFormat.Flac, item.AudioContainer);
+            Assert.Equal(AudioContainerFormat.Flac, item.Original.AudioTagOverlay.ContainerFormat);
+            Assert.Equal(AudioContainerFormat.Flac, item.Preview.AudioTagOverlay.ContainerFormat);
 
             item.ClearEmbeddedTagsCache();
-            Assert.Equal(AudioContainerFormat.Unknown, item.AudioContainer);
+            Assert.Equal(AudioContainerFormat.Unknown, item.Preview.AudioTagOverlay.ContainerFormat);
         }
 
         [Fact]

@@ -30,8 +30,8 @@ namespace Mfr.Filters
                     "Cannot read audio tags for a directory.");
             }
 
-            var overlay = AudioTagPersistence.Read(item.Original.FullPath, out var containerFormat);
-            item.SetEmbeddedTagOverlay(overlay, containerFormat);
+            var overlay = AudioTagPersistence.Read(item.Original.FullPath);
+            item.SetEmbeddedTagOverlay(overlay);
         }
 
         /// <summary>
@@ -45,7 +45,8 @@ namespace Mfr.Filters
             ArgumentNullException.ThrowIfNull(item);
 
             item.EnsureEmbeddedTagsLoaded();
-            AudioTagContainerPolicy.EnsureSupported(item.AudioContainer, blockKind);
+            var containerFormat = item.Preview.AudioTagOverlay.ContainerFormat;
+            AudioTagContainerPolicy.EnsureSupported(containerFormat, blockKind);
         }
     }
 }

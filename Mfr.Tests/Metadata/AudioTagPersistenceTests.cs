@@ -295,7 +295,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void MergeSemanticIntoBlocks_EmptyOverlay_Mpeg_CreatesRecommendedId3v2()
         {
-            var overlay = new AudioTagOverlay();
+            var overlay = new AudioTagOverlay { ContainerFormat = AudioContainerFormat.Mpeg };
             var merged = new CommonAudioTag(
                 Title: "FromEmpty",
                 Album: null,
@@ -313,11 +313,7 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null);
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(
-                overlay,
-                merged,
-                embeddedTagSourcePath: null,
-                containerFormat: AudioContainerFormat.Mpeg);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath: null);
 
             Assert.NotNull(overlay.Id3v2);
             Assert.Null(overlay.Id3v1);
@@ -331,7 +327,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void MergeSemanticIntoBlocks_EmptyOverlay_Flac_CreatesRecommendedXiph()
         {
-            var overlay = new AudioTagOverlay();
+            var overlay = new AudioTagOverlay { ContainerFormat = AudioContainerFormat.Flac };
             var merged = new CommonAudioTag(
                 Title: "FromEmptyFlac",
                 Album: null,
@@ -349,11 +345,7 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null);
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(
-                overlay,
-                merged,
-                embeddedTagSourcePath: null,
-                containerFormat: AudioContainerFormat.Flac);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath: null);
 
             Assert.NotNull(overlay.Xiph);
             Assert.Null(overlay.Ape);
@@ -368,6 +360,7 @@ namespace Mfr.Tests.Metadata
         {
             var overlay = new AudioTagOverlay
             {
+                ContainerFormat = AudioContainerFormat.Mpeg,
                 Id3v1 = new Id3v1TagData { Title = "OldV1" },
                 Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
             };
@@ -388,11 +381,7 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null);
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(
-                overlay,
-                merged,
-                embeddedTagSourcePath: null,
-                containerFormat: AudioContainerFormat.Mpeg);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath: null);
 
             Assert.Equal("Broadcast", overlay.Id3v1.Title);
             Assert.Equal("Broadcast", overlay.Semantic().Title);
