@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
 
@@ -101,7 +100,7 @@ namespace Mfr.Engine
             }
         }
 
-        /// <summary>Appends one row per differing scalar embedded-tag field.</summary>
+        /// <summary>Appends per-block presence and field-level embedded-tag deltas.</summary>
         private static void _AppendAudioTagOverlayDifferences(
             List<RenamePropertyChange> changes,
             AudioTagOverlay original,
@@ -110,32 +109,13 @@ namespace Mfr.Engine
             if (original.Equals(preview))
                 return;
 
-            var originalSemantic = CommonAudioTag.FromOverlay(original);
-            var previewSemantic = CommonAudioTag.FromOverlay(preview);
-
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Title", originalSemantic.Title, previewSemantic.Title);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Album", originalSemantic.Album, previewSemantic.Album);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Performers", originalSemantic.Performers, previewSemantic.Performers);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.AlbumArtists", originalSemantic.AlbumArtists, previewSemantic.AlbumArtists);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Composers", originalSemantic.Composers, previewSemantic.Composers);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Genre", originalSemantic.Genre, previewSemantic.Genre);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Comment", originalSemantic.Comment, previewSemantic.Comment);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Lyrics", originalSemantic.Lyrics, previewSemantic.Lyrics);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Copyright", originalSemantic.Copyright, previewSemantic.Copyright);
-            _AddRenamePropertyChangeIfOverlayStringDiffers(changes, "AudioTag.Grouping", originalSemantic.Grouping, previewSemantic.Grouping);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Year", originalSemantic.Year, previewSemantic.Year);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Track", originalSemantic.Track, previewSemantic.Track);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.TrackCount", originalSemantic.TrackCount, previewSemantic.TrackCount);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.Disc", originalSemantic.Disc, previewSemantic.Disc);
-            _AddRenamePropertyChangeIfOverlayUIntDiffers(changes, "AudioTag.DiscCount", originalSemantic.DiscCount, previewSemantic.DiscCount);
-
-            _AppendAudioTagNativeBlockLayoutDifferences(changes, original, preview);
+            _AppendAudioTagBlockLayoutDifferences(changes, original, preview);
         }
 
         /// <summary>
         /// Appends compact rows when structured per–tag snapshots differ (presence and field-level deltas).
         /// </summary>
-        private static void _AppendAudioTagNativeBlockLayoutDifferences(
+        private static void _AppendAudioTagBlockLayoutDifferences(
             List<RenamePropertyChange> changes,
             AudioTagOverlay original,
             AudioTagOverlay preview)
@@ -145,43 +125,43 @@ namespace Mfr.Engine
 
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Native.Id3v1",
+                "AudioTag.Block.Id3v1",
                 original.Id3v1,
                 preview.Id3v1,
                 _DiffId3v1Fields);
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Native.Id3v2",
+                "AudioTag.Block.Id3v2",
                 original.Id3v2,
                 preview.Id3v2,
                 _DiffId3v2Fields);
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Native.Xiph",
+                "AudioTag.Block.Xiph",
                 original.Xiph,
                 preview.Xiph,
                 _DiffXiphFields);
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Native.Ape",
+                "AudioTag.Block.Ape",
                 original.Ape,
                 preview.Ape,
                 _DiffApeFields);
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Native.RiffInfo",
+                "AudioTag.Block.RiffInfo",
                 original.RiffInfo,
                 preview.RiffInfo,
                 _DiffRiffInfoFields);
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Native.Apple",
+                "AudioTag.Block.Apple",
                 original.Apple,
                 preview.Apple,
                 _DiffAppleFields);
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Native.Asf",
+                "AudioTag.Block.Asf",
                 original.Asf,
                 preview.Asf,
                 _DiffAsfFields);
@@ -216,10 +196,10 @@ namespace Mfr.Engine
             Id3v1TagData original,
             Id3v1TagData preview)
         {
-            _AddNativeStringDiff(changes, blockProperty + ".Title", original.Title, preview.Title);
-            _AddNativeStringDiff(changes, blockProperty + ".Artist", original.Artist, preview.Artist);
-            _AddNativeStringDiff(changes, blockProperty + ".Album", original.Album, preview.Album);
-            _AddNativeStringDiff(changes, blockProperty + ".Comment", original.Comment, preview.Comment);
+            _AddBlockStringDiff(changes, blockProperty + ".Title", original.Title, preview.Title);
+            _AddBlockStringDiff(changes, blockProperty + ".Artist", original.Artist, preview.Artist);
+            _AddBlockStringDiff(changes, blockProperty + ".Album", original.Album, preview.Album);
+            _AddBlockStringDiff(changes, blockProperty + ".Comment", original.Comment, preview.Comment);
             if (original.Year != preview.Year)
             {
                 changes.Add(new RenamePropertyChange(
@@ -409,7 +389,7 @@ namespace Mfr.Engine
             }
         }
 
-        private static void _AddNativeStringDiff(
+        private static void _AddBlockStringDiff(
             List<RenamePropertyChange> changes,
             string property,
             string? oldValue,
@@ -453,36 +433,6 @@ namespace Mfr.Engine
                 Property: propertyName,
                 OldValue: originalValue.ToString("O"),
                 NewValue: previewValue.ToString("O")));
-        }
-
-        private static void _AddRenamePropertyChangeIfOverlayStringDiffers(
-            List<RenamePropertyChange> changes,
-            string propertyName,
-            string? oldValue,
-            string? newValue)
-        {
-            if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
-                return;
-
-            changes.Add(new RenamePropertyChange(
-                Property: propertyName,
-                OldValue: JsonSerializer.Serialize(oldValue),
-                NewValue: JsonSerializer.Serialize(newValue)));
-        }
-
-        private static void _AddRenamePropertyChangeIfOverlayUIntDiffers(
-            List<RenamePropertyChange> changes,
-            string propertyName,
-            uint? oldValue,
-            uint? newValue)
-        {
-            if (oldValue == newValue)
-                return;
-
-            changes.Add(new RenamePropertyChange(
-                Property: propertyName,
-                OldValue: JsonSerializer.Serialize(oldValue),
-                NewValue: JsonSerializer.Serialize(newValue)));
         }
     }
 }

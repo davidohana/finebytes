@@ -4,12 +4,12 @@ using Mfr.Models.Tags;
 namespace Mfr.Tests.Models.Tags
 {
     /// <summary>
-    /// Tests structural equality on <see cref="AudioTagOverlay"/> native blocks.
+    /// Tests structural equality on <see cref="AudioTagOverlay"/> tag blocks.
     /// </summary>
     public sealed class AudioTagOverlayTagBlockEqualityTests
     {
         /// <summary>
-        /// Verifies <see cref="AudioTagOverlay.Equals"/> matches identical native blocks.
+        /// Verifies <see cref="AudioTagOverlay.Equals"/> matches identical tag blocks.
         /// </summary>
         [Fact]
         public void Equals_WithIdenticalBlocks_ReturnsTrue()

@@ -84,7 +84,7 @@ namespace Mfr.Tests.Metadata
 
             var previewOverlay = readBaseline.Clone();
             var merged = CommonAudioTag.FromOverlay(previewOverlay) with { Title = "preview" };
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(previewOverlay, merged, candidate);
+            AudioTagPersistence.MergeSemanticIntoBlocks(previewOverlay, merged, candidate);
 
             AudioTagPersistence.Apply(candidate, previewOverlay);
 
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Metadata
                 with
             { Performers = "Alice;Bob" };
 
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(previewOverlay, merged, candidate);
+            AudioTagPersistence.MergeSemanticIntoBlocks(previewOverlay, merged, candidate);
 
             AudioTagPersistence.Apply(candidate, previewOverlay);
 
@@ -268,10 +268,10 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// Verifies <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/> pushes a semantic title into the Xiph snapshot without saving.
+        /// Verifies <see cref="AudioTagPersistence.MergeSemanticIntoBlocks"/> pushes a semantic title into the Xiph snapshot without saving.
         /// </summary>
         [Fact]
-        public void MergeSemanticOntoNativeBlocks_Ogg_MergesTitleIntoXiphSnapshot()
+        public void MergeSemanticIntoBlocks_Ogg_MergesTitleIntoXiphSnapshot()
         {
             var path = _CopyFixtureToTemp("libnogg-bitrate-123.ogg");
 
@@ -279,7 +279,7 @@ namespace Mfr.Tests.Metadata
             var uniqueTitle = $"MergeOgg_{Guid.NewGuid():N}";
             var preview = disk.Clone();
             var merged = CommonAudioTag.FromOverlay(preview) with { Title = uniqueTitle };
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
             Assert.NotNull(disk.Xiph);
             Assert.NotNull(preview.Xiph);
@@ -291,7 +291,7 @@ namespace Mfr.Tests.Metadata
         /// Empty overlay + generic title creates the MPEG recommended ID3v2 block (v2.3), not ID3v1.
         /// </summary>
         [Fact]
-        public void MergeSemanticOntoNativeBlocks_EmptyOverlay_Mpeg_CreatesRecommendedId3v2()
+        public void MergeSemanticIntoBlocks_EmptyOverlay_Mpeg_CreatesRecommendedId3v2()
         {
             var overlay = new AudioTagOverlay();
             var merged = new CommonAudioTag(
@@ -311,7 +311,7 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null);
 
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+            AudioTagPersistence.MergeSemanticIntoBlocks(
                 overlay,
                 merged,
                 embeddedTagSourcePath: null,
@@ -327,7 +327,7 @@ namespace Mfr.Tests.Metadata
         /// Empty overlay + generic title creates the FLAC recommended Xiph block only.
         /// </summary>
         [Fact]
-        public void MergeSemanticOntoNativeBlocks_EmptyOverlay_Flac_CreatesRecommendedXiph()
+        public void MergeSemanticIntoBlocks_EmptyOverlay_Flac_CreatesRecommendedXiph()
         {
             var overlay = new AudioTagOverlay();
             var merged = new CommonAudioTag(
@@ -347,7 +347,7 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null);
 
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+            AudioTagPersistence.MergeSemanticIntoBlocks(
                 overlay,
                 merged,
                 embeddedTagSourcePath: null,
@@ -362,7 +362,7 @@ namespace Mfr.Tests.Metadata
         /// Generic title broadcast updates every present block (ID3v1 and ID3v2) without inventing siblings.
         /// </summary>
         [Fact]
-        public void MergeSemanticOntoNativeBlocks_BroadcastsTitle_ToAllPresentBlocks()
+        public void MergeSemanticIntoBlocks_BroadcastsTitle_ToAllPresentBlocks()
         {
             var overlay = new AudioTagOverlay
             {
@@ -386,7 +386,7 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null);
 
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+            AudioTagPersistence.MergeSemanticIntoBlocks(
                 overlay,
                 merged,
                 embeddedTagSourcePath: null,
@@ -399,10 +399,10 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// Verifies <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/> merges a semantic title into the Apple snapshot for M4A when given the on-disk source path.
+        /// Verifies <see cref="AudioTagPersistence.MergeSemanticIntoBlocks"/> merges a semantic title into the Apple snapshot for M4A when given the on-disk source path.
         /// </summary>
         [Fact]
-        public void MergeSemanticOntoNativeBlocks_M4a_MergesTitleIntoAppleSnapshot()
+        public void MergeSemanticIntoBlocks_M4a_MergesTitleIntoAppleSnapshot()
         {
             var path = _CopyFixtureToTemp("homebrew-test.m4a");
 
@@ -410,12 +410,12 @@ namespace Mfr.Tests.Metadata
             Assert.NotNull(disk.Apple);
 
             var preview = disk.Clone();
-            var merged = CommonAudioTag.FromOverlay(preview) with { Title = "MaterializedM4aTitle" };
+            var merged = CommonAudioTag.FromOverlay(preview) with { Title = "MergedM4aTitle" };
 
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
             Assert.NotEqual(disk.Apple, preview.Apple);
-            Assert.Equal("MaterializedM4aTitle", preview.Semantic().Title);
+            Assert.Equal("MergedM4aTitle", preview.Semantic().Title);
         }
 
         /// <summary>
@@ -429,7 +429,7 @@ namespace Mfr.Tests.Metadata
             var disk = AudioTagPersistence.Read(path);
             var preview = disk.Clone();
             var merged = CommonAudioTag.FromOverlay(preview) with { Title = "SemanticTitleMergeOnly" };
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
             AudioTagPersistence.Apply(path, preview);
 

@@ -140,79 +140,77 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Embedded tag strings use JSON serialization so null clears remain distinguishable in text output.
+        /// Embedded tag field rows use block-level keys; absent values are the literal <c>absent</c>.
         /// </summary>
         [Fact]
-        public void BuildChangeRows_AudioTagTitleChange_UsesJsonEncodedScalars()
+        public void BuildChangeRows_AudioTagTitleChange_EmitsId3v2Tit2Row()
         {
             var original = _CloneBaseline();
             var item = new RenameItem(original);
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+            AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
                 CommonAudioTag.FromOverlay(pv) with { Title = "Next" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
-            Assert.Equal(2, rows.Count);
-            Assert.Contains(rows, static r => r.Property == "AudioTag.Title");
-            Assert.Contains(rows, static r => r.Property == "AudioTag.Native.Id3v2.TIT2");
-
-            var titleRow = Assert.Single(rows, static r => r.Property == "AudioTag.Title");
-            Assert.Equal(JsonSerializer.Serialize((string?)null), titleRow.OldValue);
-            Assert.Equal(JsonSerializer.Serialize("Next"), titleRow.NewValue);
+            var titleRow = Assert.Single(rows);
+            Assert.Equal("AudioTag.Block.Id3v2.TIT2", titleRow.Property);
+            Assert.Equal("absent", titleRow.OldValue);
+            Assert.Equal("Next", titleRow.NewValue);
         }
 
         /// <summary>
-        /// Nullable unsigned tag fields serialize as JSON numbers or null tokens.
+        /// Year edits surface as the modeled ID3v2 year frame (TYER for v2.3).
         /// </summary>
         [Fact]
-        public void BuildChangeRows_AudioTagYearChange_EncodesUIntAndNull()
+        public void BuildChangeRows_AudioTagYearChange_EmitsId3v2TyerRow()
         {
             var original = _CloneBaseline(configureOverlay: o =>
                 o.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999));
             var item = new RenameItem(original);
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+            AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
                 CommonAudioTag.FromOverlay(pv) with { Year = 2001 },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
-            Assert.Equal(2, rows.Count);
-            var yearRow = Assert.Single(rows, static r => r.Property == "AudioTag.Year");
-            Assert.Equal(JsonSerializer.Serialize((uint?)1999), yearRow.OldValue);
-            Assert.Equal(JsonSerializer.Serialize((uint?)2001), yearRow.NewValue);
+            var yearRow = Assert.Single(rows);
+            Assert.Equal("AudioTag.Block.Id3v2.TYER", yearRow.Property);
+            Assert.Equal("1999", yearRow.OldValue);
+            Assert.Equal("2001", yearRow.NewValue);
         }
 
         /// <summary>
-        /// Multiline tag text stays JSON-escaped on one logical value line for preview formatting.
+        /// Multiline lyrics stay on one value line (frame text); newlines are preserved in the value string.
         /// </summary>
         [Fact]
-        public void BuildChangeRows_AudioTagLyricsWithNewline_SerializesEscapedLineBreak()
+        public void BuildChangeRows_AudioTagLyricsWithNewline_EmitsPrimaryUsltRow()
         {
             var original = _CloneBaseline();
             var item = new RenameItem(original);
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+            AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
                 CommonAudioTag.FromOverlay(pv) with { Lyrics = "a\nb" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
-            var lyricsRow = Assert.Single(rows, static r => r.Property == "AudioTag.Lyrics");
-            Assert.False(lyricsRow.NewValue.Contains('\n', StringComparison.Ordinal));
-            Assert.Contains("\\n", lyricsRow.NewValue, StringComparison.Ordinal);
+            var lyricsRow = Assert.Single(rows);
+            Assert.Equal("AudioTag.Block.Id3v2.USLT[eng|]", lyricsRow.Property);
+            Assert.Equal("absent", lyricsRow.OldValue);
+            Assert.Equal("a\nb", lyricsRow.NewValue);
         }
 
         /// <summary>
-        /// When native Xiph fields differ but projected semantics match, emit per-key native rows.
+        /// When Xiph field keys differ but projected semantics match, emit per-key block rows.
         /// </summary>
         [Fact]
-        public void BuildChangeRows_AudioTagNativeXiphChange_AppendsFieldRows()
+        public void BuildChangeRows_AudioTagBlockXiphChange_AppendsFieldRows()
         {
             var original = _CloneBaseline(configureOverlay: o =>
             {
@@ -231,15 +229,15 @@ namespace Mfr.Tests.Engine
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Equal(2, rows.Count);
-            Assert.Contains(rows, static r => r.Property == "AudioTag.Native.Xiph.DATE" && r.NewValue == "absent");
-            Assert.Contains(rows, static r => r.Property == "AudioTag.Native.Xiph.YEAR" && r.OldValue == "absent");
+            Assert.Contains(rows, static r => r.Property == "AudioTag.Block.Xiph.DATE" && r.NewValue == "absent");
+            Assert.Contains(rows, static r => r.Property == "AudioTag.Block.Xiph.YEAR" && r.OldValue == "absent");
         }
 
         /// <summary>
-        /// Native block field rows follow merged embedded-tag scalar rows in stable order.
+        /// Block field rows follow path rows in stable category order.
         /// </summary>
         [Fact]
-        public void BuildChangeRows_MixedScalarAndNativeBlock_FollowsStableOrdering()
+        public void BuildChangeRows_MixedPathAndBlock_FollowsStableOrdering()
         {
             var original = _CloneBaseline(directoryPath: @"D:\A", configureOverlay: o =>
             {
@@ -255,7 +253,7 @@ namespace Mfr.Tests.Engine
                 Fields = [new TextFieldRow("TITLE", ["a"])],
             };
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+            AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
                 CommonAudioTag.FromOverlay(pv) with { Genre = "Rock" },
                 embeddedTagSourcePath: null);
@@ -263,12 +261,12 @@ namespace Mfr.Tests.Engine
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Equal(
-                ["DirectoryPath", "AudioTag.Genre", "AudioTag.Native.Xiph.GENRE"],
+                ["DirectoryPath", "AudioTag.Block.Xiph.GENRE"],
                 [.. rows.Select(r => r.Property)]);
         }
 
         /// <summary>
-        /// Rows follow structured path fields, then filesystem scalars, then stable audio-tag field order.
+        /// Rows follow structured path fields, then filesystem scalars, then block field order.
         /// </summary>
         [Fact]
         public void BuildChangeRows_MixedDifferences_FollowsStableCategoryOrdering()
@@ -278,7 +276,7 @@ namespace Mfr.Tests.Engine
             item.Preview.DirectoryPath = @"D:\B";
             item.Preview.Attributes = FileAttributes.ReadOnly;
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+            AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
                 CommonAudioTag.FromOverlay(pv) with { Genre = "Rock" },
                 embeddedTagSourcePath: null);
@@ -286,7 +284,7 @@ namespace Mfr.Tests.Engine
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Equal(
-                ["DirectoryPath", "Attributes", "AudioTag.Genre", "AudioTag.Native.Id3v2.TCON"],
+                ["DirectoryPath", "Attributes", "AudioTag.Block.Id3v2.TCON"],
                 [.. rows.Select(r => r.Property)]);
         }
 

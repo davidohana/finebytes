@@ -118,7 +118,7 @@ namespace Mfr.Tests.Engine
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
             Assert.Contains(
                 results[0].Changes,
-                c => c.Property == "AudioTag.Title");
+                c => c.Property == "AudioTag.Block.RiffInfo.INAM");
 
             var readBack = AudioTagPersistence.Read(sourcePath);
             Assert.Equal("DiskTitleAfter", readBack.Semantic().Title);

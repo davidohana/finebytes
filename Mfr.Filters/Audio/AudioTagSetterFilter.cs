@@ -166,7 +166,7 @@ namespace Mfr.Filters.Audio
             if (!_HasAnyConfiguredSemanticField())
                 return;
 
-            _ = AudioTagPersistence.TryMergeSemanticOntoNativeBlocks(
+            _ = AudioTagPersistence.TryMergeSemanticIntoBlocks(
                 tags,
                 merged,
                 item.Original.FullPath,

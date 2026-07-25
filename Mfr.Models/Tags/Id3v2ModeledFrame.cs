@@ -15,6 +15,12 @@ namespace Mfr.Models.Tags
     public sealed class Id3v2ModeledFrame : IEquatable<Id3v2ModeledFrame?>
     {
         /// <summary>
+        /// Frame ids whose identity includes language and/or description (not <see cref="FrameId"/> alone).
+        /// </summary>
+        public static IReadOnlySet<string> MultiInstanceFrameIds { get; } =
+            new HashSet<string>(StringComparer.Ordinal) { "COMM", "USLT", "TXXX" };
+
+        /// <summary>
         /// Four-character frame id (for example <c>TIT2</c>, <c>COMM</c>).
         /// </summary>
         public string FrameId { get; init; } = "";

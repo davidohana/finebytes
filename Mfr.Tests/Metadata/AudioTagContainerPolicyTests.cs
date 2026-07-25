@@ -178,7 +178,7 @@ namespace Mfr.Tests.Metadata
 
             var preview = AudioTagPersistence.Read(path).Clone();
             var merged = CommonAudioTag.FromOverlay(preview) with { Title = "PolicyAllowsGenericTitle" };
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
             AudioTagPersistence.Apply(path, preview);
 

@@ -2,7 +2,6 @@ using Mfr.Metadata;
 using Mfr.Models.Tags;
 using Mfr.Utils;
 using TagLib;
-using TagLib.Id3v2;
 
 namespace Mfr.Tests.Metadata
 {
@@ -23,30 +22,17 @@ namespace Mfr.Tests.Metadata
         /// Title-only ID3v2 patch leaves an embedded APIC frame on disk.
         /// </summary>
         [Fact]
-        [Obsolete]
         public void Apply_Mp3_TitleOnlyPatch_PreservesApic()
         {
             var path = _tempDirectoryFixture.CreateTempDir().CombinePath("with-art.mp3");
             TaggedMp3Fixture.WriteTagged(path, id3v2Title: "Before");
-
-            using (var file = TagLib.File.Create(path))
-            {
-                var id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagTypes.Id3v2, true);
-                id3v2.AddFrame(new AttachedPictureFrame
-                {
-                    MimeType = "image/png",
-                    Type = PictureType.FrontCover,
-                    Description = "cover",
-                    Data = _TinyPngBytes(),
-                });
-                file.Save();
-            }
+            _EmbedTinyPngCover(path, description: "cover");
 
             var original = AudioTagPersistence.Read(path);
             Assert.NotNull(original.Id3v2);
             var preview = original.Clone();
             var merged = CommonAudioTag.FromOverlay(preview) with { Title = "AfterTitleOnly" };
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path, AudioContainerFormat.Mpeg);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path, AudioContainerFormat.Mpeg);
 
             AudioTagPersistence.Apply(path, original, preview);
 
@@ -60,23 +46,11 @@ namespace Mfr.Tests.Metadata
         /// Removing the ID3v2 block drops APIC with the tag type.
         /// </summary>
         [Fact]
-        [Obsolete]
         public void Apply_Mp3_RemoveId3v2Block_DropsApic()
         {
             var path = _tempDirectoryFixture.CreateTempDir().CombinePath("drop-art.mp3");
             TaggedMp3Fixture.WriteTagged(path, id3v2Title: "KeepText");
-
-            using (var file = TagLib.File.Create(path))
-            {
-                var id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagTypes.Id3v2, true);
-                id3v2.AddFrame(new AttachedPictureFrame
-                {
-                    MimeType = "image/png",
-                    Type = PictureType.FrontCover,
-                    Data = _TinyPngBytes(),
-                });
-                file.Save();
-            }
+            _EmbedTinyPngCover(path, description: null);
 
             var original = AudioTagPersistence.Read(path);
             var preview = original.Clone();
@@ -106,7 +80,7 @@ namespace Mfr.Tests.Metadata
 
             var preview = original.Clone();
             var merged = CommonAudioTag.FromOverlay(preview) with { Title = "AsfPatchedTitle" };
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(preview, merged, path, AudioContainerFormat.Asf);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path, AudioContainerFormat.Asf);
 
             AudioTagPersistence.Apply(path, original, preview);
 
@@ -136,17 +110,32 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("NewFrame", AudioOverlayBlockFieldIo.GetId3v2FrameString(after, "TIT2"));
         }
 
-        private static ByteVector _TinyPngBytes()
+        /// <summary>
+        /// Embeds a 1x1 PNG cover via TagLib's <see cref="Picture"/> surface (avoids obsolete <c>AttachedPictureFrame</c>).
+        /// </summary>
+        private static void _EmbedTinyPngCover(string path, string? description)
         {
-            // 1x1 transparent PNG
-            return new ByteVector(
+            using var file = TagLib.File.Create(path);
+            file.Tag.Pictures =
             [
-                0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-                0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-                0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-                0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
-                0x42, 0x60, 0x82,
-            ]);
+                new Picture
+                {
+                    MimeType = "image/png",
+                    Type = PictureType.FrontCover,
+                    Description = description ?? string.Empty,
+                    Data = [.. _TinyPngBytes],
+                },
+            ];
+            file.Save();
         }
+
+        private static readonly byte[] _TinyPngBytes =
+        [
+            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+            0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+            0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
+            0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
+            0x42, 0x60, 0x82,
+        ];
     }
 }

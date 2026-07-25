@@ -62,9 +62,9 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Like <see cref="MergeSemanticOntoNativeBlocks"/> but ignores TagLib failures when detecting a container from disk.
+        /// Like <see cref="MergeSemanticIntoBlocks"/> but ignores TagLib failures when detecting a container from disk.
         /// </summary>
-        public static bool TryMergeSemanticOntoNativeBlocks(
+        public static bool TryMergeSemanticIntoBlocks(
             AudioTagOverlay overlay,
             CommonAudioTag merged,
             string? embeddedTagSourcePath,
@@ -74,7 +74,7 @@ namespace Mfr.Metadata
 
             try
             {
-                MergeSemanticOntoNativeBlocks(overlay, merged, embeddedTagSourcePath, containerFormat);
+                MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath, containerFormat);
                 return true;
             }
             catch (UnsupportedFormatException)
@@ -116,7 +116,7 @@ namespace Mfr.Metadata
         /// <paramref name="containerFormat"/> is unknown.</param>
         /// <param name="containerFormat">Known container for recommended-block create; pass the value cached on the
         /// rename row when available.</param>
-        public static void MergeSemanticOntoNativeBlocks(
+        public static void MergeSemanticIntoBlocks(
             AudioTagOverlay overlay,
             CommonAudioTag merged,
             string? embeddedTagSourcePath = null,
@@ -278,7 +278,7 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Removes all embedded tag blobs TagLib associates with the file.
+        /// Removes all embedded tags TagLib associates with the file.
         /// </summary>
         /// <param name="absolutePath">Path to an existing regular file (typically after rename, at the preview destination).</param>
         /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>

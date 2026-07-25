@@ -4,7 +4,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Filters.Audio
 {
     /// <summary>
-    /// Strips all embedded TagLib metadata blobs on each file row (any format TagLib supports); clears the preview overlay.
+    /// Strips all embedded TagLib metadata on each file row (any format TagLib supports); clears the preview overlay.
     /// </summary>
     /// <remarks>
     /// <para>

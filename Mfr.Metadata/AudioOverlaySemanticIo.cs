@@ -8,8 +8,8 @@ namespace Mfr.Metadata
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Embeds use <see cref="CommonAudioTag.FromOverlay"/> for reads; writes merge an updated <see cref="CommonAudioTag"/> back into native
-    /// blocks via <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/> (broadcast to present blocks; recommended create when empty).
+    /// Embeds use <see cref="CommonAudioTag.FromOverlay"/> for reads; writes merge an updated <see cref="CommonAudioTag"/> back into
+    /// blocks via <see cref="AudioTagPersistence.MergeSemanticIntoBlocks"/> (broadcast to present blocks; recommended create when empty).
     /// </para>
     /// </remarks>
     public static class AudioOverlaySemanticIo
@@ -71,7 +71,7 @@ namespace Mfr.Metadata
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+            AudioTagPersistence.MergeSemanticIntoBlocks(
                 overlay,
                 merged,
                 embeddedTagSourcePath,

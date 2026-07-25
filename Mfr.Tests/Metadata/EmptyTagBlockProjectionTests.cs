@@ -6,7 +6,7 @@ namespace Mfr.Tests.Metadata
     /// <summary>
     /// Tests that empty or absent modeled blocks project null semantics and merge rewrites fields in place.
     /// </summary>
-    public sealed class TagBlockParsingToleranceTests
+    public sealed class EmptyTagBlockProjectionTests
     {
         /// <summary>
         /// Verifies empty modeled blocks yield null semantics.
@@ -48,7 +48,7 @@ namespace Mfr.Tests.Metadata
         /// Verifies merge rewrites empty blocks from the semantic projection instead of failing.
         /// </summary>
         [Fact]
-        public void MergeSemanticOntoNativeBlocks_WithEmptyBlocks_RewritesBlocksFromSemantics()
+        public void MergeSemanticIntoBlocks_WithEmptyBlocks_RewritesBlocksFromSemantics()
         {
             var overlay = new AudioTagOverlay
             {
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Metadata
             };
             var merged = CommonAudioTag.FromOverlay(overlay) with { Title = "Recovered" };
 
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(overlay, merged, embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath: null);
 
             Assert.Equal("Recovered", CommonAudioTag.FromOverlay(overlay).Title);
             Assert.Contains(overlay.Id3v2.Frames, f => f.FrameId == "TIT2");

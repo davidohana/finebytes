@@ -247,14 +247,6 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Applies common semantic fields onto TagLib's combined façade tag.
-        /// </summary>
-        public static void WriteCommonToTag(TagLib.Tag tag, CommonAudioTag common)
-        {
-            _WriteCommonToTag(tag, common);
-        }
-
-        /// <summary>
         /// Writes only fields that differ between <paramref name="original"/> and <paramref name="preview"/> onto a façade tag.
         /// </summary>
         internal static void WriteCommonDiffToTag(TagLib.Tag tag, CommonAudioTag original, CommonAudioTag preview)

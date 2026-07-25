@@ -18,11 +18,6 @@ namespace Mfr.Metadata
     {
         private static readonly string[] _ListSeparators = [";"];
 
-        private static readonly HashSet<string> _MultiInstanceFrameIds = new(StringComparer.Ordinal)
-        {
-            "COMM", "USLT", "TXXX",
-        };
-
         /// <summary>
         /// Returns the filter/preview string for an ID3v1 scalar.
         /// </summary>

@@ -297,7 +297,7 @@ public sealed record UndoEntry
     public string SessionId { get; init; } = "";
     public string OriginalPath { get; init; } = "";
     public string RenamedPath { get; init; } = "";
-    public Id3Tags? OriginalTags { get; init; }
+    public Id3Tags? OriginalTags { get; init; }  // historical sketch; current model uses AudioTagOverlay
     public Id3Tags? NewTags { get; init; }
     public FileAttributes? OriginalAttributes { get; init; }
     public FileAttributes? NewAttributes { get; init; }
@@ -491,12 +491,12 @@ Out of scope:
 
 ### Phase 4 — MP3/audio tag support
 
-- Adds TagLibSharp-based `Id3Tags` loading and writing.
+- Adds TagLibSharp-based embedded-tag loading and writing (shipped as `AudioTagOverlay` blocks; early sketches used a flat `Id3Tags` bag).
 - Enables filters targeting `FilterTargetFamily.AudioTag`, `Id3v1`, and `Id3v2`.
 - Extends formatter tokens with ID3/audio tokens (see §7.4–7.6).
 
 Scope:
-- `Id3Tags` record fully implemented.
+- Parsed per–`TagTypes` overlay fully implemented (see §9).
 - Audio-related filters (`AudioTagSetter`, `Id3v2FieldSetter`, `EmbeddedTagRemover`, `SetFromFreeDB`).
 
 ### Phase 5 — EXIF and image metadata
@@ -1181,7 +1181,7 @@ Sets any specific ID3v2 frame by frame ID (e.g. TXXX, TIT1) for frames not acces
 ```
 
 #### EmbeddedTagRemover
-Strips **all** embedded TagLib metadata blobs on each file row (any format TagLib supports). No `target` or `options`; tag removal is applied when changes are committed (preview clears the modeled overlay).
+Strips **all** embedded TagLib metadata on each file row (any format TagLib supports). No `target` or `options`; tag removal is applied when changes are committed (preview clears the modeled overlay).
 ```json
 {
   "type": "EmbeddedTagRemover",
@@ -1506,7 +1506,7 @@ All standard text frames: TIT1/2/3, TPE1/2/3/4, TALB, TYER, TCON, TRCK, TPOS, TC
 
 `<multiple values>` shown in gray when selected files differ. Editing replaces all. Only touched fields are written (patch semantics). ID3 fields can also be edited inline in the Rename List via Manual Rename.
 
-**Implementation (current):** preview tags live in `AudioTagOverlay` (parsed per–`TagTypes` blocks, not a flat `Id3Tags` bag). Commit Apply diffs session Original → Preview per block: remove dropped tag types, create new blocks, and field-patch only changed modeled frames/keys. Unmodeled content (for example APIC) survives field edits and is removed only when that whole tag type is dropped or emptied. Generic semantic writes broadcast to present blocks (or create the container’s recommended block when none exist). Format-specific filter targets (`Id3v1Field`, `Id3v2Frame`, `XiphField`) address one native block and error on unsupported containers.
+**Implementation (current):** preview tags live in `AudioTagOverlay` (parsed per–`TagTypes` blocks, not a flat `Id3Tags` bag). Commit Apply diffs session Original → Preview per block: remove dropped tag types, create new blocks, and field-patch only changed modeled frames/keys. Unmodeled content (for example APIC) survives field edits and is removed only when that whole tag type is dropped or emptied. Generic semantic writes broadcast to present blocks (or create the container’s recommended block when none exist). Format-specific filter targets (`Id3v1Field`, `Id3v2Frame`, `XiphField`) address one tag block and error on unsupported containers.
 
 ---
 
@@ -1578,7 +1578,7 @@ public sealed record FileEntry
     public DateTimeOffset Modified { get; init; }
     public DateTimeOffset Created { get; init; }
     public FileAttributes Attributes { get; init; }
-    public Id3Tags? Tags { get; set; }           // lazy
+    public Id3Tags? Tags { get; set; }           // historical; current: AudioTagOverlay on FileMeta
     public ExifData? Exif { get; set; }          // lazy
     public MediaProperties? Media { get; set; }  // lazy
     public FreeDbData? FreeDb { get; set; }      // set by SetFromFreeDB
@@ -1923,6 +1923,10 @@ All past sessions in an expandable tree. Per-item original/result paths, status,
 ---
 
 ## 18. Library Reference
+
+> **Note:** The flat `Id3Tags` sketch below is historical. The shipped model is `AudioTagOverlay`
+> (parsed per–`TagTypes` blocks) with `CommonAudioTag` as the generic projection. See §9
+> **Implementation (current)**.
 
 ```csharp
 public sealed record Id3Tags

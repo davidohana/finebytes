@@ -7,19 +7,19 @@ using TagLib;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Common cross-format audio fields derived from structured <see cref="AudioTagOverlay"/> native blocks.
+    /// Common cross-format audio fields derived from structured <see cref="AudioTagOverlay"/> tag blocks.
     /// </summary>
     /// <remarks>
     /// <para>
     /// Generic read priority when projecting from an overlay: Id3v2 → Id3v1 → Xiph → Ape → RiffInfo → Apple → Asf.
     /// </para>
     /// <para>
-    /// Generic write (via <c>MergeSemanticOntoNativeBlocks</c>) broadcasts each field onto every present block.
+    /// Generic write (via <c>MergeSemanticIntoBlocks</c>) broadcasts each field onto every present block.
     /// When the overlay carries no blocks, the container's recommended empty block is created first
     /// (<see cref="AudioTagContainerPolicy.GetRecommendedBlock"/>); sibling tag types are never invented.
     /// </para>
     /// </remarks>
-    /// <param name="Title">Visible title, if any native block supplies one.</param>
+    /// <param name="Title">Visible title, if any tag block supplies one.</param>
     /// <param name="Album">Album name.</param>
     /// <param name="Performers">Performers joined with <c>; </c> (TagLib list convention).</param>
     /// <param name="AlbumArtists">Album artists joined with <c>; </c>.</param>
@@ -183,10 +183,10 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Materializes semantics from TagLib's merged façade tag fields.
+        /// Projects common fields from a live TagLib tag (combined or single-type).
         /// </summary>
-        /// <param name="tag">Active combined TagLib façade.</param>
-        /// <returns>Common fields reconstructed from façade strings/lists and numerics.</returns>
+        /// <param name="tag">TagLib tag whose string/list/numeric fields are read.</param>
+        /// <returns>Common fields reconstructed from the tag's strings/lists and numerics.</returns>
         public static CommonAudioTag FromCombinedTag(Tag tag)
         {
             ArgumentNullException.ThrowIfNull(tag);
