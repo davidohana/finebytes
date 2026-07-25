@@ -7,7 +7,7 @@ namespace Mfr.Tests.Metadata
 {
     public sealed class AudioTagPersistenceTests : IDisposable
     {
-        private static readonly string[] s_AliceBobPerformers = ["Alice", "Bob"];
+        private static readonly string[] s_AliceBobPerformers = ["Alice;Bob"];
 
         private readonly List<string> _pathsToDelete = [];
 
@@ -75,8 +75,9 @@ namespace Mfr.Tests.Metadata
 
             using (var stub = TagLib.File.Create(candidate))
             {
-                stub.Tag.Title = "baseline";
-                stub.Tag.Album = "AlbumX";
+                var info = (TagLib.Riff.InfoTag)stub.GetTag(TagLib.TagTypes.RiffInfo, true);
+                info.SetValue("INAM", "baseline");
+                info.SetValue("IPRD", "AlbumX");
                 stub.Save();
             }
 
@@ -96,10 +97,10 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// Verifies overlay performer strings split on <c>;</c> for TagLib and rejoin as <c>; </c> on read.
+        /// Verifies overlay performer strings land verbatim in the standard <c>IART</c> chunk and survive a read.
         /// </summary>
         [Fact]
-        public void RoundTrip_Apply_PerformersJoinedWithSemicolon()
+        public void RoundTrip_Apply_PerformersWrittenToIartChunk()
         {
             var candidate = _AllocateMinimalWavPath();
 
@@ -114,10 +115,11 @@ namespace Mfr.Tests.Metadata
             AudioTagPersistence.Apply(candidate, previewOverlay);
 
             var readAgain = AudioTagPersistence.Read(candidate);
-            Assert.Equal("Alice; Bob", readAgain.Semantic().Performers);
+            Assert.Equal("Alice;Bob", readAgain.Semantic().Performers);
 
             using var file = TagLib.File.Create(candidate);
-            Assert.Equal(s_AliceBobPerformers, file.Tag.Performers);
+            var info = (TagLib.Riff.InfoTag)file.GetTag(TagLib.TagTypes.RiffInfo, false);
+            Assert.Equal(s_AliceBobPerformers, info.GetValuesAsStrings("IART"));
         }
 
         /// <summary>

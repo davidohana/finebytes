@@ -168,8 +168,19 @@ namespace Mfr.Tests.Metadata
         private static void _ApplyTags(string path, string baselineTitle, string baselineAlbum)
         {
             using var file = TagLib.File.Create(path);
-            file.Tag.Title = baselineTitle;
-            file.Tag.Album = baselineAlbum;
+
+            // TagLib's RIFF façade writes non-standard INFO ids (Album→DIRC), so seed WAV by standard key.
+            if (file.GetTag(TagLib.TagTypes.RiffInfo, create: true) is TagLib.Riff.InfoTag info)
+            {
+                info.SetValue("INAM", baselineTitle);
+                info.SetValue("IPRD", baselineAlbum);
+            }
+            else
+            {
+                file.Tag.Title = baselineTitle;
+                file.Tag.Album = baselineAlbum;
+            }
+
             file.Save();
         }
     }

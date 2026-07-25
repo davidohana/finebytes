@@ -78,7 +78,7 @@ can still create the recommended block). It is **excluded** from equality (dirty
 | **Id3v2** | `byte Version` + modeled text frames. Singletons keyed by FrameId; multi-instance by FrameId + language/description |
 | **Xiph** | Known-key multimap (covers `SemanticAudioTag` fields). Unknown keys left on disk |
 | **Ape** | Known text key map |
-| **RiffInfo** | INFO key → string map |
+| **RiffInfo** | INFO key → string map. Standard fourCCs (`INAM`, `IPRD`, `IART`, `IGNR`, `ICMT`, `ICOP`, `ICRD`, `ITRK`) read/written by key, not through TagLib's `InfoTag` façade properties (those map to non-standard ids such as `DIRC` for album) |
 | **Apple** | Text atom rows (track/disc binary atoms not modeled yet) |
 | **Asf** | Content Description fields + extended descriptors (see below) |
 
@@ -164,6 +164,27 @@ Overlay rows use TagLib-canonical names (`AsfDescriptorNames`):
 
 Write/patch routes Content Description fields through TagLib façade properties, never
 `AddDescriptor("WM/Title")`-style non-canonical names.
+
+## RIFF INFO rules
+
+Read, write, and patch address INFO chunks by key (`InfoTag.GetValuesAsStrings` / `SetValue` / `RemoveValue`),
+matching the Xiph and APE paths. TagLib's `InfoTag` façade properties are not used because they map several
+common fields to non-standard ids (Album→`DIRC`, Performers→`ISTR`, Track→`IPRT`, TrackCount→`IFRM`), which
+other taggers do not read.
+
+| Semantic field | INFO key |
+|---|---|
+| Title | `INAM` |
+| Album | `IPRD` |
+| Performers | `IART` |
+| Genre | `IGNR` |
+| Comment | `ICMT` |
+| Copyright | `ICOP` |
+| Year | `ICRD` |
+| Track | `ITRK` |
+
+A chunk holds a single string, so multi-value semantics stay in that string verbatim (`Alice;Bob` round-trips
+unchanged). Unknown INFO keys are left on disk.
 
 ## Apply algorithm
 

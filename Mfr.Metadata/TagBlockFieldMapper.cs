@@ -44,6 +44,13 @@ namespace Mfr.Metadata
             "Year", "Track", "TrackCount", "Disc", "DiscCount",
         ];
 
+        // Standard INFO fourCCs. TagLib's InfoTag façade maps some common properties to non-standard ids
+        // (Album→DIRC, Performers→ISTR, Track→IPRT), so these chunks are read and written by key directly.
+        private static readonly string[] _KnownRiffInfoKeys =
+        [
+            "INAM", "IPRD", "IART", "IGNR", "ICMT", "ICOP", "ICRD", "ITRK",
+        ];
+
         /// <summary>
         /// Reads modeled ID3v2 frames from a live TagLib tag, or <see langword="null"/> when empty of modeled text.
         /// </summary>
@@ -99,13 +106,25 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Reads known RIFF INFO fields from TagLib façade mapping, or <see langword="null"/> when empty.
+        /// Reads known RIFF INFO chunks by key, or <see langword="null"/> when none are present.
         /// </summary>
         public static RiffInfoTagData? ReadRiffInfo(InfoTag info)
         {
-            var semantic = SemanticAudioTagTagLib.FromCombinedTag(info);
-            var rows = _RiffRowsFromCommon(semantic);
-            return rows.Length == 0 ? null : new RiffInfoTagData { Fields = rows };
+            var rows = new List<RiffInfoFieldRow>();
+            foreach (var key in _KnownRiffInfoKeys)
+            {
+                var values = _TrimNonEmpty(info.GetValuesAsStrings(key));
+                if (values.Length == 0)
+                    continue;
+
+                rows.Add(new RiffInfoFieldRow(key, string.Join("; ", values)));
+            }
+
+            if (rows.Count == 0)
+                return null;
+
+            rows.Sort(_CompareRiffInfoRows);
+            return new RiffInfoTagData { Fields = [.. rows] };
         }
 
         /// <summary>
@@ -172,12 +191,21 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Writes known RIFF INFO fields via TagLib façade setters.
+        /// Writes RIFF INFO chunks by key (sets/removes only known keys).
         /// </summary>
         public static void WriteRiffInfo(InfoTag live, RiffInfoTagData data)
         {
-            var common = _CommonFromRiffRows(data.Fields);
-            _WriteCommonToTag(live, common);
+            foreach (var key in _KnownRiffInfoKeys)
+                live.RemoveValue(key);
+
+            foreach (var row in data.Fields)
+            {
+                var value = _NullIfEmpty(row.Value);
+                if (value is null)
+                    continue;
+
+                live.SetValue(row.Key, value);
+            }
         }
 
         /// <summary>
@@ -259,84 +287,6 @@ namespace Mfr.Metadata
 
             var genreName = Id3v1Genres.IndexToAudio(data.Genre);
             live.Genres = string.IsNullOrEmpty(genreName) ? [] : [genreName];
-        }
-
-        /// <summary>
-        /// Writes only fields that differ between <paramref name="original"/> and <paramref name="preview"/> onto a façade tag.
-        /// </summary>
-        internal static void WriteCommonDiffToTag(TagLib.Tag tag, SemanticAudioTag original, SemanticAudioTag preview)
-        {
-            if (!string.Equals(original.Title, preview.Title, StringComparison.Ordinal))
-                tag.Title = _EmptyStringToNull(preview.Title);
-
-            if (!string.Equals(original.Album, preview.Album, StringComparison.Ordinal))
-                tag.Album = _EmptyStringToNull(preview.Album);
-
-            if (!string.Equals(original.Performers, preview.Performers, StringComparison.Ordinal))
-                tag.Performers = _SplitJoinedList(preview.Performers);
-
-            if (!string.Equals(original.AlbumArtists, preview.AlbumArtists, StringComparison.Ordinal))
-                tag.AlbumArtists = _SplitJoinedList(preview.AlbumArtists);
-
-            if (!string.Equals(original.Composers, preview.Composers, StringComparison.Ordinal))
-                tag.Composers = _SplitJoinedList(preview.Composers);
-
-            if (!string.Equals(original.Genre, preview.Genre, StringComparison.Ordinal))
-                tag.Genres = string.IsNullOrWhiteSpace(preview.Genre) ? [] : [preview.Genre.Trim()];
-
-            if (!string.Equals(original.Comment, preview.Comment, StringComparison.Ordinal))
-                tag.Comment = _EmptyStringToNull(preview.Comment);
-
-            if (!string.Equals(original.Lyrics, preview.Lyrics, StringComparison.Ordinal))
-                tag.Lyrics = _EmptyStringToNull(preview.Lyrics);
-
-            if (!string.Equals(original.Copyright, preview.Copyright, StringComparison.Ordinal))
-                tag.Copyright = _EmptyStringToNull(preview.Copyright);
-
-            if (!string.Equals(original.Grouping, preview.Grouping, StringComparison.Ordinal))
-                tag.Grouping = _EmptyStringToNull(preview.Grouping);
-
-            if (original.Year != preview.Year)
-                tag.Year = preview.Year ?? 0;
-
-            if (original.Track != preview.Track)
-                tag.Track = preview.Track ?? 0;
-
-            if (original.TrackCount != preview.TrackCount)
-                tag.TrackCount = preview.TrackCount ?? 0;
-
-            if (original.Disc != preview.Disc)
-                tag.Disc = preview.Disc ?? 0;
-
-            if (original.DiscCount != preview.DiscCount)
-                tag.DiscCount = preview.DiscCount ?? 0;
-        }
-
-        /// <summary>
-        /// Projects RIFF INFO rows into a <see cref="SemanticAudioTag"/> for façade patching.
-        /// </summary>
-        internal static SemanticAudioTag CommonFromRiffRows(ImmutableArray<RiffInfoFieldRow> fields)
-        {
-            return _CommonFromRiffRows(fields);
-        }
-
-        private static void _WriteCommonToTag(TagLib.Tag tag, SemanticAudioTag common)
-        {
-            tag.Title = _EmptyStringToNull(common.Title);
-            tag.Album = _EmptyStringToNull(common.Album);
-            tag.Performers = _SplitJoinedList(common.Performers);
-            tag.AlbumArtists = _SplitJoinedList(common.AlbumArtists);
-            tag.Composers = _SplitJoinedList(common.Composers);
-            tag.Genres = string.IsNullOrWhiteSpace(common.Genre) ? [] : [common.Genre.Trim()];
-            tag.Comment = _EmptyStringToNull(common.Comment);
-            tag.Lyrics = _EmptyStringToNull(common.Lyrics);
-            tag.Copyright = _EmptyStringToNull(common.Copyright);
-            tag.Grouping = _EmptyStringToNull(common.Grouping);
-            tag.Year = common.Year ?? 0;
-            tag.Track = common.Track ?? 0;
-            tag.TrackCount = common.TrackCount ?? 0;
-            tag.Disc = common.Disc ?? 0;
-            tag.DiscCount = common.DiscCount ?? 0;
         }
 
         private static List<Id3v2ModeledFrame> _CollectId3v2Frames(TagLib.Id3v2.Tag id3v2)
@@ -505,68 +455,6 @@ namespace Mfr.Metadata
             rows.AddRange(_SortedRows(map));
         }
 
-        private static ImmutableArray<RiffInfoFieldRow> _RiffRowsFromCommon(SemanticAudioTag common)
-        {
-            var rows = new List<RiffInfoFieldRow>();
-            _AddRiff(rows, "INAM", common.Title);
-            _AddRiff(rows, "IPRD", common.Album);
-            _AddRiff(rows, "IART", common.Performers);
-            _AddRiff(rows, "IGNR", common.Genre);
-            _AddRiff(rows, "ICMT", common.Comment);
-            _AddRiff(rows, "ICOP", common.Copyright);
-            _AddRiff(rows, "ICRD", common.Year?.ToString(CultureInfo.InvariantCulture));
-            _AddRiff(rows, "ITRK", common.Track?.ToString(CultureInfo.InvariantCulture));
-            rows.Sort(static (a, b) => string.CompareOrdinal(a.Key, b.Key));
-            return [.. rows];
-        }
-
-        private static SemanticAudioTag _CommonFromRiffRows(ImmutableArray<RiffInfoFieldRow> fields)
-        {
-            string? Get(string key)
-            {
-                foreach (var row in fields)
-                {
-                    if (string.Equals(row.Key, key, StringComparison.Ordinal))
-                        return row.Value;
-                }
-
-                return null;
-            }
-
-            uint? ParseUInt(string? text)
-            {
-                return text is not null && uint.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var u)
-                    ? u
-                    : null;
-            }
-
-            return new SemanticAudioTag(
-                Title: Get("INAM"),
-                Album: Get("IPRD"),
-                Performers: Get("IART"),
-                AlbumArtists: null,
-                Composers: null,
-                Genre: Get("IGNR"),
-                Comment: Get("ICMT"),
-                Lyrics: null,
-                Copyright: Get("ICOP"),
-                Grouping: null,
-                Year: ParseUInt(Get("ICRD")),
-                Track: ParseUInt(Get("ITRK")),
-                TrackCount: null,
-                Disc: null,
-                DiscCount: null);
-        }
-
-        private static void _AddRiff(List<RiffInfoFieldRow> rows, string key, string? value)
-        {
-            var text = _NullIfEmpty(value);
-            if (text is null)
-                return;
-
-            rows.Add(new RiffInfoFieldRow(key, text));
-        }
-
         private static Dictionary<string, ImmutableArray<string>> _ToMutableMultimap(ImmutableArray<TextFieldRow> fields)
         {
             var map = new Dictionary<string, ImmutableArray<string>>(StringComparer.Ordinal);
@@ -616,6 +504,12 @@ namespace Mfr.Metadata
                 return byKey;
 
             return _CompareStringSeq(a.Values, b.Values);
+        }
+
+        private static int _CompareRiffInfoRows(RiffInfoFieldRow a, RiffInfoFieldRow b)
+        {
+            var byKey = string.CompareOrdinal(a.Key, b.Key);
+            return byKey != 0 ? byKey : string.CompareOrdinal(a.Value, b.Value);
         }
 
         private static int _CompareId3v2Frames(Id3v2ModeledFrame a, Id3v2ModeledFrame b)
@@ -677,11 +571,6 @@ namespace Mfr.Metadata
         private static string? _NullIfEmpty(string? text)
         {
             return string.IsNullOrWhiteSpace(text) ? null : text.Trim();
-        }
-
-        private static string? _EmptyStringToNull(string? text)
-        {
-            return string.IsNullOrEmpty(text) ? null : text;
         }
     }
 }

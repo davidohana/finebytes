@@ -140,7 +140,7 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Creates or patches RIFF INFO fields via façade setters (only changed modeled keys).
+        /// Creates or patches RIFF INFO chunks by key (only changed modeled keys).
         /// </summary>
         public static void ApplyRiffInfo(InfoTag live, RiffInfoTagData? original, RiffInfoTagData preview)
         {
@@ -153,9 +153,25 @@ namespace Mfr.Metadata
             if (Equals(original, preview))
                 return;
 
-            var originalCommon = TagBlockFieldMapper.CommonFromRiffRows(original.Fields);
-            var previewCommon = TagBlockFieldMapper.CommonFromRiffRows(preview.Fields);
-            TagBlockFieldMapper.WriteCommonDiffToTag(live, originalCommon, previewCommon);
+            var originalMap = _IndexRiffInfo(original.Fields);
+            var previewMap = _IndexRiffInfo(preview.Fields);
+
+            foreach (var key in originalMap.Keys)
+            {
+                if (previewMap.ContainsKey(key))
+                    continue;
+
+                live.RemoveValue(key);
+            }
+
+            foreach (var (key, value) in previewMap)
+            {
+                if (originalMap.TryGetValue(key, out var prior)
+                    && string.Equals(prior, value, StringComparison.Ordinal))
+                    continue;
+
+                live.SetValue(key, value);
+            }
         }
 
         /// <summary>
@@ -297,6 +313,20 @@ namespace Mfr.Metadata
             var map = new Dictionary<string, ImmutableArray<string>>(StringComparer.Ordinal);
             foreach (var row in fields)
                 map[row.Key] = row.Values;
+
+            return map;
+        }
+
+        private static Dictionary<string, string> _IndexRiffInfo(ImmutableArray<RiffInfoFieldRow> fields)
+        {
+            var map = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var row in fields)
+            {
+                if (string.IsNullOrWhiteSpace(row.Value))
+                    continue;
+
+                map[row.Key] = row.Value;
+            }
 
             return map;
         }
