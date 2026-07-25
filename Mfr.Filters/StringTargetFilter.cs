@@ -15,9 +15,10 @@ namespace Mfr.Filters
         /// <inheritdoc />
         protected internal sealed override void ApplyCore(RenameItem item)
         {
-            var currentValue = item.GetTargetString(Target);
+            item.EnsureTargetReady(Target);
+            var currentValue = item.Preview.GetTargetString(Target);
             var transformedValue = TransformValue(currentValue, item);
-            item.SetTargetString(Target, transformedValue);
+            item.Preview.SetTargetString(Target, transformedValue);
         }
 
         internal string TransformValue(string value, RenameItem item)

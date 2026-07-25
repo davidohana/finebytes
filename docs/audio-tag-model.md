@@ -60,7 +60,7 @@ flowchart TB
 | Overlay + block records | `Mfr.Models` — `AudioTagOverlay`, `Id3v1TagData`, `Id3v2TagData`, `XiphTagData`, … |
 | Semantic projection / merge / field get-set | `Mfr.Models` — `SemanticAudioTag`, `AudioTagSemanticMerge`, `AudioTagOverlay.MergeSemantic`, `SemanticFields`, `AudioOverlayBlockFieldIo`, `AudioOverlayTargetIo`, capability `AudioTagContainerPolicy` |
 | TagLib I/O and patch | `Mfr.Metadata` — `AudioTagPersistence`, `TagBlockFieldMapper`, `TagBlockFieldPatcher`, `SemanticAudioTagTagLib`, detect-only `AudioTagContainerPolicy` |
-| Filters / targets | `Mfr.Filters` — `AudioTagSetter`, removers, `StringTargetFilter` + `RenameItemTargetStringExtensions` (ensure then `FileMeta` get/set) |
+| Filters / targets | `Mfr.Filters` — `AudioTagSetter`, removers, `StringTargetFilter` + `EnsureTargetReady` then `FileMeta` get/set |
 | Commit | `Mfr.Engine` — `CommitExecutor` (move → strip-all flag → Apply) |
 
 TagLib opens only on first lazy `Read` (via `EnsureEmbeddedTagsLoaded`) and on commit Apply / strip.
@@ -122,7 +122,7 @@ Format-specific filters/targets call `EnsureAudioTagBlockSupported` → PreviewE
 ## Format-specific targets
 
 String-target filters (Formatter, Replacer, …) can address one native field via
-`RenameItemTargetStringExtensions` (ensure) → `FileMeta.GetTargetString` / `SetTargetString` →
+`EnsureTargetReady` (load/capability) → `FileMeta.GetTargetString` / `SetTargetString` →
 `AudioOverlayTargetIo`:
 
 | `targetType` | Addresses |
