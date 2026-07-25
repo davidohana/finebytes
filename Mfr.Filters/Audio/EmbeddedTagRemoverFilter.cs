@@ -12,8 +12,10 @@ namespace Mfr.Filters.Audio
     /// (caught during preview and shown as the row’s <see cref="RenameItem.PreviewError"/>).
     /// </para>
     /// <para>
-    /// On commit, embedded tags are stripped from the destination file before the empty overlay is applied,
-    /// matching the Core finalize ordering so disk state matches the cleared preview.
+    /// Preview clears all modeled blocks via <see cref="AudioTagOverlay.ClearAllBlocks"/> so
+    /// <see cref="AudioTagOverlay.ContainerFormat"/> stays available for a later generic write that creates the
+    /// recommended empty block. On commit, embedded tags are stripped from the destination file before the
+    /// (possibly recreated) overlay is applied.
     /// </para>
     /// </remarks>
     public sealed record EmbeddedTagRemoverFilter() : BaseFilter
@@ -25,7 +27,7 @@ namespace Mfr.Filters.Audio
         protected internal override void ApplyCore(RenameItem item)
         {
             item.EnsureEmbeddedTagsLoaded();
-            item.Preview.AudioTagOverlay = new AudioTagOverlay();
+            item.Preview.AudioTagOverlay.ClearAllBlocks();
             item.StripAllEmbeddedTagsOnCommit = true;
         }
     }

@@ -146,6 +146,27 @@ namespace Mfr.Models.Tags
         }
 
         /// <summary>
+        /// Drops every tag block while keeping <see cref="ContainerFormat"/>.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Used by nuclear strip so a later generic write can still create the container's recommended block.
+        /// Replacing the overlay with <c>new AudioTagOverlay()</c> would reset the format to
+        /// <see cref="AudioContainerFormat.Unknown"/> and make recommended create a no-op.
+        /// </para>
+        /// </remarks>
+        public void ClearAllBlocks()
+        {
+            Id3v1 = null;
+            Id3v2 = null;
+            Xiph = null;
+            Ape = null;
+            Apple = null;
+            Asf = null;
+            RiffInfo = null;
+        }
+
+        /// <summary>
         /// Ensures a present (possibly empty) block of <paramref name="kind"/> exists for subsequent field writes.
         /// </summary>
         /// <remarks>
