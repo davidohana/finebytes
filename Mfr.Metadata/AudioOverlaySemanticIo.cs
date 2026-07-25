@@ -9,7 +9,7 @@ namespace Mfr.Metadata
     /// <remarks>
     /// <para>
     /// Embeds use <see cref="CommonAudioTag.FromOverlay"/> for reads; writes merge an updated <see cref="CommonAudioTag"/> back into native
-    /// blocks via <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/>.
+    /// blocks via <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/> (broadcast to present blocks; recommended create when empty).
     /// </para>
     /// </remarks>
     public static class AudioOverlaySemanticIo
@@ -30,18 +30,21 @@ namespace Mfr.Metadata
 
         /// <summary>
         /// Parses <paramref name="fieldString"/> for <paramref name="field"/>, merges the updated <see cref="CommonAudioTag"/> into
-        /// <paramref name="overlay"/> blocks, and optionally uses <paramref name="embeddedTagSourcePath"/> for Apple atom coalescence.
+        /// <paramref name="overlay"/> blocks (broadcast / recommended create).
         /// </summary>
         /// <param name="overlay">Overlay whose blocks are updated in place.</param>
         /// <param name="field">Which semantic field to replace.</param>
         /// <param name="fieldString">Text as-is, or decimal digits for numeric fields; empty clears nullable fields.</param>
-        /// <param name="embeddedTagSourcePath">On-disk file path for TagLib, or <see langword="null"/> to skip live-file Apple merge.</param>
+        /// <param name="embeddedTagSourcePath">On-disk file path used to detect the container when
+        /// <paramref name="containerFormat"/> is unknown; otherwise unused.</param>
+        /// <param name="containerFormat">Known container for recommended-block create when the overlay is empty.</param>
         /// <exception cref="ArgumentException">Thrown when a numeric field string is not empty and not a valid non-negative integer.</exception>
         public static void MergeFieldStringIntoOverlay(
             AudioTagOverlay overlay,
             AudioOverlayField field,
             string fieldString,
-            string? embeddedTagSourcePath)
+            string? embeddedTagSourcePath,
+            AudioContainerFormat containerFormat = AudioContainerFormat.Unknown)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
@@ -68,7 +71,11 @@ namespace Mfr.Metadata
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 
-            AudioTagPersistence.MergeSemanticOntoNativeBlocks(overlay, merged, embeddedTagSourcePath);
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+                overlay,
+                merged,
+                embeddedTagSourcePath,
+                containerFormat);
         }
 
         private static string? _NullIfEmptyString(string trimmed)

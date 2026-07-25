@@ -59,10 +59,7 @@ namespace Mfr.Metadata
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             containerFormat = AudioTagContainerPolicy.DetectFrom(file);
-            var ambientCombinedBeforeBlockReads = CommonAudioTag.FromCombinedTag(file.Tag);
-            var overlay = _ReadOverlay(file, file.TagTypesOnDisk);
-            _MergeAmbientCombinedTagFacadeIntoBlocks(file, overlay, absolutePath, ambientCombinedBeforeBlockReads);
-            return overlay;
+            return _ReadOverlay(file, file.TagTypesOnDisk);
         }
 
         /// <summary>
@@ -106,15 +103,19 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Like <see cref="MergeSemanticOntoNativeBlocks"/> but ignores TagLib failures.
+        /// Like <see cref="MergeSemanticOntoNativeBlocks"/> but ignores TagLib failures when detecting a container from disk.
         /// </summary>
-        public static bool TryMergeSemanticOntoNativeBlocks(AudioTagOverlay overlay, CommonAudioTag merged, string embeddedTagSourcePath)
+        public static bool TryMergeSemanticOntoNativeBlocks(
+            AudioTagOverlay overlay,
+            CommonAudioTag merged,
+            string? embeddedTagSourcePath,
+            AudioContainerFormat containerFormat = AudioContainerFormat.Unknown)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
             try
             {
-                MergeSemanticOntoNativeBlocks(overlay, merged, embeddedTagSourcePath);
+                MergeSemanticOntoNativeBlocks(overlay, merged, embeddedTagSourcePath, containerFormat);
                 return true;
             }
             catch (UnsupportedFormatException)
@@ -139,72 +140,84 @@ namespace Mfr.Metadata
         /// Merges a semantic projection into structured per–<c>TagTypes</c> field blocks on <paramref name="overlay"/>.
         /// </summary>
         /// <remarks>
-        /// When <paramref name="embeddedTagSourcePath"/> is missing or the file cannot be opened, empty-overlay façade
-        /// materialization is skipped; present blocks still update in memory with empty→absent pruning.
+        /// <para>
+        /// Broadcast write: every present block receives the updated fields (empty→absent; empty modeled blocks prune
+        /// to <see langword="null"/>). Sibling types are never invented.
+        /// </para>
+        /// <para>
+        /// When the overlay carries no blocks and <paramref name="merged"/> has renderable semantics, creates the
+        /// container's <see cref="AudioTagContainerPolicy.GetRecommendedBlock">recommended</see> empty block first.
+        /// <paramref name="containerFormat"/> is preferred; when it is <see cref="AudioContainerFormat.Unknown"/>,
+        /// the container is detected from <paramref name="embeddedTagSourcePath"/> when that path can be opened.
+        /// </para>
         /// </remarks>
+        /// <param name="overlay">Overlay whose blocks are updated in place.</param>
+        /// <param name="merged">Desired common semantic fields.</param>
+        /// <param name="embeddedTagSourcePath">Optional on-disk path used only to detect the container when
+        /// <paramref name="containerFormat"/> is unknown.</param>
+        /// <param name="containerFormat">Known container for recommended-block create; pass the value cached on the
+        /// rename row when available.</param>
         public static void MergeSemanticOntoNativeBlocks(
             AudioTagOverlay overlay,
             CommonAudioTag merged,
-            string? embeddedTagSourcePath)
+            string? embeddedTagSourcePath = null,
+            AudioContainerFormat containerFormat = AudioContainerFormat.Unknown)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var hadAnyNativeBlockBeforeSemanticMerge = overlay.HasAnyBlock();
+            if (!overlay.HasAnyBlock() && merged.ContainsRenderableSemantics())
+                _EnsureRecommendedBlockForCreate(overlay, containerFormat, embeddedTagSourcePath);
 
             TagBlockFieldMapper.MergeSemanticIntoBlocks(overlay, merged);
+        }
 
-            if (hadAnyNativeBlockBeforeSemanticMerge || !merged.ContainsRenderableSemantics())
+        /// <remarks>
+        /// Creates at most one recommended empty block. Detection from path is best-effort: open failures leave the
+        /// overlay empty so the merge is a no-op rather than inventing a wrong tag type.
+        /// </remarks>
+        private static void _EnsureRecommendedBlockForCreate(
+            AudioTagOverlay overlay,
+            AudioContainerFormat containerFormat,
+            string? embeddedTagSourcePath)
+        {
+            var container = containerFormat;
+            if (container == AudioContainerFormat.Unknown)
+                container = _TryDetectContainer(embeddedTagSourcePath);
+
+            var recommended = AudioTagContainerPolicy.GetRecommendedBlock(container);
+            if (recommended is null)
                 return;
 
+            overlay.EnsureEmptyBlock(recommended.Value);
+        }
+
+        private static AudioContainerFormat _TryDetectContainer(string? embeddedTagSourcePath)
+        {
             if (string.IsNullOrWhiteSpace(embeddedTagSourcePath)
                 || !Path.IsPathFullyQualified(embeddedTagSourcePath)
                 || !System.IO.File.Exists(embeddedTagSourcePath)
                 || Directory.Exists(embeddedTagSourcePath))
-                return;
+                return AudioContainerFormat.Unknown;
 
-            TagLib.File? file;
             try
             {
-                file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(embeddedTagSourcePath));
+                return AudioTagContainerPolicy.Detect(embeddedTagSourcePath);
             }
             catch (UnsupportedFormatException)
             {
-                return;
+                return AudioContainerFormat.Unknown;
             }
             catch (CorruptFileException)
             {
-                return;
+                return AudioContainerFormat.Unknown;
             }
             catch (IOException)
             {
-                return;
+                return AudioContainerFormat.Unknown;
             }
-
-            try
+            catch (ArgumentException)
             {
-                TagBlockFieldMapper.WriteCommonToTag(file.Tag, merged);
-                try
-                {
-                    var refreshed = _ReadOverlay(file, file.TagTypes);
-                    overlay.Id3v1 = refreshed.Id3v1;
-                    overlay.Id3v2 = refreshed.Id3v2;
-                    overlay.Xiph = refreshed.Xiph;
-                    overlay.Ape = refreshed.Ape;
-                    overlay.RiffInfo = refreshed.RiffInfo;
-                    overlay.Apple = refreshed.Apple;
-                    overlay.Asf = refreshed.Asf;
-                    TagBlockFieldMapper.MergeSemanticIntoBlocks(overlay, merged);
-                }
-                catch (CorruptFileException)
-                {
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                }
-            }
-            finally
-            {
-                file.Dispose();
+                return AudioContainerFormat.Unknown;
             }
         }
 
@@ -340,24 +353,6 @@ namespace Mfr.Metadata
                 overlay.Asf = _ReadAsfSnapshot(file);
 
             return overlay;
-        }
-
-        private static void _MergeAmbientCombinedTagFacadeIntoBlocks(
-            TagLib.File file,
-            AudioTagOverlay overlay,
-            string absolutePath,
-            CommonAudioTag ambientCombinedBeforeBlockReads)
-        {
-            var ambient = ambientCombinedBeforeBlockReads;
-            if (!ambient.ContainsRenderableSemantics())
-                return;
-
-            var projected = CommonAudioTag.FromOverlay(overlay);
-            var merged = projected.WithMissingFieldsFilledFrom(ambient);
-            if (merged.Equals(projected))
-                return;
-
-            MergeSemanticOntoNativeBlocks(overlay, merged, absolutePath);
         }
 
         private static XiphTagData? _ReadXiph(TagLib.File file)

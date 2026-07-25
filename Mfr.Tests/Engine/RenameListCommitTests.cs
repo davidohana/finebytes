@@ -126,7 +126,7 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies <see cref="AudioTagSetterFilter"/> semantic title updates persist for FLAC (Xiph block coalesced with façade).
+        /// Verifies <see cref="AudioTagSetterFilter"/> semantic title updates persist for FLAC via the Xiph block.
         /// </summary>
         public void Commit_AudioTagSetter_WritesTitle_OnFlac_OnDisk()
         {
@@ -159,7 +159,7 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies <see cref="AudioTagSetterFilter"/> semantic title updates persist for M4A (Apple block coalesced with façade).
+        /// Verifies <see cref="AudioTagSetterFilter"/> semantic title updates persist for M4A via the Apple block.
         /// </summary>
         public void Commit_AudioTagSetter_WritesTitle_OnM4a_OnDisk()
         {
@@ -192,7 +192,7 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies <see cref="AudioTagSetterFilter"/> semantic title updates persist for WMA (ASF block coalesced with façade).
+        /// Verifies <see cref="AudioTagSetterFilter"/> semantic title updates persist for WMA via the ASF block.
         /// </summary>
         public void Commit_AudioTagSetter_WritesTitle_OnWma_OnDisk()
         {
@@ -348,7 +348,7 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies strip-all then an overlay formatter writes the new title after tags were removed.
+        /// Verifies strip-all then an overlay formatter writes the new title on the recommended RIFF INFO block only.
         /// </summary>
         public void Commit_EmbeddedTagRemover_Then_Formatter_OnTitle_WritesAfterStrip()
         {
@@ -370,12 +370,90 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.Equal("AfterStrip", item.Preview.AudioTagOverlay.Semantic().Title);
+            Assert.NotNull(item.Preview.AudioTagOverlay.RiffInfo);
+            Assert.Null(item.Preview.AudioTagOverlay.Id3v2);
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
             Assert.Equal("AfterStrip", readBack.Semantic().Title);
+            Assert.NotNull(readBack.RiffInfo);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies strip-all then a title formatter on MP3 creates recommended ID3v2 only (not ID3v1).
+        /// </summary>
+        public void Commit_EmbeddedTagRemover_Then_Formatter_OnTitle_Mp3_WritesRecommendedId3v2Only()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("strip-mp3.mp3");
+            TaggedMp3Fixture.WriteTagged(sourcePath, id3v1Title: "Trailer", id3v2Title: "Frames");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+
+            var preset = _CreatePresetAllEnabled(
+                "strip-then-title-mp3",
+                new EmbeddedTagRemoverFilter(),
+                new FormatterFilter(
+                    Target: new AudioFieldTarget(AudioOverlayField.Title),
+                    Options: new FormatterOptions("RecommendedMp3")));
+            var plan = _SetupPreview(renameList, preset);
+            var item = Assert.Single(renameList.RenameItems);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("RecommendedMp3", item.Preview.AudioTagOverlay.Semantic().Title);
+            Assert.NotNull(item.Preview.AudioTagOverlay.Id3v2);
+            Assert.Null(item.Preview.AudioTagOverlay.Id3v1);
+            Assert.Equal(3, item.Preview.AudioTagOverlay.Id3v2.Version);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("RecommendedMp3", readBack.Semantic().Title);
+            Assert.NotNull(readBack.Id3v2);
+            Assert.Null(readBack.Id3v1);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies strip-all then a title formatter on FLAC creates recommended Xiph only.
+        /// </summary>
+        public void Commit_EmbeddedTagRemover_Then_Formatter_OnTitle_Flac_WritesRecommendedXiphOnly()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
+            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
+            var sourcePath = dir.CombinePath("strip-flac.flac");
+            File.Copy(fixturePath, sourcePath, overwrite: false);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+
+            var preset = _CreatePresetAllEnabled(
+                "strip-then-title-flac",
+                new EmbeddedTagRemoverFilter(),
+                new FormatterFilter(
+                    Target: new AudioFieldTarget(AudioOverlayField.Title),
+                    Options: new FormatterOptions("RecommendedFlac")));
+            var plan = _SetupPreview(renameList, preset);
+            var item = Assert.Single(renameList.RenameItems);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("RecommendedFlac", item.Preview.AudioTagOverlay.Semantic().Title);
+            Assert.NotNull(item.Preview.AudioTagOverlay.Xiph);
+            Assert.Null(item.Preview.AudioTagOverlay.Ape);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("RecommendedFlac", readBack.Semantic().Title);
+            Assert.NotNull(readBack.Xiph);
+            Assert.Null(readBack.Ape);
         }
 
         [Fact]

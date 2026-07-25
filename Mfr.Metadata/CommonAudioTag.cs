@@ -10,7 +10,14 @@ namespace Mfr.Metadata
     /// Common cross-format audio fields derived from structured <see cref="AudioTagOverlay"/> native blocks.
     /// </summary>
     /// <remarks>
-    /// Precedence: Id3v2 → Id3v1 → Xiph → Ape → RiffInfo → Apple → Asf.
+    /// <para>
+    /// Generic read priority when projecting from an overlay: Id3v2 → Id3v1 → Xiph → Ape → RiffInfo → Apple → Asf.
+    /// </para>
+    /// <para>
+    /// Generic write (via <c>MergeSemanticOntoNativeBlocks</c>) broadcasts each field onto every present block.
+    /// When the overlay carries no blocks, the container's recommended empty block is created first
+    /// (<see cref="AudioTagContainerPolicy.GetRecommendedBlock"/>); sibling tag types are never invented.
+    /// </para>
     /// </remarks>
     /// <param name="Title">Visible title, if any native block supplies one.</param>
     /// <param name="Album">Album name.</param>
@@ -223,39 +230,6 @@ namespace Mfr.Metadata
                 || TrackCount is not null
                 || Disc is not null
                 || DiscCount is not null;
-        }
-
-        /// <summary>
-        /// Copies each field from <paramref name="ambient"/> only where this instance has no substantive value per field.
-        /// </summary>
-        /// <param name="ambient">Typically <see cref="FromCombinedTag"/> values not yet reflected in native blocks.</param>
-        /// <returns>Combined common tag; equal to <see langword="this"/> when nothing was missing.</returns>
-        public CommonAudioTag WithMissingFieldsFilledFrom(CommonAudioTag ambient)
-        {
-            return new CommonAudioTag(
-                Title: _CoalesceAbsentOrWhitespaceString(Title, ambient.Title),
-                Album: _CoalesceAbsentOrWhitespaceString(Album, ambient.Album),
-                Performers: _CoalesceAbsentOrWhitespaceString(Performers, ambient.Performers),
-                AlbumArtists: _CoalesceAbsentOrWhitespaceString(AlbumArtists, ambient.AlbumArtists),
-                Composers: _CoalesceAbsentOrWhitespaceString(Composers, ambient.Composers),
-                Genre: _CoalesceAbsentOrWhitespaceString(Genre, ambient.Genre),
-                Comment: _CoalesceAbsentOrWhitespaceString(Comment, ambient.Comment),
-                Lyrics: _CoalesceAbsentOrWhitespaceString(Lyrics, ambient.Lyrics),
-                Copyright: _CoalesceAbsentOrWhitespaceString(Copyright, ambient.Copyright),
-                Grouping: _CoalesceAbsentOrWhitespaceString(Grouping, ambient.Grouping),
-                Year: Year ?? ambient.Year,
-                Track: Track ?? ambient.Track,
-                TrackCount: TrackCount ?? ambient.TrackCount,
-                Disc: Disc ?? ambient.Disc,
-                DiscCount: DiscCount ?? ambient.DiscCount);
-        }
-
-        private static string? _CoalesceAbsentOrWhitespaceString(string? projected, string? ambient)
-        {
-            if (!string.IsNullOrWhiteSpace(projected))
-                return projected;
-
-            return string.IsNullOrWhiteSpace(ambient) ? null : ambient.Trim();
         }
 
         private static string? _Id3v2Singleton(Id3v2TagData? data, string frameId)

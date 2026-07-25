@@ -102,8 +102,13 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Applies <paramref name="common"/> onto present blocks (empty→absent); prunes empty modeled blocks to <see langword="null"/>.
+        /// Applies <paramref name="common"/> onto every present block (broadcast write); empty→absent; prunes empty modeled blocks to <see langword="null"/>.
         /// </summary>
+        /// <remarks>
+        /// Does not create blocks. When the overlay carries none, callers create the container's recommended empty
+        /// block first (<see cref="AudioTagContainerPolicy.GetRecommendedBlock"/>), then call this method.
+        /// Sibling types are never invented (for example ID3v1 is not added because ID3v2 already exists).
+        /// </remarks>
         public static void MergeSemanticIntoBlocks(AudioTagOverlay overlay, CommonAudioTag common)
         {
             if (overlay.Id3v1 is not null)

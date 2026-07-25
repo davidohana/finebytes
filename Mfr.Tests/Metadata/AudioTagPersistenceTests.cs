@@ -288,6 +288,117 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
+        /// Empty overlay + generic title creates the MPEG recommended ID3v2 block (v2.3), not ID3v1.
+        /// </summary>
+        [Fact]
+        public void MergeSemanticOntoNativeBlocks_EmptyOverlay_Mpeg_CreatesRecommendedId3v2()
+        {
+            var overlay = new AudioTagOverlay();
+            var merged = new CommonAudioTag(
+                Title: "FromEmpty",
+                Album: null,
+                Performers: null,
+                AlbumArtists: null,
+                Composers: null,
+                Genre: null,
+                Comment: null,
+                Lyrics: null,
+                Copyright: null,
+                Grouping: null,
+                Year: null,
+                Track: null,
+                TrackCount: null,
+                Disc: null,
+                DiscCount: null);
+
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+                overlay,
+                merged,
+                embeddedTagSourcePath: null,
+                containerFormat: AudioContainerFormat.Mpeg);
+
+            Assert.NotNull(overlay.Id3v2);
+            Assert.Null(overlay.Id3v1);
+            Assert.Equal(3, overlay.Id3v2.Version);
+            Assert.Equal("FromEmpty", overlay.Semantic().Title);
+        }
+
+        /// <summary>
+        /// Empty overlay + generic title creates the FLAC recommended Xiph block only.
+        /// </summary>
+        [Fact]
+        public void MergeSemanticOntoNativeBlocks_EmptyOverlay_Flac_CreatesRecommendedXiph()
+        {
+            var overlay = new AudioTagOverlay();
+            var merged = new CommonAudioTag(
+                Title: "FromEmptyFlac",
+                Album: null,
+                Performers: null,
+                AlbumArtists: null,
+                Composers: null,
+                Genre: null,
+                Comment: null,
+                Lyrics: null,
+                Copyright: null,
+                Grouping: null,
+                Year: null,
+                Track: null,
+                TrackCount: null,
+                Disc: null,
+                DiscCount: null);
+
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+                overlay,
+                merged,
+                embeddedTagSourcePath: null,
+                containerFormat: AudioContainerFormat.Flac);
+
+            Assert.NotNull(overlay.Xiph);
+            Assert.Null(overlay.Ape);
+            Assert.Equal("FromEmptyFlac", overlay.Semantic().Title);
+        }
+
+        /// <summary>
+        /// Generic title broadcast updates every present block (ID3v1 and ID3v2) without inventing siblings.
+        /// </summary>
+        [Fact]
+        public void MergeSemanticOntoNativeBlocks_BroadcastsTitle_ToAllPresentBlocks()
+        {
+            var overlay = new AudioTagOverlay
+            {
+                Id3v1 = new Id3v1TagData { Title = "OldV1" },
+                Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
+            };
+            var merged = new CommonAudioTag(
+                Title: "Broadcast",
+                Album: null,
+                Performers: null,
+                AlbumArtists: null,
+                Composers: null,
+                Genre: null,
+                Comment: null,
+                Lyrics: null,
+                Copyright: null,
+                Grouping: null,
+                Year: null,
+                Track: null,
+                TrackCount: null,
+                Disc: null,
+                DiscCount: null);
+
+            AudioTagPersistence.MergeSemanticOntoNativeBlocks(
+                overlay,
+                merged,
+                embeddedTagSourcePath: null,
+                containerFormat: AudioContainerFormat.Mpeg);
+
+            Assert.Equal("Broadcast", overlay.Id3v1.Title);
+            Assert.Equal("Broadcast", overlay.Semantic().Title);
+            Assert.Contains(overlay.Id3v2.Frames, f => f.FrameId == "TIT2" && f.TextValues[0] == "Broadcast");
+            Assert.Null(overlay.Xiph);
+        }
+
+        /// <summary>
         /// Verifies <see cref="AudioTagPersistence.MergeSemanticOntoNativeBlocks"/> merges a semantic title into the Apple snapshot for M4A when given the on-disk source path.
         /// </summary>
         [Fact]

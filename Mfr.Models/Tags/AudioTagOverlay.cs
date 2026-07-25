@@ -124,6 +124,51 @@ namespace Mfr.Models.Tags
         }
 
         /// <summary>
+        /// Ensures a present (possibly empty) block of <paramref name="kind"/> exists for subsequent field writes.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Used when a generic semantic write targets a file that carries no tags yet: create the container's
+        /// recommended empty block, then merge fields into it. Already-present blocks are left unchanged.
+        /// ID3v2 creates use version <c>3</c> (ID3v2.3).
+        /// </para>
+        /// </remarks>
+        /// <param name="kind">Block type to materialize when absent.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="kind"/> is not a known block type.</exception>
+        public void EnsureEmptyBlock(AudioTagBlockKind kind)
+        {
+            if (HasBlock(kind))
+                return;
+
+            switch (kind)
+            {
+                case AudioTagBlockKind.Id3v1:
+                    Id3v1 = new Id3v1TagData();
+                    break;
+                case AudioTagBlockKind.Id3v2:
+                    Id3v2 = new Id3v2TagData { Version = 3, Frames = [] };
+                    break;
+                case AudioTagBlockKind.Xiph:
+                    Xiph = new XiphTagData { Fields = [] };
+                    break;
+                case AudioTagBlockKind.Ape:
+                    Ape = new ApeTagData { Fields = [] };
+                    break;
+                case AudioTagBlockKind.Apple:
+                    Apple = new AppleTagData { Atoms = [] };
+                    break;
+                case AudioTagBlockKind.Asf:
+                    Asf = new AsfTagData { Descriptors = [] };
+                    break;
+                case AudioTagBlockKind.RiffInfo:
+                    RiffInfo = new RiffInfoTagData { Fields = [] };
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown audio tag block kind.");
+            }
+        }
+
+        /// <summary>
         /// Lists the block types currently present on this overlay, in <see cref="AudioTagBlockKind"/> declaration order.
         /// </summary>
         /// <returns>Present block types; empty when the overlay carries no tags.</returns>
