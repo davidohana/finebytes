@@ -1,13 +1,12 @@
 namespace Mfr.Models.Tags
 {
     /// <summary>
-    /// Reads and writes string-valued <see cref="FilterTarget"/> rows that address <see cref="AudioTagOverlay"/> fields.
+    /// Reads and writes string-valued <see cref="IAudioOverlayFilterTarget"/> rows on <see cref="AudioTagOverlay"/>.
     /// </summary>
     /// <remarks>
     /// <para>
     /// Path and file-name targets are not handled here; callers must route those through
-    /// <c>FileMetaPreviewExtensions</c>. Use <see cref="IAudioOverlayFilterTarget"/> to classify a target first.
-    /// Capability checks belong to the filter layer before write.
+    /// <c>FileMetaPreviewExtensions</c>. Capability checks belong to the filter layer before write.
     /// </para>
     /// </remarks>
     public static class AudioOverlayTargetIo
@@ -18,8 +17,8 @@ namespace Mfr.Models.Tags
         /// <param name="overlay">Structured tag blocks.</param>
         /// <param name="target">Audio field or frame target.</param>
         /// <returns>Current string value (empty when unset).</returns>
-        /// <exception cref="NotSupportedException">Thrown when <paramref name="target"/> is not an audio overlay target.</exception>
-        public static string GetTargetString(AudioTagOverlay overlay, FilterTarget target)
+        /// <exception cref="NotSupportedException">Thrown when <paramref name="target"/> is an unrecognized audio overlay target type.</exception>
+        public static string GetTargetString(AudioTagOverlay overlay, IAudioOverlayFilterTarget target)
         {
             ArgumentNullException.ThrowIfNull(overlay);
             ArgumentNullException.ThrowIfNull(target);
@@ -49,8 +48,8 @@ namespace Mfr.Models.Tags
         /// <param name="overlay">Overlay whose blocks are updated.</param>
         /// <param name="target">Audio field or frame target.</param>
         /// <param name="value">Transformed string to store.</param>
-        /// <exception cref="NotSupportedException">Thrown when <paramref name="target"/> is not an audio overlay target.</exception>
-        public static void SetTargetString(AudioTagOverlay overlay, FilterTarget target, string value)
+        /// <exception cref="NotSupportedException">Thrown when <paramref name="target"/> is an unrecognized audio overlay target type.</exception>
+        public static void SetTargetString(AudioTagOverlay overlay, IAudioOverlayFilterTarget target, string value)
         {
             ArgumentNullException.ThrowIfNull(overlay);
             ArgumentNullException.ThrowIfNull(target);

@@ -19,8 +19,8 @@ namespace Mfr.Models
         /// <exception cref="NotSupportedException">Thrown when no handler exists for <paramref name="target"/>.</exception>
         internal static string GetTargetString(this FileMeta meta, FilterTarget target)
         {
-            if (target is IAudioOverlayFilterTarget)
-                return AudioOverlayTargetIo.GetTargetString(meta.AudioTagOverlay, target);
+            if (target is IAudioOverlayFilterTarget audioTarget)
+                return AudioOverlayTargetIo.GetTargetString(meta.AudioTagOverlay, audioTarget);
 
             return target switch
             {
@@ -49,9 +49,9 @@ namespace Mfr.Models
         /// <exception cref="NotSupportedException">Thrown when no handler exists for <paramref name="target"/>.</exception>
         internal static void SetTargetString(this FileMeta meta, FilterTarget target, string value)
         {
-            if (target is IAudioOverlayFilterTarget)
+            if (target is IAudioOverlayFilterTarget audioTarget)
             {
-                AudioOverlayTargetIo.SetTargetString(meta.AudioTagOverlay, target, value);
+                AudioOverlayTargetIo.SetTargetString(meta.AudioTagOverlay, audioTarget, value);
                 return;
             }
 
