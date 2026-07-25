@@ -63,7 +63,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
             var item = FilterTestHelpers.CreateRenameItem(
                 configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Orig"));
 
-            var merged = CommonAudioTag.FromOverlay(item.Preview.AudioTagOverlay) with { Title = "Prev" };
+            var merged = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay) with { Title = "Prev" };
             AudioTagPersistence.MergeSemanticIntoBlocks(item.Preview.AudioTagOverlay, merged, embeddedTagSourcePath: null);
 
             Assert.Equal("Prev", token.Compile(string.Empty)(item));

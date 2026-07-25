@@ -41,7 +41,7 @@ namespace Mfr.Metadata
     /// <param name="TrackCount">Track count.</param>
     /// <param name="Disc">Disc number.</param>
     /// <param name="DiscCount">Disc count.</param>
-    public sealed record CommonAudioTag(
+    public sealed record SemanticAudioTag(
         string? Title,
         string? Album,
         string? Performers,
@@ -63,7 +63,7 @@ namespace Mfr.Metadata
         /// </summary>
         /// <param name="overlay">Overlay whose blocks are interpreted; must not be <see langword="null"/>.</param>
         /// <returns>Projected common fields.</returns>
-        public static CommonAudioTag FromOverlay(AudioTagOverlay overlay)
+        public static SemanticAudioTag FromOverlay(AudioTagOverlay overlay)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
@@ -171,7 +171,7 @@ namespace Mfr.Metadata
                 _ParseUInt(_ApeFirst(overlay.Ape, "DiscCount")),
                 _ParseUInt(_Asf(overlay.Asf, "WM/TotalDiscs")));
 
-            return new CommonAudioTag(
+            return new SemanticAudioTag(
                 Title: title,
                 Album: album,
                 Performers: performers,
@@ -194,11 +194,11 @@ namespace Mfr.Metadata
         /// </summary>
         /// <param name="tag">TagLib tag whose string/list/numeric fields are read.</param>
         /// <returns>Common fields reconstructed from the tag's strings/lists and numerics.</returns>
-        public static CommonAudioTag FromCombinedTag(Tag tag)
+        public static SemanticAudioTag FromCombinedTag(Tag tag)
         {
             ArgumentNullException.ThrowIfNull(tag);
 
-            return new CommonAudioTag(
+            return new SemanticAudioTag(
                 Title: _NullIfWhitespace(tag.Title),
                 Album: _NullIfWhitespace(tag.Album),
                 Performers: _JoinList(tag.Performers),

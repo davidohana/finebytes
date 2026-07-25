@@ -7,7 +7,7 @@ namespace Mfr.Models.Tags.Xiph
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Only keys needed for <c>CommonAudioTag</c> projection and filters are stored. Unknown on-disk keys are left
+    /// Only keys needed for <c>SemanticAudioTag</c> projection and filters are stored. Unknown on-disk keys are left
     /// untouched by field-patch Apply. Rows are sorted by key then values for stable equality.
     /// </para>
     /// </remarks>

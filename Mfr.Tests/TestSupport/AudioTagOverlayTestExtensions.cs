@@ -9,12 +9,12 @@ namespace Mfr.Tests.TestSupport
     internal static class AudioTagOverlayTestExtensions
     {
         /// <summary>
-        /// Projects <paramref name="overlay"/> through <see cref="CommonAudioTag.FromOverlay"/>.
+        /// Projects <paramref name="overlay"/> through <see cref="SemanticAudioTag.FromOverlay"/>.
         /// </summary>
-        public static CommonAudioTag Semantic(this AudioTagOverlay overlay)
+        public static SemanticAudioTag Semantic(this AudioTagOverlay overlay)
         {
             ArgumentNullException.ThrowIfNull(overlay);
-            return CommonAudioTag.FromOverlay(overlay);
+            return SemanticAudioTag.FromOverlay(overlay);
         }
     }
 }

@@ -151,7 +151,7 @@ namespace Mfr.Tests.Engine
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
-                CommonAudioTag.FromOverlay(pv) with { Title = "Next" },
+                SemanticAudioTag.FromOverlay(pv) with { Title = "Next" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
@@ -174,7 +174,7 @@ namespace Mfr.Tests.Engine
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
-                CommonAudioTag.FromOverlay(pv) with { Year = 2001 },
+                SemanticAudioTag.FromOverlay(pv) with { Year = 2001 },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
@@ -196,7 +196,7 @@ namespace Mfr.Tests.Engine
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
-                CommonAudioTag.FromOverlay(pv) with { Lyrics = "a\nb" },
+                SemanticAudioTag.FromOverlay(pv) with { Lyrics = "a\nb" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
@@ -256,7 +256,7 @@ namespace Mfr.Tests.Engine
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
-                CommonAudioTag.FromOverlay(pv) with { Genre = "Rock" },
+                SemanticAudioTag.FromOverlay(pv) with { Genre = "Rock" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
@@ -279,7 +279,7 @@ namespace Mfr.Tests.Engine
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticIntoBlocks(
                 pv,
-                CommonAudioTag.FromOverlay(pv) with { Genre = "Rock" },
+                SemanticAudioTag.FromOverlay(pv) with { Genre = "Rock" },
                 embeddedTagSourcePath: null);
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);

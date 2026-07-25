@@ -35,7 +35,7 @@ namespace Mfr.Tests.TestSupport
                 Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
             };
 
-            var merged = new CommonAudioTag(
+            var merged = new SemanticAudioTag(
                 Title: string.IsNullOrWhiteSpace(title) ? null : title.Trim(),
                 Album: string.IsNullOrWhiteSpace(album) ? null : album.Trim(),
                 Performers: string.IsNullOrWhiteSpace(performersJoined) ? null : performersJoined.Trim(),

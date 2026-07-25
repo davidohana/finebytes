@@ -101,7 +101,7 @@ namespace Mfr.Filters.Audio
         {
             item.EnsureEmbeddedTagsLoaded();
             var tags = item.Preview.AudioTagOverlay;
-            var merged = CommonAudioTag.FromOverlay(tags);
+            var merged = SemanticAudioTag.FromOverlay(tags);
 
             if (Options.Performers is not null)
                 merged = _ApplyStringSemantics(
@@ -209,13 +209,13 @@ namespace Mfr.Filters.Audio
             return _ => literal;
         }
 
-        private static CommonAudioTag _ApplyStringSemantics(
+        private static SemanticAudioTag _ApplyStringSemantics(
             RenameItem item,
-            CommonAudioTag merged,
+            SemanticAudioTag merged,
             bool onlyIfEmpty,
             string? currentValue,
             Formatter formatter,
-            Func<CommonAudioTag, string?, CommonAudioTag> assignUpdated)
+            Func<SemanticAudioTag, string?, SemanticAudioTag> assignUpdated)
         {
             var overlayAlreadyHasValue = !string.IsNullOrWhiteSpace(currentValue);
             if (onlyIfEmpty && overlayAlreadyHasValue)
@@ -225,9 +225,9 @@ namespace Mfr.Filters.Audio
             return assignUpdated(merged, expanded);
         }
 
-        private CommonAudioTag _ApplyYearSemantics(
+        private SemanticAudioTag _ApplyYearSemantics(
             RenameItem item,
-            CommonAudioTag merged,
+            SemanticAudioTag merged,
             bool onlyIfEmpty,
             Formatter formatter)
         {
@@ -257,9 +257,9 @@ namespace Mfr.Filters.Audio
             return merged with { Year = yearValue };
         }
 
-        private CommonAudioTag _ApplyTrackSemantics(
+        private SemanticAudioTag _ApplyTrackSemantics(
             RenameItem item,
-            CommonAudioTag merged,
+            SemanticAudioTag merged,
             bool onlyIfEmpty,
             Formatter formatter)
         {

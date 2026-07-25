@@ -17,7 +17,7 @@ using AppleTag = TagLib.Mpeg4.AppleTag;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Maps TagLib tags ↔ parsed overlay field blocks (and CommonAudioTag ↔ those blocks).
+    /// Maps TagLib tags ↔ parsed overlay field blocks (and SemanticAudioTag ↔ those blocks).
     /// </summary>
     internal static class TagBlockFieldMapper
     {
@@ -90,7 +90,7 @@ namespace Mfr.Metadata
             }
 
             // Also capture TagLib façade-backed values when item keys differ.
-            _AddCommonAsRows(rows, CommonAudioTag.FromCombinedTag(ape), preferExistingKeys: true);
+            _AddCommonAsRows(rows, SemanticAudioTag.FromCombinedTag(ape), preferExistingKeys: true);
             if (rows.Count == 0)
                 return null;
 
@@ -103,7 +103,7 @@ namespace Mfr.Metadata
         /// </summary>
         public static RiffInfoTagData? ReadRiffInfo(InfoTag info)
         {
-            var common = CommonAudioTag.FromCombinedTag(info);
+            var common = SemanticAudioTag.FromCombinedTag(info);
             var rows = _RiffRowsFromCommon(common);
             return rows.Length == 0 ? null : new RiffInfoTagData { Fields = rows };
         }
@@ -116,7 +116,7 @@ namespace Mfr.Metadata
         /// block first (<see cref="AudioTagContainerPolicy.GetRecommendedBlock"/>), then call this method.
         /// Sibling types are never invented (for example ID3v1 is not added because ID3v2 already exists).
         /// </remarks>
-        public static void MergeSemanticIntoBlocks(AudioTagOverlay overlay, CommonAudioTag common)
+        public static void MergeSemanticIntoBlocks(AudioTagOverlay overlay, SemanticAudioTag common)
         {
             if (overlay.Id3v1 is not null)
                 overlay.Id3v1 = _MergeId3v1(overlay.Id3v1, common);
@@ -255,7 +255,7 @@ namespace Mfr.Metadata
         /// <summary>
         /// Writes only fields that differ between <paramref name="original"/> and <paramref name="preview"/> onto a façade tag.
         /// </summary>
-        internal static void WriteCommonDiffToTag(TagLib.Tag tag, CommonAudioTag original, CommonAudioTag preview)
+        internal static void WriteCommonDiffToTag(TagLib.Tag tag, SemanticAudioTag original, SemanticAudioTag preview)
         {
             if (!string.Equals(original.Title, preview.Title, StringComparison.Ordinal))
                 tag.Title = _EmptyStringToNull(preview.Title);
@@ -304,14 +304,14 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Projects RIFF INFO rows into a <see cref="CommonAudioTag"/> for façade patching.
+        /// Projects RIFF INFO rows into a <see cref="SemanticAudioTag"/> for façade patching.
         /// </summary>
-        internal static CommonAudioTag CommonFromRiffRows(ImmutableArray<RiffInfoFieldRow> fields)
+        internal static SemanticAudioTag CommonFromRiffRows(ImmutableArray<RiffInfoFieldRow> fields)
         {
             return _CommonFromRiffRows(fields);
         }
 
-        private static void _WriteCommonToTag(TagLib.Tag tag, CommonAudioTag common)
+        private static void _WriteCommonToTag(TagLib.Tag tag, SemanticAudioTag common)
         {
             tag.Title = _EmptyStringToNull(common.Title);
             tag.Album = _EmptyStringToNull(common.Album);
@@ -448,7 +448,7 @@ namespace Mfr.Metadata
             }
         }
 
-        private static Id3v1TagData? _MergeId3v1(Id3v1TagData existing, CommonAudioTag common)
+        private static Id3v1TagData? _MergeId3v1(Id3v1TagData existing, SemanticAudioTag common)
         {
             var parts = _SplitJoinedList(common.Performers);
             var artist = parts.Length > 0 ? parts[0] : null;
@@ -471,7 +471,7 @@ namespace Mfr.Metadata
             return _IsId3v1Empty(merged) ? null : merged;
         }
 
-        private static Id3v2TagData? _MergeId3v2(Id3v2TagData existing, CommonAudioTag common)
+        private static Id3v2TagData? _MergeId3v2(Id3v2TagData existing, SemanticAudioTag common)
         {
             var frames = existing.Frames.ToList();
             _SetSingleton(frames, "TIT2", common.Title);
@@ -498,7 +498,7 @@ namespace Mfr.Metadata
             return new Id3v2TagData { Version = existing.Version, Frames = [.. frames] };
         }
 
-        private static XiphTagData? _MergeXiph(XiphTagData existing, CommonAudioTag common)
+        private static XiphTagData? _MergeXiph(XiphTagData existing, SemanticAudioTag common)
         {
             var map = _ToMutableMultimap(existing.Fields);
             _SetMapScalar(map, "TITLE", common.Title);
@@ -527,7 +527,7 @@ namespace Mfr.Metadata
             return rows.Length == 0 ? null : new XiphTagData { Fields = rows };
         }
 
-        private static ApeTagData? _MergeApe(ApeTagData existing, CommonAudioTag common)
+        private static ApeTagData? _MergeApe(ApeTagData existing, SemanticAudioTag common)
         {
             var map = _ToMutableMultimap(existing.Fields);
             _SetMapScalar(map, "Title", common.Title);
@@ -550,13 +550,13 @@ namespace Mfr.Metadata
             return rows.Length == 0 ? null : new ApeTagData { Fields = rows };
         }
 
-        private static RiffInfoTagData? _MergeRiff(CommonAudioTag common)
+        private static RiffInfoTagData? _MergeRiff(SemanticAudioTag common)
         {
             var rows = _RiffRowsFromCommon(common);
             return rows.Length == 0 ? null : new RiffInfoTagData { Fields = rows };
         }
 
-        private static AsfTagData? _MergeAsf(AsfTagData existing, CommonAudioTag common)
+        private static AsfTagData? _MergeAsf(AsfTagData existing, SemanticAudioTag common)
         {
             var rows = existing.Descriptors.ToList();
             _SetAsf(rows, "WM/Title", common.Title);
@@ -587,7 +587,7 @@ namespace Mfr.Metadata
             return new AsfTagData { Descriptors = [.. rows] };
         }
 
-        private static AppleTagData? _MergeApple(AppleTagData existing, CommonAudioTag common)
+        private static AppleTagData? _MergeApple(AppleTagData existing, SemanticAudioTag common)
         {
             var atoms = existing.Atoms.ToList();
             _SetAppleAtom(atoms, AppleAtomIds.Title, common.Title);
@@ -714,7 +714,7 @@ namespace Mfr.Metadata
             return rows;
         }
 
-        private static void _AddCommonAsRows(List<TextFieldRow> rows, CommonAudioTag common, bool preferExistingKeys)
+        private static void _AddCommonAsRows(List<TextFieldRow> rows, SemanticAudioTag common, bool preferExistingKeys)
         {
             var map = _ToMutableMultimap([.. rows]);
             void Set(string key, string? value)
@@ -745,7 +745,7 @@ namespace Mfr.Metadata
             rows.AddRange(_SortedRows(map));
         }
 
-        private static ImmutableArray<RiffInfoFieldRow> _RiffRowsFromCommon(CommonAudioTag common)
+        private static ImmutableArray<RiffInfoFieldRow> _RiffRowsFromCommon(SemanticAudioTag common)
         {
             var rows = new List<RiffInfoFieldRow>();
             _AddRiff(rows, "INAM", common.Title);
@@ -760,7 +760,7 @@ namespace Mfr.Metadata
             return [.. rows];
         }
 
-        private static CommonAudioTag _CommonFromRiffRows(ImmutableArray<RiffInfoFieldRow> fields)
+        private static SemanticAudioTag _CommonFromRiffRows(ImmutableArray<RiffInfoFieldRow> fields)
         {
             string? Get(string key)
             {
@@ -780,7 +780,7 @@ namespace Mfr.Metadata
                     : null;
             }
 
-            return new CommonAudioTag(
+            return new SemanticAudioTag(
                 Title: Get("INAM"),
                 Album: Get("IPRD"),
                 Performers: Get("IART"),

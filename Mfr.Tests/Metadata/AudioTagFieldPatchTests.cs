@@ -31,7 +31,7 @@ namespace Mfr.Tests.Metadata
             var original = AudioTagPersistence.Read(path);
             Assert.NotNull(original.Id3v2);
             var preview = original.Clone();
-            var merged = CommonAudioTag.FromOverlay(preview) with { Title = "AfterTitleOnly" };
+            var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "AfterTitleOnly" };
             AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
             AudioTagPersistence.Apply(path, original, preview);
@@ -79,7 +79,7 @@ namespace Mfr.Tests.Metadata
             Assert.True(descriptorCountBefore > 1);
 
             var preview = original.Clone();
-            var merged = CommonAudioTag.FromOverlay(preview) with { Title = "AsfPatchedTitle" };
+            var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "AsfPatchedTitle" };
             AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
             AudioTagPersistence.Apply(path, original, preview);

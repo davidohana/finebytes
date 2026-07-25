@@ -178,7 +178,7 @@ namespace Mfr.Tests.Metadata
             var path = _CopyFixtureToTempDir("metaflac.flac");
 
             var preview = AudioTagPersistence.Read(path).Clone();
-            var merged = CommonAudioTag.FromOverlay(preview) with { Title = "PolicyAllowsGenericTitle" };
+            var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "PolicyAllowsGenericTitle" };
             AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
             AudioTagPersistence.Apply(path, preview);

@@ -69,7 +69,7 @@ namespace Mfr.Metadata
         /// <returns><see langword="true"/> when the merge ran; <see langword="false"/> when the file could not be read.</returns>
         public static bool TryMergeSemanticIntoBlocks(
             AudioTagOverlay overlay,
-            CommonAudioTag merged,
+            SemanticAudioTag merged,
             string? embeddedTagSourcePath)
         {
             ArgumentNullException.ThrowIfNull(overlay);
@@ -119,7 +119,7 @@ namespace Mfr.Metadata
         /// <see cref="AudioTagOverlay.ContainerFormat"/> is unknown.</param>
         public static void MergeSemanticIntoBlocks(
             AudioTagOverlay overlay,
-            CommonAudioTag merged,
+            SemanticAudioTag merged,
             string? embeddedTagSourcePath = null)
         {
             ArgumentNullException.ThrowIfNull(overlay);

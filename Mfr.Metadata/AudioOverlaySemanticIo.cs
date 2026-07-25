@@ -4,11 +4,11 @@ using Mfr.Models.Tags;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Reads and writes <see cref="AudioOverlayField"/> values through the block-derived <see cref="CommonAudioTag"/> layer.
+    /// Reads and writes <see cref="AudioOverlayField"/> values through the block-derived <see cref="SemanticAudioTag"/> layer.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Embeds use <see cref="CommonAudioTag.FromOverlay"/> for reads; writes merge an updated <see cref="CommonAudioTag"/> back into
+    /// Embeds use <see cref="SemanticAudioTag.FromOverlay"/> for reads; writes merge an updated <see cref="SemanticAudioTag"/> back into
     /// blocks via <see cref="AudioTagPersistence.MergeSemanticIntoBlocks"/> (broadcast to present blocks; recommended create when empty).
     /// </para>
     /// </remarks>
@@ -24,12 +24,12 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var common = CommonAudioTag.FromOverlay(overlay);
+            var common = SemanticAudioTag.FromOverlay(overlay);
             return AudioOverlaySemanticFieldStrings.Format(common, field);
         }
 
         /// <summary>
-        /// Parses <paramref name="fieldString"/> for <paramref name="field"/>, merges the updated <see cref="CommonAudioTag"/> into
+        /// Parses <paramref name="fieldString"/> for <paramref name="field"/>, merges the updated <see cref="SemanticAudioTag"/> into
         /// <paramref name="overlay"/> blocks (broadcast / recommended create).
         /// </summary>
         /// <param name="overlay">Overlay whose blocks are updated in place.</param>
@@ -46,7 +46,7 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var merged = CommonAudioTag.FromOverlay(overlay);
+            var merged = SemanticAudioTag.FromOverlay(overlay);
             var trimmed = fieldString.Trim();
 
             merged = field switch

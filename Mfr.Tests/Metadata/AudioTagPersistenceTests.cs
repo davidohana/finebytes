@@ -85,7 +85,7 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("baseline", readBaseline.Semantic().Title);
 
             var previewOverlay = readBaseline.Clone();
-            var merged = CommonAudioTag.FromOverlay(previewOverlay) with { Title = "preview" };
+            var merged = SemanticAudioTag.FromOverlay(previewOverlay) with { Title = "preview" };
             AudioTagPersistence.MergeSemanticIntoBlocks(previewOverlay, merged, candidate);
 
             AudioTagPersistence.Apply(candidate, previewOverlay);
@@ -105,7 +105,7 @@ namespace Mfr.Tests.Metadata
 
             var readBaseline = AudioTagPersistence.Read(candidate);
             var previewOverlay = readBaseline.Clone();
-            var merged = CommonAudioTag.FromOverlay(previewOverlay)
+            var merged = SemanticAudioTag.FromOverlay(previewOverlay)
                 with
             { Performers = "Alice;Bob" };
 
@@ -280,7 +280,7 @@ namespace Mfr.Tests.Metadata
             var disk = AudioTagPersistence.Read(path);
             var uniqueTitle = $"MergeOgg_{Guid.NewGuid():N}";
             var preview = disk.Clone();
-            var merged = CommonAudioTag.FromOverlay(preview) with { Title = uniqueTitle };
+            var merged = SemanticAudioTag.FromOverlay(preview) with { Title = uniqueTitle };
             AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
             Assert.NotNull(disk.Xiph);
@@ -296,7 +296,7 @@ namespace Mfr.Tests.Metadata
         public void MergeSemanticIntoBlocks_EmptyOverlay_Mpeg_CreatesRecommendedId3v2()
         {
             var overlay = new AudioTagOverlay { ContainerFormat = AudioContainerFormat.Mpeg };
-            var merged = new CommonAudioTag(
+            var merged = new SemanticAudioTag(
                 Title: "FromEmpty",
                 Album: null,
                 Performers: null,
@@ -328,7 +328,7 @@ namespace Mfr.Tests.Metadata
         public void MergeSemanticIntoBlocks_EmptyOverlay_Flac_CreatesRecommendedXiph()
         {
             var overlay = new AudioTagOverlay { ContainerFormat = AudioContainerFormat.Flac };
-            var merged = new CommonAudioTag(
+            var merged = new SemanticAudioTag(
                 Title: "FromEmptyFlac",
                 Album: null,
                 Performers: null,
@@ -364,7 +364,7 @@ namespace Mfr.Tests.Metadata
                 Id3v1 = new Id3v1TagData { Title = "OldV1" },
                 Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
             };
-            var merged = new CommonAudioTag(
+            var merged = new SemanticAudioTag(
                 Title: "Broadcast",
                 Album: null,
                 Performers: null,
@@ -401,7 +401,7 @@ namespace Mfr.Tests.Metadata
             Assert.NotNull(disk.Apple);
 
             var preview = disk.Clone();
-            var merged = CommonAudioTag.FromOverlay(preview) with { Title = "MergedM4aTitle" };
+            var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "MergedM4aTitle" };
 
             AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
@@ -419,7 +419,7 @@ namespace Mfr.Tests.Metadata
 
             var disk = AudioTagPersistence.Read(path);
             var preview = disk.Clone();
-            var merged = CommonAudioTag.FromOverlay(preview) with { Title = "SemanticTitleMergeOnly" };
+            var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "SemanticTitleMergeOnly" };
             AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
 
             AudioTagPersistence.Apply(path, preview);

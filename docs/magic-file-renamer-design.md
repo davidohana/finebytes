@@ -1925,7 +1925,7 @@ All past sessions in an expandable tree. Per-item original/result paths, status,
 ## 18. Library Reference
 
 > **Note:** The flat `Id3Tags` sketch below is historical. The shipped model is `AudioTagOverlay`
-> (parsed per–`TagTypes` blocks) with `CommonAudioTag` as the generic projection. See §9
+> (parsed per–`TagTypes` blocks) with `SemanticAudioTag` as the generic projection. See §9
 > **Implementation (current)**.
 
 ```csharp

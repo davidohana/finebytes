@@ -27,7 +27,7 @@ namespace Mfr.Tests.Metadata
                 RiffInfo = new RiffInfoTagData { Fields = [] },
             };
 
-            var common = CommonAudioTag.FromOverlay(overlay);
+            var common = SemanticAudioTag.FromOverlay(overlay);
 
             Assert.Null(common.Title);
             Assert.Null(common.Album);
@@ -44,7 +44,7 @@ namespace Mfr.Tests.Metadata
         {
             var overlay = new AudioTagOverlay { Asf = new AsfTagData() };
 
-            var common = CommonAudioTag.FromOverlay(overlay);
+            var common = SemanticAudioTag.FromOverlay(overlay);
 
             Assert.Null(common.Title);
         }
@@ -62,11 +62,11 @@ namespace Mfr.Tests.Metadata
                 Ape = new ApeTagData { Fields = [] },
                 RiffInfo = new RiffInfoTagData { Fields = [] },
             };
-            var merged = CommonAudioTag.FromOverlay(overlay) with { Title = "Recovered" };
+            var merged = SemanticAudioTag.FromOverlay(overlay) with { Title = "Recovered" };
 
             AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath: null);
 
-            Assert.Equal("Recovered", CommonAudioTag.FromOverlay(overlay).Title);
+            Assert.Equal("Recovered", SemanticAudioTag.FromOverlay(overlay).Title);
             Assert.Contains(overlay.Id3v2.Frames, f => f.FrameId == "TIT2");
             Assert.Contains(overlay.Xiph.Fields, f => f.Key == "TITLE");
         }
