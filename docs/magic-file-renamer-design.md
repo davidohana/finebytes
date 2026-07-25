@@ -1538,7 +1538,7 @@ All standard text frames: TIT1/2/3, TPE1/2/3/4, TALB, TYER, TCON, TRCK, TPOS, TC
 
 `<multiple values>` shown in gray when selected files differ. Editing replaces all. Only touched fields are written (patch semantics). ID3 fields can also be edited inline in the Rename List via Manual Rename.
 
-**Implementation (current):** preview tags live in `AudioTagOverlay` (parsed per–`TagTypes` blocks, not a flat `Id3Tags` bag). Commit Apply diffs session Original → Preview per block: remove dropped tag types, create new blocks, and field-patch only changed modeled frames/keys. Unmodeled content (for example APIC) survives field edits and is removed only when that whole tag type is dropped or emptied. Generic semantic writes broadcast to present blocks (or create the container’s recommended block when none exist). Format-specific filter targets (`Id3v1Field`, `Id3v2Frame`, `XiphField`) address one tag block and error on unsupported containers.
+**Implementation (current):** preview tags live in `AudioTagOverlay` (parsed per–`TagTypes` blocks, not a flat `Id3Tags` bag). Commit Apply diffs session Original → Preview per block: remove dropped tag types, create new blocks, and field-patch only changed modeled frames/keys. Unmodeled content (for example APIC) survives field edits and is removed only when that whole tag type is dropped or emptied. Generic semantic writes broadcast to present blocks (or create the container’s recommended block when none exist). Format-specific filter targets (`Id3v1Field`, `Id3v2Frame`, `XiphField`) address one tag block and error on unsupported containers. Full pipeline, container policy, ID3v2/ASF rules, and known limits: [audio-tag-model.md](audio-tag-model.md).
 
 ---
 
@@ -1958,7 +1958,7 @@ All past sessions in an expandable tree. Per-item original/result paths, status,
 
 > **Note:** The flat `Id3Tags` sketch below is historical. The shipped model is `AudioTagOverlay`
 > (parsed per–`TagTypes` blocks) with `SemanticAudioTag` as the generic projection. See §9
-> **Implementation (current)**.
+> **Implementation (current)** and [audio-tag-model.md](audio-tag-model.md).
 
 ```csharp
 public sealed record Id3Tags
