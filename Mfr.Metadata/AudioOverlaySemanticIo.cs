@@ -24,8 +24,8 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var common = SemanticAudioTag.FromOverlay(overlay);
-            return AudioOverlaySemanticFieldStrings.Format(common, field);
+            var semantic = SemanticAudioTag.FromOverlay(overlay);
+            return AudioOverlaySemanticFieldStrings.Format(semantic, field);
         }
 
         /// <summary>
@@ -46,30 +46,30 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var merged = SemanticAudioTag.FromOverlay(overlay);
+            var semantic = SemanticAudioTag.FromOverlay(overlay);
             var trimmed = fieldString.Trim();
 
-            merged = field switch
+            semantic = field switch
             {
-                AudioOverlayField.Title => merged with { Title = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Album => merged with { Album = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Performers => merged with { Performers = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.AlbumArtists => merged with { AlbumArtists = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Composers => merged with { Composers = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Genre => merged with { Genre = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Comment => merged with { Comment = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Lyrics => merged with { Lyrics = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Copyright => merged with { Copyright = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Grouping => merged with { Grouping = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Year => merged with { Year = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                AudioOverlayField.Track => merged with { Track = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                AudioOverlayField.TrackCount => merged with { TrackCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                AudioOverlayField.Disc => merged with { Disc = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                AudioOverlayField.DiscCount => merged with { DiscCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                AudioOverlayField.Title => semantic with { Title = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.Album => semantic with { Album = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.Performers => semantic with { Performers = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.AlbumArtists => semantic with { AlbumArtists = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.Composers => semantic with { Composers = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.Genre => semantic with { Genre = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.Comment => semantic with { Comment = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.Lyrics => semantic with { Lyrics = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.Copyright => semantic with { Copyright = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.Grouping => semantic with { Grouping = _NullIfEmptyString(trimmed) },
+                AudioOverlayField.Year => semantic with { Year = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                AudioOverlayField.Track => semantic with { Track = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                AudioOverlayField.TrackCount => semantic with { TrackCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                AudioOverlayField.Disc => semantic with { Disc = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                AudioOverlayField.DiscCount => semantic with { DiscCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, semantic, embeddedTagSourcePath);
         }
 
         private static string? _NullIfEmptyString(string trimmed)

@@ -64,19 +64,19 @@ namespace Mfr.Metadata
         /// Like <see cref="MergeSemanticIntoBlocks"/> but ignores TagLib failures when detecting a container from disk.
         /// </summary>
         /// <param name="overlay">Overlay whose blocks are updated in place.</param>
-        /// <param name="merged">Desired common semantic fields.</param>
+        /// <param name="semantic">Desired semantic fields to write into present blocks.</param>
         /// <param name="embeddedTagSourcePath">Optional on-disk path used only when the overlay's container is unknown.</param>
         /// <returns><see langword="true"/> when the merge ran; <see langword="false"/> when the file could not be read.</returns>
         public static bool TryMergeSemanticIntoBlocks(
             AudioTagOverlay overlay,
-            SemanticAudioTag merged,
+            SemanticAudioTag semantic,
             string? embeddedTagSourcePath)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
             try
             {
-                MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath);
+                MergeSemanticIntoBlocks(overlay, semantic, embeddedTagSourcePath);
                 return true;
             }
             catch (UnsupportedFormatException)
@@ -106,7 +106,7 @@ namespace Mfr.Metadata
         /// to <see langword="null"/>). Sibling types are never invented.
         /// </para>
         /// <para>
-        /// When the overlay carries no blocks and <paramref name="merged"/> has renderable semantics, creates the
+        /// When the overlay carries no blocks and <paramref name="semantic"/> has renderable semantics, creates the
         /// container's <see cref="AudioTagContainerPolicy.GetRecommendedBlock">recommended</see> empty block first.
         /// <see cref="AudioTagOverlay.ContainerFormat"/> is preferred; when it is
         /// <see cref="AudioContainerFormat.Unknown"/>, the container is detected from
@@ -114,20 +114,20 @@ namespace Mfr.Metadata
         /// </para>
         /// </remarks>
         /// <param name="overlay">Overlay whose blocks are updated in place.</param>
-        /// <param name="merged">Desired common semantic fields.</param>
+        /// <param name="semantic">Desired semantic fields to write into present blocks.</param>
         /// <param name="embeddedTagSourcePath">Optional on-disk path used only to detect the container when
         /// <see cref="AudioTagOverlay.ContainerFormat"/> is unknown.</param>
         public static void MergeSemanticIntoBlocks(
             AudioTagOverlay overlay,
-            SemanticAudioTag merged,
+            SemanticAudioTag semantic,
             string? embeddedTagSourcePath = null)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            if (!overlay.HasAnyBlock() && merged.ContainsRenderableSemantics())
+            if (!overlay.HasAnyBlock() && semantic.ContainsRenderableSemantics())
                 _EnsureRecommendedBlockForCreate(overlay, embeddedTagSourcePath);
 
-            TagBlockFieldMapper.MergeSemanticIntoBlocks(overlay, merged);
+            TagBlockFieldMapper.MergeSemanticIntoBlocks(overlay, semantic);
         }
 
         /// <remarks>

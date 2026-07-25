@@ -109,35 +109,35 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Applies <paramref name="common"/> onto every present block (broadcast write); empty→absent; prunes empty modeled blocks to <see langword="null"/>.
+        /// Applies <paramref name="semantic"/> onto every present block (broadcast write); empty→absent; prunes empty modeled blocks to <see langword="null"/>.
         /// </summary>
         /// <remarks>
         /// Does not create blocks. When the overlay carries none, callers create the container's recommended empty
         /// block first (<see cref="AudioTagContainerPolicy.GetRecommendedBlock"/>), then call this method.
         /// Sibling types are never invented (for example ID3v1 is not added because ID3v2 already exists).
         /// </remarks>
-        public static void MergeSemanticIntoBlocks(AudioTagOverlay overlay, SemanticAudioTag common)
+        public static void MergeSemanticIntoBlocks(AudioTagOverlay overlay, SemanticAudioTag semantic)
         {
             if (overlay.Id3v1 is not null)
-                overlay.Id3v1 = _MergeId3v1(overlay.Id3v1, common);
+                overlay.Id3v1 = _MergeId3v1(overlay.Id3v1, semantic);
 
             if (overlay.Id3v2 is not null)
-                overlay.Id3v2 = _MergeId3v2(overlay.Id3v2, common);
+                overlay.Id3v2 = _MergeId3v2(overlay.Id3v2, semantic);
 
             if (overlay.Xiph is not null)
-                overlay.Xiph = _MergeXiph(overlay.Xiph, common);
+                overlay.Xiph = _MergeXiph(overlay.Xiph, semantic);
 
             if (overlay.Ape is not null)
-                overlay.Ape = _MergeApe(overlay.Ape, common);
+                overlay.Ape = _MergeApe(overlay.Ape, semantic);
 
             if (overlay.RiffInfo is not null)
-                overlay.RiffInfo = _MergeRiff(common);
+                overlay.RiffInfo = _MergeRiff(semantic);
 
             if (overlay.Asf is not null)
-                overlay.Asf = _MergeAsf(overlay.Asf, common);
+                overlay.Asf = _MergeAsf(overlay.Asf, semantic);
 
             if (overlay.Apple is not null)
-                overlay.Apple = _MergeApple(overlay.Apple, common);
+                overlay.Apple = _MergeApple(overlay.Apple, semantic);
         }
 
         /// <summary>

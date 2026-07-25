@@ -101,72 +101,72 @@ namespace Mfr.Filters.Audio
         {
             item.EnsureEmbeddedTagsLoaded();
             var tags = item.Preview.AudioTagOverlay;
-            var merged = SemanticAudioTag.FromOverlay(tags);
+            var semantic = SemanticAudioTag.FromOverlay(tags);
 
             if (Options.Performers is not null)
-                merged = _ApplyStringSemantics(
+                semantic = _ApplyStringSemantics(
                     item,
-                    merged,
+                    semantic,
                     Options.Performers.OnlyIfEmpty,
-                    merged.Performers,
+                    semantic.Performers,
                     PerformersFormatter,
                     static (m, v) => m with { Performers = v });
 
             if (Options.AlbumArtists is not null)
-                merged = _ApplyStringSemantics(
+                semantic = _ApplyStringSemantics(
                     item,
-                    merged,
+                    semantic,
                     Options.AlbumArtists.OnlyIfEmpty,
-                    merged.AlbumArtists,
+                    semantic.AlbumArtists,
                     AlbumArtistsFormatter,
                     static (m, v) => m with { AlbumArtists = v });
 
             if (Options.Title is not null)
-                merged = _ApplyStringSemantics(
+                semantic = _ApplyStringSemantics(
                     item,
-                    merged,
+                    semantic,
                     Options.Title.OnlyIfEmpty,
-                    merged.Title,
+                    semantic.Title,
                     TitleFormatter,
                     static (m, v) => m with { Title = v });
 
             if (Options.Album is not null)
-                merged = _ApplyStringSemantics(
+                semantic = _ApplyStringSemantics(
                     item,
-                    merged,
+                    semantic,
                     Options.Album.OnlyIfEmpty,
-                    merged.Album,
+                    semantic.Album,
                     AlbumFormatter,
                     static (m, v) => m with { Album = v });
 
             if (Options.Genre is not null)
-                merged = _ApplyStringSemantics(
+                semantic = _ApplyStringSemantics(
                     item,
-                    merged,
+                    semantic,
                     Options.Genre.OnlyIfEmpty,
-                    merged.Genre,
+                    semantic.Genre,
                     GenreFormatter,
                     static (m, v) => m with { Genre = v });
 
             if (Options.Comment is not null)
-                merged = _ApplyStringSemantics(
+                semantic = _ApplyStringSemantics(
                     item,
-                    merged,
+                    semantic,
                     Options.Comment.OnlyIfEmpty,
-                    merged.Comment,
+                    semantic.Comment,
                     CommentFormatter,
                     static (m, v) => m with { Comment = v });
 
             if (Options.Year is not null)
-                merged = _ApplyYearSemantics(item, merged, Options.Year.OnlyIfEmpty, YearFormatter);
+                semantic = _ApplyYearSemantics(item, semantic, Options.Year.OnlyIfEmpty, YearFormatter);
 
             if (Options.Track is not null)
-                merged = _ApplyTrackSemantics(item, merged, Options.Track.OnlyIfEmpty, TrackFormatter);
+                semantic = _ApplyTrackSemantics(item, semantic, Options.Track.OnlyIfEmpty, TrackFormatter);
 
             if (!_HasAnyConfiguredSemanticField())
                 return;
 
-            _ = AudioTagPersistence.TryMergeSemanticIntoBlocks(tags, merged, item.Original.FullPath);
+            _ = AudioTagPersistence.TryMergeSemanticIntoBlocks(tags, semantic, item.Original.FullPath);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Mfr.Filters.Audio
 
         private static SemanticAudioTag _ApplyStringSemantics(
             RenameItem item,
-            SemanticAudioTag merged,
+            SemanticAudioTag semantic,
             bool onlyIfEmpty,
             string? currentValue,
             Formatter formatter,
@@ -219,25 +219,25 @@ namespace Mfr.Filters.Audio
         {
             var overlayAlreadyHasValue = !string.IsNullOrWhiteSpace(currentValue);
             if (onlyIfEmpty && overlayAlreadyHasValue)
-                return merged;
+                return semantic;
 
             var expanded = formatter(item).TrimmedOrNull();
-            return assignUpdated(merged, expanded);
+            return assignUpdated(semantic, expanded);
         }
 
         private SemanticAudioTag _ApplyYearSemantics(
             RenameItem item,
-            SemanticAudioTag merged,
+            SemanticAudioTag semantic,
             bool onlyIfEmpty,
             Formatter formatter)
         {
-            if (onlyIfEmpty && merged.Year is not null)
-                return merged;
+            if (onlyIfEmpty && semantic.Year is not null)
+                return semantic;
 
             var resolved = formatter(item);
             var trimmed = resolved.Trim();
             if (trimmed.Length == 0)
-                return merged with { Year = null };
+                return semantic with { Year = null };
 
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var yearValue))
             {
@@ -252,24 +252,24 @@ namespace Mfr.Filters.Audio
             }
 
             if (yearValue == 0)
-                return merged with { Year = null };
+                return semantic with { Year = null };
 
-            return merged with { Year = yearValue };
+            return semantic with { Year = yearValue };
         }
 
         private SemanticAudioTag _ApplyTrackSemantics(
             RenameItem item,
-            SemanticAudioTag merged,
+            SemanticAudioTag semantic,
             bool onlyIfEmpty,
             Formatter formatter)
         {
-            if (onlyIfEmpty && merged.Track is not null)
-                return merged;
+            if (onlyIfEmpty && semantic.Track is not null)
+                return semantic;
 
             var resolved = formatter(item);
             var trimmed = resolved.Trim();
             if (trimmed.Length == 0)
-                return merged with { Track = null };
+                return semantic with { Track = null };
 
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var baseTrack))
             {
@@ -288,9 +288,9 @@ namespace Mfr.Filters.Audio
                 raw += item.Original.RenameListIndex;
 
             if (raw <= 0)
-                return merged with { Track = null };
+                return semantic with { Track = null };
 
-            return merged with { Track = (uint)Math.Min(raw, 255) };
+            return semantic with { Track = (uint)Math.Min(raw, 255) };
         }
     }
 }
