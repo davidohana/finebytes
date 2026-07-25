@@ -46,7 +46,7 @@ namespace Mfr.Filters
 
             item.EnsureEmbeddedTagsLoaded();
             var containerFormat = item.Preview.AudioTagOverlay.ContainerFormat;
-            Mfr.Models.Tags.AudioTagContainerPolicy.EnsureSupported(containerFormat, blockKind);
+            AudioTagContainerPolicy.EnsureSupported(containerFormat, blockKind);
         }
     }
 }

@@ -57,7 +57,7 @@ namespace Mfr.Metadata
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             var overlay = _ReadOverlay(file, file.TagTypesOnDisk);
-            overlay.ContainerFormat = AudioTagContainerPolicy.DetectFrom(file);
+            overlay.ContainerFormat = AudioTagContainerDetector.DetectFrom(file);
             return overlay;
         }
 
@@ -90,7 +90,7 @@ namespace Mfr.Metadata
                 return;
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
-            var containerFormat = AudioTagContainerPolicy.DetectFrom(file);
+            var containerFormat = AudioTagContainerDetector.DetectFrom(file);
             _EnsureIntroducedBlocksSupported(containerFormat, originalOverlay, previewOverlay);
             _RemoveDroppedTagBlocks(file, originalOverlay, previewOverlay);
             _PatchPresentTagBlocks(file, originalOverlay, previewOverlay);
@@ -121,7 +121,7 @@ namespace Mfr.Metadata
                 if (baselineOverlay.HasBlock(kind))
                     continue;
 
-                Models.Tags.AudioTagContainerPolicy.EnsureSupported(containerFormat, kind);
+                AudioTagContainerPolicy.EnsureSupported(containerFormat, kind);
             }
         }
 

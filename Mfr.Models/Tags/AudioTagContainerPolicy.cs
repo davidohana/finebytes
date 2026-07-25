@@ -11,7 +11,7 @@ namespace Mfr.Models.Tags
     /// <see cref="GetRecommendedBlock">recommended block</see> for a file that carries no tags yet.
     /// </para>
     /// <para>
-    /// Container detection from TagLib lives in <c>Mfr.Metadata.AudioTagContainerPolicy</c>.
+    /// Container detection from TagLib lives in <c>Mfr.Metadata.AudioTagContainerDetector</c>.
     /// </para>
     /// </remarks>
     public static class AudioTagContainerPolicy

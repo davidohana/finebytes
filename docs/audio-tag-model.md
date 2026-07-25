@@ -59,7 +59,7 @@ flowchart TB
 |---|---|
 | Overlay + block records | `Mfr.Models` — `AudioTagOverlay`, `Id3v1TagData`, `Id3v2TagData`, `XiphTagData`, … |
 | Semantic projection / merge / field get-set | `Mfr.Models` — `SemanticAudioTag`, `AudioTagSemanticMerge`, `AudioTagOverlay.MergeSemantic`, `SemanticFields`, `AudioOverlayBlockFieldIo`, `AudioOverlayTargetIo`, capability `AudioTagContainerPolicy` |
-| TagLib I/O and patch | `Mfr.Metadata` — `AudioTagPersistence`, `TagBlockFieldMapper`, `TagBlockFieldPatcher`, `SemanticAudioTagTagLib`, detect-only `AudioTagContainerPolicy` |
+| TagLib I/O and patch | `Mfr.Metadata` — `AudioTagPersistence`, `TagBlockFieldMapper`, `TagBlockFieldPatcher`, `SemanticAudioTagTagLib`, `AudioTagContainerDetector` |
 | Filters / targets | `Mfr.Filters` — `AudioTagSetter`, removers, `StringTargetFilter` + `EnsureTargetReady` then `FileMeta` get/set |
 | Commit | `Mfr.Engine` — `CommitExecutor` (move → strip-all flag → Apply) |
 
@@ -96,7 +96,7 @@ Id3v1: single-field clear writes an empty scalar; clearing **all** fields prunes
 ## Container policy
 
 `Mfr.Models.Tags.AudioTagContainerPolicy` maps containers to supported blocks and a recommended create target
-(capability API). TagLib-backed detection lives on `Mfr.Metadata.AudioTagContainerPolicy` (`Detect` / `DetectFrom`):
+(capability API). TagLib-backed detection lives on `Mfr.Metadata.AudioTagContainerDetector` (`Detect` / `DetectFrom`):
 
 | Container | Supported blocks | Recommended if empty |
 |---|---|---|
@@ -215,7 +215,7 @@ same preview chain.
 | Overlay | `Mfr.Models/Tags/AudioTagOverlay.cs`, block types under `Tags/{Id3v1,Id3v2,Xiph,…}` |
 | Semantic / field I/O | `Mfr.Models/Tags/SemanticAudioTag.cs`, `AudioTagSemanticMerge.cs`, `SemanticFields.cs`, `AudioOverlayBlockFieldIo.cs`, `AudioOverlayTargetIo.cs` |
 | Persistence | `Mfr.Metadata/AudioTagPersistence.cs`, `TagBlockFieldMapper.cs`, `TagBlockFieldPatcher.cs`, `SemanticAudioTagTagLib.cs` |
-| Policy | `Mfr.Models/Tags/AudioTagContainerPolicy.cs` (capability), `Mfr.Metadata/AudioTagContainerPolicy.cs` (detect), `Id3v2FrameVersionPolicy.cs`, `AsfDescriptorNames.cs` |
+| Policy | `Mfr.Models/Tags/AudioTagContainerPolicy.cs` (capability), `Mfr.Metadata/AudioTagContainerDetector.cs` (detect), `Id3v2FrameVersionPolicy.cs`, `AsfDescriptorNames.cs` |
 | Filters | `Mfr.Filters/Audio/*`, `StringTargetFilter.cs`, `Mfr.Models/Targets.cs` |
 | Engine | `Mfr.Engine/CommitExecutor.cs`, `RenamePropertyChangeBuilder.cs` |
 | Tests | `Mfr.Tests/Metadata/*`, `Mfr.Tests/Models/Filters/Audio/*`, `RenameListCommitTests` embedded-tag cases |

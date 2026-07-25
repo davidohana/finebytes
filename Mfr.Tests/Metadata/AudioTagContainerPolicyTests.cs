@@ -3,7 +3,7 @@ using Mfr.Filters;
 using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
-using MetadataContainerPolicy = Mfr.Metadata.AudioTagContainerPolicy;
+using MetadataContainerDetector = Mfr.Metadata.AudioTagContainerDetector;
 using ModelsContainerPolicy = Mfr.Models.Tags.AudioTagContainerPolicy;
 using Mfr.Models.Tags.Id3v2;
 
@@ -106,7 +106,7 @@ namespace Mfr.Tests.Metadata
         {
             var path = _CopyFixtureToTempDir(fixtureFileName);
 
-            Assert.Equal(expected, MetadataContainerPolicy.Detect(path));
+            Assert.Equal(expected, MetadataContainerDetector.Detect(path));
         }
 
         [Fact]
@@ -114,13 +114,13 @@ namespace Mfr.Tests.Metadata
         {
             var path = _AllocateMinimalWavPath();
 
-            Assert.Equal(AudioContainerFormat.Riff, MetadataContainerPolicy.Detect(path));
+            Assert.Equal(AudioContainerFormat.Riff, MetadataContainerDetector.Detect(path));
         }
 
         [Fact]
         public void Detect_RelativePath_ThrowsArgumentException()
         {
-            var ex = Assert.Throws<ArgumentException>(() => MetadataContainerPolicy.Detect("relative\\only.mp3"));
+            var ex = Assert.Throws<ArgumentException>(() => MetadataContainerDetector.Detect("relative\\only.mp3"));
             Assert.Contains("fully qualified", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 

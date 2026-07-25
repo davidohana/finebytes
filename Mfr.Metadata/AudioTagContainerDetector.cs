@@ -9,10 +9,10 @@ namespace Mfr.Metadata
     /// <remarks>
     /// <para>
     /// Capability methods (<c>GetSupportedBlocks</c>, <c>EnsureSupported</c>, …) live on
-    /// <see cref="Models.Tags.AudioTagContainerPolicy"/>.
+    /// <see cref="AudioTagContainerPolicy"/>.
     /// </para>
     /// </remarks>
-    public static class AudioTagContainerPolicy
+    public static class AudioTagContainerDetector
     {
         /// <summary>
         /// Detects the container of an existing audio file by opening it with TagLib.
