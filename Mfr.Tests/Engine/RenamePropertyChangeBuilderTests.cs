@@ -149,10 +149,7 @@ namespace Mfr.Tests.Engine
             var original = _CloneBaseline();
             var item = new RenameItem(original);
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticIntoBlocks(
-                pv,
-                SemanticAudioTag.FromOverlay(pv) with { Title = "Next" },
-                embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(pv, SemanticAudioTag.FromOverlay(pv) with { Title = "Next" });
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
@@ -172,10 +169,7 @@ namespace Mfr.Tests.Engine
                 o.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999));
             var item = new RenameItem(original);
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticIntoBlocks(
-                pv,
-                SemanticAudioTag.FromOverlay(pv) with { Year = 2001 },
-                embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(pv, SemanticAudioTag.FromOverlay(pv) with { Year = 2001 });
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
@@ -194,10 +188,7 @@ namespace Mfr.Tests.Engine
             var original = _CloneBaseline();
             var item = new RenameItem(original);
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticIntoBlocks(
-                pv,
-                SemanticAudioTag.FromOverlay(pv) with { Lyrics = "a\nb" },
-                embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(pv, SemanticAudioTag.FromOverlay(pv) with { Lyrics = "a\nb" });
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
@@ -254,10 +245,7 @@ namespace Mfr.Tests.Engine
                 Fields = [new TextFieldRow("TITLE", ["a"])],
             };
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticIntoBlocks(
-                pv,
-                SemanticAudioTag.FromOverlay(pv) with { Genre = "Rock" },
-                embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(pv, SemanticAudioTag.FromOverlay(pv) with { Genre = "Rock" });
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
@@ -277,10 +265,7 @@ namespace Mfr.Tests.Engine
             item.Preview.DirectoryPath = @"D:\B";
             item.Preview.Attributes = FileAttributes.ReadOnly;
             var pv = item.Preview.AudioTagOverlay;
-            AudioTagPersistence.MergeSemanticIntoBlocks(
-                pv,
-                SemanticAudioTag.FromOverlay(pv) with { Genre = "Rock" },
-                embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(pv, SemanticAudioTag.FromOverlay(pv) with { Genre = "Rock" });
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 

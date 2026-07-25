@@ -56,7 +56,7 @@ namespace Mfr.Tests.TestSupport
             if (!merged.ContainsRenderableSemantics())
                 return overlay;
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged);
             return overlay;
         }
     }

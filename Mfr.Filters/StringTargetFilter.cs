@@ -27,8 +27,7 @@ namespace Mfr.Filters
                 AudioOverlaySemanticIo.MergeFieldStringIntoOverlay(
                     overlay: preview.AudioTagOverlay,
                     field: audioFieldTarget.Field,
-                    fieldString: transformed,
-                    embeddedTagSourcePath: item.Original.FullPath);
+                    fieldString: transformed);
 
                 return;
             }

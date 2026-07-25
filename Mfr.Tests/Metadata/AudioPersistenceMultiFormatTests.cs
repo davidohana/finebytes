@@ -130,7 +130,7 @@ namespace Mfr.Tests.Metadata
 
             var preview = baseline.Clone();
             var mergedRound = SemanticAudioTag.FromOverlay(preview) with { Title = "round-b" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(preview, mergedRound, path);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, mergedRound);
 
             AudioTagPersistence.Apply(path, preview);
 

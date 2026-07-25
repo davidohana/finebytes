@@ -61,43 +61,6 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Like <see cref="MergeSemanticIntoBlocks"/> but ignores TagLib failures when detecting a container from disk.
-        /// </summary>
-        /// <param name="overlay">Overlay whose blocks are updated in place.</param>
-        /// <param name="semantic">Desired semantic fields to write into present blocks.</param>
-        /// <param name="embeddedTagSourcePath">Optional on-disk path used only when the overlay's container is unknown.</param>
-        /// <returns><see langword="true"/> when the merge ran; <see langword="false"/> when the file could not be read.</returns>
-        public static bool TryMergeSemanticIntoBlocks(
-            AudioTagOverlay overlay,
-            SemanticAudioTag semantic,
-            string? embeddedTagSourcePath)
-        {
-            ArgumentNullException.ThrowIfNull(overlay);
-
-            try
-            {
-                MergeSemanticIntoBlocks(overlay, semantic, embeddedTagSourcePath);
-                return true;
-            }
-            catch (UnsupportedFormatException)
-            {
-                return false;
-            }
-            catch (CorruptFileException)
-            {
-                return false;
-            }
-            catch (IOException)
-            {
-                return false;
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
         /// Merges a semantic projection into structured per–<c>TagTypes</c> field blocks on <paramref name="overlay"/>.
         /// </summary>
         /// <remarks>
@@ -107,75 +70,33 @@ namespace Mfr.Metadata
         /// </para>
         /// <para>
         /// When the overlay carries no blocks and <paramref name="semantic"/> has renderable semantics, creates the
-        /// container's <see cref="AudioTagContainerPolicy.GetRecommendedBlock">recommended</see> empty block first.
-        /// <see cref="AudioTagOverlay.ContainerFormat"/> is preferred; when it is
-        /// <see cref="AudioContainerFormat.Unknown"/>, the container is detected from
-        /// <paramref name="embeddedTagSourcePath"/> when that path can be opened, and stamped on the overlay.
+        /// container's <see cref="AudioTagContainerPolicy.GetRecommendedBlock">recommended</see> empty block first
+        /// using <see cref="AudioTagOverlay.ContainerFormat"/> (stamped by <see cref="Read"/>). No disk I/O.
         /// </para>
         /// </remarks>
         /// <param name="overlay">Overlay whose blocks are updated in place.</param>
         /// <param name="semantic">Desired semantic fields to write into present blocks.</param>
-        /// <param name="embeddedTagSourcePath">Optional on-disk path used only to detect the container when
-        /// <see cref="AudioTagOverlay.ContainerFormat"/> is unknown.</param>
-        public static void MergeSemanticIntoBlocks(
-            AudioTagOverlay overlay,
-            SemanticAudioTag semantic,
-            string? embeddedTagSourcePath = null)
+        public static void MergeSemanticIntoBlocks(AudioTagOverlay overlay, SemanticAudioTag semantic)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
             if (!overlay.HasAnyBlock() && semantic.ContainsRenderableSemantics())
-                _EnsureRecommendedBlockForCreate(overlay, embeddedTagSourcePath);
+                _EnsureRecommendedBlockForCreate(overlay);
 
             TagBlockFieldMapper.MergeSemanticIntoBlocks(overlay, semantic);
         }
 
         /// <remarks>
-        /// Creates at most one recommended empty block. Detection from path is best-effort: open failures leave the
-        /// overlay empty so the merge is a no-op rather than inventing a wrong tag type.
+        /// Creates at most one recommended empty block from <see cref="AudioTagOverlay.ContainerFormat"/>.
+        /// Unknown container leaves the overlay empty so the merge is a no-op rather than inventing a wrong tag type.
         /// </remarks>
-        private static void _EnsureRecommendedBlockForCreate(
-            AudioTagOverlay overlay,
-            string? embeddedTagSourcePath)
+        private static void _EnsureRecommendedBlockForCreate(AudioTagOverlay overlay)
         {
-            if (overlay.ContainerFormat == AudioContainerFormat.Unknown)
-                overlay.ContainerFormat = _TryDetectContainer(embeddedTagSourcePath);
-
             var recommended = AudioTagContainerPolicy.GetRecommendedBlock(overlay.ContainerFormat);
             if (recommended is null)
                 return;
 
             overlay.EnsureEmptyBlock(recommended.Value);
-        }
-
-        private static AudioContainerFormat _TryDetectContainer(string? embeddedTagSourcePath)
-        {
-            if (string.IsNullOrWhiteSpace(embeddedTagSourcePath)
-                || !Path.IsPathFullyQualified(embeddedTagSourcePath)
-                || !System.IO.File.Exists(embeddedTagSourcePath)
-                || Directory.Exists(embeddedTagSourcePath))
-                return AudioContainerFormat.Unknown;
-
-            try
-            {
-                return AudioTagContainerPolicy.Detect(embeddedTagSourcePath);
-            }
-            catch (UnsupportedFormatException)
-            {
-                return AudioContainerFormat.Unknown;
-            }
-            catch (CorruptFileException)
-            {
-                return AudioContainerFormat.Unknown;
-            }
-            catch (IOException)
-            {
-                return AudioContainerFormat.Unknown;
-            }
-            catch (ArgumentException)
-            {
-                return AudioContainerFormat.Unknown;
-            }
         }
 
         /// <summary>

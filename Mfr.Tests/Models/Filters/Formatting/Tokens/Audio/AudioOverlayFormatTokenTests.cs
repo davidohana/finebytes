@@ -64,7 +64,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                 configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Orig"));
 
             var merged = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay) with { Title = "Prev" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(item.Preview.AudioTagOverlay, merged, embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(item.Preview.AudioTagOverlay, merged);
 
             Assert.Equal("Prev", token.Compile(string.Empty)(item));
         }

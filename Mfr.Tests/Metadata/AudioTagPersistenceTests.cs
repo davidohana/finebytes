@@ -86,7 +86,7 @@ namespace Mfr.Tests.Metadata
 
             var previewOverlay = readBaseline.Clone();
             var merged = SemanticAudioTag.FromOverlay(previewOverlay) with { Title = "preview" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(previewOverlay, merged, candidate);
+            AudioTagPersistence.MergeSemanticIntoBlocks(previewOverlay, merged);
 
             AudioTagPersistence.Apply(candidate, previewOverlay);
 
@@ -109,7 +109,7 @@ namespace Mfr.Tests.Metadata
                 with
             { Performers = "Alice;Bob" };
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(previewOverlay, merged, candidate);
+            AudioTagPersistence.MergeSemanticIntoBlocks(previewOverlay, merged);
 
             AudioTagPersistence.Apply(candidate, previewOverlay);
 
@@ -281,7 +281,7 @@ namespace Mfr.Tests.Metadata
             var uniqueTitle = $"MergeOgg_{Guid.NewGuid():N}";
             var preview = disk.Clone();
             var merged = SemanticAudioTag.FromOverlay(preview) with { Title = uniqueTitle };
-            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
 
             Assert.NotNull(disk.Xiph);
             Assert.NotNull(preview.Xiph);
@@ -313,7 +313,7 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null);
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged);
 
             Assert.NotNull(overlay.Id3v2);
             Assert.Null(overlay.Id3v1);
@@ -345,7 +345,7 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null);
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged);
 
             Assert.NotNull(overlay.Xiph);
             Assert.Null(overlay.Ape);
@@ -381,7 +381,7 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null);
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged, embeddedTagSourcePath: null);
+            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged);
 
             Assert.Equal("Broadcast", overlay.Id3v1.Title);
             Assert.Equal("Broadcast", overlay.Semantic().Title);
@@ -390,7 +390,7 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// Verifies <see cref="AudioTagPersistence.MergeSemanticIntoBlocks"/> merges a semantic title into the Apple snapshot for M4A when given the on-disk source path.
+        /// Verifies <see cref="AudioTagPersistence.MergeSemanticIntoBlocks"/> merges a semantic title into the Apple snapshot for M4A.
         /// </summary>
         [Fact]
         public void MergeSemanticIntoBlocks_M4a_MergesTitleIntoAppleSnapshot()
@@ -403,7 +403,7 @@ namespace Mfr.Tests.Metadata
             var preview = disk.Clone();
             var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "MergedM4aTitle" };
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
 
             Assert.NotEqual(disk.Apple, preview.Apple);
             Assert.Equal("MergedM4aTitle", preview.Semantic().Title);
@@ -420,7 +420,7 @@ namespace Mfr.Tests.Metadata
             var disk = AudioTagPersistence.Read(path);
             var preview = disk.Clone();
             var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "SemanticTitleMergeOnly" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged, path);
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
 
             AudioTagPersistence.Apply(path, preview);
 
