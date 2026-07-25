@@ -258,17 +258,15 @@ namespace Mfr.Engine
 
         private static string _FrameDiffKey(Id3v2ModeledFrame frame)
         {
-            if (frame.FrameId is "COMM" or "USLT" or "TXXX")
-            {
-                return frame.FrameId
-                    + "["
-                    + (frame.Language ?? string.Empty)
-                    + "|"
-                    + (frame.Description ?? string.Empty)
-                    + "]";
-            }
+            if (!Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frame.FrameId))
+                return frame.FrameId;
 
-            return frame.FrameId;
+            return frame.FrameId
+                + "["
+                + (frame.Language ?? string.Empty)
+                + "|"
+                + (frame.Description ?? string.Empty)
+                + "]";
         }
 
         private static void _DiffXiphFields(

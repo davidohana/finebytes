@@ -147,9 +147,8 @@ namespace Mfr.Metadata
             foreach (var frameId in _Id3v2SingletonFrameIds)
                 live.RemoveFrames(frameId);
 
-            live.RemoveFrames("COMM");
-            live.RemoveFrames("USLT");
-            live.RemoveFrames("TXXX");
+            foreach (var frameId in Id3v2ModeledFrame.MultiInstanceFrameIds)
+                live.RemoveFrames(frameId);
 
             foreach (var modeled in data.Frames)
                 AddModeledFrame(live, modeled);

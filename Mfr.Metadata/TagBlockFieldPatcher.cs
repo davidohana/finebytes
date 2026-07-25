@@ -12,11 +12,6 @@ namespace Mfr.Metadata
     /// </summary>
     internal static class TagBlockFieldPatcher
     {
-        private static readonly HashSet<string> _MultiInstanceFrameIds = new(StringComparer.Ordinal)
-        {
-            "COMM", "USLT", "TXXX",
-        };
-
         /// <summary>
         /// Creates or patches an ID3v2 tag from <paramref name="original"/> → <paramref name="preview"/>.
         /// </summary>
@@ -238,7 +233,7 @@ namespace Mfr.Metadata
 
         private static string _FrameIdentity(Id3v2ModeledFrame frame)
         {
-            if (!_MultiInstanceFrameIds.Contains(frame.FrameId))
+            if (!Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frame.FrameId))
                 return frame.FrameId;
 
             return frame.FrameId
