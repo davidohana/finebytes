@@ -6,26 +6,12 @@ namespace Mfr.Models.Tags
     /// <remarks>
     /// <para>
     /// Path and file-name targets are not handled here; callers must route those through
-    /// <c>FileMetaPreviewExtensions</c>. Capability checks belong to the filter layer before write.
+    /// <c>FileMetaPreviewExtensions</c>. Use <see cref="IAudioOverlayFilterTarget"/> to classify a target first.
+    /// Capability checks belong to the filter layer before write.
     /// </para>
     /// </remarks>
     public static class AudioOverlayTargetIo
     {
-        /// <summary>
-        /// Returns whether <paramref name="target"/> addresses an audio overlay field or frame.
-        /// </summary>
-        /// <param name="target">Filter target to classify.</param>
-        /// <returns><see langword="true"/> for semantic and format-specific audio targets.</returns>
-        public static bool IsAudioTarget(FilterTarget target)
-        {
-            ArgumentNullException.ThrowIfNull(target);
-
-            return target is AudioFieldTarget
-                or Id3v1FieldTarget
-                or Id3v2FrameTarget
-                or XiphFieldTarget;
-        }
-
         /// <summary>
         /// Returns the filter/preview string for an audio <paramref name="target"/> on <paramref name="overlay"/>.
         /// </summary>

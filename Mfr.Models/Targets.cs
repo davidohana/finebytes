@@ -21,6 +21,11 @@ namespace Mfr.Models
     public abstract record FilterTarget;
 
     /// <summary>
+    /// Marker for <see cref="FilterTarget"/> types that address <see cref="FileMeta.AudioTagOverlay"/> fields or frames.
+    /// </summary>
+    public interface IAudioOverlayFilterTarget;
+
+    /// <summary>
     /// Targets the file name without extension (<c>prefix</c> segment).
     /// </summary>
     public sealed record FilePrefixTarget : FilterTarget;
@@ -66,7 +71,7 @@ namespace Mfr.Models
     /// Targets one cross-format field on the semantic projection of <see cref="FileMeta.AudioTagOverlay"/>; string filters read/write text or decimal-digit numeric strings.
     /// </summary>
     /// <param name="Field">Which <see cref="SemanticAudioField"/> is addressed.</param>
-    public sealed record AudioFieldTarget(SemanticAudioField Field) : FilterTarget;
+    public sealed record AudioFieldTarget(SemanticAudioField Field) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
     /// Targets one ID3v1 scalar on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v1"/>.
@@ -77,7 +82,7 @@ namespace Mfr.Models
     /// </para>
     /// </remarks>
     /// <param name="Field">Which ID3v1 scalar is addressed.</param>
-    public sealed record Id3v1FieldTarget(Id3v1Field Field) : FilterTarget;
+    public sealed record Id3v1FieldTarget(Id3v1Field Field) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
     /// Targets one modeled ID3v2 frame on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v2"/>.
@@ -97,7 +102,7 @@ namespace Mfr.Models
     public sealed record Id3v2FrameTarget(
         string FrameId,
         string? Language = null,
-        string? Description = null) : FilterTarget;
+        string? Description = null) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
     /// Targets one known Xiph / Vorbis comment key on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Xiph"/>.
@@ -108,5 +113,5 @@ namespace Mfr.Models
     /// </para>
     /// </remarks>
     /// <param name="Key">Comment field key (for example <c>TITLE</c>, <c>ARTIST</c>).</param>
-    public sealed record XiphFieldTarget(string Key) : FilterTarget;
+    public sealed record XiphFieldTarget(string Key) : FilterTarget, IAudioOverlayFilterTarget;
 }
