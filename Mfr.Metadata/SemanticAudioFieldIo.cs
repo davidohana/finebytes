@@ -4,28 +4,62 @@ using Mfr.Models.Tags;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Reads and writes <see cref="SemanticAudioField"/> values through the block-derived <see cref="SemanticAudioTag"/> layer.
+    /// Reads and writes <see cref="SemanticAudioField"/> values as filter/preview strings through the block-derived
+    /// <see cref="SemanticAudioTag"/> layer.
     /// </summary>
     /// <remarks>
     /// <para>
     /// Embeds use <see cref="SemanticAudioTag.FromOverlay"/> for reads; writes merge an updated <see cref="SemanticAudioTag"/> back into
     /// blocks via <see cref="AudioTagPersistence.MergeSemanticIntoBlocks"/> (broadcast to present blocks; recommended create when empty).
     /// </para>
+    /// <para>
+    /// Empty strings represent absent fields (same convention as <see cref="Models.AudioFieldTarget"/> previews).
+    /// </para>
     /// </remarks>
     public static class SemanticAudioFieldIo
     {
+        /// <summary>
+        /// Formats <paramref name="field"/> using <paramref name="semantic"/> snapshot values (empty strings replace absent semantics).
+        /// </summary>
+        /// <param name="semantic">Projected semantics; typically from <see cref="SemanticAudioTag.FromOverlay"/>.</param>
+        /// <param name="field">Which semantic field to format.</param>
+        /// <returns>Filter/preview string for the field (empty when unset).</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="field"/> is unrecognized.</exception>
+        public static string Format(SemanticAudioTag semantic, SemanticAudioField field)
+        {
+            return field switch
+            {
+                SemanticAudioField.Title => semantic.Title ?? string.Empty,
+                SemanticAudioField.Album => semantic.Album ?? string.Empty,
+                SemanticAudioField.Performers => semantic.Performers ?? string.Empty,
+                SemanticAudioField.AlbumArtists => semantic.AlbumArtists ?? string.Empty,
+                SemanticAudioField.Composers => semantic.Composers ?? string.Empty,
+                SemanticAudioField.Genre => semantic.Genre ?? string.Empty,
+                SemanticAudioField.Comment => semantic.Comment ?? string.Empty,
+                SemanticAudioField.Lyrics => semantic.Lyrics ?? string.Empty,
+                SemanticAudioField.Copyright => semantic.Copyright ?? string.Empty,
+                SemanticAudioField.Grouping => semantic.Grouping ?? string.Empty,
+                SemanticAudioField.Year => _DecimalDigitsOrEmpty(semantic.Year),
+                SemanticAudioField.Track => _DecimalDigitsOrEmpty(semantic.Track),
+                SemanticAudioField.TrackCount => _DecimalDigitsOrEmpty(semantic.TrackCount),
+                SemanticAudioField.Disc => _DecimalDigitsOrEmpty(semantic.Disc),
+                SemanticAudioField.DiscCount => _DecimalDigitsOrEmpty(semantic.DiscCount),
+                _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
+            };
+        }
+
         /// <summary>
         /// Returns the filter/preview string for <paramref name="field"/> from the block projection of <paramref name="overlay"/>.
         /// </summary>
         /// <param name="overlay">Structured tag blocks.</param>
         /// <param name="field">Logical semantic audio field.</param>
-        /// <returns>Same formatting as <see cref="SemanticAudioFieldStrings.Format"/> (empty when unset).</returns>
+        /// <returns>Same formatting as <see cref="Format"/> (empty when unset).</returns>
         public static string GetSemanticField(AudioTagOverlay overlay, SemanticAudioField field)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
             var semantic = SemanticAudioTag.FromOverlay(overlay);
-            return SemanticAudioFieldStrings.Format(semantic, field);
+            return Format(semantic, field);
         }
 
         /// <summary>
@@ -67,6 +101,11 @@ namespace Mfr.Metadata
             };
 
             AudioTagPersistence.MergeSemanticIntoBlocks(overlay, semantic);
+        }
+
+        private static string _DecimalDigitsOrEmpty(uint? value)
+        {
+            return value is null ? string.Empty : value.Value.ToString(CultureInfo.InvariantCulture);
         }
 
         private static string? _NullIfEmptyString(string trimmed)
