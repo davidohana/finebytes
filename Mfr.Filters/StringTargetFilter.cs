@@ -22,9 +22,9 @@ namespace Mfr.Filters
             if (Target is AudioFieldTarget audioFieldTarget)
             {
                 item.EnsureEmbeddedTagsLoaded();
-                var currentValue = SemanticAudioFieldIo.GetSemanticField(preview.AudioTagOverlay, audioFieldTarget.Field);
+                var currentValue = SemanticFields.GetSemanticField(preview.AudioTagOverlay, audioFieldTarget.Field);
                 var transformed = TransformValue(currentValue, item);
-                SemanticAudioFieldIo.SetSemanticField(
+                SemanticFields.SetSemanticField(
                     overlay: preview.AudioTagOverlay,
                     field: audioFieldTarget.Field,
                     fieldString: transformed);
