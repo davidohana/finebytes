@@ -194,9 +194,16 @@ namespace Mfr.Tests.Metadata
         {
             var path = _CopyFixtureToTemp("libnogg-bitrate-123.ogg");
 
+            using (var file = TagLib.File.Create(path))
+            {
+                var xiph = (TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true);
+                xiph.SetField("TITLE", "ogg-stable");
+                file.Save();
+            }
+
             var first = AudioTagPersistence.Read(path);
             Assert.NotNull(first.Xiph);
-            Assert.NotEmpty(first.Xiph.CanonicalTagBytes);
+            Assert.NotEmpty(first.Xiph.Fields);
 
             AudioTagPersistence.Apply(path, first.Clone());
             var second = AudioTagPersistence.Read(path);
@@ -215,13 +222,13 @@ namespace Mfr.Tests.Metadata
             using (var file = TagLib.File.Create(path))
             {
                 var xiph = (TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true);
-                xiph.SetField("TRIPTEST", "probe");
+                xiph.SetField("TITLE", "probe");
                 file.Save();
             }
 
             var first = AudioTagPersistence.Read(path);
             Assert.NotNull(first.Xiph);
-            Assert.NotEmpty(first.Xiph.CanonicalTagBytes);
+            Assert.NotEmpty(first.Xiph.Fields);
 
             AudioTagPersistence.Apply(path, first.Clone());
             var second = AudioTagPersistence.Read(path);
@@ -276,7 +283,7 @@ namespace Mfr.Tests.Metadata
 
             Assert.NotNull(disk.Xiph);
             Assert.NotNull(preview.Xiph);
-            Assert.NotEqual(disk.Xiph.CanonicalTagBytes, preview.Xiph.CanonicalTagBytes);
+            Assert.NotEqual(disk.Xiph, preview.Xiph);
             Assert.Equal(uniqueTitle, preview.Semantic().Title);
         }
 
@@ -363,7 +370,7 @@ namespace Mfr.Tests.Metadata
 
             var first = AudioTagPersistence.Read(path);
             Assert.NotNull(first.Ape);
-            Assert.NotEmpty(first.Ape.CanonicalTagBytes);
+            Assert.NotEmpty(first.Ape.Fields);
 
             AudioTagPersistence.Apply(path, first.Clone());
             var second = AudioTagPersistence.Read(path);

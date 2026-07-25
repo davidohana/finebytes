@@ -4,25 +4,23 @@ using Mfr.Models.Tags;
 namespace Mfr.Tests.Metadata
 {
     /// <summary>
-    /// Tests that unparsable native tag blocks degrade to empty projections instead of throwing.
+    /// Tests that empty or absent modeled blocks project null semantics and merge rewrites fields in place.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Overlays can carry truncated or opaque blobs (partial reads, hand-built test doubles). Projection and semantic merge
-    /// share one rehydrate path, so both must tolerate them.
-    /// </para>
-    /// </remarks>
     public sealed class TagBlockParsingToleranceTests
     {
-        private static readonly byte[] s_GarbageBytes = [1, 2, 3];
-
         /// <summary>
-        /// Verifies every unparsable block yields null semantics rather than propagating a TagLib failure.
+        /// Verifies empty modeled blocks yield null semantics.
         /// </summary>
         [Fact]
-        public void FromOverlay_WithUnparsableBlocks_ProjectsNullSemantics()
+        public void FromOverlay_WithEmptyBlocks_ProjectsNullSemantics()
         {
-            var overlay = _GarbageBlockOverlay();
+            var overlay = new AudioTagOverlay
+            {
+                Id3v2 = new Id3v2TagData { Version = 4, Frames = [] },
+                Xiph = new XiphTagData { Fields = [] },
+                Ape = new ApeTagData { Fields = [] },
+                RiffInfo = new RiffInfoTagData { Fields = [] },
+            };
 
             var common = CommonAudioTag.FromOverlay(overlay);
 
@@ -47,30 +45,25 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// Verifies merge rebuilds unparsable blocks from the semantic projection instead of failing.
+        /// Verifies merge rewrites empty blocks from the semantic projection instead of failing.
         /// </summary>
         [Fact]
-        public void MergeSemanticOntoNativeBlocks_WithUnparsableBlocks_RewritesBlocksFromSemantics()
+        public void MergeSemanticOntoNativeBlocks_WithEmptyBlocks_RewritesBlocksFromSemantics()
         {
-            var overlay = _GarbageBlockOverlay();
+            var overlay = new AudioTagOverlay
+            {
+                Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
+                Xiph = new XiphTagData { Fields = [] },
+                Ape = new ApeTagData { Fields = [] },
+                RiffInfo = new RiffInfoTagData { Fields = [] },
+            };
             var merged = CommonAudioTag.FromOverlay(overlay) with { Title = "Recovered" };
 
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(overlay, merged, embeddedTagSourcePath: null);
 
             Assert.Equal("Recovered", CommonAudioTag.FromOverlay(overlay).Title);
-            Assert.NotEqual(s_GarbageBytes, overlay.Id3v2!.CanonicalTagBytes);
-            Assert.NotEqual(s_GarbageBytes, overlay.Xiph!.CanonicalTagBytes);
-        }
-
-        private static AudioTagOverlay _GarbageBlockOverlay()
-        {
-            return new AudioTagOverlay
-            {
-                Id3v2 = new Id3v2TagData { Version = 4, CanonicalTagBytes = [.. s_GarbageBytes] },
-                Xiph = new SerializedTagBlob { CanonicalTagBytes = [.. s_GarbageBytes] },
-                Ape = new SerializedTagBlob { CanonicalTagBytes = [.. s_GarbageBytes] },
-                RiffInfo = new SerializedTagBlob { CanonicalTagBytes = [.. s_GarbageBytes] },
-            };
+            Assert.Contains(overlay.Id3v2.Frames, f => f.FrameId == "TIT2");
+            Assert.Contains(overlay.Xiph.Fields, f => f.Key == "TITLE");
         }
     }
 }

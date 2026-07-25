@@ -209,24 +209,31 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// When native tag bytes differ but projected semantics match, emit a compact native summary row.
+        /// When native Xiph fields differ but projected semantics match, emit a compact native summary row.
         /// </summary>
         [Fact]
         public void BuildChangeRows_AudioTagNativeXiphChange_AppendsSummaryRow()
         {
             var original = _CloneBaseline(configureOverlay: o =>
             {
-                o.AudioTagOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2] };
+                o.AudioTagOverlay.Xiph = new XiphTagData
+                {
+                    Fields = [new TextFieldRow("DATE", ["1999"])],
+                };
             });
             var item = new RenameItem(original);
-            item.Preview.AudioTagOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2, 3] };
+            // Same projected year via alternate known key — field layout differs, semantics align.
+            item.Preview.AudioTagOverlay.Xiph = new XiphTagData
+            {
+                Fields = [new TextFieldRow("YEAR", ["1999"])],
+            };
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
             Assert.Equal("AudioTag.Native.Xiph", row.Property);
-            Assert.Contains("2 bytes", row.OldValue, StringComparison.Ordinal);
-            Assert.Contains("3 bytes", row.NewValue, StringComparison.Ordinal);
+            Assert.Contains("1 fields", row.OldValue, StringComparison.Ordinal);
+            Assert.Contains("1 fields", row.NewValue, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -237,11 +244,17 @@ namespace Mfr.Tests.Engine
         {
             var original = _CloneBaseline(directoryPath: @"D:\A", configureOverlay: o =>
             {
-                o.AudioTagOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = [1] };
+                o.AudioTagOverlay.Xiph = new XiphTagData
+                {
+                    Fields = [new TextFieldRow("TITLE", ["a"])],
+                };
             });
             var item = new RenameItem(original);
             item.Preview.DirectoryPath = @"D:\B";
-            item.Preview.AudioTagOverlay.Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2] };
+            item.Preview.AudioTagOverlay.Xiph = new XiphTagData
+            {
+                Fields = [new TextFieldRow("TITLE", ["a"])],
+            };
             var pv = item.Preview.AudioTagOverlay;
             AudioTagPersistence.MergeSemanticOntoNativeBlocks(
                 pv,

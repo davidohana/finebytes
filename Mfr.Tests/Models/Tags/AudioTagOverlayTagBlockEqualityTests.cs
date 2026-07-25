@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Models.Tags
@@ -13,22 +14,22 @@ namespace Mfr.Tests.Models.Tags
         [Fact]
         public void Equals_WithIdenticalBlocks_ReturnsTrue()
         {
-            var xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2, 3] };
-            var a = new AudioTagOverlay { Xiph = xiph };
-            var b = new AudioTagOverlay { Xiph = new SerializedTagBlob { CanonicalTagBytes = [1, 2, 3] } };
+            var fields = ImmutableArray.Create(new TextFieldRow("TITLE", ["a"]));
+            var a = new AudioTagOverlay { Xiph = new XiphTagData { Fields = fields } };
+            var b = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [new TextFieldRow("TITLE", ["a"])] } };
 
             Assert.True(a.Equals(b));
             Assert.True(a.TagBlocksStructurallyEquals(b));
         }
 
         /// <summary>
-        /// Verifies differing blocks are detected even when blobs are close in size.
+        /// Verifies differing blocks are detected even when field counts match.
         /// </summary>
         [Fact]
         public void Equals_DetectsBlockDifferences()
         {
-            var a = new AudioTagOverlay { Xiph = new SerializedTagBlob { CanonicalTagBytes = [1] } };
-            var b = new AudioTagOverlay { Xiph = new SerializedTagBlob { CanonicalTagBytes = [2] } };
+            var a = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [new TextFieldRow("TITLE", ["1"])] } };
+            var b = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [new TextFieldRow("TITLE", ["2"])] } };
 
             Assert.False(a.Equals(b));
             Assert.False(a.TagBlocksStructurallyEquals(b));
@@ -40,7 +41,7 @@ namespace Mfr.Tests.Models.Tags
         [Fact]
         public void Equals_SameReference_ReturnsTrue()
         {
-            var a = new AudioTagOverlay { Xiph = new SerializedTagBlob { CanonicalTagBytes = [9] } };
+            var a = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [new TextFieldRow("TITLE", ["x"])] } };
 
             Assert.True(a.Equals(a));
         }

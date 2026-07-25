@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using Mfr.Models.Tags;
 using Mfr.Utils;
 using TagLib;
@@ -9,7 +10,7 @@ namespace Mfr.Metadata
     /// Common cross-format audio fields derived from structured <see cref="AudioTagOverlay"/> native blocks.
     /// </summary>
     /// <remarks>
-    /// Precedence mirrors TagLib merged-tag behavior: ID3v2 over ID3v1, then Xiph, APE, RIFF INFO (WAV LIST), Apple text atoms, ASF descriptors.
+    /// Precedence: Id3v2 → Id3v1 → Xiph → Ape → RiffInfo → Apple → Asf.
     /// </remarks>
     /// <param name="Title">Visible title, if any native block supplies one.</param>
     /// <param name="Album">Album name.</param>
@@ -52,126 +53,109 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
-            var id3v2 = TagBlockCodec.TryParseId3v2(overlay.Id3v2);
-            var id3v1 = overlay.Id3v1;
-            var xiph = TagBlockCodec.TryParseXiph(overlay.Xiph);
-            var ape = TagBlockCodec.TryParseApe(overlay.Ape);
-            var riff = TagBlockCodec.TryParseRiffInfo(overlay.RiffInfo);
-            var asf = TagBlockCodec.TryBuildAsfTag(overlay.Asf);
-
             var title = Nullables.FirstNonNull(
-                _ReadTagTitle(id3v2),
-                _ReadId3v1String(id3v1?.Title),
-                _ReadTagTitle(xiph),
-                _ReadTagTitle(ape),
-                _ReadTagTitle(riff),
+                _Id3v2Singleton(overlay.Id3v2, "TIT2"),
+                _ReadId3v1String(overlay.Id3v1?.Title),
+                _XiphFirst(overlay.Xiph, "TITLE"),
+                _ApeFirst(overlay.Ape, "Title"),
+                _Riff(overlay.RiffInfo, "INAM"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
-                _ReadAsfString(asf, "WM/Title"),
-                _ReadTagTitle(asf));
+                _Asf(overlay.Asf, "WM/Title"));
             var album = Nullables.FirstNonNull(
-                _ReadTagAlbum(id3v2),
-                _ReadId3v1String(id3v1?.Album),
-                _ReadTagAlbum(xiph),
-                _ReadTagAlbum(ape),
-                _ReadTagAlbum(riff),
+                _Id3v2Singleton(overlay.Id3v2, "TALB"),
+                _ReadId3v1String(overlay.Id3v1?.Album),
+                _XiphFirst(overlay.Xiph, "ALBUM"),
+                _ApeFirst(overlay.Ape, "Album"),
+                _Riff(overlay.RiffInfo, "IPRD"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomConstants.AlbumAtom),
-                _ReadAsfString(asf, "WM/AlbumTitle"));
+                _Asf(overlay.Asf, "WM/AlbumTitle"));
             var performers = Nullables.FirstNonNull(
-                _JoinList(id3v2?.Performers),
-                _JoinList(_SplitId3v1Performer(id3v1?.Artist)),
-                _JoinList(xiph?.Performers),
-                _JoinList(ape?.Performers),
-                _JoinList(riff?.Performers),
+                _Id3v2Joined(overlay.Id3v2, "TPE1"),
+                _JoinList(_SplitId3v1Performer(overlay.Id3v1?.Artist)),
+                _XiphJoined(overlay.Xiph, "ARTIST"),
+                _ApeJoined(overlay.Ape, "Artist"),
+                _Riff(overlay.RiffInfo, "IART"),
                 _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom)),
-                _JoinList(_ReadAsfJoinedPerformers(asf)));
+                _Asf(overlay.Asf, "WM/Author") ?? _Asf(overlay.Asf, "WM/AlbumArtist"));
             var albumArtists = Nullables.FirstNonNull(
-                _JoinList(id3v2?.AlbumArtists),
-                _JoinList(xiph?.AlbumArtists),
-                _JoinList(ape?.AlbumArtists),
-                _JoinList(riff?.AlbumArtists),
+                _Id3v2Joined(overlay.Id3v2, "TPE2"),
+                _XiphJoined(overlay.Xiph, "ALBUMARTIST"),
+                _ApeJoined(overlay.Ape, "Album Artist"),
                 _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom)),
-                _JoinList(_ReadAsfJoinedList(asf, "WM/AlbumArtist")));
+                _Asf(overlay.Asf, "WM/AlbumArtist"));
             var composers = Nullables.FirstNonNull(
-                _JoinList(id3v2?.Composers),
-                _JoinList(xiph?.Composers),
-                _JoinList(ape?.Composers),
-                _JoinList(riff?.Composers),
+                _Id3v2Joined(overlay.Id3v2, "TCOM"),
+                _XiphJoined(overlay.Xiph, "COMPOSER"),
+                _ApeJoined(overlay.Ape, "Composer"),
                 _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom)),
-                _JoinList(_ReadAsfJoinedList(asf, "WM/Composer")));
+                _Asf(overlay.Asf, "WM/Composer"));
             var genre = Nullables.FirstNonNull(
-                _ReadTagFirstGenre(id3v2),
-                _ReadId3v1Genre(id3v1),
-                _ReadTagFirstGenre(xiph),
-                _ReadTagFirstGenre(ape),
-                _ReadTagFirstGenre(riff),
+                _Id3v2Singleton(overlay.Id3v2, "TCON"),
+                _ReadId3v1Genre(overlay.Id3v1),
+                _XiphFirst(overlay.Xiph, "GENRE"),
+                _ApeFirst(overlay.Ape, "Genre"),
+                _Riff(overlay.RiffInfo, "IGNR"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
-                _ReadAsfString(asf, "WM/Genre"));
+                _Asf(overlay.Asf, "WM/Genre"));
             var comment = Nullables.FirstNonNull(
-                _ReadTagComment(id3v2),
-                _ReadId3v1String(id3v1?.Comment),
-                _ReadTagComment(xiph),
-                _ReadTagComment(ape),
-                _ReadTagComment(riff),
+                _Id3v2PrimaryMulti(overlay.Id3v2, "COMM"),
+                _ReadId3v1String(overlay.Id3v1?.Comment),
+                _XiphFirst(overlay.Xiph, "DESCRIPTION") ?? _XiphFirst(overlay.Xiph, "COMMENT"),
+                _ApeFirst(overlay.Ape, "Comment"),
+                _Riff(overlay.RiffInfo, "ICMT"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
-                _ReadAsfString(asf, "WM/Description"));
+                _Asf(overlay.Asf, "WM/Description"));
             var lyrics = Nullables.FirstNonNull(
-                _ReadTagLyrics(id3v2),
-                _ReadTagLyrics(xiph),
-                _ReadTagLyrics(ape),
-                _ReadTagLyrics(riff),
+                _Id3v2PrimaryMulti(overlay.Id3v2, "USLT"),
+                _XiphFirst(overlay.Xiph, "LYRICS") ?? _XiphFirst(overlay.Xiph, "UNSYNCEDLYRICS"),
+                _ApeFirst(overlay.Ape, "Lyrics"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
-                _ReadAsfString(asf, "WM/Lyrics"));
+                _Asf(overlay.Asf, "WM/Lyrics"));
             var copyright = Nullables.FirstNonNull(
-                _ReadTagCopyright(id3v2),
-                _ReadTagCopyright(xiph),
-                _ReadTagCopyright(ape),
-                _ReadTagCopyright(riff),
+                _Id3v2Singleton(overlay.Id3v2, "TCOP"),
+                _XiphFirst(overlay.Xiph, "COPYRIGHT"),
+                _ApeFirst(overlay.Ape, "Copyright"),
+                _Riff(overlay.RiffInfo, "ICOP"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
-                _ReadAsfString(asf, "WM/ProviderCopyright"));
+                _Asf(overlay.Asf, "WM/ProviderCopyright"));
             var grouping = Nullables.FirstNonNull(
-                _ReadTagGrouping(id3v2),
-                _ReadTagGrouping(xiph),
-                _ReadTagGrouping(ape),
-                _ReadTagGrouping(riff),
+                _Id3v2Singleton(overlay.Id3v2, "TIT1"),
+                _XiphFirst(overlay.Xiph, "GROUPING") ?? _XiphFirst(overlay.Xiph, "CONTENTGROUP"),
+                _ApeFirst(overlay.Ape, "Grouping"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomConstants.GroupingAtom),
-                _ReadAsfString(asf, "WM/ContentGroupDescription"));
+                _Asf(overlay.Asf, "WM/ContentGroupDescription"));
             var year = Nullables.FirstNonNull(
-                _ReadTagYear(id3v2),
-                id3v1?.Year,
-                _ReadTagYear(xiph),
-                _ReadTagYear(ape),
-                _ReadTagYear(riff),
+                _Id3v2Year(overlay.Id3v2),
+                overlay.Id3v1?.Year,
+                _ParseUInt(_XiphFirst(overlay.Xiph, "DATE") ?? _XiphFirst(overlay.Xiph, "YEAR")),
+                _ParseUInt(_ApeFirst(overlay.Ape, "Year")),
+                _ParseUInt(_Riff(overlay.RiffInfo, "ICRD")),
                 _ReadAppleYear(overlay.Apple),
-                _ReadAsfUInt(asf, "WM/Year"));
+                _ParseUInt(_Asf(overlay.Asf, "WM/Year")));
+            var (id3Track, id3TrackCount) = _Id3v2TrackPair(overlay.Id3v2, "TRCK");
             var track = Nullables.FirstNonNull(
-                _ReadTagTrack(id3v2),
-                id3v1?.Track is null ? null : id3v1.Track,
-                _ReadTagTrack(xiph),
-                _ReadTagTrack(ape),
-                _ReadTagTrack(riff),
-                _ReadAppleTrack(overlay.Apple),
-                _ReadAsfUInt(asf, "WM/TrackNumber"));
+                id3Track,
+                overlay.Id3v1?.Track is null ? null : overlay.Id3v1.Track,
+                _ParseUInt(_XiphFirst(overlay.Xiph, "TRACKNUMBER")),
+                _ParseUInt(_ApeFirst(overlay.Ape, "Track")),
+                _ParseUInt(_Riff(overlay.RiffInfo, "ITRK")),
+                _ParseUInt(_Asf(overlay.Asf, "WM/TrackNumber")));
             var trackCount = Nullables.FirstNonNull(
-                _ReadTagTrackCount(id3v2),
-                _ReadTagTrackCount(xiph),
-                _ReadTagTrackCount(ape),
-                _ReadTagTrackCount(riff),
-                _ReadAppleTrackCount(overlay.Apple),
-                _ReadAsfUInt(asf, "WM/TrackTotal"));
+                id3TrackCount,
+                _ParseUInt(_XiphFirst(overlay.Xiph, "TRACKTOTAL") ?? _XiphFirst(overlay.Xiph, "TOTALTRACKS")),
+                _ParseUInt(_ApeFirst(overlay.Ape, "TrackCount")),
+                _ParseUInt(_Asf(overlay.Asf, "WM/TrackTotal")));
+            var (id3Disc, id3DiscCount) = _Id3v2TrackPair(overlay.Id3v2, "TPOS");
             var disc = Nullables.FirstNonNull(
-                _ReadTagDisc(id3v2),
-                _ReadTagDisc(xiph),
-                _ReadTagDisc(ape),
-                _ReadTagDisc(riff),
-                _ReadAppleDisc(overlay.Apple),
-                _ReadAsfUInt(asf, "WM/PartOfSet"));
+                id3Disc,
+                _ParseUInt(_XiphFirst(overlay.Xiph, "DISCNUMBER")),
+                _ParseUInt(_ApeFirst(overlay.Ape, "Disc")),
+                _ParseUInt(_Asf(overlay.Asf, "WM/PartOfSet")));
             var discCount = Nullables.FirstNonNull(
-                _ReadTagDiscCount(id3v2),
-                _ReadTagDiscCount(xiph),
-                _ReadTagDiscCount(ape),
-                _ReadTagDiscCount(riff),
-                _ReadAppleDiscCount(overlay.Apple),
-                _ReadAsfUInt(asf, "WM/TotalDiscs"));
+                id3DiscCount,
+                _ParseUInt(_XiphFirst(overlay.Xiph, "DISCTOTAL") ?? _XiphFirst(overlay.Xiph, "TOTALDISCS")),
+                _ParseUInt(_ApeFirst(overlay.Ape, "DiscCount")),
+                _ParseUInt(_Asf(overlay.Asf, "WM/TotalDiscs")));
 
             return new CommonAudioTag(
                 Title: title,
@@ -192,7 +176,7 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Materializes semantics from TagLib's merged façade tag fields (covers RIFF/WAV LIST payloads not modeled as native blocks alone).
+        /// Materializes semantics from TagLib's merged façade tag fields.
         /// </summary>
         /// <param name="tag">Active combined TagLib façade.</param>
         /// <returns>Common fields reconstructed from façade strings/lists and numerics.</returns>
@@ -242,7 +226,7 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Copies each field from <paramref name="ambient"/> only where this instance has no substantive value per field (whitespace is treated like absent strings).
+        /// Copies each field from <paramref name="ambient"/> only where this instance has no substantive value per field.
         /// </summary>
         /// <param name="ambient">Typically <see cref="FromCombinedTag"/> values not yet reflected in native blocks.</param>
         /// <returns>Combined common tag; equal to <see langword="this"/> when nothing was missing.</returns>
@@ -266,7 +250,6 @@ namespace Mfr.Metadata
                 DiscCount: DiscCount ?? ambient.DiscCount);
         }
 
-        /// <summary>Returns <paramref name="projected"/> unless it is absent or whitespace-only, otherwise uses <paramref name="ambient"/> (trimmed).</summary>
         private static string? _CoalesceAbsentOrWhitespaceString(string? projected, string? ambient)
         {
             if (!string.IsNullOrWhiteSpace(projected))
@@ -275,82 +258,204 @@ namespace Mfr.Metadata
             return string.IsNullOrWhiteSpace(ambient) ? null : ambient.Trim();
         }
 
-        private static string? _ReadTagTitle(Tag? tag)
+        private static string? _Id3v2Singleton(Id3v2TagData? data, string frameId)
         {
-            return tag is null ? null : _NullIfWhitespace(tag.Title);
-        }
-
-        private static string? _ReadTagAlbum(Tag? tag)
-        {
-            return tag is null ? null : _NullIfWhitespace(tag.Album);
-        }
-
-        private static string? _ReadTagComment(Tag? tag)
-        {
-            return tag is null ? null : _NullIfWhitespace(tag.Comment);
-        }
-
-        private static string? _ReadTagLyrics(Tag? tag)
-        {
-            return tag is null ? null : _NullIfWhitespace(tag.Lyrics);
-        }
-
-        private static string? _ReadTagCopyright(Tag? tag)
-        {
-            return tag is null ? null : _NullIfWhitespace(tag.Copyright);
-        }
-
-        private static string? _ReadTagGrouping(Tag? tag)
-        {
-            return tag is null ? null : _NullIfWhitespace(tag.Grouping);
-        }
-
-        private static string? _ReadTagFirstGenre(Tag? tag)
-        {
-            if (tag is null)
+            if (data is null)
                 return null;
 
-            return _NullIfWhitespace(tag.FirstGenre);
+            foreach (var frame in data.Frames)
+            {
+                if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
+                    continue;
+
+                return frame.TextValues.Length == 0 ? null : _NullIfWhitespace(frame.TextValues[0]);
+            }
+
+            return null;
         }
 
-        private static uint? _ReadTagYear(Tag? tag)
+        private static string? _Id3v2Joined(Id3v2TagData? data, string frameId)
         {
-            if (tag is null || tag.Year == 0)
+            if (data is null)
                 return null;
 
-            return tag.Year;
+            foreach (var frame in data.Frames)
+            {
+                if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
+                    continue;
+
+                return _JoinList([.. frame.TextValues]);
+            }
+
+            return null;
         }
 
-        private static uint? _ReadTagTrack(Tag? tag)
+        private static string? _Id3v2PrimaryMulti(Id3v2TagData? data, string frameId)
         {
-            if (tag is null || tag.Track == 0)
+            if (data is null)
                 return null;
 
-            return tag.Track;
+            Id3v2ModeledFrame? primary = null;
+            foreach (var frame in data.Frames)
+            {
+                if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
+                    continue;
+
+                if (!string.IsNullOrEmpty(frame.Description))
+                    continue;
+
+                primary = frame;
+                break;
+            }
+
+            if (primary is null)
+            {
+                foreach (var frame in data.Frames)
+                {
+                    if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
+                        continue;
+
+                    primary = frame;
+                    break;
+                }
+            }
+
+            if (primary is null || primary.TextValues.Length == 0)
+                return null;
+
+            return _NullIfWhitespace(primary.TextValues[0]);
         }
 
-        private static uint? _ReadTagTrackCount(Tag? tag)
+        private static uint? _Id3v2Year(Id3v2TagData? data)
         {
-            if (tag is null || tag.TrackCount == 0)
+            var text = _Id3v2Singleton(data, "TDRC") ?? _Id3v2Singleton(data, "TYER");
+            if (text is null)
                 return null;
 
-            return tag.TrackCount;
+            // TDRC may be a full timestamp; take leading year digits.
+            var yearPart = text.Length >= 4 ? text[..4] : text;
+            return uint.TryParse(yearPart, NumberStyles.Integer, CultureInfo.InvariantCulture, out var year) && year != 0
+                ? year
+                : null;
         }
 
-        private static uint? _ReadTagDisc(Tag? tag)
+        private static (uint? Number, uint? Count) _Id3v2TrackPair(Id3v2TagData? data, string frameId)
         {
-            if (tag is null || tag.Disc == 0)
-                return null;
+            var text = _Id3v2Singleton(data, frameId);
+            if (text is null)
+                return (null, null);
 
-            return tag.Disc;
+            var slash = text.IndexOf('/');
+            if (slash < 0)
+            {
+                return uint.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n) && n != 0
+                    ? (n, null)
+                    : (null, null);
+            }
+
+            uint? number = null;
+            uint? count = null;
+            if (slash > 0
+                && uint.TryParse(text[..slash], NumberStyles.Integer, CultureInfo.InvariantCulture, out var nParsed)
+                && nParsed != 0)
+                number = nParsed;
+
+            if (slash + 1 < text.Length
+                && uint.TryParse(text[(slash + 1)..], NumberStyles.Integer, CultureInfo.InvariantCulture, out var cParsed)
+                && cParsed != 0)
+                count = cParsed;
+
+            return (number, count);
         }
 
-        private static uint? _ReadTagDiscCount(Tag? tag)
+        private static string? _XiphFirst(XiphTagData? data, string key)
         {
-            if (tag is null || tag.DiscCount == 0)
+            return _MultimapFirst(data?.Fields ?? default, key);
+        }
+
+        private static string? _XiphJoined(XiphTagData? data, string key)
+        {
+            return _MultimapJoined(data?.Fields ?? default, key);
+        }
+
+        private static string? _ApeFirst(ApeTagData? data, string key)
+        {
+            return _MultimapFirst(data?.Fields ?? default, key);
+        }
+
+        private static string? _ApeJoined(ApeTagData? data, string key)
+        {
+            return _MultimapJoined(data?.Fields ?? default, key);
+        }
+
+        private static string? _MultimapFirst(ImmutableArray<TextFieldRow> fields, string key)
+        {
+            if (fields.IsDefaultOrEmpty)
                 return null;
 
-            return tag.DiscCount;
+            foreach (var row in fields)
+            {
+                if (!string.Equals(row.Key, key, StringComparison.Ordinal))
+                    continue;
+
+                return row.Values.Length == 0 ? null : _NullIfWhitespace(row.Values[0]);
+            }
+
+            return null;
+        }
+
+        private static string? _MultimapJoined(ImmutableArray<TextFieldRow> fields, string key)
+        {
+            if (fields.IsDefaultOrEmpty)
+                return null;
+
+            foreach (var row in fields)
+            {
+                if (!string.Equals(row.Key, key, StringComparison.Ordinal))
+                    continue;
+
+                return _JoinList([.. row.Values]);
+            }
+
+            return null;
+        }
+
+        private static string? _Riff(RiffInfoTagData? data, string key)
+        {
+            if (data is null)
+                return null;
+
+            foreach (var row in data.Fields)
+            {
+                if (string.Equals(row.Key, key, StringComparison.Ordinal))
+                    return _NullIfWhitespace(row.Value);
+            }
+
+            return null;
+        }
+
+        private static string? _Asf(AsfTagData? data, string name)
+        {
+            if (data is null)
+                return null;
+
+            foreach (var row in data.Descriptors)
+            {
+                if (string.Equals(row.Name, name, StringComparison.Ordinal))
+                    return _NullIfWhitespace(row.Value);
+            }
+
+            return null;
+        }
+
+        private static uint? _ParseUInt(string? text)
+        {
+            if (text is null)
+                return null;
+
+            return uint.TryParse(text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var u) && u != 0
+                ? u
+                : null;
         }
 
         private static string? _ReadId3v1String(string? text)
@@ -361,10 +466,7 @@ namespace Mfr.Metadata
         private static string[]? _SplitId3v1Performer(string? artist)
         {
             var trimmed = _NullIfWhitespace(artist);
-            if (trimmed is null)
-                return null;
-
-            return [trimmed];
+            return trimmed is null ? null : [trimmed];
         }
 
         private static string? _ReadId3v1Genre(Id3v1TagData? data)
@@ -372,8 +474,7 @@ namespace Mfr.Metadata
             if (data is null)
                 return null;
 
-            var name = Genres.IndexToAudio(data.Genre);
-            return _NullIfWhitespace(name);
+            return _NullIfWhitespace(Genres.IndexToAudio(data.Genre));
         }
 
         private static string? _JoinList(string[]? values)
@@ -382,66 +483,17 @@ namespace Mfr.Metadata
                 return null;
 
             var filtered = values
-                .Where(v => !string.IsNullOrWhiteSpace(v))
+                .Where(static v => !string.IsNullOrWhiteSpace(v))
                 .Select(static v => v.Trim())
                 .ToArray();
 
-            if (filtered.Length == 0)
-                return null;
-
-            return string.Join("; ", filtered);
-        }
-
-        private static string? _ReadAsfString(TagLib.Asf.Tag? asfTag, string descriptorName)
-        {
-            if (asfTag is null)
-                return null;
-
-            foreach (var d in asfTag)
-            {
-                if (!string.Equals(d.Name, descriptorName, StringComparison.Ordinal))
-                    continue;
-
-                return _NullIfWhitespace(d.ToString());
-            }
-
-            return null;
-        }
-
-        private static string[]? _ReadAsfJoinedList(TagLib.Asf.Tag? tag, string descriptorName)
-        {
-            var text = _ReadAsfString(tag, descriptorName);
-            if (text is null)
-                return null;
-
-            return [text];
-        }
-
-        private static string[]? _ReadAsfJoinedPerformers(TagLib.Asf.Tag? tag)
-        {
-            var author = _ReadAsfString(tag, "WM/Author");
-            if (author is not null)
-                return [author];
-
-            return _ReadAsfJoinedList(tag, "WM/AlbumArtist");
-        }
-
-        private static uint? _ReadAsfUInt(TagLib.Asf.Tag? tag, string descriptorName)
-        {
-            var text = _ReadAsfString(tag, descriptorName);
-            if (text is null)
-                return null;
-
-            return uint.TryParse(text.Trim(), out var u) ? u : null;
+            return filtered.Length == 0 ? null : string.Join("; ", filtered);
         }
 
         private static string? _ReadApplePlainText(AppleTagData? apple, ReadOnlySpan<byte> atomType)
         {
             var values = _ReadAppleAtomValues(apple, atomType);
-            if (values.IsDefaultOrEmpty)
-                return null;
-
-            return _NullIfWhitespace(values[0]);
+            return values.IsDefaultOrEmpty ? null : _NullIfWhitespace(values[0]);
         }
 
         private static string[]? _ReadAppleJoinedList(AppleTagData? apple, ReadOnlySpan<byte> atomType)
@@ -468,10 +520,8 @@ namespace Mfr.Metadata
 
             foreach (var row in apple.Atoms)
             {
-                if (!row.AtomType.AsSpan().SequenceEqual(atomType))
-                    continue;
-
-                return row.Values;
+                if (row.AtomType.AsSpan().SequenceEqual(atomType))
+                    return row.Values;
             }
 
             return default;
@@ -480,34 +530,9 @@ namespace Mfr.Metadata
         private static uint? _ReadAppleYear(AppleTagData? apple)
         {
             var day = _ReadApplePlainText(apple, AppleAtomConstants.DayAtom);
-            return day is not null && uint.TryParse(day.Trim(), out var y) ? y : null;
-        }
-
-        /// <remarks>
-        /// MP4 track/disc atoms are binary; omit Apple when TagLib-derived numbers are unavailable from text atoms alone.
-        /// </remarks>
-        private static uint? _ReadAppleTrack(AppleTagData? apple)
-        {
-            _ = apple;
-            return null;
-        }
-
-        private static uint? _ReadAppleTrackCount(AppleTagData? apple)
-        {
-            _ = apple;
-            return null;
-        }
-
-        private static uint? _ReadAppleDisc(AppleTagData? apple)
-        {
-            _ = apple;
-            return null;
-        }
-
-        private static uint? _ReadAppleDiscCount(AppleTagData? apple)
-        {
-            _ = apple;
-            return null;
+            return day is not null && uint.TryParse(day.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var y) && y != 0
+                ? y
+                : null;
         }
 
         private static string? _NullIfWhitespace(string? text)

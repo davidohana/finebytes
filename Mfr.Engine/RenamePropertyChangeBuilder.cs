@@ -163,24 +163,24 @@ namespace Mfr.Engine
             {
                 changes.Add(new RenamePropertyChange(
                     Property: "AudioTag.Native.Xiph",
-                    OldValue: _SummarizeSerializedBlob(original.Xiph),
-                    NewValue: _SummarizeSerializedBlob(preview.Xiph)));
+                    OldValue: _SummarizeXiphBlock(original.Xiph),
+                    NewValue: _SummarizeXiphBlock(preview.Xiph)));
             }
 
             if (!Equals(original.Ape, preview.Ape))
             {
                 changes.Add(new RenamePropertyChange(
                     Property: "AudioTag.Native.Ape",
-                    OldValue: _SummarizeSerializedBlob(original.Ape),
-                    NewValue: _SummarizeSerializedBlob(preview.Ape)));
+                    OldValue: _SummarizeApeBlock(original.Ape),
+                    NewValue: _SummarizeApeBlock(preview.Ape)));
             }
 
             if (!Equals(original.RiffInfo, preview.RiffInfo))
             {
                 changes.Add(new RenamePropertyChange(
                     Property: "AudioTag.Native.RiffInfo",
-                    OldValue: _SummarizeSerializedBlob(original.RiffInfo),
-                    NewValue: _SummarizeSerializedBlob(preview.RiffInfo)));
+                    OldValue: _SummarizeRiffInfoBlock(original.RiffInfo),
+                    NewValue: _SummarizeRiffInfoBlock(preview.RiffInfo)));
             }
 
             if (!Equals(original.Apple, preview.Apple))
@@ -205,15 +205,31 @@ namespace Mfr.Engine
             if (data is null)
                 return "absent";
 
-            return $"{data.Frames.Length} frames, {data.CanonicalTagBytes.Length} canonical bytes (ID3v2 v{data.Version})";
+            return $"{data.Frames.Length} modeled frames (ID3v2 v{data.Version})";
         }
 
-        private static string _SummarizeSerializedBlob(SerializedTagBlob? blob)
+        private static string _SummarizeXiphBlock(XiphTagData? data)
         {
-            if (blob is null)
+            if (data is null)
                 return "absent";
 
-            return $"{blob.CanonicalTagBytes.Length} bytes";
+            return $"{data.Fields.Length} fields";
+        }
+
+        private static string _SummarizeApeBlock(ApeTagData? data)
+        {
+            if (data is null)
+                return "absent";
+
+            return $"{data.Fields.Length} fields";
+        }
+
+        private static string _SummarizeRiffInfoBlock(RiffInfoTagData? data)
+        {
+            if (data is null)
+                return "absent";
+
+            return $"{data.Fields.Length} fields";
         }
 
         private static string _SummarizeAppleBlock(AppleTagData? data)

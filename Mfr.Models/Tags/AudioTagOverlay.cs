@@ -1,7 +1,7 @@
 namespace Mfr.Models.Tags
 {
     /// <summary>
-    /// Structured embedded audio tags: one snapshot per <c>TagTypes</c> block (no mirrored scalar fields).
+    /// Structured embedded audio tags: one parsed-field snapshot per <c>TagTypes</c> block.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -17,19 +17,19 @@ namespace Mfr.Models.Tags
         public Id3v1TagData? Id3v1 { get; set; }
 
         /// <summary>
-        /// Gets or sets the optional ID3v2 snapshot (full frame inventory) when the row is backed by MPEG/MP3 structured tags.
+        /// Gets or sets the optional ID3v2 snapshot (modeled text frames) when the row is backed by MPEG/MP3 structured tags.
         /// </summary>
         public Id3v2TagData? Id3v2 { get; set; }
 
         /// <summary>
-        /// Gets or sets the optional Xiph comment block (FLAC, Ogg, Opus, etc.) as canonical serialized bytes.
+        /// Gets or sets the optional Xiph comment block (FLAC, Ogg, Opus, etc.) as known-key fields.
         /// </summary>
-        public SerializedTagBlob? Xiph { get; set; }
+        public XiphTagData? Xiph { get; set; }
 
         /// <summary>
-        /// Gets or sets the optional APEv2 tag block as canonical serialized bytes.
+        /// Gets or sets the optional APEv2 tag block as known text-key fields.
         /// </summary>
-        public SerializedTagBlob? Ape { get; set; }
+        public ApeTagData? Ape { get; set; }
 
         /// <summary>
         /// Gets or sets the optional Apple <c>ilst</c> / MP4 metadata snapshot.
@@ -42,9 +42,9 @@ namespace Mfr.Models.Tags
         public AsfTagData? Asf { get; set; }
 
         /// <summary>
-        /// Gets or sets the optional RIFF LIST INFO block (classic WAV LIST/INAM, etc.) as canonical serialized bytes.
+        /// Gets or sets the optional RIFF LIST INFO block (classic WAV LIST/INAM, etc.) as known INFO fields.
         /// </summary>
-        public SerializedTagBlob? RiffInfo { get; set; }
+        public RiffInfoTagData? RiffInfo { get; set; }
 
         /// <inheritdoc cref="Equals(AudioTagOverlay?)" />
         public bool TagBlocksStructurallyEquals(AudioTagOverlay? other)
@@ -90,12 +90,11 @@ namespace Mfr.Models.Tags
                     : new Id3v2TagData
                     {
                         Version = Id3v2.Version,
-                        CanonicalTagBytes = Id3v2.CanonicalTagBytes,
                         Frames = Id3v2.Frames,
                     },
-                Xiph = Xiph is null ? null : new SerializedTagBlob { CanonicalTagBytes = Xiph.CanonicalTagBytes },
-                Ape = Ape is null ? null : new SerializedTagBlob { CanonicalTagBytes = Ape.CanonicalTagBytes },
-                RiffInfo = RiffInfo is null ? null : new SerializedTagBlob { CanonicalTagBytes = RiffInfo.CanonicalTagBytes },
+                Xiph = Xiph is null ? null : new XiphTagData { Fields = Xiph.Fields },
+                Ape = Ape is null ? null : new ApeTagData { Fields = Ape.Fields },
+                RiffInfo = RiffInfo is null ? null : new RiffInfoTagData { Fields = RiffInfo.Fields },
                 Apple = Apple is null ? null : new AppleTagData { Atoms = Apple.Atoms },
                 Asf = Asf is null ? null : new AsfTagData { Descriptors = Asf.Descriptors },
             };
