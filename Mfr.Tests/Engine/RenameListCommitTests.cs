@@ -6,6 +6,7 @@ using Mfr.Filters.Replace;
 using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Asf;
 using Mfr.Utils;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 
@@ -219,8 +220,14 @@ namespace Mfr.Tests.Engine
             Assert.Single(results);
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
 
+            using (var file = TagLib.File.Create(sourcePath))
+                Assert.Equal("CommitWmaTitle", file.Tag.Title);
+
             var readBack = AudioTagPersistence.Read(sourcePath);
             Assert.Equal("CommitWmaTitle", readBack.Semantic().Title);
+            Assert.Contains(
+                readBack.Asf!.Descriptors,
+                d => d.Name == AsfDescriptorNames.Title && d.Value == "CommitWmaTitle");
         }
 
         [Fact]

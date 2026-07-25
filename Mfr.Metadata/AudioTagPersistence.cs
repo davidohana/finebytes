@@ -334,15 +334,24 @@ namespace Mfr.Metadata
         private static AsfTagData _ReadAsfTagData(TagLib.Asf.Tag asf)
         {
             var rows = new List<AsfDescriptorRow>();
+
+            // Content Description Object fields are not in the extended-descriptor enumerator.
+            _AddAsfIfPresent(rows, AsfDescriptorNames.Title, asf.Title);
+            _AddAsfIfPresent(rows, AsfDescriptorNames.Author, _JoinPerformers(asf.Performers));
+            _AddAsfIfPresent(rows, AsfDescriptorNames.Copyright, asf.Copyright);
+
             foreach (var d in asf)
+            {
+                if (string.IsNullOrEmpty(d.Name))
+                    continue;
+
+                // Prefer Content Description for Title/Author/Copyright when both somehow exist.
+                if (_IsAsfContentDescriptionName(d.Name)
+                    && rows.Exists(r => string.Equals(r.Name, d.Name, StringComparison.Ordinal)))
+                    continue;
+
                 rows.Add(new AsfDescriptorRow(d.Name, d.ToString()));
-
-            var hasWmTitle = rows.Exists(static r =>
-                string.Equals(r.Name, "WM/Title", StringComparison.Ordinal));
-
-            var titleFromFaçade = string.IsNullOrWhiteSpace(asf.Title) ? null : asf.Title.Trim();
-            if (!hasWmTitle && titleFromFaçade is not null)
-                rows.Add(new AsfDescriptorRow("WM/Title", titleFromFaçade));
+            }
 
             rows.Sort(static (a, b) =>
             {
@@ -354,6 +363,33 @@ namespace Mfr.Metadata
             });
 
             return new AsfTagData { Descriptors = [.. rows] };
+        }
+
+        private static void _AddAsfIfPresent(List<AsfDescriptorRow> rows, string name, string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+
+            rows.Add(new AsfDescriptorRow(name, value.Trim()));
+        }
+
+        private static string? _JoinPerformers(string[] performers)
+        {
+            if (performers.Length == 0)
+                return null;
+
+            var parts = performers
+                .Select(static p => p.Trim())
+                .Where(static p => p.Length > 0)
+                .ToArray();
+            return parts.Length == 0 ? null : string.Join("; ", parts);
+        }
+
+        private static bool _IsAsfContentDescriptionName(string name)
+        {
+            return string.Equals(name, AsfDescriptorNames.Title, StringComparison.Ordinal)
+                || string.Equals(name, AsfDescriptorNames.Author, StringComparison.Ordinal)
+                || string.Equals(name, AsfDescriptorNames.Copyright, StringComparison.Ordinal);
         }
 
         private static int _CompareImmutableStringSeq(ImmutableArray<string> a, ImmutableArray<string> b)

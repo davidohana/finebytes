@@ -3,17 +3,20 @@ using System.Collections.Immutable;
 namespace Mfr.Models.Tags.Asf
 {
     /// <summary>
-    /// Detached snapshot of an ASF/WMA extended content descriptor tag surface.
+    /// Detached snapshot of an ASF/WMA tag: Content Description fields plus extended descriptors.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Rows are sorted by <see cref="AsfDescriptorRow.Name"/> for stable equality; values use TagLib’s string conversion.
+    /// Rows are sorted by <see cref="AsfDescriptorRow.Name"/> for stable equality. Content Description
+    /// fields use <see cref="AsfDescriptorNames.Title"/>, <see cref="AsfDescriptorNames.Author"/>, and
+    /// <see cref="AsfDescriptorNames.Copyright"/>; remaining rows are extended content descriptors
+    /// (TagLib string conversion).
     /// </para>
     /// </remarks>
     public sealed class AsfTagData : IEquatable<AsfTagData?>
     {
         /// <summary>
-        /// Content descriptors captured from TagLib’s ASF extended content descriptor tag.
+        /// ASF field rows (Content Description + extended descriptors) in canonical name order.
         /// </summary>
         public ImmutableArray<AsfDescriptorRow> Descriptors { get; init; } = [];
 

@@ -222,8 +222,12 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Writes ASF descriptors from overlay rows without clearing the tag.
+        /// Writes ASF rows onto a live tag without clearing unmodeled fields.
         /// </summary>
+        /// <remarks>
+        /// Content Description fields (<see cref="AsfDescriptorNames.Title"/>, Author, Copyright) are applied
+        /// via TagLib façade properties; other names go through extended descriptors.
+        /// </remarks>
         public static void WriteAsf(TagLib.Asf.Tag live, AsfTagData data)
         {
             foreach (var row in data.Descriptors)
@@ -231,9 +235,46 @@ namespace Mfr.Metadata
                 if (string.IsNullOrEmpty(row.Name))
                     continue;
 
-                live.RemoveDescriptors(row.Name);
-                live.AddDescriptor(new TagLib.Asf.ContentDescriptor(row.Name, row.Value));
+                ApplyAsfNamedValue(live, row.Name, row.Value);
             }
+        }
+
+        /// <summary>
+        /// Sets or clears one ASF overlay field on a live tag (Content Description or extended descriptor).
+        /// </summary>
+        /// <param name="live">Live ASF tag.</param>
+        /// <param name="name">Canonical overlay name from <see cref="AsfDescriptorNames"/>.</param>
+        /// <param name="value">Text to store; <see langword="null"/> or empty clears the field.</param>
+        internal static void ApplyAsfNamedValue(TagLib.Asf.Tag live, string name, string? value)
+        {
+            var text = _NullIfEmpty(value);
+            switch (name)
+            {
+                case AsfDescriptorNames.Title:
+                    live.Title = text;
+                    return;
+                case AsfDescriptorNames.Author:
+                    live.Performers = text is null ? [] : _SplitJoinedList(text);
+                    return;
+                case AsfDescriptorNames.Copyright:
+                    live.Copyright = text;
+                    return;
+                default:
+                    live.RemoveDescriptors(name);
+                    if (text is not null)
+                        live.AddDescriptor(new TagLib.Asf.ContentDescriptor(name, text));
+                    return;
+            }
+        }
+
+        /// <summary>
+        /// Clears one ASF overlay field on a live tag.
+        /// </summary>
+        /// <param name="live">Live ASF tag.</param>
+        /// <param name="name">Canonical overlay name from <see cref="AsfDescriptorNames"/>.</param>
+        internal static void ClearAsfNamedValue(TagLib.Asf.Tag live, string name)
+        {
+            ApplyAsfNamedValue(live, name, null);
         }
 
         /// <summary>
@@ -559,21 +600,29 @@ namespace Mfr.Metadata
         private static AsfTagData? _MergeAsf(AsfTagData existing, SemanticAudioTag common)
         {
             var rows = existing.Descriptors.ToList();
-            _SetAsf(rows, "WM/Title", common.Title);
-            _SetAsf(rows, "WM/AlbumTitle", common.Album);
-            _SetAsf(rows, "WM/Author", _FirstListItem(common.Performers));
-            _SetAsf(rows, "WM/AlbumArtist", _FirstListItem(common.AlbumArtists) ?? common.AlbumArtists);
-            _SetAsf(rows, "WM/Composer", _FirstListItem(common.Composers) ?? common.Composers);
-            _SetAsf(rows, "WM/Genre", common.Genre);
-            _SetAsf(rows, "WM/Description", common.Comment);
-            _SetAsf(rows, "WM/Lyrics", common.Lyrics);
-            _SetAsf(rows, "WM/ProviderCopyright", common.Copyright);
-            _SetAsf(rows, "WM/ContentGroupDescription", common.Grouping);
-            _SetAsf(rows, "WM/Year", common.Year?.ToString(CultureInfo.InvariantCulture));
-            _SetAsf(rows, "WM/TrackNumber", common.Track?.ToString(CultureInfo.InvariantCulture));
-            _SetAsf(rows, "WM/TrackTotal", common.TrackCount?.ToString(CultureInfo.InvariantCulture));
-            _SetAsf(rows, "WM/PartOfSet", common.Disc?.ToString(CultureInfo.InvariantCulture));
-            _SetAsf(rows, "WM/TotalDiscs", common.DiscCount?.ToString(CultureInfo.InvariantCulture));
+
+            // Drop non-canonical names left by older writes or foreign tools for fields we model.
+            _RemoveAsf(rows, "WM/Title");
+            _RemoveAsf(rows, "WM/Author");
+            _RemoveAsf(rows, "WM/Description");
+            _RemoveAsf(rows, "WM/ProviderCopyright");
+            _RemoveAsf(rows, "WM/TrackTotal");
+            _RemoveAsf(rows, "WM/TotalDiscs");
+
+            _SetAsf(rows, AsfDescriptorNames.Title, common.Title);
+            _SetAsf(rows, AsfDescriptorNames.Album, common.Album);
+            _SetAsf(rows, AsfDescriptorNames.Author, common.Performers);
+            _SetAsf(rows, AsfDescriptorNames.AlbumArtist, common.AlbumArtists);
+            _SetAsf(rows, AsfDescriptorNames.Composer, common.Composers);
+            _SetAsf(rows, AsfDescriptorNames.Genre, common.Genre);
+            _SetAsf(rows, AsfDescriptorNames.Comment, common.Comment);
+            _SetAsf(rows, AsfDescriptorNames.Lyrics, common.Lyrics);
+            _SetAsf(rows, AsfDescriptorNames.Copyright, common.Copyright);
+            _SetAsf(rows, AsfDescriptorNames.Grouping, common.Grouping);
+            _SetAsf(rows, AsfDescriptorNames.Year, common.Year?.ToString(CultureInfo.InvariantCulture));
+            _SetAsf(rows, AsfDescriptorNames.TrackNumber, common.Track?.ToString(CultureInfo.InvariantCulture));
+            _SetAsf(rows, AsfDescriptorNames.TrackTotal, common.TrackCount?.ToString(CultureInfo.InvariantCulture));
+            _SetAsfPartOfSet(rows, common.Disc, common.DiscCount);
 
             if (rows.Count == 0)
                 return null;
@@ -817,6 +866,39 @@ namespace Mfr.Metadata
             rows.Add(new AsfDescriptorRow(name, text));
         }
 
+        private static void _RemoveAsf(List<AsfDescriptorRow> rows, string name)
+        {
+            rows.RemoveAll(r => string.Equals(r.Name, name, StringComparison.Ordinal));
+        }
+
+        private static void _SetAsfPartOfSet(List<AsfDescriptorRow> rows, uint? disc, uint? discCount)
+        {
+            _RemoveAsf(rows, AsfDescriptorNames.PartOfSet);
+            if (disc is null && discCount is null)
+                return;
+
+            if (disc is not null && discCount is not null)
+            {
+                rows.Add(new AsfDescriptorRow(
+                    AsfDescriptorNames.PartOfSet,
+                    string.Format(CultureInfo.InvariantCulture, "{0}/{1}", disc.Value, discCount.Value)));
+                return;
+            }
+
+            if (disc is not null)
+            {
+                rows.Add(new AsfDescriptorRow(
+                    AsfDescriptorNames.PartOfSet,
+                    disc.Value.ToString(CultureInfo.InvariantCulture)));
+                return;
+            }
+
+            // TagLib encodes count-only as "0/{count}".
+            rows.Add(new AsfDescriptorRow(
+                AsfDescriptorNames.PartOfSet,
+                string.Format(CultureInfo.InvariantCulture, "0/{0}", discCount!.Value)));
+        }
+
         private static void _SetAppleAtom(List<AppleAtomRow> atoms, ReadOnlySpan<byte> atomType, string? value)
         {
             var typeBytes = atomType.ToArray();
@@ -963,12 +1045,6 @@ namespace Mfr.Metadata
             return [.. joined.Split(_ListSeparators, StringSplitOptions.TrimEntries)
                 .Where(static part => !string.IsNullOrEmpty(part))
                 .Select(static part => part.Trim())];
-        }
-
-        private static string? _FirstListItem(string? joined)
-        {
-            var parts = _SplitJoinedList(joined);
-            return parts.Length == 0 ? null : parts[0];
         }
 
         private static string? _NullIfEmpty(string? text)

@@ -1,5 +1,6 @@
 using Mfr.Metadata;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Asf;
 using Mfr.Utils;
 using TagLib;
 
@@ -64,7 +65,7 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// ASF title patch does not Clear the tag and round-trips.
+        /// ASF title patch writes Content Description Title (TagLib façade) without Clear, and preserves other fields.
         /// </summary>
         [Fact]
         public void Apply_Wma_TitleOnlyPatch_DoesNotClearAsf()
@@ -84,10 +85,68 @@ namespace Mfr.Tests.Metadata
 
             AudioTagPersistence.Apply(path, original, preview);
 
+            using (var file = TagLib.File.Create(path))
+            {
+                var asf = Assert.IsType<TagLib.Asf.Tag>(file.GetTag(TagTypes.Asf));
+                Assert.Equal("AsfPatchedTitle", asf.Title);
+                Assert.DoesNotContain(asf, d => string.Equals(d.Name, "WM/Title", StringComparison.Ordinal));
+            }
+
             var after = AudioTagPersistence.Read(path);
             Assert.Equal("AsfPatchedTitle", after.Semantic().Title);
             Assert.NotNull(after.Asf);
+            Assert.Contains(
+                after.Asf.Descriptors,
+                d => d.Name == AsfDescriptorNames.Title && d.Value == "AsfPatchedTitle");
+            Assert.DoesNotContain(after.Asf.Descriptors, d => d.Name == "WM/Title");
             Assert.True(after.Asf.Descriptors.Length >= descriptorCountBefore - 1);
+        }
+
+        /// <summary>
+        /// ASF performers, comment, and copyright map to Author / WM/Text / Copyright (TagLib façade).
+        /// </summary>
+        [Fact]
+        public void Apply_Wma_CommonFields_WriteTagLibCanonicalLocations()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("asf-canonical.wma");
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "taglib-sharp-sample.wma");
+            System.IO.File.Copy(fixturePath, path, overwrite: false);
+
+            var original = AudioTagPersistence.Read(path);
+            var preview = original.Clone();
+            var merged = SemanticAudioTag.FromOverlay(preview) with
+            {
+                Title = "CanonTitle",
+                Performers = "Canon Artist",
+                Comment = "CanonComment",
+                Copyright = "Canon©",
+                Disc = 2,
+                DiscCount = 3,
+                TrackCount = 12,
+            };
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
+            AudioTagPersistence.Apply(path, original, preview);
+
+            using var file = TagLib.File.Create(path);
+            var asf = Assert.IsType<TagLib.Asf.Tag>(file.GetTag(TagTypes.Asf));
+            Assert.Equal("CanonTitle", asf.Title);
+            Assert.Equal(["Canon Artist"], asf.Performers);
+            Assert.Equal("CanonComment", asf.Comment);
+            Assert.Equal("Canon©", asf.Copyright);
+            Assert.Equal(2u, asf.Disc);
+            Assert.Equal(3u, asf.DiscCount);
+            Assert.Equal(12u, asf.TrackCount);
+            Assert.DoesNotContain(asf, d => string.Equals(d.Name, "WM/Title", StringComparison.Ordinal));
+            Assert.DoesNotContain(asf, d => string.Equals(d.Name, "WM/Author", StringComparison.Ordinal));
+            Assert.DoesNotContain(asf, d => string.Equals(d.Name, "WM/Description", StringComparison.Ordinal));
+            Assert.DoesNotContain(asf, d => string.Equals(d.Name, "WM/ProviderCopyright", StringComparison.Ordinal));
+            Assert.DoesNotContain(asf, d => string.Equals(d.Name, "WM/TotalDiscs", StringComparison.Ordinal));
+            Assert.Contains(asf, d => string.Equals(d.Name, "WM/Text", StringComparison.Ordinal));
+            Assert.Contains(
+                asf,
+                d => string.Equals(d.Name, "WM/PartOfSet", StringComparison.Ordinal)
+                    && string.Equals(d.ToString(), "2/3", StringComparison.Ordinal));
+            Assert.Contains(asf, d => string.Equals(d.Name, "TrackTotal", StringComparison.Ordinal));
         }
 
         /// <summary>

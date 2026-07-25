@@ -194,8 +194,12 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Creates or patches ASF descriptors without clearing the tag.
+        /// Creates or patches ASF fields without clearing the tag.
         /// </summary>
+        /// <remarks>
+        /// Content Description fields are applied via TagLib façade properties; extended descriptors use
+        /// add/remove. Never calls <c>Clear()</c>.
+        /// </remarks>
         public static void ApplyAsf(TagLib.Asf.Tag live, AsfTagData? original, AsfTagData preview)
         {
             if (original is null)
@@ -215,7 +219,7 @@ namespace Mfr.Metadata
                 if (previewByName.ContainsKey(name))
                     continue;
 
-                live.RemoveDescriptors(name);
+                TagBlockFieldMapper.ClearAsfNamedValue(live, name);
             }
 
             foreach (var (name, value) in previewByName)
@@ -224,8 +228,7 @@ namespace Mfr.Metadata
                     && string.Equals(prior, value, StringComparison.Ordinal))
                     continue;
 
-                live.RemoveDescriptors(name);
-                live.AddDescriptor(new TagLib.Asf.ContentDescriptor(name, value));
+                TagBlockFieldMapper.ApplyAsfNamedValue(live, name, value);
             }
         }
 
