@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Mfr.Engine;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
@@ -133,6 +134,26 @@ namespace Mfr.Tests.Engine
             Assert.Equal(-5, typed.Options.Amount);
             Assert.Equal(TimeShiftUnit.Days, typed.Options.Unit);
             Assert.Equal(TimestampField.LastWrite, typed.Options.TimestampField);
+            typed.Setup();
+        }
+
+        [Fact]
+        public void EmbeddedTagTypeRemover_roundtrips_block_names()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "EmbeddedTagTypeRemover",
+              "options": {
+                "blocks": ["id3v1", "riffInfo"]
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<EmbeddedTagTypeRemoverFilter>(filter);
+            AudioTagBlockKind[] expectedBlocks = [AudioTagBlockKind.Id3v1, AudioTagBlockKind.RiffInfo];
+            Assert.Equal(expectedBlocks, typed.Options.Blocks);
             typed.Setup();
         }
 

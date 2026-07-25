@@ -60,7 +60,7 @@ namespace Mfr.Metadata
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             containerFormat = AudioTagContainerPolicy.DetectFrom(file);
             var ambientCombinedBeforeBlockReads = CommonAudioTag.FromCombinedTag(file.Tag);
-            var overlay = _ReadOverlay(file);
+            var overlay = _ReadOverlay(file, file.TagTypesOnDisk);
             _MergeAmbientCombinedTagFacadeIntoBlocks(file, overlay, absolutePath, ambientCombinedBeforeBlockReads);
             return overlay;
         }
@@ -185,7 +185,7 @@ namespace Mfr.Metadata
                 TagBlockFieldMapper.WriteCommonToTag(file.Tag, merged);
                 try
                 {
-                    var refreshed = _ReadOverlay(file);
+                    var refreshed = _ReadOverlay(file, file.TagTypes);
                     overlay.Id3v1 = refreshed.Id3v1;
                     overlay.Id3v2 = refreshed.Id3v2;
                     overlay.Xiph = refreshed.Xiph;
@@ -211,6 +211,12 @@ namespace Mfr.Metadata
         /// <summary>
         /// Loads the file’s normalized tag overlay via TagLib and, when <paramref name="previewOverlay"/> differs from that overlay, assigns modeled fields from <paramref name="previewOverlay"/> to TagLib tags and saves.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Blocks the file carries but <paramref name="previewOverlay"/> does not are removed outright
+        /// (<c>RemoveTags</c> for that <c>TagTypes</c>) before the remaining blocks are written.
+        /// </para>
+        /// </remarks>
         /// <param name="absolutePath">Path to an existing regular file (typically the post-move destination).</param>
         /// <param name="previewOverlay">Desired tag values.</param>
         /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
@@ -227,12 +233,11 @@ namespace Mfr.Metadata
             _EnsureIntroducedBlocksSupported(containerFormat, baselineOverlay, previewOverlay);
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
+            _RemoveDroppedTagBlocks(file, baselineOverlay, previewOverlay);
             _ApplyNativeTagBlocks(file, previewOverlay);
 
             if (file is AudioFile)
                 _ApplyToMpeg(file, previewOverlay);
-            else if (!previewOverlay.HasAnyBlock())
-                TagBlockFieldMapper.WriteCommonToTag(file.Tag, CommonAudioTag.FromOverlay(previewOverlay));
 
             file.Save();
         }
@@ -255,6 +260,39 @@ namespace Mfr.Metadata
             }
         }
 
+        /// <remarks>
+        /// A block the file carries but the preview dropped is a tag-type removal. The whole <c>TagTypes</c> entry goes,
+        /// so unmodeled content on that block (embedded art, unknown frames) is deleted with it.
+        /// </remarks>
+        private static void _RemoveDroppedTagBlocks(
+            TagLib.File file,
+            AudioTagOverlay baselineOverlay,
+            AudioTagOverlay previewOverlay)
+        {
+            foreach (var kind in baselineOverlay.GetPresentBlockKinds())
+            {
+                if (previewOverlay.HasBlock(kind))
+                    continue;
+
+                file.RemoveTags(_ToTagTypes(kind));
+            }
+        }
+
+        private static TagTypes _ToTagTypes(AudioTagBlockKind kind)
+        {
+            return kind switch
+            {
+                AudioTagBlockKind.Id3v1 => TagTypes.Id3v1,
+                AudioTagBlockKind.Id3v2 => TagTypes.Id3v2,
+                AudioTagBlockKind.Xiph => TagTypes.Xiph,
+                AudioTagBlockKind.Ape => TagTypes.Ape,
+                AudioTagBlockKind.Apple => TagTypes.Apple,
+                AudioTagBlockKind.Asf => TagTypes.Asf,
+                AudioTagBlockKind.RiffInfo => TagTypes.RiffInfo,
+                _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown audio tag block kind."),
+            };
+        }
+
         /// <summary>
         /// Removes all embedded tag blobs TagLib associates with the file.
         /// </summary>
@@ -270,26 +308,38 @@ namespace Mfr.Metadata
             file.Save();
         }
 
-        private static AudioTagOverlay _ReadOverlay(TagLib.File file)
+        /// <remarks>
+        /// <paramref name="presentTypes"/> decides which blocks the logical tag carries. TagLib materializes empty
+        /// sibling tags while loading (an MPEG file always exposes ID3v1 and ID3v2, seeded from whichever tag was on
+        /// disk), so callers reading disk state pass <c>TagTypesOnDisk</c>; callers re-reading a file they just wrote
+        /// in memory pass <c>TagTypes</c>.
+        /// </remarks>
+        private static AudioTagOverlay _ReadOverlay(TagLib.File file, TagTypes presentTypes)
         {
-            Id3v1TagData? id3v1 = null;
-            Id3v2TagData? id3v2 = null;
-            if (file is AudioFile)
-            {
-                id3v2 = _ReadId3v2Snapshot(file);
-                id3v1 = _ReadId3v1Snapshot(file);
-            }
+            var overlay = new AudioTagOverlay();
 
-            return new AudioTagOverlay
-            {
-                Id3v1 = id3v1,
-                Id3v2 = id3v2,
-                Xiph = _ReadXiph(file),
-                Ape = _ReadApe(file),
-                RiffInfo = _ReadRiffInfo(file),
-                Apple = _ReadAppleSnapshot(file),
-                Asf = _ReadAsfSnapshot(file),
-            };
+            if (file is AudioFile && presentTypes.HasFlag(TagTypes.Id3v2))
+                overlay.Id3v2 = _ReadId3v2Snapshot(file);
+
+            if (file is AudioFile && presentTypes.HasFlag(TagTypes.Id3v1))
+                overlay.Id3v1 = _ReadId3v1Snapshot(file);
+
+            if (presentTypes.HasFlag(TagTypes.Xiph))
+                overlay.Xiph = _ReadXiph(file);
+
+            if (presentTypes.HasFlag(TagTypes.Ape))
+                overlay.Ape = _ReadApe(file);
+
+            if (presentTypes.HasFlag(TagTypes.RiffInfo))
+                overlay.RiffInfo = _ReadRiffInfo(file);
+
+            if (presentTypes.HasFlag(TagTypes.Apple))
+                overlay.Apple = _ReadAppleSnapshot(file);
+
+            if (presentTypes.HasFlag(TagTypes.Asf))
+                overlay.Asf = _ReadAsfSnapshot(file);
+
+            return overlay;
         }
 
         private static void _MergeAmbientCombinedTagFacadeIntoBlocks(

@@ -55,6 +55,7 @@ namespace Mfr.Engine
             new(typeof(AttributesSetterFilter), "AttributesSetter"),
             new(typeof(AudioTagSetterFilter), "AudioTagSetter"),
             new(typeof(EmbeddedTagRemoverFilter), "EmbeddedTagRemover"),
+            new(typeof(EmbeddedTagTypeRemoverFilter), "EmbeddedTagTypeRemover"),
             new(typeof(DateSetterFilter), "DateSetter"),
             new(typeof(TimeSetterFilter), "TimeSetter"),
             new(typeof(TimeShifterFilter), "TimeShifter")

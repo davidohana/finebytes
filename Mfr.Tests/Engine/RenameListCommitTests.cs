@@ -255,6 +255,99 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies selective removal deletes only the named tag type and leaves the other ID3 block on disk.
+        /// </summary>
+        public void Commit_EmbeddedTagTypeRemover_RemovesId3v1_KeepsId3v2_OnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("selective.mp3");
+            TaggedMp3Fixture.WriteTagged(sourcePath, id3v1Title: "TrailerTitle", id3v2Title: "FrameTitle");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "remove-id3v1",
+                new EmbeddedTagTypeRemoverFilter(
+                    new EmbeddedTagTypeRemoverOptions([AudioTagBlockKind.Id3v1])));
+            var plan = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.False(item.StripAllEmbeddedTagsOnCommit);
+            Assert.Null(item.Preview.AudioTagOverlay.Id3v1);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Null(readBack.Id3v1);
+            Assert.NotNull(readBack.Id3v2);
+            Assert.Equal("FrameTitle", readBack.Semantic().Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies a generic title written after selective removal only reaches the tag block that survived.
+        /// </summary>
+        public void Commit_EmbeddedTagTypeRemover_Then_Formatter_OnTitle_WritesOnlyToRemainingBlock()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("selective-then-title.mp3");
+            TaggedMp3Fixture.WriteTagged(sourcePath, id3v1Title: "TrailerTitle", id3v2Title: "FrameTitle");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "remove-id3v1-then-title",
+                new EmbeddedTagTypeRemoverFilter(
+                    new EmbeddedTagTypeRemoverOptions([AudioTagBlockKind.Id3v1])),
+                new FormatterFilter(
+                    Target: new AudioFieldTarget(AudioOverlayField.Title),
+                    Options: new FormatterOptions("OnlyOnFrames")));
+            var plan = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Null(item.Preview.AudioTagOverlay.Id3v1);
+            Assert.Equal("OnlyOnFrames", item.Preview.AudioTagOverlay.Semantic().Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Null(readBack.Id3v1);
+            Assert.Equal("OnlyOnFrames", readBack.Semantic().Title);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies removing a tag type the container cannot hold fails the row in preview instead of writing anything.
+        /// </summary>
+        public void Preview_EmbeddedTagTypeRemover_Id3v2OnFlac_ReportsPreviewError()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
+            var sourcePath = dir.CombinePath("unsupported.flac");
+            File.Copy(fixturePath, sourcePath, overwrite: false);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "remove-id3v2-on-flac",
+                new EmbeddedTagTypeRemoverFilter(
+                    new EmbeddedTagTypeRemoverOptions([AudioTagBlockKind.Id3v2])));
+            _ = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.Contains("ID3v2", item.PreviewError!.Message, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies strip-all then an overlay formatter writes the new title after tags were removed.
         /// </summary>
         public void Commit_EmbeddedTagRemover_Then_Formatter_OnTitle_WritesAfterStrip()

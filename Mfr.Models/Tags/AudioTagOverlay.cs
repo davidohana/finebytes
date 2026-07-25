@@ -83,6 +83,47 @@ namespace Mfr.Models.Tags
         }
 
         /// <summary>
+        /// Drops the block for <paramref name="kind"/> from the logical tag.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// A null block on a preview overlay whose original snapshot carried that block is a removal instruction:
+        /// commit deletes the whole tag type, including frames this model never parsed (embedded art on that type).
+        /// </para>
+        /// </remarks>
+        /// <param name="kind">Block type to drop; already-absent blocks are left alone.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="kind"/> is not a known block type.</exception>
+        public void ClearBlock(AudioTagBlockKind kind)
+        {
+            switch (kind)
+            {
+                case AudioTagBlockKind.Id3v1:
+                    Id3v1 = null;
+                    break;
+                case AudioTagBlockKind.Id3v2:
+                    Id3v2 = null;
+                    break;
+                case AudioTagBlockKind.Xiph:
+                    Xiph = null;
+                    break;
+                case AudioTagBlockKind.Ape:
+                    Ape = null;
+                    break;
+                case AudioTagBlockKind.Apple:
+                    Apple = null;
+                    break;
+                case AudioTagBlockKind.Asf:
+                    Asf = null;
+                    break;
+                case AudioTagBlockKind.RiffInfo:
+                    RiffInfo = null;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown audio tag block kind.");
+            }
+        }
+
+        /// <summary>
         /// Lists the block types currently present on this overlay, in <see cref="AudioTagBlockKind"/> declaration order.
         /// </summary>
         /// <returns>Present block types; empty when the overlay carries no tags.</returns>
