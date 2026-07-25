@@ -13,15 +13,14 @@ namespace Mfr.Metadata
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Call <see cref="Apply"/> only when the rename row’s embedded-tag preview differs from its original snapshot;
-    /// compare outside this type (for example in <c>CommitExecutor</c>) before calling. <see cref="Apply"/>
-    /// opens the file, builds an overlay snapshot from TagLib (<see cref="Read(string)"/> normalization), compares it to
-    /// the preview in full, returns without saving when they match, and otherwise writes blocks and merged
-    /// TagLib-visible semantics before saving.
+    /// Call <see cref="Apply(string, AudioTagOverlay, AudioTagOverlay)"/> only when the rename row’s embedded-tag
+    /// preview differs from its original snapshot; compare outside this type (for example in <c>CommitExecutor</c>)
+    /// before calling. That Apply overload diffs Original → Preview per tag block: remove dropped types, create new
+    /// blocks, and field-patch only changed modeled fields (unmodeled frames such as APIC stay unless the whole type
+    /// is removed).
     /// </para>
     /// <para>
-    /// Overlay blocks hold parsed fields (not binary blobs). Unmodeled frames/keys stay on disk until a whole tag type
-    /// is removed or Phase E field-patch Apply replaces coarse writers.
+    /// Overlay blocks hold parsed fields (not binary blobs). There is no merged <c>file.Tag</c> dual write.
     /// </para>
     /// <para>
     /// A preview may not introduce a tag block the container cannot hold; see <see cref="AudioTagContainerPolicy"/>.
@@ -182,37 +181,49 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Loads the file’s normalized tag overlay via TagLib and, when <paramref name="previewOverlay"/> differs from that overlay, assigns modeled fields from <paramref name="previewOverlay"/> to TagLib tags and saves.
+        /// Field-patches the file’s tags from <paramref name="originalOverlay"/> to <paramref name="previewOverlay"/> and saves.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Blocks the file carries but <paramref name="previewOverlay"/> does not are removed outright
-        /// (<c>RemoveTags</c> for that <c>TagTypes</c>) before the remaining blocks are written.
+        /// Per tag type: Original present and Preview null → <c>RemoveTags</c>; Original null and Preview present →
+        /// create and write all Preview fields; both present → diff modeled fields only. Unchanged blocks are skipped.
+        /// ASF is never cleared wholesale.
         /// </para>
         /// </remarks>
         /// <param name="absolutePath">Path to an existing regular file (typically the post-move destination).</param>
-        /// <param name="previewOverlay">Desired tag values.</param>
+        /// <param name="originalOverlay">Session / pre-edit overlay (usually the row’s Original snapshot).</param>
+        /// <param name="previewOverlay">Desired tag values after filters.</param>
         /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
         /// <exception cref="IOException">The file cannot be opened or saved.</exception>
         /// <exception cref="NotSupportedException">The preview introduces a tag block the container cannot hold.</exception>
-        public static void Apply(string absolutePath, AudioTagOverlay previewOverlay)
+        public static void Apply(
+            string absolutePath,
+            AudioTagOverlay originalOverlay,
+            AudioTagOverlay previewOverlay)
         {
+            ArgumentNullException.ThrowIfNull(originalOverlay);
+            ArgumentNullException.ThrowIfNull(previewOverlay);
             _ValidateExistingRegularFile(absolutePath);
 
-            var baselineOverlay = Read(absolutePath, out var containerFormat);
-            if (previewOverlay.Equals(baselineOverlay))
+            if (previewOverlay.Equals(originalOverlay))
                 return;
 
-            _EnsureIntroducedBlocksSupported(containerFormat, baselineOverlay, previewOverlay);
-
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
-            _RemoveDroppedTagBlocks(file, baselineOverlay, previewOverlay);
-            _ApplyNativeTagBlocks(file, previewOverlay);
-
-            if (file is AudioFile)
-                _ApplyToMpeg(file, previewOverlay);
-
+            var containerFormat = AudioTagContainerPolicy.DetectFrom(file);
+            _EnsureIntroducedBlocksSupported(containerFormat, originalOverlay, previewOverlay);
+            _RemoveDroppedTagBlocks(file, originalOverlay, previewOverlay);
+            _PatchPresentTagBlocks(file, originalOverlay, previewOverlay);
             file.Save();
+        }
+
+        /// <summary>
+        /// Convenience overload: treats the current on-disk overlay as Original.
+        /// </summary>
+        /// <param name="absolutePath">Path to an existing regular file.</param>
+        /// <param name="previewOverlay">Desired tag values.</param>
+        public static void Apply(string absolutePath, AudioTagOverlay previewOverlay)
+        {
+            Apply(absolutePath, Read(absolutePath), previewOverlay);
         }
 
         /// <remarks>
@@ -439,22 +450,55 @@ namespace Mfr.Metadata
             return a.Length.CompareTo(b.Length);
         }
 
-        private static void _ApplyNativeTagBlocks(TagLib.File file, AudioTagOverlay overlay)
+        private static void _PatchPresentTagBlocks(
+            TagLib.File file,
+            AudioTagOverlay originalOverlay,
+            AudioTagOverlay previewOverlay)
         {
-            if (overlay.Xiph is not null && file.GetTag(TagTypes.Xiph, true) is XiphComment xiph)
-                TagBlockFieldMapper.WriteXiph(xiph, overlay.Xiph);
+            if (previewOverlay.Xiph is not null)
+            {
+                var xiph = (XiphComment)file.GetTag(TagTypes.Xiph, true);
+                TagBlockFieldPatcher.ApplyXiph(xiph, originalOverlay.Xiph, previewOverlay.Xiph);
+            }
 
-            if (overlay.Ape is not null && file.GetTag(TagTypes.Ape, true) is TagLib.Ape.Tag ape)
-                TagBlockFieldMapper.WriteApe(ape, overlay.Ape);
+            if (previewOverlay.Ape is not null)
+            {
+                var ape = (TagLib.Ape.Tag)file.GetTag(TagTypes.Ape, true);
+                TagBlockFieldPatcher.ApplyApe(ape, originalOverlay.Ape, previewOverlay.Ape);
+            }
 
-            if (overlay.RiffInfo is not null && file.GetTag(TagTypes.RiffInfo, true) is InfoTag info)
-                TagBlockFieldMapper.WriteRiffInfo(info, overlay.RiffInfo);
+            if (previewOverlay.RiffInfo is not null)
+            {
+                var info = (InfoTag)file.GetTag(TagTypes.RiffInfo, true);
+                TagBlockFieldPatcher.ApplyRiffInfo(info, originalOverlay.RiffInfo, previewOverlay.RiffInfo);
+            }
 
-            if (overlay.Apple is not null && file.GetTag(TagTypes.Apple, true) is AppleTag apple)
-                TagBlockFieldMapper.WriteApple(apple, overlay.Apple);
+            if (previewOverlay.Apple is not null)
+            {
+                var apple = (AppleTag)file.GetTag(TagTypes.Apple, true);
+                TagBlockFieldPatcher.ApplyApple(apple, originalOverlay.Apple, previewOverlay.Apple);
+            }
 
-            if (overlay.Asf is not null && file.GetTag(TagTypes.Asf, true) is TagLib.Asf.Tag asf)
-                TagBlockFieldMapper.WriteAsf(asf, overlay.Asf);
+            if (previewOverlay.Asf is not null)
+            {
+                var asf = (TagLib.Asf.Tag)file.GetTag(TagTypes.Asf, true);
+                TagBlockFieldPatcher.ApplyAsf(asf, originalOverlay.Asf, previewOverlay.Asf);
+            }
+
+            if (file is not AudioFile)
+                return;
+
+            if (previewOverlay.Id3v2 is not null)
+            {
+                var id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagTypes.Id3v2, true);
+                TagBlockFieldPatcher.ApplyId3v2(id3v2, originalOverlay.Id3v2, previewOverlay.Id3v2);
+            }
+
+            if (previewOverlay.Id3v1 is not null)
+            {
+                var id3v1 = (TagLib.Id3v1.Tag)file.GetTag(TagTypes.Id3v1, true);
+                TagBlockFieldPatcher.ApplyId3v1(id3v1, originalOverlay.Id3v1, previewOverlay.Id3v1);
+            }
         }
 
         private static Id3v1TagData? _ReadId3v1Snapshot(TagLib.File file)
@@ -500,21 +544,6 @@ namespace Mfr.Metadata
                 return null;
 
             return TagBlockFieldMapper.ReadId3v2(id3v2);
-        }
-
-        private static void _ApplyToMpeg(TagLib.File file, AudioTagOverlay overlay)
-        {
-            if (overlay.Id3v2 is not null)
-            {
-                var id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagTypes.Id3v2, true);
-                TagBlockFieldMapper.WriteId3v2(id3v2, overlay.Id3v2);
-            }
-
-            if (overlay.Id3v1 is not null)
-            {
-                var id3v1 = (TagLib.Id3v1.Tag)file.GetTag(TagTypes.Id3v1, true);
-                TagBlockFieldMapper.WriteId3v1(id3v1, overlay.Id3v1);
-            }
         }
 
         private static void _ValidateExistingRegularFile(string absolutePath)

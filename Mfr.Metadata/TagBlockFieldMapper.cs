@@ -136,6 +136,10 @@ namespace Mfr.Metadata
         /// <summary>
         /// Writes modeled ID3v2 frames onto a live tag (clears modeled frame ids first; leaves unmodeled frames).
         /// </summary>
+        /// <remarks>
+        /// Used for create paths. Patch paths use <see cref="TagBlockFieldPatcher.ApplyId3v2"/> so only changed
+        /// frame identities are touched.
+        /// </remarks>
         public static void WriteId3v2(TagLib.Id3v2.Tag live, Id3v2TagData data)
         {
             live.Version = data.Version;
@@ -148,7 +152,15 @@ namespace Mfr.Metadata
             live.RemoveFrames("TXXX");
 
             foreach (var modeled in data.Frames)
-                _AddModeledFrame(live, modeled);
+                AddModeledFrame(live, modeled);
+        }
+
+        /// <summary>
+        /// Adds one modeled frame instance to a live ID3v2 tag.
+        /// </summary>
+        internal static void AddModeledFrame(TagLib.Id3v2.Tag live, Id3v2ModeledFrame modeled)
+        {
+            _AddModeledFrame(live, modeled);
         }
 
         /// <summary>
@@ -240,6 +252,65 @@ namespace Mfr.Metadata
         public static void WriteCommonToTag(TagLib.Tag tag, CommonAudioTag common)
         {
             _WriteCommonToTag(tag, common);
+        }
+
+        /// <summary>
+        /// Writes only fields that differ between <paramref name="original"/> and <paramref name="preview"/> onto a façade tag.
+        /// </summary>
+        internal static void WriteCommonDiffToTag(TagLib.Tag tag, CommonAudioTag original, CommonAudioTag preview)
+        {
+            if (!string.Equals(original.Title, preview.Title, StringComparison.Ordinal))
+                tag.Title = _EmptyStringToNull(preview.Title);
+
+            if (!string.Equals(original.Album, preview.Album, StringComparison.Ordinal))
+                tag.Album = _EmptyStringToNull(preview.Album);
+
+            if (!string.Equals(original.Performers, preview.Performers, StringComparison.Ordinal))
+                tag.Performers = _SplitJoinedList(preview.Performers);
+
+            if (!string.Equals(original.AlbumArtists, preview.AlbumArtists, StringComparison.Ordinal))
+                tag.AlbumArtists = _SplitJoinedList(preview.AlbumArtists);
+
+            if (!string.Equals(original.Composers, preview.Composers, StringComparison.Ordinal))
+                tag.Composers = _SplitJoinedList(preview.Composers);
+
+            if (!string.Equals(original.Genre, preview.Genre, StringComparison.Ordinal))
+                tag.Genres = string.IsNullOrWhiteSpace(preview.Genre) ? [] : [preview.Genre.Trim()];
+
+            if (!string.Equals(original.Comment, preview.Comment, StringComparison.Ordinal))
+                tag.Comment = _EmptyStringToNull(preview.Comment);
+
+            if (!string.Equals(original.Lyrics, preview.Lyrics, StringComparison.Ordinal))
+                tag.Lyrics = _EmptyStringToNull(preview.Lyrics);
+
+            if (!string.Equals(original.Copyright, preview.Copyright, StringComparison.Ordinal))
+                tag.Copyright = _EmptyStringToNull(preview.Copyright);
+
+            if (!string.Equals(original.Grouping, preview.Grouping, StringComparison.Ordinal))
+                tag.Grouping = _EmptyStringToNull(preview.Grouping);
+
+            if (original.Year != preview.Year)
+                tag.Year = preview.Year ?? 0;
+
+            if (original.Track != preview.Track)
+                tag.Track = preview.Track ?? 0;
+
+            if (original.TrackCount != preview.TrackCount)
+                tag.TrackCount = preview.TrackCount ?? 0;
+
+            if (original.Disc != preview.Disc)
+                tag.Disc = preview.Disc ?? 0;
+
+            if (original.DiscCount != preview.DiscCount)
+                tag.DiscCount = preview.DiscCount ?? 0;
+        }
+
+        /// <summary>
+        /// Projects RIFF INFO rows into a <see cref="CommonAudioTag"/> for façade patching.
+        /// </summary>
+        internal static CommonAudioTag CommonFromRiffRows(ImmutableArray<RiffInfoFieldRow> fields)
+        {
+            return _CommonFromRiffRows(fields);
         }
 
         private static void _WriteCommonToTag(TagLib.Tag tag, CommonAudioTag common)

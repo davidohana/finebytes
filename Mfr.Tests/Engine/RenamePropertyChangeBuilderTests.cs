@@ -157,7 +157,7 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal(2, rows.Count);
             Assert.Contains(rows, static r => r.Property == "AudioTag.Title");
-            Assert.Contains(rows, static r => r.Property == "AudioTag.Native.Id3v2");
+            Assert.Contains(rows, static r => r.Property == "AudioTag.Native.Id3v2.TIT2");
 
             var titleRow = Assert.Single(rows, static r => r.Property == "AudioTag.Title");
             Assert.Equal(JsonSerializer.Serialize((string?)null), titleRow.OldValue);
@@ -209,10 +209,10 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// When native Xiph fields differ but projected semantics match, emit a compact native summary row.
+        /// When native Xiph fields differ but projected semantics match, emit per-key native rows.
         /// </summary>
         [Fact]
-        public void BuildChangeRows_AudioTagNativeXiphChange_AppendsSummaryRow()
+        public void BuildChangeRows_AudioTagNativeXiphChange_AppendsFieldRows()
         {
             var original = _CloneBaseline(configureOverlay: o =>
             {
@@ -230,14 +230,13 @@ namespace Mfr.Tests.Engine
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
-            var row = Assert.Single(rows);
-            Assert.Equal("AudioTag.Native.Xiph", row.Property);
-            Assert.Contains("1 fields", row.OldValue, StringComparison.Ordinal);
-            Assert.Contains("1 fields", row.NewValue, StringComparison.Ordinal);
+            Assert.Equal(2, rows.Count);
+            Assert.Contains(rows, static r => r.Property == "AudioTag.Native.Xiph.DATE" && r.NewValue == "absent");
+            Assert.Contains(rows, static r => r.Property == "AudioTag.Native.Xiph.YEAR" && r.OldValue == "absent");
         }
 
         /// <summary>
-        /// Native block rows follow merged embedded-tag scalar rows in stable order.
+        /// Native block field rows follow merged embedded-tag scalar rows in stable order.
         /// </summary>
         [Fact]
         public void BuildChangeRows_MixedScalarAndNativeBlock_FollowsStableOrdering()
@@ -264,7 +263,7 @@ namespace Mfr.Tests.Engine
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Equal(
-                ["DirectoryPath", "AudioTag.Genre", "AudioTag.Native.Xiph"],
+                ["DirectoryPath", "AudioTag.Genre", "AudioTag.Native.Xiph.GENRE"],
                 [.. rows.Select(r => r.Property)]);
         }
 
@@ -287,7 +286,7 @@ namespace Mfr.Tests.Engine
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             Assert.Equal(
-                ["DirectoryPath", "Attributes", "AudioTag.Genre", "AudioTag.Native.Id3v2"],
+                ["DirectoryPath", "Attributes", "AudioTag.Genre", "AudioTag.Native.Id3v2.TCON"],
                 [.. rows.Select(r => r.Property)]);
         }
 

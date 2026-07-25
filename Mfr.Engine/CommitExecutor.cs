@@ -1,5 +1,6 @@
 using Mfr.Metadata;
 using Mfr.Models;
+using Mfr.Models.Tags;
 using Serilog;
 
 namespace Mfr.Engine
@@ -190,7 +191,17 @@ namespace Mfr.Engine
                     AudioTagPersistence.RemoveAllEmbeddedTags(item.Preview.FullPath);
 
                 if (shouldPersistEmbeddedTagOverlay)
-                    AudioTagPersistence.Apply(item.Preview.FullPath, previewSnapshot.AudioTagOverlay);
+                {
+                    // Strip-all already cleared the destination; field-patch Original must match post-strip disk
+                    // (empty), not the pre-strip session snapshot.
+                    var applyOriginal = shouldStripAllEmbeddedTags
+                        ? new AudioTagOverlay()
+                        : originalSnapshot.AudioTagOverlay;
+                    AudioTagPersistence.Apply(
+                        item.Preview.FullPath,
+                        applyOriginal,
+                        previewSnapshot.AudioTagOverlay);
+                }
 
                 item.Status = RenameStatus.CommitOk;
                 outcomes[item] = new PlanOutcome(

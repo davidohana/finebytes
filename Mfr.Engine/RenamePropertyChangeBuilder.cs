@@ -133,7 +133,7 @@ namespace Mfr.Engine
         }
 
         /// <summary>
-        /// Appends compact rows when structured per–tag snapshots differ.
+        /// Appends compact rows when structured per–tag snapshots differ (presence and field-level deltas).
         /// </summary>
         private static void _AppendAudioTagNativeBlockLayoutDifferences(
             List<RenamePropertyChange> changes,
@@ -143,109 +143,285 @@ namespace Mfr.Engine
             if (original.TagBlocksStructurallyEquals(preview))
                 return;
 
-            if (!Equals(original.Id3v1, preview.Id3v1))
+            _AppendBlockPresenceAndFieldDiffs(
+                changes,
+                "AudioTag.Native.Id3v1",
+                original.Id3v1,
+                preview.Id3v1,
+                _DiffId3v1Fields);
+            _AppendBlockPresenceAndFieldDiffs(
+                changes,
+                "AudioTag.Native.Id3v2",
+                original.Id3v2,
+                preview.Id3v2,
+                _DiffId3v2Fields);
+            _AppendBlockPresenceAndFieldDiffs(
+                changes,
+                "AudioTag.Native.Xiph",
+                original.Xiph,
+                preview.Xiph,
+                _DiffXiphFields);
+            _AppendBlockPresenceAndFieldDiffs(
+                changes,
+                "AudioTag.Native.Ape",
+                original.Ape,
+                preview.Ape,
+                _DiffApeFields);
+            _AppendBlockPresenceAndFieldDiffs(
+                changes,
+                "AudioTag.Native.RiffInfo",
+                original.RiffInfo,
+                preview.RiffInfo,
+                _DiffRiffInfoFields);
+            _AppendBlockPresenceAndFieldDiffs(
+                changes,
+                "AudioTag.Native.Apple",
+                original.Apple,
+                preview.Apple,
+                _DiffAppleFields);
+            _AppendBlockPresenceAndFieldDiffs(
+                changes,
+                "AudioTag.Native.Asf",
+                original.Asf,
+                preview.Asf,
+                _DiffAsfFields);
+        }
+
+        private static void _AppendBlockPresenceAndFieldDiffs<T>(
+            List<RenamePropertyChange> changes,
+            string blockProperty,
+            T? original,
+            T? preview,
+            Action<List<RenamePropertyChange>, string, T, T> appendFieldDiffs)
+            where T : class
+        {
+            if (Equals(original, preview))
+                return;
+
+            if (original is null || preview is null)
             {
                 changes.Add(new RenamePropertyChange(
-                    Property: "AudioTag.Native.Id3v1",
-                    OldValue: JsonSerializer.Serialize(original.Id3v1),
-                    NewValue: JsonSerializer.Serialize(preview.Id3v1)));
+                    Property: blockProperty,
+                    OldValue: original is null ? "absent" : "present",
+                    NewValue: preview is null ? "absent" : "present"));
+                return;
             }
 
-            if (!Equals(original.Id3v2, preview.Id3v2))
+            appendFieldDiffs(changes, blockProperty, original, preview);
+        }
+
+        private static void _DiffId3v1Fields(
+            List<RenamePropertyChange> changes,
+            string blockProperty,
+            Id3v1TagData original,
+            Id3v1TagData preview)
+        {
+            _AddNativeStringDiff(changes, blockProperty + ".Title", original.Title, preview.Title);
+            _AddNativeStringDiff(changes, blockProperty + ".Artist", original.Artist, preview.Artist);
+            _AddNativeStringDiff(changes, blockProperty + ".Album", original.Album, preview.Album);
+            _AddNativeStringDiff(changes, blockProperty + ".Comment", original.Comment, preview.Comment);
+            if (original.Year != preview.Year)
             {
                 changes.Add(new RenamePropertyChange(
-                    Property: "AudioTag.Native.Id3v2",
-                    OldValue: _SummarizeId3v2Block(original.Id3v2),
-                    NewValue: _SummarizeId3v2Block(preview.Id3v2)));
+                    Property: blockProperty + ".Year",
+                    OldValue: JsonSerializer.Serialize(original.Year),
+                    NewValue: JsonSerializer.Serialize(preview.Year)));
             }
 
-            if (!Equals(original.Xiph, preview.Xiph))
+            if (original.Track != preview.Track)
             {
                 changes.Add(new RenamePropertyChange(
-                    Property: "AudioTag.Native.Xiph",
-                    OldValue: _SummarizeXiphBlock(original.Xiph),
-                    NewValue: _SummarizeXiphBlock(preview.Xiph)));
+                    Property: blockProperty + ".Track",
+                    OldValue: JsonSerializer.Serialize(original.Track),
+                    NewValue: JsonSerializer.Serialize(preview.Track)));
             }
 
-            if (!Equals(original.Ape, preview.Ape))
+            if (original.Genre != preview.Genre)
             {
                 changes.Add(new RenamePropertyChange(
-                    Property: "AudioTag.Native.Ape",
-                    OldValue: _SummarizeApeBlock(original.Ape),
-                    NewValue: _SummarizeApeBlock(preview.Ape)));
-            }
-
-            if (!Equals(original.RiffInfo, preview.RiffInfo))
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "AudioTag.Native.RiffInfo",
-                    OldValue: _SummarizeRiffInfoBlock(original.RiffInfo),
-                    NewValue: _SummarizeRiffInfoBlock(preview.RiffInfo)));
-            }
-
-            if (!Equals(original.Apple, preview.Apple))
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "AudioTag.Native.Apple",
-                    OldValue: _SummarizeAppleBlock(original.Apple),
-                    NewValue: _SummarizeAppleBlock(preview.Apple)));
-            }
-
-            if (!Equals(original.Asf, preview.Asf))
-            {
-                changes.Add(new RenamePropertyChange(
-                    Property: "AudioTag.Native.Asf",
-                    OldValue: _SummarizeAsfBlock(original.Asf),
-                    NewValue: _SummarizeAsfBlock(preview.Asf)));
+                    Property: blockProperty + ".Genre",
+                    OldValue: JsonSerializer.Serialize(original.Genre),
+                    NewValue: JsonSerializer.Serialize(preview.Genre)));
             }
         }
 
-        private static string _SummarizeId3v2Block(Id3v2TagData? data)
+        private static void _DiffId3v2Fields(
+            List<RenamePropertyChange> changes,
+            string blockProperty,
+            Id3v2TagData original,
+            Id3v2TagData preview)
         {
-            if (data is null)
-                return "absent";
+            if (original.Version != preview.Version)
+            {
+                changes.Add(new RenamePropertyChange(
+                    Property: blockProperty + ".Version",
+                    OldValue: original.Version.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    NewValue: preview.Version.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            }
 
-            return $"{data.Frames.Length} modeled frames (ID3v2 v{data.Version})";
+            var originalById = original.Frames.ToDictionary(_FrameDiffKey, StringComparer.Ordinal);
+            var previewById = preview.Frames.ToDictionary(_FrameDiffKey, StringComparer.Ordinal);
+
+            foreach (var key in originalById.Keys.Union(previewById.Keys).Order(StringComparer.Ordinal))
+            {
+                originalById.TryGetValue(key, out var oldFrame);
+                previewById.TryGetValue(key, out var newFrame);
+                if (Equals(oldFrame, newFrame))
+                    continue;
+
+                changes.Add(new RenamePropertyChange(
+                    Property: blockProperty + "." + key,
+                    OldValue: oldFrame is null ? "absent" : string.Join("; ", oldFrame.TextValues),
+                    NewValue: newFrame is null ? "absent" : string.Join("; ", newFrame.TextValues)));
+            }
         }
 
-        private static string _SummarizeXiphBlock(XiphTagData? data)
+        private static string _FrameDiffKey(Id3v2ModeledFrame frame)
         {
-            if (data is null)
-                return "absent";
+            if (frame.FrameId is "COMM" or "USLT" or "TXXX")
+            {
+                return frame.FrameId
+                    + "["
+                    + (frame.Language ?? string.Empty)
+                    + "|"
+                    + (frame.Description ?? string.Empty)
+                    + "]";
+            }
 
-            return $"{data.Fields.Length} fields";
+            return frame.FrameId;
         }
 
-        private static string _SummarizeApeBlock(ApeTagData? data)
+        private static void _DiffXiphFields(
+            List<RenamePropertyChange> changes,
+            string blockProperty,
+            XiphTagData original,
+            XiphTagData preview)
         {
-            if (data is null)
-                return "absent";
-
-            return $"{data.Fields.Length} fields";
+            _DiffTextFieldRows(changes, blockProperty, original.Fields, preview.Fields);
         }
 
-        private static string _SummarizeRiffInfoBlock(RiffInfoTagData? data)
+        private static void _DiffApeFields(
+            List<RenamePropertyChange> changes,
+            string blockProperty,
+            ApeTagData original,
+            ApeTagData preview)
         {
-            if (data is null)
-                return "absent";
-
-            return $"{data.Fields.Length} fields";
+            _DiffTextFieldRows(changes, blockProperty, original.Fields, preview.Fields);
         }
 
-        private static string _SummarizeAppleBlock(AppleTagData? data)
+        private static void _DiffTextFieldRows(
+            List<RenamePropertyChange> changes,
+            string blockProperty,
+            System.Collections.Immutable.ImmutableArray<TextFieldRow> original,
+            System.Collections.Immutable.ImmutableArray<TextFieldRow> preview)
         {
-            if (data is null)
-                return "absent";
+            var originalMap = original.ToDictionary(r => r.Key, r => r.Values, StringComparer.Ordinal);
+            var previewMap = preview.ToDictionary(r => r.Key, r => r.Values, StringComparer.Ordinal);
 
-            return $"{data.Atoms.Length} atoms";
+            foreach (var key in originalMap.Keys.Union(previewMap.Keys).Order(StringComparer.Ordinal))
+            {
+                originalMap.TryGetValue(key, out var oldValues);
+                previewMap.TryGetValue(key, out var newValues);
+                var oldText = oldValues.IsDefaultOrEmpty ? null : string.Join("; ", oldValues);
+                var newText = newValues.IsDefaultOrEmpty ? null : string.Join("; ", newValues);
+                if (string.Equals(oldText, newText, StringComparison.Ordinal))
+                    continue;
+
+                changes.Add(new RenamePropertyChange(
+                    Property: blockProperty + "." + key,
+                    OldValue: oldText ?? "absent",
+                    NewValue: newText ?? "absent"));
+            }
         }
 
-        private static string _SummarizeAsfBlock(AsfTagData? data)
+        private static void _DiffRiffInfoFields(
+            List<RenamePropertyChange> changes,
+            string blockProperty,
+            RiffInfoTagData original,
+            RiffInfoTagData preview)
         {
-            if (data is null)
-                return "absent";
+            var originalMap = original.Fields.ToDictionary(r => r.Key, r => r.Value, StringComparer.Ordinal);
+            var previewMap = preview.Fields.ToDictionary(r => r.Key, r => r.Value, StringComparer.Ordinal);
 
-            return $"{data.Descriptors.Length} descriptors";
+            foreach (var key in originalMap.Keys.Union(previewMap.Keys).Order(StringComparer.Ordinal))
+            {
+                originalMap.TryGetValue(key, out var oldValue);
+                previewMap.TryGetValue(key, out var newValue);
+                if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                    continue;
+
+                changes.Add(new RenamePropertyChange(
+                    Property: blockProperty + "." + key,
+                    OldValue: oldValue ?? "absent",
+                    NewValue: newValue ?? "absent"));
+            }
+        }
+
+        private static void _DiffAppleFields(
+            List<RenamePropertyChange> changes,
+            string blockProperty,
+            AppleTagData original,
+            AppleTagData preview)
+        {
+            var originalMap = original.Atoms.ToDictionary(
+                a => Convert.ToHexString(a.AtomType.AsSpan()),
+                a => string.Join("; ", a.Values),
+                StringComparer.Ordinal);
+            var previewMap = preview.Atoms.ToDictionary(
+                a => Convert.ToHexString(a.AtomType.AsSpan()),
+                a => string.Join("; ", a.Values),
+                StringComparer.Ordinal);
+
+            foreach (var key in originalMap.Keys.Union(previewMap.Keys).Order(StringComparer.Ordinal))
+            {
+                originalMap.TryGetValue(key, out var oldValue);
+                previewMap.TryGetValue(key, out var newValue);
+                if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                    continue;
+
+                changes.Add(new RenamePropertyChange(
+                    Property: blockProperty + "." + key,
+                    OldValue: oldValue ?? "absent",
+                    NewValue: newValue ?? "absent"));
+            }
+        }
+
+        private static void _DiffAsfFields(
+            List<RenamePropertyChange> changes,
+            string blockProperty,
+            AsfTagData original,
+            AsfTagData preview)
+        {
+            var originalMap = original.Descriptors.ToDictionary(r => r.Name, r => r.Value, StringComparer.Ordinal);
+            var previewMap = preview.Descriptors.ToDictionary(r => r.Name, r => r.Value, StringComparer.Ordinal);
+
+            foreach (var key in originalMap.Keys.Union(previewMap.Keys).Order(StringComparer.Ordinal))
+            {
+                originalMap.TryGetValue(key, out var oldValue);
+                previewMap.TryGetValue(key, out var newValue);
+                if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                    continue;
+
+                changes.Add(new RenamePropertyChange(
+                    Property: blockProperty + "." + key,
+                    OldValue: oldValue ?? "absent",
+                    NewValue: newValue ?? "absent"));
+            }
+        }
+
+        private static void _AddNativeStringDiff(
+            List<RenamePropertyChange> changes,
+            string property,
+            string? oldValue,
+            string? newValue)
+        {
+            if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                return;
+
+            changes.Add(new RenamePropertyChange(
+                Property: property,
+                OldValue: oldValue ?? "absent",
+                NewValue: newValue ?? "absent"));
         }
 
         private static void _AddRenamePropertyChangeIfStringDiffers(

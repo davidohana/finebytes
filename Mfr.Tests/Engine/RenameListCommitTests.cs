@@ -375,12 +375,8 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies an ID3v2 <c>TIT2</c> formatter updates only the ID3v2 block in preview; commit persists <c>TIT2</c>.
+        /// Verifies an ID3v2 <c>TIT2</c> formatter updates only the ID3v2 block in preview and on disk.
         /// </summary>
-        /// <remarks>
-        /// TagLib may rewrite the ID3v1 trailer from ID3v2 on save; Phase E field-patch Apply is the path that stops
-        /// unintended sibling writes. This test locks preview isolation and on-disk <c>TIT2</c>.
-        /// </remarks>
         public void Commit_Id3v2FrameTarget_Tit2_WritesOnDisk()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
@@ -406,7 +402,7 @@ namespace Mfr.Tests.Engine
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
-            Assert.NotNull(readBack.Id3v2);
+            Assert.Equal("Trailer", readBack.Id3v1!.Title);
             Assert.Equal("NewFrame", AudioOverlayBlockFieldIo.GetId3v2FrameString(readBack, "TIT2"));
         }
 
