@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Globalization;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Ape;
 using Mfr.Models.Tags.Apple;
@@ -44,6 +43,12 @@ namespace Mfr.Metadata
             "Year", "Track", "TrackCount", "Disc", "DiscCount",
         ];
 
+        // Spellings other taggers use for a modeled APE key; values are stored under the modeled key.
+        private static readonly Dictionary<string, string> _ApeAliasToKnownKey = new(StringComparer.Ordinal)
+        {
+            ["ALBUMARTIST"] = "Album Artist",
+        };
+
         // Standard INFO fourCCs. TagLib's InfoTag façade maps some common properties to non-standard ids
         // (Album→DIRC, Performers→ISTR, Track→IPRT), so these chunks are read and written by key directly.
         private static readonly string[] _KnownRiffInfoKeys =
@@ -80,29 +85,41 @@ namespace Mfr.Metadata
         /// <summary>
         /// Reads known APE text items, or <see langword="null"/> when none are present.
         /// </summary>
+        /// <remarks>
+        /// Alias keys are folded into their modeled key, and <c>number/total</c> pairs are split so counts
+        /// reach their own key. Item lookup is case-insensitive, so casing variants need no alias entry.
+        /// </remarks>
         public static ApeTagData? ReadApe(TagLib.Ape.Tag ape)
         {
-            var rows = new List<TextFieldRow>();
+            var keyToValues = new Dictionary<string, ImmutableArray<string>>(StringComparer.Ordinal);
             foreach (var key in _KnownApeKeys)
             {
-                var item = ape.GetItem(key);
-                if (item is null || item.IsEmpty)
-                    continue;
-
-                var values = _TrimNonEmpty(item.ToStringArray());
+                var values = _ReadApeItem(ape, key);
                 if (values.Length == 0)
                     continue;
 
-                rows.Add(new TextFieldRow(key, values));
+                keyToValues[key] = values;
             }
 
-            // Also capture TagLib façade-backed values when item keys differ.
-            _AddCommonAsRows(rows, SemanticAudioTagTagLib.FromCombinedTag(ape), preferExistingKeys: true);
-            if (rows.Count == 0)
+            foreach (var (alias, knownKey) in _ApeAliasToKnownKey)
+            {
+                if (keyToValues.ContainsKey(knownKey))
+                    continue;
+
+                var values = _ReadApeItem(ape, alias);
+                if (values.Length == 0)
+                    continue;
+
+                keyToValues[knownKey] = values;
+            }
+
+            _SplitApeCountPair(keyToValues, numberKey: "Track", countKey: "TrackCount");
+            _SplitApeCountPair(keyToValues, numberKey: "Disc", countKey: "DiscCount");
+
+            if (keyToValues.Count == 0)
                 return null;
 
-            rows.Sort(_CompareTextFieldRows);
-            return new ApeTagData { Fields = [.. rows] };
+            return new ApeTagData { Fields = _SortedRows(keyToValues) };
         }
 
         /// <summary>
@@ -424,68 +441,36 @@ namespace Mfr.Metadata
             return rows;
         }
 
-        private static void _AddCommonAsRows(List<TextFieldRow> rows, SemanticAudioTag common, bool preferExistingKeys)
+        private static ImmutableArray<string> _ReadApeItem(TagLib.Ape.Tag ape, string key)
         {
-            var map = _ToMutableMultimap([.. rows]);
-            void Set(string key, string? value)
-            {
-                if (preferExistingKeys && map.ContainsKey(key))
-                    return;
+            var item = ape.GetItem(key);
+            if (item is null || item.IsEmpty)
+                return [];
 
-                _SetMapScalar(map, key, value);
-            }
-
-            Set("Title", common.Title);
-            Set("Album", common.Album);
-            if (!preferExistingKeys || !map.ContainsKey("Artist"))
-                _SetMapList(map, "Artist", common.Performers);
-
-            Set("Genre", common.Genre);
-            Set("Comment", common.Comment);
-            Set("Lyrics", common.Lyrics);
-            Set("Copyright", common.Copyright);
-            Set("Grouping", common.Grouping);
-            Set("Year", common.Year?.ToString(CultureInfo.InvariantCulture));
-            Set("Track", common.Track?.ToString(CultureInfo.InvariantCulture));
-            Set("TrackCount", common.TrackCount?.ToString(CultureInfo.InvariantCulture));
-            Set("Disc", common.Disc?.ToString(CultureInfo.InvariantCulture));
-            Set("DiscCount", common.DiscCount?.ToString(CultureInfo.InvariantCulture));
-
-            rows.Clear();
-            rows.AddRange(_SortedRows(map));
+            return _TrimNonEmpty(item.ToStringArray());
         }
 
-        private static Dictionary<string, ImmutableArray<string>> _ToMutableMultimap(ImmutableArray<TextFieldRow> fields)
+        private static void _SplitApeCountPair(
+            Dictionary<string, ImmutableArray<string>> keyToValues,
+            string numberKey,
+            string countKey)
         {
-            var map = new Dictionary<string, ImmutableArray<string>>(StringComparer.Ordinal);
-            foreach (var row in fields)
-                map[row.Key] = row.Values;
-
-            return map;
-        }
-
-        private static void _SetMapScalar(Dictionary<string, ImmutableArray<string>> map, string key, string? value)
-        {
-            var text = _NullIfEmpty(value);
-            if (text is null)
-            {
-                map.Remove(key);
+            if (!keyToValues.TryGetValue(numberKey, out var values) || values.Length == 0)
                 return;
-            }
 
-            map[key] = [text];
-        }
-
-        private static void _SetMapList(Dictionary<string, ImmutableArray<string>> map, string key, string? joined)
-        {
-            var values = _TrimNonEmpty(_SplitJoinedList(joined));
-            if (values.Length == 0)
-            {
-                map.Remove(key);
+            var parts = values[0].Split('/', 2);
+            if (parts.Length != 2)
                 return;
-            }
 
-            map[key] = values;
+            var number = _NullIfEmpty(parts[0]);
+            if (number is null)
+                keyToValues.Remove(numberKey);
+            else
+                keyToValues[numberKey] = [number];
+
+            var count = _NullIfEmpty(parts[1]);
+            if (count is not null && !keyToValues.ContainsKey(countKey))
+                keyToValues[countKey] = [count];
         }
 
         private static ImmutableArray<TextFieldRow> _SortedRows(Dictionary<string, ImmutableArray<string>> map)

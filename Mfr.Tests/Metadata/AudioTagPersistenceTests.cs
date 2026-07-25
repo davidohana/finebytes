@@ -1,5 +1,6 @@
 using Mfr.Metadata;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Ape;
 using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
 
@@ -480,6 +481,49 @@ namespace Mfr.Tests.Metadata
             var second = AudioTagPersistence.Read(path);
 
             Assert.Equal(first, second);
+        }
+
+        /// <summary>
+        /// Verifies APE alias keys and <c>number/total</c> pairs land on modeled keys and stay stable across Apply.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_Mp3_ApeAliasAndCountPair_NormalizeOntoModeledKeys()
+        {
+            var path = _AllocateMp3ScratchPath();
+
+            using (var file = TagLib.File.Create(path))
+            {
+                var ape = (TagLib.Ape.Tag)file.GetTag(TagLib.TagTypes.Ape, true);
+                ape.SetValue("ALBUMARTIST", "ape-album-artist");
+                ape.SetValue("Track", "3/12");
+                ape.SetValue("Disc", "1/2");
+                file.Save();
+            }
+
+            var first = AudioTagPersistence.Read(path);
+            Assert.NotNull(first.Ape);
+
+            Assert.Equal("ape-album-artist", _ApeValue(first.Ape, "Album Artist"));
+            Assert.Equal("3", _ApeValue(first.Ape, "Track"));
+            Assert.Equal("12", _ApeValue(first.Ape, "TrackCount"));
+            Assert.Equal("1", _ApeValue(first.Ape, "Disc"));
+            Assert.Equal("2", _ApeValue(first.Ape, "DiscCount"));
+
+            AudioTagPersistence.Apply(path, first.Clone());
+            Assert.Equal(first, AudioTagPersistence.Read(path));
+        }
+
+        private static string? _ApeValue(ApeTagData ape, string key)
+        {
+            foreach (var row in ape.Fields)
+            {
+                if (!string.Equals(row.Key, key, StringComparison.Ordinal))
+                    continue;
+
+                return row.Values.Length == 0 ? null : row.Values[0];
+            }
+
+            return null;
         }
 
         private string _CopyFixtureToTemp(string fileName)

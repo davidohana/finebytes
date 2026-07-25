@@ -31,7 +31,7 @@ namespace Mfr.Metadata
     /// </para>
     /// <para>
     /// A preview may not introduce a tag block the container cannot hold; see
-    /// <see cref="Models.Tags.AudioTagContainerPolicy"/>.
+    /// <see cref="AudioTagContainerPolicy"/>.
     /// </para>
     /// </remarks>
     public static class AudioTagPersistence

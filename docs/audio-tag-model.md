@@ -59,7 +59,7 @@ flowchart TB
 |---|---|
 | Overlay + block records | `Mfr.Models` — `AudioTagOverlay`, `Id3v1TagData`, `Id3v2TagData`, `XiphTagData`, … |
 | Semantic projection / merge / field get-set | `Mfr.Models` — `SemanticAudioTag`, `AudioTagSemanticMerge`, `AudioTagOverlay.MergeSemantic`, `SemanticFields`, `AudioOverlayBlockFieldIo`, `AudioOverlayTargetIo`, capability `AudioTagContainerPolicy` |
-| TagLib I/O and patch | `Mfr.Metadata` — `AudioTagPersistence`, `TagBlockFieldMapper`, `TagBlockFieldPatcher`, `SemanticAudioTagTagLib`, `AudioTagContainerDetector` |
+| TagLib I/O and patch | `Mfr.Metadata` — `AudioTagPersistence`, `TagBlockFieldMapper`, `TagBlockFieldPatcher`, `AudioTagContainerDetector` |
 | Filters / targets | `Mfr.Filters` — `AudioTagSetter`, removers, `StringTargetFilter` + `EnsureTargetReady` then `FileMeta` get/set |
 | Commit | `Mfr.Engine` — `CommitExecutor` (move → strip-all flag → Apply) |
 
@@ -77,7 +77,7 @@ can still create the recommended block). It is **excluded** from equality (dirty
 | **Id3v1** | Scalars: Title, Artist, Album, Year, Comment, Track, Genre |
 | **Id3v2** | `byte Version` + modeled text frames. Singletons keyed by FrameId; multi-instance by FrameId + language/description |
 | **Xiph** | Known-key multimap (covers `SemanticAudioTag` fields). Unknown keys left on disk |
-| **Ape** | Known text key map |
+| **Ape** | Known text key map. Read folds alias spellings (`ALBUMARTIST` → `Album Artist`) and splits `number/total` pairs into `Track`/`TrackCount` and `Disc`/`DiscCount`; item lookup is case-insensitive |
 | **RiffInfo** | INFO key → string map. Standard fourCCs (`INAM`, `IPRD`, `IART`, `IGNR`, `ICMT`, `ICOP`, `ICRD`, `ITRK`) read/written by key, not through TagLib's `InfoTag` façade properties (those map to non-standard ids such as `DIRC` for album) |
 | **Apple** | Text atom rows (track/disc binary atoms not modeled yet) |
 | **Asf** | Content Description fields + extended descriptors (see below) |
@@ -235,7 +235,7 @@ same preview chain.
 |---|---|
 | Overlay | `Mfr.Models/Tags/AudioTagOverlay.cs`, block types under `Tags/{Id3v1,Id3v2,Xiph,…}` |
 | Semantic / field I/O | `Mfr.Models/Tags/SemanticAudioTag.cs`, `AudioTagSemanticMerge.cs`, `SemanticFields.cs`, `AudioOverlayBlockFieldIo.cs`, `AudioOverlayTargetIo.cs` |
-| Persistence | `Mfr.Metadata/AudioTagPersistence.cs`, `TagBlockFieldMapper.cs`, `TagBlockFieldPatcher.cs`, `SemanticAudioTagTagLib.cs` |
+| Persistence | `Mfr.Metadata/AudioTagPersistence.cs`, `TagBlockFieldMapper.cs`, `TagBlockFieldPatcher.cs` |
 | Policy | `Mfr.Models/Tags/AudioTagContainerPolicy.cs` (capability), `Mfr.Metadata/AudioTagContainerDetector.cs` (detect), `Id3v2FrameVersionPolicy.cs`, `AsfDescriptorNames.cs` |
 | Filters | `Mfr.Filters/Audio/*`, `StringTargetFilter.cs`, `Mfr.Models/Targets.cs` |
 | Engine | `Mfr.Engine/CommitExecutor.cs`, `RenamePropertyChangeBuilder.cs` |
