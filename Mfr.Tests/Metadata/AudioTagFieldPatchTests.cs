@@ -1,8 +1,11 @@
 using Mfr.Metadata;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Asf;
+using Mfr.Models.Tags.Id3v1;
 using Mfr.Utils;
 using TagLib;
+using TagLib.Id3v2;
+using TagLib.Ogg;
 
 namespace Mfr.Tests.Metadata
 {
@@ -170,6 +173,199 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
+        /// Clearing the last modeled ID3v2 frame prunes the block to null and removes APIC with the tag type.
+        /// </summary>
+        [Fact]
+        public void Apply_Mp3_EmptyModeledId3v2Prune_DropsApic()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("prune-art.mp3");
+            TaggedMp3Fixture.WriteTagged(path, id3v2Title: "OnlyModeled");
+            _EmbedTinyPngCover(path, description: "cover");
+
+            var original = AudioTagPersistence.Read(path);
+            Assert.NotNull(original.Id3v2);
+            Assert.NotEmpty(original.Id3v2.Frames);
+
+            var preview = original.Clone();
+            AudioOverlayBlockFieldIo.SetId3v2FrameString(preview, "TIT2", string.Empty);
+            Assert.Null(preview.Id3v2);
+
+            AudioTagPersistence.Apply(path, original, preview);
+
+            using var after = TagLib.File.Create(path);
+            Assert.Empty(after.Tag.Pictures);
+            Assert.False(after.TagTypesOnDisk.HasFlag(TagTypes.Id3v2));
+            Assert.Null(AudioTagPersistence.Read(path).Id3v2);
+        }
+
+        /// <summary>
+        /// Clearing one ID3v1 scalar writes an empty field; clearing every scalar removes the trailer.
+        /// </summary>
+        [Fact]
+        public void Apply_Mp3_Id3v1_SingleFieldClear_Vs_ClearAll()
+        {
+            var singlePath = _tempDirectoryFixture.CreateTempDir().CombinePath("id3v1-single.mp3");
+            TaggedMp3Fixture.WriteTagged(singlePath, id3v1Title: "KeepArtistTitle", id3v2Title: "FrameStay");
+            _SeedId3v1Artist(singlePath, "KeepArtist");
+
+            var singleOriginal = AudioTagPersistence.Read(singlePath);
+            Assert.Equal("KeepArtistTitle", singleOriginal.Id3v1!.Title);
+            Assert.Equal("KeepArtist", singleOriginal.Id3v1.Artist);
+
+            var singlePreview = singleOriginal.Clone();
+            AudioOverlayBlockFieldIo.SetId3v1FieldString(singlePreview, Id3v1Field.Title, string.Empty);
+            Assert.NotNull(singlePreview.Id3v1);
+            Assert.Null(singlePreview.Id3v1.Title);
+            Assert.Equal("KeepArtist", singlePreview.Id3v1.Artist);
+
+            AudioTagPersistence.Apply(singlePath, singleOriginal, singlePreview);
+
+            using (var afterSingle = TagLib.File.Create(singlePath))
+            {
+                var id3v1 = Assert.IsType<TagLib.Id3v1.Tag>(afterSingle.GetTag(TagTypes.Id3v1, false));
+                Assert.True(string.IsNullOrEmpty(id3v1.Title));
+                Assert.Equal("KeepArtist", id3v1.FirstPerformer);
+                Assert.True(afterSingle.TagTypesOnDisk.HasFlag(TagTypes.Id3v1));
+            }
+
+            var clearAllPath = _tempDirectoryFixture.CreateTempDir().CombinePath("id3v1-clear-all.mp3");
+            TaggedMp3Fixture.WriteTagged(clearAllPath, id3v1Title: "Gone", id3v2Title: "FrameStay");
+            _SeedId3v1Artist(clearAllPath, "AlsoGone");
+
+            var clearAllOriginal = AudioTagPersistence.Read(clearAllPath);
+            var clearAllPreview = clearAllOriginal.Clone();
+            AudioOverlayBlockFieldIo.SetId3v1FieldString(clearAllPreview, Id3v1Field.Title, string.Empty);
+            AudioOverlayBlockFieldIo.SetId3v1FieldString(clearAllPreview, Id3v1Field.Artist, string.Empty);
+            Assert.Null(clearAllPreview.Id3v1);
+
+            AudioTagPersistence.Apply(clearAllPath, clearAllOriginal, clearAllPreview);
+
+            using var afterClearAll = TagLib.File.Create(clearAllPath);
+            Assert.False(afterClearAll.TagTypesOnDisk.HasFlag(TagTypes.Id3v1));
+            Assert.Null(AudioTagPersistence.Read(clearAllPath).Id3v1);
+            Assert.Equal("FrameStay", AudioTagPersistence.Read(clearAllPath).Id3v2!.Frames
+                .Single(f => f.FrameId == "TIT2").TextValues[0]);
+        }
+
+        /// <summary>
+        /// Clearing one COMM/TXXX instance leaves other instances with different identity intact.
+        /// </summary>
+        [Fact]
+        public void Apply_Mp3_ClearPrimaryCommAndOneTxxx_PreservesOtherInstances()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("multi-instance.mp3");
+            TaggedMp3Fixture.WriteTagged(path, id3v2Title: "TitleStay");
+            _SeedMultiInstanceFrames(path);
+
+            var original = AudioTagPersistence.Read(path);
+            Assert.Contains(
+                original.Id3v2!.Frames,
+                f => f.FrameId == "COMM"
+                    && string.Equals(f.Language, "eng", StringComparison.Ordinal)
+                    && string.IsNullOrEmpty(f.Description));
+            Assert.Contains(
+                original.Id3v2.Frames,
+                f => f.FrameId == "COMM"
+                    && string.Equals(f.Language, "deu", StringComparison.Ordinal)
+                    && string.Equals(f.Description, "liner", StringComparison.Ordinal));
+            Assert.Contains(original.Id3v2.Frames, f => f.FrameId == "TXXX" && f.Description == "replaygain");
+            Assert.Contains(original.Id3v2.Frames, f => f.FrameId == "TXXX" && f.Description == "catalog");
+
+            var preview = original.Clone();
+            AudioOverlayBlockFieldIo.SetId3v2FrameString(preview, "COMM", string.Empty);
+            AudioOverlayBlockFieldIo.SetId3v2FrameString(
+                preview,
+                "TXXX",
+                string.Empty,
+                description: "replaygain");
+
+            AudioTagPersistence.Apply(path, original, preview);
+
+            using var after = TagLib.File.Create(path);
+            var id3v2 = Assert.IsType<TagLib.Id3v2.Tag>(after.GetTag(TagTypes.Id3v2, false));
+
+            var comments = id3v2.GetFrames<CommentsFrame>("COMM").ToArray();
+            Assert.DoesNotContain(
+                comments,
+                c => string.Equals(c.Language, "eng", StringComparison.OrdinalIgnoreCase)
+                    && string.IsNullOrEmpty(c.Description));
+            var secondaryComm = Assert.Single(
+                comments,
+                c => string.Equals(c.Language, "deu", StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(c.Description, "liner", StringComparison.Ordinal));
+            Assert.Equal("German liner", secondaryComm.Text);
+
+            var userText = id3v2.GetFrames<UserTextInformationFrame>("TXXX").ToArray();
+            Assert.DoesNotContain(userText, t => string.Equals(t.Description, "replaygain", StringComparison.Ordinal));
+            var catalog = Assert.Single(userText, t => string.Equals(t.Description, "catalog", StringComparison.Ordinal));
+            Assert.Equal("ABC-123", Assert.Single(catalog.Text));
+            Assert.Equal("TitleStay", id3v2.Title);
+        }
+
+        /// <summary>
+        /// Title-only Xiph patch leaves an unknown comment key on disk (known-key field patch only).
+        /// </summary>
+        [Fact]
+        public void Apply_Flac_TitleOnlyPatch_PreservesUnknownXiphKey()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("unknown-xiph.flac");
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
+            System.IO.File.Copy(fixturePath, path, overwrite: false);
+
+            using (var seed = TagLib.File.Create(path))
+            {
+                var xiph = (XiphComment)seed.GetTag(TagTypes.Xiph, true);
+                xiph.SetField("TITLE", "BeforeTitle");
+                xiph.SetField("MY_CUSTOM_KEY", "KeepMe");
+                seed.Save();
+            }
+
+            var original = AudioTagPersistence.Read(path);
+            Assert.DoesNotContain(original.Xiph!.Fields, r => r.Key == "MY_CUSTOM_KEY");
+
+            var preview = original.Clone();
+            var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "AfterTitle" };
+            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
+            AudioTagPersistence.Apply(path, original, preview);
+
+            using var after = TagLib.File.Create(path);
+            var afterXiph = (XiphComment)after.GetTag(TagTypes.Xiph, false);
+            Assert.Equal(["AfterTitle"], afterXiph.GetField("TITLE"));
+            Assert.Equal(["KeepMe"], afterXiph.GetField("MY_CUSTOM_KEY"));
+        }
+
+        /// <summary>
+        /// Field-patch on an existing ID3v2.4 tag preserves version 4 (no silent downgrade/upgrade).
+        /// </summary>
+        [Fact]
+        public void Apply_Mp3_Tit2Patch_PreservesId3v24Version()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("v24-preserve.mp3");
+            TaggedMp3Fixture.WriteTagged(path, id3v2Title: "V24Title");
+            using (var seed = TagLib.File.Create(path))
+            {
+                var id3v2 = (TagLib.Id3v2.Tag)seed.GetTag(TagTypes.Id3v2, true);
+                id3v2.Version = 4;
+                seed.Save();
+            }
+
+            var original = AudioTagPersistence.Read(path);
+            Assert.Equal(4, original.Id3v2!.Version);
+
+            var preview = original.Clone();
+            AudioOverlayBlockFieldIo.SetId3v2FrameString(preview, "TIT2", "StillV24");
+            Assert.Equal(4, preview.Id3v2!.Version);
+
+            AudioTagPersistence.Apply(path, original, preview);
+
+            using var after = TagLib.File.Create(path);
+            var afterId3v2 = (TagLib.Id3v2.Tag)after.GetTag(TagTypes.Id3v2, false);
+            Assert.Equal(4, afterId3v2.Version);
+            Assert.Equal("StillV24", afterId3v2.Title);
+            Assert.Equal(4, AudioTagPersistence.Read(path).Id3v2!.Version);
+        }
+
+        /// <summary>
         /// Embeds a 1x1 PNG cover via TagLib's <see cref="Picture"/> surface (avoids obsolete <c>AttachedPictureFrame</c>).
         /// </summary>
         private static void _EmbedTinyPngCover(string path, string? description)
@@ -185,6 +381,27 @@ namespace Mfr.Tests.Metadata
                     Data = [.. _TinyPngBytes],
                 },
             ];
+            file.Save();
+        }
+
+        private static void _SeedId3v1Artist(string path, string artist)
+        {
+            using var file = TagLib.File.Create(path);
+            var id3v1 = (TagLib.Id3v1.Tag)file.GetTag(TagTypes.Id3v1, true);
+            id3v1.Performers = [artist];
+            file.Save();
+        }
+
+        private static void _SeedMultiInstanceFrames(string path)
+        {
+            using var file = TagLib.File.Create(path);
+            var id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagTypes.Id3v2, true);
+            id3v2.RemoveFrames("COMM");
+            id3v2.RemoveFrames("TXXX");
+            id3v2.AddFrame(new CommentsFrame(string.Empty, "eng") { Text = "Primary eng" });
+            id3v2.AddFrame(new CommentsFrame("liner", "deu") { Text = "German liner" });
+            id3v2.AddFrame(new UserTextInformationFrame("replaygain") { Text = ["-6.0"] });
+            id3v2.AddFrame(new UserTextInformationFrame("catalog") { Text = ["ABC-123"] });
             file.Save();
         }
 

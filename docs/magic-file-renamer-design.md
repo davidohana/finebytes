@@ -492,12 +492,16 @@ Out of scope:
 ### Phase 4 — MP3/audio tag support
 
 - Adds TagLibSharp-based embedded-tag loading and writing (shipped as `AudioTagOverlay` blocks; early sketches used a flat `Id3Tags` bag).
-- Enables filters targeting `FilterTargetFamily.AudioTag`, `Id3v1`, and `Id3v2`.
+- Enables string filters to target generic common fields (`AudioField`) or one native block field
+  (`Id3v1Field`, `Id3v2Frame`, `XiphField`). Format-specific targets fail preview when the
+  container cannot hold that block; v2.4-only frames also fail preview on an ID3v2.3 tag.
 - Extends formatter tokens with ID3/audio tokens (see §7.4–7.6).
 
 Scope:
 - Parsed per–`TagTypes` overlay fully implemented (see §9).
-- Audio-related filters (`AudioTagSetter`, `Id3v2FieldSetter`, `EmbeddedTagRemover`, `SetFromFreeDB`).
+- Audio-related filters (`AudioTagSetter`, `EmbeddedTagTypeRemover`, `EmbeddedTagRemover`, `SetFromFreeDB`).
+- Native ID3v2 frame edits use the normal string-filter contract with an `Id3v2Frame` target;
+  there is no separate `Id3v2FieldSetter` filter.
 
 ### Phase 5 — EXIF and image metadata
 
@@ -1152,6 +1156,17 @@ Inserts text at a specified position within the target field.
 
 ### Group 6 — Audio (4 filters)
 
+Specific native tag fields do not have dedicated setter filters. Any string-target filter (for
+example `Formatter`, `Replacer`, or `LettersCase`) can use:
+
+- `{ "targetType": "Id3v1Field", "field": "title" }`
+- `{ "targetType": "Id3v2Frame", "frameId": "TXXX", "description": "custom-key" }`
+- `{ "targetType": "XiphField", "key": "TITLE" }`
+
+`Id3v2Frame` also accepts optional `language` and `description` identity fields for `COMM`, `USLT`,
+and `TXXX`. Unsupported container/block combinations are preview errors. A v2.4-only frame such as
+`TDRC` is also a preview error on an ID3v2.3 tag; the tag is not silently upgraded.
+
 #### AudioTagSetter
 Sets common embedded audio-tag fields in one step (multi-format via TagLibSharp). String `text` values are literals unless they contain a balanced formatter `<token>` span (same template language as Formatter). No `target`; omit a field to leave it unchanged. Optional **`onlyIfEmpty`** on each field object fills only when the overlay value is empty; otherwise **`text`** overwrites. **`year`** and **`track`** use that shape; **`trackAutoIncrement`** adds each item’s rename-list index to the parsed track base (clamp 255).
 ```json
@@ -1166,16 +1181,33 @@ Sets common embedded audio-tag fields in one step (multi-format via TagLibSharp)
 }
 ```
 
-#### Id3v2FieldSetter
-Sets any specific ID3v2 frame by frame ID (e.g. TXXX, TIT1) for frames not accessible via AudioTagSetter.
+For example, a Formatter targeting one specific ID3v2 frame uses the shipped string-target preset
+contract:
+
 ```json
 {
-  "type": "Id3v2FieldSetter",
-  "target": { "targetType": "Id3v2" },
-  "options": {
+  "type": "Formatter",
+  "target": {
+    "targetType": "Id3v2Frame",
     "frameId": "TXXX",
-    "value": "my custom value",
-    "createIfMissing": true
+    "description": "custom-key"
+  },
+  "options": { "template": "my custom value" }
+}
+```
+
+#### EmbeddedTagTypeRemover
+Removes selected native tag blocks while leaving the others intact. It has no `target`.
+`options.blocks` accepts `id3v1`, `id3v2`, `xiph`, `ape`, `apple`, `asf`, and `riffInfo`.
+Removing a block also removes unmodeled content stored in that block, such as ID3v2 album art.
+Naming a block unsupported by the file's container is a preview error.
+
+```json
+{
+  "type": "EmbeddedTagTypeRemover",
+  "enabled": true,
+  "options": {
+    "blocks": ["id3v1"]
   }
 }
 ```

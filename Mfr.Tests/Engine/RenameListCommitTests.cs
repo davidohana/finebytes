@@ -382,6 +382,33 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies setting v2.4-only <c>TDRC</c> on a v2.3 MP3 fails preview (no silent upgrade).
+        /// </summary>
+        public void Preview_Id3v2FrameTarget_TdrcOnV23_ReportsPreviewError()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("tdrc-v23.mp3");
+            TaggedMp3Fixture.WriteTagged(sourcePath, id3v2Title: "HasV23");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "tdrc-on-v23",
+                new FormatterFilter(
+                    Target: new Id3v2FrameTarget("TDRC"),
+                    Options: new FormatterOptions("2020")));
+            _ = _SetupPreview(renameList, preset);
+
+            Assert.Equal(3, item.Original.AudioTagOverlay.Id3v2!.Version);
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.Contains("TDRC", item.PreviewError!.Message, StringComparison.Ordinal);
+            Assert.Contains("2.4", item.PreviewError.Message, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies an ID3v2 <c>TIT2</c> formatter updates only the ID3v2 block in preview and on disk.
         /// </summary>
         public void Commit_Id3v2FrameTarget_Tit2_WritesOnDisk()

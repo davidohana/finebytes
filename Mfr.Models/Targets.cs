@@ -87,7 +87,8 @@ namespace Mfr.Models
     /// Singleton frames (for example <c>TIT2</c>) use <paramref name="FrameId"/> only.
     /// Multi-instance frames (<c>COMM</c>, <c>USLT</c>, <c>TXXX</c>) also match <paramref name="Language"/> /
     /// <paramref name="Description"/>; omit both for the primary <c>COMM</c>/<c>USLT</c> instance
-    /// (empty description). Unsupported on non-MPEG containers.
+    /// (empty description). Unsupported on non-MPEG containers. Writing a v2.4-only frame (for example
+    /// <c>TDRC</c>) into a v2.3 tag is a PreviewError — the version is never upgraded silently.
     /// </para>
     /// </remarks>
     /// <param name="FrameId">Four-character frame id (case-insensitive; stored uppercase).</param>

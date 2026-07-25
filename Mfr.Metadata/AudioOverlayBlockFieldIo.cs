@@ -117,6 +117,10 @@ namespace Mfr.Metadata
         /// <param name="fieldString">Text, or <c>;</c>-separated list values; empty removes that instance only.</param>
         /// <param name="language">Optional language for multi-instance frames.</param>
         /// <param name="description">Optional description for multi-instance frames.</param>
+        /// <exception cref="NotSupportedException">
+        /// Thrown when writing a v2.4-only frame into a tag whose version is below 2.4
+        /// (<see cref="Id3v2FrameVersionPolicy"/>).
+        /// </exception>
         public static void SetId3v2FrameString(
             AudioTagOverlay overlay,
             string frameId,
@@ -137,6 +141,8 @@ namespace Mfr.Metadata
 
             if (trimmed.Length > 0)
             {
+                Id3v2FrameVersionPolicy.EnsureCompatible(existing.Version, normalizedId);
+
                 var values = _SplitJoinedList(trimmed);
                 if (values.Length > 0)
                 {

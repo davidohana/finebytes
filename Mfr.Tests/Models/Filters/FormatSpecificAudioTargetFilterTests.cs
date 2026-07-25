@@ -192,5 +192,79 @@ namespace Mfr.Tests.Models.Filters
             Assert.DoesNotContain(item.Preview.AudioTagOverlay.Id3v2!.Frames, f => f.FrameId == "TIT2");
             Assert.Contains(item.Preview.AudioTagOverlay.Id3v2.Frames, f => f.FrameId == "TALB");
         }
+
+        /// <summary>
+        /// Writing v2.4-only <c>TDRC</c> into a v2.3 overlay throws <see cref="NotSupportedException"/>.
+        /// </summary>
+        [Fact]
+        public void Formatter_Id3v2Frame_TdrcOnV23_ThrowsNotSupported()
+        {
+            var filter = new FormatterFilter(
+                new Id3v2FrameTarget("TDRC"),
+                new FormatterOptions("2020"));
+            var item = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: m =>
+                {
+                    m.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
+                    };
+                });
+
+            filter.Setup();
+            var ex = Assert.Throws<NotSupportedException>(() => filter.Apply(item));
+            Assert.Contains("TDRC", ex.Message, StringComparison.Ordinal);
+            Assert.Contains("2.4", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Writing <c>TDRC</c> into a v2.4 overlay succeeds.
+        /// </summary>
+        [Fact]
+        public void Formatter_Id3v2Frame_TdrcOnV24_Succeeds()
+        {
+            var filter = new FormatterFilter(
+                new Id3v2FrameTarget("TDRC"),
+                new FormatterOptions("2020"));
+            var item = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: m =>
+                {
+                    m.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        Id3v2 = new Id3v2TagData { Version = 4, Frames = [] },
+                    };
+                });
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("2020", AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TDRC"));
+            Assert.Equal(4, item.Preview.AudioTagOverlay.Id3v2!.Version);
+        }
+
+        /// <summary>
+        /// Clearing a v2.4-only frame on a v2.3 tag does not throw (removal is always allowed).
+        /// </summary>
+        [Fact]
+        public void SetId3v2FrameString_ClearTdrcOnV23_Succeeds()
+        {
+            var overlay = new AudioTagOverlay
+            {
+                Id3v2 = new Id3v2TagData
+                {
+                    Version = 3,
+                    Frames =
+                    [
+                        new Id3v2ModeledFrame { FrameId = "TDRC", TextValues = ["2019"] },
+                        new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Keep"] },
+                    ],
+                },
+            };
+
+            AudioOverlayBlockFieldIo.SetId3v2FrameString(overlay, "TDRC", string.Empty);
+
+            Assert.DoesNotContain(overlay.Id3v2!.Frames, f => f.FrameId == "TDRC");
+            Assert.Equal("Keep", AudioOverlayBlockFieldIo.GetId3v2FrameString(overlay, "TIT2"));
+        }
     }
 }
