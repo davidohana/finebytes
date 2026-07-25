@@ -4,7 +4,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Reads and writes <see cref="AudioOverlayField"/> values through the block-derived <see cref="SemanticAudioTag"/> layer.
+    /// Reads and writes <see cref="SemanticAudioField"/> values through the block-derived <see cref="SemanticAudioTag"/> layer.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -12,20 +12,20 @@ namespace Mfr.Metadata
     /// blocks via <see cref="AudioTagPersistence.MergeSemanticIntoBlocks"/> (broadcast to present blocks; recommended create when empty).
     /// </para>
     /// </remarks>
-    public static class AudioOverlaySemanticIo
+    public static class SemanticAudioFieldIo
     {
         /// <summary>
         /// Returns the filter/preview string for <paramref name="field"/> from the block projection of <paramref name="overlay"/>.
         /// </summary>
         /// <param name="overlay">Structured tag blocks.</param>
-        /// <param name="field">Logical audio field.</param>
-        /// <returns>Same formatting as <see cref="AudioOverlaySemanticFieldStrings.Format"/> (empty when unset).</returns>
-        public static string GetFieldString(AudioTagOverlay overlay, AudioOverlayField field)
+        /// <param name="field">Logical semantic audio field.</param>
+        /// <returns>Same formatting as <see cref="SemanticAudioFieldStrings.Format"/> (empty when unset).</returns>
+        public static string GetFieldString(AudioTagOverlay overlay, SemanticAudioField field)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
             var semantic = SemanticAudioTag.FromOverlay(overlay);
-            return AudioOverlaySemanticFieldStrings.Format(semantic, field);
+            return SemanticAudioFieldStrings.Format(semantic, field);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Mfr.Metadata
         /// <exception cref="ArgumentException">Thrown when a numeric field string is not empty and not a valid non-negative integer.</exception>
         public static void MergeFieldStringIntoOverlay(
             AudioTagOverlay overlay,
-            AudioOverlayField field,
+            SemanticAudioField field,
             string fieldString)
         {
             ArgumentNullException.ThrowIfNull(overlay);
@@ -48,21 +48,21 @@ namespace Mfr.Metadata
 
             semantic = field switch
             {
-                AudioOverlayField.Title => semantic with { Title = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Album => semantic with { Album = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Performers => semantic with { Performers = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.AlbumArtists => semantic with { AlbumArtists = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Composers => semantic with { Composers = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Genre => semantic with { Genre = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Comment => semantic with { Comment = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Lyrics => semantic with { Lyrics = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Copyright => semantic with { Copyright = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Grouping => semantic with { Grouping = _NullIfEmptyString(trimmed) },
-                AudioOverlayField.Year => semantic with { Year = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                AudioOverlayField.Track => semantic with { Track = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                AudioOverlayField.TrackCount => semantic with { TrackCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                AudioOverlayField.Disc => semantic with { Disc = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                AudioOverlayField.DiscCount => semantic with { DiscCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                SemanticAudioField.Title => semantic with { Title = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Album => semantic with { Album = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Performers => semantic with { Performers = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.AlbumArtists => semantic with { AlbumArtists = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Composers => semantic with { Composers = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Genre => semantic with { Genre = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Comment => semantic with { Comment = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Lyrics => semantic with { Lyrics = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Copyright => semantic with { Copyright = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Grouping => semantic with { Grouping = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Year => semantic with { Year = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                SemanticAudioField.Track => semantic with { Track = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                SemanticAudioField.TrackCount => semantic with { TrackCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                SemanticAudioField.Disc => semantic with { Disc = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                SemanticAudioField.DiscCount => semantic with { DiscCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 

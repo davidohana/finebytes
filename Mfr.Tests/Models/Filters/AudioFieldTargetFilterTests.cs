@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters
         public void Formatter_SetsTitleOnPreviewAudioOverlay()
         {
             var filter = new FormatterFilter(
-                new AudioFieldTarget(AudioOverlayField.Title),
+                new AudioFieldTarget(SemanticAudioField.Title),
                 new FormatterOptions("NextTitle"));
             var item = FilterTestHelpers.CreateRenameItem(
                 configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PrevTitle"));
@@ -32,17 +32,17 @@ namespace Mfr.Tests.Models.Filters
         /// <summary>
         /// Verifies formatter sets each numeric overlay field from a non-negative integer decimal string.
         /// </summary>
-        /// <param name="field">Which <see cref="AudioOverlayField"/> is targeted.</param>
+        /// <param name="field">Which <see cref="SemanticAudioField"/> is targeted.</param>
         /// <param name="template">Template output (single integer token).</param>
         /// <param name="expected">Expected <see cref="uint"/> on the overlay.</param>
         [Theory]
-        [InlineData(AudioOverlayField.Year, "1999", 1999u)]
-        [InlineData(AudioOverlayField.Track, "7", 7u)]
-        [InlineData(AudioOverlayField.TrackCount, "12", 12u)]
-        [InlineData(AudioOverlayField.Disc, "2", 2u)]
-        [InlineData(AudioOverlayField.DiscCount, "3", 3u)]
+        [InlineData(SemanticAudioField.Year, "1999", 1999u)]
+        [InlineData(SemanticAudioField.Track, "7", 7u)]
+        [InlineData(SemanticAudioField.TrackCount, "12", 12u)]
+        [InlineData(SemanticAudioField.Disc, "2", 2u)]
+        [InlineData(SemanticAudioField.DiscCount, "3", 3u)]
         public void Formatter_SetsNumericOverlayField(
-            AudioOverlayField field,
+            SemanticAudioField field,
             string template,
             uint expected)
         {
@@ -54,24 +54,24 @@ namespace Mfr.Tests.Models.Filters
             filter.Setup();
             filter.Apply(item);
 
-            const string nonNumericTheoryMessage = "Theory must only use numeric AudioOverlayField values.";
+            const string nonNumericTheoryMessage = "Theory must only use numeric SemanticAudioField values.";
             var actual = field switch
             {
-                AudioOverlayField.Year => item.Preview.AudioTagOverlay.Semantic().Year,
-                AudioOverlayField.Track => item.Preview.AudioTagOverlay.Semantic().Track,
-                AudioOverlayField.TrackCount => item.Preview.AudioTagOverlay.Semantic().TrackCount,
-                AudioOverlayField.Disc => item.Preview.AudioTagOverlay.Semantic().Disc,
-                AudioOverlayField.DiscCount => item.Preview.AudioTagOverlay.Semantic().DiscCount,
-                AudioOverlayField.Title => throw new InvalidOperationException(nonNumericTheoryMessage),
-                AudioOverlayField.Album => throw new InvalidOperationException(nonNumericTheoryMessage),
-                AudioOverlayField.Performers => throw new InvalidOperationException(nonNumericTheoryMessage),
-                AudioOverlayField.AlbumArtists => throw new InvalidOperationException(nonNumericTheoryMessage),
-                AudioOverlayField.Composers => throw new InvalidOperationException(nonNumericTheoryMessage),
-                AudioOverlayField.Genre => throw new InvalidOperationException(nonNumericTheoryMessage),
-                AudioOverlayField.Comment => throw new InvalidOperationException(nonNumericTheoryMessage),
-                AudioOverlayField.Lyrics => throw new InvalidOperationException(nonNumericTheoryMessage),
-                AudioOverlayField.Copyright => throw new InvalidOperationException(nonNumericTheoryMessage),
-                AudioOverlayField.Grouping => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.Year => item.Preview.AudioTagOverlay.Semantic().Year,
+                SemanticAudioField.Track => item.Preview.AudioTagOverlay.Semantic().Track,
+                SemanticAudioField.TrackCount => item.Preview.AudioTagOverlay.Semantic().TrackCount,
+                SemanticAudioField.Disc => item.Preview.AudioTagOverlay.Semantic().Disc,
+                SemanticAudioField.DiscCount => item.Preview.AudioTagOverlay.Semantic().DiscCount,
+                SemanticAudioField.Title => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.Album => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.Performers => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.AlbumArtists => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.Composers => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.Genre => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.Comment => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.Lyrics => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.Copyright => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.Grouping => throw new InvalidOperationException(nonNumericTheoryMessage),
                 _ => throw new InvalidOperationException(nonNumericTheoryMessage),
             };
 
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Models.Filters
         public void Formatter_EmptyTemplate_ClearsNumericOverlayField()
         {
             var filter = new FormatterFilter(
-                new AudioFieldTarget(AudioOverlayField.Year),
+                new AudioFieldTarget(SemanticAudioField.Year),
                 new FormatterOptions(string.Empty));
             var item = FilterTestHelpers.CreateRenameItem(
                 configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 2001));
@@ -103,7 +103,7 @@ namespace Mfr.Tests.Models.Filters
         public void Formatter_WhitespaceOnlyTemplate_ClearsNumericOverlayField()
         {
             var filter = new FormatterFilter(
-                new AudioFieldTarget(AudioOverlayField.Track),
+                new AudioFieldTarget(SemanticAudioField.Track),
                 new FormatterOptions("   "));
             var item = FilterTestHelpers.CreateRenameItem(
                 configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 9));
@@ -121,7 +121,7 @@ namespace Mfr.Tests.Models.Filters
         public void Formatter_InvalidNumericTemplate_ThrowsArgumentException()
         {
             var filter = new FormatterFilter(
-                new AudioFieldTarget(AudioOverlayField.Disc),
+                new AudioFieldTarget(SemanticAudioField.Disc),
                 new FormatterOptions("not-a-number"));
 
             var item = FilterTestHelpers.CreateRenameItem();
@@ -138,7 +138,7 @@ namespace Mfr.Tests.Models.Filters
         public void Replacer_ReplacesNumericYearStringOnPreviewAudioOverlay()
         {
             var filter = new ReplacerFilter(
-                new AudioFieldTarget(AudioOverlayField.Year),
+                new AudioFieldTarget(SemanticAudioField.Year),
                 new ReplacerOptions(
                     Find: "199",
                     Replacement: "200",
@@ -166,7 +166,7 @@ namespace Mfr.Tests.Models.Filters
         public void Replacer_ReplacesGenreOnPreviewAudioOverlay()
         {
             var filter = new ReplacerFilter(
-                new AudioFieldTarget(AudioOverlayField.Genre),
+                new AudioFieldTarget(SemanticAudioField.Genre),
                 new ReplacerOptions(
                     Find: "Rock",
                     Replacement: "Metal",
@@ -191,7 +191,7 @@ namespace Mfr.Tests.Models.Filters
         public void Apply_ToDirectory_ThrowsInvalidOperation()
         {
             var filter = new FormatterFilter(
-                new AudioFieldTarget(AudioOverlayField.Title),
+                new AudioFieldTarget(SemanticAudioField.Title),
                 new FormatterOptions("x"));
 
             var item = FilterTestHelpers.CreateRenameItem(

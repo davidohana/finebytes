@@ -6,7 +6,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// <summary>
     /// Shared implementation for formatter tokens backed by preview <see cref="AudioTagOverlay"/> semantic projection.
     /// </summary>
-    internal abstract class AudioOverlayTokenBase(IReadOnlyList<string> names, AudioOverlayField field) : IFormatToken
+    internal abstract class AudioOverlayTokenBase(IReadOnlyList<string> names, SemanticAudioField field) : IFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
@@ -20,7 +20,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
             {
                 item.EnsureEmbeddedTagsLoaded();
                 var semantic = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay);
-                return AudioOverlaySemanticFieldStrings.Format(semantic, field);
+                return SemanticAudioFieldStrings.Format(semantic, field);
             };
         }
     }
@@ -30,7 +30,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-title&gt;</c>.</summary>
         public AudioTitleToken()
-            : base(["audio-title"], AudioOverlayField.Title)
+            : base(["audio-title"], SemanticAudioField.Title)
         {
         }
     }
@@ -40,7 +40,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-artist&gt;</c> (joined performers).</summary>
         public AudioArtistToken()
-            : base(["audio-artist"], AudioOverlayField.Performers)
+            : base(["audio-artist"], SemanticAudioField.Performers)
         {
         }
     }
@@ -50,7 +50,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-album-artist&gt;</c>.</summary>
         public AudioAlbumArtistToken()
-            : base(["audio-album-artist"], AudioOverlayField.AlbumArtists)
+            : base(["audio-album-artist"], SemanticAudioField.AlbumArtists)
         {
         }
     }
@@ -60,7 +60,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-album&gt;</c>.</summary>
         public AudioAlbumToken()
-            : base(["audio-album"], AudioOverlayField.Album)
+            : base(["audio-album"], SemanticAudioField.Album)
         {
         }
     }
@@ -70,7 +70,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-year&gt;</c>.</summary>
         public AudioYearToken()
-            : base(["audio-year"], AudioOverlayField.Year)
+            : base(["audio-year"], SemanticAudioField.Year)
         {
         }
     }
@@ -80,7 +80,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-genre&gt;</c>.</summary>
         public AudioGenreToken()
-            : base(["audio-genre"], AudioOverlayField.Genre)
+            : base(["audio-genre"], SemanticAudioField.Genre)
         {
         }
     }
@@ -90,7 +90,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-track&gt;</c>.</summary>
         public AudioTrackToken()
-            : base(["audio-track"], AudioOverlayField.Track)
+            : base(["audio-track"], SemanticAudioField.Track)
         {
         }
     }
@@ -100,7 +100,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-track-count&gt;</c>.</summary>
         public AudioTrackCountToken()
-            : base(["audio-track-count"], AudioOverlayField.TrackCount)
+            : base(["audio-track-count"], SemanticAudioField.TrackCount)
         {
         }
     }
@@ -110,7 +110,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-disc&gt;</c>.</summary>
         public AudioDiscToken()
-            : base(["audio-disc"], AudioOverlayField.Disc)
+            : base(["audio-disc"], SemanticAudioField.Disc)
         {
         }
     }
@@ -120,7 +120,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-disc-count&gt;</c>.</summary>
         public AudioDiscCountToken()
-            : base(["audio-disc-count"], AudioOverlayField.DiscCount)
+            : base(["audio-disc-count"], SemanticAudioField.DiscCount)
         {
         }
     }
@@ -130,7 +130,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-comment&gt;</c>.</summary>
         public AudioCommentToken()
-            : base(["audio-comment"], AudioOverlayField.Comment)
+            : base(["audio-comment"], SemanticAudioField.Comment)
         {
         }
     }
@@ -140,7 +140,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-composer&gt;</c>.</summary>
         public AudioComposerToken()
-            : base(["audio-composer"], AudioOverlayField.Composers)
+            : base(["audio-composer"], SemanticAudioField.Composers)
         {
         }
     }
@@ -150,7 +150,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-lyrics&gt;</c>.</summary>
         public AudioLyricsToken()
-            : base(["audio-lyrics"], AudioOverlayField.Lyrics)
+            : base(["audio-lyrics"], SemanticAudioField.Lyrics)
         {
         }
     }
@@ -160,7 +160,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-copyright&gt;</c>.</summary>
         public AudioCopyrightToken()
-            : base(["audio-copyright"], AudioOverlayField.Copyright)
+            : base(["audio-copyright"], SemanticAudioField.Copyright)
         {
         }
     }
@@ -170,7 +170,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-grouping&gt;</c>.</summary>
         public AudioGroupingToken()
-            : base(["audio-grouping"], AudioOverlayField.Grouping)
+            : base(["audio-grouping"], SemanticAudioField.Grouping)
         {
         }
     }

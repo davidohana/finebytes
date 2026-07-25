@@ -63,10 +63,10 @@ namespace Mfr.Models
     public sealed record ParentDirectoryTarget : FilterTarget;
 
     /// <summary>
-    /// Targets one field on <see cref="FileMeta.AudioTagOverlay"/>; string filters read/write text or decimal-digit numeric strings.
+    /// Targets one cross-format field on the semantic projection of <see cref="FileMeta.AudioTagOverlay"/>; string filters read/write text or decimal-digit numeric strings.
     /// </summary>
-    /// <param name="Field">Which overlay property is addressed.</param>
-    public sealed record AudioFieldTarget(AudioOverlayField Field) : FilterTarget;
+    /// <param name="Field">Which <see cref="SemanticAudioField"/> is addressed.</param>
+    public sealed record AudioFieldTarget(SemanticAudioField Field) : FilterTarget;
 
     /// <summary>
     /// Targets one ID3v1 scalar on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v1"/>.

@@ -253,7 +253,7 @@ namespace Mfr.Tests.Engine
             Assert.NotNull(filter);
             var typed = Assert.IsType<FormatterFilter>(filter);
             var target = Assert.IsType<AudioFieldTarget>(typed.Target);
-            Assert.Equal(AudioOverlayField.Title, target.Field);
+            Assert.Equal(SemanticAudioField.Title, target.Field);
             typed.Setup();
         }
 

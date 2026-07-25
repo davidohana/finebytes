@@ -475,7 +475,7 @@ namespace Mfr.Tests.Engine
                 Chain = FilterChain.CreateAllEnabled(
                     [
                         new FormatterFilter(
-                            Target: new AudioFieldTarget(AudioOverlayField.Title),
+                            Target: new AudioFieldTarget(SemanticAudioField.Title),
                             Options: new FormatterOptions("x")),
                     ]),
             };

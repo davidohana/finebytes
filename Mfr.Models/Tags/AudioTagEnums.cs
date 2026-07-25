@@ -79,9 +79,15 @@ namespace Mfr.Models.Tags
     }
 
     /// <summary>
-    /// Which embedded audio-tag overlay field a <see cref="AudioFieldTarget"/> addresses on <see cref="FileMeta.AudioTagOverlay"/>.
+    /// Which cross-format semantic audio field a <see cref="AudioFieldTarget"/> addresses.
     /// </summary>
-    public enum AudioOverlayField
+    /// <remarks>
+    /// <para>
+    /// Members map one-to-one onto the common projected fields (title, album, track, and so on). Values are read from
+    /// and written back into structured blocks on <see cref="AudioTagOverlay"/>; they are not properties of the overlay itself.
+    /// </para>
+    /// </remarks>
+    public enum SemanticAudioField
     {
         /// <summary>Track title.</summary>
         [JsonStringEnumMemberName("title")]
