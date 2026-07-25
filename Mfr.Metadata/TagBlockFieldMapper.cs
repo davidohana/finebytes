@@ -103,8 +103,8 @@ namespace Mfr.Metadata
         /// </summary>
         public static RiffInfoTagData? ReadRiffInfo(InfoTag info)
         {
-            var common = SemanticAudioTagTagLib.FromCombinedTag(info);
-            var rows = _RiffRowsFromCommon(common);
+            var semantic = SemanticAudioTagTagLib.FromCombinedTag(info);
+            var rows = _RiffRowsFromCommon(semantic);
             return rows.Length == 0 ? null : new RiffInfoTagData { Fields = rows };
         }
 
