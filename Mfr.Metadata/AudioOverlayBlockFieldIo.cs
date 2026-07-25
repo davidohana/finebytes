@@ -250,7 +250,7 @@ namespace Mfr.Metadata
             if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
                 return false;
 
-            if (!_MultiInstanceFrameIds.Contains(frameId))
+            if (!Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frameId))
                 return true;
 
             if (string.Equals(frameId, "TXXX", StringComparison.Ordinal))
@@ -278,7 +278,7 @@ namespace Mfr.Metadata
             if (string.Equals(frameId, "TXXX", StringComparison.Ordinal))
                 return null;
 
-            if (!_MultiInstanceFrameIds.Contains(frameId))
+            if (!Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frameId))
                 return null;
 
             if (!string.IsNullOrWhiteSpace(language))
