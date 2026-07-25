@@ -1,5 +1,4 @@
 using Mfr.Filters.Formatting;
-using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;

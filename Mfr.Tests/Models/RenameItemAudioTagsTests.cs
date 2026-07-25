@@ -1,6 +1,6 @@
 using Mfr.Filters;
-using Mfr.Metadata;
 using Mfr.Models;
+using Mfr.Models.Tags;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Models
@@ -43,7 +43,7 @@ namespace Mfr.Tests.Models
             var mutated = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay)
                 with
             { Album = "PreviewOnlyMutated" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(item.Preview.AudioTagOverlay, mutated);
+            item.Preview.AudioTagOverlay.MergeSemantic(mutated);
 
             item.EnsureEmbeddedTagsLoaded();
 
@@ -60,7 +60,7 @@ namespace Mfr.Tests.Models
             Assert.False(item.HasPreviewChanges());
 
             var mergedPreview = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay) with { Title = "PreviewTitle" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(item.Preview.AudioTagOverlay, mergedPreview);
+            item.Preview.AudioTagOverlay.MergeSemantic(mergedPreview);
 
             Assert.True(item.HasPreviewChanges());
             Assert.True(item.IsPreviewPathUnchanged());
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Models
             var first = _CreateMetaWithAlbum("A");
             var second = first.Clone();
             var merged = SemanticAudioTag.FromOverlay(second.AudioTagOverlay) with { Title = "B" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(second.AudioTagOverlay, merged);
+            second.AudioTagOverlay.MergeSemantic(merged);
 
             Assert.Null(first.AudioTagOverlay.Semantic().Title);
             Assert.Equal("B", second.AudioTagOverlay.Semantic().Title);

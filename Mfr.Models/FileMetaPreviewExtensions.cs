@@ -1,9 +1,10 @@
+using Mfr.Models.Tags;
 using Mfr.Utils;
 
 namespace Mfr.Models
 {
     /// <summary>
-    /// Mutation, filter-target read/write dispatch, and path helpers for a <see cref="FileMeta"/> rename snapshot.
+    /// Path, file-name, and audio overlay filter-target read/write dispatch plus path helpers for a <see cref="FileMeta"/> rename snapshot.
     /// </summary>
     internal static class FileMetaPreviewExtensions
     {
@@ -18,6 +19,9 @@ namespace Mfr.Models
         /// <exception cref="NotSupportedException">Thrown when no handler exists for <paramref name="target"/>.</exception>
         internal static string GetTargetString(this FileMeta meta, FilterTarget target)
         {
+            if (AudioOverlayTargetIo.IsAudioTarget(target))
+                return AudioOverlayTargetIo.GetTargetString(meta.AudioTagOverlay, target);
+
             return target switch
             {
                 FilePrefixTarget => meta.Prefix,
@@ -45,6 +49,12 @@ namespace Mfr.Models
         /// <exception cref="NotSupportedException">Thrown when no handler exists for <paramref name="target"/>.</exception>
         internal static void SetTargetString(this FileMeta meta, FilterTarget target, string value)
         {
+            if (AudioOverlayTargetIo.IsAudioTarget(target))
+            {
+                AudioOverlayTargetIo.SetTargetString(meta.AudioTagOverlay, target, value);
+                return;
+            }
+
             switch (target)
             {
                 case FilePrefixTarget:

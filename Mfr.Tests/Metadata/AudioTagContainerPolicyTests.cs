@@ -3,6 +3,8 @@ using Mfr.Filters;
 using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
+using MetadataContainerPolicy = Mfr.Metadata.AudioTagContainerPolicy;
+using ModelsContainerPolicy = Mfr.Models.Tags.AudioTagContainerPolicy;
 using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.Tests.Metadata
@@ -43,11 +45,11 @@ namespace Mfr.Tests.Metadata
             AudioTagBlockKind[] expectedBlocks,
             AudioTagBlockKind? expectedRecommended)
         {
-            Assert.Equal(expectedBlocks, AudioTagContainerPolicy.GetSupportedBlocks(container));
-            Assert.Equal(expectedRecommended, AudioTagContainerPolicy.GetRecommendedBlock(container));
+            Assert.Equal(expectedBlocks, ModelsContainerPolicy.GetSupportedBlocks(container));
+            Assert.Equal(expectedRecommended, ModelsContainerPolicy.GetRecommendedBlock(container));
 
             foreach (var block in Enum.GetValues<AudioTagBlockKind>())
-                Assert.Equal(expectedBlocks.Contains(block), AudioTagContainerPolicy.Supports(container, block));
+                Assert.Equal(expectedBlocks.Contains(block), ModelsContainerPolicy.Supports(container, block));
         }
 
         /// <summary>
@@ -56,14 +58,14 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void GetRecommendedBlock_Mpeg_PrefersId3v2OverId3v1()
         {
-            Assert.Equal(AudioTagBlockKind.Id3v2, AudioTagContainerPolicy.GetRecommendedBlock(AudioContainerFormat.Mpeg));
+            Assert.Equal(AudioTagBlockKind.Id3v2, ModelsContainerPolicy.GetRecommendedBlock(AudioContainerFormat.Mpeg));
         }
 
         [Fact]
         public void EnsureSupported_Id3v2OnFlac_ThrowsNotSupported()
         {
             var ex = Assert.Throws<NotSupportedException>(() =>
-                AudioTagContainerPolicy.EnsureSupported(AudioContainerFormat.Flac, AudioTagBlockKind.Id3v2));
+                ModelsContainerPolicy.EnsureSupported(AudioContainerFormat.Flac, AudioTagBlockKind.Id3v2));
 
             Assert.Contains("ID3v2", ex.Message, StringComparison.Ordinal);
             Assert.Contains("FLAC", ex.Message, StringComparison.Ordinal);
@@ -74,7 +76,7 @@ namespace Mfr.Tests.Metadata
         public void EnsureSupported_UnknownContainer_ReportsNoSupportedBlocks()
         {
             var ex = Assert.Throws<NotSupportedException>(() =>
-                AudioTagContainerPolicy.EnsureSupported(AudioContainerFormat.Unknown, AudioTagBlockKind.Xiph));
+                ModelsContainerPolicy.EnsureSupported(AudioContainerFormat.Unknown, AudioTagBlockKind.Xiph));
 
             Assert.Contains("no tag blocks are supported", ex.Message, StringComparison.Ordinal);
         }
@@ -82,7 +84,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void EnsureSupported_XiphOnFlac_DoesNotThrow()
         {
-            AudioTagContainerPolicy.EnsureSupported(AudioContainerFormat.Flac, AudioTagBlockKind.Xiph);
+            ModelsContainerPolicy.EnsureSupported(AudioContainerFormat.Flac, AudioTagBlockKind.Xiph);
         }
 
         /// <summary>
@@ -104,7 +106,7 @@ namespace Mfr.Tests.Metadata
         {
             var path = _CopyFixtureToTempDir(fixtureFileName);
 
-            Assert.Equal(expected, AudioTagContainerPolicy.Detect(path));
+            Assert.Equal(expected, MetadataContainerPolicy.Detect(path));
         }
 
         [Fact]
@@ -112,13 +114,13 @@ namespace Mfr.Tests.Metadata
         {
             var path = _AllocateMinimalWavPath();
 
-            Assert.Equal(AudioContainerFormat.Riff, AudioTagContainerPolicy.Detect(path));
+            Assert.Equal(AudioContainerFormat.Riff, MetadataContainerPolicy.Detect(path));
         }
 
         [Fact]
         public void Detect_RelativePath_ThrowsArgumentException()
         {
-            var ex = Assert.Throws<ArgumentException>(() => AudioTagContainerPolicy.Detect("relative\\only.mp3"));
+            var ex = Assert.Throws<ArgumentException>(() => MetadataContainerPolicy.Detect("relative\\only.mp3"));
             Assert.Contains("fully qualified", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -179,7 +181,7 @@ namespace Mfr.Tests.Metadata
 
             var preview = AudioTagPersistence.Read(path).Clone();
             var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "PolicyAllowsGenericTitle" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
+            preview.MergeSemantic(merged);
 
             AudioTagPersistence.Apply(path, preview);
 

@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
 using Mfr.Filters.Formatting;
-using Mfr.Metadata;
 using Mfr.Models;
+using Mfr.Models.Tags;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Audio
@@ -166,7 +166,7 @@ namespace Mfr.Filters.Audio
             if (!_HasAnyConfiguredSemanticField())
                 return;
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(tags, semantic);
+            tags.MergeSemantic(semantic);
         }
 
         /// <summary>

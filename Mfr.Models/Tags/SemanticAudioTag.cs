@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Globalization;
-using Mfr.Models.Tags;
 using Mfr.Models.Tags.Ape;
 using Mfr.Models.Tags.Apple;
 using Mfr.Models.Tags.Asf;
@@ -9,9 +8,8 @@ using Mfr.Models.Tags.Id3v2;
 using Mfr.Models.Tags.RiffInfo;
 using Mfr.Models.Tags.Xiph;
 using Mfr.Utils;
-using TagLib;
 
-namespace Mfr.Metadata
+namespace Mfr.Models.Tags
 {
     /// <summary>
     /// Common cross-format audio fields derived from structured <see cref="AudioTagOverlay"/> tag blocks.
@@ -21,7 +19,7 @@ namespace Mfr.Metadata
     /// Generic read priority when projecting from an overlay: Id3v2 → Id3v1 → Xiph → Ape → RiffInfo → Apple → Asf.
     /// </para>
     /// <para>
-    /// Generic write (via <c>MergeSemanticIntoBlocks</c>) broadcasts each field onto every present block.
+    /// Generic write (via <see cref="AudioTagOverlay.MergeSemantic"/>) broadcasts each field onto every present block.
     /// When the overlay carries no blocks, the container's recommended empty block is created first
     /// (<see cref="AudioTagContainerPolicy.GetRecommendedBlock"/>); sibling tag types are never invented.
     /// </para>
@@ -73,7 +71,7 @@ namespace Mfr.Metadata
                 _XiphFirst(overlay.Xiph, "TITLE"),
                 _ApeFirst(overlay.Ape, "Title"),
                 _Riff(overlay.RiffInfo, "INAM"),
-                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.TitleAtom),
+                _ReadApplePlainText(overlay.Apple, AppleAtomIds.Title),
                 _Asf(overlay.Asf, AsfDescriptorNames.Title));
             var album = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TALB"),
@@ -81,7 +79,7 @@ namespace Mfr.Metadata
                 _XiphFirst(overlay.Xiph, "ALBUM"),
                 _ApeFirst(overlay.Ape, "Album"),
                 _Riff(overlay.RiffInfo, "IPRD"),
-                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.AlbumAtom),
+                _ReadApplePlainText(overlay.Apple, AppleAtomIds.Album),
                 _Asf(overlay.Asf, AsfDescriptorNames.Album));
             var performers = Nullables.FirstNonNull(
                 _Id3v2Joined(overlay.Id3v2, "TPE1"),
@@ -89,19 +87,19 @@ namespace Mfr.Metadata
                 _XiphJoined(overlay.Xiph, "ARTIST"),
                 _ApeJoined(overlay.Ape, "Artist"),
                 _Riff(overlay.RiffInfo, "IART"),
-                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomConstants.ArtistAtom)),
+                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomIds.Artist)),
                 _Asf(overlay.Asf, AsfDescriptorNames.Author));
             var albumArtists = Nullables.FirstNonNull(
                 _Id3v2Joined(overlay.Id3v2, "TPE2"),
                 _XiphJoined(overlay.Xiph, "ALBUMARTIST"),
                 _ApeJoined(overlay.Ape, "Album Artist"),
-                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomConstants.AlbumArtistAtom)),
+                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomIds.AlbumArtist)),
                 _Asf(overlay.Asf, AsfDescriptorNames.AlbumArtist));
             var composers = Nullables.FirstNonNull(
                 _Id3v2Joined(overlay.Id3v2, "TCOM"),
                 _XiphJoined(overlay.Xiph, "COMPOSER"),
                 _ApeJoined(overlay.Ape, "Composer"),
-                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomConstants.ComposerAtom)),
+                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomIds.Composer)),
                 _Asf(overlay.Asf, AsfDescriptorNames.Composer));
             var genre = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TCON"),
@@ -109,7 +107,7 @@ namespace Mfr.Metadata
                 _XiphFirst(overlay.Xiph, "GENRE"),
                 _ApeFirst(overlay.Ape, "Genre"),
                 _Riff(overlay.RiffInfo, "IGNR"),
-                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.GenreAtom),
+                _ReadApplePlainText(overlay.Apple, AppleAtomIds.Genre),
                 _Asf(overlay.Asf, AsfDescriptorNames.Genre));
             var comment = Nullables.FirstNonNull(
                 _Id3v2PrimaryMulti(overlay.Id3v2, "COMM"),
@@ -117,26 +115,26 @@ namespace Mfr.Metadata
                 _XiphFirst(overlay.Xiph, "DESCRIPTION") ?? _XiphFirst(overlay.Xiph, "COMMENT"),
                 _ApeFirst(overlay.Ape, "Comment"),
                 _Riff(overlay.RiffInfo, "ICMT"),
-                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.CommentAtom),
+                _ReadApplePlainText(overlay.Apple, AppleAtomIds.Comment),
                 _Asf(overlay.Asf, AsfDescriptorNames.Comment));
             var lyrics = Nullables.FirstNonNull(
                 _Id3v2PrimaryMulti(overlay.Id3v2, "USLT"),
                 _XiphFirst(overlay.Xiph, "LYRICS") ?? _XiphFirst(overlay.Xiph, "UNSYNCEDLYRICS"),
                 _ApeFirst(overlay.Ape, "Lyrics"),
-                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.LyricsAtom),
+                _ReadApplePlainText(overlay.Apple, AppleAtomIds.Lyrics),
                 _Asf(overlay.Asf, AsfDescriptorNames.Lyrics));
             var copyright = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TCOP"),
                 _XiphFirst(overlay.Xiph, "COPYRIGHT"),
                 _ApeFirst(overlay.Ape, "Copyright"),
                 _Riff(overlay.RiffInfo, "ICOP"),
-                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.CopyrightAtom),
+                _ReadApplePlainText(overlay.Apple, AppleAtomIds.Copyright),
                 _Asf(overlay.Asf, AsfDescriptorNames.Copyright));
             var grouping = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TIT1"),
                 _XiphFirst(overlay.Xiph, "GROUPING") ?? _XiphFirst(overlay.Xiph, "CONTENTGROUP"),
                 _ApeFirst(overlay.Ape, "Grouping"),
-                _ReadApplePlainText(overlay.Apple, AppleAtomConstants.GroupingAtom),
+                _ReadApplePlainText(overlay.Apple, AppleAtomIds.Grouping),
                 _Asf(overlay.Asf, AsfDescriptorNames.Grouping));
             var year = Nullables.FirstNonNull(
                 _Id3v2Year(overlay.Id3v2),
@@ -188,33 +186,6 @@ namespace Mfr.Metadata
                 TrackCount: trackCount,
                 Disc: disc,
                 DiscCount: discCount);
-        }
-
-        /// <summary>
-        /// Projects common fields from a live TagLib tag (combined or single-type).
-        /// </summary>
-        /// <param name="tag">TagLib tag whose string/list/numeric fields are read.</param>
-        /// <returns>Common fields reconstructed from the tag's strings/lists and numerics.</returns>
-        public static SemanticAudioTag FromCombinedTag(Tag tag)
-        {
-            ArgumentNullException.ThrowIfNull(tag);
-
-            return new SemanticAudioTag(
-                Title: _NullIfWhitespace(tag.Title),
-                Album: _NullIfWhitespace(tag.Album),
-                Performers: _JoinList(tag.Performers),
-                AlbumArtists: _JoinList(tag.AlbumArtists),
-                Composers: _JoinList(tag.Composers),
-                Genre: tag.Genres.Length == 0 ? null : _NullIfWhitespace(tag.Genres[0]),
-                Comment: _NullIfWhitespace(tag.Comment),
-                Lyrics: _NullIfWhitespace(tag.Lyrics),
-                Copyright: _NullIfWhitespace(tag.Copyright),
-                Grouping: _NullIfWhitespace(tag.Grouping),
-                Year: tag.Year == 0 ? null : tag.Year,
-                Track: tag.Track == 0 ? null : tag.Track,
-                TrackCount: tag.TrackCount == 0 ? null : tag.TrackCount,
-                Disc: tag.Disc == 0 ? null : tag.Disc,
-                DiscCount: tag.DiscCount == 0 ? null : tag.DiscCount);
         }
 
         /// <summary>
@@ -467,7 +438,7 @@ namespace Mfr.Metadata
             if (data is null)
                 return null;
 
-            return _NullIfWhitespace(Genres.IndexToAudio(data.Genre));
+            return _NullIfWhitespace(Id3v1Genres.IndexToAudio(data.Genre));
         }
 
         private static string? _JoinList(string[]? values)
@@ -522,7 +493,7 @@ namespace Mfr.Metadata
 
         private static uint? _ReadAppleYear(AppleTagData? apple)
         {
-            var day = _ReadApplePlainText(apple, AppleAtomConstants.DayAtom);
+            var day = _ReadApplePlainText(apple, AppleAtomIds.Day);
             return day is not null && uint.TryParse(day.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var y) && y != 0
                 ? y
                 : null;
@@ -531,21 +502,6 @@ namespace Mfr.Metadata
         private static string? _NullIfWhitespace(string? text)
         {
             return string.IsNullOrWhiteSpace(text) ? null : text.Trim();
-        }
-
-        private static class AppleAtomConstants
-        {
-            public static ReadOnlySpan<byte> TitleAtom => [0xA9, (byte)'n', (byte)'a', (byte)'m'];
-            public static ReadOnlySpan<byte> AlbumAtom => [0xA9, (byte)'a', (byte)'l', (byte)'b'];
-            public static ReadOnlySpan<byte> ArtistAtom => [0xA9, (byte)'A', (byte)'R', (byte)'T'];
-            public static ReadOnlySpan<byte> AlbumArtistAtom => [(byte)'a', (byte)'A', (byte)'R', (byte)'T'];
-            public static ReadOnlySpan<byte> ComposerAtom => [0xA9, (byte)'w', (byte)'r', (byte)'t'];
-            public static ReadOnlySpan<byte> GenreAtom => [0xA9, (byte)'g', (byte)'e', (byte)'n'];
-            public static ReadOnlySpan<byte> CommentAtom => [0xA9, (byte)'c', (byte)'m', (byte)'t'];
-            public static ReadOnlySpan<byte> LyricsAtom => [0xA9, (byte)'l', (byte)'y', (byte)'r'];
-            public static ReadOnlySpan<byte> CopyrightAtom => [(byte)'c', (byte)'p', (byte)'r', (byte)'t'];
-            public static ReadOnlySpan<byte> GroupingAtom => [0xA9, (byte)'g', (byte)'r', (byte)'p'];
-            public static ReadOnlySpan<byte> DayAtom => [0xA9, (byte)'d', (byte)'a', (byte)'y'];
         }
     }
 }

@@ -30,7 +30,8 @@ namespace Mfr.Metadata
     /// Overlay blocks hold parsed fields (not binary blobs). There is no merged <c>file.Tag</c> dual write.
     /// </para>
     /// <para>
-    /// A preview may not introduce a tag block the container cannot hold; see <see cref="AudioTagContainerPolicy"/>.
+    /// A preview may not introduce a tag block the container cannot hold; see
+    /// <see cref="Models.Tags.AudioTagContainerPolicy"/>.
     /// </para>
     /// </remarks>
     public static class AudioTagPersistence
@@ -58,45 +59,6 @@ namespace Mfr.Metadata
             var overlay = _ReadOverlay(file, file.TagTypesOnDisk);
             overlay.ContainerFormat = AudioTagContainerPolicy.DetectFrom(file);
             return overlay;
-        }
-
-        /// <summary>
-        /// Merges a semantic projection into structured per–<c>TagTypes</c> field blocks on <paramref name="overlay"/>.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Broadcast write: every present block receives the updated fields (empty→absent; empty modeled blocks prune
-        /// to <see langword="null"/>). Sibling types are never invented.
-        /// </para>
-        /// <para>
-        /// When the overlay carries no blocks and <paramref name="semantic"/> has renderable semantics, creates the
-        /// container's <see cref="AudioTagContainerPolicy.GetRecommendedBlock">recommended</see> empty block first
-        /// using <see cref="AudioTagOverlay.ContainerFormat"/> (stamped by <see cref="Read"/>). No disk I/O.
-        /// </para>
-        /// </remarks>
-        /// <param name="overlay">Overlay whose blocks are updated in place.</param>
-        /// <param name="semantic">Desired semantic fields to write into present blocks.</param>
-        public static void MergeSemanticIntoBlocks(AudioTagOverlay overlay, SemanticAudioTag semantic)
-        {
-            ArgumentNullException.ThrowIfNull(overlay);
-
-            if (!overlay.HasAnyBlock() && semantic.ContainsRenderableSemantics())
-                _EnsureRecommendedBlockForCreate(overlay);
-
-            TagBlockFieldMapper.MergeSemanticIntoBlocks(overlay, semantic);
-        }
-
-        /// <remarks>
-        /// Creates at most one recommended empty block from <see cref="AudioTagOverlay.ContainerFormat"/>.
-        /// Unknown container leaves the overlay empty so the merge is a no-op rather than inventing a wrong tag type.
-        /// </remarks>
-        private static void _EnsureRecommendedBlockForCreate(AudioTagOverlay overlay)
-        {
-            var recommended = AudioTagContainerPolicy.GetRecommendedBlock(overlay.ContainerFormat);
-            if (recommended is null)
-                return;
-
-            overlay.EnsureEmptyBlock(recommended.Value);
         }
 
         /// <summary>
@@ -159,7 +121,7 @@ namespace Mfr.Metadata
                 if (baselineOverlay.HasBlock(kind))
                     continue;
 
-                AudioTagContainerPolicy.EnsureSupported(containerFormat, kind);
+                Models.Tags.AudioTagContainerPolicy.EnsureSupported(containerFormat, kind);
             }
         }
 

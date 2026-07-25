@@ -58,10 +58,9 @@ flowchart TB
 | Concern | Project / type |
 |---|---|
 | Overlay + block records | `Mfr.Models` — `AudioTagOverlay`, `Id3v1TagData`, `Id3v2TagData`, `XiphTagData`, … |
-| TagLib I/O, merge, patch | `Mfr.Metadata` — `AudioTagPersistence`, `TagBlockFieldMapper`, `TagBlockFieldPatcher` |
-| Container capability | `Mfr.Metadata` — `AudioTagContainerPolicy` |
-| Format-specific field get/set | `Mfr.Metadata` — `AudioOverlayBlockFieldIo`, `SemanticFields` |
-| Filters / targets | `Mfr.Filters` — `AudioTagSetter`, removers, `StringTargetFilter` + targets |
+| Semantic projection / merge / field get-set | `Mfr.Models` — `SemanticAudioTag`, `AudioTagSemanticMerge`, `AudioTagOverlay.MergeSemantic`, `SemanticFields`, `AudioOverlayBlockFieldIo`, `AudioOverlayTargetIo`, capability `AudioTagContainerPolicy` |
+| TagLib I/O and patch | `Mfr.Metadata` — `AudioTagPersistence`, `TagBlockFieldMapper`, `TagBlockFieldPatcher`, `SemanticAudioTagTagLib`, detect-only `AudioTagContainerPolicy` |
+| Filters / targets | `Mfr.Filters` — `AudioTagSetter`, removers, `StringTargetFilter` + `RenameItemTargetStringExtensions` (ensure then `FileMeta` get/set) |
 | Commit | `Mfr.Engine` — `CommitExecutor` (move → strip-all flag → Apply) |
 
 TagLib opens only on first lazy `Read` (via `EnsureEmbeddedTagsLoaded`) and on commit Apply / strip.
@@ -96,7 +95,8 @@ Id3v1: single-field clear writes an empty scalar; clearing **all** fields prunes
 
 ## Container policy
 
-`AudioTagContainerPolicy` maps containers to supported blocks and a recommended create target:
+`Mfr.Models.Tags.AudioTagContainerPolicy` maps containers to supported blocks and a recommended create target
+(capability API). TagLib-backed detection lives on `Mfr.Metadata.AudioTagContainerPolicy` (`Detect` / `DetectFrom`):
 
 | Container | Supported blocks | Recommended if empty |
 |---|---|---|
@@ -112,16 +112,18 @@ Format-specific filters/targets call `EnsureAudioTagBlockSupported` → PreviewE
 
 ## Semantic projection and writes
 
-`SemanticAudioTag` is the cross-format common-field view (`Title`, `Album`, `Performers`, …).
+`SemanticAudioTag` is the cross-format common-field view (`Title`, `Album`, `Performers`, …) in `Mfr.Models`.
 
 - **Read:** `SemanticAudioTag.FromOverlay` / `overlay.Semantic()` using the priority above.
-- **Write:** `AudioTagPersistence.MergeSemanticIntoBlocks` broadcasts onto every present block (empty→absent,
+- **Write:** `AudioTagOverlay.MergeSemantic` broadcasts onto every present block (empty→absent,
   empty modeled blocks prune). If no blocks exist, creates the recommended empty block from
   `ContainerFormat` first.
 
 ## Format-specific targets
 
-String-target filters (Formatter, Replacer, …) can address one native field:
+String-target filters (Formatter, Replacer, …) can address one native field via
+`RenameItemTargetStringExtensions` (ensure) → `FileMeta.GetTargetString` / `SetTargetString` →
+`AudioOverlayTargetIo`:
 
 | `targetType` | Addresses |
 |---|---|
@@ -211,8 +213,9 @@ same preview chain.
 | Area | Paths |
 |---|---|
 | Overlay | `Mfr.Models/Tags/AudioTagOverlay.cs`, block types under `Tags/{Id3v1,Id3v2,Xiph,…}` |
-| Persistence | `Mfr.Metadata/AudioTagPersistence.cs`, `TagBlockFieldMapper.cs`, `TagBlockFieldPatcher.cs` |
-| Policy | `AudioTagContainerPolicy.cs`, `Id3v2FrameVersionPolicy.cs`, `AsfDescriptorNames.cs` |
+| Semantic / field I/O | `Mfr.Models/Tags/SemanticAudioTag.cs`, `AudioTagSemanticMerge.cs`, `SemanticFields.cs`, `AudioOverlayBlockFieldIo.cs`, `AudioOverlayTargetIo.cs` |
+| Persistence | `Mfr.Metadata/AudioTagPersistence.cs`, `TagBlockFieldMapper.cs`, `TagBlockFieldPatcher.cs`, `SemanticAudioTagTagLib.cs` |
+| Policy | `Mfr.Models/Tags/AudioTagContainerPolicy.cs` (capability), `Mfr.Metadata/AudioTagContainerPolicy.cs` (detect), `Id3v2FrameVersionPolicy.cs`, `AsfDescriptorNames.cs` |
 | Filters | `Mfr.Filters/Audio/*`, `StringTargetFilter.cs`, `Mfr.Models/Targets.cs` |
 | Engine | `Mfr.Engine/CommitExecutor.cs`, `RenamePropertyChangeBuilder.cs` |
 | Tests | `Mfr.Tests/Metadata/*`, `Mfr.Tests/Models/Filters/Audio/*`, `RenameListCommitTests` embedded-tag cases |

@@ -1,4 +1,3 @@
-using Mfr.Metadata;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v2;
 
@@ -56,7 +55,7 @@ namespace Mfr.Tests.TestSupport
             if (!merged.ContainsRenderableSemantics())
                 return overlay;
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged);
+            overlay.MergeSemantic(merged);
             return overlay;
         }
     }

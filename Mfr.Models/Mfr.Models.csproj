@@ -18,6 +18,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Mfr.Engine" />
     <InternalsVisibleTo Include="Mfr.Filters" />
+    <InternalsVisibleTo Include="Mfr.Metadata" />
     <InternalsVisibleTo Include="Mfr.Tests" />
   </ItemGroup>
 

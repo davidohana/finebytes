@@ -13,8 +13,8 @@ namespace Mfr.Models.Tags
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Semantic values (title, album, performers, …) are obtained by projecting blocks in <c>Mfr.Metadata</c> (for example
-    /// <c>SemanticAudioTag.FromOverlay</c>). There are no mirrored scalar properties on this type.
+    /// Semantic values (title, album, performers, …) are obtained by projecting blocks via
+    /// <see cref="SemanticAudioTag.FromOverlay"/>. There are no mirrored scalar properties on this type.
     /// </para>
     /// </remarks>
     public sealed class AudioTagOverlay : IEquatable<AudioTagOverlay?>
@@ -218,6 +218,35 @@ namespace Mfr.Models.Tags
         public IReadOnlyList<AudioTagBlockKind> GetPresentBlockKinds()
         {
             return [.. Enum.GetValues<AudioTagBlockKind>().Where(HasBlock)];
+        }
+
+        /// <summary>
+        /// Merges a semantic projection into structured field blocks on this overlay.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Broadcast write: every present block receives the updated fields (empty→absent; empty modeled blocks prune
+        /// to <see langword="null"/>). Sibling types are never invented.
+        /// </para>
+        /// <para>
+        /// When this overlay carries no blocks and <paramref name="semantic"/> has renderable semantics, creates the
+        /// container's <see cref="AudioTagContainerPolicy.GetRecommendedBlock">recommended</see> empty block first
+        /// using <see cref="ContainerFormat"/>. No disk I/O.
+        /// </para>
+        /// </remarks>
+        /// <param name="semantic">Desired semantic fields to write into present blocks.</param>
+        public void MergeSemantic(SemanticAudioTag semantic)
+        {
+            ArgumentNullException.ThrowIfNull(semantic);
+
+            if (!HasAnyBlock() && semantic.ContainsRenderableSemantics())
+            {
+                var recommended = AudioTagContainerPolicy.GetRecommendedBlock(ContainerFormat);
+                if (recommended is not null)
+                    EnsureEmptyBlock(recommended.Value);
+            }
+
+            AudioTagSemanticMerge.MergeIntoPresentBlocks(this, semantic);
         }
 
         /// <inheritdoc cref="Equals(AudioTagOverlay?)" />

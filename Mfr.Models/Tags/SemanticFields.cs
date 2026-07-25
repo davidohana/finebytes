@@ -1,7 +1,6 @@
 using System.Globalization;
-using Mfr.Models.Tags;
 
-namespace Mfr.Metadata
+namespace Mfr.Models.Tags
 {
     /// <summary>
     /// Reads and writes <see cref="SemanticAudioField"/> values as filter/preview strings through the block-derived
@@ -10,10 +9,10 @@ namespace Mfr.Metadata
     /// <remarks>
     /// <para>
     /// Embeds use <see cref="SemanticAudioTag.FromOverlay"/> for reads; writes merge an updated <see cref="SemanticAudioTag"/> back into
-    /// blocks via <see cref="AudioTagPersistence.MergeSemanticIntoBlocks"/> (broadcast to present blocks; recommended create when empty).
+    /// blocks via <see cref="AudioTagOverlay.MergeSemantic"/> (broadcast to present blocks; recommended create when empty).
     /// </para>
     /// <para>
-    /// Empty strings represent absent fields (same convention as <see cref="Models.AudioFieldTarget"/> previews).
+    /// Empty strings represent absent fields (same convention as <see cref="AudioFieldTarget"/> previews).
     /// </para>
     /// </remarks>
     public static class SemanticFields
@@ -100,7 +99,7 @@ namespace Mfr.Metadata
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, semantic);
+            overlay.MergeSemantic(semantic);
         }
 
         private static string _DecimalDigitsOrEmpty(uint? value)

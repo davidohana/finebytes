@@ -1,12 +1,10 @@
 using System.Collections.Immutable;
 using System.Globalization;
-using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
 using Mfr.Models.Tags.Xiph;
-using TagLib;
 
-namespace Mfr.Metadata
+namespace Mfr.Models.Tags
 {
     /// <summary>
     /// Reads and writes format-specific tag fields on <see cref="AudioTagOverlay"/> blocks (ID3v1 scalars, ID3v2 frames, Xiph keys).
@@ -45,7 +43,7 @@ namespace Mfr.Metadata
                 Id3v1Field.Track => block.Track is null ? string.Empty : block.Track.Value.ToString(CultureInfo.InvariantCulture),
                 Id3v1Field.Genre => block.Genre == 0
                     ? string.Empty
-                    : Genres.IndexToAudio(block.Genre) ?? string.Empty,
+                    : Id3v1Genres.IndexToAudio(block.Genre) ?? string.Empty,
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
         }
@@ -341,7 +339,7 @@ namespace Mfr.Metadata
             if (byte.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index))
                 return index;
 
-            return Genres.AudioToIndex(trimmed);
+            return Id3v1Genres.AudioToIndex(trimmed);
         }
 
         private static uint? _ParseNullableUInt(string trimmed, uint max, string valueParamName)

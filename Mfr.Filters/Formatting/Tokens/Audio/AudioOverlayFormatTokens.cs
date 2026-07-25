@@ -1,4 +1,3 @@
-using Mfr.Metadata;
 using Mfr.Models.Tags;
 
 namespace Mfr.Filters.Formatting.Tokens.Audio

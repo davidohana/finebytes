@@ -36,7 +36,7 @@ namespace Mfr.Tests.Metadata
             Assert.NotNull(original.Id3v2);
             var preview = original.Clone();
             var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "AfterTitleOnly" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
+            preview.MergeSemantic(merged);
 
             AudioTagPersistence.Apply(path, original, preview);
 
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Metadata
 
             var preview = original.Clone();
             var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "AsfPatchedTitle" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
+            preview.MergeSemantic(merged);
 
             AudioTagPersistence.Apply(path, original, preview);
 
@@ -127,7 +127,7 @@ namespace Mfr.Tests.Metadata
                 DiscCount = 3,
                 TrackCount = 12,
             };
-            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
+            preview.MergeSemantic(merged);
             AudioTagPersistence.Apply(path, original, preview);
 
             using var file = TagLib.File.Create(path);
@@ -325,7 +325,7 @@ namespace Mfr.Tests.Metadata
 
             var preview = original.Clone();
             var merged = SemanticAudioTag.FromOverlay(preview) with { Title = "AfterTitle" };
-            AudioTagPersistence.MergeSemanticIntoBlocks(preview, merged);
+            preview.MergeSemantic(merged);
             AudioTagPersistence.Apply(path, original, preview);
 
             using var after = TagLib.File.Create(path);

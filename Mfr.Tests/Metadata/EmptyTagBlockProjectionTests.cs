@@ -64,7 +64,7 @@ namespace Mfr.Tests.Metadata
             };
             var merged = SemanticAudioTag.FromOverlay(overlay) with { Title = "Recovered" };
 
-            AudioTagPersistence.MergeSemanticIntoBlocks(overlay, merged);
+            overlay.MergeSemantic(merged);
 
             Assert.Equal("Recovered", SemanticAudioTag.FromOverlay(overlay).Title);
             Assert.Contains(overlay.Id3v2.Frames, f => f.FrameId == "TIT2");
