@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Mfr.Models.Tags
+namespace Mfr.Models.Tags.Asf
 {
     /// <summary>
     /// Detached snapshot of an ASF/WMA extended content descriptor tag surface.

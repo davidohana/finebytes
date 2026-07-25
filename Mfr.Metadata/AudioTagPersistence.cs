@@ -1,5 +1,12 @@
 using System.Collections.Immutable;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Ape;
+using Mfr.Models.Tags.Apple;
+using Mfr.Models.Tags.Asf;
+using Mfr.Models.Tags.Id3v1;
+using Mfr.Models.Tags.Id3v2;
+using Mfr.Models.Tags.RiffInfo;
+using Mfr.Models.Tags.Xiph;
 using TagLib;
 using TagLib.Mpeg;
 using TagLib.Ogg;

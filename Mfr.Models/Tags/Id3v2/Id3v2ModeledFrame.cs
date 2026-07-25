@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Mfr.Models.Tags
+namespace Mfr.Models.Tags.Id3v2
 {
     /// <summary>
     /// One modeled ID3v2 text-bearing frame in an <see cref="Id3v2TagData"/> snapshot.

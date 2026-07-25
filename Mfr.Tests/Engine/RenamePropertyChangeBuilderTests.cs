@@ -3,6 +3,7 @@ using Mfr.Engine;
 using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Xiph;
 using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Engine

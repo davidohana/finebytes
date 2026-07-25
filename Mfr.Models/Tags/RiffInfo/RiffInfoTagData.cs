@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Mfr.Models.Tags
+namespace Mfr.Models.Tags.RiffInfo
 {
     /// <summary>
     /// Detached RIFF LIST INFO snapshot as INFO fourCC → string (no binary blob).

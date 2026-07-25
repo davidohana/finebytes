@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Mfr.Models.Tags
+namespace Mfr.Models.Tags.Xiph
 {
     /// <summary>
     /// Detached Xiph / Vorbis comment snapshot as a known-key multimap (no binary blob).

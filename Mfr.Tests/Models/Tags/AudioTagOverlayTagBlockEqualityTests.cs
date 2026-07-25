@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Xiph;
 
 namespace Mfr.Tests.Models.Tags
 {

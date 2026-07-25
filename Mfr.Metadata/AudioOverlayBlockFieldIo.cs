@@ -1,6 +1,9 @@
 using System.Collections.Immutable;
 using System.Globalization;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v1;
+using Mfr.Models.Tags.Id3v2;
+using Mfr.Models.Tags.Xiph;
 using TagLib;
 
 namespace Mfr.Metadata

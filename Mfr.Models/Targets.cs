@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v1;
 
 namespace Mfr.Models
 {

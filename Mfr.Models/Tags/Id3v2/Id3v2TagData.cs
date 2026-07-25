@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Mfr.Models.Tags
+namespace Mfr.Models.Tags.Id3v2
 {
     /// <summary>
     /// Detached ID3v2 snapshot as modeled text frames (no binary tag blob).

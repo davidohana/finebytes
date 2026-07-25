@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Mfr.Models.Tags
+namespace Mfr.Models.Tags.Apple
 {
     /// <summary>
     /// Detached snapshot of an MP4 QuickTime <c>ilst</c> / Apple tag (atom ids and text values).

@@ -1,5 +1,7 @@
 using Mfr.Metadata;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v1;
+using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.Tests.Metadata
 {

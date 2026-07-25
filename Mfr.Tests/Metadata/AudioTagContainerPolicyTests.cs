@@ -3,6 +3,7 @@ using Mfr.Filters;
 using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.Tests.Metadata
 {

@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Mfr.Models.Tags
+namespace Mfr.Models.Tags.Ape
 {
     /// <summary>
     /// Detached APEv2 snapshot as a known text-key map (no binary blob).
