@@ -240,7 +240,7 @@ namespace Mfr.Tests.Engine
             {
               "type": "Formatter",
               "target": {
-                "targetType": "AudioField",
+                "targetType": "SemanticAudioField",
                 "field": "title"
               },
               "options": {
@@ -252,7 +252,7 @@ namespace Mfr.Tests.Engine
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
             var typed = Assert.IsType<FormatterFilter>(filter);
-            var target = Assert.IsType<AudioFieldTarget>(typed.Target);
+            var target = Assert.IsType<SemanticAudioFieldTarget>(typed.Target);
             Assert.Equal(SemanticAudioField.Title, target.Field);
             typed.Setup();
         }

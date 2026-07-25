@@ -14,7 +14,7 @@ namespace Mfr.Models
     [JsonDerivedType(typeof(AncestorFolderTarget), "AncestorFolder")]
     [JsonDerivedType(typeof(FullPathTarget), "FullPath")]
     [JsonDerivedType(typeof(ParentDirectoryTarget), "ParentDirectory")]
-    [JsonDerivedType(typeof(AudioFieldTarget), "AudioField")]
+    [JsonDerivedType(typeof(SemanticAudioFieldTarget), "SemanticAudioField")]
     [JsonDerivedType(typeof(Id3v1FieldTarget), "Id3v1Field")]
     [JsonDerivedType(typeof(Id3v2FrameTarget), "Id3v2Frame")]
     [JsonDerivedType(typeof(XiphFieldTarget), "XiphField")]
@@ -71,7 +71,7 @@ namespace Mfr.Models
     /// Targets one cross-format field on the semantic projection of <see cref="FileMeta.AudioTagOverlay"/>; string filters read/write text or decimal-digit numeric strings.
     /// </summary>
     /// <param name="Field">Which <see cref="SemanticAudioField"/> is addressed.</param>
-    public sealed record AudioFieldTarget(SemanticAudioField Field) : FilterTarget, IAudioOverlayFilterTarget;
+    public sealed record SemanticAudioFieldTarget(SemanticAudioField Field) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
     /// Targets one ID3v1 scalar on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v1"/>.

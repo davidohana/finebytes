@@ -25,7 +25,7 @@ namespace Mfr.Models.Tags
 
             return target switch
             {
-                AudioFieldTarget audioFieldTarget =>
+                SemanticAudioFieldTarget audioFieldTarget =>
                     SemanticFields.GetSemanticField(overlay, audioFieldTarget.Field),
                 Id3v1FieldTarget id3v1FieldTarget =>
                     AudioOverlayBlockFieldIo.GetId3v1FieldString(overlay, id3v1FieldTarget.Field),
@@ -56,7 +56,7 @@ namespace Mfr.Models.Tags
 
             switch (target)
             {
-                case AudioFieldTarget audioFieldTarget:
+                case SemanticAudioFieldTarget audioFieldTarget:
                     SemanticFields.SetSemanticField(
                         overlay: overlay,
                         field: audioFieldTarget.Field,

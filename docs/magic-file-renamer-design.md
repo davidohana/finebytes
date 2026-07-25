@@ -492,7 +492,7 @@ Out of scope:
 ### Phase 4 — MP3/audio tag support
 
 - Adds TagLibSharp-based embedded-tag loading and writing (shipped as `AudioTagOverlay` blocks; early sketches used a flat `Id3Tags` bag).
-- Enables string filters to target generic common fields (`AudioField`) or one native block field
+- Enables string filters to target generic common fields (`SemanticAudioField`) or one native block field
   (`Id3v1Field`, `Id3v2Frame`, `XiphField`). Format-specific targets fail preview when the
   container cannot hold that block; v2.4-only frames also fail preview on an ID3v2.3 tag.
 - Extends formatter tokens with ID3/audio tokens (see §7.4–7.6).

@@ -60,7 +60,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             var item = new RenameItem(meta);
             item.MarkEmbeddedTagsLoadAttempted();
             var formatter = new FormatterFilter(
-                Target: new AudioFieldTarget(SemanticAudioField.Title),
+                Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                 Options: new FormatterOptions("Formatted"));
             var remover = new EmbeddedTagRemoverFilter();
             formatter.Setup();

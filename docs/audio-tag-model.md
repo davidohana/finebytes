@@ -127,7 +127,7 @@ String-target filters (Formatter, Replacer, …) can address one native field vi
 
 | `targetType` | Addresses |
 |---|---|
-| `AudioField` | Generic semantic field (broadcast write) |
+| `SemanticAudioField` | Generic semantic field (broadcast write) |
 | `Id3v1Field` | One Id3v1 scalar |
 | `Id3v2Frame` | One modeled frame (`frameId`, optional `language` / `description`) |
 | `XiphField` | One Xiph key |

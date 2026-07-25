@@ -107,7 +107,7 @@ namespace Mfr.Tests.Engine
             var preset = _CreatePresetAllEnabled(
                 "audio-overlay-title",
                 new FormatterFilter(
-                    Target: new AudioFieldTarget(SemanticAudioField.Title),
+                    Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("DiskTitleAfter")));
             var plan = _SetupPreview(renameList, preset);
 
@@ -312,7 +312,7 @@ namespace Mfr.Tests.Engine
                 new EmbeddedTagTypeRemoverFilter(
                     new EmbeddedTagTypeRemoverOptions([AudioTagBlockKind.Id3v1])),
                 new FormatterFilter(
-                    Target: new AudioFieldTarget(SemanticAudioField.Title),
+                    Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("OnlyOnFrames")));
             var plan = _SetupPreview(renameList, preset);
 
@@ -491,7 +491,7 @@ namespace Mfr.Tests.Engine
                 "strip-then-title",
                 new EmbeddedTagRemoverFilter(),
                 new FormatterFilter(
-                    Target: new AudioFieldTarget(SemanticAudioField.Title),
+                    Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("AfterStrip")));
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
@@ -526,7 +526,7 @@ namespace Mfr.Tests.Engine
                 "strip-then-title-mp3",
                 new EmbeddedTagRemoverFilter(),
                 new FormatterFilter(
-                    Target: new AudioFieldTarget(SemanticAudioField.Title),
+                    Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("RecommendedMp3")));
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
@@ -565,7 +565,7 @@ namespace Mfr.Tests.Engine
                 "strip-then-title-flac",
                 new EmbeddedTagRemoverFilter(),
                 new FormatterFilter(
-                    Target: new AudioFieldTarget(SemanticAudioField.Title),
+                    Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("RecommendedFlac")));
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
@@ -600,7 +600,7 @@ namespace Mfr.Tests.Engine
             var preset = _CreatePresetAllEnabled(
                 "fmt-strip",
                 new FormatterFilter(
-                    Target: new AudioFieldTarget(SemanticAudioField.Title),
+                    Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("PreviewStyled")),
                 new EmbeddedTagRemoverFilter());
             var plan = _SetupPreview(renameList, preset);
@@ -665,11 +665,11 @@ namespace Mfr.Tests.Engine
             var preset = _CreatePresetAllEnabled(
                 "triple-chain",
                 new FormatterFilter(
-                    Target: new AudioFieldTarget(SemanticAudioField.Title),
+                    Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("Intermediate")),
                 new EmbeddedTagRemoverFilter(),
                 new FormatterFilter(
-                    Target: new AudioFieldTarget(SemanticAudioField.Title),
+                    Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("Final")));
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
@@ -767,7 +767,7 @@ namespace Mfr.Tests.Engine
             var preset = _CreatePresetAllEnabled(
                 "audio-overlay-dry",
                 new FormatterFilter(
-                    Target: new AudioFieldTarget(SemanticAudioField.Title),
+                    Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("PreviewOnly")));
             _ = _PreviewAndCommit(renameList, preset, dryRun: true);
 

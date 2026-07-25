@@ -458,7 +458,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies audio overlay field filters on a folder row surface preview failure.
         /// </summary>
-        public void Preview_AudioFieldTarget_OnDirectory_HasPreviewError()
+        public void Preview_SemanticAudioFieldTarget_OnDirectory_HasPreviewError()
         {
             var folder = Path.Combine(_tempRoot, "folder");
             Directory.CreateDirectory(folder);
@@ -475,7 +475,7 @@ namespace Mfr.Tests.Engine
                 Chain = FilterChain.CreateAllEnabled(
                     [
                         new FormatterFilter(
-                            Target: new AudioFieldTarget(SemanticAudioField.Title),
+                            Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                             Options: new FormatterOptions("x")),
                     ]),
             };
