@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Ape;
+using Mfr.Utils;
 using TagLib;
 using ApeTag = TagLib.Ape.Tag;
 
@@ -95,7 +96,7 @@ namespace Mfr.Metadata.TagFields
             TagFieldDiff.Apply(
                 TagFieldDiff.IndexTextFields(original.Fields),
                 TagFieldDiff.IndexTextFields(preview.Fields),
-                valuesEqual: TagFieldText.SequenceEquals,
+                valuesEqual: OrdinalSequence.AreEqual,
                 remove: key => live.RemoveItem(key),
                 set: (key, values) => live.SetValue(key, [.. values]));
         }
@@ -120,7 +121,7 @@ namespace Mfr.Metadata.TagFields
             if (item is null || item.IsEmpty)
                 return [];
 
-            return TagFieldText.TrimNonEmpty(item.ToStringArray());
+            return DelimitedText.TrimNonEmpty(item.ToStringArray());
         }
 
         private static void _SplitCountPair(
@@ -135,13 +136,13 @@ namespace Mfr.Metadata.TagFields
             if (parts.Length != 2)
                 return;
 
-            var number = TagFieldText.NullIfEmpty(parts[0]);
+            var number = parts[0].TrimmedOrNull();
             if (number is null)
                 keyToValues.Remove(numberKey);
             else
                 keyToValues[numberKey] = [number];
 
-            var count = TagFieldText.NullIfEmpty(parts[1]);
+            var count = parts[1].TrimmedOrNull();
             if (count is not null && !keyToValues.ContainsKey(countKey))
                 keyToValues[countKey] = [count];
         }
@@ -149,7 +150,7 @@ namespace Mfr.Metadata.TagFields
         private static int _CompareRows(TextFieldRow a, TextFieldRow b)
         {
             var byKey = string.CompareOrdinal(a.Key, b.Key);
-            return byKey != 0 ? byKey : TagFieldText.CompareSequence(a.Values, b.Values);
+            return byKey != 0 ? byKey : OrdinalSequence.Compare(a.Values, b.Values);
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Mfr.Models.Tags
 
             var title = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TIT2"),
-                _ReadId3v1String(overlay.Id3v1?.Title),
+                overlay.Id3v1?.Title.TrimmedOrNull(),
                 _XiphFirst(overlay.Xiph, "TITLE"),
                 _ApeFirst(overlay.Ape, "Title"),
                 _Riff(overlay.RiffInfo, "INAM"),
@@ -75,7 +75,7 @@ namespace Mfr.Models.Tags
                 _Asf(overlay.Asf, AsfDescriptorNames.Title));
             var album = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TALB"),
-                _ReadId3v1String(overlay.Id3v1?.Album),
+                overlay.Id3v1?.Album.TrimmedOrNull(),
                 _XiphFirst(overlay.Xiph, "ALBUM"),
                 _ApeFirst(overlay.Ape, "Album"),
                 _Riff(overlay.RiffInfo, "IPRD"),
@@ -83,23 +83,23 @@ namespace Mfr.Models.Tags
                 _Asf(overlay.Asf, AsfDescriptorNames.Album));
             var performers = Nullables.FirstNonNull(
                 _Id3v2Joined(overlay.Id3v2, "TPE1"),
-                _JoinList(_SplitId3v1Performer(overlay.Id3v1?.Artist)),
+                overlay.Id3v1?.Artist.TrimmedOrNull(),
                 _XiphJoined(overlay.Xiph, "ARTIST"),
                 _ApeJoined(overlay.Ape, "Artist"),
                 _Riff(overlay.RiffInfo, "IART"),
-                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomIds.Artist)),
+                DelimitedText.JoinOrNull(_ReadAppleAtomValues(overlay.Apple, AppleAtomIds.Artist)),
                 _Asf(overlay.Asf, AsfDescriptorNames.Author));
             var albumArtists = Nullables.FirstNonNull(
                 _Id3v2Joined(overlay.Id3v2, "TPE2"),
                 _XiphJoined(overlay.Xiph, "ALBUMARTIST"),
                 _ApeJoined(overlay.Ape, "Album Artist"),
-                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomIds.AlbumArtist)),
+                DelimitedText.JoinOrNull(_ReadAppleAtomValues(overlay.Apple, AppleAtomIds.AlbumArtist)),
                 _Asf(overlay.Asf, AsfDescriptorNames.AlbumArtist));
             var composers = Nullables.FirstNonNull(
                 _Id3v2Joined(overlay.Id3v2, "TCOM"),
                 _XiphJoined(overlay.Xiph, "COMPOSER"),
                 _ApeJoined(overlay.Ape, "Composer"),
-                _JoinList(_ReadAppleJoinedList(overlay.Apple, AppleAtomIds.Composer)),
+                DelimitedText.JoinOrNull(_ReadAppleAtomValues(overlay.Apple, AppleAtomIds.Composer)),
                 _Asf(overlay.Asf, AsfDescriptorNames.Composer));
             var genre = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TCON"),
@@ -111,7 +111,7 @@ namespace Mfr.Models.Tags
                 _Asf(overlay.Asf, AsfDescriptorNames.Genre));
             var comment = Nullables.FirstNonNull(
                 _Id3v2PrimaryMulti(overlay.Id3v2, "COMM"),
-                _ReadId3v1String(overlay.Id3v1?.Comment),
+                overlay.Id3v1?.Comment.TrimmedOrNull(),
                 _XiphFirst(overlay.Xiph, "DESCRIPTION") ?? _XiphFirst(overlay.Xiph, "COMMENT"),
                 _ApeFirst(overlay.Ape, "Comment"),
                 _Riff(overlay.RiffInfo, "ICMT"),
@@ -221,7 +221,7 @@ namespace Mfr.Models.Tags
                 if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
                     continue;
 
-                return frame.TextValues.Length == 0 ? null : _NullIfWhitespace(frame.TextValues[0]);
+                return frame.TextValues.Length == 0 ? null : frame.TextValues[0].TrimmedOrNull();
             }
 
             return null;
@@ -237,7 +237,7 @@ namespace Mfr.Models.Tags
                 if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
                     continue;
 
-                return _JoinList([.. frame.TextValues]);
+                return DelimitedText.JoinOrNull(frame.TextValues);
             }
 
             return null;
@@ -276,7 +276,7 @@ namespace Mfr.Models.Tags
             if (primary is null || primary.TextValues.Length == 0)
                 return null;
 
-            return _NullIfWhitespace(primary.TextValues[0]);
+            return primary.TextValues[0].TrimmedOrNull();
         }
 
         private static uint? _Id3v2Year(Id3v2TagData? data)
@@ -351,7 +351,7 @@ namespace Mfr.Models.Tags
                 if (!string.Equals(row.Key, key, StringComparison.Ordinal))
                     continue;
 
-                return row.Values.Length == 0 ? null : _NullIfWhitespace(row.Values[0]);
+                return row.Values.Length == 0 ? null : row.Values[0].TrimmedOrNull();
             }
 
             return null;
@@ -367,7 +367,7 @@ namespace Mfr.Models.Tags
                 if (!string.Equals(row.Key, key, StringComparison.Ordinal))
                     continue;
 
-                return _JoinList([.. row.Values]);
+                return DelimitedText.JoinOrNull(row.Values);
             }
 
             return null;
@@ -381,7 +381,7 @@ namespace Mfr.Models.Tags
             foreach (var row in data.Fields)
             {
                 if (string.Equals(row.Key, key, StringComparison.Ordinal))
-                    return _NullIfWhitespace(row.Value);
+                    return row.Value.TrimmedOrNull();
             }
 
             return null;
@@ -395,7 +395,7 @@ namespace Mfr.Models.Tags
             foreach (var row in data.Descriptors)
             {
                 if (string.Equals(row.Name, name, StringComparison.Ordinal))
-                    return _NullIfWhitespace(row.Value);
+                    return row.Value.TrimmedOrNull();
             }
 
             return null;
@@ -422,59 +422,18 @@ namespace Mfr.Models.Tags
             return (disc, discCount);
         }
 
-        private static string? _ReadId3v1String(string? text)
-        {
-            return _NullIfWhitespace(text);
-        }
-
-        private static string[]? _SplitId3v1Performer(string? artist)
-        {
-            var trimmed = _NullIfWhitespace(artist);
-            return trimmed is null ? null : [trimmed];
-        }
-
         private static string? _ReadId3v1Genre(Id3v1TagData? data)
         {
             if (data is null)
                 return null;
 
-            return _NullIfWhitespace(Id3v1Genres.IndexToAudio(data.Genre));
-        }
-
-        private static string? _JoinList(string[]? values)
-        {
-            if (values is null || values.Length == 0)
-                return null;
-
-            var filtered = values
-                .Where(static v => !string.IsNullOrWhiteSpace(v))
-                .Select(static v => v.Trim())
-                .ToArray();
-
-            return filtered.Length == 0 ? null : string.Join("; ", filtered);
+            return Id3v1Genres.IndexToAudio(data.Genre).TrimmedOrNull();
         }
 
         private static string? _ReadApplePlainText(AppleTagData? apple, ReadOnlySpan<byte> atomType)
         {
             var values = _ReadAppleAtomValues(apple, atomType);
-            return values.IsDefaultOrEmpty ? null : _NullIfWhitespace(values[0]);
-        }
-
-        private static string[]? _ReadAppleJoinedList(AppleTagData? apple, ReadOnlySpan<byte> atomType)
-        {
-            var values = _ReadAppleAtomValues(apple, atomType);
-            if (values.IsDefaultOrEmpty)
-                return null;
-
-            var filtered = new List<string>();
-            foreach (var v in values)
-            {
-                var t = _NullIfWhitespace(v);
-                if (t is not null)
-                    filtered.Add(t);
-            }
-
-            return filtered.Count == 0 ? null : [.. filtered];
+            return values.IsDefaultOrEmpty ? null : values[0].TrimmedOrNull();
         }
 
         private static ImmutableArray<string> _ReadAppleAtomValues(AppleTagData? apple, ReadOnlySpan<byte> atomType)
@@ -497,11 +456,6 @@ namespace Mfr.Models.Tags
             return day is not null && uint.TryParse(day.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var y) && y != 0
                 ? y
                 : null;
-        }
-
-        private static string? _NullIfWhitespace(string? text)
-        {
-            return string.IsNullOrWhiteSpace(text) ? null : text.Trim();
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Globalization;
+using Mfr.Utils;
 
 namespace Mfr.Models.Tags
 {
@@ -81,16 +82,16 @@ namespace Mfr.Models.Tags
 
             semantic = field switch
             {
-                SemanticAudioField.Title => semantic with { Title = _NullIfEmptyString(trimmed) },
-                SemanticAudioField.Album => semantic with { Album = _NullIfEmptyString(trimmed) },
-                SemanticAudioField.Performers => semantic with { Performers = _NullIfEmptyString(trimmed) },
-                SemanticAudioField.AlbumArtists => semantic with { AlbumArtists = _NullIfEmptyString(trimmed) },
-                SemanticAudioField.Composers => semantic with { Composers = _NullIfEmptyString(trimmed) },
-                SemanticAudioField.Genre => semantic with { Genre = _NullIfEmptyString(trimmed) },
-                SemanticAudioField.Comment => semantic with { Comment = _NullIfEmptyString(trimmed) },
-                SemanticAudioField.Lyrics => semantic with { Lyrics = _NullIfEmptyString(trimmed) },
-                SemanticAudioField.Copyright => semantic with { Copyright = _NullIfEmptyString(trimmed) },
-                SemanticAudioField.Grouping => semantic with { Grouping = _NullIfEmptyString(trimmed) },
+                SemanticAudioField.Title => semantic with { Title = trimmed.TrimmedOrNull() },
+                SemanticAudioField.Album => semantic with { Album = trimmed.TrimmedOrNull() },
+                SemanticAudioField.Performers => semantic with { Performers = trimmed.TrimmedOrNull() },
+                SemanticAudioField.AlbumArtists => semantic with { AlbumArtists = trimmed.TrimmedOrNull() },
+                SemanticAudioField.Composers => semantic with { Composers = trimmed.TrimmedOrNull() },
+                SemanticAudioField.Genre => semantic with { Genre = trimmed.TrimmedOrNull() },
+                SemanticAudioField.Comment => semantic with { Comment = trimmed.TrimmedOrNull() },
+                SemanticAudioField.Lyrics => semantic with { Lyrics = trimmed.TrimmedOrNull() },
+                SemanticAudioField.Copyright => semantic with { Copyright = trimmed.TrimmedOrNull() },
+                SemanticAudioField.Grouping => semantic with { Grouping = trimmed.TrimmedOrNull() },
                 SemanticAudioField.Year => semantic with { Year = _ParseNullableUInt(trimmed, nameof(fieldString)) },
                 SemanticAudioField.Track => semantic with { Track = _ParseNullableUInt(trimmed, nameof(fieldString)) },
                 SemanticAudioField.TrackCount => semantic with { TrackCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
@@ -105,11 +106,6 @@ namespace Mfr.Models.Tags
         private static string _DecimalDigitsOrEmpty(uint? value)
         {
             return value is null ? string.Empty : value.Value.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static string? _NullIfEmptyString(string trimmed)
-        {
-            return trimmed.Length == 0 ? null : trimmed;
         }
 
         private static uint? _ParseNullableUInt(string trimmed, string valueParamName)

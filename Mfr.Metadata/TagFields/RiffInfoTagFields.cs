@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Mfr.Models.Tags.RiffInfo;
+using Mfr.Utils;
 using TagLib;
 using TagLib.Riff;
 
@@ -36,7 +37,7 @@ namespace Mfr.Metadata.TagFields
             var rows = new List<RiffInfoFieldRow>();
             foreach (var key in _KnownKeys)
             {
-                var value = TagFieldText.JoinList(live.GetValuesAsStrings(key));
+                var value = DelimitedText.JoinOrNull(live.GetValuesAsStrings(key));
                 if (value is null)
                     continue;
 
@@ -83,7 +84,7 @@ namespace Mfr.Metadata.TagFields
 
             foreach (var row in data.Fields)
             {
-                var value = TagFieldText.NullIfEmpty(row.Value);
+                var value = row.Value.TrimmedOrNull();
                 if (value is null)
                     continue;
 

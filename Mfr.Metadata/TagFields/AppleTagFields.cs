@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Mfr.Models.Tags.Apple;
+using Mfr.Utils;
 using TagLib;
 using AppleTag = TagLib.Mpeg4.AppleTag;
 
@@ -109,7 +110,7 @@ namespace Mfr.Metadata.TagFields
         private static int _CompareRows(AppleAtomRow a, AppleAtomRow b)
         {
             var byType = a.AtomType.AsSpan().SequenceCompareTo(b.AtomType.AsSpan());
-            return byType != 0 ? byType : TagFieldText.CompareSequence(a.Values, b.Values);
+            return byType != 0 ? byType : OrdinalSequence.Compare(a.Values, b.Values);
         }
     }
 }

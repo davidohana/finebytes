@@ -262,7 +262,7 @@ namespace Mfr.Tests.Models.Filters
 
             AudioOverlayBlockFieldIo.SetId3v2FrameString(overlay, "TDRC", string.Empty);
 
-            Assert.DoesNotContain(overlay.Id3v2!.Frames, f => f.FrameId == "TDRC");
+            Assert.DoesNotContain(overlay.Id3v2.Frames, f => f.FrameId == "TDRC");
             Assert.Equal("Keep", AudioOverlayBlockFieldIo.GetId3v2FrameString(overlay, "TIT2"));
         }
     }

@@ -3,6 +3,7 @@ using System.Globalization;
 using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
 using Mfr.Models.Tags.Xiph;
+using Mfr.Utils;
 
 namespace Mfr.Models.Tags
 {
@@ -17,8 +18,6 @@ namespace Mfr.Models.Tags
     /// </remarks>
     public static class AudioOverlayBlockFieldIo
     {
-        private static readonly string[] _ListSeparators = [";"];
-
         /// <summary>
         /// Returns the filter/preview string for an ID3v1 scalar.
         /// </summary>
@@ -65,10 +64,10 @@ namespace Mfr.Models.Tags
 
             var updated = field switch
             {
-                Id3v1Field.Title => existing with { Title = _NullIfEmpty(trimmed) },
-                Id3v1Field.Artist => existing with { Artist = _NullIfEmpty(trimmed) },
-                Id3v1Field.Album => existing with { Album = _NullIfEmpty(trimmed) },
-                Id3v1Field.Comment => existing with { Comment = _NullIfEmpty(trimmed) },
+                Id3v1Field.Title => existing with { Title = trimmed.TrimmedOrNull() },
+                Id3v1Field.Artist => existing with { Artist = trimmed.TrimmedOrNull() },
+                Id3v1Field.Album => existing with { Album = trimmed.TrimmedOrNull() },
+                Id3v1Field.Comment => existing with { Comment = trimmed.TrimmedOrNull() },
                 Id3v1Field.Year => existing with { Year = _ParseNullableUInt(trimmed, max: 9999, nameof(fieldString)) },
                 Id3v1Field.Track => existing with { Track = _ParseNullableByte(trimmed, nameof(fieldString)) },
                 Id3v1Field.Genre => existing with { Genre = _ParseGenreByte(trimmed) },
@@ -101,10 +100,7 @@ namespace Mfr.Models.Tags
 
             var normalizedId = frameId.Trim().ToUpperInvariant();
             var frame = _FindFrame(block.Frames, normalizedId, language, description);
-            if (frame is null || frame.TextValues.Length == 0)
-                return string.Empty;
-
-            return string.Join("; ", frame.TextValues);
+            return frame is null ? string.Empty : DelimitedText.Join(frame.TextValues);
         }
 
         /// <summary>
@@ -141,7 +137,7 @@ namespace Mfr.Models.Tags
             {
                 Id3v2FrameVersionPolicy.EnsureCompatible(existing.Version, normalizedId);
 
-                var values = _SplitJoinedList(trimmed);
+                var values = DelimitedText.Split(trimmed);
                 if (values.Length > 0)
                 {
                     frames.Add(new Id3v2ModeledFrame
@@ -181,7 +177,7 @@ namespace Mfr.Models.Tags
                 if (!string.Equals(row.Key, normalizedKey, StringComparison.Ordinal))
                     continue;
 
-                return row.Values.Length == 0 ? string.Empty : string.Join("; ", row.Values);
+                return DelimitedText.Join(row.Values);
             }
 
             return string.Empty;
@@ -208,7 +204,7 @@ namespace Mfr.Models.Tags
 
             if (trimmed.Length > 0)
             {
-                var values = _SplitJoinedList(trimmed);
+                var values = DelimitedText.Split(trimmed);
                 if (values.Length > 0)
                     rows.Add(new TextFieldRow(normalizedKey, values));
             }
@@ -379,23 +375,9 @@ namespace Mfr.Models.Tags
             return parsed == 0 ? null : parsed;
         }
 
-        private static ImmutableArray<string> _SplitJoinedList(string text)
-        {
-            var parts = text.Split(_ListSeparators, StringSplitOptions.None)
-                .Select(static s => s.Trim())
-                .Where(static s => s.Length > 0)
-                .ToArray();
-            return [.. parts];
-        }
-
         private static string _DecimalDigitsOrEmpty(uint? value)
         {
             return value is null ? string.Empty : value.Value.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static string? _NullIfEmpty(string trimmed)
-        {
-            return trimmed.Length == 0 ? null : trimmed;
         }
     }
 }

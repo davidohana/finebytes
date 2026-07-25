@@ -1,5 +1,6 @@
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Xiph;
+using Mfr.Utils;
 using TagLib;
 using TagLib.Ogg;
 
@@ -37,7 +38,7 @@ namespace Mfr.Metadata.TagFields
             var rows = new List<TextFieldRow>();
             foreach (var key in _KnownKeys)
             {
-                var values = TagFieldText.TrimNonEmpty(live.GetField(key));
+                var values = DelimitedText.TrimNonEmpty(live.GetField(key));
                 if (values.Length == 0)
                     continue;
 
@@ -72,7 +73,7 @@ namespace Mfr.Metadata.TagFields
             TagFieldDiff.Apply(
                 TagFieldDiff.IndexTextFields(original.Fields),
                 TagFieldDiff.IndexTextFields(preview.Fields),
-                valuesEqual: TagFieldText.SequenceEquals,
+                valuesEqual: OrdinalSequence.AreEqual,
                 remove: key => live.RemoveField(key),
                 set: (key, values) => live.SetField(key, [.. values]));
         }
@@ -94,7 +95,7 @@ namespace Mfr.Metadata.TagFields
         private static int _CompareRows(TextFieldRow a, TextFieldRow b)
         {
             var byKey = string.CompareOrdinal(a.Key, b.Key);
-            return byKey != 0 ? byKey : TagFieldText.CompareSequence(a.Values, b.Values);
+            return byKey != 0 ? byKey : OrdinalSequence.Compare(a.Values, b.Values);
         }
     }
 }

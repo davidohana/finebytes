@@ -8,6 +8,7 @@ using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
 using Mfr.Models.Tags.RiffInfo;
 using Mfr.Models.Tags.Xiph;
+using Mfr.Utils;
 
 namespace Mfr.Engine
 {
@@ -258,8 +259,8 @@ namespace Mfr.Engine
 
                 changes.Add(new RenamePropertyChange(
                     Property: blockProperty + "." + key,
-                    OldValue: oldFrame is null ? "absent" : string.Join("; ", oldFrame.TextValues),
-                    NewValue: newFrame is null ? "absent" : string.Join("; ", newFrame.TextValues)));
+                    OldValue: oldFrame is null ? "absent" : DelimitedText.Join(oldFrame.TextValues),
+                    NewValue: newFrame is null ? "absent" : DelimitedText.Join(newFrame.TextValues)));
             }
         }
 
@@ -307,8 +308,8 @@ namespace Mfr.Engine
             {
                 originalMap.TryGetValue(key, out var oldValues);
                 previewMap.TryGetValue(key, out var newValues);
-                var oldText = oldValues.IsDefaultOrEmpty ? null : string.Join("; ", oldValues);
-                var newText = newValues.IsDefaultOrEmpty ? null : string.Join("; ", newValues);
+                var oldText = DelimitedText.JoinOrNull(oldValues);
+                var newText = DelimitedText.JoinOrNull(newValues);
                 if (string.Equals(oldText, newText, StringComparison.Ordinal))
                     continue;
 
@@ -350,11 +351,11 @@ namespace Mfr.Engine
         {
             var originalMap = original.Atoms.ToDictionary(
                 a => Convert.ToHexString(a.AtomType.AsSpan()),
-                a => string.Join("; ", a.Values),
+                a => DelimitedText.Join(a.Values),
                 StringComparer.Ordinal);
             var previewMap = preview.Atoms.ToDictionary(
                 a => Convert.ToHexString(a.AtomType.AsSpan()),
-                a => string.Join("; ", a.Values),
+                a => DelimitedText.Join(a.Values),
                 StringComparer.Ordinal);
 
             foreach (var key in originalMap.Keys.Union(previewMap.Keys).Order(StringComparer.Ordinal))

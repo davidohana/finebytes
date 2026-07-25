@@ -1,4 +1,5 @@
 using Mfr.Models.Tags.Id3v1;
+using Mfr.Utils;
 using TagLib;
 using Id3v1Tag = TagLib.Id3v1.Tag;
 
@@ -32,11 +33,11 @@ namespace Mfr.Metadata.TagFields
 
             return new Id3v1TagData
             {
-                Title = TagFieldText.NullIfEmpty(live.Title),
-                Artist = TagFieldText.NullIfEmpty(live.FirstPerformer),
-                Album = TagFieldText.NullIfEmpty(live.Album),
+                Title = live.Title.TrimmedOrNull(),
+                Artist = live.FirstPerformer.TrimmedOrNull(),
+                Album = live.Album.TrimmedOrNull(),
                 Year = live.Year == 0 ? null : live.Year,
-                Comment = TagFieldText.NullIfEmpty(live.Comment),
+                Comment = live.Comment.TrimmedOrNull(),
                 Track = live.Track == 0 ? null : (byte)Math.Min(live.Track, 255u),
                 Genre = genreByte,
             };

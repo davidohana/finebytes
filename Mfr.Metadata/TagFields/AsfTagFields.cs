@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Mfr.Models.Tags.Asf;
+using Mfr.Utils;
 using TagLib;
 using TagLib.Asf;
 using AsfTag = TagLib.Asf.Tag;
@@ -30,7 +31,7 @@ namespace Mfr.Metadata.TagFields
 
             var rows = new List<AsfDescriptorRow>();
             _AddIfPresent(rows, AsfDescriptorNames.Title, live.Title);
-            _AddIfPresent(rows, AsfDescriptorNames.Author, TagFieldText.JoinList(live.Performers));
+            _AddIfPresent(rows, AsfDescriptorNames.Author, DelimitedText.JoinOrNull(live.Performers));
             _AddIfPresent(rows, AsfDescriptorNames.Copyright, live.Copyright);
 
             foreach (var descriptor in live)
@@ -89,14 +90,14 @@ namespace Mfr.Metadata.TagFields
         /// </remarks>
         private static void _SetNamedValue(AsfTag live, string name, string? value)
         {
-            var text = TagFieldText.NullIfEmpty(value);
+            var text = value.TrimmedOrNull();
             switch (name)
             {
                 case AsfDescriptorNames.Title:
                     live.Title = text;
                     return;
                 case AsfDescriptorNames.Author:
-                    live.Performers = text is null ? [] : TagFieldText.SplitJoinedList(text);
+                    live.Performers = text is null ? [] : [.. DelimitedText.Split(text)];
                     return;
                 case AsfDescriptorNames.Copyright:
                     live.Copyright = text;
@@ -112,7 +113,7 @@ namespace Mfr.Metadata.TagFields
 
         private static void _AddIfPresent(List<AsfDescriptorRow> rows, string name, string? value)
         {
-            var text = TagFieldText.NullIfEmpty(value);
+            var text = value.TrimmedOrNull();
             if (text is null)
                 return;
 

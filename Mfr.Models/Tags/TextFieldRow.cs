@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Mfr.Utils;
 
 namespace Mfr.Models.Tags
 {
@@ -19,7 +20,7 @@ namespace Mfr.Models.Tags
             if (!string.Equals(Key, other.Key, StringComparison.Ordinal))
                 return false;
 
-            return Values.AsSpan().SequenceEqual(other.Values.AsSpan(), StringComparer.Ordinal);
+            return OrdinalSequence.AreEqual(Values, other.Values);
         }
 
         /// <inheritdoc />

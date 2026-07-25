@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Mfr.Utils;
 
 namespace Mfr.Models.Tags.Apple
 {
@@ -75,19 +76,10 @@ namespace Mfr.Models.Tags.Apple
         /// <inheritdoc />
         public bool Equals(AppleAtomRow other)
         {
-            if (AtomType.Length != other.AtomType.Length || Values.Length != other.Values.Length)
-                return false;
-
             if (!AtomType.AsSpan().SequenceEqual(other.AtomType.AsSpan()))
                 return false;
 
-            for (var i = 0; i < Values.Length; i++)
-            {
-                if (!string.Equals(Values[i], other.Values[i], StringComparison.Ordinal))
-                    return false;
-            }
-
-            return true;
+            return OrdinalSequence.AreEqual(Values, other.Values);
         }
 
         /// <inheritdoc />

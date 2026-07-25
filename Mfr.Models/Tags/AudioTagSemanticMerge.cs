@@ -7,6 +7,7 @@ using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
 using Mfr.Models.Tags.RiffInfo;
 using Mfr.Models.Tags.Xiph;
+using Mfr.Utils;
 
 namespace Mfr.Models.Tags
 {
@@ -15,8 +16,6 @@ namespace Mfr.Models.Tags
     /// </summary>
     public static class AudioTagSemanticMerge
     {
-        private static readonly string[] _ListSeparators = [";"];
-
         /// <summary>
         /// Applies <paramref name="semantic"/> onto every present block; empty→absent; prunes empty modeled blocks.
         /// </summary>
@@ -57,7 +56,7 @@ namespace Mfr.Models.Tags
 
         private static Id3v1TagData? _MergeId3v1(Id3v1TagData existing, SemanticAudioTag common)
         {
-            var parts = _SplitJoinedList(common.Performers);
+            var parts = DelimitedText.Split(common.Performers);
             var artist = parts.Length > 0 ? parts[0] : null;
             var genreByte = string.IsNullOrWhiteSpace(common.Genre)
                 ? (byte)0
@@ -66,11 +65,11 @@ namespace Mfr.Models.Tags
 
             var merged = new Id3v1TagData
             {
-                Title = _NullIfEmpty(common.Title),
-                Artist = _NullIfEmpty(artist),
-                Album = _NullIfEmpty(common.Album),
+                Title = common.Title.TrimmedOrNull(),
+                Artist = artist.TrimmedOrNull(),
+                Album = common.Album.TrimmedOrNull(),
                 Year = common.Year,
-                Comment = _NullIfEmpty(common.Comment),
+                Comment = common.Comment.TrimmedOrNull(),
                 Track = track,
                 Genre = genreByte,
             };
@@ -226,7 +225,7 @@ namespace Mfr.Models.Tags
                 if (byType != 0)
                     return byType;
 
-                return _CompareStringSeq(a.Values, b.Values);
+                return OrdinalSequence.Compare(a.Values, b.Values);
             });
 
             return new AppleTagData { Atoms = [.. atoms] };
@@ -235,7 +234,7 @@ namespace Mfr.Models.Tags
         private static void _SetSingleton(List<Id3v2ModeledFrame> frames, string frameId, string? value)
         {
             frames.RemoveAll(f => string.Equals(f.FrameId, frameId, StringComparison.Ordinal));
-            var text = _NullIfEmpty(value);
+            var text = value.TrimmedOrNull();
             if (text is null)
                 return;
 
@@ -245,7 +244,7 @@ namespace Mfr.Models.Tags
         private static void _SetList(List<Id3v2ModeledFrame> frames, string frameId, string? joined)
         {
             frames.RemoveAll(f => string.Equals(f.FrameId, frameId, StringComparison.Ordinal));
-            var values = _TrimNonEmpty(_SplitJoinedList(joined));
+            var values = DelimitedText.Split(joined);
             if (values.Length == 0)
                 return;
 
@@ -258,7 +257,7 @@ namespace Mfr.Models.Tags
                 string.Equals(f.FrameId, frameId, StringComparison.Ordinal)
                 && string.IsNullOrEmpty(f.Description));
 
-            var text = _NullIfEmpty(value);
+            var text = value.TrimmedOrNull();
             if (text is null)
             {
                 if (primaryIndex >= 0)
@@ -329,7 +328,7 @@ namespace Mfr.Models.Tags
 
         private static void _AddRiff(List<RiffInfoFieldRow> rows, string key, string? value)
         {
-            var text = _NullIfEmpty(value);
+            var text = value.TrimmedOrNull();
             if (text is null)
                 return;
 
@@ -339,7 +338,7 @@ namespace Mfr.Models.Tags
         private static void _SetAsf(List<AsfDescriptorRow> rows, string name, string? value)
         {
             rows.RemoveAll(r => string.Equals(r.Name, name, StringComparison.Ordinal));
-            var text = _NullIfEmpty(value);
+            var text = value.TrimmedOrNull();
             if (text is null)
                 return;
 
@@ -383,7 +382,7 @@ namespace Mfr.Models.Tags
         {
             var typeBytes = atomType.ToArray();
             atoms.RemoveAll(a => a.AtomType.AsSpan().SequenceEqual(typeBytes));
-            var text = _NullIfEmpty(value);
+            var text = value.TrimmedOrNull();
             if (text is null)
                 return;
 
@@ -398,7 +397,7 @@ namespace Mfr.Models.Tags
         {
             var typeBytes = atomType.ToArray();
             atoms.RemoveAll(a => a.AtomType.AsSpan().SequenceEqual(typeBytes));
-            var values = _TrimNonEmpty(_SplitJoinedList(joined));
+            var values = DelimitedText.Split(joined);
             if (values.Length == 0)
                 return;
 
@@ -420,7 +419,7 @@ namespace Mfr.Models.Tags
 
         private static void _SetMapScalar(Dictionary<string, ImmutableArray<string>> map, string key, string? value)
         {
-            var text = _NullIfEmpty(value);
+            var text = value.TrimmedOrNull();
             if (text is null)
             {
                 map.Remove(key);
@@ -432,7 +431,7 @@ namespace Mfr.Models.Tags
 
         private static void _SetMapList(Dictionary<string, ImmutableArray<string>> map, string key, string? joined)
         {
-            var values = _TrimNonEmpty(_SplitJoinedList(joined));
+            var values = DelimitedText.Split(joined);
             if (values.Length == 0)
             {
                 map.Remove(key);
@@ -457,7 +456,7 @@ namespace Mfr.Models.Tags
             if (byKey != 0)
                 return byKey;
 
-            return _CompareStringSeq(a.Values, b.Values);
+            return OrdinalSequence.Compare(a.Values, b.Values);
         }
 
         private static int _CompareId3v2Frames(Id3v2ModeledFrame a, Id3v2ModeledFrame b)
@@ -474,20 +473,7 @@ namespace Mfr.Models.Tags
             if (byDesc != 0)
                 return byDesc;
 
-            return _CompareStringSeq(a.TextValues, b.TextValues);
-        }
-
-        private static int _CompareStringSeq(ImmutableArray<string> a, ImmutableArray<string> b)
-        {
-            var len = Math.Min(a.Length, b.Length);
-            for (var i = 0; i < len; i++)
-            {
-                var c = string.CompareOrdinal(a[i], b[i]);
-                if (c != 0)
-                    return c;
-            }
-
-            return a.Length.CompareTo(b.Length);
+            return OrdinalSequence.Compare(a.TextValues, b.TextValues);
         }
 
         private static bool _IsId3v1Empty(Id3v1TagData data)
@@ -499,31 +485,6 @@ namespace Mfr.Models.Tags
                 && string.IsNullOrWhiteSpace(data.Comment)
                 && data.Track is null
                 && data.Genre == 0;
-        }
-
-        private static ImmutableArray<string> _TrimNonEmpty(IEnumerable<string>? values)
-        {
-            if (values is null)
-                return [];
-
-            return [.. values
-                .Where(static v => !string.IsNullOrWhiteSpace(v))
-                .Select(static v => v.Trim())];
-        }
-
-        private static string[] _SplitJoinedList(string? joined)
-        {
-            if (string.IsNullOrWhiteSpace(joined))
-                return [];
-
-            return [.. joined.Split(_ListSeparators, StringSplitOptions.TrimEntries)
-                .Where(static part => !string.IsNullOrEmpty(part))
-                .Select(static part => part.Trim())];
-        }
-
-        private static string? _NullIfEmpty(string? text)
-        {
-            return string.IsNullOrWhiteSpace(text) ? null : text.Trim();
         }
     }
 }

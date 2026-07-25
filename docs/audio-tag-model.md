@@ -59,7 +59,8 @@ flowchart TB
 |---|---|
 | Overlay + block records | `Mfr.Models` — `AudioTagOverlay`, `Id3v1TagData`, `Id3v2TagData`, `XiphTagData`, … |
 | Semantic projection / merge / field get-set | `Mfr.Models` — `SemanticAudioTag`, `AudioTagSemanticMerge`, `AudioTagOverlay.MergeSemantic`, `SemanticFields`, `AudioOverlayBlockFieldIo`, `AudioOverlayTargetIo`, capability `AudioTagContainerPolicy` |
-| TagLib I/O and patch | `Mfr.Metadata` — `AudioTagPersistence` (orchestration), `Mfr.Metadata.TagFields` (`*TagFields` per block, plus `TagFieldDiff` / `TagFieldText`), `AudioTagContainerDetector` |
+| TagLib I/O and patch | `Mfr.Metadata` — `AudioTagPersistence` (orchestration), `Mfr.Metadata.TagFields` (`*TagFields` per block, plus `TagFieldDiff`), `AudioTagContainerDetector` |
+| Shared text rules | `Mfr.Utils` — `DelimitedText` (`;`-list split/join, trim), `OrdinalSequence` (value-array compare/equality), `StringExtensions.TrimmedOrNull` |
 | Filters / targets | `Mfr.Filters` — `AudioTagSetter`, removers, `StringTargetFilter` + `EnsureTargetReady` then `FileMeta` get/set |
 | Commit | `Mfr.Engine` — `CommitExecutor` (move → strip-all flag → Apply) |
 
@@ -68,8 +69,11 @@ Filters do not reopen the file mid-chain.
 
 Each block type owns one `*TagFields` class under `Mfr.Metadata/TagFields/` exposing `Read(file)` and
 `Apply(file, original, preview)`, so its modeled keys, read rules, and patch rules sit together.
-`AudioTagPersistence` only decides which blocks to visit; `TagFieldDiff` holds the shared key-diff loop and
-`TagFieldText` the shared trim/join/compare rules.
+`AudioTagPersistence` only decides which blocks to visit; `TagFieldDiff` holds the shared key-diff loop.
+
+Text normalization is shared with `Mfr.Models` through `Mfr.Utils`: `TrimmedOrNull()` for blank→absent,
+`DelimitedText` for the `;`-delimited multi-value convention (`Split` / `Join` / `JoinOrNull`), and
+`OrdinalSequence` for value-array ordering and equality.
 
 ## Overlay model
 
@@ -240,7 +244,8 @@ same preview chain.
 |---|---|
 | Overlay | `Mfr.Models/Tags/AudioTagOverlay.cs`, block types under `Tags/{Id3v1,Id3v2,Xiph,…}` |
 | Semantic / field I/O | `Mfr.Models/Tags/SemanticAudioTag.cs`, `AudioTagSemanticMerge.cs`, `SemanticFields.cs`, `AudioOverlayBlockFieldIo.cs`, `AudioOverlayTargetIo.cs` |
-| Persistence | `Mfr.Metadata/AudioTagPersistence.cs`, `Mfr.Metadata/TagFields/` (`*TagFields`, `TagFieldDiff`, `TagFieldText`) |
+| Persistence | `Mfr.Metadata/AudioTagPersistence.cs`, `Mfr.Metadata/TagFields/` (`*TagFields`, `TagFieldDiff`) |
+| Shared text rules | `Mfr.Utils/DelimitedText.cs`, `Mfr.Utils/OrdinalSequence.cs`, `Mfr.Utils/StringExtensions.cs` |
 | Policy | `Mfr.Models/Tags/AudioTagContainerPolicy.cs` (capability), `Mfr.Metadata/AudioTagContainerDetector.cs` (detect), `Id3v2FrameVersionPolicy.cs`, `AsfDescriptorNames.cs` |
 | Filters | `Mfr.Filters/Audio/*`, `StringTargetFilter.cs`, `Mfr.Models/Targets.cs` |
 | Engine | `Mfr.Engine/CommitExecutor.cs`, `RenamePropertyChangeBuilder.cs` |

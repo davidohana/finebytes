@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Mfr.Utils;
 
 namespace Mfr.Models.Tags.Id3v2
 {
@@ -58,16 +59,7 @@ namespace Mfr.Models.Tags.Id3v2
             if (!string.Equals(Description, other.Description, StringComparison.Ordinal))
                 return false;
 
-            if (TextValues.Length != other.TextValues.Length)
-                return false;
-
-            for (var i = 0; i < TextValues.Length; i++)
-            {
-                if (!string.Equals(TextValues[i], other.TextValues[i], StringComparison.Ordinal))
-                    return false;
-            }
-
-            return true;
+            return OrdinalSequence.AreEqual(TextValues, other.TextValues);
         }
 
         /// <inheritdoc />

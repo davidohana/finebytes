@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Mfr.Models.Tags.Id3v2;
+using Mfr.Utils;
 using TagLib;
 using TagLib.Id3v2;
 using Id3v2Tag = TagLib.Id3v2.Tag;
@@ -107,9 +108,9 @@ namespace Mfr.Metadata.TagFields
                         list.Add(new Id3v2ModeledFrame
                         {
                             FrameId = "COMM",
-                            Language = TagFieldText.NullIfEmpty(comment.Language),
-                            Description = TagFieldText.NullIfEmpty(comment.Description),
-                            TextValues = TagFieldText.SingleText(comment.Text),
+                            Language = comment.Language.TrimmedOrNull(),
+                            Description = comment.Description.TrimmedOrNull(),
+                            TextValues = _SingleText(comment.Text),
                         });
                         break;
 
@@ -117,9 +118,9 @@ namespace Mfr.Metadata.TagFields
                         list.Add(new Id3v2ModeledFrame
                         {
                             FrameId = "USLT",
-                            Language = TagFieldText.NullIfEmpty(lyrics.Language),
-                            Description = TagFieldText.NullIfEmpty(lyrics.Description),
-                            TextValues = TagFieldText.SingleText(lyrics.Text),
+                            Language = lyrics.Language.TrimmedOrNull(),
+                            Description = lyrics.Description.TrimmedOrNull(),
+                            TextValues = _SingleText(lyrics.Text),
                         });
                         break;
 
@@ -127,8 +128,8 @@ namespace Mfr.Metadata.TagFields
                         list.Add(new Id3v2ModeledFrame
                         {
                             FrameId = "TXXX",
-                            Description = TagFieldText.NullIfEmpty(userText.Description),
-                            TextValues = TagFieldText.TrimNonEmpty(userText.Text),
+                            Description = userText.Description.TrimmedOrNull(),
+                            TextValues = DelimitedText.TrimNonEmpty(userText.Text),
                         });
                         break;
 
@@ -138,7 +139,7 @@ namespace Mfr.Metadata.TagFields
                             if (!_SingletonFrameIds.Contains(frameId))
                                 break;
 
-                            var values = TagFieldText.TrimNonEmpty(text.Text);
+                            var values = DelimitedText.TrimNonEmpty(text.Text);
                             if (values.Length == 0)
                                 break;
 
@@ -287,7 +288,16 @@ namespace Mfr.Metadata.TagFields
             if (byDesc != 0)
                 return byDesc;
 
-            return TagFieldText.CompareSequence(a.TextValues, b.TextValues);
+            return OrdinalSequence.Compare(a.TextValues, b.TextValues);
+        }
+
+        /// <remarks>
+        /// <c>COMM</c> and <c>USLT</c> carry a single text payload, unlike the multi-value text frames.
+        /// </remarks>
+        private static ImmutableArray<string> _SingleText(string? text)
+        {
+            var trimmed = text.TrimmedOrNull();
+            return trimmed is null ? [] : [trimmed];
         }
     }
 }
