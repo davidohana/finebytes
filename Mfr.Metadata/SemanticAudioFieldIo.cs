@@ -20,7 +20,7 @@ namespace Mfr.Metadata
         /// <param name="overlay">Structured tag blocks.</param>
         /// <param name="field">Logical semantic audio field.</param>
         /// <returns>Same formatting as <see cref="SemanticAudioFieldStrings.Format"/> (empty when unset).</returns>
-        public static string GetFieldString(AudioTagOverlay overlay, SemanticAudioField field)
+        public static string GetSemanticField(AudioTagOverlay overlay, SemanticAudioField field)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
@@ -36,7 +36,7 @@ namespace Mfr.Metadata
         /// <param name="field">Which semantic field to replace.</param>
         /// <param name="fieldString">Text as-is, or decimal digits for numeric fields; empty clears nullable fields.</param>
         /// <exception cref="ArgumentException">Thrown when a numeric field string is not empty and not a valid non-negative integer.</exception>
-        public static void MergeFieldStringIntoOverlay(
+        public static void SetSemanticField(
             AudioTagOverlay overlay,
             SemanticAudioField field,
             string fieldString)
