@@ -27,7 +27,7 @@ namespace Mfr.Models.Tags.Ape
             if (ReferenceEquals(this, other))
                 return true;
 
-            return TextFieldRowEquality.Equals(Fields, other.Fields);
+            return TextFieldRow.SequenceEquals(Fields, other.Fields);
         }
 
         /// <inheritdoc />
@@ -39,7 +39,7 @@ namespace Mfr.Models.Tags.Ape
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return TextFieldRowEquality.GetHashCode(Fields);
+            return TextFieldRow.GetSequenceHashCode(Fields);
         }
     }
 }
