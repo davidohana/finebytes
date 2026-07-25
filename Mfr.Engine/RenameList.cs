@@ -1,4 +1,3 @@
-using Mfr.Metadata;
 using Mfr.Models;
 using Mfr.Utils;
 using Serilog;
@@ -105,11 +104,6 @@ namespace Mfr.Engine
         /// Call <see cref="FilterChain.SetupFilters"/> on <see cref="FilterPreset.Chain"/> before this method
         /// so filter setup runs once for the chain (for example from the CLI before preview).
         /// </para>
-        /// <para>
-        /// For regular files that exist on disk, each item calls
-        /// <see cref="AudioTagPersistence.TryNormalizeNativeBlocks"/> to reconcile per-block snapshots with the
-        /// <see cref="CommonAudioTag.FromOverlay"/> projection after the filter chain (best-effort when TagLib cannot open the path).
-        /// </para>
         /// </remarks>
         public CommitPlan Preview(FilterPreset preset)
         {
@@ -130,13 +124,6 @@ namespace Mfr.Engine
                 try
                 {
                     preset.Chain.ApplyFilters(renameItem);
-                    if (!renameItem.Original.Attributes.IsDirectory() &&
-                        File.Exists(renameItem.Original.FullPath))
-                    {
-                        _ = AudioTagPersistence.TryNormalizeNativeBlocks(
-                            renameItem.Preview.AudioTagOverlay,
-                            renameItem.Original.FullPath);
-                    }
 
                     if (renameItem.PreviewError is null)
                         renameItem.Status = RenameStatus.PreviewOk;

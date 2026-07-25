@@ -14,6 +14,9 @@ namespace Mfr.Models
     [JsonDerivedType(typeof(FullPathTarget), "FullPath")]
     [JsonDerivedType(typeof(ParentDirectoryTarget), "ParentDirectory")]
     [JsonDerivedType(typeof(AudioFieldTarget), "AudioField")]
+    [JsonDerivedType(typeof(Id3v1FieldTarget), "Id3v1Field")]
+    [JsonDerivedType(typeof(Id3v2FrameTarget), "Id3v2Frame")]
+    [JsonDerivedType(typeof(XiphFieldTarget), "XiphField")]
     public abstract record FilterTarget;
 
     /// <summary>
@@ -63,4 +66,45 @@ namespace Mfr.Models
     /// </summary>
     /// <param name="Field">Which overlay property is addressed.</param>
     public sealed record AudioFieldTarget(AudioOverlayField Field) : FilterTarget;
+
+    /// <summary>
+    /// Targets one ID3v1 scalar on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v1"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Unsupported on non-MPEG containers (PreviewError). Creates an empty ID3v1 block when absent on a capable file.
+    /// </para>
+    /// </remarks>
+    /// <param name="Field">Which ID3v1 scalar is addressed.</param>
+    public sealed record Id3v1FieldTarget(Id3v1Field Field) : FilterTarget;
+
+    /// <summary>
+    /// Targets one modeled ID3v2 frame on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v2"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Singleton frames (for example <c>TIT2</c>) use <paramref name="FrameId"/> only.
+    /// Multi-instance frames (<c>COMM</c>, <c>USLT</c>, <c>TXXX</c>) also match <paramref name="Language"/> /
+    /// <paramref name="Description"/>; omit both for the primary <c>COMM</c>/<c>USLT</c> instance
+    /// (empty description). Unsupported on non-MPEG containers.
+    /// </para>
+    /// </remarks>
+    /// <param name="FrameId">Four-character frame id (case-insensitive; stored uppercase).</param>
+    /// <param name="Language">ISO-639-2 language for <c>COMM</c>/<c>USLT</c>, or <see langword="null"/> when not applicable.</param>
+    /// <param name="Description">Content descriptor for <c>COMM</c>/<c>USLT</c>/<c>TXXX</c>, or <see langword="null"/> for primary.</param>
+    public sealed record Id3v2FrameTarget(
+        string FrameId,
+        string? Language = null,
+        string? Description = null) : FilterTarget;
+
+    /// <summary>
+    /// Targets one known Xiph / Vorbis comment key on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Xiph"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Keys are matched case-insensitively and stored uppercase. Unsupported outside FLAC/Ogg-style containers.
+    /// </para>
+    /// </remarks>
+    /// <param name="Key">Comment field key (for example <c>TITLE</c>, <c>ARTIST</c>).</param>
+    public sealed record XiphFieldTarget(string Key) : FilterTarget;
 }

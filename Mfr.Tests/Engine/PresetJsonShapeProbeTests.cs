@@ -257,6 +257,70 @@ namespace Mfr.Tests.Engine
         }
 
         [Fact]
+        public void Formatter_JSON_round_trips_Id3v2Frame_target()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "Formatter",
+              "target": {
+                "targetType": "Id3v2Frame",
+                "frameId": "COMM",
+                "language": "eng",
+                "description": ""
+              },
+              "options": {
+                "template": "hi"
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<FormatterFilter>(filter);
+            var target = Assert.IsType<Id3v2FrameTarget>(typed.Target);
+            Assert.Equal("COMM", target.FrameId);
+            Assert.Equal("eng", target.Language);
+            Assert.Equal(string.Empty, target.Description);
+            typed.Setup();
+        }
+
+        [Fact]
+        public void Formatter_JSON_round_trips_XiphField_and_Id3v1Field_targets()
+        {
+            var xiphJson = /*lang=json,strict*/ """
+            {
+              "type": "Formatter",
+              "target": {
+                "targetType": "XiphField",
+                "key": "TITLE"
+              },
+              "options": {
+                "template": "x"
+              }
+            }
+            """;
+            var xiphFilter = Assert.IsType<FormatterFilter>(
+                JsonSerializer.Deserialize<BaseFilter>(xiphJson, PresetJsonOptions.Default));
+            Assert.Equal("TITLE", Assert.IsType<XiphFieldTarget>(xiphFilter.Target).Key);
+
+            var id3v1Json = /*lang=json,strict*/ """
+            {
+              "type": "Formatter",
+              "target": {
+                "targetType": "Id3v1Field",
+                "field": "artist"
+              },
+              "options": {
+                "template": "x"
+              }
+            }
+            """;
+            var id3v1Filter = Assert.IsType<FormatterFilter>(
+                JsonSerializer.Deserialize<BaseFilter>(id3v1Json, PresetJsonOptions.Default));
+            Assert.Equal(Id3v1Field.Artist, Assert.IsType<Id3v1FieldTarget>(id3v1Filter.Target).Field);
+        }
+
+        [Fact]
         public void LettersCase_JSON_round_trips_apply_scope_token()
         {
             var expected = new LettersCaseFilter(

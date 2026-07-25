@@ -31,6 +31,10 @@ description: >-
    | `AncestorFolder` | `level`: positive integer | Single ancestor segment name vs preview directory |
    | `FullPath` | (none) | Entire preview full path |
    | `ParentDirectory` | (none) | Preview containing directory path |
+   | `AudioField` | `field` | Generic semantic overlay field (`title`, `album`, …); broadcast / recommended create |
+   | `Id3v1Field` | `field` | One ID3v1 scalar (MPEG only) |
+   | `Id3v2Frame` | `frameId`, optional `language` / `description` | One modeled ID3v2 frame (MPEG only) |
+   | `XiphField` | `key` | One Xiph / Vorbis comment key (FLAC/Ogg only) |
 
 7. **JSON registration.** In `Mfr.Engine/PresetJsonOptions.cs`, add `using Mfr.Filters.<Group>;` if missing and append `new JsonDerivedType(typeof(YourFilter), "YourFilterType")` to `DerivedTypes` (follow the ordering style already used in that list).
 

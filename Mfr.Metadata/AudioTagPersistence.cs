@@ -63,46 +63,6 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Like <see cref="NormalizeNativeBlocks"/> but returns <see langword="false"/> when TagLib cannot open the path.
-        /// </summary>
-        public static bool TryNormalizeNativeBlocks(AudioTagOverlay overlay, string embeddedTagSourcePath)
-        {
-            ArgumentNullException.ThrowIfNull(overlay);
-
-            if (string.IsNullOrWhiteSpace(embeddedTagSourcePath))
-                return false;
-
-            try
-            {
-                NormalizeNativeBlocks(overlay, embeddedTagSourcePath);
-                return true;
-            }
-            catch (UnsupportedFormatException)
-            {
-                return false;
-            }
-            catch (CorruptFileException)
-            {
-                return false;
-            }
-            catch (IOException)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Re-snaps native tag blocks using the semantic projection derived from current blocks (end-of-preview reconcile).
-        /// </summary>
-        public static void NormalizeNativeBlocks(AudioTagOverlay overlay, string embeddedTagSourcePath)
-        {
-            ArgumentNullException.ThrowIfNull(overlay);
-            _ValidateExistingRegularFile(embeddedTagSourcePath);
-            var merged = CommonAudioTag.FromOverlay(overlay);
-            MergeSemanticOntoNativeBlocks(overlay, merged, embeddedTagSourcePath);
-        }
-
-        /// <summary>
         /// Like <see cref="MergeSemanticOntoNativeBlocks"/> but ignores TagLib failures when detecting a container from disk.
         /// </summary>
         public static bool TryMergeSemanticOntoNativeBlocks(

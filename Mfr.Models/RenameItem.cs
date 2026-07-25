@@ -112,6 +112,15 @@ namespace Mfr.Models
         internal AudioContainerFormat AudioContainer { get; private set; } = AudioContainerFormat.Unknown;
 
         /// <summary>
+        /// Sets <see cref="AudioContainer"/> when tags are already loaded without a disk read (synthetic test rows).
+        /// </summary>
+        /// <param name="containerFormat">Container the row should pretend to be.</param>
+        internal void SetAudioContainer(AudioContainerFormat containerFormat)
+        {
+            AudioContainer = containerFormat;
+        }
+
+        /// <summary>
         /// Marks embedded-tag load as attempted for this preview cycle.
         /// </summary>
         internal void MarkEmbeddedTagsLoadAttempted()

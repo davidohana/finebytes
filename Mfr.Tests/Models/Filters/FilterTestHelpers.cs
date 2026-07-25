@@ -1,4 +1,5 @@
 using Mfr.Models;
+using Mfr.Models.Tags;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Models.Filters
@@ -68,7 +69,10 @@ namespace Mfr.Tests.Models.Filters
             EnsureSyntheticAudioOverlayWhenTagless(meta);
             var item = new RenameItem(meta);
             if (!attributes.IsDirectory())
+            {
                 item.MarkEmbeddedTagsLoadAttempted();
+                item.SetAudioContainer(_InferAudioContainer(extension));
+            }
 
             return item;
         }
@@ -83,6 +87,24 @@ namespace Mfr.Tests.Models.Filters
                 return;
 
             meta.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay();
+        }
+
+        private static AudioContainerFormat _InferAudioContainer(string extension)
+        {
+            if (string.IsNullOrWhiteSpace(extension))
+                return AudioContainerFormat.Unknown;
+
+            return extension.Trim().ToLowerInvariant() switch
+            {
+                ".mp3" or ".mp2" or ".mp1" => AudioContainerFormat.Mpeg,
+                ".flac" => AudioContainerFormat.Flac,
+                ".ogg" or ".oga" or ".opus" => AudioContainerFormat.Ogg,
+                ".m4a" or ".m4b" or ".mp4" or ".m4v" => AudioContainerFormat.Mpeg4,
+                ".wma" or ".asf" => AudioContainerFormat.Asf,
+                ".wav" => AudioContainerFormat.Riff,
+                ".ape" => AudioContainerFormat.Ape,
+                _ => AudioContainerFormat.Unknown,
+            };
         }
         /// <summary>
         /// Applies a filter to a prefix-targeted rename item and returns the resulting preview prefix.

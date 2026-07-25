@@ -348,6 +348,104 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies an ID3v2 frame target on FLAC fails preview (unsupported container).
+        /// </summary>
+        public void Preview_Id3v2FrameTarget_OnFlac_ReportsPreviewError()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
+            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
+            var sourcePath = dir.CombinePath("id3v2-on-flac.flac");
+            File.Copy(fixturePath, sourcePath, overwrite: false);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "id3v2-on-flac",
+                new FormatterFilter(
+                    Target: new Id3v2FrameTarget("TIT2"),
+                    Options: new FormatterOptions("Nope")));
+            _ = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.Contains("ID3v2", item.PreviewError!.Message, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies an ID3v2 <c>TIT2</c> formatter updates only the ID3v2 block in preview; commit persists <c>TIT2</c>.
+        /// </summary>
+        /// <remarks>
+        /// TagLib may rewrite the ID3v1 trailer from ID3v2 on save; Phase E field-patch Apply is the path that stops
+        /// unintended sibling writes. This test locks preview isolation and on-disk <c>TIT2</c>.
+        /// </remarks>
+        public void Commit_Id3v2FrameTarget_Tit2_WritesOnDisk()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("tit2.mp3");
+            TaggedMp3Fixture.WriteTagged(sourcePath, id3v1Title: "Trailer", id3v2Title: "OldFrame");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "tit2-only",
+                new FormatterFilter(
+                    Target: new Id3v2FrameTarget("TIT2"),
+                    Options: new FormatterOptions("NewFrame")));
+            var plan = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("Trailer", item.Preview.AudioTagOverlay.Id3v1!.Title);
+            Assert.Equal("NewFrame", AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2"));
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.NotNull(readBack.Id3v2);
+            Assert.Equal("NewFrame", AudioOverlayBlockFieldIo.GetId3v2FrameString(readBack, "TIT2"));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies a Xiph <c>TITLE</c> formatter writes on FLAC commit.
+        /// </summary>
+        public void Commit_XiphFieldTarget_Title_WritesOnFlac()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
+            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
+            var sourcePath = dir.CombinePath("xiph-title.flac");
+            File.Copy(fixturePath, sourcePath, overwrite: false);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(sourcePath);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = _CreatePresetAllEnabled(
+                "xiph-title",
+                new FormatterFilter(
+                    Target: new XiphFieldTarget("TITLE"),
+                    Options: new FormatterOptions("XiphOnlyTitle")));
+            var plan = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal("XiphOnlyTitle", item.Preview.AudioTagOverlay.Semantic().Title);
+
+            var results = renameList.Commit(plan, failFast: false, dryRun: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+
+            var readBack = AudioTagPersistence.Read(sourcePath);
+            Assert.Equal("XiphOnlyTitle", readBack.Semantic().Title);
+            Assert.NotNull(readBack.Xiph);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies strip-all then an overlay formatter writes the new title on the recommended RIFF INFO block only.
         /// </summary>
         public void Commit_EmbeddedTagRemover_Then_Formatter_OnTitle_WritesAfterStrip()

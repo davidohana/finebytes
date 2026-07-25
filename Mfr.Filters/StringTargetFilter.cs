@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Mfr.Metadata;
 using Mfr.Models;
+using Mfr.Models.Tags;
 
 namespace Mfr.Filters
 {
@@ -30,6 +31,52 @@ namespace Mfr.Filters
                     embeddedTagSourcePath: item.Original.FullPath,
                     containerFormat: item.AudioContainer);
 
+                return;
+            }
+
+            if (Target is Id3v1FieldTarget id3v1FieldTarget)
+            {
+                item.EnsureAudioTagBlockSupported(AudioTagBlockKind.Id3v1);
+                var currentValue = AudioOverlayBlockFieldIo.GetId3v1FieldString(
+                    preview.AudioTagOverlay,
+                    id3v1FieldTarget.Field);
+                var transformed = TransformValue(currentValue, item);
+                AudioOverlayBlockFieldIo.SetId3v1FieldString(
+                    preview.AudioTagOverlay,
+                    id3v1FieldTarget.Field,
+                    transformed);
+                return;
+            }
+
+            if (Target is Id3v2FrameTarget id3v2FrameTarget)
+            {
+                item.EnsureAudioTagBlockSupported(AudioTagBlockKind.Id3v2);
+                var currentValue = AudioOverlayBlockFieldIo.GetId3v2FrameString(
+                    preview.AudioTagOverlay,
+                    id3v2FrameTarget.FrameId,
+                    id3v2FrameTarget.Language,
+                    id3v2FrameTarget.Description);
+                var transformed = TransformValue(currentValue, item);
+                AudioOverlayBlockFieldIo.SetId3v2FrameString(
+                    preview.AudioTagOverlay,
+                    id3v2FrameTarget.FrameId,
+                    transformed,
+                    id3v2FrameTarget.Language,
+                    id3v2FrameTarget.Description);
+                return;
+            }
+
+            if (Target is XiphFieldTarget xiphFieldTarget)
+            {
+                item.EnsureAudioTagBlockSupported(AudioTagBlockKind.Xiph);
+                var currentValue = AudioOverlayBlockFieldIo.GetXiphFieldString(
+                    preview.AudioTagOverlay,
+                    xiphFieldTarget.Key);
+                var transformed = TransformValue(currentValue, item);
+                AudioOverlayBlockFieldIo.SetXiphFieldString(
+                    preview.AudioTagOverlay,
+                    xiphFieldTarget.Key,
+                    transformed);
                 return;
             }
 
