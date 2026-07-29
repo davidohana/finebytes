@@ -178,29 +178,27 @@ namespace Mfr.Engine
 
             try
             {
-                var shouldStripAllEmbeddedTags = !dryRun && item.StripAllEmbeddedTagsOnCommit;
-                var shouldPersistEmbeddedTagOverlay = !dryRun
-                    && !previewSnapshot.AudioTagOverlay.Equals(originalSnapshot.AudioTagOverlay);
-
                 var changes = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
                 if (!dryRun)
+                {
                     RenameItemMover.FinalizeCommit(item, step.ActualSourcePath);
 
-                if (shouldStripAllEmbeddedTags)
-                    AudioTagPersistence.RemoveAllEmbeddedTags(item.Preview.FullPath);
+                    if (item.StripAllEmbeddedTagsOnCommit)
+                        AudioTagPersistence.RemoveAllEmbeddedTags(item.Preview.FullPath);
 
-                if (shouldPersistEmbeddedTagOverlay)
-                {
-                    // Strip-all already cleared the destination; field-patch Original must match post-strip disk
-                    // (empty), not the pre-strip session snapshot.
-                    var applyOriginal = shouldStripAllEmbeddedTags
-                        ? new AudioTagOverlay()
-                        : originalSnapshot.AudioTagOverlay;
-                    AudioTagPersistence.Apply(
-                        item.Preview.FullPath,
-                        applyOriginal,
-                        previewSnapshot.AudioTagOverlay);
+                    // Strip clears unmodeled frames too; Apply still runs when Preview differs so later
+                    // setters can rewrite tags. Post-strip field-patch baseline is empty, not the session Original.
+                    if (!previewSnapshot.AudioTagOverlay.Equals(originalSnapshot.AudioTagOverlay))
+                    {
+                        var applyOriginal = item.StripAllEmbeddedTagsOnCommit
+                            ? new AudioTagOverlay()
+                            : originalSnapshot.AudioTagOverlay;
+                        AudioTagPersistence.Apply(
+                            item.Preview.FullPath,
+                            applyOriginal,
+                            previewSnapshot.AudioTagOverlay);
+                    }
                 }
 
                 item.Status = RenameStatus.CommitOk;
