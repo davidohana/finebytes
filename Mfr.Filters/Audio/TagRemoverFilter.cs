@@ -8,13 +8,18 @@ namespace Mfr.Filters.Audio
     /// Options for <see cref="TagRemoverFilter"/>.
     /// </summary>
     /// <param name="All">
-    /// When <see langword="true"/>, strip every TagLib tag type on commit (<c>RemoveTags(AllTags)</c>) and clear all
-    /// modeled overlay blocks; <paramref name="Blocks"/> is ignored.
+    /// When <see langword="true"/>, nuclear strip: preview clears every modeled overlay block, and commit calls
+    /// <c>RemoveTags(AllTags)</c>. That removes not only the seven <see cref="AudioTagBlockKind"/> values listed in
+    /// <paramref name="Blocks"/>, but also TagLib types this overlay never models
+    /// (<c>MovieId</c>, <c>DivX</c>, <c>FlacMetadata</c>, <c>TiffIFD</c>, <c>XMP</c>, <c>JpegComment</c>,
+    /// <c>GifComment</c>, <c>Png</c>, <c>IPTCIIM</c>, <c>AudibleMetadata</c>, <c>Matroska</c>).
+    /// <paramref name="Blocks"/> is ignored.
     /// </param>
     /// <param name="Blocks">
     /// Tag block types to drop when <paramref name="All"/> is <see langword="false"/>, by JSON name
     /// (<c>id3v1</c>, <c>id3v2</c>, <c>xiph</c>, <c>ape</c>, <c>apple</c>, <c>asf</c>, <c>riffInfo</c>).
     /// At least one entry is required unless <paramref name="All"/> is <see langword="true"/>.
+    /// Listing every modeled kind is still not a nuclear strip: unmodeled TagLib types stay on disk.
     /// </param>
     public sealed record TagRemoverOptions(
         [property: JsonPropertyName("all")] bool All = false,
@@ -25,13 +30,15 @@ namespace Mfr.Filters.Audio
     /// </summary>
     /// <remarks>
     /// <para>
-    /// With <c>all: true</c>, preview clears all modeled blocks via <see cref="AudioTagOverlay.ClearAllBlocks"/> so
-    /// <see cref="AudioTagOverlay.ContainerFormat"/> stays available for a later generic write, and commit strips
-    /// with <c>RemoveTags(AllTags)</c> before the (possibly recreated) overlay is applied.
+    /// With <c>all: true</c> (nuclear), preview clears all modeled blocks via <see cref="AudioTagOverlay.ClearAllBlocks"/>
+    /// so <see cref="AudioTagOverlay.ContainerFormat"/> stays available for a later generic write, and commit sets
+    /// <see cref="RenameItem.StripAllEmbeddedTagsOnCommit"/> so the engine runs <c>RemoveTags(AllTags)</c> before the
+    /// (possibly recreated) overlay is applied. Preview looks the same as nulling every modeled block; the extra work
+    /// is on disk only — TagLib types outside <see cref="AudioTagBlockKind"/> are wiped too.
     /// </para>
     /// <para>
     /// With selected <c>blocks</c>, preview nulls those blocks only; commit deletes those <c>TagTypes</c> and never
-    /// requests a full strip, so later filters can still write into surviving blocks.
+    /// requests a full strip, so later filters can still write into surviving blocks. Unmodeled TagLib types are left alone.
     /// </para>
     /// <para>
     /// Removing a block the row's container cannot hold is an error (surfaced as

@@ -1,25 +1,45 @@
 # TagRemover
 
-Removes embedded tag blocks — either **selected** types, or **everything** TagLibSharp controls when `all` is true. Has **no** `target`.
+Removes embedded tag blocks — either **selected** types, or a **nuclear** wipe of everything TagLibSharp controls when `all` is true. Has **no** `target`.
 
 ## Modes
 
 | `options` | Preview | Commit |
 |-----------|---------|--------|
-| `"all": true` | Clears all modeled overlay blocks (`ClearAllBlocks`) | `RemoveTags(AllTags)` — every TagLib type, including unmodeled ones (XMP, DivX, Matroska, …) |
+| `"all": true` | Clears all modeled overlay blocks (`ClearAllBlocks`) | Nuclear: `RemoveTags(AllTags)` (see below) |
 | `"blocks": [...]` | Nulls each listed block | `RemoveTags` for those types only; surviving blocks stay writable by later filters |
 
 When `all` is true, `blocks` is ignored. When `all` is false (or omitted), `blocks` must list at least one type.
 
-Removing a tag type also deletes content the overlay does not model, such as **embedded art stored on that block**. **You cannot undo this with the app's Undo control**—only filesystem or backup restore.
+Removing a tag type also deletes content the overlay does not model on that block, such as **embedded art**. **You cannot undo this with the app's Undo control**—only filesystem or backup restore.
 
 **Directory rows** are not supported (preview error, same as other embedded-tag filters). **Invalid or non-TagLib files** surface preview errors when tags cannot be read.
+
+## Nuclear option (`all: true`) — what it does extra
+
+On **preview**, nuclear looks the same as clearing every modeled block: the overlay’s seven block properties go null; `ContainerFormat` is kept so a later filter can recreate the recommended empty block.
+
+On **commit**, nuclear does **more** than listing all seven `blocks` values. Selective Apply only deletes tag types that appear in the Original→Preview diff for modeled kinds. Nuclear sets `StripAllEmbeddedTagsOnCommit` and the engine calls TagLib `RemoveTags(AllTags)`, which also strips types **outside** `AudioTagBlockKind`:
+
+| TagLib `TagTypes` | Typical meaning |
+|-------------------|-----------------|
+| `MovieId` | RIFF / MOVIEID |
+| `DivX` | DivX tags |
+| `FlacMetadata` | FLAC native metadata (separate from Xiph comments) |
+| `TiffIFD` | TIFF IFD |
+| `XMP` | XMP packets |
+| `JpegComment` / `GifComment` / `Png` | image comment / PNG chunks |
+| `IPTCIIM` | IPTC-IIM |
+| `AudibleMetadata` | Audible |
+| `Matroska` | Matroska / WebM tags |
+
+So for a normal MP3/FLAC/M4A that only carries modeled blocks, `all: true` and `blocks: [all seven]` end the same way for those blocks. Prefer `all: true` when you want a hard wipe of whatever TagLib can see (including leftovers the overlay never parsed).
 
 ## Options
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `all` | boolean | When `true`, nuclear strip of all TagLib tags. Default `false`. |
+| `all` | boolean | When `true`, nuclear strip (see above). Default `false`. |
 | `blocks` | array of strings | Tag block types to remove when `all` is false. At least one entry required unless `all` is true. |
 
 Valid `blocks` values and the containers that can hold them:
@@ -62,10 +82,10 @@ Naming a block the row's container cannot hold is a **preview error** (for examp
 
 | Options | Before | After | Comment |
 |--------|--------|-------|---------|
-| `all: true` | Tagged `.wav` / `.mp3` / image with XMP | No embedded tags left | After **Apply**; preview columns show cleared overlay |
+| `all: true` | Tagged `.wav` / `.mp3` / image with XMP | No embedded tags left | XMP and other unmodeled TagLib types go too |
 | `all: true` | Chain: TagRemover → Formatter on `audio-title` | New title written after strip | Commit runs strip **then** overlay merge |
 | `blocks: ["id3v1"]` | `.mp3` with ID3v1 + ID3v2 | ID3v2 only | ID3v2 frames, including art, are untouched |
 | `blocks: ["id3v1"]` | `.mp3` with ID3v2 only | Unchanged | Supported block that is absent is a no-op |
-| `blocks: ["id3v1", "id3v2"]` | `.mp3` with ID3v1 + ID3v2 | No modeled tags | Unlike `all: true`, unmodeled TagLib types (if any) are left alone |
+| `blocks: ["id3v1", "id3v2"]` | `.mp3` with ID3v1 + ID3v2 | No modeled tags | Unlike `all: true`, unmodeled TagLib types (if any) stay |
 | `blocks: ["id3v2"]` | `.flac` | Preview error | FLAC cannot hold ID3v2; supported blocks are listed in the message |
 | `blocks: ["id3v1"]` → Formatter on `audio-title` | `.mp3` with conflicting ID3v1/ID3v2 titles | Title written to ID3v2 only | Removing the block first keeps the generic write off the trailer |

@@ -101,8 +101,16 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Removes all embedded tags TagLib associates with the file.
+        /// Removes all embedded tags TagLib associates with the file (<c>RemoveTags(AllTags)</c>).
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Used when <c>TagRemover</c> ran with <c>options.all</c>. Unlike selective block removal, this also deletes
+        /// TagLib types outside the modeled overlay (<c>MovieId</c>, <c>DivX</c>, <c>FlacMetadata</c>, <c>TiffIFD</c>,
+        /// <c>XMP</c>, <c>JpegComment</c>, <c>GifComment</c>, <c>Png</c>, <c>IPTCIIM</c>, <c>AudibleMetadata</c>,
+        /// <c>Matroska</c>), not only <c>Id3v1</c>/<c>Id3v2</c>/<c>Xiph</c>/<c>Ape</c>/<c>Apple</c>/<c>Asf</c>/<c>RiffInfo</c>.
+        /// </para>
+        /// </remarks>
         /// <param name="absolutePath">Path to an existing regular file (typically after rename, at the preview destination).</param>
         /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
         /// <exception cref="IOException">The file cannot be opened or saved.</exception>

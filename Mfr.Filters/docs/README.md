@@ -74,7 +74,7 @@ Each filter in a preset has:
 - For [DateSetter](Attributes/DateSetter.md), [TimeSetter](Attributes/TimeSetter.md), and [TimeShifter](Attributes/TimeShifter.md), `options` includes **`timestampField`**: which **filesystem timestamp field** to edit (not a clock value) — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings), together with the other filter-specific options.
 - **AttributesSetter** has no `target`; it always updates filesystem attributes ([AttributesSetter](Attributes/AttributesSetter.md)).
 - **AudioTagSetter** has no `target`; it updates multiple embedded audio tag fields from `options` ([AudioTagSetter](Audio/AudioTagSetter.md)).
-- **TagRemover** has no `target`; `options.all` strips every TagLib type on commit, or `options.blocks` lists selected types to delete ([TagRemover](Audio/TagRemover.md)).
+- **TagRemover** has no `target`; `options.all` is a nuclear TagLib wipe (including unmodeled types such as XMP), or `options.blocks` lists selected modeled types to delete ([TagRemover](Audio/TagRemover.md)).
 - `options` — optional object; filters with no settings omit it.
 
 Property names use **camelCase**; enum values usually match the C# names (e.g. `TitleCase`, `Literal`).
