@@ -34,7 +34,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 #### Audio tags (canonical overlay)
 
-Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`AudioTagPersistence.Read`**) **on first `audio-*` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
+Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`AudioTagPersistence.Read`**) **on first `audio-*` / `id3v2` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
 **Contrast:** file-name tokens use **`Original`** paths; audio tokens deliberately use **preview** so later filters can mutate tags before a formatter runs.
 
@@ -65,6 +65,22 @@ Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateR
 **Unit tests:** **`FilterTestHelpers.CreateRenameItem`** marks embedded tags as already loaded, so **`EnsureEmbeddedTagsLoaded`** is skipped and the overlay stays at its initial state (usually the default empty overlay), meaning **`<audio-*>`** tokens expand to **empty** strings without touching disk.
 
 **Not implemented yet:** stream-only properties often shown in specs as `<audio-duration:…>`, `<audio-bitrate:…>`, `<audio-channels:…>`, `<audio-bpm>`—they require data beyond **`AudioTagOverlay`**.
+
+#### ID3v2 Custom Field (MFR7 `<id3v2:…>`)
+
+Reads one **modeled ID3v2 frame** from **`Preview.AudioTagOverlay.Id3v2`** (same lazy load rules as `<audio-*>`). Unlike semantic `<audio-*>` tokens, this is **ID3v2-only** (other containers yield empty when no Id3v2 block is present).
+
+| Token | Output |
+|--------|--------|
+| `<id3v2:TALB>` | Album frame text; empty when unset. |
+| `<id3v2:TIT2>` | Title frame text; empty when unset. |
+| `<id3v2:TXXX>` | First `TXXX` frame in overlay order (MFR7-compatible; no content-descriptor picker). |
+| `<id3v2:TXXX:catalog>` | `TXXX` whose content descriptor is `catalog`; empty when no match. |
+| `<id3v2:COMM>` | Primary comment (empty content descriptor); empty when unset. |
+| `<id3v2:COMM:other>` | Comment whose content descriptor is `other`. |
+| `<id3v2:USLT>` | Primary unsynced lyrics; optional content-descriptor suffix like `COMM`. |
+
+**Arguments:** `field-code` is **required** (the four-character frame id, case-insensitive). Multi-instance frames (`TXXX` / `COMM` / `USLT`) may append a content-descriptor suffix after the id. Singleton frames reject that suffix at compile time. Multi-value text on one frame is joined with `; `. `TRCK` / `TPOS` return the full frame text (e.g. `3/12`); use `<audio-track>` / `<audio-track-count>` when a split is needed.
 
 #### File properties
 
