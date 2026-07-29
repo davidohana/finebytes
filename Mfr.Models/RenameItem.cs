@@ -149,23 +149,13 @@ namespace Mfr.Models
         /// <summary>
         /// Stores a media-properties snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
         /// </summary>
-        /// <param name="media">Read-only properties from TagLib.</param>
+        /// <param name="media">Read-only properties from TagLib (may include nested MPEG header data).</param>
         internal void SetMediaProperties(MediaProperties media)
         {
             ArgumentNullException.ThrowIfNull(media);
 
             Original.Media = media;
             Preview.Media = media;
-        }
-
-        /// <summary>
-        /// Stores an MPEG audio-header snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
-        /// </summary>
-        /// <param name="mpeg">Read-only MPEG properties from TagLib, or <see langword="null"/> when no header.</param>
-        internal void SetMpegAudioProperties(MpegAudioProperties? mpeg)
-        {
-            Original.Mpeg = mpeg;
-            Preview.Mpeg = mpeg;
         }
 
         /// <summary>
@@ -180,15 +170,13 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Clears media and MPEG stream-property caches after commit so subsequent previews reload from disk.
+        /// Clears the media-properties cache after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearMediaPropertiesCache()
         {
             MediaPropertiesLoadAttempted = false;
             Original.Media = null;
             Preview.Media = null;
-            Original.Mpeg = null;
-            Preview.Mpeg = null;
         }
 
         /// <summary>

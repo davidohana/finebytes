@@ -119,26 +119,15 @@ namespace Mfr.Models
         public AudioTagOverlay AudioTagOverlay { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets the lazy TagLib media-properties read cache (duration, bitrate, dimensions, etc.).
+        /// Gets or sets the lazy TagLib media-properties read cache (duration, bitrate, dimensions, optional MPEG header).
         /// </summary>
         /// <remarks>
         /// <para>
         /// Read-only; never written on commit. <see langword="null"/> until first <c>media-*</c> or <c>mpeg-*</c>
-        /// formatter load (shared TagLib open with <see cref="Mpeg"/>).
+        /// formatter load. When present, <see cref="MediaProperties.Mpeg"/> is set only if an MPEG audio header exists.
         /// </para>
         /// </remarks>
         public MediaProperties? Media { get; set; }
-
-        /// <summary>
-        /// Gets or sets the lazy TagLib MPEG audio-header read cache for <c>mpeg-*</c> tokens.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Read-only; never written on commit. <see langword="null"/> until first stream-properties load when no
-        /// <c>TagLib.Mpeg.AudioHeader</c> codec is present, or until that load when one is present.
-        /// </para>
-        /// </remarks>
-        public MpegAudioProperties? Mpeg { get; set; }
 
         /// <summary>
         /// Creates a detached copy of this metadata instance.
@@ -162,7 +151,6 @@ namespace Mfr.Models
             {
                 AudioTagOverlay = AudioTagOverlay.Clone(),
                 Media = Media,
-                Mpeg = Mpeg,
             };
         }
     }

@@ -79,5 +79,10 @@ namespace Mfr.Models
         /// Gets format-specific photo quality; <c>0</c> when absent.
         /// </summary>
         public int PhotoQuality { get; init; }
+
+        /// <summary>
+        /// Gets MPEG audio-header properties when a codec is <c>TagLib.Mpeg.AudioHeader</c>; otherwise <see langword="null"/>.
+        /// </summary>
+        public MpegAudioProperties? Mpeg { get; init; }
     }
 }

@@ -10,6 +10,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
     /// </summary>
     public sealed class MpegAudioPropertyTokenTests
     {
+        private static MediaProperties _MediaWithMpeg(MpegAudioProperties mpeg)
+        {
+            return new MediaProperties { Mpeg = mpeg };
+        }
+
         private static MpegAudioProperties _SampleMpeg(bool isVbr = false)
         {
             return new MpegAudioProperties
@@ -30,7 +35,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         [Fact]
         public void Resolve_SeededFields_FormatPerRules()
         {
-            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.Mpeg = _SampleMpeg());
+            var item = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: m => m.Media = _MediaWithMpeg(_SampleMpeg()));
 
             Assert.Equal("128", new MpegBitrateToken().Compile(string.Empty)(item));
             Assert.Equal("Yes", new MpegCopyrightToken().Compile(string.Empty)(item));
@@ -49,7 +55,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         public void Resolve_VbrBitrate_PrefixesVbr()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Mpeg = _SampleMpeg(isVbr: true));
+                configureOriginal: m => m.Media = _MediaWithMpeg(_SampleMpeg(isVbr: true)));
 
             Assert.Equal("VBR128", new MpegBitrateToken().Compile(string.Empty)(item));
             Assert.Equal("VBR", new MpegEncodingToken().Compile(string.Empty)(item));
@@ -59,7 +65,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         public void Resolve_NullMpeg_YieldsEmpty()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            Assert.Null(item.Original.Mpeg);
+            Assert.Null(item.Original.Media?.Mpeg);
 
             Assert.Equal(string.Empty, new MpegBitrateToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new MpegCopyrightToken().Compile(string.Empty)(item));
@@ -75,12 +81,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         public void Resolve_ZeroBitrateAndDuration_YieldEmpty()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Mpeg = new MpegAudioProperties
+                configureOriginal: m => m.Media = _MediaWithMpeg(new MpegAudioProperties
                 {
                     IsCopyrighted = false,
                     IsOriginal = true,
                     IsProtected = false,
-                });
+                }));
 
             Assert.Equal(string.Empty, new MpegBitrateToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new MpegDurationToken().Compile(string.Empty)(item));
@@ -110,13 +116,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         public void FormatterFilter_UsesSeededMpeg()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Mpeg = new MpegAudioProperties
+                configureOriginal: m => m.Media = _MediaWithMpeg(new MpegAudioProperties
                 {
                     Bitrate = 320,
                     IsVbr = true,
                     Layer = 3,
                     Duration = TimeSpan.FromSeconds(61),
-                });
+                }));
 
             var filter = new FormatterFilter(
                 Target: new FilePrefixTarget(),
@@ -150,36 +156,33 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
             var item = new RenameItem(meta);
             item.MarkEmbeddedTagsLoadAttempted();
             Assert.False(item.MediaPropertiesLoadAttempted);
-            Assert.Null(item.Original.Mpeg);
             Assert.Null(item.Original.Media);
 
             var text = new MpegLayerToken().Compile(string.Empty)(item);
 
             Assert.True(item.MediaPropertiesLoadAttempted);
             Assert.NotNull(item.Original.Media);
-            Assert.NotNull(item.Original.Mpeg);
+            Assert.NotNull(item.Original.Media.Mpeg);
             Assert.Equal("III", text);
             Assert.Equal("CBR", new MpegEncodingToken().Compile(string.Empty)(item));
         }
 
         [Fact]
-        public void ClearMediaPropertiesCache_ClearsMpeg()
+        public void ClearMediaPropertiesCache_ClearsNestedMpeg()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+                configureOriginal: m => m.Media = new MediaProperties
                 {
-                    m.Media = new MediaProperties { AudioBitrate = 128 };
-                    m.Mpeg = _SampleMpeg();
+                    AudioBitrate = 128,
+                    Mpeg = _SampleMpeg(),
                 });
 
-            Assert.NotNull(item.Original.Mpeg);
+            Assert.NotNull(item.Original.Media?.Mpeg);
             item.ClearMediaPropertiesCache();
 
             Assert.False(item.MediaPropertiesLoadAttempted);
             Assert.Null(item.Original.Media);
-            Assert.Null(item.Original.Mpeg);
             Assert.Null(item.Preview.Media);
-            Assert.Null(item.Preview.Mpeg);
         }
     }
 }

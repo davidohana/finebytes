@@ -68,9 +68,9 @@ Stream properties (duration, bitrate, channels, …) are under **Media propertie
 
 #### Media properties
 
-Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`MediaPropertiesReader.ReadStream`**) **on first `media-*` or `mpeg-*` token use** for that **file** row inside a **`Preview`** run (one TagLib open fills both caches); **`RenameList.Commit`** clears both afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
+Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`MediaPropertiesReader.Read`**) **on first `media-*` or `mpeg-*` token use** for that **file** row inside a **`Preview`** run (one TagLib open; MPEG header nested on **`Media.Mpeg`** when present); **`RenameList.Commit`** clears the cache afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
 
-Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties as already loaded so seeded **`FileMeta.Media`** / **`FileMeta.Mpeg`** is used without disk I/O.
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties as already loaded so seeded **`FileMeta.Media`** (including nested **`Media.Mpeg`**) is used without disk I/O.
 
 | Token | Output |
 |--------|--------|
@@ -94,7 +94,7 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties a
 
 #### MPEG audio properties
 
-Reads from **`Original.Mpeg`** (read-only TagLib `Mpeg.AudioHeader` cache). Loaded by the same **`ReadStream`** path as media properties. Files without an MPEG audio header (e.g. WAV/FLAC/AAC) leave **`Mpeg`** null and expand tokens to **empty** (not PreviewError). Replaces MFR7’s legacy **`mp3-*`** names.
+Reads from **`Original.Media.Mpeg`** (nested read-only TagLib `Mpeg.AudioHeader` on the media cache). Loaded by the same **`MediaPropertiesReader.Read`** path as media properties. Files without an MPEG audio header (e.g. WAV/FLAC/AAC) leave **`Media.Mpeg`** null and expand tokens to **empty** (not PreviewError). Replaces MFR7’s legacy **`mp3-*`** names.
 
 | Token | Output |
 |--------|--------|

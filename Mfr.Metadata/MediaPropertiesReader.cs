@@ -6,19 +6,12 @@ using TagLib.Mpeg;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Combined TagLib stream snapshots from one file open.
-    /// </summary>
-    /// <param name="Media">Always populated when open succeeds.</param>
-    /// <param name="Mpeg">MPEG audio header when a codec is <see cref="AudioHeader"/>; otherwise <see langword="null"/>.</param>
-    public readonly record struct TagLibStreamProperties(MediaProperties Media, MpegAudioProperties? Mpeg);
-
-    /// <summary>
-    /// Reads TagLib stream and image properties into detached snapshots.
+    /// Reads TagLib stream and image properties into a detached <see cref="MediaProperties"/> snapshot.
     /// </summary>
     public static class MediaPropertiesReader
     {
         /// <summary>
-        /// Reads media properties from an existing regular file.
+        /// Reads media properties (and nested MPEG audio header when present) from an existing regular file.
         /// </summary>
         /// <param name="absolutePath">Fully qualified filesystem path to an existing file.</param>
         /// <returns>A new snapshot built from TagLib file properties and related fields.</returns>
@@ -27,20 +20,6 @@ namespace Mfr.Metadata
         /// <exception cref="CorruptFileException">Thrown by TagLib when the embedded structure is unreadable.</exception>
         /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
         public static MediaProperties Read(string absolutePath)
-        {
-            return ReadStream(absolutePath).Media;
-        }
-
-        /// <summary>
-        /// Reads media properties and optional MPEG audio-header properties from one TagLib open.
-        /// </summary>
-        /// <param name="absolutePath">Fully qualified filesystem path to an existing file.</param>
-        /// <returns>Media snapshot plus MPEG snapshot when an <see cref="AudioHeader"/> codec is present.</returns>
-        /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
-        /// <exception cref="IOException">TagLib cannot open or read the file.</exception>
-        /// <exception cref="CorruptFileException">Thrown by TagLib when the embedded structure is unreadable.</exception>
-        /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
-        public static TagLibStreamProperties ReadStream(string absolutePath)
         {
             _ValidateExistingRegularFile(absolutePath);
 
@@ -51,7 +30,7 @@ namespace Mfr.Metadata
             if (mediaTypes != MediaTypes.None)
                 mediaTypesText = mediaTypes.ToString();
 
-            var media = new MediaProperties
+            return new MediaProperties
             {
                 MimeType = file.MimeType.TrimmedOrNull(),
                 PossiblyCorrupt = file.PossiblyCorrupt,
@@ -67,9 +46,8 @@ namespace Mfr.Metadata
                 PhotoWidth = properties.PhotoWidth,
                 PhotoHeight = properties.PhotoHeight,
                 PhotoQuality = properties.PhotoQuality,
+                Mpeg = _TryMapMpeg(properties),
             };
-
-            return new TagLibStreamProperties(media, _TryMapMpeg(properties));
         }
 
         private static MpegAudioProperties? _TryMapMpeg(Properties properties)
