@@ -731,7 +731,7 @@ Users configure columns via the **Field Selector** (right-click column header �
 | File Properties | Partial | FileContents (rw), CreationDate (rw), LastWriteDate (rw), LastAccessDate (rw), Size (ro), Attributes (rw), FolderFileCount (ro) |
 | ID3v1 | Yes | Album, Artist, Comment, Genre, Title, TrackNumber, Year |
 | ID3v2 | Yes | All standard TXXX/Txx frames — see §9 |
-| MP3 Properties | No | Bitrate, Duration, DurationSec, Encoding, Frequency, Mode, MpegVersion, Layer, VbrQuality |
+| MPEG Audio Properties | Yes (ro) | Bitrate, Duration, DurationSec, Encoding, Frequency, Mode, MpegVersion, Layer, Copyright, Original, Protection |
 | Image | No | Format, Width, Height, BitDepth, HorzResolution, VertResolution, FramesCount |
 | JPEG Tag | No | Title, Subject, Author, Keywords, Comments, DateTime, Make, Model, Artist, UserComment |
 | JPEG-Geo | No | Latitude, Longitude, NearestCountry, NearestRegion, NearestCityOrPlace |
@@ -1404,9 +1404,11 @@ Counter parameters: `initial`, `step`, padding keyword (`none`, `auto` from list
 | `<id3-language:0>` | TLAN | `eng` |
 | `<id3-mood:0>` | TMOO (v2.4) | `Melancholic` |
 
-### 7.5 MP3 Properties (read-only)
+### 7.5 MPEG Audio Properties (read-only)
 
-`<mp3-bitrate:0>`, `<mp3-duration:0>`, `<mp3-duration-sec:0>`, `<mp3-frequency:0>`, `<mp3-mode:0>`, `<mp3-mpeg-ver:0>`, `<mp3-encoding:0>`, `<mp3-vbr-quality:0>`
+Replaces MFR7’s `mp3-*` names. No argument suffixes. VBR Quality is deferred (optional Phase G).
+
+`<mpeg-bitrate>`, `<mpeg-copyright>`, `<mpeg-duration>`, `<mpeg-duration-sec>`, `<mpeg-encoding>`, `<mpeg-frequency>`, `<mpeg-layer>`, `<mpeg-ver>`, `<mpeg-mode>`, `<mpeg-original>`, `<mpeg-protection>`
 
 ### 7.6 Audio Tag Group (multi-format)
 

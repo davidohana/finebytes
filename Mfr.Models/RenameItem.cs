@@ -108,7 +108,7 @@ namespace Mfr.Models
         internal bool EmbeddedTagsLoadAttempted { get; private set; }
 
         /// <summary>
-        /// Gets whether media properties were loaded for this preview cycle.
+        /// Gets whether TagLib stream properties (media + optional MPEG) were loaded for this preview cycle.
         /// </summary>
         internal bool MediaPropertiesLoadAttempted { get; private set; }
 
@@ -121,7 +121,7 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Marks media-properties load as attempted for this preview cycle.
+        /// Marks TagLib stream-properties load as attempted for this preview cycle.
         /// </summary>
         internal void MarkMediaPropertiesLoadAttempted()
         {
@@ -159,6 +159,16 @@ namespace Mfr.Models
         }
 
         /// <summary>
+        /// Stores an MPEG audio-header snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
+        /// </summary>
+        /// <param name="mpeg">Read-only MPEG properties from TagLib, or <see langword="null"/> when no header.</param>
+        internal void SetMpegAudioProperties(MpegAudioProperties? mpeg)
+        {
+            Original.Mpeg = mpeg;
+            Preview.Mpeg = mpeg;
+        }
+
+        /// <summary>
         /// Clears overlays and resets load state after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearEmbeddedTagsCache()
@@ -170,13 +180,15 @@ namespace Mfr.Models
         }
 
         /// <summary>
-        /// Clears the media-properties cache after commit so subsequent previews reload from disk.
+        /// Clears media and MPEG stream-property caches after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearMediaPropertiesCache()
         {
             MediaPropertiesLoadAttempted = false;
             Original.Media = null;
             Preview.Media = null;
+            Original.Mpeg = null;
+            Preview.Mpeg = null;
         }
 
         /// <summary>

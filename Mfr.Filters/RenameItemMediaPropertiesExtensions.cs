@@ -5,7 +5,7 @@ using Mfr.Utils;
 namespace Mfr.Filters
 {
     /// <summary>
-    /// Lazily loads TagLib media properties onto rename rows for formatter tokens.
+    /// Lazily loads TagLib media and MPEG stream properties onto rename rows for formatter tokens.
     /// </summary>
     internal static class RenameItemMediaPropertiesExtensions
     {
@@ -15,6 +15,21 @@ namespace Mfr.Filters
         /// <param name="item">Rename row to load.</param>
         /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
         internal static void EnsureMediaPropertiesLoaded(this RenameItem item)
+        {
+            _EnsureTagLibStreamPropertiesLoaded(item);
+        }
+
+        /// <summary>
+        /// Ensures <see cref="RenameItem.Original"/> carries MPEG audio properties when present on disk.
+        /// </summary>
+        /// <param name="item">Rename row to load.</param>
+        /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
+        internal static void EnsureMpegAudioPropertiesLoaded(this RenameItem item)
+        {
+            _EnsureTagLibStreamPropertiesLoaded(item);
+        }
+
+        private static void _EnsureTagLibStreamPropertiesLoaded(RenameItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
 
@@ -29,8 +44,9 @@ namespace Mfr.Filters
                     "Cannot read media properties for a directory.");
             }
 
-            var media = MediaPropertiesReader.Read(item.Original.FullPath);
-            item.SetMediaProperties(media);
+            var snapshot = MediaPropertiesReader.ReadStream(item.Original.FullPath);
+            item.SetMediaProperties(snapshot.Media);
+            item.SetMpegAudioProperties(snapshot.Mpeg);
         }
     }
 }

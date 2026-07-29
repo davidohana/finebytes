@@ -24,6 +24,23 @@ namespace Mfr.Tests.Metadata
         }
 
         [Fact]
+        public void ReadStream_Mp3Fixture_PopulatesMediaAndMpeg()
+        {
+            var path = _RequireFixture("l3-compl-cut.mp3");
+
+            var snapshot = MediaPropertiesReader.ReadStream(path);
+
+            Assert.NotNull(snapshot.Mpeg);
+            Assert.Equal(3, snapshot.Mpeg.Layer);
+            Assert.False(snapshot.Mpeg.IsVbr);
+            Assert.Equal("1", snapshot.Mpeg.MpegVersion);
+            Assert.True(snapshot.Mpeg.Bitrate > 0);
+            Assert.True(snapshot.Mpeg.SampleRate > 0);
+            Assert.False(string.IsNullOrEmpty(snapshot.Mpeg.ChannelMode));
+            Assert.Contains("Audio", snapshot.Media.MediaTypes ?? string.Empty, StringComparison.Ordinal);
+        }
+
+        [Fact]
         public void Read_WavFixture_PopulatesAudioFields()
         {
             var path = _RequireFixture("minimal-silent.wav");
@@ -35,6 +52,17 @@ namespace Mfr.Tests.Metadata
             Assert.Equal(1, media.AudioChannels);
             Assert.Equal(44100, media.AudioSampleRate);
             Assert.Equal(16, media.BitsPerSample);
+        }
+
+        [Fact]
+        public void ReadStream_WavFixture_MpegIsNull()
+        {
+            var path = _RequireFixture("minimal-silent.wav");
+
+            var snapshot = MediaPropertiesReader.ReadStream(path);
+
+            Assert.Null(snapshot.Mpeg);
+            Assert.Equal(1, snapshot.Media.AudioChannels);
         }
 
         [Fact]

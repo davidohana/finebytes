@@ -123,10 +123,22 @@ namespace Mfr.Models
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Read-only; never written on commit. <see langword="null"/> until first <c>media-*</c> formatter load.
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>media-*</c> or <c>mpeg-*</c>
+        /// formatter load (shared TagLib open with <see cref="Mpeg"/>).
         /// </para>
         /// </remarks>
         public MediaProperties? Media { get; set; }
+
+        /// <summary>
+        /// Gets or sets the lazy TagLib MPEG audio-header read cache for <c>mpeg-*</c> tokens.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Read-only; never written on commit. <see langword="null"/> until first stream-properties load when no
+        /// <c>TagLib.Mpeg.AudioHeader</c> codec is present, or until that load when one is present.
+        /// </para>
+        /// </remarks>
+        public MpegAudioProperties? Mpeg { get; set; }
 
         /// <summary>
         /// Creates a detached copy of this metadata instance.
@@ -150,6 +162,7 @@ namespace Mfr.Models
             {
                 AudioTagOverlay = AudioTagOverlay.Clone(),
                 Media = Media,
+                Mpeg = Mpeg,
             };
         }
     }

@@ -64,13 +64,13 @@ Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateR
 
 **Unit tests:** **`FilterTestHelpers.CreateRenameItem`** marks embedded tags as already loaded, so **`EnsureEmbeddedTagsLoaded`** is skipped and the overlay stays at its initial state (usually the default empty overlay), meaning **`<audio-*>`** tokens expand to **empty** strings without touching disk.
 
-Stream properties (duration, bitrate, channels, …) are under **Media properties** (`<media-*>`), not `<audio-*>`. BPM is not implemented yet.
+Stream properties (duration, bitrate, channels, …) are under **Media properties** (`<media-*>`) and **MPEG audio properties** (`<mpeg-*>`), not `<audio-*>`. BPM is not implemented yet.
 
 #### Media properties
 
-Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`MediaPropertiesReader.Read`**) **on first `media-*` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears the cache afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
+Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`MediaPropertiesReader.ReadStream`**) **on first `media-*` or `mpeg-*` token use** for that **file** row inside a **`Preview`** run (one TagLib open fills both caches); **`RenameList.Commit`** clears both afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
 
-Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark media properties as already loaded so seeded **`FileMeta.Media`** is used without disk I/O.
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties as already loaded so seeded **`FileMeta.Media`** / **`FileMeta.Mpeg`** is used without disk I/O.
 
 | Token | Output |
 |--------|--------|
@@ -91,6 +91,26 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark media properties as
 | `<media-photo-quality>` | Photo quality; empty when `0`. |
 
 **Arguments:** No argument (`<media-mime>` only). A stray **`<media-mime:…>`** fails at compile.
+
+#### MPEG audio properties
+
+Reads from **`Original.Mpeg`** (read-only TagLib `Mpeg.AudioHeader` cache). Loaded by the same **`ReadStream`** path as media properties. Files without an MPEG audio header (e.g. WAV/FLAC/AAC) leave **`Mpeg`** null and expand tokens to **empty** (not PreviewError). Replaces MFR7’s legacy **`mp3-*`** names.
+
+| Token | Output |
+|--------|--------|
+| `<mpeg-bitrate>` | Bitrate (kbps); prefixed `VBR` when Xing/VBRI present (e.g. `VBR128`); empty when `0`. |
+| `<mpeg-copyright>` | `Yes` or `No`. |
+| `<mpeg-duration>` | Header duration as `h:mm:ss`; empty when zero. |
+| `<mpeg-duration-sec>` | Whole seconds (floor); empty when zero. |
+| `<mpeg-encoding>` | `CBR` or `VBR`; empty when no MPEG header. |
+| `<mpeg-frequency>` | Sample rate (Hz); empty when `0`. |
+| `<mpeg-layer>` | `I`, `II`, or `III`; empty when unset. |
+| `<mpeg-ver>` | MPEG version (`1`, `2`, or `2.5`); empty when unknown. |
+| `<mpeg-mode>` | Channel mode (`Stereo`, `JointStereo`, `DualChannel`, `SingleChannel`). |
+| `<mpeg-original>` | `Yes` or `No`. |
+| `<mpeg-protection>` | `Yes` or `No` (CRC protection bit). |
+
+**Arguments:** No argument (`<mpeg-bitrate>` only). A stray **`<mpeg-bitrate:…>`** fails at compile.
 
 #### ID3v2 Custom Field (MFR7 `<id3v2:…>`)
 
