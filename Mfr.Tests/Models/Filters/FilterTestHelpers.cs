@@ -74,7 +74,10 @@ namespace Mfr.Tests.Models.Filters
 
             var item = new RenameItem(meta);
             if (isFileRow)
+            {
                 item.MarkEmbeddedTagsLoadAttempted();
+                item.MarkMediaPropertiesLoadAttempted();
+            }
 
             return item;
         }

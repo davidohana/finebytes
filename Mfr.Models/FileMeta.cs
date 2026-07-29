@@ -119,6 +119,16 @@ namespace Mfr.Models
         public AudioTagOverlay AudioTagOverlay { get; set; } = new();
 
         /// <summary>
+        /// Gets or sets the lazy TagLib media-properties read cache (duration, bitrate, dimensions, etc.).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>media-*</c> formatter load.
+        /// </para>
+        /// </remarks>
+        public MediaProperties? Media { get; set; }
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -139,6 +149,7 @@ namespace Mfr.Models
                 renameListFolderSiblingCount: RenameListFolderSiblingCount)
             {
                 AudioTagOverlay = AudioTagOverlay.Clone(),
+                Media = Media,
             };
         }
     }

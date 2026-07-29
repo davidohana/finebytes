@@ -108,11 +108,24 @@ namespace Mfr.Models
         internal bool EmbeddedTagsLoadAttempted { get; private set; }
 
         /// <summary>
+        /// Gets whether media properties were loaded for this preview cycle.
+        /// </summary>
+        internal bool MediaPropertiesLoadAttempted { get; private set; }
+
+        /// <summary>
         /// Marks embedded-tag load as attempted for this preview cycle.
         /// </summary>
         internal void MarkEmbeddedTagsLoadAttempted()
         {
             EmbeddedTagsLoadAttempted = true;
+        }
+
+        /// <summary>
+        /// Marks media-properties load as attempted for this preview cycle.
+        /// </summary>
+        internal void MarkMediaPropertiesLoadAttempted()
+        {
+            MediaPropertiesLoadAttempted = true;
         }
 
         /// <summary>
@@ -134,6 +147,18 @@ namespace Mfr.Models
         }
 
         /// <summary>
+        /// Stores a media-properties snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
+        /// </summary>
+        /// <param name="media">Read-only properties from TagLib.</param>
+        internal void SetMediaProperties(MediaProperties media)
+        {
+            ArgumentNullException.ThrowIfNull(media);
+
+            Original.Media = media;
+            Preview.Media = media;
+        }
+
+        /// <summary>
         /// Clears overlays and resets load state after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearEmbeddedTagsCache()
@@ -142,6 +167,16 @@ namespace Mfr.Models
             Original.AudioTagOverlay = new AudioTagOverlay();
             Preview.AudioTagOverlay = new AudioTagOverlay();
             StripAllEmbeddedTagsOnCommit = false;
+        }
+
+        /// <summary>
+        /// Clears the media-properties cache after commit so subsequent previews reload from disk.
+        /// </summary>
+        internal void ClearMediaPropertiesCache()
+        {
+            MediaPropertiesLoadAttempted = false;
+            Original.Media = null;
+            Preview.Media = null;
         }
 
         /// <summary>

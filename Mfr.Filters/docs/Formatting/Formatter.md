@@ -64,7 +64,33 @@ Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateR
 
 **Unit tests:** **`FilterTestHelpers.CreateRenameItem`** marks embedded tags as already loaded, so **`EnsureEmbeddedTagsLoaded`** is skipped and the overlay stays at its initial state (usually the default empty overlay), meaning **`<audio-*>`** tokens expand to **empty** strings without touching disk.
 
-**Not implemented yet:** stream-only properties often shown in specs as `<audio-duration:…>`, `<audio-bitrate:…>`, `<audio-channels:…>`, `<audio-bpm>`—they require data beyond **`AudioTagOverlay`**.
+Stream properties (duration, bitrate, channels, …) are under **Media properties** (`<media-*>`), not `<audio-*>`. BPM is not implemented yet.
+
+#### Media properties
+
+Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`MediaPropertiesReader.Read`**) **on first `media-*` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears the cache afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
+
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark media properties as already loaded so seeded **`FileMeta.Media`** is used without disk I/O.
+
+| Token | Output |
+|--------|--------|
+| `<media-mime>` | MIME type; empty when unset. |
+| `<media-corrupt>` | `True` or `False` (invariant). |
+| `<media-duration>` | Duration as `h:mm:ss` (total hours unpadded); empty when zero. |
+| `<media-duration-sec>` | Whole seconds (floor); empty when zero. |
+| `<media-types>` | TagLib media-type flags text (e.g. `Audio`); empty when none. |
+| `<media-description>` | Codec description; empty when unset. |
+| `<media-audio-bitrate>` | Audio bitrate (kbps); empty when `0`. |
+| `<media-samplerate>` | Sample rate (Hz); empty when `0`. |
+| `<media-bits-per-sample>` | Bits per sample; empty when `0`. |
+| `<media-channels>` | Channel count; empty when `0`. |
+| `<media-video-width>` | Video width (px); empty when `0`. |
+| `<media-video-height>` | Video height (px); empty when `0`. |
+| `<media-photo-width>` | Photo width (px); empty when `0`. |
+| `<media-photo-height>` | Photo height (px); empty when `0`. |
+| `<media-photo-quality>` | Photo quality; empty when `0`. |
+
+**Arguments:** No argument (`<media-mime>` only). A stray **`<media-mime:…>`** fails at compile.
 
 #### ID3v2 Custom Field (MFR7 `<id3v2:…>`)
 

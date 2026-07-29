@@ -203,6 +203,7 @@ namespace Mfr.Engine
             foreach (var item in _renameItems)
             {
                 item.ClearEmbeddedTagsCache();
+                item.ClearMediaPropertiesCache();
             }
 
             var commitOkCount = results.Count(item => item.Status == RenameStatus.CommitOk);

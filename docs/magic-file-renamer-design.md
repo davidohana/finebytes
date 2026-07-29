@@ -736,7 +736,7 @@ Users configure columns via the **Field Selector** (right-click column header โ
 | JPEG Tag | No | Title, Subject, Author, Keywords, Comments, DateTime, Make, Model, Artist, UserComment |
 | JPEG-Geo | No | Latitude, Longitude, NearestCountry, NearestRegion, NearestCityOrPlace |
 | FreeDB | No | Artist, Album, Year, Genre, Title (per-track) |
-| Media Properties | No | MimeType, Duration, DurationSec, AudioBitrate, SampleRate, BitsPerSample, Channels, VideoWidth, VideoHeight |
+| Media Properties | Yes (ro) | MimeType, Corrupt, Duration, DurationSec, MediaTypes, Description, AudioBitrate, SampleRate, BitsPerSample, Channels, VideoWidth, VideoHeight, PhotoWidth, PhotoHeight, PhotoQuality |
 | Audio Tag (multi-format) | Yes | Title, Performers, AlbumArtists, Composers, Album, Comment, Genres, Year, Track, TrackCount, Disc, DiscCount, Lyrics, Grouping, BPM, Conductor, Copyright, MusicBrainz IDs |
 | Image Tag (multi-format) | No | Keywords, DateTime, Orientation, Software, GPS, ExposureTime, FNumber, ISO, FocalLength, Make, Model, Creator |
 
@@ -1448,7 +1448,9 @@ Requires GeoNames.org username in settings. See ยง13.
 
 ### 7.11 Media Properties Group
 
-`<media-mime:0>`, `<media-duration:0>`, `<media-duration-sec:0>`, `<media-audio-bitrate:0>`, `<media-samplerate:0>`, `<media-channels:0>`, `<media-video-width:0>`, `<media-video-height:0>`
+`<media-mime>`, `<media-corrupt>`, `<media-duration>`, `<media-duration-sec>`, `<media-types>`, `<media-description>`, `<media-audio-bitrate>`, `<media-samplerate>`, `<media-bits-per-sample>`, `<media-channels>`, `<media-video-width>`, `<media-video-height>`, `<media-photo-width>`, `<media-photo-height>`, `<media-photo-quality>`
+
+(No `:0` argument suffixes; stray args fail at formatter compile.)
 
 ---
 
