@@ -141,9 +141,10 @@ String-target filters (Formatter, Replacer, …) can address one native field vi
 | `Id3v2Frame` | One modeled frame (`frameId`, optional `language` / `description`) |
 | `XiphField` | One Xiph key |
 
-There is **no** separate `Id3v2FieldSetter` filter. Dedicated audio filters:
+Dedicated audio filters:
 
 - `AudioTagSetter` — multi-field semantic set (no target)
+- `Id3v2FieldSetter` — one modeled ID3v2 frame (`frameId`, `text`, optional `onlyIfEmpty` / `language` / `description`); no target. String filters with an `Id3v2Frame` target remain valid for transforms without `onlyIfEmpty`.
 - `TagRemover` — null selected blocks (`options.blocks`), or clear all + strip on commit (`options.all`)
 - `SetFromFreeDB` — still product-scoped separately
 

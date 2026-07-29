@@ -54,6 +54,7 @@ namespace Mfr.Engine
             new(typeof(TrimBetweenFilter), "TrimBetween"),
             new(typeof(AttributesSetterFilter), "AttributesSetter"),
             new(typeof(AudioTagSetterFilter), "AudioTagSetter"),
+            new(typeof(Id3v2FieldSetterFilter), "Id3v2FieldSetter"),
             new(typeof(TagRemoverFilter), "TagRemover"),
             new(typeof(DateSetterFilter), "DateSetter"),
             new(typeof(TimeSetterFilter), "TimeSetter"),

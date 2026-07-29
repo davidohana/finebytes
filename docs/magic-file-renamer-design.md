@@ -499,9 +499,9 @@ Out of scope:
 
 Scope:
 - Parsed per–`TagTypes` overlay fully implemented (see §9).
-- Audio-related filters (`AudioTagSetter`, `TagRemover`, `SetFromFreeDB`).
-- Native ID3v2 frame edits use the normal string-filter contract with an `Id3v2Frame` target;
-  there is no separate `Id3v2FieldSetter` filter.
+- Audio-related filters (`AudioTagSetter`, `Id3v2FieldSetter`, `TagRemover`, `SetFromFreeDB`).
+- Native ID3v2 frame edits also use the normal string-filter contract with an `Id3v2Frame` target;
+  `Id3v2FieldSetter` is the dedicated one-frame setter with optional `onlyIfEmpty`.
 
 ### Phase 5 — EXIF and image metadata
 
@@ -1181,8 +1181,20 @@ Sets common embedded audio-tag fields in one step (multi-format via TagLibSharp)
 }
 ```
 
-For example, a Formatter targeting one specific ID3v2 frame uses the shipped string-target preset
-contract:
+#### Id3v2FieldSetter
+Sets one modeled ID3v2 text frame on MPEG rows (no `target`). Creates ID3v2.3 when absent; preserves existing tag version on patch. String `text` uses the same literal-vs-formatter-token rules as AudioTagSetter. Optional **`onlyIfEmpty`** skips when the current frame text is non-empty. Optional **`language`** / **`description`** match multi-instance frames (`COMM`, `USLT`, `TXXX`).
+```json
+{
+  "type": "Id3v2FieldSetter",
+  "options": {
+    "frameId": "TIT2",
+    "text": "<file-name>",
+    "onlyIfEmpty": true
+  }
+}
+```
+
+A Formatter (or other string filter) targeting one ID3v2 frame remains valid when `onlyIfEmpty` is not needed:
 
 ```json
 {
