@@ -234,7 +234,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies embedded-tag strip (TagLib <c>RemoveTags(All)</c>) runs on commit for tagged audio.
         /// </summary>
-        public void Commit_EmbeddedTagRemover_StripsAllTags_OnDisk()
+        public void Commit_TagRemover_All_StripsAllTags_OnDisk()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("tagged.wav");
@@ -244,7 +244,7 @@ namespace Mfr.Tests.Engine
             renameList.AddSource(sourcePath);
             var item = Assert.Single(renameList.RenameItems);
 
-            var preset = _CreatePresetAllEnabled("embed-strip", new EmbeddedTagRemoverFilter());
+            var preset = _CreatePresetAllEnabled("embed-strip", new TagRemoverFilter(new TagRemoverOptions(All: true)));
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
@@ -264,7 +264,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies selective removal deletes only the named tag type and leaves the other ID3 block on disk.
         /// </summary>
-        public void Commit_EmbeddedTagTypeRemover_RemovesId3v1_KeepsId3v2_OnDisk()
+        public void Commit_TagRemover_RemovesId3v1_KeepsId3v2_OnDisk()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("selective.mp3");
@@ -276,8 +276,7 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "remove-id3v1",
-                new EmbeddedTagTypeRemoverFilter(
-                    new EmbeddedTagTypeRemoverOptions([AudioTagBlockKind.Id3v1])));
+                new TagRemoverFilter(new TagRemoverOptions(Blocks: [AudioTagBlockKind.Id3v1])));
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
@@ -297,7 +296,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies a generic title written after selective removal only reaches the tag block that survived.
         /// </summary>
-        public void Commit_EmbeddedTagTypeRemover_Then_Formatter_OnTitle_WritesOnlyToRemainingBlock()
+        public void Commit_TagRemover_Then_Formatter_OnTitle_WritesOnlyToRemainingBlock()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("selective-then-title.mp3");
@@ -309,8 +308,7 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "remove-id3v1-then-title",
-                new EmbeddedTagTypeRemoverFilter(
-                    new EmbeddedTagTypeRemoverOptions([AudioTagBlockKind.Id3v1])),
+                new TagRemoverFilter(new TagRemoverOptions(Blocks: [AudioTagBlockKind.Id3v1])),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("OnlyOnFrames")));
@@ -332,7 +330,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies removing a tag type the container cannot hold fails the row in preview instead of writing anything.
         /// </summary>
-        public void Preview_EmbeddedTagTypeRemover_Id3v2OnFlac_ReportsPreviewError()
+        public void Preview_TagRemover_Id3v2OnFlac_ReportsPreviewError()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
@@ -345,8 +343,7 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "remove-id3v2-on-flac",
-                new EmbeddedTagTypeRemoverFilter(
-                    new EmbeddedTagTypeRemoverOptions([AudioTagBlockKind.Id3v2])));
+                new TagRemoverFilter(new TagRemoverOptions(Blocks: [AudioTagBlockKind.Id3v2])));
             _ = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewError, item.Status);
@@ -478,7 +475,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies strip-all then an overlay formatter writes the new title on the recommended RIFF INFO block only.
         /// </summary>
-        public void Commit_EmbeddedTagRemover_Then_Formatter_OnTitle_WritesAfterStrip()
+        public void Commit_TagRemover_All_Then_Formatter_OnTitle_WritesAfterStrip()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("chain.wav");
@@ -489,7 +486,7 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "strip-then-title",
-                new EmbeddedTagRemoverFilter(),
+                new TagRemoverFilter(new TagRemoverOptions(All: true)),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("AfterStrip")));
@@ -513,7 +510,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies strip-all then a title formatter on MP3 creates recommended ID3v2 only (not ID3v1).
         /// </summary>
-        public void Commit_EmbeddedTagRemover_Then_Formatter_OnTitle_Mp3_WritesRecommendedId3v2Only()
+        public void Commit_TagRemover_All_Then_Formatter_OnTitle_Mp3_WritesRecommendedId3v2Only()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("strip-mp3.mp3");
@@ -524,7 +521,7 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "strip-then-title-mp3",
-                new EmbeddedTagRemoverFilter(),
+                new TagRemoverFilter(new TagRemoverOptions(All: true)),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("RecommendedMp3")));
@@ -550,7 +547,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies strip-all then a title formatter on FLAC creates recommended Xiph only.
         /// </summary>
-        public void Commit_EmbeddedTagRemover_Then_Formatter_OnTitle_Flac_WritesRecommendedXiphOnly()
+        public void Commit_TagRemover_All_Then_Formatter_OnTitle_Flac_WritesRecommendedXiphOnly()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
@@ -563,7 +560,7 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "strip-then-title-flac",
-                new EmbeddedTagRemoverFilter(),
+                new TagRemoverFilter(new TagRemoverOptions(All: true)),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("RecommendedFlac")));
@@ -588,7 +585,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies a title formatter followed by tag strip clears the preview overlay and leaves no title on disk.
         /// </summary>
-        public void Commit_Formatter_OnTitle_Then_EmbeddedTagRemover_ClearsPreviewOverlay_OnDisk()
+        public void Commit_Formatter_OnTitle_Then_TagRemover_All_ClearsPreviewOverlay_OnDisk()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("fmt-then-strip.wav");
@@ -602,7 +599,7 @@ namespace Mfr.Tests.Engine
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("PreviewStyled")),
-                new EmbeddedTagRemoverFilter());
+                new TagRemoverFilter(new TagRemoverOptions(All: true)));
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -621,7 +618,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies <see cref="AudioTagSetterFilter"/> output is cleared by a later strip step in preview and on disk.
         /// </summary>
-        public void Commit_AudioTagSetter_Then_EmbeddedTagRemover_ClearsSetterInPreview_OnDisk()
+        public void Commit_AudioTagSetter_Then_TagRemover_All_ClearsSetterInPreview_OnDisk()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("setter-strip.wav");
@@ -634,7 +631,7 @@ namespace Mfr.Tests.Engine
                 "setter-strip",
                 new AudioTagSetterFilter(new AudioTagSetterOptions(
                     Title: new AudioTagStringFieldOptions(Text: "FromSetter"))),
-                new EmbeddedTagRemoverFilter());
+                new TagRemoverFilter(new TagRemoverOptions(All: true)));
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -667,7 +664,7 @@ namespace Mfr.Tests.Engine
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("Intermediate")),
-                new EmbeddedTagRemoverFilter(),
+                new TagRemoverFilter(new TagRemoverOptions(All: true)),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                     Options: new FormatterOptions("Final")));
@@ -689,7 +686,7 @@ namespace Mfr.Tests.Engine
         /// <summary>
         /// Verifies a non-tag replacer step before strip still renames the file and removes embedded tags on disk.
         /// </summary>
-        public void Commit_Replacer_OnPrefix_Then_EmbeddedTagRemover_RenamesAndStrips_OnDisk()
+        public void Commit_Replacer_OnPrefix_Then_TagRemover_All_RenamesAndStrips_OnDisk()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("track.wav");
@@ -709,7 +706,7 @@ namespace Mfr.Tests.Engine
                         CaseSensitive: true,
                         ReplaceAll: false,
                         WholeWord: false)),
-                new EmbeddedTagRemoverFilter());
+                new TagRemoverFilter(new TagRemoverOptions(All: true)));
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -742,7 +739,7 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSource(sourcePath);
 
-            var preset = _CreatePresetAllEnabled("embed-strip-dry", new EmbeddedTagRemoverFilter());
+            var preset = _CreatePresetAllEnabled("embed-strip-dry", new TagRemoverFilter(new TagRemoverOptions(All: true)));
             var plan = _SetupPreview(renameList, preset);
             var results = renameList.Commit(plan, failFast: false, dryRun: true);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);

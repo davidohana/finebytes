@@ -139,11 +139,11 @@ namespace Mfr.Tests.Engine
         }
 
         [Fact]
-        public void EmbeddedTagTypeRemover_roundtrips_block_names()
+        public void TagRemover_roundtrips_block_names()
         {
             var json = /*lang=json,strict*/ """
             {
-              "type": "EmbeddedTagTypeRemover",
+              "type": "TagRemover",
               "options": {
                 "blocks": ["id3v1", "riffInfo"]
               }
@@ -152,9 +152,29 @@ namespace Mfr.Tests.Engine
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
-            var typed = Assert.IsType<EmbeddedTagTypeRemoverFilter>(filter);
+            var typed = Assert.IsType<TagRemoverFilter>(filter);
             AudioTagBlockKind[] expectedBlocks = [AudioTagBlockKind.Id3v1, AudioTagBlockKind.RiffInfo];
             Assert.Equal(expectedBlocks, typed.Options.Blocks);
+            Assert.False(typed.Options.All);
+            typed.Setup();
+        }
+
+        [Fact]
+        public void TagRemover_roundtrips_all_flag()
+        {
+            var json = /*lang=json,strict*/ """
+            {
+              "type": "TagRemover",
+              "options": {
+                "all": true
+              }
+            }
+            """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            Assert.NotNull(filter);
+            var typed = Assert.IsType<TagRemoverFilter>(filter);
+            Assert.True(typed.Options.All);
             typed.Setup();
         }
 

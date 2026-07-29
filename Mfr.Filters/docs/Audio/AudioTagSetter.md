@@ -2,7 +2,7 @@
 
 Sets common embedded audio-tag fields on each **file** row in one step (legacy **Audio / ID3 Tag Setter** style). Values update the preview `AudioTagOverlay`; commit writes through the same path as other audio-tag changes.
 
-Generic writes **broadcast** each set field onto every present tag block (for example Title updates both ID3v1 and ID3v2 when both exist). When the overlay carries **no** blocks (untagged file, or after **EmbeddedTagRemover**), the filter creates the container’s **recommended** empty block first (ID3v2 on MP3, Xiph on FLAC, Apple on M4A, ASF on WMA, RIFF INFO on WAV, …) then writes into that block only — sibling types are never invented.
+Generic writes **broadcast** each set field onto every present tag block (for example Title updates both ID3v1 and ID3v2 when both exist). When the overlay carries **no** blocks (untagged file, or after **TagRemover** with `all: true`), the filter creates the container’s **recommended** empty block first (ID3v2 on MP3, Xiph on FLAC, Apple on M4A, ASF on WMA, RIFF INFO on WAV, …) then writes into that block only — sibling types are never invented.
 
 **Directory rows** cannot load embedded tags; applying this filter to a folder row fails preview with an error (same as other audio-overlay operations).
 

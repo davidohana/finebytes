@@ -14,8 +14,7 @@ These pages document **per-filter `options`** (and behavior). Common preset fiel
 ### Audio
 
 - [AudioTagSetter](Audio/AudioTagSetter.md)
-- [EmbeddedTagRemover](Audio/EmbeddedTagRemover.md)
-- [EmbeddedTagTypeRemover](Audio/EmbeddedTagTypeRemover.md)
+- [TagRemover](Audio/TagRemover.md)
 
 ### Case
 
@@ -75,8 +74,7 @@ Each filter in a preset has:
 - For [DateSetter](Attributes/DateSetter.md), [TimeSetter](Attributes/TimeSetter.md), and [TimeShifter](Attributes/TimeShifter.md), `options` includes **`timestampField`**: which **filesystem timestamp field** to edit (not a clock value) — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings), together with the other filter-specific options.
 - **AttributesSetter** has no `target`; it always updates filesystem attributes ([AttributesSetter](Attributes/AttributesSetter.md)).
 - **AudioTagSetter** has no `target`; it updates multiple embedded audio tag fields from `options` ([AudioTagSetter](Audio/AudioTagSetter.md)).
-- **EmbeddedTagRemover** has no `target` or `options`; stripping runs at **commit** (preview clears the modeled overlay) ([EmbeddedTagRemover](Audio/EmbeddedTagRemover.md)).
-- **EmbeddedTagTypeRemover** has no `target`; `options.blocks` lists the tag types to delete and leaves the rest intact ([EmbeddedTagTypeRemover](Audio/EmbeddedTagTypeRemover.md)).
+- **TagRemover** has no `target`; `options.all` strips every TagLib type on commit, or `options.blocks` lists selected types to delete ([TagRemover](Audio/TagRemover.md)).
 - `options` — optional object; filters with no settings omit it.
 
 Property names use **camelCase**; enum values usually match the C# names (e.g. `TitleCase`, `Literal`).

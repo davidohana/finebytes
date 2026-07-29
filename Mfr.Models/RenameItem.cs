@@ -67,7 +67,7 @@ namespace Mfr.Models
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Set by the <c>EmbeddedTagRemover</c> filter when the preview chain requests a full tag strip.
+        /// Set by the <c>TagRemover</c> filter when <c>options.all</c> is true and the preview chain requests a full tag strip.
         /// </para>
         /// </remarks>
         public bool StripAllEmbeddedTagsOnCommit { get; set; }

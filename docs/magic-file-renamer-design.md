@@ -499,7 +499,7 @@ Out of scope:
 
 Scope:
 - Parsed per–`TagTypes` overlay fully implemented (see §9).
-- Audio-related filters (`AudioTagSetter`, `EmbeddedTagTypeRemover`, `EmbeddedTagRemover`, `SetFromFreeDB`).
+- Audio-related filters (`AudioTagSetter`, `TagRemover`, `SetFromFreeDB`).
 - Native ID3v2 frame edits use the normal string-filter contract with an `Id3v2Frame` target;
   there is no separate `Id3v2FieldSetter` filter.
 
@@ -1196,15 +1196,16 @@ contract:
 }
 ```
 
-#### EmbeddedTagTypeRemover
-Removes selected native tag blocks while leaving the others intact. It has no `target`.
-`options.blocks` accepts `id3v1`, `id3v2`, `xiph`, `ape`, `apple`, `asf`, and `riffInfo`.
+#### TagRemover
+Removes selected native tag blocks, or every TagLib tag type when `options.all` is true. It has no `target`.
+`options.blocks` accepts `id3v1`, `id3v2`, `xiph`, `ape`, `apple`, `asf`, and `riffInfo` (required unless `all` is true).
 Removing a block also removes unmodeled content stored in that block, such as ID3v2 album art.
 Naming a block unsupported by the file's container is a preview error.
+With `all: true`, commit calls `RemoveTags(AllTags)` after clearing the modeled overlay.
 
 ```json
 {
-  "type": "EmbeddedTagTypeRemover",
+  "type": "TagRemover",
   "enabled": true,
   "options": {
     "blocks": ["id3v1"]
@@ -1212,12 +1213,13 @@ Naming a block unsupported by the file's container is a preview error.
 }
 ```
 
-#### EmbeddedTagRemover
-Strips **all** embedded TagLib metadata on each file row (any format TagLib supports). No `target` or `options`; tag removal is applied when changes are committed (preview clears the modeled overlay).
 ```json
 {
-  "type": "EmbeddedTagRemover",
-  "enabled": true
+  "type": "TagRemover",
+  "enabled": true,
+  "options": {
+    "all": true
+  }
 }
 ```
 

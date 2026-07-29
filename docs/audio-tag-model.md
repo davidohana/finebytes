@@ -44,7 +44,7 @@ flowchart TB
    never `0`.
 8. **Clear tag type:** block property = `null`. Empty modeled block pruned to `null` before diff
    (intentional: also drops on-disk APIC on that type).
-9. **Nuclear strip:** `EmbeddedTagRemover` + `StripAllEmbeddedTagsOnCommit` → `RemoveTags(AllTags)`.
+9. **Nuclear strip:** `TagRemover` with `options.all` + `StripAllEmbeddedTagsOnCommit` → `RemoveTags(AllTags)`.
 10. **Id3v2 version:** create → **2.3** (`Version = 3`); patch → **preserve** read version;
     v2.4-only frame into v2.3 → **PreviewError** (no silent upgrade).
 11. **Multi-instance frames** (`COMM` / `USLT` / `TXXX`): identity = FrameId + language/description as
@@ -144,8 +144,7 @@ String-target filters (Formatter, Replacer, …) can address one native field vi
 There is **no** separate `Id3v2FieldSetter` filter. Dedicated audio filters:
 
 - `AudioTagSetter` — multi-field semantic set (no target)
-- `EmbeddedTagTypeRemover` — null selected blocks (`options.blocks`)
-- `EmbeddedTagRemover` — clear all modeled blocks; strip on commit
+- `TagRemover` — null selected blocks (`options.blocks`), or clear all + strip on commit (`options.all`)
 - `SetFromFreeDB` — still product-scoped separately
 
 ## ID3v2 rules
@@ -216,7 +215,7 @@ Inputs: destination path, **Original** overlay (session snapshot), **Preview** o
 3. Commit: filesystem move → optional nuclear strip → `AudioTagPersistence.Apply(Original, Preview)`.
 4. After commit, clear embedded-tag cache for re-preview.
 
-`EmbeddedTagRemover` uses `ClearAllBlocks()` so `ContainerFormat` survives for a later generic write in the
+`TagRemover` with `all: true` uses `ClearAllBlocks()` so `ContainerFormat` survives for a later generic write in the
 same preview chain.
 
 ## Out of scope
