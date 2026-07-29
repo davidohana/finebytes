@@ -3,9 +3,9 @@ using Mfr.Models.Tags;
 namespace Mfr.Filters.Formatting.Tokens.Audio
 {
     /// <summary>
-    /// Shared implementation for formatter tokens backed by preview <see cref="AudioTagOverlay"/> semantic projection.
+    /// Shared implementation for formatter tokens backed by <see cref="SemanticAudioField"/> projection.
     /// </summary>
-    internal abstract class AudioOverlayTokenBase(IReadOnlyList<string> names, SemanticAudioField field) : IFormatToken
+    internal abstract class SemanticAudioFieldTokenBase(IReadOnlyList<string> names, SemanticAudioField field) : IFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
@@ -25,7 +25,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioTitleToken : AudioOverlayTokenBase
+    internal sealed class AudioTitleToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-title&gt;</c>.</summary>
         public AudioTitleToken()
@@ -35,7 +35,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioArtistToken : AudioOverlayTokenBase
+    internal sealed class AudioArtistToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-artist&gt;</c> (joined performers).</summary>
         public AudioArtistToken()
@@ -45,7 +45,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioAlbumArtistToken : AudioOverlayTokenBase
+    internal sealed class AudioAlbumArtistToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-album-artist&gt;</c>.</summary>
         public AudioAlbumArtistToken()
@@ -55,7 +55,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioAlbumToken : AudioOverlayTokenBase
+    internal sealed class AudioAlbumToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-album&gt;</c>.</summary>
         public AudioAlbumToken()
@@ -65,7 +65,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioYearToken : AudioOverlayTokenBase
+    internal sealed class AudioYearToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-year&gt;</c>.</summary>
         public AudioYearToken()
@@ -75,7 +75,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioGenreToken : AudioOverlayTokenBase
+    internal sealed class AudioGenreToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-genre&gt;</c>.</summary>
         public AudioGenreToken()
@@ -85,7 +85,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioTrackToken : AudioOverlayTokenBase
+    internal sealed class AudioTrackToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-track&gt;</c>.</summary>
         public AudioTrackToken()
@@ -95,7 +95,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioTrackCountToken : AudioOverlayTokenBase
+    internal sealed class AudioTrackCountToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-track-count&gt;</c>.</summary>
         public AudioTrackCountToken()
@@ -105,7 +105,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioDiscToken : AudioOverlayTokenBase
+    internal sealed class AudioDiscToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-disc&gt;</c>.</summary>
         public AudioDiscToken()
@@ -115,7 +115,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioDiscCountToken : AudioOverlayTokenBase
+    internal sealed class AudioDiscCountToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-disc-count&gt;</c>.</summary>
         public AudioDiscCountToken()
@@ -125,7 +125,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioCommentToken : AudioOverlayTokenBase
+    internal sealed class AudioCommentToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-comment&gt;</c>.</summary>
         public AudioCommentToken()
@@ -135,7 +135,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioComposerToken : AudioOverlayTokenBase
+    internal sealed class AudioComposerToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-composer&gt;</c>.</summary>
         public AudioComposerToken()
@@ -145,7 +145,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioLyricsToken : AudioOverlayTokenBase
+    internal sealed class AudioLyricsToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-lyrics&gt;</c>.</summary>
         public AudioLyricsToken()
@@ -155,7 +155,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioCopyrightToken : AudioOverlayTokenBase
+    internal sealed class AudioCopyrightToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-copyright&gt;</c>.</summary>
         public AudioCopyrightToken()
@@ -165,7 +165,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    internal sealed class AudioGroupingToken : AudioOverlayTokenBase
+    internal sealed class AudioGroupingToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-grouping&gt;</c>.</summary>
         public AudioGroupingToken()

@@ -7,9 +7,9 @@ using Mfr.Models.Tags;
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
 {
     /// <summary>
-    /// Tests for audio overlay formatter tokens (<c>audio-*</c>).
+    /// Tests for semantic audio field formatter tokens (<c>audio-*</c>).
     /// </summary>
-    public sealed class AudioOverlayFormatTokenTests
+    public sealed class SemanticAudioFieldTokenTests
     {
         private static AudioTagOverlay _FullTagSample()
         {
