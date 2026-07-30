@@ -57,5 +57,11 @@ namespace Mfr.Models.Tags.Asf
 
         /// <summary>Disc / disc-count extended descriptor (<c>disc</c> or <c>disc/count</c>).</summary>
         public const string PartOfSet = "WM/PartOfSet";
+
+        /// <summary>Beats-per-minute extended descriptor.</summary>
+        public const string BeatsPerMinute = "WM/BeatsPerMinute";
+
+        /// <summary>Conductor extended descriptor.</summary>
+        public const string Conductor = "WM/Conductor";
     }
 }

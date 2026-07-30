@@ -88,6 +88,8 @@ namespace Mfr.Models.Tags
             _SetSingleton(frames, "TCON", common.Genre);
             _SetSingleton(frames, "TCOP", common.Copyright);
             _SetSingleton(frames, "TIT1", common.Grouping);
+            _SetSingleton(frames, "TPE3", common.Conductor);
+            _SetSingleton(frames, "TBPM", common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
             _SetPrimaryMulti(frames, "COMM", common.Comment);
             _SetPrimaryMulti(frames, "USLT", common.Lyrics);
             _SetYear(frames, existing.Version, common.Year);
@@ -128,6 +130,9 @@ namespace Mfr.Models.Tags
             _SetMapScalar(map, "DISCNUMBER", common.Disc?.ToString(CultureInfo.InvariantCulture));
             _SetMapScalar(map, "DISCTOTAL", common.DiscCount?.ToString(CultureInfo.InvariantCulture));
             map.Remove("TOTALDISCS");
+            _SetMapScalar(map, "BPM", common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
+            map.Remove("TEMPO");
+            _SetMapScalar(map, "CONDUCTOR", common.Conductor);
 
             var rows = _SortedRows(map);
             return rows.Length == 0 ? null : new XiphTagData { Fields = rows };
@@ -151,6 +156,8 @@ namespace Mfr.Models.Tags
             _SetMapScalar(map, "TrackCount", common.TrackCount?.ToString(CultureInfo.InvariantCulture));
             _SetMapScalar(map, "Disc", common.Disc?.ToString(CultureInfo.InvariantCulture));
             _SetMapScalar(map, "DiscCount", common.DiscCount?.ToString(CultureInfo.InvariantCulture));
+            _SetMapScalar(map, "BPM", common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
+            _SetMapScalar(map, "Conductor", common.Conductor);
 
             var rows = _SortedRows(map);
             return rows.Length == 0 ? null : new ApeTagData { Fields = rows };
@@ -188,6 +195,11 @@ namespace Mfr.Models.Tags
             _SetAsf(rows, AsfDescriptorNames.TrackNumber, common.Track?.ToString(CultureInfo.InvariantCulture));
             _SetAsf(rows, AsfDescriptorNames.TrackTotal, common.TrackCount?.ToString(CultureInfo.InvariantCulture));
             _SetAsfPartOfSet(rows, common.Disc, common.DiscCount);
+            _SetAsf(
+                rows,
+                AsfDescriptorNames.BeatsPerMinute,
+                common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
+            _SetAsf(rows, AsfDescriptorNames.Conductor, common.Conductor);
 
             if (rows.Count == 0)
                 return null;
@@ -215,6 +227,8 @@ namespace Mfr.Models.Tags
             _SetAppleAtom(atoms, AppleAtomIds.Copyright, common.Copyright);
             _SetAppleAtom(atoms, AppleAtomIds.Grouping, common.Grouping);
             _SetAppleAtom(atoms, AppleAtomIds.Day, common.Year?.ToString(CultureInfo.InvariantCulture));
+            // BPM uses the binary tmpo atom; not modeled as Apple text (same limitation as track/disc).
+            _SetAppleAtom(atoms, AppleAtomIds.Conductor, common.Conductor);
 
             if (atoms.Count == 0)
                 return null;

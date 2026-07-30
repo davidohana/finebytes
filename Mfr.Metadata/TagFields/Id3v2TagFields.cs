@@ -21,7 +21,8 @@ namespace Mfr.Metadata.TagFields
     {
         private static readonly HashSet<string> _SingletonFrameIds = new(StringComparer.Ordinal)
         {
-            "TIT1", "TIT2", "TALB", "TPE1", "TPE2", "TCOM", "TCON", "TCOP", "TYER", "TDRC", "TRCK", "TPOS",
+            "TIT1", "TIT2", "TALB", "TPE1", "TPE2", "TPE3", "TCOM", "TCON", "TCOP", "TBPM",
+            "TYER", "TDRC", "TRCK", "TPOS",
         };
 
         /// <summary>

@@ -23,6 +23,7 @@ namespace Mfr.Metadata.TagFields
             "GROUPING", "CONTENTGROUP", "DATE", "YEAR",
             "TRACKNUMBER", "TRACKTOTAL", "TOTALTRACKS",
             "DISCNUMBER", "DISCTOTAL", "TOTALDISCS",
+            "BPM", "TEMPO", "CONDUCTOR",
         ];
 
         /// <summary>

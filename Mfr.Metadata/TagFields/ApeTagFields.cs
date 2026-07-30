@@ -24,6 +24,7 @@ namespace Mfr.Metadata.TagFields
             "Title", "Album", "Artist", "Album Artist", "Composer", "Genre",
             "Comment", "Lyrics", "Copyright", "Grouping",
             "Year", "Track", "TrackCount", "Disc", "DiscCount",
+            "BPM", "Conductor",
         ];
 
         // Spellings other taggers use for a modeled APE key; values are stored under the modeled key.

@@ -28,7 +28,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                 track: 7,
                 trackCount: 12,
                 disc: 2,
-                discCount: 3);
+                discCount: 3,
+                beatsPerMinute: 128,
+                conductor: "Cond");
         }
 
         [Fact]
@@ -88,6 +90,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
             Assert.Equal(string.Empty, new AudioTrackCountToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new AudioDiscToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new AudioDiscCountToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new AudioBpmToken().Compile(string.Empty)(item));
         }
 
         [Fact]
@@ -100,7 +103,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                     track: 7,
                     trackCount: 12,
                     disc: 2,
-                    discCount: 3);
+                    discCount: 3,
+                    beatsPerMinute: 128);
             });
 
             Assert.Equal("2024", new AudioYearToken().Compile(string.Empty)(item));
@@ -108,6 +112,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
             Assert.Equal("12", new AudioTrackCountToken().Compile(string.Empty)(item));
             Assert.Equal("2", new AudioDiscToken().Compile(string.Empty)(item));
             Assert.Equal("3", new AudioDiscCountToken().Compile(string.Empty)(item));
+            Assert.Equal("128", new AudioBpmToken().Compile(string.Empty)(item));
 
             var prior = CultureInfo.CurrentCulture;
             try
@@ -149,6 +154,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
             Assert.Equal("Ly", new AudioLyricsToken().Compile(string.Empty)(item));
             Assert.Equal("Cop", new AudioCopyrightToken().Compile(string.Empty)(item));
             Assert.Equal("Grp", new AudioGroupingToken().Compile(string.Empty)(item));
+            Assert.Equal("128", new AudioBpmToken().Compile(string.Empty)(item));
+            Assert.Equal("Cond", new AudioConductorToken().Compile(string.Empty)(item));
         }
 
         [Fact]

@@ -173,4 +173,24 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
         {
         }
     }
+
+    /// <inheritdoc />
+    internal sealed class AudioBpmToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-bpm&gt;</c>.</summary>
+        public AudioBpmToken()
+            : base(["audio-bpm"], SemanticAudioField.BeatsPerMinute)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioConductorToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-conductor&gt;</c>.</summary>
+        public AudioConductorToken()
+            : base(["audio-conductor"], SemanticAudioField.Conductor)
+        {
+        }
+    }
 }

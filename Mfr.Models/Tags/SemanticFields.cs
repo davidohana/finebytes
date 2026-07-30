@@ -44,6 +44,8 @@ namespace Mfr.Models.Tags
                 SemanticAudioField.TrackCount => _DecimalDigitsOrEmpty(semantic.TrackCount),
                 SemanticAudioField.Disc => _DecimalDigitsOrEmpty(semantic.Disc),
                 SemanticAudioField.DiscCount => _DecimalDigitsOrEmpty(semantic.DiscCount),
+                SemanticAudioField.BeatsPerMinute => _DecimalDigitsOrEmpty(semantic.BeatsPerMinute),
+                SemanticAudioField.Conductor => semantic.Conductor ?? string.Empty,
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
         }
@@ -97,6 +99,9 @@ namespace Mfr.Models.Tags
                 SemanticAudioField.TrackCount => semantic with { TrackCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
                 SemanticAudioField.Disc => semantic with { Disc = _ParseNullableUInt(trimmed, nameof(fieldString)) },
                 SemanticAudioField.DiscCount => semantic with { DiscCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                SemanticAudioField.BeatsPerMinute =>
+                    semantic with { BeatsPerMinute = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                SemanticAudioField.Conductor => semantic with { Conductor = trimmed.TrimmedOrNull() },
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 

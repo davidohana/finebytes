@@ -57,6 +57,8 @@ Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateR
 | `<audio-lyrics>` | Lyrics text; empty when unset. |
 | `<audio-copyright>` | Copyright; empty when unset. |
 | `<audio-grouping>` | Grouping; empty when unset. |
+| `<audio-bpm>` | Beats per minute as decimal digits; empty when unset. |
+| `<audio-conductor>` | Conductor; empty when unset. |
 
 **Arguments:** Unlike some design-draft examples (**`:0`** suffixes), these tokens accept **no** argument (`<audio-title>` only). A stray **`<audio-title:…>`** fails at compile with a formatter error listing the token name.
 
@@ -64,7 +66,7 @@ Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateR
 
 **Unit tests:** **`FilterTestHelpers.CreateRenameItem`** marks embedded tags as already loaded, so **`EnsureEmbeddedTagsLoaded`** is skipped and the overlay stays at its initial state (usually the default empty overlay), meaning **`<audio-*>`** tokens expand to **empty** strings without touching disk.
 
-Stream properties (duration, bitrate, channels, …) are under **Media properties** (`<media-*>`) and **MPEG audio properties** (`<mpeg-*>`), not `<audio-*>`. BPM is not implemented yet.
+Stream properties (duration, bitrate, channels, …) are under **Media properties** (`<media-*>`) and **MPEG audio properties** (`<mpeg-*>`), not `<audio-*>`.
 
 #### Media properties
 

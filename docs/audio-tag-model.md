@@ -88,7 +88,7 @@ can still create the recommended block). It is **excluded** from equality (dirty
 | **Xiph** | Known-key multimap (covers `SemanticAudioTag` fields). Unknown keys left on disk |
 | **Ape** | Known text key map. Read folds alias spellings (`ALBUMARTIST` → `Album Artist`) and splits `number/total` pairs into `Track`/`TrackCount` and `Disc`/`DiscCount`; item lookup is case-insensitive |
 | **RiffInfo** | INFO key → string map. Standard fourCCs (`INAM`, `IPRD`, `IART`, `IGNR`, `ICMT`, `ICOP`, `ICRD`, `ITRK`) read/written by key, not through TagLib's `InfoTag` façade properties (those map to non-standard ids such as `DIRC` for album) |
-| **Apple** | Text atom rows (track/disc binary atoms not modeled yet) |
+| **Apple** | Text atom rows (track/disc/BPM binary atoms not modeled yet) |
 | **Asf** | Content Description fields + extended descriptors (see below) |
 
 ### Presence and pruning
@@ -121,7 +121,8 @@ Format-specific filters/targets call `EnsureAudioTagBlockSupported` → PreviewE
 
 ## Semantic projection and writes
 
-`SemanticAudioTag` is the cross-format common-field view (`Title`, `Album`, `Performers`, …) in `Mfr.Models`.
+`SemanticAudioTag` is the cross-format common-field view (`Title`, `Album`, `Performers`, …,
+`BeatsPerMinute`, `Conductor`) in `Mfr.Models`.
 
 - **Read:** `SemanticAudioTag.FromOverlay` / `overlay.Semantic()` using the priority above.
 - **Write:** `AudioTagOverlay.MergeSemantic` broadcasts onto every present block (empty→absent,
@@ -170,6 +171,8 @@ Overlay rows use TagLib-canonical names (`AsfDescriptorNames`):
 | Album, Genre, … | `WM/AlbumTitle`, … | Extended descriptors |
 | TrackCount | `TrackTotal` | Extended descriptor |
 | Disc / DiscCount | `WM/PartOfSet` (`disc` or `disc/count`) | Extended descriptor |
+| BeatsPerMinute | `WM/BeatsPerMinute` | Extended descriptor |
+| Conductor | `WM/Conductor` | Extended descriptor |
 
 Write/patch routes Content Description fields through TagLib façade properties, never
 `AddDescriptor("WM/Title")`-style non-canonical names.
@@ -232,8 +235,8 @@ same preview chain.
 
 - **Art-only / modeled-empty tags:** block readers that find no modeled text may still surface a null
   block even when `TagTypesOnDisk` includes that type, which weakens selective remove for APIC-only tags.
-- **Apple track/disc:** binary atoms are not in the text-atom overlay; generic Track/Disc on M4A may not
-  round-trip.
+- **Apple track/disc/BPM:** binary atoms (`trkn` / `disk` / `tmpo`) are not in the text-atom overlay;
+  generic Track/Disc/BPM on M4A may not round-trip. Conductor uses the text `cond` atom.
 - **WAV/RIFF:** TagLib may write an ID3v2 chunk on save that the overlay does not model; removing
   `riffInfo` alone can leave façade-readable title data.
 - **Unknown keys** on Xiph/Ape survive title-only patches by omission; they are not editable in the overlay.

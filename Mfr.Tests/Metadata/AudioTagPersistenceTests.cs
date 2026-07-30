@@ -314,7 +314,9 @@ namespace Mfr.Tests.Metadata
                 Track: null,
                 TrackCount: null,
                 Disc: null,
-                DiscCount: null);
+                DiscCount: null,
+                BeatsPerMinute: null,
+                Conductor: null);
 
             overlay.MergeSemantic(merged);
 
@@ -346,7 +348,9 @@ namespace Mfr.Tests.Metadata
                 Track: null,
                 TrackCount: null,
                 Disc: null,
-                DiscCount: null);
+                DiscCount: null,
+                BeatsPerMinute: null,
+                Conductor: null);
 
             overlay.MergeSemantic(merged);
 
@@ -382,7 +386,9 @@ namespace Mfr.Tests.Metadata
                 Track: null,
                 TrackCount: null,
                 Disc: null,
-                DiscCount: null);
+                DiscCount: null,
+                BeatsPerMinute: null,
+                Conductor: null);
 
             overlay.MergeSemantic(merged);
 
@@ -511,6 +517,32 @@ namespace Mfr.Tests.Metadata
 
             AudioTagPersistence.Apply(path, first.Clone());
             Assert.Equal(first, AudioTagPersistence.Read(path));
+        }
+
+        /// <summary>
+        /// Semantic BPM and Conductor round-trip through ID3v2 <c>TBPM</c> / <c>TPE3</c>.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_Apply_BpmAndConductor_WrittenToId3v2()
+        {
+            var path = _AllocateMp3ScratchPath();
+
+            var original = AudioTagPersistence.Read(path);
+            var preview = original.Clone();
+            preview.MergeSemantic(
+                SemanticAudioTag.FromOverlay(preview) with
+                {
+                    BeatsPerMinute = 128,
+                    Conductor = "Karajan",
+                });
+
+            AudioTagPersistence.Apply(path, preview);
+
+            var again = AudioTagPersistence.Read(path);
+            Assert.Equal(128u, again.Semantic().BeatsPerMinute);
+            Assert.Equal("Karajan", again.Semantic().Conductor);
+            Assert.Contains(again.Id3v2!.Frames, f => f.FrameId == "TBPM" && f.TextValues[0] == "128");
+            Assert.Contains(again.Id3v2.Frames, f => f.FrameId == "TPE3" && f.TextValues[0] == "Karajan");
         }
 
         private static string? _ApeValue(ApeTagData ape, string key)

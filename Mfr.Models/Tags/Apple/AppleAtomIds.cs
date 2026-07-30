@@ -37,5 +37,8 @@ namespace Mfr.Models.Tags.Apple
 
         /// <summary>Release day/year atom (<c>©day</c>).</summary>
         public static ReadOnlySpan<byte> Day => [0xA9, (byte)'d', (byte)'a', (byte)'y'];
+
+        /// <summary>Conductor atom (<c>cond</c>).</summary>
+        public static ReadOnlySpan<byte> Conductor => [(byte)'c', (byte)'o', (byte)'n', (byte)'d'];
     }
 }

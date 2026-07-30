@@ -26,7 +26,9 @@ namespace Mfr.Tests.TestSupport
             uint track = 0,
             uint trackCount = 0,
             uint disc = 0,
-            uint discCount = 0)
+            uint discCount = 0,
+            uint beatsPerMinute = 0,
+            string? conductor = null)
         {
             var overlay = new AudioTagOverlay
             {
@@ -49,7 +51,9 @@ namespace Mfr.Tests.TestSupport
                 Track: track == 0 ? null : track,
                 TrackCount: trackCount == 0 ? null : trackCount,
                 Disc: disc == 0 ? null : disc,
-                DiscCount: discCount == 0 ? null : discCount);
+                DiscCount: discCount == 0 ? null : discCount,
+                BeatsPerMinute: beatsPerMinute == 0 ? null : beatsPerMinute,
+                Conductor: string.IsNullOrWhiteSpace(conductor) ? null : conductor.Trim());
 
             // Keep an empty Id3v2 block present so filter merges have a target (do not prune before first write).
             if (!merged.ContainsRenderableSemantics())

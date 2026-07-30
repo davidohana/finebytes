@@ -148,5 +148,13 @@ namespace Mfr.Models.Tags
         /// <summary>Disc count.</summary>
         [JsonStringEnumMemberName("discCount")]
         DiscCount,
+
+        /// <summary>Beats per minute.</summary>
+        [JsonStringEnumMemberName("beatsPerMinute")]
+        BeatsPerMinute,
+
+        /// <summary>Conductor or director.</summary>
+        [JsonStringEnumMemberName("conductor")]
+        Conductor,
     }
 }

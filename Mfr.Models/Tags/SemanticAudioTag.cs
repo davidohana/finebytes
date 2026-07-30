@@ -39,6 +39,8 @@ namespace Mfr.Models.Tags
     /// <param name="TrackCount">Track count.</param>
     /// <param name="Disc">Disc number.</param>
     /// <param name="DiscCount">Disc count.</param>
+    /// <param name="BeatsPerMinute">Tempo in beats per minute when non-zero in source tags.</param>
+    /// <param name="Conductor">Conductor or director.</param>
     public sealed record SemanticAudioTag(
         string? Title,
         string? Album,
@@ -54,7 +56,9 @@ namespace Mfr.Models.Tags
         uint? Track,
         uint? TrackCount,
         uint? Disc,
-        uint? DiscCount)
+        uint? DiscCount,
+        uint? BeatsPerMinute,
+        string? Conductor)
     {
         /// <summary>
         /// Projects merged semantic values from structured tag blocks only.
@@ -169,6 +173,17 @@ namespace Mfr.Models.Tags
                 _ParseUInt(_XiphFirst(overlay.Xiph, "DISCTOTAL") ?? _XiphFirst(overlay.Xiph, "TOTALDISCS")),
                 _ParseUInt(_ApeFirst(overlay.Ape, "DiscCount")),
                 asfDiscCount);
+            var beatsPerMinute = Nullables.FirstNonNull(
+                _ParseUInt(_Id3v2Singleton(overlay.Id3v2, "TBPM")),
+                _ParseUInt(_XiphFirst(overlay.Xiph, "BPM") ?? _XiphFirst(overlay.Xiph, "TEMPO")),
+                _ParseUInt(_ApeFirst(overlay.Ape, "BPM")),
+                _ParseUInt(_Asf(overlay.Asf, AsfDescriptorNames.BeatsPerMinute)));
+            var conductor = Nullables.FirstNonNull(
+                _Id3v2Singleton(overlay.Id3v2, "TPE3"),
+                _XiphFirst(overlay.Xiph, "CONDUCTOR"),
+                _ApeFirst(overlay.Ape, "Conductor"),
+                _ReadApplePlainText(overlay.Apple, AppleAtomIds.Conductor),
+                _Asf(overlay.Asf, AsfDescriptorNames.Conductor));
 
             return new SemanticAudioTag(
                 Title: title,
@@ -185,7 +200,9 @@ namespace Mfr.Models.Tags
                 Track: track,
                 TrackCount: trackCount,
                 Disc: disc,
-                DiscCount: discCount);
+                DiscCount: discCount,
+                BeatsPerMinute: beatsPerMinute,
+                Conductor: conductor);
         }
 
         /// <summary>
@@ -208,7 +225,9 @@ namespace Mfr.Models.Tags
                 || Track is not null
                 || TrackCount is not null
                 || Disc is not null
-                || DiscCount is not null;
+                || DiscCount is not null
+                || BeatsPerMinute is not null
+                || Conductor is not null;
         }
 
         private static string? _Id3v2Singleton(Id3v2TagData? data, string frameId)
