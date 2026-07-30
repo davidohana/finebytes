@@ -127,7 +127,7 @@ namespace Mfr.Filters.Audio
             var semantic = SemanticAudioTag.FromOverlay(tags);
 
             if (Options.Performers is not null)
-                semantic = _ApplyStringSemantics(
+                semantic = _ApplyStringField(
                     item,
                     semantic,
                     Options.Performers.OnlyIfEmpty,
@@ -136,7 +136,7 @@ namespace Mfr.Filters.Audio
                     static (m, v) => m with { Performers = v });
 
             if (Options.AlbumArtists is not null)
-                semantic = _ApplyStringSemantics(
+                semantic = _ApplyStringField(
                     item,
                     semantic,
                     Options.AlbumArtists.OnlyIfEmpty,
@@ -145,7 +145,7 @@ namespace Mfr.Filters.Audio
                     static (m, v) => m with { AlbumArtists = v });
 
             if (Options.Title is not null)
-                semantic = _ApplyStringSemantics(
+                semantic = _ApplyStringField(
                     item,
                     semantic,
                     Options.Title.OnlyIfEmpty,
@@ -154,7 +154,7 @@ namespace Mfr.Filters.Audio
                     static (m, v) => m with { Title = v });
 
             if (Options.Album is not null)
-                semantic = _ApplyStringSemantics(
+                semantic = _ApplyStringField(
                     item,
                     semantic,
                     Options.Album.OnlyIfEmpty,
@@ -163,7 +163,7 @@ namespace Mfr.Filters.Audio
                     static (m, v) => m with { Album = v });
 
             if (Options.Genre is not null)
-                semantic = _ApplyStringSemantics(
+                semantic = _ApplyStringField(
                     item,
                     semantic,
                     Options.Genre.OnlyIfEmpty,
@@ -172,7 +172,7 @@ namespace Mfr.Filters.Audio
                     static (m, v) => m with { Genre = v });
 
             if (Options.Comment is not null)
-                semantic = _ApplyStringSemantics(
+                semantic = _ApplyStringField(
                     item,
                     semantic,
                     Options.Comment.OnlyIfEmpty,
@@ -181,7 +181,7 @@ namespace Mfr.Filters.Audio
                     static (m, v) => m with { Comment = v });
 
             if (Options.Composers is not null)
-                semantic = _ApplyStringSemantics(
+                semantic = _ApplyStringField(
                     item,
                     semantic,
                     Options.Composers.OnlyIfEmpty,
@@ -190,12 +190,12 @@ namespace Mfr.Filters.Audio
                     static (m, v) => m with { Composers = v });
 
             if (Options.Year is not null)
-                semantic = _ApplyYearSemantics(item, semantic, Options.Year.OnlyIfEmpty, YearFormatter);
+                semantic = _ApplyYearField(item, semantic, Options.Year.OnlyIfEmpty, YearFormatter);
 
             if (Options.Track is not null)
             {
                 var trackIncrement = Options.TrackAutoIncrement ? item.Original.RenameListIndex : 0;
-                semantic = _ApplyByteSizedUintSemantics(
+                semantic = _ApplyByteField(
                     item,
                     semantic,
                     Options.Track.OnlyIfEmpty,
@@ -208,7 +208,7 @@ namespace Mfr.Filters.Audio
 
             if (Options.TrackCount is not null)
             {
-                semantic = _ApplyByteSizedUintSemantics(
+                semantic = _ApplyByteField(
                     item,
                     semantic,
                     Options.TrackCount.OnlyIfEmpty,
@@ -220,7 +220,7 @@ namespace Mfr.Filters.Audio
 
             if (Options.Disc is not null)
             {
-                semantic = _ApplyByteSizedUintSemantics(
+                semantic = _ApplyByteField(
                     item,
                     semantic,
                     Options.Disc.OnlyIfEmpty,
@@ -232,7 +232,7 @@ namespace Mfr.Filters.Audio
 
             if (Options.DiscCount is not null)
             {
-                semantic = _ApplyByteSizedUintSemantics(
+                semantic = _ApplyByteField(
                     item,
                     semantic,
                     Options.DiscCount.OnlyIfEmpty,
@@ -292,7 +292,7 @@ namespace Mfr.Filters.Audio
             return _ => literal;
         }
 
-        private static SemanticAudioTag _ApplyStringSemantics(
+        private static SemanticAudioTag _ApplyStringField(
             RenameItem item,
             SemanticAudioTag semantic,
             bool onlyIfEmpty,
@@ -308,7 +308,7 @@ namespace Mfr.Filters.Audio
             return assignUpdated(semantic, expanded);
         }
 
-        private SemanticAudioTag _ApplyYearSemantics(
+        private SemanticAudioTag _ApplyYearField(
             RenameItem item,
             SemanticAudioTag semantic,
             bool onlyIfEmpty,
@@ -349,7 +349,7 @@ namespace Mfr.Filters.Audio
         /// base and the sum is clamped to 255; a non-positive sum clears the field.
         /// </para>
         /// </remarks>
-        private static SemanticAudioTag _ApplyByteSizedUintSemantics(
+        private static SemanticAudioTag _ApplyByteField(
             RenameItem item,
             SemanticAudioTag semantic,
             bool onlyIfEmpty,
