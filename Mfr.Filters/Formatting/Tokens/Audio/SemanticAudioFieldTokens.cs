@@ -193,4 +193,104 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
         {
         }
     }
+
+    /// <inheritdoc />
+    internal sealed class AudioMbArtistIdToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-mb-artist-id&gt;</c>.</summary>
+        public AudioMbArtistIdToken()
+            : base(["audio-mb-artist-id"], SemanticAudioField.MusicBrainzArtistId)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioMbReleaseIdToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-mb-release-id&gt;</c>.</summary>
+        public AudioMbReleaseIdToken()
+            : base(["audio-mb-release-id"], SemanticAudioField.MusicBrainzReleaseId)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioMbReleaseArtistIdToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-mb-release-artist-id&gt;</c>.</summary>
+        public AudioMbReleaseArtistIdToken()
+            : base(["audio-mb-release-artist-id"], SemanticAudioField.MusicBrainzReleaseArtistId)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioMbTrackIdToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-mb-track-id&gt;</c>.</summary>
+        public AudioMbTrackIdToken()
+            : base(["audio-mb-track-id"], SemanticAudioField.MusicBrainzTrackId)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioMbDiscIdToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-mb-disc-id&gt;</c>.</summary>
+        public AudioMbDiscIdToken()
+            : base(["audio-mb-disc-id"], SemanticAudioField.MusicBrainzDiscId)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioMbReleaseStatusToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-mb-release-status&gt;</c>.</summary>
+        public AudioMbReleaseStatusToken()
+            : base(["audio-mb-release-status"], SemanticAudioField.MusicBrainzReleaseStatus)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioMbReleaseTypeToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-mb-release-type&gt;</c>.</summary>
+        public AudioMbReleaseTypeToken()
+            : base(["audio-mb-release-type"], SemanticAudioField.MusicBrainzReleaseType)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioMbReleaseCountryToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-mb-release-country&gt;</c>.</summary>
+        public AudioMbReleaseCountryToken()
+            : base(["audio-mb-release-country"], SemanticAudioField.MusicBrainzReleaseCountry)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioMusicIpIdToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-musicip-id&gt;</c>.</summary>
+        public AudioMusicIpIdToken()
+            : base(["audio-musicip-id"], SemanticAudioField.MusicIpId)
+        {
+        }
+    }
+
+    /// <inheritdoc />
+    internal sealed class AudioAmazonIdToken : SemanticAudioFieldTokenBase
+    {
+        /// <summary>Registers <c>&lt;audio-amazon-id&gt;</c>.</summary>
+        public AudioAmazonIdToken()
+            : base(["audio-amazon-id"], SemanticAudioField.AmazonId)
+        {
+        }
+    }
 }

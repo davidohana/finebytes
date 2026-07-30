@@ -316,7 +316,17 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null,
                 BeatsPerMinute: null,
-                Conductor: null);
+                Conductor: null,
+                MusicBrainzArtistId: null,
+                MusicBrainzReleaseId: null,
+                MusicBrainzReleaseArtistId: null,
+                MusicBrainzTrackId: null,
+                MusicBrainzDiscId: null,
+                MusicBrainzReleaseStatus: null,
+                MusicBrainzReleaseType: null,
+                MusicBrainzReleaseCountry: null,
+                MusicIpId: null,
+                AmazonId: null);
 
             overlay.MergeSemantic(merged);
 
@@ -350,7 +360,17 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null,
                 BeatsPerMinute: null,
-                Conductor: null);
+                Conductor: null,
+                MusicBrainzArtistId: null,
+                MusicBrainzReleaseId: null,
+                MusicBrainzReleaseArtistId: null,
+                MusicBrainzTrackId: null,
+                MusicBrainzDiscId: null,
+                MusicBrainzReleaseStatus: null,
+                MusicBrainzReleaseType: null,
+                MusicBrainzReleaseCountry: null,
+                MusicIpId: null,
+                AmazonId: null);
 
             overlay.MergeSemantic(merged);
 
@@ -388,7 +408,17 @@ namespace Mfr.Tests.Metadata
                 Disc: null,
                 DiscCount: null,
                 BeatsPerMinute: null,
-                Conductor: null);
+                Conductor: null,
+                MusicBrainzArtistId: null,
+                MusicBrainzReleaseId: null,
+                MusicBrainzReleaseArtistId: null,
+                MusicBrainzTrackId: null,
+                MusicBrainzDiscId: null,
+                MusicBrainzReleaseStatus: null,
+                MusicBrainzReleaseType: null,
+                MusicBrainzReleaseCountry: null,
+                MusicIpId: null,
+                AmazonId: null);
 
             overlay.MergeSemantic(merged);
 
@@ -543,6 +573,84 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("Karajan", again.Semantic().Conductor);
             Assert.Contains(again.Id3v2!.Frames, f => f.FrameId == "TBPM" && f.TextValues[0] == "128");
             Assert.Contains(again.Id3v2.Frames, f => f.FrameId == "TPE3" && f.TextValues[0] == "Karajan");
+        }
+
+        /// <summary>
+        /// Catalog IDs write as <c>TXXX</c> by description and leave unrelated <c>TXXX</c> frames intact.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_Apply_CatalogIds_WriteTxxxWithoutWipingUnrelated()
+        {
+            var path = _AllocateMp3ScratchPath();
+
+            using (var file = TagLib.File.Create(path))
+            {
+                var id3 = (TagLib.Id3v2.Tag)file.GetTag(TagLib.TagTypes.Id3v2, true);
+                id3.Version = 3;
+                id3.SetTextFrame("TIT2", "keep-title");
+                id3.AddFrame(new TagLib.Id3v2.UserTextInformationFrame("replaygain") { Text = ["-6.5 dB"] });
+                file.Save();
+            }
+
+            var original = AudioTagPersistence.Read(path);
+            Assert.Contains(
+                original.Id3v2!.Frames,
+                f => f.FrameId == "TXXX" && f.Description == "replaygain");
+
+            var preview = original.Clone();
+            preview.MergeSemantic(
+                SemanticAudioTag.FromOverlay(preview) with
+                {
+                    MusicBrainzArtistId = "artist-mbid",
+                    AmazonId = "B000ASIN01",
+                });
+
+            AudioTagPersistence.Apply(path, preview);
+
+            var again = AudioTagPersistence.Read(path);
+            Assert.Equal("artist-mbid", again.Semantic().MusicBrainzArtistId);
+            Assert.Equal("B000ASIN01", again.Semantic().AmazonId);
+            Assert.Contains(
+                again.Id3v2!.Frames,
+                f => f.FrameId == "TXXX" && f.Description == "replaygain" && f.TextValues[0] == "-6.5 dB");
+            Assert.Contains(
+                again.Id3v2.Frames,
+                f => f.FrameId == "TXXX"
+                    && f.Description == "MusicBrainz Artist Id"
+                    && f.TextValues[0] == "artist-mbid");
+            Assert.Contains(
+                again.Id3v2.Frames,
+                f => f.FrameId == "TXXX" && f.Description == "ASIN" && f.TextValues[0] == "B000ASIN01");
+        }
+
+        /// <summary>
+        /// Catalog IDs round-trip through Xiph known keys on Ogg.
+        /// </summary>
+        [Fact]
+        public void RoundTrip_Apply_CatalogIds_WrittenToXiph()
+        {
+            var path = _CopyFixtureToTemp("libnogg-bitrate-123.ogg");
+
+            var original = AudioTagPersistence.Read(path);
+            var preview = original.Clone();
+            preview.MergeSemantic(
+                SemanticAudioTag.FromOverlay(preview) with
+                {
+                    MusicBrainzTrackId = "track-mbid",
+                    MusicIpId = "puid-value",
+                    MusicBrainzReleaseCountry = "GB",
+                });
+
+            AudioTagPersistence.Apply(path, preview);
+
+            var again = AudioTagPersistence.Read(path);
+            Assert.Equal("track-mbid", again.Semantic().MusicBrainzTrackId);
+            Assert.Equal("puid-value", again.Semantic().MusicIpId);
+            Assert.Equal("GB", again.Semantic().MusicBrainzReleaseCountry);
+            Assert.NotNull(again.Xiph);
+            Assert.Contains(
+                again.Xiph.Fields,
+                r => r.Key == "MUSICBRAINZ_TRACKID" && r.Values[0] == "track-mbid");
         }
 
         private static string? _ApeValue(ApeTagData ape, string key)

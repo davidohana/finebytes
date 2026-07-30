@@ -25,6 +25,10 @@ namespace Mfr.Metadata.TagFields
             "Comment", "Lyrics", "Copyright", "Grouping",
             "Year", "Track", "TrackCount", "Disc", "DiscCount",
             "BPM", "Conductor",
+            "MUSICBRAINZ_ARTISTID", "MUSICBRAINZ_ALBUMID", "MUSICBRAINZ_ALBUMARTISTID",
+            "MUSICBRAINZ_TRACKID", "MUSICBRAINZ_DISCID",
+            "MUSICBRAINZ_ALBUMSTATUS", "MUSICBRAINZ_ALBUMTYPE", "MUSICBRAINZ_RELEASECOUNTRY",
+            "MUSICIP_PUID", "ASIN",
         ];
 
         // Spellings other taggers use for a modeled APE key; values are stored under the modeled key.

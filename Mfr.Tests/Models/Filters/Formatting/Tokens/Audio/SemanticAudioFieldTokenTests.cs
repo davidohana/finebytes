@@ -159,6 +159,33 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         }
 
         [Fact]
+        public void Resolve_CatalogIdTokens_EmptyAndSet()
+        {
+            var emptyItem = FilterTestHelpers.CreateRenameItem();
+            Assert.Equal(string.Empty, new AudioMbArtistIdToken().Compile(string.Empty)(emptyItem));
+            Assert.Equal(string.Empty, new AudioAmazonIdToken().Compile(string.Empty)(emptyItem));
+
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "t");
+                m.AudioTagOverlay.MergeSemantic(
+                    SemanticAudioTag.FromOverlay(m.AudioTagOverlay) with
+                    {
+                        MusicBrainzArtistId = "mb-artist",
+                        MusicBrainzReleaseId = "mb-release",
+                        AmazonId = "B00TEST",
+                        MusicIpId = "puid-1",
+                    });
+            });
+
+            Assert.Equal("mb-artist", new AudioMbArtistIdToken().Compile(string.Empty)(item));
+            Assert.Equal("mb-release", new AudioMbReleaseIdToken().Compile(string.Empty)(item));
+            Assert.Equal("B00TEST", new AudioAmazonIdToken().Compile(string.Empty)(item));
+            Assert.Equal("puid-1", new AudioMusicIpIdToken().Compile(string.Empty)(item));
+            Assert.Contains("audio-mb-artist-id", new AudioMbArtistIdToken().Names);
+        }
+
+        [Fact]
         public void Apply_FormatterCombinesYearAndTitle()
         {
             var target = new FilePrefixTarget();

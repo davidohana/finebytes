@@ -53,7 +53,17 @@ namespace Mfr.Tests.TestSupport
                 Disc: disc == 0 ? null : disc,
                 DiscCount: discCount == 0 ? null : discCount,
                 BeatsPerMinute: beatsPerMinute == 0 ? null : beatsPerMinute,
-                Conductor: string.IsNullOrWhiteSpace(conductor) ? null : conductor.Trim());
+                Conductor: string.IsNullOrWhiteSpace(conductor) ? null : conductor.Trim(),
+                MusicBrainzArtistId: null,
+                MusicBrainzReleaseId: null,
+                MusicBrainzReleaseArtistId: null,
+                MusicBrainzTrackId: null,
+                MusicBrainzDiscId: null,
+                MusicBrainzReleaseStatus: null,
+                MusicBrainzReleaseType: null,
+                MusicBrainzReleaseCountry: null,
+                MusicIpId: null,
+                AmazonId: null);
 
             // Keep an empty Id3v2 block present so filter merges have a target (do not prune before first write).
             if (!merged.ContainsRenderableSemantics())

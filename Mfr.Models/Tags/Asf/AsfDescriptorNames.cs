@@ -63,5 +63,35 @@ namespace Mfr.Models.Tags.Asf
 
         /// <summary>Conductor extended descriptor.</summary>
         public const string Conductor = "WM/Conductor";
+
+        /// <summary>MusicBrainz artist ID extended descriptor.</summary>
+        public const string MusicBrainzArtistId = "MusicBrainz/Artist Id";
+
+        /// <summary>MusicBrainz album/release ID extended descriptor.</summary>
+        public const string MusicBrainzReleaseId = "MusicBrainz/Album Id";
+
+        /// <summary>MusicBrainz album artist ID extended descriptor.</summary>
+        public const string MusicBrainzReleaseArtistId = "MusicBrainz/Album Artist Id";
+
+        /// <summary>MusicBrainz track ID extended descriptor.</summary>
+        public const string MusicBrainzTrackId = "MusicBrainz/Track Id";
+
+        /// <summary>MusicBrainz disc ID extended descriptor.</summary>
+        public const string MusicBrainzDiscId = "MusicBrainz/Disc Id";
+
+        /// <summary>MusicBrainz album status extended descriptor.</summary>
+        public const string MusicBrainzReleaseStatus = "MusicBrainz/Album Status";
+
+        /// <summary>MusicBrainz album type extended descriptor.</summary>
+        public const string MusicBrainzReleaseType = "MusicBrainz/Album Type";
+
+        /// <summary>MusicBrainz album release country extended descriptor.</summary>
+        public const string MusicBrainzReleaseCountry = "MusicBrainz/Album Release Country";
+
+        /// <summary>MusicIP PUID extended descriptor.</summary>
+        public const string MusicIpId = "MusicIP/PUID";
+
+        /// <summary>Amazon ASIN extended descriptor.</summary>
+        public const string AmazonId = "ASIN";
     }
 }

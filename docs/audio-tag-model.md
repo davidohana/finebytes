@@ -122,7 +122,9 @@ Format-specific filters/targets call `EnsureAudioTagBlockSupported` → PreviewE
 ## Semantic projection and writes
 
 `SemanticAudioTag` is the cross-format common-field view (`Title`, `Album`, `Performers`, …,
-`BeatsPerMinute`, `Conductor`) in `Mfr.Models`.
+`BeatsPerMinute`, `Conductor`, MusicBrainz/MusicIP/Amazon catalog IDs) in `Mfr.Models`.
+Key maps for catalog IDs live in `AudioCatalogFieldMaps` (ID3v2 `TXXX` descriptions, Xiph/APE keys, ASF
+descriptors). Apple freeform atoms and RIFF INFO are not mapped for catalog IDs.
 
 - **Read:** `SemanticAudioTag.FromOverlay` / `overlay.Semantic()` using the priority above.
 - **Write:** `AudioTagOverlay.MergeSemantic` broadcasts onto every present block (empty→absent,
@@ -246,7 +248,7 @@ same preview chain.
 | Area | Paths |
 |---|---|
 | Overlay | `Mfr.Models/Tags/AudioTagOverlay.cs`, block types under `Tags/{Id3v1,Id3v2,Xiph,…}` |
-| Semantic / field I/O | `Mfr.Models/Tags/SemanticAudioTag.cs`, `AudioTagSemanticMerge.cs`, `SemanticFields.cs`, `AudioOverlayBlockFieldIo.cs`, `AudioOverlayTargetIo.cs` |
+| Semantic / field I/O | `Mfr.Models/Tags/SemanticAudioTag.cs`, `AudioTagSemanticMerge.cs`, `SemanticFields.cs`, `AudioCatalogFieldMaps.cs`, `AudioOverlayBlockFieldIo.cs`, `AudioOverlayTargetIo.cs` |
 | Persistence | `Mfr.Metadata/AudioTagPersistence.cs`, `Mfr.Metadata/TagFields/` (`*TagFields`, `TagFieldDiff`) |
 | Shared text rules | `Mfr.Utils/DelimitedText.cs`, `Mfr.Utils/OrdinalSequence.cs`, `Mfr.Utils/StringExtensions.cs` |
 | Policy | `Mfr.Models/Tags/AudioTagContainerPolicy.cs` (capability), `Mfr.Metadata/AudioTagContainerDetector.cs` (detect), `Id3v2FrameVersionPolicy.cs`, `AsfDescriptorNames.cs` |

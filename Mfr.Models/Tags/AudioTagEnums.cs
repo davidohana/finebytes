@@ -156,5 +156,45 @@ namespace Mfr.Models.Tags
         /// <summary>Conductor or director.</summary>
         [JsonStringEnumMemberName("conductor")]
         Conductor,
+
+        /// <summary>MusicBrainz artist ID.</summary>
+        [JsonStringEnumMemberName("musicBrainzArtistId")]
+        MusicBrainzArtistId,
+
+        /// <summary>MusicBrainz release (album) ID.</summary>
+        [JsonStringEnumMemberName("musicBrainzReleaseId")]
+        MusicBrainzReleaseId,
+
+        /// <summary>MusicBrainz release (album) artist ID.</summary>
+        [JsonStringEnumMemberName("musicBrainzReleaseArtistId")]
+        MusicBrainzReleaseArtistId,
+
+        /// <summary>MusicBrainz track ID.</summary>
+        [JsonStringEnumMemberName("musicBrainzTrackId")]
+        MusicBrainzTrackId,
+
+        /// <summary>MusicBrainz disc ID.</summary>
+        [JsonStringEnumMemberName("musicBrainzDiscId")]
+        MusicBrainzDiscId,
+
+        /// <summary>MusicBrainz release status.</summary>
+        [JsonStringEnumMemberName("musicBrainzReleaseStatus")]
+        MusicBrainzReleaseStatus,
+
+        /// <summary>MusicBrainz release type.</summary>
+        [JsonStringEnumMemberName("musicBrainzReleaseType")]
+        MusicBrainzReleaseType,
+
+        /// <summary>MusicBrainz release country.</summary>
+        [JsonStringEnumMemberName("musicBrainzReleaseCountry")]
+        MusicBrainzReleaseCountry,
+
+        /// <summary>MusicIP PUID.</summary>
+        [JsonStringEnumMemberName("musicIpId")]
+        MusicIpId,
+
+        /// <summary>Amazon ASIN.</summary>
+        [JsonStringEnumMemberName("amazonId")]
+        AmazonId,
     }
 }

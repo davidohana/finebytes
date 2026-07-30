@@ -46,6 +46,16 @@ namespace Mfr.Models.Tags
                 SemanticAudioField.DiscCount => _DecimalDigitsOrEmpty(semantic.DiscCount),
                 SemanticAudioField.BeatsPerMinute => _DecimalDigitsOrEmpty(semantic.BeatsPerMinute),
                 SemanticAudioField.Conductor => semantic.Conductor ?? string.Empty,
+                SemanticAudioField.MusicBrainzArtistId => semantic.MusicBrainzArtistId ?? string.Empty,
+                SemanticAudioField.MusicBrainzReleaseId => semantic.MusicBrainzReleaseId ?? string.Empty,
+                SemanticAudioField.MusicBrainzReleaseArtistId => semantic.MusicBrainzReleaseArtistId ?? string.Empty,
+                SemanticAudioField.MusicBrainzTrackId => semantic.MusicBrainzTrackId ?? string.Empty,
+                SemanticAudioField.MusicBrainzDiscId => semantic.MusicBrainzDiscId ?? string.Empty,
+                SemanticAudioField.MusicBrainzReleaseStatus => semantic.MusicBrainzReleaseStatus ?? string.Empty,
+                SemanticAudioField.MusicBrainzReleaseType => semantic.MusicBrainzReleaseType ?? string.Empty,
+                SemanticAudioField.MusicBrainzReleaseCountry => semantic.MusicBrainzReleaseCountry ?? string.Empty,
+                SemanticAudioField.MusicIpId => semantic.MusicIpId ?? string.Empty,
+                SemanticAudioField.AmazonId => semantic.AmazonId ?? string.Empty,
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
         }
@@ -102,6 +112,24 @@ namespace Mfr.Models.Tags
                 SemanticAudioField.BeatsPerMinute =>
                     semantic with { BeatsPerMinute = _ParseNullableUInt(trimmed, nameof(fieldString)) },
                 SemanticAudioField.Conductor => semantic with { Conductor = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzArtistId =>
+                    semantic with { MusicBrainzArtistId = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzReleaseId =>
+                    semantic with { MusicBrainzReleaseId = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzReleaseArtistId =>
+                    semantic with { MusicBrainzReleaseArtistId = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzTrackId =>
+                    semantic with { MusicBrainzTrackId = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzDiscId =>
+                    semantic with { MusicBrainzDiscId = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzReleaseStatus =>
+                    semantic with { MusicBrainzReleaseStatus = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzReleaseType =>
+                    semantic with { MusicBrainzReleaseType = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzReleaseCountry =>
+                    semantic with { MusicBrainzReleaseCountry = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicIpId => semantic with { MusicIpId = trimmed.TrimmedOrNull() },
+                SemanticAudioField.AmazonId => semantic with { AmazonId = trimmed.TrimmedOrNull() },
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 

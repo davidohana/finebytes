@@ -41,6 +41,16 @@ namespace Mfr.Models.Tags
     /// <param name="DiscCount">Disc count.</param>
     /// <param name="BeatsPerMinute">Tempo in beats per minute when non-zero in source tags.</param>
     /// <param name="Conductor">Conductor or director.</param>
+    /// <param name="MusicBrainzArtistId">MusicBrainz artist ID.</param>
+    /// <param name="MusicBrainzReleaseId">MusicBrainz release (album) ID.</param>
+    /// <param name="MusicBrainzReleaseArtistId">MusicBrainz release (album) artist ID.</param>
+    /// <param name="MusicBrainzTrackId">MusicBrainz track ID.</param>
+    /// <param name="MusicBrainzDiscId">MusicBrainz disc ID.</param>
+    /// <param name="MusicBrainzReleaseStatus">MusicBrainz release status.</param>
+    /// <param name="MusicBrainzReleaseType">MusicBrainz release type.</param>
+    /// <param name="MusicBrainzReleaseCountry">MusicBrainz release country.</param>
+    /// <param name="MusicIpId">MusicIP PUID.</param>
+    /// <param name="AmazonId">Amazon ASIN.</param>
     public sealed record SemanticAudioTag(
         string? Title,
         string? Album,
@@ -58,7 +68,17 @@ namespace Mfr.Models.Tags
         uint? Disc,
         uint? DiscCount,
         uint? BeatsPerMinute,
-        string? Conductor)
+        string? Conductor,
+        string? MusicBrainzArtistId,
+        string? MusicBrainzReleaseId,
+        string? MusicBrainzReleaseArtistId,
+        string? MusicBrainzTrackId,
+        string? MusicBrainzDiscId,
+        string? MusicBrainzReleaseStatus,
+        string? MusicBrainzReleaseType,
+        string? MusicBrainzReleaseCountry,
+        string? MusicIpId,
+        string? AmazonId)
     {
         /// <summary>
         /// Projects merged semantic values from structured tag blocks only.
@@ -184,6 +204,16 @@ namespace Mfr.Models.Tags
                 _ApeFirst(overlay.Ape, "Conductor"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomIds.Conductor),
                 _Asf(overlay.Asf, AsfDescriptorNames.Conductor));
+            var musicBrainzArtistId = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzArtistId);
+            var musicBrainzReleaseId = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzReleaseId);
+            var musicBrainzReleaseArtistId = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzReleaseArtistId);
+            var musicBrainzTrackId = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzTrackId);
+            var musicBrainzDiscId = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzDiscId);
+            var musicBrainzReleaseStatus = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzReleaseStatus);
+            var musicBrainzReleaseType = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzReleaseType);
+            var musicBrainzReleaseCountry = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzReleaseCountry);
+            var musicIpId = _ReadCatalogField(overlay, SemanticAudioField.MusicIpId);
+            var amazonId = _ReadCatalogField(overlay, SemanticAudioField.AmazonId);
 
             return new SemanticAudioTag(
                 Title: title,
@@ -202,7 +232,17 @@ namespace Mfr.Models.Tags
                 Disc: disc,
                 DiscCount: discCount,
                 BeatsPerMinute: beatsPerMinute,
-                Conductor: conductor);
+                Conductor: conductor,
+                MusicBrainzArtistId: musicBrainzArtistId,
+                MusicBrainzReleaseId: musicBrainzReleaseId,
+                MusicBrainzReleaseArtistId: musicBrainzReleaseArtistId,
+                MusicBrainzTrackId: musicBrainzTrackId,
+                MusicBrainzDiscId: musicBrainzDiscId,
+                MusicBrainzReleaseStatus: musicBrainzReleaseStatus,
+                MusicBrainzReleaseType: musicBrainzReleaseType,
+                MusicBrainzReleaseCountry: musicBrainzReleaseCountry,
+                MusicIpId: musicIpId,
+                AmazonId: amazonId);
         }
 
         /// <summary>
@@ -227,7 +267,57 @@ namespace Mfr.Models.Tags
                 || Disc is not null
                 || DiscCount is not null
                 || BeatsPerMinute is not null
-                || Conductor is not null;
+                || Conductor is not null
+                || MusicBrainzArtistId is not null
+                || MusicBrainzReleaseId is not null
+                || MusicBrainzReleaseArtistId is not null
+                || MusicBrainzTrackId is not null
+                || MusicBrainzDiscId is not null
+                || MusicBrainzReleaseStatus is not null
+                || MusicBrainzReleaseType is not null
+                || MusicBrainzReleaseCountry is not null
+                || MusicIpId is not null
+                || AmazonId is not null;
+        }
+
+        private static string? _ReadCatalogField(AudioTagOverlay overlay, SemanticAudioField field)
+        {
+            var row = _CatalogRow(field);
+            return Nullables.FirstNonNull(
+                _Id3v2Txxx(overlay.Id3v2, row.Id3v2TxxxDescription),
+                _XiphFirst(overlay.Xiph, row.XiphKey),
+                _ApeFirst(overlay.Ape, row.ApeKey),
+                _Asf(overlay.Asf, row.AsfDescriptor));
+        }
+
+        private static AudioCatalogFieldMaps.CatalogKeyRow _CatalogRow(SemanticAudioField field)
+        {
+            foreach (var row in AudioCatalogFieldMaps.All)
+            {
+                if (row.Field == field)
+                    return row;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(field), field, "Not a catalog semantic field.");
+        }
+
+        private static string? _Id3v2Txxx(Id3v2TagData? data, string description)
+        {
+            if (data is null)
+                return null;
+
+            foreach (var frame in data.Frames)
+            {
+                if (!string.Equals(frame.FrameId, "TXXX", StringComparison.Ordinal))
+                    continue;
+
+                if (!string.Equals(frame.Description, description, StringComparison.Ordinal))
+                    continue;
+
+                return frame.TextValues.Length == 0 ? null : frame.TextValues[0].TrimmedOrNull();
+            }
+
+            return null;
         }
 
         private static string? _Id3v2Singleton(Id3v2TagData? data, string frameId)

@@ -95,6 +95,7 @@ namespace Mfr.Models.Tags
             _SetYear(frames, existing.Version, common.Year);
             _SetTrackPair(frames, "TRCK", common.Track, common.TrackCount);
             _SetTrackPair(frames, "TPOS", common.Disc, common.DiscCount);
+            _MergeCatalogId3v2(frames, common);
 
             frames.Sort(_CompareId3v2Frames);
             // Preserve an intentionally empty Id3v2 block (create/recommended target) until fields are set or the
@@ -133,6 +134,7 @@ namespace Mfr.Models.Tags
             _SetMapScalar(map, "BPM", common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
             map.Remove("TEMPO");
             _SetMapScalar(map, "CONDUCTOR", common.Conductor);
+            _MergeCatalogMap(map, common, static row => row.XiphKey);
 
             var rows = _SortedRows(map);
             return rows.Length == 0 ? null : new XiphTagData { Fields = rows };
@@ -158,6 +160,7 @@ namespace Mfr.Models.Tags
             _SetMapScalar(map, "DiscCount", common.DiscCount?.ToString(CultureInfo.InvariantCulture));
             _SetMapScalar(map, "BPM", common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
             _SetMapScalar(map, "Conductor", common.Conductor);
+            _MergeCatalogMap(map, common, static row => row.ApeKey);
 
             var rows = _SortedRows(map);
             return rows.Length == 0 ? null : new ApeTagData { Fields = rows };
@@ -200,6 +203,8 @@ namespace Mfr.Models.Tags
                 AsfDescriptorNames.BeatsPerMinute,
                 common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
             _SetAsf(rows, AsfDescriptorNames.Conductor, common.Conductor);
+            foreach (var catalog in AudioCatalogFieldMaps.All)
+                _SetAsf(rows, catalog.AsfDescriptor, _CatalogValue(common, catalog.Field));
 
             if (rows.Count == 0)
                 return null;
@@ -243,6 +248,56 @@ namespace Mfr.Models.Tags
             });
 
             return new AppleTagData { Atoms = [.. atoms] };
+        }
+
+        private static void _MergeCatalogId3v2(List<Id3v2ModeledFrame> frames, SemanticAudioTag common)
+        {
+            foreach (var catalog in AudioCatalogFieldMaps.All)
+                _SetTxxx(frames, catalog.Id3v2TxxxDescription, _CatalogValue(common, catalog.Field));
+        }
+
+        private static void _MergeCatalogMap(
+            Dictionary<string, ImmutableArray<string>> map,
+            SemanticAudioTag common,
+            Func<AudioCatalogFieldMaps.CatalogKeyRow, string> keySelector)
+        {
+            foreach (var catalog in AudioCatalogFieldMaps.All)
+                _SetMapScalar(map, keySelector(catalog), _CatalogValue(common, catalog.Field));
+        }
+
+        private static string? _CatalogValue(SemanticAudioTag common, SemanticAudioField field)
+        {
+            // Catalog fields are plain strings; Format already maps each SemanticAudioField.
+            return SemanticFields.Format(common, field).TrimmedOrNull();
+        }
+
+        private static void _SetTxxx(List<Id3v2ModeledFrame> frames, string description, string? value)
+        {
+            var index = frames.FindIndex(f =>
+                string.Equals(f.FrameId, "TXXX", StringComparison.Ordinal)
+                && string.Equals(f.Description, description, StringComparison.Ordinal));
+
+            var text = value.TrimmedOrNull();
+            if (text is null)
+            {
+                if (index >= 0)
+                    frames.RemoveAt(index);
+
+                return;
+            }
+
+            var replacement = new Id3v2ModeledFrame
+            {
+                FrameId = "TXXX",
+                Language = null,
+                Description = description,
+                TextValues = [text],
+            };
+
+            if (index >= 0)
+                frames[index] = replacement;
+            else
+                frames.Add(replacement);
         }
 
         private static void _SetSingleton(List<Id3v2ModeledFrame> frames, string frameId, string? value)
