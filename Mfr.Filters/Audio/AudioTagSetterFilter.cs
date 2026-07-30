@@ -9,7 +9,8 @@ namespace Mfr.Filters.Audio
 {
     /// <summary>
     /// Options for one string-valued audio overlay field (performers, title, comment, etc.), including
-    /// <c>year</c> and <c>track</c> in <see cref="AudioTagSetterOptions"/> where <c>text</c> is parsed as a number after formatting.
+    /// <c>year</c>, <c>track</c>, <c>trackCount</c>, <c>disc</c>, and <c>discCount</c> in
+    /// <see cref="AudioTagSetterOptions"/> where <c>text</c> is parsed as a number after formatting.
     /// </summary>
     /// <param name="Text">
     /// Plain text, or a formatter template when it contains at least one balanced <c>&lt;...&gt;</c> span
@@ -31,6 +32,7 @@ namespace Mfr.Filters.Audio
     /// <param name="Album">Album name options.</param>
     /// <param name="Genre">Genre options (use <c>; </c> in text for multiple values).</param>
     /// <param name="Comment">Comment options.</param>
+    /// <param name="Composers">Composers; omit (or <c>null</c>) to leave unchanged (use <c>; </c> in text for multiple values).</param>
     /// <param name="Year">
     /// Release year; same shape as other string fields. After formatting (or literal <c>text</c>), the result must be
     /// empty (clear year), <c>0</c> (clear), or an integer <c>1</c>-<c>9999</c>. Anything else yields a preview error.
@@ -38,6 +40,15 @@ namespace Mfr.Filters.Audio
     /// <param name="Track">
     /// Track index; same <c>text</c> / <c>onlyIfEmpty</c> shape as <paramref name="Year"/>. After formatting, empty clears;
     /// otherwise the value must parse as an integer <c>0</c>-<c>255</c> (base before increment). Non-numeric or out of range yields a preview error. With <paramref name="TrackAutoIncrement"/>, <see cref="FileMeta.RenameListIndex"/> is added and the sum is clamped to 255.
+    /// </param>
+    /// <param name="TrackCount">
+    /// Track count (of n/m); same parse rules as <paramref name="Track"/> without auto-increment (empty or <c>0</c> clears; <c>1</c>-<c>255</c> sets).
+    /// </param>
+    /// <param name="Disc">
+    /// Disc index; same parse rules as <paramref name="TrackCount"/>.
+    /// </param>
+    /// <param name="DiscCount">
+    /// Disc count; same parse rules as <paramref name="TrackCount"/>.
     /// </param>
     /// <param name="TrackAutoIncrement">
     /// When true and <paramref name="Track"/> is active, add each item’s <see cref="FileMeta.RenameListIndex"/> to the parsed base track before clamping to 255 (legacy “auto-increment track” checkbox).
@@ -49,8 +60,12 @@ namespace Mfr.Filters.Audio
         [property: JsonPropertyName("album")] AudioTagStringFieldOptions? Album = null,
         [property: JsonPropertyName("genre")] AudioTagStringFieldOptions? Genre = null,
         [property: JsonPropertyName("comment")] AudioTagStringFieldOptions? Comment = null,
+        [property: JsonPropertyName("composers")] AudioTagStringFieldOptions? Composers = null,
         [property: JsonPropertyName("year")] AudioTagStringFieldOptions? Year = null,
         [property: JsonPropertyName("track")] AudioTagStringFieldOptions? Track = null,
+        [property: JsonPropertyName("trackCount")] AudioTagStringFieldOptions? TrackCount = null,
+        [property: JsonPropertyName("disc")] AudioTagStringFieldOptions? Disc = null,
+        [property: JsonPropertyName("discCount")] AudioTagStringFieldOptions? DiscCount = null,
         [property: JsonPropertyName("trackAutoIncrement")] bool TrackAutoIncrement = false);
 
     /// <summary>
@@ -77,8 +92,12 @@ namespace Mfr.Filters.Audio
         private Formatter AlbumFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter GenreFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter CommentFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter ComposersFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter YearFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter TrackFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter TrackCountFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter DiscFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter DiscCountFormatter = FormatStringCompiler.EmptyFormatter;
 
         /// <inheritdoc />
         public override string Type => "AudioTagSetter";
@@ -92,8 +111,12 @@ namespace Mfr.Filters.Audio
             AlbumFormatter = _CreateFormatter(Options.Album);
             GenreFormatter = _CreateFormatter(Options.Genre);
             CommentFormatter = _CreateFormatter(Options.Comment);
+            ComposersFormatter = _CreateFormatter(Options.Composers);
             YearFormatter = _CreateFormatter(Options.Year);
             TrackFormatter = _CreateFormatter(Options.Track);
+            TrackCountFormatter = _CreateFormatter(Options.TrackCount);
+            DiscFormatter = _CreateFormatter(Options.Disc);
+            DiscCountFormatter = _CreateFormatter(Options.DiscCount);
         }
 
         /// <inheritdoc />
@@ -157,11 +180,67 @@ namespace Mfr.Filters.Audio
                     CommentFormatter,
                     static (m, v) => m with { Comment = v });
 
+            if (Options.Composers is not null)
+                semantic = _ApplyStringSemantics(
+                    item,
+                    semantic,
+                    Options.Composers.OnlyIfEmpty,
+                    semantic.Composers,
+                    ComposersFormatter,
+                    static (m, v) => m with { Composers = v });
+
             if (Options.Year is not null)
                 semantic = _ApplyYearSemantics(item, semantic, Options.Year.OnlyIfEmpty, YearFormatter);
 
             if (Options.Track is not null)
-                semantic = _ApplyTrackSemantics(item, semantic, Options.Track.OnlyIfEmpty, TrackFormatter);
+            {
+                var trackIncrement = Options.TrackAutoIncrement ? item.Original.RenameListIndex : 0;
+                semantic = _ApplyByteSizedUintSemantics(
+                    item,
+                    semantic,
+                    Options.Track.OnlyIfEmpty,
+                    semantic.Track,
+                    TrackFormatter,
+                    fieldLabel: "track",
+                    static (m, v) => m with { Track = v },
+                    autoIncrementBy: trackIncrement);
+            }
+
+            if (Options.TrackCount is not null)
+            {
+                semantic = _ApplyByteSizedUintSemantics(
+                    item,
+                    semantic,
+                    Options.TrackCount.OnlyIfEmpty,
+                    semantic.TrackCount,
+                    TrackCountFormatter,
+                    fieldLabel: "trackCount",
+                    static (m, v) => m with { TrackCount = v });
+            }
+
+            if (Options.Disc is not null)
+            {
+                semantic = _ApplyByteSizedUintSemantics(
+                    item,
+                    semantic,
+                    Options.Disc.OnlyIfEmpty,
+                    semantic.Disc,
+                    DiscFormatter,
+                    fieldLabel: "disc",
+                    static (m, v) => m with { Disc = v });
+            }
+
+            if (Options.DiscCount is not null)
+            {
+                semantic = _ApplyByteSizedUintSemantics(
+                    item,
+                    semantic,
+                    Options.DiscCount.OnlyIfEmpty,
+                    semantic.DiscCount,
+                    DiscCountFormatter,
+                    fieldLabel: "discCount",
+                    static (m, v) => m with { DiscCount = v });
+            }
 
             if (!_HasAnyConfiguredSemanticField())
                 return;
@@ -180,8 +259,12 @@ namespace Mfr.Filters.Audio
                 || Options.Album is not null
                 || Options.Genre is not null
                 || Options.Comment is not null
+                || Options.Composers is not null
                 || Options.Year is not null
-                || Options.Track is not null;
+                || Options.Track is not null
+                || Options.TrackCount is not null
+                || Options.Disc is not null
+                || Options.DiscCount is not null;
         }
 
         /// <summary>
@@ -257,40 +340,50 @@ namespace Mfr.Filters.Audio
             return semantic with { Year = yearValue };
         }
 
-        private SemanticAudioTag _ApplyTrackSemantics(
+        /// <summary>
+        /// Parses a 0–255 overlay integer field (track, track count, disc, disc count) after formatting.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When <paramref name="autoIncrementBy"/> is non-zero (track auto-increment), it is added to the parsed
+        /// base and the sum is clamped to 255; a non-positive sum clears the field.
+        /// </para>
+        /// </remarks>
+        private static SemanticAudioTag _ApplyByteSizedUintSemantics(
             RenameItem item,
             SemanticAudioTag semantic,
             bool onlyIfEmpty,
-            Formatter formatter)
+            uint? currentValue,
+            Formatter formatter,
+            string fieldLabel,
+            Func<SemanticAudioTag, uint?, SemanticAudioTag> assignUpdated,
+            int autoIncrementBy = 0)
         {
-            if (onlyIfEmpty && semantic.Track is not null)
+            if (onlyIfEmpty && currentValue is not null)
                 return semantic;
 
             var resolved = formatter(item);
             var trimmed = resolved.Trim();
             if (trimmed.Length == 0)
-                return semantic with { Track = null };
+                return assignUpdated(semantic, null);
 
-            if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var baseTrack))
+            if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
                 throw new FormatException(
-                    $"AudioTagSetter track must be empty, or an integer 0-255 after formatting. Got '{trimmed}'.");
+                    $"AudioTagSetter {fieldLabel} must be empty, or an integer 0-255 after formatting. Got '{trimmed}'.");
             }
 
-            if (baseTrack > 255u)
+            if (parsed > 255u)
             {
                 throw new FormatException(
-                    $"AudioTagSetter track base value must be between 0 and 255. Got {baseTrack}.");
+                    $"AudioTagSetter {fieldLabel} must be between 0 and 255. Got {parsed}.");
             }
 
-            long raw = baseTrack;
-            if (Options.TrackAutoIncrement)
-                raw += item.Original.RenameListIndex;
-
+            long raw = parsed + autoIncrementBy;
             if (raw <= 0)
-                return semantic with { Track = null };
+                return assignUpdated(semantic, null);
 
-            return semantic with { Track = (uint)Math.Min(raw, 255) };
+            return assignUpdated(semantic, (uint)Math.Min(raw, 255));
         }
     }
 }

@@ -318,6 +318,92 @@ namespace Mfr.Tests.Models.Filters.Audio
         }
 
         /// <summary>
+        /// Verifies composer <c>text</c> may list several names separated by <c>;</c>.
+        /// </summary>
+        [Fact]
+        public void Apply_Composers_SemicolonSeparated_SetsJoinedPreviewString()
+        {
+            var item = _CreateAudioItem();
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Composers: new AudioTagStringFieldOptions(Text: "Bach ; Handel")));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("Bach; Handel", item.Preview.AudioTagOverlay.Semantic().Composers);
+        }
+
+        /// <summary>
+        /// Verifies track count, disc, and disc count parse and set together.
+        /// </summary>
+        [Fact]
+        public void Apply_TrackCount_Disc_DiscCount_SetsValues()
+        {
+            var item = _CreateAudioItem();
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                TrackCount: new AudioTagStringFieldOptions(Text: "12"),
+                Disc: new AudioTagStringFieldOptions(Text: "2"),
+                DiscCount: new AudioTagStringFieldOptions(Text: "3")));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            var semantic = item.Preview.AudioTagOverlay.Semantic();
+            Assert.Equal(12u, semantic.TrackCount);
+            Assert.Equal(2u, semantic.Disc);
+            Assert.Equal(3u, semantic.DiscCount);
+        }
+
+        /// <summary>
+        /// Verifies disc value 0 clears the overlay disc.
+        /// </summary>
+        [Fact]
+        public void Disc_Zero_Clears()
+        {
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(disc: 2));
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Disc: new AudioTagStringFieldOptions(Text: "0")));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Disc);
+        }
+
+        /// <summary>
+        /// Verifies track count above 255 throws <see cref="FormatException"/>.
+        /// </summary>
+        [Fact]
+        public void TrackCount_Above255_Throws_FormatException()
+        {
+            var item = _CreateAudioItem();
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                TrackCount: new AudioTagStringFieldOptions(Text: "256")));
+
+            filter.Setup();
+            var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
+            Assert.Contains("255", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="AudioTagStringFieldOptions.OnlyIfEmpty"/> does not replace an existing disc.
+        /// </summary>
+        [Fact]
+        public void Disc_IfEmpty_KeepsExisting()
+        {
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(disc: 1));
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Disc: new AudioTagStringFieldOptions(Text: "9", OnlyIfEmpty: true)));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(1u, item.Preview.AudioTagOverlay.Semantic().Disc);
+        }
+
+        /// <summary>
         /// Verifies year clears when value is 0.
         /// </summary>
         [Fact]
@@ -457,12 +543,24 @@ namespace Mfr.Tests.Models.Filters.Audio
                 "title": {
                   "text": "<file-name>"
                 },
+                "composers": {
+                  "text": "Bach"
+                },
                 "year": {
                   "text": "2004",
                   "onlyIfEmpty": true
                 },
                 "track": {
                   "text": "1"
+                },
+                "trackCount": {
+                  "text": "12"
+                },
+                "disc": {
+                  "text": "2"
+                },
+                "discCount": {
+                  "text": "3"
                 },
                 "trackAutoIncrement": true
               }
@@ -478,9 +576,14 @@ namespace Mfr.Tests.Models.Filters.Audio
 
             var item = _CreateAudioItem(renameListIndex: 2, prefix: "P");
             typed.Apply(item);
-            Assert.Equal("P", item.Preview.AudioTagOverlay.Semantic().Title);
-            Assert.Equal(2004u, item.Preview.AudioTagOverlay.Semantic().Year);
-            Assert.Equal(3u, item.Preview.AudioTagOverlay.Semantic().Track);
+            var semantic = item.Preview.AudioTagOverlay.Semantic();
+            Assert.Equal("P", semantic.Title);
+            Assert.Equal("Bach", semantic.Composers);
+            Assert.Equal(2004u, semantic.Year);
+            Assert.Equal(3u, semantic.Track);
+            Assert.Equal(12u, semantic.TrackCount);
+            Assert.Equal(2u, semantic.Disc);
+            Assert.Equal(3u, semantic.DiscCount);
         }
     }
 }
