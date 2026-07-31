@@ -355,6 +355,57 @@ namespace Mfr.Tests.Models.Filters.Audio
         }
 
         /// <summary>
+        /// Verifies conductor and BPM set together.
+        /// </summary>
+        [Fact]
+        public void Apply_Conductor_BeatsPerMinute_SetsValues()
+        {
+            var item = _CreateAudioItem();
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Conductor: new AudioTagStringFieldOptions(Text: "Karajan"),
+                BeatsPerMinute: new AudioTagStringFieldOptions(Text: "120")));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            var semantic = item.Preview.AudioTagOverlay.Semantic();
+            Assert.Equal("Karajan", semantic.Conductor);
+            Assert.Equal(120u, semantic.BeatsPerMinute);
+        }
+
+        /// <summary>
+        /// Verifies BPM value 0 clears the overlay tempo.
+        /// </summary>
+        [Fact]
+        public void BeatsPerMinute_Zero_Clears()
+        {
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(beatsPerMinute: 128));
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                BeatsPerMinute: new AudioTagStringFieldOptions(Text: "0")));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().BeatsPerMinute);
+        }
+
+        /// <summary>
+        /// Verifies BPM above 65535 throws <see cref="FormatException"/>.
+        /// </summary>
+        [Fact]
+        public void BeatsPerMinute_Above65535_Throws_FormatException()
+        {
+            var item = _CreateAudioItem();
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                BeatsPerMinute: new AudioTagStringFieldOptions(Text: "65536")));
+
+            filter.Setup();
+            var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
+            Assert.Contains("65535", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// Verifies <see cref="AudioTagStringFieldOptions.OnlyIfEmpty"/> leaves non-empty lyrics unchanged.
         /// </summary>
         [Fact]
@@ -593,6 +644,12 @@ namespace Mfr.Tests.Models.Filters.Audio
                 "copyright": {
                   "text": "© Label"
                 },
+                "conductor": {
+                  "text": "Karajan"
+                },
+                "beatsPerMinute": {
+                  "text": "128"
+                },
                 "year": {
                   "text": "2004",
                   "onlyIfEmpty": true
@@ -629,6 +686,8 @@ namespace Mfr.Tests.Models.Filters.Audio
             Assert.Equal("Verse", semantic.Lyrics);
             Assert.Equal("Work", semantic.Grouping);
             Assert.Equal("© Label", semantic.Copyright);
+            Assert.Equal("Karajan", semantic.Conductor);
+            Assert.Equal(128u, semantic.BeatsPerMinute);
             Assert.Equal(2004u, semantic.Year);
             Assert.Equal(3u, semantic.Track);
             Assert.Equal(12u, semantic.TrackCount);

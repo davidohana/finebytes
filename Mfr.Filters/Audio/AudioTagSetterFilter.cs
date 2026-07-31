@@ -9,7 +9,7 @@ namespace Mfr.Filters.Audio
 {
     /// <summary>
     /// Options for one string-valued audio overlay field (performers, title, comment, etc.), including
-    /// <c>year</c>, <c>track</c>, <c>trackCount</c>, <c>disc</c>, and <c>discCount</c> in
+    /// <c>year</c>, <c>beatsPerMinute</c>, <c>track</c>, <c>trackCount</c>, <c>disc</c>, and <c>discCount</c> in
     /// <see cref="AudioTagSetterOptions"/> where <c>text</c> is parsed as a number after formatting.
     /// </summary>
     /// <param name="Text">
@@ -36,9 +36,14 @@ namespace Mfr.Filters.Audio
     /// <param name="Lyrics">Unsynchronised lyrics; omit (or <c>null</c>) to leave unchanged.</param>
     /// <param name="Grouping">Content group / work title; omit (or <c>null</c>) to leave unchanged.</param>
     /// <param name="Copyright">Copyright notice; omit (or <c>null</c>) to leave unchanged.</param>
+    /// <param name="Conductor">Conductor or director; omit (or <c>null</c>) to leave unchanged.</param>
     /// <param name="Year">
     /// Release year; same shape as other string fields. After formatting (or literal <c>text</c>), the result must be
     /// empty (clear year), <c>0</c> (clear), or an integer <c>1</c>-<c>9999</c>. Anything else yields a preview error.
+    /// </param>
+    /// <param name="BeatsPerMinute">
+    /// Tempo in BPM; same shape as <paramref name="Year"/>. After formatting, empty or <c>0</c> clears; otherwise an integer
+    /// <c>1</c>-<c>65535</c>. Non-numeric or out of range yields a preview error.
     /// </param>
     /// <param name="Track">
     /// Track index; same <c>text</c> / <c>onlyIfEmpty</c> shape as <paramref name="Year"/>. After formatting, empty clears;
@@ -67,7 +72,9 @@ namespace Mfr.Filters.Audio
         [property: JsonPropertyName("lyrics")] AudioTagStringFieldOptions? Lyrics = null,
         [property: JsonPropertyName("grouping")] AudioTagStringFieldOptions? Grouping = null,
         [property: JsonPropertyName("copyright")] AudioTagStringFieldOptions? Copyright = null,
+        [property: JsonPropertyName("conductor")] AudioTagStringFieldOptions? Conductor = null,
         [property: JsonPropertyName("year")] AudioTagStringFieldOptions? Year = null,
+        [property: JsonPropertyName("beatsPerMinute")] AudioTagStringFieldOptions? BeatsPerMinute = null,
         [property: JsonPropertyName("track")] AudioTagStringFieldOptions? Track = null,
         [property: JsonPropertyName("trackCount")] AudioTagStringFieldOptions? TrackCount = null,
         [property: JsonPropertyName("disc")] AudioTagStringFieldOptions? Disc = null,
@@ -102,7 +109,9 @@ namespace Mfr.Filters.Audio
         private Formatter LyricsFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter GroupingFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter CopyrightFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter ConductorFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter YearFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter BeatsPerMinuteFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter TrackFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter TrackCountFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter DiscFormatter = FormatStringCompiler.EmptyFormatter;
@@ -124,7 +133,9 @@ namespace Mfr.Filters.Audio
             LyricsFormatter = _CreateFormatter(Options.Lyrics);
             GroupingFormatter = _CreateFormatter(Options.Grouping);
             CopyrightFormatter = _CreateFormatter(Options.Copyright);
+            ConductorFormatter = _CreateFormatter(Options.Conductor);
             YearFormatter = _CreateFormatter(Options.Year);
+            BeatsPerMinuteFormatter = _CreateFormatter(Options.BeatsPerMinute);
             TrackFormatter = _CreateFormatter(Options.Track);
             TrackCountFormatter = _CreateFormatter(Options.TrackCount);
             DiscFormatter = _CreateFormatter(Options.Disc);
@@ -228,8 +239,40 @@ namespace Mfr.Filters.Audio
                     CopyrightFormatter,
                     static (m, v) => m with { Copyright = v });
 
+            if (Options.Conductor is not null)
+                semanticTag = _ApplyStringField(
+                    item,
+                    semanticTag,
+                    Options.Conductor.OnlyIfEmpty,
+                    semanticTag.Conductor,
+                    ConductorFormatter,
+                    static (m, v) => m with { Conductor = v });
+
             if (Options.Year is not null)
-                semanticTag = _ApplyYearField(item, semanticTag, Options.Year.OnlyIfEmpty, YearFormatter);
+            {
+                semanticTag = _ApplyBoundedUintField(
+                    item,
+                    semanticTag,
+                    Options.Year.OnlyIfEmpty,
+                    semanticTag.Year,
+                    YearFormatter,
+                    fieldLabel: "year",
+                    maxValue: 9999u,
+                    static (m, v) => m with { Year = v });
+            }
+
+            if (Options.BeatsPerMinute is not null)
+            {
+                semanticTag = _ApplyBoundedUintField(
+                    item,
+                    semanticTag,
+                    Options.BeatsPerMinute.OnlyIfEmpty,
+                    semanticTag.BeatsPerMinute,
+                    BeatsPerMinuteFormatter,
+                    fieldLabel: "beatsPerMinute",
+                    maxValue: 65535u,
+                    static (m, v) => m with { BeatsPerMinute = v });
+            }
 
             if (Options.Track is not null)
             {
@@ -302,7 +345,9 @@ namespace Mfr.Filters.Audio
                 || Options.Lyrics is not null
                 || Options.Grouping is not null
                 || Options.Copyright is not null
+                || Options.Conductor is not null
                 || Options.Year is not null
+                || Options.BeatsPerMinute is not null
                 || Options.Track is not null
                 || Options.TrackCount is not null
                 || Options.Disc is not null
@@ -350,36 +395,48 @@ namespace Mfr.Filters.Audio
             return assignUpdated(semantic, expanded);
         }
 
-        private SemanticAudioTag _ApplyYearField(
+        /// <summary>
+        /// Parses a bounded non-negative overlay integer (year, BPM) after formatting.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Empty or <c>0</c> clears; otherwise the value must be an integer from 1 through <paramref name="maxValue"/>.
+        /// </para>
+        /// </remarks>
+        private static SemanticAudioTag _ApplyBoundedUintField(
             RenameItem item,
             SemanticAudioTag semantic,
             bool onlyIfEmpty,
-            Formatter formatter)
+            uint? currentValue,
+            Formatter formatter,
+            string fieldLabel,
+            uint maxValue,
+            Func<SemanticAudioTag, uint?, SemanticAudioTag> assignUpdated)
         {
-            if (onlyIfEmpty && semantic.Year is not null)
+            if (onlyIfEmpty && currentValue is not null)
                 return semantic;
 
             var resolved = formatter(item);
             var trimmed = resolved.Trim();
             if (trimmed.Length == 0)
-                return semantic with { Year = null };
+                return assignUpdated(semantic, null);
 
-            if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var yearValue))
+            if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
                 throw new FormatException(
-                    $"AudioTagSetter year must be empty, 0, or an integer 1-9999 after formatting. Got '{trimmed}'.");
+                    $"AudioTagSetter {fieldLabel} must be empty, 0, or an integer 1-{maxValue} after formatting. Got '{trimmed}'.");
             }
 
-            if (yearValue > 9999u)
+            if (parsed > maxValue)
             {
                 throw new FormatException(
-                    $"AudioTagSetter year must be between 0 and 9999. Got {yearValue}.");
+                    $"AudioTagSetter {fieldLabel} must be between 0 and {maxValue}. Got {parsed}.");
             }
 
-            if (yearValue == 0)
-                return semantic with { Year = null };
+            if (parsed == 0)
+                return assignUpdated(semantic, null);
 
-            return semantic with { Year = yearValue };
+            return assignUpdated(semantic, parsed);
         }
 
         /// <summary>
