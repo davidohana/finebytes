@@ -334,6 +334,44 @@ namespace Mfr.Tests.Models.Filters.Audio
         }
 
         /// <summary>
+        /// Verifies lyrics, grouping, and copyright set together.
+        /// </summary>
+        [Fact]
+        public void Apply_Lyrics_Grouping_Copyright_SetsValues()
+        {
+            var item = _CreateAudioItem();
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Lyrics: new AudioTagStringFieldOptions(Text: "La la"),
+                Grouping: new AudioTagStringFieldOptions(Text: "Suite"),
+                Copyright: new AudioTagStringFieldOptions(Text: "© 2004")));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            var semantic = item.Preview.AudioTagOverlay.Semantic();
+            Assert.Equal("La la", semantic.Lyrics);
+            Assert.Equal("Suite", semantic.Grouping);
+            Assert.Equal("© 2004", semantic.Copyright);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="AudioTagStringFieldOptions.OnlyIfEmpty"/> leaves non-empty lyrics unchanged.
+        /// </summary>
+        [Fact]
+        public void IfEmpty_Lyrics_LeavesNonEmpty()
+        {
+            var item = _CreateAudioItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(lyrics: "Kept"));
+            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
+                Lyrics: new AudioTagStringFieldOptions(Text: "Other", OnlyIfEmpty: true)));
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("Kept", item.Preview.AudioTagOverlay.Semantic().Lyrics);
+        }
+
+        /// <summary>
         /// Verifies track count, disc, and disc count parse and set together.
         /// </summary>
         [Fact]
@@ -546,6 +584,15 @@ namespace Mfr.Tests.Models.Filters.Audio
                 "composers": {
                   "text": "Bach"
                 },
+                "lyrics": {
+                  "text": "Verse"
+                },
+                "grouping": {
+                  "text": "Work"
+                },
+                "copyright": {
+                  "text": "© Label"
+                },
                 "year": {
                   "text": "2004",
                   "onlyIfEmpty": true
@@ -579,6 +626,9 @@ namespace Mfr.Tests.Models.Filters.Audio
             var semantic = item.Preview.AudioTagOverlay.Semantic();
             Assert.Equal("P", semantic.Title);
             Assert.Equal("Bach", semantic.Composers);
+            Assert.Equal("Verse", semantic.Lyrics);
+            Assert.Equal("Work", semantic.Grouping);
+            Assert.Equal("© Label", semantic.Copyright);
             Assert.Equal(2004u, semantic.Year);
             Assert.Equal(3u, semantic.Track);
             Assert.Equal(12u, semantic.TrackCount);

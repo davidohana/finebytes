@@ -13,7 +13,7 @@ Each included field object uses:
 - **`text`** — plain text, **or** a formatter template when it contains at least one balanced `<...>` span that looks like a formatter token (ASCII letter, then letters/digits/`-`/`_`, at least two characters before an optional `:`), same token language as [Formatter](../Formatting/Formatter.md). Text without such a span is left **literal**.
 - **`onlyIfEmpty`** (optional, default **`false`**) — when **`true`**, set the value only when the field is empty in the preview overlay after tags are loaded (strings: null/whitespace; year/track/trackCount/disc/discCount: unset). When **`false`** or omitted, always set (overwrite).
 
-**String fields** (`performers`, `albumArtists`, `title`, `album`, `genre`, `comment`, `composers`, **`year`**, **`track`**, **`trackCount`**, **`disc`**, **`discCount`**):
+**String fields** (`performers`, `albumArtists`, `title`, `album`, `genre`, `comment`, `composers`, `lyrics`, `grouping`, `copyright`, **`year`**, **`track`**, **`trackCount`**, **`disc`**, **`discCount`**):
 
 - **Year-specific:** after formatting (or as literal `text`), the result is trimmed. **Empty** clears the year. **`0`** clears. Otherwise the value must parse as an integer **1–9999**; anything else (non-numeric, out of range) causes a **preview error** for that row (`FormatException`, surfaced like other filter failures).
 - **Track-specific:** after formatting, **empty** clears the track. Otherwise the value must parse as an integer **0–255** (base value before increment). **`0`** with **`trackAutoIncrement`** `false` clears; with **`trackAutoIncrement`** `true`, **0 + RenameListIndex** is applied (then clamped to **255**). Base **&gt; 255** or non-numeric → preview error.
@@ -34,6 +34,9 @@ Each included field object uses:
 | `trackCount`: `text`: `12` | any | track count `12` | |
 | `disc`: `text`: `2`; `discCount`: `text`: `3` | any | disc `2` of `3` | |
 | `composers`: `text`: `Bach ; Handel` | any | composers `Bach; Handel` | |
+| `lyrics`: `text`: `La la` | any | lyrics `La la` | |
+| `grouping`: `text`: `Suite` | any | grouping `Suite` | |
+| `copyright`: `text`: `© 2004` | any | copyright set | |
 | `year`: `text`: `0` | year `1999` | cleared | |
 | `year`: `text`: `12000` | any | preview error | Not a valid tag year. |
 
@@ -53,6 +56,15 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
     },
     "composers": {
       "text": "J. S. Bach"
+    },
+    "lyrics": {
+      "text": "Verse one"
+    },
+    "grouping": {
+      "text": "Part I"
+    },
+    "copyright": {
+      "text": "© 2004 Label"
     },
     "track": {
       "text": "1"

@@ -33,6 +33,9 @@ namespace Mfr.Filters.Audio
     /// <param name="Genre">Genre options (use <c>; </c> in text for multiple values).</param>
     /// <param name="Comment">Comment options.</param>
     /// <param name="Composers">Composers; omit (or <c>null</c>) to leave unchanged (use <c>; </c> in text for multiple values).</param>
+    /// <param name="Lyrics">Unsynchronised lyrics; omit (or <c>null</c>) to leave unchanged.</param>
+    /// <param name="Grouping">Content group / work title; omit (or <c>null</c>) to leave unchanged.</param>
+    /// <param name="Copyright">Copyright notice; omit (or <c>null</c>) to leave unchanged.</param>
     /// <param name="Year">
     /// Release year; same shape as other string fields. After formatting (or literal <c>text</c>), the result must be
     /// empty (clear year), <c>0</c> (clear), or an integer <c>1</c>-<c>9999</c>. Anything else yields a preview error.
@@ -61,6 +64,9 @@ namespace Mfr.Filters.Audio
         [property: JsonPropertyName("genre")] AudioTagStringFieldOptions? Genre = null,
         [property: JsonPropertyName("comment")] AudioTagStringFieldOptions? Comment = null,
         [property: JsonPropertyName("composers")] AudioTagStringFieldOptions? Composers = null,
+        [property: JsonPropertyName("lyrics")] AudioTagStringFieldOptions? Lyrics = null,
+        [property: JsonPropertyName("grouping")] AudioTagStringFieldOptions? Grouping = null,
+        [property: JsonPropertyName("copyright")] AudioTagStringFieldOptions? Copyright = null,
         [property: JsonPropertyName("year")] AudioTagStringFieldOptions? Year = null,
         [property: JsonPropertyName("track")] AudioTagStringFieldOptions? Track = null,
         [property: JsonPropertyName("trackCount")] AudioTagStringFieldOptions? TrackCount = null,
@@ -93,6 +99,9 @@ namespace Mfr.Filters.Audio
         private Formatter GenreFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter CommentFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter ComposersFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter LyricsFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter GroupingFormatter = FormatStringCompiler.EmptyFormatter;
+        private Formatter CopyrightFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter YearFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter TrackFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter TrackCountFormatter = FormatStringCompiler.EmptyFormatter;
@@ -112,6 +121,9 @@ namespace Mfr.Filters.Audio
             GenreFormatter = _CreateFormatter(Options.Genre);
             CommentFormatter = _CreateFormatter(Options.Comment);
             ComposersFormatter = _CreateFormatter(Options.Composers);
+            LyricsFormatter = _CreateFormatter(Options.Lyrics);
+            GroupingFormatter = _CreateFormatter(Options.Grouping);
+            CopyrightFormatter = _CreateFormatter(Options.Copyright);
             YearFormatter = _CreateFormatter(Options.Year);
             TrackFormatter = _CreateFormatter(Options.Track);
             TrackCountFormatter = _CreateFormatter(Options.TrackCount);
@@ -189,6 +201,33 @@ namespace Mfr.Filters.Audio
                     ComposersFormatter,
                     static (m, v) => m with { Composers = v });
 
+            if (Options.Lyrics is not null)
+                semanticTag = _ApplyStringField(
+                    item,
+                    semanticTag,
+                    Options.Lyrics.OnlyIfEmpty,
+                    semanticTag.Lyrics,
+                    LyricsFormatter,
+                    static (m, v) => m with { Lyrics = v });
+
+            if (Options.Grouping is not null)
+                semanticTag = _ApplyStringField(
+                    item,
+                    semanticTag,
+                    Options.Grouping.OnlyIfEmpty,
+                    semanticTag.Grouping,
+                    GroupingFormatter,
+                    static (m, v) => m with { Grouping = v });
+
+            if (Options.Copyright is not null)
+                semanticTag = _ApplyStringField(
+                    item,
+                    semanticTag,
+                    Options.Copyright.OnlyIfEmpty,
+                    semanticTag.Copyright,
+                    CopyrightFormatter,
+                    static (m, v) => m with { Copyright = v });
+
             if (Options.Year is not null)
                 semanticTag = _ApplyYearField(item, semanticTag, Options.Year.OnlyIfEmpty, YearFormatter);
 
@@ -260,6 +299,9 @@ namespace Mfr.Filters.Audio
                 || Options.Genre is not null
                 || Options.Comment is not null
                 || Options.Composers is not null
+                || Options.Lyrics is not null
+                || Options.Grouping is not null
+                || Options.Copyright is not null
                 || Options.Year is not null
                 || Options.Track is not null
                 || Options.TrackCount is not null
