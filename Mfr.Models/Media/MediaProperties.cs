@@ -1,4 +1,4 @@
-namespace Mfr.Models
+namespace Mfr.Models.Media
 {
     /// <summary>
     /// Read-only TagLib stream/image snapshot for media formatter tokens.

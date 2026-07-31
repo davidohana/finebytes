@@ -1,4 +1,3 @@
-using Mfr.Models;
 using Mfr.Models.Tags;
 
 namespace Mfr.Filters

@@ -1,8 +1,9 @@
 using System.Text.Json.Serialization;
 
+using Mfr.Models.Rename;
 using Mfr.Utils;
 
-namespace Mfr.Models
+namespace Mfr.Models.Filters
 {
     /// <summary>
     /// Represents a polymorphic filter.

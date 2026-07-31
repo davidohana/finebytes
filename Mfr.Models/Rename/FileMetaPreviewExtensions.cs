@@ -1,7 +1,8 @@
+using Mfr.Models.Filters;
 using Mfr.Models.Tags;
 using Mfr.Utils;
 
-namespace Mfr.Models
+namespace Mfr.Models.Rename
 {
     /// <summary>
     /// Path, file-name, and audio overlay filter-target read/write dispatch plus path helpers for a <see cref="FileMeta"/> rename snapshot.

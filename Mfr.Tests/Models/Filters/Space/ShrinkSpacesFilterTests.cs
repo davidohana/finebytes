@@ -1,5 +1,4 @@
 using Mfr.Filters.Space;
-using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Space
 {

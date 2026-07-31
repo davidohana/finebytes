@@ -1,5 +1,4 @@
 using System.Text;
-using Mfr.Models;
 
 namespace Mfr.Filters.Case
 {

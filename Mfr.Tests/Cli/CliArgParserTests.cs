@@ -1,5 +1,4 @@
 using Mfr.App.Cli;
-using Mfr.Models;
 using Serilog.Events;
 
 namespace Mfr.Tests.Cli

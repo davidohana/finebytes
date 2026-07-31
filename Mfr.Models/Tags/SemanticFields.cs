@@ -13,7 +13,7 @@ namespace Mfr.Models.Tags
     /// blocks via <see cref="AudioTagOverlay.MergeSemantic"/> (broadcast to present blocks; recommended create when empty).
     /// </para>
     /// <para>
-    /// Empty strings represent absent fields (same convention as <see cref="SemanticAudioFieldTarget"/> previews).
+    /// Empty strings represent absent fields (same convention as <see cref="Filters.SemanticAudioFieldTarget"/> previews).
     /// </para>
     /// </remarks>
     public static class SemanticFields

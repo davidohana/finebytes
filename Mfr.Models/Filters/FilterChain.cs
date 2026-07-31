@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Mfr.Models
+using Mfr.Models.Rename;
+
+namespace Mfr.Models.Filters
 {
     /// <summary>
     /// One step in a <see cref="FilterChain"/>: whether it runs and the filter configuration.

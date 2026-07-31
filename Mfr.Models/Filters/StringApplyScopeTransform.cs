@@ -1,6 +1,7 @@
+using Mfr.Models.Rename;
 using Mfr.Utils;
 
-namespace Mfr.Models
+namespace Mfr.Models.Filters
 {
     /// <summary>
     /// Applies optional <see cref="StringApplyScope"/> around a string filter callback.

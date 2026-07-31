@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Mfr.Models;
 
 namespace Mfr.Filters.Attributes
 {

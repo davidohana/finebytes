@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Mfr.Models
+namespace Mfr.Models.Media
 {
     /// <summary>
     /// Which filesystem timestamp field date/time filters modify.

@@ -1,6 +1,5 @@
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.Tokens.Media;
-using Mfr.Models;
 using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media

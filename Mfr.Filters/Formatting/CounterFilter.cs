@@ -1,5 +1,4 @@
 using System.Globalization;
-using Mfr.Models;
 
 namespace Mfr.Filters.Formatting
 {

@@ -2,7 +2,7 @@ using System.Text.Json;
 using Mfr.Utils;
 using Mfr.Utils.Config;
 
-namespace Mfr.Models
+namespace Mfr.Models.Config
 {
     /// <summary>
     /// Loads optional process-wide settings from JSON.

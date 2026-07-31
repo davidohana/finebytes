@@ -1,5 +1,4 @@
 using Mfr.Filters.Replace;
-using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Replace
 {

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Mfr.Models
+namespace Mfr.Models.Filters
 {
     /// <summary>
     /// Endpoint anchor for <see cref="SubstringApplyScope"/> positions (1-based inclusive from that side).

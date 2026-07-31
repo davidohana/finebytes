@@ -1,6 +1,6 @@
 using Mfr.Utils.Config;
 
-namespace Mfr.Models
+namespace Mfr.Models.Config
 {
     /// <summary>
     /// Filter-related settings loaded from the <c>filters</c> section of the config file.

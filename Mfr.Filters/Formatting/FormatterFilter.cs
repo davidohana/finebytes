@@ -1,4 +1,3 @@
-using Mfr.Models;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting

@@ -8,7 +8,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Reads one modeled ID3v2 frame from <see cref="Models.FileMeta.AudioTagOverlay"/> on the
+    /// Reads one modeled ID3v2 frame from <see cref="Mfr.Models.Rename.FileMeta.AudioTagOverlay"/> on the
     /// preview snapshot. <c>field-code</c> is the four-character frame id (for example <c>TALB</c>,
     /// <c>TIT2</c>, <c>TXXX</c>).
     /// </para>

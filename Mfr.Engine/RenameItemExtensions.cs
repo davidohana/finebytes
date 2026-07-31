@@ -1,4 +1,3 @@
-using Mfr.Models;
 using Serilog;
 
 namespace Mfr.Engine

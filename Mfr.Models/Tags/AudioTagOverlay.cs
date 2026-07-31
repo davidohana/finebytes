@@ -280,7 +280,7 @@ namespace Mfr.Models.Tags
         }
 
         /// <summary>
-        /// Creates a detached copy suitable for cloning <see cref="FileMeta"/>.
+        /// Creates a detached copy suitable for cloning <see cref="Rename.FileMeta"/>.
         /// </summary>
         /// <returns>New instance with copied values.</returns>
         public AudioTagOverlay Clone()

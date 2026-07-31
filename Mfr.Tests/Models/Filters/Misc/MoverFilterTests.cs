@@ -1,5 +1,4 @@
 using Mfr.Filters.Misc;
-using Mfr.Models;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Models.Filters.Misc

@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using Mfr.Models;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.Session

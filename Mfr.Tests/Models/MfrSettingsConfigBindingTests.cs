@@ -1,5 +1,4 @@
 using System.Reflection;
-using Mfr.Models;
 using Mfr.Utils.Config;
 
 namespace Mfr.Tests.Models

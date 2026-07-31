@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using Mfr.Filters;
 using Mfr.Metadata;
-using Mfr.Models;
 using Mfr.Models.Tags;
 using MetadataContainerDetector = Mfr.Metadata.AudioTagContainerDetector;
 using ModelsContainerPolicy = Mfr.Models.Tags.AudioTagContainerPolicy;

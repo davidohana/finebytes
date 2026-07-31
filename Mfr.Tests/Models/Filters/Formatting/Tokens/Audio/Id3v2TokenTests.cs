@@ -1,6 +1,5 @@
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.Tokens.Audio;
-using Mfr.Models;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v2;
 using Mfr.Models.Tags.Xiph;

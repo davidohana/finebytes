@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Encodings.Web;
 
-namespace Mfr.Models
+namespace Mfr.Models.Rename
 {
     /// <summary>
     /// Represents the top-level rename execution result for JSON serialization.

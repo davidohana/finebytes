@@ -1,5 +1,4 @@
 using Mfr.Filters.Case;
-using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Case
 {

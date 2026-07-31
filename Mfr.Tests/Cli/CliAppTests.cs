@@ -1,7 +1,6 @@
 using Mfr.App.Cli;
 using Mfr.Engine;
 using Mfr.Filters.Formatting;
-using Mfr.Models;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Cli

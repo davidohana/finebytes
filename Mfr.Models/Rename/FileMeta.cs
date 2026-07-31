@@ -1,6 +1,7 @@
+using Mfr.Models.Media;
 using Mfr.Models.Tags;
 
-namespace Mfr.Models
+namespace Mfr.Models.Rename
 {
     /// <summary>
     /// Lightweight file metadata used during rename planning and execution.

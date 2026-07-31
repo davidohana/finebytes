@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Mfr.Models
+namespace Mfr.Models.Filters
 {
     /// <summary>
     /// Defines a named filter preset.

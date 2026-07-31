@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Mfr.Models
+namespace Mfr.Models.Rename
 {
     /// <summary>
     /// Represents one modified property for a rename item.

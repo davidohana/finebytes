@@ -1,4 +1,3 @@
-using Mfr.Models;
 using Mfr.Utils;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;

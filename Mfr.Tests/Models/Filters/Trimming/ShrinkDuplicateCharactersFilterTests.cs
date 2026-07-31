@@ -1,5 +1,4 @@
 using Mfr.Filters.Trimming;
-using Mfr.Models;
 
 namespace Mfr.Tests.Models.Filters.Trimming
 {

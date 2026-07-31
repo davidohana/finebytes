@@ -1,6 +1,5 @@
 using System.Text;
 using Mfr.Filters.Formatting.Tokens;
-using Mfr.Models;
 
 namespace Mfr.Filters.Formatting
 {

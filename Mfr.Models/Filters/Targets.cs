@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 
-namespace Mfr.Models
+namespace Mfr.Models.Filters
 {
     /// <summary>
     /// Represents a polymorphic filter target (file-name slices, paths, ancestor segments, audio overlay fields); JSON uses property <c>targetType</c> as the discriminator.
@@ -21,7 +21,7 @@ namespace Mfr.Models
     public abstract record FilterTarget;
 
     /// <summary>
-    /// Marker for <see cref="FilterTarget"/> types that address <see cref="FileMeta.AudioTagOverlay"/> fields or frames.
+    /// Marker for <see cref="FilterTarget"/> types that address <see cref="Rename.FileMeta.AudioTagOverlay"/> fields or frames.
     /// </summary>
     public interface IAudioOverlayFilterTarget;
 
@@ -68,13 +68,13 @@ namespace Mfr.Models
     public sealed record ParentDirectoryTarget : FilterTarget;
 
     /// <summary>
-    /// Targets one cross-format field on the semantic projection of <see cref="FileMeta.AudioTagOverlay"/>; string filters read/write text or decimal-digit numeric strings.
+    /// Targets one cross-format field on the semantic projection of <see cref="Rename.FileMeta.AudioTagOverlay"/>; string filters read/write text or decimal-digit numeric strings.
     /// </summary>
     /// <param name="Field">Which <see cref="SemanticAudioField"/> is addressed.</param>
     public sealed record SemanticAudioFieldTarget(SemanticAudioField Field) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
-    /// Targets one ID3v1 scalar on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v1"/>.
+    /// Targets one ID3v1 scalar on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="Tags.AudioTagOverlay.Id3v1"/>.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -85,7 +85,7 @@ namespace Mfr.Models
     public sealed record Id3v1FieldTarget(Id3v1Field Field) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
-    /// Targets one modeled ID3v2 frame on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v2"/>.
+    /// Targets one modeled ID3v2 frame on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="Tags.AudioTagOverlay.Id3v2"/>.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -105,7 +105,7 @@ namespace Mfr.Models
         string? Description = null) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
-    /// Targets one known Xiph / Vorbis comment key on <see cref="FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Xiph"/>.
+    /// Targets one known Xiph / Vorbis comment key on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="Tags.AudioTagOverlay.Xiph"/>.
     /// </summary>
     /// <remarks>
     /// <para>

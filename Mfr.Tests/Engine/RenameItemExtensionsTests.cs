@@ -1,6 +1,5 @@
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
-using Mfr.Models;
 using Mfr.Tests.Models.Filters;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 

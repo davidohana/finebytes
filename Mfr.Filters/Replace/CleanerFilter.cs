@@ -1,4 +1,3 @@
-using Mfr.Models;
 
 namespace Mfr.Filters.Replace
 {

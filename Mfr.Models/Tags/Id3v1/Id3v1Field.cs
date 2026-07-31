@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Mfr.Models.Tags.Id3v1
 {
     /// <summary>
-    /// Which scalar on an <see cref="Id3v1TagData"/> block an <see cref="Id3v1FieldTarget"/> addresses.
+    /// Which scalar on an <see cref="Id3v1TagData"/> block an <see cref="Filters.Id3v1FieldTarget"/> addresses.
     /// </summary>
     public enum Id3v1Field
     {

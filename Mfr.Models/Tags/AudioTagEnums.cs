@@ -79,7 +79,7 @@ namespace Mfr.Models.Tags
     }
 
     /// <summary>
-    /// Which cross-format semantic audio field a <see cref="SemanticAudioFieldTarget"/> addresses.
+    /// Which cross-format semantic audio field a <see cref="Filters.SemanticAudioFieldTarget"/> addresses.
     /// </summary>
     /// <remarks>
     /// <para>

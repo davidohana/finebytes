@@ -1,6 +1,5 @@
 using System.Text;
 using System.Text.RegularExpressions;
-using Mfr.Models;
 
 namespace Mfr.Filters.Replace
 {

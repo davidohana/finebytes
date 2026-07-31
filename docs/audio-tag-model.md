@@ -252,6 +252,6 @@ same preview chain.
 | Persistence | `Mfr.Metadata/AudioTagPersistence.cs`, `Mfr.Metadata/TagFields/` (`*TagFields`, `TagFieldDiff`) |
 | Shared text rules | `Mfr.Utils/DelimitedText.cs`, `Mfr.Utils/OrdinalSequence.cs`, `Mfr.Utils/StringExtensions.cs` |
 | Policy | `Mfr.Models/Tags/AudioTagContainerPolicy.cs` (capability), `Mfr.Metadata/AudioTagContainerDetector.cs` (detect), `Id3v2FrameVersionPolicy.cs`, `AsfDescriptorNames.cs` |
-| Filters | `Mfr.Filters/Audio/*`, `StringTargetFilter.cs`, `Mfr.Models/Targets.cs` |
+| Filters | `Mfr.Filters/Audio/*`, `StringTargetFilter.cs`, `Mfr.Models/Filters/Targets.cs` |
 | Engine | `Mfr.Engine/CommitExecutor.cs`, `RenamePropertyChangeBuilder.cs` |
 | Tests | `Mfr.Tests/Metadata/*`, `Mfr.Tests/Models/Filters/Audio/*`, `RenameListCommitTests` embedded-tag cases |

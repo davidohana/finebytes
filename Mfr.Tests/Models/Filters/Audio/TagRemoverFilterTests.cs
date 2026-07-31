@@ -1,6 +1,5 @@
 using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
-using Mfr.Models;
 using Mfr.Models.Tags;
 using Mfr.Utils;
 

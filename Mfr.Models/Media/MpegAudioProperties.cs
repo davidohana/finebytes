@@ -1,4 +1,4 @@
-namespace Mfr.Models
+namespace Mfr.Models.Media
 {
     /// <summary>
     /// Read-only TagLib MPEG audio-header snapshot for <c>mpeg-*</c> formatter tokens.
