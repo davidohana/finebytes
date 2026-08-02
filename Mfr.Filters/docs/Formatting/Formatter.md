@@ -32,6 +32,8 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 | `<parent-folder:level>` | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth. |
 | `<full-path>` | Full path of the file. |
 | `<file-or-folder>` | `File` or `Folder` from original `Attributes.IsDirectory` (read-only; no Apply target). |
+| `<file-name-numeric-value>` | First contiguous digit run in the original prefix (leading zeros stripped); `0` when none. Useful for numeric sort. |
+
 
 #### Audio tags (canonical overlay)
 
