@@ -32,7 +32,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 | `<parent-folder:level>` | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth. |
 | `<full-path>` | Preview full path of the file. |
 | `<file-or-folder>` | `File` or `Folder` from original `Attributes.IsDirectory` (read-only; no Apply target). |
-| `<file-name-numeric-value>` | First contiguous digit run in the preview prefix (leading zeros stripped); `0` when none. Useful for numeric sort. |
+| `<file-name-numeric-value>` | First contiguous digit run in the preview full name (prefix + extension; leading zeros stripped); `0` when none. Useful for numeric sort. |
 | `<file-name-length>` | Character length of the preview full name (prefix + extension). |
 | `<full-path-length>` | Character length of the preview full path. |
 

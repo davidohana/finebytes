@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         [InlineData("file10", "10")]
         [InlineData("000", "0")]
         [InlineData("007", "7")]
-        public void Resolve_PrefixWithDigits_ReturnsFirstNumber(string prefix, string expected)
+        public void Resolve_FullNameWithDigits_ReturnsFirstNumber(string prefix, string expected)
         {
             var token = new FileNameNumericValueToken();
             var item = FilterTestHelpers.CreateRenameItem(prefix: prefix);
@@ -27,16 +27,31 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         }
 
         /// <summary>
-        /// Verifies prefixes without digits expand to <c>0</c>.
+        /// Verifies digits in the extension are found when the prefix has none (MFR7 FullName behavior).
         /// </summary>
         [Theory]
-        [InlineData("track")]
-        [InlineData("")]
-        [InlineData("no-digits")]
-        public void Resolve_PrefixWithoutDigits_ReturnsZero(string prefix)
+        [InlineData("song", ".mp3", "3")]
+        [InlineData("clip", ".mp4", "4")]
+        public void Resolve_DigitsOnlyInExtension_ReturnsExtensionNumber(string prefix, string extension, string expected)
         {
             var token = new FileNameNumericValueToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: prefix);
+            var item = FilterTestHelpers.CreateRenameItem(prefix: prefix, extension: extension);
+
+            Assert.Equal(expected, token.Compile(tokenArgs: "")(item));
+        }
+
+        /// <summary>
+        /// Verifies full names without digits expand to <c>0</c>.
+        /// </summary>
+        [Theory]
+        [InlineData("track", ".txt")]
+        [InlineData("", "")]
+        [InlineData("no-digits", ".bak")]
+        [InlineData("photo", ".jpg")]
+        public void Resolve_FullNameWithoutDigits_ReturnsZero(string prefix, string extension)
+        {
+            var token = new FileNameNumericValueToken();
+            var item = FilterTestHelpers.CreateRenameItem(prefix: prefix, extension: extension);
 
             Assert.Equal("0", token.Compile(tokenArgs: "")(item));
         }
