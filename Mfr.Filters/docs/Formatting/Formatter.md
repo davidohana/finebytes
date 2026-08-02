@@ -153,7 +153,7 @@ Reads one **modeled ID3v2 frame** from **`Preview.AudioTagOverlay.Id3v2`** (same
 | `<file-date:format,date-kind>` | Arguments are **required**. **Both** parts: a .NET date format string, then a comma, then `date-kind`. Split uses the **last** comma so `format` may contain commas. `date-kind` (case-insensitive): `creation`, `lastWrite`, `lastAccess`. Example: `<file-date:dd-MM-yyyy,creation>`. |
 | `<drive-letter>` | Drive letter of the file's location (e.g. `C:`). Returns `$` for network (UNC) paths. |
 | `<label>` | Volume label of the drive that holds the file. |
-| `<file-count>` | Number of files and folders in the same directory (non-recursive). Empty when directory does not exist. |
+| `<file-count>` | Non-recursive file count (subfolders ignored). For a folder item: files inside that folder. For a file item: files in its parent directory. Empty when the counted directory does not exist. |
 | `<file-size>` | File size, auto-selecting the largest unit (e.g. `1 KB`, `2 MB`). |
 | `<file-size:unit>` | File size in a specific unit. `unit`: omit or `auto` (auto-scale), `b`/`bytes`, `kb`, `mb`, `gb` (case-insensitive). |
 | `<file-size:unit,decimals>` | File size with the specified number of decimal places (default `0`). |

@@ -1,13 +1,15 @@
 using System.Globalization;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.FileProperties
 {
     /// <summary>
-    /// Resolves the <c>&lt;file-count&gt;</c> token to the entry count in the file's parent directory (non-recursive).
+    /// Resolves the <c>&lt;file-count&gt;</c> token to the non-recursive file count for a folder or its parent.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Returns an empty string when the directory does not exist.
+    /// For folder items, counts files inside the folder. For file items, counts files in the parent folder.
+    /// Subfolders are not counted. Returns an empty string when the directory does not exist.
     /// </para>
     /// </remarks>
     internal sealed class FileCountToken : IFormatToken
@@ -22,10 +24,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             FormatOptionsParsing.RequireNoArgument(tokenArgs, FormatOptionsParsing.TokenDisplayName(this));
             return item =>
             {
-                var dir = item.Original.DirectoryPath;
+                var dir = item.Original.Attributes.IsDirectory()
+                    ? item.Original.FullPath
+                    : item.Original.DirectoryPath;
                 if (!Directory.Exists(dir))
                     return string.Empty;
-                return Directory.GetFileSystemEntries(dir).Length.ToString(CultureInfo.InvariantCulture);
+                return Directory.GetFiles(dir).Length.ToString(CultureInfo.InvariantCulture);
             };
         }
     }
