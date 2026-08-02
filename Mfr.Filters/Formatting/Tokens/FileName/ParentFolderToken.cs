@@ -9,7 +9,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// <remarks>
     /// <para>
     /// Argument is an optional 1-based ancestor level: <c>1</c> = immediate parent (default),
-    /// <c>2</c> = grandparent, and so on. Returns an empty string when the level exceeds path depth.
+    /// <c>2</c> = grandparent, and so on. Uses the preview directory path. Returns an empty string when
+    /// the level exceeds path depth.
     /// </para>
     /// </remarks>
     internal sealed class ParentFolderToken : IFormatToken
@@ -25,7 +26,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
             {
                 try
                 {
-                    return DirectoryPathAncestor.GetSegmentName(item.Original.DirectoryPath, level);
+                    return DirectoryPathAncestor.GetSegmentName(item.Preview.DirectoryPath, level);
                 }
                 catch (InvalidOperationException)
                 {

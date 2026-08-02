@@ -54,5 +54,19 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
 
             Assert.Equal(string.Empty, token.Compile(tokenArgs: "5")(item));
         }
+
+        /// <summary>
+        /// Verifies the token follows preview directory when it diverges from original.
+        /// </summary>
+        [Fact]
+        public void Resolve_UsesPreviewNotOriginal()
+        {
+            var token = new ParentFolderToken();
+            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Music\Album");
+            item.Preview.DirectoryPath = @"D:\Libs\Staging";
+
+            Assert.Equal("Staging", token.Compile(tokenArgs: "")(item));
+            Assert.Equal(@"C:\Music\Album", item.Original.DirectoryPath);
+        }
     }
 }

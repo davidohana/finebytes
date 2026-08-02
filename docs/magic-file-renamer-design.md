@@ -1346,14 +1346,14 @@ The Formatter filter, Mover sub-folder template, AudioTagSetter value, and date 
 
 | Token | Description | Example |
 |-------|-------------|---------|
-| `<file-name:0>` | Filename without extension | `track01` |
-| `<file-ext:0>` | Extension with dot | `.mp3` |
+| `<file-name:0>` | Preview filename without extension | `track01` |
+| `<file-ext:0>` | Preview extension with dot | `.mp3` |
 | `<ext:0>` | Extension with dot (alias) | `.mp3` |
-| `<full-name:0>` | Filename with extension | `track01.mp3` |
-| `<parent-folder:0>` | Immediate parent folder name | `Albums` |
-| `<full-path:0>` | Full file path | `/music/albums/track01.mp3` |
+| `<full-name:0>` | Preview filename with extension | `track01.mp3` |
+| `<parent-folder:0>` | Immediate parent folder name (preview directory) | `Albums` |
+| `<full-path:0>` | Preview full file path | `/music/albums/track01.mp3` |
 | `<file-or-folder>` | `File` or `Folder` from directory attribute | `File` |
-| `<file-name-numeric-value>` | First digit run in filename (no extension); `0` if none | `track01` → `1` |
+| `<file-name-numeric-value>` | First digit run in preview filename (no extension); `0` if none | `track01` → `1` |
 | `<file-name-length>` | Character length of preview full name (prefix + extension) | `track01.mp3` → `11` |
 | `<full-path-length>` | Character length of preview full path | |
 

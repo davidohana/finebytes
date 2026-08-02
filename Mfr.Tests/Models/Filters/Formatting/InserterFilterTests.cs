@@ -84,7 +84,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies formatter tokens are expanded in the insert text using original file-name metadata.
+        /// Verifies formatter tokens are expanded in the insert text using preview file-name metadata.
         /// </summary>
         [Fact]
         public void Apply_TextWithToken_ResolvesTemplate()

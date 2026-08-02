@@ -1,7 +1,7 @@
 namespace Mfr.Filters.Formatting.Tokens.FileName
 {
     /// <summary>
-    /// Resolves the <c>&lt;file-name-numeric-value&gt;</c> token to the first digit run in the original prefix.
+    /// Resolves the <c>&lt;file-name-numeric-value&gt;</c> token to the first digit run in the preview prefix.
     /// </summary>
     /// <remarks>
     /// Leading zeros are stripped. When the prefix has no digits, the token expands to <c>0</c>.
@@ -16,13 +16,13 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         public Formatter Compile(string tokenArgs)
         {
             FormatOptionsParsing.RequireNoArgument(tokenArgs, FormatOptionsParsing.TokenDisplayName(this));
-            return item => _ExtractNumericValue(item.Original.Prefix);
+            return item => _ExtractNumericValue(item.Preview.Prefix);
         }
 
         /// <summary>
         /// Returns the first contiguous ASCII digit run in <paramref name="prefix"/>, without leading zeros.
         /// </summary>
-        /// <param name="prefix">Original file name without extension.</param>
+        /// <param name="prefix">Preview file name without extension.</param>
         /// <returns><c>0</c> when no digits are present; otherwise the digit run with leading zeros removed.</returns>
         private static string _ExtractNumericValue(string prefix)
         {

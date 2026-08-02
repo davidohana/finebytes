@@ -25,23 +25,23 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 | Token | Output |
 |--------|--------|
-| `<file-name>` | Original prefix (no extension). |
-| `<file-extension>` or `<ext>` | Original extension (with dot). |
-| `<full-name>` | Prefix + extension. |
-| `<parent-folder>` | Name of the immediate parent folder (level 1). |
+| `<file-name>` | Preview prefix (no extension). |
+| `<file-extension>` or `<ext>` | Preview extension (with dot). |
+| `<full-name>` | Preview prefix + extension. |
+| `<parent-folder>` | Name of the immediate parent folder (level 1) from preview directory. |
 | `<parent-folder:level>` | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth. |
-| `<full-path>` | Full path of the file. |
+| `<full-path>` | Preview full path of the file. |
 | `<file-or-folder>` | `File` or `Folder` from original `Attributes.IsDirectory` (read-only; no Apply target). |
-| `<file-name-numeric-value>` | First contiguous digit run in the original prefix (leading zeros stripped); `0` when none. Useful for numeric sort. |
-| `<file-name-length>` | Character length of the **preview** full name (prefix + extension). Tracks predicted renames. |
-| `<full-path-length>` | Character length of the **preview** full path. Tracks predicted renames and moves. |
+| `<file-name-numeric-value>` | First contiguous digit run in the preview prefix (leading zeros stripped); `0` when none. Useful for numeric sort. |
+| `<file-name-length>` | Character length of the preview full name (prefix + extension). |
+| `<full-path-length>` | Character length of the preview full path. |
 
 
 #### Audio tags (canonical overlay)
 
 Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`AudioTagPersistence.Read`**) **on first `audio-*` / `id3v2` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
-**Contrast:** file-name tokens use **`Original`** paths; audio tokens deliberately use **preview** so later filters can mutate tags before a formatter runs.
+**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mpeg-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
 
 Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateRenameItem`**, which marks embedded tags as already loaded so **`EnsureEmbeddedTagsLoaded`** does not touch pre-seeded **`AudioTagOverlay`**; integration-style tests use real tagged temp files when exercising disk read.
 
@@ -205,7 +205,7 @@ For sequential numbering without a full template, see [Counter](Counter.md).
 
 ## Sample preset (JSON)
 
-The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). When targeting **Prefix**, `<file-name>` is the original file prefix.
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). When targeting **Prefix**, `<file-name>` is the **preview** file prefix (same as original until an earlier filter mutates it).
 
 ```json
 {

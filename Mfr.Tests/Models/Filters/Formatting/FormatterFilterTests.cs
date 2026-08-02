@@ -41,7 +41,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Full path target picks up formatter template output (<c>Original</c>-based tokens plus literals).
+        /// Full path target picks up formatter template output (preview-based tokens plus literals).
         /// </summary>
         [Fact]
         public void Apply_FullPathTarget_SetsPreviewFromTemplate()
@@ -76,10 +76,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Parent directory target can include <c>parent-folder</c> token from original path.
+        /// Parent directory target can include <c>parent-folder</c> token from the preview directory.
         /// </summary>
         [Fact]
-        public void Apply_ParentDirectoryTarget_TokenFromOriginalDirectory()
+        public void Apply_ParentDirectoryTarget_TokenFromPreviewDirectory()
         {
             var f = new FormatterFilter(
                 new ParentDirectoryTarget(),

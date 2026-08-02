@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
     public sealed class FullNameTokenTests
     {
         /// <summary>
-        /// Verifies the token concatenates prefix and extension.
+        /// Verifies the token concatenates preview prefix and extension.
         /// </summary>
         [Fact]
         public void Resolve_ConcatenatesPrefixAndExtension()
@@ -29,6 +29,21 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Albums", extension: "");
 
             Assert.Equal("Albums", token.Compile(tokenArgs: "")(item));
+        }
+
+        /// <summary>
+        /// Verifies the token follows preview when it diverges from original.
+        /// </summary>
+        [Fact]
+        public void Resolve_UsesPreviewNotOriginal()
+        {
+            var token = new FullNameToken();
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track01", extension: ".mp3");
+            item.Preview.Prefix = "renamed";
+            item.Preview.Extension = ".flac";
+
+            Assert.Equal("renamed.flac", token.Compile(tokenArgs: "")(item));
+            Assert.Equal("track01.mp3", item.Original.Prefix + item.Original.Extension);
         }
     }
 }

@@ -42,6 +42,20 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         }
 
         /// <summary>
+        /// Verifies the token follows preview when it diverges from original.
+        /// </summary>
+        [Fact]
+        public void Resolve_UsesPreviewNotOriginal()
+        {
+            var token = new FileNameNumericValueToken();
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track01");
+            item.Preview.Prefix = "chapter07";
+
+            Assert.Equal("7", token.Compile(tokenArgs: "")(item));
+            Assert.Equal("track01", item.Original.Prefix);
+        }
+
+        /// <summary>
         /// Verifies stray arguments are rejected.
         /// </summary>
         [Fact]

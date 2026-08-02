@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
     public sealed class FileExtensionTokenTests
     {
         /// <summary>
-        /// Verifies the token returns the extension with its leading dot.
+        /// Verifies the token returns the preview extension with its leading dot.
         /// </summary>
         [Fact]
         public void Resolve_ReturnsExtensionWithDot()
@@ -17,6 +17,20 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var item = FilterTestHelpers.CreateRenameItem(extension: ".flac");
 
             Assert.Equal(".flac", token.Compile(tokenArgs: "")(item));
+        }
+
+        /// <summary>
+        /// Verifies the token follows preview when it diverges from original.
+        /// </summary>
+        [Fact]
+        public void Resolve_UsesPreviewNotOriginal()
+        {
+            var token = new FileExtensionToken();
+            var item = FilterTestHelpers.CreateRenameItem(extension: ".mp3");
+            item.Preview.Extension = ".flac";
+
+            Assert.Equal(".flac", token.Compile(tokenArgs: "")(item));
+            Assert.Equal(".mp3", item.Original.Extension);
         }
 
         /// <summary>
