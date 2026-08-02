@@ -111,4 +111,35 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
             return string.Empty;
         }
     }
+
+    /// <summary>
+    /// Resolves <c>&lt;id3v2-version&gt;</c> — the ID3v2 tag minor version from the preview overlay.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Returns MFR7-style text such as <c>2.3</c> or <c>2.4</c> from
+    /// <see cref="Mfr.Models.Tags.Id3v2.Id3v2TagData.Version"/>. Empty when no ID3v2 block is present.
+    /// </para>
+    /// </remarks>
+    internal sealed class Id3v2VersionToken : IFormatToken
+    {
+        /// <inheritdoc />
+        public IReadOnlyList<string> Names { get; } = ["id3v2-version"];
+
+        /// <inheritdoc />
+        public Formatter Compile(string tokenArgs)
+        {
+            FormatOptionsParsing.RequireNoArgument(tokenArgs, FormatOptionsParsing.TokenDisplayName(this));
+
+            return item =>
+            {
+                item.EnsureEmbeddedTagsLoaded();
+                var block = item.Preview.AudioTagOverlay.Id3v2;
+                if (block is null)
+                    return string.Empty;
+
+                return $"2.{block.Version}";
+            };
+        }
+    }
 }

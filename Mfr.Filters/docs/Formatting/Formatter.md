@@ -39,7 +39,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 #### Audio tags (canonical overlay)
 
-Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`AudioTagPersistence.Read`**) **on first `audio-*` / `id3v2` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
+Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`AudioTagPersistence.Read`**) **on first `audio-*` / `id3v2` / `id3v2-version` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
 **Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mpeg-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
 
@@ -142,8 +142,9 @@ Reads one **modeled ID3v2 frame** from **`Preview.AudioTagOverlay.Id3v2`** (same
 | `<id3v2:COMM>` | Primary comment (empty content descriptor); empty when unset. |
 | `<id3v2:COMM:other>` | Comment whose content descriptor is `other`. |
 | `<id3v2:USLT>` | Primary unsynced lyrics; optional content-descriptor suffix like `COMM`. |
+| `<id3v2-version>` | Tag version as `2.3` / `2.4` / … from the overlay block; empty when no ID3v2 tag. No arguments. |
 
-**Arguments:** `field-code` is **required** (the four-character frame id, case-insensitive). Multi-instance frames (`TXXX` / `COMM` / `USLT`) may append a content-descriptor suffix after the id. Singleton frames reject that suffix at compile time. Multi-value text on one frame is joined with `; `. `TRCK` / `TPOS` return the full frame text (e.g. `3/12`); use `<audio-track>` / `<audio-track-count>` when a split is needed.
+**Arguments:** For `<id3v2:…>`, `field-code` is **required** (the four-character frame id, case-insensitive). Multi-instance frames (`TXXX` / `COMM` / `USLT`) may append a content-descriptor suffix after the id. Singleton frames reject that suffix at compile time. Multi-value text on one frame is joined with `; `. `TRCK` / `TPOS` return the full frame text (e.g. `3/12`); use `<audio-track>` / `<audio-track-count>` when a split is needed. `<id3v2-version>` accepts **no** argument.
 
 #### File properties
 

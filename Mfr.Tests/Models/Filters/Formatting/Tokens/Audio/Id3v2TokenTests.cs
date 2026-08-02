@@ -117,6 +117,47 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         }
 
         [Fact]
+        public void Resolve_Version_FormatsMinorAsTwoDotN()
+        {
+            var token = new Id3v2VersionToken();
+            var v23 = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
+                    version: 3,
+                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["A"] }));
+            var v24 = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
+                    version: 4,
+                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["B"] }));
+
+            Assert.Equal("2.3", token.Compile(string.Empty)(v23));
+            Assert.Equal("2.4", token.Compile(string.Empty)(v24));
+            Assert.Contains("id3v2-version", token.Names);
+        }
+
+        [Fact]
+        public void Resolve_Version_NullBlock_YieldsEmpty()
+        {
+            var token = new Id3v2VersionToken();
+            var item = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: m => m.AudioTagOverlay = new AudioTagOverlay
+                {
+                    ContainerFormat = AudioContainerFormat.Mpeg,
+                    Id3v2 = null,
+                    Xiph = new XiphTagData { Fields = [] },
+                });
+
+            Assert.Equal(string.Empty, token.Compile(string.Empty)(item));
+        }
+
+        [Fact]
+        public void Resolve_Version_WithArgument_Throws()
+        {
+            var token = new Id3v2VersionToken();
+            var ex = Assert.Throws<ArgumentException>(() => token.Compile("0")(FilterTestHelpers.CreateRenameItem()));
+            Assert.Contains("id3v2-version", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
         public void Resolve_PrefersPreviewOverlayOverOriginal()
         {
             var token = new Id3v2Token();
@@ -210,10 +251,15 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
 
         private static AudioTagOverlay _OverlayWithFrames(params Id3v2ModeledFrame[] frames)
         {
+            return _OverlayWithFrames(version: 3, frames);
+        }
+
+        private static AudioTagOverlay _OverlayWithFrames(byte version, params Id3v2ModeledFrame[] frames)
+        {
             return new AudioTagOverlay
             {
                 ContainerFormat = AudioContainerFormat.Mpeg,
-                Id3v2 = new Id3v2TagData { Version = 3, Frames = [.. frames] },
+                Id3v2 = new Id3v2TagData { Version = version, Frames = [.. frames] },
             };
         }
     }
