@@ -155,6 +155,12 @@ Dedicated audio filters:
 
 - **Create:** `Version = 3` (ID3v2.3).
 - **Patch:** preserve on-disk version; do not upgrade or downgrade.
+- **Modeled singleton text frames** (`Id3v2TagFields`): `TALB`, `TBPM`, `TCOM`, `TCON`, `TCOP`,
+  `TDAT`, `TDEN`, `TDOR`, `TDRC`, `TDRL`, `TDTG`, `TENC`, `TEXT`, `TFLT`, `TIPL`, `TIT1`, `TIT2`,
+  `TIT3`, `TKEY`, `TLAN`, `TLEN`, `TMED`, `TMOO`, `TOAL`, `TOFN`, `TOLY`, `TOPE`, `TORY`, `TOWN`,
+  `TPE1`, `TPE2`, `TPE3`, `TPE4`, `TPOS`, `TPUB`, `TRCK`, `TRDA`, `TRSN`, `TRSO`, `TSIZ`, `TSOA`,
+  `TSOP`, `TSSE`, `TSST`, `TYER`. Plus multi-instance `COMM` / `USLT` / `TXXX`. Unmodeled frames
+  (e.g. `APIC`, `UFID`, `USER`, `W*`) stay on disk untouched by field-patch.
 - **v2.4-only frames** (`TDRC`, `TMOO`, `TSST`, …): `Id3v2FrameVersionPolicy.EnsureCompatible` at
   `AudioOverlayBlockFieldIo.SetId3v2FrameString` → PreviewError on v2.3 tags.
 - **Generic year:** writes `TYER` on v2.3, `TDRC` on v2.4.

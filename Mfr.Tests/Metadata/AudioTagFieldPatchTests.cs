@@ -366,6 +366,54 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
+        /// Expanded singleton frames such as <c>TPUB</c> are read into the overlay and field-patched.
+        /// </summary>
+        [Fact]
+        public void Apply_Mp3_TpubPatch_RoundTrips()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("tpub-patch.mp3");
+            TaggedMp3Fixture.WriteTagged(path, id3v2Title: "Song");
+            using (var seed = TagLib.File.Create(path))
+            {
+                var id3v2 = (TagLib.Id3v2.Tag)seed.GetTag(TagTypes.Id3v2, true);
+                id3v2.AddFrame(new TextInformationFrame("TPUB", StringType.UTF8) { Text = ["EMI"] });
+                seed.Save();
+            }
+
+            var original = AudioTagPersistence.Read(path);
+            Assert.Equal("EMI", AudioOverlayBlockFieldIo.GetId3v2FrameString(original, "TPUB"));
+
+            var preview = original.Clone();
+            AudioOverlayBlockFieldIo.SetId3v2FrameString(preview, "TPUB", "Parlophone");
+            AudioTagPersistence.Apply(path, original, preview);
+
+            var again = AudioTagPersistence.Read(path);
+            Assert.Equal("Parlophone", AudioOverlayBlockFieldIo.GetId3v2FrameString(again, "TPUB"));
+            Assert.Equal("Song", AudioOverlayBlockFieldIo.GetId3v2FrameString(again, "TIT2"));
+        }
+
+        /// <summary>
+        /// v2.4-only frames such as <c>TMOO</c> are modeled when present on a version-4 tag.
+        /// </summary>
+        [Fact]
+        public void Read_Mp3_TmooOnV24_IsModeled()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("tmoo-v24.mp3");
+            TaggedMp3Fixture.WriteTagged(path, id3v2Title: "MoodSong");
+            using (var seed = TagLib.File.Create(path))
+            {
+                var id3v2 = (TagLib.Id3v2.Tag)seed.GetTag(TagTypes.Id3v2, true);
+                id3v2.Version = 4;
+                id3v2.AddFrame(new TextInformationFrame("TMOO", StringType.UTF8) { Text = ["Melancholic"] });
+                seed.Save();
+            }
+
+            var overlay = AudioTagPersistence.Read(path);
+            Assert.Equal(4, overlay.Id3v2!.Version);
+            Assert.Equal("Melancholic", AudioOverlayBlockFieldIo.GetId3v2FrameString(overlay, "TMOO"));
+        }
+
+        /// <summary>
         /// Embeds a 1x1 PNG cover via TagLib's <see cref="Picture"/> surface (avoids obsolete <c>AttachedPictureFrame</c>).
         /// </summary>
         private static void _EmbedTinyPngCover(string path, string? description)

@@ -12,17 +12,21 @@ namespace Mfr.Metadata.TagFields
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Only the frame ids listed here plus <c>COMM</c> / <c>USLT</c> / <c>TXXX</c> are modeled; anything else
-    /// (for example <c>APIC</c>) stays on disk untouched. Multi-instance frames are identified by frame id plus
-    /// language and description, so clearing one comment never removes its siblings.
+    /// Only the singleton frame ids in <c>_SingletonFrameIds</c> plus <c>COMM</c> / <c>USLT</c> / <c>TXXX</c>
+    /// are modeled; anything else (for example <c>APIC</c>, <c>UFID</c>, URL frames) stays on disk untouched.
+    /// Multi-instance frames are identified by frame id plus language and description, so clearing one comment
+    /// never removes its siblings.
     /// </para>
     /// </remarks>
     internal static class Id3v2TagFields
     {
         private static readonly HashSet<string> _SingletonFrameIds = new(StringComparer.Ordinal)
         {
-            "TIT1", "TIT2", "TALB", "TPE1", "TPE2", "TPE3", "TCOM", "TCON", "TCOP", "TBPM",
-            "TYER", "TDRC", "TRCK", "TPOS",
+            "TALB", "TBPM", "TCOM", "TCON", "TCOP", "TDAT", "TDEN", "TDOR", "TDRC", "TDRL", "TDTG",
+            "TENC", "TEXT", "TFLT", "TIPL", "TIT1", "TIT2", "TIT3", "TKEY", "TLAN", "TLEN",
+            "TMED", "TMOO", "TOAL", "TOFN", "TOLY", "TOPE", "TORY", "TOWN",
+            "TPE1", "TPE2", "TPE3", "TPE4", "TPOS", "TPUB", "TRCK", "TRDA", "TRSN", "TRSO",
+            "TSIZ", "TSOA", "TSOP", "TSSE", "TSST", "TYER",
         };
 
         /// <summary>
