@@ -1352,6 +1352,7 @@ The Formatter filter, Mover sub-folder template, AudioTagSetter value, and date 
 | `<full-name:0>` | Filename with extension | `track01.mp3` |
 | `<parent-folder:0>` | Immediate parent folder name | `Albums` |
 | `<full-path:0>` | Full file path | `/music/albums/track01.mp3` |
+| `<file-or-folder>` | `File` or `Folder` from directory attribute | `File` |
 
 ### 7.2 File Properties Group
 

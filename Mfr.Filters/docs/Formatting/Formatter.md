@@ -31,6 +31,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 | `<parent-folder>` | Name of the immediate parent folder (level 1). |
 | `<parent-folder:level>` | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth. |
 | `<full-path>` | Full path of the file. |
+| `<file-or-folder>` | `File` or `Folder` from original `Attributes.IsDirectory` (read-only; no Apply target). |
 
 #### Audio tags (canonical overlay)
 
