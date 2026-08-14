@@ -16,7 +16,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
 
             return item =>
             {
-                item.EnsureMpegAudioPropertiesLoaded();
+                item.EnsureMediaPropertiesLoaded();
                 return MpegAudioPropertiesFormatting.Format(item.Original.Media?.Mpeg, field);
             };
         }

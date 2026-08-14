@@ -133,7 +133,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         }
 
         [Fact]
-        public void EnsureMpegAudioPropertiesLoaded_ReadsFromDiskWhenNotMarked()
+        public void Compile_ReadsFromDiskWhenNotMarked()
         {
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "l3-compl-cut.mp3");
             Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");

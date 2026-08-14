@@ -15,21 +15,6 @@ namespace Mfr.Filters
         /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
         internal static void EnsureMediaPropertiesLoaded(this RenameItem item)
         {
-            _EnsureMediaPropertiesLoaded(item);
-        }
-
-        /// <summary>
-        /// Ensures <see cref="RenameItem.Original"/> carries media properties (including nested MPEG when present).
-        /// </summary>
-        /// <param name="item">Rename row to load.</param>
-        /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
-        internal static void EnsureMpegAudioPropertiesLoaded(this RenameItem item)
-        {
-            _EnsureMediaPropertiesLoaded(item);
-        }
-
-        private static void _EnsureMediaPropertiesLoaded(RenameItem item)
-        {
             ArgumentNullException.ThrowIfNull(item);
 
             if (item.MediaPropertiesLoadAttempted)
