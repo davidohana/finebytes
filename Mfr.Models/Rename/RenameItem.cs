@@ -185,6 +185,16 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Clears lazy metadata caches after commit so subsequent previews reload from disk.
+        /// </summary>
+        internal void ClearMetadataCaches()
+        {
+            ClearEmbeddedTagsCache();
+            ClearMediaPropertiesCache();
+            ClearImagePropertiesCache();
+        }
+
+        /// <summary>
         /// Clears overlays and resets load state after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearEmbeddedTagsCache()

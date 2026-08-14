@@ -47,7 +47,7 @@ flowchart LR
 | Disk read / raster map | `Mfr.Metadata` — `ImagePropertiesReader` |
 | Lazy load | `Mfr.Filters` — `RenameItemImagePropertiesExtensions.EnsureImagePropertiesLoaded` |
 | Tokens | `Mfr.Filters` — `ImagePropertyTokenBase` and seven `image-*` tokens |
-| Commit cache clear | `Mfr.Engine` — `RenameList.Commit` calls `ClearImagePropertiesCache` |
+| Commit cache clear | `Mfr.Engine` — `RenameList.Commit` calls `ClearMetadataCaches` |
 
 ## Cache lifetime
 

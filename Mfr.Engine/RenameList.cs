@@ -201,9 +201,7 @@ namespace Mfr.Engine
 
             foreach (var item in _renameItems)
             {
-                item.ClearEmbeddedTagsCache();
-                item.ClearMediaPropertiesCache();
-                item.ClearImagePropertiesCache();
+                item.ClearMetadataCaches();
             }
 
             var commitOkCount = results.Count(item => item.Status == RenameStatus.CommitOk);
