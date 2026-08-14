@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Mfr.Filters.Formatting.Tokens.Media
 {
     /// <summary>
@@ -22,49 +20,21 @@ namespace Mfr.Filters.Formatting.Tokens.Media
             {
                 MediaPropertyField.MimeType => media.MimeType ?? string.Empty,
                 MediaPropertyField.Corrupt => media.PossiblyCorrupt ? "True" : "False",
-                MediaPropertyField.Duration => _FormatDuration(media.Duration),
-                MediaPropertyField.DurationSec => _FormatDurationSec(media.Duration),
+                MediaPropertyField.Duration => PropertyValueFormatting.Duration(media.Duration),
+                MediaPropertyField.DurationSec => PropertyValueFormatting.DurationSec(media.Duration),
                 MediaPropertyField.MediaTypes => media.MediaTypes ?? string.Empty,
                 MediaPropertyField.Description => media.Description ?? string.Empty,
-                MediaPropertyField.AudioBitrate => _FormatPositiveInt(media.AudioBitrate),
-                MediaPropertyField.SampleRate => _FormatPositiveInt(media.AudioSampleRate),
-                MediaPropertyField.BitsPerSample => _FormatPositiveInt(media.BitsPerSample),
-                MediaPropertyField.Channels => _FormatPositiveInt(media.AudioChannels),
-                MediaPropertyField.VideoWidth => _FormatPositiveInt(media.VideoWidth),
-                MediaPropertyField.VideoHeight => _FormatPositiveInt(media.VideoHeight),
-                MediaPropertyField.PhotoWidth => _FormatPositiveInt(media.PhotoWidth),
-                MediaPropertyField.PhotoHeight => _FormatPositiveInt(media.PhotoHeight),
-                MediaPropertyField.PhotoQuality => _FormatPositiveInt(media.PhotoQuality),
+                MediaPropertyField.AudioBitrate => PropertyValueFormatting.PositiveInt(media.AudioBitrate),
+                MediaPropertyField.SampleRate => PropertyValueFormatting.PositiveInt(media.AudioSampleRate),
+                MediaPropertyField.BitsPerSample => PropertyValueFormatting.PositiveInt(media.BitsPerSample),
+                MediaPropertyField.Channels => PropertyValueFormatting.PositiveInt(media.AudioChannels),
+                MediaPropertyField.VideoWidth => PropertyValueFormatting.PositiveInt(media.VideoWidth),
+                MediaPropertyField.VideoHeight => PropertyValueFormatting.PositiveInt(media.VideoHeight),
+                MediaPropertyField.PhotoWidth => PropertyValueFormatting.PositiveInt(media.PhotoWidth),
+                MediaPropertyField.PhotoHeight => PropertyValueFormatting.PositiveInt(media.PhotoHeight),
+                MediaPropertyField.PhotoQuality => PropertyValueFormatting.PositiveInt(media.PhotoQuality),
                 _ => string.Empty,
             };
-        }
-
-        private static string _FormatDuration(TimeSpan duration)
-        {
-            if (duration == TimeSpan.Zero)
-                return string.Empty;
-
-            var totalHours = (int)duration.TotalHours;
-            return string.Create(
-                CultureInfo.InvariantCulture,
-                $"{totalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}");
-        }
-
-        private static string _FormatDurationSec(TimeSpan duration)
-        {
-            if (duration == TimeSpan.Zero)
-                return string.Empty;
-
-            var seconds = (long)Math.Floor(duration.TotalSeconds);
-            return seconds.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static string _FormatPositiveInt(int value)
-        {
-            if (value == 0)
-                return string.Empty;
-
-            return value.ToString(CultureInfo.InvariantCulture);
         }
     }
 

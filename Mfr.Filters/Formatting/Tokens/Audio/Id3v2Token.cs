@@ -8,7 +8,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Reads one modeled ID3v2 frame from <see cref="Mfr.Models.Rename.FileMeta.AudioTagOverlay"/> on the
+    /// Reads one modeled ID3v2 frame from <see cref="FileMeta.AudioTagOverlay"/> on the
     /// preview snapshot. <c>field-code</c> is the four-character frame id (for example <c>TALB</c>,
     /// <c>TIT2</c>, <c>TXXX</c>).
     /// </para>
@@ -118,7 +118,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// <remarks>
     /// <para>
     /// Returns MFR7-style text such as <c>2.3</c> or <c>2.4</c> from
-    /// <see cref="Mfr.Models.Tags.Id3v2.Id3v2TagData.Version"/>. Empty when no ID3v2 block is present.
+    /// <see cref="Models.Tags.Id3v2.Id3v2TagData.Version"/>. Empty when no ID3v2 block is present.
     /// </para>
     /// </remarks>
     internal sealed class Id3v2VersionToken : IFormatToken

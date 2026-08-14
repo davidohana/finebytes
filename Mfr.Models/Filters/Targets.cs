@@ -74,7 +74,7 @@ namespace Mfr.Models.Filters
     public sealed record SemanticAudioFieldTarget(SemanticAudioField Field) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
-    /// Targets one ID3v1 scalar on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="Tags.AudioTagOverlay.Id3v1"/>.
+    /// Targets one ID3v1 scalar on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v1"/>.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -85,7 +85,7 @@ namespace Mfr.Models.Filters
     public sealed record Id3v1FieldTarget(Id3v1Field Field) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
-    /// Targets one modeled ID3v2 frame on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="Tags.AudioTagOverlay.Id3v2"/>.
+    /// Targets one modeled ID3v2 frame on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Id3v2"/>.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -105,7 +105,7 @@ namespace Mfr.Models.Filters
         string? Description = null) : FilterTarget, IAudioOverlayFilterTarget;
 
     /// <summary>
-    /// Targets one known Xiph / Vorbis comment key on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="Tags.AudioTagOverlay.Xiph"/>.
+    /// Targets one known Xiph / Vorbis comment key on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Xiph"/>.
     /// </summary>
     /// <remarks>
     /// <para>

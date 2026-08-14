@@ -22,10 +22,10 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
             {
                 MpegAudioPropertyField.Bitrate => _FormatBitrate(mpeg),
                 MpegAudioPropertyField.Copyright => _FormatYesNo(mpeg.IsCopyrighted),
-                MpegAudioPropertyField.Duration => _FormatDuration(mpeg.Duration),
-                MpegAudioPropertyField.DurationSec => _FormatDurationSec(mpeg.Duration),
+                MpegAudioPropertyField.Duration => PropertyValueFormatting.Duration(mpeg.Duration),
+                MpegAudioPropertyField.DurationSec => PropertyValueFormatting.DurationSec(mpeg.Duration),
                 MpegAudioPropertyField.Encoding => mpeg.IsVbr ? "VBR" : "CBR",
-                MpegAudioPropertyField.Frequency => _FormatPositiveInt(mpeg.SampleRate),
+                MpegAudioPropertyField.Frequency => PropertyValueFormatting.PositiveInt(mpeg.SampleRate),
                 MpegAudioPropertyField.Layer => _FormatLayer(mpeg.Layer),
                 MpegAudioPropertyField.MpegVer => mpeg.MpegVersion,
                 MpegAudioPropertyField.Mode => mpeg.ChannelMode,
@@ -61,34 +61,6 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
         private static string _FormatYesNo(bool value)
         {
             return value ? "Yes" : "No";
-        }
-
-        private static string _FormatDuration(TimeSpan duration)
-        {
-            if (duration == TimeSpan.Zero)
-                return string.Empty;
-
-            var totalHours = (int)duration.TotalHours;
-            return string.Create(
-                CultureInfo.InvariantCulture,
-                $"{totalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}");
-        }
-
-        private static string _FormatDurationSec(TimeSpan duration)
-        {
-            if (duration == TimeSpan.Zero)
-                return string.Empty;
-
-            var seconds = (long)Math.Floor(duration.TotalSeconds);
-            return seconds.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static string _FormatPositiveInt(int value)
-        {
-            if (value == 0)
-                return string.Empty;
-
-            return value.ToString(CultureInfo.InvariantCulture);
         }
     }
 

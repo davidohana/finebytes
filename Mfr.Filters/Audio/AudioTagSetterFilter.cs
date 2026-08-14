@@ -477,7 +477,7 @@ namespace Mfr.Filters.Audio
                     $"AudioTagSetter {fieldLabel} must be between 0 and 255. Got {parsed}.");
             }
 
-            long raw = parsed + autoIncrementBy;
+            var raw = parsed + autoIncrementBy;
             if (raw <= 0)
                 return assignUpdated(semantic, null);
 

@@ -71,6 +71,18 @@ namespace Mfr.Tests.Models.Filters
                 SemanticAudioField.Lyrics => throw new InvalidOperationException(nonNumericTheoryMessage),
                 SemanticAudioField.Copyright => throw new InvalidOperationException(nonNumericTheoryMessage),
                 SemanticAudioField.Grouping => throw new InvalidOperationException(nonNumericTheoryMessage),
+                SemanticAudioField.BeatsPerMinute => throw new NotImplementedException(),
+                SemanticAudioField.Conductor => throw new NotImplementedException(),
+                SemanticAudioField.MusicBrainzArtistId => throw new NotImplementedException(),
+                SemanticAudioField.MusicBrainzReleaseId => throw new NotImplementedException(),
+                SemanticAudioField.MusicBrainzReleaseArtistId => throw new NotImplementedException(),
+                SemanticAudioField.MusicBrainzTrackId => throw new NotImplementedException(),
+                SemanticAudioField.MusicBrainzDiscId => throw new NotImplementedException(),
+                SemanticAudioField.MusicBrainzReleaseStatus => throw new NotImplementedException(),
+                SemanticAudioField.MusicBrainzReleaseType => throw new NotImplementedException(),
+                SemanticAudioField.MusicBrainzReleaseCountry => throw new NotImplementedException(),
+                SemanticAudioField.MusicIpId => throw new NotImplementedException(),
+                SemanticAudioField.AmazonId => throw new NotImplementedException(),
                 _ => throw new InvalidOperationException(nonNumericTheoryMessage),
             };
 
