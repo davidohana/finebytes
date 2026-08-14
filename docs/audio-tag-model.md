@@ -59,13 +59,16 @@ flowchart TB
 |---|---|
 | Overlay + block records | `Mfr.Models` — `AudioTagOverlay`, `Id3v1TagData`, `Id3v2TagData`, `XiphTagData`, … |
 | Semantic projection / merge / field get-set | `Mfr.Models` — `SemanticAudioTag`, `AudioTagSemanticMerge`, `AudioTagOverlay.MergeSemantic`, `SemanticFields`, `AudioOverlayBlockFieldIo`, `AudioOverlayTargetIo`, capability `AudioTagContainerPolicy` |
-| TagLib I/O and patch | `Mfr.Metadata` — `AudioTagPersistence` (orchestration), `Mfr.Metadata.TagFields` (`*TagFields` per block, plus `TagFieldDiff`), `AudioTagContainerDetector` |
+| TagLib I/O and patch | `Mfr.Metadata` — `TagLibFileReader` (one preview open → tags + media), `AudioTagPersistence` (orchestration / Apply), `Mfr.Metadata.TagFields` (`*TagFields` per block, plus `TagFieldDiff`), `AudioTagContainerDetector` |
 | Shared text rules | `Mfr.Utils` — `DelimitedText` (`;`-list split/join, trim), `OrdinalSequence` (value-array compare/equality), `StringExtensions.TrimmedOrNull` |
 | Filters / targets | `Mfr.Filters` — `AudioTagSetter`, removers, `StringTargetFilter` + `EnsureTargetReady` then `FileMeta` get/set |
 | Commit | `Mfr.Engine` — `CommitExecutor` (move → strip-all flag → Apply) |
 
-TagLib opens only on first lazy `Read` (via `EnsureEmbeddedTagsLoaded`) and on commit Apply / strip.
-Filters do not reopen the file mid-chain.
+The first TagLib preview open — tags via `EnsureEmbeddedTagsLoaded` or media via
+`EnsureMediaPropertiesLoaded` — maps both caches from one `TagLibFileReader.Read`. The sibling
+cache is filled only when that load flag is not already set, so seeded unit-test overlays are not
+overwritten. Commit Apply / strip still opens again to write. Filters do not reopen the file
+mid-chain.
 
 Each block type owns one `*TagFields` class under `Mfr.Metadata/TagFields/` exposing `Read(file)` and
 `Apply(file, original, preview)`, so its modeled keys, read rules, and patch rules sit together.

@@ -29,8 +29,13 @@ namespace Mfr.Filters
                     "Cannot read audio tags for a directory.");
             }
 
-            var overlay = AudioTagPersistence.Read(item.Original.FullPath);
-            item.SetEmbeddedTagOverlay(overlay);
+            var snapshot = TagLibFileReader.Read(item.Original.FullPath);
+            item.SetEmbeddedTagOverlay(snapshot.Overlay);
+            if (item.MediaPropertiesLoadAttempted)
+                return;
+
+            item.MarkMediaPropertiesLoadAttempted();
+            item.SetMediaProperties(snapshot.Media);
         }
 
         /// <summary>

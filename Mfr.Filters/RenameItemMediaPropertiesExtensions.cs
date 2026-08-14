@@ -28,8 +28,13 @@ namespace Mfr.Filters
                     "Cannot read media properties for a directory.");
             }
 
-            var media = MediaPropertiesReader.Read(item.Original.FullPath);
-            item.SetMediaProperties(media);
+            var snapshot = TagLibFileReader.Read(item.Original.FullPath);
+            item.SetMediaProperties(snapshot.Media);
+            if (item.EmbeddedTagsLoadAttempted)
+                return;
+
+            item.MarkEmbeddedTagsLoadAttempted();
+            item.SetEmbeddedTagOverlay(snapshot.Overlay);
         }
     }
 }

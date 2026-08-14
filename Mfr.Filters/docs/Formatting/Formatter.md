@@ -39,7 +39,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 #### Audio tags (canonical overlay)
 
-Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`AudioTagPersistence.Read`**) **on first `audio-*` / `id3v2` / `id3v2-version` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
+Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`TagLibFileReader.Read`**) **on first `audio-*` / `id3v2` / `id3v2-version` token use** (or first `media-*` / `mpeg-*` token, which shares that open) for that **file** row inside a **`Preview`** run; the same open also fills the media cache when it is not already marked loaded. **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
 **Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mpeg-*`, `image-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
 
@@ -85,7 +85,7 @@ Stream properties (duration, bitrate, channels, …) are under **Media propertie
 
 #### Media properties
 
-Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`MediaPropertiesReader.Read`**) **on first `media-*` or `mpeg-*` token use** for that **file** row inside a **`Preview`** run (one TagLib open; MPEG header nested on **`Media.Mpeg`** when present); **`RenameList.Commit`** clears the cache afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
+Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`TagLibFileReader.Read`**) **on first `media-*` or `mpeg-*` token use** (or first `audio-*` / tag-filter load, which shares that open) for that **file** row inside a **`Preview`** run (one TagLib open; MPEG header nested on **`Media.Mpeg`** when present). The same open also fills embedded-tag overlays when they are not already marked loaded. **`RenameList.Commit`** clears the cache afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
 
 Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties as already loaded so seeded **`FileMeta.Media`** (including nested **`Media.Mpeg`**) is used without disk I/O.
 
@@ -111,7 +111,7 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties a
 
 #### MPEG audio properties
 
-Reads from **`Original.Media.Mpeg`** (nested read-only TagLib `Mpeg.AudioHeader` on the media cache). Loaded by the same **`MediaPropertiesReader.Read`** path as media properties. Files without an MPEG audio header (e.g. WAV/FLAC/AAC) leave **`Media.Mpeg`** null and expand tokens to **empty** (not PreviewError). Replaces MFR7’s legacy **`mp3-*`** names.
+Reads from **`Original.Media.Mpeg`** (nested read-only TagLib `Mpeg.AudioHeader` on the media cache). Loaded by the same **`TagLibFileReader.Read`** path as media properties (and as audio tags when that family loads first). Files without an MPEG audio header (e.g. WAV/FLAC/AAC) leave **`Media.Mpeg`** null and expand tokens to **empty** (not PreviewError). Replaces MFR7’s legacy **`mp3-*`** names.
 
 | Token | Output |
 |--------|--------|

@@ -50,6 +50,18 @@ namespace Mfr.Metadata
             absolutePath.RequireExistingRegularFile();
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
+            return ReadFrom(file);
+        }
+
+        /// <summary>
+        /// Maps embedded tags from an already-open TagLib file.
+        /// </summary>
+        /// <param name="file">Open TagLib file.</param>
+        /// <returns>A new overlay built from embedded tags, with <see cref="AudioTagOverlay.ContainerFormat"/> stamped.</returns>
+        internal static AudioTagOverlay ReadFrom(TagLib.File file)
+        {
+            ArgumentNullException.ThrowIfNull(file);
+
             var overlay = _ReadOverlay(file, file.TagTypesOnDisk);
             overlay.ContainerFormat = AudioTagContainerDetector.DetectFrom(file);
             return overlay;

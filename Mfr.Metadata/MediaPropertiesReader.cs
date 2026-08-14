@@ -23,6 +23,18 @@ namespace Mfr.Metadata
             absolutePath.RequireExistingRegularFile();
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
+            return ReadFrom(file);
+        }
+
+        /// <summary>
+        /// Maps media properties from an already-open TagLib file.
+        /// </summary>
+        /// <param name="file">Open TagLib file.</param>
+        /// <returns>A new snapshot built from TagLib file properties and related fields.</returns>
+        internal static MediaProperties ReadFrom(TagLib.File file)
+        {
+            ArgumentNullException.ThrowIfNull(file);
+
             var properties = file.Properties;
             var mediaTypes = properties.MediaTypes;
             string? mediaTypesText = null;
