@@ -28,7 +28,8 @@ namespace Mfr.Tests.Models.Filters
         /// </param>
         /// <param name="configureOriginal">
         /// Optional callback invoked on <see cref="FileMeta"/> after construction but before constructing
-        /// <see cref="RenameItem"/>—for stamping <see cref="FileMeta.AudioTagOverlay"/> and other overrides.
+        /// <see cref="RenameItem"/>—for stamping <see cref="FileMeta.AudioTagOverlay"/>, <see cref="FileMeta.Media"/>,
+        /// <see cref="FileMeta.Image"/>, and other overrides.
         /// </param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
@@ -76,6 +77,7 @@ namespace Mfr.Tests.Models.Filters
             {
                 item.MarkEmbeddedTagsLoadAttempted();
                 item.MarkMediaPropertiesLoadAttempted();
+                item.MarkImagePropertiesLoadAttempted();
             }
 
             return item;

@@ -1,7 +1,7 @@
 namespace Mfr.Utils
 {
     /// <summary>
-    /// Provides convenience extensions for composing file-system paths.
+    /// Path composition helpers and filesystem-path preconditions.
     /// </summary>
     public static class PathExtensions
     {
@@ -14,6 +14,25 @@ namespace Mfr.Utils
         public static string CombinePath(this string root, params string[] segments)
         {
             return Path.Combine([root, .. segments]);
+        }
+
+        /// <summary>
+        /// Ensures <paramref name="absolutePath"/> names an existing regular file.
+        /// </summary>
+        /// <param name="absolutePath">Fully qualified filesystem path.</param>
+        /// <exception cref="ArgumentException">The path is empty, relative, missing, or a directory.</exception>
+        public static void RequireExistingRegularFile(this string absolutePath)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(absolutePath);
+
+            if (!Path.IsPathFullyQualified(absolutePath))
+                throw new ArgumentException("Path must be fully qualified.", nameof(absolutePath));
+
+            if (Directory.Exists(absolutePath))
+                throw new ArgumentException($"'{absolutePath}' is a directory.", nameof(absolutePath));
+
+            if (!File.Exists(absolutePath))
+                throw new ArgumentException($"File does not exist: '{absolutePath}'.", nameof(absolutePath));
         }
 
         /// <summary>

@@ -1079,7 +1079,7 @@ Renames any target field to a format string built from literals and formatting p
   "type": "Formatter",
   "target": { "targetType": "FileFullName" },
   "options": {
-    "template": "<counter:initial=1,step=1,padding=none,length=2,resetScope=global>.<image-width:0>x<image-height:0>.<image-format:0><ext:0>"
+    "template": "<counter:initial=1,step=1,padding=none,length=2,resetScope=global>.<image-width>x<image-height>.<image-format><ext>"
   }
 }
 ```
@@ -1420,7 +1420,9 @@ Replaces MFR7’s `mp3-*` names. No argument suffixes. VBR Quality is deferred (
 
 ### 7.7 Image Properties (read-only)
 
-`<image-width:0>`, `<image-height:0>`, `<image-bit-depth:0>`, `<image-format:0>`, `<image-horz-res:0>`, `<image-vert-res:0>`, `<image-frames:0>`
+No argument suffixes (stray args fail at formatter compile). Values come from MetadataExtractor (not TagLib/GDI+); mapped rasters are JPEG, PNG, GIF, BMP, TIFF, ICO, and WebP. See [image-metadata-model.md](image-metadata-model.md).
+
+`<image-width>`, `<image-height>`, `<image-bit-depth>`, `<image-format>`, `<image-horz-res>`, `<image-vert-res>`, `<image-frame-count>`
 
 ### 7.8 EXIF Group (JPEG)
 

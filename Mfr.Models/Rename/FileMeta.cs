@@ -131,6 +131,17 @@ namespace Mfr.Models.Rename
         public MediaProperties? Media { get; set; }
 
         /// <summary>
+        /// Gets or sets the lazy MetadataExtractor image-properties read cache (dims, bit depth, DPI, frames).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>image-*</c> formatter load.
+        /// Separate from TagLib <see cref="Media"/> photo fields; values may differ.
+        /// </para>
+        /// </remarks>
+        public ImageProperties? Image { get; set; }
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -152,6 +163,7 @@ namespace Mfr.Models.Rename
             {
                 AudioTagOverlay = AudioTagOverlay.Clone(),
                 Media = Media,
+                Image = Image,
             };
         }
     }

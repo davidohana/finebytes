@@ -1,5 +1,6 @@
 using Mfr.Metadata.TagFields;
 using Mfr.Models.Tags;
+using Mfr.Utils;
 using TagLib;
 using TagLib.Mpeg;
 
@@ -46,7 +47,7 @@ namespace Mfr.Metadata
         /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
         public static AudioTagOverlay Read(string absolutePath)
         {
-            _ValidateExistingRegularFile(absolutePath);
+            absolutePath.RequireExistingRegularFile();
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             var overlay = _ReadOverlay(file, file.TagTypesOnDisk);
@@ -77,7 +78,7 @@ namespace Mfr.Metadata
         {
             ArgumentNullException.ThrowIfNull(originalOverlay);
             ArgumentNullException.ThrowIfNull(previewOverlay);
-            _ValidateExistingRegularFile(absolutePath);
+            absolutePath.RequireExistingRegularFile();
 
             if (previewOverlay.Equals(originalOverlay))
                 return;
@@ -116,7 +117,7 @@ namespace Mfr.Metadata
         /// <exception cref="IOException">The file cannot be opened or saved.</exception>
         public static void RemoveAllEmbeddedTags(string absolutePath)
         {
-            _ValidateExistingRegularFile(absolutePath);
+            absolutePath.RequireExistingRegularFile();
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             file.RemoveTags(TagTypes.AllTags);
@@ -239,20 +240,6 @@ namespace Mfr.Metadata
 
             if (previewOverlay.Id3v1 is not null)
                 Id3v1TagFields.Apply(file, originalOverlay.Id3v1, previewOverlay.Id3v1);
-        }
-
-        private static void _ValidateExistingRegularFile(string absolutePath)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(absolutePath);
-
-            if (!Path.IsPathFullyQualified(absolutePath))
-                throw new ArgumentException("Path must be fully qualified.", nameof(absolutePath));
-
-            if (Directory.Exists(absolutePath))
-                throw new ArgumentException($"'{absolutePath}' is a directory.", nameof(absolutePath));
-
-            if (!System.IO.File.Exists(absolutePath))
-                throw new ArgumentException($"File does not exist: '{absolutePath}'.", nameof(absolutePath));
         }
     }
 }

@@ -114,6 +114,11 @@ namespace Mfr.Models.Rename
         internal bool MediaPropertiesLoadAttempted { get; private set; }
 
         /// <summary>
+        /// Gets whether MetadataExtractor image properties were loaded for this preview cycle.
+        /// </summary>
+        internal bool ImagePropertiesLoadAttempted { get; private set; }
+
+        /// <summary>
         /// Marks embedded-tag load as attempted for this preview cycle.
         /// </summary>
         internal void MarkEmbeddedTagsLoadAttempted()
@@ -127,6 +132,14 @@ namespace Mfr.Models.Rename
         internal void MarkMediaPropertiesLoadAttempted()
         {
             MediaPropertiesLoadAttempted = true;
+        }
+
+        /// <summary>
+        /// Marks image-properties load as attempted for this preview cycle.
+        /// </summary>
+        internal void MarkImagePropertiesLoadAttempted()
+        {
+            ImagePropertiesLoadAttempted = true;
         }
 
         /// <summary>
@@ -160,6 +173,18 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Stores an image-properties snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
+        /// </summary>
+        /// <param name="image">Read-only raster properties from MetadataExtractor.</param>
+        internal void SetImageProperties(ImageProperties image)
+        {
+            ArgumentNullException.ThrowIfNull(image);
+
+            Original.Image = image;
+            Preview.Image = image;
+        }
+
+        /// <summary>
         /// Clears overlays and resets load state after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearEmbeddedTagsCache()
@@ -178,6 +203,16 @@ namespace Mfr.Models.Rename
             MediaPropertiesLoadAttempted = false;
             Original.Media = null;
             Preview.Media = null;
+        }
+
+        /// <summary>
+        /// Clears the image-properties cache after commit so subsequent previews reload from disk.
+        /// </summary>
+        internal void ClearImagePropertiesCache()
+        {
+            ImagePropertiesLoadAttempted = false;
+            Original.Image = null;
+            Preview.Image = null;
         }
 
         /// <summary>

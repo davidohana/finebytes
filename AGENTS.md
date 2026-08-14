@@ -11,6 +11,7 @@
 - `docs/mfr-folder-layering.md`
 - `docs/magic-file-renamer-design.md` (consult for architecture/feature-level changes)
 - `docs/audio-tag-model.md` (embedded audio tag read/write/Apply)
+- `docs/image-metadata-model.md` (lazy MetadataExtractor image property cache)
 - `.editorconfig`
 - `.cursor/rules/refactor-no-legacy-compat.mdc`
 - `.cursor/rules/csharp-style.mdc`

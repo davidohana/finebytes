@@ -31,7 +31,7 @@ Illustrative spine (typical flow, not exhaustive):
 
 `Mfr.App.Ui -> Mfr.Engine -> ...` (same lower layers as CLI)
 
-`Mfr.Metadata` bridges TagLib Sharp to canonical tag records in `Mfr.Models` (overlay types, semantic projection/merge, and field get/set live in L1; TagLib read/write/detect stay in L2). `Mfr.Engine` references Metadata for commit Apply; filters use Models for overlay edits and Metadata only for lazy load.
+`Mfr.Metadata` bridges TagLib Sharp and MetadataExtractor to canonical records in `Mfr.Models` (overlay types, semantic projection/merge, and field get/set live in L1; TagLib and MetadataExtractor read/write/detect stay in L2). `Mfr.Engine` references Metadata for commit Apply; filters use Models for overlay edits and Metadata only for lazy load.
 
 ## Enforcement
 

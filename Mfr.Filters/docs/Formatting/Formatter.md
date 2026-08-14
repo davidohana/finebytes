@@ -41,7 +41,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`AudioTagPersistence.Read`**) **on first `audio-*` / `id3v2` / `id3v2-version` token use** for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
-**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mpeg-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
+**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mpeg-*`, `image-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
 
 Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateRenameItem`**, which marks embedded tags as already loaded so **`EnsureEmbeddedTagsLoaded`** does not touch pre-seeded **`AudioTagOverlay`**; integration-style tests use real tagged temp files when exercising disk read.
 
@@ -128,6 +128,28 @@ Reads from **`Original.Media.Mpeg`** (nested read-only TagLib `Mpeg.AudioHeader`
 | `<mpeg-protection>` | `Yes` or `No` (CRC protection bit). |
 
 **Arguments:** No argument (`<mpeg-bitrate>` only). A stray **`<mpeg-bitrate:…>`** fails at compile.
+
+#### Image properties
+
+Reads from **`Original.Image`** (read-only MetadataExtractor raster cache). Properties load from disk (**`ImagePropertiesReader.Read`**) **on first `image-*` token use** for that **file** row inside a **`Preview`** run (one MetadataExtractor open); **`RenameList.Commit`** clears the cache afterward so later previews reload from disk.
+
+**Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** (exception as **`Cause`**). Mapped rasters are JPEG, PNG, GIF, BMP, TIFF, ICO, and WebP. MetadataExtractor **does** open MP3/WAV (and other audio/video), but **`image-*` still errors** on those types. A missing field on a mapped raster (no DPI, WebP bit depth, `0` dimensions) expands **empty**, not an error.
+
+Keep **`<media-photo-width>`** / **`<media-photo-height>`** for TagLib photo dims; values may differ from **`<image-width>`** / **`<image-height>`**.
+
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image properties as already loaded so seeded **`FileMeta.Image`** is used without disk I/O.
+
+| Token | Output |
+|--------|--------|
+| `<image-width>` | Width (px); empty when `0`. |
+| `<image-height>` | Height (px); empty when `0`. |
+| `<image-bit-depth>` | Total bits per pixel; empty when `0`. |
+| `<image-format>` | MetadataExtractor short type name (`JPEG`, `PNG`, `GIF`, `TIFF`, `BMP`, `ICO`, `WebP`); empty when unset. |
+| `<image-horz-res>` | Horizontal DPI; whole numbers without a decimal (`96`); otherwise general (`72.009`); empty when `≤ 0`. |
+| `<image-vert-res>` | Vertical DPI; same formatting as horz-res; empty when `≤ 0`. |
+| `<image-frame-count>` | Frame count; empty when `0`. Stills with known dims are `1`. |
+
+**Arguments:** No argument (`<image-width>` only). A stray **`<image-width:…>`** fails at compile.
 
 #### ID3v2 Custom Field (MFR7 `<id3v2:…>`)
 

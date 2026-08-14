@@ -20,7 +20,7 @@ namespace Mfr.Metadata
         /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
         public static MediaProperties Read(string absolutePath)
         {
-            _ValidateExistingRegularFile(absolutePath);
+            absolutePath.RequireExistingRegularFile();
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             var properties = file.Properties;
@@ -85,20 +85,6 @@ namespace Mfr.Metadata
                 TagLib.Mpeg.Version.Unknown => string.Empty,
                 _ => string.Empty,
             };
-        }
-
-        private static void _ValidateExistingRegularFile(string absolutePath)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(absolutePath);
-
-            if (!Path.IsPathFullyQualified(absolutePath))
-                throw new ArgumentException("Path must be fully qualified.", nameof(absolutePath));
-
-            if (Directory.Exists(absolutePath))
-                throw new ArgumentException($"'{absolutePath}' is a directory.", nameof(absolutePath));
-
-            if (!System.IO.File.Exists(absolutePath))
-                throw new ArgumentException($"File does not exist: '{absolutePath}'.", nameof(absolutePath));
         }
     }
 }

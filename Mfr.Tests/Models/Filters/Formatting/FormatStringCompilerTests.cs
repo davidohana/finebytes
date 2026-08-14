@@ -102,6 +102,13 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [InlineData("counter")]
         [InlineData("counter:length=0,initial=1,step=1,padding=none,resetScope=global")]
         [InlineData("now")]
+        [InlineData("image-width")]
+        [InlineData("image-height")]
+        [InlineData("image-bit-depth")]
+        [InlineData("image-format")]
+        [InlineData("image-horz-res")]
+        [InlineData("image-vert-res")]
+        [InlineData("image-frame-count")]
         public void ResolveTemplate_ShippedToken_ResolvesWithoutThrowing(string tokenInner)
         {
             var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Music\Album");
