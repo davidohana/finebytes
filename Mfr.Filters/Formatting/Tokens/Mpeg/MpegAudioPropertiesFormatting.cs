@@ -21,7 +21,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
             return field switch
             {
                 MpegAudioPropertyField.Bitrate => _FormatBitrate(mpeg),
-                MpegAudioPropertyField.Copyright => _FormatYesNo(mpeg.IsCopyrighted),
+                MpegAudioPropertyField.Copyright => PropertyValueFormatting.YesNo(mpeg.IsCopyrighted),
                 MpegAudioPropertyField.Duration => PropertyValueFormatting.Duration(mpeg.Duration),
                 MpegAudioPropertyField.DurationSec => PropertyValueFormatting.DurationSec(mpeg.Duration),
                 MpegAudioPropertyField.Encoding => mpeg.IsVbr ? "VBR" : "CBR",
@@ -29,8 +29,8 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
                 MpegAudioPropertyField.Layer => _FormatLayer(mpeg.Layer),
                 MpegAudioPropertyField.MpegVer => mpeg.MpegVersion,
                 MpegAudioPropertyField.Mode => mpeg.ChannelMode,
-                MpegAudioPropertyField.Original => _FormatYesNo(mpeg.IsOriginal),
-                MpegAudioPropertyField.Protection => _FormatYesNo(mpeg.IsProtected),
+                MpegAudioPropertyField.Original => PropertyValueFormatting.YesNo(mpeg.IsOriginal),
+                MpegAudioPropertyField.Protection => PropertyValueFormatting.YesNo(mpeg.IsProtected),
                 _ => string.Empty,
             };
         }
@@ -56,11 +56,6 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
                 3 => "III",
                 _ => string.Empty,
             };
-        }
-
-        private static string _FormatYesNo(bool value)
-        {
-            return value ? "Yes" : "No";
         }
     }
 

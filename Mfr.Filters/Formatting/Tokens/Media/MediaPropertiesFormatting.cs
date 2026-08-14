@@ -19,7 +19,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
             return field switch
             {
                 MediaPropertyField.MimeType => media.MimeType ?? string.Empty,
-                MediaPropertyField.Corrupt => media.PossiblyCorrupt ? "True" : "False",
+                MediaPropertyField.Corrupt => PropertyValueFormatting.YesNo(media.PossiblyCorrupt),
                 MediaPropertyField.Duration => PropertyValueFormatting.Duration(media.Duration),
                 MediaPropertyField.DurationSec => PropertyValueFormatting.DurationSec(media.Duration),
                 MediaPropertyField.MediaTypes => media.MediaTypes ?? string.Empty,

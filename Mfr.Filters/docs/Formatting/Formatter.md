@@ -92,7 +92,7 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties a
 | Token | Output |
 |--------|--------|
 | `<media-mime>` | MIME type; empty when unset. |
-| `<media-corrupt>` | `True` or `False` (invariant). |
+| `<media-corrupt>` | `Yes` or `No`. |
 | `<media-duration>` | Duration as `h:mm:ss` (total hours unpadded); empty when zero. |
 | `<media-duration-sec>` | Whole seconds (floor); empty when zero. |
 | `<media-types>` | TagLib media-type flags text (e.g. `Audio`); empty when none. |

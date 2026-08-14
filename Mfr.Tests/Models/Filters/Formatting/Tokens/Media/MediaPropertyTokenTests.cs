@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.Media = _SampleMedia());
 
             Assert.Equal("taglib/mp3", new MediaMimeToken().Compile(string.Empty)(item));
-            Assert.Equal("False", new MediaCorruptToken().Compile(string.Empty)(item));
+            Assert.Equal("No", new MediaCorruptToken().Compile(string.Empty)(item));
             Assert.Equal("0:03:45", new MediaDurationToken().Compile(string.Empty)(item));
             Assert.Equal("225", new MediaDurationSecToken().Compile(string.Empty)(item));
             Assert.Equal("Audio", new MediaTypesToken().Compile(string.Empty)(item));
@@ -53,12 +53,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
         }
 
         [Fact]
-        public void Resolve_CorruptTrue_FormatsInvariantTrue()
+        public void Resolve_CorruptTrue_FormatsYes()
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 configureOriginal: m => m.Media = new MediaProperties { PossiblyCorrupt = true });
 
-            Assert.Equal("True", new MediaCorruptToken().Compile(string.Empty)(item));
+            Assert.Equal("Yes", new MediaCorruptToken().Compile(string.Empty)(item));
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
             Assert.Equal(string.Empty, new MediaDurationSecToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new MediaAudioBitrateToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new MediaChannelsToken().Compile(string.Empty)(item));
-            Assert.Equal("False", new MediaCorruptToken().Compile(string.Empty)(item));
+            Assert.Equal("No", new MediaCorruptToken().Compile(string.Empty)(item));
         }
 
         [Fact]
