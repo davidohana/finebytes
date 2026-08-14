@@ -1426,19 +1426,21 @@ No argument suffixes (stray args fail at formatter compile). Values come from Me
 
 ### 7.8 EXIF Group (JPEG)
 
+See [image-metadata-model.md](image-metadata-model.md). Values come from MetadataExtractor (same open as `<image-*>`). Mapped rasters are JPEG, PNG, GIF, BMP, TIFF, ICO, and WebP; missing EXIF on a mapped raster expands empty. No-arg tokens reject stray arguments at compile; `<exif-date>` and `<exif>` require their arguments.
+
 | Token | Description |
 |-------|-------------|
-| `<exif-date:format>` | Date/time image taken |
-| `<exif-make:0>` | Camera manufacturer |
-| `<exif-model:0>` | Camera model |
-| `<exif-exposure:0>` | Exposure time |
-| `<exif-fnumber:0>` | F-number |
-| `<exif-iso:0>` | ISO speed |
-| `<exif-focal:0>` | Focal length mm |
-| `<exif-focal-35:0>` | Focal length 35mm equivalent |
-| `<exif-gps-lat:0>` | GPS latitude |
-| `<exif-gps-lon:0>` | GPS longitude |
-| `<exif-tag:source,name>` | Extended EXIF by source+name — Canon, Casio, FujiFilm, GPS, IPTC, Nikon, Olympus |
+| `<exif-date:format>` | Date/time image taken (DateTimeOriginal only; .NET format string) |
+| `<exif-make>` | Camera manufacturer |
+| `<exif-model>` | Camera model |
+| `<exif-exposure>` | Exposure time |
+| `<exif-fnumber>` | F-number |
+| `<exif-iso>` | ISO speed |
+| `<exif-focal>` | Focal length mm |
+| `<exif-focal-35>` | Focal length 35mm equivalent |
+| `<exif-gps-lat>` | GPS latitude (5c) |
+| `<exif-gps-lon>` | GPS longitude (5c) |
+| `<exif:source,name>` | Extended EXIF by source+name — Exif, ExifSub, GPS, IPTC, Canon, Casio, FujiFilm, Nikon, Olympus, Interop, Thumb |
 
 ### 7.9 Nearby Location Group
 

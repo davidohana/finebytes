@@ -135,11 +135,23 @@ namespace Mfr.Models.Rename
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Read-only; never written on commit. <see langword="null"/> until first <c>image-*</c> formatter load.
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>image-*</c> or <c>exif-*</c>
+        /// formatter load (one MetadataExtractor open fills <see cref="Image"/> and <see cref="Exif"/>).
         /// Separate from TagLib <see cref="Media"/> photo fields; values may differ.
         /// </para>
         /// </remarks>
         public ImageProperties? Image { get; set; }
+
+        /// <summary>
+        /// Gets or sets the lazy MetadataExtractor EXIF read cache (camera fields, DateTaken, extended tags).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>image-*</c> or <c>exif-*</c>
+        /// formatter load. Mapped rasters with no EXIF store an empty snapshot, not <see langword="null"/>.
+        /// </para>
+        /// </remarks>
+        public ExifData? Exif { get; set; }
 
         /// <summary>
         /// Creates a detached copy of this metadata instance.
@@ -164,6 +176,7 @@ namespace Mfr.Models.Rename
                 AudioTagOverlay = AudioTagOverlay.Clone(),
                 Media = Media,
                 Image = Image,
+                Exif = Exif,
             };
         }
     }

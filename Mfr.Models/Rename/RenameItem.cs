@@ -114,7 +114,7 @@ namespace Mfr.Models.Rename
         internal bool MediaPropertiesLoadAttempted { get; private set; }
 
         /// <summary>
-        /// Gets whether MetadataExtractor image properties were loaded for this preview cycle.
+        /// Gets whether MetadataExtractor image properties and EXIF were loaded for this preview cycle.
         /// </summary>
         internal bool ImagePropertiesLoadAttempted { get; private set; }
 
@@ -185,6 +185,18 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Stores an EXIF snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
+        /// </summary>
+        /// <param name="exif">Read-only EXIF properties from MetadataExtractor.</param>
+        internal void SetExifData(ExifData exif)
+        {
+            ArgumentNullException.ThrowIfNull(exif);
+
+            Original.Exif = exif;
+            Preview.Exif = exif;
+        }
+
+        /// <summary>
         /// Clears lazy metadata caches after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearMetadataCaches()
@@ -216,13 +228,15 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
-        /// Clears the image-properties cache after commit so subsequent previews reload from disk.
+        /// Clears the image-properties and EXIF caches after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearImagePropertiesCache()
         {
             ImagePropertiesLoadAttempted = false;
             Original.Image = null;
             Preview.Image = null;
+            Original.Exif = null;
+            Preview.Exif = null;
         }
 
         /// <summary>

@@ -109,6 +109,15 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [InlineData("image-horz-res")]
         [InlineData("image-vert-res")]
         [InlineData("image-frame-count")]
+        [InlineData("exif-make")]
+        [InlineData("exif-model")]
+        [InlineData("exif-exposure")]
+        [InlineData("exif-fnumber")]
+        [InlineData("exif-iso")]
+        [InlineData("exif-focal")]
+        [InlineData("exif-focal-35")]
+        [InlineData("exif-date:yyyy")]
+        [InlineData("exif:Exif,Make")]
         public void ResolveTemplate_ShippedToken_ResolvesWithoutThrowing(string tokenInner)
         {
             var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Music\Album");

@@ -148,6 +148,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
             Assert.False(item.ImagePropertiesLoadAttempted);
             Assert.Null(item.Original.Image);
             Assert.Null(item.Preview.Image);
+            Assert.Null(item.Original.Exif);
+            Assert.Null(item.Preview.Exif);
         }
     }
 }

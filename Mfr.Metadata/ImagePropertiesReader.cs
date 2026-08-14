@@ -38,10 +38,7 @@ namespace Mfr.Metadata
         /// <exception cref="InvalidOperationException">The file is not a mapped raster type (including audio/video MetadataExtractor opens).</exception>
         public static ImageProperties Read(string absolutePath)
         {
-            absolutePath.RequireExistingRegularFile();
-
-            var directories = ImageMetadataReader.ReadMetadata(absolutePath);
-            return _MapImage(directories);
+            return ImageFileReader.Read(absolutePath).Image;
         }
 
         /// <summary>
@@ -49,15 +46,15 @@ namespace Mfr.Metadata
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Split from the disk open so a later EXIF slice can map from the same in-memory directories
-        /// without a second file read. Non-allowlist types (including audio/video MetadataExtractor opens)
-        /// throw; missing fields on a mapped raster stay <c>0</c> / null.
+        /// Split from the disk open so <see cref="ImageFileReader"/> can map EXIF from the same in-memory
+        /// directories without a second file read. Non-allowlist types (including audio/video MetadataExtractor
+        /// opens) throw; missing fields on a mapped raster stay <c>0</c> / null.
         /// </para>
         /// </remarks>
         /// <param name="directories">Directories from one <see cref="ImageMetadataReader.ReadMetadata(string)"/> call.</param>
         /// <returns>A detached raster snapshot; no MetadataExtractor types are retained.</returns>
         /// <exception cref="InvalidOperationException">The detected file type is not a mapped raster.</exception>
-        private static ImageProperties _MapImage(IReadOnlyList<MeDirectory> directories)
+        internal static ImageProperties MapFrom(IReadOnlyList<MeDirectory> directories)
         {
             var format = _EnsureRasterAllowlist(_ReadFormatName(directories));
             var (width, height) = _ReadDimensions(directories, format);

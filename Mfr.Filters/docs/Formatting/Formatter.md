@@ -131,7 +131,7 @@ Reads from **`Original.Media.Mpeg`** (nested read-only TagLib `Mpeg.AudioHeader`
 
 #### Image properties
 
-Reads from **`Original.Image`** (read-only MetadataExtractor raster cache). Properties load from disk (**`ImagePropertiesReader.Read`**) **on first `image-*` token use** for that **file** row inside a **`Preview`** run (one MetadataExtractor open); **`RenameList.Commit`** clears the cache afterward so later previews reload from disk.
+Reads from **`Original.Image`** (read-only MetadataExtractor raster cache). Properties load from disk (**`ImageFileReader.Read`**) **on first `image-*` or `exif-*` token use** for that **file** row inside a **`Preview`** run (one MetadataExtractor open fills **`Image`** and **`Exif`**); **`RenameList.Commit`** clears the cache afterward so later previews reload from disk.
 
 **Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** (exception as **`Cause`**). Mapped rasters are JPEG, PNG, GIF, BMP, TIFF, ICO, and WebP. MetadataExtractor **does** open MP3/WAV (and other audio/video), but **`image-*` still errors** on those types. A missing field on a mapped raster (no DPI, WebP bit depth, `0` dimensions) expands **empty**, not an error.
 
@@ -150,6 +150,30 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image properties as
 | `<image-frame-count>` | Frame count; empty when `0`. Stills with known dims are `1`. |
 
 **Arguments:** No argument (`<image-width>` only). A stray **`<image-width:…>`** fails at compile.
+
+#### EXIF
+
+Reads from **`Original.Exif`** (read-only MetadataExtractor EXIF cache). The same **`EnsureImagePropertiesLoaded`** path as **`image-*`** fills both caches on first **`image-*`** or **`exif-*`** token use; **`RenameList.Commit`** clears them. Text/camera fields are MetadataExtractor **`GetDescription`** strings (then `\n` → space, trim). **`DateTaken`** is SubIFD DateTimeOriginal via **`TryGetDateTime`** only (no DateTimeDigitized / IFD0 DateTime fallback).
+
+**Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** — including MP3/WAV. A mapped raster with no EXIF (or a missing field) expands **empty**, not an error. PNG/TIFF/WebP with EXIF work; the allowlist is the same as **`image-*`**.
+
+Keep later **`<imagetag-*>`** (TagLib Image Tag) separate; values may differ from **`<exif-*>`**. Typed GPS lat/lon and **`<geo-*>`** are not in this slice.
+
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image/EXIF load as already attempted so seeded **`FileMeta.Exif`** is used without disk I/O.
+
+| Token | Output |
+|--------|--------|
+| `<exif-make>` | Camera manufacturer; empty when unset. |
+| `<exif-model>` | Camera model; empty when unset. |
+| `<exif-exposure>` | Exposure time description (e.g. `1/60 sec`); empty when unset. |
+| `<exif-fnumber>` | F-number description (e.g. `f/8.0`); empty when unset. |
+| `<exif-iso>` | ISO speed description; empty when unset. |
+| `<exif-focal>` | Focal length description (e.g. `50 mm`); empty when unset. |
+| `<exif-focal-35>` | 35mm-equivalent focal length; empty when unset. |
+| `<exif-date:format>` | DateTaken with a .NET date format string (InvariantCulture); empty when unset. |
+| `<exif:source,name>` | Extended tag by directory alias and tag name or decimal id; empty when missing. Example: `<exif:ExifSub,36867>`. |
+
+**Arguments:** No-arg tokens (`<exif-make>` only) reject a stray **`<exif-make:…>`** at compile. **`<exif-date>`** requires a non-empty format string (the pattern is not validated). **`<exif>`** requires **`source,name`** split on the first comma; both parts non-empty; **`source`** must be a known alias (`Exif`, `ExifSub`, `GPS`, `IPTC`, `Canon`, `Casio`, `FujiFilm`, `Nikon`, `Olympus`, `Interop`, or `Thumb`). Unknown tag names expand empty.
 
 #### ID3v2 Custom Field (MFR7 `<id3v2:…>`)
 
