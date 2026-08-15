@@ -183,7 +183,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies This PC lists Network first and opening it shows the Network location.
+        /// Verifies This PC lists Network with other folders and opening it shows the Network location.
         /// </summary>
         [Fact]
         public void ThisPc_Lists_Network_And_OpenSelected_Navigates()
@@ -195,11 +195,13 @@ namespace Mfr.Tests.Ui
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
 
             Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
-            Assert.Equal(FileListViewModel.NetworkDisplayName, viewModel.Entries[0].Name);
-            Assert.Equal("Network location", viewModel.Entries[0].Type);
+            var network = Assert.Single(
+                viewModel.Entries,
+                entry => entry.Name == FileListViewModel.NetworkDisplayName);
+            Assert.Equal("Network location", network.Type);
             Assert.False(viewModel.CanGoUp);
 
-            viewModel.SelectedEntry = viewModel.Entries[0];
+            viewModel.SelectedEntry = network;
             viewModel.OpenSelected();
 
             Assert.Equal(FileListViewModel.NetworkPath, viewModel.CurrentPath);
@@ -214,22 +216,21 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Network stays first on This PC when the name column is reversed.
+        /// Verifies Network stays with known folders on This PC when the name column is reversed.
         /// </summary>
         [Fact]
-        public void ThisPc_Keeps_Network_First_When_Sorted()
+        public void ThisPc_Keeps_Network_With_Known_Places_When_Sorted()
         {
             if (!OperatingSystem.IsWindows())
                 return;
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
-            Assert.True(viewModel.Entries[0].IsPinnedFirst);
+            _AssertNetworkAfterDrives(_Names(viewModel));
 
             viewModel.SortByColumn(nameof(FileListEntry.Name));
 
-            Assert.Equal(FileListViewModel.NetworkDisplayName, viewModel.Entries[0].Name);
-            Assert.True(viewModel.Entries[0].IsPinnedFirst);
+            _AssertNetworkAfterDrives(_Names(viewModel));
         }
 
         /// <summary>
@@ -421,10 +422,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies This PC lists Documents, Music, and Pictures above drives.
+        /// Verifies This PC lists drives above Documents, Music, and Pictures.
         /// </summary>
         [Fact]
-        public void ThisPc_Lists_Known_Places_Before_Drives()
+        public void ThisPc_Lists_Drives_Before_Known_Places()
         {
             if (!OperatingSystem.IsWindows())
                 return;
@@ -433,19 +434,21 @@ namespace Mfr.Tests.Ui
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
             var names = _Names(viewModel);
 
-            Assert.Equal(FileListViewModel.NetworkDisplayName, names[0]);
-            var firstDriveIndex = names.FindIndex(_IsDriveName);
-            Assert.True(firstDriveIndex > 0);
+            Assert.True(_IsDriveName(names[0]));
+            var lastDriveIndex = names.FindLastIndex(_IsDriveName);
+            Assert.True(lastDriveIndex >= 0);
 
-            _AssertPlaceBeforeDrive(names, "Documents", firstDriveIndex, Environment.SpecialFolder.MyDocuments);
-            _AssertPlaceBeforeDrive(names, "Music", firstDriveIndex, Environment.SpecialFolder.MyMusic);
-            _AssertPlaceBeforeDrive(names, "Pictures", firstDriveIndex, Environment.SpecialFolder.MyPictures);
+            _AssertPlaceAfterDrives(names, "Documents", lastDriveIndex, Environment.SpecialFolder.MyDocuments);
+            _AssertPlaceAfterDrives(names, "Music", lastDriveIndex, Environment.SpecialFolder.MyMusic);
+            _AssertPlaceAfterDrives(names, "Pictures", lastDriveIndex, Environment.SpecialFolder.MyPictures);
+            _AssertNetworkAfterDrives(names);
 
             viewModel.SortByColumn(nameof(FileListEntry.Name));
             var reversed = _Names(viewModel);
-            Assert.Equal(FileListViewModel.NetworkDisplayName, reversed[0]);
-            var reversedDriveIndex = reversed.FindIndex(_IsDriveName);
-            _AssertPlaceBeforeDrive(reversed, "Documents", reversedDriveIndex, Environment.SpecialFolder.MyDocuments);
+            Assert.True(_IsDriveName(reversed[0]));
+            var reversedDriveIndex = reversed.FindLastIndex(_IsDriveName);
+            _AssertPlaceAfterDrives(reversed, "Documents", reversedDriveIndex, Environment.SpecialFolder.MyDocuments);
+            _AssertNetworkAfterDrives(reversed);
         }
 
         /// <summary>
@@ -500,10 +503,10 @@ namespace Mfr.Tests.Ui
             Assert.Equal(new DirectoryInfo(expanded).FullName, viewModel.CurrentPath);
         }
 
-        private static void _AssertPlaceBeforeDrive(
+        private static void _AssertPlaceAfterDrives(
             List<string> names,
             string placeName,
-            int firstDriveIndex,
+            int lastDriveIndex,
             Environment.SpecialFolder folder)
         {
             if (_ExistingSpecialFolder(folder) is null)
@@ -511,7 +514,14 @@ namespace Mfr.Tests.Ui
 
             var index = names.IndexOf(placeName);
             Assert.True(index > 0, placeName + " should be listed on This PC");
-            Assert.True(index < firstDriveIndex, placeName + " should appear before drives");
+            Assert.True(index > lastDriveIndex, placeName + " should appear after drives");
+        }
+
+        private static void _AssertNetworkAfterDrives(List<string> names)
+        {
+            var lastDriveIndex = names.FindLastIndex(_IsDriveName);
+            var networkIndex = names.IndexOf(FileListViewModel.NetworkDisplayName);
+            Assert.True(networkIndex > lastDriveIndex, "Network should appear with folders after drives");
         }
 
         private static bool _IsDriveName(string name)

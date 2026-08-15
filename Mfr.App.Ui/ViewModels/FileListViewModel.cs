@@ -68,8 +68,8 @@ namespace Mfr.App.Ui.ViewModels
         // First contact with a UNC server (\\ohanas) is often slower than a share Exists check.
         private static readonly TimeSpan _UncServerProbeTimeout = TimeSpan.FromSeconds(8);
 
-        private const int _KnownPlaceListingGroup = 0;
-        private const int _VolumeListingGroup = 1;
+        private const int _VolumeListingGroup = 0;
+        private const int _KnownPlaceListingGroup = 1;
 
         private readonly ISystemIconProvider _iconProvider;
         private readonly List<ListedItem> _listedItems = [];
@@ -394,10 +394,10 @@ namespace Mfr.App.Ui.ViewModels
             {
                 _listedItems.AddRange(_ListKnownPlaces());
                 _listedItems.AddRange(_ListDrives());
-                _ApplyListingSort();
                 if (OperatingSystem.IsWindows())
-                    _listedItems.Insert(0, _CreateNetworkRootItem());
+                    _listedItems.Add(_CreateNetworkRootItem());
 
+                _ApplyListingSort();
                 _RebuildVisibleEntries(preserveSelection: false);
                 return;
             }
@@ -439,10 +439,6 @@ namespace Mfr.App.Ui.ViewModels
 
         private int _CompareListedItems(ListedItem left, ListedItem right)
         {
-            var networkCmp = _NetworkSortRank(left).CompareTo(_NetworkSortRank(right));
-            if (networkCmp != 0)
-                return networkCmp;
-
             var groupCmp = left.ListingGroup.CompareTo(right.ListingGroup);
             if (groupCmp != 0)
                 return groupCmp;
@@ -456,11 +452,6 @@ namespace Mfr.App.Ui.ViewModels
                 fieldCmp = PathComparers.Os.Compare(left.Name, right.Name);
 
             return IsSortAscending ? fieldCmp : -fieldCmp;
-        }
-
-        private static int _NetworkSortRank(ListedItem item)
-        {
-            return ExplorerPath.IsNetworkPath(item.Path) ? 0 : 1;
         }
 
         private int _CompareSortField(ListedItem left, ListedItem right)
@@ -515,7 +506,7 @@ namespace Mfr.App.Ui.ViewModels
                 Name = item.Name,
                 FullPath = item.Path,
                 IsDirectory = item.IsDirectory,
-                IsPinnedFirst = ExplorerPath.IsNetworkPath(item.Path),
+                ListingGroup = item.ListingGroup,
                 Icon = _ResolveIcon(item),
                 Details = ViewMode == FileListViewMode.Tiles ? _FormatDetails(item) : string.Empty,
                 Type = _TypeLabel(item),
@@ -755,7 +746,8 @@ namespace Mfr.App.Ui.ViewModels
                 NetworkDisplayName,
                 IsDirectory: true,
                 Length: null,
-                LastWriteTime: null);
+                LastWriteTime: null,
+                ListingGroup: _KnownPlaceListingGroup);
         }
 
         private bool _TryListFolder(

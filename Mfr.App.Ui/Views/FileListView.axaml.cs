@@ -84,8 +84,8 @@ namespace Mfr.App.Ui.Views
                 view.SortDescriptions.Clear();
                 view.SortDescriptions.Add(
                     DataGridSortDescription.FromPath(
-                        nameof(FileListEntry.IsPinnedFirst),
-                        ListSortDirection.Descending));
+                        nameof(FileListEntry.ListingGroup),
+                        ListSortDirection.Ascending));
                 view.SortDescriptions.Add(
                     DataGridSortDescription.FromPath(
                         nameof(FileListEntry.IsDirectory),

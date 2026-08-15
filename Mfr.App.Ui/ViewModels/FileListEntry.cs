@@ -23,9 +23,9 @@ namespace Mfr.App.Ui.ViewModels
         public required bool IsDirectory { get; init; }
 
         /// <summary>
-        /// Gets whether this row stays above other items when sorting, such as Network on This PC.
+        /// Gets the This PC sort group: volumes before known folders. Ignored in ordinary folders.
         /// </summary>
-        public bool IsPinnedFirst { get; init; }
+        public int ListingGroup { get; init; }
 
         /// <summary>
         /// Gets the icon or thumbnail for the current view mode, or <see langword="null"/> when none is available.
