@@ -12,10 +12,16 @@
         <Style Selector="ListBox.file-list">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="4" />
+            <Setter Property="Padding" Value="2" />
         </Style>
         <Style Selector="ListBox.file-icons">
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        </Style>
+        <Style Selector="ListBox.file-list ListBoxItem">
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="3,1" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
         </Style>
     </UserControl.Styles>
     <Border Classes="pane">
@@ -115,7 +121,7 @@
                          KeyDown="_OnEntriesKeyDown">
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Width="16"
                                        Height="16"
                                        VerticalAlignment="Center"
@@ -141,9 +147,8 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
                             <StackPanel Orientation="Horizontal"
-                                        Width="148"
-                                        Spacing="6"
-                                        Margin="2">
+                                        MaxWidth="140"
+                                        Spacing="4">
                                 <Image Width="16"
                                        Height="16"
                                        VerticalAlignment="Center"
@@ -170,7 +175,7 @@
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Width="88" Margin="4">
+                            <StackPanel Width="72" Margin="2,1">
                                 <Image Width="32"
                                        Height="32"
                                        HorizontalAlignment="Center"
@@ -200,9 +205,9 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
                             <StackPanel Orientation="Horizontal"
-                                        Width="220"
-                                        Spacing="8"
-                                        Margin="4">
+                                        Width="168"
+                                        Spacing="4"
+                                        Margin="1">
                                 <Image Width="32"
                                        Height="32"
                                        VerticalAlignment="Top"
@@ -234,7 +239,7 @@
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Width="110" Margin="4">
+                            <StackPanel Width="100" Margin="2,1">
                                 <Image Width="96"
                                        Height="96"
                                        Stretch="Uniform"
