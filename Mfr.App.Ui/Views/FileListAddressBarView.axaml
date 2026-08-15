@@ -10,49 +10,6 @@
              x:Class="Mfr.App.Ui.Views.FileListAddressBarView"
              x:Name="AddressBarRoot"
              x:DataType="vm:FileListViewModel">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="FileListAddressBarBrush" Color="#FFFFFF" />
-                    <SolidColorBrush x:Key="FileListAddressBarBorderBrush" Color="#D0D0D0" />
-                    <SolidColorBrush x:Key="FileListBreadcrumbMutedBrush" Color="#5C5C5C" />
-                </ResourceDictionary>
-                <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="FileListAddressBarBrush" Color="#2B2B2B" />
-                    <SolidColorBrush x:Key="FileListAddressBarBorderBrush" Color="#3F3F3F" />
-                    <SolidColorBrush x:Key="FileListBreadcrumbMutedBrush" Color="#B0B0B0" />
-                </ResourceDictionary>
-            </ResourceDictionary.ThemeDictionaries>
-            <FontFamily x:Key="FileListFont">Segoe UI, SegoeUI</FontFamily>
-            <x:Double x:Key="FileListFontSize">12</x:Double>
-            <LinearGradientBrush x:Key="GoUpFolderFillBrush" StartPoint="0.2,0" EndPoint="0.8,1">
-                <GradientStop Color="#FFF6C4" Offset="0" />
-                <GradientStop Color="#F7D15A" Offset="0.38" />
-                <GradientStop Color="#E8B020" Offset="0.78" />
-                <GradientStop Color="#D4920C" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="GoUpFolderTabBrush" StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="#F3C94A" Offset="0" />
-                <GradientStop Color="#D4A018" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="GoUpFolderGlossBrush" StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="#66FFFFFF" Offset="0" />
-                <GradientStop Color="#00FFFFFF" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="GoUpArrowLeftBrush" StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#4A4A4A" Offset="0" />
-                <GradientStop Color="#2C2C2C" Offset="1" />
-            </LinearGradientBrush>
-            <LinearGradientBrush x:Key="GoUpArrowRightBrush" StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#1C1C1C" Offset="0" />
-                <GradientStop Color="#0A0A0A" Offset="1" />
-            </LinearGradientBrush>
-            <SolidColorBrush x:Key="GoUpFolderBorderBrush" Color="#A67C12" />
-            <SolidColorBrush x:Key="GoUpFolderShadowBrush" Color="#55000000" />
-            <SolidColorBrush x:Key="GoUpFolderHighlightBrush" Color="#B3FFFFFF" />
-        </ResourceDictionary>
-    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="Border.address-bar">
             <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
@@ -153,22 +110,23 @@
                     <Button Classes="breadcrumb"
                             Focusable="False"
                             Margin="2,0,0,0"
-                            Command="{Binding BeginPathEditCommand}"
-                            ToolTip.Tip="Click to type or paste a path">
+                            Command="{Binding NavigateToCommand}"
+                            CommandParameter="{Binding RootTargetPath}"
+                            ToolTip.Tip="{Binding RootTargetPath}">
                         <Panel Width="16" Height="16">
                             <Viewbox IsVisible="{Binding ShowsComputerRoot}">
                                 <Path Width="16"
                                       Height="16"
                                       Stretch="Uniform"
                                       Fill="{DynamicResource FileListForegroundBrush}"
-                                      Data="M1.5,2.5 H14.5 A1,1 0 0 1 15.5,3.5 V10.5 A1,1 0 0 1 14.5,11.5 H1.5 A1,1 0 0 1 0.5,10.5 V3.5 A1,1 0 0 1 1.5,2.5 Z M5,13 H11 V14.5 H5 Z M0,15 H16 V16 H0 Z" />
+                                      Data="{StaticResource ComputerGeometry}" />
                             </Viewbox>
                             <Viewbox IsVisible="{Binding !ShowsComputerRoot}">
                                 <Path Width="16"
                                       Height="16"
                                       Stretch="Uniform"
                                       Fill="{DynamicResource FileListForegroundBrush}"
-                                      Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
+                                      Data="{StaticResource FolderGeometry}" />
                             </Viewbox>
                         </Panel>
                     </Button>
@@ -280,31 +238,9 @@
                 Classes="address-tool"
                 Command="{Binding GoUpCommand}"
                 ToolTip.Tip="Up">
-            <Viewbox Width="16" Height="16">
-                <Canvas Width="16" Height="16">
-                    <Path Canvas.Left="0.45"
-                          Canvas.Top="0.5"
-                          Fill="{StaticResource GoUpFolderShadowBrush}"
-                          Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
-                    <Path Fill="{StaticResource GoUpFolderFillBrush}"
-                          Stroke="{StaticResource GoUpFolderBorderBrush}"
-                          StrokeThickness="0.65"
-                          StrokeJoin="Round"
-                          Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
-                    <Path Fill="{StaticResource GoUpFolderTabBrush}"
-                          Data="M5.15,5 L6.5,3.2 H12.5 L13.85,5 Z" />
-                    <Path Fill="{StaticResource GoUpFolderGlossBrush}"
-                          Data="M1.45,5.25 H14.55 V8.15 H1.45 Z" />
-                    <Path Stroke="{StaticResource GoUpFolderHighlightBrush}"
-                          StrokeThickness="0.55"
-                          StrokeLineCap="Round"
-                          Data="M1.85,5.45 H14.15" />
-                    <Path Fill="{StaticResource GoUpArrowLeftBrush}"
-                          Data="M8,6.15 L8,11.35 L3.95,11.35 Z" />
-                    <Path Fill="{StaticResource GoUpArrowRightBrush}"
-                          Data="M8,6.15 L12.05,11.35 L8,11.35 Z" />
-                </Canvas>
-            </Viewbox>
+            <TemplatedControl Width="16"
+                              Height="16"
+                              Template="{StaticResource GoUpIconTemplate}" />
         </Button>
         <Button Grid.Column="2"
                 Classes="address-tool"
@@ -315,7 +251,7 @@
                       Height="16"
                       Stretch="Uniform"
                       Fill="{DynamicResource FileListForegroundBrush}"
-                      Data="M14.2,6.4 C13.1,3.7 10.7,2 8,2 C4.7,2 2,4.7 2,8 C2,11.3 4.7,14 8,14 C10.6,14 12.8,12.4 13.6,10 H11.8 C11.1,11.4 9.7,12.3 8,12.3 C5.6,12.3 3.7,10.4 3.7,8 C3.7,5.6 5.6,3.7 8,3.7 C9.7,3.7 11.1,4.6 11.8,6 H9.5 L12.6,9.2 L15.7,6 Z" />
+                      Data="{StaticResource RefreshGeometry}" />
             </Viewbox>
         </Button>
     </Grid>

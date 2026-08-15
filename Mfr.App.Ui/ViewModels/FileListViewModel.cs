@@ -119,6 +119,11 @@ namespace Mfr.App.Ui.ViewModels
         public bool ShowsComputerRoot { get; } = OperatingSystem.IsWindows();
 
         /// <summary>
+        /// Address-bar root the computer/folder icon navigates to: This PC on Windows, <c>/</c> on Unix.
+        /// </summary>
+        public string RootTargetPath => ShowsComputerRoot ? ComputerDisplayName : UnixRootPath;
+
+        /// <summary>
         /// Gets include-mask suggestions for the Mask combo.
         /// </summary>
         public ObservableCollection<string> MaskSuggestions { get; }

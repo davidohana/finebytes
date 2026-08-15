@@ -184,6 +184,28 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies the address-bar computer/folder icon opens This PC on Windows, or <c>/</c> on Unix.
+        /// </summary>
+        [Fact]
+        public void AddressBar_Root_Icon_Navigates_To_Computer_Or_Unix_Root()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+
+            viewModel.NavigateTo(viewModel.RootTargetPath);
+
+            Assert.False(viewModel.IsPathEditing);
+            if (OperatingSystem.IsWindows())
+            {
+                Assert.Equal(FileListViewModel.ComputerDisplayName, viewModel.RootTargetPath);
+                Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
+                return;
+            }
+
+            Assert.Equal(FileListViewModel.UnixRootPath, viewModel.RootTargetPath);
+            Assert.Equal(FileListViewModel.UnixRootPath, viewModel.CurrentPath);
+        }
+
+        /// <summary>
         /// Verifies This PC lists Network with other folders and opening it shows the Network location.
         /// </summary>
         [Fact]

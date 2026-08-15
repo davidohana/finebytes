@@ -4,6 +4,10 @@
              RequestedThemeVariant="Default">
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Themes/FileList.axaml" />
+                <ResourceInclude Source="/Assets/Icons.axaml" />
+            </ResourceDictionary.MergedDictionaries>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="PaneChromeBrush" Color="#F0F0F0" />

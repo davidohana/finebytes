@@ -11,32 +11,6 @@
              x:DataType="vm:FileListViewModel">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="FileListRowBrush" Color="#FFFFFF" />
-                    <SolidColorBrush x:Key="FileListAltRowBrush" Color="#F6F6F6" />
-                    <SolidColorBrush x:Key="FileListSelectionBrush" Color="#CCE8FF" />
-                    <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#99D1FF" />
-                    <SolidColorBrush x:Key="FileListHoverBrush" Color="#E5F3FF" />
-                    <SolidColorBrush x:Key="FileListHeaderBrush" Color="#F5F5F5" />
-                    <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#1A1A1A" />
-                    <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#E0E0E0" />
-                    <SolidColorBrush x:Key="FileListForegroundBrush" Color="#000000" />
-                </ResourceDictionary>
-                <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="FileListRowBrush" Color="#202020" />
-                    <SolidColorBrush x:Key="FileListAltRowBrush" Color="#2A2A2A" />
-                    <SolidColorBrush x:Key="FileListSelectionBrush" Color="#264F78" />
-                    <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#3A6A9A" />
-                    <SolidColorBrush x:Key="FileListHoverBrush" Color="#2A3F55" />
-                    <SolidColorBrush x:Key="FileListHeaderBrush" Color="#2B2B2B" />
-                    <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#F0F0F0" />
-                    <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#3F3F3F" />
-                    <SolidColorBrush x:Key="FileListForegroundBrush" Color="#F0F0F0" />
-                </ResourceDictionary>
-            </ResourceDictionary.ThemeDictionaries>
-            <FontFamily x:Key="FileListFont">Segoe UI, SegoeUI</FontFamily>
-            <x:Double x:Key="FileListFontSize">12</x:Double>
             <x:Double x:Key="DataGridRowSelectedBackgroundOpacity">1</x:Double>
             <x:Double x:Key="DataGridRowSelectedHoveredBackgroundOpacity">1</x:Double>
             <x:Double x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity">1</x:Double>
