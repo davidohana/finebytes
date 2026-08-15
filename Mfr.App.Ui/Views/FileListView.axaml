@@ -178,6 +178,7 @@
             <Setter Property="MinHeight" Value="30" />
             <Setter Property="Padding" Value="2,0,0,0" />
             <Setter Property="ClipToBounds" Value="True" />
+            <Setter Property="Cursor" Value="IBeam" />
         </Style>
         <Style Selector="Button.breadcrumb">
             <Setter Property="Background" Value="Transparent" />
@@ -207,16 +208,17 @@
         <Style Selector="Button.address-history:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
         </Style>
-        <Style Selector="ComboBox.address-edit">
+        <Style Selector="TextBox.address-edit">
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="MinHeight" Value="0" />
-            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="Padding" Value="8,0,4,0" />
             <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
             <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="AcceptsReturn" Value="False" />
         </Style>
     </UserControl.Styles>
     <Border Classes="pane">
@@ -224,35 +226,36 @@
             <Grid DockPanel.Dock="Top"
                   ColumnDefinitions="*,Auto,Auto,Auto,Auto"
                   Margin="4">
-                <Border Classes="address-bar"
+                <Border x:Name="AddressBar"
+                        Classes="address-bar"
                         PointerPressed="_OnAddressBarPointerPressed">
-                    <Grid ColumnDefinitions="*,Auto">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
                         <ScrollViewer HorizontalScrollBarVisibility="Hidden"
                                       VerticalScrollBarVisibility="Disabled"
                                       IsVisible="{Binding !IsPathEditing}">
                             <StackPanel Orientation="Horizontal">
-                                <Viewbox Width="16"
-                                         Height="16"
-                                         Margin="6,0,2,0"
-                                         VerticalAlignment="Center"
-                                         IsVisible="{Binding ShowsComputerRoot}">
-                                    <Path Width="16"
-                                          Height="16"
-                                          Stretch="Uniform"
-                                          Fill="{DynamicResource FileListForegroundBrush}"
-                                          Data="M1.5,2.5 H14.5 A1,1 0 0 1 15.5,3.5 V10.5 A1,1 0 0 1 14.5,11.5 H1.5 A1,1 0 0 1 0.5,10.5 V3.5 A1,1 0 0 1 1.5,2.5 Z M5,13 H11 V14.5 H5 Z M0,15 H16 V16 H0 Z" />
-                                </Viewbox>
-                                <Viewbox Width="16"
-                                         Height="16"
-                                         Margin="6,0,2,0"
-                                         VerticalAlignment="Center"
-                                         IsVisible="{Binding !ShowsComputerRoot}">
-                                    <Path Width="16"
-                                          Height="16"
-                                          Stretch="Uniform"
-                                          Fill="{DynamicResource FileListForegroundBrush}"
-                                          Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
-                                </Viewbox>
+                                <Button Classes="breadcrumb"
+                                        Focusable="False"
+                                        Margin="2,0,0,0"
+                                        Command="{Binding BeginPathEditCommand}"
+                                        ToolTip.Tip="Click to type or paste a path">
+                                    <Panel Width="16" Height="16">
+                                        <Viewbox IsVisible="{Binding ShowsComputerRoot}">
+                                            <Path Width="16"
+                                                  Height="16"
+                                                  Stretch="Uniform"
+                                                  Fill="{DynamicResource FileListForegroundBrush}"
+                                                  Data="M1.5,2.5 H14.5 A1,1 0 0 1 15.5,3.5 V10.5 A1,1 0 0 1 14.5,11.5 H1.5 A1,1 0 0 1 0.5,10.5 V3.5 A1,1 0 0 1 1.5,2.5 Z M5,13 H11 V14.5 H5 Z M0,15 H16 V16 H0 Z" />
+                                        </Viewbox>
+                                        <Viewbox IsVisible="{Binding !ShowsComputerRoot}">
+                                            <Path Width="16"
+                                                  Height="16"
+                                                  Stretch="Uniform"
+                                                  Fill="{DynamicResource FileListForegroundBrush}"
+                                                  Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
+                                        </Viewbox>
+                                    </Panel>
+                                </Button>
                                 <ItemsControl ItemsSource="{Binding BreadcrumbSegments}"
                                               VerticalAlignment="Stretch">
                                     <ItemsControl.ItemsPanel>
@@ -279,19 +282,35 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
+                                <Border MinWidth="28"
+                                        Background="Transparent"
+                                        VerticalAlignment="Stretch" />
                             </StackPanel>
                         </ScrollViewer>
-                        <ComboBox x:Name="PathCombo"
-                                  Classes="address-edit"
-                                  IsEditable="True"
-                                  IsVisible="{Binding IsPathEditing}"
-                                  ItemsSource="{Binding PathHistory}"
-                                  Text="{Binding PathText, Mode=TwoWay}"
-                                  KeyDown="_OnPathKeyDown"
-                                  LostFocus="_OnPathLostFocus" />
+                        <TextBox x:Name="PathEditBox"
+                                 Classes="address-edit"
+                                 IsVisible="{Binding IsPathEditing}"
+                                 Text="{Binding PathText, Mode=TwoWay}"
+                                 Watermark="Paste or type a folder path"
+                                 KeyDown="_OnPathKeyDown"
+                                 LostFocus="_OnPathLostFocus" />
                         <Button Grid.Column="1"
                                 Classes="address-history"
-                                IsVisible="{Binding !IsPathEditing}"
+                                Focusable="False"
+                                IsVisible="{Binding IsPathEditing}"
+                                Click="_OnClearPathClick"
+                                ToolTip.Tip="Clear">
+                            <Path Width="8"
+                                  Height="8"
+                                  Stretch="Uniform"
+                                  Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
+                                  StrokeThickness="1.5"
+                                  Data="M0,0 L8,8 M8,0 L0,8" />
+                        </Button>
+                        <Button x:Name="HistoryButton"
+                                Grid.Column="2"
+                                Classes="address-history"
+                                Focusable="False"
                                 Click="_OnHistoryClick"
                                 ToolTip.Tip="Recent locations">
                             <Path Width="10"
@@ -299,6 +318,16 @@
                                   Stretch="Uniform"
                                   Fill="{DynamicResource FileListBreadcrumbMutedBrush}"
                                   Data="M0,0 L10,0 L5,6 Z" />
+                            <Button.Flyout>
+                                <Flyout Placement="BottomEdgeAlignedRight"
+                                        Opened="_OnHistoryOpened"
+                                        Closed="_OnHistoryClosed">
+                                    <ListBox MaxHeight="220"
+                                             MinWidth="280"
+                                             ItemsSource="{Binding PathHistory}"
+                                             Tapped="_OnHistoryTapped" />
+                                </Flyout>
+                            </Button.Flyout>
                         </Button>
                     </Grid>
                 </Border>
