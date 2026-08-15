@@ -83,15 +83,6 @@ namespace Mfr.App.Ui.Views
                 viewModel.BeginPathEdit();
         }
 
-        private void _OnClearPathClick(object? sender, RoutedEventArgs e)
-        {
-            if (DataContext is not FileListViewModel viewModel)
-                return;
-
-            viewModel.PathText = string.Empty;
-            _FocusAndSelectPathEdit();
-        }
-
         private void _OnHistoryOpened(object? sender, EventArgs e)
         {
             _isHistoryOpen = true;

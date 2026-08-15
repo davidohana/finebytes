@@ -194,9 +194,14 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+        <Style Selector="Button.breadcrumb /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Cursor" Value="Arrow" />
         </Style>
         <Style Selector="Button.breadcrumb:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+            <Setter Property="Cursor" Value="Arrow" />
         </Style>
         <Style Selector="Button.address-history">
             <Setter Property="Background" Value="Transparent" />
@@ -205,6 +210,7 @@
             <Setter Property="MinWidth" Value="22" />
             <Setter Property="MinHeight" Value="0" />
             <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Arrow" />
         </Style>
         <Style Selector="Button.address-history:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
@@ -220,6 +226,12 @@
             <Setter Property="VerticalAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="AcceptsReturn" Value="False" />
+            <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
+            <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
+        </Style>
+        <Style Selector="TextBox.address-edit /template/ TextPresenter#PART_TextPresenter">
+            <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
+            <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
         </Style>
     </UserControl.Styles>
     <Border Classes="pane">
@@ -230,7 +242,7 @@
                 <Border x:Name="AddressBar"
                         Classes="address-bar"
                         PointerPressed="_OnAddressBarPointerPressed">
-                    <Grid ColumnDefinitions="*,Auto,Auto">
+                    <Grid ColumnDefinitions="*,Auto">
                         <ScrollViewer HorizontalScrollBarVisibility="Hidden"
                                       VerticalScrollBarVisibility="Disabled"
                                       IsVisible="{Binding !IsPathEditing}">
@@ -268,7 +280,8 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vm:PathBreadcrumbSegment">
                                             <StackPanel Orientation="Horizontal"
-                                                        VerticalAlignment="Center">
+                                                        VerticalAlignment="Center"
+                                                        Cursor="Arrow">
                                                 <Path Width="6"
                                                       Height="10"
                                                       Margin="4,0"
@@ -301,21 +314,8 @@
                                  Watermark="Paste or type a folder path"
                                  KeyDown="_OnPathKeyDown"
                                  LostFocus="_OnPathLostFocus" />
-                        <Button Grid.Column="1"
-                                Classes="address-history"
-                                Focusable="False"
-                                IsVisible="{Binding IsPathEditing}"
-                                Click="_OnClearPathClick"
-                                ToolTip.Tip="Clear">
-                            <Path Width="8"
-                                  Height="8"
-                                  Stretch="Uniform"
-                                  Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
-                                  StrokeThickness="1.5"
-                                  Data="M0,0 L8,8 M8,0 L0,8" />
-                        </Button>
                         <Button x:Name="HistoryButton"
-                                Grid.Column="2"
+                                Grid.Column="1"
                                 Classes="address-history"
                                 Focusable="False"
                                 Click="_OnHistoryClick"
