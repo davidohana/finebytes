@@ -191,7 +191,8 @@
             <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
             <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
             <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Left" />
         </Style>
         <Style Selector="Button.breadcrumb:pointerover /template/ ContentPresenter#PART_ContentPresenter">
@@ -233,7 +234,8 @@
                         <ScrollViewer HorizontalScrollBarVisibility="Hidden"
                                       VerticalScrollBarVisibility="Disabled"
                                       IsVisible="{Binding !IsPathEditing}">
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
                                 <Button Classes="breadcrumb"
                                         Focusable="False"
                                         Margin="2,0,0,0"
@@ -257,7 +259,7 @@
                                     </Panel>
                                 </Button>
                                 <ItemsControl ItemsSource="{Binding BreadcrumbSegments}"
-                                              VerticalAlignment="Stretch">
+                                              VerticalAlignment="Center">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal" />
@@ -265,14 +267,19 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vm:PathBreadcrumbSegment">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="›"
-                                                           IsVisible="{Binding ShowLeadingChevron}"
-                                                           Margin="2,0"
-                                                           FontSize="14"
-                                                           Opacity="0.7"
-                                                           Foreground="{DynamicResource FileListBreadcrumbMutedBrush}"
-                                                           VerticalAlignment="Center" />
+                                            <StackPanel Orientation="Horizontal"
+                                                        VerticalAlignment="Center">
+                                                <Path Width="6"
+                                                      Height="10"
+                                                      Margin="4,0"
+                                                      Stretch="Uniform"
+                                                      VerticalAlignment="Center"
+                                                      IsVisible="{Binding ShowLeadingChevron}"
+                                                      Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
+                                                      StrokeThickness="1.25"
+                                                      StrokeLineCap="Round"
+                                                      StrokeJoin="Round"
+                                                      Data="M1,1.5 L5,5 L1,8.5" />
                                                 <Button Classes="breadcrumb"
                                                         Content="{Binding Label}"
                                                         ToolTip.Tip="{Binding TargetPath}"
