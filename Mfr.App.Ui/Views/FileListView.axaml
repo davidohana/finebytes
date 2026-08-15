@@ -8,11 +8,49 @@
              d:DesignHeight="400"
              x:Class="Mfr.App.Ui.Views.FileListView"
              x:DataType="vm:FileListViewModel">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="FileListRowBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="FileListAltRowBrush" Color="#F6F6F6" />
+                    <SolidColorBrush x:Key="FileListSelectionBrush" Color="#CCE8FF" />
+                    <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#99D1FF" />
+                    <SolidColorBrush x:Key="FileListHoverBrush" Color="#E5F3FF" />
+                    <SolidColorBrush x:Key="FileListHeaderBrush" Color="#F5F5F5" />
+                    <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#1A1A1A" />
+                    <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#E0E0E0" />
+                    <SolidColorBrush x:Key="FileListForegroundBrush" Color="#000000" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="FileListRowBrush" Color="#202020" />
+                    <SolidColorBrush x:Key="FileListAltRowBrush" Color="#2A2A2A" />
+                    <SolidColorBrush x:Key="FileListSelectionBrush" Color="#264F78" />
+                    <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#3A6A9A" />
+                    <SolidColorBrush x:Key="FileListHoverBrush" Color="#2A3F55" />
+                    <SolidColorBrush x:Key="FileListHeaderBrush" Color="#2B2B2B" />
+                    <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#F0F0F0" />
+                    <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#3F3F3F" />
+                    <SolidColorBrush x:Key="FileListForegroundBrush" Color="#F0F0F0" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+            <FontFamily x:Key="FileListFont">Segoe UI, SegoeUI</FontFamily>
+            <x:Double x:Key="FileListFontSize">12</x:Double>
+            <x:Double x:Key="DataGridRowSelectedBackgroundOpacity">1</x:Double>
+            <x:Double x:Key="DataGridRowSelectedHoveredBackgroundOpacity">1</x:Double>
+            <x:Double x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity">1</x:Double>
+            <x:Double x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundOpacity">1</x:Double>
+            <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="ListBox.file-list">
-            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Padding" Value="2" />
+            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
         </Style>
         <Style Selector="ListBox.file-icons">
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
@@ -21,15 +59,109 @@
             <Setter Property="MinHeight" Value="0" />
             <Setter Property="Padding" Value="3,1" />
             <Setter Property="Margin" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+        </Style>
+        <Style Selector="ListBox.file-rows ListBoxItem">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Padding" Value="4,1" />
+            <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+        </Style>
+        <Style Selector="ListBox.file-rows ListBoxItem:nth-child(even)">
+            <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
+        </Style>
+        <Style Selector="ListBox.file-icons ListBoxItem">
             <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Padding" Value="2,1" />
+        </Style>
+        <Style Selector="ListBox.file-small-icons ListBoxItem">
+            <Setter Property="Width" Value="120" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="ListBox.file-list ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+        </Style>
+        <Style Selector="ListBox.file-list ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+        </Style>
+        <Style Selector="ListBox.file-list ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+        </Style>
+        <Style Selector="DataGrid.file-report">
+            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+            <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+            <Setter Property="RowBackground" Value="{DynamicResource FileListRowBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="ColumnHeaderHeight" Value="22" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridColumnHeader">
+            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Foreground" Value="{DynamicResource FileListHeaderForegroundBrush}" />
+            <Setter Property="Background" Value="{DynamicResource FileListHeaderBrush}" />
+            <Setter Property="MinHeight" Value="22" />
+            <Setter Property="Padding" Value="6,0,4,0" />
+            <Setter Property="SeparatorBrush" Value="{DynamicResource FileListSeparatorBrush}" />
+            <Setter Property="AreSeparatorsVisible" Value="True" />
         </Style>
         <Style Selector="DataGrid.file-report DataGridRow">
             <Setter Property="MinHeight" Value="20" />
             <Setter Property="Height" Value="20" />
+            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+            <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridRow:nth-child(even)">
+            <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
         </Style>
         <Style Selector="DataGrid.file-report DataGridCell">
-            <Setter Property="Padding" Value="4,1" />
+            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+            <Setter Property="Padding" Value="4,0" />
             <Setter Property="MinHeight" Value="0" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridCell:focus /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridRow /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="Transparent" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{DynamicResource FileListHoverBrush}" />
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+            <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+            <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+            <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+            <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="Opacity" Value="1" />
         </Style>
     </UserControl.Styles>
     <Border Classes="pane">
@@ -102,6 +234,7 @@
                           HeadersVisibility="Column"
                           GridLinesVisibility="None"
                           RowHeight="20"
+                          ColumnHeaderHeight="22"
                           SelectionMode="Extended"
                           DoubleTapped="_OnEntriesDoubleTapped"
                           KeyDown="_OnEntriesKeyDown">
@@ -121,10 +254,17 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Date modified"
-                                            Binding="{Binding DateModifiedDisplay}"
-                                            SortMemberPath="LastWriteTime"
-                                            Width="140" />
+                        <DataGridTemplateColumn Header="Date modified"
+                                                Width="140"
+                                                SortMemberPath="LastWriteTime">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:FileListEntry">
+                                    <TextBlock Text="{Binding DateModifiedDisplay}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Type"
                                             Binding="{Binding Type}"
                                             Width="110" />
@@ -142,7 +282,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <ListBox Classes="file-list"
+                <ListBox Classes="file-list file-rows"
                          ItemsSource="{Binding Entries}"
                          SelectedItem="{Binding SelectedEntry}"
                          IsVisible="{Binding IsListView}"
@@ -162,7 +302,7 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <ListBox Classes="file-list file-icons"
+                <ListBox Classes="file-list file-icons file-small-icons"
                          ItemsSource="{Binding Entries}"
                          SelectedItem="{Binding SelectedEntry}"
                          IsVisible="{Binding IsSmallIconsView}"
@@ -171,14 +311,12 @@
                          KeyDown="_OnEntriesKeyDown">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel />
+                            <WrapPanel ItemWidth="120" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Orientation="Horizontal"
-                                        MaxWidth="140"
-                                        Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Width="16"
                                        Height="16"
                                        VerticalAlignment="Center"
