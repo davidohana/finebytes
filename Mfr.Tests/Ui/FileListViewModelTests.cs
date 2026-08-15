@@ -502,6 +502,30 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies typing a drive letter such as <c>D:</c> opens the drive root.
+        /// </summary>
+        [Fact]
+        public void NavigateTo_Drive_Letter_Opens_Root()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var dir = _CreateTree();
+            var root = Path.GetPathRoot(dir);
+            if (string.IsNullOrEmpty(root) || !Directory.Exists(root))
+                return;
+
+            var driveSpec = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var viewModel = _CreateViewModel(dir);
+            viewModel.BeginPathEdit();
+            viewModel.PathText = driveSpec.ToLowerInvariant();
+            viewModel.CommitPath();
+
+            Assert.True(PathRelations.IsSamePath(root, viewModel.CurrentPath));
+            Assert.False(viewModel.IsPathEditing);
+        }
+
+        /// <summary>
         /// Verifies typing Documents or Music opens those folders.
         /// </summary>
         [Fact]

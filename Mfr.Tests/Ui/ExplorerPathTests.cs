@@ -8,6 +8,27 @@ namespace Mfr.Tests.Ui
     public sealed class ExplorerPathTests
     {
         /// <summary>
+        /// Verifies a typed drive letter such as <c>D:</c> is the drive root, not the current folder on that drive.
+        /// </summary>
+        [Fact]
+        public void TryGetDriveRoot_Expands_Bare_Drive_Spec()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                Assert.False(ExplorerPath.TryGetDriveRoot("d:", out _));
+                return;
+            }
+
+            Assert.True(ExplorerPath.TryGetDriveRoot("d:", out var root));
+            Assert.Equal(@"D:\", root);
+            Assert.True(ExplorerPath.TryGetDriveRoot(" D: ", out root));
+            Assert.Equal(@"D:\", root);
+            Assert.False(ExplorerPath.TryGetDriveRoot(@"d:\", out _));
+            Assert.False(ExplorerPath.TryGetDriveRoot(@"d:\music", out _));
+            Assert.False(ExplorerPath.TryGetDriveRoot("This PC", out _));
+        }
+
+        /// <summary>
         /// Verifies Network, <c>\\</c>, and <c>//</c> are the Network sentinel on Windows.
         /// </summary>
         [Fact]

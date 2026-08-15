@@ -48,6 +48,29 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
+        /// Treats a typed Windows drive spec such as <c>D:</c> as the drive root.
+        /// <para>
+        /// Windows otherwise resolves <c>D:</c> to the process current directory on that drive.
+        /// </para>
+        /// </summary>
+        /// <param name="path">Typed address-bar text.</param>
+        /// <param name="root">Drive root such as <c>D:\</c> when parsing succeeds.</param>
+        /// <returns><see langword="true"/> for a letter plus colon with no path.</returns>
+        public static bool TryGetDriveRoot(string? path, [NotNullWhen(true)] out string? root)
+        {
+            root = null;
+            if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(path))
+                return false;
+
+            var trimmed = path.Trim();
+            if (trimmed.Length != 2 || trimmed[1] != ':' || !char.IsAsciiLetter(trimmed[0]))
+                return false;
+
+            root = char.ToUpperInvariant(trimmed[0]) + @":\";
+            return true;
+        }
+
+        /// <summary>
         /// Whether <paramref name="path"/> is the Windows Network location.
         /// </summary>
         /// <param name="path">Path or display name to classify.</param>

@@ -1050,6 +1050,9 @@ namespace Mfr.App.Ui.ViewModels
             try
             {
                 var expanded = Environment.ExpandEnvironmentVariables(path!);
+                if (ExplorerPath.TryGetDriveRoot(expanded, out var driveRoot))
+                    expanded = driveRoot;
+
                 resolved = new DirectoryInfo(expanded).FullName;
                 return _DirectoryExists(resolved);
             }

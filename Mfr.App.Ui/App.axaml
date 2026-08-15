@@ -15,8 +15,19 @@
             <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
             <Setter Property="Margin" Value="2" />
         </Style>
-        <Style Selector="GridSplitter">
-            <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}" />
+        <Style Selector=":is(GridSplitter)">
+            <Setter Property="Background" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+            <Setter Property="MinWidth" Value="6" />
+            <Setter Property="MinHeight" Value="6" />
+            <Setter Property="(Panel.ZIndex)" Value="1" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector=":is(GridSplitter):pointerover">
+            <Setter Property="Background" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
         </Style>
     </Application.Styles>
 </Application>
