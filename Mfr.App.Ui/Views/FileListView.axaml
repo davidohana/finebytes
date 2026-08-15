@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Mfr.App.Ui.ViewModels"
+             xmlns:views="using:Mfr.App.Ui.Views"
              mc:Ignorable="d"
              d:DesignWidth="280"
              d:DesignHeight="400"
@@ -203,6 +204,20 @@
             <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
             <Setter Property="Cursor" Value="Arrow" />
         </Style>
+        <Style Selector="Button.breadcrumb-overflow">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="Width" Value="{x:Static vm:BreadcrumbOverflow.ButtonWidth}" />
+            <Setter Property="MinWidth" Value="{x:Static vm:BreadcrumbOverflow.ButtonWidth}" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+        <Style Selector="Button.breadcrumb-overflow:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+        </Style>
         <Style Selector="Button.address-history">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
@@ -243,50 +258,51 @@
                         Classes="address-bar"
                         PointerPressed="_OnAddressBarPointerPressed">
                     <Grid ColumnDefinitions="*,Auto">
-                        <ScrollViewer HorizontalScrollBarVisibility="Hidden"
-                                      VerticalScrollBarVisibility="Disabled"
-                                      IsVisible="{Binding !IsPathEditing}">
-                            <StackPanel Orientation="Horizontal"
-                                        VerticalAlignment="Center">
-                                <Button Classes="breadcrumb"
-                                        Focusable="False"
-                                        Margin="2,0,0,0"
-                                        Command="{Binding BeginPathEditCommand}"
-                                        ToolTip.Tip="Click to type or paste a path">
-                                    <Panel Width="16" Height="16">
-                                        <Viewbox IsVisible="{Binding ShowsComputerRoot}">
-                                            <Path Width="16"
-                                                  Height="16"
-                                                  Stretch="Uniform"
-                                                  Fill="{DynamicResource FileListForegroundBrush}"
-                                                  Data="M1.5,2.5 H14.5 A1,1 0 0 1 15.5,3.5 V10.5 A1,1 0 0 1 14.5,11.5 H1.5 A1,1 0 0 1 0.5,10.5 V3.5 A1,1 0 0 1 1.5,2.5 Z M5,13 H11 V14.5 H5 Z M0,15 H16 V16 H0 Z" />
-                                        </Viewbox>
-                                        <Viewbox IsVisible="{Binding !ShowsComputerRoot}">
-                                            <Path Width="16"
-                                                  Height="16"
-                                                  Stretch="Uniform"
-                                                  Fill="{DynamicResource FileListForegroundBrush}"
-                                                  Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
-                                        </Viewbox>
-                                    </Panel>
-                                </Button>
-                                <ItemsControl ItemsSource="{Binding BreadcrumbSegments}"
-                                              VerticalAlignment="Center">
+                        <Grid ColumnDefinitions="Auto,*"
+                              IsVisible="{Binding !IsPathEditing}">
+                            <Button Classes="breadcrumb"
+                                    Focusable="False"
+                                    Margin="2,0,0,0"
+                                    Command="{Binding BeginPathEditCommand}"
+                                    ToolTip.Tip="Click to type or paste a path">
+                                <Panel Width="16" Height="16">
+                                    <Viewbox IsVisible="{Binding ShowsComputerRoot}">
+                                        <Path Width="16"
+                                              Height="16"
+                                              Stretch="Uniform"
+                                              Fill="{DynamicResource FileListForegroundBrush}"
+                                              Data="M1.5,2.5 H14.5 A1,1 0 0 1 15.5,3.5 V10.5 A1,1 0 0 1 14.5,11.5 H1.5 A1,1 0 0 1 0.5,10.5 V3.5 A1,1 0 0 1 1.5,2.5 Z M5,13 H11 V14.5 H5 Z M0,15 H16 V16 H0 Z" />
+                                    </Viewbox>
+                                    <Viewbox IsVisible="{Binding !ShowsComputerRoot}">
+                                        <Path Width="16"
+                                              Height="16"
+                                              Stretch="Uniform"
+                                              Fill="{DynamicResource FileListForegroundBrush}"
+                                              Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
+                                    </Viewbox>
+                                </Panel>
+                            </Button>
+                            <Grid Grid.Column="1">
+                                <ItemsControl x:Name="BreadcrumbItems"
+                                              ItemsSource="{Binding BreadcrumbSegments}"
+                                              VerticalAlignment="Stretch">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal" />
+                                            <views:BreadcrumbTrailPanel
+                                                OverflowButtonWidth="{x:Static vm:BreadcrumbOverflow.ButtonWidth}" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vm:PathBreadcrumbSegment">
-                                            <StackPanel Orientation="Horizontal"
-                                                        VerticalAlignment="Center"
-                                                        Cursor="Arrow">
+                                            <DockPanel LastChildFill="True"
+                                                       VerticalAlignment="Center"
+                                                       Cursor="Arrow">
                                                 <Path Width="6"
                                                       Height="10"
                                                       Margin="4,0"
                                                       Stretch="Uniform"
                                                       VerticalAlignment="Center"
+                                                      DockPanel.Dock="Left"
                                                       IsVisible="{Binding ShowLeadingChevron}"
                                                       Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
                                                       StrokeThickness="1.25"
@@ -294,19 +310,51 @@
                                                       StrokeJoin="Round"
                                                       Data="M1,1.5 L5,5 L1,8.5" />
                                                 <Button Classes="breadcrumb"
-                                                        Content="{Binding Label}"
+                                                        HorizontalAlignment="Stretch"
+                                                        HorizontalContentAlignment="Left"
                                                         ToolTip.Tip="{Binding TargetPath}"
                                                         Command="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).NavigateToCommand}"
-                                                        CommandParameter="{Binding TargetPath}" />
-                                            </StackPanel>
+                                                        CommandParameter="{Binding TargetPath}">
+                                                    <TextBlock Text="{Binding Label}"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               VerticalAlignment="Center" />
+                                                </Button>
+                                            </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <Border MinWidth="28"
-                                        Background="Transparent"
-                                        VerticalAlignment="Stretch" />
-                            </StackPanel>
-                        </ScrollViewer>
+                                <Button x:Name="OverflowButton"
+                                        Classes="breadcrumb-overflow"
+                                        Focusable="False"
+                                        IsVisible="False"
+                                        ToolTip.Tip="Ancestor folders">
+                                    <Path Width="10"
+                                          Height="10"
+                                          Stretch="Uniform"
+                                          Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
+                                          StrokeThickness="1.25"
+                                          StrokeLineCap="Round"
+                                          StrokeJoin="Round"
+                                          Data="M4,1.5 L0.5,5 L4,8.5 M8,1.5 L4.5,5 L8,8.5" />
+                                    <Button.Flyout>
+                                        <Flyout Placement="BottomEdgeAlignedLeft">
+                                            <ListBox MaxHeight="220"
+                                                     MinWidth="180"
+                                                     MaxWidth="360"
+                                                     ItemsSource="{Binding OverflowBreadcrumbSegments, ElementName=FileListRoot}"
+                                                     Tapped="_OnOverflowTapped">
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:PathBreadcrumbSegment">
+                                                        <TextBlock Text="{Binding Label}"
+                                                                   TextTrimming="CharacterEllipsis" />
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                        </Flyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </Grid>
+                        </Grid>
                         <TextBox x:Name="PathEditBox"
                                  Classes="address-edit"
                                  IsVisible="{Binding IsPathEditing}"

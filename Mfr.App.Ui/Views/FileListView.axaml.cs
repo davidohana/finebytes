@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Collections;
@@ -25,7 +26,13 @@ namespace Mfr.App.Ui.Views
         {
             InitializeComponent();
             PathEditBox.PropertyChanged += _OnPathEditBoxPropertyChanged;
+            BreadcrumbItems.LayoutUpdated += _OnBreadcrumbLayoutUpdated;
         }
+
+        /// <summary>
+        /// Gets ancestor folders hidden from the address bar when it is too narrow.
+        /// </summary>
+        public ObservableCollection<PathBreadcrumbSegment> OverflowBreadcrumbSegments { get; } = [];
 
         /// <inheritdoc />
         protected override void OnKeyDown(KeyEventArgs e)
@@ -112,6 +119,71 @@ namespace Mfr.App.Ui.Views
             if (source is Visual visual
                 && visual.FindAncestorOfType<ListBoxItem>()?.DataContext is string itemPath)
                 return itemPath;
+
+            return null;
+        }
+
+        private void _OnBreadcrumbLayoutUpdated(object? sender, EventArgs e)
+        {
+            _SyncBreadcrumbOverflow();
+        }
+
+        private void _SyncBreadcrumbOverflow()
+        {
+            if (BreadcrumbItems.ItemsPanelRoot is not BreadcrumbTrailPanel trail)
+                return;
+
+            OverflowButton.IsVisible = trail.HasOverflow;
+            var hiddenSegments = _HiddenBreadcrumbSegments(trail.VisibleStartIndex);
+            if (_SameOverflowSegments(hiddenSegments))
+                return;
+
+            OverflowBreadcrumbSegments.Clear();
+            foreach (var segment in hiddenSegments)
+                OverflowBreadcrumbSegments.Add(segment);
+        }
+
+        private List<PathBreadcrumbSegment> _HiddenBreadcrumbSegments(int visibleStartIndex)
+        {
+            if (DataContext is not FileListViewModel viewModel || visibleStartIndex <= 0)
+                return [];
+
+            var hiddenCount = Math.Min(visibleStartIndex, viewModel.BreadcrumbSegments.Count);
+            return [.. viewModel.BreadcrumbSegments.Take(hiddenCount)];
+        }
+
+        private bool _SameOverflowSegments(List<PathBreadcrumbSegment> hiddenSegments)
+        {
+            if (hiddenSegments.Count != OverflowBreadcrumbSegments.Count)
+                return false;
+
+            for (var i = 0; i < hiddenSegments.Count; i++)
+            {
+                if (hiddenSegments[i].TargetPath != OverflowBreadcrumbSegments[i].TargetPath)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private void _OnOverflowTapped(object? sender, TappedEventArgs e)
+        {
+            var segment = _OverflowSegmentFromTap(e.Source);
+            if (segment is null || DataContext is not FileListViewModel viewModel)
+                return;
+
+            viewModel.NavigateTo(segment.TargetPath);
+            OverflowButton.Flyout?.Hide();
+        }
+
+        private static PathBreadcrumbSegment? _OverflowSegmentFromTap(object? source)
+        {
+            if (source is StyledElement { DataContext: PathBreadcrumbSegment segment })
+                return segment;
+
+            if (source is Visual visual
+                && visual.FindAncestorOfType<ListBoxItem>()?.DataContext is PathBreadcrumbSegment item)
+                return item;
 
             return null;
         }
