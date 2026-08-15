@@ -140,5 +140,58 @@ namespace Mfr.Tests.Ui
                 segments.Select(segment => segment.Label));
             Assert.Equal(@"\\ohanas", segments[2].TargetPath);
         }
+
+        /// <summary>
+        /// Verifies Go Up from Documents returns to This PC.
+        /// </summary>
+        [Fact]
+        public void GetParentPath_Known_Place_Returns_ThisPc()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var documents = _ExistingSpecialFolder(Environment.SpecialFolder.MyDocuments);
+            if (documents is null)
+                return;
+
+            Assert.Equal(ExplorerPath.ComputerPath, ExplorerPath.GetParentPath(documents));
+            Assert.Equal(documents, ExplorerPath.GetParentPath(Path.Combine(documents, "Work")));
+        }
+
+        /// <summary>
+        /// Verifies Documents breadcrumbs are This PC, then Documents, then child folders.
+        /// </summary>
+        [Fact]
+        public void Breadcrumb_Known_Place_Follows_ThisPc()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var documents = _ExistingSpecialFolder(Environment.SpecialFolder.MyDocuments);
+            if (documents is null)
+                return;
+
+            var atPlace = ExplorerPath.BuildBreadcrumbSegments(documents);
+            Assert.Equal(
+                [ExplorerPath.ComputerDisplayName, "Documents"],
+                atPlace.Select(segment => segment.Label));
+            Assert.Equal(documents, atPlace[1].TargetPath);
+            Assert.False(atPlace[0].ShowLeadingChevron);
+            Assert.True(atPlace[1].ShowLeadingChevron);
+
+            var nested = ExplorerPath.BuildBreadcrumbSegments(Path.Combine(documents, "Work"));
+            Assert.Equal(
+                [ExplorerPath.ComputerDisplayName, "Documents", "Work"],
+                nested.Select(segment => segment.Label));
+        }
+
+        private static string? _ExistingSpecialFolder(Environment.SpecialFolder folder)
+        {
+            var path = Environment.GetFolderPath(folder);
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+                return null;
+
+            return new DirectoryInfo(path).FullName;
+        }
     }
 }

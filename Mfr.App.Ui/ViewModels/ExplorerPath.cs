@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Mfr.App.Ui.Services;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels
@@ -191,6 +192,9 @@ namespace Mfr.App.Ui.ViewModels
                 && TryGetUncServerRoot(path, out var serverRoot))
                 return serverRoot;
 
+            if (WindowsKnownPlaces.TryGetPlace(path, out _))
+                return ComputerPath;
+
             var parent = Path.GetDirectoryName(path);
             if (string.IsNullOrEmpty(parent))
                 return OperatingSystem.IsWindows() ? ComputerPath : null;
@@ -247,6 +251,16 @@ namespace Mfr.App.Ui.ViewModels
             {
                 segments.Add(_CreateSegment(NetworkDisplayName, NetworkDisplayName, showLeadingChevron: true));
                 _AddUncBreadcrumbSegments(segments, path);
+                return segments;
+            }
+
+            if (WindowsKnownPlaces.TryGetContainingPlace(path, out var place))
+            {
+                segments.Add(_CreateSegment(place.Name, place.Path, showLeadingChevron: true));
+                if (PathRelations.IsSamePath(path, place.Path))
+                    return segments;
+
+                _AddChildBreadcrumbSegments(segments, path, place.Path);
                 return segments;
             }
 

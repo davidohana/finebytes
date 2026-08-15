@@ -68,6 +68,9 @@ namespace Mfr.App.Ui.ViewModels
         // First contact with a UNC server (\\ohanas) is often slower than a share Exists check.
         private static readonly TimeSpan _UncServerProbeTimeout = TimeSpan.FromSeconds(8);
 
+        private const int _KnownPlaceListingGroup = 0;
+        private const int _VolumeListingGroup = 1;
+
         private readonly ISystemIconProvider _iconProvider;
         private readonly List<ListedItem> _listedItems = [];
         private readonly Dictionary<string, IImage?> _pathToThumbnail = new(PathComparers.Os);
@@ -389,6 +392,7 @@ namespace Mfr.App.Ui.ViewModels
 
             if (ExplorerPath.IsComputerPath(CurrentPath))
             {
+                _listedItems.AddRange(_ListKnownPlaces());
                 _listedItems.AddRange(_ListDrives());
                 _ApplyListingSort();
                 if (OperatingSystem.IsWindows())
@@ -438,6 +442,10 @@ namespace Mfr.App.Ui.ViewModels
             var networkCmp = _NetworkSortRank(left).CompareTo(_NetworkSortRank(right));
             if (networkCmp != 0)
                 return networkCmp;
+
+            var groupCmp = left.ListingGroup.CompareTo(right.ListingGroup);
+            if (groupCmp != 0)
+                return groupCmp;
 
             var folderCmp = right.IsDirectory.CompareTo(left.IsDirectory);
             if (folderCmp != 0)
@@ -547,7 +555,7 @@ namespace Mfr.App.Ui.ViewModels
             return thumbnail;
         }
 
-        private static ListedItem _CreateListedItem(string path, bool isDirectory)
+        private static ListedItem _CreateListedItem(string path, bool isDirectory, int listingGroup = 0)
         {
             var name = isDirectory ? _DirectoryDisplayName(path) : Path.GetFileName(path);
             if (isDirectory)
@@ -557,7 +565,8 @@ namespace Mfr.App.Ui.ViewModels
                     name,
                     IsDirectory: true,
                     Length: null,
-                    LastWriteTime: _TryGetLastWriteTime(path));
+                    LastWriteTime: _TryGetLastWriteTime(path),
+                    ListingGroup: listingGroup);
             }
 
             var (length, lastWriteTime) = _TryGetFileInfo(path);
@@ -603,7 +612,24 @@ namespace Mfr.App.Ui.ViewModels
                     continue;
                 }
 
-                items.Add(_CreateListedItem(name, isDirectory: true));
+                items.Add(_CreateListedItem(name, isDirectory: true, listingGroup: _VolumeListingGroup));
+            }
+
+            return items;
+        }
+
+        private static List<ListedItem> _ListKnownPlaces()
+        {
+            var items = new List<ListedItem>();
+            foreach (var place in WindowsKnownPlaces.GetPlaces())
+            {
+                items.Add(new ListedItem(
+                    place.Path,
+                    place.Name,
+                    IsDirectory: true,
+                    Length: null,
+                    LastWriteTime: _TryGetLastWriteTime(place.Path),
+                    ListingGroup: _KnownPlaceListingGroup));
             }
 
             return items;
@@ -962,6 +988,12 @@ namespace Mfr.App.Ui.ViewModels
                 return true;
             }
 
+            if (WindowsKnownPlaces.TryResolveAlias(path, out var aliasPath))
+            {
+                resolved = aliasPath;
+                return true;
+            }
+
             if (OperatingSystem.IsWindows())
             {
                 var isUncServer = path is not null && ExplorerPath.IsUncServerRoot(path);
@@ -974,7 +1006,8 @@ namespace Mfr.App.Ui.ViewModels
 
             try
             {
-                resolved = new DirectoryInfo(path!).FullName;
+                var expanded = Environment.ExpandEnvironmentVariables(path!);
+                resolved = new DirectoryInfo(expanded).FullName;
                 return _DirectoryExists(resolved);
             }
             catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException or UnauthorizedAccessException)
@@ -995,6 +1028,7 @@ namespace Mfr.App.Ui.ViewModels
             string Name,
             bool IsDirectory,
             long? Length,
-            DateTime? LastWriteTime);
+            DateTime? LastWriteTime,
+            int ListingGroup = 0);
     }
 }

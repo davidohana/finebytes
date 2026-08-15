@@ -420,6 +420,114 @@ namespace Mfr.Tests.Ui
             Assert.Null(folder.Length);
         }
 
+        /// <summary>
+        /// Verifies This PC lists Documents, Music, and Pictures above drives.
+        /// </summary>
+        [Fact]
+        public void ThisPc_Lists_Known_Places_Before_Drives()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            var names = _Names(viewModel);
+
+            Assert.Equal(FileListViewModel.NetworkDisplayName, names[0]);
+            var firstDriveIndex = names.FindIndex(_IsDriveName);
+            Assert.True(firstDriveIndex > 0);
+
+            _AssertPlaceBeforeDrive(names, "Documents", firstDriveIndex, Environment.SpecialFolder.MyDocuments);
+            _AssertPlaceBeforeDrive(names, "Music", firstDriveIndex, Environment.SpecialFolder.MyMusic);
+            _AssertPlaceBeforeDrive(names, "Pictures", firstDriveIndex, Environment.SpecialFolder.MyPictures);
+
+            viewModel.SortByColumn(nameof(FileListEntry.Name));
+            var reversed = _Names(viewModel);
+            Assert.Equal(FileListViewModel.NetworkDisplayName, reversed[0]);
+            var reversedDriveIndex = reversed.FindIndex(_IsDriveName);
+            _AssertPlaceBeforeDrive(reversed, "Documents", reversedDriveIndex, Environment.SpecialFolder.MyDocuments);
+        }
+
+        /// <summary>
+        /// Verifies typing Documents or Music opens those folders.
+        /// </summary>
+        [Fact]
+        public void NavigateTo_Known_Place_Alias_Opens_Folder()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var documents = _ExistingSpecialFolder(Environment.SpecialFolder.MyDocuments);
+            if (documents is null)
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.NavigateTo("Documents");
+            Assert.Equal(documents, viewModel.CurrentPath);
+            Assert.Equal(
+                [FileListViewModel.ComputerDisplayName, "Documents"],
+                viewModel.BreadcrumbSegments.Select(segment => segment.Label));
+
+            viewModel.GoUp();
+            Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
+
+            var music = _ExistingSpecialFolder(Environment.SpecialFolder.MyMusic);
+            if (music is null)
+                return;
+
+            viewModel.BeginPathEdit();
+            viewModel.PathText = "Music";
+            viewModel.CommitPath();
+            Assert.Equal(music, viewModel.CurrentPath);
+            Assert.False(viewModel.IsPathEditing);
+        }
+
+        /// <summary>
+        /// Verifies environment variables in a typed path are expanded.
+        /// </summary>
+        [Fact]
+        public void CommitPath_Expands_Environment_Variables()
+        {
+            var expanded = Environment.ExpandEnvironmentVariables("%USERPROFILE%");
+            if (expanded == "%USERPROFILE%" || !Directory.Exists(expanded))
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.BeginPathEdit();
+            viewModel.PathText = "%USERPROFILE%";
+            viewModel.CommitPath();
+
+            Assert.Equal(new DirectoryInfo(expanded).FullName, viewModel.CurrentPath);
+        }
+
+        private static void _AssertPlaceBeforeDrive(
+            List<string> names,
+            string placeName,
+            int firstDriveIndex,
+            Environment.SpecialFolder folder)
+        {
+            if (_ExistingSpecialFolder(folder) is null)
+                return;
+
+            var index = names.IndexOf(placeName);
+            Assert.True(index > 0, placeName + " should be listed on This PC");
+            Assert.True(index < firstDriveIndex, placeName + " should appear before drives");
+        }
+
+        private static bool _IsDriveName(string name)
+        {
+            return name.Contains(':', StringComparison.Ordinal);
+        }
+
+        private static string? _ExistingSpecialFolder(Environment.SpecialFolder folder)
+        {
+            var path = Environment.GetFolderPath(folder);
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+                return null;
+
+            return new DirectoryInfo(path).FullName;
+        }
+
         private string _CreateTree()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
