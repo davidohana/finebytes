@@ -10,11 +10,9 @@
              x:DataType="vm:FileListViewModel">
     <Border Classes="pane">
         <DockPanel>
-            <TextBlock DockPanel.Dock="Top" Classes="pane-header" Text="File Explorer" />
-
             <Grid DockPanel.Dock="Top"
                   ColumnDefinitions="*,Auto,Auto,Auto,Auto"
-                  Margin="4,0,4,4">
+                  Margin="4">
                 <ComboBox IsEditable="True"
                           ItemsSource="{Binding PathHistory}"
                           Text="{Binding PathText, Mode=TwoWay}"
