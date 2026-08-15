@@ -376,6 +376,11 @@ namespace Mfr.App.Ui.ViewModels
                 IsDirectory = item.IsDirectory,
                 Icon = _ResolveIcon(item),
                 Details = ViewMode == FileListViewMode.Tiles ? _FormatDetails(item) : string.Empty,
+                Type = _TypeLabel(item),
+                DateModifiedDisplay = _FormatDate(item.LastWriteTime),
+                SizeDisplay = item.Length is { } bytes ? _FormatSize(bytes) : string.Empty,
+                LastWriteTime = item.LastWriteTime,
+                Length = item.Length,
             };
         }
 
@@ -411,7 +416,23 @@ namespace Mfr.App.Ui.ViewModels
         private static ListedItem _CreateListedItem(string path, bool isDirectory)
         {
             var name = isDirectory ? _DirectoryDisplayName(path) : Path.GetFileName(path);
-            return new ListedItem(path, name, isDirectory, isDirectory ? null : _TryGetLength(path));
+            if (isDirectory)
+            {
+                return new ListedItem(
+                    path,
+                    name,
+                    IsDirectory: true,
+                    Length: null,
+                    LastWriteTime: _TryGetLastWriteTime(path));
+            }
+
+            var (length, lastWriteTime) = _TryGetFileInfo(path);
+            return new ListedItem(
+                path,
+                name,
+                IsDirectory: false,
+                Length: length,
+                LastWriteTime: lastWriteTime);
         }
 
         private bool _PassesFileMasks(string path)
@@ -504,6 +525,14 @@ namespace Mfr.App.Ui.ViewModels
             return extension.TrimStart('.').ToUpperInvariant() + " File";
         }
 
+        private static string _FormatDate(DateTime? lastWriteTime)
+        {
+            if (lastWriteTime is null)
+                return string.Empty;
+
+            return lastWriteTime.Value.ToString("g", CultureInfo.CurrentCulture);
+        }
+
         private static string _FormatSize(long bytes)
         {
             const double kb = 1024;
@@ -520,11 +549,24 @@ namespace Mfr.App.Ui.ViewModels
             return bytes.ToString(CultureInfo.InvariantCulture) + " B";
         }
 
-        private static long? _TryGetLength(string path)
+        private static (long? Length, DateTime? LastWriteTime) _TryGetFileInfo(string path)
         {
             try
             {
-                return new FileInfo(path).Length;
+                var info = new FileInfo(path);
+                return (info.Length, info.LastWriteTime);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+            {
+                return (null, null);
+            }
+        }
+
+        private static DateTime? _TryGetLastWriteTime(string path)
+        {
+            try
+            {
+                return Directory.GetLastWriteTime(path);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
             {
@@ -630,6 +672,11 @@ namespace Mfr.App.Ui.ViewModels
             Forward,
         }
 
-        private sealed record ListedItem(string Path, string Name, bool IsDirectory, long? Length);
+        private sealed record ListedItem(
+            string Path,
+            string Name,
+            bool IsDirectory,
+            long? Length,
+            DateTime? LastWriteTime);
     }
 }

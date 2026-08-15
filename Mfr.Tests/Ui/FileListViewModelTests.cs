@@ -199,6 +199,27 @@ namespace Mfr.Tests.Ui
             Assert.Equal("File folder", folder.Details);
         }
 
+        /// <summary>
+        /// Verifies Report rows include Explorer-style type, date, and size.
+        /// </summary>
+        [Fact]
+        public void Report_Populates_Explorer_Columns()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var file = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var folder = viewModel.Entries.First(entry => entry.IsDirectory);
+
+            Assert.Equal("TXT File", file.Type);
+            Assert.False(string.IsNullOrWhiteSpace(file.DateModifiedDisplay));
+            Assert.Contains("B", file.SizeDisplay, StringComparison.Ordinal);
+            Assert.Equal(1, file.Length);
+
+            Assert.Equal("File folder", folder.Type);
+            Assert.False(string.IsNullOrWhiteSpace(folder.DateModifiedDisplay));
+            Assert.Equal(string.Empty, folder.SizeDisplay);
+            Assert.Null(folder.Length);
+        }
+
         private string _CreateTree()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();

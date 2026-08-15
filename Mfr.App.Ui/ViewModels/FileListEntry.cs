@@ -31,5 +31,30 @@ namespace Mfr.App.Ui.ViewModels
         /// Gets extra text for Tiles (type and size), or empty in other view modes.
         /// </summary>
         public string Details { get; init; } = string.Empty;
+
+        /// <summary>
+        /// Gets the Explorer-style type label, such as <c>File folder</c> or <c>TXT File</c>.
+        /// </summary>
+        public string Type { get; init; } = string.Empty;
+
+        /// <summary>
+        /// Gets the formatted last-write time, or empty when unknown.
+        /// </summary>
+        public string DateModifiedDisplay { get; init; } = string.Empty;
+
+        /// <summary>
+        /// Gets the formatted size, or empty for folders and when unknown.
+        /// </summary>
+        public string SizeDisplay { get; init; } = string.Empty;
+
+        /// <summary>
+        /// Gets the last-write time used when sorting the Date modified column.
+        /// </summary>
+        public DateTime? LastWriteTime { get; init; }
+
+        /// <summary>
+        /// Gets the file length in bytes used when sorting the Size column.
+        /// </summary>
+        public long? Length { get; init; }
     }
 }

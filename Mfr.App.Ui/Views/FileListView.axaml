@@ -97,7 +97,7 @@
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
                           CanUserReorderColumns="False"
-                          CanUserSortColumns="False"
+                          CanUserSortColumns="True"
                           CanUserResizeColumns="True"
                           HeadersVisibility="Column"
                           GridLinesVisibility="None"
@@ -106,7 +106,9 @@
                           DoubleTapped="_OnEntriesDoubleTapped"
                           KeyDown="_OnEntriesKeyDown">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Name" Width="*">
+                        <DataGridTemplateColumn Header="Name"
+                                                Width="*"
+                                                SortMemberPath="Name">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate x:DataType="vm:FileListEntry">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
@@ -116,6 +118,24 @@
                                                Source="{Binding Icon}" />
                                         <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
                                     </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Date modified"
+                                            Binding="{Binding DateModifiedDisplay}"
+                                            SortMemberPath="LastWriteTime"
+                                            Width="140" />
+                        <DataGridTextColumn Header="Type"
+                                            Binding="{Binding Type}"
+                                            Width="110" />
+                        <DataGridTemplateColumn Header="Size"
+                                                Width="72"
+                                                SortMemberPath="Length">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:FileListEntry">
+                                    <TextBlock Text="{Binding SizeDisplay}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
