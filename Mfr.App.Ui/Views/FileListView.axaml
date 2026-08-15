@@ -8,6 +8,16 @@
              d:DesignHeight="400"
              x:Class="Mfr.App.Ui.Views.FileListView"
              x:DataType="vm:FileListViewModel">
+    <UserControl.Styles>
+        <Style Selector="ListBox.file-list">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4" />
+        </Style>
+        <Style Selector="ListBox.file-icons">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        </Style>
+    </UserControl.Styles>
     <Border Classes="pane">
         <DockPanel>
             <Grid DockPanel.Dock="Top"
@@ -65,34 +75,181 @@
                          Text="{Binding ExcludeMasks, Mode=TwoWay}" />
             </Grid>
 
-            <DataGrid ItemsSource="{Binding Entries}"
-                      SelectedItem="{Binding SelectedEntry}"
-                      AutoGenerateColumns="False"
-                      IsReadOnly="True"
-                      CanUserReorderColumns="False"
-                      CanUserSortColumns="False"
-                      CanUserResizeColumns="True"
-                      HeadersVisibility="Column"
-                      GridLinesVisibility="Horizontal"
-                      SelectionMode="Extended"
-                      DoubleTapped="_OnEntriesDoubleTapped"
-                      KeyDown="_OnEntriesKeyDown">
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="Name" Width="*">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate x:DataType="vm:FileListEntry">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Image Width="16"
-                                           Height="16"
-                                           VerticalAlignment="Center"
-                                           Source="{Binding Icon}" />
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+            <Panel>
+                <DataGrid ItemsSource="{Binding Entries}"
+                          SelectedItem="{Binding SelectedEntry}"
+                          IsVisible="{Binding IsReportView}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserReorderColumns="False"
+                          CanUserSortColumns="False"
+                          CanUserResizeColumns="True"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          SelectionMode="Extended"
+                          DoubleTapped="_OnEntriesDoubleTapped"
+                          KeyDown="_OnEntriesKeyDown">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Name" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:FileListEntry">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Image Width="16"
+                                               Height="16"
+                                               VerticalAlignment="Center"
+                                               Source="{Binding Icon}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <ListBox Classes="file-list"
+                         ItemsSource="{Binding Entries}"
+                         SelectedItem="{Binding SelectedEntry}"
+                         IsVisible="{Binding IsListView}"
+                         SelectionMode="Multiple"
+                         DoubleTapped="_OnEntriesDoubleTapped"
+                         KeyDown="_OnEntriesKeyDown">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FileListEntry">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Width="16"
+                                       Height="16"
+                                       VerticalAlignment="Center"
+                                       Source="{Binding Icon}" />
+                                <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <ListBox Classes="file-list file-icons"
+                         ItemsSource="{Binding Entries}"
+                         SelectedItem="{Binding SelectedEntry}"
+                         IsVisible="{Binding IsSmallIconsView}"
+                         SelectionMode="Multiple"
+                         DoubleTapped="_OnEntriesDoubleTapped"
+                         KeyDown="_OnEntriesKeyDown">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FileListEntry">
+                            <StackPanel Orientation="Horizontal"
+                                        Width="148"
+                                        Spacing="6"
+                                        Margin="2">
+                                <Image Width="16"
+                                       Height="16"
+                                       VerticalAlignment="Center"
+                                       Source="{Binding Icon}" />
+                                <TextBlock VerticalAlignment="Center"
+                                           Text="{Binding Name}"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <ListBox Classes="file-list file-icons"
+                         ItemsSource="{Binding Entries}"
+                         SelectedItem="{Binding SelectedEntry}"
+                         IsVisible="{Binding IsLargeIconsView}"
+                         SelectionMode="Multiple"
+                         DoubleTapped="_OnEntriesDoubleTapped"
+                         KeyDown="_OnEntriesKeyDown">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FileListEntry">
+                            <StackPanel Width="88" Margin="4">
+                                <Image Width="32"
+                                       Height="32"
+                                       HorizontalAlignment="Center"
+                                       Source="{Binding Icon}" />
+                                <TextBlock Text="{Binding Name}"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxLines="2" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <ListBox Classes="file-list file-icons"
+                         ItemsSource="{Binding Entries}"
+                         SelectedItem="{Binding SelectedEntry}"
+                         IsVisible="{Binding IsTilesView}"
+                         SelectionMode="Multiple"
+                         DoubleTapped="_OnEntriesDoubleTapped"
+                         KeyDown="_OnEntriesKeyDown">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FileListEntry">
+                            <StackPanel Orientation="Horizontal"
+                                        Width="220"
+                                        Spacing="8"
+                                        Margin="4">
+                                <Image Width="32"
+                                       Height="32"
+                                       VerticalAlignment="Top"
+                                       Source="{Binding Icon}" />
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Details}"
+                                               Opacity="0.7"
+                                               FontSize="11"
+                                               TextWrapping="Wrap" />
                                 </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <ListBox Classes="file-list file-icons"
+                         ItemsSource="{Binding Entries}"
+                         SelectedItem="{Binding SelectedEntry}"
+                         IsVisible="{Binding IsThumbnailsView}"
+                         SelectionMode="Multiple"
+                         DoubleTapped="_OnEntriesDoubleTapped"
+                         KeyDown="_OnEntriesKeyDown">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FileListEntry">
+                            <StackPanel Width="110" Margin="4">
+                                <Image Width="96"
+                                       Height="96"
+                                       Stretch="Uniform"
+                                       HorizontalAlignment="Center"
+                                       Source="{Binding Icon}" />
+                                <TextBlock Text="{Binding Name}"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxLines="2" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Panel>
         </DockPanel>
     </Border>
 </UserControl>

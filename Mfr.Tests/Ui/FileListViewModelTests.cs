@@ -151,6 +151,54 @@ namespace Mfr.Tests.Ui
             Assert.Contains("gamma.txt", _Names(viewModel));
         }
 
+        /// <summary>
+        /// Verifies the File Explorer starts in Report view.
+        /// </summary>
+        [Fact]
+        public void ViewMode_Defaults_To_Report()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+
+            Assert.Equal(FileListViewMode.Report, viewModel.ViewMode);
+            Assert.True(viewModel.IsReportView);
+            Assert.False(viewModel.IsListView);
+        }
+
+        /// <summary>
+        /// Verifies changing the layout does not re-order or drop listed names.
+        /// </summary>
+        [Fact]
+        public void Changing_ViewMode_Does_Not_Change_Listing()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var names = _Names(viewModel);
+
+            viewModel.ViewMode = FileListViewMode.LargeIcons;
+
+            Assert.Equal(names, _Names(viewModel));
+            Assert.True(viewModel.IsLargeIconsView);
+        }
+
+        /// <summary>
+        /// Verifies Tiles fill type and size details, while other modes leave details empty.
+        /// </summary>
+        [Fact]
+        public void Tiles_Populate_Details_For_Files()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var reportFile = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            Assert.Equal(string.Empty, reportFile.Details);
+
+            viewModel.ViewMode = FileListViewMode.Tiles;
+
+            var file = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            Assert.Contains("TXT File", file.Details, StringComparison.Ordinal);
+            Assert.Contains("B", file.Details, StringComparison.Ordinal);
+
+            var folder = viewModel.Entries.First(entry => entry.IsDirectory);
+            Assert.Equal("File folder", folder.Details);
+        }
+
         private string _CreateTree()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();

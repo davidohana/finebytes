@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services;
@@ -8,7 +10,7 @@ using Mfr.Utils;
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// File Explorer pane: Report-style folder listing with path, mask, and exclude masks.
+    /// File Explorer pane: folder listing with path, mask, exclude masks, and view modes.
     /// </summary>
     public sealed partial class FileListViewModel : ViewModelBase
     {
@@ -46,6 +48,8 @@ namespace Mfr.App.Ui.ViewModels
         private readonly ISystemIconProvider _iconProvider;
         private readonly List<string> _backPaths = [];
         private readonly List<string> _forwardPaths = [];
+        private readonly List<ListedItem> _listedItems = [];
+        private readonly Dictionary<string, IImage?> _pathToThumbnail = new(PathComparers.Os);
 
         /// <summary>
         /// Initializes the explorer at the user profile folder with the default icon provider.
@@ -70,7 +74,7 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
-        /// Gets the rows shown in the Name grid.
+        /// Gets the items shown in the File Explorer pane.
         /// </summary>
         public ObservableCollection<FileListEntry> Entries { get; }
 
@@ -109,6 +113,18 @@ namespace Mfr.App.Ui.ViewModels
         private string _excludeMasks = string.Empty;
 
         /// <summary>
+        /// Layout used to present <see cref="Entries"/>. Default is Report.
+        /// </summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsLargeIconsView))]
+        [NotifyPropertyChangedFor(nameof(IsSmallIconsView))]
+        [NotifyPropertyChangedFor(nameof(IsReportView))]
+        [NotifyPropertyChangedFor(nameof(IsListView))]
+        [NotifyPropertyChangedFor(nameof(IsTilesView))]
+        [NotifyPropertyChangedFor(nameof(IsThumbnailsView))]
+        private FileListViewMode _viewMode = FileListViewMode.Report;
+
+        /// <summary>
         /// The selected grid row, or <see langword="null"/> when nothing is selected.
         /// </summary>
         [ObservableProperty]
@@ -135,6 +151,36 @@ namespace Mfr.App.Ui.ViewModels
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(GoUpCommand))]
         private bool _canGoUp;
+
+        /// <summary>
+        /// Gets whether the Large Icons layout is active.
+        /// </summary>
+        public bool IsLargeIconsView => ViewMode == FileListViewMode.LargeIcons;
+
+        /// <summary>
+        /// Gets whether the Small Icons layout is active.
+        /// </summary>
+        public bool IsSmallIconsView => ViewMode == FileListViewMode.SmallIcons;
+
+        /// <summary>
+        /// Gets whether the Report layout is active.
+        /// </summary>
+        public bool IsReportView => ViewMode == FileListViewMode.Report;
+
+        /// <summary>
+        /// Gets whether the List layout is active.
+        /// </summary>
+        public bool IsListView => ViewMode == FileListViewMode.List;
+
+        /// <summary>
+        /// Gets whether the Tiles layout is active.
+        /// </summary>
+        public bool IsTilesView => ViewMode == FileListViewMode.Tiles;
+
+        /// <summary>
+        /// Gets whether the Thumbnails layout is active.
+        /// </summary>
+        public bool IsThumbnailsView => ViewMode == FileListViewMode.Thumbnails;
 
         /// <summary>
         /// Navigates to <see cref="PathText"/> when the user commits the path combo.
@@ -204,6 +250,16 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
+        /// Switches the File Explorer layout.
+        /// </summary>
+        /// <param name="mode">Layout to show.</param>
+        [RelayCommand]
+        public void SetViewMode(FileListViewMode mode)
+        {
+            ViewMode = mode;
+        }
+
+        /// <summary>
         /// Navigates to a filesystem path or the drive list.
         /// </summary>
         /// <param name="path">Directory path, or empty / <see cref="ComputerDisplayName"/> for drives.</param>
@@ -221,6 +277,11 @@ namespace Mfr.App.Ui.ViewModels
         partial void OnExcludeMasksChanged(string value)
         {
             _ReloadEntries();
+        }
+
+        partial void OnViewModeChanged(FileListViewMode value)
+        {
+            _RebuildVisibleEntries(preserveSelection: true);
         }
 
         private bool _CanOpenSelected()
@@ -255,49 +316,102 @@ namespace Mfr.App.Ui.ViewModels
 
         private void _ReloadEntries()
         {
-            Entries.Clear();
             SelectedEntry = null;
+            _listedItems.Clear();
+            _pathToThumbnail.Clear();
 
             if (_IsComputerPath(CurrentPath))
             {
-                foreach (var entry in _ListDrives())
-                    Entries.Add(entry);
+                _listedItems.AddRange(_ListDrives());
+                _RebuildVisibleEntries(preserveSelection: false);
                 return;
             }
 
-            List<FileListEntry> listed;
             try
             {
                 var folders = Directory.EnumerateDirectories(CurrentPath, "*", _ListingOptions)
-                    .Select(path => _CreateEntry(path, isDirectory: true))
-                    .OrderBy(entry => entry.Name, PathComparers.Os);
+                    .Select(path => _CreateListedItem(path, isDirectory: true))
+                    .OrderBy(item => item.Name, PathComparers.Os);
 
                 var files = Directory.EnumerateFiles(CurrentPath, "*", _ListingOptions)
                     .Where(_PassesFileMasks)
-                    .Select(path => _CreateEntry(path, isDirectory: false))
-                    .OrderBy(entry => entry.Name, PathComparers.Os);
+                    .Select(path => _CreateListedItem(path, isDirectory: false))
+                    .OrderBy(item => item.Name, PathComparers.Os);
 
-                listed = [.. folders, .. files];
+                _listedItems.AddRange(folders);
+                _listedItems.AddRange(files);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
             {
+                _RebuildVisibleEntries(preserveSelection: false);
                 return;
             }
 
-            foreach (var entry in listed)
-                Entries.Add(entry);
+            _RebuildVisibleEntries(preserveSelection: false);
         }
 
-        private FileListEntry _CreateEntry(string path, bool isDirectory)
+        private void _RebuildVisibleEntries(bool preserveSelection)
         {
-            var name = isDirectory ? _DirectoryDisplayName(path) : Path.GetFileName(path);
+            var selectedPath = preserveSelection ? SelectedEntry?.FullPath : null;
+            Entries.Clear();
+
+            foreach (var item in _listedItems)
+                Entries.Add(_CreateEntry(item));
+
+            if (selectedPath is null)
+            {
+                SelectedEntry = null;
+                return;
+            }
+
+            SelectedEntry = Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, selectedPath));
+        }
+
+        private FileListEntry _CreateEntry(ListedItem item)
+        {
             return new FileListEntry
             {
-                Name = name,
-                FullPath = path,
-                IsDirectory = isDirectory,
-                Icon = _iconProvider.GetSmallIcon(path, isDirectory),
+                Name = item.Name,
+                FullPath = item.Path,
+                IsDirectory = item.IsDirectory,
+                Icon = _ResolveIcon(item),
+                Details = ViewMode == FileListViewMode.Tiles ? _FormatDetails(item) : string.Empty,
             };
+        }
+
+        private IImage? _ResolveIcon(ListedItem item)
+        {
+            if (ViewMode == FileListViewMode.Thumbnails)
+            {
+                var thumbnail = _TryGetThumbnail(item);
+                if (thumbnail is not null)
+                    return thumbnail;
+
+                return _iconProvider.GetIcon(item.Path, item.IsDirectory, ShellIconSize.Large);
+            }
+
+            var usesLargeIcon = ViewMode is FileListViewMode.LargeIcons or FileListViewMode.Tiles;
+            var size = usesLargeIcon ? ShellIconSize.Large : ShellIconSize.Small;
+            return _iconProvider.GetIcon(item.Path, item.IsDirectory, size);
+        }
+
+        private IImage? _TryGetThumbnail(ListedItem item)
+        {
+            if (item.IsDirectory)
+                return null;
+
+            if (_pathToThumbnail.TryGetValue(item.Path, out var cached))
+                return cached;
+
+            var thumbnail = ImageThumbnailLoader.TryLoad(item.Path, item.Length);
+            _pathToThumbnail[item.Path] = thumbnail;
+            return thumbnail;
+        }
+
+        private static ListedItem _CreateListedItem(string path, bool isDirectory)
+        {
+            var name = isDirectory ? _DirectoryDisplayName(path) : Path.GetFileName(path);
+            return new ListedItem(path, name, isDirectory, isDirectory ? null : _TryGetLength(path));
         }
 
         private bool _PassesFileMasks(string path)
@@ -309,7 +423,7 @@ namespace Mfr.App.Ui.ViewModels
             return !WildcardMask.MatchesAny(fileName, ExcludeMasks);
         }
 
-        private IEnumerable<FileListEntry> _ListDrives()
+        private IEnumerable<ListedItem> _ListDrives()
         {
             DriveInfo[] drives;
             try
@@ -321,7 +435,7 @@ namespace Mfr.App.Ui.ViewModels
                 return [];
             }
 
-            var entries = new List<FileListEntry>();
+            var items = new List<ListedItem>();
             foreach (var drive in drives)
             {
                 string name;
@@ -334,10 +448,10 @@ namespace Mfr.App.Ui.ViewModels
                     continue;
                 }
 
-                entries.Add(_CreateEntry(name, isDirectory: true));
+                items.Add(_CreateListedItem(name, isDirectory: true));
             }
 
-            return entries.OrderBy(entry => entry.Name, PathComparers.Os);
+            return items.OrderBy(item => item.Name, PathComparers.Os);
         }
 
         private void _UpdateNavigationFlags()
@@ -367,6 +481,55 @@ namespace Mfr.App.Ui.ViewModels
                 return;
 
             MaskSuggestions.Add(mask);
+        }
+
+        private static string _FormatDetails(ListedItem item)
+        {
+            var typeLabel = _TypeLabel(item);
+            if (item.IsDirectory || item.Length is null)
+                return typeLabel;
+
+            return typeLabel + "\n" + _FormatSize(item.Length.Value);
+        }
+
+        private static string _TypeLabel(ListedItem item)
+        {
+            if (item.IsDirectory)
+                return "File folder";
+
+            var extension = Path.GetExtension(item.Name);
+            if (string.IsNullOrEmpty(extension))
+                return "File";
+
+            return extension.TrimStart('.').ToUpperInvariant() + " File";
+        }
+
+        private static string _FormatSize(long bytes)
+        {
+            const double kb = 1024;
+            const double mb = kb * 1024;
+            const double gb = mb * 1024;
+
+            if (bytes >= gb)
+                return (bytes / gb).ToString("0.#", CultureInfo.InvariantCulture) + " GB";
+            if (bytes >= mb)
+                return (bytes / mb).ToString("0.#", CultureInfo.InvariantCulture) + " MB";
+            if (bytes >= kb)
+                return (bytes / kb).ToString("0.#", CultureInfo.InvariantCulture) + " KB";
+
+            return bytes.ToString(CultureInfo.InvariantCulture) + " B";
+        }
+
+        private static long? _TryGetLength(string path)
+        {
+            try
+            {
+                return new FileInfo(path).Length;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+            {
+                return null;
+            }
         }
 
         private static string _ResolveStartPath(string? initialPath)
@@ -466,5 +629,7 @@ namespace Mfr.App.Ui.ViewModels
             Back,
             Forward,
         }
+
+        private sealed record ListedItem(string Path, string Name, bool IsDirectory, long? Length);
     }
 }

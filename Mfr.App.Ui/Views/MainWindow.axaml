@@ -29,10 +29,41 @@
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="_File List">
+                <MenuItem Header="_File List Type">
+                    <MenuItem Header="Large _Icons"
+                              Command="{Binding FileList.SetViewModeCommand}"
+                              CommandParameter="{x:Static vm:FileListViewMode.LargeIcons}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsLargeIconsView, Mode=OneWay}" />
+                    <MenuItem Header="_Small Icons"
+                              Command="{Binding FileList.SetViewModeCommand}"
+                              CommandParameter="{x:Static vm:FileListViewMode.SmallIcons}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsSmallIconsView, Mode=OneWay}" />
+                    <MenuItem Header="_Report"
+                              Command="{Binding FileList.SetViewModeCommand}"
+                              CommandParameter="{x:Static vm:FileListViewMode.Report}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsReportView, Mode=OneWay}" />
+                    <MenuItem Header="_List"
+                              Command="{Binding FileList.SetViewModeCommand}"
+                              CommandParameter="{x:Static vm:FileListViewMode.List}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsListView, Mode=OneWay}" />
+                    <MenuItem Header="_Tiles"
+                              Command="{Binding FileList.SetViewModeCommand}"
+                              CommandParameter="{x:Static vm:FileListViewMode.Tiles}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsTilesView, Mode=OneWay}" />
+                    <MenuItem Header="Thumb_nails"
+                              Command="{Binding FileList.SetViewModeCommand}"
+                              CommandParameter="{x:Static vm:FileListViewMode.Thumbnails}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsThumbnailsView, Mode=OneWay}" />
+                </MenuItem>
                 <MenuItem Header="_Refresh" Command="{Binding FileList.RefreshCommand}" />
                 <Separator />
                 <MenuItem Header="Show Hidden/System Files" IsEnabled="False" />
-                <MenuItem Header="File List Style" IsEnabled="False" />
             </MenuItem>
             <MenuItem Header="_Rename List">
                 <MenuItem Header="Add Selected" IsEnabled="False" />

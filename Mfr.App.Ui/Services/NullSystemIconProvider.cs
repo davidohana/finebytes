@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.Services
         public static NullSystemIconProvider Instance { get; } = new();
 
         /// <inheritdoc />
-        public IImage? GetSmallIcon(string path, bool isDirectory)
+        public IImage? GetIcon(string path, bool isDirectory, ShellIconSize size)
         {
             return null;
         }

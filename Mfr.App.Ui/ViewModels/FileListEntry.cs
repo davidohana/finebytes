@@ -3,7 +3,7 @@ using Avalonia.Media;
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// One row in the File Explorer Name grid.
+    /// One item in the File Explorer listing.
     /// </summary>
     public sealed class FileListEntry
     {
@@ -23,8 +23,13 @@ namespace Mfr.App.Ui.ViewModels
         public required bool IsDirectory { get; init; }
 
         /// <summary>
-        /// Gets the small system icon, or <see langword="null"/> when none is available.
+        /// Gets the icon or thumbnail for the current view mode, or <see langword="null"/> when none is available.
         /// </summary>
         public IImage? Icon { get; init; }
+
+        /// <summary>
+        /// Gets extra text for Tiles (type and size), or empty in other view modes.
+        /// </summary>
+        public string Details { get; init; } = string.Empty;
     }
 }

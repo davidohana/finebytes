@@ -8,13 +8,14 @@ using Avalonia.Platform;
 namespace Mfr.App.Ui.Services
 {
     /// <summary>
-    /// Windows shell icons via <c>SHGetFileInfo</c>, cached by kind and file extension.
+    /// Windows shell icons via <c>SHGetFileInfo</c>, cached by kind, size, and file extension.
     /// </summary>
     [SupportedOSPlatform("windows")]
     internal sealed class WindowsSystemIconProvider : ISystemIconProvider
     {
         private const uint _ShgfiIcon = 0x100;
         private const uint _ShgfiSmallIcon = 0x1;
+        private const uint _ShgfiLargeIcon = 0x0;
         private const uint _ShgfiUseFileAttributes = 0x10;
         private const uint _FileAttributeNormal = 0x80;
         private const uint _FileAttributeDirectory = 0x10;
@@ -24,21 +25,30 @@ namespace Mfr.App.Ui.Services
         private readonly Dictionary<string, IImage?> _keyToIcon = new(StringComparer.OrdinalIgnoreCase);
 
         /// <inheritdoc />
-        public IImage? GetSmallIcon(string path, bool isDirectory)
+        public IImage? GetIcon(string path, bool isDirectory, ShellIconSize size)
         {
+            var sizeKey = size == ShellIconSize.Large ? "large" : "small";
             try
             {
                 if (isDirectory)
                 {
                     var isDrive = path.Length <= 3;
                     if (isDrive)
-                        return _GetCached("drive:" + path, () => _ExtractIcon(path, _FileAttributeDirectory, useFileAttributes: false));
+                    {
+                        return _GetCached(
+                            "drive:" + path + ":" + sizeKey,
+                            () => _ExtractIcon(path, _FileAttributeDirectory, useFileAttributes: false, size));
+                    }
 
-                    return _GetCached("dir", () => _ExtractIcon("folder", _FileAttributeDirectory, useFileAttributes: true));
+                    return _GetCached(
+                        "dir:" + sizeKey,
+                        () => _ExtractIcon("folder", _FileAttributeDirectory, useFileAttributes: true, size));
                 }
 
                 var extension = Path.GetExtension(path);
-                return _GetCached("file:" + extension, () => _ExtractIcon("file" + extension, _FileAttributeNormal, useFileAttributes: true));
+                return _GetCached(
+                    "file:" + extension + ":" + sizeKey,
+                    () => _ExtractIcon("file" + extension, _FileAttributeNormal, useFileAttributes: true, size));
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or COMException)
             {
@@ -56,9 +66,13 @@ namespace Mfr.App.Ui.Services
             return icon;
         }
 
-        private static WriteableBitmap? _ExtractIcon(string path, uint fileAttributes, bool useFileAttributes)
+        private static WriteableBitmap? _ExtractIcon(
+            string path,
+            uint fileAttributes,
+            bool useFileAttributes,
+            ShellIconSize size)
         {
-            var flags = _ShgfiIcon | _ShgfiSmallIcon;
+            var flags = _ShgfiIcon | (size == ShellIconSize.Small ? _ShgfiSmallIcon : _ShgfiLargeIcon);
             if (useFileAttributes)
                 flags |= _ShgfiUseFileAttributes;
 
