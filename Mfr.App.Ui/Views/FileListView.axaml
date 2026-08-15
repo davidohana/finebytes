@@ -52,6 +52,8 @@
             <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
             <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
             <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+            <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         </Style>
         <Style Selector="ListBox.file-icons">
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
@@ -104,6 +106,14 @@
             <Setter Property="RowBackground" Value="{DynamicResource FileListRowBrush}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="ColumnHeaderHeight" Value="22" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+        </Style>
+        <Style Selector="DataGrid.file-report /template/ ScrollBar#PART_VerticalScrollbar">
+            <Setter Property="AllowAutoHide" Value="False" />
+        </Style>
+        <Style Selector="DataGrid.file-report /template/ ScrollBar#PART_HorizontalScrollbar">
+            <Setter Property="AllowAutoHide" Value="False" />
         </Style>
         <Style Selector="DataGrid.file-report DataGridColumnHeader">
             <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />

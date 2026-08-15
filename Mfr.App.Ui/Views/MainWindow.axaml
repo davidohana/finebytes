@@ -121,7 +121,7 @@
         </Border>
 
         <Grid x:Name="MainPanesGrid"
-              Background="{DynamicResource SystemRegionBrush}">
+              Background="{DynamicResource PaneChromeBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*" MinHeight="140" />
                 <RowDefinition Height="6" />
