@@ -78,19 +78,21 @@
             <Setter Property="Width" Value="120" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
+        <Style Selector="ListBox.file-list ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
         <Style Selector="ListBox.file-list ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
         </Style>
         <Style Selector="ListBox.file-list ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
         </Style>
         <Style Selector="ListBox.file-list ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
         </Style>
         <Style Selector="DataGrid.file-report">
@@ -134,6 +136,8 @@
         </Style>
         <Style Selector="DataGrid.file-report DataGridRow /template/ Rectangle#BackgroundRectangle">
             <Setter Property="Fill" Value="Transparent" />
+            <Setter Property="Stroke" Value="Transparent" />
+            <Setter Property="StrokeThickness" Value="1" />
         </Style>
         <Style Selector="DataGrid.file-report DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
             <Setter Property="Fill" Value="{DynamicResource FileListHoverBrush}" />
@@ -142,25 +146,21 @@
         <Style Selector="DataGrid.file-report DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
             <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
             <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="Opacity" Value="1" />
         </Style>
         <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
             <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
             <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="Opacity" Value="1" />
         </Style>
         <Style Selector="DataGrid.file-report DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
             <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
             <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="Opacity" Value="1" />
         </Style>
         <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
             <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
             <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="Opacity" Value="1" />
         </Style>
     </UserControl.Styles>
