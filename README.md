@@ -21,11 +21,30 @@ just build
 just test
 just format
 just run-help
+just run-ui
 ```
 
 Run `just` by itself to list available targets.
 
 For contributor workflow, formatting/linting expectations, and pre-commit checks, see `CONTRIBUTING.md`.
+
+### Run the GUI App
+
+Launch the Avalonia desktop window (Windows-first; empty 7.4 layout until later GUI phases):
+
+```powershell
+just run-ui
+```
+
+Or:
+
+```powershell
+dotnet run --project .\Mfr.App.Ui\Mfr.App.Ui.csproj
+```
+
+```bash
+dotnet run --project ./Mfr.App.Ui/Mfr.App.Ui.csproj
+```
 
 ### Run the CLI App
 

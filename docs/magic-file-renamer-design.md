@@ -511,12 +511,25 @@ Scope:
 
 ### Phase 6 — Avalonia UI (Mfr GUI)
 
-- Adds the Avalonia UI layer on top of the stabilized core.
-- Includes:
-  - List-based embedded file explorer (see §5).
-  - Rename list, preset manager UI, log/undo windows.
-  - ID3/attributes/date editors.
-- CLI mode continues to use the same core services.
+Avalonia 11 + CommunityToolkit.Mvvm in `Mfr.App.Ui` (`net10.0`, Windows-first). Layout and workflow follow **MFR 7.4 help** (`mfr7` Site Help `ui.html` / `parts.html`), not the old three-equal-column sketch. Skip ReactiveUI unless a later screen truly needs it. `just run-ui` launches the desktop window. CLI continues to use the same engine.
+
+GUI slices (build in this order; pane placement is §17):
+
+- **G0 — Avalonia shell.** Empty 7.4 grid + splitters, menu/toolbar/status stubs. No engine work.
+- **G1 — File Explorer.** Tall left Report-style listing (path combo, back/up, Name grid, Mask, exclude). No `IShellView`.
+- **G2 — Rename List.** Full-width bottom row-virtualized grid (10k+ rows); add/remove/clear. Engine `Clear` / `Remove`.
+- **G3 — Available Filters.** 8 group icons + All A–Z; public filter catalog from `PresetJsonOptions`.
+- **G4 — Applied Filters.** Checkbox list (Name | Apply To); Presets/Save/Options placeholders.
+- **G5 — Filter Configuration.** Editor vs description; Formatter first; Filter Options including Whole/Substring/Token.
+- **G6 — Preview + GO.** Eager full-list preview, Auto-Preview, debounce, progress/cancel, red `[New]` column, status counts.
+- **G7 — Presets / Save Preset** via existing `PresetManager`.
+- **G8 — Formatting Editor** (token picker); Visual Trim Helper.
+- **G9 — Remaining filter editors;** File List metadata columns (Title, Album, …).
+- **G10 — Field Selector,** color legend, sort, F2 manual rename; just-on-time ID3/EXIF for visible cells.
+- **G11 — Undo toolbar + Log window** (needs Engine undo).
+- **G12 — Windows shell context menu,** session restore, macOS/Linux polish.
+
+OS-specific bits (file icons via `SHGetFileInfo`) live behind `ISystemIconProvider` with a no-op fallback. Do not add UI types to Engine.
 
 ---
 
@@ -1908,53 +1921,48 @@ Dragging files onto the MFR desktop shortcut launches MFR with those items pre-l
 
 ## 17. UI Layout & Screens
 
+Behavior for G1–G6 follows MFR 7.4 help (`mfr7` Site Help: `ui.html`, `parts.html`, and the per-pane pages linked from there). Theme is Avalonia Fluent; **layout and workflow match 7.4**, not Win32 chrome.
+
 ### 17.1 Main window
 
-```
-┌───────────────────────────────────────────────────────────────────────────┐
-│ Magic File Renamer                                     [_] [□] [×]       │
-│ File  Edit  View  Presets  Tools  Help                                    │
-├──────────────────┬──────────────────────────────────┬─────────────────────┤
-│ File Explorer    │ Rename List                      │ Available Filters   │
-│ (300px)          │                                  │                     │
-│ [roots + tree]   │ [toolbar: +sel +all -sel clr     │ Case Manip. ▶       │
-│                  │  autosort preview legend refresh] │ Space Manip. ▶      │
-│ Include: [*.mp3] │                                  │ Trimming ▶          │
-│ Exclude: [     ] │ Name │Preview│Artist│Title│...   │ Replace ▶           │
-│ [F][D][R][H]     │──────┼───────┼──────┼─────┼──── │ Formatting ▶        │
-│ [+ Add Selected] │ a.mp3│001…   │Queen │Boh  │     │ Audio ▶             │
-│ [+ Add All]      │ b.mp3│002…   │Queen │We W │     │ Attributes ▶        │
-│                  │ c.mp3│ ⚠     │      │     │     │ Misc ▶              │
-├──────────────────┴──────────────────────────────────┤─────────────────────┤
-│                                                      │ Applied Filters     │
-│                                                      │                     │
-│                                                      │ ≡ 1. SetFromFreeDB  │
-│                                                      │ ≡ 2. Counter        │
-│                                                      │ ≡ 3. Formatter      │
-│                                                      │ ≡ 4. Mover          │
-│                                                      │                     │
-│                                                      │ [Preset ▾] [Save]  │
-│                                                      │ [GO!] Target: Files │
-├──────────────────────────────────────────────────────┴─────────────────────┤
-│ ID3 / Attributes / Dates panel (collapsible)                              │
-│ Title: [Bohemian Rhapsody]  Artist: [Queen]  Track: [11/12]  …           │
-├───────────────────────────────────────────────────────────────────────────┤
-│ Status: 42 items · 40 will change · 1 conflict · 1 error  [Log] [Undo]  │
-└───────────────────────────────────────────────────────────────────────────┘
-```
-
-### 17.2 Filter Configuration Panel (inline expansion)
+File Explorer is the **tall left column** (filters + editor height). Filter Configuration sits under Available + Applied only (not under File Explorer). Rename List is **full-width bottom**. GO is on the toolbar above the explorer (`MFR > GO`), not on the status bar.
 
 ```
-≡ 3. Formatter                         [enabled ☑] [×] [Options ⚙]
-   Apply to: [Filename ▾]   When: [Always ▾]   Part: [None ▾]
-   ┌────────────────────────────────────────────────────────────────┐
-   │ <counter:initial=1,step=1,padding=fixed,length=2,resetScope=global> - <id3-artist:0> - <id3-title:0><ext:0>  │
-   └────────────────────────────────────────────────────────────────┘
-   [Token Picker ▾]   Preview: "01 - Queen - Bohemian Rhapsody.mp3"
+┌──────────────────────────────────────────────────────────────────────────┐
+│ Menu:  MFR | File List | Rename List | Filters | Help                    │
+│ Toolbar: [GO ▶] [Undo] [Log] [Options] …                                 │
+├─────────────────────────────┬──────────────────┬─────────────────────────┤
+│ FILE EXPLORER               │ AVAILABLE        │ APPLIED FILTERS         │
+│ [path combo] ◄ ► ▲          │ [group icons]    │ ☑ Name     Apply To     │
+│                             │ Counter          │ ☑ Formatter  File Name  │
+│ Name | # | Title | …        │ Formatter        │                         │
+│ (folders first, then files) │ …                │ [Presets] [Save Preset] │
+│                             ├──────────────────┴─────────────────────────┤
+│                             │ FILTER CONFIGURATION                       │
+│ Mask: [*]  [exclude…]       │ Applied Filter: Formatter                  │
+│                             │ Format string: [ <mp3:bitrate>          ]  │
+├─────────────────────────────┴────────────────────────────────────────────┤
+│ RENAME LIST                                                              │
+│ [+][-][clr][sort][preview][legend]                                       │
+│ File/Fol | Parent Folder | Full File Name | [New] Full File Name (red)   │
+├──────────────────────────────────────────────────────────────────────────┤
+│ (hover hint)     Items: 21  Filters: 1  Changes: 21  Preview Errors: 1   │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-Filters are drag-reorderable via the `≡` handle.
+### 17.2 Filter Configuration Panel
+
+Dedicated pane **under Available + Applied**. Shows a type-specific editor when an **applied** filter is selected, or a short description when an **available** filter is selected. Filter Options (name, Apply To group+field, Whole/Substring/Token) is a dialog from the Applied Filters toolbar, not an inline expansion of the applied-list row.
+
+Example Formatter editor:
+
+```
+Applied Filter: Formatter
+Format string: [ <counter:initial=1,step=1,padding=fixed,length=2> - <id3-artist:0> - <id3-title:0><ext:0> ]
+[Token Picker]   Preview: "01 - Queen - Bohemian Rhapsody.mp3"
+```
+
+Applied filters are drag-reorderable in the Applied Filters list (Ctrl-Up/Down).
 
 ### 17.3 Visual Trim Helper
 

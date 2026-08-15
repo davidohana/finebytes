@@ -23,3 +23,6 @@ run-help:
 
 run *args:
     dotnet run --project ./Mfr.App.Cli/Mfr.App.Cli.csproj -- {{args}}
+
+run-ui:
+    dotnet run --project ./Mfr.App.Ui/Mfr.App.Ui.csproj

@@ -1,7 +1,7 @@
 # AGENTS
 
 ## What to know
-- Use `just` for common tasks: `restore`, `build`, `test`, `format`.
+- Use `just` for common tasks: `restore`, `build`, `test`, `format`, `run-ui`.
 - Before committing, run `dotnet format .\finebytes.slnx` then `dotnet build .\finebytes.slnx`.
 - Follow project code style from `.editorconfig`.
 - Follow constraints in `.cursor/rules/*.mdc`.

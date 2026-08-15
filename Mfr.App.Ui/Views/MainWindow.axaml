@@ -1,0 +1,125 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Mfr.App.Ui.ViewModels"
+        xmlns:views="using:Mfr.App.Ui.Views"
+        mc:Ignorable="d"
+        d:DesignWidth="1100"
+        d:DesignHeight="720"
+        x:Class="Mfr.App.Ui.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Magic File Renamer"
+        Width="1100"
+        Height="720"
+        MinWidth="800"
+        MinHeight="500">
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_MFR">
+                <MenuItem Header="_GO" Command="{Binding GoCommand}" />
+                <MenuItem Header="_Undo Last" Command="{Binding UndoLastCommand}" />
+                <MenuItem Header="_Log" Command="{Binding ShowLogCommand}" />
+                <MenuItem Header="_Options" Command="{Binding ShowOptionsCommand}" />
+                <Separator />
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+            </MenuItem>
+            <MenuItem Header="_File List">
+                <MenuItem Header="Show Hidden/System Files" IsEnabled="False" />
+                <MenuItem Header="File List Style" IsEnabled="False" />
+            </MenuItem>
+            <MenuItem Header="_Rename List">
+                <MenuItem Header="Add Selected" IsEnabled="False" />
+                <MenuItem Header="Add All" IsEnabled="False" />
+                <MenuItem Header="Remove" IsEnabled="False" />
+                <MenuItem Header="Clear" IsEnabled="False" />
+                <Separator />
+                <MenuItem Header="Auto-Sort" IsEnabled="False" />
+                <MenuItem Header="Auto-Preview" IsEnabled="False" />
+                <MenuItem Header="Refresh" IsEnabled="False" />
+            </MenuItem>
+            <MenuItem Header="F_ilters">
+                <MenuItem Header="Presets" IsEnabled="False" />
+                <MenuItem Header="Save Preset" IsEnabled="False" />
+                <MenuItem Header="Filter Options" IsEnabled="False" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="About" IsEnabled="False" />
+            </MenuItem>
+        </Menu>
+
+        <Border DockPanel.Dock="Top" Padding="4,2">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <Button Content="GO ▶" Command="{Binding GoCommand}" MinWidth="72" />
+                <Button Content="Undo" Command="{Binding UndoLastCommand}" />
+                <Button Content="Log" Command="{Binding ShowLogCommand}" />
+                <Button Content="Options" Command="{Binding ShowOptionsCommand}" />
+            </StackPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Bottom"
+                Padding="8,4"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource ThemeControlMidBrush}">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+                <TextBlock VerticalAlignment="Center"
+                           Text="{Binding StatusHint}" />
+                <TextBlock Grid.Column="1"
+                           Margin="16,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding ItemCount, StringFormat='Items: {0}'}" />
+                <TextBlock Grid.Column="2"
+                           Margin="16,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding FilterCount, StringFormat='Filters: {0}'}" />
+                <TextBlock Grid.Column="3"
+                           Margin="16,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding ChangeCount, StringFormat='Changes: {0}'}" />
+                <TextBlock Grid.Column="4"
+                           Margin="16,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding PreviewErrorCount, StringFormat='Preview Errors: {0}'}" />
+            </Grid>
+        </Border>
+
+        <Grid RowDefinitions="2*,Auto,3*" MinHeight="200">
+            <Grid Grid.Row="0" ColumnDefinitions="2*,Auto,3*" MinHeight="180">
+                <views:FileListView Grid.Column="0" DataContext="{Binding FileList}" />
+                <GridSplitter Grid.Column="1"
+                              Width="4"
+                              ResizeDirection="Columns"
+                              HorizontalAlignment="Stretch" />
+                <Grid Grid.Column="2" RowDefinitions="*,Auto,*" MinWidth="280">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
+                        <views:FilterPaletteView Grid.Column="0"
+                                                 DataContext="{Binding FilterPalette}" />
+                        <GridSplitter Grid.Column="1"
+                                      Width="4"
+                                      ResizeDirection="Columns"
+                                      HorizontalAlignment="Stretch" />
+                        <views:AppliedFiltersView Grid.Column="2"
+                                                  DataContext="{Binding AppliedFilters}" />
+                    </Grid>
+                    <GridSplitter Grid.Row="1"
+                                  Height="4"
+                                  ResizeDirection="Rows"
+                                  HorizontalAlignment="Stretch" />
+                    <views:FilterEditorView Grid.Row="2"
+                                            DataContext="{Binding FilterEditor}" />
+                </Grid>
+            </Grid>
+            <GridSplitter Grid.Row="1"
+                          Height="4"
+                          ResizeDirection="Rows"
+                          HorizontalAlignment="Stretch" />
+            <views:RenameListView Grid.Row="2"
+                                  MinHeight="140"
+                                  DataContext="{Binding RenameList}" />
+        </Grid>
+    </DockPanel>
+</Window>

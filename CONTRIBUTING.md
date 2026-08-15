@@ -11,6 +11,7 @@ If you have `just` installed, you can use shortcuts for the most common workflow
 - `just test`
 - `just format`
 - `just run-help`
+- `just run-ui`
 
 ## C# formatting and linting
 
