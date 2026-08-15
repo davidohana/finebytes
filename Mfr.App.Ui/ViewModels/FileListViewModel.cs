@@ -20,9 +20,14 @@ namespace Mfr.App.Ui.ViewModels
         public const string ComputerPath = "";
 
         /// <summary>
-        /// Combo text shown when listing drives.
+        /// Address-bar label shown when listing drives on Windows.
         /// </summary>
         public const string ComputerDisplayName = "This PC";
+
+        /// <summary>
+        /// Address-bar label and path for the filesystem root on Unix.
+        /// </summary>
+        public const string UnixRootPath = "/";
 
         private static readonly string[] _DefaultMasks =
         [
@@ -70,6 +75,7 @@ namespace Mfr.App.Ui.ViewModels
             Entries = [];
             MaskSuggestions = [.. _DefaultMasks];
             PathHistory = [];
+            BreadcrumbSegments = [];
             _Navigate(_ResolveStartPath(initialPath), NavigationKind.Replace);
         }
 
@@ -79,9 +85,19 @@ namespace Mfr.App.Ui.ViewModels
         public ObservableCollection<FileListEntry> Entries { get; }
 
         /// <summary>
-        /// Gets recent and suggested filesystem paths for the path combo.
+        /// Gets recent filesystem paths for the address-bar history list.
         /// </summary>
         public ObservableCollection<string> PathHistory { get; }
+
+        /// <summary>
+        /// Gets the current folder trail shown in the address bar.
+        /// </summary>
+        public ObservableCollection<PathBreadcrumbSegment> BreadcrumbSegments { get; }
+
+        /// <summary>
+        /// Gets whether the address bar uses a This PC root instead of a filesystem root.
+        /// </summary>
+        public bool ShowsComputerRoot { get; } = OperatingSystem.IsWindows();
 
         /// <summary>
         /// Gets include-mask suggestions for the Mask combo.
@@ -95,10 +111,16 @@ namespace Mfr.App.Ui.ViewModels
         private string _currentPath = ComputerPath;
 
         /// <summary>
-        /// Editable path combo text (display name for the drive list).
+        /// Editable address-bar text (display name for the drive list).
         /// </summary>
         [ObservableProperty]
         private string _pathText = string.Empty;
+
+        /// <summary>
+        /// Whether the address bar is a typed path instead of breadcrumbs.
+        /// </summary>
+        [ObservableProperty]
+        private bool _isPathEditing;
 
         /// <summary>
         /// Include mask applied to file names. Folders are always listed.
@@ -123,6 +145,16 @@ namespace Mfr.App.Ui.ViewModels
         [NotifyPropertyChangedFor(nameof(IsTilesView))]
         [NotifyPropertyChangedFor(nameof(IsThumbnailsView))]
         private FileListViewMode _viewMode = FileListViewMode.Report;
+
+        /// <summary>
+        /// Gets the <see cref="FileListEntry"/> property used for the current column sort.
+        /// </summary>
+        public string SortMemberPath { get; private set; } = nameof(FileListEntry.Name);
+
+        /// <summary>
+        /// Gets whether the current column sort is ascending.
+        /// </summary>
+        public bool IsSortAscending { get; private set; } = true;
 
         /// <summary>
         /// The selected grid row, or <see langword="null"/> when nothing is selected.
@@ -183,12 +215,35 @@ namespace Mfr.App.Ui.ViewModels
         public bool IsThumbnailsView => ViewMode == FileListViewMode.Thumbnails;
 
         /// <summary>
-        /// Navigates to <see cref="PathText"/> when the user commits the path combo.
+        /// Navigates to <see cref="PathText"/> when the user commits the typed path.
         /// </summary>
         [RelayCommand]
         public void CommitPath()
         {
             _Navigate(PathText, NavigationKind.Direct);
+            _EndPathEdit();
+        }
+
+        /// <summary>
+        /// Switches the address bar to a typed path.
+        /// </summary>
+        [RelayCommand]
+        public void BeginPathEdit()
+        {
+            if (IsPathEditing)
+                return;
+
+            PathText = _ToDisplayPath(CurrentPath);
+            IsPathEditing = true;
+        }
+
+        /// <summary>
+        /// Leaves typed-path mode without navigating.
+        /// </summary>
+        [RelayCommand]
+        public void CancelPathEdit()
+        {
+            _EndPathEdit();
         }
 
         /// <summary>
@@ -260,9 +315,35 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
+        /// Sorts the listing like Windows Explorer: folders stay first, then the column.
+        /// <para>
+        /// Clicking the same column again reverses order within the folder group and within the file
+        /// group. Folders remain above files in both directions.
+        /// </para>
+        /// </summary>
+        /// <param name="memberPath">
+        /// A <see cref="FileListEntry"/> property name such as <c>Name</c> or <c>LastWriteTime</c>.
+        /// </param>
+        public void SortByColumn(string? memberPath)
+        {
+            var column = _NormalizeSortMemberPath(memberPath);
+            if (column == SortMemberPath)
+                IsSortAscending = !IsSortAscending;
+            else
+            {
+                SortMemberPath = column;
+                IsSortAscending = true;
+            }
+
+            _ApplyListingSort();
+            _RebuildVisibleEntries(preserveSelection: true);
+        }
+
+        /// <summary>
         /// Navigates to a filesystem path or the drive list.
         /// </summary>
         /// <param name="path">Directory path, or empty / <see cref="ComputerDisplayName"/> for drives.</param>
+        [RelayCommand]
         public void NavigateTo(string? path)
         {
             _Navigate(path, NavigationKind.Direct);
@@ -309,9 +390,24 @@ namespace Mfr.App.Ui.ViewModels
 
             CurrentPath = resolved;
             PathText = _ToDisplayPath(resolved);
+            IsPathEditing = false;
             _RememberPath(PathText);
+            _RebuildBreadcrumbs();
             _ReloadEntries();
             _UpdateNavigationFlags();
+        }
+
+        private void _EndPathEdit()
+        {
+            PathText = _ToDisplayPath(CurrentPath);
+            IsPathEditing = false;
+        }
+
+        private void _RebuildBreadcrumbs()
+        {
+            BreadcrumbSegments.Clear();
+            foreach (var segment in _BuildBreadcrumbSegments(CurrentPath))
+                BreadcrumbSegments.Add(segment);
         }
 
         private void _ReloadEntries()
@@ -323,6 +419,7 @@ namespace Mfr.App.Ui.ViewModels
             if (_IsComputerPath(CurrentPath))
             {
                 _listedItems.AddRange(_ListDrives());
+                _ApplyListingSort();
                 _RebuildVisibleEntries(preserveSelection: false);
                 return;
             }
@@ -330,13 +427,11 @@ namespace Mfr.App.Ui.ViewModels
             try
             {
                 var folders = Directory.EnumerateDirectories(CurrentPath, "*", _ListingOptions)
-                    .Select(path => _CreateListedItem(path, isDirectory: true))
-                    .OrderBy(item => item.Name, PathComparers.Os);
+                    .Select(path => _CreateListedItem(path, isDirectory: true));
 
                 var files = Directory.EnumerateFiles(CurrentPath, "*", _ListingOptions)
                     .Where(_PassesFileMasks)
-                    .Select(path => _CreateListedItem(path, isDirectory: false))
-                    .OrderBy(item => item.Name, PathComparers.Os);
+                    .Select(path => _CreateListedItem(path, isDirectory: false));
 
                 _listedItems.AddRange(folders);
                 _listedItems.AddRange(files);
@@ -347,7 +442,54 @@ namespace Mfr.App.Ui.ViewModels
                 return;
             }
 
+            _ApplyListingSort();
             _RebuildVisibleEntries(preserveSelection: false);
+        }
+
+        private void _ApplyListingSort()
+        {
+            _listedItems.Sort(_CompareListedItems);
+        }
+
+        private int _CompareListedItems(ListedItem left, ListedItem right)
+        {
+            var folderCmp = right.IsDirectory.CompareTo(left.IsDirectory);
+            if (folderCmp != 0)
+                return folderCmp;
+
+            var fieldCmp = _CompareSortField(left, right);
+            if (fieldCmp == 0)
+                fieldCmp = PathComparers.Os.Compare(left.Name, right.Name);
+
+            return IsSortAscending ? fieldCmp : -fieldCmp;
+        }
+
+        private int _CompareSortField(ListedItem left, ListedItem right)
+        {
+            if (SortMemberPath == nameof(FileListEntry.LastWriteTime))
+                return Comparer<DateTime?>.Default.Compare(left.LastWriteTime, right.LastWriteTime);
+
+            if (SortMemberPath == nameof(FileListEntry.Length))
+                return Comparer<long?>.Default.Compare(left.Length, right.Length);
+
+            if (SortMemberPath == nameof(FileListEntry.Type))
+                return PathComparers.Os.Compare(_TypeLabel(left), _TypeLabel(right));
+
+            return PathComparers.Os.Compare(left.Name, right.Name);
+        }
+
+        private static string _NormalizeSortMemberPath(string? memberPath)
+        {
+            if (string.Equals(memberPath, nameof(FileListEntry.LastWriteTime), StringComparison.Ordinal))
+                return nameof(FileListEntry.LastWriteTime);
+
+            if (string.Equals(memberPath, nameof(FileListEntry.Type), StringComparison.Ordinal))
+                return nameof(FileListEntry.Type);
+
+            if (string.Equals(memberPath, nameof(FileListEntry.Length), StringComparison.Ordinal))
+                return nameof(FileListEntry.Length);
+
+            return nameof(FileListEntry.Name);
         }
 
         private void _RebuildVisibleEntries(bool preserveSelection)
@@ -444,7 +586,7 @@ namespace Mfr.App.Ui.ViewModels
             return !WildcardMask.MatchesAny(fileName, ExcludeMasks);
         }
 
-        private IEnumerable<ListedItem> _ListDrives()
+        private List<ListedItem> _ListDrives()
         {
             DriveInfo[] drives;
             try
@@ -472,7 +614,7 @@ namespace Mfr.App.Ui.ViewModels
                 items.Add(_CreateListedItem(name, isDirectory: true));
             }
 
-            return items.OrderBy(item => item.Name, PathComparers.Os);
+            return items;
         }
 
         private void _UpdateNavigationFlags()
@@ -627,6 +769,134 @@ namespace Mfr.App.Ui.ViewModels
         private static string _ToDisplayPath(string path)
         {
             return _IsComputerPath(path) ? ComputerDisplayName : path;
+        }
+
+        private static List<PathBreadcrumbSegment> _BuildBreadcrumbSegments(string path)
+        {
+            if (OperatingSystem.IsWindows())
+                return _BuildWindowsBreadcrumbSegments(path);
+
+            return _BuildUnixBreadcrumbSegments(path);
+        }
+
+        private static List<PathBreadcrumbSegment> _BuildWindowsBreadcrumbSegments(string path)
+        {
+            var segments = new List<PathBreadcrumbSegment>();
+            if (_IsComputerPath(path))
+            {
+                segments.Add(_CreateSegment(
+                    ComputerDisplayName,
+                    ComputerDisplayName,
+                    showLeadingChevron: false));
+                return segments;
+            }
+
+            var isUnc = path.StartsWith(@"\\", StringComparison.Ordinal);
+            if (!isUnc)
+                segments.Add(_CreateSegment(
+                    ComputerDisplayName,
+                    ComputerDisplayName,
+                    showLeadingChevron: false));
+
+            var root = Path.GetPathRoot(path);
+            if (string.IsNullOrEmpty(root))
+                return segments;
+
+            var rootLabel = isUnc ? root.TrimTrailingSeparator() : _FormatDriveLabel(root);
+            segments.Add(_CreateSegment(rootLabel, root, showLeadingChevron: segments.Count > 0));
+            _AddChildBreadcrumbSegments(segments, path, root);
+            return segments;
+        }
+
+        private static List<PathBreadcrumbSegment> _BuildUnixBreadcrumbSegments(string path)
+        {
+            var segments = new List<PathBreadcrumbSegment>
+            {
+                _CreateSegment(UnixRootPath, UnixRootPath, showLeadingChevron: false),
+            };
+
+            if (_IsComputerPath(path) || _IsSamePath(path, UnixRootPath))
+                return segments;
+
+            _AddChildBreadcrumbSegments(segments, path, UnixRootPath);
+            return segments;
+        }
+
+        private static void _AddChildBreadcrumbSegments(
+            List<PathBreadcrumbSegment> segments,
+            string path,
+            string rootPath)
+        {
+            DirectoryInfo? current;
+            string rootFullName;
+            try
+            {
+                current = new DirectoryInfo(path);
+                rootFullName = new DirectoryInfo(rootPath).FullName;
+            }
+            catch (Exception ex) when (
+                ex is ArgumentException or NotSupportedException or IOException)
+            {
+                return;
+            }
+
+            var parts = new List<PathBreadcrumbSegment>();
+            while (current is not null && !_IsSamePath(current.FullName, rootFullName))
+            {
+                var name = current.Name;
+                if (string.IsNullOrEmpty(name))
+                    break;
+
+                parts.Add(_CreateSegment(name, current.FullName, showLeadingChevron: true));
+                current = current.Parent;
+            }
+
+            parts.Reverse();
+            segments.AddRange(parts);
+        }
+
+        private static PathBreadcrumbSegment _CreateSegment(
+            string label,
+            string targetPath,
+            bool showLeadingChevron)
+        {
+            return new PathBreadcrumbSegment
+            {
+                Label = label,
+                TargetPath = targetPath,
+                ShowLeadingChevron = showLeadingChevron,
+            };
+        }
+
+        private static string _FormatDriveLabel(string root)
+        {
+            try
+            {
+                var drive = new DriveInfo(root);
+                var letter = drive.Name.TrimEnd(
+                    Path.DirectorySeparatorChar,
+                    Path.AltDirectorySeparatorChar);
+                if (drive.IsReady)
+                {
+                    var volume = drive.VolumeLabel;
+                    if (!string.IsNullOrWhiteSpace(volume))
+                        return volume + " (" + letter + ")";
+                }
+
+                return letter;
+            }
+            catch (Exception ex) when (
+                ex is ArgumentException or IOException or UnauthorizedAccessException)
+            {
+                return root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            }
+        }
+
+        private static bool _IsSamePath(string first, string second)
+        {
+            var firstPath = first.TrimTrailingSeparator();
+            var secondPath = second.TrimTrailingSeparator();
+            return PathComparers.Os.Equals(firstPath, secondPath);
         }
 
         private static bool _IsComputerPath(string? path)

@@ -31,6 +31,51 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Name sort keeps folders above files, matching Windows Explorer.
+        /// </summary>
+        [Fact]
+        public void SortByColumn_Name_Keeps_Folders_First()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            Directory.CreateDirectory(Path.Combine(dir, "alpha-folder"));
+            Directory.CreateDirectory(Path.Combine(dir, "zeta-folder"));
+            File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
+            File.WriteAllText(Path.Combine(dir, "zeta.txt"), "z");
+            var viewModel = _CreateViewModel(dir);
+
+            Assert.Equal(["alpha-folder", "zeta-folder", "alpha.txt", "zeta.txt"], _Names(viewModel));
+
+            viewModel.SortByColumn(nameof(FileListEntry.Name));
+
+            Assert.Equal(["zeta-folder", "alpha-folder", "zeta.txt", "alpha.txt"], _Names(viewModel));
+            Assert.True(viewModel.Entries[0].IsDirectory);
+            Assert.True(viewModel.Entries[1].IsDirectory);
+            Assert.False(viewModel.Entries[2].IsDirectory);
+        }
+
+        /// <summary>
+        /// Verifies Size sort keeps folders above files.
+        /// </summary>
+        [Fact]
+        public void SortByColumn_Length_Keeps_Folders_First()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            Directory.CreateDirectory(Path.Combine(dir, "zeta-folder"));
+            File.WriteAllText(Path.Combine(dir, "tiny.txt"), "a");
+            File.WriteAllText(Path.Combine(dir, "huge.txt"), new string('b', 32));
+            var viewModel = _CreateViewModel(dir);
+
+            viewModel.SortByColumn(nameof(FileListEntry.Length));
+
+            Assert.Equal(["zeta-folder", "tiny.txt", "huge.txt"], _Names(viewModel));
+
+            viewModel.SortByColumn(nameof(FileListEntry.Length));
+
+            Assert.Equal(["zeta-folder", "huge.txt", "tiny.txt"], _Names(viewModel));
+            Assert.True(viewModel.Entries[0].IsDirectory);
+        }
+
+        /// <summary>
         /// Verifies the include mask hides non-matching files but still lists folders.
         /// </summary>
         [Fact]
@@ -118,6 +163,98 @@ namespace Mfr.Tests.Ui
             var viewModel = _CreateViewModel(dir);
 
             Assert.DoesNotContain(hiddenName, _Names(viewModel));
+        }
+
+        /// <summary>
+        /// Verifies the address bar trail includes the OS root and the current folder.
+        /// </summary>
+        [Fact]
+        public void Breadcrumb_Includes_Root_And_Current_Folder()
+        {
+            var dir = _CreateTree();
+            var child = Path.Combine(dir, "zeta-folder");
+            var viewModel = _CreateViewModel(child);
+            var labels = viewModel.BreadcrumbSegments.Select(segment => segment.Label).ToList();
+
+            Assert.Contains("zeta-folder", labels);
+            Assert.Contains(new DirectoryInfo(dir).Name, labels);
+            Assert.Equal(OperatingSystem.IsWindows(), viewModel.ShowsComputerRoot);
+
+            if (OperatingSystem.IsWindows())
+                Assert.Equal(FileListViewModel.ComputerDisplayName, labels[0]);
+            else
+                Assert.Equal(FileListViewModel.UnixRootPath, labels[0]);
+
+            Assert.False(viewModel.BreadcrumbSegments[0].ShowLeadingChevron);
+            Assert.True(viewModel.BreadcrumbSegments[^1].ShowLeadingChevron);
+        }
+
+        /// <summary>
+        /// Verifies clicking an ancestor breadcrumb opens that folder.
+        /// </summary>
+        [Fact]
+        public void Breadcrumb_Segment_Navigates_To_Ancestor()
+        {
+            var dir = _CreateTree();
+            var child = Path.Combine(dir, "zeta-folder");
+            var viewModel = _CreateViewModel(child);
+
+            viewModel.NavigateTo(viewModel.BreadcrumbSegments[^2].TargetPath);
+
+            Assert.Equal(new DirectoryInfo(dir).FullName, viewModel.CurrentPath);
+        }
+
+        /// <summary>
+        /// Verifies the Windows root breadcrumb opens the drive list.
+        /// </summary>
+        [Fact]
+        public void Breadcrumb_Root_Opens_Drive_List_On_Windows()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.NavigateTo(viewModel.BreadcrumbSegments[0].TargetPath);
+
+            Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
+            var root = Assert.Single(viewModel.BreadcrumbSegments);
+            Assert.Equal(FileListViewModel.ComputerDisplayName, root.Label);
+        }
+
+        /// <summary>
+        /// Verifies typed-path mode can be cancelled without navigating.
+        /// </summary>
+        [Fact]
+        public void CancelPathEdit_Restores_Display_Path()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var original = viewModel.PathText;
+
+            viewModel.BeginPathEdit();
+            viewModel.PathText = "does-not-exist";
+            viewModel.CancelPathEdit();
+
+            Assert.False(viewModel.IsPathEditing);
+            Assert.Equal(original, viewModel.PathText);
+            Assert.Equal(new DirectoryInfo(original).FullName, viewModel.CurrentPath);
+        }
+
+        /// <summary>
+        /// Verifies committing a typed path leaves address-bar edit mode.
+        /// </summary>
+        [Fact]
+        public void CommitPath_Leaves_Typed_Path_Mode()
+        {
+            var dir = _CreateTree();
+            var child = Path.Combine(dir, "zeta-folder");
+            var viewModel = _CreateViewModel(dir);
+
+            viewModel.BeginPathEdit();
+            viewModel.PathText = child;
+            viewModel.CommitPath();
+
+            Assert.False(viewModel.IsPathEditing);
+            Assert.Equal(new DirectoryInfo(child).FullName, viewModel.CurrentPath);
         }
 
         /// <summary>

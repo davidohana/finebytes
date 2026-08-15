@@ -7,6 +7,7 @@
              d:DesignWidth="280"
              d:DesignHeight="400"
              x:Class="Mfr.App.Ui.Views.FileListView"
+             x:Name="FileListRoot"
              x:DataType="vm:FileListViewModel">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -21,6 +22,9 @@
                     <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#1A1A1A" />
                     <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#E0E0E0" />
                     <SolidColorBrush x:Key="FileListForegroundBrush" Color="#000000" />
+                    <SolidColorBrush x:Key="FileListAddressBarBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="FileListAddressBarBorderBrush" Color="#D0D0D0" />
+                    <SolidColorBrush x:Key="FileListBreadcrumbMutedBrush" Color="#5C5C5C" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="FileListRowBrush" Color="#202020" />
@@ -32,6 +36,9 @@
                     <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#F0F0F0" />
                     <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#3F3F3F" />
                     <SolidColorBrush x:Key="FileListForegroundBrush" Color="#F0F0F0" />
+                    <SolidColorBrush x:Key="FileListAddressBarBrush" Color="#2B2B2B" />
+                    <SolidColorBrush x:Key="FileListAddressBarBorderBrush" Color="#3F3F3F" />
+                    <SolidColorBrush x:Key="FileListBreadcrumbMutedBrush" Color="#B0B0B0" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
             <FontFamily x:Key="FileListFont">Segoe UI, SegoeUI</FontFamily>
@@ -163,17 +170,138 @@
             <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
             <Setter Property="Opacity" Value="1" />
         </Style>
+        <Style Selector="Border.address-bar">
+            <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Padding" Value="2,0,0,0" />
+            <Setter Property="ClipToBounds" Value="True" />
+        </Style>
+        <Style Selector="Button.breadcrumb">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="6,2" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+        <Style Selector="Button.breadcrumb:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+        </Style>
+        <Style Selector="Button.address-history">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="MinWidth" Value="22" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="Button.address-history:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+        </Style>
+        <Style Selector="ComboBox.address-edit">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
     </UserControl.Styles>
     <Border Classes="pane">
         <DockPanel>
             <Grid DockPanel.Dock="Top"
                   ColumnDefinitions="*,Auto,Auto,Auto,Auto"
                   Margin="4">
-                <ComboBox IsEditable="True"
-                          ItemsSource="{Binding PathHistory}"
-                          Text="{Binding PathText, Mode=TwoWay}"
-                          KeyDown="_OnPathKeyDown"
-                          LostFocus="_OnPathLostFocus" />
+                <Border Classes="address-bar"
+                        PointerPressed="_OnAddressBarPointerPressed">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <ScrollViewer HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Disabled"
+                                      IsVisible="{Binding !IsPathEditing}">
+                            <StackPanel Orientation="Horizontal">
+                                <Viewbox Width="16"
+                                         Height="16"
+                                         Margin="6,0,2,0"
+                                         VerticalAlignment="Center"
+                                         IsVisible="{Binding ShowsComputerRoot}">
+                                    <Path Width="16"
+                                          Height="16"
+                                          Stretch="Uniform"
+                                          Fill="{DynamicResource FileListForegroundBrush}"
+                                          Data="M1.5,2.5 H14.5 A1,1 0 0 1 15.5,3.5 V10.5 A1,1 0 0 1 14.5,11.5 H1.5 A1,1 0 0 1 0.5,10.5 V3.5 A1,1 0 0 1 1.5,2.5 Z M5,13 H11 V14.5 H5 Z M0,15 H16 V16 H0 Z" />
+                                </Viewbox>
+                                <Viewbox Width="16"
+                                         Height="16"
+                                         Margin="6,0,2,0"
+                                         VerticalAlignment="Center"
+                                         IsVisible="{Binding !ShowsComputerRoot}">
+                                    <Path Width="16"
+                                          Height="16"
+                                          Stretch="Uniform"
+                                          Fill="{DynamicResource FileListForegroundBrush}"
+                                          Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
+                                </Viewbox>
+                                <ItemsControl ItemsSource="{Binding BreadcrumbSegments}"
+                                              VerticalAlignment="Stretch">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:PathBreadcrumbSegment">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="›"
+                                                           IsVisible="{Binding ShowLeadingChevron}"
+                                                           Margin="2,0"
+                                                           FontSize="14"
+                                                           Opacity="0.7"
+                                                           Foreground="{DynamicResource FileListBreadcrumbMutedBrush}"
+                                                           VerticalAlignment="Center" />
+                                                <Button Classes="breadcrumb"
+                                                        Content="{Binding Label}"
+                                                        ToolTip.Tip="{Binding TargetPath}"
+                                                        Command="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).NavigateToCommand}"
+                                                        CommandParameter="{Binding TargetPath}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+                        <ComboBox x:Name="PathCombo"
+                                  Classes="address-edit"
+                                  IsEditable="True"
+                                  IsVisible="{Binding IsPathEditing}"
+                                  ItemsSource="{Binding PathHistory}"
+                                  Text="{Binding PathText, Mode=TwoWay}"
+                                  KeyDown="_OnPathKeyDown"
+                                  LostFocus="_OnPathLostFocus" />
+                        <Button Grid.Column="1"
+                                Classes="address-history"
+                                IsVisible="{Binding !IsPathEditing}"
+                                Click="_OnHistoryClick"
+                                ToolTip.Tip="Recent locations">
+                            <Path Width="10"
+                                  Height="6"
+                                  Stretch="Uniform"
+                                  Fill="{DynamicResource FileListBreadcrumbMutedBrush}"
+                                  Data="M0,0 L10,0 L5,6 Z" />
+                        </Button>
+                    </Grid>
+                </Border>
                 <Button Grid.Column="1"
                         Content="◀"
                         MinWidth="32"
@@ -236,6 +364,8 @@
                           RowHeight="20"
                           ColumnHeaderHeight="22"
                           SelectionMode="Extended"
+                          Sorting="_OnEntriesSorting"
+                          Loaded="_OnReportGridLoaded"
                           DoubleTapped="_OnEntriesDoubleTapped"
                           KeyDown="_OnEntriesKeyDown">
                     <DataGrid.Columns>
@@ -260,22 +390,24 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate x:DataType="vm:FileListEntry">
                                     <TextBlock Text="{Binding DateModifiedDisplay}"
-                                               HorizontalAlignment="Right"
+                                               HorizontalAlignment="Left"
                                                VerticalAlignment="Center" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Type"
                                             Binding="{Binding Type}"
+                                            SortMemberPath="Type"
                                             Width="110" />
                         <DataGridTemplateColumn Header="Size"
-                                                Width="72"
+                                                Width="80"
                                                 SortMemberPath="Length">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate x:DataType="vm:FileListEntry">
                                     <TextBlock Text="{Binding SizeDisplay}"
                                                HorizontalAlignment="Right"
-                                               VerticalAlignment="Center" />
+                                               VerticalAlignment="Center"
+                                               Padding="0,0,8,0" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
