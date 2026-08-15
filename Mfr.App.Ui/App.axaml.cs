@@ -26,12 +26,12 @@ namespace Mfr.App.Ui
                 {
                     DataContext = new MainWindowViewModel(),
                 };
+#if DEBUG
+                this.AttachDevTools();
+#endif
             }
 
             base.OnFrameworkInitializationCompleted();
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
     }
 }

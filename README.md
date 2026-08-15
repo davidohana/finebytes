@@ -30,7 +30,7 @@ For contributor workflow, formatting/linting expectations, and pre-commit checks
 
 ### Run the GUI App
 
-Launch the Avalonia desktop window (Windows-first; empty 7.4 layout until later GUI phases):
+Launch the Avalonia desktop window (Windows-first). The File Explorer pane lists folders and files; remaining panes are filled in later GUI phases:
 
 ```powershell
 just run-ui

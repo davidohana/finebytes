@@ -11,7 +11,7 @@ namespace Mfr.App.Ui.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         /// <summary>
-        /// Initializes pane view models for the empty 7.4 layout.
+        /// Initializes pane view models for the 7.4 layout.
         /// </summary>
         public MainWindowViewModel()
         {

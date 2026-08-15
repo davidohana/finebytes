@@ -4,6 +4,7 @@
              RequestedThemeVariant="Default">
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <Style Selector="TextBlock.pane-header">
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Margin" Value="8,6" />

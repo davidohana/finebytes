@@ -29,6 +29,8 @@
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="_File List">
+                <MenuItem Header="_Refresh" Command="{Binding FileList.RefreshCommand}" />
+                <Separator />
                 <MenuItem Header="Show Hidden/System Files" IsEnabled="False" />
                 <MenuItem Header="File List Style" IsEnabled="False" />
             </MenuItem>
