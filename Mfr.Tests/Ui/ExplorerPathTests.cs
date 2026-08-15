@@ -54,7 +54,10 @@ namespace Mfr.Tests.Ui
             Assert.Equal(@"\\nas", server);
             Assert.True(ExplorerPath.IsUncServerRoot(@"\\nas"));
             Assert.True(ExplorerPath.IsUncServerRoot(@"//ohanas"));
+            Assert.True(ExplorerPath.IsUncServerRoot(@"\\wsl$"));
+            Assert.True(ExplorerPath.IsUncServerRoot(@"\\wsl.localhost"));
             Assert.False(ExplorerPath.IsUncServerRoot(@"\\nas\music"));
+            Assert.False(ExplorerPath.IsUncServerRoot(@"\\wsl$\Ubuntu"));
             if (OperatingSystem.IsWindows())
                 Assert.True(ExplorerPath.IsUncServerRoot(@"\\nas\"));
             if (OperatingSystem.IsWindows())
@@ -74,6 +77,9 @@ namespace Mfr.Tests.Ui
             Assert.Equal(@"\\nas", ExplorerPath.GetParentPath(@"\\nas\music\"));
             Assert.Equal(@"\\nas\music", ExplorerPath.GetParentPath(@"\\nas\music\albums"));
             Assert.Equal(ExplorerPath.NetworkPath, ExplorerPath.GetParentPath(@"\\nas"));
+            Assert.Equal(@"\\wsl$", ExplorerPath.GetParentPath(@"\\wsl$\Ubuntu"));
+            Assert.Equal(ExplorerPath.NetworkPath, ExplorerPath.GetParentPath(@"\\wsl$"));
+            Assert.Equal(@"\\wsl.localhost", ExplorerPath.GetParentPath(@"\\wsl.localhost\Ubuntu"));
             Assert.Equal(ExplorerPath.ComputerPath, ExplorerPath.GetParentPath(ExplorerPath.NetworkPath));
             Assert.Null(ExplorerPath.GetParentPath(ExplorerPath.ComputerPath));
         }
@@ -139,6 +145,29 @@ namespace Mfr.Tests.Ui
                 [ExplorerPath.ComputerDisplayName, ExplorerPath.NetworkDisplayName, "ohanas"],
                 segments.Select(segment => segment.Label));
             Assert.Equal(@"\\ohanas", segments[2].TargetPath);
+        }
+
+        /// <summary>
+        /// Verifies WSL UNC roots use the same Network trail as other servers.
+        /// </summary>
+        [Fact]
+        public void Breadcrumb_Wsl_Unc_Shows_Host_Then_Distro()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var segments = ExplorerPath.BuildBreadcrumbSegments(@"\\wsl$\Ubuntu\home");
+            Assert.Equal(
+                [
+                    ExplorerPath.ComputerDisplayName,
+                    ExplorerPath.NetworkDisplayName,
+                    "wsl$",
+                    "Ubuntu",
+                    "home",
+                ],
+                segments.Select(segment => segment.Label));
+            Assert.Equal(@"\\wsl$", segments[2].TargetPath);
+            Assert.Equal(@"\\wsl$\Ubuntu", segments[3].TargetPath);
         }
 
         /// <summary>

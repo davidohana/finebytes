@@ -410,6 +410,14 @@ namespace Mfr.App.Ui.ViewModels
                 return;
             }
 
+            if (OperatingSystem.IsWindows() && WindowsWslUnc.IsWslServerRoot(CurrentPath))
+            {
+                _listedItems.AddRange(_ListWslDistros(CurrentPath));
+                _ApplyListingSort();
+                _RebuildVisibleEntries(preserveSelection: false);
+                return;
+            }
+
             if (ExplorerPath.IsUncServerRoot(CurrentPath))
             {
                 if (OperatingSystem.IsWindows())
@@ -639,6 +647,16 @@ namespace Mfr.App.Ui.ViewModels
                 items.Add(drive);
             }
 
+            if (OperatingSystem.IsWindows() && WindowsWslUnc.TryGetLiveRoot(out var wslRoot) && pathToIsAdded.Add(wslRoot))
+            {
+                items.Add(new ListedItem(
+                    wslRoot,
+                    wslRoot[2..],
+                    IsDirectory: true,
+                    Length: null,
+                    LastWriteTime: null));
+            }
+
             foreach (var historyPath in PathHistory)
             {
                 if (!ExplorerPath.IsUncPath(historyPath))
@@ -651,6 +669,26 @@ namespace Mfr.App.Ui.ViewModels
                 items.Add(new ListedItem(
                     location,
                     location,
+                    IsDirectory: true,
+                    Length: null,
+                    LastWriteTime: null));
+            }
+
+            return items;
+        }
+
+        private static List<ListedItem> _ListWslDistros(string serverRoot)
+        {
+            if (!WindowsWslUnc.TryListDistroPaths(serverRoot, out var distroPaths))
+                return [];
+
+            var items = new List<ListedItem>();
+            foreach (var distroPath in distroPaths)
+            {
+                var name = _LastUncSegment(distroPath);
+                items.Add(new ListedItem(
+                    distroPath,
+                    name,
                     IsDirectory: true,
                     Length: null,
                     LastWriteTime: null));
@@ -765,7 +803,8 @@ namespace Mfr.App.Ui.ViewModels
                     return true;
                 }
 
-                if (!_TryRunWithTimeout(() => _ReadFolderListing(path), _NetworkProbeTimeout, out var listing))
+                var timeout = WindowsWslUnc.IsWslUncPath(path) ? _UncServerProbeTimeout : _NetworkProbeTimeout;
+                if (!_TryRunWithTimeout(() => _ReadFolderListing(path), timeout, out var listing))
                     return false;
 
                 folders = listing.Folders;
@@ -986,6 +1025,18 @@ namespace Mfr.App.Ui.ViewModels
                 return true;
             }
 
+            if (OperatingSystem.IsWindows() && WindowsWslUnc.IsWslUncPath(path))
+            {
+                if (WindowsWslUnc.TryResolve(path, out var wslPath))
+                {
+                    resolved = wslPath;
+                    return true;
+                }
+
+                resolved = ComputerPath;
+                return false;
+            }
+
             if (OperatingSystem.IsWindows())
             {
                 var isUncServer = path is not null && ExplorerPath.IsUncServerRoot(path);
@@ -1012,7 +1063,17 @@ namespace Mfr.App.Ui.ViewModels
         private static string _DirectoryDisplayName(string path)
         {
             var name = Path.GetFileName(path.TrimTrailingSeparator());
-            return string.IsNullOrEmpty(name) ? path : name;
+            return string.IsNullOrEmpty(name) ? _LastUncSegment(path) : name;
+        }
+
+        private static string _LastUncSegment(string path)
+        {
+            var trimmed = path.TrimTrailingSeparator();
+            var slash = trimmed.LastIndexOf('\\');
+            if (slash < 0 || slash == trimmed.Length - 1)
+                return trimmed;
+
+            return trimmed[(slash + 1)..];
         }
 
         private sealed record ListedItem(

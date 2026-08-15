@@ -1,5 +1,6 @@
 using Mfr.App.Ui.Services;
 using Mfr.App.Ui.ViewModels;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Ui
 {
@@ -266,6 +267,55 @@ namespace Mfr.Tests.Ui
             viewModel.Refresh();
 
             Assert.Contains(@"\\nas\music\albums", _Names(viewModel));
+        }
+
+        /// <summary>
+        /// Verifies typing <c>\\wsl</c> opens the live WSL root and lists distros.
+        /// </summary>
+        [Fact]
+        public void NavigateTo_Wsl_Alias_Opens_Live_Root()
+        {
+            if (!OperatingSystem.IsWindows() || !WindowsWslUnc.TryGetLiveRoot(out var liveRoot))
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.NavigateTo(@"\\wsl");
+
+            Assert.True(PathRelations.IsSamePath(liveRoot, viewModel.CurrentPath));
+            Assert.Equal(liveRoot, viewModel.PathText);
+            Assert.Contains(
+                liveRoot[2..],
+                viewModel.BreadcrumbSegments.Select(segment => segment.Label));
+            Assert.True(WindowsWslUnc.TryListDistroPaths(liveRoot, out var distroPaths));
+            Assert.NotEmpty(distroPaths);
+            Assert.Equal(distroPaths.Count, viewModel.Entries.Count);
+            foreach (var distroPath in distroPaths)
+            {
+                var name = Path.GetFileName(distroPath);
+                if (string.IsNullOrEmpty(name))
+                    name = distroPath[(liveRoot.Length + 1)..];
+
+                Assert.Contains(name, _Names(viewModel));
+            }
+
+            viewModel.GoUp();
+            Assert.Equal(FileListViewModel.NetworkPath, viewModel.CurrentPath);
+            Assert.Contains(liveRoot[2..], _Names(viewModel));
+        }
+
+        /// <summary>
+        /// Verifies Network lists the live WSL host when the redirector is present.
+        /// </summary>
+        [Fact]
+        public void Network_Lists_Live_Wsl_Root()
+        {
+            if (!OperatingSystem.IsWindows() || !WindowsWslUnc.TryGetLiveRoot(out var liveRoot))
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.NavigateTo(FileListViewModel.NetworkDisplayName);
+
+            Assert.Contains(liveRoot[2..], _Names(viewModel));
         }
 
         /// <summary>
