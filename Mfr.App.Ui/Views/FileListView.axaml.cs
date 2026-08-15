@@ -199,6 +199,10 @@ namespace Mfr.App.Ui.Views
                 view.SortDescriptions.Clear();
                 view.SortDescriptions.Add(
                     DataGridSortDescription.FromPath(
+                        nameof(FileListEntry.IsPinnedFirst),
+                        ListSortDirection.Descending));
+                view.SortDescriptions.Add(
+                    DataGridSortDescription.FromPath(
                         nameof(FileListEntry.IsDirectory),
                         ListSortDirection.Descending));
                 view.SortDescriptions.Add(_CreateColumnSort(viewModel.SortMemberPath, direction));

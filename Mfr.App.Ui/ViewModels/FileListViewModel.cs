@@ -557,6 +557,7 @@ namespace Mfr.App.Ui.ViewModels
                 Name = item.Name,
                 FullPath = item.Path,
                 IsDirectory = item.IsDirectory,
+                IsPinnedFirst = ExplorerPath.IsNetworkPath(item.Path),
                 Icon = _ResolveIcon(item),
                 Details = ViewMode == FileListViewMode.Tiles ? _FormatDetails(item) : string.Empty,
                 Type = _TypeLabel(item),

@@ -23,6 +23,11 @@ namespace Mfr.App.Ui.ViewModels
         public required bool IsDirectory { get; init; }
 
         /// <summary>
+        /// Gets whether this row stays above other items when sorting, such as Network on This PC.
+        /// </summary>
+        public bool IsPinnedFirst { get; init; }
+
+        /// <summary>
         /// Gets the icon or thumbnail for the current view mode, or <see langword="null"/> when none is available.
         /// </summary>
         public IImage? Icon { get; init; }

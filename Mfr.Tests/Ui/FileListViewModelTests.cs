@@ -245,9 +245,12 @@ namespace Mfr.Tests.Ui
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            Assert.True(viewModel.Entries[0].IsPinnedFirst);
+
             viewModel.SortByColumn(nameof(FileListEntry.Name));
 
             Assert.Equal(FileListViewModel.NetworkDisplayName, viewModel.Entries[0].Name);
+            Assert.True(viewModel.Entries[0].IsPinnedFirst);
         }
 
         /// <summary>
