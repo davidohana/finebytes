@@ -120,7 +120,8 @@
             </Grid>
         </Border>
 
-        <Grid x:Name="MainPanesGrid">
+        <Grid x:Name="MainPanesGrid"
+              Background="{DynamicResource SystemRegionBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*" MinHeight="140" />
                 <RowDefinition Height="6" />

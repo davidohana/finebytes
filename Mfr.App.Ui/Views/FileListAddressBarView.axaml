@@ -26,9 +26,31 @@
             </ResourceDictionary.ThemeDictionaries>
             <FontFamily x:Key="FileListFont">Segoe UI, SegoeUI</FontFamily>
             <x:Double x:Key="FileListFontSize">12</x:Double>
-            <SolidColorBrush x:Key="GoUpFolderBrush" Color="#F5C542" />
-            <SolidColorBrush x:Key="GoUpFolderBorderBrush" Color="#C4A02A" />
-            <SolidColorBrush x:Key="GoUpArrowBrush" Color="#1A1A1A" />
+            <LinearGradientBrush x:Key="GoUpFolderFillBrush" StartPoint="0.2,0" EndPoint="0.8,1">
+                <GradientStop Color="#FFF6C4" Offset="0" />
+                <GradientStop Color="#F7D15A" Offset="0.38" />
+                <GradientStop Color="#E8B020" Offset="0.78" />
+                <GradientStop Color="#D4920C" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GoUpFolderTabBrush" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#F3C94A" Offset="0" />
+                <GradientStop Color="#D4A018" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GoUpFolderGlossBrush" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#66FFFFFF" Offset="0" />
+                <GradientStop Color="#00FFFFFF" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GoUpArrowLeftBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#4A4A4A" Offset="0" />
+                <GradientStop Color="#2C2C2C" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GoUpArrowRightBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#1C1C1C" Offset="0" />
+                <GradientStop Color="#0A0A0A" Offset="1" />
+            </LinearGradientBrush>
+            <SolidColorBrush x:Key="GoUpFolderBorderBrush" Color="#A67C12" />
+            <SolidColorBrush x:Key="GoUpFolderShadowBrush" Color="#55000000" />
+            <SolidColorBrush x:Key="GoUpFolderHighlightBrush" Color="#B3FFFFFF" />
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.Styles>
@@ -260,13 +282,27 @@
                 ToolTip.Tip="Up">
             <Viewbox Width="16" Height="16">
                 <Canvas Width="16" Height="16">
-                    <Path Fill="{StaticResource GoUpFolderBrush}"
+                    <Path Canvas.Left="0.45"
+                          Canvas.Top="0.5"
+                          Fill="{StaticResource GoUpFolderShadowBrush}"
+                          Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
+                    <Path Fill="{StaticResource GoUpFolderFillBrush}"
                           Stroke="{StaticResource GoUpFolderBorderBrush}"
-                          StrokeThickness="0.7"
+                          StrokeThickness="0.65"
                           StrokeJoin="Round"
                           Data="M1,13 V5 H5 L6.5,3 H12.5 L14,5 H15 V13 Z" />
-                    <Path Fill="{StaticResource GoUpArrowBrush}"
-                          Data="M8,6 L12.2,11.4 L3.8,11.4 Z" />
+                    <Path Fill="{StaticResource GoUpFolderTabBrush}"
+                          Data="M5.15,5 L6.5,3.2 H12.5 L13.85,5 Z" />
+                    <Path Fill="{StaticResource GoUpFolderGlossBrush}"
+                          Data="M1.45,5.25 H14.55 V8.15 H1.45 Z" />
+                    <Path Stroke="{StaticResource GoUpFolderHighlightBrush}"
+                          StrokeThickness="0.55"
+                          StrokeLineCap="Round"
+                          Data="M1.85,5.45 H14.15" />
+                    <Path Fill="{StaticResource GoUpArrowLeftBrush}"
+                          Data="M8,6.15 L8,11.35 L3.95,11.35 Z" />
+                    <Path Fill="{StaticResource GoUpArrowRightBrush}"
+                          Data="M8,6.15 L12.05,11.35 L8,11.35 Z" />
                 </Canvas>
             </Viewbox>
         </Button>
