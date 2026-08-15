@@ -229,31 +229,23 @@ namespace Mfr.App.Ui.ViewModels
 
         private static List<PathBreadcrumbSegment> _BuildWindowsBreadcrumbSegments(string path)
         {
-            if (IsComputerPath(path))
+            var segments = new List<PathBreadcrumbSegment>
             {
-                return
-                [
-                    _CreateSegment(ComputerDisplayName, ComputerDisplayName, showLeadingChevron: false),
-                ];
-            }
+                _CreateSegment(ComputerDisplayName, ComputerDisplayName, showLeadingChevron: false),
+            };
+
+            if (IsComputerPath(path))
+                return segments;
 
             if (IsNetworkPath(path))
             {
-                return
-                [
-                    _CreateSegment(NetworkDisplayName, NetworkDisplayName, showLeadingChevron: false),
-                ];
+                segments.Add(_CreateSegment(NetworkDisplayName, NetworkDisplayName, showLeadingChevron: true));
+                return segments;
             }
 
-            var segments = new List<PathBreadcrumbSegment>();
-            var isUnc = IsUncPath(path);
-            if (isUnc)
-                segments.Add(_CreateSegment(NetworkDisplayName, NetworkDisplayName, showLeadingChevron: false));
-            else
-                segments.Add(_CreateSegment(ComputerDisplayName, ComputerDisplayName, showLeadingChevron: false));
-
-            if (isUnc)
+            if (IsUncPath(path))
             {
+                segments.Add(_CreateSegment(NetworkDisplayName, NetworkDisplayName, showLeadingChevron: true));
                 _AddUncBreadcrumbSegments(segments, path);
                 return segments;
             }

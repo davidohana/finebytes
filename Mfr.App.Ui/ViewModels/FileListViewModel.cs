@@ -69,8 +69,6 @@ namespace Mfr.App.Ui.ViewModels
         private static readonly TimeSpan _UncServerProbeTimeout = TimeSpan.FromSeconds(8);
 
         private readonly ISystemIconProvider _iconProvider;
-        private readonly List<string> _backPaths = [];
-        private readonly List<string> _forwardPaths = [];
         private readonly List<ListedItem> _listedItems = [];
         private readonly Dictionary<string, IImage?> _pathToThumbnail = new(PathComparers.Os);
 
@@ -94,7 +92,7 @@ namespace Mfr.App.Ui.ViewModels
             MaskSuggestions = [.. _DefaultMasks];
             PathHistory = [];
             BreadcrumbSegments = [];
-            _Navigate(_ResolveStartPath(initialPath), NavigationKind.Replace);
+            _Navigate(_ResolveStartPath(initialPath));
         }
 
         /// <summary>
@@ -126,7 +124,7 @@ namespace Mfr.App.Ui.ViewModels
         /// Filesystem path of the current folder, <see cref="ComputerPath"/>, or <see cref="NetworkPath"/>.
         /// </summary>
         [ObservableProperty]
-        private string _currentPath = ComputerPath;
+        private string _currentPath = string.Empty;
 
         /// <summary>
         /// Editable address-bar text (display name for the drive list).
@@ -182,20 +180,6 @@ namespace Mfr.App.Ui.ViewModels
         private FileListEntry? _selectedEntry;
 
         /// <summary>
-        /// Whether <see cref="GoBack"/> has a previous folder.
-        /// </summary>
-        [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(GoBackCommand))]
-        private bool _canGoBack;
-
-        /// <summary>
-        /// Whether <see cref="GoForward"/> has a next folder.
-        /// </summary>
-        [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(GoForwardCommand))]
-        private bool _canGoForward;
-
-        /// <summary>
         /// Whether <see cref="GoUp"/> can move to a parent folder, Network, or This PC.
         /// </summary>
         [ObservableProperty]
@@ -238,7 +222,7 @@ namespace Mfr.App.Ui.ViewModels
         [RelayCommand]
         public void CommitPath()
         {
-            _Navigate(PathText, NavigationKind.Direct);
+            _Navigate(PathText);
             _EndPathEdit();
         }
 
@@ -274,31 +258,7 @@ namespace Mfr.App.Ui.ViewModels
             if (parent is null)
                 return;
 
-            _Navigate(parent, NavigationKind.Direct);
-        }
-
-        /// <summary>
-        /// Goes back in the explorer history.
-        /// </summary>
-        [RelayCommand(CanExecute = nameof(CanGoBack))]
-        public void GoBack()
-        {
-            if (!_TryPop(_backPaths, out var path))
-                return;
-
-            _Navigate(path, NavigationKind.Back);
-        }
-
-        /// <summary>
-        /// Goes forward in the explorer history.
-        /// </summary>
-        [RelayCommand(CanExecute = nameof(CanGoForward))]
-        public void GoForward()
-        {
-            if (!_TryPop(_forwardPaths, out var path))
-                return;
-
-            _Navigate(path, NavigationKind.Forward);
+            _Navigate(parent);
         }
 
         /// <summary>
@@ -319,7 +279,7 @@ namespace Mfr.App.Ui.ViewModels
             if (SelectedEntry is not { IsDirectory: true, FullPath: var path })
                 return;
 
-            _Navigate(path, NavigationKind.Direct);
+            _Navigate(path);
         }
 
         /// <summary>
@@ -367,7 +327,7 @@ namespace Mfr.App.Ui.ViewModels
         [RelayCommand]
         public void NavigateTo(string? path)
         {
-            _Navigate(path, NavigationKind.Direct);
+            _Navigate(path);
         }
 
         partial void OnMaskChanged(string value)
@@ -391,23 +351,13 @@ namespace Mfr.App.Ui.ViewModels
             return SelectedEntry is { IsDirectory: true };
         }
 
-        private void _Navigate(string? path, NavigationKind kind)
+        private void _Navigate(string? path)
         {
             if (!_TryResolvePath(path, out var resolved))
                 return;
 
-            if (kind == NavigationKind.Direct && PathComparers.Os.Equals(resolved, CurrentPath))
+            if (PathComparers.Os.Equals(resolved, CurrentPath))
                 return;
-
-            if (kind == NavigationKind.Direct)
-            {
-                _Push(_backPaths, CurrentPath);
-                _forwardPaths.Clear();
-            }
-            else if (kind == NavigationKind.Back)
-                _Push(_forwardPaths, CurrentPath);
-            else if (kind == NavigationKind.Forward)
-                _Push(_backPaths, CurrentPath);
 
             CurrentPath = resolved;
             PathText = ExplorerPath.ToDisplayPath(resolved);
@@ -882,8 +832,6 @@ namespace Mfr.App.Ui.ViewModels
 
         private void _UpdateNavigationFlags()
         {
-            CanGoBack = _backPaths.Count > 0;
-            CanGoForward = _forwardPaths.Count > 0;
             CanGoUp = ExplorerPath.GetParentPath(CurrentPath) is not null;
         }
 
@@ -1040,35 +988,6 @@ namespace Mfr.App.Ui.ViewModels
         {
             var name = Path.GetFileName(path.TrimTrailingSeparator());
             return string.IsNullOrEmpty(name) ? path : name;
-        }
-
-        private static void _Push(List<string> stack, string path)
-        {
-            if (stack.Count > 0 && PathComparers.Os.Equals(stack[^1], path))
-                return;
-
-            stack.Add(path);
-        }
-
-        private static bool _TryPop(List<string> stack, [NotNullWhen(true)] out string? path)
-        {
-            if (stack.Count == 0)
-            {
-                path = null;
-                return false;
-            }
-
-            path = stack[^1];
-            stack.RemoveAt(stack.Count - 1);
-            return true;
-        }
-
-        private enum NavigationKind
-        {
-            Replace,
-            Direct,
-            Back,
-            Forward,
         }
 
         private sealed record ListedItem(

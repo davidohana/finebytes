@@ -126,28 +126,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies back and forward walk the explorer history.
-        /// </summary>
-        [Fact]
-        public void GoBack_And_GoForward_Restore_History()
-        {
-            var dir = _CreateTree();
-            var viewModel = _CreateViewModel(dir);
-            var child = Path.Combine(dir, "zeta-folder");
-
-            viewModel.NavigateTo(child);
-            Assert.Equal(new DirectoryInfo(child).FullName, viewModel.CurrentPath);
-            Assert.True(viewModel.CanGoBack);
-
-            viewModel.GoBack();
-            Assert.Equal(new DirectoryInfo(dir).FullName, viewModel.CurrentPath);
-            Assert.True(viewModel.CanGoForward);
-
-            viewModel.GoForward();
-            Assert.Equal(new DirectoryInfo(child).FullName, viewModel.CurrentPath);
-        }
-
-        /// <summary>
         /// Verifies hidden and system items are omitted from the listing.
         /// </summary>
         [Fact]
@@ -227,8 +205,9 @@ namespace Mfr.Tests.Ui
             Assert.Equal(FileListViewModel.NetworkPath, viewModel.CurrentPath);
             Assert.Equal(FileListViewModel.NetworkDisplayName, viewModel.PathText);
             Assert.True(viewModel.CanGoUp);
-            var root = Assert.Single(viewModel.BreadcrumbSegments);
-            Assert.Equal(FileListViewModel.NetworkDisplayName, root.Label);
+            Assert.Equal(
+                [FileListViewModel.ComputerDisplayName, FileListViewModel.NetworkDisplayName],
+                viewModel.BreadcrumbSegments.Select(segment => segment.Label));
 
             viewModel.GoUp();
             Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);

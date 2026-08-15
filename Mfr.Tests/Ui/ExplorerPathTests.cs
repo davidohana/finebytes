@@ -79,10 +79,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies UNC breadcrumbs start at Network and include the share root.
+        /// Verifies UNC breadcrumbs start at This PC, then Network, then the share.
         /// </summary>
         [Fact]
-        public void Breadcrumb_Unc_Starts_At_Network()
+        public void Breadcrumb_Unc_Starts_At_ThisPc_Then_Network()
         {
             if (!OperatingSystem.IsWindows())
                 return;
@@ -90,37 +90,43 @@ namespace Mfr.Tests.Ui
             var segments = ExplorerPath.BuildBreadcrumbSegments(@"\\nas\music\albums");
             Assert.Equal(
                 [
+                    ExplorerPath.ComputerDisplayName,
                     ExplorerPath.NetworkDisplayName,
                     "nas",
                     "music",
                     "albums",
                 ],
                 segments.Select(segment => segment.Label));
-            Assert.Equal(ExplorerPath.NetworkDisplayName, segments[0].TargetPath);
-            Assert.Equal(@"\\nas", segments[1].TargetPath);
-            Assert.Equal(@"\\nas\music", segments[2].TargetPath);
+            Assert.Equal(ExplorerPath.ComputerDisplayName, segments[0].TargetPath);
+            Assert.Equal(ExplorerPath.NetworkDisplayName, segments[1].TargetPath);
+            Assert.Equal(@"\\nas", segments[2].TargetPath);
+            Assert.Equal(@"\\nas\music", segments[3].TargetPath);
             Assert.False(segments[0].ShowLeadingChevron);
             Assert.True(segments[1].ShowLeadingChevron);
             Assert.True(segments[^1].ShowLeadingChevron);
         }
 
         /// <summary>
-        /// Verifies the Network sentinel is a single breadcrumb.
+        /// Verifies the Network sentinel sits under This PC.
         /// </summary>
         [Fact]
-        public void Breadcrumb_Network_Is_Single_Segment()
+        public void Breadcrumb_Network_Follows_ThisPc()
         {
             if (!OperatingSystem.IsWindows())
                 return;
 
-            var root = Assert.Single(ExplorerPath.BuildBreadcrumbSegments(ExplorerPath.NetworkPath));
-            Assert.Equal(ExplorerPath.NetworkDisplayName, root.Label);
-            Assert.Equal(ExplorerPath.NetworkDisplayName, root.TargetPath);
-            Assert.False(root.ShowLeadingChevron);
+            var segments = ExplorerPath.BuildBreadcrumbSegments(ExplorerPath.NetworkPath);
+            Assert.Equal(
+                [ExplorerPath.ComputerDisplayName, ExplorerPath.NetworkDisplayName],
+                segments.Select(segment => segment.Label));
+            Assert.Equal(ExplorerPath.ComputerDisplayName, segments[0].TargetPath);
+            Assert.Equal(ExplorerPath.NetworkDisplayName, segments[1].TargetPath);
+            Assert.False(segments[0].ShowLeadingChevron);
+            Assert.True(segments[1].ShowLeadingChevron);
         }
 
         /// <summary>
-        /// Verifies a UNC server root is Network plus the computer name.
+        /// Verifies a UNC server root is This PC, Network, then the computer name.
         /// </summary>
         [Fact]
         public void Breadcrumb_Unc_Server_Shows_Host_Name()
@@ -130,9 +136,9 @@ namespace Mfr.Tests.Ui
 
             var segments = ExplorerPath.BuildBreadcrumbSegments(@"\\ohanas");
             Assert.Equal(
-                [ExplorerPath.NetworkDisplayName, "ohanas"],
+                [ExplorerPath.ComputerDisplayName, ExplorerPath.NetworkDisplayName, "ohanas"],
                 segments.Select(segment => segment.Label));
-            Assert.Equal(@"\\ohanas", segments[1].TargetPath);
+            Assert.Equal(@"\\ohanas", segments[2].TargetPath);
         }
     }
 }

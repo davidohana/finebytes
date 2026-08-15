@@ -237,7 +237,7 @@
     <Border Classes="pane">
         <DockPanel>
             <Grid DockPanel.Dock="Top"
-                  ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                  ColumnDefinitions="*,Auto,Auto"
                   Margin="4">
                 <Border x:Name="AddressBar"
                         Classes="address-bar"
@@ -339,25 +339,13 @@
                     </Grid>
                 </Border>
                 <Button Grid.Column="1"
-                        Content="◀"
-                        MinWidth="32"
-                        Padding="6,2"
-                        Margin="4,0,0,0"
-                        Command="{Binding GoBackCommand}"
-                        ToolTip.Tip="Back" />
-                <Button Grid.Column="2"
-                        Content="▶"
-                        MinWidth="32"
-                        Padding="6,2"
-                        Command="{Binding GoForwardCommand}"
-                        ToolTip.Tip="Forward" />
-                <Button Grid.Column="3"
                         Content="▲"
                         MinWidth="32"
                         Padding="6,2"
+                        Margin="4,0,0,0"
                         Command="{Binding GoUpCommand}"
                         ToolTip.Tip="Up" />
-                <Button Grid.Column="4"
+                <Button Grid.Column="2"
                         Content="↻"
                         MinWidth="32"
                         Padding="6,2"
