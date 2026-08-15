@@ -11,7 +11,7 @@ namespace Mfr.App.Ui.ViewModels
         public required string Label { get; init; }
 
         /// <summary>
-        /// Gets the filesystem path to open, or <see cref="FileListViewModel.ComputerDisplayName"/> for This PC.
+        /// Gets the filesystem path to open, or This PC / Network display names for those roots.
         /// </summary>
         public required string TargetPath { get; init; }
 

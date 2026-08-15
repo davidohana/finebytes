@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.Versioning;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -17,17 +18,27 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Sentinel path for the Windows drive list ("This PC").
         /// </summary>
-        public const string ComputerPath = "";
+        public const string ComputerPath = ExplorerPath.ComputerPath;
 
         /// <summary>
         /// Address-bar label shown when listing drives on Windows.
         /// </summary>
-        public const string ComputerDisplayName = "This PC";
+        public const string ComputerDisplayName = ExplorerPath.ComputerDisplayName;
+
+        /// <summary>
+        /// Sentinel path for mapped drives and recent UNC locations.
+        /// </summary>
+        public const string NetworkPath = ExplorerPath.NetworkPath;
+
+        /// <summary>
+        /// Address-bar label shown for <see cref="NetworkPath"/>.
+        /// </summary>
+        public const string NetworkDisplayName = ExplorerPath.NetworkDisplayName;
 
         /// <summary>
         /// Address-bar label and path for the filesystem root on Unix.
         /// </summary>
-        public const string UnixRootPath = "/";
+        public const string UnixRootPath = ExplorerPath.UnixRootPath;
 
         private static readonly string[] _DefaultMasks =
         [
@@ -49,6 +60,13 @@ namespace Mfr.App.Ui.ViewModels
             ReturnSpecialDirectories = false,
             AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
         };
+
+        // Caps how long a disconnected UNC or mapped drive may block Exists/enumerate.
+        // The OS SMB timeout cannot be cancelled; this bound keeps the explorer responsive.
+        private static readonly TimeSpan _NetworkProbeTimeout = TimeSpan.FromSeconds(3);
+
+        // First contact with a UNC server (\\ohanas) is often slower than a share Exists check.
+        private static readonly TimeSpan _UncServerProbeTimeout = TimeSpan.FromSeconds(8);
 
         private readonly ISystemIconProvider _iconProvider;
         private readonly List<string> _backPaths = [];
@@ -105,7 +123,7 @@ namespace Mfr.App.Ui.ViewModels
         public ObservableCollection<string> MaskSuggestions { get; }
 
         /// <summary>
-        /// Filesystem path of the current folder, or <see cref="ComputerPath"/> for the drive list.
+        /// Filesystem path of the current folder, <see cref="ComputerPath"/>, or <see cref="NetworkPath"/>.
         /// </summary>
         [ObservableProperty]
         private string _currentPath = ComputerPath;
@@ -178,7 +196,7 @@ namespace Mfr.App.Ui.ViewModels
         private bool _canGoForward;
 
         /// <summary>
-        /// Whether <see cref="GoUp"/> can move to a parent folder or the drive list.
+        /// Whether <see cref="GoUp"/> can move to a parent folder, Network, or This PC.
         /// </summary>
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(GoUpCommand))]
@@ -233,7 +251,7 @@ namespace Mfr.App.Ui.ViewModels
             if (IsPathEditing)
                 return;
 
-            PathText = _ToDisplayPath(CurrentPath);
+            PathText = ExplorerPath.ToDisplayPath(CurrentPath);
             IsPathEditing = true;
         }
 
@@ -247,12 +265,12 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
-        /// Opens the current folder's parent, or the drive list at a volume root on Windows.
+        /// Opens the current folder's parent, Network at a UNC share root, or This PC at a volume root.
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanGoUp))]
         public void GoUp()
         {
-            var parent = _GetParentPath(CurrentPath);
+            var parent = ExplorerPath.GetParentPath(CurrentPath);
             if (parent is null)
                 return;
 
@@ -340,9 +358,12 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
-        /// Navigates to a filesystem path or the drive list.
+        /// Navigates to a filesystem path, This PC, or Network.
         /// </summary>
-        /// <param name="path">Directory path, or empty / <see cref="ComputerDisplayName"/> for drives.</param>
+        /// <param name="path">
+        /// Directory path, empty / <see cref="ComputerDisplayName"/> for drives, or
+        /// <see cref="NetworkDisplayName"/> / <c>\\</c> for Network.
+        /// </param>
         [RelayCommand]
         public void NavigateTo(string? path)
         {
@@ -389,7 +410,7 @@ namespace Mfr.App.Ui.ViewModels
                 _Push(_backPaths, CurrentPath);
 
             CurrentPath = resolved;
-            PathText = _ToDisplayPath(resolved);
+            PathText = ExplorerPath.ToDisplayPath(resolved);
             IsPathEditing = false;
             _RememberPath(PathText);
             _RebuildBreadcrumbs();
@@ -399,14 +420,14 @@ namespace Mfr.App.Ui.ViewModels
 
         private void _EndPathEdit()
         {
-            PathText = _ToDisplayPath(CurrentPath);
+            PathText = ExplorerPath.ToDisplayPath(CurrentPath);
             IsPathEditing = false;
         }
 
         private void _RebuildBreadcrumbs()
         {
             BreadcrumbSegments.Clear();
-            foreach (var segment in _BuildBreadcrumbSegments(CurrentPath))
+            foreach (var segment in ExplorerPath.BuildBreadcrumbSegments(CurrentPath))
                 BreadcrumbSegments.Add(segment);
         }
 
@@ -416,32 +437,43 @@ namespace Mfr.App.Ui.ViewModels
             _listedItems.Clear();
             _pathToThumbnail.Clear();
 
-            if (_IsComputerPath(CurrentPath))
+            if (ExplorerPath.IsComputerPath(CurrentPath))
             {
                 _listedItems.AddRange(_ListDrives());
+                _ApplyListingSort();
+                if (OperatingSystem.IsWindows())
+                    _listedItems.Insert(0, _CreateNetworkRootItem());
+
+                _RebuildVisibleEntries(preserveSelection: false);
+                return;
+            }
+
+            if (ExplorerPath.IsNetworkPath(CurrentPath))
+            {
+                _listedItems.AddRange(_ListNetworkLocations());
                 _ApplyListingSort();
                 _RebuildVisibleEntries(preserveSelection: false);
                 return;
             }
 
-            try
+            if (ExplorerPath.IsUncServerRoot(CurrentPath))
             {
-                var folders = Directory.EnumerateDirectories(CurrentPath, "*", _ListingOptions)
-                    .Select(path => _CreateListedItem(path, isDirectory: true));
+                if (OperatingSystem.IsWindows())
+                    _listedItems.AddRange(_ListUncShares(CurrentPath));
 
-                var files = Directory.EnumerateFiles(CurrentPath, "*", _ListingOptions)
-                    .Where(_PassesFileMasks)
-                    .Select(path => _CreateListedItem(path, isDirectory: false));
-
-                _listedItems.AddRange(folders);
-                _listedItems.AddRange(files);
+                _ApplyListingSort();
+                _RebuildVisibleEntries(preserveSelection: false);
+                return;
             }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+
+            if (!_TryListFolder(CurrentPath, out var folders, out var files))
             {
                 _RebuildVisibleEntries(preserveSelection: false);
                 return;
             }
 
+            _listedItems.AddRange(folders);
+            _listedItems.AddRange(files);
             _ApplyListingSort();
             _RebuildVisibleEntries(preserveSelection: false);
         }
@@ -453,6 +485,10 @@ namespace Mfr.App.Ui.ViewModels
 
         private int _CompareListedItems(ListedItem left, ListedItem right)
         {
+            var networkCmp = _NetworkSortRank(left).CompareTo(_NetworkSortRank(right));
+            if (networkCmp != 0)
+                return networkCmp;
+
             var folderCmp = right.IsDirectory.CompareTo(left.IsDirectory);
             if (folderCmp != 0)
                 return folderCmp;
@@ -462,6 +498,11 @@ namespace Mfr.App.Ui.ViewModels
                 fieldCmp = PathComparers.Os.Compare(left.Name, right.Name);
 
             return IsSortAscending ? fieldCmp : -fieldCmp;
+        }
+
+        private static int _NetworkSortRank(ListedItem item)
+        {
+            return ExplorerPath.IsNetworkPath(item.Path) ? 0 : 1;
         }
 
         private int _CompareSortField(ListedItem left, ListedItem right)
@@ -617,11 +658,232 @@ namespace Mfr.App.Ui.ViewModels
             return items;
         }
 
+        private List<ListedItem> _ListNetworkLocations()
+        {
+            var items = new List<ListedItem>();
+            var pathToIsAdded = new HashSet<string>(PathComparers.Os);
+
+            foreach (var drive in _ListNetworkDrives())
+            {
+                if (!pathToIsAdded.Add(drive.Path))
+                    continue;
+
+                items.Add(drive);
+            }
+
+            foreach (var historyPath in PathHistory)
+            {
+                if (!ExplorerPath.IsUncPath(historyPath))
+                    continue;
+
+                var location = historyPath.TrimTrailingSeparator();
+                if (!pathToIsAdded.Add(location))
+                    continue;
+
+                items.Add(new ListedItem(
+                    location,
+                    location,
+                    IsDirectory: true,
+                    Length: null,
+                    LastWriteTime: null));
+            }
+
+            return items;
+        }
+
+        [SupportedOSPlatform("windows")]
+        private List<ListedItem> _ListUncShares(string serverRoot)
+        {
+            if (!_TryRunWithTimeout(
+                    () => _TryReadUncShares(serverRoot),
+                    _UncServerProbeTimeout,
+                    out var sharePaths)
+                || sharePaths is null)
+                return [];
+
+            var items = new List<ListedItem>();
+            foreach (var sharePath in sharePaths)
+            {
+                var name = Path.GetFileName(sharePath.TrimTrailingSeparator());
+                items.Add(new ListedItem(
+                    sharePath,
+                    string.IsNullOrEmpty(name) ? sharePath : name,
+                    IsDirectory: true,
+                    Length: null,
+                    LastWriteTime: null));
+            }
+
+            return items;
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static List<string>? _TryReadUncShares(string serverRoot)
+        {
+            if (!WindowsUncShareLister.TryListDiskShares(serverRoot, out var sharePaths))
+                return null;
+
+            return sharePaths;
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static bool _UncServerIsReachable(string serverRoot)
+        {
+            return _TryRunWithTimeout(
+                    () => _TryReadUncShares(serverRoot) is not null,
+                    _UncServerProbeTimeout,
+                    out var reachable)
+                && reachable;
+        }
+
+        private static List<ListedItem> _ListNetworkDrives()
+        {
+            DriveInfo[] drives;
+            try
+            {
+                drives = DriveInfo.GetDrives();
+            }
+            catch (IOException)
+            {
+                return [];
+            }
+
+            var items = new List<ListedItem>();
+            foreach (var drive in drives)
+            {
+                DriveType driveType;
+                string name;
+                try
+                {
+                    driveType = drive.DriveType;
+                    name = drive.Name;
+                }
+                catch (IOException)
+                {
+                    continue;
+                }
+
+                if (driveType != DriveType.Network)
+                    continue;
+
+                items.Add(_CreateListedItem(name, isDirectory: true));
+            }
+
+            return items;
+        }
+
+        private static ListedItem _CreateNetworkRootItem()
+        {
+            return new ListedItem(
+                NetworkPath,
+                NetworkDisplayName,
+                IsDirectory: true,
+                Length: null,
+                LastWriteTime: null);
+        }
+
+        private bool _TryListFolder(
+            string path,
+            out List<ListedItem> folders,
+            out List<ListedItem> files)
+        {
+            folders = [];
+            files = [];
+            try
+            {
+                if (!_NeedsNetworkTimeout(path))
+                {
+                    (folders, files) = _ReadFolderListing(path);
+                    return true;
+                }
+
+                if (!_TryRunWithTimeout(() => _ReadFolderListing(path), _NetworkProbeTimeout, out var listing))
+                    return false;
+
+                folders = listing.Folders;
+                files = listing.Files;
+                return true;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+            {
+                return false;
+            }
+        }
+
+        private (List<ListedItem> Folders, List<ListedItem> Files) _ReadFolderListing(string path)
+        {
+            var folders = Directory.EnumerateDirectories(path, "*", _ListingOptions)
+                .Select(folderPath => _CreateListedItem(folderPath, isDirectory: true))
+                .ToList();
+
+            var files = Directory.EnumerateFiles(path, "*", _ListingOptions)
+                .Where(_PassesFileMasks)
+                .Select(filePath => _CreateListedItem(filePath, isDirectory: false))
+                .ToList();
+
+            return (folders, files);
+        }
+
+        private static bool _DirectoryExists(string path)
+        {
+            if (!_NeedsNetworkTimeout(path))
+                return Directory.Exists(path);
+
+            return _TryRunWithTimeout(() => Directory.Exists(path), _NetworkProbeTimeout, out var exists)
+                && exists;
+        }
+
+        private static bool _NeedsNetworkTimeout(string path)
+        {
+            if (ExplorerPath.IsUncPath(path))
+                return true;
+
+            try
+            {
+                var root = Path.GetPathRoot(path);
+                if (string.IsNullOrEmpty(root))
+                    return false;
+
+                return new DriveInfo(root).DriveType == DriveType.Network;
+            }
+            catch (Exception ex) when (
+                ex is ArgumentException or IOException or UnauthorizedAccessException)
+            {
+                return false;
+            }
+        }
+
+        private static bool _TryRunWithTimeout<T>(Func<T> action, TimeSpan timeout, out T result)
+        {
+            var task = Task.Run(action);
+            try
+            {
+                if (task.Wait(timeout))
+                {
+                    result = task.Result;
+                    return true;
+                }
+            }
+            catch (AggregateException)
+            {
+                result = default!;
+                return false;
+            }
+
+            // Exists/enumerate cannot be cancelled; observe later faults so they are not unhandled.
+            _ = task.ContinueWith(
+                static completed => completed.Exception,
+                CancellationToken.None,
+                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+                TaskScheduler.Default);
+            result = default!;
+            return false;
+        }
+
         private void _UpdateNavigationFlags()
         {
             CanGoBack = _backPaths.Count > 0;
             CanGoForward = _forwardPaths.Count > 0;
-            CanGoUp = _GetParentPath(CurrentPath) is not null;
+            CanGoUp = ExplorerPath.GetParentPath(CurrentPath) is not null;
         }
 
         private void _RememberPath(string displayPath)
@@ -657,6 +919,9 @@ namespace Mfr.App.Ui.ViewModels
 
         private static string _TypeLabel(ListedItem item)
         {
+            if (ExplorerPath.IsNetworkPath(item.Path))
+                return "Network location";
+
             if (item.IsDirectory)
                 return "File folder";
 
@@ -718,11 +983,11 @@ namespace Mfr.App.Ui.ViewModels
 
         private static string _ResolveStartPath(string? initialPath)
         {
-            if (_TryResolvePath(initialPath, out var resolved) && !_IsComputerPath(resolved))
+            if (_TryResolvePath(initialPath, out var resolved) && !ExplorerPath.IsComputerPath(resolved))
                 return resolved;
 
             var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if (_TryResolvePath(profile, out resolved) && !_IsComputerPath(resolved))
+            if (_TryResolvePath(profile, out resolved) && !ExplorerPath.IsComputerPath(resolved))
                 return resolved;
 
             return Directory.GetCurrentDirectory();
@@ -730,7 +995,7 @@ namespace Mfr.App.Ui.ViewModels
 
         private static bool _TryResolvePath(string? path, [NotNullWhen(true)] out string resolved)
         {
-            if (_IsComputerPath(path))
+            if (ExplorerPath.IsComputerPath(path))
             {
                 if (!OperatingSystem.IsWindows())
                 {
@@ -742,169 +1007,32 @@ namespace Mfr.App.Ui.ViewModels
                 return true;
             }
 
+            if (ExplorerPath.IsNetworkPath(path))
+            {
+                resolved = NetworkPath;
+                return true;
+            }
+
+            if (OperatingSystem.IsWindows())
+            {
+                var isUncServer = path is not null && ExplorerPath.IsUncServerRoot(path);
+                if (isUncServer && ExplorerPath.TryGetUncServerRoot(path!, out var serverRoot))
+                {
+                    resolved = serverRoot;
+                    return _UncServerIsReachable(serverRoot);
+                }
+            }
+
             try
             {
                 resolved = new DirectoryInfo(path!).FullName;
-                return Directory.Exists(resolved);
+                return _DirectoryExists(resolved);
             }
             catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException or UnauthorizedAccessException)
             {
                 resolved = ComputerPath;
                 return false;
             }
-        }
-
-        private static string? _GetParentPath(string path)
-        {
-            if (_IsComputerPath(path))
-                return null;
-
-            var parent = Path.GetDirectoryName(path);
-            if (!string.IsNullOrEmpty(parent))
-                return parent;
-
-            return OperatingSystem.IsWindows() ? ComputerPath : null;
-        }
-
-        private static string _ToDisplayPath(string path)
-        {
-            return _IsComputerPath(path) ? ComputerDisplayName : path;
-        }
-
-        private static List<PathBreadcrumbSegment> _BuildBreadcrumbSegments(string path)
-        {
-            if (OperatingSystem.IsWindows())
-                return _BuildWindowsBreadcrumbSegments(path);
-
-            return _BuildUnixBreadcrumbSegments(path);
-        }
-
-        private static List<PathBreadcrumbSegment> _BuildWindowsBreadcrumbSegments(string path)
-        {
-            var segments = new List<PathBreadcrumbSegment>();
-            if (_IsComputerPath(path))
-            {
-                segments.Add(_CreateSegment(
-                    ComputerDisplayName,
-                    ComputerDisplayName,
-                    showLeadingChevron: false));
-                return segments;
-            }
-
-            var isUnc = path.StartsWith(@"\\", StringComparison.Ordinal);
-            if (!isUnc)
-                segments.Add(_CreateSegment(
-                    ComputerDisplayName,
-                    ComputerDisplayName,
-                    showLeadingChevron: false));
-
-            var root = Path.GetPathRoot(path);
-            if (string.IsNullOrEmpty(root))
-                return segments;
-
-            var rootLabel = isUnc ? root.TrimTrailingSeparator() : _FormatDriveLabel(root);
-            segments.Add(_CreateSegment(rootLabel, root, showLeadingChevron: segments.Count > 0));
-            _AddChildBreadcrumbSegments(segments, path, root);
-            return segments;
-        }
-
-        private static List<PathBreadcrumbSegment> _BuildUnixBreadcrumbSegments(string path)
-        {
-            var segments = new List<PathBreadcrumbSegment>
-            {
-                _CreateSegment(UnixRootPath, UnixRootPath, showLeadingChevron: false),
-            };
-
-            if (_IsComputerPath(path) || _IsSamePath(path, UnixRootPath))
-                return segments;
-
-            _AddChildBreadcrumbSegments(segments, path, UnixRootPath);
-            return segments;
-        }
-
-        private static void _AddChildBreadcrumbSegments(
-            List<PathBreadcrumbSegment> segments,
-            string path,
-            string rootPath)
-        {
-            DirectoryInfo? current;
-            string rootFullName;
-            try
-            {
-                current = new DirectoryInfo(path);
-                rootFullName = new DirectoryInfo(rootPath).FullName;
-            }
-            catch (Exception ex) when (
-                ex is ArgumentException or NotSupportedException or IOException)
-            {
-                return;
-            }
-
-            var parts = new List<PathBreadcrumbSegment>();
-            while (current is not null && !_IsSamePath(current.FullName, rootFullName))
-            {
-                var name = current.Name;
-                if (string.IsNullOrEmpty(name))
-                    break;
-
-                parts.Add(_CreateSegment(name, current.FullName, showLeadingChevron: true));
-                current = current.Parent;
-            }
-
-            parts.Reverse();
-            segments.AddRange(parts);
-        }
-
-        private static PathBreadcrumbSegment _CreateSegment(
-            string label,
-            string targetPath,
-            bool showLeadingChevron)
-        {
-            return new PathBreadcrumbSegment
-            {
-                Label = label,
-                TargetPath = targetPath,
-                ShowLeadingChevron = showLeadingChevron,
-            };
-        }
-
-        private static string _FormatDriveLabel(string root)
-        {
-            try
-            {
-                var drive = new DriveInfo(root);
-                var letter = drive.Name.TrimEnd(
-                    Path.DirectorySeparatorChar,
-                    Path.AltDirectorySeparatorChar);
-                if (drive.IsReady)
-                {
-                    var volume = drive.VolumeLabel;
-                    if (!string.IsNullOrWhiteSpace(volume))
-                        return volume + " (" + letter + ")";
-                }
-
-                return letter;
-            }
-            catch (Exception ex) when (
-                ex is ArgumentException or IOException or UnauthorizedAccessException)
-            {
-                return root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            }
-        }
-
-        private static bool _IsSamePath(string first, string second)
-        {
-            var firstPath = first.TrimTrailingSeparator();
-            var secondPath = second.TrimTrailingSeparator();
-            return PathComparers.Os.Equals(firstPath, secondPath);
-        }
-
-        private static bool _IsComputerPath(string? path)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-                return true;
-
-            return path.Equals(ComputerDisplayName, StringComparison.OrdinalIgnoreCase);
         }
 
         private static string _DirectoryDisplayName(string path)

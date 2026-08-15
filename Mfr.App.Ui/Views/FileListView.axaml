@@ -311,7 +311,7 @@
                                  Classes="address-edit"
                                  IsVisible="{Binding IsPathEditing}"
                                  Text="{Binding PathText, Mode=TwoWay}"
-                                 Watermark="Paste or type a folder path"
+                                 Watermark="Folder path or \\server\share"
                                  KeyDown="_OnPathKeyDown"
                                  LostFocus="_OnPathLostFocus" />
                         <Button x:Name="HistoryButton"

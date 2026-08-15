@@ -205,6 +205,87 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies This PC lists Network first and opening it shows the Network location.
+        /// </summary>
+        [Fact]
+        public void ThisPc_Lists_Network_And_OpenSelected_Navigates()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+
+            Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
+            Assert.Equal(FileListViewModel.NetworkDisplayName, viewModel.Entries[0].Name);
+            Assert.Equal("Network location", viewModel.Entries[0].Type);
+            Assert.False(viewModel.CanGoUp);
+
+            viewModel.SelectedEntry = viewModel.Entries[0];
+            viewModel.OpenSelected();
+
+            Assert.Equal(FileListViewModel.NetworkPath, viewModel.CurrentPath);
+            Assert.Equal(FileListViewModel.NetworkDisplayName, viewModel.PathText);
+            Assert.True(viewModel.CanGoUp);
+            var root = Assert.Single(viewModel.BreadcrumbSegments);
+            Assert.Equal(FileListViewModel.NetworkDisplayName, root.Label);
+
+            viewModel.GoUp();
+            Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
+        }
+
+        /// <summary>
+        /// Verifies Network stays first on This PC when the name column is reversed.
+        /// </summary>
+        [Fact]
+        public void ThisPc_Keeps_Network_First_When_Sorted()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            viewModel.SortByColumn(nameof(FileListEntry.Name));
+
+            Assert.Equal(FileListViewModel.NetworkDisplayName, viewModel.Entries[0].Name);
+        }
+
+        /// <summary>
+        /// Verifies typing Network or <c>\\</c> opens the Network location.
+        /// </summary>
+        [Fact]
+        public void CommitPath_Network_Aliases_Open_Network()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.BeginPathEdit();
+            viewModel.PathText = @"\\";
+            viewModel.CommitPath();
+
+            Assert.Equal(FileListViewModel.NetworkPath, viewModel.CurrentPath);
+            Assert.False(viewModel.IsPathEditing);
+        }
+
+        /// <summary>
+        /// Verifies Network lists recent UNC folders from address-bar history.
+        /// </summary>
+        [Fact]
+        public void Network_Lists_Unc_Paths_From_History()
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.NavigateTo(FileListViewModel.NetworkDisplayName);
+            viewModel.PathHistory.Insert(0, @"\\nas\music\albums");
+            viewModel.Refresh();
+
+            Assert.Contains(@"\\nas\music\albums", _Names(viewModel));
+        }
+
+        /// <summary>
         /// Verifies the Windows root breadcrumb opens the drive list.
         /// </summary>
         [Fact]
