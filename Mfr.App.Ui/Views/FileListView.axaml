@@ -23,6 +23,14 @@
             <Setter Property="Margin" Value="0" />
             <Setter Property="HorizontalAlignment" Value="Left" />
         </Style>
+        <Style Selector="DataGrid.file-report DataGridRow">
+            <Setter Property="MinHeight" Value="20" />
+            <Setter Property="Height" Value="20" />
+        </Style>
+        <Style Selector="DataGrid.file-report DataGridCell">
+            <Setter Property="Padding" Value="4,1" />
+            <Setter Property="MinHeight" Value="0" />
+        </Style>
     </UserControl.Styles>
     <Border Classes="pane">
         <DockPanel>
@@ -82,7 +90,8 @@
             </Grid>
 
             <Panel>
-                <DataGrid ItemsSource="{Binding Entries}"
+                <DataGrid Classes="file-report"
+                          ItemsSource="{Binding Entries}"
                           SelectedItem="{Binding SelectedEntry}"
                           IsVisible="{Binding IsReportView}"
                           AutoGenerateColumns="False"
@@ -91,7 +100,8 @@
                           CanUserSortColumns="False"
                           CanUserResizeColumns="True"
                           HeadersVisibility="Column"
-                          GridLinesVisibility="Horizontal"
+                          GridLinesVisibility="None"
+                          RowHeight="20"
                           SelectionMode="Extended"
                           DoubleTapped="_OnEntriesDoubleTapped"
                           KeyDown="_OnEntriesKeyDown">
@@ -99,7 +109,7 @@
                         <DataGridTemplateColumn Header="Name" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate x:DataType="vm:FileListEntry">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
                                         <Image Width="16"
                                                Height="16"
                                                VerticalAlignment="Center"
