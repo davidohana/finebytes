@@ -8,7 +8,7 @@ using Avalonia.Platform;
 namespace Mfr.App.Ui.Services
 {
     /// <summary>
-    /// Windows shell icons via <c>SHGetFileInfo</c>, cached by kind, size, and file extension.
+    /// Windows shell icons via <c>SHGetFileInfo</c> and <c>SHGetImageList</c>, cached by kind, size, and extension.
     /// </summary>
     [SupportedOSPlatform("windows")]
     internal sealed class WindowsSystemIconProvider : ISystemIconProvider
@@ -16,18 +16,35 @@ namespace Mfr.App.Ui.Services
         private const uint _ShgfiIcon = 0x100;
         private const uint _ShgfiSmallIcon = 0x1;
         private const uint _ShgfiLargeIcon = 0x0;
+        private const uint _ShgfiSysIconIndex = 0x4000;
         private const uint _ShgfiUseFileAttributes = 0x10;
         private const uint _FileAttributeNormal = 0x80;
         private const uint _FileAttributeDirectory = 0x10;
         private const uint _DibRgbColors = 0;
         private const uint _BiRgb = 0;
+        private const int _ShilExtraLarge = 2;
+        private const int _ShilJumbo = 4;
+        private const int _IldTransparent = 1;
+        private const int _JumboPixels = 256;
+        private const int _ExtraLargePixels = 48;
+        private const int _SOk = 0;
+
+        private static readonly Guid _IidIImageList = new("46EB5926-582E-4017-9FDF-E8998DAA0950");
+        private static readonly Dictionary<int, IImageList?> _shilToImageList = [];
+        private static readonly Lock _imageListGate = new();
 
         private readonly Dictionary<string, IImage?> _keyToIcon = new(StringComparer.OrdinalIgnoreCase);
 
         /// <inheritdoc />
         public IImage? GetIcon(string path, bool isDirectory, ShellIconSize size)
         {
-            var sizeKey = size == ShellIconSize.Large ? "large" : "small";
+            var sizeKey = size switch
+            {
+                ShellIconSize.Small => "small",
+                ShellIconSize.Jumbo => "jumbo",
+                ShellIconSize.Large => throw new NotImplementedException(),
+                _ => "large",
+            };
             try
             {
                 if (isDirectory)
@@ -72,6 +89,27 @@ namespace Mfr.App.Ui.Services
             bool useFileAttributes,
             ShellIconSize size)
         {
+            if (size == ShellIconSize.Jumbo)
+            {
+                var jumbo = _ExtractFromImageList(
+                    path,
+                    fileAttributes,
+                    useFileAttributes,
+                    _ShilJumbo);
+                // Jumbo is 256px; missing glyphs are a small icon on an empty canvas.
+                if (jumbo is not null && _HasJumboContent(jumbo))
+                    return jumbo;
+
+                jumbo?.Dispose();
+                var extraLarge = _ExtractFromImageList(
+                    path,
+                    fileAttributes,
+                    useFileAttributes,
+                    _ShilExtraLarge);
+                if (extraLarge is not null)
+                    return extraLarge;
+            }
+
             var flags = _ShgfiIcon | (size == ShellIconSize.Small ? _ShgfiSmallIcon : _ShgfiLargeIcon);
             if (useFileAttributes)
                 flags |= _ShgfiUseFileAttributes;
@@ -89,6 +127,104 @@ namespace Mfr.App.Ui.Services
             {
                 _ = NativeMethods.DestroyIcon(info.hIcon);
             }
+        }
+
+        private static WriteableBitmap? _ExtractFromImageList(
+            string path,
+            uint fileAttributes,
+            bool useFileAttributes,
+            int shil)
+        {
+            var iconIndex = _GetSysIconIndex(path, fileAttributes, useFileAttributes);
+            if (iconIndex < 0)
+                return null;
+
+            var imageList = _GetImageList(shil);
+            if (imageList is null)
+                return null;
+
+            var hr = imageList.GetIcon(iconIndex, _IldTransparent, out var hIcon);
+            if (hr != _SOk || hIcon == IntPtr.Zero)
+                return null;
+
+            try
+            {
+                return _HIconToBitmap(hIcon);
+            }
+            finally
+            {
+                _ = NativeMethods.DestroyIcon(hIcon);
+            }
+        }
+
+        private static int _GetSysIconIndex(string path, uint fileAttributes, bool useFileAttributes)
+        {
+            var flags = _ShgfiSysIconIndex;
+            if (useFileAttributes)
+                flags |= _ShgfiUseFileAttributes;
+
+            var info = new ShFileInfo();
+            var result = NativeMethods.SHGetFileInfo(
+                path,
+                fileAttributes,
+                ref info,
+                (uint)Marshal.SizeOf<ShFileInfo>(),
+                flags);
+            if (result == IntPtr.Zero)
+                return -1;
+
+            return info.iIcon;
+        }
+
+        private static IImageList? _GetImageList(int shil)
+        {
+            lock (_imageListGate)
+            {
+                if (_shilToImageList.TryGetValue(shil, out var cached))
+                    return cached;
+
+                var iid = _IidIImageList;
+                var hr = NativeMethods.SHGetImageList(shil, ref iid, out var imageList);
+                if (hr != _SOk)
+                    imageList = null;
+
+                _shilToImageList[shil] = imageList;
+                return imageList;
+            }
+        }
+
+        private static bool _HasJumboContent(WriteableBitmap bitmap)
+        {
+            var width = bitmap.PixelSize.Width;
+            var height = bitmap.PixelSize.Height;
+            var isSmallerThanJumbo = width < _JumboPixels || height < _JumboPixels;
+            if (isSmallerThanJumbo)
+                return width > _ExtraLargePixels || height > _ExtraLargePixels;
+
+            var marginX = (width - _ExtraLargePixels) / 2;
+            var marginY = (height - _ExtraLargePixels) / 2;
+            using var framebuffer = bitmap.Lock();
+            var rowBytes = framebuffer.RowBytes;
+            var buffer = new byte[rowBytes * height];
+            Marshal.Copy(framebuffer.Address, buffer, 0, buffer.Length);
+
+            for (var y = 0; y < height; y++)
+            {
+                var rowIsInCenter = y >= marginY && y < height - marginY;
+                var rowOffset = y * rowBytes;
+                for (var x = 0; x < width; x++)
+                {
+                    var pixelIsInCenter = rowIsInCenter && x >= marginX && x < width - marginX;
+                    if (pixelIsInCenter)
+                        continue;
+
+                    var alpha = buffer[rowOffset + (x * 4) + 3];
+                    if (alpha != 0)
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         private static WriteableBitmap? _HIconToBitmap(IntPtr hIcon)
@@ -216,6 +352,21 @@ namespace Mfr.App.Ui.Services
             public uint bmiColors;
         }
 
+        [ComImport]
+        [Guid("46EB5926-582E-4017-9FDF-E8998DAA0950")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IImageList
+        {
+            [PreserveSig] int Add(IntPtr hbmImage, IntPtr hbmMask, ref int pi);
+            [PreserveSig] int ReplaceIcon(int i, IntPtr hicon, ref int pi);
+            [PreserveSig] int SetOverlayImage(int iImage, int iOverlay);
+            [PreserveSig] int Replace(int i, IntPtr hbmImage, IntPtr hbmMask);
+            [PreserveSig] int AddMasked(IntPtr hbmImage, int crMask, ref int pi);
+            [PreserveSig] int Draw(IntPtr pimldp);
+            [PreserveSig] int Remove(int i);
+            [PreserveSig] int GetIcon(int i, int flags, out IntPtr picon);
+        }
+
         private static class NativeMethods
         {
             [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
@@ -225,6 +376,12 @@ namespace Mfr.App.Ui.Services
                 ref ShFileInfo psfi,
                 uint cbFileInfo,
                 uint uFlags);
+
+            [DllImport("shell32.dll")]
+            public static extern int SHGetImageList(
+                int iImageList,
+                ref Guid riid,
+                out IImageList ppv);
 
             [DllImport("user32.dll", SetLastError = true)]
             public static extern bool DestroyIcon(IntPtr hIcon);

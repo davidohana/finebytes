@@ -31,7 +31,7 @@ namespace Mfr.App.Ui.ViewModels
         Tiles,
 
         /// <summary>
-        /// Wrapping grid with an image thumbnail or large icon above the name.
+        /// Wrapping grid with an image thumbnail or jumbo shell icon above the name.
         /// </summary>
         Thumbnails,
     }

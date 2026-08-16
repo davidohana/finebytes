@@ -620,15 +620,10 @@ namespace Mfr.App.Ui.ViewModels
             foreach (var item in _listedItems)
                 Entries.Add(_CreateEntry(item));
 
-            if (selectedPath is null)
-            {
-                SelectedEntry = null;
-            }
-            else
-            {
-                SelectedEntry = Entries.FirstOrDefault(
+            SelectedEntry = selectedPath is null
+                ? null
+                : Entries.FirstOrDefault(
                     entry => PathComparers.Os.Equals(entry.FullPath, selectedPath));
-            }
 
             if (ViewMode == FileListViewMode.Thumbnails)
                 _StartThumbnailLoad();
@@ -659,7 +654,7 @@ namespace Mfr.App.Ui.ViewModels
                 if (_pathToThumbnail.TryGetValue(item.Path, out var cached) && cached is not null)
                     return cached;
 
-                return _iconProvider.GetIcon(item.Path, item.IsDirectory, ShellIconSize.Large);
+                return _iconProvider.GetIcon(item.Path, item.IsDirectory, ShellIconSize.Jumbo);
             }
 
             var usesLargeIcon = ViewMode is FileListViewMode.LargeIcons or FileListViewMode.Tiles;

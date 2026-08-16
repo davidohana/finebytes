@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:Mfr.App.Ui.ViewModels"
         xmlns:views="using:Mfr.App.Ui.Views"
+        xmlns:shortcuts="using:Mfr.App.Ui.Input"
         mc:Ignorable="d"
         d:DesignWidth="1100"
         d:DesignHeight="720"
@@ -18,15 +19,42 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
+    <Window.KeyBindings>
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.Go}"
+                    Command="{Binding GoCommand}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.UndoLast}"
+                    Command="{Binding UndoLastCommand}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowLog}"
+                    Command="{Binding ShowLogCommand}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowOptions}"
+                    Command="{Binding ShowOptionsCommand}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.Refresh}"
+                    Command="{Binding FileList.RefreshCommand}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.GoToAddress}"
+                    Command="{Binding FileList.BeginPathEditCommand}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.GoToAddressAlt}"
+                    Command="{Binding FileList.BeginPathEditCommand}" />
+    </Window.KeyBindings>
+
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_MFR">
-                <MenuItem Header="_GO" Command="{Binding GoCommand}" />
-                <MenuItem Header="_Undo Last" Command="{Binding UndoLastCommand}" />
-                <MenuItem Header="_Log" Command="{Binding ShowLogCommand}" />
-                <MenuItem Header="_Options" Command="{Binding ShowOptionsCommand}" />
+                <MenuItem Header="_GO"
+                          Command="{Binding GoCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.Go}" />
+                <MenuItem Header="_Undo Last"
+                          Command="{Binding UndoLastCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.UndoLast}" />
+                <MenuItem Header="_Log"
+                          Command="{Binding ShowLogCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.ShowLog}" />
+                <MenuItem Header="_Options"
+                          Command="{Binding ShowOptionsCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.ShowOptions}" />
                 <Separator />
-                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+                <MenuItem Header="E_xit"
+                          Command="{Binding ExitCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.Exit}" />
             </MenuItem>
             <MenuItem Header="_File List">
                 <MenuItem Header="_File List Type">
@@ -94,19 +122,45 @@
                               ToggleType="Radio"
                               IsChecked="{Binding FileList.IsThumbnailSizeHuge, Mode=OneWay}" />
                 </MenuItem>
-                <MenuItem Header="_Refresh" Command="{Binding FileList.RefreshCommand}" />
+                <MenuItem Header="Zoom _In"
+                          Command="{Binding FileList.ZoomThumbnailsInCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.ZoomIn}" />
+                <MenuItem Header="Zoom _Out"
+                          Command="{Binding FileList.ZoomThumbnailsOutCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.ZoomOut}" />
+                <MenuItem Header="_Reset Size"
+                          Command="{Binding FileList.ResetThumbnailSizeCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.ResetZoom}" />
+                <MenuItem Header="Go to _Address"
+                          Command="{Binding FileList.BeginPathEditCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.GoToAddress}" />
+                <MenuItem Header="Go _Up"
+                          Command="{Binding FileList.GoUpCommand}" />
+                <MenuItem Header="_Refresh"
+                          Command="{Binding FileList.RefreshCommand}"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.Refresh}" />
                 <Separator />
                 <MenuItem Header="Show Hidden/System Files" IsEnabled="False" />
             </MenuItem>
             <MenuItem Header="_Rename List">
-                <MenuItem Header="Add Selected" IsEnabled="False" />
-                <MenuItem Header="Add All" IsEnabled="False" />
-                <MenuItem Header="Remove" IsEnabled="False" />
-                <MenuItem Header="Clear" IsEnabled="False" />
+                <MenuItem Header="Add Selected"
+                          IsEnabled="False"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.AddSelected}" />
+                <MenuItem Header="Add All"
+                          IsEnabled="False"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.AddAll}" />
+                <MenuItem Header="Remove"
+                          IsEnabled="False"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}" />
+                <MenuItem Header="Clear"
+                          IsEnabled="False"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}" />
                 <Separator />
                 <MenuItem Header="Auto-Sort" IsEnabled="False" />
                 <MenuItem Header="Auto-Preview" IsEnabled="False" />
-                <MenuItem Header="Refresh" IsEnabled="False" />
+                <MenuItem Header="Refresh"
+                          IsEnabled="False"
+                          InputGesture="{x:Static shortcuts:AppShortcuts.Refresh}" />
             </MenuItem>
             <MenuItem Header="F_ilters">
                 <MenuItem Header="Presets" IsEnabled="False" />
@@ -120,10 +174,19 @@
 
         <Border DockPanel.Dock="Top" Padding="4,2">
             <StackPanel Orientation="Horizontal" Spacing="4">
-                <Button Content="GO ▶" Command="{Binding GoCommand}" MinWidth="72" />
-                <Button Content="Undo" Command="{Binding UndoLastCommand}" />
-                <Button Content="Log" Command="{Binding ShowLogCommand}" />
-                <Button Content="Options" Command="{Binding ShowOptionsCommand}" />
+                <Button Content="GO ▶"
+                        Command="{Binding GoCommand}"
+                        MinWidth="72"
+                        ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoTip}" />
+                <Button Content="Undo"
+                        Command="{Binding UndoLastCommand}"
+                        ToolTip.Tip="{x:Static shortcuts:AppShortcuts.UndoLastTip}" />
+                <Button Content="Log"
+                        Command="{Binding ShowLogCommand}"
+                        ToolTip.Tip="{x:Static shortcuts:AppShortcuts.ShowLogTip}" />
+                <Button Content="Options"
+                        Command="{Binding ShowOptionsCommand}"
+                        ToolTip.Tip="{x:Static shortcuts:AppShortcuts.ShowOptionsTip}" />
             </StackPanel>
         </Border>
 

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Mfr.App.Ui.ViewModels"
              xmlns:views="using:Mfr.App.Ui.Views"
+             xmlns:shortcuts="using:Mfr.App.Ui.Input"
              mc:Ignorable="d"
              d:DesignWidth="280"
              d:DesignHeight="40"
@@ -103,6 +104,7 @@
           Margin="4">
         <Border x:Name="AddressBar"
                 Classes="address-bar"
+                ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoToAddressTip}"
                 PointerPressed="_OnAddressBarPointerPressed">
             <Grid ColumnDefinitions="*,Auto">
                 <Grid ColumnDefinitions="Auto,*"
@@ -208,6 +210,7 @@
                          IsVisible="{Binding IsPathEditing}"
                          Text="{Binding PathText, Mode=TwoWay}"
                          Watermark="Folder path or \\server\share"
+                         ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddressEditTip}"
                          KeyDown="_OnPathKeyDown"
                          LostFocus="_OnPathLostFocus" />
                 <Button x:Name="HistoryButton"
@@ -237,7 +240,7 @@
         <Button Grid.Column="1"
                 Classes="address-tool"
                 Command="{Binding GoUpCommand}"
-                ToolTip.Tip="Up">
+                ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoUpTip}">
             <TemplatedControl Width="16"
                               Height="16"
                               Template="{StaticResource GoUpIconTemplate}" />
@@ -245,7 +248,7 @@
         <Button Grid.Column="2"
                 Classes="address-tool"
                 Command="{Binding RefreshCommand}"
-                ToolTip.Tip="Refresh">
+                ToolTip.Tip="{x:Static shortcuts:AppShortcuts.RefreshTip}">
             <Viewbox Width="16" Height="16">
                 <Path Width="16"
                       Height="16"

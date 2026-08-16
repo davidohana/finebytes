@@ -28,15 +28,6 @@ namespace Mfr.App.Ui.Views
         /// <inheritdoc />
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            var isAddressHotkey = (e.Key == Key.L && e.KeyModifiers == KeyModifiers.Control)
-                || (e.Key == Key.D && e.KeyModifiers == KeyModifiers.Alt);
-            if (isAddressHotkey && DataContext is FileListViewModel viewModel)
-            {
-                viewModel.BeginPathEdit();
-                e.Handled = true;
-                return;
-            }
-
             if (_TryHandleThumbnailZoomKeys(e))
                 return;
 

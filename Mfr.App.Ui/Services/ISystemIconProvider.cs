@@ -12,7 +12,7 @@ namespace Mfr.App.Ui.Services
         /// </summary>
         /// <param name="path">Full path of the file, folder, or drive.</param>
         /// <param name="isDirectory">Whether <paramref name="path"/> is a directory or drive.</param>
-        /// <param name="size">Small or large shell icon.</param>
+        /// <param name="size">Small, large, or jumbo shell icon.</param>
         /// <returns>An image to show for the entry, or <see langword="null"/>.</returns>
         IImage? GetIcon(string path, bool isDirectory, ShellIconSize size);
     }

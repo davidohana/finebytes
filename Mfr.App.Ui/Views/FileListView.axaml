@@ -374,6 +374,8 @@
                                 <Image Width="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"
                                        Height="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"
                                        Stretch="Uniform"
+                                       StretchDirection="DownOnly"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality"
                                        HorizontalAlignment="Center"
                                        Source="{Binding Icon}" />
                                 <TextBlock Text="{Binding Name}"

@@ -11,8 +11,13 @@ namespace Mfr.App.Ui.Services
         Small,
 
         /// <summary>
-        /// 32×32 large icon, used by Large Icons, Tiles, and thumbnail fallbacks.
+        /// 32×32 large icon, used by Large Icons and Tiles.
         /// </summary>
         Large,
+
+        /// <summary>
+        /// 256×256 jumbo icon, used by Thumbnails so shell glyphs are not upscaled.
+        /// </summary>
+        Jumbo,
     }
 }

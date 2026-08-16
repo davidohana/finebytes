@@ -1,3 +1,4 @@
+using Avalonia.Media;
 using Mfr.App.Ui.Services;
 using Mfr.App.Ui.ViewModels;
 using Mfr.Utils;
@@ -549,6 +550,23 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Thumbnails requests jumbo shell icons so glyphs are not upscaled from 32×32.
+        /// </summary>
+        [Fact]
+        public void Thumbnails_View_Requests_Jumbo_Shell_Icons()
+        {
+            var provider = new RecordingIconProvider();
+            var viewModel = new FileListViewModel(provider, _CreateTree());
+            _viewModels.Add(viewModel);
+
+            provider.RequestedSizes.Clear();
+            viewModel.ViewMode = FileListViewMode.Thumbnails;
+
+            Assert.NotEmpty(provider.RequestedSizes);
+            Assert.All(provider.RequestedSizes, size => Assert.Equal(ShellIconSize.Jumbo, size));
+        }
+
+        /// <summary>
         /// Verifies switching to Thumbnails lists image files immediately without waiting on decode.
         /// </summary>
         [Fact]
@@ -773,6 +791,17 @@ namespace Mfr.Tests.Ui
         private static List<string> _Names(FileListViewModel viewModel)
         {
             return [.. viewModel.Entries.Select(entry => entry.Name)];
+        }
+
+        private sealed class RecordingIconProvider : ISystemIconProvider
+        {
+            public List<ShellIconSize> RequestedSizes { get; } = [];
+
+            public IImage? GetIcon(string path, bool isDirectory, ShellIconSize size)
+            {
+                RequestedSizes.Add(size);
+                return null;
+            }
         }
     }
 }
