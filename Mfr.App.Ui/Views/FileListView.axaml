@@ -49,17 +49,23 @@
             <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
         </Style>
         <Style Selector="ListBox.file-icons ListBoxItem">
-            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
             <Setter Property="Padding" Value="2,1" />
             <Setter Property="ClipToBounds" Value="False" />
         </Style>
         <Style Selector="ListBox.file-small-icons ListBoxItem">
             <Setter Property="Width" Value="120" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
         <Style Selector="ListBox.file-list ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="ListBox.file-icons ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
         </Style>
         <Style Selector="ListBox.file-list ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
@@ -369,21 +375,22 @@
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Width="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"
-                                        Margin="2,1">
-                                <Image Width="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"
-                                       Height="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"
-                                       Stretch="Uniform"
-                                       StretchDirection="DownOnly"
-                                       RenderOptions.BitmapInterpolationMode="HighQuality"
-                                       HorizontalAlignment="Center"
-                                       Source="{Binding Icon}" />
-                                <TextBlock Text="{Binding Name}"
+                            <DockPanel Margin="2,1"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch">
+                                <TextBlock DockPanel.Dock="Bottom"
+                                           Text="{Binding Name}"
                                            TextAlignment="Center"
                                            TextWrapping="Wrap"
                                            TextTrimming="CharacterEllipsis"
                                            MaxLines="2" />
-                            </StackPanel>
+                                <Image Stretch="Uniform"
+                                       StretchDirection="DownOnly"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Source="{Binding Icon}" />
+                            </DockPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
