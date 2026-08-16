@@ -51,6 +51,7 @@
         <Style Selector="ListBox.file-icons ListBoxItem">
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="Padding" Value="2,1" />
+            <Setter Property="ClipToBounds" Value="False" />
         </Style>
         <Style Selector="ListBox.file-small-icons ListBoxItem">
             <Setter Property="Width" Value="120" />
@@ -355,17 +356,20 @@
                          ItemsSource="{Binding Entries}"
                          SelectedItem="{Binding SelectedEntry}"
                          IsVisible="{Binding IsThumbnailsView}"
+                         ClipToBounds="False"
                          SelectionMode="Multiple"
                          DoubleTapped="_OnEntriesDoubleTapped"
                          KeyDown="_OnEntriesKeyDown">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel />
+                            <views:VirtualizingWrapPanel
+                                ItemWidth="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailCellWidth}"
+                                ItemHeight="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailCellHeight}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Width="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailCellWidth}"
+                            <StackPanel Width="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"
                                         Margin="2,1">
                                 <Image Width="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"
                                        Height="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"

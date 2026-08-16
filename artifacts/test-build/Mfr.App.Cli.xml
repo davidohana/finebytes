@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Mfr.App.Cli</name>
+    </assembly>
+    <members>
+        <member name="T:Mfr.App.Cli.CliApp">
+            <summary>
+            CLI entry point and console output for Mfr.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Cli.CliApp.Run(System.String[])">
+            <summary>
+            Runs the CLI application.
+            </summary>
+            <param name="args">Command-line arguments.</param>
+            <returns>The process exit code.</returns>
+        </member>
+        <member name="M:Mfr.App.Cli.CliArgParser.ParseArgs(System.String[])">
+            <summary>
+            Parses command-line arguments into <see cref="T:Mfr.App.Cli.CliOptions"/>.
+            </summary>
+            <param name="args">Command-line arguments.</param>
+            <returns>Parsed <see cref="T:Mfr.App.Cli.CliOptions"/> on success; <c>null</c> when the user requested help output.</returns>
+            <exception cref="T:Mfr.Models.UserException">Thrown when argument parsing cannot produce options, including unknown flags or options.</exception>
+        </member>
+        <member name="T:Mfr.App.Cli.CliExitCode">
+            <summary>
+            Represents process exit codes returned by the CLI.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Cli.CliExitCode.Success">
+            <summary>
+            The command completed successfully.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Cli.CliExitCode.UserError">
+            <summary>
+            The command failed due to invalid user input or configuration.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Cli.CliExitCode.AppError">
+            <summary>
+            The command failed due to an unexpected application fault.
+            </summary>
+        </member>
+        <member name="T:Mfr.App.Cli.CliOptions">
+            <summary>
+            Immutable options parsed from the command line and carried into the CLI execution.
+            </summary>
+            <param name="PresetName">Name of the preset to apply for the file renaming.</param>
+            <param name="Sources">List of source files, folders, or wildcard patterns to process.</param>
+            <param name="IncludeFiles">Whether file entries should be included from resolved sources.</param>
+            <param name="IncludeFolders">Whether folder entries should be included from resolved sources.</param>
+            <param name="RecursiveDirectoryFileAdd">Whether directory sources should add files recursively when folder inclusion is disabled.</param>
+            <param name="OutputFilePath">Optional output file path where JSON results are written.</param>
+            <param name="IncludeHidden">Whether to include hidden and system files.</param>
+            <param name="ContinueOnRenameError">Whether commit should continue after per-item rename errors.</param>
+            <param name="ConfirmBeforeCommit">Whether to prompt for confirmation before applying each rename.</param>
+            <param name="DryRun">Whether commit operations should be simulated without modifying the filesystem.</param>
+            <param name="LogLevel">Minimum log level to emit.</param>
+            <param name="LogDirectoryPath">Optional log directory override.</param>
+            <param name="PresetsFilePath">Path to the JSON file containing presets.</param>
+            <param name="ConfigFilePath">Optional path to <c>mfr.config.json</c>; when null, the default AppData path is used.</param>
+            <param name="ConfigOverrides"><c>--set section.leaf=value</c> assignments applied after the config file.</param>
+        </member>
+        <member name="M:Mfr.App.Cli.CliOptions.#ctor(System.String,System.Collections.Generic.IReadOnlyList{System.String},System.Boolean,System.Boolean,System.Boolean,System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean,Serilog.Events.LogEventLevel,System.String,System.String,System.String,System.Collections.Generic.IReadOnlyList{System.String})">
+            <summary>
+            Immutable options parsed from the command line and carried into the CLI execution.
+            </summary>
+            <param name="PresetName">Name of the preset to apply for the file renaming.</param>
+            <param name="Sources">List of source files, folders, or wildcard patterns to process.</param>
+            <param name="IncludeFiles">Whether file entries should be included from resolved sources.</param>
+            <param name="IncludeFolders">Whether folder entries should be included from resolved sources.</param>
+            <param name="RecursiveDirectoryFileAdd">Whether directory sources should add files recursively when folder inclusion is disabled.</param>
+            <param name="OutputFilePath">Optional output file path where JSON results are written.</param>
+            <param name="IncludeHidden">Whether to include hidden and system files.</param>
+            <param name="ContinueOnRenameError">Whether commit should continue after per-item rename errors.</param>
+            <param name="ConfirmBeforeCommit">Whether to prompt for confirmation before applying each rename.</param>
+            <param name="DryRun">Whether commit operations should be simulated without modifying the filesystem.</param>
+            <param name="LogLevel">Minimum log level to emit.</param>
+            <param name="LogDirectoryPath">Optional log directory override.</param>
+            <param name="PresetsFilePath">Path to the JSON file containing presets.</param>
+            <param name="ConfigFilePath">Optional path to <c>mfr.config.json</c>; when null, the default AppData path is used.</param>
+            <param name="ConfigOverrides"><c>--set section.leaf=value</c> assignments applied after the config file.</param>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.PresetName">
+            <summary>Name of the preset to apply for the file renaming.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.Sources">
+            <summary>List of source files, folders, or wildcard patterns to process.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.IncludeFiles">
+            <summary>Whether file entries should be included from resolved sources.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.IncludeFolders">
+            <summary>Whether folder entries should be included from resolved sources.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.RecursiveDirectoryFileAdd">
+            <summary>Whether directory sources should add files recursively when folder inclusion is disabled.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.OutputFilePath">
+            <summary>Optional output file path where JSON results are written.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.IncludeHidden">
+            <summary>Whether to include hidden and system files.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.ContinueOnRenameError">
+            <summary>Whether commit should continue after per-item rename errors.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.ConfirmBeforeCommit">
+            <summary>Whether to prompt for confirmation before applying each rename.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.DryRun">
+            <summary>Whether commit operations should be simulated without modifying the filesystem.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.LogLevel">
+            <summary>Minimum log level to emit.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.LogDirectoryPath">
+            <summary>Optional log directory override.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.PresetsFilePath">
+            <summary>Path to the JSON file containing presets.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.ConfigFilePath">
+            <summary>Optional path to <c>mfr.config.json</c>; when null, the default AppData path is used.</summary>
+        </member>
+        <member name="P:Mfr.App.Cli.CliOptions.ConfigOverrides">
+            <summary><c>--set section.leaf=value</c> assignments applied after the config file.</summary>
+        </member>
+    </members>
+</doc>

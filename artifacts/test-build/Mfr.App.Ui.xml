@@ -1,0 +1,1616 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Mfr.App.Ui</name>
+    </assembly>
+    <members>
+        <member name="T:Mfr.App.Ui.App">
+            <summary>
+            Avalonia application host for the Magic File Renamer GUI.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.App.Initialize">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.App.OnFrameworkInitializationCompleted">
+            <inheritdoc />
+        </member>
+        <member name="T:Mfr.App.Ui.Program">
+            <summary>
+            Desktop entry point for the Magic File Renamer GUI.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Program.BuildAvaloniaApp">
+            <summary>
+            Configures the Avalonia builder. Also used by the visual designer.
+            </summary>
+            <returns>The configured application builder.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.ImageThumbnailLoader">
+            <summary>
+            Decodes a small preview bitmap for common image files.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.Services.ImageThumbnailLoader.DecodeWidth">
+            <summary>
+            Pixel width used when decoding image previews (matches the largest thumbnail step).
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.ImageThumbnailLoader.CanLoad(System.String,System.Nullable{System.Int64})">
+            <summary>
+            Gets whether <paramref name="path"/> is an image that <see cref="M:Mfr.App.Ui.Services.ImageThumbnailLoader.TryLoad(System.String,System.Nullable{System.Int64},System.Int32)"/> will attempt to decode.
+            </summary>
+            <param name="path">Full filesystem path of a file.</param>
+            <param name="length">Known file length, or <see langword="null"/> when unknown.</param>
+            <returns><see langword="true"/> when the file is an allowed image within the size cap.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.ImageThumbnailLoader.TryLoad(System.String,System.Nullable{System.Int64},System.Int32)">
+            <summary>
+            Tries to decode a thumbnail for <paramref name="path"/>.
+            </summary>
+            <param name="path">Full filesystem path of a file.</param>
+            <param name="length">Known file length, or <see langword="null"/> when unknown.</param>
+            <param name="decodeWidth">Target pixel width. Defaults to <see cref="F:Mfr.App.Ui.Services.ImageThumbnailLoader.DecodeWidth"/>.</param>
+            <returns>A preview image, or <see langword="null"/> when the file is skipped or cannot be decoded.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.ISystemIconProvider">
+            <summary>
+            Supplies filesystem icons for the File Explorer pane.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.ISystemIconProvider.GetIcon(System.String,System.Boolean,Mfr.App.Ui.Services.ShellIconSize)">
+            <summary>
+            Returns a shell icon for a filesystem entry, or <see langword="null"/> when none is available.
+            </summary>
+            <param name="path">Full path of the file, folder, or drive.</param>
+            <param name="isDirectory">Whether <paramref name="path"/> is a directory or drive.</param>
+            <param name="size">Small or large shell icon.</param>
+            <returns>An image to show for the entry, or <see langword="null"/>.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.JpegExifThumbnailReader">
+            <summary>
+            Extracts an embedded JPEG thumbnail from a JPEG EXIF IFD1, if present.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.JpegExifThumbnailReader.TryExtract(System.IO.Stream)">
+            <summary>
+            Tries to read the EXIF IFD1 JPEG thumbnail from the start of <paramref name="stream"/>.
+            </summary>
+            <param name="stream">A JPEG file stream positioned at the start, or seekable.</param>
+            <returns>The embedded thumbnail JPEG bytes, or <see langword="null"/> when none is found.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.NullSystemIconProvider">
+            <summary>
+            Icon provider that never returns an image. Used in tests and on platforms without shell icons.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.Services.NullSystemIconProvider.Instance">
+            <summary>
+            Gets the shared instance.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.NullSystemIconProvider.GetIcon(System.String,System.Boolean,Mfr.App.Ui.Services.ShellIconSize)">
+            <inheritdoc />
+        </member>
+        <member name="T:Mfr.App.Ui.Services.ShellIconSize">
+            <summary>
+            Shell icon pixel size requested from <see cref="T:Mfr.App.Ui.Services.ISystemIconProvider"/>.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.Services.ShellIconSize.Small">
+            <summary>
+            16×16 small icon, used by Report, List, and Small Icons.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.Services.ShellIconSize.Large">
+            <summary>
+            32×32 large icon, used by Large Icons, Tiles, and thumbnail fallbacks.
+            </summary>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.SystemIconProvider">
+            <summary>
+            Creates the default <see cref="T:Mfr.App.Ui.Services.ISystemIconProvider"/> for the current OS.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.SystemIconProvider.CreateDefault">
+            <summary>
+            Returns a Windows shell-icon provider on Windows, otherwise a no-op provider.
+            </summary>
+            <returns>An icon provider suitable for the host OS.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.WildcardMask">
+            <summary>
+            Matches file names against Explorer-style wildcard masks (<c>*</c> / <c>?</c>).
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WildcardMask.IsMatch(System.String,System.String)">
+            <summary>
+            Whether <paramref name="fileName"/> matches <paramref name="pattern"/>.
+            </summary>
+            <param name="fileName">File name only, not a full path.</param>
+            <param name="pattern">Mask such as <c>*</c> or <c>*.mp3</c>. Blank matches every name.</param>
+            <returns><see langword="true"/> when the name matches.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WildcardMask.MatchesAny(System.String,System.String)">
+            <summary>
+            Whether <paramref name="fileName"/> matches any mask in a <c>:</c>- or <c>;</c>-delimited list.
+            </summary>
+            <param name="fileName">File name only, not a full path.</param>
+            <param name="joinedPatterns">Exclude masks typed in the explorer pane.</param>
+            <returns><see langword="true"/> when at least one mask matches.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WildcardMask.SplitPatterns(System.String)">
+            <summary>
+            Splits a combined mask list into individual patterns.
+            </summary>
+            <param name="joinedPatterns"><c>:</c>- or <c>;</c>-delimited masks.</param>
+            <returns>Trimmed non-empty patterns in source order.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.WindowsKnownPlace">
+            <summary>
+            One Windows user folder shown on This PC, such as Documents or Music.
+            </summary>
+            <param name="Name">Explorer-style label used in the listing and address bar.</param>
+            <param name="Path">Resolved filesystem directory.</param>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsKnownPlace.#ctor(System.String,System.String)">
+            <summary>
+            One Windows user folder shown on This PC, such as Documents or Music.
+            </summary>
+            <param name="Name">Explorer-style label used in the listing and address bar.</param>
+            <param name="Path">Resolved filesystem directory.</param>
+        </member>
+        <member name="P:Mfr.App.Ui.Services.WindowsKnownPlace.Name">
+            <summary>Explorer-style label used in the listing and address bar.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.Services.WindowsKnownPlace.Path">
+            <summary>Resolved filesystem directory.</summary>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.WindowsKnownPlaces">
+            <summary>
+            Maps a small set of Explorer-like names to real user folders.
+            <para>
+            No shell namespace: paths come from <see cref="T:System.Environment.SpecialFolder"/> plus a Downloads
+            folder under the profile when that directory exists.
+            </para>
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsKnownPlaces.GetPlaces">
+            <summary>
+            User folders to show on This PC, in Explorer-like order.
+            </summary>
+            <returns>Existing unique folders; empty on non-Windows.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsKnownPlaces.TryResolveAlias(System.String,System.String@)">
+            <summary>
+            Resolves an address-bar alias such as <c>Documents</c> or the folder's last path segment.
+            </summary>
+            <param name="text">Typed path or display name.</param>
+            <param name="path">Filesystem path when <paramref name="text"/> matches a known place.</param>
+            <returns><see langword="true"/> when <paramref name="text"/> is a known-place alias.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsKnownPlaces.TryGetPlace(System.String,Mfr.App.Ui.Services.WindowsKnownPlace@)">
+            <summary>
+            Whether <paramref name="filesystemPath"/> is exactly a known place.
+            </summary>
+            <param name="filesystemPath">Resolved directory path.</param>
+            <param name="place">Matching place when found.</param>
+            <returns><see langword="true"/> for an exact known-place path.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsKnownPlaces.TryGetContainingPlace(System.String,Mfr.App.Ui.Services.WindowsKnownPlace@)">
+            <summary>
+            Finds the known place that is <paramref name="filesystemPath"/> or its closest ancestor.
+            </summary>
+            <param name="filesystemPath">Resolved directory path.</param>
+            <param name="place">Longest matching known place.</param>
+            <returns><see langword="true"/> when the path is a known place or under one.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.WindowsSystemIconProvider">
+            <summary>
+            Windows shell icons via <c>SHGetFileInfo</c>, cached by kind, size, and file extension.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsSystemIconProvider.GetIcon(System.String,System.Boolean,Mfr.App.Ui.Services.ShellIconSize)">
+            <inheritdoc />
+        </member>
+        <member name="T:Mfr.App.Ui.Services.WindowsUncShareLister">
+            <summary>
+            Lists SMB disk shares on a UNC server such as <c>\\ohanas</c>.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsUncShareLister.TryListDiskShares(System.String,System.Collections.Generic.List{System.String}@)">
+            <summary>
+            Lists non-hidden disk shares on <paramref name="serverRoot"/>.
+            </summary>
+            <param name="serverRoot">UNC server root such as <c>\\ohanas</c>.</param>
+            <param name="sharePaths">Full UNC share paths when the server responded.</param>
+            <returns>
+            <see langword="true"/> when the server was reached (even with no shares or access denied).
+            </returns>
+        </member>
+        <member name="T:Mfr.App.Ui.Services.WindowsWslUnc">
+            <summary>
+            Resolves Windows Subsystem for Linux UNC paths such as <c>\\wsl$</c> and <c>\\wsl.localhost</c>.
+            <para>
+            Those hosts are a Plan 9 redirector, not SMB. The server root is not a real directory
+            (<c>Directory.Exists(@"\\wsl$")</c> is false); distros are listed from WSL, and each distro
+            is a share such as <c>\\wsl$\Ubuntu</c>. <c>\\wsl</c> is an alias for the live host.
+            </para>
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsWslUnc.IsWslUncPath(System.String)">
+            <summary>
+            Whether <paramref name="path"/> is under a WSL UNC host, including the short <c>\\wsl</c> alias.
+            </summary>
+            <param name="path">Typed or resolved path.</param>
+            <returns><see langword="true"/> for <c>\\wsl</c>, <c>\\wsl$</c>, <c>\\wsl.localhost</c>, and descendants.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsWslUnc.IsWslServerRoot(System.String)">
+            <summary>
+            Whether <paramref name="path"/> is a WSL host root with no distro or folder segment.
+            </summary>
+            <param name="path">Typed or resolved path.</param>
+            <returns><see langword="true"/> for <c>\\wsl</c>, <c>\\wsl$</c>, and <c>\\wsl.localhost</c>.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsWslUnc.TryMapPath(System.String,System.String,System.String@)">
+            <summary>
+            Rewrites a WSL UNC path onto <paramref name="liveRoot"/> when the host is the short alias.
+            </summary>
+            <param name="path">Typed WSL path.</param>
+            <param name="liveRoot">Reachable <c>\\wsl$</c> or <c>\\wsl.localhost</c>.</param>
+            <param name="mapped">Rewritten path when <paramref name="path"/> is a WSL UNC path.</param>
+            <returns><see langword="true"/> when <paramref name="path"/> uses a WSL host.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsWslUnc.TryResolve(System.String,System.String@)">
+            <summary>
+            Resolves a typed WSL path to a UNC location.
+            </summary>
+            <param name="path">Typed path, possibly using the <c>\\wsl</c> alias.</param>
+            <param name="resolved">Filesystem path when WSL distros are installed.</param>
+            <returns><see langword="true"/> when <paramref name="path"/> is WSL and can be opened.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsWslUnc.TryGetLiveRoot(System.String@)">
+            <summary>
+            Finds the WSL UNC root to use when distros are installed, preferring
+            <c>\\wsl.localhost</c> on Windows 11.
+            </summary>
+            <param name="root">Preferred <c>\\wsl.localhost</c> or <c>\\wsl$</c>.</param>
+            <returns><see langword="true"/> when at least one distro is registered.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.Services.WindowsWslUnc.TryListDistroPaths(System.String,System.Collections.Generic.List{System.String}@)">
+            <summary>
+            Lists installed distro UNC paths under <paramref name="serverRoot"/>.
+            </summary>
+            <param name="serverRoot">WSL host such as <c>\\wsl$</c> or <c>\\wsl.localhost</c>.</param>
+            <param name="distroPaths">One path per distro, such as <c>\\wsl$\Ubuntu</c>.</param>
+            <returns><see langword="true"/> when at least one distro is registered.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.AppliedFiltersViewModel">
+            <summary>
+            Applied Filters pane. The in-memory filter stack is implemented in a later GUI phase.
+            </summary>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.BreadcrumbOverflow">
+            <summary>
+            Chooses which address-bar folders stay visible when the trail is too wide.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.BreadcrumbOverflow.ButtonWidth">
+            <summary>
+            Width reserved for the ancestor-overflow button when any leading folder is hidden.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.BreadcrumbOverflow.PickVisibleStart(System.Collections.Generic.IReadOnlyList{System.Double},System.Double,System.Double)">
+            <summary>
+            Returns the first visible segment index so the current folder stays on screen.
+            </summary>
+            <param name="segmentWidths">Root-to-current desired widths.</param>
+            <param name="availableWidth">Width for an overflow button plus visible segments.</param>
+            <param name="overflowButtonWidth">Width reserved when any ancestor is hidden.</param>
+            <returns>
+            Index of the first visible segment. <c>0</c> means the full trail fits.
+            </returns>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.ExplorerPath">
+            <summary>
+            Explorer location sentinels and Windows UNC path rules for the File Explorer pane.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ExplorerPath.ComputerPath">
+            <summary>
+            Sentinel path for the Windows drive list ("This PC").
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ExplorerPath.ComputerDisplayName">
+            <summary>
+            Address-bar label shown when listing drives on Windows.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ExplorerPath.NetworkPath">
+            <summary>
+            Sentinel path for mapped drives and recent UNC locations.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ExplorerPath.NetworkDisplayName">
+            <summary>
+            Address-bar label shown for <see cref="F:Mfr.App.Ui.ViewModels.ExplorerPath.NetworkPath"/>.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ExplorerPath.UnixRootPath">
+            <summary>
+            Address-bar label and path for the filesystem root on Unix.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.IsComputerPath(System.String)">
+            <summary>
+            Whether <paramref name="path"/> is the Windows drive list.
+            </summary>
+            <param name="path">Path or display name to classify.</param>
+            <returns><see langword="true"/> for empty / This PC.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.TryGetDriveRoot(System.String,System.String@)">
+            <summary>
+            Treats a typed Windows drive spec such as <c>D:</c> as the drive root.
+            <para>
+            Windows otherwise resolves <c>D:</c> to the process current directory on that drive.
+            </para>
+            </summary>
+            <param name="path">Typed address-bar text.</param>
+            <param name="root">Drive root such as <c>D:\</c> when parsing succeeds.</param>
+            <returns><see langword="true"/> for a letter plus colon with no path.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.IsNetworkPath(System.String)">
+            <summary>
+            Whether <paramref name="path"/> is the Windows Network location.
+            </summary>
+            <param name="path">Path or display name to classify.</param>
+            <returns><see langword="true"/> for Network, <c>\\</c>, or <c>//</c> on Windows.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.IsUncPath(System.String)">
+            <summary>
+            Whether <paramref name="path"/> is a UNC filesystem path (not the Network sentinel).
+            </summary>
+            <param name="path">Path to classify.</param>
+            <returns><see langword="true"/> for <c>\\server\share</c> and long UNC form.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.IsUncServerRoot(System.String)">
+            <summary>
+            Whether <paramref name="path"/> is a UNC server root such as <c>\\ohanas</c>.
+            </summary>
+            <param name="path">Path to classify.</param>
+            <returns><see langword="true"/> when the path is a server with no share segment.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.TryGetUncServerRoot(System.String,System.String@)">
+            <summary>
+            Reads the <c>\\server</c> root from a UNC path.
+            </summary>
+            <param name="path">UNC path, possibly with a share and folders.</param>
+            <param name="root">Server root when parsing succeeds.</param>
+            <returns><see langword="true"/> when <paramref name="path"/> includes a server name.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.IsUncShareRoot(System.String)">
+            <summary>
+            Whether <paramref name="path"/> is a UNC share root such as <c>\\server\share</c>.
+            </summary>
+            <param name="path">Path to classify.</param>
+            <returns><see langword="true"/> when the path has no segments below the share.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.TryGetUncShareRoot(System.String,System.String@)">
+            <summary>
+            Reads the <c>\\server\share</c> root from a UNC path.
+            </summary>
+            <param name="path">UNC path, possibly with extra folders or a long-path prefix.</param>
+            <param name="root">Share root when parsing succeeds.</param>
+            <returns><see langword="true"/> when <paramref name="path"/> includes a server and share.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.GetParentPath(System.String)">
+            <summary>
+            Parent folder, Network, or This PC for explorer Go Up.
+            </summary>
+            <param name="path">Current explorer path or sentinel.</param>
+            <returns>Parent path, or <see langword="null"/> at This PC / Unix root.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.ToDisplayPath(System.String)">
+            <summary>
+            Address-bar text for a resolved explorer path.
+            </summary>
+            <param name="path">Filesystem path or sentinel.</param>
+            <returns>Display name for This PC / Network, otherwise <paramref name="path"/>.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ExplorerPath.BuildBreadcrumbSegments(System.String)">
+            <summary>
+            Builds the clickable address-bar trail for <paramref name="path"/>.
+            </summary>
+            <param name="path">Filesystem path or sentinel.</param>
+            <returns>Root-to-current segments.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.FileListEntry">
+            <summary>
+            One item in the File Explorer listing.
+            </summary>
+            <inheritdoc/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.Name">
+            <summary>
+            Gets the file or folder name, or the drive name.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.FullPath">
+            <summary>
+            Gets the full filesystem path for this row.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.IsDirectory">
+            <summary>
+            Gets whether this row is a directory or drive that can be opened.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.ListingGroup">
+            <summary>
+            Gets the This PC sort group: volumes before known folders. Ignored in ordinary folders.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListEntry._icon">
+            <summary>
+            Gets or sets the icon or thumbnail for the current view mode, or <see langword="null"/> when none is available.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.Details">
+            <summary>
+            Gets extra text for Tiles (type and size), or empty in other view modes.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.Type">
+            <summary>
+            Gets the Explorer-style type label, such as <c>File folder</c> or <c>TXT File</c>.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.DateModifiedDisplay">
+            <summary>
+            Gets the formatted last-write time, or empty when unknown.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.SizeDisplay">
+            <summary>
+            Gets the formatted size, or empty for folders and when unknown.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.LastWriteTime">
+            <summary>
+            Gets the last-write time used when sorting the Date modified column.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.Length">
+            <summary>
+            Gets the file length in bytes used when sorting the Size column.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListEntry.Icon">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListEntry._icon"/>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.FileListViewMode">
+            <summary>
+            Layout used by the File Explorer item pane.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewMode.LargeIcons">
+            <summary>
+            Wrapping grid with a large shell icon above the name.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewMode.SmallIcons">
+            <summary>
+            Wrapping grid with a small shell icon to the left of the name.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewMode.Report">
+            <summary>
+            Details grid with a Name column. This is the default.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewMode.List">
+            <summary>
+            Compact vertical list with a small icon and name.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewMode.Tiles">
+            <summary>
+            Wrapping grid with a large icon, name, and type/size details.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewMode.Thumbnails">
+            <summary>
+            Wrapping grid with an image thumbnail or large icon above the name.
+            </summary>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.FileListViewModel">
+            <summary>
+            File Explorer pane: folder listing with path, mask, exclude masks, and view modes.
+            </summary>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.ComputerPath">
+            <summary>
+            Sentinel path for the Windows drive list ("This PC").
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.ComputerDisplayName">
+            <summary>
+            Address-bar label shown when listing drives on Windows.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.NetworkPath">
+            <summary>
+            Sentinel path for mapped drives and recent UNC locations.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.NetworkDisplayName">
+            <summary>
+            Address-bar label shown for <see cref="F:Mfr.App.Ui.ViewModels.FileListViewModel.NetworkPath"/>.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.UnixRootPath">
+            <summary>
+            Address-bar label and path for the filesystem root on Unix.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.#ctor">
+            <summary>
+            Initializes the explorer at the user profile folder with the default icon provider.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.#ctor(Mfr.App.Ui.Services.ISystemIconProvider,System.String)">
+            <summary>
+            Initializes the explorer.
+            </summary>
+            <param name="iconProvider">Shell icons, or <see langword="null"/> to use the OS default.</param>
+            <param name="initialPath">Directory to open, or <see langword="null"/> for the user profile.</param>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.Entries">
+            <summary>
+            Gets the items shown in the File Explorer pane.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.PathHistory">
+            <summary>
+            Gets recent filesystem paths for the address-bar history list.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.BreadcrumbSegments">
+            <summary>
+            Gets the current folder trail shown in the address bar.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.ShowsComputerRoot">
+            <summary>
+            Gets whether the address bar uses a This PC root instead of a filesystem root.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.RootTargetPath">
+            <summary>
+            Address-bar root the computer/folder icon navigates to: This PC on Windows, <c>/</c> on Unix.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.MaskSuggestions">
+            <summary>
+            Gets include-mask suggestions for the Mask combo.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel._currentPath">
+            <summary>
+            Filesystem path of the current folder, <see cref="F:Mfr.App.Ui.ViewModels.FileListViewModel.ComputerPath"/>, or <see cref="F:Mfr.App.Ui.ViewModels.FileListViewModel.NetworkPath"/>.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel._pathText">
+            <summary>
+            Editable address-bar text (display name for the drive list).
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel._isPathEditing">
+            <summary>
+            Whether the address bar is a typed path instead of breadcrumbs.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel._mask">
+            <summary>
+            Include mask applied to file names. Folders are always listed.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel._excludeMasks">
+            <summary>
+            <c>:</c>- or <c>;</c>-delimited exclude masks applied to file names.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel._viewMode">
+            <summary>
+            Layout used to present <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.Entries"/>. Default is Report.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel._thumbnailSize">
+            <summary>
+            Pixel size of the thumbnail image box in Thumbnails view.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.SortMemberPath">
+            <summary>
+            Gets the <see cref="T:Mfr.App.Ui.ViewModels.FileListEntry"/> property used for the current column sort.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsSortAscending">
+            <summary>
+            Gets whether the current column sort is ascending.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel._selectedEntry">
+            <summary>
+            The selected grid row, or <see langword="null"/> when nothing is selected.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel._canGoUp">
+            <summary>
+            Whether <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.GoUp"/> can move to a parent folder, Network, or This PC.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsLargeIconsView">
+            <summary>
+            Gets whether the Large Icons layout is active.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsSmallIconsView">
+            <summary>
+            Gets whether the Small Icons layout is active.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsReportView">
+            <summary>
+            Gets whether the Report layout is active.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsListView">
+            <summary>
+            Gets whether the List layout is active.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsTilesView">
+            <summary>
+            Gets whether the Tiles layout is active.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsThumbnailsView">
+            <summary>
+            Gets whether the Thumbnails layout is active.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.ThumbnailCellWidth">
+            <summary>
+            Gets the wrapping cell width for the current <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ThumbnailSize"/>.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.ThumbnailCellHeight">
+            <summary>
+            Gets the wrapping cell height for the current <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ThumbnailSize"/>, including the caption.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsThumbnailSizeExtraSmall">
+            <summary>
+            Gets whether Extra Small (48) thumbnails are selected.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsThumbnailSizeSmall">
+            <summary>
+            Gets whether Small (64) thumbnails are selected.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsThumbnailSizeMedium">
+            <summary>
+            Gets whether Medium (96) thumbnails are selected.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsThumbnailSizeLarge">
+            <summary>
+            Gets whether Large (128) thumbnails are selected.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsThumbnailSizeExtraLarge">
+            <summary>
+            Gets whether Extra Large (192) thumbnails are selected.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsThumbnailSizeHuge">
+            <summary>
+            Gets whether Huge (256) thumbnails are selected.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.CommitPath">
+            <summary>
+            Navigates to <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.PathText"/> when the user commits the typed path.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.BeginPathEdit">
+            <summary>
+            Switches the address bar to a typed path.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.CancelPathEdit">
+            <summary>
+            Leaves typed-path mode without navigating.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.GoUp">
+            <summary>
+            Opens the current folder's parent, Network at a UNC share root, or This PC at a volume root.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.Refresh">
+            <summary>
+            Reloads the current folder listing.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.OpenSelected">
+            <summary>
+            Navigates into the selected folder. Files are ignored until add-to-list (G2).
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.SetViewMode(Mfr.App.Ui.ViewModels.FileListViewMode)">
+            <summary>
+            Switches the File Explorer layout.
+            </summary>
+            <param name="mode">Layout to show.</param>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.SetThumbnailSize(System.Int32)">
+            <summary>
+            Sets the Thumbnails image size to the nearest allowed step.
+            </summary>
+            <param name="size">Requested size in pixels.</param>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.ZoomThumbnailsIn">
+            <summary>
+            Moves Thumbnails view to the next larger size step.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.ZoomThumbnailsOut">
+            <summary>
+            Moves Thumbnails view to the next smaller size step.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.ResetThumbnailSize">
+            <summary>
+            Restores the default Thumbnails size (96 pixels).
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.Dispose">
+            <summary>
+            Cancels in-flight thumbnail decoding and disposes cached preview bitmaps.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.SortByColumn(System.String)">
+            <summary>
+            Sorts the listing like Windows Explorer: folders stay first, then the column.
+            <para>
+            Clicking the same column again reverses order within the folder group and within the file
+            group. Folders remain above files in both directions.
+            </para>
+            </summary>
+            <param name="memberPath">
+            A <see cref="T:Mfr.App.Ui.ViewModels.FileListEntry"/> property name such as <c>Name</c> or <c>LastWriteTime</c>.
+            </param>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.NavigateTo(System.String)">
+            <summary>
+            Navigates to a filesystem path, This PC, or Network.
+            </summary>
+            <param name="path">
+            Directory path, empty / <see cref="F:Mfr.App.Ui.ViewModels.FileListViewModel.ComputerDisplayName"/> for drives, or
+            <see cref="F:Mfr.App.Ui.ViewModels.FileListViewModel.NetworkDisplayName"/> / <c>\\</c> for Network.
+            </param>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.CurrentPath">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListViewModel._currentPath"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.PathText">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListViewModel._pathText"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.IsPathEditing">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListViewModel._isPathEditing"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.Mask">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListViewModel._mask"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.ExcludeMasks">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListViewModel._excludeMasks"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.ViewMode">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListViewModel._viewMode"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.ThumbnailSize">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListViewModel._thumbnailSize"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.SelectedEntry">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListViewModel._selectedEntry"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.CanGoUp">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.FileListViewModel._canGoUp"/>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.OnMaskChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.Mask"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.Mask"/> is changed.</remarks>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.OnExcludeMasksChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ExcludeMasks"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ExcludeMasks"/> is changed.</remarks>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.OnViewModeChanged(Mfr.App.Ui.ViewModels.FileListViewMode)">
+            <summary>Executes the logic for when <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ViewMode"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ViewMode"/> is changed.</remarks>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.FileListViewModel.OnThumbnailSizeChanged(System.Int32)">
+            <summary>Executes the logic for when <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ThumbnailSize"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ThumbnailSize"/> is changed.</remarks>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.commitPathCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.CommitPathCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.CommitPathCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.CommitPath"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.beginPathEditCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.BeginPathEditCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.BeginPathEditCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.BeginPathEdit"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.cancelPathEditCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.CancelPathEditCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.CancelPathEditCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.CancelPathEdit"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.goUpCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.GoUpCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.GoUpCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.GoUp"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.refreshCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.RefreshCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.RefreshCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.Refresh"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.openSelectedCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.OpenSelectedCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.OpenSelectedCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.OpenSelected"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.setViewModeCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.SetViewModeCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.SetViewModeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.SetViewMode(Mfr.App.Ui.ViewModels.FileListViewMode)"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.setThumbnailSizeCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.SetThumbnailSizeCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.SetThumbnailSizeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.SetThumbnailSize(System.Int32)"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.zoomThumbnailsInCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ZoomThumbnailsInCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.ZoomThumbnailsInCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.ZoomThumbnailsIn"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.zoomThumbnailsOutCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ZoomThumbnailsOutCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.ZoomThumbnailsOutCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.ZoomThumbnailsOut"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.resetThumbnailSizeCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.ResetThumbnailSizeCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.ResetThumbnailSizeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.ResetThumbnailSize"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.FileListViewModel.navigateToCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.FileListViewModel.NavigateToCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.FileListViewModel.NavigateToCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.FileListViewModel.NavigateTo(System.String)"/>.</summary>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.FilterEditorViewModel">
+            <summary>
+            Filter Configuration pane. Type-specific editors are implemented in a later GUI phase.
+            </summary>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.FilterPaletteViewModel">
+            <summary>
+            Available Filters pane. The filter catalog is implemented in a later GUI phase.
+            </summary>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.MainWindowViewModel">
+            <summary>
+            Root view model for the main window shell (menus, toolbar, status, pane hosts).
+            </summary>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.#ctor">
+            <summary>
+            Initializes pane view models for the 7.4 layout.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.FileList">
+            <summary>
+            Gets the File Explorer pane.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.FilterPalette">
+            <summary>
+            Gets the Available Filters pane.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.AppliedFilters">
+            <summary>
+            Gets the Applied Filters pane.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.FilterEditor">
+            <summary>
+            Gets the Filter Configuration pane.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.RenameList">
+            <summary>
+            Gets the Rename List pane.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._statusHint">
+            <summary>
+            Status-bar hover hint. Empty until panes publish hints.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._itemCount">
+            <summary>
+            Count of items in the rename list.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._filterCount">
+            <summary>
+            Count of applied filters.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._changeCount">
+            <summary>
+            Count of items whose preview name differs from the original.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._previewErrorCount">
+            <summary>
+            Count of items with a preview error.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.Go">
+            <summary>
+            Applies pending rename changes. Disabled until preview/GO is implemented.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.UndoLast">
+            <summary>
+            Undoes the last GO. Placeholder until undo is implemented.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.ShowLog">
+            <summary>
+            Opens the log window. Placeholder until the log is implemented.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.ShowOptions">
+            <summary>
+            Opens Options. Placeholder until the options window is implemented.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.Exit">
+            <summary>
+            Shuts down the application.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.StatusHint">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._statusHint"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.ItemCount">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._itemCount"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.FilterCount">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._filterCount"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.ChangeCount">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._changeCount"/>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.PreviewErrorCount">
+            <inheritdoc cref="F:Mfr.App.Ui.ViewModels.MainWindowViewModel._previewErrorCount"/>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel.goCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.GoCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.GoCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.Go"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel.undoLastCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.UndoLastCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.UndoLastCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.UndoLast"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel.showLogCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.ShowLogCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.ShowLogCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.ShowLog"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel.showOptionsCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.ShowOptionsCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.ShowOptionsCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.ShowOptions"/>.</summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.MainWindowViewModel.exitCommand">
+            <summary>The backing field for <see cref="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.ExitCommand"/>.</summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.MainWindowViewModel.ExitCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:Mfr.App.Ui.ViewModels.MainWindowViewModel.Exit"/>.</summary>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.PathBreadcrumbSegment">
+            <summary>
+            One clickable folder in the File Explorer address bar.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.PathBreadcrumbSegment.Label">
+            <summary>
+            Gets the text shown for this folder.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.PathBreadcrumbSegment.TargetPath">
+            <summary>
+            Gets the filesystem path to open, or This PC / Network display names for those roots.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.ViewModels.PathBreadcrumbSegment.ShowLeadingChevron">
+            <summary>
+            Gets whether a chevron is shown before this segment.
+            </summary>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.RenameListViewModel">
+            <summary>
+            Rename List pane. The preview grid is implemented in a later GUI phase.
+            </summary>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.ThumbnailSizes">
+            <summary>
+            Discrete thumbnail display sizes for the File Explorer Thumbnails layout.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.ExtraSmall">
+            <summary>
+            Smallest preview: 48 CSS pixels on a side.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.Small">
+            <summary>
+            Compact preview: 64 pixels.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.Medium">
+            <summary>
+            Default preview: 96 pixels.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.Large">
+            <summary>
+            Large preview: 128 pixels.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.ExtraLarge">
+            <summary>
+            Extra-large preview: 192 pixels.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.Huge">
+            <summary>
+            Largest preview: 256 pixels. Bitmaps are decoded at this width.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.Default">
+            <summary>
+            Starting size when Thumbnails view is first used.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.CellPadding">
+            <summary>
+            Extra width around the image so ListBoxItem padding, border, and template margin fit.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.CaptionHeight">
+            <summary>
+            Extra height under the image for two name lines, item padding, and margin.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.Steps">
+            <summary>
+            Allowed sizes, smallest to largest.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ThumbnailSizes.Clamp(System.Int32)">
+            <summary>
+            Snaps <paramref name="size"/> to the nearest allowed step.
+            <para>
+            Ties round up so a value halfway between steps becomes the larger size.
+            </para>
+            </summary>
+            <param name="size">Requested display size in pixels.</param>
+            <returns>One of <see cref="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.Steps"/>.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ThumbnailSizes.LargerThan(System.Int32)">
+            <summary>
+            Next larger step after <paramref name="size"/>, or the maximum when already there.
+            </summary>
+            <param name="size">Current display size in pixels.</param>
+            <returns>One of <see cref="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.Steps"/>.</returns>
+        </member>
+        <member name="M:Mfr.App.Ui.ViewModels.ThumbnailSizes.SmallerThan(System.Int32)">
+            <summary>
+            Next smaller step before <paramref name="size"/>, or the minimum when already there.
+            </summary>
+            <param name="size">Current display size in pixels.</param>
+            <returns>One of <see cref="F:Mfr.App.Ui.ViewModels.ThumbnailSizes.Steps"/>.</returns>
+        </member>
+        <member name="T:Mfr.App.Ui.ViewModels.ViewModelBase">
+            <summary>
+            Base type for GUI view models.
+            </summary>
+        </member>
+        <member name="T:Mfr.App.Ui.Views.AppliedFiltersView">
+            <summary>
+            Applied Filters pane host.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.AppliedFiltersView.#ctor">
+            <summary>
+            Initializes the Applied Filters pane.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.AppliedFiltersView.InitializeComponent(System.Boolean)">
+            <summary>
+            Wires up the controls and optionally loads XAML markup and attaches dev tools (if Avalonia.Diagnostics package is referenced).
+            </summary>
+            <param name="loadXaml">Should the XAML be loaded into the component.</param>
+        </member>
+        <member name="T:Mfr.App.Ui.Views.BreadcrumbTrailPanel">
+            <summary>
+            Lays out address-bar folders from the right so the current folder stays visible.
+            <para>
+            Hidden ancestors are moved off-screen and clipped. The host overlays an overflow
+            button in the reserved leading gap when <see cref="P:Mfr.App.Ui.Views.BreadcrumbTrailPanel.HasOverflow"/> is true.
+            </para>
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.Views.BreadcrumbTrailPanel.OverflowButtonWidthProperty">
+            <summary>
+            Width reserved on the left when leading folders are collapsed.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.Views.BreadcrumbTrailPanel.HasOverflowProperty">
+            <summary>
+            Whether any ancestor folder is hidden behind the overflow button.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.Views.BreadcrumbTrailPanel.VisibleStartIndexProperty">
+            <summary>
+            Index of the first visible folder in root-to-current order.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.BreadcrumbTrailPanel.#ctor">
+            <summary>
+            Initializes the trail panel and clips collapsed folders so they cannot paint.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.Views.BreadcrumbTrailPanel.OverflowButtonWidth">
+            <summary>
+            Gets or sets the width reserved for the overflow button when ancestors are hidden.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.Views.BreadcrumbTrailPanel.HasOverflow">
+            <summary>
+            Gets whether leading folders are collapsed into the overflow button.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.Views.BreadcrumbTrailPanel.VisibleStartIndex">
+            <summary>
+            Gets the first visible folder index. <c>0</c> means the full trail is shown.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.BreadcrumbTrailPanel.MeasureOverride(Avalonia.Size)">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.BreadcrumbTrailPanel.ArrangeOverride(Avalonia.Size)">
+            <inheritdoc />
+        </member>
+        <member name="T:Mfr.App.Ui.Views.FileListAddressBarView">
+            <summary>
+            Explorer address bar: breadcrumbs, path edit, history, Up, and Refresh.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.FileListAddressBarView.#ctor">
+            <summary>
+            Initializes the address bar.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.Views.FileListAddressBarView.OverflowBreadcrumbSegments">
+            <summary>
+            Gets ancestor folders hidden from the address bar when it is too narrow.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.FileListAddressBarView.InitializeComponent(System.Boolean)">
+            <summary>
+            Wires up the controls and optionally loads XAML markup and attaches dev tools (if Avalonia.Diagnostics package is referenced).
+            </summary>
+            <param name="loadXaml">Should the XAML be loaded into the component.</param>
+        </member>
+        <member name="T:Mfr.App.Ui.Views.FileListView">
+            <summary>
+            File Explorer pane host.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.FileListView.#ctor">
+            <summary>
+            Initializes the File Explorer pane.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.FileListView.OnKeyDown(Avalonia.Input.KeyEventArgs)">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.FileListView.InitializeComponent(System.Boolean)">
+            <summary>
+            Wires up the controls and optionally loads XAML markup and attaches dev tools (if Avalonia.Diagnostics package is referenced).
+            </summary>
+            <param name="loadXaml">Should the XAML be loaded into the component.</param>
+        </member>
+        <member name="T:Mfr.App.Ui.Views.FilterEditorView">
+            <summary>
+            Filter Configuration pane host.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.FilterEditorView.#ctor">
+            <summary>
+            Initializes the Filter Configuration pane.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.FilterEditorView.InitializeComponent(System.Boolean)">
+            <summary>
+            Wires up the controls and optionally loads XAML markup and attaches dev tools (if Avalonia.Diagnostics package is referenced).
+            </summary>
+            <param name="loadXaml">Should the XAML be loaded into the component.</param>
+        </member>
+        <member name="T:Mfr.App.Ui.Views.FilterPaletteView">
+            <summary>
+            Available Filters pane host.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.FilterPaletteView.#ctor">
+            <summary>
+            Initializes the Available Filters pane.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.FilterPaletteView.InitializeComponent(System.Boolean)">
+            <summary>
+            Wires up the controls and optionally loads XAML markup and attaches dev tools (if Avalonia.Diagnostics package is referenced).
+            </summary>
+            <param name="loadXaml">Should the XAML be loaded into the component.</param>
+        </member>
+        <member name="T:Mfr.App.Ui.Views.MainWindow">
+            <summary>
+            Main application window with the MFR 7.4 splitter layout.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.MainWindow.#ctor">
+            <summary>
+            Initializes the main window.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.MainWindow.InitializeComponent(System.Boolean,System.Boolean)">
+            <summary>
+            Wires up the controls and optionally loads XAML markup and attaches dev tools (if Avalonia.Diagnostics package is referenced).
+            </summary>
+            <param name="loadXaml">Should the XAML be loaded into the component.</param>
+            <param name="attachDevTools">Should the dev tools be attached.</param>
+        </member>
+        <member name="T:Mfr.App.Ui.Views.PaneSplitter">
+            <summary>
+            Main-window pane splitter that keeps the drag after the pointer leaves the bar.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.PaneSplitter.OnPointerPressed(Avalonia.Input.PointerPressedEventArgs)">
+            <inheritdoc />
+        </member>
+        <member name="T:Mfr.App.Ui.Views.RenameListView">
+            <summary>
+            Rename List pane host.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.RenameListView.#ctor">
+            <summary>
+            Initializes the Rename List pane.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.RenameListView.InitializeComponent(System.Boolean)">
+            <summary>
+            Wires up the controls and optionally loads XAML markup and attaches dev tools (if Avalonia.Diagnostics package is referenced).
+            </summary>
+            <param name="loadXaml">Should the XAML be loaded into the component.</param>
+        </member>
+        <member name="T:Mfr.App.Ui.Views.VirtualizingWrapPanel">
+            <summary>
+            Uniform-size wrapping panel that realizes only items in the effective viewport.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.Views.VirtualizingWrapPanel.ItemWidthProperty">
+            <summary>
+            Defines the <see cref="P:Mfr.App.Ui.Views.VirtualizingWrapPanel.ItemWidth"/> property.
+            </summary>
+        </member>
+        <member name="F:Mfr.App.Ui.Views.VirtualizingWrapPanel.ItemHeightProperty">
+            <summary>
+            Defines the <see cref="P:Mfr.App.Ui.Views.VirtualizingWrapPanel.ItemHeight"/> property.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.Views.VirtualizingWrapPanel.ItemWidth">
+            <summary>
+            Gets or sets the uniform cell width. <see cref="F:System.Double.NaN"/> measures from the first item.
+            </summary>
+        </member>
+        <member name="P:Mfr.App.Ui.Views.VirtualizingWrapPanel.ItemHeight">
+            <summary>
+            Gets or sets the uniform cell height. <see cref="F:System.Double.NaN"/> measures from the first item.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.#ctor">
+            <summary>
+            Initializes a new wrapping virtualizing panel.
+            </summary>
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.MeasureOverride(Avalonia.Size)">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.ArrangeOverride(Avalonia.Size)">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.ScrollIntoView(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.ContainerFromIndex(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.IndexFromContainer(Avalonia.Controls.Control)">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.GetRealizedContainers">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.GetControl(Avalonia.Input.NavigationDirection,Avalonia.Input.IInputElement,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.OnItemsChanged(System.Collections.Generic.IReadOnlyList{System.Object},System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <inheritdoc />
+        </member>
+        <member name="M:Mfr.App.Ui.Views.VirtualizingWrapPanel.OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs)">
+            <inheritdoc />
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Icon">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Icon" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentPath">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentPath" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PathText">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PathText" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsPathEditing">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsPathEditing" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Mask">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Mask" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ExcludeMasks">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ExcludeMasks" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ViewMode">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ViewMode" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsLargeIconsView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsLargeIconsView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsSmallIconsView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsSmallIconsView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsReportView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsReportView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsListView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsListView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsTilesView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsTilesView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsThumbnailsView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsThumbnailsView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ThumbnailSize">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ThumbnailSize" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ThumbnailCellWidth">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ThumbnailCellWidth" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ThumbnailCellHeight">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ThumbnailCellHeight" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsThumbnailSizeExtraSmall">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsThumbnailSizeExtraSmall" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsThumbnailSizeSmall">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsThumbnailSizeSmall" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsThumbnailSizeMedium">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsThumbnailSizeMedium" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsThumbnailSizeLarge">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsThumbnailSizeLarge" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsThumbnailSizeExtraLarge">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsThumbnailSizeExtraLarge" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsThumbnailSizeHuge">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsThumbnailSizeHuge" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedEntry">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedEntry" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CanGoUp">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CanGoUp" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.StatusHint">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "StatusHint" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ItemCount">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ItemCount" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.FilterCount">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "FilterCount" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ChangeCount">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ChangeCount" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PreviewErrorCount">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PreviewErrorCount" generated properties.</summary>
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Icon">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Icon" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentPath">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentPath" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PathText">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PathText" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsPathEditing">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsPathEditing" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Mask">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Mask" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ExcludeMasks">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ExcludeMasks" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ViewMode">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ViewMode" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsLargeIconsView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsLargeIconsView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsSmallIconsView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsSmallIconsView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsReportView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsReportView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsListView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsListView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsTilesView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsTilesView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsThumbnailsView">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsThumbnailsView" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ThumbnailSize">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ThumbnailSize" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ThumbnailCellWidth">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ThumbnailCellWidth" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ThumbnailCellHeight">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ThumbnailCellHeight" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsThumbnailSizeExtraSmall">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsThumbnailSizeExtraSmall" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsThumbnailSizeSmall">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsThumbnailSizeSmall" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsThumbnailSizeMedium">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsThumbnailSizeMedium" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsThumbnailSizeLarge">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsThumbnailSizeLarge" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsThumbnailSizeExtraLarge">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsThumbnailSizeExtraLarge" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsThumbnailSizeHuge">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsThumbnailSizeHuge" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedEntry">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedEntry" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CanGoUp">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CanGoUp" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.StatusHint">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "StatusHint" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ItemCount">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ItemCount" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.FilterCount">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "FilterCount" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ChangeCount">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ChangeCount" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PreviewErrorCount">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PreviewErrorCount" generated properties.</summary>
+        </member>
+    </members>
+</doc>

@@ -2,7 +2,9 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.Versioning;
+using Avalonia;
 using Avalonia.Media;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services;
@@ -13,7 +15,7 @@ namespace Mfr.App.Ui.ViewModels
     /// <summary>
     /// File Explorer pane: folder listing with path, mask, exclude masks, and view modes.
     /// </summary>
-    public sealed partial class FileListViewModel : ViewModelBase
+    public sealed partial class FileListViewModel : ViewModelBase, IDisposable
     {
         /// <summary>
         /// Sentinel path for the Windows drive list ("This PC").
@@ -70,10 +72,12 @@ namespace Mfr.App.Ui.ViewModels
 
         private const int _VolumeListingGroup = 0;
         private const int _KnownPlaceListingGroup = 1;
+        private const int _ThumbnailLoadParallelismCap = 4;
 
         private readonly ISystemIconProvider _iconProvider;
         private readonly List<ListedItem> _listedItems = [];
         private readonly Dictionary<string, IImage?> _pathToThumbnail = new(PathComparers.Os);
+        private CancellationTokenSource? _thumbnailLoadCts;
 
         /// <summary>
         /// Initializes the explorer at the user profile folder with the default icon provider.
@@ -178,6 +182,7 @@ namespace Mfr.App.Ui.ViewModels
         /// </summary>
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ThumbnailCellWidth))]
+        [NotifyPropertyChangedFor(nameof(ThumbnailCellHeight))]
         [NotifyPropertyChangedFor(nameof(IsThumbnailSizeExtraSmall))]
         [NotifyPropertyChangedFor(nameof(IsThumbnailSizeSmall))]
         [NotifyPropertyChangedFor(nameof(IsThumbnailSizeMedium))]
@@ -244,6 +249,11 @@ namespace Mfr.App.Ui.ViewModels
         /// Gets the wrapping cell width for the current <see cref="ThumbnailSize"/>.
         /// </summary>
         public int ThumbnailCellWidth => ThumbnailSize + ThumbnailSizes.CellPadding;
+
+        /// <summary>
+        /// Gets the wrapping cell height for the current <see cref="ThumbnailSize"/>, including the caption.
+        /// </summary>
+        public int ThumbnailCellHeight => ThumbnailSize + ThumbnailSizes.CaptionHeight;
 
         /// <summary>
         /// Gets whether Extra Small (48) thumbnails are selected.
@@ -389,6 +399,15 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
+        /// Cancels in-flight thumbnail decoding and disposes cached preview bitmaps.
+        /// </summary>
+        public void Dispose()
+        {
+            _CancelThumbnailLoad();
+            _DisposeAndClearThumbnails();
+        }
+
+        /// <summary>
         /// Sorts the listing like Windows Explorer: folders stay first, then the column.
         /// <para>
         /// Clicking the same column again reverses order within the folder group and within the file
@@ -486,9 +505,11 @@ namespace Mfr.App.Ui.ViewModels
 
         private void _ReloadEntries()
         {
+            _CancelThumbnailLoad();
             SelectedEntry = null;
+            Entries.Clear();
             _listedItems.Clear();
-            _pathToThumbnail.Clear();
+            _DisposeAndClearThumbnails();
 
             if (ExplorerPath.IsComputerPath(CurrentPath))
             {
@@ -592,6 +613,7 @@ namespace Mfr.App.Ui.ViewModels
 
         private void _RebuildVisibleEntries(bool preserveSelection)
         {
+            _CancelThumbnailLoad();
             var selectedPath = preserveSelection ? SelectedEntry?.FullPath : null;
             Entries.Clear();
 
@@ -601,10 +623,15 @@ namespace Mfr.App.Ui.ViewModels
             if (selectedPath is null)
             {
                 SelectedEntry = null;
-                return;
+            }
+            else
+            {
+                SelectedEntry = Entries.FirstOrDefault(
+                    entry => PathComparers.Os.Equals(entry.FullPath, selectedPath));
             }
 
-            SelectedEntry = Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, selectedPath));
+            if (ViewMode == FileListViewMode.Thumbnails)
+                _StartThumbnailLoad();
         }
 
         private FileListEntry _CreateEntry(ListedItem item)
@@ -629,9 +656,8 @@ namespace Mfr.App.Ui.ViewModels
         {
             if (ViewMode == FileListViewMode.Thumbnails)
             {
-                var thumbnail = _TryGetThumbnail(item);
-                if (thumbnail is not null)
-                    return thumbnail;
+                if (_pathToThumbnail.TryGetValue(item.Path, out var cached) && cached is not null)
+                    return cached;
 
                 return _iconProvider.GetIcon(item.Path, item.IsDirectory, ShellIconSize.Large);
             }
@@ -641,20 +667,112 @@ namespace Mfr.App.Ui.ViewModels
             return _iconProvider.GetIcon(item.Path, item.IsDirectory, size);
         }
 
-        private IImage? _TryGetThumbnail(ListedItem item)
+        private void _StartThumbnailLoad()
         {
-            if (item.IsDirectory)
-                return null;
+            var pending = new List<FileListEntry>();
+            foreach (var entry in Entries)
+            {
+                if (entry.IsDirectory)
+                    continue;
+                if (_pathToThumbnail.ContainsKey(entry.FullPath))
+                    continue;
+                if (!ImageThumbnailLoader.CanLoad(entry.FullPath, entry.Length))
+                    continue;
 
-            if (_pathToThumbnail.TryGetValue(item.Path, out var cached))
-                return cached;
+                pending.Add(entry);
+            }
 
-            var thumbnail = ImageThumbnailLoader.TryLoad(
-                item.Path,
-                item.Length,
-                ThumbnailSizes.Huge);
-            _pathToThumbnail[item.Path] = thumbnail;
-            return thumbnail;
+            if (pending.Count == 0)
+                return;
+
+            var cts = new CancellationTokenSource();
+            _thumbnailLoadCts = cts;
+            var token = cts.Token;
+            var loadTask = _LoadThumbnailsAsync(pending, token);
+            _ = loadTask.ContinueWith(
+                static completed => completed.Exception,
+                CancellationToken.None,
+                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+                TaskScheduler.Default);
+        }
+
+        private async Task _LoadThumbnailsAsync(IReadOnlyList<FileListEntry> pending, CancellationToken token)
+        {
+            var options = new ParallelOptions
+            {
+                CancellationToken = token,
+                MaxDegreeOfParallelism = Math.Min(_ThumbnailLoadParallelismCap, Environment.ProcessorCount),
+            };
+
+            try
+            {
+                await Parallel.ForEachAsync(pending, options, (entry, ct) =>
+                {
+                    var thumbnail = ImageThumbnailLoader.TryLoad(
+                        entry.FullPath,
+                        entry.Length,
+                        ThumbnailSizes.Huge);
+                    if (ct.IsCancellationRequested)
+                    {
+                        _DisposeImage(thumbnail);
+                        return ValueTask.CompletedTask;
+                    }
+
+                    _PostToUi(() => _ApplyThumbnail(entry, thumbnail, ct));
+                    return ValueTask.CompletedTask;
+                });
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        private void _ApplyThumbnail(FileListEntry entry, IImage? thumbnail, CancellationToken token)
+        {
+            if (token.IsCancellationRequested)
+            {
+                _DisposeImage(thumbnail);
+                return;
+            }
+
+            _pathToThumbnail[entry.FullPath] = thumbnail;
+            if (thumbnail is not null)
+                entry.Icon = thumbnail;
+        }
+
+        private void _CancelThumbnailLoad()
+        {
+            if (_thumbnailLoadCts is null)
+                return;
+
+            _thumbnailLoadCts.Cancel();
+            _thumbnailLoadCts.Dispose();
+            _thumbnailLoadCts = null;
+        }
+
+        private void _DisposeAndClearThumbnails()
+        {
+            foreach (var image in _pathToThumbnail.Values)
+                _DisposeImage(image);
+
+            _pathToThumbnail.Clear();
+        }
+
+        private static void _DisposeImage(IImage? image)
+        {
+            if (image is IDisposable disposable)
+                disposable.Dispose();
+        }
+
+        private static void _PostToUi(Action action)
+        {
+            if (Application.Current is null)
+            {
+                action();
+                return;
+            }
+
+            Dispatcher.UIThread.Post(action);
         }
 
         private static ListedItem _CreateListedItem(string path, bool isDirectory, int listingGroup = 0)

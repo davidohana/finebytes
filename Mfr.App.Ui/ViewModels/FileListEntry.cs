@@ -1,11 +1,12 @@
 using Avalonia.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
     /// One item in the File Explorer listing.
     /// </summary>
-    public sealed class FileListEntry
+    public sealed partial class FileListEntry : ObservableObject
     {
         /// <summary>
         /// Gets the file or folder name, or the drive name.
@@ -28,9 +29,10 @@ namespace Mfr.App.Ui.ViewModels
         public int ListingGroup { get; init; }
 
         /// <summary>
-        /// Gets the icon or thumbnail for the current view mode, or <see langword="null"/> when none is available.
+        /// Gets or sets the icon or thumbnail for the current view mode, or <see langword="null"/> when none is available.
         /// </summary>
-        public IImage? Icon { get; init; }
+        [ObservableProperty]
+        private IImage? _icon;
 
         /// <summary>
         /// Gets extra text for Tiles (type and size), or empty in other view modes.

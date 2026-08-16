@@ -41,9 +41,14 @@ namespace Mfr.App.Ui.ViewModels
         public const int Default = Medium;
 
         /// <summary>
-        /// Extra width around the image for the wrapping cell.
+        /// Extra width around the image so ListBoxItem padding, border, and template margin fit.
         /// </summary>
-        public const int CellPadding = 4;
+        public const int CellPadding = 10;
+
+        /// <summary>
+        /// Extra height under the image for two name lines, item padding, and margin.
+        /// </summary>
+        public const int CaptionHeight = 44;
 
         /// <summary>
         /// Allowed sizes, smallest to largest.

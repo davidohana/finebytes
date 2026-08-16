@@ -10,10 +10,14 @@ namespace Mfr.Tests.Ui
     public sealed class FileListViewModelTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
+        private readonly List<FileListViewModel> _viewModels = [];
 
         /// <inheritdoc />
         public void Dispose()
         {
+            foreach (var viewModel in _viewModels)
+                viewModel.Dispose();
+
             _tempDirectoryFixture.Dispose();
         }
 
@@ -465,6 +469,9 @@ namespace Mfr.Tests.Ui
             Assert.Equal(
                 ThumbnailSizes.Medium + ThumbnailSizes.CellPadding,
                 viewModel.ThumbnailCellWidth);
+            Assert.Equal(
+                ThumbnailSizes.Medium + ThumbnailSizes.CaptionHeight,
+                viewModel.ThumbnailCellHeight);
             Assert.False(viewModel.ZoomThumbnailsInCommand.CanExecute(null));
         }
 
@@ -481,6 +488,9 @@ namespace Mfr.Tests.Ui
             viewModel.ZoomThumbnailsIn();
             Assert.Equal(ThumbnailSizes.Large, viewModel.ThumbnailSize);
             Assert.True(viewModel.IsThumbnailSizeLarge);
+            Assert.Equal(
+                ThumbnailSizes.Large + ThumbnailSizes.CaptionHeight,
+                viewModel.ThumbnailCellHeight);
 
             viewModel.ZoomThumbnailsIn();
             viewModel.ZoomThumbnailsIn();
@@ -536,6 +546,30 @@ namespace Mfr.Tests.Ui
             viewModel.GoUp();
             Assert.Equal(ThumbnailSizes.ExtraLarge, viewModel.ThumbnailSize);
             Assert.Equal(dir, viewModel.CurrentPath);
+        }
+
+        /// <summary>
+        /// Verifies switching to Thumbnails lists image files immediately without waiting on decode.
+        /// </summary>
+        [Fact]
+        public void Thumbnails_View_Lists_Image_Folder_Without_Waiting_For_Decode()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var fixture = Path.Combine(AppContext.BaseDirectory, "Fixtures", "tiny.jpeg");
+            Assert.True(File.Exists(fixture), $"Missing fixture '{fixture}'.");
+            var expected = new List<string>();
+            for (var i = 0; i < 40; i++)
+            {
+                var name = $"photo-{i:00}.jpeg";
+                File.Copy(fixture, Path.Combine(dir, name));
+                expected.Add(name);
+            }
+
+            var viewModel = _CreateViewModel(dir);
+            viewModel.ViewMode = FileListViewMode.Thumbnails;
+
+            Assert.Equal(expected, _Names(viewModel));
+            Assert.Equal(40, viewModel.Entries.Count);
         }
 
         /// <summary>
@@ -729,9 +763,11 @@ namespace Mfr.Tests.Ui
             return dir;
         }
 
-        private static FileListViewModel _CreateViewModel(string dir)
+        private FileListViewModel _CreateViewModel(string dir)
         {
-            return new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            _viewModels.Add(viewModel);
+            return viewModel;
         }
 
         private static List<string> _Names(FileListViewModel viewModel)
