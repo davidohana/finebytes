@@ -29,11 +29,19 @@ Ctrl+L is the address bar (Explorer / Chrome). Log is Ctrl+Shift+L so the two do
 | Go to address bar | Ctrl+L, Alt+D | Main window |
 | Up (parent folder) | Backspace | File listing focused, not while typing |
 | Refresh | F5 | Main window |
+| Large Icons | Ctrl+1 | Main window |
+| Small Icons | Ctrl+2 | Main window |
+| Report | Ctrl+3 | Main window |
+| List | Ctrl+4 | Main window |
+| Tiles | Ctrl+5 | Main window |
+| Thumbnails | Ctrl+6 | Main window |
 | Zoom thumbnails in | Ctrl++, Ctrl+Shift+=, Ctrl+numpad +, Ctrl+wheel up | Thumbnails view, not while typing |
 | Zoom thumbnails out | Ctrl+-, Ctrl+numpad -, Ctrl+wheel down | Thumbnails view, not while typing |
 | Reset thumbnail size | Ctrl+0, Ctrl+numpad 0 | Thumbnails view, not while typing |
 | Commit typed path | Enter | Address bar edit |
 | Cancel typed path | Esc | Address bar edit |
+
+Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 
 **File List → Go Up** runs from the menu anywhere; Backspace is only handled when the listing has focus so it does not steal from text boxes.
 

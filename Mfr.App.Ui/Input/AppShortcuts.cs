@@ -6,8 +6,9 @@ namespace Mfr.App.Ui.Input
     /// Keyboard shortcuts shown in menus and tooltips, and bound on the main window.
     /// <para>
     /// Keep <c>docs/keyboard-shortcuts.md</c> in sync with these gestures.
-    /// Window-level <see cref="KeyBinding"/>s use the members here. Pane-local keys
-    /// (Backspace, thumbnail zoom, address Enter/Esc) are handled in the File List view.
+    /// Window-level <see cref="KeyBinding"/>s use the members here, including File List
+    /// view types (Ctrl+1 through Ctrl+6). Pane-local keys (Backspace, thumbnail zoom,
+    /// address Enter/Esc) are handled in the File List view.
     /// </para>
     /// </summary>
     public static class AppShortcuts
@@ -47,6 +48,24 @@ namespace Mfr.App.Ui.Input
 
         /// <summary>Restores the default Thumbnails size. Also numpad 0.</summary>
         public static KeyGesture ResetZoom { get; } = new(Key.D0, KeyModifiers.Control);
+
+        /// <summary>Switches the File List to Large Icons.</summary>
+        public static KeyGesture ViewLargeIcons { get; } = new(Key.D1, KeyModifiers.Control);
+
+        /// <summary>Switches the File List to Small Icons.</summary>
+        public static KeyGesture ViewSmallIcons { get; } = new(Key.D2, KeyModifiers.Control);
+
+        /// <summary>Switches the File List to Report (details grid).</summary>
+        public static KeyGesture ViewReport { get; } = new(Key.D3, KeyModifiers.Control);
+
+        /// <summary>Switches the File List to List.</summary>
+        public static KeyGesture ViewList { get; } = new(Key.D4, KeyModifiers.Control);
+
+        /// <summary>Switches the File List to Tiles.</summary>
+        public static KeyGesture ViewTiles { get; } = new(Key.D5, KeyModifiers.Control);
+
+        /// <summary>Switches the File List to Thumbnails.</summary>
+        public static KeyGesture ViewThumbnails { get; } = new(Key.D6, KeyModifiers.Control);
 
         /// <summary>Adds the File List selection to the Rename List.</summary>
         public static KeyGesture AddSelected { get; } = new(Key.S, KeyModifiers.Control | KeyModifiers.Shift);

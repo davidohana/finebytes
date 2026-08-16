@@ -34,6 +34,24 @@
                     Command="{Binding FileList.BeginPathEditCommand}" />
         <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.GoToAddressAlt}"
                     Command="{Binding FileList.BeginPathEditCommand}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ViewLargeIcons}"
+                    Command="{Binding FileList.SetViewModeCommand}"
+                    CommandParameter="{x:Static vm:FileListViewMode.LargeIcons}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ViewSmallIcons}"
+                    Command="{Binding FileList.SetViewModeCommand}"
+                    CommandParameter="{x:Static vm:FileListViewMode.SmallIcons}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ViewReport}"
+                    Command="{Binding FileList.SetViewModeCommand}"
+                    CommandParameter="{x:Static vm:FileListViewMode.Report}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ViewList}"
+                    Command="{Binding FileList.SetViewModeCommand}"
+                    CommandParameter="{x:Static vm:FileListViewMode.List}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ViewTiles}"
+                    Command="{Binding FileList.SetViewModeCommand}"
+                    CommandParameter="{x:Static vm:FileListViewMode.Tiles}" />
+        <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ViewThumbnails}"
+                    Command="{Binding FileList.SetViewModeCommand}"
+                    CommandParameter="{x:Static vm:FileListViewMode.Thumbnails}" />
     </Window.KeyBindings>
 
     <DockPanel>
@@ -61,31 +79,37 @@
                     <MenuItem Header="Large _Icons"
                               Command="{Binding FileList.SetViewModeCommand}"
                               CommandParameter="{x:Static vm:FileListViewMode.LargeIcons}"
+                              InputGesture="{x:Static shortcuts:AppShortcuts.ViewLargeIcons}"
                               ToggleType="Radio"
                               IsChecked="{Binding FileList.IsLargeIconsView, Mode=OneWay}" />
                     <MenuItem Header="_Small Icons"
                               Command="{Binding FileList.SetViewModeCommand}"
                               CommandParameter="{x:Static vm:FileListViewMode.SmallIcons}"
+                              InputGesture="{x:Static shortcuts:AppShortcuts.ViewSmallIcons}"
                               ToggleType="Radio"
                               IsChecked="{Binding FileList.IsSmallIconsView, Mode=OneWay}" />
                     <MenuItem Header="_Report"
                               Command="{Binding FileList.SetViewModeCommand}"
                               CommandParameter="{x:Static vm:FileListViewMode.Report}"
+                              InputGesture="{x:Static shortcuts:AppShortcuts.ViewReport}"
                               ToggleType="Radio"
                               IsChecked="{Binding FileList.IsReportView, Mode=OneWay}" />
                     <MenuItem Header="_List"
                               Command="{Binding FileList.SetViewModeCommand}"
                               CommandParameter="{x:Static vm:FileListViewMode.List}"
+                              InputGesture="{x:Static shortcuts:AppShortcuts.ViewList}"
                               ToggleType="Radio"
                               IsChecked="{Binding FileList.IsListView, Mode=OneWay}" />
                     <MenuItem Header="_Tiles"
                               Command="{Binding FileList.SetViewModeCommand}"
                               CommandParameter="{x:Static vm:FileListViewMode.Tiles}"
+                              InputGesture="{x:Static shortcuts:AppShortcuts.ViewTiles}"
                               ToggleType="Radio"
                               IsChecked="{Binding FileList.IsTilesView, Mode=OneWay}" />
                     <MenuItem Header="Thumb_nails"
                               Command="{Binding FileList.SetViewModeCommand}"
                               CommandParameter="{x:Static vm:FileListViewMode.Thumbnails}"
+                              InputGesture="{x:Static shortcuts:AppShortcuts.ViewThumbnails}"
                               ToggleType="Radio"
                               IsChecked="{Binding FileList.IsThumbnailsView, Mode=OneWay}" />
                 </MenuItem>

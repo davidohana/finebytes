@@ -36,6 +36,12 @@ namespace Mfr.Tests.Ui
             Assert.Equal(new KeyGesture(Key.OemPlus, KeyModifiers.Control), AppShortcuts.ZoomIn);
             Assert.Equal(new KeyGesture(Key.OemMinus, KeyModifiers.Control), AppShortcuts.ZoomOut);
             Assert.Equal(new KeyGesture(Key.D0, KeyModifiers.Control), AppShortcuts.ResetZoom);
+            Assert.Equal(new KeyGesture(Key.D1, KeyModifiers.Control), AppShortcuts.ViewLargeIcons);
+            Assert.Equal(new KeyGesture(Key.D2, KeyModifiers.Control), AppShortcuts.ViewSmallIcons);
+            Assert.Equal(new KeyGesture(Key.D3, KeyModifiers.Control), AppShortcuts.ViewReport);
+            Assert.Equal(new KeyGesture(Key.D4, KeyModifiers.Control), AppShortcuts.ViewList);
+            Assert.Equal(new KeyGesture(Key.D5, KeyModifiers.Control), AppShortcuts.ViewTiles);
+            Assert.Equal(new KeyGesture(Key.D6, KeyModifiers.Control), AppShortcuts.ViewThumbnails);
             Assert.Equal(
                 new KeyGesture(Key.S, KeyModifiers.Control | KeyModifiers.Shift),
                 AppShortcuts.AddSelected);

@@ -48,6 +48,12 @@ namespace Mfr.Tests.Ui
             Assert.Contains(AppShortcuts.Refresh, gestures);
             Assert.Contains(AppShortcuts.GoToAddress, gestures);
             Assert.Contains(AppShortcuts.GoToAddressAlt, gestures);
+            Assert.Contains(AppShortcuts.ViewLargeIcons, gestures);
+            Assert.Contains(AppShortcuts.ViewSmallIcons, gestures);
+            Assert.Contains(AppShortcuts.ViewReport, gestures);
+            Assert.Contains(AppShortcuts.ViewList, gestures);
+            Assert.Contains(AppShortcuts.ViewTiles, gestures);
+            Assert.Contains(AppShortcuts.ViewThumbnails, gestures);
             Assert.DoesNotContain(AppShortcuts.GoUp, gestures);
             Assert.DoesNotContain(AppShortcuts.Exit, gestures);
             Assert.DoesNotContain(AppShortcuts.ZoomIn, gestures);
