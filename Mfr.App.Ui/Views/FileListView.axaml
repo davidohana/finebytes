@@ -384,12 +384,16 @@
                                            TextWrapping="Wrap"
                                            TextTrimming="CharacterEllipsis"
                                            MaxLines="2" />
-                                <Image Stretch="Uniform"
-                                       StretchDirection="DownOnly"
-                                       RenderOptions.BitmapInterpolationMode="HighQuality"
+                                <Panel x:Name="ThumbnailSquare"
+                                       Width="{Binding $parent[views:FileListView].((vm:FileListViewModel)DataContext).ThumbnailSize}"
+                                       Height="{Binding $parent[views:FileListView].((vm:FileListViewModel)DataContext).ThumbnailSize}"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
-                                       Source="{Binding Icon}" />
+                                       ClipToBounds="True">
+                                    <Image Stretch="Uniform"
+                                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                                           Source="{Binding Icon}" />
+                                </Panel>
                             </DockPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

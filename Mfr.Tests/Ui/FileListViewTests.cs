@@ -47,6 +47,28 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies each thumbnail image occupies a square of the current size, including after zoom.
+        /// </summary>
+        [AvaloniaFact]
+        public void Thumbnail_Image_Is_Square_Of_ThumbnailSize()
+        {
+            var viewModel = _CreateThumbnailsViewModel(folderCount: 4);
+            var (window, list) = _ShowThumbnails(viewModel);
+            var entry = Assert.Single(viewModel.Entries, item => item.Name == ".config");
+            var square = _ThumbnailSquare(list, entry);
+
+            Assert.Equal(viewModel.ThumbnailSize, square.Bounds.Width, precision: 0);
+            Assert.Equal(viewModel.ThumbnailSize, square.Bounds.Height, precision: 0);
+
+            viewModel.ZoomThumbnailsIn();
+            window.UpdateLayout();
+
+            Assert.Equal(ThumbnailSizes.Large, viewModel.ThumbnailSize);
+            Assert.Equal(viewModel.ThumbnailSize, square.Bounds.Width, precision: 0);
+            Assert.Equal(viewModel.ThumbnailSize, square.Bounds.Height, precision: 0);
+        }
+
+        /// <summary>
         /// Verifies recycled thumbnail containers keep a full-cell selection after a long scroll.
         /// </summary>
         [AvaloniaFact]
@@ -100,18 +122,31 @@ namespace Mfr.Tests.Ui
             return (window, list);
         }
 
-        private static ContentPresenter _SelectionPresenter(ListBox list, FileListEntry entry)
+        private static ListBoxItem _ThumbnailContainer(ListBox list, FileListEntry entry)
         {
             var index = list.Items.Cast<FileListEntry>().ToList().IndexOf(entry);
             Assert.True(index >= 0);
             var container = list.ContainerFromIndex(index) as ListBoxItem;
             Assert.NotNull(container);
+            return container;
+        }
 
-            var presenter = container.GetVisualDescendants()
+        private static ContentPresenter _SelectionPresenter(ListBox list, FileListEntry entry)
+        {
+            var presenter = _ThumbnailContainer(list, entry).GetVisualDescendants()
                 .OfType<ContentPresenter>()
                 .FirstOrDefault(item => item.Name == "PART_ContentPresenter");
             Assert.NotNull(presenter);
             return presenter;
+        }
+
+        private static Panel _ThumbnailSquare(ListBox list, FileListEntry entry)
+        {
+            var square = _ThumbnailContainer(list, entry).GetVisualDescendants()
+                .OfType<Panel>()
+                .FirstOrDefault(item => item.Name == "ThumbnailSquare");
+            Assert.NotNull(square);
+            return square;
         }
     }
 }
