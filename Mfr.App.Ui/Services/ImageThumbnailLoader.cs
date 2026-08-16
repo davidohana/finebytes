@@ -9,9 +9,9 @@ namespace Mfr.App.Ui.Services
     internal static class ImageThumbnailLoader
     {
         /// <summary>
-        /// Pixel width used when decoding image previews.
+        /// Pixel width used when decoding image previews (matches the largest thumbnail step).
         /// </summary>
-        public const int DecodeWidth = 96;
+        public const int DecodeWidth = 256;
 
         private const long _MaxBytes = 20 * 1024 * 1024;
 
@@ -30,8 +30,9 @@ namespace Mfr.App.Ui.Services
         /// </summary>
         /// <param name="path">Full filesystem path of a file.</param>
         /// <param name="length">Known file length, or <see langword="null"/> when unknown.</param>
+        /// <param name="decodeWidth">Target pixel width. Defaults to <see cref="DecodeWidth"/>.</param>
         /// <returns>A preview image, or <see langword="null"/> when the file is skipped or cannot be decoded.</returns>
-        public static IImage? TryLoad(string path, long? length)
+        public static IImage? TryLoad(string path, long? length, int decodeWidth = DecodeWidth)
         {
             if (length is null or > _MaxBytes)
                 return null;
@@ -40,10 +41,11 @@ namespace Mfr.App.Ui.Services
             if (!_extensionToIsImage.Contains(extension))
                 return null;
 
+            var width = decodeWidth < 1 ? DecodeWidth : decodeWidth;
             try
             {
                 using var stream = File.OpenRead(path);
-                return Bitmap.DecodeToWidth(stream, DecodeWidth);
+                return Bitmap.DecodeToWidth(stream, width);
             }
             catch (Exception ex) when (ex is IOException
                 or UnauthorizedAccessException

@@ -453,6 +453,92 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies thumbnail size starts at Medium and cell width includes padding.
+        /// </summary>
+        [Fact]
+        public void ThumbnailSize_Defaults_To_Medium()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+
+            Assert.Equal(ThumbnailSizes.Medium, viewModel.ThumbnailSize);
+            Assert.True(viewModel.IsThumbnailSizeMedium);
+            Assert.Equal(
+                ThumbnailSizes.Medium + ThumbnailSizes.CellPadding,
+                viewModel.ThumbnailCellWidth);
+            Assert.False(viewModel.ZoomThumbnailsInCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies zoom commands step through sizes only while Thumbnails view is active.
+        /// </summary>
+        [Fact]
+        public void Thumbnail_Zoom_Steps_And_Stops_At_Ends()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.SetViewMode(FileListViewMode.Thumbnails);
+
+            Assert.True(viewModel.ZoomThumbnailsInCommand.CanExecute(null));
+            viewModel.ZoomThumbnailsIn();
+            Assert.Equal(ThumbnailSizes.Large, viewModel.ThumbnailSize);
+            Assert.True(viewModel.IsThumbnailSizeLarge);
+
+            viewModel.ZoomThumbnailsIn();
+            viewModel.ZoomThumbnailsIn();
+            viewModel.ZoomThumbnailsIn();
+            Assert.Equal(ThumbnailSizes.Huge, viewModel.ThumbnailSize);
+            viewModel.ZoomThumbnailsIn();
+            Assert.Equal(ThumbnailSizes.Huge, viewModel.ThumbnailSize);
+
+            viewModel.ResetThumbnailSize();
+            Assert.Equal(ThumbnailSizes.Default, viewModel.ThumbnailSize);
+
+            viewModel.ZoomThumbnailsOut();
+            Assert.Equal(ThumbnailSizes.Small, viewModel.ThumbnailSize);
+            viewModel.ZoomThumbnailsOut();
+            viewModel.ZoomThumbnailsOut();
+            Assert.Equal(ThumbnailSizes.ExtraSmall, viewModel.ThumbnailSize);
+        }
+
+        /// <summary>
+        /// Verifies SetThumbnailSize snaps to a step without rebuilding the listing.
+        /// </summary>
+        [Fact]
+        public void SetThumbnailSize_Snaps_Without_Rebuilding_Entries()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.SetViewMode(FileListViewMode.Thumbnails);
+            var first = viewModel.Entries[0];
+
+            viewModel.SetThumbnailSize(100);
+
+            Assert.Equal(ThumbnailSizes.Medium, viewModel.ThumbnailSize);
+            Assert.Same(first, viewModel.Entries[0]);
+        }
+
+        /// <summary>
+        /// Verifies thumbnail size survives refresh and folder navigation.
+        /// </summary>
+        [Fact]
+        public void ThumbnailSize_Survives_Refresh_And_Navigate()
+        {
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir);
+            viewModel.SetViewMode(FileListViewMode.Thumbnails);
+            viewModel.SetThumbnailSize(ThumbnailSizes.ExtraLarge);
+
+            viewModel.Refresh();
+            Assert.Equal(ThumbnailSizes.ExtraLarge, viewModel.ThumbnailSize);
+
+            viewModel.SelectedEntry = viewModel.Entries.First(entry => entry.IsDirectory);
+            viewModel.OpenSelected();
+            Assert.Equal(ThumbnailSizes.ExtraLarge, viewModel.ThumbnailSize);
+
+            viewModel.GoUp();
+            Assert.Equal(ThumbnailSizes.ExtraLarge, viewModel.ThumbnailSize);
+            Assert.Equal(dir, viewModel.CurrentPath);
+        }
+
+        /// <summary>
         /// Verifies Tiles fill type and size details, while other modes leave details empty.
         /// </summary>
         [Fact]

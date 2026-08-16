@@ -61,6 +61,39 @@
                               ToggleType="Radio"
                               IsChecked="{Binding FileList.IsThumbnailsView, Mode=OneWay}" />
                 </MenuItem>
+                <MenuItem Header="Thumbnail _Size"
+                          IsEnabled="{Binding FileList.IsThumbnailsView}">
+                    <MenuItem Header="_Extra Small"
+                              Command="{Binding FileList.SetThumbnailSizeCommand}"
+                              CommandParameter="{x:Static vm:ThumbnailSizes.ExtraSmall}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsThumbnailSizeExtraSmall, Mode=OneWay}" />
+                    <MenuItem Header="_Small"
+                              Command="{Binding FileList.SetThumbnailSizeCommand}"
+                              CommandParameter="{x:Static vm:ThumbnailSizes.Small}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsThumbnailSizeSmall, Mode=OneWay}" />
+                    <MenuItem Header="_Medium"
+                              Command="{Binding FileList.SetThumbnailSizeCommand}"
+                              CommandParameter="{x:Static vm:ThumbnailSizes.Medium}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsThumbnailSizeMedium, Mode=OneWay}" />
+                    <MenuItem Header="_Large"
+                              Command="{Binding FileList.SetThumbnailSizeCommand}"
+                              CommandParameter="{x:Static vm:ThumbnailSizes.Large}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsThumbnailSizeLarge, Mode=OneWay}" />
+                    <MenuItem Header="E_xtra Large"
+                              Command="{Binding FileList.SetThumbnailSizeCommand}"
+                              CommandParameter="{x:Static vm:ThumbnailSizes.ExtraLarge}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsThumbnailSizeExtraLarge, Mode=OneWay}" />
+                    <MenuItem Header="_Huge"
+                              Command="{Binding FileList.SetThumbnailSizeCommand}"
+                              CommandParameter="{x:Static vm:ThumbnailSizes.Huge}"
+                              ToggleType="Radio"
+                              IsChecked="{Binding FileList.IsThumbnailSizeHuge, Mode=OneWay}" />
+                </MenuItem>
                 <MenuItem Header="_Refresh" Command="{Binding FileList.RefreshCommand}" />
                 <Separator />
                 <MenuItem Header="Show Hidden/System Files" IsEnabled="False" />

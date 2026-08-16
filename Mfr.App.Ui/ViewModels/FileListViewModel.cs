@@ -168,7 +168,23 @@ namespace Mfr.App.Ui.ViewModels
         [NotifyPropertyChangedFor(nameof(IsListView))]
         [NotifyPropertyChangedFor(nameof(IsTilesView))]
         [NotifyPropertyChangedFor(nameof(IsThumbnailsView))]
+        [NotifyCanExecuteChangedFor(nameof(ZoomThumbnailsInCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ZoomThumbnailsOutCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ResetThumbnailSizeCommand))]
         private FileListViewMode _viewMode = FileListViewMode.Report;
+
+        /// <summary>
+        /// Pixel size of the thumbnail image box in Thumbnails view.
+        /// </summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ThumbnailCellWidth))]
+        [NotifyPropertyChangedFor(nameof(IsThumbnailSizeExtraSmall))]
+        [NotifyPropertyChangedFor(nameof(IsThumbnailSizeSmall))]
+        [NotifyPropertyChangedFor(nameof(IsThumbnailSizeMedium))]
+        [NotifyPropertyChangedFor(nameof(IsThumbnailSizeLarge))]
+        [NotifyPropertyChangedFor(nameof(IsThumbnailSizeExtraLarge))]
+        [NotifyPropertyChangedFor(nameof(IsThumbnailSizeHuge))]
+        private int _thumbnailSize = ThumbnailSizes.Default;
 
         /// <summary>
         /// Gets the <see cref="FileListEntry"/> property used for the current column sort.
@@ -223,6 +239,41 @@ namespace Mfr.App.Ui.ViewModels
         /// Gets whether the Thumbnails layout is active.
         /// </summary>
         public bool IsThumbnailsView => ViewMode == FileListViewMode.Thumbnails;
+
+        /// <summary>
+        /// Gets the wrapping cell width for the current <see cref="ThumbnailSize"/>.
+        /// </summary>
+        public int ThumbnailCellWidth => ThumbnailSize + ThumbnailSizes.CellPadding;
+
+        /// <summary>
+        /// Gets whether Extra Small (48) thumbnails are selected.
+        /// </summary>
+        public bool IsThumbnailSizeExtraSmall => ThumbnailSize == ThumbnailSizes.ExtraSmall;
+
+        /// <summary>
+        /// Gets whether Small (64) thumbnails are selected.
+        /// </summary>
+        public bool IsThumbnailSizeSmall => ThumbnailSize == ThumbnailSizes.Small;
+
+        /// <summary>
+        /// Gets whether Medium (96) thumbnails are selected.
+        /// </summary>
+        public bool IsThumbnailSizeMedium => ThumbnailSize == ThumbnailSizes.Medium;
+
+        /// <summary>
+        /// Gets whether Large (128) thumbnails are selected.
+        /// </summary>
+        public bool IsThumbnailSizeLarge => ThumbnailSize == ThumbnailSizes.Large;
+
+        /// <summary>
+        /// Gets whether Extra Large (192) thumbnails are selected.
+        /// </summary>
+        public bool IsThumbnailSizeExtraLarge => ThumbnailSize == ThumbnailSizes.ExtraLarge;
+
+        /// <summary>
+        /// Gets whether Huge (256) thumbnails are selected.
+        /// </summary>
+        public bool IsThumbnailSizeHuge => ThumbnailSize == ThumbnailSizes.Huge;
 
         /// <summary>
         /// Navigates to <see cref="PathText"/> when the user commits the typed path.
@@ -301,6 +352,43 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
+        /// Sets the Thumbnails image size to the nearest allowed step.
+        /// </summary>
+        /// <param name="size">Requested size in pixels.</param>
+        [RelayCommand]
+        public void SetThumbnailSize(int size)
+        {
+            ThumbnailSize = ThumbnailSizes.Clamp(size);
+        }
+
+        /// <summary>
+        /// Moves Thumbnails view to the next larger size step.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(IsThumbnailsView))]
+        public void ZoomThumbnailsIn()
+        {
+            ThumbnailSize = ThumbnailSizes.LargerThan(ThumbnailSize);
+        }
+
+        /// <summary>
+        /// Moves Thumbnails view to the next smaller size step.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(IsThumbnailsView))]
+        public void ZoomThumbnailsOut()
+        {
+            ThumbnailSize = ThumbnailSizes.SmallerThan(ThumbnailSize);
+        }
+
+        /// <summary>
+        /// Restores the default Thumbnails size (96 pixels).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(IsThumbnailsView))]
+        public void ResetThumbnailSize()
+        {
+            ThumbnailSize = ThumbnailSizes.Default;
+        }
+
+        /// <summary>
         /// Sorts the listing like Windows Explorer: folders stay first, then the column.
         /// <para>
         /// Clicking the same column again reverses order within the folder group and within the file
@@ -352,6 +440,13 @@ namespace Mfr.App.Ui.ViewModels
         partial void OnViewModeChanged(FileListViewMode value)
         {
             _RebuildVisibleEntries(preserveSelection: true);
+        }
+
+        partial void OnThumbnailSizeChanged(int value)
+        {
+            var clamped = ThumbnailSizes.Clamp(value);
+            if (clamped != value)
+                ThumbnailSize = clamped;
         }
 
         private bool _CanOpenSelected()
@@ -554,7 +649,10 @@ namespace Mfr.App.Ui.ViewModels
             if (_pathToThumbnail.TryGetValue(item.Path, out var cached))
                 return cached;
 
-            var thumbnail = ImageThumbnailLoader.TryLoad(item.Path, item.Length);
+            var thumbnail = ImageThumbnailLoader.TryLoad(
+                item.Path,
+                item.Length,
+                ThumbnailSizes.Huge);
             _pathToThumbnail[item.Path] = thumbnail;
             return thumbnail;
         }

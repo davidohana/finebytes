@@ -19,6 +19,10 @@ namespace Mfr.App.Ui.Views
         public FileListView()
         {
             InitializeComponent();
+            ThumbnailsList.AddHandler(
+                PointerWheelChangedEvent,
+                _OnThumbnailsPointerWheelChanged,
+                RoutingStrategies.Tunnel);
         }
 
         /// <inheritdoc />
@@ -33,6 +37,9 @@ namespace Mfr.App.Ui.Views
                 return;
             }
 
+            if (_TryHandleThumbnailZoomKeys(e))
+                return;
+
             base.OnKeyDown(e);
         }
 
@@ -44,6 +51,9 @@ namespace Mfr.App.Ui.Views
 
         private void _OnEntriesKeyDown(object? sender, KeyEventArgs e)
         {
+            if (_TryHandleThumbnailZoomKeys(e))
+                return;
+
             if (e.Key != Key.Back)
                 return;
 
@@ -51,6 +61,58 @@ namespace Mfr.App.Ui.Views
                 viewModel.GoUp();
 
             e.Handled = true;
+        }
+
+        private void _OnThumbnailsPointerWheelChanged(object? sender, PointerWheelEventArgs e)
+        {
+            if (e.KeyModifiers != KeyModifiers.Control)
+                return;
+            if (DataContext is not FileListViewModel viewModel || !viewModel.IsThumbnailsView)
+                return;
+
+            if (e.Delta.Y > 0)
+                viewModel.ZoomThumbnailsIn();
+            else if (e.Delta.Y < 0)
+                viewModel.ZoomThumbnailsOut();
+
+            e.Handled = true;
+        }
+
+        private bool _TryHandleThumbnailZoomKeys(KeyEventArgs e)
+        {
+            // Shift is allowed so Ctrl+Shift+= (the + key) zooms in on typical keyboards.
+            var modifiersWithoutShift = e.KeyModifiers & ~KeyModifiers.Shift;
+            if (modifiersWithoutShift != KeyModifiers.Control)
+                return false;
+            if (DataContext is not FileListViewModel viewModel || !viewModel.IsThumbnailsView)
+                return false;
+            if (viewModel.IsPathEditing)
+                return false;
+            if (e.Source is TextBox or ComboBox)
+                return false;
+
+            if (e.Key is Key.OemPlus or Key.Add)
+            {
+                viewModel.ZoomThumbnailsIn();
+                e.Handled = true;
+                return true;
+            }
+
+            if (e.Key is Key.OemMinus or Key.Subtract)
+            {
+                viewModel.ZoomThumbnailsOut();
+                e.Handled = true;
+                return true;
+            }
+
+            if (e.Key is Key.D0 or Key.NumPad0)
+            {
+                viewModel.ResetThumbnailSize();
+                e.Handled = true;
+                return true;
+            }
+
+            return false;
         }
 
         private void _OnReportGridLoaded(object? sender, RoutedEventArgs e)

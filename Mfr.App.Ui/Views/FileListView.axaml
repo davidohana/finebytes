@@ -8,6 +8,7 @@
              d:DesignWidth="280"
              d:DesignHeight="400"
              x:Class="Mfr.App.Ui.Views.FileListView"
+             x:Name="FileListRoot"
              x:DataType="vm:FileListViewModel">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -349,7 +350,8 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <ListBox Classes="file-list file-icons"
+                <ListBox x:Name="ThumbnailsList"
+                         Classes="file-list file-icons"
                          ItemsSource="{Binding Entries}"
                          SelectedItem="{Binding SelectedEntry}"
                          IsVisible="{Binding IsThumbnailsView}"
@@ -363,9 +365,10 @@
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Width="100" Margin="2,1">
-                                <Image Width="96"
-                                       Height="96"
+                            <StackPanel Width="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailCellWidth}"
+                                        Margin="2,1">
+                                <Image Width="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"
+                                       Height="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailSize}"
                                        Stretch="Uniform"
                                        HorizontalAlignment="Center"
                                        Source="{Binding Icon}" />
