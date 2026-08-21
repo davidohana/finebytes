@@ -1,3 +1,4 @@
+using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -16,6 +17,11 @@ namespace Mfr.App.Ui.ViewModels
     /// </param>
     public partial class MainWindowViewModel(string? initialFileListPath = null) : ViewModelBase
     {
+        /// <summary>
+        /// Gets the main window title, including the product version.
+        /// </summary>
+        public string WindowTitle { get; } = $"Magic File Renamer {_GetDisplayVersion()}";
+
         /// <summary>
         /// Gets the File List pane.
         /// </summary>
@@ -109,6 +115,19 @@ namespace Mfr.App.Ui.ViewModels
         private static bool _CanExecuteUnimplemented()
         {
             return false;
+        }
+
+        private static string _GetDisplayVersion()
+        {
+            var informational = typeof(MainWindowViewModel)
+                .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion;
+            if (!string.IsNullOrWhiteSpace(informational))
+            {
+                return informational;
+            }
+
+            return typeof(MainWindowViewModel).Assembly.GetName().Version?.ToString(3) ?? "unknown";
         }
     }
 }

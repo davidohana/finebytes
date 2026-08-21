@@ -25,6 +25,21 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies the window title includes the product version.
+        /// </summary>
+        [AvaloniaFact]
+        public void MainWindow_TitleIncludesVersion()
+        {
+            var viewModel = new MainWindowViewModel();
+            var window = new MainWindow { DataContext = viewModel };
+
+            window.Show();
+
+            Assert.Equal(viewModel.WindowTitle, window.Title);
+            Assert.Matches(@"^Magic File Renamer \S+", viewModel.WindowTitle);
+        }
+
+        /// <summary>
         /// Verifies documented global shortcuts are window key bindings, not Backspace or Alt+F4.
         /// </summary>
         [AvaloniaFact]

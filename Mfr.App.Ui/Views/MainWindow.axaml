@@ -11,7 +11,7 @@
   d:DesignHeight="720"
   x:Class="Mfr.App.Ui.Views.MainWindow"
   x:DataType="vm:MainWindowViewModel"
-  Title="Magic File Renamer"
+  Title="{Binding WindowTitle}"
   Icon="/Assets/mfr.ico"
   Width="1100"
   Height="720"

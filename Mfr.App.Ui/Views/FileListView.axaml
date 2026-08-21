@@ -158,6 +158,26 @@
       <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
+    <Style Selector="ComboBox.mask-filter">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="ComboBox.mask-filter /template/ TextBox#PART_EditableTextBox">
+      <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="ComboBox.mask-filter /template/ TextBox#PART_EditableTextBox /template/ TextPresenter#PART_TextPresenter">
+      <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBox.mask-filter">
+      <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBox.mask-filter /template/ TextPresenter#PART_TextPresenter">
+      <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
   </UserControl.Styles>
   <Border Classes="pane">
     <DockPanel>
@@ -167,12 +187,20 @@
         <TextBlock Text="Mask:" VerticalAlignment="Center" Margin="0,0,6,0" />
         <ComboBox
           Grid.Column="1"
+          Classes="mask-filter"
           IsEditable="True"
+          HorizontalAlignment="Stretch"
           ItemsSource="{Binding MaskSuggestions}"
           Text="{Binding Mask, Mode=TwoWay}"
         />
         <TextBlock Grid.Column="2" Text="Exclude:" VerticalAlignment="Center" Margin="8,0,6,0" />
-        <TextBox Grid.Column="3" MinWidth="72" Watermark="*.tmp; *.bak" Text="{Binding ExcludeMasks, Mode=TwoWay}" />
+        <TextBox
+          Grid.Column="3"
+          Classes="mask-filter"
+          MinWidth="72"
+          Watermark="*.tmp; *.bak"
+          Text="{Binding ExcludeMasks, Mode=TwoWay}"
+        />
       </Grid>
 
       <Panel>
