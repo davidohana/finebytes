@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.Services.FileExplorer
+namespace Mfr.App.Ui.Services.FileList
 {
     /// <summary>
     /// One Windows user folder shown on This PC, such as Documents or Music.

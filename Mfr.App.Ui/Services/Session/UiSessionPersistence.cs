@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.Services.Session
         /// Updates <c>session.json</c> for enabled remember flags; leaves disabled fields unchanged.
         /// </summary>
         /// <param name="window">Main window (for geometry capture).</param>
-        /// <param name="viewModel">Root VM providing the explorer path.</param>
+        /// <param name="viewModel">Root VM providing the File List path.</param>
         /// <param name="hasNormalBounds">True when normal-state bounds were observed.</param>
         /// <param name="normalX">Tracked normal-state X.</param>
         /// <param name="normalY">Tracked normal-state Y.</param>
@@ -68,7 +68,7 @@ namespace Mfr.App.Ui.Services.Session
             if (path.IsBlank())
                 return false;
 
-            if (ExplorerPath.IsComputerPath(path) || ExplorerPath.IsNetworkPath(path))
+            if (FileListPath.IsComputerPath(path) || FileListPath.IsNetworkPath(path))
                 return false;
 
             return Directory.Exists(path);

@@ -9,12 +9,12 @@ using Mfr.Utils;
 namespace Mfr.App.Ui.Views
 {
     /// <summary>
-    /// File Explorer pane host.
+    /// File List pane host.
     /// </summary>
     public partial class FileListView : UserControl
     {
         /// <summary>
-        /// Initializes the File Explorer pane.
+        /// Initializes the File List pane.
         /// </summary>
         public FileListView()
         {

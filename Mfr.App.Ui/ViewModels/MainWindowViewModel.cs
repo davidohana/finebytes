@@ -11,16 +11,16 @@ namespace Mfr.App.Ui.ViewModels
     /// <remarks>
     /// Initializes pane view models for the 7.4 layout.
     /// </remarks>
-    /// <param name="initialExplorerPath">
-    /// Optional File Explorer start path (e.g. remembered last folder). When null, the explorer uses its default.
+    /// <param name="initialFileListPath">
+    /// Optional File List start path (e.g. remembered last folder). When null, the File List uses its default.
     /// </param>
-    public partial class MainWindowViewModel(string? initialExplorerPath = null) : ViewModelBase
+    public partial class MainWindowViewModel(string? initialFileListPath = null) : ViewModelBase
     {
 
         /// <summary>
-        /// Gets the File Explorer pane.
+        /// Gets the File List pane.
         /// </summary>
-        public FileListViewModel FileList { get; } = new FileListViewModel(iconProvider: null, initialPath: initialExplorerPath);
+        public FileListViewModel FileList { get; } = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
 
         /// <summary>
         /// Gets the Available Filters pane.

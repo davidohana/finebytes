@@ -14,14 +14,14 @@ namespace Mfr.Tests.Ui
     public sealed class MainWindowSplitterTests
     {
         /// <summary>
-        /// Verifies dragging the File Explorer splitter changes the left column width.
+        /// Verifies dragging the File List splitter changes the left column width.
         /// </summary>
         [AvaloniaFact]
-        public void FileExplorerSplitter_Resizes_Columns()
+        public void FileListSplitter_Resizes_Columns()
         {
             var window = _ShowMainWindow();
             var grid = window.FindControl<Grid>("TopPanesGrid")!;
-            var splitter = window.FindControl<GridSplitter>("FileExplorerSplitter")!;
+            var splitter = window.FindControl<GridSplitter>("FileListSplitter")!;
             var before = grid.ColumnDefinitions[0].ActualWidth;
 
             _Drag(splitter, deltaX: 80, deltaY: 0);

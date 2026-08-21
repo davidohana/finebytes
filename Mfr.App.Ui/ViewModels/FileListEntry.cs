@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// One item in the File Explorer listing.
+    /// One item in the File List listing.
     /// </summary>
     public sealed partial class FileListEntry : ObservableObject
     {

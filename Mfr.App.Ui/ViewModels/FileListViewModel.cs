@@ -7,40 +7,40 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mfr.App.Ui.Services.FileExplorer;
+using Mfr.App.Ui.Services.FileList;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// File Explorer pane: folder listing with path, mask, exclude masks, and view modes.
+    /// File List pane: folder listing with path, mask, exclude masks, and view modes.
     /// </summary>
     public sealed partial class FileListViewModel : ViewModelBase, IDisposable
     {
         /// <summary>
         /// Sentinel path for the Windows drive list ("This PC").
         /// </summary>
-        public const string ComputerPath = ExplorerPath.ComputerPath;
+        public const string ComputerPath = FileListPath.ComputerPath;
 
         /// <summary>
         /// Address-bar label shown when listing drives on Windows.
         /// </summary>
-        public const string ComputerDisplayName = ExplorerPath.ComputerDisplayName;
+        public const string ComputerDisplayName = FileListPath.ComputerDisplayName;
 
         /// <summary>
         /// Sentinel path for mapped drives and recent UNC locations.
         /// </summary>
-        public const string NetworkPath = ExplorerPath.NetworkPath;
+        public const string NetworkPath = FileListPath.NetworkPath;
 
         /// <summary>
         /// Address-bar label shown for <see cref="NetworkPath"/>.
         /// </summary>
-        public const string NetworkDisplayName = ExplorerPath.NetworkDisplayName;
+        public const string NetworkDisplayName = FileListPath.NetworkDisplayName;
 
         /// <summary>
         /// Address-bar label and path for the filesystem root on Unix.
         /// </summary>
-        public const string UnixRootPath = ExplorerPath.UnixRootPath;
+        public const string UnixRootPath = FileListPath.UnixRootPath;
 
         private static readonly string[] _DefaultMasks =
         [
@@ -64,7 +64,7 @@ namespace Mfr.App.Ui.ViewModels
         };
 
         // Caps how long a disconnected UNC or mapped drive may block Exists/enumerate.
-        // The OS SMB timeout cannot be cancelled; this bound keeps the explorer responsive.
+        // The OS SMB timeout cannot be cancelled; this bound keeps the File List responsive.
         private static readonly TimeSpan _NetworkProbeTimeout = TimeSpan.FromSeconds(3);
 
         // First contact with a UNC server (\\ohanas) is often slower than a share Exists check.
@@ -80,7 +80,7 @@ namespace Mfr.App.Ui.ViewModels
         private CancellationTokenSource? _thumbnailLoadCts;
 
         /// <summary>
-        /// Initializes the explorer at the user profile folder with the default icon provider.
+        /// Initializes the File List at the user profile folder with the default icon provider.
         /// </summary>
         public FileListViewModel()
             : this(iconProvider: null, initialPath: null)
@@ -88,7 +88,7 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
-        /// Initializes the explorer.
+        /// Initializes the File List.
         /// </summary>
         /// <param name="iconProvider">Shell icons, or <see langword="null"/> to use the OS default.</param>
         /// <param name="initialPath">Directory to open, or <see langword="null"/> for the user profile.</param>
@@ -103,7 +103,7 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
-        /// Gets the items shown in the File Explorer pane.
+        /// Gets the items shown in the File List pane.
         /// </summary>
         public ObservableCollection<FileListEntry> Entries { get; }
 
@@ -304,7 +304,7 @@ namespace Mfr.App.Ui.ViewModels
             if (IsPathEditing)
                 return;
 
-            PathText = ExplorerPath.ToDisplayPath(CurrentPath);
+            PathText = FileListPath.ToDisplayPath(CurrentPath);
             IsPathEditing = true;
         }
 
@@ -323,7 +323,7 @@ namespace Mfr.App.Ui.ViewModels
         [RelayCommand(CanExecute = nameof(CanGoUp))]
         public void GoUp()
         {
-            var parent = ExplorerPath.GetParentPath(CurrentPath);
+            var parent = FileListPath.GetParentPath(CurrentPath);
             if (parent is null)
                 return;
 
@@ -352,7 +352,7 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
-        /// Switches the File Explorer layout.
+        /// Switches the File List layout.
         /// </summary>
         /// <param name="mode">Layout to show.</param>
         [RelayCommand]
@@ -482,7 +482,7 @@ namespace Mfr.App.Ui.ViewModels
                 return;
 
             CurrentPath = resolved;
-            PathText = ExplorerPath.ToDisplayPath(resolved);
+            PathText = FileListPath.ToDisplayPath(resolved);
             IsPathEditing = false;
             _RememberPath(PathText);
             _RebuildBreadcrumbs();
@@ -492,14 +492,14 @@ namespace Mfr.App.Ui.ViewModels
 
         private void _EndPathEdit()
         {
-            PathText = ExplorerPath.ToDisplayPath(CurrentPath);
+            PathText = FileListPath.ToDisplayPath(CurrentPath);
             IsPathEditing = false;
         }
 
         private void _RebuildBreadcrumbs()
         {
             BreadcrumbSegments.Clear();
-            foreach (var segment in ExplorerPath.BuildBreadcrumbSegments(CurrentPath))
+            foreach (var segment in FileListPath.BuildBreadcrumbSegments(CurrentPath))
                 BreadcrumbSegments.Add(segment);
         }
 
@@ -511,7 +511,7 @@ namespace Mfr.App.Ui.ViewModels
             _listedItems.Clear();
             _DisposeAndClearThumbnails();
 
-            if (ExplorerPath.IsComputerPath(CurrentPath))
+            if (FileListPath.IsComputerPath(CurrentPath))
             {
                 _listedItems.AddRange(_ListKnownPlaces());
                 _listedItems.AddRange(_ListDrives());
@@ -523,7 +523,7 @@ namespace Mfr.App.Ui.ViewModels
                 return;
             }
 
-            if (ExplorerPath.IsNetworkPath(CurrentPath))
+            if (FileListPath.IsNetworkPath(CurrentPath))
             {
                 _listedItems.AddRange(_ListNetworkLocations());
                 _ApplyListingSort();
@@ -539,7 +539,7 @@ namespace Mfr.App.Ui.ViewModels
                 return;
             }
 
-            if (ExplorerPath.IsUncServerRoot(CurrentPath))
+            if (FileListPath.IsUncServerRoot(CurrentPath))
             {
                 if (OperatingSystem.IsWindows())
                     _listedItems.AddRange(_ListUncShares(CurrentPath));
@@ -875,7 +875,7 @@ namespace Mfr.App.Ui.ViewModels
 
             foreach (var historyPath in PathHistory)
             {
-                if (!ExplorerPath.IsUncPath(historyPath))
+                if (!FileListPath.IsUncPath(historyPath))
                     continue;
 
                 var location = historyPath.TrimTrailingSeparator();
@@ -1058,7 +1058,7 @@ namespace Mfr.App.Ui.ViewModels
 
         private static bool _NeedsNetworkTimeout(string path)
         {
-            if (ExplorerPath.IsUncPath(path))
+            if (FileListPath.IsUncPath(path))
                 return true;
 
             try
@@ -1105,7 +1105,7 @@ namespace Mfr.App.Ui.ViewModels
 
         private void _UpdateNavigationFlags()
         {
-            CanGoUp = ExplorerPath.GetParentPath(CurrentPath) is not null;
+            CanGoUp = FileListPath.GetParentPath(CurrentPath) is not null;
         }
 
         private void _RememberPath(string displayPath)
@@ -1141,7 +1141,7 @@ namespace Mfr.App.Ui.ViewModels
 
         private static string _TypeLabel(ListedItem item)
         {
-            if (ExplorerPath.IsNetworkPath(item.Path))
+            if (FileListPath.IsNetworkPath(item.Path))
                 return "Network location";
 
             if (item.IsDirectory)
@@ -1205,11 +1205,11 @@ namespace Mfr.App.Ui.ViewModels
 
         private static string _ResolveStartPath(string? initialPath)
         {
-            if (_TryResolvePath(initialPath, out var resolved) && !ExplorerPath.IsComputerPath(resolved))
+            if (_TryResolvePath(initialPath, out var resolved) && !FileListPath.IsComputerPath(resolved))
                 return resolved;
 
             var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if (_TryResolvePath(profile, out resolved) && !ExplorerPath.IsComputerPath(resolved))
+            if (_TryResolvePath(profile, out resolved) && !FileListPath.IsComputerPath(resolved))
                 return resolved;
 
             return Directory.GetCurrentDirectory();
@@ -1217,7 +1217,7 @@ namespace Mfr.App.Ui.ViewModels
 
         private static bool _TryResolvePath(string? path, [NotNullWhen(true)] out string resolved)
         {
-            if (ExplorerPath.IsComputerPath(path))
+            if (FileListPath.IsComputerPath(path))
             {
                 if (!OperatingSystem.IsWindows())
                 {
@@ -1229,7 +1229,7 @@ namespace Mfr.App.Ui.ViewModels
                 return true;
             }
 
-            if (ExplorerPath.IsNetworkPath(path))
+            if (FileListPath.IsNetworkPath(path))
             {
                 resolved = NetworkPath;
                 return true;
@@ -1255,8 +1255,8 @@ namespace Mfr.App.Ui.ViewModels
 
             if (OperatingSystem.IsWindows())
             {
-                var isUncServer = path is not null && ExplorerPath.IsUncServerRoot(path);
-                if (isUncServer && ExplorerPath.TryGetUncServerRoot(path!, out var serverRoot))
+                var isUncServer = path is not null && FileListPath.IsUncServerRoot(path);
+                if (isUncServer && FileListPath.TryGetUncServerRoot(path!, out var serverRoot))
                 {
                     resolved = serverRoot;
                     return _UncServerIsReachable(serverRoot);
@@ -1266,7 +1266,7 @@ namespace Mfr.App.Ui.ViewModels
             try
             {
                 var expanded = Environment.ExpandEnvironmentVariables(path!);
-                if (ExplorerPath.TryGetDriveRoot(expanded, out var driveRoot))
+                if (FileListPath.TryGetDriveRoot(expanded, out var driveRoot))
                     expanded = driveRoot;
 
                 resolved = new DirectoryInfo(expanded).FullName;

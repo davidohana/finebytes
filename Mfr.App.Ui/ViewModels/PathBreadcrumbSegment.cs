@@ -1,7 +1,7 @@
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// One clickable folder in the File Explorer address bar.
+    /// One clickable folder in the File List address bar.
     /// </summary>
     public sealed class PathBreadcrumbSegment
     {

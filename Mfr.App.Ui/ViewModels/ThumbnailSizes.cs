@@ -1,7 +1,7 @@
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// Discrete thumbnail display sizes for the File Explorer Thumbnails layout.
+    /// Discrete thumbnail display sizes for the File List Thumbnails layout.
     /// </summary>
     public static class ThumbnailSizes
     {

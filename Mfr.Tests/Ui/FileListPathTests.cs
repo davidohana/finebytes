@@ -3,9 +3,9 @@ using Mfr.App.Ui.ViewModels;
 namespace Mfr.Tests.Ui
 {
     /// <summary>
-    /// Tests UNC and Network location rules used by the File Explorer pane.
+    /// Tests UNC and Network location rules used by the File List pane.
     /// </summary>
-    public sealed class ExplorerPathTests
+    public sealed class FileListPathTests
     {
         /// <summary>
         /// Verifies a typed drive letter such as <c>D:</c> is the drive root, not the current folder on that drive.
@@ -15,17 +15,17 @@ namespace Mfr.Tests.Ui
         {
             if (!OperatingSystem.IsWindows())
             {
-                Assert.False(ExplorerPath.TryGetDriveRoot("d:", out _));
+                Assert.False(FileListPath.TryGetDriveRoot("d:", out _));
                 return;
             }
 
-            Assert.True(ExplorerPath.TryGetDriveRoot("d:", out var root));
+            Assert.True(FileListPath.TryGetDriveRoot("d:", out var root));
             Assert.Equal(@"D:\", root);
-            Assert.True(ExplorerPath.TryGetDriveRoot(" D: ", out root));
+            Assert.True(FileListPath.TryGetDriveRoot(" D: ", out root));
             Assert.Equal(@"D:\", root);
-            Assert.False(ExplorerPath.TryGetDriveRoot(@"d:\", out _));
-            Assert.False(ExplorerPath.TryGetDriveRoot(@"d:\music", out _));
-            Assert.False(ExplorerPath.TryGetDriveRoot("This PC", out _));
+            Assert.False(FileListPath.TryGetDriveRoot(@"d:\", out _));
+            Assert.False(FileListPath.TryGetDriveRoot(@"d:\music", out _));
+            Assert.False(FileListPath.TryGetDriveRoot("This PC", out _));
         }
 
         /// <summary>
@@ -37,12 +37,12 @@ namespace Mfr.Tests.Ui
             if (!OperatingSystem.IsWindows())
                 return;
 
-            Assert.True(ExplorerPath.IsNetworkPath(ExplorerPath.NetworkDisplayName));
-            Assert.True(ExplorerPath.IsNetworkPath("network"));
-            Assert.True(ExplorerPath.IsNetworkPath(@"\\"));
-            Assert.True(ExplorerPath.IsNetworkPath("//"));
-            Assert.False(ExplorerPath.IsNetworkPath(@"\\nas\music"));
-            Assert.False(ExplorerPath.IsNetworkPath(ExplorerPath.ComputerDisplayName));
+            Assert.True(FileListPath.IsNetworkPath(FileListPath.NetworkDisplayName));
+            Assert.True(FileListPath.IsNetworkPath("network"));
+            Assert.True(FileListPath.IsNetworkPath(@"\\"));
+            Assert.True(FileListPath.IsNetworkPath("//"));
+            Assert.False(FileListPath.IsNetworkPath(@"\\nas\music"));
+            Assert.False(FileListPath.IsNetworkPath(FileListPath.ComputerDisplayName));
         }
 
         /// <summary>
@@ -51,13 +51,13 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void IsUncPath_Detects_Share_Paths()
         {
-            Assert.True(ExplorerPath.IsUncPath(@"\\ohanas"));
-            Assert.True(ExplorerPath.IsUncPath(@"\\nas\music\albums"));
-            Assert.True(ExplorerPath.IsUncPath(@"//nas/music"));
-            Assert.True(ExplorerPath.IsUncPath(@"\\?\UNC\nas\music"));
-            Assert.False(ExplorerPath.IsUncPath(@"\\?\C:\Users"));
-            Assert.False(ExplorerPath.IsUncPath(@"C:\Users"));
-            Assert.False(ExplorerPath.IsUncPath("Network"));
+            Assert.True(FileListPath.IsUncPath(@"\\ohanas"));
+            Assert.True(FileListPath.IsUncPath(@"\\nas\music\albums"));
+            Assert.True(FileListPath.IsUncPath(@"//nas/music"));
+            Assert.True(FileListPath.IsUncPath(@"\\?\UNC\nas\music"));
+            Assert.False(FileListPath.IsUncPath(@"\\?\C:\Users"));
+            Assert.False(FileListPath.IsUncPath(@"C:\Users"));
+            Assert.False(FileListPath.IsUncPath("Network"));
         }
 
         /// <summary>
@@ -66,23 +66,23 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void TryGetUncShareRoot_Reads_Server_And_Share()
         {
-            Assert.True(ExplorerPath.TryGetUncShareRoot(@"\\nas\music\albums\live", out var root));
+            Assert.True(FileListPath.TryGetUncShareRoot(@"\\nas\music\albums\live", out var root));
             Assert.Equal(@"\\nas\music", root);
-            Assert.True(ExplorerPath.IsUncShareRoot(@"\\nas\music"));
-            Assert.False(ExplorerPath.IsUncShareRoot(@"\\nas\music\albums"));
-            Assert.False(ExplorerPath.TryGetUncShareRoot(@"\\nas", out _));
-            Assert.True(ExplorerPath.TryGetUncServerRoot(@"\\nas\music\albums", out var server));
+            Assert.True(FileListPath.IsUncShareRoot(@"\\nas\music"));
+            Assert.False(FileListPath.IsUncShareRoot(@"\\nas\music\albums"));
+            Assert.False(FileListPath.TryGetUncShareRoot(@"\\nas", out _));
+            Assert.True(FileListPath.TryGetUncServerRoot(@"\\nas\music\albums", out var server));
             Assert.Equal(@"\\nas", server);
-            Assert.True(ExplorerPath.IsUncServerRoot(@"\\nas"));
-            Assert.True(ExplorerPath.IsUncServerRoot(@"//ohanas"));
-            Assert.True(ExplorerPath.IsUncServerRoot(@"\\wsl$"));
-            Assert.True(ExplorerPath.IsUncServerRoot(@"\\wsl.localhost"));
-            Assert.False(ExplorerPath.IsUncServerRoot(@"\\nas\music"));
-            Assert.False(ExplorerPath.IsUncServerRoot(@"\\wsl$\Ubuntu"));
+            Assert.True(FileListPath.IsUncServerRoot(@"\\nas"));
+            Assert.True(FileListPath.IsUncServerRoot(@"//ohanas"));
+            Assert.True(FileListPath.IsUncServerRoot(@"\\wsl$"));
+            Assert.True(FileListPath.IsUncServerRoot(@"\\wsl.localhost"));
+            Assert.False(FileListPath.IsUncServerRoot(@"\\nas\music"));
+            Assert.False(FileListPath.IsUncServerRoot(@"\\wsl$\Ubuntu"));
             if (OperatingSystem.IsWindows())
-                Assert.True(ExplorerPath.IsUncServerRoot(@"\\nas\"));
+                Assert.True(FileListPath.IsUncServerRoot(@"\\nas\"));
             if (OperatingSystem.IsWindows())
-                Assert.True(ExplorerPath.IsUncShareRoot(@"\\nas\music\"));
+                Assert.True(FileListPath.IsUncShareRoot(@"\\nas\music\"));
         }
 
         /// <summary>
@@ -94,15 +94,15 @@ namespace Mfr.Tests.Ui
             if (!OperatingSystem.IsWindows())
                 return;
 
-            Assert.Equal(@"\\nas", ExplorerPath.GetParentPath(@"\\nas\music"));
-            Assert.Equal(@"\\nas", ExplorerPath.GetParentPath(@"\\nas\music\"));
-            Assert.Equal(@"\\nas\music", ExplorerPath.GetParentPath(@"\\nas\music\albums"));
-            Assert.Equal(ExplorerPath.NetworkPath, ExplorerPath.GetParentPath(@"\\nas"));
-            Assert.Equal(@"\\wsl$", ExplorerPath.GetParentPath(@"\\wsl$\Ubuntu"));
-            Assert.Equal(ExplorerPath.NetworkPath, ExplorerPath.GetParentPath(@"\\wsl$"));
-            Assert.Equal(@"\\wsl.localhost", ExplorerPath.GetParentPath(@"\\wsl.localhost\Ubuntu"));
-            Assert.Equal(ExplorerPath.ComputerPath, ExplorerPath.GetParentPath(ExplorerPath.NetworkPath));
-            Assert.Null(ExplorerPath.GetParentPath(ExplorerPath.ComputerPath));
+            Assert.Equal(@"\\nas", FileListPath.GetParentPath(@"\\nas\music"));
+            Assert.Equal(@"\\nas", FileListPath.GetParentPath(@"\\nas\music\"));
+            Assert.Equal(@"\\nas\music", FileListPath.GetParentPath(@"\\nas\music\albums"));
+            Assert.Equal(FileListPath.NetworkPath, FileListPath.GetParentPath(@"\\nas"));
+            Assert.Equal(@"\\wsl$", FileListPath.GetParentPath(@"\\wsl$\Ubuntu"));
+            Assert.Equal(FileListPath.NetworkPath, FileListPath.GetParentPath(@"\\wsl$"));
+            Assert.Equal(@"\\wsl.localhost", FileListPath.GetParentPath(@"\\wsl.localhost\Ubuntu"));
+            Assert.Equal(FileListPath.ComputerPath, FileListPath.GetParentPath(FileListPath.NetworkPath));
+            Assert.Null(FileListPath.GetParentPath(FileListPath.ComputerPath));
         }
 
         /// <summary>
@@ -114,18 +114,18 @@ namespace Mfr.Tests.Ui
             if (!OperatingSystem.IsWindows())
                 return;
 
-            var segments = ExplorerPath.BuildBreadcrumbSegments(@"\\nas\music\albums");
+            var segments = FileListPath.BuildBreadcrumbSegments(@"\\nas\music\albums");
             Assert.Equal(
                 [
-                    ExplorerPath.ComputerDisplayName,
-                    ExplorerPath.NetworkDisplayName,
+                    FileListPath.ComputerDisplayName,
+                    FileListPath.NetworkDisplayName,
                     "nas",
                     "music",
                     "albums",
                 ],
                 segments.Select(segment => segment.Label));
-            Assert.Equal(ExplorerPath.ComputerDisplayName, segments[0].TargetPath);
-            Assert.Equal(ExplorerPath.NetworkDisplayName, segments[1].TargetPath);
+            Assert.Equal(FileListPath.ComputerDisplayName, segments[0].TargetPath);
+            Assert.Equal(FileListPath.NetworkDisplayName, segments[1].TargetPath);
             Assert.Equal(@"\\nas", segments[2].TargetPath);
             Assert.Equal(@"\\nas\music", segments[3].TargetPath);
             Assert.False(segments[0].ShowLeadingChevron);
@@ -142,12 +142,12 @@ namespace Mfr.Tests.Ui
             if (!OperatingSystem.IsWindows())
                 return;
 
-            var segments = ExplorerPath.BuildBreadcrumbSegments(ExplorerPath.NetworkPath);
+            var segments = FileListPath.BuildBreadcrumbSegments(FileListPath.NetworkPath);
             Assert.Equal(
-                [ExplorerPath.ComputerDisplayName, ExplorerPath.NetworkDisplayName],
+                [FileListPath.ComputerDisplayName, FileListPath.NetworkDisplayName],
                 segments.Select(segment => segment.Label));
-            Assert.Equal(ExplorerPath.ComputerDisplayName, segments[0].TargetPath);
-            Assert.Equal(ExplorerPath.NetworkDisplayName, segments[1].TargetPath);
+            Assert.Equal(FileListPath.ComputerDisplayName, segments[0].TargetPath);
+            Assert.Equal(FileListPath.NetworkDisplayName, segments[1].TargetPath);
             Assert.False(segments[0].ShowLeadingChevron);
             Assert.True(segments[1].ShowLeadingChevron);
         }
@@ -161,9 +161,9 @@ namespace Mfr.Tests.Ui
             if (!OperatingSystem.IsWindows())
                 return;
 
-            var segments = ExplorerPath.BuildBreadcrumbSegments(@"\\ohanas");
+            var segments = FileListPath.BuildBreadcrumbSegments(@"\\ohanas");
             Assert.Equal(
-                [ExplorerPath.ComputerDisplayName, ExplorerPath.NetworkDisplayName, "ohanas"],
+                [FileListPath.ComputerDisplayName, FileListPath.NetworkDisplayName, "ohanas"],
                 segments.Select(segment => segment.Label));
             Assert.Equal(@"\\ohanas", segments[2].TargetPath);
         }
@@ -177,11 +177,11 @@ namespace Mfr.Tests.Ui
             if (!OperatingSystem.IsWindows())
                 return;
 
-            var segments = ExplorerPath.BuildBreadcrumbSegments(@"\\wsl$\Ubuntu\home");
+            var segments = FileListPath.BuildBreadcrumbSegments(@"\\wsl$\Ubuntu\home");
             Assert.Equal(
                 [
-                    ExplorerPath.ComputerDisplayName,
-                    ExplorerPath.NetworkDisplayName,
+                    FileListPath.ComputerDisplayName,
+                    FileListPath.NetworkDisplayName,
                     "wsl$",
                     "Ubuntu",
                     "home",
@@ -204,8 +204,8 @@ namespace Mfr.Tests.Ui
             if (documents is null)
                 return;
 
-            Assert.Equal(ExplorerPath.ComputerPath, ExplorerPath.GetParentPath(documents));
-            Assert.Equal(documents, ExplorerPath.GetParentPath(Path.Combine(documents, "Work")));
+            Assert.Equal(FileListPath.ComputerPath, FileListPath.GetParentPath(documents));
+            Assert.Equal(documents, FileListPath.GetParentPath(Path.Combine(documents, "Work")));
         }
 
         /// <summary>
@@ -221,17 +221,17 @@ namespace Mfr.Tests.Ui
             if (documents is null)
                 return;
 
-            var atPlace = ExplorerPath.BuildBreadcrumbSegments(documents);
+            var atPlace = FileListPath.BuildBreadcrumbSegments(documents);
             Assert.Equal(
-                [ExplorerPath.ComputerDisplayName, "Documents"],
+                [FileListPath.ComputerDisplayName, "Documents"],
                 atPlace.Select(segment => segment.Label));
             Assert.Equal(documents, atPlace[1].TargetPath);
             Assert.False(atPlace[0].ShowLeadingChevron);
             Assert.True(atPlace[1].ShowLeadingChevron);
 
-            var nested = ExplorerPath.BuildBreadcrumbSegments(Path.Combine(documents, "Work"));
+            var nested = FileListPath.BuildBreadcrumbSegments(Path.Combine(documents, "Work"));
             Assert.Equal(
-                [ExplorerPath.ComputerDisplayName, "Documents", "Work"],
+                [FileListPath.ComputerDisplayName, "Documents", "Work"],
                 nested.Select(segment => segment.Label));
         }
 

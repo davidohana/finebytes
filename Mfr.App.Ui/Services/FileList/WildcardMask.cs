@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 
-namespace Mfr.App.Ui.Services.FileExplorer
+namespace Mfr.App.Ui.Services.FileList
 {
     /// <summary>
     /// Matches file names against Explorer-style wildcard masks (<c>*</c> / <c>?</c>).
@@ -34,7 +34,7 @@ namespace Mfr.App.Ui.Services.FileExplorer
         /// Whether <paramref name="fileName"/> matches any mask in a <c>:</c>- or <c>;</c>-delimited list.
         /// </summary>
         /// <param name="fileName">File name only, not a full path.</param>
-        /// <param name="joinedPatterns">Exclude masks typed in the explorer pane.</param>
+        /// <param name="joinedPatterns">Exclude masks typed in the File List pane.</param>
         /// <returns><see langword="true"/> when at least one mask matches.</returns>
         public static bool MatchesAny(string fileName, string? joinedPatterns)
         {

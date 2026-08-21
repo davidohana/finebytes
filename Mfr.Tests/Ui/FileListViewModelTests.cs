@@ -1,12 +1,12 @@
 using Avalonia.Media;
-using Mfr.App.Ui.Services.FileExplorer;
+using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Ui
 {
     /// <summary>
-    /// Tests File Explorer listing, mask, and navigation in <see cref="FileListViewModel"/>.
+    /// Tests File List listing, mask, and navigation in <see cref="FileListViewModel"/>.
     /// </summary>
     public sealed class FileListViewModelTests : IDisposable
     {
@@ -430,7 +430,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies the File Explorer starts in Report view.
+        /// Verifies the File List starts in Report view.
         /// </summary>
         [Fact]
         public void ViewMode_Defaults_To_Report()

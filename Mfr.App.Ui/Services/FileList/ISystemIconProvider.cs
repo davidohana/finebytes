@@ -1,9 +1,9 @@
 using Avalonia.Media;
 
-namespace Mfr.App.Ui.Services.FileExplorer
+namespace Mfr.App.Ui.Services.FileList
 {
     /// <summary>
-    /// Supplies filesystem icons for the File Explorer pane.
+    /// Supplies filesystem icons for the File List pane.
     /// </summary>
     public interface ISystemIconProvider
     {

@@ -1,7 +1,7 @@
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 
-namespace Mfr.App.Ui.Services.FileExplorer
+namespace Mfr.App.Ui.Services.FileList
 {
     /// <summary>
     /// Decodes a small preview bitmap for common image files.

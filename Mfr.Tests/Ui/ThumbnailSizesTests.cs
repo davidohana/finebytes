@@ -3,7 +3,7 @@ using Mfr.App.Ui.ViewModels;
 namespace Mfr.Tests.Ui
 {
     /// <summary>
-    /// Tests discrete thumbnail size snapping used by the File Explorer.
+    /// Tests discrete thumbnail size snapping used by the File List.
     /// </summary>
     public sealed class ThumbnailSizesTests
     {
@@ -25,7 +25,7 @@ namespace Mfr.Tests.Ui
                 ThumbnailSizes.Steps);
             Assert.Equal(96, ThumbnailSizes.Default);
             Assert.Equal(ThumbnailSizes.Medium, ThumbnailSizes.Default);
-            Assert.Equal(ThumbnailSizes.Huge, App.Ui.Services.FileExplorer.ImageThumbnailLoader.DecodeWidth);
+            Assert.Equal(ThumbnailSizes.Huge, App.Ui.Services.FileList.ImageThumbnailLoader.DecodeWidth);
         }
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace Mfr.App.Ui
 
                 var mainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(initialExplorerPath: initialFolder),
+                    DataContext = new MainWindowViewModel(initialFileListPath: initialFolder),
                 };
 
                 if (ui.RememberWindowState)

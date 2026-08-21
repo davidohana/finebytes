@@ -11,7 +11,7 @@ namespace Mfr.Tests.Ui
     public sealed class MainWindowSmokeTests
     {
         /// <summary>
-        /// Verifies the main window constructs with a File Explorer pane.
+        /// Verifies the main window constructs with a File List pane.
         /// </summary>
         [AvaloniaFact]
         public void MainWindow_Constructs()

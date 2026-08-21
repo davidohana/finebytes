@@ -254,7 +254,7 @@
                     <ColumnDefinition Width="3*" MinWidth="280" />
                 </Grid.ColumnDefinitions>
                 <views:FileListView Grid.Column="0" DataContext="{Binding FileList}" />
-                <views:PaneSplitter x:Name="FileExplorerSplitter"
+                <views:PaneSplitter x:Name="FileListSplitter"
                                     Grid.Column="1"
                                     ResizeDirection="Columns"
                                     ResizeBehavior="PreviousAndNext"

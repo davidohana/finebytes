@@ -10,7 +10,7 @@ using Mfr.App.Ui.ViewModels;
 namespace Mfr.App.Ui.Views
 {
     /// <summary>
-    /// Explorer address bar: breadcrumbs, path edit, history, Up, and Refresh.
+    /// File List address bar: breadcrumbs, path edit, history, Up, and Refresh.
     /// </summary>
     public partial class FileListAddressBarView : UserControl
     {

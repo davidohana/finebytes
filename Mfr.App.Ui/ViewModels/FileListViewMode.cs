@@ -1,7 +1,7 @@
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// Layout used by the File Explorer item pane.
+    /// Layout used by the File List item pane.
     /// </summary>
     public enum FileListViewMode
     {

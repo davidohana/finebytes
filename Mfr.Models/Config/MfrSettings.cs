@@ -72,7 +72,7 @@ namespace Mfr.Models.Config
         public bool RememberWindowState = true;
 
         /// <summary>
-        /// When true, restore and save the last File Explorer folder across launches.
+        /// When true, restore and save the last File List folder across launches.
         /// </summary>
         public bool RememberLastFolder = true;
     }

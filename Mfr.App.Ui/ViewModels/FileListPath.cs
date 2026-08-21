@@ -1,13 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
-using Mfr.App.Ui.Services.FileExplorer;
+using Mfr.App.Ui.Services.FileList;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// Explorer location sentinels and Windows UNC path rules for the File Explorer pane.
+    /// File List location sentinels and Windows UNC path rules.
     /// </summary>
-    internal static class ExplorerPath
+    internal static class FileListPath
     {
         /// <summary>
         /// Sentinel path for the Windows drive list ("This PC").
@@ -195,9 +195,9 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
-        /// Parent folder, Network, or This PC for explorer Go Up.
+        /// Parent folder, Network, or This PC for File List Go Up.
         /// </summary>
-        /// <param name="path">Current explorer path or sentinel.</param>
+        /// <param name="path">Current File List path or sentinel.</param>
         /// <returns>Parent path, or <see langword="null"/> at This PC / Unix root.</returns>
         public static string? GetParentPath(string path)
         {
@@ -226,7 +226,7 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
-        /// Address-bar text for a resolved explorer path.
+        /// Address-bar text for a resolved File List path.
         /// </summary>
         /// <param name="path">Filesystem path or sentinel.</param>
         /// <returns>Display name for This PC / Network, otherwise <paramref name="path"/>.</returns>

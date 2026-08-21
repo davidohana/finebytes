@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.Win32;
 
-namespace Mfr.App.Ui.Services.FileExplorer
+namespace Mfr.App.Ui.Services.FileList
 {
     /// <summary>
     /// Resolves Windows Subsystem for Linux UNC paths such as <c>\\wsl$</c> and <c>\\wsl.localhost</c>.

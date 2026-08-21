@@ -34,7 +34,7 @@ namespace Mfr.App.Ui.Input
         /// <summary>Focuses the File List address bar for typing a path.</summary>
         public static KeyGesture GoToAddress { get; } = new(Key.L, KeyModifiers.Control);
 
-        /// <summary>Alternate address-bar focus, matching File Explorer.</summary>
+        /// <summary>Alternate address-bar focus, matching Windows Explorer.</summary>
         public static KeyGesture GoToAddressAlt { get; } = new(Key.D, KeyModifiers.Alt);
 
         /// <summary>Goes to the parent folder when the File List has focus.</summary>
