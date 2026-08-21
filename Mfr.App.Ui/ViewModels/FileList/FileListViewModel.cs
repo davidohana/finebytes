@@ -76,9 +76,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private const int _MaxRememberedMasks = 10;
 
         /// <summary>
-        /// Default exclude patterns (same as MFR 7); applied only when exclude masks are enabled.
+        /// Default exclude patterns; applied only when exclude masks are enabled.
         /// </summary>
-        public const string DefaultExcludeMasks = "*.exe;*.dll;*.sys";
+        public static IReadOnlyList<string> DefaultExcludeMasks { get; } = ["*.exe", "*.dll", "*.sys"];
 
         private readonly ISystemIconProvider _iconProvider;
         private readonly List<ListedItem> _listedItems = [];
@@ -167,10 +167,10 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private bool _excludeMasksEnabled;
 
         /// <summary>
-        /// <c>;</c>-delimited exclude masks applied to file names when <see cref="ExcludeMasksEnabled"/> is true.
+        /// Exclude masks applied to file names when <see cref="ExcludeMasksEnabled"/> is true.
         /// </summary>
         [ObservableProperty]
-        private string _excludeMasks = DefaultExcludeMasks;
+        private IReadOnlyList<string> _excludeMasks = DefaultExcludeMasks;
 
         /// <summary>
         /// Layout used to present <see cref="Entries"/>. Default is Report.
@@ -476,7 +476,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             _ReloadEntries();
         }
 
-        partial void OnExcludeMasksChanged(string value)
+        partial void OnExcludeMasksChanged(IReadOnlyList<string> value)
         {
             _ReloadEntries();
         }
@@ -487,10 +487,10 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
-        /// Applies Exclude Masks dialog results (enable flag and multiline / delimited patterns).
+        /// Applies Exclude Masks dialog results (enable flag and one-mask-per-line text).
         /// </summary>
         /// <param name="enabled">Whether exclude masks are active.</param>
-        /// <param name="editorText">Masks as typed in the dialog (one per line or delimited).</param>
+        /// <param name="editorText">Masks as typed in the dialog (one per line).</param>
         public void ApplyExcludeMasks(bool enabled, string? editorText)
         {
             ExcludeMasks = WildcardMask.NormalizeForStorage(editorText);

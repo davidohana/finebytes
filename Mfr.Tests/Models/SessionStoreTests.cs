@@ -60,7 +60,7 @@ namespace Mfr.Tests.Models
                         TopPanes = 0.65,
                     },
                     FileMask = "*.mp3",
-                    ExcludeMasks = "*.wav;*.ogg",
+                    ExcludeMasks = ["*.wav", "*.ogg"],
                     ExcludeMasksEnabled = true,
                     MaskSuggestions = ["*.mp3", "*.flac"],
                 };
@@ -82,7 +82,7 @@ namespace Mfr.Tests.Models
                 Assert.Equal(0.55, loaded.Splitters.FilterLists);
                 Assert.Equal(0.65, loaded.Splitters.TopPanes);
                 Assert.Equal("*.mp3", loaded.FileMask);
-                Assert.Equal("*.wav;*.ogg", loaded.ExcludeMasks);
+                Assert.Equal(["*.wav", "*.ogg"], loaded.ExcludeMasks);
                 Assert.True(loaded.ExcludeMasksEnabled);
                 Assert.Equal(2, loaded.MaskSuggestions?.Count);
                 Assert.Contains("*.mp3", loaded.MaskSuggestions!);

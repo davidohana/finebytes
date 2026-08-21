@@ -167,7 +167,7 @@ namespace Mfr.Tests.Ui
             var dir = _CreateTree();
             var viewModel = _CreateViewModel(dir);
 
-            viewModel.ApplyExcludeMasks(enabled: true, editorText: "*.txt;*.bak");
+            viewModel.ApplyExcludeMasks(enabled: true, editorText: "*.txt\n*.bak");
 
             Assert.Equal(["zeta-folder", "beta.md"], _Names(viewModel));
         }
@@ -181,7 +181,7 @@ namespace Mfr.Tests.Ui
             var dir = _CreateTree();
             var viewModel = _CreateViewModel(dir);
 
-            viewModel.ApplyExcludeMasks(enabled: false, editorText: "*.txt;*.bak");
+            viewModel.ApplyExcludeMasks(enabled: false, editorText: "*.txt\n*.bak");
 
             Assert.Equal(["zeta-folder", "alpha.txt", "beta.md"], _Names(viewModel));
         }

@@ -42,11 +42,10 @@ namespace Mfr.App.Ui.Services.Session
                     fileList.Mask = session.FileMask;
                 }
 
-                // Blank means "unset" (older sessions saved "" from the inline Exclude box).
-                // Keep the MFR 7 defaults (*.exe;*.dll;*.sys) unless the user stored real masks.
-                if (!string.IsNullOrWhiteSpace(session.ExcludeMasks))
+                // Null means unset: keep the defaults. An empty list means the user cleared them.
+                if (session.ExcludeMasks is not null)
                 {
-                    fileList.ExcludeMasks = session.ExcludeMasks;
+                    fileList.ExcludeMasks = [.. session.ExcludeMasks];
                 }
 
                 if (session.ExcludeMasksEnabled is { } excludeEnabled)
@@ -104,7 +103,7 @@ namespace Mfr.App.Ui.Services.Session
                     }
 
                     session.FileMask = fileList.Mask;
-                    session.ExcludeMasks = fileList.ExcludeMasks;
+                    session.ExcludeMasks = [.. fileList.ExcludeMasks];
                     session.ExcludeMasksEnabled = fileList.ExcludeMasksEnabled;
                     session.MaskSuggestions = [.. fileList.MaskSuggestions];
                 }

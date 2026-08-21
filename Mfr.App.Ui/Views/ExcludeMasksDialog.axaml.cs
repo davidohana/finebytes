@@ -5,7 +5,7 @@ using Mfr.App.Ui.ViewModels.FileList;
 namespace Mfr.App.Ui.Views
 {
     /// <summary>
-    /// Modal dialog for File List exclude masks (MFR 7 Exclude Masks window).
+    /// Modal dialog for File List exclude masks.
     /// </summary>
     public partial class ExcludeMasksDialog : Window
     {

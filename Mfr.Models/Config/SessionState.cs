@@ -39,10 +39,10 @@ namespace Mfr.Models.Config
         public string? FileMask { get; set; }
 
         /// <summary>
-        /// Last exclude mask applied to file names.
+        /// Last exclude masks applied to file names.
         /// </summary>
         [JsonPropertyName("excludeMasks")]
-        public string? ExcludeMasks { get; set; }
+        public List<string>? ExcludeMasks { get; set; }
 
         /// <summary>
         /// Whether exclude masks are applied when listing and adding files.

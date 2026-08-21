@@ -30,27 +30,26 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies exclude lists split on colon, semicolon, pipe, and newlines.
+        /// Verifies exclude lists match any pattern in the collection.
         /// </summary>
         [Fact]
-        public void MatchesAny_Splits_Common_Delimiters()
+        public void MatchesAny_Uses_Pattern_List()
         {
-            Assert.True(WildcardMask.MatchesAny("a.tmp", "*.tmp;*.bak"));
-            Assert.True(WildcardMask.MatchesAny("a.bak", "*.tmp:*.bak"));
-            Assert.True(WildcardMask.MatchesAny("a.exe", "*.exe|*.dll"));
-            Assert.True(WildcardMask.MatchesAny("a.sys", "*.exe\n*.sys"));
-            Assert.False(WildcardMask.MatchesAny("a.txt", "*.tmp;*.bak"));
+            Assert.True(WildcardMask.MatchesAny("a.tmp", ["*.tmp", "*.bak"]));
+            Assert.True(WildcardMask.MatchesAny("a.bak", ["*.tmp", "*.bak"]));
+            Assert.False(WildcardMask.MatchesAny("a.txt", ["*.tmp", "*.bak"]));
         }
 
         /// <summary>
-        /// Verifies editor formatting and storage normalization round-trip.
+        /// Verifies editor formatting and storage normalization round-trip (one mask per line).
         /// </summary>
         [Fact]
         public void Format_And_Normalize_Round_Trip()
         {
-            var formatted = WildcardMask.FormatForEditor("*.exe;*.dll|*.sys");
+            var formatted = WildcardMask.FormatForEditor(["*.exe", "*.dll", "*.sys"]);
             Assert.Equal($"*.exe{Environment.NewLine}*.dll{Environment.NewLine}*.sys", formatted);
-            Assert.Equal("*.exe;*.dll;*.sys", WildcardMask.NormalizeForStorage(formatted));
+            Assert.Equal(["*.exe", "*.dll", "*.sys"], WildcardMask.NormalizeForStorage(formatted));
+            Assert.Equal(["*.tmp", "*.bak"], WildcardMask.NormalizeForStorage("*.tmp\n*.bak"));
         }
     }
 }

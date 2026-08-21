@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 
 namespace Mfr.App.Ui.Services.FileList
@@ -33,16 +32,26 @@ namespace Mfr.App.Ui.Services.FileList
         }
 
         /// <summary>
-        /// Whether <paramref name="fileName"/> matches any mask in a delimited list.
+        /// Whether <paramref name="fileName"/> matches any mask in <paramref name="patterns"/>.
         /// </summary>
         /// <param name="fileName">File name only, not a full path.</param>
-        /// <param name="joinedPatterns">Exclude masks from session or the Exclude Masks dialog.</param>
+        /// <param name="patterns">Exclude masks from session or the Exclude Masks dialog.</param>
         /// <returns><see langword="true"/> when at least one mask matches.</returns>
-        public static bool MatchesAny(string fileName, string? joinedPatterns)
+        public static bool MatchesAny(string fileName, IEnumerable<string>? patterns)
         {
-            foreach (var pattern in SplitPatterns(joinedPatterns))
+            if (patterns is null)
             {
-                if (IsMatch(fileName, pattern))
+                return false;
+            }
+
+            foreach (var pattern in patterns)
+            {
+                if (string.IsNullOrWhiteSpace(pattern))
+                {
+                    continue;
+                }
+
+                if (IsMatch(fileName, pattern.Trim()))
                 {
                     return true;
                 }
@@ -52,58 +61,48 @@ namespace Mfr.App.Ui.Services.FileList
         }
 
         /// <summary>
-        /// Splits a combined mask list into individual patterns.
+        /// Formats stored masks as one pattern per line for the Exclude Masks dialog.
         /// </summary>
-        /// <param name="joinedPatterns">
-        /// Masks separated by <c>:</c>, <c>;</c>, <c>|</c>, or newlines (MFR 7 dialog / config forms).
-        /// </param>
-        /// <returns>Trimmed non-empty patterns in source order.</returns>
-        public static ImmutableArray<string> SplitPatterns(string? joinedPatterns)
+        /// <param name="patterns">Persisted or in-memory mask list.</param>
+        /// <returns>Newline-separated patterns, or empty when none.</returns>
+        public static string FormatForEditor(IEnumerable<string>? patterns)
         {
-            if (string.IsNullOrWhiteSpace(joinedPatterns))
+            if (patterns is null)
+            {
+                return string.Empty;
+            }
+
+            var lines = patterns
+                .Where(static p => !string.IsNullOrWhiteSpace(p))
+                .Select(static p => p.Trim())
+                .ToArray();
+            if (lines.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            return string.Join(Environment.NewLine, lines);
+        }
+
+        /// <summary>
+        /// Parses Exclude Masks dialog text into a trimmed pattern list (one mask per line).
+        /// </summary>
+        /// <param name="editorText">Multiline masks from the dialog.</param>
+        /// <returns>Trimmed patterns, or empty when none.</returns>
+        public static IReadOnlyList<string> NormalizeForStorage(string? editorText)
+        {
+            if (string.IsNullOrWhiteSpace(editorText))
             {
                 return [];
             }
 
             return
             [
-                .. joinedPatterns.Split(
-                    [':', ';', '|', '\r', '\n'],
+                .. editorText.Split(
+                    ['\r', '\n'],
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
                 ),
             ];
-        }
-
-        /// <summary>
-        /// Formats stored masks as one pattern per line for the Exclude Masks dialog.
-        /// </summary>
-        /// <param name="joinedPatterns">Persisted or in-memory mask list.</param>
-        /// <returns>Newline-separated patterns, or empty when none.</returns>
-        public static string FormatForEditor(string? joinedPatterns)
-        {
-            var patterns = SplitPatterns(joinedPatterns);
-            if (patterns.IsDefaultOrEmpty)
-            {
-                return string.Empty;
-            }
-
-            return string.Join(Environment.NewLine, patterns);
-        }
-
-        /// <summary>
-        /// Normalizes editor text into a <c>;</c>-delimited list for persistence.
-        /// </summary>
-        /// <param name="editorText">Multiline or delimited masks from the dialog.</param>
-        /// <returns><c>;</c>-joined patterns, or empty when none.</returns>
-        public static string NormalizeForStorage(string? editorText)
-        {
-            var patterns = SplitPatterns(editorText);
-            if (patterns.IsDefaultOrEmpty)
-            {
-                return string.Empty;
-            }
-
-            return string.Join(';', patterns);
         }
 
         private static string _ToAnchoredRegex(string pattern)
