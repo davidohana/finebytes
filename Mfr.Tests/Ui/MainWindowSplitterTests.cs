@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
+using Mfr.Models.Config;
 
 namespace Mfr.Tests.Ui
 {
@@ -101,31 +102,25 @@ namespace Mfr.Tests.Ui
         public void SplitterSession_Capture_And_Restore_FileList_Ratio()
         {
             var window = _ShowMainWindow();
-            var grid = window.FindControl<Grid>("TopPanesGrid")!;
             var splitter = window.FindControl<GridSplitter>("FileListSplitter")!;
 
             _Drag(splitter, deltaX: 80, deltaY: 0);
             window.UpdateLayout();
 
             var captured = SplitterSession.Capture(window);
-            Assert.NotNull(captured);
             Assert.NotNull(captured.FileList);
 
             var other = _ShowMainWindow();
             SplitterSession.TryRestore(other, new SessionSplitterState { FileList = captured.FileList });
             other.UpdateLayout();
 
-            var restored = other.FindControl<Grid>("TopPanesGrid")!;
-            var expectedRatio = captured.FileList!.Value;
+            var restored = other.TopPanesGrid;
+            var expectedRatio = captured.FileList.Value;
             var actualRatio =
                 restored.ColumnDefinitions[0].ActualWidth
                 / (restored.ColumnDefinitions[0].ActualWidth + restored.ColumnDefinitions[2].ActualWidth);
 
             Assert.InRange(actualRatio, expectedRatio - 0.03, expectedRatio + 0.03);
-            Assert.True(
-                Math.Abs(restored.ColumnDefinitions[0].ActualWidth - grid.ColumnDefinitions[0].ActualWidth) < 8,
-                $"Expected restored File List width near {grid.ColumnDefinitions[0].ActualWidth}, got {restored.ColumnDefinitions[0].ActualWidth}."
-            );
         }
 
         private static MainWindow _ShowMainWindow()

@@ -1,5 +1,5 @@
-using Avalonia.Controls;
 using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.Views;
 using Mfr.Models.Config;
 using Mfr.Utils;
 
@@ -15,7 +15,7 @@ namespace Mfr.App.Ui.Services.Session
         /// </summary>
         /// <param name="window">Main window to configure.</param>
         /// <param name="session">Loaded session document.</param>
-        public static void TryRestore(Window window, SessionState session)
+        public static void TryRestore(MainWindow window, SessionState session)
         {
             ArgumentNullException.ThrowIfNull(window);
             ArgumentNullException.ThrowIfNull(session);
@@ -32,7 +32,7 @@ namespace Mfr.App.Ui.Services.Session
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
         /// <param name="viewModel">Root VM providing the File List path.</param>
-        public static void SaveOnClose(Window window, MainWindowViewModel? viewModel)
+        public static void SaveOnClose(MainWindow window, MainWindowViewModel? viewModel)
         {
             ArgumentNullException.ThrowIfNull(window);
 
@@ -47,10 +47,7 @@ namespace Mfr.App.Ui.Services.Session
                 if (ui.RememberWindowState)
                 {
                     session.Window = WindowSession.Capture(window);
-
-                    var splitters = SplitterSession.Capture(window);
-                    if (splitters is not null)
-                        session.Splitters = splitters;
+                    session.Splitters = SplitterSession.Capture(window);
                 }
 
                 if (ui.RememberLastFolder && viewModel is not null)
