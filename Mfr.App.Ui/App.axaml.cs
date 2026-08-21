@@ -33,8 +33,7 @@ namespace Mfr.App.Ui
                     DataContext = new MainWindowViewModel(initialFileListPath: initialFolder),
                 };
 
-                if (ui.RememberWindowState)
-                    WindowSession.TryRestore(mainWindow, session.Window);
+                UiSessionPersistence.TryRestore(mainWindow, session);
 
                 desktop.MainWindow = mainWindow;
 #if DEBUG

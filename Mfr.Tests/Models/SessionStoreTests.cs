@@ -13,6 +13,7 @@ namespace Mfr.Tests.Models
             Assert.Equal(1, session.Version);
             Assert.Null(session.LastOpenedDirectory);
             Assert.Null(session.Window);
+            Assert.Null(session.Splitters);
         }
 
         [Fact]
@@ -25,6 +26,7 @@ namespace Mfr.Tests.Models
                 var session = SessionStore.Load(path);
                 Assert.Null(session.LastOpenedDirectory);
                 Assert.Null(session.Window);
+                Assert.Null(session.Splitters);
             }
             finally
             {
@@ -50,6 +52,13 @@ namespace Mfr.Tests.Models
                         Height = 720,
                         State = "Maximized",
                     },
+                    Splitters = new SessionSplitterState
+                    {
+                        FileList = 0.35,
+                        AvailableApplied = 0.45,
+                        FilterLists = 0.55,
+                        TopPanes = 0.65,
+                    },
                 };
 
                 SessionStore.Save(original, path);
@@ -63,6 +72,11 @@ namespace Mfr.Tests.Models
                 Assert.Equal(1100, loaded.Window.Width);
                 Assert.Equal(720, loaded.Window.Height);
                 Assert.Equal("Maximized", loaded.Window.State);
+                Assert.NotNull(loaded.Splitters);
+                Assert.Equal(0.35, loaded.Splitters.FileList);
+                Assert.Equal(0.45, loaded.Splitters.AvailableApplied);
+                Assert.Equal(0.55, loaded.Splitters.FilterLists);
+                Assert.Equal(0.65, loaded.Splitters.TopPanes);
             }
             finally
             {

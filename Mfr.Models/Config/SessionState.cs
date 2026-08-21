@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Persisted UI session state (window geometry and last File List folder).
+    /// Persisted UI session state (window geometry, pane splitters, and last File List folder).
     /// <para>Stored in <c>session.json</c> under the same AppData root as <c>config.json</c>.</para>
     /// </summary>
     public sealed class SessionState
@@ -25,6 +25,12 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("window")]
         public SessionWindowState? Window { get; set; }
+
+        /// <summary>
+        /// Last main-window pane splitter ratios, when remembered.
+        /// </summary>
+        [JsonPropertyName("splitters")]
+        public SessionSplitterState? Splitters { get; set; }
     }
 
     /// <summary>
@@ -64,5 +70,38 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("state")]
         public string State { get; set; } = "Normal";
+    }
+
+    /// <summary>
+    /// Saved main-window pane splitter positions as star ratios of the first pane in each pair.
+    /// <para>
+    /// Each ratio is firstPane / (firstPane + secondPane) in the range (0, 1). Null means leave XAML defaults.
+    /// </para>
+    /// </summary>
+    public sealed class SessionSplitterState
+    {
+        /// <summary>
+        /// File List column share of File List + filter panes (horizontal).
+        /// </summary>
+        [JsonPropertyName("fileList")]
+        public double? FileList { get; set; }
+
+        /// <summary>
+        /// Available Filters column share of Available + Applied (horizontal).
+        /// </summary>
+        [JsonPropertyName("availableApplied")]
+        public double? AvailableApplied { get; set; }
+
+        /// <summary>
+        /// Filter lists row share of filter lists + filter editor (vertical).
+        /// </summary>
+        [JsonPropertyName("filterLists")]
+        public double? FilterLists { get; set; }
+
+        /// <summary>
+        /// Top panes row share of top panes + Rename List (vertical).
+        /// </summary>
+        [JsonPropertyName("topPanes")]
+        public double? TopPanes { get; set; }
     }
 }

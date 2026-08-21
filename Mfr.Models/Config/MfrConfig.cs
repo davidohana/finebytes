@@ -68,7 +68,7 @@ namespace Mfr.Models.Config
     public sealed class UiConfig
     {
         /// <summary>
-        /// When true, restore and save main-window size, position, and maximized state across launches.
+        /// When true, restore and save main-window size, position, maximized state, and pane splitters across launches.
         /// </summary>
         public bool RememberWindowState = true;
 
