@@ -94,6 +94,7 @@ namespace Mfr.Filters.Audio
     /// </para>
     /// </remarks>
     /// <param name="Options">Per-field behaviors and values.</param>
+    [FilterPalette(FilterGroup.Audio, "Audio Tag Setter")]
     public sealed record AudioTagSetterFilter(AudioTagSetterOptions Options) : BaseFilter
     {
         /// <summary>

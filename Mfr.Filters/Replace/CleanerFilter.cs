@@ -14,6 +14,7 @@ namespace Mfr.Filters.Replace
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Cleaner options.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
+    [FilterPalette(FilterGroup.Replace, "Cleaner")]
     public sealed record CleanerFilter(FilterTarget Target, CleanerOptions Options, StringApplyScope? ApplyScope = null)
         : StringTargetFilter(Target, ApplyScope)
     {

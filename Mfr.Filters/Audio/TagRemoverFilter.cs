@@ -51,6 +51,7 @@ namespace Mfr.Filters.Audio
     /// </para>
     /// </remarks>
     /// <param name="Options">Whether to strip all tags, or which block types to remove.</param>
+    [FilterPalette(FilterGroup.Audio, "Audio Tag Remover")]
     public sealed record TagRemoverFilter(TagRemoverOptions Options) : BaseFilter
     {
         /// <inheritdoc />

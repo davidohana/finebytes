@@ -24,6 +24,7 @@ namespace Mfr.Filters.Space
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Trigger characters and conditional insertion.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
+    [FilterPalette(FilterGroup.Space, "Space Around")]
     public sealed record SpaceAroundFilter(
         FilterTarget Target,
         SpaceAroundOptions Options,

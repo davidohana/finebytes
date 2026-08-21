@@ -4,16 +4,117 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels"
+  xmlns:filters="using:Mfr.Filters"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
   mc:Ignorable="d"
   d:DesignWidth="240"
-  d:DesignHeight="200"
+  d:DesignHeight="320"
   x:Class="Mfr.App.Ui.Views.FilterPaletteView"
+  x:Name="FilterPaletteRoot"
   x:DataType="vm:FilterPaletteViewModel"
 >
+  <UserControl.Styles>
+    <Style Selector="Button.filter-group">
+      <Setter Property="Width" Value="22" />
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinWidth" Value="22" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="2" />
+      <Setter Property="Margin" Value="1" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.filter-group.selected">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+    </Style>
+    <Style Selector="ListBox.filter-palette">
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+      <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+    <Style Selector="ListBox.filter-palette ListBoxItem">
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="ListBox.filter-palette ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="ListBox.filter-palette ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="ListBox.filter-palette ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="ListBox.filter-palette ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+  </UserControl.Styles>
   <Border Classes="pane">
     <DockPanel>
-      <TextBlock DockPanel.Dock="Top" Classes="pane-header" Text="Available Filters" />
-      <Border />
+      <Border DockPanel.Dock="Top" Padding="4,4,4,4">
+        <ItemsControl ItemsSource="{Binding Groups}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:FilterPaletteGroupViewModel">
+              <Button
+                Classes="filter-group"
+                Classes.selected="{Binding IsSelected}"
+                ToolTip.Tip="{Binding DisplayName}"
+                Command="{Binding #FilterPaletteRoot.((vm:FilterPaletteViewModel)DataContext).SelectGroupCommand}"
+                CommandParameter="{Binding}"
+              >
+                <Path
+                  Width="14"
+                  Height="14"
+                  Stretch="Uniform"
+                  Fill="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                  Data="{Binding IconKey, Converter={x:Static converters:ResourceKeyToGeometryConverter.Instance}}"
+                />
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Border>
+      <TextBox
+        x:Name="SearchBox"
+        DockPanel.Dock="Top"
+        Margin="4,0,4,4"
+        Watermark="Filter…"
+        Text="{Binding SearchText, Mode=TwoWay}"
+        KeyDown="_OnSearchKeyDown"
+      />
+      <ListBox
+        x:Name="FilterList"
+        Classes="filter-palette"
+        ItemsSource="{Binding VisibleFilters}"
+        SelectedItem="{Binding SelectedFilter}"
+        KeyDown="_OnFilterListKeyDown"
+      >
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="filters:FilterCatalogEntry">
+            <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
     </DockPanel>
   </Border>
 </UserControl>

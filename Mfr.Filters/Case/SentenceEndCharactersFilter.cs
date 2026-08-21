@@ -17,6 +17,7 @@ namespace Mfr.Filters.Case
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Sentence-end character list.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
+    [FilterPalette(FilterGroup.Case, "Sentence End Characters")]
     public sealed record SentenceEndCharactersFilter(
         FilterTarget Target,
         SentenceEndCharactersOptions Options,

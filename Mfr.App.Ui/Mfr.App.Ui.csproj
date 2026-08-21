@@ -45,6 +45,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mfr.Engine\Mfr.Engine.csproj" />
+    <ProjectReference Include="..\Mfr.Filters\Mfr.Filters.csproj" />
     <ProjectReference Include="..\Mfr.Models\Mfr.Models.csproj" />
     <ProjectReference Include="..\Mfr.Utils\Mfr.Utils.csproj" />
   </ItemGroup>

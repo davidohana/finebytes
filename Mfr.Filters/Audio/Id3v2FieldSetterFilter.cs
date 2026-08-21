@@ -46,6 +46,7 @@ namespace Mfr.Filters.Audio
     /// </para>
     /// </remarks>
     /// <param name="Options">Frame identity, value, and fill-if-empty behavior.</param>
+    [FilterPalette(FilterGroup.Audio, "ID3v2 Field Setter")]
     public sealed record Id3v2FieldSetterFilter(Id3v2FieldSetterOptions Options) : BaseFilter
     {
         private Formatter _textFormatter = FormatStringCompiler.EmptyFormatter;

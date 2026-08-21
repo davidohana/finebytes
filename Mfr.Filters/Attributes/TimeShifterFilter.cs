@@ -61,6 +61,7 @@ namespace Mfr.Filters.Attributes
     /// Shifts creation, last write, or last access time by an amount in the chosen unit.
     /// </summary>
     /// <param name="Options">Timestamp field, amount, and unit.</param>
+    [FilterPalette(FilterGroup.Attributes, "Time Shifter")]
     public sealed record TimeShifterFilter(TimeShifterOptions Options) : BaseFilter
     {
         /// <inheritdoc />

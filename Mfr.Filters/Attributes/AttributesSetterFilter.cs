@@ -41,6 +41,7 @@ namespace Mfr.Filters.Attributes
     /// Sets or clears filesystem attributes on each rename item (preview and commit).
     /// </summary>
     /// <param name="Options">Per-flag tri-state options.</param>
+    [FilterPalette(FilterGroup.Attributes, "Attributes Setter")]
     public sealed record AttributesSetterFilter(AttributesSetterOptions Options) : BaseFilter
     {
         /// <inheritdoc />

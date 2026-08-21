@@ -18,6 +18,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Token mover options.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
+    [FilterPalette(FilterGroup.Formatting, "Token Mover")]
     public sealed record TokenMoverFilter(
         FilterTarget Target,
         TokenMoverOptions Options,

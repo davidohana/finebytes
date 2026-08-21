@@ -17,6 +17,7 @@ namespace Mfr.Filters.Attributes
     /// Sets the calendar date for creation, last write, or last access time. Does not change the time-of-day part.
     /// </summary>
     /// <param name="Options">Timestamp field and date value.</param>
+    [FilterPalette(FilterGroup.Attributes, "Date Setter")]
     public sealed record DateSetterFilter(DateSetterOptions Options) : BaseFilter
     {
         /// <inheritdoc />

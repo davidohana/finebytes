@@ -36,6 +36,7 @@ namespace Mfr.Filters.Misc
     /// </para>
     /// </remarks>
     /// <param name="Options">Mover options.</param>
+    [FilterPalette(FilterGroup.Misc, "Mover")]
     public sealed record MoverFilter(MoverOptions Options) : BaseFilter
     {
         private Formatter? _compiledSubFolder;
