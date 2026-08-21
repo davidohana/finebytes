@@ -15,7 +15,6 @@ namespace Mfr.App.Ui.Diagnostics
     /// </summary>
     internal static class UiCrashHandler
     {
-        private static int _isRegistered;
         private static int _isReporting;
 
         /// <summary>
@@ -29,10 +28,9 @@ namespace Mfr.App.Ui.Diagnostics
         /// </summary>
         internal static void RegisterProcessHandlers()
         {
-            if (Interlocked.Exchange(ref _isRegistered, 1) == 1)
-                return;
-
+            AppDomain.CurrentDomain.UnhandledException -= _OnUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += _OnUnhandledException;
+            TaskScheduler.UnobservedTaskException -= _OnUnobservedTaskException;
             TaskScheduler.UnobservedTaskException += _OnUnobservedTaskException;
         }
 
@@ -56,36 +54,31 @@ namespace Mfr.App.Ui.Diagnostics
             ArgumentNullException.ThrowIfNull(exception);
 
             var details = LogPaths.FormatCrashText(exception, isTerminating);
-            var sessionLogFilePath = LogSession.LogFilePath;
-            var sessionLogDirectoryPath = LogSession.LogDirectoryPath;
-            if (sessionLogFilePath is null || sessionLogDirectoryPath is null)
+            if (LogSession.LogFilePath is { } sessionLogFilePath
+                && LogSession.LogDirectoryPath is { } sessionLogDirectoryPath)
             {
-                var configuredLogDirectoryPath = ConfigLoader.Settings.Log.DirectoryPath;
-                var crashFilePath = LogPaths.TryWriteCrashFile(
-                    logDirectoryPath: configuredLogDirectoryPath,
-                    exception: exception,
-                    isTerminating: isTerminating);
-                var directoryPath = crashFilePath is null
-                    ? LogPaths.ResolveDirectoryPath(configuredLogDirectoryPath)
-                    : Path.GetDirectoryName(crashFilePath)
-                        ?? LogPaths.ResolveDirectoryPath(configuredLogDirectoryPath);
+                Log.Error(
+                    exception,
+                    "Unhandled exception. Terminating: {IsTerminating}.",
+                    isTerminating);
+                if (isTerminating)
+                    LogSession.Shutdown();
+
                 return new CrashReport(
                     Details: details,
-                    LogFilePath: crashFilePath,
-                    LogDirectoryPath: directoryPath);
+                    LogFilePath: sessionLogFilePath,
+                    LogDirectoryPath: sessionLogDirectoryPath);
             }
 
-            Log.Error(
-                exception,
-                "Unhandled exception. Terminating: {IsTerminating}.",
-                isTerminating);
-            if (isTerminating)
-                LogSession.Shutdown();
-
+            var logDirectoryPath = LogPaths.ResolveDirectoryPath(ConfigLoader.Settings.Log.DirectoryPath);
+            var crashFilePath = LogPaths.TryWriteCrashFile(
+                logDirectoryPath: logDirectoryPath,
+                exception: exception,
+                isTerminating: isTerminating);
             return new CrashReport(
                 Details: details,
-                LogFilePath: sessionLogFilePath,
-                LogDirectoryPath: sessionLogDirectoryPath);
+                LogFilePath: crashFilePath,
+                LogDirectoryPath: logDirectoryPath);
         }
 
         /// <summary>
