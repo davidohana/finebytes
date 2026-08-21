@@ -19,15 +19,31 @@ namespace Mfr.App.Ui.ViewModels.FilterPalette
         {
             Groups =
             [
-                new FilterPaletteGroupViewModel(null, "All", "FilterGroupAllGeometry"),
-                new FilterPaletteGroupViewModel(FilterGroup.Case, "Case", "FilterGroupCaseGeometry"),
-                new FilterPaletteGroupViewModel(FilterGroup.Space, "Space", "FilterGroupSpaceGeometry"),
-                new FilterPaletteGroupViewModel(FilterGroup.Trimming, "Trimming", "FilterGroupTrimmingGeometry"),
-                new FilterPaletteGroupViewModel(FilterGroup.Replace, "Replace", "FilterGroupReplaceGeometry"),
-                new FilterPaletteGroupViewModel(FilterGroup.Formatting, "Formatting", "FilterGroupFormattingGeometry"),
-                new FilterPaletteGroupViewModel(FilterGroup.Audio, "Audio", "FilterGroupAudioGeometry"),
-                new FilterPaletteGroupViewModel(FilterGroup.Attributes, "Attributes", "FilterGroupAttributesGeometry"),
-                new FilterPaletteGroupViewModel(FilterGroup.Misc, "Misc", "FilterGroupMiscGeometry"),
+                new FilterPaletteGroupViewModel(null, "All", "/Assets/FilterGroups/FilterGroupAll.png"),
+                new FilterPaletteGroupViewModel(FilterGroup.Case, "Case", "/Assets/FilterGroups/FilterGroupCase.png"),
+                new FilterPaletteGroupViewModel(FilterGroup.Space, "Space", "/Assets/FilterGroups/FilterGroupSpace.png"),
+                new FilterPaletteGroupViewModel(
+                    FilterGroup.Trimming,
+                    "Trimming",
+                    "/Assets/FilterGroups/FilterGroupTrimming.png"
+                ),
+                new FilterPaletteGroupViewModel(
+                    FilterGroup.Replace,
+                    "Replace",
+                    "/Assets/FilterGroups/FilterGroupReplace.png"
+                ),
+                new FilterPaletteGroupViewModel(
+                    FilterGroup.Formatting,
+                    "Formatting",
+                    "/Assets/FilterGroups/FilterGroupFormatting.png"
+                ),
+                new FilterPaletteGroupViewModel(FilterGroup.Audio, "Audio", "/Assets/FilterGroups/FilterGroupAudio.png"),
+                new FilterPaletteGroupViewModel(
+                    FilterGroup.Attributes,
+                    "Attributes",
+                    "/Assets/FilterGroups/FilterGroupAttributes.png"
+                ),
+                new FilterPaletteGroupViewModel(FilterGroup.Misc, "Misc", "/Assets/FilterGroups/FilterGroupMisc.png"),
             ];
 
             VisibleFilters = [];

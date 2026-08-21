@@ -1,3 +1,6 @@
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.Filters;
 
@@ -8,9 +11,14 @@ namespace Mfr.App.Ui.ViewModels.FilterPalette
     /// </summary>
     /// <param name="group">The filter group, or <see langword="null"/> for the All button.</param>
     /// <param name="displayName">Tooltip and accessibility name.</param>
-    /// <param name="iconKey">Resource key for the toolbar icon geometry.</param>
-    public sealed partial class FilterPaletteGroupViewModel(FilterGroup? group, string displayName, string iconKey)
-        : ViewModelBase
+    /// <param name="iconAssetPath">
+    /// App-relative Avalonia resource path (e.g. <c>/Assets/FilterGroups/FilterGroupAll.png</c>).
+    /// </param>
+    public sealed partial class FilterPaletteGroupViewModel(
+        FilterGroup? group,
+        string displayName,
+        string iconAssetPath
+    ) : ViewModelBase
     {
         /// <summary>
         /// Gets the filter group, or <see langword="null"/> for All.
@@ -23,14 +31,21 @@ namespace Mfr.App.Ui.ViewModels.FilterPalette
         public string DisplayName { get; } = displayName;
 
         /// <summary>
-        /// Gets the <c>StreamGeometry</c> resource key for the icon.
+        /// Gets the MFR 7 filter-group toolbar icon.
         /// </summary>
-        public string IconKey { get; } = iconKey;
+        public IImage Icon { get; } = _LoadIcon(iconAssetPath);
 
         /// <summary>
         /// Whether this group is the active exclusive selection.
         /// </summary>
         [ObservableProperty]
         private bool _isSelected;
+
+        private static Bitmap _LoadIcon(string assetPath)
+        {
+            var uri = new Uri($"avares://Mfr.App.Ui{assetPath}");
+            using var stream = AssetLoader.Open(uri);
+            return new Bitmap(stream);
+        }
     }
 }

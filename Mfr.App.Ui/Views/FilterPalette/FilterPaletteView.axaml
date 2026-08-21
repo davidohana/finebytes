@@ -5,7 +5,6 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterPalette"
   xmlns:filters="using:Mfr.Filters"
-  xmlns:converters="using:Mfr.App.Ui.Converters"
   mc:Ignorable="d"
   d:DesignWidth="240"
   d:DesignHeight="320"
@@ -21,10 +20,25 @@
       <Setter Property="MinHeight" Value="22" />
       <Setter Property="Padding" Value="2" />
       <Setter Property="Margin" Value="1" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
-    <Style Selector="Button.filter-group.selected">
+    <Style Selector="Button.filter-group /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.filter-group:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.filter-group.selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+    </Style>
+    <Style Selector="Button.filter-group.selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
     </Style>
@@ -82,13 +96,7 @@
                 Command="{Binding #FilterPaletteRoot.((vm:FilterPaletteViewModel)DataContext).SelectGroupCommand}"
                 CommandParameter="{Binding}"
               >
-                <Path
-                  Width="14"
-                  Height="14"
-                  Stretch="Uniform"
-                  Fill="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                  Data="{Binding IconKey, Converter={x:Static converters:ResourceKeyToGeometryConverter.Instance}}"
-                />
+                <Image Width="16" Height="16" Stretch="None" Source="{Binding Icon}" />
               </Button>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
@@ -96,6 +104,7 @@
       </Border>
       <TextBox
         x:Name="SearchBox"
+        Classes="clearButton"
         DockPanel.Dock="Bottom"
         Margin="4,4,4,4"
         Watermark="Filter…"
