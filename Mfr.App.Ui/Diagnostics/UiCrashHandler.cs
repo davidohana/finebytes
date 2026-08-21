@@ -55,23 +55,24 @@ namespace Mfr.App.Ui.Diagnostics
             ArgumentNullException.ThrowIfNull(exception);
 
             var details = LogPaths.FormatCrashText(exception);
-            if (LogSession.LogFilePath is { } sessionLogFilePath
-                && LogSession.LogDirectoryPath is { } sessionLogDirectoryPath)
+            if (!LogSession.IsStarted)
             {
-                Log.Error(exception, "Unhandled exception.");
-                LogSession.Shutdown();
-
+                var crashFilePath = LogPaths.TryWriteCrashFile(exception);
                 return new CrashReport(
                     Details: details,
-                    LogFilePath: sessionLogFilePath,
-                    LogDirectoryPath: sessionLogDirectoryPath);
+                    LogFilePath: crashFilePath,
+                    LogDirectoryPath: LogPaths.DefaultDirectoryPath);
             }
 
-            var crashFilePath = LogPaths.TryWriteCrashFile(exception);
+            var sessionLogFilePath = LogSession.LogFilePath!;
+            var sessionLogDirectoryPath = LogSession.LogDirectoryPath!;
+            Log.Error(exception, "Unhandled exception.");
+            LogSession.Shutdown();
+
             return new CrashReport(
                 Details: details,
-                LogFilePath: crashFilePath,
-                LogDirectoryPath: LogPaths.DefaultDirectoryPath);
+                LogFilePath: sessionLogFilePath,
+                LogDirectoryPath: sessionLogDirectoryPath);
         }
 
         /// <summary>

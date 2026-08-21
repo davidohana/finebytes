@@ -20,6 +20,11 @@ namespace Mfr.Engine.Logging
         public static string? LogDirectoryPath { get; private set; }
 
         /// <summary>
+        /// Gets whether a session is active (<see cref="Start"/> has run and <see cref="Shutdown"/> has not).
+        /// </summary>
+        public static bool IsStarted => LogFilePath is not null;
+
+        /// <summary>
         /// Creates a session log file, assigns <see cref="Log.Logger"/>, and prunes old sessions.
         /// <para>
         /// Call once per process; then <see cref="Shutdown"/> at exit.
