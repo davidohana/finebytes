@@ -5,7 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
-using Mfr.App.Ui.Views;
+using Mfr.App.Ui.Views.FileList;
 
 namespace Mfr.Tests.Ui
 {

@@ -6,6 +6,8 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels"
   xmlns:filelist="using:Mfr.App.Ui.ViewModels.FileList"
   xmlns:views="using:Mfr.App.Ui.Views"
+  xmlns:filelistviews="using:Mfr.App.Ui.Views.FileList"
+  xmlns:filterpaletteviews="using:Mfr.App.Ui.Views.FilterPalette"
   xmlns:shortcuts="using:Mfr.App.Ui.Input"
   mc:Ignorable="d"
   d:DesignWidth="1100"
@@ -316,7 +318,7 @@
           <ColumnDefinition Width="6" />
           <ColumnDefinition Width="3*" MinWidth="280" />
         </Grid.ColumnDefinitions>
-        <views:FileListView Grid.Column="0" DataContext="{Binding FileList}" />
+        <filelistviews:FileListView Grid.Column="0" DataContext="{Binding FileList}" />
         <views:PaneSplitter
           x:Name="FileListSplitter"
           Grid.Column="1"
@@ -337,7 +339,7 @@
               <ColumnDefinition Width="6" />
               <ColumnDefinition Width="*" MinWidth="120" />
             </Grid.ColumnDefinitions>
-            <views:FilterPaletteView Grid.Column="0" DataContext="{Binding FilterPalette}" />
+            <filterpaletteviews:FilterPaletteView Grid.Column="0" DataContext="{Binding FilterPalette}" />
             <views:PaneSplitter
               x:Name="AvailableAppliedSplitter"
               Grid.Column="1"

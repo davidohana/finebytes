@@ -4,11 +4,11 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FileList"
-  xmlns:views="using:Mfr.App.Ui.Views"
+  xmlns:views="using:Mfr.App.Ui.Views.FileList"
   mc:Ignorable="d"
   d:DesignWidth="280"
   d:DesignHeight="400"
-  x:Class="Mfr.App.Ui.Views.FileListView"
+  x:Class="Mfr.App.Ui.Views.FileList.FileListView"
   x:Name="FileListRoot"
   x:DataType="vm:FileListViewModel"
 >

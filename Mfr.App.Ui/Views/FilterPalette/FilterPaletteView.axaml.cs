@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.FilterPalette
 {
     /// <summary>
     /// Available Filters pane host.

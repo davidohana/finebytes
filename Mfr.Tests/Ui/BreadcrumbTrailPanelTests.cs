@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Mfr.App.Ui.Views;
+using Mfr.App.Ui.Views.FileList;
 
 namespace Mfr.Tests.Ui
 {

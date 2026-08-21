@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Mfr.App.Ui.ViewModels.FileList;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.FileList
 {
     /// <summary>
     /// Lays out address-bar folders from the right so the current folder stays visible.

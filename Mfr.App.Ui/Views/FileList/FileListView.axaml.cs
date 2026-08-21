@@ -7,7 +7,7 @@ using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.FileList
 {
     /// <summary>
     /// File List pane host.

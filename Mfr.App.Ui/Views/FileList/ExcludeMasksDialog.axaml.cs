@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.FileList;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.FileList
 {
     /// <summary>
     /// Modal dialog for File List exclude masks.

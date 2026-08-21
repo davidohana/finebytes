@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.FileList
 {
     /// <summary>
     /// Uniform-size wrapping panel that realizes only items in the effective viewport.

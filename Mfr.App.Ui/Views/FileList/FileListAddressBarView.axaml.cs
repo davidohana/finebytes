@@ -7,7 +7,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FileList;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.FileList
 {
     /// <summary>
     /// File List address bar: breadcrumbs, path edit, history, Up, and Refresh.
