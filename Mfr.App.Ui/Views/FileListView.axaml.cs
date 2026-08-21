@@ -3,6 +3,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels;
 using Mfr.Utils;
 
@@ -33,6 +34,33 @@ namespace Mfr.App.Ui.Views
                 return;
 
             base.OnKeyDown(e);
+        }
+
+        private void _OnMaskKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter)
+                return;
+
+            if (DataContext is FileListViewModel viewModel)
+                viewModel.CommitMask();
+
+            e.Handled = true;
+        }
+
+        private void _OnMaskLostFocus(object? sender, RoutedEventArgs e)
+        {
+            Dispatcher.UIThread.Post(_CommitMaskIfInactive, DispatcherPriority.Input);
+        }
+
+        private void _CommitMaskIfInactive()
+        {
+            if (DataContext is not FileListViewModel viewModel)
+                return;
+
+            if (MaskCombo.IsDropDownOpen || MaskCombo.IsKeyboardFocusWithin)
+                return;
+
+            viewModel.CommitMask();
         }
 
         private void _OnEntriesDoubleTapped(object? sender, TappedEventArgs e)

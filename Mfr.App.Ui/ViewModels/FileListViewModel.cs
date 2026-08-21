@@ -443,9 +443,16 @@ namespace Mfr.App.Ui.ViewModels
             _Navigate(path);
         }
 
+        /// <summary>
+        /// Remembers the current include mask after the user commits it (Enter or leave the combo).
+        /// </summary>
+        public void CommitMask()
+        {
+            _RememberMask(Mask);
+        }
+
         partial void OnMaskChanged(string value)
         {
-            _RememberMask(value);
             _ReloadEntries();
         }
 

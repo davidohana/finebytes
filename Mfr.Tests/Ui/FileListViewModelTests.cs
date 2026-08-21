@@ -96,6 +96,30 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies typed masks are remembered only on commit, not on every property change.
+        /// </summary>
+        [Fact]
+        public void Mask_Is_Remembered_Only_On_Commit()
+        {
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir);
+            var defaultCount = viewModel.MaskSuggestions.Count;
+
+            viewModel.Mask = "4";
+            viewModel.Mask = "44";
+            viewModel.Mask = "444";
+
+            Assert.Equal(defaultCount, viewModel.MaskSuggestions.Count);
+
+            viewModel.CommitMask();
+
+            Assert.Equal(defaultCount + 1, viewModel.MaskSuggestions.Count);
+            Assert.Contains("444", viewModel.MaskSuggestions);
+            Assert.DoesNotContain("4", viewModel.MaskSuggestions);
+            Assert.DoesNotContain("44", viewModel.MaskSuggestions);
+        }
+
+        /// <summary>
         /// Verifies exclude masks hide matching files from the listing.
         /// </summary>
         [Fact]

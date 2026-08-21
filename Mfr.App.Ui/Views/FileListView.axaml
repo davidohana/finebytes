@@ -186,12 +186,15 @@
       <Grid DockPanel.Dock="Bottom" ColumnDefinitions="Auto,*,Auto,Auto" Margin="4">
         <TextBlock Text="Mask:" VerticalAlignment="Center" Margin="0,0,6,0" />
         <ComboBox
+          x:Name="MaskCombo"
           Grid.Column="1"
           Classes="mask-filter"
           IsEditable="True"
           HorizontalAlignment="Stretch"
           ItemsSource="{Binding MaskSuggestions}"
           Text="{Binding Mask, Mode=TwoWay}"
+          KeyDown="_OnMaskKeyDown"
+          LostFocus="_OnMaskLostFocus"
         />
         <TextBlock Grid.Column="2" Text="Exclude:" VerticalAlignment="Center" Margin="8,0,6,0" />
         <TextBox
