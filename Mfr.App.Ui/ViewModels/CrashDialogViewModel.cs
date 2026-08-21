@@ -11,20 +11,15 @@ namespace Mfr.App.Ui.ViewModels
     /// <param name="details">Full exception text including inner exceptions.</param>
     /// <param name="logFilePath">Session or crash log path, when written.</param>
     /// <param name="logDirectoryPath">Directory to open from the dialog.</param>
-    /// <param name="isTerminating">Whether the process will close after the dialog.</param>
     public sealed class CrashDialogViewModel(
         string details,
         string? logFilePath,
-        string logDirectoryPath,
-        bool isTerminating)
+        string logDirectoryPath)
     {
-
         /// <summary>
         /// Gets the short user-facing summary.
         /// </summary>
-        public string Summary { get; } = isTerminating
-                ? "An unexpected error occurred. Application will be terminated."
-                : "An unexpected error occurred.";
+        public string Summary { get; } = "An unexpected error occurred. Application will be terminated.";
 
         /// <summary>
         /// Gets the full exception details for copy/display.

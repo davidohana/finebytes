@@ -11,15 +11,14 @@ namespace Mfr.Tests.Ui
     {
         [Fact]
         /// <summary>
-        /// Verifies terminating copy includes the close warning and log fallback text.
+        /// Verifies summary includes the close warning and log fallback text.
         /// </summary>
-        public void ViewModel_Terminating_Sets_Summary_And_Log_Fallback()
+        public void ViewModel_Sets_Summary_And_Log_Fallback()
         {
             var viewModel = new CrashDialogViewModel(
                 details: "details",
                 logFilePath: null,
-                logDirectoryPath: string.Empty,
-                isTerminating: true);
+                logDirectoryPath: string.Empty);
 
             Assert.Contains("terminated", viewModel.Summary, StringComparison.OrdinalIgnoreCase);
             Assert.Equal("Diagnostic log was not written.", viewModel.LogFileDisplay);
@@ -35,14 +34,13 @@ namespace Mfr.Tests.Ui
             var viewModel = new CrashDialogViewModel(
                 details: "System.InvalidOperationException: boom",
                 logFilePath: @"C:\logs\session-test.log",
-                logDirectoryPath: @"C:\logs",
-                isTerminating: false);
+                logDirectoryPath: @"C:\logs");
             var dialog = new CrashDialog(viewModel);
             dialog.Show();
 
             Assert.True(dialog.IsVisible);
             Assert.Same(viewModel, dialog.DataContext);
-            Assert.Equal("An unexpected error occurred.", viewModel.Summary);
+            Assert.Contains("terminated", viewModel.Summary, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

@@ -2255,7 +2255,7 @@ Unexpected process faults are **not** the same channel as per-item preview/commi
   - Session files: `session-*.log` (retention: `log.maxSessionFiles`, default 100)
   - If Serilog is not running yet, the UI writes a best-effort `crash-*.log` under the default log directory (not `log.directoryPath`)
 
-The UI hooks `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException`, and `Dispatcher.UIThread.UnhandledException`. UI-thread faults are logged and shown in a local crash dialog (copy details / open log folder); the process continues. Terminating faults log, flush, show the dialog when the dispatcher is available, then exit. Nothing is sent off-machine.
+The UI hooks `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException`, and `Dispatcher.UIThread.UnhandledException`. UI-thread and other terminating faults are logged, flushed, shown in a local crash dialog (copy details / open log folder), then the process exits. Unobserved background-task faults are logged only. Nothing is sent off-machine.
 
 ---
 

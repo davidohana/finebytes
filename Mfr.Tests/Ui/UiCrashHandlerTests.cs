@@ -42,7 +42,7 @@ namespace Mfr.Tests.Ui
             string? crashFilePath = null;
             try
             {
-                var report = UiCrashHandler.Persist(exception, isTerminating: true);
+                var report = UiCrashHandler.Persist(exception);
                 crashFilePath = report.LogFilePath;
 
                 Assert.NotNull(crashFilePath);
@@ -77,13 +77,11 @@ namespace Mfr.Tests.Ui
             var sessionLogFilePath = LogSession.LogFilePath;
             var sessionLogDirectoryPath = LogSession.LogDirectoryPath;
 
-            var report = UiCrashHandler.Persist(
-                new InvalidOperationException("boom"),
-                isTerminating: false);
+            var report = UiCrashHandler.Persist(new InvalidOperationException("boom"));
 
             Assert.Equal(sessionLogFilePath, report.LogFilePath);
             Assert.Equal(sessionLogDirectoryPath, report.LogDirectoryPath);
-            LogSession.Shutdown();
+            Assert.Null(LogSession.LogFilePath);
             Assert.NotNull(sessionLogFilePath);
             var content = File.ReadAllText(sessionLogFilePath);
             Assert.Contains("boom", content, StringComparison.Ordinal);

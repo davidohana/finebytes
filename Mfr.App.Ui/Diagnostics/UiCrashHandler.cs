@@ -24,6 +24,9 @@ namespace Mfr.App.Ui.Diagnostics
         /// <summary>
         /// Hooks <see cref="AppDomain.UnhandledException"/> and
         /// <see cref="TaskScheduler.UnobservedTaskException"/>. Safe to call more than once.
+        /// <para>
+        /// Unobserved task faults are logged only; they do not show the crash dialog.
+        /// </para>
         /// </summary>
         internal static void RegisterProcessHandlers()
         {
@@ -34,7 +37,7 @@ namespace Mfr.App.Ui.Diagnostics
         }
 
         /// <summary>
-        /// Hooks Avalonia dispatcher faults so a UI-thread exception does not kill the process.
+        /// Hooks Avalonia dispatcher faults. UI-thread exceptions are treated as fatal after the crash dialog.
         /// </summary>
         internal static void RegisterDispatcherHandler()
         {
@@ -46,22 +49,17 @@ namespace Mfr.App.Ui.Diagnostics
         /// Writes the fault to the session log, or to a <c>crash-*.log</c> in the default log folder.
         /// </summary>
         /// <param name="exception">The fault to record.</param>
-        /// <param name="isTerminating">Whether the process is shutting down.</param>
         /// <returns>Text and log paths for the crash dialog.</returns>
-        internal static CrashReport Persist(Exception exception, bool isTerminating)
+        internal static CrashReport Persist(Exception exception)
         {
             ArgumentNullException.ThrowIfNull(exception);
 
-            var details = LogPaths.FormatCrashText(exception, isTerminating);
+            var details = LogPaths.FormatCrashText(exception);
             if (LogSession.LogFilePath is { } sessionLogFilePath
                 && LogSession.LogDirectoryPath is { } sessionLogDirectoryPath)
             {
-                Log.Error(
-                    exception,
-                    "Unhandled exception. Terminating: {IsTerminating}.",
-                    isTerminating);
-                if (isTerminating)
-                    LogSession.Shutdown();
+                Log.Error(exception, "Unhandled exception.");
+                LogSession.Shutdown();
 
                 return new CrashReport(
                     Details: details,
@@ -69,7 +67,7 @@ namespace Mfr.App.Ui.Diagnostics
                     LogDirectoryPath: sessionLogDirectoryPath);
             }
 
-            var crashFilePath = LogPaths.TryWriteCrashFile(exception, isTerminating);
+            var crashFilePath = LogPaths.TryWriteCrashFile(exception);
             return new CrashReport(
                 Details: details,
                 LogFilePath: crashFilePath,
@@ -77,29 +75,23 @@ namespace Mfr.App.Ui.Diagnostics
         }
 
         /// <summary>
-        /// Records a fault and shows the crash dialog when the dispatcher is available.
+        /// Records a fatal fault and shows the crash dialog when the dispatcher is available.
         /// </summary>
         /// <param name="exception">The fault to report.</param>
-        /// <param name="isTerminating">Whether the process will exit after this report.</param>
-        internal static void Report(Exception exception, bool isTerminating)
+        internal static void Report(Exception exception)
         {
             if (Interlocked.Exchange(ref _isReporting, 1) == 1)
                 return;
 
             try
             {
-                var report = Persist(exception, isTerminating);
+                var report = Persist(exception);
                 if (!SuppressDialogs)
-                    _ShowCrashDialog(report, isTerminating);
+                    _ShowCrashDialog(report);
             }
             catch (Exception)
             {
                 // Crash reporting must not throw; the original fault is already in flight.
-            }
-            finally
-            {
-                if (!isTerminating)
-                    Interlocked.Exchange(ref _isReporting, 0);
             }
         }
 
@@ -107,12 +99,20 @@ namespace Mfr.App.Ui.Diagnostics
         {
             var exception = args.ExceptionObject as Exception
                 ?? new Exception($"Non-exception unhandled object: {args.ExceptionObject}");
-            Report(exception, isTerminating: args.IsTerminating);
+            Report(exception);
         }
 
         private static void _OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
         {
-            Report(args.Exception, isTerminating: false);
+            try
+            {
+                Log.Error(args.Exception, "Unobserved task exception.");
+            }
+            catch (Exception)
+            {
+                // Logging must not throw; mark observed so the process is not torn down later.
+            }
+
             args.SetObserved();
         }
 
@@ -121,10 +121,28 @@ namespace Mfr.App.Ui.Diagnostics
             DispatcherUnhandledExceptionEventArgs args)
         {
             args.Handled = true;
-            Report(args.Exception, isTerminating: false);
+            Report(args.Exception);
+            _ShutdownApplication();
         }
 
-        private static void _ShowCrashDialog(CrashReport report, bool isTerminating)
+        /// <summary>
+        /// Exits the desktop lifetime after a fatal UI-thread fault. No-op in headless tests.
+        /// </summary>
+        private static void _ShutdownApplication()
+        {
+            if (SuppressDialogs)
+                return;
+
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.Shutdown(1);
+                return;
+            }
+
+            Environment.Exit(1);
+        }
+
+        private static void _ShowCrashDialog(CrashReport report)
         {
             if (Application.Current is null)
                 return;
@@ -134,8 +152,7 @@ namespace Mfr.App.Ui.Diagnostics
                 var viewModel = new CrashDialogViewModel(
                     details: report.Details,
                     logFilePath: report.LogFilePath,
-                    logDirectoryPath: report.LogDirectoryPath,
-                    isTerminating: isTerminating);
+                    logDirectoryPath: report.LogDirectoryPath);
                 var dialog = new CrashDialog(viewModel);
                 var owner = _TryGetMainWindow();
                 if (owner is not null)

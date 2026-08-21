@@ -23,12 +23,11 @@ namespace Mfr.App.Ui
                 LogSession.Start(
                     logLevel: LogEventLevel.Information,
                     logSettings: ConfigLoader.Settings.Log);
-                BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
-                return 0;
+                return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
             }
             catch (Exception ex)
             {
-                UiCrashHandler.Report(ex, isTerminating: true);
+                UiCrashHandler.Report(ex);
                 return 1;
             }
             finally

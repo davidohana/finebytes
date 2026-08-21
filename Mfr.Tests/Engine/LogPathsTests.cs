@@ -122,16 +122,13 @@ namespace Mfr.Tests.Engine
                 "outer boom",
                 new ArgumentException("inner boom"));
 
-            var terminating = LogPaths.FormatCrashText(exception, isTerminating: true);
-            Assert.Contains("An unexpected error occurred.", terminating, StringComparison.Ordinal);
-            Assert.Contains("Application will be terminated.", terminating, StringComparison.Ordinal);
-            Assert.Contains("InvalidOperationException", terminating, StringComparison.Ordinal);
-            Assert.Contains("outer boom", terminating, StringComparison.Ordinal);
-            Assert.Contains("ArgumentException", terminating, StringComparison.Ordinal);
-            Assert.Contains("inner boom", terminating, StringComparison.Ordinal);
-
-            var continuing = LogPaths.FormatCrashText(exception, isTerminating: false);
-            Assert.DoesNotContain("Application will be terminated.", continuing, StringComparison.Ordinal);
+            var text = LogPaths.FormatCrashText(exception);
+            Assert.Contains("An unexpected error occurred.", text, StringComparison.Ordinal);
+            Assert.Contains("Application will be terminated.", text, StringComparison.Ordinal);
+            Assert.Contains("InvalidOperationException", text, StringComparison.Ordinal);
+            Assert.Contains("outer boom", text, StringComparison.Ordinal);
+            Assert.Contains("ArgumentException", text, StringComparison.Ordinal);
+            Assert.Contains("inner boom", text, StringComparison.Ordinal);
         }
 
         [Fact]
@@ -144,7 +141,7 @@ namespace Mfr.Tests.Engine
             string? crashFilePath = null;
             try
             {
-                crashFilePath = LogPaths.TryWriteCrashFile(exception, isTerminating: true);
+                crashFilePath = LogPaths.TryWriteCrashFile(exception);
 
                 Assert.NotNull(crashFilePath);
                 Assert.True(File.Exists(crashFilePath));

@@ -125,17 +125,14 @@ namespace Mfr.Engine.Logging
         /// Formats user-facing crash text from an exception, including inner exceptions.
         /// </summary>
         /// <param name="exception">The fault to describe.</param>
-        /// <param name="isTerminating">
-        /// When <c>true</c>, the text states that the application will close.
-        /// </param>
-        /// <returns>A header plus <see cref="Exception.ToString"/>.</returns>
-        public static string FormatCrashText(Exception exception, bool isTerminating)
+        /// <returns>A terminating header plus <see cref="Exception.ToString"/>.</returns>
+        public static string FormatCrashText(Exception exception)
         {
             ArgumentNullException.ThrowIfNull(exception);
 
-            var header = isTerminating
-                ? "An unexpected error occurred." + Environment.NewLine + "Application will be terminated."
-                : "An unexpected error occurred.";
+            var header = "An unexpected error occurred."
+                + Environment.NewLine
+                + "Application will be terminated.";
             return header + Environment.NewLine + Environment.NewLine + exception.ToString();
         }
 
@@ -143,9 +140,8 @@ namespace Mfr.Engine.Logging
         /// Best-effort write of a <c>crash-*.log</c> file under <see cref="DefaultDirectoryPath"/>.
         /// </summary>
         /// <param name="exception">The fault to persist.</param>
-        /// <param name="isTerminating">Whether the process is shutting down.</param>
         /// <returns>The written file path, or <c>null</c> when the write failed.</returns>
-        public static string? TryWriteCrashFile(Exception exception, bool isTerminating)
+        public static string? TryWriteCrashFile(Exception exception)
         {
             ArgumentNullException.ThrowIfNull(exception);
 
@@ -157,7 +153,7 @@ namespace Mfr.Engine.Logging
                     logDirectoryPath: directoryPath,
                     prefix: CrashFilePrefix,
                     extension: ".log");
-                File.WriteAllText(crashFilePath, FormatCrashText(exception, isTerminating));
+                File.WriteAllText(crashFilePath, FormatCrashText(exception));
                 return crashFilePath;
             }
             catch (Exception)

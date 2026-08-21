@@ -103,4 +103,4 @@ CLI and UI write per-session Serilog files (not the View → Log undo window):
 - CLI: `-l|--log-level` (`debug|info|warn|error`, default `info`)
 - Retention: `log.maxSessionFiles` in `mfr.config.json` (default 100)
 
-The UI shows a local crash dialog on unhandled exceptions (copy details, open log folder). Reports are not uploaded.
+The UI shows a local crash dialog on UI-thread and other fatal faults (copy details, open log folder), then exits. Background task errors are logged only. Reports are not uploaded.
