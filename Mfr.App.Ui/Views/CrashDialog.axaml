@@ -5,6 +5,7 @@
   x:Class="Mfr.App.Ui.Views.CrashDialog"
   x:DataType="vm:CrashDialogViewModel"
   Title="Magic File Renamer"
+  Icon="/Assets/mfr.ico"
   Width="640"
   Height="480"
   MinWidth="420"
