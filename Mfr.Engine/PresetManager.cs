@@ -27,8 +27,7 @@ namespace Mfr.Engine
         /// <returns>Absolute path to the default presets JSON file.</returns>
         public static string DefaultPresetsFilePath()
         {
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return appData.CombinePath("finebytes", "mfr", "presets.json");
+            return AppDataPaths.RoamingRoot().CombinePath("presets.json");
         }
 
         /// <summary>

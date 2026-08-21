@@ -16,13 +16,12 @@ namespace Mfr.Models.Config
         };
 
         /// <summary>
-        /// Default session file path (<c>%ApplicationData%/finebytes/mfr/session.json</c>).
+        /// Default session file path (<see cref="AppDataPaths.RoamingRoot"/> + <c>session.json</c>).
         /// </summary>
         /// <returns>Absolute path to the default session JSON file.</returns>
         public static string DefaultSessionFilePath()
         {
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return appData.CombinePath("finebytes", "mfr", "session.json");
+            return AppDataPaths.RoamingRoot().CombinePath("session.json");
         }
 
         /// <summary>

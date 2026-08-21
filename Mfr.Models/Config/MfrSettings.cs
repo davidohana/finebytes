@@ -23,7 +23,7 @@ namespace Mfr.Models.Config
         /// <summary>
         /// Directory for session log files.
         /// <para>
-        /// When blank, <c>%LocalApplicationData%/finebytes/mfr/logs</c> is used.
+        /// When blank, <see cref="AppDataPaths.LocalRoot"/> + <c>logs</c> is used.
         /// </para>
         /// </summary>
         [ConfigStringMaxLength(4096)]

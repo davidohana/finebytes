@@ -21,17 +21,9 @@ namespace Mfr.Engine.Logging
 
         /// <summary>
         /// Default diagnostic log directory:
-        /// <c>%LocalApplicationData%/finebytes/mfr/logs</c>.
+        /// <see cref="AppDataPaths.LocalRoot"/> + <c>logs</c>.
         /// </summary>
-        public static string DefaultDirectoryPath
-        {
-            get
-            {
-                var localAppDataPath = Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData);
-                return localAppDataPath.CombinePath("finebytes", "mfr", "logs");
-            }
-        }
+        public static string DefaultDirectoryPath => AppDataPaths.LocalRoot().CombinePath("logs");
 
         /// <summary>
         /// Resolves the directory used for session log files.

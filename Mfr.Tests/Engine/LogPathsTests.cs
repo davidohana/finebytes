@@ -24,8 +24,8 @@ namespace Mfr.Tests.Engine
         public void ResolveDirectoryPath_Uses_Default_When_Blank()
         {
             var path = LogPaths.ResolveDirectoryPath(null);
-            Assert.Contains("finebytes", path, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("mfr", path, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains(AppDataPaths.VendorDirectoryName, path, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains(AppDataPaths.ProductDirectoryName, path, StringComparison.OrdinalIgnoreCase);
             Assert.EndsWith("logs", path, StringComparison.OrdinalIgnoreCase);
             Assert.Equal(LogPaths.DefaultDirectoryPath, path);
         }
