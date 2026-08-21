@@ -93,6 +93,38 @@ namespace Mfr.Utils.Config
         }
 
         /// <summary>
+        /// Reads an optional boolean from a JSON string property.
+        /// <para>
+        /// When <paramref name="propertyName"/> is missing or JSON null, <paramref name="value"/> is unchanged.
+        /// Accepted text is case-insensitive <c>true</c> / <c>false</c>.
+        /// </para>
+        /// </summary>
+        /// <param name="configObject">A JSON object (typically the document root).</param>
+        /// <param name="propertyName">Object property name; matching is case-insensitive.</param>
+        /// <param name="value">Field to update when the property is set.</param>
+        /// <exception cref="InvalidDataException">
+        /// Thrown when <paramref name="configObject"/> is not an object, the property is not a JSON string or null, or the text is not a boolean.
+        /// </exception>
+        public static void ReadBool(
+            JsonElement configObject,
+            string propertyName,
+            ref bool value)
+        {
+            var raw = _ReadOptionalStringProperty(configObject, propertyName);
+            if (raw is null)
+                return;
+
+            if (bool.TryParse(raw, out var parsed))
+            {
+                value = parsed;
+                return;
+            }
+
+            throw new InvalidDataException(
+                $"'{propertyName}' must be a boolean (got '{raw}').");
+        }
+
+        /// <summary>
         /// Reads a case-insensitive object property whose value must be a JSON string or null.
         /// </summary>
         /// <param name="root">A JSON object (config root or nested object).</param>
@@ -121,7 +153,7 @@ namespace Mfr.Utils.Config
                     return null;
 
                 throw new InvalidDataException(
-                                    $"'{propertyName}' must be a JSON string or null.");
+                    $"'{propertyName}' must be a JSON string or null.");
             }
 
             return null;

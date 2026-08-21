@@ -61,6 +61,23 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
+    /// UI-related preferences loaded from the <c>ui</c> section of the config file.
+    /// <para>Options dialog will expose these later; until then edit <c>mfr.config.json</c> or use CLI <c>--set</c>.</para>
+    /// </summary>
+    public sealed class UiSettings
+    {
+        /// <summary>
+        /// When true, restore and save main-window size, position, and maximized state across launches.
+        /// </summary>
+        public bool RememberWindowState = true;
+
+        /// <summary>
+        /// When true, restore and save the last File Explorer folder across launches.
+        /// </summary>
+        public bool RememberLastFolder = true;
+    }
+
+    /// <summary>
     /// Resolved settings for the current process (see <see cref="ConfigLoader.Settings"/>).
     /// </summary>
     public sealed class MfrSettings
@@ -76,5 +93,11 @@ namespace Mfr.Models.Config
         /// </summary>
         [ConfigSection]
         public LogSettings Log = new();
+
+        /// <summary>
+        /// UI preferences (window/folder restore toggles and future Options settings).
+        /// </summary>
+        [ConfigSection]
+        public UiSettings Ui = new();
     }
 }

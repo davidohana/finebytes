@@ -136,7 +136,8 @@ namespace Mfr.Utils.Config
 
                 var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
                 var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
-                if (intRange is null && strMax is null)
+                var isBoolLeaf = field.FieldType == typeof(bool);
+                if (intRange is null && strMax is null && !isBoolLeaf)
                     continue;
 
                 var jsonName = s_Naming.ConvertName(field.Name);

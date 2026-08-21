@@ -1,8 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Mfr.App.Ui.Services;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
+using Mfr.Models.Config;
 
 namespace Mfr.App.Ui
 {
@@ -22,10 +24,19 @@ namespace Mfr.App.Ui
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow
+                var session = SessionStore.Load();
+                var ui = ConfigLoader.Settings.Ui;
+                var initialFolder = ui.RememberLastFolder ? session.LastOpenedDirectory : null;
+
+                var mainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(),
+                    DataContext = new MainWindowViewModel(initialExplorerPath: initialFolder),
                 };
+
+                if (ui.RememberWindowState)
+                    WindowSession.TryRestore(mainWindow, session.Window);
+
+                desktop.MainWindow = mainWindow;
 #if DEBUG
                 this.AttachDevTools();
 #endif

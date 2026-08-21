@@ -14,9 +14,10 @@ namespace Mfr.Models.Config
     /// <see cref="MfrSettings"/> field initializers.
     /// </para>
     /// <para>
-    /// The document root must be a JSON object with nested sections (e.g. <c>filters</c>, <c>log</c>). Each section is a JSON object;
+    /// The document root must be a JSON object with nested sections (e.g. <c>filters</c>, <c>log</c>, <c>ui</c>). Each section is a JSON object;
     /// <see cref="ConfigJsonApplier.Apply"/> maps annotated fields on <see cref="MfrSettings"/> and nested section types using
-    /// <see cref="ConfigValueReader"/>; every leaf value is read from a JSON <strong>string</strong> (including integers, e.g. <c>"1000"</c>).
+    /// <see cref="ConfigValueReader"/>; every leaf value is read from a JSON <strong>string</strong>
+    /// (including integers, e.g. <c>"1000"</c>, and booleans, e.g. <c>"true"</c>).
     /// </para>
     /// <para>
     /// Config binding is covered by <see cref="ApplyCliOverrides"/> tests and

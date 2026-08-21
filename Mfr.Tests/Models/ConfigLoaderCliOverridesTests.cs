@@ -94,5 +94,20 @@ namespace Mfr.Tests.Models
                 ConfigLoader.ApplyCliOverrides(["log.maxSessionFiles=0"]));
             Assert.Contains("CLI config override", ex.Message, StringComparison.Ordinal);
         }
+
+        [Fact]
+        public void ApplyCliOverrides_Sets_Ui_RememberLastFolder()
+        {
+            ConfigLoader.ApplyCliOverrides(["ui.rememberLastFolder=false"]);
+            Assert.False(ConfigLoader.Settings.Ui.RememberLastFolder);
+            Assert.True(ConfigLoader.Settings.Ui.RememberWindowState);
+        }
+
+        [Fact]
+        public void ApplyCliOverrides_Sets_Ui_RememberWindowState()
+        {
+            ConfigLoader.ApplyCliOverrides(["ui.rememberWindowState=false"]);
+            Assert.False(ConfigLoader.Settings.Ui.RememberWindowState);
+        }
     }
 }

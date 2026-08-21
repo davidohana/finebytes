@@ -6,8 +6,10 @@ namespace Mfr.Utils.Config
     /// <summary>
     /// Applies JSON configuration to annotated public instance fields.
     /// <para>
-    /// Uses <see cref="ConfigSectionAttribute"/> for nested objects, <see cref="ConfigIntRangeAttribute"/> and
-    /// <see cref="ConfigStringMaxLengthAttribute"/> for leaves (via <see cref="ConfigValueReader"/>; leaf values are JSON strings, including integers).
+    /// Uses <see cref="ConfigSectionAttribute"/> for nested objects,
+    /// <see cref="ConfigIntRangeAttribute"/> / <see cref="ConfigStringMaxLengthAttribute"/> for constrained leaves,
+    /// and unannotated <c>bool</c> fields as boolean leaves (via <see cref="ConfigValueReader"/>; leaf values are JSON strings,
+    /// including integers and booleans).
     /// </para>
     /// </summary>
     public static class ConfigJsonApplier
@@ -15,8 +17,8 @@ namespace Mfr.Utils.Config
         /// <summary>
         /// Binds <paramref name="configObject"/> onto <paramref name="target"/>.
         /// <para>
-        /// <see cref="ConfigSectionAttribute"/> fields recurse into nested JSON objects. <see cref="ConfigIntRangeAttribute"/> and
-        /// <see cref="ConfigStringMaxLengthAttribute"/> read matching properties as JSON strings. Omitted properties and JSON null leave fields unchanged.
+        /// <see cref="ConfigSectionAttribute"/> fields recurse into nested JSON objects. Leaf attributes and public
+        /// <c>bool</c> fields read matching properties as JSON strings. Omitted properties and JSON null leave fields unchanged.
         /// </para>
         /// </summary>
         /// <param name="configObject">A JSON object (typically the document root).</param>
@@ -27,7 +29,7 @@ namespace Mfr.Utils.Config
         /// <exception cref="ArgumentNullException"><paramref name="target"/> is null.</exception>
         /// <exception cref="InvalidDataException">JSON or values are invalid (see <see cref="ConfigValueReader"/>).</exception>
         /// <exception cref="InvalidOperationException">
-        /// A field has incompatible attributes or types, or both range and string-length attributes.
+        /// A field has incompatible attributes or types, or more than one leaf attribute.
         /// </exception>
         public static void Apply(
             JsonElement configObject,
@@ -49,7 +51,7 @@ namespace Mfr.Utils.Config
                     if (intRange is not null || strMax is not null)
                     {
                         throw new InvalidOperationException(
-                            $"Field '{field.Name}' cannot combine [{nameof(ConfigSectionAttribute)}] with [{nameof(ConfigIntRangeAttribute)}] or [{nameof(ConfigStringMaxLengthAttribute)}].");
+                            $"Field '{field.Name}' cannot combine [{nameof(ConfigSectionAttribute)}] with leaf config attributes.");
                     }
 
                     if (!field.FieldType.IsClass || field.FieldType == typeof(string))
@@ -114,6 +116,14 @@ namespace Mfr.Utils.Config
                         jsonName,
                         ref value,
                         maxLengthInclusive: strMax.MaxLengthInclusive);
+                    field.SetValue(target, value);
+                    continue;
+                }
+
+                if (field.FieldType == typeof(bool))
+                {
+                    var value = (bool)field.GetValue(target)!;
+                    ConfigValueReader.ReadBool(configObject, jsonName, ref value);
                     field.SetValue(target, value);
                 }
             }

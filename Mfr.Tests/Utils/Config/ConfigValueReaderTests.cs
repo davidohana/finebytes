@@ -133,5 +133,37 @@ namespace Mfr.Tests.Utils.Config
             Assert.Throws<InvalidDataException>(() =>
                 ConfigValueReader.ReadString(doc.RootElement, "p", ref s, maxLengthInclusive: 2));
         }
+
+        [Fact]
+        public void ReadBool_parses_true_and_false()
+        {
+            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"flag":"true"}""");
+            var value = false;
+            ConfigValueReader.ReadBool(doc.RootElement, "flag", ref value);
+            Assert.True(value);
+
+            using var docFalse = JsonDocument.Parse(/*lang=json,strict*/ """{"flag":"False"}""");
+            value = true;
+            ConfigValueReader.ReadBool(docFalse.RootElement, "flag", ref value);
+            Assert.False(value);
+        }
+
+        [Fact]
+        public void ReadBool_missing_property_leaves_ref_unchanged()
+        {
+            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            var value = true;
+            ConfigValueReader.ReadBool(doc.RootElement, "flag", ref value);
+            Assert.True(value);
+        }
+
+        [Fact]
+        public void ReadBool_invalid_text_throws()
+        {
+            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"flag":"yes"}""");
+            var value = false;
+            Assert.Throws<InvalidDataException>(() =>
+                ConfigValueReader.ReadBool(doc.RootElement, "flag", ref value));
+        }
     }
 }
