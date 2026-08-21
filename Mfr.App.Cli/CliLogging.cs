@@ -9,39 +9,13 @@ namespace Mfr.App.Cli
     {
         internal const string DefaultLogLevelName = "info";
 
-        internal static CliLoggerSession Start(LogEventLevel logLevel, string? logDirectoryPath)
+        internal static void Start(LogEventLevel logLevel, string? logDirectoryPath)
         {
-            var logSettings = ConfigLoader.Settings.Log;
-            var resolvedLogDirectoryPath = _ResolveLogDirectoryPath(logDirectoryPath);
-            Directory.CreateDirectory(resolvedLogDirectoryPath);
-
-            var fileName = $"{logSettings.FilePrefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{logSettings.FileExtension}";
-            var logFilePath = Path.Combine(resolvedLogDirectoryPath, fileName);
-
-            var logger = new LoggerConfiguration()
-                .MinimumLevel.Is(logLevel)
-                .WriteTo.Console(
-                    outputTemplate: logSettings.ConsoleOutputTemplate,
-                    theme: AnsiConsoleTheme.Code,
-                    standardErrorFromLevel: LogEventLevel.Error)
-                .WriteTo.File(
-                    path: logFilePath,
-                    outputTemplate: logSettings.FileOutputTemplate,
-                    rollingInterval: RollingInterval.Infinite,
-                    shared: false)
-                .CreateLogger();
-
-            Log.Logger = logger;
-            _PruneSessionLogFiles(
-                logDirectoryPath: resolvedLogDirectoryPath,
-                maxSessionFiles: logSettings.MaxSessionFiles,
-                sessionLogPrefix: logSettings.FilePrefix,
-                sessionLogExtension: logSettings.FileExtension);
-            logger.Debug(
-                "Logging initialized. Level: {LogLevel}. File: {LogFilePath}",
-                logLevel,
-                logFilePath);
-            return new CliLoggerSession(logger, logFilePath);
+            LogSession.Start(
+                logLevel: logLevel,
+                logDirectoryPath: logDirectoryPath,
+                logSettings: ConfigLoader.Settings.Log,
+                configureAdditionalSinks: _AddConsoleSink);
         }
 
         internal static LogEventLevel ParseLogLevel(string? value)
@@ -60,69 +34,16 @@ namespace Mfr.App.Cli
             };
         }
 
-        private static void _PruneSessionLogFiles(
-            string logDirectoryPath,
-            int maxSessionFiles,
-            string sessionLogPrefix,
-            string sessionLogExtension)
+        /// <summary>
+        /// Adds the CLI console sink (errors to stderr) using <see cref="ConfigLoader.Settings"/>.
+        /// </summary>
+        /// <param name="configuration">Serilog configuration after the shared file sink is attached.</param>
+        private static void _AddConsoleSink(LoggerConfiguration configuration)
         {
-            if (!Directory.Exists(logDirectoryPath))
-                return;
-
-            var sessionLogFilePaths = Directory
-                            .EnumerateFiles(
-                                logDirectoryPath,
-                                $"{sessionLogPrefix}*{sessionLogExtension}",
-                                SearchOption.TopDirectoryOnly)
-                            .Select(path => new FileInfo(path))
-                            .OrderByDescending(fileInfo => fileInfo.CreationTimeUtc)
-                            .ThenByDescending(fileInfo => fileInfo.Name, StringComparer.Ordinal)
-                            .ToList();
-
-            if (sessionLogFilePaths.Count <= maxSessionFiles)
-                return;
-
-            foreach (var fileInfo in sessionLogFilePaths.Skip(maxSessionFiles))
-            {
-                try
-                {
-                    fileInfo.Delete();
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning(
-                        ex,
-                        "Failed to delete old log file '{LogFilePath}' during pruning.",
-                        fileInfo.FullName);
-                }
-            }
-        }
-
-        private static string _ResolveLogDirectoryPath(string? configuredLogDirectoryPath)
-        {
-            if (!configuredLogDirectoryPath.IsBlank())
-                return configuredLogDirectoryPath.Trim();
-
-            var localAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            return Path.Combine(localAppDataPath, "finebytes", "mfr", "logs");
-        }
-    }
-
-    internal sealed class CliLoggerSession : IDisposable
-    {
-        internal CliLoggerSession(ILogger logger, string logFilePath)
-        {
-            Logger = logger;
-            LogFilePath = logFilePath;
-        }
-
-        internal ILogger Logger { get; }
-
-        internal string LogFilePath { get; }
-
-        public void Dispose()
-        {
-            Log.CloseAndFlush();
+            configuration.WriteTo.Console(
+                outputTemplate: ConfigLoader.Settings.Log.ConsoleOutputTemplate,
+                theme: AnsiConsoleTheme.Code,
+                standardErrorFromLevel: LogEventLevel.Error);
         }
     }
 }

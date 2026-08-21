@@ -2243,6 +2243,20 @@ Writes use a temp file + atomic rename to protect the original. Reported as a pe
 
 Only successfully completed operations are recorded in the undo journal.
 
+### Diagnostic session logs vs View → Log
+
+Unexpected process faults are **not** the same channel as per-item preview/commit errors or the View → Log undo window.
+
+- **Preview/commit errors** stay on the rename item (grid + status bar). They are not treated as app crashes.
+- **View → Log** (`Ctrl+Shift+L`) lists rename undo sessions under `undo/` (see §14). That command remains a stub until Engine undo exists.
+- **Diagnostic session logs** are Serilog files shared by CLI and UI:
+
+  - Directory: `%LocalApplicationData%/finebytes/mfr/logs` (override with CLI `--log-dir`)
+  - Session files: `session-*.log` (retention: `log.maxSessionFiles`, default 100)
+  - If Serilog is not running yet, the UI writes a best-effort `crash-*.log` in the same folder
+
+The UI hooks `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException`, and `Dispatcher.UIThread.UnhandledException`. UI-thread faults are logged and shown in a local crash dialog (copy details / open log folder); the process continues. Terminating faults log, flush, show the dialog when the dispatcher is available, then exit. Nothing is sent off-machine.
+
 ---
 
 *End of design document — Magic File Renamer v2.0*

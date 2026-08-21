@@ -48,21 +48,24 @@ namespace Mfr.App.Cli
                 return CliExitCode.UserError;
             }
 
-            using var loggerSession = CliLogging.Start(options.LogLevel, options.LogDirectoryPath);
-            var logger = loggerSession.Logger;
+            CliLogging.Start(options.LogLevel, options.LogDirectoryPath);
             try
             {
                 return _Execute(options);
             }
             catch (UserException ex)
             {
-                logger.Error("{Text}", ex.Message);
+                Log.Error("{Text}", ex.Message);
                 return CliExitCode.UserError;
             }
             catch (Exception ex)
             {
-                logger.Error("{Text}", ex.ToString());
+                Log.Error("{Text}", ex.ToString());
                 return CliExitCode.AppError;
+            }
+            finally
+            {
+                LogSession.Shutdown();
             }
         }
 

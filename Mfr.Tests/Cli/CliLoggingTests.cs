@@ -7,6 +7,7 @@ namespace Mfr.Tests.Cli
     /// <summary>
     /// Tests Serilog bootstrap and session log retention behavior.
     /// </summary>
+    [Collection(SessionLogCollection.Name)]
     public class CliLoggingTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
@@ -24,6 +25,7 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void Dispose()
         {
+            LogSession.Shutdown();
             _tempDirectoryFixture.Dispose();
         }
 
@@ -35,13 +37,12 @@ namespace Mfr.Tests.Cli
         {
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
 
-            string logFilePath;
-            using (var loggerSession = CliLogging.Start(LogEventLevel.Information, logDirectoryPath))
-            {
-                logFilePath = loggerSession.LogFilePath;
-                Log.Information("hello from test");
-            }
+            CliLogging.Start(LogEventLevel.Information, logDirectoryPath);
+            var logFilePath = LogSession.LogFilePath;
+            Log.Information("hello from test");
+            LogSession.Shutdown();
 
+            Assert.NotNull(logFilePath);
             Assert.True(File.Exists(logFilePath));
             var content = File.ReadAllText(logFilePath);
             Assert.Contains("hello from test", content, StringComparison.Ordinal);
@@ -63,9 +64,8 @@ namespace Mfr.Tests.Cli
                 File.SetCreationTimeUtc(logFilePath, baseTime.AddMinutes(i));
             }
 
-            using (var _ = CliLogging.Start(LogEventLevel.Information, logDirectoryPath))
-            {
-            }
+            CliLogging.Start(LogEventLevel.Information, logDirectoryPath);
+            LogSession.Shutdown();
 
             var remainingNames = Directory
                 .EnumerateFiles(logDirectoryPath, "session-*.log", SearchOption.TopDirectoryOnly)

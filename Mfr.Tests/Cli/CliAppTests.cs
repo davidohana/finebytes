@@ -8,6 +8,7 @@ namespace Mfr.Tests.Cli
     /// <summary>
     /// Tests command-line error handling and user-facing output behavior.
     /// </summary>
+    [Collection(SessionLogCollection.Name)]
     public class CliAppTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();

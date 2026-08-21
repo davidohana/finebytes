@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Mfr.App.Ui.Diagnostics;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
 
@@ -20,6 +21,8 @@ namespace Mfr.App.Ui
         /// <inheritdoc />
         public override void OnFrameworkInitializationCompleted()
         {
+            UiCrashHandler.RegisterDispatcherHandler();
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new MainWindow
