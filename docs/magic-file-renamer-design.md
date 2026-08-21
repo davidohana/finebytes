@@ -2253,7 +2253,7 @@ Unexpected process faults are **not** the same channel as per-item preview/commi
 
   - Directory: `%LocalApplicationData%/finebytes/mfr/logs` (override with `log.directoryPath` in `mfr.config.json`)
   - Session files: `session-*.log` (retention: `log.maxSessionFiles`, default 100)
-  - If Serilog is not running yet, the UI writes a best-effort `crash-*.log` in the same folder
+  - If Serilog is not running yet, the UI writes a best-effort `crash-*.log` under the default log directory (not `log.directoryPath`)
 
 The UI hooks `AppDomain.UnhandledException`, `TaskScheduler.UnobservedTaskException`, and `Dispatcher.UIThread.UnhandledException`. UI-thread faults are logged and shown in a local crash dialog (copy details / open log folder); the process continues. Terminating faults log, flush, show the dialog when the dispatcher is available, then exit. Nothing is sent off-machine.
 

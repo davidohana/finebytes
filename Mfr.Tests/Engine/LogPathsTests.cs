@@ -92,15 +92,15 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies crash files are not deleted when pruning session logs.
+        /// Verifies files that do not match the session prefix are left in place.
         /// </summary>
-        public void PruneSessionFiles_Does_Not_Delete_Crash_Files()
+        public void PruneSessionFiles_Does_Not_Delete_Unrelated_Files()
         {
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
             var sessionPath = logDirectoryPath.CombinePath("session-001.log");
-            var crashPath = logDirectoryPath.CombinePath("crash-001.log");
+            var otherPath = logDirectoryPath.CombinePath("other-001.log");
             File.WriteAllText(sessionPath, "session");
-            File.WriteAllText(crashPath, "crash");
+            File.WriteAllText(otherPath, "other");
 
             LogPaths.PruneSessionFiles(
                 logDirectoryPath: logDirectoryPath,
@@ -109,7 +109,7 @@ namespace Mfr.Tests.Engine
                 sessionLogExtension: ".log");
 
             Assert.True(File.Exists(sessionPath));
-            Assert.True(File.Exists(crashPath));
+            Assert.True(File.Exists(otherPath));
         }
 
         [Fact]
@@ -136,26 +136,33 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies a best-effort crash file is written with formatted text.
+        /// Verifies a best-effort crash file is written under the default log directory.
         /// </summary>
-        public void TryWriteCrashFile_Writes_Formatted_Text()
+        public void TryWriteCrashFile_Writes_Formatted_Text_To_Default_Directory()
         {
-            var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
             var exception = new InvalidOperationException("boom", new ArgumentException("inner"));
+            string? crashFilePath = null;
+            try
+            {
+                crashFilePath = LogPaths.TryWriteCrashFile(exception, isTerminating: true);
 
-            var crashFilePath = LogPaths.TryWriteCrashFile(
-                logDirectoryPath: logDirectoryPath,
-                exception: exception,
-                isTerminating: true);
-
-            Assert.NotNull(crashFilePath);
-            Assert.True(File.Exists(crashFilePath));
-            var fileName = Path.GetFileName(crashFilePath);
-            Assert.StartsWith(LogPaths.CrashFilePrefix, fileName, StringComparison.Ordinal);
-            var content = File.ReadAllText(crashFilePath);
-            Assert.Contains("boom", content, StringComparison.Ordinal);
-            Assert.Contains("inner", content, StringComparison.Ordinal);
-            Assert.Contains("terminated", content, StringComparison.OrdinalIgnoreCase);
+                Assert.NotNull(crashFilePath);
+                Assert.True(File.Exists(crashFilePath));
+                Assert.Equal(LogPaths.DefaultDirectoryPath, Path.GetDirectoryName(crashFilePath));
+                Assert.StartsWith(
+                    LogPaths.CrashFilePrefix,
+                    Path.GetFileName(crashFilePath),
+                    StringComparison.Ordinal);
+                var content = File.ReadAllText(crashFilePath);
+                Assert.Contains("boom", content, StringComparison.Ordinal);
+                Assert.Contains("inner", content, StringComparison.Ordinal);
+                Assert.Contains("terminated", content, StringComparison.OrdinalIgnoreCase);
+            }
+            finally
+            {
+                if (crashFilePath is not null && File.Exists(crashFilePath))
+                    File.Delete(crashFilePath);
+            }
         }
     }
 }

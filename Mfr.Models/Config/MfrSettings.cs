@@ -21,7 +21,7 @@ namespace Mfr.Models.Config
     public sealed class LogSettings
     {
         /// <summary>
-        /// Directory for session and crash log files.
+        /// Directory for session log files.
         /// <para>
         /// When blank, <c>%LocalApplicationData%/finebytes/mfr/logs</c> is used.
         /// </para>

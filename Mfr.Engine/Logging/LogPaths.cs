@@ -7,7 +7,8 @@ namespace Mfr.Engine.Logging
     /// <summary>
     /// Path and on-disk helpers for diagnostic session and crash log files.
     /// <para>
-    /// CLI and UI both write under <see cref="DefaultDirectoryPath"/> unless <see cref="LogSettings.DirectoryPath"/> is set.
+    /// CLI and UI session logs write under <see cref="DefaultDirectoryPath"/> unless
+    /// <see cref="LogSettings.DirectoryPath"/> is set. Crash files always use the default directory.
     /// These helpers do not configure Serilog; hosts assign <c>Log.Logger</c> via <see cref="LogSession.Start"/>.
     /// </para>
     /// </summary>
@@ -33,7 +34,7 @@ namespace Mfr.Engine.Logging
         }
 
         /// <summary>
-        /// Resolves the directory used for session and crash log files.
+        /// Resolves the directory used for session log files.
         /// </summary>
         /// <param name="configuredLogDirectoryPath">
         /// Override directory. When blank, <see cref="DefaultDirectoryPath"/> is used.
@@ -139,24 +140,18 @@ namespace Mfr.Engine.Logging
         }
 
         /// <summary>
-        /// Best-effort write of a <c>crash-*.log</c> file when Serilog is not running.
+        /// Best-effort write of a <c>crash-*.log</c> file under <see cref="DefaultDirectoryPath"/>.
         /// </summary>
-        /// <param name="logDirectoryPath">
-        /// Directory override. When blank, <see cref="DefaultDirectoryPath"/> is used.
-        /// </param>
         /// <param name="exception">The fault to persist.</param>
         /// <param name="isTerminating">Whether the process is shutting down.</param>
         /// <returns>The written file path, or <c>null</c> when the write failed.</returns>
-        public static string? TryWriteCrashFile(
-            string? logDirectoryPath,
-            Exception exception,
-            bool isTerminating)
+        public static string? TryWriteCrashFile(Exception exception, bool isTerminating)
         {
             ArgumentNullException.ThrowIfNull(exception);
 
             try
             {
-                var directoryPath = ResolveDirectoryPath(logDirectoryPath);
+                var directoryPath = DefaultDirectoryPath;
                 Directory.CreateDirectory(directoryPath);
                 var crashFilePath = _CreateTimestampedFilePath(
                     logDirectoryPath: directoryPath,

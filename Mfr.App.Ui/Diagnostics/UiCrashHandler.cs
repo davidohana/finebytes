@@ -5,7 +5,6 @@ using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
 using Mfr.Engine.Logging;
-using Mfr.Models.Config;
 using Serilog;
 
 namespace Mfr.App.Ui.Diagnostics
@@ -44,7 +43,7 @@ namespace Mfr.App.Ui.Diagnostics
         }
 
         /// <summary>
-        /// Persists a fault to the session log or a best-effort <c>crash-*.log</c> file.
+        /// Writes the fault to the session log, or to a <c>crash-*.log</c> in the default log folder.
         /// </summary>
         /// <param name="exception">The fault to record.</param>
         /// <param name="isTerminating">Whether the process is shutting down.</param>
@@ -70,15 +69,11 @@ namespace Mfr.App.Ui.Diagnostics
                     LogDirectoryPath: sessionLogDirectoryPath);
             }
 
-            var logDirectoryPath = LogPaths.ResolveDirectoryPath(ConfigLoader.Settings.Log.DirectoryPath);
-            var crashFilePath = LogPaths.TryWriteCrashFile(
-                logDirectoryPath: logDirectoryPath,
-                exception: exception,
-                isTerminating: isTerminating);
+            var crashFilePath = LogPaths.TryWriteCrashFile(exception, isTerminating);
             return new CrashReport(
                 Details: details,
                 LogFilePath: crashFilePath,
-                LogDirectoryPath: logDirectoryPath);
+                LogDirectoryPath: LogPaths.DefaultDirectoryPath);
         }
 
         /// <summary>

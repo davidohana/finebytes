@@ -33,30 +33,40 @@ namespace Mfr.Tests.Ui
 
         [Fact]
         /// <summary>
-        /// Verifies a crash file is written when Serilog is not running.
+        /// Verifies a crash file is written to the default log folder when Serilog is not running.
         /// </summary>
         public void Persist_WritesCrashFile_WhenLoggingNotStarted()
         {
             LogSession.Shutdown();
-            var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
-            ConfigLoader.Load();
-            ConfigLoader.Settings.Log.DirectoryPath = logDirectoryPath;
             var exception = new InvalidOperationException("boom", new ArgumentException("inner"));
+            string? crashFilePath = null;
+            try
+            {
+                var report = UiCrashHandler.Persist(exception, isTerminating: true);
+                crashFilePath = report.LogFilePath;
 
-            var report = UiCrashHandler.Persist(exception, isTerminating: true);
-
-            Assert.NotNull(report.LogFilePath);
-            Assert.True(File.Exists(report.LogFilePath));
-            Assert.Equal(logDirectoryPath, report.LogDirectoryPath);
-            Assert.Contains("boom", report.Details, StringComparison.Ordinal);
-            Assert.Contains("inner", report.Details, StringComparison.Ordinal);
-            var content = File.ReadAllText(report.LogFilePath);
-            Assert.Contains("terminated", content, StringComparison.OrdinalIgnoreCase);
+                Assert.NotNull(crashFilePath);
+                Assert.True(File.Exists(crashFilePath));
+                Assert.Equal(LogPaths.DefaultDirectoryPath, report.LogDirectoryPath);
+                Assert.StartsWith(
+                    LogPaths.CrashFilePrefix,
+                    Path.GetFileName(crashFilePath),
+                    StringComparison.Ordinal);
+                Assert.Contains("boom", report.Details, StringComparison.Ordinal);
+                Assert.Contains("inner", report.Details, StringComparison.Ordinal);
+                var content = File.ReadAllText(crashFilePath);
+                Assert.Contains("terminated", content, StringComparison.OrdinalIgnoreCase);
+            }
+            finally
+            {
+                if (crashFilePath is not null && File.Exists(crashFilePath))
+                    File.Delete(crashFilePath);
+            }
         }
 
         [Fact]
         /// <summary>
-        /// Verifies an active session log is used instead of a separate crash file.
+        /// Verifies an active session log is used for unexpected faults.
         /// </summary>
         public void Persist_UsesSessionFile_WhenLoggingStarted()
         {
@@ -77,11 +87,6 @@ namespace Mfr.Tests.Ui
             Assert.NotNull(sessionLogFilePath);
             var content = File.ReadAllText(sessionLogFilePath);
             Assert.Contains("boom", content, StringComparison.Ordinal);
-            var crashFiles = Directory.EnumerateFiles(
-                logDirectoryPath,
-                "crash-*.log",
-                SearchOption.TopDirectoryOnly);
-            Assert.Empty(crashFiles);
         }
     }
 }
