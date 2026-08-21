@@ -96,8 +96,8 @@
       </Border>
       <TextBox
         x:Name="SearchBox"
-        DockPanel.Dock="Top"
-        Margin="4,0,4,4"
+        DockPanel.Dock="Bottom"
+        Margin="4,4,4,4"
         Watermark="Filter…"
         Text="{Binding SearchText, Mode=TwoWay}"
         KeyDown="_OnSearchKeyDown"
