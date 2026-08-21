@@ -1,0 +1,15 @@
+{
+  "printWidth": 120,
+  "useTabs": false,
+  "indentSize": 4,
+  "endOfLine": "crlf",
+  "overrides": [
+    {
+      "files": "*.{csproj,axaml,slnx}",
+      "formatter": "xml",
+      "indentSize": 2,
+      "printWidth": 120,
+      "endOfLine": "crlf"
+    }
+  ]
+}

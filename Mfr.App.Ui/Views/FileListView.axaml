@@ -172,12 +172,7 @@
           Text="{Binding Mask, Mode=TwoWay}"
         />
         <TextBlock Grid.Column="2" Text="Exclude:" VerticalAlignment="Center" Margin="8,0,6,0" />
-        <TextBox
-          Grid.Column="3"
-          MinWidth="72"
-          Watermark="*.tmp; *.bak"
-          Text="{Binding ExcludeMasks, Mode=TwoWay}"
-        />
+        <TextBox Grid.Column="3" MinWidth="72" Watermark="*.tmp; *.bak" Text="{Binding ExcludeMasks, Mode=TwoWay}" />
       </Grid>
 
       <Panel>
@@ -206,22 +201,13 @@
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:FileListEntry">
                   <StackPanel Orientation="Horizontal" Spacing="4">
-                    <Image
-                      Width="16"
-                      Height="16"
-                      VerticalAlignment="Center"
-                      Source="{Binding Icon}"
-                    />
+                    <Image Width="16" Height="16" VerticalAlignment="Center" Source="{Binding Icon}" />
                     <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
                   </StackPanel>
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-            <DataGridTemplateColumn
-              Header="Date modified"
-              Width="140"
-              SortMemberPath="LastWriteTime"
-            >
+            <DataGridTemplateColumn Header="Date modified" Width="140" SortMemberPath="LastWriteTime">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:FileListEntry">
                   <TextBlock
@@ -232,12 +218,7 @@
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-            <DataGridTextColumn
-              Header="Type"
-              Binding="{Binding Type}"
-              SortMemberPath="Type"
-              Width="110"
-            />
+            <DataGridTextColumn Header="Type" Binding="{Binding Type}" SortMemberPath="Type" Width="110" />
             <DataGridTemplateColumn Header="Size" Width="80" SortMemberPath="Length">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="vm:FileListEntry">
@@ -320,12 +301,7 @@
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:FileListEntry">
               <StackPanel Width="72" Margin="2,1">
-                <Image
-                  Width="32"
-                  Height="32"
-                  HorizontalAlignment="Center"
-                  Source="{Binding Icon}"
-                />
+                <Image Width="32" Height="32" HorizontalAlignment="Center" Source="{Binding Icon}" />
                 <TextBlock
                   Text="{Binding Name}"
                   TextAlignment="Center"

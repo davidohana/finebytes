@@ -85,17 +85,11 @@
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="AcceptsReturn" Value="False" />
       <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter
-        Property="SelectionForegroundBrush"
-        Value="{DynamicResource FileListForegroundBrush}"
-      />
+      <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
     </Style>
     <Style Selector="TextBox.address-edit /template/ TextPresenter#PART_TextPresenter">
       <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter
-        Property="SelectionForegroundBrush"
-        Value="{DynamicResource FileListForegroundBrush}"
-      />
+      <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
     </Style>
     <Style Selector="Button.address-tool">
       <Setter Property="Width" Value="32" />
@@ -182,11 +176,7 @@
                       Command="{Binding #AddressBarRoot.((vm:FileListViewModel)DataContext).NavigateToCommand}"
                       CommandParameter="{Binding TargetPath}"
                     >
-                      <TextBlock
-                        Text="{Binding Label}"
-                        TextTrimming="CharacterEllipsis"
-                        VerticalAlignment="Center"
-                      />
+                      <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
                     </Button>
                   </DockPanel>
                 </DataTemplate>
@@ -255,17 +245,8 @@
             Data="M0,0 L10,0 L5,6 Z"
           />
           <Button.Flyout>
-            <Flyout
-              Placement="BottomEdgeAlignedRight"
-              Opened="_OnHistoryOpened"
-              Closed="_OnHistoryClosed"
-            >
-              <ListBox
-                MaxHeight="220"
-                MinWidth="280"
-                ItemsSource="{Binding PathHistory}"
-                Tapped="_OnHistoryTapped"
-              />
+            <Flyout Placement="BottomEdgeAlignedRight" Opened="_OnHistoryOpened" Closed="_OnHistoryClosed">
+              <ListBox MaxHeight="220" MinWidth="280" ItemsSource="{Binding PathHistory}" Tapped="_OnHistoryTapped" />
             </Flyout>
           </Button.Flyout>
         </Button>

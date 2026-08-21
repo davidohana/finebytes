@@ -23,22 +23,10 @@
 
   <Window.KeyBindings>
     <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.Go}" Command="{Binding GoCommand}" />
-    <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.UndoLast}"
-      Command="{Binding UndoLastCommand}"
-    />
-    <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.ShowLog}"
-      Command="{Binding ShowLogCommand}"
-    />
-    <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.ShowOptions}"
-      Command="{Binding ShowOptionsCommand}"
-    />
-    <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.Refresh}"
-      Command="{Binding FileList.RefreshCommand}"
-    />
+    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.UndoLast}" Command="{Binding UndoLastCommand}" />
+    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowLog}" Command="{Binding ShowLogCommand}" />
+    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowOptions}" Command="{Binding ShowOptionsCommand}" />
+    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.Refresh}" Command="{Binding FileList.RefreshCommand}" />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.GoToAddress}"
       Command="{Binding FileList.BeginPathEditCommand}"
@@ -82,11 +70,7 @@
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="_MFR">
-        <MenuItem
-          Header="_GO"
-          Command="{Binding GoCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.Go}"
-        />
+        <MenuItem Header="_GO" Command="{Binding GoCommand}" InputGesture="{x:Static shortcuts:AppShortcuts.Go}" />
         <MenuItem
           Header="_Undo Last"
           Command="{Binding UndoLastCommand}"
@@ -239,29 +223,13 @@
           IsEnabled="False"
           InputGesture="{x:Static shortcuts:AppShortcuts.AddSelected}"
         />
-        <MenuItem
-          Header="Add All"
-          IsEnabled="False"
-          InputGesture="{x:Static shortcuts:AppShortcuts.AddAll}"
-        />
-        <MenuItem
-          Header="Remove"
-          IsEnabled="False"
-          InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}"
-        />
-        <MenuItem
-          Header="Clear"
-          IsEnabled="False"
-          InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}"
-        />
+        <MenuItem Header="Add All" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.AddAll}" />
+        <MenuItem Header="Remove" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}" />
+        <MenuItem Header="Clear" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}" />
         <Separator />
         <MenuItem Header="Auto-Sort" IsEnabled="False" />
         <MenuItem Header="Auto-Preview" IsEnabled="False" />
-        <MenuItem
-          Header="Refresh"
-          IsEnabled="False"
-          InputGesture="{x:Static shortcuts:AppShortcuts.Refresh}"
-        />
+        <MenuItem Header="Refresh" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.Refresh}" />
       </MenuItem>
       <MenuItem Header="F_ilters">
         <MenuItem Header="Presets" IsEnabled="False" />

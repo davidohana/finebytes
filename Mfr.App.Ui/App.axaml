@@ -29,10 +29,7 @@
     </Style>
     <Style Selector="Border.pane">
       <Setter Property="BorderThickness" Value="1" />
-      <Setter
-        Property="BorderBrush"
-        Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-      />
+      <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
       <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
       <Setter Property="Margin" Value="1" />
     </Style>
@@ -46,12 +43,7 @@
       <Setter Property="Template">
         <ControlTemplate>
           <Border Background="Transparent">
-            <Rectangle
-              x:Name="Hairline"
-              Width="1"
-              HorizontalAlignment="Center"
-              Fill="Transparent"
-            />
+            <Rectangle x:Name="Hairline" Width="1" HorizontalAlignment="Center" Fill="Transparent" />
           </Border>
         </ControlTemplate>
       </Setter>

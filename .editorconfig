@@ -56,3 +56,13 @@ dotnet_diagnostic.IDE0060.severity = suggestion
 dotnet_diagnostic.IDE0058.severity = none
 dotnet_diagnostic.CA1822.severity = suggestion
 dotnet_diagnostic.CA2007.severity = none
+
+# IDE indent for XML we format with CSharpier (.axaml needs formatter mapping in .csharpierrc.json).
+[*.{csproj,axaml,slnx}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+max_line_length = 120
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true

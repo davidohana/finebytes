@@ -3,7 +3,7 @@
 ## What to know
 - Use `just` for common tasks: `restore`, `build`, `test`, `format`, `run-ui`.
 - Before committing, run `just format` then `dotnet build .\finebytes.slnx`.
-- Formatting: CSharpier for `.cs` layout; `dotnet format style` / `analyzers` for non-whitespace rules.
+- Formatting: CSharpier for `.cs` / `.csproj` / `.axaml` / `.slnx` layout; `dotnet format style` / `analyzers` for non-whitespace rules.
 - Follow project code style from `.editorconfig`.
 - Follow constraints in `.cursor/rules/*.mdc`.
 

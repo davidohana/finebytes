@@ -1,7 +1,4 @@
-<ResourceDictionary
-  xmlns="https://github.com/avaloniaui"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
->
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <StreamGeometry x:Key="ComputerGeometry">
     M1.5,2.5 H14.5 A1,1 0 0 1 15.5,3.5 V10.5 A1,1 0 0 1 14.5,11.5 H1.5 A1,1 0 0 1 0.5,10.5 V3.5 A1,1 0 0 1 1.5,2.5 Z M5,13 H11 V14.5 H5 Z M0,15 H16 V16 H0 Z
   </StreamGeometry>

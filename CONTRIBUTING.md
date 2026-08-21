@@ -15,7 +15,8 @@ If you have `just` installed, you can use shortcuts for the most common workflow
 
 ## C# formatting and linting
 
-- Layout: [CSharpier](https://csharpier.com/) (local tool; print width from `.editorconfig` `max_line_length = 120`)
+- Layout: [CSharpier](https://csharpier.com/) (local tool; options in `.csharpierrc.json`, print width 120)
+- Formats `.cs`, `.csproj`, `.axaml`, and `.slnx` (see `.csharpierignore`)
 - Style / analyzers: `dotnet format style` and `dotnet format analyzers` (no whitespace — that conflicts with CSharpier)
 - Linting: `dotnet build` (analyzers and code style enforcement)
 
@@ -46,4 +47,4 @@ dotnet format analyzers ./finebytes.slnx
 dotnet build ./finebytes.slnx
 ```
 
-CSharpier formats `.cs` only (see `.csharpierignore`). Code style and diagnostic severities live in `.editorconfig`.
+CSharpier formats `.cs`, `.csproj`, `.axaml`, and `.slnx` (see `.csharpierignore`). Code style and diagnostic severities live in `.editorconfig`.
