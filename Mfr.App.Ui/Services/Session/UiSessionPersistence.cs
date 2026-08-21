@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using Mfr.App.Ui.ViewModels;
 using Mfr.Models.Config;
 using Mfr.Utils;
@@ -13,21 +12,9 @@ namespace Mfr.App.Ui.Services.Session
         /// <summary>
         /// Updates <c>session.json</c> for enabled remember flags; leaves disabled fields unchanged.
         /// </summary>
-        /// <param name="window">Main window (for geometry capture).</param>
         /// <param name="viewModel">Root VM providing the File List path.</param>
-        /// <param name="hasNormalBounds">True when normal-state bounds were observed.</param>
-        /// <param name="normalX">Tracked normal-state X.</param>
-        /// <param name="normalY">Tracked normal-state Y.</param>
-        /// <param name="normalWidth">Tracked normal-state width.</param>
-        /// <param name="normalHeight">Tracked normal-state height.</param>
-        public static void SaveOnClose(
-            Window window,
-            MainWindowViewModel? viewModel,
-            bool hasNormalBounds,
-            int normalX,
-            int normalY,
-            double normalWidth,
-            double normalHeight)
+        /// <param name="windowGeometry">Captured main-window geometry when remembering window state.</param>
+        public static void SaveOnClose(MainWindowViewModel? viewModel, SessionWindowState? windowGeometry)
         {
             var ui = ConfigLoader.Settings.Ui;
             if (!ui.RememberWindowState && !ui.RememberLastFolder)
@@ -37,16 +24,8 @@ namespace Mfr.App.Ui.Services.Session
             {
                 var session = SessionStore.Load();
 
-                if (ui.RememberWindowState)
-                {
-                    session.Window = WindowSession.Capture(
-                        window,
-                        hasNormalBounds,
-                        normalX,
-                        normalY,
-                        normalWidth,
-                        normalHeight);
-                }
+                if (ui.RememberWindowState && windowGeometry is not null)
+                    session.Window = windowGeometry;
 
                 if (ui.RememberLastFolder && viewModel is not null)
                 {

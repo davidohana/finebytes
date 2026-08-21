@@ -33,31 +33,34 @@ namespace Mfr.Models.Config
     public sealed class SessionWindowState
     {
         /// <summary>
-        /// Window left edge in screen pixels (normal bounds).
+        /// Window left edge in screen pixels (used when <see cref="State"/> is <c>Normal</c>).
         /// </summary>
         [JsonPropertyName("x")]
         public int X { get; set; }
 
         /// <summary>
-        /// Window top edge in screen pixels (normal bounds).
+        /// Window top edge in screen pixels (used when <see cref="State"/> is <c>Normal</c>).
         /// </summary>
         [JsonPropertyName("y")]
         public int Y { get; set; }
 
         /// <summary>
-        /// Window width in device-independent pixels (normal bounds).
+        /// Window width in device-independent pixels (used when <see cref="State"/> is <c>Normal</c>).
         /// </summary>
         [JsonPropertyName("width")]
         public double Width { get; set; }
 
         /// <summary>
-        /// Window height in device-independent pixels (normal bounds).
+        /// Window height in device-independent pixels (used when <see cref="State"/> is <c>Normal</c>).
         /// </summary>
         [JsonPropertyName("height")]
         public double Height { get; set; }
 
         /// <summary>
         /// <c>Normal</c> or <c>Maximized</c>.
+        /// <para>
+        /// When maximized, restore skips size/position and keeps the window's default dimensions.
+        /// </para>
         /// </summary>
         [JsonPropertyName("state")]
         public string State { get; set; } = "Normal";
