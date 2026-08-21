@@ -20,9 +20,7 @@ namespace Mfr.App.Ui.Views
 
         private void _OnClosing(object? sender, WindowClosingEventArgs e)
         {
-            UiSessionPersistence.SaveOnClose(
-                DataContext as MainWindowViewModel,
-                WindowSession.Capture(this));
+            UiSessionPersistence.SaveOnClose(DataContext as MainWindowViewModel, WindowSession.Capture(this));
         }
     }
 }
