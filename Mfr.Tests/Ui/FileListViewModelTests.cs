@@ -113,10 +113,47 @@ namespace Mfr.Tests.Ui
 
             viewModel.CommitMask();
 
-            Assert.Equal(defaultCount + 1, viewModel.MaskSuggestions.Count);
-            Assert.Contains("444", viewModel.MaskSuggestions);
+            Assert.Equal("444", viewModel.MaskSuggestions[0]);
             Assert.DoesNotContain("4", viewModel.MaskSuggestions);
             Assert.DoesNotContain("44", viewModel.MaskSuggestions);
+        }
+
+        /// <summary>
+        /// Verifies committing a mask moves it to the front of suggestions.
+        /// </summary>
+        [Fact]
+        public void CommitMask_Moves_Existing_Mask_To_Front()
+        {
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir);
+
+            viewModel.Mask = "*.txt";
+            viewModel.CommitMask();
+
+            Assert.Equal("*.txt", viewModel.MaskSuggestions[0]);
+            Assert.Equal(1, viewModel.MaskSuggestions.Count(m => m == "*.txt"));
+        }
+
+        /// <summary>
+        /// Verifies only the 10 most recently committed masks are kept.
+        /// </summary>
+        [Fact]
+        public void CommitMask_Keeps_Only_Last_10_Masks()
+        {
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir);
+
+            for (var i = 1; i <= 12; i++)
+            {
+                viewModel.Mask = $"*.ext{i}";
+                viewModel.CommitMask();
+            }
+
+            Assert.Equal(10, viewModel.MaskSuggestions.Count);
+            Assert.Equal("*.ext12", viewModel.MaskSuggestions[0]);
+            Assert.Equal("*.ext3", viewModel.MaskSuggestions[^1]);
+            Assert.DoesNotContain("*.ext1", viewModel.MaskSuggestions);
+            Assert.DoesNotContain("*.ext2", viewModel.MaskSuggestions);
         }
 
         /// <summary>

@@ -73,6 +73,7 @@ namespace Mfr.App.Ui.ViewModels
         private const int _VolumeListingGroup = 0;
         private const int _KnownPlaceListingGroup = 1;
         private const int _ThumbnailLoadParallelismCap = 4;
+        private const int _MaxRememberedMasks = 10;
 
         private readonly ISystemIconProvider _iconProvider;
         private readonly List<ListedItem> _listedItems = [];
@@ -1117,10 +1118,18 @@ namespace Mfr.App.Ui.ViewModels
             if (string.IsNullOrWhiteSpace(mask))
                 return;
 
-            if (MaskSuggestions.Contains(mask, StringComparer.OrdinalIgnoreCase))
-                return;
+            for (var i = MaskSuggestions.Count - 1; i >= 0; i--)
+            {
+                if (!string.Equals(MaskSuggestions[i], mask, StringComparison.OrdinalIgnoreCase))
+                    continue;
 
-            MaskSuggestions.Add(mask);
+                MaskSuggestions.RemoveAt(i);
+            }
+
+            MaskSuggestions.Insert(0, mask);
+
+            while (MaskSuggestions.Count > _MaxRememberedMasks)
+                MaskSuggestions.RemoveAt(MaskSuggestions.Count - 1);
         }
 
         private static string _FormatDetails(ListedItem item)
