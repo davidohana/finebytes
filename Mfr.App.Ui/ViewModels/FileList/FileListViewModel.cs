@@ -10,7 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.ViewModels
+namespace Mfr.App.Ui.ViewModels.FileList
 {
     /// <summary>
     /// File List pane: folder listing with path, mask, exclude masks, and view modes.

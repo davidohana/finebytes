@@ -1,7 +1,7 @@
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
 using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.FileList;
 
 namespace Mfr.Tests.Ui
 {

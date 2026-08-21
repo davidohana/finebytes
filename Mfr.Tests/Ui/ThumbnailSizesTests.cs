@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.FileList;
 
 namespace Mfr.Tests.Ui
 {

@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.ViewModels
+namespace Mfr.App.Ui.ViewModels.FileList
 {
     /// <summary>
     /// File List location sentinels and Windows UNC path rules.

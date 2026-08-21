@@ -4,6 +4,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels"
+  xmlns:filelist="using:Mfr.App.Ui.ViewModels.FileList"
   xmlns:views="using:Mfr.App.Ui.Views"
   xmlns:shortcuts="using:Mfr.App.Ui.Input"
   mc:Ignorable="d"
@@ -39,32 +40,32 @@
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewLargeIcons}"
       Command="{Binding FileList.SetViewModeCommand}"
-      CommandParameter="{x:Static vm:FileListViewMode.LargeIcons}"
+      CommandParameter="{x:Static filelist:FileListViewMode.LargeIcons}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewSmallIcons}"
       Command="{Binding FileList.SetViewModeCommand}"
-      CommandParameter="{x:Static vm:FileListViewMode.SmallIcons}"
+      CommandParameter="{x:Static filelist:FileListViewMode.SmallIcons}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewReport}"
       Command="{Binding FileList.SetViewModeCommand}"
-      CommandParameter="{x:Static vm:FileListViewMode.Report}"
+      CommandParameter="{x:Static filelist:FileListViewMode.Report}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewList}"
       Command="{Binding FileList.SetViewModeCommand}"
-      CommandParameter="{x:Static vm:FileListViewMode.List}"
+      CommandParameter="{x:Static filelist:FileListViewMode.List}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewTiles}"
       Command="{Binding FileList.SetViewModeCommand}"
-      CommandParameter="{x:Static vm:FileListViewMode.Tiles}"
+      CommandParameter="{x:Static filelist:FileListViewMode.Tiles}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewThumbnails}"
       Command="{Binding FileList.SetViewModeCommand}"
-      CommandParameter="{x:Static vm:FileListViewMode.Thumbnails}"
+      CommandParameter="{x:Static filelist:FileListViewMode.Thumbnails}"
     />
   </Window.KeyBindings>
 
@@ -99,7 +100,7 @@
           <MenuItem
             Header="Large _Icons"
             Command="{Binding FileList.SetViewModeCommand}"
-            CommandParameter="{x:Static vm:FileListViewMode.LargeIcons}"
+            CommandParameter="{x:Static filelist:FileListViewMode.LargeIcons}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewLargeIcons}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsLargeIconsView, Mode=OneWay}"
@@ -107,7 +108,7 @@
           <MenuItem
             Header="_Small Icons"
             Command="{Binding FileList.SetViewModeCommand}"
-            CommandParameter="{x:Static vm:FileListViewMode.SmallIcons}"
+            CommandParameter="{x:Static filelist:FileListViewMode.SmallIcons}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewSmallIcons}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsSmallIconsView, Mode=OneWay}"
@@ -115,7 +116,7 @@
           <MenuItem
             Header="_Report"
             Command="{Binding FileList.SetViewModeCommand}"
-            CommandParameter="{x:Static vm:FileListViewMode.Report}"
+            CommandParameter="{x:Static filelist:FileListViewMode.Report}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewReport}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsReportView, Mode=OneWay}"
@@ -123,7 +124,7 @@
           <MenuItem
             Header="_List"
             Command="{Binding FileList.SetViewModeCommand}"
-            CommandParameter="{x:Static vm:FileListViewMode.List}"
+            CommandParameter="{x:Static filelist:FileListViewMode.List}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewList}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsListView, Mode=OneWay}"
@@ -131,7 +132,7 @@
           <MenuItem
             Header="_Tiles"
             Command="{Binding FileList.SetViewModeCommand}"
-            CommandParameter="{x:Static vm:FileListViewMode.Tiles}"
+            CommandParameter="{x:Static filelist:FileListViewMode.Tiles}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewTiles}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsTilesView, Mode=OneWay}"
@@ -139,7 +140,7 @@
           <MenuItem
             Header="Thumb_nails"
             Command="{Binding FileList.SetViewModeCommand}"
-            CommandParameter="{x:Static vm:FileListViewMode.Thumbnails}"
+            CommandParameter="{x:Static filelist:FileListViewMode.Thumbnails}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewThumbnails}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsThumbnailsView, Mode=OneWay}"
@@ -149,42 +150,42 @@
           <MenuItem
             Header="_Extra Small"
             Command="{Binding FileList.SetThumbnailSizeCommand}"
-            CommandParameter="{x:Static vm:ThumbnailSizes.ExtraSmall}"
+            CommandParameter="{x:Static filelist:ThumbnailSizes.ExtraSmall}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsThumbnailSizeExtraSmall, Mode=OneWay}"
           />
           <MenuItem
             Header="_Small"
             Command="{Binding FileList.SetThumbnailSizeCommand}"
-            CommandParameter="{x:Static vm:ThumbnailSizes.Small}"
+            CommandParameter="{x:Static filelist:ThumbnailSizes.Small}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsThumbnailSizeSmall, Mode=OneWay}"
           />
           <MenuItem
             Header="_Medium"
             Command="{Binding FileList.SetThumbnailSizeCommand}"
-            CommandParameter="{x:Static vm:ThumbnailSizes.Medium}"
+            CommandParameter="{x:Static filelist:ThumbnailSizes.Medium}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsThumbnailSizeMedium, Mode=OneWay}"
           />
           <MenuItem
             Header="_Large"
             Command="{Binding FileList.SetThumbnailSizeCommand}"
-            CommandParameter="{x:Static vm:ThumbnailSizes.Large}"
+            CommandParameter="{x:Static filelist:ThumbnailSizes.Large}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsThumbnailSizeLarge, Mode=OneWay}"
           />
           <MenuItem
             Header="E_xtra Large"
             Command="{Binding FileList.SetThumbnailSizeCommand}"
-            CommandParameter="{x:Static vm:ThumbnailSizes.ExtraLarge}"
+            CommandParameter="{x:Static filelist:ThumbnailSizes.ExtraLarge}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsThumbnailSizeExtraLarge, Mode=OneWay}"
           />
           <MenuItem
             Header="_Huge"
             Command="{Binding FileList.SetThumbnailSizeCommand}"
-            CommandParameter="{x:Static vm:ThumbnailSizes.Huge}"
+            CommandParameter="{x:Static filelist:ThumbnailSizes.Huge}"
             ToggleType="Radio"
             IsChecked="{Binding FileList.IsThumbnailSizeHuge, Mode=OneWay}"
           />

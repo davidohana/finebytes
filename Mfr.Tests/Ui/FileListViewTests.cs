@@ -4,7 +4,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.Views;
 
 namespace Mfr.Tests.Ui

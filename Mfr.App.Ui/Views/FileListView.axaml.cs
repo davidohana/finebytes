@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.Views

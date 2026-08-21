@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.FileList;
 
 namespace Mfr.App.Ui.Views
 {

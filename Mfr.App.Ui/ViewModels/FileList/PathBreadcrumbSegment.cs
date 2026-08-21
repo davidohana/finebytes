@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.ViewModels
+namespace Mfr.App.Ui.ViewModels.FileList
 {
     /// <summary>
     /// One clickable folder in the File List address bar.

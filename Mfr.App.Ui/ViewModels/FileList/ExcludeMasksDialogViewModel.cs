@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.Services.FileList;
 
-namespace Mfr.App.Ui.ViewModels
+namespace Mfr.App.Ui.ViewModels.FileList
 {
     /// <summary>
     /// Draft state for the Exclude Masks dialog (MFR 7 layout).

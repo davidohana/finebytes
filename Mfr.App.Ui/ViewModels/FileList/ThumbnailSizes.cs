@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.ViewModels
+namespace Mfr.App.Ui.ViewModels.FileList
 {
     /// <summary>
     /// Discrete thumbnail display sizes for the File List Thumbnails layout.
