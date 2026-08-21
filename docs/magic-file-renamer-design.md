@@ -540,8 +540,8 @@ All files: **UTF-8, LF line endings, 2-space indent**.
 ### 4.1 Preset files (`presets/*.json`)
 
 Location:
-- Windows: `%APPDATA%\MagicFileRenamer\presets\*.json`
-- macOS/Linux: `~/.config/magic-file-renamer/presets/*.json`
+- Windows: `%APPDATA%\finebytes\mfr\presets\*.json`
+- macOS/Linux: `~/.config/finebytes/mfr/presets/*.json`
 
 Each preset is stored in its **own file**. File name convention: `<slug>-<id>.json` (e.g. `music-artist-album-a1b2c3d4.json`).
 
@@ -1749,8 +1749,8 @@ When image files have GPS coordinates in EXIF, the Nearby Location fields and to
 
 Each rename session writes a **separate undo file** under the `undo` directory:
 
-- Windows: `%APPDATA%\MagicFileRenamer\undo\sess-*.json`
-- macOS/Linux: `~/.config/magic-file-renamer/undo/sess-*.json`
+- Windows: `%APPDATA%\finebytes\mfr\undo\sess-*.json`
+- macOS/Linux: `~/.config/finebytes/mfr/undo/sess-*.json`
 
 File name convention: `sess-<timestamp>-<short-id>.json`.
 

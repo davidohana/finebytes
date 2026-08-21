@@ -31,12 +31,12 @@ namespace Mfr.Models.Config
         public static MfrSettings Settings { get; private set; } = new();
 
         /// <summary>
-        /// Default JSON config path (<c>%ApplicationData%/MagicFileRenamer/mfr.config.json</c>).
+        /// Default JSON config path (<c>%ApplicationData%/finebytes/mfr/mfr.config.json</c>).
         /// </summary>
         private static string _DefaultConfigFilePath()
         {
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return appData.CombinePath("MagicFileRenamer", "mfr.config.json");
+            return appData.CombinePath("finebytes", "mfr", "mfr.config.json");
         }
 
         /// <summary>

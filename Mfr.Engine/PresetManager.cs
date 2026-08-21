@@ -28,7 +28,7 @@ namespace Mfr.Engine
         public static string DefaultPresetsFilePath()
         {
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return appData.CombinePath("MagicFileRenamer", "presets.json");
+            return appData.CombinePath("finebytes", "mfr", "presets.json");
         }
 
         /// <summary>
