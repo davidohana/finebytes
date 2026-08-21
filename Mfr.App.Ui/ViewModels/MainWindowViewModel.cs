@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.App.Ui.ViewModels.FilterPalette;
 
 namespace Mfr.App.Ui.ViewModels
 {

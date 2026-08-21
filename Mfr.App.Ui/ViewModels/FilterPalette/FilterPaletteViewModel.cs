@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Filters;
 
-namespace Mfr.App.Ui.ViewModels
+namespace Mfr.App.Ui.ViewModels.FilterPalette
 {
     /// <summary>
     /// Available Filters pane: group toolbar, quick search, and catalog list.

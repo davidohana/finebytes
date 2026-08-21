@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.Filters;
 
 namespace Mfr.Tests.Ui

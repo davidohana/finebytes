@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.Filters;
 
-namespace Mfr.App.Ui.ViewModels
+namespace Mfr.App.Ui.ViewModels.FilterPalette
 {
     /// <summary>
     /// One exclusive group button on the Available Filters toolbar.

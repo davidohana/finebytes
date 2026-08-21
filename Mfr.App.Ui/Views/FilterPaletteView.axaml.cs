@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.FilterPalette;
 
 namespace Mfr.App.Ui.Views
 {
