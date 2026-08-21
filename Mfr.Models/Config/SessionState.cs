@@ -31,6 +31,24 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("splitters")]
         public SessionSplitterState? Splitters { get; set; }
+
+        /// <summary>
+        /// Last include mask applied to file names.
+        /// </summary>
+        [JsonPropertyName("fileMask")]
+        public string? FileMask { get; set; }
+
+        /// <summary>
+        /// Last exclude mask applied to file names.
+        /// </summary>
+        [JsonPropertyName("excludeMasks")]
+        public string? ExcludeMasks { get; set; }
+
+        /// <summary>
+        /// Recently used include masks.
+        /// </summary>
+        [JsonPropertyName("maskSuggestions")]
+        public List<string>? MaskSuggestions { get; set; }
     }
 
     /// <summary>

@@ -20,11 +20,29 @@ namespace Mfr.App.Ui.Services.Session
             ArgumentNullException.ThrowIfNull(window);
             ArgumentNullException.ThrowIfNull(session);
 
-            if (!ConfigStore.Config.Ui.RememberWindowState)
-                return;
+            if (ConfigStore.Config.Ui.RememberWindowState)
+            {
+                WindowSession.TryRestore(window, session.Window);
+                SplitterSession.TryRestore(window, session.Splitters);
+            }
 
-            WindowSession.TryRestore(window, session.Window);
-            SplitterSession.TryRestore(window, session.Splitters);
+            var viewModel = window.DataContext as MainWindowViewModel;
+            if (viewModel is not null)
+            {
+                var fileList = viewModel.FileList;
+                if (!string.IsNullOrEmpty(session.FileMask))
+                    fileList.Mask = session.FileMask;
+
+                if (session.ExcludeMasks is not null)
+                    fileList.ExcludeMasks = session.ExcludeMasks;
+
+                if (session.MaskSuggestions is { Count: > 0 })
+                {
+                    fileList.MaskSuggestions.Clear();
+                    foreach (var mask in session.MaskSuggestions)
+                        fileList.MaskSuggestions.Add(mask);
+                }
+            }
         }
 
         /// <summary>
@@ -50,11 +68,20 @@ namespace Mfr.App.Ui.Services.Session
                     session.Splitters = SplitterSession.Capture(window);
                 }
 
-                if (ui.RememberLastFolder && viewModel is not null)
+                if (viewModel is not null)
                 {
-                    var path = viewModel.FileList.CurrentPath;
-                    if (_IsPersistableFolder(path))
-                        session.LastOpenedDirectory = path;
+                    var fileList = viewModel.FileList;
+
+                    if (ui.RememberLastFolder)
+                    {
+                        var path = fileList.CurrentPath;
+                        if (_IsPersistableFolder(path))
+                            session.LastOpenedDirectory = path;
+                    }
+
+                    session.FileMask = fileList.Mask;
+                    session.ExcludeMasks = fileList.ExcludeMasks;
+                    session.MaskSuggestions = [.. fileList.MaskSuggestions];
                 }
 
                 SessionStore.Save(session);
