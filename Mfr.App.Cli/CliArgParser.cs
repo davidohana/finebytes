@@ -74,7 +74,6 @@ namespace Mfr.App.Cli
                 : rawPresetsFilePath.Trim();
             var outputFilePath = _GetValueOrDefault(parsedSettings.OutputFilePath, defaultValue: string.Empty);
             var logLevel = _GetValueOrDefault(parsedSettings.LogLevel, defaultValue: CliLogging.DefaultLogLevelName);
-            var logDirectoryPath = _GetValueOrDefault(parsedSettings.LogDirectoryPath, defaultValue: string.Empty);
             var configFilePath = _GetValueOrDefault(parsedSettings.ConfigFilePath, defaultValue: string.Empty);
             var configOverrides = parsedSettings.ConfigOverrides
                 .Where(o => !o.IsBlank())
@@ -92,7 +91,6 @@ namespace Mfr.App.Cli
                 ConfirmBeforeCommit: parsedSettings.ConfirmBeforeCommit,
                 DryRun: parsedSettings.DryRun,
                 LogLevel: CliLogging.ParseLogLevel(logLevel),
-                LogDirectoryPath: logDirectoryPath.IsBlank() ? null : logDirectoryPath.Trim(),
                 PresetsFilePath: presetsFilePath,
                 ConfigFilePath: configFilePath.IsBlank() ? null : configFilePath.Trim(),
                 ConfigOverrides: configOverrides);
@@ -190,10 +188,6 @@ namespace Mfr.App.Cli
             [CommandOption("-l|--log-level <LEVEL>")]
             [Description("Minimum log level: debug | info | warn | error.")]
             public string? LogLevel { get; init; }
-
-            [CommandOption("--log-dir <PATH>")]
-            [Description("Optional log directory path override.")]
-            public string? LogDirectoryPath { get; init; }
 
             [CommandOption("--config <PATH>")]
             [Description("Optional mfr.config.json path (default: AppData). File must exist when this option is set.")]

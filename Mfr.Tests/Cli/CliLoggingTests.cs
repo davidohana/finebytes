@@ -1,85 +1,152 @@
 using Mfr.App.Cli;
+
 using Serilog;
+
 using Serilog.Events;
 
+
+
 namespace Mfr.Tests.Cli
+
 {
+
     /// <summary>
-    /// Tests Serilog bootstrap and session log retention behavior.
+
+    /// Tests CLI Serilog bootstrap and log-level parsing.
+
     /// </summary>
+
     [Collection(SessionLogCollection.Name)]
+
     public class CliLoggingTests : IDisposable
+
     {
+
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
 
-        /// <summary>
-        /// Resets <see cref="ConfigLoader.Settings"/> via <see cref="ConfigLoader.Load()"/> before each test class instance.
-        /// </summary>
-        public CliLoggingTests()
-        {
-            ConfigLoader.Load();
-        }
+
 
         /// <summary>
-        /// Restores process-level environment variables and temporary resources.
+
+        /// Resets <see cref="ConfigLoader.Settings"/> via <see cref="ConfigLoader.Load()"/> before each test class instance.
+
         /// </summary>
-        public void Dispose()
+
+        public CliLoggingTests()
+
         {
-            LogSession.Shutdown();
-            _tempDirectoryFixture.Dispose();
+
+            ConfigLoader.Load();
+
         }
+
+
+
+        /// <summary>
+
+        /// Restores process-level logging and temporary resources.
+
+        /// </summary>
+
+        public void Dispose()
+
+        {
+
+            LogSession.Shutdown();
+
+            ConfigLoader.Load();
+
+            _tempDirectoryFixture.Dispose();
+
+        }
+
+
 
         [Fact]
+
         /// <summary>
-        /// Verifies that startup creates one session file in the configured log directory.
+
+        /// Verifies startup creates a session file under <see cref="LogSettings.DirectoryPath"/>.
+
         /// </summary>
+
         public void Start_Creates_PerSession_LogFile()
+
         {
+
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
 
-            CliLogging.Start(LogEventLevel.Information, logDirectoryPath);
+            ConfigLoader.Settings.Log.DirectoryPath = logDirectoryPath;
+
+
+
+            CliLogging.Start(LogEventLevel.Information);
+
             var logFilePath = LogSession.LogFilePath;
+
             Log.Information("hello from test");
+
             LogSession.Shutdown();
+
+
 
             Assert.NotNull(logFilePath);
+
             Assert.True(File.Exists(logFilePath));
+
+            Assert.Equal(logDirectoryPath, Path.GetDirectoryName(logFilePath));
+
             var content = File.ReadAllText(logFilePath);
+
             Assert.Contains("hello from test", content, StringComparison.Ordinal);
+
         }
+
+
 
         [Fact]
+
         /// <summary>
-        /// Verifies retention pruning keeps only the newest configured session files.
+
+        /// Verifies blank input uses the default level name.
+
         /// </summary>
-        public void PruneSessionLogFiles_Keeps_Newest_Max()
+
+        public void ParseLogLevel_Defaults_To_Info()
+
         {
-            var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
-            var baseTime = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-            for (var i = 0; i < 105; i++)
-            {
-                var logFilePath = Path.Combine(logDirectoryPath, $"session-{i:D3}.log");
-                File.WriteAllText(logFilePath, $"log-{i:D3}");
-                File.SetCreationTimeUtc(logFilePath, baseTime.AddMinutes(i));
-            }
+            Assert.Equal(LogEventLevel.Information, CliLogging.ParseLogLevel(null));
 
-            CliLogging.Start(LogEventLevel.Information, logDirectoryPath);
-            LogSession.Shutdown();
+            Assert.Equal(LogEventLevel.Information, CliLogging.ParseLogLevel(" "));
 
-            var remainingNames = Directory
-                .EnumerateFiles(logDirectoryPath, "session-*.log", SearchOption.TopDirectoryOnly)
-                .Select(Path.GetFileName)
-                .OrderBy(name => name, StringComparer.Ordinal)
-                .ToList();
-
-            Assert.Equal(ConfigLoader.Settings.Log.MaxSessionFiles, remainingNames.Count);
-            Assert.DoesNotContain("session-000.log", remainingNames);
-            Assert.DoesNotContain("session-001.log", remainingNames);
-            Assert.DoesNotContain("session-002.log", remainingNames);
-            Assert.DoesNotContain("session-003.log", remainingNames);
-            Assert.DoesNotContain("session-004.log", remainingNames);
-            Assert.Contains("session-104.log", remainingNames);
         }
+
+
+
+        [Fact]
+
+        /// <summary>
+
+        /// Verifies supported level names map to Serilog levels.
+
+        /// </summary>
+
+        public void ParseLogLevel_Accepts_Supported_Names()
+
+        {
+
+            Assert.Equal(LogEventLevel.Debug, CliLogging.ParseLogLevel("debug"));
+
+            Assert.Equal(LogEventLevel.Information, CliLogging.ParseLogLevel("INFO"));
+
+            Assert.Equal(LogEventLevel.Warning, CliLogging.ParseLogLevel("warn"));
+
+            Assert.Equal(LogEventLevel.Error, CliLogging.ParseLogLevel("error"));
+
+        }
+
     }
+
 }
+

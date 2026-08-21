@@ -9,11 +9,10 @@ namespace Mfr.App.Cli
     {
         internal const string DefaultLogLevelName = "info";
 
-        internal static void Start(LogEventLevel logLevel, string? logDirectoryPath)
+        internal static void Start(LogEventLevel logLevel)
         {
             LogSession.Start(
                 logLevel: logLevel,
-                logDirectoryPath: logDirectoryPath,
                 logSettings: ConfigLoader.Settings.Log,
                 configureAdditionalSinks: _AddConsoleSink);
         }

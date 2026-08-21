@@ -48,7 +48,7 @@ namespace Mfr.App.Cli
                 return CliExitCode.UserError;
             }
 
-            CliLogging.Start(options.LogLevel, options.LogDirectoryPath);
+            CliLogging.Start(options.LogLevel);
             try
             {
                 return _Execute(options);

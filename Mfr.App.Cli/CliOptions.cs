@@ -16,7 +16,6 @@ namespace Mfr.App.Cli
     /// <param name="ConfirmBeforeCommit">Whether to prompt for confirmation before applying each rename.</param>
     /// <param name="DryRun">Whether commit operations should be simulated without modifying the filesystem.</param>
     /// <param name="LogLevel">Minimum log level to emit.</param>
-    /// <param name="LogDirectoryPath">Optional log directory override.</param>
     /// <param name="PresetsFilePath">Path to the JSON file containing presets.</param>
     /// <param name="ConfigFilePath">Optional path to <c>mfr.config.json</c>; when null, the default AppData path is used.</param>
     /// <param name="ConfigOverrides"><c>--set section.leaf=value</c> assignments applied after the config file.</param>
@@ -32,7 +31,6 @@ namespace Mfr.App.Cli
         bool ConfirmBeforeCommit,
         bool DryRun,
         LogEventLevel LogLevel,
-        string? LogDirectoryPath,
         string PresetsFilePath,
         string? ConfigFilePath,
         IReadOnlyList<string> ConfigOverrides);

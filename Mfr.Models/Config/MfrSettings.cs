@@ -21,6 +21,15 @@ namespace Mfr.Models.Config
     public sealed class LogSettings
     {
         /// <summary>
+        /// Directory for session and crash log files.
+        /// <para>
+        /// When blank, <c>%LocalApplicationData%/finebytes/mfr/logs</c> is used.
+        /// </para>
+        /// </summary>
+        [ConfigStringMaxLength(4096)]
+        public string DirectoryPath = string.Empty;
+
+        /// <summary>
         /// Maximum number of per-session log files to retain (oldest deleted first).
         /// </summary>
         [ConfigIntRange(1, 10000)]

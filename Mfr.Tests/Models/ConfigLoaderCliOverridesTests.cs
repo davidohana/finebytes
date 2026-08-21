@@ -30,6 +30,13 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
+        public void ApplyCliOverrides_Sets_Log_DirectoryPath()
+        {
+            ConfigLoader.ApplyCliOverrides([@"log.directoryPath=C:\Temp\mfr-logs"]);
+            Assert.Equal(@"C:\Temp\mfr-logs", ConfigLoader.Settings.Log.DirectoryPath);
+        }
+
+        [Fact]
         public void ApplyCliOverrides_Sets_Log_Field()
         {
             ConfigLoader.ApplyCliOverrides(["log.maxSessionFiles=77"]);

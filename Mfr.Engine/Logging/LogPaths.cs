@@ -7,7 +7,7 @@ namespace Mfr.Engine.Logging
     /// <summary>
     /// Path and on-disk helpers for diagnostic session and crash log files.
     /// <para>
-    /// CLI and UI both write under <see cref="DefaultDirectoryPath"/> unless a directory is supplied.
+    /// CLI and UI both write under <see cref="DefaultDirectoryPath"/> unless <see cref="LogSettings.DirectoryPath"/> is set.
     /// These helpers do not configure Serilog; hosts assign <c>Log.Logger</c> via <see cref="LogSession.Start"/>.
     /// </para>
     /// </summary>

@@ -23,27 +23,22 @@ namespace Mfr.Engine.Logging
         /// Creates a session log file, assigns <see cref="Log.Logger"/>, and prunes old sessions.
         /// <para>
         /// Call once per process; then <see cref="Shutdown"/> at exit.
+        /// Directory comes from <see cref="LogSettings.DirectoryPath"/> (blank uses the default under LocalApplicationData).
         /// </para>
         /// </summary>
         /// <param name="logLevel">Minimum level written to the file (and any host extras).</param>
-        /// <param name="logDirectoryPath">
-        /// Override directory. When blank, <see cref="LogPaths.DefaultDirectoryPath"/> is used.
-        /// </param>
-        /// <param name="logSettings">File naming, retention, and file output template.</param>
+        /// <param name="logSettings">Directory, file naming, retention, and file output template.</param>
         /// <param name="configureAdditionalSinks">
         /// Optional host extras (CLI console). Invoked after the file target is added.
         /// </param>
         public static void Start(
             LogEventLevel logLevel,
-            string? logDirectoryPath,
             LogSettings logSettings,
             Action<LoggerConfiguration>? configureAdditionalSinks = null)
         {
             ArgumentNullException.ThrowIfNull(logSettings);
 
-            var (resolvedLogDirectoryPath, logFilePath) = _PrepareSessionPaths(
-                configuredLogDirectoryPath: logDirectoryPath,
-                logSettings: logSettings);
+            var (resolvedLogDirectoryPath, logFilePath) = _PrepareSessionPaths(logSettings);
             _AssignProcessLogger(
                 logLevel: logLevel,
                 logFilePath: logFilePath,
@@ -80,11 +75,9 @@ namespace Mfr.Engine.Logging
         /// <summary>
         /// Resolves the log directory, creates it, and builds a new session file path.
         /// </summary>
-        private static (string LogDirectoryPath, string LogFilePath) _PrepareSessionPaths(
-            string? configuredLogDirectoryPath,
-            LogSettings logSettings)
+        private static (string LogDirectoryPath, string LogFilePath) _PrepareSessionPaths(LogSettings logSettings)
         {
-            var logDirectoryPath = LogPaths.ResolveDirectoryPath(configuredLogDirectoryPath);
+            var logDirectoryPath = LogPaths.ResolveDirectoryPath(logSettings.DirectoryPath);
             Directory.CreateDirectory(logDirectoryPath);
             var logFilePath = LogPaths.CreateSessionFilePath(
                 logDirectoryPath: logDirectoryPath,

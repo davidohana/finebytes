@@ -98,9 +98,9 @@ Minimal shape:
 
 CLI and UI write per-session Serilog files (not the View → Log undo window):
 
-- Directory: `%LOCALAPPDATA%\finebytes\mfr\logs` (Linux/macOS: `~/.local/share/finebytes/mfr/logs`)
+- Directory: `%LOCALAPPDATA%\finebytes\mfr\logs` (Linux/macOS: `~/.local/share/finebytes/mfr/logs`); override with `log.directoryPath` in `mfr.config.json` (or CLI `--set log.directoryPath=...`)
 - Files: `session-*.log`; unexpected UI faults before logging starts may add `crash-*.log`
-- CLI: `--log-dir` and `-l|--log-level` (`debug|info|warn|error`, default `info`)
+- CLI: `-l|--log-level` (`debug|info|warn|error`, default `info`)
 - Retention: `log.maxSessionFiles` in `mfr.config.json` (default 100)
 
 The UI shows a local crash dialog on unhandled exceptions (copy details, open log folder). Reports are not uploaded.

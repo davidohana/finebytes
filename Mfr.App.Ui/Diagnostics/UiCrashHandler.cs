@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
 using Mfr.Engine.Logging;
+using Mfr.Models.Config;
 using Serilog;
 
 namespace Mfr.App.Ui.Diagnostics
@@ -49,14 +50,8 @@ namespace Mfr.App.Ui.Diagnostics
         /// </summary>
         /// <param name="exception">The fault to record.</param>
         /// <param name="isTerminating">Whether the process is shutting down.</param>
-        /// <param name="logDirectoryPath">
-        /// Directory override used only when <see cref="LogSession.Start"/> has not run.
-        /// </param>
         /// <returns>Text and log paths for the crash dialog.</returns>
-        internal static CrashReport Persist(
-            Exception exception,
-            bool isTerminating,
-            string? logDirectoryPath = null)
+        internal static CrashReport Persist(Exception exception, bool isTerminating)
         {
             ArgumentNullException.ThrowIfNull(exception);
 
@@ -65,13 +60,15 @@ namespace Mfr.App.Ui.Diagnostics
             var sessionLogDirectoryPath = LogSession.LogDirectoryPath;
             if (sessionLogFilePath is null || sessionLogDirectoryPath is null)
             {
+                var configuredLogDirectoryPath = ConfigLoader.Settings.Log.DirectoryPath;
                 var crashFilePath = LogPaths.TryWriteCrashFile(
-                    logDirectoryPath: logDirectoryPath,
+                    logDirectoryPath: configuredLogDirectoryPath,
                     exception: exception,
                     isTerminating: isTerminating);
                 var directoryPath = crashFilePath is null
-                    ? LogPaths.ResolveDirectoryPath(logDirectoryPath)
-                    : Path.GetDirectoryName(crashFilePath) ?? LogPaths.ResolveDirectoryPath(logDirectoryPath);
+                    ? LogPaths.ResolveDirectoryPath(configuredLogDirectoryPath)
+                    : Path.GetDirectoryName(crashFilePath)
+                        ?? LogPaths.ResolveDirectoryPath(configuredLogDirectoryPath);
                 return new CrashReport(
                     Details: details,
                     LogFilePath: crashFilePath,

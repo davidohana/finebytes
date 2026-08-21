@@ -2251,7 +2251,7 @@ Unexpected process faults are **not** the same channel as per-item preview/commi
 - **View → Log** (`Ctrl+Shift+L`) lists rename undo sessions under `undo/` (see §14). That command remains a stub until Engine undo exists.
 - **Diagnostic session logs** are Serilog files shared by CLI and UI:
 
-  - Directory: `%LocalApplicationData%/finebytes/mfr/logs` (override with CLI `--log-dir`)
+  - Directory: `%LocalApplicationData%/finebytes/mfr/logs` (override with `log.directoryPath` in `mfr.config.json`)
   - Session files: `session-*.log` (retention: `log.maxSessionFiles`, default 100)
   - If Serilog is not running yet, the UI writes a best-effort `crash-*.log` in the same folder
 

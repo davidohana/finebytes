@@ -29,13 +29,12 @@ namespace Mfr.Tests.Cli
         {
             using var errorWriter = new StringWriter();
             var originalError = Console.Error;
-            var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
 
             try
             {
                 Console.SetError(errorWriter);
 
-                var exitCode = CliApp.Run(["-p", "xxx", "--log-dir", logDirectoryPath]);
+                var exitCode = CliApp.Run(["-p", "xxx"]);
                 var output = errorWriter.ToString();
 
                 Assert.Equal(CliExitCode.UserError, exitCode);
@@ -57,7 +56,6 @@ namespace Mfr.Tests.Cli
             var sourcePath = dir.CombinePath("track01.mp3");
             var expectedDestinationPath = dir.CombinePath("001.mp3");
             var presetsFilePath = dir.CombinePath("presets.json");
-            var logDirectoryPath = dir.CombinePath("logs");
             File.WriteAllText(sourcePath, "x");
 
             var presetManager = new PresetManager(presetsFilePath);
@@ -87,8 +85,7 @@ namespace Mfr.Tests.Cli
                 sourcePath,
                 "--preset", "counter",
                 "--presets-file", presetsFilePath,
-                "--dry-run",
-                "--log-dir", logDirectoryPath
+                "--dry-run"
             ]);
 
             Assert.Equal(CliExitCode.Success, exitCode);

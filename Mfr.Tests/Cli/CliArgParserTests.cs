@@ -50,16 +50,6 @@ namespace Mfr.Tests.Cli
 
         [Fact]
         /// <summary>
-        /// Verifies that <c>--log-dir</c> is parsed and exposed on CLI options.
-        /// </summary>
-        public void ParseArgs_Accepts_LogDirectoryPath()
-        {
-            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--log-dir", "C:\\logs\\mfr"])!;
-            Assert.Equal("C:\\logs\\mfr", options.LogDirectoryPath);
-        }
-
-        [Fact]
-        /// <summary>
         /// Verifies that <c>--config</c> is parsed and trimmed.
         /// </summary>
         public void ParseArgs_Accepts_ConfigFilePath()

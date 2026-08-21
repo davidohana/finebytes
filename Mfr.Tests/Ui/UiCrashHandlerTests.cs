@@ -17,6 +17,7 @@ namespace Mfr.Tests.Ui
         public void Dispose()
         {
             LogSession.Shutdown();
+            ConfigLoader.Load();
             _tempDirectoryFixture.Dispose();
         }
 
@@ -38,12 +39,11 @@ namespace Mfr.Tests.Ui
         {
             LogSession.Shutdown();
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
+            ConfigLoader.Load();
+            ConfigLoader.Settings.Log.DirectoryPath = logDirectoryPath;
             var exception = new InvalidOperationException("boom", new ArgumentException("inner"));
 
-            var report = UiCrashHandler.Persist(
-                exception,
-                isTerminating: true,
-                logDirectoryPath: logDirectoryPath);
+            var report = UiCrashHandler.Persist(exception, isTerminating: true);
 
             Assert.NotNull(report.LogFilePath);
             Assert.True(File.Exists(report.LogFilePath));
@@ -63,15 +63,13 @@ namespace Mfr.Tests.Ui
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
             LogSession.Start(
                 logLevel: LogEventLevel.Information,
-                logDirectoryPath: logDirectoryPath,
-                logSettings: new LogSettings());
+                logSettings: new LogSettings { DirectoryPath = logDirectoryPath });
             var sessionLogFilePath = LogSession.LogFilePath;
             var sessionLogDirectoryPath = LogSession.LogDirectoryPath;
 
             var report = UiCrashHandler.Persist(
                 new InvalidOperationException("boom"),
-                isTerminating: false,
-                logDirectoryPath: logDirectoryPath);
+                isTerminating: false);
 
             Assert.Equal(sessionLogFilePath, report.LogFilePath);
             Assert.Equal(sessionLogDirectoryPath, report.LogDirectoryPath);

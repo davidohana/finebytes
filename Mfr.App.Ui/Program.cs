@@ -22,7 +22,6 @@ namespace Mfr.App.Ui
                 ConfigLoader.Load();
                 LogSession.Start(
                     logLevel: LogEventLevel.Information,
-                    logDirectoryPath: null,
                     logSettings: ConfigLoader.Settings.Log);
                 BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
                 return 0;
