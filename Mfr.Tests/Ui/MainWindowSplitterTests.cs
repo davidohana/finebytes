@@ -6,7 +6,6 @@ using Avalonia.Input;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
-using Mfr.Models.Config;
 
 namespace Mfr.Tests.Ui
 {
