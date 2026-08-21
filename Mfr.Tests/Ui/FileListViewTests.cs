@@ -27,6 +27,52 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies long tile names stay inside the cell instead of painting over neighbors.
+        /// </summary>
+        [AvaloniaFact]
+        public void Tiles_Long_Names_Do_Not_Exceed_Cell_Width()
+        {
+            const string longName =
+                "Unigine_Heaven_Benchmark_4.0_20241106_2059_extra_long_report_name.html";
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            File.WriteAllText(Path.Combine(dir, longName), "x");
+            File.WriteAllText(Path.Combine(dir, "short.txt"), "y");
+
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            _viewModels.Add(viewModel);
+            viewModel.SetViewMode(FileListViewMode.Tiles);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 560,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            var list = view.FindControl<ListBox>("TilesList");
+            Assert.NotNull(list);
+            Assert.True(list.IsVisible);
+
+            var entry = Assert.Single(viewModel.Entries, item => item.Name == longName);
+            var container = list.ContainerFromIndex(list.Items.Cast<FileListEntry>().ToList().IndexOf(entry));
+            Assert.NotNull(container);
+            Assert.True(container.ClipToBounds);
+
+            var nameBlock = container.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .First(block => block.Text == longName);
+            Assert.True(
+                nameBlock.Bounds.Width <= 140,
+                $"Name width {nameBlock.Bounds.Width} should stay within the tile text column.");
+            Assert.True(
+                container.Bounds.Width <= 176,
+                $"Tile container width {container.Bounds.Width} should match the wrap cell.");
+        }
+
+        /// <summary>
         /// Verifies thumbnail selection fills the cell even when the caption is narrower than the icon.
         /// </summary>
         [AvaloniaFact]

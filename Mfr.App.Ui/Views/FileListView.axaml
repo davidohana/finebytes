@@ -54,7 +54,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
             <Setter Property="Padding" Value="2,1" />
-            <Setter Property="ClipToBounds" Value="False" />
+            <Setter Property="ClipToBounds" Value="True" />
         </Style>
         <Style Selector="ListBox.file-small-icons ListBoxItem">
             <Setter Property="Width" Value="120" />
@@ -280,15 +280,20 @@
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
+                            <!-- Grid * column constrains width so TextTrimming applies (horizontal StackPanel does not). -->
+                            <Grid Width="116"
+                                  ColumnDefinitions="Auto,*"
+                                  Margin="0,0,4,0">
                                 <Image Width="16"
                                        Height="16"
                                        VerticalAlignment="Center"
                                        Source="{Binding Icon}" />
-                                <TextBlock VerticalAlignment="Center"
+                                <TextBlock Grid.Column="1"
+                                           Margin="4,0,0,0"
+                                           VerticalAlignment="Center"
                                            Text="{Binding Name}"
                                            TextTrimming="CharacterEllipsis" />
-                            </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -302,7 +307,7 @@
                          KeyDown="_OnEntriesKeyDown">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel />
+                            <WrapPanel ItemWidth="76" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
@@ -322,7 +327,8 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <ListBox Classes="file-list file-icons"
+                <ListBox x:Name="TilesList"
+                         Classes="file-list file-icons"
                          ItemsSource="{Binding Entries}"
                          SelectedItem="{Binding SelectedEntry}"
                          IsVisible="{Binding IsTilesView}"
@@ -331,28 +337,32 @@
                          KeyDown="_OnEntriesKeyDown">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel />
+                            <WrapPanel ItemWidth="172" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Orientation="Horizontal"
-                                        Width="168"
-                                        Spacing="4"
-                                        Margin="1">
+                            <!-- Grid * column constrains width so TextTrimming applies (horizontal StackPanel does not). -->
+                            <Grid Width="168"
+                                  ColumnDefinitions="Auto,*"
+                                  Margin="1">
                                 <Image Width="32"
                                        Height="32"
                                        VerticalAlignment="Top"
                                        Source="{Binding Icon}" />
-                                <StackPanel VerticalAlignment="Center">
+                                <StackPanel Grid.Column="1"
+                                            Margin="4,0,0,0"
+                                            VerticalAlignment="Center">
                                     <TextBlock Text="{Binding Name}"
                                                TextTrimming="CharacterEllipsis" />
                                     <TextBlock Text="{Binding Details}"
                                                Opacity="0.7"
                                                FontSize="11"
-                                               TextWrapping="Wrap" />
+                                               TextWrapping="Wrap"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxLines="2" />
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
