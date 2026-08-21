@@ -19,7 +19,9 @@ namespace Mfr.Filters.Formatting
         internal static string PositiveInt(int value)
         {
             if (value == 0)
+            {
                 return string.Empty;
+            }
 
             return value.ToString(CultureInfo.InvariantCulture);
         }
@@ -32,7 +34,9 @@ namespace Mfr.Filters.Formatting
         internal static string Duration(TimeSpan duration)
         {
             if (duration == TimeSpan.Zero)
+            {
                 return string.Empty;
+            }
 
             var totalHours = (int)duration.TotalHours;
             return string.Create(
@@ -51,7 +55,9 @@ namespace Mfr.Filters.Formatting
         internal static string DurationSec(TimeSpan duration)
         {
             if (duration == TimeSpan.Zero)
+            {
                 return string.Empty;
+            }
 
             var seconds = (long)Math.Floor(duration.TotalSeconds);
             return seconds.ToString(CultureInfo.InvariantCulture);

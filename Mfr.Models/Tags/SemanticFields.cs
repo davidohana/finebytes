@@ -159,7 +159,9 @@ namespace Mfr.Models.Tags
         private static uint? _ParseNullableUInt(string trimmed, string valueParamName)
         {
             if (trimmed.Length == 0)
+            {
                 return null;
+            }
 
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {

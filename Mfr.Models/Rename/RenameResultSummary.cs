@@ -59,7 +59,9 @@ namespace Mfr.Models.Rename
             var outputFilePathTrimmed = outputFilePath.Trim();
             var outputDirectoryPath = Path.GetDirectoryName(outputFilePathTrimmed);
             if (!string.IsNullOrWhiteSpace(outputDirectoryPath))
+            {
                 Directory.CreateDirectory(outputDirectoryPath);
+            }
 
             File.WriteAllText(outputFilePathTrimmed, json);
         }

@@ -126,7 +126,9 @@ namespace Mfr.Tests.Engine
         public void Case_only_file_rename_on_windows_applies_new_casing()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("track.mp3");
@@ -161,7 +163,9 @@ namespace Mfr.Tests.Engine
         public void Case_only_folder_rename_on_windows_applies_new_casing()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var dir = _tempDirectoryFixture.CreateTempDir();
             var oldFolder = dir.CombinePath("album");

@@ -18,7 +18,9 @@ namespace Mfr.Filters
             ArgumentNullException.ThrowIfNull(item);
 
             if (item.ImagePropertiesLoadAttempted)
+            {
                 return;
+            }
 
             item.MarkImagePropertiesLoadAttempted();
 

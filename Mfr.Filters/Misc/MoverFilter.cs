@@ -61,7 +61,9 @@ namespace Mfr.Filters.Misc
             );
 
             if (!string.IsNullOrEmpty(Options.SubFolder))
+            {
                 _compiledSubFolder = FormatStringCompiler.Compile(Options.SubFolder);
+            }
         }
 
         /// <inheritdoc />
@@ -75,7 +77,9 @@ namespace Mfr.Filters.Misc
         private string _ResolveTargetDirectory(RenameItem item)
         {
             if (_compiledSubFolder is null)
+            {
                 return Options.RootFolder;
+            }
 
             var resolved = _compiledSubFolder(item);
             // Strip a leading slash so Path.Combine appends relative segments. Otherwise a value like
@@ -84,7 +88,9 @@ namespace Mfr.Filters.Misc
 
             var relativeIsEmpty = string.IsNullOrEmpty(relative);
             if (relativeIsEmpty)
+            {
                 return Options.RootFolder;
+            }
 
             return Path.Combine(Options.RootFolder, relative);
         }

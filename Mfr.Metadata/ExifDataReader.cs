@@ -69,10 +69,14 @@ namespace Mfr.Metadata
         private static DateTime? _ReadDateTaken(ExifSubIfdDirectory? subIfd)
         {
             if (subIfd is null)
+            {
                 return null;
+            }
 
             if (!subIfd.TryGetDateTime(ExifDirectoryBase.TagDateTimeOriginal, out var dateTaken))
+            {
                 return null;
+            }
 
             return DateTime.SpecifyKind(dateTaken, DateTimeKind.Unspecified);
         }
@@ -80,7 +84,9 @@ namespace Mfr.Metadata
         private static string? _ReadDescription(MeDirectory? directory, int tag)
         {
             if (directory is null)
+            {
                 return null;
+            }
 
             return _CleanDescription(directory.GetDescription(tag));
         }
@@ -88,7 +94,9 @@ namespace Mfr.Metadata
         private static string? _CleanDescription(string? raw)
         {
             if (raw is null)
+            {
                 return null;
+            }
 
             var cleaned = raw.Replace('\n', ' ').Trim();
             return cleaned.TrimmedOrNull();
@@ -115,13 +123,17 @@ namespace Mfr.Metadata
             {
                 var alias = _TryGetSourceAlias(directory);
                 if (alias is null)
+                {
                     continue;
+                }
 
                 foreach (var tag in directory.Tags)
                 {
                     var description = _CleanDescription(directory.GetDescription(tag.Type));
                     if (description is null)
+                    {
                         continue;
+                    }
 
                     tagToDescription ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     tagToDescription.TryAdd($"{alias}/{tag.Name}", description);
@@ -130,7 +142,9 @@ namespace Mfr.Metadata
             }
 
             if (tagToDescription is null || tagToDescription.Count == 0)
+            {
                 return _emptyTags;
+            }
 
             return tagToDescription;
         }

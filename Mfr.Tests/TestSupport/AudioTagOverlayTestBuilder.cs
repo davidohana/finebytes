@@ -69,7 +69,9 @@ namespace Mfr.Tests.TestSupport
 
             // Keep an empty Id3v2 block present so filter merges have a target (do not prune before first write).
             if (!merged.ContainsRenderableSemantics())
+            {
                 return overlay;
+            }
 
             overlay.MergeSemantic(merged);
             return overlay;

@@ -44,7 +44,9 @@ namespace Mfr.Tests.Ui
                 Height = 24,
             };
             foreach (var childWidth in childWidths)
+            {
                 panel.Children.Add(new Border { Width = childWidth, Height = 16 });
+            }
 
             return panel;
         }

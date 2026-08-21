@@ -52,7 +52,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         private static IEnumerable<string> _UnitKeywordsForErrorHint()
         {
             foreach (var key in _unitKeywordToKind.Keys)
+            {
                 yield return key.Length == 0 ? "(omit)" : key;
+            }
         }
 
         /// <summary>
@@ -97,10 +99,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
                 : int.Parse(decimalArg, CultureInfo.InvariantCulture);
 
             if (!_unitKeywordToKind.TryGetValue(unitArg, out var unitKind))
+            {
                 throw new NotSupportedException(
                     $"{tokenDisplayName} unit '{unitArg}' is not supported "
                         + $"(expected {FormatOptionsParsing.FormatExpectedKeywords(_UnitKeywordsForErrorHint())})."
                 );
+            }
 
             return new Options(Unit: unitKind, Decimals: decimals);
         }
@@ -108,11 +112,20 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         private static string _FormatAuto(double bytes, int decimals)
         {
             if (bytes >= Gb)
+            {
                 return _Format(bytes, Gb, "GB", decimals);
+            }
+
             if (bytes >= Mb)
+            {
                 return _Format(bytes, Mb, "MB", decimals);
+            }
+
             if (bytes >= Kb)
+            {
                 return _Format(bytes, Kb, "KB", decimals);
+            }
+
             return _Format(bytes, 1.0, "B", decimals);
         }
 

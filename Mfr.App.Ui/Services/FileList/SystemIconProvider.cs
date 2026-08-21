@@ -12,7 +12,9 @@ namespace Mfr.App.Ui.Services.FileList
         public static ISystemIconProvider CreateDefault()
         {
             if (OperatingSystem.IsWindows())
+            {
                 return new WindowsSystemIconProvider();
+            }
 
             return NullSystemIconProvider.Instance;
         }

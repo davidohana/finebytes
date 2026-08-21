@@ -19,7 +19,9 @@ namespace Mfr.App.Ui.Views
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
                 e.Pointer.Capture(this);
+            }
 
             base.OnPointerPressed(e);
         }

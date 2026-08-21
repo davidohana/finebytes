@@ -21,7 +21,9 @@ namespace Mfr.App.Ui.Services.Session
         public static void TryRestore(Window window, SessionWindowState? saved)
         {
             if (saved is null)
+            {
                 return;
+            }
 
             var isMaximized = string.Equals(saved.State, "Maximized", StringComparison.OrdinalIgnoreCase);
             if (isMaximized)
@@ -31,10 +33,14 @@ namespace Mfr.App.Ui.Services.Session
             }
 
             if (!_IsValidSize(saved.Width, saved.Height))
+            {
                 return;
+            }
 
             if (!_IsOnScreen(window, saved.X, saved.Y, saved.Width, saved.Height))
+            {
                 return;
+            }
 
             window.Width = saved.Width;
             window.Height = saved.Height;
@@ -62,7 +68,9 @@ namespace Mfr.App.Ui.Services.Session
         private static bool _IsValidSize(double width, double height)
         {
             if (double.IsNaN(width) || double.IsNaN(height) || double.IsInfinity(width) || double.IsInfinity(height))
+            {
                 return false;
+            }
 
             return width > 0 && height > 0;
         }
@@ -71,7 +79,9 @@ namespace Mfr.App.Ui.Services.Session
         {
             var screens = window.Screens;
             if (screens is null || screens.ScreenCount == 0)
+            {
                 return true;
+            }
 
             var bounds = new PixelRect(x, y, (int)Math.Ceiling(width), (int)Math.Ceiling(height));
             return screens.ScreenFromBounds(bounds) is not null;

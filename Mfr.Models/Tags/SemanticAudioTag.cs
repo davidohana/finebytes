@@ -315,7 +315,9 @@ namespace Mfr.Models.Tags
             foreach (var row in AudioCatalogFieldMaps.All)
             {
                 if (row.Field == field)
+                {
                     return row;
+                }
             }
 
             throw new ArgumentOutOfRangeException(nameof(field), field, "Not a catalog semantic field.");
@@ -324,15 +326,21 @@ namespace Mfr.Models.Tags
         private static string? _Id3v2Txxx(Id3v2TagData? data, string description)
         {
             if (data is null)
+            {
                 return null;
+            }
 
             foreach (var frame in data.Frames)
             {
                 if (!string.Equals(frame.FrameId, "TXXX", StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 if (!string.Equals(frame.Description, description, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 return frame.TextValues.Length == 0 ? null : frame.TextValues[0].TrimmedOrNull();
             }
@@ -343,12 +351,16 @@ namespace Mfr.Models.Tags
         private static string? _Id3v2Singleton(Id3v2TagData? data, string frameId)
         {
             if (data is null)
+            {
                 return null;
+            }
 
             foreach (var frame in data.Frames)
             {
                 if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 return frame.TextValues.Length == 0 ? null : frame.TextValues[0].TrimmedOrNull();
             }
@@ -359,12 +371,16 @@ namespace Mfr.Models.Tags
         private static string? _Id3v2Joined(Id3v2TagData? data, string frameId)
         {
             if (data is null)
+            {
                 return null;
+            }
 
             foreach (var frame in data.Frames)
             {
                 if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 return DelimitedText.JoinOrNull(frame.TextValues);
             }
@@ -375,16 +391,22 @@ namespace Mfr.Models.Tags
         private static string? _Id3v2PrimaryMulti(Id3v2TagData? data, string frameId)
         {
             if (data is null)
+            {
                 return null;
+            }
 
             Id3v2ModeledFrame? primary = null;
             foreach (var frame in data.Frames)
             {
                 if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 if (!string.IsNullOrEmpty(frame.Description))
+                {
                     continue;
+                }
 
                 primary = frame;
                 break;
@@ -395,7 +417,9 @@ namespace Mfr.Models.Tags
                 foreach (var frame in data.Frames)
                 {
                     if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
+                    {
                         continue;
+                    }
 
                     primary = frame;
                     break;
@@ -403,7 +427,9 @@ namespace Mfr.Models.Tags
             }
 
             if (primary is null || primary.TextValues.Length == 0)
+            {
                 return null;
+            }
 
             return primary.TextValues[0].TrimmedOrNull();
         }
@@ -412,7 +438,9 @@ namespace Mfr.Models.Tags
         {
             var text = _Id3v2Singleton(data, "TDRC") ?? _Id3v2Singleton(data, "TYER");
             if (text is null)
+            {
                 return null;
+            }
 
             // TDRC may be a full timestamp; take leading year digits.
             var yearPart = text.Length >= 4 ? text[..4] : text;
@@ -426,7 +454,9 @@ namespace Mfr.Models.Tags
         {
             var text = _Id3v2Singleton(data, frameId);
             if (text is null)
+            {
                 return (null, null);
+            }
 
             var slash = text.IndexOf('/');
             if (slash < 0)
@@ -443,7 +473,9 @@ namespace Mfr.Models.Tags
                 && uint.TryParse(text[..slash], NumberStyles.Integer, CultureInfo.InvariantCulture, out var nParsed)
                 && nParsed != 0
             )
+            {
                 number = nParsed;
+            }
 
             if (
                 slash + 1 < text.Length
@@ -455,7 +487,9 @@ namespace Mfr.Models.Tags
                 )
                 && cParsed != 0
             )
+            {
                 count = cParsed;
+            }
 
             return (number, count);
         }
@@ -483,12 +517,16 @@ namespace Mfr.Models.Tags
         private static string? _MultimapFirst(ImmutableArray<TextFieldRow> fields, string key)
         {
             if (fields.IsDefaultOrEmpty)
+            {
                 return null;
+            }
 
             foreach (var row in fields)
             {
                 if (!string.Equals(row.Key, key, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 return row.Values.Length == 0 ? null : row.Values[0].TrimmedOrNull();
             }
@@ -499,12 +537,16 @@ namespace Mfr.Models.Tags
         private static string? _MultimapJoined(ImmutableArray<TextFieldRow> fields, string key)
         {
             if (fields.IsDefaultOrEmpty)
+            {
                 return null;
+            }
 
             foreach (var row in fields)
             {
                 if (!string.Equals(row.Key, key, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 return DelimitedText.JoinOrNull(row.Values);
             }
@@ -515,12 +557,16 @@ namespace Mfr.Models.Tags
         private static string? _Riff(RiffInfoTagData? data, string key)
         {
             if (data is null)
+            {
                 return null;
+            }
 
             foreach (var row in data.Fields)
             {
                 if (string.Equals(row.Key, key, StringComparison.Ordinal))
+                {
                     return row.Value.TrimmedOrNull();
+                }
             }
 
             return null;
@@ -529,12 +575,16 @@ namespace Mfr.Models.Tags
         private static string? _Asf(AsfTagData? data, string name)
         {
             if (data is null)
+            {
                 return null;
+            }
 
             foreach (var row in data.Descriptors)
             {
                 if (string.Equals(row.Name, name, StringComparison.Ordinal))
+                {
                     return row.Value.TrimmedOrNull();
+                }
             }
 
             return null;
@@ -543,7 +593,9 @@ namespace Mfr.Models.Tags
         private static uint? _ParseUInt(string? text)
         {
             if (text is null)
+            {
                 return null;
+            }
 
             return uint.TryParse(text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var u) && u != 0
                 ? u
@@ -553,7 +605,9 @@ namespace Mfr.Models.Tags
         private static (uint? Disc, uint? DiscCount) _ParseAsfPartOfSet(string? text)
         {
             if (string.IsNullOrWhiteSpace(text))
+            {
                 return (null, null);
+            }
 
             var parts = text.Split('/');
             var disc = parts.Length >= 1 ? _ParseUInt(parts[0]) : null;
@@ -564,7 +618,9 @@ namespace Mfr.Models.Tags
         private static string? _ReadId3v1Genre(Id3v1TagData? data)
         {
             if (data is null)
+            {
                 return null;
+            }
 
             return Id3v1Genres.IndexToAudio(data.Genre).TrimmedOrNull();
         }
@@ -578,12 +634,16 @@ namespace Mfr.Models.Tags
         private static ImmutableArray<string> _ReadAppleAtomValues(AppleTagData? apple, ReadOnlySpan<byte> atomType)
         {
             if (apple is null || apple.Atoms.IsDefaultOrEmpty || atomType.Length != 4)
+            {
                 return default;
+            }
 
             foreach (var row in apple.Atoms)
             {
                 if (row.AtomType.AsSpan().SequenceEqual(atomType))
+                {
                     return row.Values;
+                }
             }
 
             return default;

@@ -73,7 +73,9 @@ namespace Mfr.App.Ui.ViewModels
                 var isCloser = stepDistance < nearestDistance;
                 var isTiePreferLarger = stepDistance == nearestDistance && step > nearest;
                 if (isCloser || isTiePreferLarger)
+                {
                     nearest = step;
+                }
             }
 
             return nearest;
@@ -90,7 +92,9 @@ namespace Mfr.App.Ui.ViewModels
             foreach (var step in Steps)
             {
                 if (step > current)
+                {
                     return step;
+                }
             }
 
             return Steps[^1];
@@ -107,7 +111,9 @@ namespace Mfr.App.Ui.ViewModels
             for (var i = Steps.Length - 1; i >= 0; i--)
             {
                 if (Steps[i] < current)
+                {
                     return Steps[i];
+                }
             }
 
             return Steps[0];

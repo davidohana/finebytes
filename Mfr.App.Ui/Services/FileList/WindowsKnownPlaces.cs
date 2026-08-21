@@ -26,7 +26,9 @@ namespace Mfr.App.Ui.Services.FileList
         public static IReadOnlyList<WindowsKnownPlace> GetPlaces()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return [];
+            }
 
             var places = new List<WindowsKnownPlace>();
             var pathToIsAdded = new HashSet<string>(PathComparers.Os);
@@ -49,7 +51,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             path = null;
             if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(text))
+            {
                 return false;
+            }
 
             var trimmed = text.Trim();
             foreach (var place in GetPlaces())
@@ -62,10 +66,14 @@ namespace Mfr.App.Ui.Services.FileList
 
                 var segment = Path.GetFileName(place.Path.TrimTrailingSeparator());
                 if (string.IsNullOrEmpty(segment))
+                {
                     continue;
+                }
 
                 if (!segment.Equals(trimmed, StringComparison.OrdinalIgnoreCase))
+                {
                     continue;
+                }
 
                 path = place.Path;
                 return true;
@@ -84,12 +92,16 @@ namespace Mfr.App.Ui.Services.FileList
         {
             place = null;
             if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(filesystemPath))
+            {
                 return false;
+            }
 
             foreach (var candidate in GetPlaces())
             {
                 if (!PathRelations.IsSamePath(filesystemPath, candidate.Path))
+                {
                     continue;
+                }
 
                 place = candidate;
                 return true;
@@ -111,7 +123,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             place = null;
             if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(filesystemPath))
+            {
                 return false;
+            }
 
             foreach (var candidate in GetPlaces())
             {
@@ -119,10 +133,14 @@ namespace Mfr.App.Ui.Services.FileList
                     PathRelations.IsSamePath(filesystemPath, candidate.Path)
                     || PathRelations.IsDescendantOf(filesystemPath, candidate.Path);
                 if (!isMatch)
+                {
                     continue;
+                }
 
                 if (place is not null && candidate.Path.Length <= place.Path.Length)
+                {
                     continue;
+                }
 
                 place = candidate;
             }
@@ -163,7 +181,9 @@ namespace Mfr.App.Ui.Services.FileList
             }
 
             if (string.IsNullOrWhiteSpace(profile))
+            {
                 return;
+            }
 
             _TryAddResolved(places, pathToIsAdded, "Downloads", Path.Combine(profile, "Downloads"));
         }
@@ -176,13 +196,17 @@ namespace Mfr.App.Ui.Services.FileList
         )
         {
             if (string.IsNullOrWhiteSpace(folderPath))
+            {
                 return;
+            }
 
             string fullPath;
             try
             {
                 if (!Directory.Exists(folderPath))
+                {
                     return;
+                }
 
                 fullPath = new DirectoryInfo(folderPath).FullName;
             }
@@ -193,7 +217,9 @@ namespace Mfr.App.Ui.Services.FileList
             }
 
             if (!pathToIsAdded.Add(fullPath))
+            {
                 return;
+            }
 
             places.Add(new WindowsKnownPlace(name, fullPath));
         }

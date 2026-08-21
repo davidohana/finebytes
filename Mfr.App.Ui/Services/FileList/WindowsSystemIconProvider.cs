@@ -80,7 +80,9 @@ namespace Mfr.App.Ui.Services.FileList
         private IImage? _GetCached(string key, Func<IImage?> factory)
         {
             if (_keyToIcon.TryGetValue(key, out var icon))
+            {
                 return icon;
+            }
 
             icon = factory();
             _keyToIcon[key] = icon;
@@ -99,22 +101,30 @@ namespace Mfr.App.Ui.Services.FileList
                 var jumbo = _ExtractFromImageList(path, fileAttributes, useFileAttributes, _ShilJumbo);
                 // Jumbo is 256px; missing glyphs are a small icon on an empty canvas.
                 if (jumbo is not null && _HasJumboContent(jumbo))
+                {
                     return jumbo;
+                }
 
                 jumbo?.Dispose();
                 var extraLarge = _ExtractFromImageList(path, fileAttributes, useFileAttributes, _ShilExtraLarge);
                 if (extraLarge is not null)
+                {
                     return extraLarge;
+                }
             }
 
             var flags = _ShgfiIcon | (size == ShellIconSize.Small ? _ShgfiSmallIcon : _ShgfiLargeIcon);
             if (useFileAttributes)
+            {
                 flags |= _ShgfiUseFileAttributes;
+            }
 
             var info = new ShFileInfo();
             _ = NativeMethods.SHGetFileInfo(path, fileAttributes, ref info, (uint)Marshal.SizeOf<ShFileInfo>(), flags);
             if (info.hIcon == IntPtr.Zero)
+            {
                 return null;
+            }
 
             try
             {
@@ -135,15 +145,21 @@ namespace Mfr.App.Ui.Services.FileList
         {
             var iconIndex = _GetSysIconIndex(path, fileAttributes, useFileAttributes);
             if (iconIndex < 0)
+            {
                 return null;
+            }
 
             var imageList = _GetImageList(shil);
             if (imageList is null)
+            {
                 return null;
+            }
 
             var hr = imageList.GetIcon(iconIndex, _IldTransparent, out var hIcon);
             if (hr != _SOk || hIcon == IntPtr.Zero)
+            {
                 return null;
+            }
 
             try
             {
@@ -159,7 +175,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             var flags = _ShgfiSysIconIndex;
             if (useFileAttributes)
+            {
                 flags |= _ShgfiUseFileAttributes;
+            }
 
             var info = new ShFileInfo();
             var result = NativeMethods.SHGetFileInfo(
@@ -170,7 +188,9 @@ namespace Mfr.App.Ui.Services.FileList
                 flags
             );
             if (result == IntPtr.Zero)
+            {
                 return -1;
+            }
 
             return info.iIcon;
         }
@@ -180,12 +200,16 @@ namespace Mfr.App.Ui.Services.FileList
             lock (_imageListGate)
             {
                 if (_shilToImageList.TryGetValue(shil, out var cached))
+                {
                     return cached;
+                }
 
                 var iid = _IidIImageList;
                 var hr = NativeMethods.SHGetImageList(shil, ref iid, out var imageList);
                 if (hr != _SOk)
+                {
                     imageList = null;
+                }
 
                 _shilToImageList[shil] = imageList;
                 return imageList;
@@ -198,7 +222,9 @@ namespace Mfr.App.Ui.Services.FileList
             var height = bitmap.PixelSize.Height;
             var isSmallerThanJumbo = width < _JumboPixels || height < _JumboPixels;
             if (isSmallerThanJumbo)
+            {
                 return width > _ExtraLargePixels || height > _ExtraLargePixels;
+            }
 
             var marginX = (width - _ExtraLargePixels) / 2;
             var marginY = (height - _ExtraLargePixels) / 2;
@@ -215,11 +241,15 @@ namespace Mfr.App.Ui.Services.FileList
                 {
                     var pixelIsInCenter = rowIsInCenter && x >= marginX && x < width - marginX;
                     if (pixelIsInCenter)
+                    {
                         continue;
+                    }
 
                     var alpha = buffer[rowOffset + (x * 4) + 3];
                     if (alpha != 0)
+                    {
                         return true;
+                    }
                 }
             }
 
@@ -229,7 +259,9 @@ namespace Mfr.App.Ui.Services.FileList
         private static WriteableBitmap? _HIconToBitmap(IntPtr hIcon)
         {
             if (!NativeMethods.GetIconInfo(hIcon, out var iconInfo))
+            {
                 return null;
+            }
 
             try
             {
@@ -238,20 +270,29 @@ namespace Mfr.App.Ui.Services.FileList
             finally
             {
                 if (iconInfo.hbmMask != IntPtr.Zero)
+                {
                     _ = NativeMethods.DeleteObject(iconInfo.hbmMask);
+                }
+
                 if (iconInfo.hbmColor != IntPtr.Zero)
+                {
                     _ = NativeMethods.DeleteObject(iconInfo.hbmColor);
+                }
             }
         }
 
         private static WriteableBitmap? _BitmapFromGdiHandle(IntPtr hBitmap)
         {
             if (hBitmap == IntPtr.Zero)
+            {
                 return null;
+            }
 
             var hdc = NativeMethods.GetDC(IntPtr.Zero);
             if (hdc == IntPtr.Zero)
+            {
                 return null;
+            }
 
             try
             {
@@ -261,12 +302,16 @@ namespace Mfr.App.Ui.Services.FileList
                 };
 
                 if (NativeMethods.GetDIBits(hdc, hBitmap, 0, 0, IntPtr.Zero, ref bmi, _DibRgbColors) == 0)
+                {
                     return null;
+                }
 
                 var width = bmi.bmiHeader.biWidth;
                 var height = Math.Abs(bmi.bmiHeader.biHeight);
                 if (width <= 0 || height <= 0)
+                {
                     return null;
+                }
 
                 bmi.bmiHeader.biBitCount = 32;
                 bmi.bmiHeader.biCompression = _BiRgb;

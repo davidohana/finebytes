@@ -14,7 +14,9 @@ namespace Mfr.Engine
         internal static void LogPreviewChangeDetail(this RenameItem renameItem)
         {
             if (!renameItem.HasPreviewChanges())
+            {
                 return;
+            }
 
             var originalFullPath = renameItem.Original.FullPath;
             Log.Debug("Preview changes for {OriginalFullPath}:", originalFullPath);
@@ -45,11 +47,15 @@ namespace Mfr.Engine
         public static string FormatPreviewChangesForDisplay(this RenameItem renameItem)
         {
             if (!renameItem.HasPreviewChanges())
+            {
                 return string.Empty;
+            }
 
             var previewChanges = RenamePropertyChangeBuilder.BuildChangeRows(renameItem);
             if (previewChanges.Count == 0)
+            {
                 return $"{renameItem.Original.FullPath} --> {renameItem.Preview.FullPath}";
+            }
 
             return string.Join(Environment.NewLine, previewChanges.Select(change => change.FormatPreviewChangeBlock()));
         }

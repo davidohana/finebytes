@@ -52,11 +52,15 @@ namespace Mfr.Models.Tags.Id3v2
             ArgumentException.ThrowIfNullOrWhiteSpace(frameId);
 
             if (tagVersion >= 4)
+            {
                 return;
+            }
 
             var normalizedId = frameId.Trim().ToUpperInvariant();
             if (!_Id3v24OnlyFrameIds.Contains(normalizedId))
+            {
                 return;
+            }
 
             throw new NotSupportedException(
                 $"ID3v2 frame '{normalizedId}' requires version 2.4; this tag is version 2.{tagVersion} (no silent upgrade)."

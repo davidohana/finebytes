@@ -31,7 +31,9 @@ namespace Mfr.App.Ui.Views
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (_TryHandleThumbnailZoomKeys(e))
+            {
                 return;
+            }
 
             base.OnKeyDown(e);
         }
@@ -39,10 +41,14 @@ namespace Mfr.App.Ui.Views
         private void _OnMaskKeyDown(object? sender, KeyEventArgs e)
         {
             if (e.Key != Key.Enter)
+            {
                 return;
+            }
 
             if (DataContext is FileListViewModel viewModel)
+            {
                 viewModel.CommitMask();
+            }
 
             e.Handled = true;
         }
@@ -55,10 +61,14 @@ namespace Mfr.App.Ui.Views
         private void _CommitMaskIfInactive()
         {
             if (DataContext is not FileListViewModel viewModel)
+            {
                 return;
+            }
 
             if (MaskCombo.IsDropDownOpen || MaskCombo.IsKeyboardFocusWithin)
+            {
                 return;
+            }
 
             viewModel.CommitMask();
         }
@@ -66,19 +76,27 @@ namespace Mfr.App.Ui.Views
         private void _OnEntriesDoubleTapped(object? sender, TappedEventArgs e)
         {
             if (DataContext is FileListViewModel viewModel)
+            {
                 viewModel.OpenSelected();
+            }
         }
 
         private void _OnEntriesKeyDown(object? sender, KeyEventArgs e)
         {
             if (_TryHandleThumbnailZoomKeys(e))
+            {
                 return;
+            }
 
             if (e.Key != Key.Back)
+            {
                 return;
+            }
 
             if (DataContext is FileListViewModel viewModel)
+            {
                 viewModel.GoUp();
+            }
 
             e.Handled = true;
         }
@@ -86,14 +104,23 @@ namespace Mfr.App.Ui.Views
         private void _OnThumbnailsPointerWheelChanged(object? sender, PointerWheelEventArgs e)
         {
             if (e.KeyModifiers != KeyModifiers.Control)
+            {
                 return;
+            }
+
             if (DataContext is not FileListViewModel viewModel || !viewModel.IsThumbnailsView)
+            {
                 return;
+            }
 
             if (e.Delta.Y > 0)
+            {
                 viewModel.ZoomThumbnailsIn();
+            }
             else if (e.Delta.Y < 0)
+            {
                 viewModel.ZoomThumbnailsOut();
+            }
 
             e.Handled = true;
         }
@@ -103,13 +130,24 @@ namespace Mfr.App.Ui.Views
             // Shift is allowed so Ctrl+Shift+= (the + key) zooms in on typical keyboards.
             var modifiersWithoutShift = e.KeyModifiers & ~KeyModifiers.Shift;
             if (modifiersWithoutShift != KeyModifiers.Control)
+            {
                 return false;
+            }
+
             if (DataContext is not FileListViewModel viewModel || !viewModel.IsThumbnailsView)
+            {
                 return false;
+            }
+
             if (viewModel.IsPathEditing)
+            {
                 return false;
+            }
+
             if (e.Source is TextBox or ComboBox)
+            {
                 return false;
+            }
 
             if (e.Key is Key.OemPlus or Key.Add)
             {
@@ -138,14 +176,18 @@ namespace Mfr.App.Ui.Views
         private void _OnReportGridLoaded(object? sender, RoutedEventArgs e)
         {
             if (sender is DataGrid grid && DataContext is FileListViewModel viewModel)
+            {
                 _SyncReportSortGlyphs(grid, viewModel);
+            }
         }
 
         private void _OnEntriesSorting(object? sender, DataGridColumnEventArgs e)
         {
             e.Handled = true;
             if (sender is not DataGrid grid || DataContext is not FileListViewModel viewModel)
+            {
                 return;
+            }
 
             viewModel.SortByColumn(e.Column.SortMemberPath);
             _SyncReportSortGlyphs(grid, viewModel);
@@ -155,7 +197,9 @@ namespace Mfr.App.Ui.Views
         {
             var view = grid.CollectionView;
             if (view?.SortDescriptions is null)
+            {
                 return;
+            }
 
             var direction = viewModel.IsSortAscending ? ListSortDirection.Ascending : ListSortDirection.Descending;
 
@@ -176,7 +220,9 @@ namespace Mfr.App.Ui.Views
         {
             var isStringColumn = memberPath is nameof(FileListEntry.Name) or nameof(FileListEntry.Type);
             if (isStringColumn)
+            {
                 return DataGridSortDescription.FromPath(memberPath, direction, PathComparers.Os);
+            }
 
             return DataGridSortDescription.FromPath(memberPath, direction);
         }

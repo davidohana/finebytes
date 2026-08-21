@@ -26,11 +26,15 @@ namespace Mfr.App.Ui.ViewModels
         )
         {
             if (segmentWidths.Count == 0)
+            {
                 return 0;
+            }
 
             var canShowFullTrail = double.IsNaN(availableWidth) || double.IsInfinity(availableWidth);
             if (canShowFullTrail)
+            {
                 return 0;
+            }
 
             var lastIndex = segmentWidths.Count - 1;
             var suffixWidth = segmentWidths[lastIndex];
@@ -42,7 +46,9 @@ namespace Mfr.App.Ui.ViewModels
                 var nextSuffixWidth = suffixWidth + segmentWidths[i];
                 var overflowCost = i > 0 ? reservedOverflowWidth : 0;
                 if (overflowCost + nextSuffixWidth > availableWidth)
+                {
                     break;
+                }
 
                 suffixWidth = nextSuffixWidth;
                 visibleStart = i;

@@ -21,7 +21,9 @@ namespace Mfr.Tests.Ui
         public void Dispose()
         {
             foreach (var viewModel in _viewModels)
+            {
                 viewModel.Dispose();
+            }
 
             _tempDirectoryFixture.Dispose();
         }
@@ -142,7 +144,9 @@ namespace Mfr.Tests.Ui
             var dir = _tempDirectoryFixture.CreateTempDir();
             Directory.CreateDirectory(Path.Combine(dir, ".config"));
             for (var i = 0; i < folderCount; i++)
+            {
                 Directory.CreateDirectory(Path.Combine(dir, $"folder{i:D3}"));
+            }
 
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
             _viewModels.Add(viewModel);

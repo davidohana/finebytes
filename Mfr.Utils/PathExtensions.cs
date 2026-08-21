@@ -26,13 +26,19 @@ namespace Mfr.Utils
             ArgumentException.ThrowIfNullOrWhiteSpace(absolutePath);
 
             if (!Path.IsPathFullyQualified(absolutePath))
+            {
                 throw new ArgumentException("Path must be fully qualified.", nameof(absolutePath));
+            }
 
             if (Directory.Exists(absolutePath))
+            {
                 throw new ArgumentException($"'{absolutePath}' is a directory.", nameof(absolutePath));
+            }
 
             if (!File.Exists(absolutePath))
+            {
                 throw new ArgumentException($"File does not exist: '{absolutePath}'.", nameof(absolutePath));
+            }
         }
 
         /// <summary>

@@ -72,7 +72,9 @@ namespace Mfr.Tests.Models.Filters
 
             var isFileRow = !attributes.IsDirectory();
             if (isFileRow)
+            {
                 meta.AudioTagOverlay.ContainerFormat = _InferAudioContainer(extension);
+            }
 
             var item = new RenameItem(meta);
             if (isFileRow)
@@ -98,7 +100,9 @@ namespace Mfr.Tests.Models.Filters
                 || o.Apple is not null
                 || o.Asf is not null
             )
+            {
                 return;
+            }
 
             meta.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay();
         }
@@ -106,7 +110,9 @@ namespace Mfr.Tests.Models.Filters
         private static AudioContainerFormat _InferAudioContainer(string extension)
         {
             if (string.IsNullOrWhiteSpace(extension))
+            {
                 return AudioContainerFormat.Unknown;
+            }
 
             return extension.Trim().ToLowerInvariant() switch
             {

@@ -20,7 +20,9 @@ namespace Mfr.Filters.Space
         protected override string _TransformValue(string value, RenameItem item)
         {
             if (string.IsNullOrEmpty(value))
+            {
                 return value;
+            }
 
             return value.TrimStart(item.WordSeparator);
         }

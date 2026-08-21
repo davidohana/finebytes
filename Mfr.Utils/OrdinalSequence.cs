@@ -29,7 +29,9 @@ namespace Mfr.Utils
             {
                 var byValue = string.CompareOrdinal(left[i], right[i]);
                 if (byValue != 0)
+                {
                     return byValue;
+                }
             }
 
             return left.Length.CompareTo(right.Length);

@@ -117,7 +117,9 @@ namespace Mfr.Tests.Engine
             finally
             {
                 if (createdLogFilePath is not null && File.Exists(createdLogFilePath))
+                {
                     File.Delete(createdLogFilePath);
+                }
             }
         }
     }

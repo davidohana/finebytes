@@ -90,7 +90,9 @@ namespace Mfr.Metadata
             absolutePath.RequireExistingRegularFile();
 
             if (previewOverlay.Equals(originalOverlay))
+            {
                 return;
+            }
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             var containerFormat = AudioTagContainerDetector.DetectFrom(file);
@@ -146,7 +148,9 @@ namespace Mfr.Metadata
             foreach (var kind in previewOverlay.GetPresentBlockKinds())
             {
                 if (baselineOverlay.HasBlock(kind))
+                {
                     continue;
+                }
 
                 AudioTagContainerPolicy.EnsureSupported(containerFormat, kind);
             }
@@ -165,7 +169,9 @@ namespace Mfr.Metadata
             foreach (var kind in baselineOverlay.GetPresentBlockKinds())
             {
                 if (previewOverlay.HasBlock(kind))
+                {
                     continue;
+                }
 
                 file.RemoveTags(_ToTagTypes(kind));
             }
@@ -197,25 +203,39 @@ namespace Mfr.Metadata
             var overlay = new AudioTagOverlay();
 
             if (file is AudioFile && presentTypes.HasFlag(TagTypes.Id3v2))
+            {
                 overlay.Id3v2 = Id3v2TagFields.Read(file);
+            }
 
             if (file is AudioFile && presentTypes.HasFlag(TagTypes.Id3v1))
+            {
                 overlay.Id3v1 = Id3v1TagFields.Read(file);
+            }
 
             if (presentTypes.HasFlag(TagTypes.Xiph))
+            {
                 overlay.Xiph = XiphTagFields.Read(file);
+            }
 
             if (presentTypes.HasFlag(TagTypes.Ape))
+            {
                 overlay.Ape = ApeTagFields.Read(file);
+            }
 
             if (presentTypes.HasFlag(TagTypes.RiffInfo))
+            {
                 overlay.RiffInfo = RiffInfoTagFields.Read(file);
+            }
 
             if (presentTypes.HasFlag(TagTypes.Apple))
+            {
                 overlay.Apple = AppleTagFields.Read(file);
+            }
 
             if (presentTypes.HasFlag(TagTypes.Asf))
+            {
                 overlay.Asf = AsfTagFields.Read(file);
+            }
 
             return overlay;
         }
@@ -230,28 +250,44 @@ namespace Mfr.Metadata
         )
         {
             if (previewOverlay.Xiph is not null)
+            {
                 XiphTagFields.Apply(file, originalOverlay.Xiph, previewOverlay.Xiph);
+            }
 
             if (previewOverlay.Ape is not null)
+            {
                 ApeTagFields.Apply(file, originalOverlay.Ape, previewOverlay.Ape);
+            }
 
             if (previewOverlay.RiffInfo is not null)
+            {
                 RiffInfoTagFields.Apply(file, originalOverlay.RiffInfo, previewOverlay.RiffInfo);
+            }
 
             if (previewOverlay.Apple is not null)
+            {
                 AppleTagFields.Apply(file, originalOverlay.Apple, previewOverlay.Apple);
+            }
 
             if (previewOverlay.Asf is not null)
+            {
                 AsfTagFields.Apply(file, originalOverlay.Asf, previewOverlay.Asf);
+            }
 
             if (file is not AudioFile)
+            {
                 return;
+            }
 
             if (previewOverlay.Id3v2 is not null)
+            {
                 Id3v2TagFields.Apply(file, originalOverlay.Id3v2, previewOverlay.Id3v2);
+            }
 
             if (previewOverlay.Id3v1 is not null)
+            {
                 Id3v1TagFields.Apply(file, originalOverlay.Id3v1, previewOverlay.Id3v1);
+            }
         }
     }
 }

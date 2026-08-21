@@ -22,10 +22,14 @@ namespace Mfr.Models.Tags.Xiph
         public bool Equals(XiphTagData? other)
         {
             if (other is null)
+            {
                 return false;
+            }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             return TextFieldRow.SequenceEquals(Fields, other.Fields);
         }

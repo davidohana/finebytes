@@ -17,7 +17,9 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         public static string Format(ExifData? exif, ExifPropertyField field)
         {
             if (exif is null)
+            {
                 return string.Empty;
+            }
 
             return field switch
             {
@@ -41,7 +43,9 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         public static string FormatDate(ExifData? exif, string format)
         {
             if (exif?.DateTaken is not { } dateTaken)
+            {
                 return string.Empty;
+            }
 
             return dateTaken.ToString(format, CultureInfo.InvariantCulture);
         }
@@ -56,7 +60,9 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         public static string FormatExtendedTag(ExifData? exif, string source, string name)
         {
             if (exif is null)
+            {
                 return string.Empty;
+            }
 
             return exif.TagToDescription.TryGetValue($"{source}/{name}", out var value) ? value : string.Empty;
         }

@@ -142,7 +142,9 @@ namespace Mfr.Tests.Models.Filters.Case
         private static void _DeleteIfExists(string filePath)
         {
             if (!File.Exists(filePath))
+            {
                 return;
+            }
 
             File.Delete(filePath);
         }

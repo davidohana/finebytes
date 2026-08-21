@@ -14,10 +14,14 @@ namespace Mfr.Filters
         internal static void ValidateListFilePath(string filePath, string listKindLabel)
         {
             if (string.IsNullOrWhiteSpace(filePath))
+            {
                 throw new UserException($"{listKindLabel} file path cannot be empty.");
+            }
 
             if (!File.Exists(filePath))
+            {
                 throw new UserException($"{listKindLabel} file not found: '{filePath}'.");
+            }
         }
 
         /// <summary>
@@ -31,7 +35,9 @@ namespace Mfr.Filters
         {
             var trimmedStart = line.TrimStart();
             if (trimmedStart.Length == 0)
+            {
                 return false;
+            }
 
             return trimmedStart.StartsWith("//", StringComparison.Ordinal)
                 || trimmedStart.StartsWith(@"\\", StringComparison.Ordinal)

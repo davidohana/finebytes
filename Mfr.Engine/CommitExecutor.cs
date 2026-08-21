@@ -92,16 +92,22 @@ namespace Mfr.Engine
             foreach (var step in plan.Steps)
             {
                 if (stopped)
+                {
                     break;
+                }
 
                 if (step.Item.Status != RenameStatus.PreviewOk)
+                {
                     continue;
+                }
 
                 if (step is StashStep stashStep)
                 {
                     var stashSucceeded = _TryExecuteStashStep(step: stashStep, dryRun: dryRun, outcomes: outcomes);
                     if (stashSucceeded)
+                    {
                         inFlightStashedItems.Add(stashStep.Item);
+                    }
 
                     continue;
                 }
@@ -122,7 +128,9 @@ namespace Mfr.Engine
                     var stepFailed = !_ExecuteFinalizeStep(step: finalizeStep, dryRun: dryRun, outcomes: outcomes);
                     inFlightStashedItems.Remove(finalizeStep.Item);
                     if (stepFailed && failFast)
+                    {
                         stopped = true;
+                    }
                 }
             }
         }
@@ -138,7 +146,9 @@ namespace Mfr.Engine
         )
         {
             if (dryRun)
+            {
                 return true;
+            }
 
             try
             {
@@ -187,7 +197,9 @@ namespace Mfr.Engine
                     RenameItemMover.FinalizeCommit(item, step.ActualSourcePath);
 
                     if (item.StripAllEmbeddedTagsOnCommit)
+                    {
                         AudioTagPersistence.RemoveAllEmbeddedTags(item.Preview.FullPath);
+                    }
 
                     // Strip clears unmodeled frames too; Apply still runs when Preview differs so later
                     // setters can rewrite tags. Post-strip field-patch baseline is empty, not the session Original.

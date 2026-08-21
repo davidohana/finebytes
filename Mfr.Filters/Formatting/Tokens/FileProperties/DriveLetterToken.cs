@@ -22,7 +22,10 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             {
                 var root = Path.GetPathRoot(item.Original.DirectoryPath) ?? string.Empty;
                 if (root.StartsWith(@"\\", StringComparison.Ordinal))
+                {
                     return "$";
+                }
+
                 return root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             };
         }

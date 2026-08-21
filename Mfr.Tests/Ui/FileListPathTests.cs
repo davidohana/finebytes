@@ -35,7 +35,9 @@ namespace Mfr.Tests.Ui
         public void IsNetworkPath_Accepts_Aliases_On_Windows()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             Assert.True(FileListPath.IsNetworkPath(FileListPath.NetworkDisplayName));
             Assert.True(FileListPath.IsNetworkPath("network"));
@@ -80,9 +82,14 @@ namespace Mfr.Tests.Ui
             Assert.False(FileListPath.IsUncServerRoot(@"\\nas\music"));
             Assert.False(FileListPath.IsUncServerRoot(@"\\wsl$\Ubuntu"));
             if (OperatingSystem.IsWindows())
+            {
                 Assert.True(FileListPath.IsUncServerRoot(@"\\nas\"));
+            }
+
             if (OperatingSystem.IsWindows())
+            {
                 Assert.True(FileListPath.IsUncShareRoot(@"\\nas\music\"));
+            }
         }
 
         /// <summary>
@@ -92,7 +99,9 @@ namespace Mfr.Tests.Ui
         public void GetParentPath_Unc_Walks_Server_Then_Network()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             Assert.Equal(@"\\nas", FileListPath.GetParentPath(@"\\nas\music"));
             Assert.Equal(@"\\nas", FileListPath.GetParentPath(@"\\nas\music\"));
@@ -112,7 +121,9 @@ namespace Mfr.Tests.Ui
         public void Breadcrumb_Unc_Starts_At_ThisPc_Then_Network()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var segments = FileListPath.BuildBreadcrumbSegments(@"\\nas\music\albums");
             Assert.Equal(
@@ -135,7 +146,9 @@ namespace Mfr.Tests.Ui
         public void Breadcrumb_Network_Follows_ThisPc()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var segments = FileListPath.BuildBreadcrumbSegments(FileListPath.NetworkPath);
             Assert.Equal(
@@ -155,7 +168,9 @@ namespace Mfr.Tests.Ui
         public void Breadcrumb_Unc_Server_Shows_Host_Name()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var segments = FileListPath.BuildBreadcrumbSegments(@"\\ohanas");
             Assert.Equal(
@@ -172,7 +187,9 @@ namespace Mfr.Tests.Ui
         public void Breadcrumb_Wsl_Unc_Shows_Host_Then_Distro()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var segments = FileListPath.BuildBreadcrumbSegments(@"\\wsl$\Ubuntu\home");
             Assert.Equal(
@@ -190,11 +207,15 @@ namespace Mfr.Tests.Ui
         public void GetParentPath_Known_Place_Returns_ThisPc()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var documents = _ExistingSpecialFolder(Environment.SpecialFolder.MyDocuments);
             if (documents is null)
+            {
                 return;
+            }
 
             Assert.Equal(FileListPath.ComputerPath, FileListPath.GetParentPath(documents));
             Assert.Equal(documents, FileListPath.GetParentPath(Path.Combine(documents, "Work")));
@@ -207,11 +228,15 @@ namespace Mfr.Tests.Ui
         public void Breadcrumb_Known_Place_Follows_ThisPc()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var documents = _ExistingSpecialFolder(Environment.SpecialFolder.MyDocuments);
             if (documents is null)
+            {
                 return;
+            }
 
             var atPlace = FileListPath.BuildBreadcrumbSegments(documents);
             Assert.Equal([FileListPath.ComputerDisplayName, "Documents"], atPlace.Select(segment => segment.Label));
@@ -230,7 +255,9 @@ namespace Mfr.Tests.Ui
         {
             var path = Environment.GetFolderPath(folder);
             if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            {
                 return null;
+            }
 
             return new DirectoryInfo(path).FullName;
         }

@@ -25,18 +25,24 @@ namespace Mfr.Metadata.TagFields
         public static AppleTagData? Read(TagLib.File file)
         {
             if (file.GetTag(TagTypes.Apple, false) is not AppleTag live || live.IsEmpty)
+            {
                 return null;
+            }
 
             var hexToBoxType = new SortedDictionary<string, ByteVector>(StringComparer.Ordinal);
             foreach (var box in live)
             {
                 var typeData = box.BoxType.Data;
                 if (typeData is null || typeData.Length != 4)
+                {
                     continue;
+                }
 
                 var hex = Convert.ToHexString(typeData);
                 if (hexToBoxType.ContainsKey(hex))
+                {
                     continue;
+                }
 
                 hexToBoxType[hex] = box.BoxType;
             }
@@ -46,7 +52,9 @@ namespace Mfr.Metadata.TagFields
             {
                 var texts = live.GetText(boxType);
                 if (texts is null || texts.Length == 0)
+                {
                     continue;
+                }
 
                 rows.Add(
                     new AppleAtomRow
@@ -58,7 +66,9 @@ namespace Mfr.Metadata.TagFields
             }
 
             if (rows.Count == 0)
+            {
                 return null;
+            }
 
             rows.Sort(_CompareRows);
             return new AppleTagData { Atoms = [.. rows] };
@@ -76,13 +86,17 @@ namespace Mfr.Metadata.TagFields
         public static void Apply(TagLib.File file, AppleTagData? original, AppleTagData preview)
         {
             if (Equals(original, preview))
+            {
                 return;
+            }
 
             var live = (AppleTag)file.GetTag(TagTypes.Apple, true);
             if (original is null)
             {
                 foreach (var row in preview.Atoms)
+                {
                     _SetAtom(live, row);
+                }
 
                 return;
             }
@@ -105,7 +119,9 @@ namespace Mfr.Metadata.TagFields
         {
             var hexToRow = new Dictionary<string, AppleAtomRow>(StringComparer.Ordinal);
             foreach (var row in atoms)
+            {
                 hexToRow[Convert.ToHexString(row.AtomType.AsSpan())] = row;
+            }
 
             return hexToRow;
         }

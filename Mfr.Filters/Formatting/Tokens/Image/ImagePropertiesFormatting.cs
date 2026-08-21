@@ -17,7 +17,9 @@ namespace Mfr.Filters.Formatting.Tokens.Image
         public static string Format(ImageProperties? image, ImagePropertyField field)
         {
             if (image is null)
+            {
                 return string.Empty;
+            }
 
             return field switch
             {
@@ -40,11 +42,15 @@ namespace Mfr.Filters.Formatting.Tokens.Image
         private static string _FormatDpi(double value)
         {
             if (value <= 0)
+            {
                 return string.Empty;
+            }
 
             var rounded = Math.Round(value);
             if (Math.Abs(value - rounded) < 1e-9)
+            {
                 return rounded.ToString(CultureInfo.InvariantCulture);
+            }
 
             return value.ToString("G", CultureInfo.InvariantCulture);
         }

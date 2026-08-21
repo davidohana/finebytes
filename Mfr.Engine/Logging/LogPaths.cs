@@ -35,7 +35,9 @@ namespace Mfr.Engine.Logging
         public static string ResolveDirectoryPath(string? configuredLogDirectoryPath)
         {
             if (!configuredLogDirectoryPath.IsBlank())
+            {
                 return configuredLogDirectoryPath.Trim();
+            }
 
             return DefaultDirectoryPath;
         }
@@ -79,7 +81,9 @@ namespace Mfr.Engine.Logging
             ArgumentException.ThrowIfNullOrWhiteSpace(logDirectoryPath);
 
             if (!Directory.Exists(logDirectoryPath) || maxSessionFiles < 1)
+            {
                 return;
+            }
 
             var prefix = sessionLogPrefix ?? string.Empty;
             var extension = sessionLogExtension ?? string.Empty;
@@ -91,7 +95,9 @@ namespace Mfr.Engine.Logging
                 .ToList();
 
             if (sessionLogFilePaths.Count <= maxSessionFiles)
+            {
                 return;
+            }
 
             foreach (var fileInfo in sessionLogFilePaths.Skip(maxSessionFiles))
             {

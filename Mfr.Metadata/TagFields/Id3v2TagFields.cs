@@ -77,11 +77,15 @@ namespace Mfr.Metadata.TagFields
         public static Id3v2TagData? Read(TagLib.File file)
         {
             if (file.GetTag(TagTypes.Id3v2, false) is not Id3v2Tag live)
+            {
                 return null;
+            }
 
             var frames = _CollectFrames(live);
             if (frames.Count == 0)
+            {
                 return null;
+            }
 
             frames.Sort(_CompareFrames);
             return new Id3v2TagData { Version = live.Version, Frames = [.. frames] };
@@ -101,7 +105,9 @@ namespace Mfr.Metadata.TagFields
         public static void Apply(TagLib.File file, Id3v2TagData? original, Id3v2TagData preview)
         {
             if (Equals(original, preview))
+            {
                 return;
+            }
 
             var live = (Id3v2Tag)file.GetTag(TagTypes.Id3v2, true);
             if (original is null)
@@ -129,13 +135,19 @@ namespace Mfr.Metadata.TagFields
             live.Version = data.Version;
 
             foreach (var frameId in _SingletonFrameIds)
+            {
                 live.RemoveFrames(frameId);
+            }
 
             foreach (var frameId in Id3v2ModeledFrame.MultiInstanceFrameIds)
+            {
                 live.RemoveFrames(frameId);
+            }
 
             foreach (var modeled in data.Frames)
+            {
                 _AddFrame(live, modeled);
+            }
         }
 
         private static List<Id3v2ModeledFrame> _CollectFrames(Id3v2Tag live)
@@ -185,11 +197,15 @@ namespace Mfr.Metadata.TagFields
                     {
                         var frameId = text.FrameId.ToString(StringType.Latin1);
                         if (!_SingletonFrameIds.Contains(frameId))
+                        {
                             break;
+                        }
 
                         var values = DelimitedText.TrimNonEmpty(text.Text);
                         if (values.Length == 0)
+                        {
                             break;
+                        }
 
                         list.Add(new Id3v2ModeledFrame { FrameId = frameId, TextValues = values });
                         break;
@@ -206,7 +222,9 @@ namespace Mfr.Metadata.TagFields
         private static void _AddFrame(Id3v2Tag live, Id3v2ModeledFrame modeled)
         {
             if (modeled.TextValues.Length == 0)
+            {
                 return;
+            }
 
             switch (modeled.FrameId)
             {
@@ -264,7 +282,9 @@ namespace Mfr.Metadata.TagFields
         {
             var identityToFrame = new Dictionary<string, Id3v2ModeledFrame>(StringComparer.Ordinal);
             foreach (var frame in frames)
+            {
                 identityToFrame[_FrameIdentity(frame)] = frame;
+            }
 
             return identityToFrame;
         }
@@ -272,7 +292,9 @@ namespace Mfr.Metadata.TagFields
         private static string _FrameIdentity(Id3v2ModeledFrame frame)
         {
             if (!Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frame.FrameId))
+            {
                 return frame.FrameId;
+            }
 
             return frame.FrameId + '\0' + (frame.Language ?? string.Empty) + '\0' + (frame.Description ?? string.Empty);
         }
@@ -294,7 +316,9 @@ namespace Mfr.Metadata.TagFields
             foreach (var frame in live.GetFrames(frameId).ToArray())
             {
                 if (!_LiveFrameMatches(frame, frameId, language, description))
+                {
                     continue;
+                }
 
                 live.RemoveFrame(frame);
             }
@@ -327,15 +351,21 @@ namespace Mfr.Metadata.TagFields
         {
             var byId = string.CompareOrdinal(a.FrameId, b.FrameId);
             if (byId != 0)
+            {
                 return byId;
+            }
 
             var byLang = string.CompareOrdinal(a.Language, b.Language);
             if (byLang != 0)
+            {
                 return byLang;
+            }
 
             var byDesc = string.CompareOrdinal(a.Description, b.Description);
             if (byDesc != 0)
+            {
                 return byDesc;
+            }
 
             return OrdinalSequence.Compare(a.TextValues, b.TextValues);
         }

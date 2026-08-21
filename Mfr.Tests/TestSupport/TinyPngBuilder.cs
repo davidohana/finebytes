@@ -66,7 +66,9 @@ namespace Mfr.Tests.TestSupport
 
             using var compressed = new MemoryStream();
             using (var zlib = new ZLibStream(compressed, CompressionLevel.SmallestSize, leaveOpen: true))
+            {
                 zlib.Write(raw);
+            }
 
             return compressed.ToArray();
         }

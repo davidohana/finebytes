@@ -36,11 +36,15 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
             for (var i = 0; i < fullName.Length; i++)
             {
                 if (!char.IsAsciiDigit(fullName[i]))
+                {
                     continue;
+                }
 
                 var end = i + 1;
                 while (end < fullName.Length && char.IsAsciiDigit(fullName[end]))
+                {
                     end++;
+                }
 
                 var digits = fullName.AsSpan(i, end - i).TrimStart('0');
                 return digits.IsEmpty ? "0" : digits.ToString();

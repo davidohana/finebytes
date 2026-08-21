@@ -26,7 +26,9 @@ namespace Mfr.Utils
         public static ImmutableArray<string> TrimNonEmpty(IEnumerable<string>? values)
         {
             if (values is null)
+            {
                 return [];
+            }
 
             return [.. values.Where(static v => !string.IsNullOrWhiteSpace(v)).Select(static v => v.Trim())];
         }
@@ -39,7 +41,9 @@ namespace Mfr.Utils
         public static ImmutableArray<string> SplitList(string? joined)
         {
             if (string.IsNullOrWhiteSpace(joined))
+            {
                 return [];
+            }
 
             return
             [
@@ -68,13 +72,17 @@ namespace Mfr.Utils
         {
             var span = values.AsSpan();
             if (span.IsEmpty)
+            {
                 return null;
+            }
 
             var parts = new List<string>(span.Length);
             foreach (var value in span)
             {
                 if (string.IsNullOrWhiteSpace(value))
+                {
                     continue;
+                }
 
                 parts.Add(value.Trim());
             }

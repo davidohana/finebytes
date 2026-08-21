@@ -46,7 +46,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
         {
             var localDrive = DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady);
             if (localDrive is null)
+            {
                 return;
+            }
 
             var token = new LabelToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: localDrive.RootDirectory.FullName);

@@ -19,13 +19,19 @@ namespace Mfr.Models.Filters
         )
         {
             if (scope is null)
+            {
                 return transform(value, item);
+            }
 
             if (scope is SubstringApplyScope sub)
+            {
                 return _ApplySubstring(sub, value, item, transform);
+            }
 
             if (scope is TokenApplyScope token)
+            {
                 return _ApplyToken(token, value, item, transform);
+            }
 
             throw new NotSupportedException($"Unsupported apply scope '{scope.GetType().Name}'.");
         }
@@ -39,12 +45,16 @@ namespace Mfr.Models.Filters
         {
             var length = value.Length;
             if (length == 0)
+            {
                 return transform(value, item);
+            }
 
             var iStart = _ResolveIndex(scope.StartPosition, scope.StartAnchor, length);
             var iEnd = _ResolveIndex(scope.EndPosition, scope.EndAnchor, length);
             if (iStart > iEnd)
+            {
                 (iStart, iEnd) = (iEnd, iStart);
+            }
 
             var slice = value.Substring(iStart, iEnd - iStart + 1);
             var transformedSlice = transform(slice, item);
@@ -57,13 +67,17 @@ namespace Mfr.Models.Filters
             if (anchor == StringScopeAnchor.Left)
             {
                 if (p > length)
+                {
                     p = length;
+                }
 
                 return p - 1;
             }
 
             if (p > length)
+            {
                 p = length;
+            }
 
             return length - p;
         }
@@ -89,7 +103,9 @@ namespace Mfr.Models.Filters
 
             var parts = value.Split(scope.Separator, StringSplitOptions.None);
             if (scope.TokenNumber > parts.Length)
+            {
                 return value;
+            }
 
             var index = scope.TokenNumber - 1;
             parts[index] = transform(parts[index], item);

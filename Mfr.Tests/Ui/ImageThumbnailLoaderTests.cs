@@ -207,7 +207,9 @@ namespace Mfr.Tests.Ui
         private static void _WriteAscii(Stream stream, string text)
         {
             foreach (var ch in text)
+            {
                 stream.WriteByte((byte)ch);
+            }
         }
 
         private static void _WriteUInt16Little(Stream stream, ushort value)

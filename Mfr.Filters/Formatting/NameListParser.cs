@@ -27,13 +27,17 @@ namespace Mfr.Filters.Formatting
                 }
 
                 if (ListFileParseHelpers.IsListFileCommentLine(line))
+                {
                     continue;
+                }
 
                 entries.Add(line);
             }
 
             if (entries.Count == 0)
+            {
                 throw new UserException("Name-list file must contain at least one name entry.");
+            }
 
             return entries;
         }

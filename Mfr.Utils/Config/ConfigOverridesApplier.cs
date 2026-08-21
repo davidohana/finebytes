@@ -34,7 +34,9 @@ namespace Mfr.Utils.Config
             foreach (var raw in assignments)
             {
                 if (raw.IsBlank())
+                {
                     continue;
+                }
 
                 var trimmed = raw.Trim();
                 var equalsIndex = trimmed.IndexOf('=');
@@ -65,7 +67,9 @@ namespace Mfr.Utils.Config
             }
 
             if (merged.Count == 0)
+            {
                 return;
+            }
 
             var utf8Json = JsonSerializer.SerializeToUtf8Bytes(merged);
             using var doc = JsonDocument.Parse(utf8Json);
@@ -94,7 +98,9 @@ namespace Mfr.Utils.Config
             var sectionKey = _GetSectionJsonKey(section);
             JsonObject sectionObject;
             if (parent[sectionKey] is JsonObject existingSection)
+            {
                 sectionObject = existingSection;
+            }
             else
             {
                 sectionObject = [];
@@ -111,11 +117,15 @@ namespace Mfr.Utils.Config
             {
                 var attr = field.GetCustomAttribute<ConfigSectionAttribute>();
                 if (attr is null)
+                {
                     continue;
+                }
 
                 var jsonKey = string.IsNullOrEmpty(attr.JsonName) ? s_Naming.ConvertName(field.Name) : attr.JsonName;
                 if (string.Equals(jsonKey, segment, StringComparison.OrdinalIgnoreCase))
+                {
                     return field;
+                }
             }
 
             return null;
@@ -127,17 +137,23 @@ namespace Mfr.Utils.Config
             foreach (var field in containerType.GetFields(flags))
             {
                 if (field.GetCustomAttribute<ConfigSectionAttribute>() is not null)
+                {
                     continue;
+                }
 
                 var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
                 var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
                 var isBoolLeaf = field.FieldType == typeof(bool);
                 if (intRange is null && strMax is null && !isBoolLeaf)
+                {
                     continue;
+                }
 
                 var jsonName = s_Naming.ConvertName(field.Name);
                 if (string.Equals(jsonName, segment, StringComparison.OrdinalIgnoreCase))
+                {
                     return field;
+                }
             }
 
             return null;

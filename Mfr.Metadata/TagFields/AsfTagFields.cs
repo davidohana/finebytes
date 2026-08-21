@@ -27,7 +27,9 @@ namespace Mfr.Metadata.TagFields
         public static AsfTagData? Read(TagLib.File file)
         {
             if (file.GetTag(TagTypes.Asf, false) is not AsfTag live || live.IsEmpty)
+            {
                 return null;
+            }
 
             var rows = new List<AsfDescriptorRow>();
             _AddIfPresent(rows, AsfDescriptorNames.Title, live.Title);
@@ -37,14 +39,18 @@ namespace Mfr.Metadata.TagFields
             foreach (var descriptor in live)
             {
                 if (string.IsNullOrEmpty(descriptor.Name))
+                {
                     continue;
+                }
 
                 // Prefer Content Description for Title/Author/Copyright when both somehow exist.
                 var isDuplicateContentDescription =
                     _IsContentDescriptionName(descriptor.Name)
                     && rows.Exists(r => string.Equals(r.Name, descriptor.Name, StringComparison.Ordinal));
                 if (isDuplicateContentDescription)
+                {
                     continue;
+                }
 
                 rows.Add(new AsfDescriptorRow(descriptor.Name, descriptor.ToString()));
             }
@@ -62,7 +68,9 @@ namespace Mfr.Metadata.TagFields
         public static void Apply(TagLib.File file, AsfTagData? original, AsfTagData preview)
         {
             if (Equals(original, preview))
+            {
                 return;
+            }
 
             var live = (AsfTag)file.GetTag(TagTypes.Asf, true);
             if (original is null)
@@ -70,7 +78,9 @@ namespace Mfr.Metadata.TagFields
                 foreach (var row in preview.Descriptors)
                 {
                     if (string.IsNullOrEmpty(row.Name))
+                    {
                         continue;
+                    }
 
                     _SetNamedValue(live, row.Name, row.Value);
                 }
@@ -107,7 +117,9 @@ namespace Mfr.Metadata.TagFields
                 default:
                     live.RemoveDescriptors(name);
                     if (text is not null)
+                    {
                         live.AddDescriptor(new ContentDescriptor(name, text));
+                    }
 
                     return;
             }
@@ -117,7 +129,9 @@ namespace Mfr.Metadata.TagFields
         {
             var text = value.TrimmedOrNull();
             if (text is null)
+            {
                 return;
+            }
 
             rows.Add(new AsfDescriptorRow(name, text));
         }
@@ -135,7 +149,9 @@ namespace Mfr.Metadata.TagFields
             foreach (var row in rows)
             {
                 if (string.IsNullOrEmpty(row.Name))
+                {
                     continue;
+                }
 
                 nameToValue[row.Name] = row.Value;
             }

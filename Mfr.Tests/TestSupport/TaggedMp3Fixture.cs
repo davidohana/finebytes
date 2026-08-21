@@ -23,10 +23,14 @@ namespace Mfr.Tests.TestSupport
             using var file = TagLib.File.Create(absolutePath);
 
             if (id3v2Title is not null)
+            {
                 ((TagLib.Id3v2.Tag)file.GetTag(TagTypes.Id3v2, true)).Title = id3v2Title;
+            }
 
             if (id3v1Title is not null)
+            {
                 ((TagLib.Id3v1.Tag)file.GetTag(TagTypes.Id3v1, true)).Title = id3v1Title;
+            }
 
             file.Save();
         }

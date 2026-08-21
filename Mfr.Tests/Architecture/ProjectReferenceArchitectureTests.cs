@@ -129,7 +129,9 @@ namespace Mfr.Tests.Architecture
                 var solutionPath = Path.Combine(directory.FullName, "finebytes.slnx");
 
                 if (File.Exists(solutionPath))
+                {
                     return directory.FullName;
+                }
 
                 directory = directory.Parent;
             }

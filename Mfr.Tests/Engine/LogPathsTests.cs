@@ -155,7 +155,9 @@ namespace Mfr.Tests.Engine
             finally
             {
                 if (crashFilePath is not null && File.Exists(crashFilePath))
+                {
                     File.Delete(crashFilePath);
+                }
             }
         }
     }

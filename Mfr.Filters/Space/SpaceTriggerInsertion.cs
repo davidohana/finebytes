@@ -16,9 +16,14 @@ namespace Mfr.Filters.Space
         internal static bool ShouldInsertBeside(char neighbor, char separator, bool onlyWhenNeighborIsLetterOrDigit)
         {
             if (neighbor == separator)
+            {
                 return false;
+            }
+
             if (onlyWhenNeighborIsLetterOrDigit && !char.IsLetterOrDigit(neighbor))
+            {
                 return false;
+            }
 
             return true;
         }

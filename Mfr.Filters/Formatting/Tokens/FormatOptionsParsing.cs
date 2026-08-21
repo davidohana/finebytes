@@ -21,9 +21,13 @@ namespace Mfr.Filters.Formatting.Tokens
             {
                 var c = arg[i];
                 if (c == '<')
+                {
                     depth++;
+                }
                 else if (c == '>')
+                {
                     depth = Math.Max(0, depth - 1);
+                }
                 else if (c == ',' && depth == 0)
                 {
                     segments.Add(arg[start..i]);

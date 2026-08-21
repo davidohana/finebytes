@@ -27,18 +27,26 @@ namespace Mfr.Models.Tags.Id3v2
         public bool Equals(Id3v2TagData? other)
         {
             if (other is null)
+            {
                 return false;
+            }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             if (Version != other.Version || Frames.Length != other.Frames.Length)
+            {
                 return false;
+            }
 
             for (var i = 0; i < Frames.Length; i++)
             {
                 if (!Equals(Frames[i], other.Frames[i]))
+                {
                     return false;
+                }
             }
 
             return true;
@@ -56,7 +64,9 @@ namespace Mfr.Models.Tags.Id3v2
             var hash = new HashCode();
             hash.Add(Version);
             foreach (var frame in Frames)
+            {
                 hash.Add(frame);
+            }
 
             return hash.ToHashCode();
         }

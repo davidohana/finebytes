@@ -39,7 +39,9 @@ namespace Mfr.Tests.Metadata
                     }
 
                     if (File.Exists(path))
+                    {
                         File.Delete(path);
+                    }
                 }
                 catch (IOException) { }
             }
@@ -107,7 +109,9 @@ namespace Mfr.Tests.Metadata
             var compareNumerics = !string.Equals(format.Label, "m4a", StringComparison.OrdinalIgnoreCase);
 
             if (!compareNumerics)
+            {
                 return;
+            }
 
             var sem = overlay.Semantic();
             Assert.Equal(sem.Year, projected.Year);

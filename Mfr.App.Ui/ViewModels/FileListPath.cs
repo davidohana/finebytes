@@ -42,7 +42,9 @@ namespace Mfr.App.Ui.ViewModels
         public static bool IsComputerPath(string? path)
         {
             if (string.IsNullOrWhiteSpace(path))
+            {
                 return true;
+            }
 
             return path.Equals(ComputerDisplayName, StringComparison.OrdinalIgnoreCase);
         }
@@ -60,11 +62,15 @@ namespace Mfr.App.Ui.ViewModels
         {
             root = null;
             if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(path))
+            {
                 return false;
+            }
 
             var trimmed = path.Trim();
             if (trimmed.Length != 2 || trimmed[1] != ':' || !char.IsAsciiLetter(trimmed[0]))
+            {
                 return false;
+            }
 
             root = char.ToUpperInvariant(trimmed[0]) + @":\";
             return true;
@@ -78,10 +84,14 @@ namespace Mfr.App.Ui.ViewModels
         public static bool IsNetworkPath(string? path)
         {
             if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(path))
+            {
                 return false;
+            }
 
             if (path.Equals(NetworkDisplayName, StringComparison.OrdinalIgnoreCase))
+            {
                 return true;
+            }
 
             var trimmed = path.Trim();
             return trimmed is @"\\" or "//";
@@ -95,14 +105,20 @@ namespace Mfr.App.Ui.ViewModels
         public static bool IsUncPath(string? path)
         {
             if (string.IsNullOrWhiteSpace(path) || IsNetworkPath(path) || IsComputerPath(path))
+            {
                 return false;
+            }
 
             var normalized = path.Replace('/', '\\');
             if (normalized.StartsWith(@"\\?\UNC\", StringComparison.OrdinalIgnoreCase))
+            {
                 return normalized.Length > 8;
+            }
 
             if (normalized.StartsWith(@"\\?\", StringComparison.Ordinal))
+            {
                 return false;
+            }
 
             return normalized.StartsWith(@"\\", StringComparison.Ordinal) && normalized.Length > 2;
         }
@@ -115,7 +131,9 @@ namespace Mfr.App.Ui.ViewModels
         public static bool IsUncServerRoot(string path)
         {
             if (!TryGetUncServerRoot(path, out var root))
+            {
                 return false;
+            }
 
             return PathRelations.IsSamePath(_CanonicalUncPath(path), root);
         }
@@ -130,17 +148,23 @@ namespace Mfr.App.Ui.ViewModels
         {
             root = null;
             if (!IsUncPath(path))
+            {
                 return false;
+            }
 
             var normalized = _CanonicalUncPath(path);
             if (!normalized.StartsWith(@"\\", StringComparison.Ordinal) || normalized.Length < 3)
+            {
                 return false;
+            }
 
             var rest = normalized[2..];
             var serverEnd = rest.IndexOf('\\');
             var server = serverEnd < 0 ? rest : rest[..serverEnd];
             if (server.Length == 0)
+            {
                 return false;
+            }
 
             root = @"\\" + server;
             return true;
@@ -154,7 +178,9 @@ namespace Mfr.App.Ui.ViewModels
         public static bool IsUncShareRoot(string path)
         {
             if (!TryGetUncShareRoot(path, out var root))
+            {
                 return false;
+            }
 
             return PathRelations.IsSamePath(_CanonicalUncPath(path), root);
         }
@@ -169,25 +195,35 @@ namespace Mfr.App.Ui.ViewModels
         {
             root = null;
             if (!IsUncPath(path))
+            {
                 return false;
+            }
 
             var normalized = _CanonicalUncPath(path);
             if (!normalized.StartsWith(@"\\", StringComparison.Ordinal) || normalized.Length < 5)
+            {
                 return false;
+            }
 
             var rest = normalized[2..];
             var serverEnd = rest.IndexOf('\\');
             if (serverEnd <= 0)
+            {
                 return false;
+            }
 
             var afterServer = rest[(serverEnd + 1)..];
             if (afterServer.Length == 0)
+            {
                 return false;
+            }
 
             var shareEnd = afterServer.IndexOf('\\');
             var share = shareEnd < 0 ? afterServer : afterServer[..shareEnd];
             if (share.Length == 0)
+            {
                 return false;
+            }
 
             var server = rest[..serverEnd];
             root = @"\\" + server + @"\" + share;
@@ -202,23 +238,35 @@ namespace Mfr.App.Ui.ViewModels
         public static string? GetParentPath(string path)
         {
             if (IsComputerPath(path))
+            {
                 return null;
+            }
 
             if (IsNetworkPath(path))
+            {
                 return OperatingSystem.IsWindows() ? ComputerPath : null;
+            }
 
             if (OperatingSystem.IsWindows() && IsUncServerRoot(path))
+            {
                 return NetworkPath;
+            }
 
             if (OperatingSystem.IsWindows() && IsUncShareRoot(path) && TryGetUncServerRoot(path, out var serverRoot))
+            {
                 return serverRoot;
+            }
 
             if (WindowsKnownPlaces.TryGetPlace(path, out _))
+            {
                 return ComputerPath;
+            }
 
             var parent = Path.GetDirectoryName(path);
             if (string.IsNullOrEmpty(parent))
+            {
                 return OperatingSystem.IsWindows() ? ComputerPath : null;
+            }
 
             return parent;
         }
@@ -231,10 +279,14 @@ namespace Mfr.App.Ui.ViewModels
         public static string ToDisplayPath(string path)
         {
             if (IsComputerPath(path))
+            {
                 return ComputerDisplayName;
+            }
 
             if (IsNetworkPath(path))
+            {
                 return NetworkDisplayName;
+            }
 
             return path;
         }
@@ -247,7 +299,9 @@ namespace Mfr.App.Ui.ViewModels
         public static List<PathBreadcrumbSegment> BuildBreadcrumbSegments(string path)
         {
             if (OperatingSystem.IsWindows())
+            {
                 return _BuildWindowsBreadcrumbSegments(path);
+            }
 
             return _BuildUnixBreadcrumbSegments(path);
         }
@@ -260,7 +314,9 @@ namespace Mfr.App.Ui.ViewModels
             };
 
             if (IsComputerPath(path))
+            {
                 return segments;
+            }
 
             if (IsNetworkPath(path))
             {
@@ -279,7 +335,9 @@ namespace Mfr.App.Ui.ViewModels
             {
                 segments.Add(_CreateSegment(place.Name, place.Path, showLeadingChevron: true));
                 if (PathRelations.IsSamePath(path, place.Path))
+                {
                     return segments;
+                }
 
                 _AddChildBreadcrumbSegments(segments, path, place.Path);
                 return segments;
@@ -287,7 +345,9 @@ namespace Mfr.App.Ui.ViewModels
 
             var root = Path.GetPathRoot(path);
             if (string.IsNullOrEmpty(root))
+            {
                 return segments;
+            }
 
             segments.Add(_CreateSegment(_FormatDriveLabel(root), root, showLeadingChevron: true));
             _AddChildBreadcrumbSegments(segments, path, root);
@@ -302,7 +362,9 @@ namespace Mfr.App.Ui.ViewModels
             };
 
             if (IsComputerPath(path) || PathRelations.IsSamePath(path, UnixRootPath))
+            {
                 return segments;
+            }
 
             _AddChildBreadcrumbSegments(segments, path, UnixRootPath);
             return segments;
@@ -311,17 +373,23 @@ namespace Mfr.App.Ui.ViewModels
         private static void _AddUncBreadcrumbSegments(List<PathBreadcrumbSegment> segments, string path)
         {
             if (!TryGetUncServerRoot(path, out var serverRoot))
+            {
                 return;
+            }
 
             var serverName = serverRoot[2..];
             segments.Add(_CreateSegment(serverName, serverRoot, showLeadingChevron: true));
             if (IsUncServerRoot(path) || !TryGetUncShareRoot(path, out var shareRoot))
+            {
                 return;
+            }
 
             var shareName = shareRoot[(serverRoot.Length + 1)..];
             segments.Add(_CreateSegment(shareName, shareRoot, showLeadingChevron: true));
             if (IsUncShareRoot(path))
+            {
                 return;
+            }
 
             _AddChildBreadcrumbSegments(segments, path, shareRoot);
         }
@@ -349,7 +417,9 @@ namespace Mfr.App.Ui.ViewModels
             {
                 var name = current.Name;
                 if (string.IsNullOrEmpty(name))
+                {
                     break;
+                }
 
                 parts.Add(_CreateSegment(name, current.FullName, showLeadingChevron: true));
                 current = current.Parent;
@@ -379,7 +449,9 @@ namespace Mfr.App.Ui.ViewModels
                 {
                     var volume = drive.VolumeLabel;
                     if (!string.IsNullOrWhiteSpace(volume))
+                    {
                         return volume + " (" + letter + ")";
+                    }
                 }
 
                 return letter;
@@ -399,7 +471,9 @@ namespace Mfr.App.Ui.ViewModels
         {
             var trimmed = path;
             while (trimmed.Length > 2 && trimmed.EndsWith('\\'))
+            {
                 trimmed = trimmed[..^1];
+            }
 
             return trimmed;
         }
@@ -409,7 +483,9 @@ namespace Mfr.App.Ui.ViewModels
             var normalized = path.Replace('/', '\\');
             const string longUnc = @"\\?\UNC\";
             if (normalized.StartsWith(longUnc, StringComparison.OrdinalIgnoreCase))
+            {
                 return @"\\" + normalized[longUnc.Length..];
+            }
 
             return normalized;
         }

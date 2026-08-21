@@ -86,7 +86,9 @@ namespace Mfr.App.Ui.Diagnostics
         internal static void Report(Exception exception)
         {
             if (Interlocked.Exchange(ref _isReporting, 1) == 1)
+            {
                 return;
+            }
 
             try
             {
@@ -145,7 +147,9 @@ namespace Mfr.App.Ui.Diagnostics
         private static void _ShowCrashDialog(CrashReport report)
         {
             if (Application.Current is null)
+            {
                 return;
+            }
 
             _RunSynchronouslyOnUiThread(async () =>
             {
@@ -172,7 +176,9 @@ namespace Mfr.App.Ui.Diagnostics
         private static Window? _TryGetMainWindow()
         {
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
                 return desktop.MainWindow;
+            }
 
             return null;
         }

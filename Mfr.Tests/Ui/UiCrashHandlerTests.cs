@@ -57,7 +57,9 @@ namespace Mfr.Tests.Ui
             finally
             {
                 if (crashFilePath is not null && File.Exists(crashFilePath))
+                {
                     File.Delete(crashFilePath);
+                }
             }
         }
 

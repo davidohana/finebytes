@@ -35,7 +35,9 @@ namespace Mfr.Metadata.TagFields
             foreach (var key in original.Keys)
             {
                 if (preview.ContainsKey(key))
+                {
                     continue;
+                }
 
                 remove(key);
             }
@@ -43,7 +45,9 @@ namespace Mfr.Metadata.TagFields
             foreach (var (key, value) in preview)
             {
                 if (original.TryGetValue(key, out var prior) && valuesEqual(prior, value))
+                {
                     continue;
+                }
 
                 set(key, value);
             }
@@ -58,7 +62,9 @@ namespace Mfr.Metadata.TagFields
         {
             var keyToValues = new Dictionary<string, ImmutableArray<string>>(StringComparer.Ordinal);
             foreach (var row in fields)
+            {
                 keyToValues[row.Key] = row.Values;
+            }
 
             return keyToValues;
         }

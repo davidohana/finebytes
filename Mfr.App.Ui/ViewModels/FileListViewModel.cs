@@ -301,7 +301,9 @@ namespace Mfr.App.Ui.ViewModels
         public void BeginPathEdit()
         {
             if (IsPathEditing)
+            {
                 return;
+            }
 
             PathText = FileListPath.ToDisplayPath(CurrentPath);
             IsPathEditing = true;
@@ -324,7 +326,9 @@ namespace Mfr.App.Ui.ViewModels
         {
             var parent = FileListPath.GetParentPath(CurrentPath);
             if (parent is null)
+            {
                 return;
+            }
 
             _Navigate(parent);
         }
@@ -345,7 +349,9 @@ namespace Mfr.App.Ui.ViewModels
         public void OpenSelected()
         {
             if (SelectedEntry is not { IsDirectory: true, FullPath: var path })
+            {
                 return;
+            }
 
             _Navigate(path);
         }
@@ -420,7 +426,9 @@ namespace Mfr.App.Ui.ViewModels
         {
             var column = _NormalizeSortMemberPath(memberPath);
             if (column == SortMemberPath)
+            {
                 IsSortAscending = !IsSortAscending;
+            }
             else
             {
                 SortMemberPath = column;
@@ -482,10 +490,14 @@ namespace Mfr.App.Ui.ViewModels
         private void _Navigate(string? path)
         {
             if (!_TryResolvePath(path, out var resolved))
+            {
                 return;
+            }
 
             if (PathComparers.Os.Equals(resolved, CurrentPath))
+            {
                 return;
+            }
 
             CurrentPath = resolved;
             PathText = FileListPath.ToDisplayPath(resolved);
@@ -506,7 +518,9 @@ namespace Mfr.App.Ui.ViewModels
         {
             BreadcrumbSegments.Clear();
             foreach (var segment in FileListPath.BuildBreadcrumbSegments(CurrentPath))
+            {
                 BreadcrumbSegments.Add(segment);
+            }
         }
 
         private void _ReloadEntries()
@@ -522,7 +536,9 @@ namespace Mfr.App.Ui.ViewModels
                 _listedItems.AddRange(_ListKnownPlaces());
                 _listedItems.AddRange(_ListDrives());
                 if (OperatingSystem.IsWindows())
+                {
                     _listedItems.Add(_CreateNetworkRootItem());
+                }
 
                 _ApplyListingSort();
                 _RebuildVisibleEntries(preserveSelection: false);
@@ -548,7 +564,9 @@ namespace Mfr.App.Ui.ViewModels
             if (FileListPath.IsUncServerRoot(CurrentPath))
             {
                 if (OperatingSystem.IsWindows())
+                {
                     _listedItems.AddRange(_ListUncShares(CurrentPath));
+                }
 
                 _ApplyListingSort();
                 _RebuildVisibleEntries(preserveSelection: false);
@@ -576,15 +594,21 @@ namespace Mfr.App.Ui.ViewModels
         {
             var groupCmp = left.ListingGroup.CompareTo(right.ListingGroup);
             if (groupCmp != 0)
+            {
                 return groupCmp;
+            }
 
             var folderCmp = right.IsDirectory.CompareTo(left.IsDirectory);
             if (folderCmp != 0)
+            {
                 return folderCmp;
+            }
 
             var fieldCmp = _CompareSortField(left, right);
             if (fieldCmp == 0)
+            {
                 fieldCmp = PathComparers.Os.Compare(left.Name, right.Name);
+            }
 
             return IsSortAscending ? fieldCmp : -fieldCmp;
         }
@@ -592,13 +616,19 @@ namespace Mfr.App.Ui.ViewModels
         private int _CompareSortField(ListedItem left, ListedItem right)
         {
             if (SortMemberPath == nameof(FileListEntry.LastWriteTime))
+            {
                 return Comparer<DateTime?>.Default.Compare(left.LastWriteTime, right.LastWriteTime);
+            }
 
             if (SortMemberPath == nameof(FileListEntry.Length))
+            {
                 return Comparer<long?>.Default.Compare(left.Length, right.Length);
+            }
 
             if (SortMemberPath == nameof(FileListEntry.Type))
+            {
                 return PathComparers.Os.Compare(_TypeLabel(left), _TypeLabel(right));
+            }
 
             return PathComparers.Os.Compare(left.Name, right.Name);
         }
@@ -606,13 +636,19 @@ namespace Mfr.App.Ui.ViewModels
         private static string _NormalizeSortMemberPath(string? memberPath)
         {
             if (string.Equals(memberPath, nameof(FileListEntry.LastWriteTime), StringComparison.Ordinal))
+            {
                 return nameof(FileListEntry.LastWriteTime);
+            }
 
             if (string.Equals(memberPath, nameof(FileListEntry.Type), StringComparison.Ordinal))
+            {
                 return nameof(FileListEntry.Type);
+            }
 
             if (string.Equals(memberPath, nameof(FileListEntry.Length), StringComparison.Ordinal))
+            {
                 return nameof(FileListEntry.Length);
+            }
 
             return nameof(FileListEntry.Name);
         }
@@ -624,14 +660,18 @@ namespace Mfr.App.Ui.ViewModels
             Entries.Clear();
 
             foreach (var item in _listedItems)
+            {
                 Entries.Add(_CreateEntry(item));
+            }
 
             SelectedEntry = selectedPath is null
                 ? null
                 : Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, selectedPath));
 
             if (ViewMode == FileListViewMode.Thumbnails)
+            {
                 _StartThumbnailLoad();
+            }
         }
 
         private FileListEntry _CreateEntry(ListedItem item)
@@ -657,7 +697,9 @@ namespace Mfr.App.Ui.ViewModels
             if (ViewMode == FileListViewMode.Thumbnails)
             {
                 if (_pathToThumbnail.TryGetValue(item.Path, out var cached) && cached is not null)
+                {
                     return cached;
+                }
 
                 return _iconProvider.GetIcon(item.Path, item.IsDirectory, ShellIconSize.Jumbo);
             }
@@ -673,17 +715,27 @@ namespace Mfr.App.Ui.ViewModels
             foreach (var entry in Entries)
             {
                 if (entry.IsDirectory)
+                {
                     continue;
+                }
+
                 if (_pathToThumbnail.ContainsKey(entry.FullPath))
+                {
                     continue;
+                }
+
                 if (!ImageThumbnailLoader.CanLoad(entry.FullPath, entry.Length))
+                {
                     continue;
+                }
 
                 pending.Add(entry);
             }
 
             if (pending.Count == 0)
+            {
                 return;
+            }
 
             var cts = new CancellationTokenSource();
             _thumbnailLoadCts = cts;
@@ -737,13 +789,17 @@ namespace Mfr.App.Ui.ViewModels
 
             _pathToThumbnail[entry.FullPath] = thumbnail;
             if (thumbnail is not null)
+            {
                 entry.Icon = thumbnail;
+            }
         }
 
         private void _CancelThumbnailLoad()
         {
             if (_thumbnailLoadCts is null)
+            {
                 return;
+            }
 
             _thumbnailLoadCts.Cancel();
             _thumbnailLoadCts.Dispose();
@@ -753,7 +809,9 @@ namespace Mfr.App.Ui.ViewModels
         private void _DisposeAndClearThumbnails()
         {
             foreach (var image in _pathToThumbnail.Values)
+            {
                 _DisposeImage(image);
+            }
 
             _pathToThumbnail.Clear();
         }
@@ -761,7 +819,9 @@ namespace Mfr.App.Ui.ViewModels
         private static void _DisposeImage(IImage? image)
         {
             if (image is IDisposable disposable)
+            {
                 disposable.Dispose();
+            }
         }
 
         private static void _PostToUi(Action action)
@@ -798,7 +858,9 @@ namespace Mfr.App.Ui.ViewModels
         {
             var fileName = Path.GetFileName(path);
             if (!WildcardMask.IsMatch(fileName, Mask))
+            {
                 return false;
+            }
 
             return !WildcardMask.MatchesAny(fileName, ExcludeMasks);
         }
@@ -862,7 +924,9 @@ namespace Mfr.App.Ui.ViewModels
             foreach (var drive in _ListNetworkDrives())
             {
                 if (!pathToIsAdded.Add(drive.Path))
+                {
                     continue;
+                }
 
                 items.Add(drive);
             }
@@ -879,11 +943,15 @@ namespace Mfr.App.Ui.ViewModels
             foreach (var historyPath in PathHistory)
             {
                 if (!FileListPath.IsUncPath(historyPath))
+                {
                     continue;
+                }
 
                 var location = historyPath.TrimTrailingSeparator();
                 if (!pathToIsAdded.Add(location))
+                {
                     continue;
+                }
 
                 items.Add(new ListedItem(location, location, IsDirectory: true, Length: null, LastWriteTime: null));
             }
@@ -894,7 +962,9 @@ namespace Mfr.App.Ui.ViewModels
         private static List<ListedItem> _ListWslDistros(string serverRoot)
         {
             if (!WindowsWslUnc.TryListDistroPaths(serverRoot, out var distroPaths))
+            {
                 return [];
+            }
 
             var items = new List<ListedItem>();
             foreach (var distroPath in distroPaths)
@@ -913,7 +983,9 @@ namespace Mfr.App.Ui.ViewModels
                 !_TryRunWithTimeout(() => _TryReadUncShares(serverRoot), _UncServerProbeTimeout, out var sharePaths)
                 || sharePaths is null
             )
+            {
                 return [];
+            }
 
             var items = new List<ListedItem>();
             foreach (var sharePath in sharePaths)
@@ -937,7 +1009,9 @@ namespace Mfr.App.Ui.ViewModels
         private static List<string>? _TryReadUncShares(string serverRoot)
         {
             if (!WindowsUncShareLister.TryListDiskShares(serverRoot, out var sharePaths))
+            {
                 return null;
+            }
 
             return sharePaths;
         }
@@ -980,7 +1054,9 @@ namespace Mfr.App.Ui.ViewModels
                 }
 
                 if (driveType != DriveType.Network)
+                {
                     continue;
+                }
 
                 items.Add(_CreateListedItem(name, isDirectory: true));
             }
@@ -1014,7 +1090,9 @@ namespace Mfr.App.Ui.ViewModels
 
                 var timeout = WindowsWslUnc.IsWslUncPath(path) ? _UncServerProbeTimeout : _NetworkProbeTimeout;
                 if (!_TryRunWithTimeout(() => _ReadFolderListing(path), timeout, out var listing))
+                {
                     return false;
+                }
 
                 folders = listing.Folders;
                 files = listing.Files;
@@ -1045,7 +1123,9 @@ namespace Mfr.App.Ui.ViewModels
         private static bool _DirectoryExists(string path)
         {
             if (!_NeedsNetworkTimeout(path))
+            {
                 return Directory.Exists(path);
+            }
 
             return _TryRunWithTimeout(() => Directory.Exists(path), _NetworkProbeTimeout, out var exists) && exists;
         }
@@ -1053,13 +1133,17 @@ namespace Mfr.App.Ui.ViewModels
         private static bool _NeedsNetworkTimeout(string path)
         {
             if (FileListPath.IsUncPath(path))
+            {
                 return true;
+            }
 
             try
             {
                 var root = Path.GetPathRoot(path);
                 if (string.IsNullOrEmpty(root))
+                {
                     return false;
+                }
 
                 return new DriveInfo(root).DriveType == DriveType.Network;
             }
@@ -1105,10 +1189,14 @@ namespace Mfr.App.Ui.ViewModels
         private void _RememberPath(string displayPath)
         {
             if (string.IsNullOrWhiteSpace(displayPath))
+            {
                 return;
+            }
 
             if (PathHistory.Contains(displayPath, PathComparers.Os))
+            {
                 return;
+            }
 
             PathHistory.Insert(0, displayPath);
         }
@@ -1116,12 +1204,16 @@ namespace Mfr.App.Ui.ViewModels
         private void _RememberMask(string mask)
         {
             if (string.IsNullOrWhiteSpace(mask))
+            {
                 return;
+            }
 
             for (var i = MaskSuggestions.Count - 1; i >= 0; i--)
             {
                 if (!string.Equals(MaskSuggestions[i], mask, StringComparison.OrdinalIgnoreCase))
+                {
                     continue;
+                }
 
                 MaskSuggestions.RemoveAt(i);
             }
@@ -1129,14 +1221,18 @@ namespace Mfr.App.Ui.ViewModels
             MaskSuggestions.Insert(0, mask);
 
             while (MaskSuggestions.Count > _MaxRememberedMasks)
+            {
                 MaskSuggestions.RemoveAt(MaskSuggestions.Count - 1);
+            }
         }
 
         private static string _FormatDetails(ListedItem item)
         {
             var typeLabel = _TypeLabel(item);
             if (item.IsDirectory || item.Length is null)
+            {
                 return typeLabel;
+            }
 
             return typeLabel + "\n" + _FormatSize(item.Length.Value);
         }
@@ -1144,14 +1240,20 @@ namespace Mfr.App.Ui.ViewModels
         private static string _TypeLabel(ListedItem item)
         {
             if (FileListPath.IsNetworkPath(item.Path))
+            {
                 return "Network location";
+            }
 
             if (item.IsDirectory)
+            {
                 return "File folder";
+            }
 
             var extension = Path.GetExtension(item.Name);
             if (string.IsNullOrEmpty(extension))
+            {
                 return "File";
+            }
 
             return extension.TrimStart('.').ToUpperInvariant() + " File";
         }
@@ -1159,7 +1261,9 @@ namespace Mfr.App.Ui.ViewModels
         private static string _FormatDate(DateTime? lastWriteTime)
         {
             if (lastWriteTime is null)
+            {
                 return string.Empty;
+            }
 
             return lastWriteTime.Value.ToString("g", CultureInfo.CurrentCulture);
         }
@@ -1171,11 +1275,19 @@ namespace Mfr.App.Ui.ViewModels
             const double gb = mb * 1024;
 
             if (bytes >= gb)
+            {
                 return (bytes / gb).ToString("0.#", CultureInfo.InvariantCulture) + " GB";
+            }
+
             if (bytes >= mb)
+            {
                 return (bytes / mb).ToString("0.#", CultureInfo.InvariantCulture) + " MB";
+            }
+
             if (bytes >= kb)
+            {
                 return (bytes / kb).ToString("0.#", CultureInfo.InvariantCulture) + " KB";
+            }
 
             return bytes.ToString(CultureInfo.InvariantCulture) + " B";
         }
@@ -1208,11 +1320,15 @@ namespace Mfr.App.Ui.ViewModels
         private static string _ResolveStartPath(string? initialPath)
         {
             if (_TryResolvePath(initialPath, out var resolved) && !FileListPath.IsComputerPath(resolved))
+            {
                 return resolved;
+            }
 
             var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             if (_TryResolvePath(profile, out resolved) && !FileListPath.IsComputerPath(resolved))
+            {
                 return resolved;
+            }
 
             return Directory.GetCurrentDirectory();
         }
@@ -1269,7 +1385,9 @@ namespace Mfr.App.Ui.ViewModels
             {
                 var expanded = Environment.ExpandEnvironmentVariables(path!);
                 if (FileListPath.TryGetDriveRoot(expanded, out var driveRoot))
+                {
                     expanded = driveRoot;
+                }
 
                 resolved = new DirectoryInfo(expanded).FullName;
                 return _DirectoryExists(resolved);
@@ -1293,7 +1411,9 @@ namespace Mfr.App.Ui.ViewModels
             var trimmed = path.TrimTrailingSeparator();
             var slash = trimmed.LastIndexOf('\\');
             if (slash < 0 || slash == trimmed.Length - 1)
+            {
                 return trimmed;
+            }
 
             return trimmed[(slash + 1)..];
         }

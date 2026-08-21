@@ -33,25 +33,39 @@ namespace Mfr.Models.Tags
             ArgumentNullException.ThrowIfNull(semantic);
 
             if (overlay.Id3v1 is not null)
+            {
                 overlay.Id3v1 = _MergeId3v1(overlay.Id3v1, semantic);
+            }
 
             if (overlay.Id3v2 is not null)
+            {
                 overlay.Id3v2 = _MergeId3v2(overlay.Id3v2, semantic);
+            }
 
             if (overlay.Xiph is not null)
+            {
                 overlay.Xiph = _MergeXiph(overlay.Xiph, semantic);
+            }
 
             if (overlay.Ape is not null)
+            {
                 overlay.Ape = _MergeApe(overlay.Ape, semantic);
+            }
 
             if (overlay.RiffInfo is not null)
+            {
                 overlay.RiffInfo = _MergeRiff(semantic);
+            }
 
             if (overlay.Asf is not null)
+            {
                 overlay.Asf = _MergeAsf(overlay.Asf, semantic);
+            }
 
             if (overlay.Apple is not null)
+            {
                 overlay.Apple = _MergeApple(overlay.Apple, semantic);
+            }
         }
 
         private static Id3v1TagData? _MergeId3v1(Id3v1TagData existing, SemanticAudioTag common)
@@ -102,7 +116,9 @@ namespace Mfr.Models.Tags
             // block is explicitly nulled by a remover. Prune only when the prior snapshot already had modeled frames
             // and this merge cleared them all.
             if (frames.Count == 0 && existing.Frames.Length > 0)
+            {
                 return null;
+            }
 
             return new Id3v2TagData { Version = existing.Version, Frames = [.. frames] };
         }
@@ -205,10 +221,14 @@ namespace Mfr.Models.Tags
             );
             _SetAsf(rows, AsfDescriptorNames.Conductor, common.Conductor);
             foreach (var catalog in AudioCatalogFieldMaps.All)
+            {
                 _SetAsf(rows, catalog.AsfDescriptor, _CatalogValue(common, catalog.Field));
+            }
 
             if (rows.Count == 0)
+            {
                 return null;
+            }
 
             rows.Sort(
                 static (a, b) =>
@@ -239,14 +259,18 @@ namespace Mfr.Models.Tags
             _SetAppleAtom(atoms, AppleAtomIds.Conductor, common.Conductor);
 
             if (atoms.Count == 0)
+            {
                 return null;
+            }
 
             atoms.Sort(
                 static (a, b) =>
                 {
                     var byType = a.AtomType.AsSpan().SequenceCompareTo(b.AtomType.AsSpan());
                     if (byType != 0)
+                    {
                         return byType;
+                    }
 
                     return OrdinalSequence.Compare(a.Values, b.Values);
                 }
@@ -258,7 +282,9 @@ namespace Mfr.Models.Tags
         private static void _MergeCatalogId3v2(List<Id3v2ModeledFrame> frames, SemanticAudioTag common)
         {
             foreach (var catalog in AudioCatalogFieldMaps.All)
+            {
                 _SetTxxx(frames, catalog.Id3v2TxxxDescription, _CatalogValue(common, catalog.Field));
+            }
         }
 
         private static void _MergeCatalogMap(
@@ -268,7 +294,9 @@ namespace Mfr.Models.Tags
         )
         {
             foreach (var catalog in AudioCatalogFieldMaps.All)
+            {
                 _SetMapScalar(map, keySelector(catalog), _CatalogValue(common, catalog.Field));
+            }
         }
 
         private static string? _CatalogValue(SemanticAudioTag common, SemanticAudioField field)
@@ -288,7 +316,9 @@ namespace Mfr.Models.Tags
             if (text is null)
             {
                 if (index >= 0)
+                {
                     frames.RemoveAt(index);
+                }
 
                 return;
             }
@@ -302,9 +332,13 @@ namespace Mfr.Models.Tags
             };
 
             if (index >= 0)
+            {
                 frames[index] = replacement;
+            }
             else
+            {
                 frames.Add(replacement);
+            }
         }
 
         private static void _SetSingleton(List<Id3v2ModeledFrame> frames, string frameId, string? value)
@@ -312,7 +346,9 @@ namespace Mfr.Models.Tags
             frames.RemoveAll(f => string.Equals(f.FrameId, frameId, StringComparison.Ordinal));
             var text = value.TrimmedOrNull();
             if (text is null)
+            {
                 return;
+            }
 
             frames.Add(new Id3v2ModeledFrame { FrameId = frameId, TextValues = [text] });
         }
@@ -322,7 +358,9 @@ namespace Mfr.Models.Tags
             frames.RemoveAll(f => string.Equals(f.FrameId, frameId, StringComparison.Ordinal));
             var values = DelimitedText.Split(joined);
             if (values.Length == 0)
+            {
                 return;
+            }
 
             frames.Add(new Id3v2ModeledFrame { FrameId = frameId, TextValues = values });
         }
@@ -337,7 +375,9 @@ namespace Mfr.Models.Tags
             if (text is null)
             {
                 if (primaryIndex >= 0)
+                {
                     frames.RemoveAt(primaryIndex);
+                }
 
                 return;
             }
@@ -351,9 +391,13 @@ namespace Mfr.Models.Tags
             };
 
             if (primaryIndex >= 0)
+            {
                 frames[primaryIndex] = replacement;
+            }
             else
+            {
                 frames.Add(replacement);
+            }
         }
 
         private static void _SetYear(List<Id3v2ModeledFrame> frames, byte version, uint? year)
@@ -364,7 +408,9 @@ namespace Mfr.Models.Tags
             );
 
             if (year is null)
+            {
                 return;
+            }
 
             var frameId = version >= 4 ? "TDRC" : "TYER";
             frames.Add(
@@ -380,7 +426,9 @@ namespace Mfr.Models.Tags
         {
             frames.RemoveAll(f => string.Equals(f.FrameId, frameId, StringComparison.Ordinal));
             if (number is null && count is null)
+            {
                 return;
+            }
 
             var text =
                 number is null ? "0/" + count!.Value.ToString(CultureInfo.InvariantCulture)
@@ -410,7 +458,9 @@ namespace Mfr.Models.Tags
         {
             var text = value.TrimmedOrNull();
             if (text is null)
+            {
                 return;
+            }
 
             rows.Add(new RiffInfoFieldRow(key, text));
         }
@@ -420,7 +470,9 @@ namespace Mfr.Models.Tags
             rows.RemoveAll(r => string.Equals(r.Name, name, StringComparison.Ordinal));
             var text = value.TrimmedOrNull();
             if (text is null)
+            {
                 return;
+            }
 
             rows.Add(new AsfDescriptorRow(name, text));
         }
@@ -434,7 +486,9 @@ namespace Mfr.Models.Tags
         {
             _RemoveAsf(rows, AsfDescriptorNames.PartOfSet);
             if (disc is null && discCount is null)
+            {
                 return;
+            }
 
             if (disc is not null && discCount is not null)
             {
@@ -473,7 +527,9 @@ namespace Mfr.Models.Tags
             atoms.RemoveAll(a => a.AtomType.AsSpan().SequenceEqual(typeBytes));
             var text = value.TrimmedOrNull();
             if (text is null)
+            {
                 return;
+            }
 
             atoms.Add(new AppleAtomRow { AtomType = ImmutableArray.Create(typeBytes), Values = [text] });
         }
@@ -484,7 +540,9 @@ namespace Mfr.Models.Tags
             atoms.RemoveAll(a => a.AtomType.AsSpan().SequenceEqual(typeBytes));
             var values = DelimitedText.Split(joined);
             if (values.Length == 0)
+            {
                 return;
+            }
 
             atoms.Add(new AppleAtomRow { AtomType = ImmutableArray.Create(typeBytes), Values = values });
         }
@@ -495,7 +553,9 @@ namespace Mfr.Models.Tags
         {
             var map = new Dictionary<string, ImmutableArray<string>>(StringComparer.Ordinal);
             foreach (var row in fields)
+            {
                 map[row.Key] = row.Values;
+            }
 
             return map;
         }
@@ -535,7 +595,9 @@ namespace Mfr.Models.Tags
         {
             var byKey = string.CompareOrdinal(a.Key, b.Key);
             if (byKey != 0)
+            {
                 return byKey;
+            }
 
             return OrdinalSequence.Compare(a.Values, b.Values);
         }
@@ -544,15 +606,21 @@ namespace Mfr.Models.Tags
         {
             var byId = string.CompareOrdinal(a.FrameId, b.FrameId);
             if (byId != 0)
+            {
                 return byId;
+            }
 
             var byLang = string.CompareOrdinal(a.Language, b.Language);
             if (byLang != 0)
+            {
                 return byLang;
+            }
 
             var byDesc = string.CompareOrdinal(a.Description, b.Description);
             if (byDesc != 0)
+            {
                 return byDesc;
+            }
 
             return OrdinalSequence.Compare(a.TextValues, b.TextValues);
         }

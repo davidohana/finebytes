@@ -21,18 +21,26 @@ namespace Mfr.Models.Tags.RiffInfo
         public bool Equals(RiffInfoTagData? other)
         {
             if (other is null)
+            {
                 return false;
+            }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             if (Fields.Length != other.Fields.Length)
+            {
                 return false;
+            }
 
             for (var i = 0; i < Fields.Length; i++)
             {
                 if (!Equals(Fields[i], other.Fields[i]))
+                {
                     return false;
+                }
             }
 
             return true;
@@ -49,7 +57,9 @@ namespace Mfr.Models.Tags.RiffInfo
         {
             var hash = new HashCode();
             foreach (var row in Fields)
+            {
                 hash.Add(row);
+            }
 
             return hash.ToHashCode();
         }

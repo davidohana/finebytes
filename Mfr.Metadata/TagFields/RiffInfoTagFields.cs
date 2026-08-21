@@ -29,20 +29,26 @@ namespace Mfr.Metadata.TagFields
         public static RiffInfoTagData? Read(TagLib.File file)
         {
             if (file.GetTag(TagTypes.RiffInfo, false) is not InfoTag live || live.IsEmpty)
+            {
                 return null;
+            }
 
             var rows = new List<RiffInfoFieldRow>();
             foreach (var key in _KnownKeys)
             {
                 var value = DelimitedText.JoinOrNull(live.GetValuesAsStrings(key));
                 if (value is null)
+                {
                     continue;
+                }
 
                 rows.Add(new RiffInfoFieldRow(key, value));
             }
 
             if (rows.Count == 0)
+            {
                 return null;
+            }
 
             rows.Sort(_CompareRows);
             return new RiffInfoTagData { Fields = [.. rows] };
@@ -57,7 +63,9 @@ namespace Mfr.Metadata.TagFields
         public static void Apply(TagLib.File file, RiffInfoTagData? original, RiffInfoTagData preview)
         {
             if (Equals(original, preview))
+            {
                 return;
+            }
 
             var live = (InfoTag)file.GetTag(TagTypes.RiffInfo, true);
             if (original is null)
@@ -78,13 +86,17 @@ namespace Mfr.Metadata.TagFields
         private static void _WriteAll(InfoTag live, RiffInfoTagData data)
         {
             foreach (var key in _KnownKeys)
+            {
                 live.RemoveValue(key);
+            }
 
             foreach (var row in data.Fields)
             {
                 var value = row.Value.TrimmedOrNull();
                 if (value is null)
+                {
                     continue;
+                }
 
                 live.SetValue(row.Key, value);
             }
@@ -96,7 +108,9 @@ namespace Mfr.Metadata.TagFields
             foreach (var row in fields)
             {
                 if (string.IsNullOrWhiteSpace(row.Value))
+                {
                     continue;
+                }
 
                 keyToValue[row.Key] = row.Value;
             }

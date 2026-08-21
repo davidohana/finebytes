@@ -83,7 +83,9 @@ namespace Mfr.Filters.Audio
             );
 
             if (Options.OnlyIfEmpty && !string.IsNullOrWhiteSpace(current))
+            {
                 return;
+            }
 
             var resolved = _textFormatter(item);
             AudioOverlayBlockFieldIo.SetId3v2FrameString(

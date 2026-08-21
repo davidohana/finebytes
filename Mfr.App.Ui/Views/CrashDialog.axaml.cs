@@ -32,11 +32,15 @@ namespace Mfr.App.Ui.Views
         private async void _OnCopyDetailsClick(object? sender, RoutedEventArgs e)
         {
             if (DataContext is not CrashDialogViewModel viewModel)
+            {
                 return;
+            }
 
             var clipboard = Clipboard;
             if (clipboard is null)
+            {
                 return;
+            }
 
             await clipboard.SetTextAsync(viewModel.Details);
         }
@@ -44,10 +48,14 @@ namespace Mfr.App.Ui.Views
         private void _OnOpenLogFolderClick(object? sender, RoutedEventArgs e)
         {
             if (DataContext is not CrashDialogViewModel viewModel)
+            {
                 return;
+            }
 
             if (viewModel.LogDirectoryPath.IsBlank() || !Directory.Exists(viewModel.LogDirectoryPath))
+            {
                 return;
+            }
 
             try
             {

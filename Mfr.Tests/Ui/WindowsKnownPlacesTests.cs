@@ -55,11 +55,15 @@ namespace Mfr.Tests.Ui
         public void ContainingPlace_Uses_Longest_Known_Prefix()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var documents = _ExistingSpecialFolder(Environment.SpecialFolder.MyDocuments);
             if (documents is null)
+            {
                 return;
+            }
 
             var nested = Path.Combine(documents, "Work");
             Assert.True(WindowsKnownPlaces.TryGetContainingPlace(nested, out var place));
@@ -71,7 +75,9 @@ namespace Mfr.Tests.Ui
         {
             var path = Environment.GetFolderPath(folder);
             if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            {
                 return null;
+            }
 
             return new DirectoryInfo(path).FullName;
         }

@@ -63,7 +63,9 @@ namespace Mfr.Filters.Audio
         protected override void _Setup()
         {
             if (Options.All)
+            {
                 return;
+            }
 
             var blocks = Options.Blocks ?? [];
             if (blocks.Count == 0)

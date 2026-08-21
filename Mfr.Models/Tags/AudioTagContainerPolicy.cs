@@ -54,11 +54,15 @@ namespace Mfr.Models.Tags
         {
             var supported = GetSupportedBlocks(container);
             if (supported.Count == 0)
+            {
                 return null;
+            }
 
             // MPEG prefers ID3v2 over the ID3v1 trailer; every other container lists a single block first.
             if (container == AudioContainerFormat.Mpeg)
+            {
                 return AudioTagBlockKind.Id3v2;
+            }
 
             return supported[0];
         }
@@ -83,7 +87,9 @@ namespace Mfr.Models.Tags
         public static void EnsureSupported(AudioContainerFormat container, AudioTagBlockKind block)
         {
             if (Supports(container, block))
+            {
                 return;
+            }
 
             var supported = GetSupportedBlocks(container);
             var alternatives =

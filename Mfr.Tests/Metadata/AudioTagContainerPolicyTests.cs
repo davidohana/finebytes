@@ -53,7 +53,9 @@ namespace Mfr.Tests.Metadata
             Assert.Equal(expectedRecommended, ModelsContainerPolicy.GetRecommendedBlock(container));
 
             foreach (var block in Enum.GetValues<AudioTagBlockKind>())
+            {
                 Assert.Equal(expectedBlocks.Contains(block), ModelsContainerPolicy.Supports(container, block));
+            }
         }
 
         /// <summary>

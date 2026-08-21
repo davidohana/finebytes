@@ -150,6 +150,7 @@ namespace Mfr.Filters.Audio
             var semanticTag = SemanticAudioTag.FromOverlay(tags);
 
             if (Options.Performers is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -158,8 +159,10 @@ namespace Mfr.Filters.Audio
                     PerformersFormatter,
                     static (m, v) => m with { Performers = v }
                 );
+            }
 
             if (Options.AlbumArtists is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -168,8 +171,10 @@ namespace Mfr.Filters.Audio
                     AlbumArtistsFormatter,
                     static (m, v) => m with { AlbumArtists = v }
                 );
+            }
 
             if (Options.Title is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -178,8 +183,10 @@ namespace Mfr.Filters.Audio
                     TitleFormatter,
                     static (m, v) => m with { Title = v }
                 );
+            }
 
             if (Options.Album is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -188,8 +195,10 @@ namespace Mfr.Filters.Audio
                     AlbumFormatter,
                     static (m, v) => m with { Album = v }
                 );
+            }
 
             if (Options.Genre is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -198,8 +207,10 @@ namespace Mfr.Filters.Audio
                     GenreFormatter,
                     static (m, v) => m with { Genre = v }
                 );
+            }
 
             if (Options.Comment is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -208,8 +219,10 @@ namespace Mfr.Filters.Audio
                     CommentFormatter,
                     static (m, v) => m with { Comment = v }
                 );
+            }
 
             if (Options.Composers is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -218,8 +231,10 @@ namespace Mfr.Filters.Audio
                     ComposersFormatter,
                     static (m, v) => m with { Composers = v }
                 );
+            }
 
             if (Options.Lyrics is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -228,8 +243,10 @@ namespace Mfr.Filters.Audio
                     LyricsFormatter,
                     static (m, v) => m with { Lyrics = v }
                 );
+            }
 
             if (Options.Grouping is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -238,8 +255,10 @@ namespace Mfr.Filters.Audio
                     GroupingFormatter,
                     static (m, v) => m with { Grouping = v }
                 );
+            }
 
             if (Options.Copyright is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -248,8 +267,10 @@ namespace Mfr.Filters.Audio
                     CopyrightFormatter,
                     static (m, v) => m with { Copyright = v }
                 );
+            }
 
             if (Options.Conductor is not null)
+            {
                 semanticTag = _ApplyStringField(
                     item,
                     semanticTag,
@@ -258,6 +279,7 @@ namespace Mfr.Filters.Audio
                     ConductorFormatter,
                     static (m, v) => m with { Conductor = v }
                 );
+            }
 
             if (Options.Year is not null)
             {
@@ -342,7 +364,9 @@ namespace Mfr.Filters.Audio
             }
 
             if (!_HasAnyConfiguredSemanticField())
+            {
                 return;
+            }
 
             tags.MergeSemantic(semanticTag);
         }
@@ -387,10 +411,14 @@ namespace Mfr.Filters.Audio
         private static Formatter _CreateFormatter(AudioTagStringFieldOptions? spec)
         {
             if (spec is null)
+            {
                 return FormatStringCompiler.EmptyFormatter;
+            }
 
             if (FormatStringCompiler.ContainsLikelyFormatTokens(spec.Text))
+            {
                 return FormatStringCompiler.Compile(spec.Text);
+            }
 
             var literal = spec.Text;
             return _ => literal;
@@ -407,7 +435,9 @@ namespace Mfr.Filters.Audio
         {
             var overlayAlreadyHasValue = !string.IsNullOrWhiteSpace(currentValue);
             if (onlyIfEmpty && overlayAlreadyHasValue)
+            {
                 return semantic;
+            }
 
             var expanded = formatter(item).TrimmedOrNull();
             return assignUpdated(semantic, expanded);
@@ -433,12 +463,16 @@ namespace Mfr.Filters.Audio
         )
         {
             if (onlyIfEmpty && currentValue is not null)
+            {
                 return semantic;
+            }
 
             var resolved = formatter(item);
             var trimmed = resolved.Trim();
             if (trimmed.Length == 0)
+            {
                 return assignUpdated(semantic, null);
+            }
 
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
@@ -455,7 +489,9 @@ namespace Mfr.Filters.Audio
             }
 
             if (parsed == 0)
+            {
                 return assignUpdated(semantic, null);
+            }
 
             return assignUpdated(semantic, parsed);
         }
@@ -481,12 +517,16 @@ namespace Mfr.Filters.Audio
         )
         {
             if (onlyIfEmpty && currentValue is not null)
+            {
                 return semantic;
+            }
 
             var resolved = formatter(item);
             var trimmed = resolved.Trim();
             if (trimmed.Length == 0)
+            {
                 return assignUpdated(semantic, null);
+            }
 
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
@@ -502,7 +542,9 @@ namespace Mfr.Filters.Audio
 
             var raw = parsed + autoIncrementBy;
             if (raw <= 0)
+            {
                 return assignUpdated(semantic, null);
+            }
 
             return assignUpdated(semantic, (uint)Math.Min(raw, 255));
         }

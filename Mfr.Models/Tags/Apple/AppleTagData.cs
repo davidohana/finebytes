@@ -23,19 +23,27 @@ namespace Mfr.Models.Tags.Apple
         public bool Equals(AppleTagData? other)
         {
             if (other is null)
+            {
                 return false;
+            }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             if (Atoms.Length != other.Atoms.Length)
+            {
                 return false;
+            }
 
             var comparer = EqualityComparer<AppleAtomRow>.Default;
             for (var i = 0; i < Atoms.Length; i++)
             {
                 if (!comparer.Equals(Atoms[i], other.Atoms[i]))
+                {
                     return false;
+                }
             }
 
             return true;
@@ -52,7 +60,9 @@ namespace Mfr.Models.Tags.Apple
         {
             var hash = new HashCode();
             foreach (var row in Atoms)
+            {
                 hash.Add(row);
+            }
 
             return hash.ToHashCode();
         }
@@ -77,7 +87,9 @@ namespace Mfr.Models.Tags.Apple
         public bool Equals(AppleAtomRow other)
         {
             if (!AtomType.AsSpan().SequenceEqual(other.AtomType.AsSpan()))
+            {
                 return false;
+            }
 
             return OrdinalSequence.AreEqual(Values, other.Values);
         }
@@ -95,7 +107,9 @@ namespace Mfr.Models.Tags.Apple
             hash.AddBytes(AtomType.AsSpan());
 
             foreach (var v in Values)
+            {
                 hash.Add(v, StringComparer.Ordinal);
+            }
 
             return hash.ToHashCode();
         }

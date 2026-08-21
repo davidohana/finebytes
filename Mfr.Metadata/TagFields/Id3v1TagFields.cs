@@ -24,10 +24,14 @@ namespace Mfr.Metadata.TagFields
         public static Id3v1TagData? Read(TagLib.File file)
         {
             if (file.GetTag(TagTypes.Id3v1, false) is not Id3v1Tag live)
+            {
                 return null;
+            }
 
             if (_IsEffectivelyEmpty(live))
+            {
                 return null;
+            }
 
             var genreByte = live.FirstGenre is null ? (byte)0 : Genres.AudioToIndex(live.FirstGenre);
 
@@ -52,7 +56,9 @@ namespace Mfr.Metadata.TagFields
         public static void Apply(TagLib.File file, Id3v1TagData? original, Id3v1TagData preview)
         {
             if (Equals(original, preview))
+            {
                 return;
+            }
 
             var live = (Id3v1Tag)file.GetTag(TagTypes.Id3v1, true);
 

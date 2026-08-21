@@ -35,7 +35,9 @@ namespace Mfr.Models.Config
         {
             var path = sessionFilePath.IsBlank() ? DefaultSessionFilePath() : sessionFilePath.Trim();
             if (!File.Exists(path))
+            {
                 return new SessionState();
+            }
 
             try
             {
@@ -64,10 +66,14 @@ namespace Mfr.Models.Config
             var path = sessionFilePath.IsBlank() ? DefaultSessionFilePath() : sessionFilePath.Trim();
             var directory = Path.GetDirectoryName(path);
             if (!string.IsNullOrWhiteSpace(directory))
+            {
                 Directory.CreateDirectory(directory);
+            }
 
             if (state.Version <= 0)
+            {
                 state.Version = 1;
+            }
 
             var json = JsonSerializer.Serialize(state, s_JsonOptions);
             File.WriteAllText(path, json);

@@ -28,7 +28,9 @@ namespace Mfr.App.Ui.Services.FileList
             try
             {
                 if (stream.CanSeek)
+                {
                     stream.Position = 0;
+                }
 
                 return _TryExtract(stream);
             }
@@ -42,23 +44,38 @@ namespace Mfr.App.Ui.Services.FileList
         private static byte[]? _TryExtract(Stream stream)
         {
             if (stream.ReadByte() != 0xFF)
+            {
                 return null;
+            }
+
             if (stream.ReadByte() != _MarkerSoi)
+            {
                 return null;
+            }
 
             while (true)
             {
                 var marker = _ReadMarker(stream);
                 if (marker is null)
+                {
                     return null;
+                }
+
                 if (marker is _MarkerEoi or _MarkerSos)
+                {
                     return null;
+                }
+
                 if (_IsStandalone(marker.Value))
+                {
                     continue;
+                }
 
                 var segmentLength = _ReadUInt16BigEndian(stream);
                 if (segmentLength < 2)
+                {
                     return null;
+                }
 
                 var payloadLength = segmentLength - 2;
                 if (marker != _MarkerApp1)
@@ -76,14 +93,19 @@ namespace Mfr.App.Ui.Services.FileList
                 var payload = _ReadExact(stream, payloadLength);
                 var thumbnail = _TryReadExifThumbnail(payload);
                 if (thumbnail is not null)
+                {
                     return thumbnail;
+                }
             }
         }
 
         private static byte[]? _TryReadExifThumbnail(ReadOnlySpan<byte> payload)
         {
             if (payload.Length < 14)
+            {
                 return null;
+            }
+
             if (
                 payload[0] != (byte)'E'
                 || payload[1] != (byte)'x'
@@ -92,21 +114,33 @@ namespace Mfr.App.Ui.Services.FileList
                 || payload[4] != 0
                 || payload[5] != 0
             )
+            {
                 return null;
+            }
 
             var tiff = payload[6..];
             var isLittleEndian = tiff[0] == (byte)'I' && tiff[1] == (byte)'I';
             var isBigEndian = tiff[0] == (byte)'M' && tiff[1] == (byte)'M';
             if (!isLittleEndian && !isBigEndian)
+            {
                 return null;
+            }
+
             if (_ReadUInt16(tiff, 2, isLittleEndian) != _TiffMagic)
+            {
                 return null;
+            }
 
             var ifd0Offset = _ReadUInt32(tiff, 4, isLittleEndian);
             if (!_TryReadNextIfdOffset(tiff, ifd0Offset, isLittleEndian, out var ifd1Offset))
+            {
                 return null;
+            }
+
             if (ifd1Offset == 0)
+            {
                 return null;
+            }
 
             return _TryReadJpegFromIfd(tiff, ifd1Offset, isLittleEndian);
         }
@@ -120,12 +154,16 @@ namespace Mfr.App.Ui.Services.FileList
         {
             nextIfdOffset = 0;
             if (!_TryToIndex(ifdOffset, tiff.Length, minRemaining: 2, out var index))
+            {
                 return false;
+            }
 
             var entryCount = _ReadUInt16(tiff, index, isLittleEndian);
             var nextOffsetIndex = index + 2 + (entryCount * 12);
             if (nextOffsetIndex < 0 || nextOffsetIndex + 4 > tiff.Length)
+            {
                 return false;
+            }
 
             nextIfdOffset = _ReadUInt32(tiff, nextOffsetIndex, isLittleEndian);
             return true;
@@ -134,7 +172,9 @@ namespace Mfr.App.Ui.Services.FileList
         private static byte[]? _TryReadJpegFromIfd(ReadOnlySpan<byte> tiff, uint ifdOffset, bool isLittleEndian)
         {
             if (!_TryToIndex(ifdOffset, tiff.Length, minRemaining: 2, out var index))
+            {
                 return null;
+            }
 
             var entryCount = _ReadUInt16(tiff, index, isLittleEndian);
             uint? compression = null;
@@ -144,34 +184,50 @@ namespace Mfr.App.Ui.Services.FileList
             for (var i = 0; i < entryCount; i++)
             {
                 if (entryIndex + 12 > tiff.Length)
+                {
                     return null;
+                }
 
                 var tag = _ReadUInt16(tiff, entryIndex, isLittleEndian);
                 if (
                     tag == _TagCompression
                     && _TryReadIfdUInt(tiff, entryIndex, isLittleEndian, out var compressionValue)
                 )
+                {
                     compression = compressionValue;
+                }
                 else if (
                     tag == _TagJpegOffset
                     && _TryReadIfdUInt(tiff, entryIndex, isLittleEndian, out var offsetValue)
                 )
+                {
                     jpegOffset = offsetValue;
+                }
                 else if (
                     tag == _TagJpegLength
                     && _TryReadIfdUInt(tiff, entryIndex, isLittleEndian, out var lengthValue)
                 )
+                {
                     jpegLength = lengthValue;
+                }
 
                 entryIndex += 12;
             }
 
             if (compression != _JpegCompression || jpegOffset is null || jpegLength is null or 0)
+            {
                 return null;
+            }
+
             if (!_TryToIndex(jpegOffset.Value, tiff.Length, minRemaining: 0, out var jpegIndex))
+            {
                 return null;
+            }
+
             if (jpegLength.Value > (uint)(tiff.Length - jpegIndex))
+            {
                 return null;
+            }
 
             return tiff.Slice(jpegIndex, (int)jpegLength.Value).ToArray();
         }
@@ -187,7 +243,9 @@ namespace Mfr.App.Ui.Services.FileList
             var type = _ReadUInt16(tiff, entryOffset + 2, isLittleEndian);
             var count = _ReadUInt32(tiff, entryOffset + 4, isLittleEndian);
             if (count != 1)
+            {
                 return false;
+            }
 
             var valueOffset = entryOffset + 8;
             if (type == _TypeShort)
@@ -212,18 +270,24 @@ namespace Mfr.App.Ui.Services.FileList
             {
                 current = stream.ReadByte();
                 if (current < 0)
+                {
                     return null;
+                }
             } while (current != 0xFF);
 
             do
             {
                 current = stream.ReadByte();
                 if (current < 0)
+                {
                     return null;
+                }
             } while (current == 0xFF);
 
             if (current == 0)
+            {
                 return _ReadMarker(stream);
+            }
 
             return (byte)current;
         }
@@ -238,7 +302,9 @@ namespace Mfr.App.Ui.Services.FileList
             var high = stream.ReadByte();
             var low = stream.ReadByte();
             if (high < 0 || low < 0)
+            {
                 throw new EndOfStreamException();
+            }
 
             return (ushort)((high << 8) | low);
         }
@@ -251,7 +317,9 @@ namespace Mfr.App.Ui.Services.FileList
             {
                 var read = stream.Read(buffer, offset, count - offset);
                 if (read == 0)
+                {
                     throw new EndOfStreamException();
+                }
 
                 offset += read;
             }
@@ -273,7 +341,9 @@ namespace Mfr.App.Ui.Services.FileList
             {
                 var read = stream.Read(buffer, 0, Math.Min(buffer.Length, remaining));
                 if (read == 0)
+                {
                     throw new EndOfStreamException();
+                }
 
                 remaining -= read;
             }
@@ -283,7 +353,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             index = 0;
             if (offset > int.MaxValue)
+            {
                 return false;
+            }
 
             index = (int)offset;
             return index >= 0 && index <= length - minRemaining;
@@ -293,7 +365,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             var value = (ushort)(data[offset] | (data[offset + 1] << 8));
             if (isLittleEndian)
+            {
                 return value;
+            }
 
             return (ushort)((data[offset] << 8) | data[offset + 1]);
         }

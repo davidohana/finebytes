@@ -131,7 +131,9 @@ namespace Mfr.Engine
         )
         {
             if (original.Equals(preview))
+            {
                 return;
+            }
 
             _AppendAudioTagBlockLayoutDifferences(changes, original, preview);
         }
@@ -146,7 +148,9 @@ namespace Mfr.Engine
         )
         {
             if (original.TagBlocksStructurallyEquals(preview))
+            {
                 return;
+            }
 
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
@@ -197,7 +201,9 @@ namespace Mfr.Engine
             where T : class
         {
             if (Equals(original, preview))
+            {
                 return;
+            }
 
             if (original is null || preview is null)
             {
@@ -285,7 +291,9 @@ namespace Mfr.Engine
                 originalById.TryGetValue(key, out var oldFrame);
                 previewById.TryGetValue(key, out var newFrame);
                 if (Equals(oldFrame, newFrame))
+                {
                     continue;
+                }
 
                 changes.Add(
                     new RenamePropertyChange(
@@ -300,7 +308,9 @@ namespace Mfr.Engine
         private static string _FrameDiffKey(Id3v2ModeledFrame frame)
         {
             if (!Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frame.FrameId))
+            {
                 return frame.FrameId;
+            }
 
             return frame.FrameId
                 + "["
@@ -347,7 +357,9 @@ namespace Mfr.Engine
                 var oldText = DelimitedText.JoinOrNull(oldValues);
                 var newText = DelimitedText.JoinOrNull(newValues);
                 if (string.Equals(oldText, newText, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 changes.Add(
                     new RenamePropertyChange(
@@ -374,7 +386,9 @@ namespace Mfr.Engine
                 originalMap.TryGetValue(key, out var oldValue);
                 previewMap.TryGetValue(key, out var newValue);
                 if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 changes.Add(
                     new RenamePropertyChange(
@@ -409,7 +423,9 @@ namespace Mfr.Engine
                 originalMap.TryGetValue(key, out var oldValue);
                 previewMap.TryGetValue(key, out var newValue);
                 if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 changes.Add(
                     new RenamePropertyChange(
@@ -436,7 +452,9 @@ namespace Mfr.Engine
                 originalMap.TryGetValue(key, out var oldValue);
                 previewMap.TryGetValue(key, out var newValue);
                 if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 changes.Add(
                     new RenamePropertyChange(
@@ -456,7 +474,9 @@ namespace Mfr.Engine
         )
         {
             if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+            {
                 return;
+            }
 
             changes.Add(
                 new RenamePropertyChange(
@@ -476,7 +496,9 @@ namespace Mfr.Engine
         )
         {
             if (string.Equals(oldValue, newValue, comparison))
+            {
                 return;
+            }
 
             changes.Add(new RenamePropertyChange(Property: propertyName, OldValue: oldValue, NewValue: newValue));
         }
@@ -489,7 +511,9 @@ namespace Mfr.Engine
         )
         {
             if (originalValue == previewValue)
+            {
                 return;
+            }
 
             changes.Add(
                 new RenamePropertyChange(

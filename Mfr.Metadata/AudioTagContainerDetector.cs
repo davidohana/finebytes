@@ -28,7 +28,9 @@ namespace Mfr.Metadata
             ArgumentException.ThrowIfNullOrWhiteSpace(absolutePath);
 
             if (!Path.IsPathFullyQualified(absolutePath))
+            {
                 throw new ArgumentException("Path must be fully qualified.", nameof(absolutePath));
+            }
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             return DetectFrom(file);

@@ -225,7 +225,9 @@ namespace Mfr.Tests.Engine
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
 
             using (var file = TagLib.File.Create(sourcePath))
+            {
                 Assert.Equal("CommitWmaTitle", file.Tag.Title);
+            }
 
             var readBack = AudioTagPersistence.Read(sourcePath);
             Assert.Equal("CommitWmaTitle", readBack.Semantic().Title);
@@ -1755,7 +1757,9 @@ namespace Mfr.Tests.Engine
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
             if (expectChangeProperty is not null)
+            {
                 Assert.Contains(result[0].Changes, c => c.Property == expectChangeProperty);
+            }
         }
 
         private static FilterPreset _FailingReplacerUnsupportedTargetPreset(string name)

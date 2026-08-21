@@ -48,7 +48,9 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
                     string.Equals(options.FrameId, "TXXX", StringComparison.Ordinal)
                     && options.ContentDescriptor is null;
                 if (isBareTxxx)
+                {
                     return _FirstTxxxText(overlay);
+                }
 
                 return AudioOverlayBlockFieldIo.GetId3v2FrameString(
                     overlay,
@@ -101,12 +103,16 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
         {
             var block = overlay.Id3v2;
             if (block is null)
+            {
                 return string.Empty;
+            }
 
             foreach (var frame in block.Frames)
             {
                 if (!string.Equals(frame.FrameId, "TXXX", StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 return DelimitedText.Join(frame.TextValues);
             }
@@ -139,7 +145,9 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
                 item.EnsureEmbeddedTagsLoaded();
                 var block = item.Preview.AudioTagOverlay.Id3v2;
                 if (block is null)
+                {
                     return string.Empty;
+                }
 
                 return $"2.{block.Version}";
             };

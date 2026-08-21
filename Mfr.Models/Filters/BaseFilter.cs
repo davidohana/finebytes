@@ -20,7 +20,9 @@ namespace Mfr.Models.Filters
         internal void Setup()
         {
             if (_isSetupComplete)
+            {
                 return;
+            }
 
             _Setup();
             _isSetupComplete = true;

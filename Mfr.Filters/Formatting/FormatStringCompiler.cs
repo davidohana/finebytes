@@ -84,17 +84,24 @@ namespace Mfr.Filters.Formatting
             }
 
             if (segments.Count == 0)
+            {
                 return _ => template;
+            }
 
             if (segments.Count == 1)
+            {
                 return segments[0];
+            }
 
             var frozen = segments.ToArray();
             return item =>
             {
                 var sb = new StringBuilder();
                 foreach (var seg in frozen)
+                {
                     sb.Append(seg(item));
+                }
+
                 return sb.ToString();
             };
         }
@@ -113,22 +120,30 @@ namespace Mfr.Filters.Formatting
             for (var i = 0; i < text.Length; i++)
             {
                 if (text[i] != '<')
+                {
                     continue;
+                }
 
                 var close = _FindMatchingClose(text, i);
                 if (close < 0 || close <= i + 1)
+                {
                     continue;
+                }
 
                 var inner = text.AsSpan(i + 1, close - (i + 1)).Trim();
                 if (inner.Length == 0)
+                {
                     continue;
+                }
 
                 var innerStr = inner.ToString();
                 var colonIndex = innerStr.IndexOf(':');
                 var namePart = colonIndex < 0 ? innerStr : innerStr[..colonIndex];
                 namePart = namePart.Trim();
                 if (_LooksLikeFormatterTokenName(namePart))
+                {
                     return true;
+                }
             }
 
             return false;
@@ -137,13 +152,17 @@ namespace Mfr.Filters.Formatting
         private static bool _LooksLikeFormatterTokenName(string name)
         {
             if (name.Length < 2 || !char.IsAsciiLetter(name[0]))
+            {
                 return false;
+            }
 
             for (var k = 1; k < name.Length; k++)
             {
                 var c = name[k];
                 if (char.IsAsciiLetterOrDigit(c) || c is '-' or '_')
+                {
                     continue;
+                }
 
                 return false;
             }
@@ -161,12 +180,16 @@ namespace Mfr.Filters.Formatting
             for (var j = openIndex; j < template.Length; j++)
             {
                 if (template[j] == '<')
+                {
                     depth++;
+                }
                 else if (template[j] == '>')
                 {
                     depth--;
                     if (depth == 0)
+                    {
                         return j;
+                    }
                 }
             }
             return -1;
@@ -178,9 +201,12 @@ namespace Mfr.Filters.Formatting
             var name = colonIndex < 0 ? tokenInner : tokenInner[..colonIndex];
             var tokenArgs = colonIndex < 0 ? "" : tokenInner[(colonIndex + 1)..];
             if (!_nameToToken.TryGetValue(name, out var token))
+            {
                 throw new NotSupportedException(
                     $"Unknown formatter token '<{name}>'. See the Formatter docs for supported tokens."
                 );
+            }
+
             return token.Compile(tokenArgs);
         }
 

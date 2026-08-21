@@ -35,7 +35,9 @@ namespace Mfr.Filters.Space
         protected override string _TransformValue(string value, RenameItem item)
         {
             if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(Options.AfterChars))
+            {
                 return value;
+            }
 
             var triggers = new HashSet<char>(Options.AfterChars);
             var sep = item.WordSeparator;
@@ -46,13 +48,20 @@ namespace Mfr.Filters.Space
                 var c = value[i];
                 builder.Append(c);
                 if (!triggers.Contains(c))
+                {
                     continue;
+                }
+
                 if (i + 1 >= value.Length)
+                {
                     continue;
+                }
 
                 var next = value[i + 1];
                 if (SpaceTriggerInsertion.ShouldInsertBeside(next, sep, onlyWhenNext))
+                {
                     builder.Append(sep);
+                }
             }
 
             return builder.ToString();

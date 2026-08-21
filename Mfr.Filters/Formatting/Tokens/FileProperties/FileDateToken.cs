@@ -92,11 +92,13 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             );
 
             if (!_TryParseFileDateKindKeyword(dateKindPart, out var timestampField))
+            {
                 throw new ArgumentException(
                     $"{tokenDisplayName} invalid date-kind '{dateKindPart}' "
                         + $"(expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToTimestampField.Keys)}).",
                     nameof(tokenArgs)
                 );
+            }
 
             return new Options(Format: formatPart, TimestampField: timestampField);
         }
@@ -108,7 +110,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         {
             timestampField = default;
             if (string.IsNullOrWhiteSpace(raw))
+            {
                 return false;
+            }
 
             return _keywordToTimestampField.TryGetValue(raw.Trim(), out timestampField);
         }

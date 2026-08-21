@@ -89,7 +89,9 @@ namespace Mfr.Tests.Models
             finally
             {
                 if (File.Exists(path))
+                {
                     File.Delete(path);
+                }
             }
         }
     }

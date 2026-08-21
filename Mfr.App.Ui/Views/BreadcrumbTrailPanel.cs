@@ -109,11 +109,15 @@ namespace Mfr.App.Ui.Views
             _ConstrainLastVisibleChild(widths, availableSize, visibleStart);
 
             if (double.IsInfinity(availableSize.Width) || double.IsNaN(availableSize.Width))
+            {
                 return new Size(_Sum(widths), height);
+            }
 
             var usedWidth = HasOverflow ? OverflowButtonWidth : 0;
             for (var i = visibleStart; i < count; i++)
+            {
                 usedWidth += Children[i].DesiredSize.Width;
+            }
 
             return new Size(Math.Min(usedWidth, availableSize.Width), height);
         }
@@ -123,7 +127,9 @@ namespace Mfr.App.Ui.Views
         {
             var count = Children.Count;
             if (count == 0)
+            {
                 return finalSize;
+            }
 
             var x = HasOverflow ? OverflowButtonWidth : 0;
             for (var i = 0; i < count; i++)
@@ -141,7 +147,9 @@ namespace Mfr.App.Ui.Views
                 var width = child.DesiredSize.Width;
                 var remaining = Math.Max(0, finalSize.Width - x);
                 if (width > remaining)
+                {
                     width = remaining;
+                }
 
                 var y = Math.Max(0, (finalSize.Height - child.DesiredSize.Height) / 2);
                 child.Arrange(new Rect(x, y, width, child.DesiredSize.Height));
@@ -154,16 +162,22 @@ namespace Mfr.App.Ui.Views
         private void _ConstrainLastVisibleChild(double[] widths, Size availableSize, int visibleStart)
         {
             if (double.IsInfinity(availableSize.Width) || double.IsNaN(availableSize.Width))
+            {
                 return;
+            }
 
             var lastIndex = widths.Length - 1;
             var usedBeforeLast = HasOverflow ? OverflowButtonWidth : 0;
             for (var i = visibleStart; i < lastIndex; i++)
+            {
                 usedBeforeLast += widths[i];
+            }
 
             var remainingForLast = availableSize.Width - usedBeforeLast;
             if (remainingForLast >= widths[lastIndex])
+            {
                 return;
+            }
 
             var maxWidth = Math.Max(0, remainingForLast);
             var lastChild = Children[lastIndex];
@@ -175,7 +189,9 @@ namespace Mfr.App.Ui.Views
         {
             var total = 0d;
             foreach (var width in widths)
+            {
                 total += width;
+            }
 
             return total;
         }

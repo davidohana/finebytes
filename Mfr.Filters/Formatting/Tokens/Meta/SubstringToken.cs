@@ -60,13 +60,17 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             {
                 var source = compiledSource(item);
                 if (source.Length == 0)
+                {
                     return string.Empty;
+                }
 
                 var start = _ResolvePosition(options.StartPosition, source.Length);
                 var end = _ResolvePosition(options.EndPosition, source.Length);
 
                 if (start <= end)
+                {
                     return source[(start - 1)..end];
+                }
 
                 // Crossed positions: return (end, start] — the range between them, end excluded.
                 return source[end..start];

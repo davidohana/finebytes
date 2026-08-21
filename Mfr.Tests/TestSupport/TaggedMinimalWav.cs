@@ -23,7 +23,9 @@ namespace Mfr.Tests.TestSupport
             info.SetValue("INAM", title);
 
             if (!string.IsNullOrEmpty(album))
+            {
                 info.SetValue("IPRD", album);
+            }
 
             file.Save();
         }

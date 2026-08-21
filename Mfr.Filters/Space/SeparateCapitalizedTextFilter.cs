@@ -32,7 +32,9 @@ namespace Mfr.Filters.Space
         protected override string _TransformValue(string value, RenameItem item)
         {
             if (value.Length <= 1)
+            {
                 return value;
+            }
 
             var separator = item.WordSeparator.ToString();
             var builder = new StringBuilder(value.Length + 8);
@@ -42,7 +44,9 @@ namespace Mfr.Filters.Space
                 var previous = value[i - 1];
                 var current = value[i];
                 if (_ShouldInsertSeparator(previous, current))
+                {
                     builder.Append(separator);
+                }
 
                 builder.Append(current);
             }

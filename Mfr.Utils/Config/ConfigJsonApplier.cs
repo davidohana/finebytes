@@ -42,7 +42,9 @@ namespace Mfr.Utils.Config
             var naming = jsonPropertyNamingPolicy ?? JsonNamingPolicy.CamelCase;
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             foreach (var field in target.GetType().GetFields(flags))
+            {
                 _ApplyField(configObject, target, field, naming, jsonPropertyNamingPolicy);
+            }
         }
 
         /// <summary>
@@ -95,7 +97,9 @@ namespace Mfr.Utils.Config
             }
 
             if (field.FieldType == typeof(bool))
+            {
                 _ApplyBoolLeaf(configObject, target, field, jsonName);
+            }
         }
 
         /// <summary>
@@ -119,14 +123,20 @@ namespace Mfr.Utils.Config
 
             var nested = field.GetValue(target);
             if (nested is null)
+            {
                 return;
+            }
 
             var sectionKey = sectionAttr.JsonName;
             if (string.IsNullOrEmpty(sectionKey))
+            {
                 sectionKey = naming.ConvertName(field.Name);
+            }
 
             if (!_TryGetObjectProperty(configObject, sectionKey, out var nestedObject))
+            {
                 return;
+            }
 
             Apply(nestedObject, nested, jsonPropertyNamingPolicy);
         }
@@ -206,12 +216,16 @@ namespace Mfr.Utils.Config
         private static bool _TryGetObjectProperty(JsonElement root, string propertyName, out JsonElement value)
         {
             if (root.ValueKind != JsonValueKind.Object)
+            {
                 throw new InvalidDataException("Root must be a JSON object.");
+            }
 
             foreach (var prop in root.EnumerateObject())
             {
                 if (!string.Equals(prop.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                {
                     continue;
+                }
 
                 var kind = prop.Value.ValueKind;
                 if (kind == JsonValueKind.Null)

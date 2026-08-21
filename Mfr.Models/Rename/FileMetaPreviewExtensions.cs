@@ -21,7 +21,9 @@ namespace Mfr.Models.Rename
         internal static string GetTargetString(this FileMeta meta, FilterTarget target)
         {
             if (target is IAudioOverlayFilterTarget audioTarget)
+            {
                 return AudioOverlayTargetIo.GetTargetString(meta.AudioTagOverlay, audioTarget);
+            }
 
             return target switch
             {
@@ -115,21 +117,31 @@ namespace Mfr.Models.Rename
 
             var trimmed = value.Trim();
             if (trimmed.Length == 0)
+            {
                 throw new ArgumentException("Full path cannot be empty or whitespace.", nameof(value));
+            }
 
             if (!Path.IsPathFullyQualified(trimmed))
+            {
                 throw new ArgumentException("Full path must be fully qualified.", nameof(value));
+            }
 
             if (_ContainsInvalidPathChar(trimmed))
+            {
                 throw new ArgumentException("Full path contains invalid characters.", nameof(value));
+            }
 
             var fileName = Path.GetFileName(trimmed);
             if (string.IsNullOrEmpty(fileName))
+            {
                 throw new ArgumentException("Full path must include a file name.", nameof(value));
+            }
 
             var directory = Path.GetDirectoryName(trimmed);
             if (string.IsNullOrEmpty(directory))
+            {
                 throw new ArgumentException("Full path must include a parent directory.", nameof(value));
+            }
 
             meta.DirectoryPath = directory;
             meta.Extension = Path.GetExtension(fileName);
@@ -152,13 +164,19 @@ namespace Mfr.Models.Rename
 
             var trimmed = value.Trim();
             if (trimmed.Length == 0)
+            {
                 throw new ArgumentException("Directory path cannot be empty or whitespace.", nameof(value));
+            }
 
             if (!Path.IsPathFullyQualified(trimmed))
+            {
                 throw new ArgumentException("Directory path must be fully qualified.", nameof(value));
+            }
 
             if (_ContainsInvalidPathChar(trimmed))
+            {
                 throw new ArgumentException("Directory path contains invalid characters.", nameof(value));
+            }
 
             meta.DirectoryPath = trimmed;
         }

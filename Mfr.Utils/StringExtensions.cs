@@ -25,7 +25,9 @@ namespace Mfr.Utils
         public static string? TrimmedOrNull(this string? value)
         {
             if (value is null)
+            {
                 return null;
+            }
 
             var trimmed = value.Trim();
             return trimmed.Length == 0 ? null : trimmed;

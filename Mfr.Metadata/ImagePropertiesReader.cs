@@ -74,7 +74,9 @@ namespace Mfr.Metadata
         private static string _EnsureRasterAllowlist(string? format)
         {
             if (format is not null && _rasterTypeNameToIsAllowed.Contains(format))
+            {
                 return format;
+            }
 
             var displayName = format ?? "unknown";
             throw new InvalidOperationException($"Cannot read image properties for file type '{displayName}'.");
@@ -128,7 +130,9 @@ namespace Mfr.Metadata
             var width = _TryGetInt(bmp, BmpHeaderDirectory.TagImageWidth);
             var height = _TryGetInt(bmp, BmpHeaderDirectory.TagImageHeight);
             if (height < 0)
+            {
                 height = Math.Abs(height);
+            }
 
             return (width, height);
         }
@@ -160,7 +164,9 @@ namespace Mfr.Metadata
         private static int _ReadIcoDimension(IcoDirectory? directory, int tag)
         {
             if (directory is null || !directory.ContainsTag(tag))
+            {
                 return 0;
+            }
 
             var value = _TryGetInt(directory, tag);
             return value == 0 ? 256 : value;
@@ -192,7 +198,9 @@ namespace Mfr.Metadata
             var precision = _TryGetInt(jpeg, JpegDirectory.TagDataPrecision);
             var components = _TryGetInt(jpeg, JpegDirectory.TagNumberOfComponents);
             if (precision == 0 || components == 0)
+            {
                 return 0;
+            }
 
             return precision * components;
         }
@@ -202,7 +210,9 @@ namespace Mfr.Metadata
             var ihdr = _FindPngChunk(directories, PngChunkType.IHDR);
             var bitsPerSample = _TryGetInt(ihdr, PngDirectory.TagBitsPerSample);
             if (bitsPerSample == 0 || ihdr is null || !ihdr.TryGetInt32(PngDirectory.TagColorType, out var colorType))
+            {
                 return 0;
+            }
 
             var channelCount = colorType switch
             {
@@ -213,7 +223,9 @@ namespace Mfr.Metadata
                 _ => 0,
             };
             if (channelCount == 0)
+            {
                 return 0;
+            }
 
             return bitsPerSample * channelCount;
         }
@@ -222,7 +234,9 @@ namespace Mfr.Metadata
         {
             var ifd0 = directories.OfType<ExifIfd0Directory>().FirstOrDefault();
             if (ifd0 is null)
+            {
                 return 0;
+            }
 
             return _SumNumericTag(ifd0, ExifDirectoryBase.TagBitsPerSample);
         }
@@ -231,19 +245,27 @@ namespace Mfr.Metadata
         {
             var jfif = directories.OfType<JfifDirectory>().FirstOrDefault();
             if (jfif is not null)
+            {
                 return _ReadJfifDpi(jfif);
+            }
 
             var ifd0 = directories.OfType<ExifIfd0Directory>().FirstOrDefault();
             if (ifd0 is not null && _TryReadExifDpi(ifd0, out var exifDpi))
+            {
                 return exifDpi;
+            }
 
             var phys = _FindPngChunk(directories, PngChunkType.pHYs);
             if (phys is not null)
+            {
                 return _ReadPngDpi(phys);
+            }
 
             var bmp = directories.OfType<BmpHeaderDirectory>().FirstOrDefault();
             if (bmp is not null)
+            {
                 return _ReadBmpDpi(bmp);
+            }
 
             return (0, 0);
         }
@@ -251,7 +273,9 @@ namespace Mfr.Metadata
         private static (double Horizontal, double Vertical) _ReadJfifDpi(JfifDirectory jfif)
         {
             if (!jfif.TryGetInt32(JfifDirectory.TagUnits, out var units))
+            {
                 return (0, 0);
+            }
 
             var x = _TryGetDouble(jfif, JfifDirectory.TagResX);
             var y = _TryGetDouble(jfif, JfifDirectory.TagResY);
@@ -272,7 +296,9 @@ namespace Mfr.Metadata
             var y = _TryGetDouble(ifd0, ExifDirectoryBase.TagYResolution);
             var unit = 2;
             if (ifd0.TryGetInt32(ExifDirectoryBase.TagResolutionUnit, out var taggedUnit))
+            {
                 unit = taggedUnit;
+            }
 
             dpi = _ConvertDensityToDpi(x, y, unit, isJfifUnits: false);
             return true;
@@ -281,7 +307,9 @@ namespace Mfr.Metadata
         private static (double Horizontal, double Vertical) _ReadPngDpi(PngDirectory phys)
         {
             if (!phys.TryGetInt32(PngDirectory.TagUnitSpecifier, out var unit) || unit != 1)
+            {
                 return (0, 0);
+            }
 
             var x = _TryGetDouble(phys, PngDirectory.TagPixelsPerUnitX);
             var y = _TryGetDouble(phys, PngDirectory.TagPixelsPerUnitY);
@@ -305,17 +333,27 @@ namespace Mfr.Metadata
             if (isJfifUnits)
             {
                 if (unit == 1)
+                {
                     return (_NonPositiveToZero(x), _NonPositiveToZero(y));
+                }
+
                 if (unit == 2)
+                {
                     return (_NonPositiveToZero(x * 2.54), _NonPositiveToZero(y * 2.54));
+                }
 
                 return (0, 0);
             }
 
             if (unit == 2)
+            {
                 return (_NonPositiveToZero(x), _NonPositiveToZero(y));
+            }
+
             if (unit == 3)
+            {
                 return (_NonPositiveToZero(x * 2.54), _NonPositiveToZero(y * 2.54));
+            }
 
             return (0, 0);
         }
@@ -323,21 +361,29 @@ namespace Mfr.Metadata
         private static int _ReadFrameCount(IReadOnlyList<MeDirectory> directories, string format, int width, int height)
         {
             if (format == "GIF")
+            {
                 return directories.OfType<GifImageDirectory>().Count();
+            }
 
             if (format == "ICO")
+            {
                 return directories.OfType<IcoDirectory>().Count();
+            }
 
             if (format == "TIFF")
             {
                 var imageIfdCount = directories.OfType<ExifIfd0Directory>().Count(_HasDimensionTag);
                 if (imageIfdCount > 0)
+                {
                     return imageIfdCount;
+                }
             }
 
             var isStillFormat = format is "JPEG" or "PNG" or "BMP" or "WebP" or "TIFF";
             if (isStillFormat && (width > 0 || height > 0))
+            {
                 return 1;
+            }
 
             return 0;
         }
@@ -357,13 +403,20 @@ namespace Mfr.Metadata
         {
             var ints = directory.GetInt32Array(tag);
             if (ints is { Length: > 0 })
+            {
                 return ints.Sum();
+            }
 
             var raw = directory.GetObject(tag);
             if (raw is ushort[] ushorts)
+            {
                 return ushorts.Sum(v => v);
+            }
+
             if (raw is short[] shorts)
+            {
                 return shorts.Sum(v => v);
+            }
 
             return _TryGetInt(directory, tag);
         }
@@ -371,7 +424,9 @@ namespace Mfr.Metadata
         private static int _TryGetInt(MeDirectory? directory, int tag)
         {
             if (directory is null || !directory.TryGetInt32(tag, out var value))
+            {
                 return 0;
+            }
 
             return value;
         }
@@ -379,10 +434,14 @@ namespace Mfr.Metadata
         private static double _TryGetDouble(MeDirectory directory, int tag)
         {
             if (directory.TryGetDouble(tag, out var value))
+            {
                 return value;
+            }
 
             if (directory.TryGetRational(tag, out var rational))
+            {
                 return rational.ToDouble();
+            }
 
             return 0;
         }
@@ -390,7 +449,9 @@ namespace Mfr.Metadata
         private static double _PixelsPerMetreToDpi(double pixelsPerMetre)
         {
             if (pixelsPerMetre <= 0)
+            {
                 return 0;
+            }
 
             return pixelsPerMetre * 0.0254;
         }

@@ -62,20 +62,26 @@ namespace Mfr.Metadata.TagFields
         public static XiphTagData? Read(TagLib.File file)
         {
             if (file.GetTag(TagTypes.Xiph, false) is not XiphComment live || live.IsEmpty)
+            {
                 return null;
+            }
 
             var rows = new List<TextFieldRow>();
             foreach (var key in _KnownKeys)
             {
                 var values = DelimitedText.TrimNonEmpty(live.GetField(key));
                 if (values.Length == 0)
+                {
                     continue;
+                }
 
                 rows.Add(new TextFieldRow(key, values));
             }
 
             if (rows.Count == 0)
+            {
                 return null;
+            }
 
             rows.Sort(_CompareRows);
             return new XiphTagData { Fields = [.. rows] };
@@ -90,7 +96,9 @@ namespace Mfr.Metadata.TagFields
         public static void Apply(TagLib.File file, XiphTagData? original, XiphTagData preview)
         {
             if (Equals(original, preview))
+            {
                 return;
+            }
 
             var live = (XiphComment)file.GetTag(TagTypes.Xiph, true);
             if (original is null)
@@ -111,12 +119,16 @@ namespace Mfr.Metadata.TagFields
         private static void _WriteAll(XiphComment live, XiphTagData data)
         {
             foreach (var key in _KnownKeys)
+            {
                 live.RemoveField(key);
+            }
 
             foreach (var row in data.Fields)
             {
                 if (row.Values.Length == 0)
+                {
                     continue;
+                }
 
                 live.SetField(row.Key, [.. row.Values]);
             }

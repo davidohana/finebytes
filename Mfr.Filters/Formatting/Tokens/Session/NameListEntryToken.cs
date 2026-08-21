@@ -47,15 +47,19 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             {
                 var index = item.Original.RenameListIndex;
                 if (index < 0)
+                {
                     throw new InvalidOperationException(
                         $"{tokenDisplayName} requires non-negative global index (got {index})."
                     );
+                }
 
                 if (index >= entries.Count)
+                {
                     throw new UserException(
                         $"{tokenDisplayName} index {index} is out of range for '{normalizedPath}' "
                             + $"({entries.Count} parsed entries)."
                     );
+                }
 
                 return entries[index];
             };

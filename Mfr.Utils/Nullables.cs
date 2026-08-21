@@ -17,7 +17,9 @@ namespace Mfr.Utils
             foreach (var candidate in candidates)
             {
                 if (candidate is not null)
+                {
                     return candidate;
+                }
             }
 
             return null;
@@ -35,7 +37,9 @@ namespace Mfr.Utils
             foreach (var candidate in candidates)
             {
                 if (candidate is not null)
+                {
                     return candidate;
+                }
             }
 
             return null;

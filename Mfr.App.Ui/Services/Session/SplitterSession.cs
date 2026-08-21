@@ -17,7 +17,9 @@ namespace Mfr.App.Ui.Services.Session
         public static void TryRestore(MainWindow window, SessionSplitterState? saved)
         {
             if (saved is null)
+            {
                 return;
+            }
 
             _SetColumnRatio(window.TopPanesGrid, saved.FileList);
             _SetColumnRatio(window.FilterListsGrid, saved.AvailableApplied);
@@ -44,7 +46,9 @@ namespace Mfr.App.Ui.Services.Session
         private static void _SetColumnRatio(Grid grid, double? ratio)
         {
             if (ratio is not (> 0 and < 1))
+            {
                 return;
+            }
 
             grid.ColumnDefinitions[0].Width = new GridLength(ratio.Value, GridUnitType.Star);
             grid.ColumnDefinitions[2].Width = new GridLength(1 - ratio.Value, GridUnitType.Star);
@@ -53,7 +57,9 @@ namespace Mfr.App.Ui.Services.Session
         private static void _SetRowRatio(Grid grid, double? ratio)
         {
             if (ratio is not (> 0 and < 1))
+            {
                 return;
+            }
 
             grid.RowDefinitions[0].Height = new GridLength(ratio.Value, GridUnitType.Star);
             grid.RowDefinitions[2].Height = new GridLength(1 - ratio.Value, GridUnitType.Star);

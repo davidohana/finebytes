@@ -39,7 +39,9 @@ namespace Mfr.Metadata
             var mediaTypes = properties.MediaTypes;
             string? mediaTypesText = null;
             if (mediaTypes != MediaTypes.None)
+            {
                 mediaTypesText = mediaTypes.ToString();
+            }
 
             return new MediaProperties
             {
@@ -66,7 +68,9 @@ namespace Mfr.Metadata
             foreach (var codec in properties.Codecs)
             {
                 if (codec is not AudioHeader header)
+                {
                     continue;
+                }
 
                 var isVbr = header.XingHeader.Present || header.VBRIHeader.Present;
                 return new MpegAudioProperties

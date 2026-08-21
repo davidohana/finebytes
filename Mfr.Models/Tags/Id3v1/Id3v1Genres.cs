@@ -175,7 +175,9 @@ namespace Mfr.Models.Tags.Id3v1
             for (var i = 0; i < _Audio.Length; i++)
             {
                 if (string.Equals(_Audio[i], name, StringComparison.OrdinalIgnoreCase))
+                {
                     return (byte)i;
+                }
             }
 
             return 255;
@@ -189,7 +191,9 @@ namespace Mfr.Models.Tags.Id3v1
         public static string? IndexToAudio(byte index)
         {
             if (index >= _Audio.Length)
+            {
                 return null;
+            }
 
             return _Audio[index];
         }

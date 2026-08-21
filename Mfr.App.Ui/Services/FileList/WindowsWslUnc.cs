@@ -53,7 +53,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             mapped = null;
             if (string.IsNullOrWhiteSpace(liveRoot) || !_TrySplit(path, out var host, out var remainder))
+            {
                 return false;
+            }
 
             var targetRoot = _IsShortAlias(host) ? liveRoot.TrimEnd('\\') : @"\\" + host;
             mapped = remainder.Length == 0 ? targetRoot : targetRoot + @"\" + remainder;
@@ -70,10 +72,14 @@ namespace Mfr.App.Ui.Services.FileList
         {
             resolved = null;
             if (!OperatingSystem.IsWindows() || !_TrySplit(path, out var host, out var remainder))
+            {
                 return false;
+            }
 
             if (!TryGetLiveRoot(out var liveRoot))
+            {
                 return false;
+            }
 
             var explicitRoot = _IsShortAlias(host) ? liveRoot : @"\\" + host;
             if (remainder.Length == 0)
@@ -86,7 +92,9 @@ namespace Mfr.App.Ui.Services.FileList
             {
                 var candidate = root + @"\" + remainder;
                 if (!_IsAccessible(candidate))
+                {
                     continue;
+                }
 
                 resolved = candidate;
                 return true;
@@ -105,7 +113,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             root = null;
             if (!OperatingSystem.IsWindows() || _ListDistroNames().Count == 0)
+            {
                 return false;
+            }
 
             root = _PreferredRoot();
             return true;
@@ -121,18 +131,26 @@ namespace Mfr.App.Ui.Services.FileList
         {
             distroPaths = null;
             if (!OperatingSystem.IsWindows() || !IsWslServerRoot(serverRoot))
+            {
                 return false;
+            }
 
             var names = _ListDistroNames();
             if (names.Count == 0)
+            {
                 return false;
+            }
 
             if (!TryMapPath(serverRoot, _PreferredRoot(), out var mappedRoot))
+            {
                 return false;
+            }
 
             distroPaths = [];
             foreach (var name in names)
+            {
                 distroPaths.Add(mappedRoot + @"\" + name);
+            }
 
             return true;
         }
@@ -140,7 +158,9 @@ namespace Mfr.App.Ui.Services.FileList
         private static string _PreferredRoot()
         {
             if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, _Windows11Build))
+            {
                 return @"\\" + _LocalhostHost;
+            }
 
             return @"\\" + _LegacyHost;
         }
@@ -149,7 +169,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             var names = _ReadRegistryDistroNames();
             if (names.Count > 0)
+            {
                 return names;
+            }
 
             return _ReadWslListDistroNames();
         }
@@ -158,23 +180,31 @@ namespace Mfr.App.Ui.Services.FileList
         {
             var names = new List<string>();
             if (!OperatingSystem.IsWindows())
+            {
                 return names;
+            }
 
             var pathToIsAdded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             try
             {
                 using var lxss = Registry.CurrentUser.OpenSubKey(_LxssKey);
                 if (lxss is null)
+                {
                     return names;
+                }
 
                 foreach (var subName in lxss.GetSubKeyNames())
                 {
                     using var subKey = lxss.OpenSubKey(subName);
                     if (subKey?.GetValue("DistributionName") is not string distroName)
+                    {
                         continue;
+                    }
 
                     if (string.IsNullOrWhiteSpace(distroName) || !pathToIsAdded.Add(distroName))
+                    {
                         continue;
+                    }
 
                     names.Add(distroName);
                 }
@@ -208,7 +238,9 @@ namespace Mfr.App.Ui.Services.FileList
                 };
                 using var process = Process.Start(start);
                 if (process is null)
+                {
                     return [];
+                }
 
                 if (!process.WaitForExit(_WslListTimeoutMs))
                 {
@@ -244,7 +276,9 @@ namespace Mfr.App.Ui.Services.FileList
             {
                 var name = line.Trim().Trim('\0');
                 if (string.IsNullOrWhiteSpace(name) || !pathToIsAdded.Add(name))
+                {
                     continue;
+                }
 
                 names.Add(name);
             }
@@ -256,7 +290,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             yield return first;
             if (!first.Equals(second, StringComparison.OrdinalIgnoreCase))
+            {
                 yield return second;
+            }
         }
 
         private static bool _TrySplit(
@@ -268,17 +304,23 @@ namespace Mfr.App.Ui.Services.FileList
             host = null;
             remainder = null;
             if (string.IsNullOrWhiteSpace(path))
+            {
                 return false;
+            }
 
             var normalized = _CanonicalUnc(path.Trim());
             if (!normalized.StartsWith(@"\\", StringComparison.Ordinal) || normalized.Length < 3)
+            {
                 return false;
+            }
 
             var rest = normalized[2..];
             var slash = rest.IndexOf('\\');
             var parsedHost = slash < 0 ? rest : rest[..slash];
             if (!_IsWslHost(parsedHost))
+            {
                 return false;
+            }
 
             host = parsedHost;
             remainder = slash < 0 ? string.Empty : rest[(slash + 1)..];
@@ -315,10 +357,14 @@ namespace Mfr.App.Ui.Services.FileList
             var normalized = path.Replace('/', '\\');
             const string longUnc = @"\\?\UNC\";
             if (normalized.StartsWith(longUnc, StringComparison.OrdinalIgnoreCase))
+            {
                 normalized = @"\\" + normalized[longUnc.Length..];
+            }
 
             while (normalized.Length > 2 && normalized.EndsWith('\\'))
+            {
                 normalized = normalized[..^1];
+            }
 
             return normalized;
         }

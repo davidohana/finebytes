@@ -37,10 +37,14 @@ namespace Mfr.Engine
                 ? Directory.GetCurrentDirectory()
                 : parentDirectory;
             if (_TryResolveGlob(fullSource, out var globMatches))
+            {
                 return globMatches;
+            }
 
             if (!Directory.Exists(parentDirectory))
+            {
                 throw new UserException($"Directory for source does not exist: '{parentDirectory}'.");
+            }
 
             var filePattern = Path.GetFileName(fullSource);
             if (_ContainsGlobPattern(filePattern))
@@ -69,7 +73,9 @@ namespace Mfr.Engine
         {
             resolvedPaths = [];
             if (!_ContainsGlobPattern(fullSource))
+            {
                 return false;
+            }
 
             var normalizedSource = fullSource.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             var root = Path.GetPathRoot(normalizedSource) ?? Directory.GetCurrentDirectory();
@@ -92,7 +98,9 @@ namespace Mfr.Engine
             }
 
             if (!foundGlob)
+            {
                 return false;
+            }
 
             if (globSegments.Count == 1)
             {
@@ -107,7 +115,9 @@ namespace Mfr.Engine
             }
 
             if (!Directory.Exists(baseDirectory))
+            {
                 throw new UserException($"Directory for source does not exist: '{baseDirectory}'.");
+            }
 
             var includePattern = globSegments.Count == 0 ? "*" : string.Join('/', globSegments);
             var matcher = new Matcher(

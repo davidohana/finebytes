@@ -59,7 +59,9 @@ namespace Mfr.Models.Config
             if (!File.Exists(path))
             {
                 if (!useDefaultPath)
+                {
                     throw new InvalidDataException($"Config file not found: '{path}'.");
+                }
 
                 return;
             }
@@ -88,7 +90,9 @@ namespace Mfr.Models.Config
 
             var list = assignments.Where(a => !a.IsBlank()).Select(a => a.Trim()).ToList();
             if (list.Count == 0)
+            {
                 return;
+            }
 
             try
             {

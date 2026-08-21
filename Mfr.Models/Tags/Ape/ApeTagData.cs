@@ -22,10 +22,14 @@ namespace Mfr.Models.Tags.Ape
         public bool Equals(ApeTagData? other)
         {
             if (other is null)
+            {
                 return false;
+            }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             return TextFieldRow.SequenceEquals(Fields, other.Fields);
         }

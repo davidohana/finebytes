@@ -34,7 +34,9 @@ namespace Mfr.App.Ui.Services.FileList
         public static bool CanLoad(string path, long? length)
         {
             if (length is null or > _MaxBytes)
+            {
                 return false;
+            }
 
             return _extensionToIsImage.Contains(Path.GetExtension(path));
         }
@@ -49,7 +51,9 @@ namespace Mfr.App.Ui.Services.FileList
         public static IImage? TryLoad(string path, long? length, int decodeWidth = DecodeWidth)
         {
             if (!CanLoad(path, length))
+            {
                 return null;
+            }
 
             var width = decodeWidth < 1 ? DecodeWidth : decodeWidth;
             var extension = Path.GetExtension(path);
@@ -63,10 +67,14 @@ namespace Mfr.App.Ui.Services.FileList
                 {
                     var fromExif = _TryLoadFromExifThumbnail(stream, width);
                     if (fromExif is not null)
+                    {
                         return fromExif;
+                    }
 
                     if (stream.CanSeek)
+                    {
                         stream.Position = 0;
+                    }
                 }
 
                 return Bitmap.DecodeToWidth(stream, width);
@@ -88,7 +96,9 @@ namespace Mfr.App.Ui.Services.FileList
         {
             var embeddedJpeg = JpegExifThumbnailReader.TryExtract(stream);
             if (embeddedJpeg is null)
+            {
                 return null;
+            }
 
             try
             {
@@ -102,7 +112,9 @@ namespace Mfr.App.Ui.Services.FileList
                 }
 
                 if (native.PixelSize.Width == width)
+                {
                     return native;
+                }
 
                 native.Dispose();
                 thumbStream.Position = 0;

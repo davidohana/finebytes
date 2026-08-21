@@ -48,17 +48,23 @@ namespace Mfr.App.Ui.Services.FileList
                     var isReachable =
                         status is _ErrorSuccess or _ErrorMoreData or _ErrorAccessDenied or _ErrorLogonFailure;
                     if (!isReachable)
+                    {
                         return false;
+                    }
 
                     if (buffer == IntPtr.Zero || entriesRead <= 0)
+                    {
                         continue;
+                    }
 
                     _AddDiskShares(buffer, entriesRead, serverRoot, sharePaths);
                 }
                 finally
                 {
                     if (buffer != IntPtr.Zero)
+                    {
                         _ = NativeMethods.NetApiBufferFree(buffer);
+                    }
                 }
             } while (status == _ErrorMoreData);
 
@@ -70,21 +76,29 @@ namespace Mfr.App.Ui.Services.FileList
             var stride = Marshal.SizeOf<ShareInfo1>();
             var pathToIsAdded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var existing in sharePaths)
+            {
                 pathToIsAdded.Add(existing);
+            }
 
             for (var i = 0; i < entriesRead; i++)
             {
                 var info = Marshal.PtrToStructure<ShareInfo1>(buffer + (i * stride));
                 var name = Marshal.PtrToStringUni(info.NetName);
                 if (string.IsNullOrWhiteSpace(name) || name.EndsWith('$'))
+                {
                     continue;
+                }
 
                 if ((info.Type & _ShareTypeMask) != _ShareTypeDisk)
+                {
                     continue;
+                }
 
                 var sharePath = serverRoot.TrimEnd('\\') + @"\" + name;
                 if (!pathToIsAdded.Add(sharePath))
+                {
                     continue;
+                }
 
                 sharePaths.Add(sharePath);
             }

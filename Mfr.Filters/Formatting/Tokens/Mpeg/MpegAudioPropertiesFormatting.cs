@@ -16,7 +16,9 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
         public static string Format(MpegAudioProperties? mpeg, MpegAudioPropertyField field)
         {
             if (mpeg is null)
+            {
                 return string.Empty;
+            }
 
             return field switch
             {
@@ -38,11 +40,15 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
         private static string _FormatBitrate(MpegAudioProperties mpeg)
         {
             if (mpeg.Bitrate == 0)
+            {
                 return string.Empty;
+            }
 
             var rate = mpeg.Bitrate.ToString(CultureInfo.InvariantCulture);
             if (mpeg.IsVbr)
+            {
                 return "VBR" + rate;
+            }
 
             return rate;
         }

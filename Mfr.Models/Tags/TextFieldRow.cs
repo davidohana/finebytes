@@ -18,7 +18,9 @@ namespace Mfr.Models.Tags
         public bool Equals(TextFieldRow other)
         {
             if (!string.Equals(Key, other.Key, StringComparison.Ordinal))
+            {
                 return false;
+            }
 
             return OrdinalSequence.AreEqual(Values, other.Values);
         }
@@ -29,7 +31,9 @@ namespace Mfr.Models.Tags
             var hash = new HashCode();
             hash.Add(Key, StringComparer.Ordinal);
             foreach (var value in Values.AsSpan())
+            {
                 hash.Add(value, StringComparer.Ordinal);
+            }
 
             return hash.ToHashCode();
         }
@@ -54,7 +58,9 @@ namespace Mfr.Models.Tags
         {
             var hash = new HashCode();
             foreach (var row in fields.AsSpan())
+            {
                 hash.Add(row);
+            }
 
             return hash.ToHashCode();
         }

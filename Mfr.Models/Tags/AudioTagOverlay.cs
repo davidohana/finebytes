@@ -181,7 +181,9 @@ namespace Mfr.Models.Tags
         public void EnsureEmptyBlock(AudioTagBlockKind kind)
         {
             if (HasBlock(kind))
+            {
                 return;
+            }
 
             switch (kind)
             {
@@ -243,7 +245,9 @@ namespace Mfr.Models.Tags
             {
                 var recommended = AudioTagContainerPolicy.GetRecommendedBlock(ContainerFormat);
                 if (recommended is not null)
+                {
                     EnsureEmptyBlock(recommended.Value);
+                }
             }
 
             AudioTagSemanticMerge.MergeIntoPresentBlocks(this, semantic);
@@ -253,28 +257,44 @@ namespace Mfr.Models.Tags
         public bool TagBlocksStructurallyEquals(AudioTagOverlay? other)
         {
             if (other is null)
+            {
                 return false;
+            }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             if (!Equals(Id3v1, other.Id3v1))
+            {
                 return false;
+            }
 
             if (!Equals(Id3v2, other.Id3v2))
+            {
                 return false;
+            }
 
             if (!Equals(Xiph, other.Xiph))
+            {
                 return false;
+            }
 
             if (!Equals(Ape, other.Ape))
+            {
                 return false;
+            }
 
             if (!Equals(RiffInfo, other.RiffInfo))
+            {
                 return false;
+            }
 
             if (!Equals(Apple, other.Apple))
+            {
                 return false;
+            }
 
             return Equals(Asf, other.Asf);
         }

@@ -17,7 +17,9 @@ namespace Mfr.Tests.Ui
         public void Dispose()
         {
             foreach (var viewModel in _viewModels)
+            {
                 viewModel.Dispose();
+            }
 
             _tempDirectoryFixture.Dispose();
         }
@@ -203,7 +205,9 @@ namespace Mfr.Tests.Ui
             var hiddenPath = Path.Combine(dir, hiddenName);
             File.WriteAllText(hiddenPath, "hidden");
             if (OperatingSystem.IsWindows())
+            {
                 File.SetAttributes(hiddenPath, FileAttributes.Hidden);
+            }
 
             var viewModel = _CreateViewModel(dir);
 
@@ -226,9 +230,13 @@ namespace Mfr.Tests.Ui
             Assert.Equal(OperatingSystem.IsWindows(), viewModel.ShowsComputerRoot);
 
             if (OperatingSystem.IsWindows())
+            {
                 Assert.Equal(FileListViewModel.ComputerDisplayName, labels[0]);
+            }
             else
+            {
                 Assert.Equal(FileListViewModel.UnixRootPath, labels[0]);
+            }
 
             Assert.False(viewModel.BreadcrumbSegments[0].ShowLeadingChevron);
             Assert.True(viewModel.BreadcrumbSegments[^1].ShowLeadingChevron);
@@ -278,7 +286,9 @@ namespace Mfr.Tests.Ui
         public void ThisPc_Lists_Network_And_OpenSelected_Navigates()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
@@ -310,7 +320,9 @@ namespace Mfr.Tests.Ui
         public void ThisPc_Keeps_Network_With_Known_Places_When_Sorted()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
@@ -328,7 +340,9 @@ namespace Mfr.Tests.Ui
         public void CommitPath_Network_Aliases_Open_Network()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.BeginPathEdit();
@@ -346,7 +360,9 @@ namespace Mfr.Tests.Ui
         public void Network_Lists_Unc_Paths_From_History()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(FileListViewModel.NetworkDisplayName);
@@ -363,7 +379,9 @@ namespace Mfr.Tests.Ui
         public void NavigateTo_Wsl_Alias_Opens_Live_Root()
         {
             if (!OperatingSystem.IsWindows() || !WindowsWslUnc.TryGetLiveRoot(out var liveRoot))
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(@"\\wsl");
@@ -378,7 +396,9 @@ namespace Mfr.Tests.Ui
             {
                 var name = Path.GetFileName(distroPath);
                 if (string.IsNullOrEmpty(name))
+                {
                     name = distroPath[(liveRoot.Length + 1)..];
+                }
 
                 Assert.Contains(name, _Names(viewModel));
             }
@@ -395,7 +415,9 @@ namespace Mfr.Tests.Ui
         public void Network_Lists_Live_Wsl_Root()
         {
             if (!OperatingSystem.IsWindows() || !WindowsWslUnc.TryGetLiveRoot(out var liveRoot))
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(FileListViewModel.NetworkDisplayName);
@@ -410,7 +432,9 @@ namespace Mfr.Tests.Ui
         public void Breadcrumb_Root_Opens_Drive_List_On_Windows()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(viewModel.BreadcrumbSegments[0].TargetPath);
@@ -690,7 +714,9 @@ namespace Mfr.Tests.Ui
         public void ThisPc_Lists_Drives_Before_Known_Places()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
@@ -720,12 +746,16 @@ namespace Mfr.Tests.Ui
         public void NavigateTo_Drive_Letter_Opens_Root()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var dir = _CreateTree();
             var root = Path.GetPathRoot(dir);
             if (string.IsNullOrEmpty(root) || !Directory.Exists(root))
+            {
                 return;
+            }
 
             var driveSpec = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             var viewModel = _CreateViewModel(dir);
@@ -744,11 +774,15 @@ namespace Mfr.Tests.Ui
         public void NavigateTo_Known_Place_Alias_Opens_Folder()
         {
             if (!OperatingSystem.IsWindows())
+            {
                 return;
+            }
 
             var documents = _ExistingSpecialFolder(Environment.SpecialFolder.MyDocuments);
             if (documents is null)
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo("Documents");
@@ -763,7 +797,9 @@ namespace Mfr.Tests.Ui
 
             var music = _ExistingSpecialFolder(Environment.SpecialFolder.MyMusic);
             if (music is null)
+            {
                 return;
+            }
 
             viewModel.BeginPathEdit();
             viewModel.PathText = "Music";
@@ -780,7 +816,9 @@ namespace Mfr.Tests.Ui
         {
             var expanded = Environment.ExpandEnvironmentVariables("%USERPROFILE%");
             if (expanded == "%USERPROFILE%" || !Directory.Exists(expanded))
+            {
                 return;
+            }
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.BeginPathEdit();
@@ -798,7 +836,9 @@ namespace Mfr.Tests.Ui
         )
         {
             if (_ExistingSpecialFolder(folder) is null)
+            {
                 return;
+            }
 
             var index = names.IndexOf(placeName);
             Assert.True(index > 0, placeName + " should be listed on This PC");
@@ -821,7 +861,9 @@ namespace Mfr.Tests.Ui
         {
             var path = Environment.GetFolderPath(folder);
             if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            {
                 return null;
+            }
 
             return new DirectoryInfo(path).FullName;
         }

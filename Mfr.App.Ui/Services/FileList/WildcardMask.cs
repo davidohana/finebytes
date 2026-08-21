@@ -17,7 +17,9 @@ namespace Mfr.App.Ui.Services.FileList
         public static bool IsMatch(string fileName, string? pattern)
         {
             if (string.IsNullOrEmpty(pattern))
+            {
                 return true;
+            }
 
             var regexPattern = _ToAnchoredRegex(pattern);
             try
@@ -41,7 +43,9 @@ namespace Mfr.App.Ui.Services.FileList
             foreach (var pattern in SplitPatterns(joinedPatterns))
             {
                 if (IsMatch(fileName, pattern))
+                {
                     return true;
+                }
             }
 
             return false;
@@ -55,7 +59,9 @@ namespace Mfr.App.Ui.Services.FileList
         public static ImmutableArray<string> SplitPatterns(string? joinedPatterns)
         {
             if (string.IsNullOrWhiteSpace(joinedPatterns))
+            {
                 return [];
+            }
 
             return
             [

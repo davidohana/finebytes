@@ -248,7 +248,9 @@ namespace Mfr.Tests.Models.Filters.Replace
         private static void _DeleteIfExists(string filePath)
         {
             if (!File.Exists(filePath))
+            {
                 return;
+            }
 
             File.Delete(filePath);
         }

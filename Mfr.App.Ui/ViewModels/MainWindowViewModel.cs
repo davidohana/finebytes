@@ -109,7 +109,9 @@ namespace Mfr.App.Ui.ViewModels
         public void Exit()
         {
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
                 desktop.Shutdown();
+            }
         }
 
         private static bool _CanExecuteUnimplemented()

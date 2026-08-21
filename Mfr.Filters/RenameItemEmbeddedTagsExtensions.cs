@@ -19,7 +19,9 @@ namespace Mfr.Filters
             ArgumentNullException.ThrowIfNull(item);
 
             if (item.EmbeddedTagsLoadAttempted)
+            {
                 return;
+            }
 
             item.MarkEmbeddedTagsLoadAttempted();
 
@@ -31,7 +33,9 @@ namespace Mfr.Filters
             var snapshot = TagLibFileReader.Read(item.Original.FullPath);
             item.SetEmbeddedTagOverlay(snapshot.Overlay);
             if (item.MediaPropertiesLoadAttempted)
+            {
                 return;
+            }
 
             item.MarkMediaPropertiesLoadAttempted();
             item.SetMediaProperties(snapshot.Media);

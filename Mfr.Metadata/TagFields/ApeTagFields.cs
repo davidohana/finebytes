@@ -64,14 +64,18 @@ namespace Mfr.Metadata.TagFields
         public static ApeTagData? Read(TagLib.File file)
         {
             if (file.GetTag(TagTypes.Ape, false) is not ApeTag live || live.IsEmpty)
+            {
                 return null;
+            }
 
             var keyToValues = new Dictionary<string, ImmutableArray<string>>(StringComparer.Ordinal);
             foreach (var key in _KnownKeys)
             {
                 var values = _ReadItem(live, key);
                 if (values.Length == 0)
+                {
                     continue;
+                }
 
                 keyToValues[key] = values;
             }
@@ -79,11 +83,15 @@ namespace Mfr.Metadata.TagFields
             foreach (var (alias, knownKey) in _AliasToKnownKey)
             {
                 if (keyToValues.ContainsKey(knownKey))
+                {
                     continue;
+                }
 
                 var values = _ReadItem(live, alias);
                 if (values.Length == 0)
+                {
                     continue;
+                }
 
                 keyToValues[knownKey] = values;
             }
@@ -92,7 +100,9 @@ namespace Mfr.Metadata.TagFields
             _SplitCountPair(keyToValues, numberKey: "Disc", countKey: "DiscCount");
 
             if (keyToValues.Count == 0)
+            {
                 return null;
+            }
 
             var rows = keyToValues.Select(static kvp => new TextFieldRow(kvp.Key, kvp.Value)).ToList();
             rows.Sort(_CompareRows);
@@ -108,7 +118,9 @@ namespace Mfr.Metadata.TagFields
         public static void Apply(TagLib.File file, ApeTagData? original, ApeTagData preview)
         {
             if (Equals(original, preview))
+            {
                 return;
+            }
 
             var live = (ApeTag)file.GetTag(TagTypes.Ape, true);
             if (original is null)
@@ -129,12 +141,16 @@ namespace Mfr.Metadata.TagFields
         private static void _WriteAll(ApeTag live, ApeTagData data)
         {
             foreach (var key in _KnownKeys)
+            {
                 live.RemoveItem(key);
+            }
 
             foreach (var row in data.Fields)
             {
                 if (row.Values.Length == 0)
+                {
                     continue;
+                }
 
                 live.SetValue(row.Key, [.. row.Values]);
             }
@@ -144,7 +160,9 @@ namespace Mfr.Metadata.TagFields
         {
             var item = live.GetItem(key);
             if (item is null || item.IsEmpty)
+            {
                 return [];
+            }
 
             return DelimitedText.TrimNonEmpty(item.ToStringArray());
         }
@@ -156,21 +174,31 @@ namespace Mfr.Metadata.TagFields
         )
         {
             if (!keyToValues.TryGetValue(numberKey, out var values) || values.Length == 0)
+            {
                 return;
+            }
 
             var parts = values[0].Split('/', 2);
             if (parts.Length != 2)
+            {
                 return;
+            }
 
             var number = parts[0].TrimmedOrNull();
             if (number is null)
+            {
                 keyToValues.Remove(numberKey);
+            }
             else
+            {
                 keyToValues[numberKey] = [number];
+            }
 
             var count = parts[1].TrimmedOrNull();
             if (count is not null && !keyToValues.ContainsKey(countKey))
+            {
                 keyToValues[countKey] = [count];
+            }
         }
 
         private static int _CompareRows(TextFieldRow a, TextFieldRow b)

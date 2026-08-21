@@ -52,7 +52,9 @@ namespace Mfr.Filters.Replace
         {
             var compiledEntries = Check.NotNull(_compiledEntries, "Replace-list setup must complete before transform.");
             if (compiledEntries.Count == 0)
+            {
                 return value;
+            }
 
             var transformed = value;
             foreach (var (search, compiledReplacement) in compiledEntries)

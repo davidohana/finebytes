@@ -122,7 +122,9 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                 );
 
                 if (padWidth <= 0 || padWidth <= raw.Length)
+                {
                     return raw;
+                }
 
                 return raw.PadLeft(padWidth, '0');
             };
@@ -148,7 +150,9 @@ namespace Mfr.Filters.Formatting.Tokens.Session
 
                 merged = new Dictionary<string, string>(_counterDefaults, StringComparer.OrdinalIgnoreCase);
                 foreach (var kv in parsed)
+                {
                     merged[kv.Key] = kv.Value;
+                }
             }
 
             var paddingMode = _ParsePaddingMode(tokenDisplayName, merged["padding"]);
@@ -169,10 +173,12 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         private static CounterPaddingMode _ParsePaddingMode(string tokenDisplayName, string raw)
         {
             if (!_keywordToPaddingMode.TryGetValue(raw.Trim(), out var mode))
+            {
                 throw new ArgumentException(
                     $"{tokenDisplayName} padding '{raw}' is not supported (expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToPaddingMode.Keys)}).",
                     paramName: nameof(raw)
                 );
+            }
 
             return mode;
         }
@@ -183,10 +189,12 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         private static int _ParseResetScope(string tokenDisplayName, string raw)
         {
             if (!_keywordToResetOnFolderChange.TryGetValue(raw.Trim(), out var resetOnFolderChange))
+            {
                 throw new ArgumentException(
                     $"{tokenDisplayName} reset scope '{raw}' is not supported (expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToResetOnFolderChange.Keys)}).",
                     paramName: nameof(raw)
                 );
+            }
 
             return resetOnFolderChange;
         }

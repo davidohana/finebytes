@@ -45,19 +45,29 @@ namespace Mfr.Models.Tags.Id3v2
         public bool Equals(Id3v2ModeledFrame? other)
         {
             if (other is null)
+            {
                 return false;
+            }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             if (!string.Equals(FrameId, other.FrameId, StringComparison.Ordinal))
+            {
                 return false;
+            }
 
             if (!string.Equals(Language, other.Language, StringComparison.Ordinal))
+            {
                 return false;
+            }
 
             if (!string.Equals(Description, other.Description, StringComparison.Ordinal))
+            {
                 return false;
+            }
 
             return OrdinalSequence.AreEqual(TextValues, other.TextValues);
         }
@@ -76,7 +86,9 @@ namespace Mfr.Models.Tags.Id3v2
             hash.Add(Language, StringComparer.Ordinal);
             hash.Add(Description, StringComparer.Ordinal);
             foreach (var value in TextValues)
+            {
                 hash.Add(value, StringComparer.Ordinal);
+            }
 
             return hash.ToHashCode();
         }

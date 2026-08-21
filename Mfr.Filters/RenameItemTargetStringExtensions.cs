@@ -19,7 +19,9 @@ namespace Mfr.Filters
             ArgumentNullException.ThrowIfNull(target);
 
             if (target is not IAudioOverlayFilterTarget)
+            {
                 return;
+            }
 
             switch (target)
             {

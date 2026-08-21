@@ -52,7 +52,9 @@ namespace Mfr.Tests.Ui
         public void Resolve_Maps_Short_Alias_When_Wsl_Is_Present()
         {
             if (!OperatingSystem.IsWindows() || !WindowsWslUnc.TryGetLiveRoot(out var liveRoot))
+            {
                 return;
+            }
 
             Assert.True(WindowsWslUnc.TryResolve(@"\\wsl", out var resolved));
             Assert.True(PathRelations.IsSamePath(liveRoot, resolved));
@@ -69,7 +71,9 @@ namespace Mfr.Tests.Ui
         public void Resolve_Returns_False_Without_Live_Root()
         {
             if (OperatingSystem.IsWindows() && WindowsWslUnc.TryGetLiveRoot(out _))
+            {
                 return;
+            }
 
             Assert.False(WindowsWslUnc.TryResolve(@"\\wsl", out _));
             Assert.False(WindowsWslUnc.TryResolve(@"\\wsl$", out _));

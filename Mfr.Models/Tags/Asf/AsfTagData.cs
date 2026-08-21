@@ -24,19 +24,27 @@ namespace Mfr.Models.Tags.Asf
         public bool Equals(AsfTagData? other)
         {
             if (other is null)
+            {
                 return false;
+            }
 
             if (ReferenceEquals(this, other))
+            {
                 return true;
+            }
 
             if (Descriptors.Length != other.Descriptors.Length)
+            {
                 return false;
+            }
 
             var comparer = EqualityComparer<AsfDescriptorRow>.Default;
             for (var i = 0; i < Descriptors.Length; i++)
             {
                 if (!comparer.Equals(Descriptors[i], other.Descriptors[i]))
+                {
                     return false;
+                }
             }
 
             return true;
@@ -53,7 +61,9 @@ namespace Mfr.Models.Tags.Asf
         {
             var hash = new HashCode();
             foreach (var row in Descriptors)
+            {
                 hash.Add(row);
+            }
 
             return hash.ToHashCode();
         }

@@ -39,7 +39,9 @@ namespace Mfr.Filters.Formatting.Tokens.Generators
             var low = lowSegment[0];
             var high = highSegment[0];
             if (low > high)
+            {
                 (low, high) = (high, low);
+            }
 
             var loCode = (int)low;
             var hiCode = (int)high;

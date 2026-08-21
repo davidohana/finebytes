@@ -14,7 +14,9 @@ namespace Mfr.Filters.Formatting.Tokens.Media
         public static string Format(MediaProperties? media, MediaPropertyField field)
         {
             if (media is null)
+            {
                 return string.Empty;
+            }
 
             return field switch
             {

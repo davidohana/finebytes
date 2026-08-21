@@ -31,16 +31,22 @@ namespace Mfr.App.Ui.Services.Session
             {
                 var fileList = viewModel.FileList;
                 if (!string.IsNullOrEmpty(session.FileMask))
+                {
                     fileList.Mask = session.FileMask;
+                }
 
                 if (session.ExcludeMasks is not null)
+                {
                     fileList.ExcludeMasks = session.ExcludeMasks;
+                }
 
                 if (session.MaskSuggestions is { Count: > 0 })
                 {
                     fileList.MaskSuggestions.Clear();
                     foreach (var mask in session.MaskSuggestions)
+                    {
                         fileList.MaskSuggestions.Add(mask);
+                    }
                 }
             }
         }
@@ -56,7 +62,9 @@ namespace Mfr.App.Ui.Services.Session
 
             var ui = ConfigStore.Config.Ui;
             if (!ui.RememberWindowState && !ui.RememberLastFolder)
+            {
                 return;
+            }
 
             try
             {
@@ -76,7 +84,9 @@ namespace Mfr.App.Ui.Services.Session
                     {
                         var path = fileList.CurrentPath;
                         if (_IsPersistableFolder(path))
+                        {
                             session.LastOpenedDirectory = path;
+                        }
                     }
 
                     session.FileMask = fileList.Mask;
@@ -95,10 +105,14 @@ namespace Mfr.App.Ui.Services.Session
         private static bool _IsPersistableFolder(string? path)
         {
             if (path.IsBlank())
+            {
                 return false;
+            }
 
             if (FileListPath.IsComputerPath(path) || FileListPath.IsNetworkPath(path))
+            {
                 return false;
+            }
 
             return Directory.Exists(path);
         }

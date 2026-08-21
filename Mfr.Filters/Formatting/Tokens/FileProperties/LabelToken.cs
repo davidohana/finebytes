@@ -17,9 +17,15 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             {
                 var root = Path.GetPathRoot(item.Original.DirectoryPath);
                 if (string.IsNullOrEmpty(root))
+                {
                     return string.Empty;
+                }
+
                 if (root.StartsWith(@"\\", StringComparison.Ordinal))
+                {
                     return string.Empty;
+                }
+
                 return new DriveInfo(root).VolumeLabel;
             };
         }

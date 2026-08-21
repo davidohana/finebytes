@@ -75,13 +75,19 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
                 );
 
                 if (options.IncludeNext && options.IncludePrev)
+                {
                     return source;
+                }
 
                 if (options.IncludeNext)
+                {
                     return string.Join(options.Separator, parts[(options.TokenNumber - 1)..]);
+                }
 
                 if (options.IncludePrev)
+                {
                     return string.Join(options.Separator, parts[..options.TokenNumber]);
+                }
 
                 return parts[options.TokenNumber - 1];
             };
@@ -142,10 +148,12 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
         private static bool _ParseIncludeFlag(string tokenDisplayName, string fieldLabel, string raw)
         {
             if (!bool.TryParse(raw.Trim(), out var value))
+            {
                 throw new ArgumentException(
                     $"{tokenDisplayName} {fieldLabel} '{raw}' is not supported (expected {FormatOptionsParsing.FormatExpectedKeywords(_includeFlagKeywords)}).",
                     paramName: nameof(raw)
                 );
+            }
 
             return value;
         }

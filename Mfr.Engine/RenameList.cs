@@ -70,13 +70,17 @@ namespace Mfr.Engine
         )
         {
             if (string.IsNullOrWhiteSpace(source))
+            {
                 throw new UserException("Source cannot be empty.");
+            }
 
             var trimmedSource = source.Trim();
             var fullSource = Path.GetFullPath(trimmedSource);
             var isRootPath = string.Equals(Path.GetPathRoot(fullSource), fullSource, PathComparers.OsComparison);
             if (isRootPath)
+            {
                 throw new UserException($"Root paths cannot be added as rename sources: '{trimmedSource}'.");
+            }
 
             var resolvedPaths = AddedSourceResolver
                 .ResolveToPaths(source: trimmedSource, includeFolders: includeFolders, includeSubdirs: includeSubdirs)
@@ -128,7 +132,9 @@ namespace Mfr.Engine
                     preset.Chain.ApplyFilters(renameItem);
 
                     if (renameItem.PreviewError is null)
+                    {
                         renameItem.Status = RenameStatus.PreviewOk;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -254,7 +260,9 @@ namespace Mfr.Engine
             {
                 var normalizedResolvedPath = _NormalizePathKey(fullPath);
                 if (!_resolvedPathToIsIncluded.Add(normalizedResolvedPath))
+                {
                     continue;
+                }
 
                 var attrs = File.GetAttributes(fullPath);
                 if (!_includeHidden && (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System)))
@@ -264,10 +272,14 @@ namespace Mfr.Engine
 
                 var isDirectory = attrs.IsDirectory();
                 if (isDirectory && !includeFolders)
+                {
                     continue;
+                }
 
                 if (!isDirectory && !includeFiles)
+                {
                     continue;
+                }
 
                 if (isDirectory)
                 {
@@ -289,9 +301,13 @@ namespace Mfr.Engine
                 string extension;
 
                 if (isDirectory)
+                {
                     (directoryPath, prefix, extension) = _SplitRenamePathForDirectory(fullPath);
+                }
                 else
+                {
                     (directoryPath, prefix, extension) = _SplitRenamePathForFile(fullPath);
+                }
 
                 var inFolderIndex = _folderPathToCount.GetValueOrDefault(directoryPath);
                 _folderPathToCount[directoryPath] = inFolderIndex + 1;

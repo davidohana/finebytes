@@ -26,7 +26,9 @@ namespace Mfr.Tests.Metadata
                     }
 
                     if (File.Exists(path))
+                    {
                         File.Delete(path);
+                    }
                 }
                 catch (IOException) { }
             }
@@ -653,7 +655,9 @@ namespace Mfr.Tests.Metadata
             foreach (var row in ape.Fields)
             {
                 if (!string.Equals(row.Key, key, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 return row.Values.Length == 0 ? null : row.Values[0];
             }

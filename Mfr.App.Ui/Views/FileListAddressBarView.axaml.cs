@@ -34,7 +34,9 @@ namespace Mfr.App.Ui.Views
         private void _OnPathEditBoxPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
         {
             if (e.Property != IsVisibleProperty || !PathEditBox.IsVisible)
+            {
                 return;
+            }
 
             _FocusAndSelectPathEdit();
         }
@@ -45,7 +47,9 @@ namespace Mfr.App.Ui.Views
                 () =>
                 {
                     if (!PathEditBox.IsVisible)
+                    {
                         return;
+                    }
 
                     PathEditBox.Focus();
                     PathEditBox.SelectAll();
@@ -57,10 +61,14 @@ namespace Mfr.App.Ui.Views
         private void _OnAddressBarPointerPressed(object? sender, PointerPressedEventArgs e)
         {
             if (DataContext is not FileListViewModel viewModel || viewModel.IsPathEditing)
+            {
                 return;
+            }
 
             if (e.Source is Visual visual && visual.FindAncestorOfType<Button>(includeSelf: true) is not null)
+            {
                 return;
+            }
 
             viewModel.BeginPathEdit();
             e.Handled = true;
@@ -69,7 +77,9 @@ namespace Mfr.App.Ui.Views
         private void _OnHistoryClick(object? sender, RoutedEventArgs e)
         {
             if (DataContext is FileListViewModel viewModel)
+            {
                 viewModel.BeginPathEdit();
+            }
         }
 
         private void _OnHistoryOpened(object? sender, EventArgs e)
@@ -87,7 +97,9 @@ namespace Mfr.App.Ui.Views
         {
             var path = _HistoryPathFromTap(e.Source);
             if (path is null || DataContext is not FileListViewModel viewModel)
+            {
                 return;
+            }
 
             viewModel.NavigateTo(path);
             HistoryButton.Flyout?.Hide();
@@ -96,10 +108,14 @@ namespace Mfr.App.Ui.Views
         private static string? _HistoryPathFromTap(object? source)
         {
             if (source is StyledElement { DataContext: string path })
+            {
                 return path;
+            }
 
             if (source is Visual visual && visual.FindAncestorOfType<ListBoxItem>()?.DataContext is string itemPath)
+            {
                 return itemPath;
+            }
 
             return null;
         }
@@ -112,22 +128,30 @@ namespace Mfr.App.Ui.Views
         private void _SyncBreadcrumbOverflow()
         {
             if (BreadcrumbItems.ItemsPanelRoot is not BreadcrumbTrailPanel trail)
+            {
                 return;
+            }
 
             OverflowButton.IsVisible = trail.HasOverflow;
             var hiddenSegments = _HiddenBreadcrumbSegments(trail.VisibleStartIndex);
             if (_SameOverflowSegments(hiddenSegments))
+            {
                 return;
+            }
 
             OverflowBreadcrumbSegments.Clear();
             foreach (var segment in hiddenSegments)
+            {
                 OverflowBreadcrumbSegments.Add(segment);
+            }
         }
 
         private List<PathBreadcrumbSegment> _HiddenBreadcrumbSegments(int visibleStartIndex)
         {
             if (DataContext is not FileListViewModel viewModel || visibleStartIndex <= 0)
+            {
                 return [];
+            }
 
             var hiddenCount = Math.Min(visibleStartIndex, viewModel.BreadcrumbSegments.Count);
             return [.. viewModel.BreadcrumbSegments.Take(hiddenCount)];
@@ -136,12 +160,16 @@ namespace Mfr.App.Ui.Views
         private bool _SameOverflowSegments(List<PathBreadcrumbSegment> hiddenSegments)
         {
             if (hiddenSegments.Count != OverflowBreadcrumbSegments.Count)
+            {
                 return false;
+            }
 
             for (var i = 0; i < hiddenSegments.Count; i++)
             {
                 if (hiddenSegments[i].TargetPath != OverflowBreadcrumbSegments[i].TargetPath)
+                {
                     return false;
+                }
             }
 
             return true;
@@ -151,7 +179,9 @@ namespace Mfr.App.Ui.Views
         {
             var segment = _OverflowSegmentFromTap(e.Source);
             if (segment is null || DataContext is not FileListViewModel viewModel)
+            {
                 return;
+            }
 
             viewModel.NavigateTo(segment.TargetPath);
             OverflowButton.Flyout?.Hide();
@@ -160,13 +190,17 @@ namespace Mfr.App.Ui.Views
         private static PathBreadcrumbSegment? _OverflowSegmentFromTap(object? source)
         {
             if (source is StyledElement { DataContext: PathBreadcrumbSegment segment })
+            {
                 return segment;
+            }
 
             if (
                 source is Visual visual
                 && visual.FindAncestorOfType<ListBoxItem>()?.DataContext is PathBreadcrumbSegment item
             )
+            {
                 return item;
+            }
 
             return null;
         }
@@ -174,7 +208,9 @@ namespace Mfr.App.Ui.Views
         private void _OnPathKeyDown(object? sender, KeyEventArgs e)
         {
             if (DataContext is not FileListViewModel viewModel)
+            {
                 return;
+            }
 
             if (e.Key == Key.Escape)
             {
@@ -184,7 +220,9 @@ namespace Mfr.App.Ui.Views
             }
 
             if (e.Key != Key.Enter)
+            {
                 return;
+            }
 
             viewModel.CommitPath();
             e.Handled = true;
@@ -198,10 +236,14 @@ namespace Mfr.App.Ui.Views
         private void _CommitPathIfAddressBarInactive()
         {
             if (DataContext is not FileListViewModel viewModel || !viewModel.IsPathEditing)
+            {
                 return;
+            }
 
             if (_isHistoryOpen || AddressBar.IsPointerOver || PathEditBox.IsFocused)
+            {
                 return;
+            }
 
             viewModel.CommitPath();
         }

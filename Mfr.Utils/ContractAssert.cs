@@ -16,7 +16,9 @@ namespace Mfr.Utils
         public static void That(bool condition, string message)
         {
             if (!condition)
+            {
                 throw new InvalidOperationException(message);
+            }
         }
 
         /// <summary>
@@ -32,7 +34,9 @@ namespace Mfr.Utils
             where T : class
         {
             if (value is null)
+            {
                 throw new InvalidOperationException(message);
+            }
 
             return value;
         }
@@ -52,7 +56,9 @@ namespace Mfr.Utils
         public static void That(bool condition, string message)
         {
             if (!condition)
+            {
                 throw new ArgumentException(message);
+            }
         }
 
         /// <summary>
@@ -65,7 +71,9 @@ namespace Mfr.Utils
         public static void That(bool condition, string message, string paramName)
         {
             if (!condition)
+            {
                 throw new ArgumentException(message, paramName);
+            }
         }
     }
 }

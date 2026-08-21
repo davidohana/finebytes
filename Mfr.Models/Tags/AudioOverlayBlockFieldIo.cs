@@ -30,7 +30,9 @@ namespace Mfr.Models.Tags
 
             var block = overlay.Id3v1;
             if (block is null)
+            {
                 return string.Empty;
+            }
 
             return field switch
             {
@@ -99,7 +101,9 @@ namespace Mfr.Models.Tags
 
             var block = overlay.Id3v2;
             if (block is null)
+            {
                 return string.Empty;
+            }
 
             var normalizedId = frameId.Trim().ToUpperInvariant();
             var frame = _FindFrame(block.Frames, normalizedId, language, description);
@@ -174,13 +178,17 @@ namespace Mfr.Models.Tags
 
             var block = overlay.Xiph;
             if (block is null)
+            {
                 return string.Empty;
+            }
 
             var normalizedKey = key.Trim().ToUpperInvariant();
             foreach (var row in block.Fields)
             {
                 if (!string.Equals(row.Key, normalizedKey, StringComparison.Ordinal))
+                {
                     continue;
+                }
 
                 return DelimitedText.Join(row.Values);
             }
@@ -211,7 +219,9 @@ namespace Mfr.Models.Tags
             {
                 var values = DelimitedText.Split(trimmed);
                 if (values.Length > 0)
+                {
                     rows.Add(new TextFieldRow(normalizedKey, values));
+                }
             }
 
             rows.Sort(
@@ -237,7 +247,9 @@ namespace Mfr.Models.Tags
             foreach (var frame in frames)
             {
                 if (_FrameMatches(frame, frameId, language, description))
+                {
                     return frame;
+                }
             }
 
             return null;
@@ -261,20 +273,30 @@ namespace Mfr.Models.Tags
         )
         {
             if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
+            {
                 return false;
+            }
 
             if (!Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frameId))
+            {
                 return true;
+            }
 
             if (string.Equals(frameId, "TXXX", StringComparison.Ordinal))
+            {
                 return _SameOptionalText(frame.Description, description);
+            }
 
             // COMM / USLT: primary = empty description when target description is omitted.
             if (!_SameOptionalText(frame.Description, description))
+            {
                 return false;
+            }
 
             if (string.IsNullOrWhiteSpace(language))
+            {
                 return true;
+            }
 
             return string.Equals(frame.Language, language.Trim(), StringComparison.OrdinalIgnoreCase);
         }
@@ -289,17 +311,25 @@ namespace Mfr.Models.Tags
         private static string? _ResolveLanguageForWrite(string frameId, string? language, string? description)
         {
             if (string.Equals(frameId, "TXXX", StringComparison.Ordinal))
+            {
                 return null;
+            }
 
             if (!Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frameId))
+            {
                 return null;
+            }
 
             if (!string.IsNullOrWhiteSpace(language))
+            {
                 return language.Trim();
+            }
 
             // Primary COMM/USLT create uses eng when language omitted.
             if (string.IsNullOrWhiteSpace(description))
+            {
                 return "eng";
+            }
 
             return null;
         }
@@ -313,15 +343,21 @@ namespace Mfr.Models.Tags
         {
             var byId = string.CompareOrdinal(a.FrameId, b.FrameId);
             if (byId != 0)
+            {
                 return byId;
+            }
 
             var byLang = string.CompareOrdinal(a.Language ?? string.Empty, b.Language ?? string.Empty);
             if (byLang != 0)
+            {
                 return byLang;
+            }
 
             var byDesc = string.CompareOrdinal(a.Description ?? string.Empty, b.Description ?? string.Empty);
             if (byDesc != 0)
+            {
                 return byDesc;
+            }
 
             return string.CompareOrdinal(string.Join('\0', a.TextValues), string.Join('\0', b.TextValues));
         }
@@ -340,10 +376,14 @@ namespace Mfr.Models.Tags
         private static byte _ParseGenreByte(string trimmed)
         {
             if (trimmed.Length == 0)
+            {
                 return 0;
+            }
 
             if (byte.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index))
+            {
                 return index;
+            }
 
             return Id3v1Genres.AudioToIndex(trimmed);
         }
@@ -351,7 +391,9 @@ namespace Mfr.Models.Tags
         private static uint? _ParseNullableUInt(string trimmed, uint max, string valueParamName)
         {
             if (trimmed.Length == 0)
+            {
                 return null;
+            }
 
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
@@ -372,7 +414,9 @@ namespace Mfr.Models.Tags
         private static byte? _ParseNullableByte(string trimmed, string valueParamName)
         {
             if (trimmed.Length == 0)
+            {
                 return null;
+            }
 
             if (!byte.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
