@@ -1,4 +1,4 @@
-using Mfr.App.Ui.Services;
+using Mfr.App.Ui.Services.FileExplorer;
 
 namespace Mfr.Tests.Ui
 {

@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.Services
+namespace Mfr.App.Ui.Services.FileExplorer
 {
     /// <summary>
     /// Creates the default <see cref="ISystemIconProvider"/> for the current OS.

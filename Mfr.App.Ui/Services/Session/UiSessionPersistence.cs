@@ -3,7 +3,7 @@ using Mfr.App.Ui.ViewModels;
 using Mfr.Models.Config;
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.Services
+namespace Mfr.App.Ui.Services.Session
 {
     /// <summary>
     /// Merges UI preferences with in-memory window/folder state into <see cref="SessionStore"/>.

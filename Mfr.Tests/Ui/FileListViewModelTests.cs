@@ -1,5 +1,5 @@
 using Avalonia.Media;
-using Mfr.App.Ui.Services;
+using Mfr.App.Ui.Services.FileExplorer;
 using Mfr.App.Ui.ViewModels;
 using Mfr.Utils;
 

@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Mfr.Models.Config;
 
-namespace Mfr.App.Ui.Services
+namespace Mfr.App.Ui.Services.Session
 {
     /// <summary>
     /// Applies and captures main-window geometry for <see cref="SessionStore"/>.

@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.Services
+namespace Mfr.App.Ui.Services.FileExplorer
 {
     /// <summary>
     /// Shell icon pixel size requested from <see cref="ISystemIconProvider"/>.

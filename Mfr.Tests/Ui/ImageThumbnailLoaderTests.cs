@@ -1,6 +1,6 @@
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
-using Mfr.App.Ui.Services;
+using Mfr.App.Ui.Services.FileExplorer;
 using Mfr.App.Ui.ViewModels;
 
 namespace Mfr.Tests.Ui

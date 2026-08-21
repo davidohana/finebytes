@@ -7,7 +7,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mfr.App.Ui.Services;
+using Mfr.App.Ui.Services.FileExplorer;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels

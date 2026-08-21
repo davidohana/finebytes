@@ -25,7 +25,7 @@ namespace Mfr.Tests.Ui
                 ThumbnailSizes.Steps);
             Assert.Equal(96, ThumbnailSizes.Default);
             Assert.Equal(ThumbnailSizes.Medium, ThumbnailSizes.Default);
-            Assert.Equal(ThumbnailSizes.Huge, App.Ui.Services.ImageThumbnailLoader.DecodeWidth);
+            Assert.Equal(ThumbnailSizes.Huge, App.Ui.Services.FileExplorer.ImageThumbnailLoader.DecodeWidth);
         }
 
         /// <summary>

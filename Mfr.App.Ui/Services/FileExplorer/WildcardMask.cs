@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 
-namespace Mfr.App.Ui.Services
+namespace Mfr.App.Ui.Services.FileExplorer
 {
     /// <summary>
     /// Matches file names against Explorer-style wildcard masks (<c>*</c> / <c>?</c>).

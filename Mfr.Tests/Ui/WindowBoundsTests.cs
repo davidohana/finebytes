@@ -1,4 +1,4 @@
-using Mfr.App.Ui.Services;
+using Mfr.App.Ui.Services.Session;
 
 namespace Mfr.Tests.Ui
 {

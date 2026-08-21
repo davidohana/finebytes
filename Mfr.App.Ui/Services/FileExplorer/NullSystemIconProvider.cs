@@ -1,6 +1,6 @@
 using Avalonia.Media;
 
-namespace Mfr.App.Ui.Services
+namespace Mfr.App.Ui.Services.FileExplorer
 {
     /// <summary>
     /// Icon provider that never returns an image. Used in tests and on platforms without shell icons.

@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.Services;
+using Mfr.App.Ui.Services.FileExplorer;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
 

@@ -1,6 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
-using Mfr.App.Ui.Services;
+using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels;
 
 namespace Mfr.App.Ui.Views

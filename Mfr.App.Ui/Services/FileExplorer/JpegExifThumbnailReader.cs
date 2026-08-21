@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.Services
+namespace Mfr.App.Ui.Services.FileExplorer
 {
     /// <summary>
     /// Extracts an embedded JPEG thumbnail from a JPEG EXIF IFD1, if present.
