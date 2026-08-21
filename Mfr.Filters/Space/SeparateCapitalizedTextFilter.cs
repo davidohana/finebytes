@@ -21,8 +21,8 @@ namespace Mfr.Filters.Space
     /// The inserted character is the current word separator (U+0020 SPACE by default; set by a preceding
     /// <c>SpaceCharacter</c> filter).
     /// </remarks>
-    public sealed record SeparateCapitalizedTextFilter(
-        FilterTarget Target, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+    public sealed record SeparateCapitalizedTextFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)
+        : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

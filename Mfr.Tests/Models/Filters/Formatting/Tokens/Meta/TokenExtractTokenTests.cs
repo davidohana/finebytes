@@ -15,10 +15,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
             string separator,
             bool includeNext,
             bool includePrev,
-            string source)
+            string source
+        )
         {
-            return $"tokenNumber={tokenNumber},separator={separator},includeNext={includeNext.ToString().ToLowerInvariant()}," +
-            $"includePrev={includePrev.ToString().ToLowerInvariant()},source={source}";
+            return $"tokenNumber={tokenNumber},separator={separator},includeNext={includeNext.ToString().ToLowerInvariant()},"
+                + $"includePrev={includePrev.ToString().ToLowerInvariant()},source={source}";
         }
 
         // ── Basic extraction ──────────────────────────────────────────────────
@@ -31,10 +32,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3");
+                extension: ".mp3"
+            );
             Assert.Equal(
                 "13_",
-                _token.Compile(_Named(1, "-", false, false, "13_-_Smog_-_Cold_Blooded_Old_Times.mp3"))(item));
+                _token.Compile(_Named(1, "-", false, false, "13_-_Smog_-_Cold_Blooded_Old_Times.mp3"))(item)
+            );
         }
 
         /// <summary>
@@ -45,10 +48,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3");
+                extension: ".mp3"
+            );
             Assert.Equal(
                 "Smog",
-                _token.Compile(_Named(2, "_-_", false, false, "13_-_Smog_-_Cold_Blooded_Old_Times.mp3"))(item));
+                _token.Compile(_Named(2, "_-_", false, false, "13_-_Smog_-_Cold_Blooded_Old_Times.mp3"))(item)
+            );
         }
 
         /// <summary>
@@ -71,10 +76,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3");
+                extension: ".mp3"
+            );
             Assert.Equal(
                 "Smog_-_Cold_Blooded_Old_Times.mp3",
-                _token.Compile(_Named(2, "_-_", true, false, "13_-_Smog_-_Cold_Blooded_Old_Times.mp3"))(item));
+                _token.Compile(_Named(2, "_-_", true, false, "13_-_Smog_-_Cold_Blooded_Old_Times.mp3"))(item)
+            );
         }
 
         /// <summary>
@@ -130,8 +137,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
             Assert.Equal(
                 "b",
-                _token.Compile(
-                    "source=a_b_c.txt,separator=_,tokenNumber=2,includePrev=false,includeNext=false")(item));
+                _token.Compile("source=a_b_c.txt,separator=_,tokenNumber=2,includePrev=false,includeNext=false")(item)
+            );
         }
 
         // ── nested format string via FormatStringCompiler ─────────────────────
@@ -144,9 +151,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3");
+                extension: ".mp3"
+            );
             var compiled = FormatStringCompiler.Compile(
-                "<token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<full-name>>");
+                "<token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<full-name>>"
+            );
             Assert.Equal("13_", compiled(item));
         }
 
@@ -158,9 +167,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3");
+                extension: ".mp3"
+            );
             var compiled = FormatStringCompiler.Compile(
-                "<token:tokenNumber=2,separator=_-_,includeNext=false,includePrev=false,source=<full-name>>");
+                "<token:tokenNumber=2,separator=_-_,includeNext=false,includePrev=false,source=<full-name>>"
+            );
             Assert.Equal("Smog", compiled(item));
         }
 
@@ -172,12 +183,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3");
+                extension: ".mp3"
+            );
             var compiled = FormatStringCompiler.Compile(
-                "<token:tokenNumber=2,separator=_-_,includeNext=true,includePrev=false,source=<full-name>>");
-            Assert.Equal(
-                "Smog_-_Cold_Blooded_Old_Times.mp3",
-                compiled(item));
+                "<token:tokenNumber=2,separator=_-_,includeNext=true,includePrev=false,source=<full-name>>"
+            );
+            Assert.Equal("Smog_-_Cold_Blooded_Old_Times.mp3", compiled(item));
         }
 
         // ── error cases ───────────────────────────────────────────────────────
@@ -212,7 +223,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
             var ex = Assert.Throws<ArgumentException>(() =>
-                _token.Compile(_Named(0, "_", false, false, "a_b.txt"))(item));
+                _token.Compile(_Named(0, "_", false, false, "a_b.txt"))(item)
+            );
             Assert.Contains("1 or greater", ex.Message);
         }
 
@@ -224,7 +236,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
             var ex = Assert.Throws<ArgumentException>(() =>
-                _token.Compile(_Named(5, "_", false, false, "a_b.txt"))(item));
+                _token.Compile(_Named(5, "_", false, false, "a_b.txt"))(item)
+            );
             Assert.Contains("exceeds the number of parts", ex.Message);
         }
 
@@ -236,8 +249,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
             var ex = Assert.Throws<ArgumentException>(() =>
-                _token.Compile(
-                    "tokenNumber=1,separator=_,includeNext=1,includePrev=false,source=a_b.txt")(item));
+                _token.Compile("tokenNumber=1,separator=_,includeNext=1,includePrev=false,source=a_b.txt")(item)
+            );
             Assert.Contains("includeNext", ex.Message);
         }
 
@@ -246,8 +259,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
             var ex = Assert.Throws<ArgumentException>(() =>
-                _token.Compile(
-                    "tokenNumber=1,separator=,includeNext=false,includePrev=false,source=abc.txt")(item));
+                _token.Compile("tokenNumber=1,separator=,includeNext=false,includePrev=false,source=abc.txt")(item)
+            );
             Assert.Contains("separator", ex.Message);
         }
     }

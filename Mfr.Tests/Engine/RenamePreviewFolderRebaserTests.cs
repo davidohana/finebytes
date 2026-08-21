@@ -22,7 +22,8 @@ namespace Mfr.Tests.Engine
             var fileItem = _CreateFileItem(
                 fullPath: _Path("A", "track.txt"),
                 previewDirectoryPath: oldFolderPath,
-                previewFileName: "song.txt");
+                previewFileName: "song.txt"
+            );
 
             RenamePreviewFolderRebaser.RebaseDescendants([folderItem, fileItem]);
 
@@ -43,7 +44,8 @@ namespace Mfr.Tests.Engine
             var fileItem = _CreateFileItem(
                 fullPath: _Path("A", "sub", "track.txt"),
                 previewDirectoryPath: _Path("A", "sub"),
-                previewFileName: "song.txt");
+                previewFileName: "song.txt"
+            );
 
             RenamePreviewFolderRebaser.RebaseDescendants([folderItem, fileItem]);
 
@@ -57,14 +59,13 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void RebaseDescendants_unrelated_folder_rename_does_not_change_preview_directory()
         {
-            var unrelatedFolder = _CreateDirectoryItem(
-                fullPath: _Path("A"),
-                previewFullPath: _Path("A2"));
+            var unrelatedFolder = _CreateDirectoryItem(fullPath: _Path("A"), previewFullPath: _Path("A2"));
 
             var fileItem = _CreateFileItem(
                 fullPath: _Path("B", "track.txt"),
                 previewDirectoryPath: _Path("B"),
-                previewFileName: "song.txt");
+                previewFileName: "song.txt"
+            );
             var expectedDirectory = fileItem.Preview.DirectoryPath;
             var expectedPath = fileItem.Preview.FullPath;
 
@@ -80,17 +81,14 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void RebaseDescendants_nested_ancestors_compose_innermost_first()
         {
-            var outerFolderItem = _CreateDirectoryItem(
-                fullPath: _Path("A"),
-                previewFullPath: _Path("A2"));
-            var innerFolderItem = _CreateDirectoryItem(
-                fullPath: _Path("A", "B"),
-                previewFullPath: _Path("A2", "B2"));
+            var outerFolderItem = _CreateDirectoryItem(fullPath: _Path("A"), previewFullPath: _Path("A2"));
+            var innerFolderItem = _CreateDirectoryItem(fullPath: _Path("A", "B"), previewFullPath: _Path("A2", "B2"));
 
             var fileItem = _CreateFileItem(
                 fullPath: _Path("A", "B", "sub", "track.txt"),
                 previewDirectoryPath: _Path("A", "B", "sub"),
-                previewFileName: "song.txt");
+                previewFileName: "song.txt"
+            );
 
             RenamePreviewFolderRebaser.RebaseDescendants([outerFolderItem, innerFolderItem, fileItem]);
 
@@ -104,14 +102,13 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void RebaseDescendants_preview_error_item_is_not_rebased()
         {
-            var folderItem = _CreateDirectoryItem(
-                fullPath: _Path("A"),
-                previewFullPath: _Path("A2"));
+            var folderItem = _CreateDirectoryItem(fullPath: _Path("A"), previewFullPath: _Path("A2"));
 
             var fileItem = _CreateFileItem(
                 fullPath: _Path("A", "track.txt"),
                 previewDirectoryPath: _Path("A"),
-                previewFileName: "song.txt");
+                previewFileName: "song.txt"
+            );
             fileItem.SetPreviewError(message: "preexisting", cause: null);
             var expectedDirectory = fileItem.Preview.DirectoryPath;
             var expectedPath = fileItem.Preview.FullPath;
@@ -125,22 +122,15 @@ namespace Mfr.Tests.Engine
 
         private static RenameItem _CreateDirectoryItem(string fullPath, string previewFullPath)
         {
-            var item = _CreateItem(
-                fullPath: fullPath,
-                attributes: FileAttributes.Directory);
+            var item = _CreateItem(fullPath: fullPath, attributes: FileAttributes.Directory);
             _SetPreviewPath(item, previewFullPath);
             item.Status = RenameStatus.PreviewOk;
             return item;
         }
 
-        private static RenameItem _CreateFileItem(
-            string fullPath,
-            string previewDirectoryPath,
-            string previewFileName)
+        private static RenameItem _CreateFileItem(string fullPath, string previewDirectoryPath, string previewFileName)
         {
-            var item = _CreateItem(
-                fullPath: fullPath,
-                attributes: FileAttributes.Normal);
+            var item = _CreateItem(fullPath: fullPath, attributes: FileAttributes.Normal);
             item.Preview.DirectoryPath = previewDirectoryPath;
             item.Preview.Prefix = Path.GetFileNameWithoutExtension(previewFileName);
             item.Preview.Extension = Path.GetExtension(previewFileName);
@@ -156,7 +146,8 @@ namespace Mfr.Tests.Engine
                 directoryPath: Path.GetDirectoryName(fullPath)!,
                 prefix: Path.GetFileNameWithoutExtension(fullPath),
                 extension: Path.GetExtension(fullPath),
-                attributes: attributes);
+                attributes: attributes
+            );
             return new RenameItem(meta);
         }
 

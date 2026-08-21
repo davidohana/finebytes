@@ -16,11 +16,9 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_RemoveIllegalChars_ReplacesInvalidCharacters()
         {
             var f = new CleanerFilter(
-                                _target,
-                new CleanerOptions(
-                    RemoveIllegalChars: true,
-                    CustomCharsToRemove: "",
-                    Replacement: "_"));
+                _target,
+                new CleanerOptions(RemoveIllegalChars: true, CustomCharsToRemove: "", Replacement: "_")
+            );
             Assert.Equal("a_b", FilterTestHelpers.ApplyToPrefix(f, "a/b"));
         }
 
@@ -31,11 +29,9 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_CustomChars_ReplacesConfiguredCharacters()
         {
             var f = new CleanerFilter(
-                                _target,
-                new CleanerOptions(
-                    RemoveIllegalChars: false,
-                    CustomCharsToRemove: "@#",
-                    Replacement: "-"));
+                _target,
+                new CleanerOptions(RemoveIllegalChars: false, CustomCharsToRemove: "@#", Replacement: "-")
+            );
             Assert.Equal("a-b-c", FilterTestHelpers.ApplyToPrefix(f, "a@b#c"));
         }
 
@@ -46,11 +42,9 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Apply_Both_ReplacesWithSameCharacter()
         {
             var f = new CleanerFilter(
-                                _target,
-                new CleanerOptions(
-                    RemoveIllegalChars: true,
-                    CustomCharsToRemove: "@#",
-                    Replacement: "X"));
+                _target,
+                new CleanerOptions(RemoveIllegalChars: true, CustomCharsToRemove: "@#", Replacement: "X")
+            );
             Assert.Equal("aXbXcXdXe", FilterTestHelpers.ApplyToPrefix(f, "a/b@c#d|e"));
         }
     }

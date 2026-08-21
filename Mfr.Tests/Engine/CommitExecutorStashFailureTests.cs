@@ -34,18 +34,19 @@ namespace Mfr.Tests.Engine
                 inFolderIndex: 0,
                 directoryPath: dir,
                 prefix: "a",
-                extension: ".txt");
+                extension: ".txt"
+            );
             var item = new RenameItem(meta) { Status = RenameStatus.PreviewOk };
             item.Preview.Prefix = "b";
 
             var tempPath = RenameItemMover.AllocateTempPath(item.Original.FullPath);
             var plan = new CommitPlan(
                 Steps: [new StashStep(item, tempPath), new FinalizeStep(item, tempPath)],
-                UnresolvableCycleItems: []);
+                UnresolvableCycleItems: []
+            );
 
             var simulateMessage = "mfr-test stash failure";
-            RenameItemMover.StashSourceToTempSubstitute = (_, _) =>
-                throw new IOException(simulateMessage);
+            RenameItemMover.StashSourceToTempSubstitute = (_, _) => throw new IOException(simulateMessage);
             try
             {
                 var results = CommitExecutor.Execute(
@@ -53,7 +54,8 @@ namespace Mfr.Tests.Engine
                     allItems: [item],
                     confirmBeforeApply: null,
                     failFast: false,
-                    dryRun: false);
+                    dryRun: false
+                );
 
                 Assert.Single(results);
                 Assert.Equal(RenameStatus.CommitError, results[0].Status);
@@ -85,14 +87,16 @@ namespace Mfr.Tests.Engine
                 inFolderIndex: 0,
                 directoryPath: dir,
                 prefix: "a",
-                extension: ".txt");
+                extension: ".txt"
+            );
             var item = new RenameItem(meta) { Status = RenameStatus.PreviewOk };
             item.Preview.Prefix = "b";
 
             var tempPath = RenameItemMover.AllocateTempPath(item.Original.FullPath);
             var plan = new CommitPlan(
                 Steps: [new StashStep(item, tempPath), new FinalizeStep(item, tempPath)],
-                UnresolvableCycleItems: []);
+                UnresolvableCycleItems: []
+            );
 
             var substituteCalled = false;
             RenameItemMover.StashSourceToTempSubstitute = (_, _) =>
@@ -107,7 +111,8 @@ namespace Mfr.Tests.Engine
                     allItems: [item],
                     confirmBeforeApply: null,
                     failFast: false,
-                    dryRun: true);
+                    dryRun: true
+                );
 
                 Assert.False(substituteCalled);
                 Assert.Single(results);

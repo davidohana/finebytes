@@ -34,7 +34,8 @@ namespace Mfr.Utils.Config
         public static void Apply(
             JsonElement configObject,
             object target,
-            JsonNamingPolicy? jsonPropertyNamingPolicy = null)
+            JsonNamingPolicy? jsonPropertyNamingPolicy = null
+        )
         {
             ArgumentNullException.ThrowIfNull(target);
 
@@ -52,7 +53,8 @@ namespace Mfr.Utils.Config
             object target,
             FieldInfo field,
             JsonNamingPolicy naming,
-            JsonNamingPolicy? jsonPropertyNamingPolicy)
+            JsonNamingPolicy? jsonPropertyNamingPolicy
+        )
         {
             var sectionAttr = field.GetCustomAttribute<ConfigSectionAttribute>();
             var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
@@ -63,7 +65,8 @@ namespace Mfr.Utils.Config
                 if (intRange is not null || strMax is not null)
                 {
                     throw new InvalidOperationException(
-                        $"Field '{field.Name}' cannot combine [{nameof(ConfigSectionAttribute)}] with leaf config attributes.");
+                        $"Field '{field.Name}' cannot combine [{nameof(ConfigSectionAttribute)}] with leaf config attributes."
+                    );
                 }
 
                 _ApplySection(configObject, target, field, sectionAttr, naming, jsonPropertyNamingPolicy);
@@ -73,7 +76,8 @@ namespace Mfr.Utils.Config
             if (intRange is not null && strMax is not null)
             {
                 throw new InvalidOperationException(
-                    $"Field '{field.Name}' cannot specify both [{nameof(ConfigIntRangeAttribute)}] and [{nameof(ConfigStringMaxLengthAttribute)}].");
+                    $"Field '{field.Name}' cannot specify both [{nameof(ConfigIntRangeAttribute)}] and [{nameof(ConfigStringMaxLengthAttribute)}]."
+                );
             }
 
             var jsonName = naming.ConvertName(field.Name);
@@ -103,12 +107,14 @@ namespace Mfr.Utils.Config
             FieldInfo field,
             ConfigSectionAttribute sectionAttr,
             JsonNamingPolicy naming,
-            JsonNamingPolicy? jsonPropertyNamingPolicy)
+            JsonNamingPolicy? jsonPropertyNamingPolicy
+        )
         {
             if (!field.FieldType.IsClass || field.FieldType == typeof(string))
             {
                 throw new InvalidOperationException(
-                    $"Field '{field.Name}' has [{nameof(ConfigSectionAttribute)}] but is not a reference class type.");
+                    $"Field '{field.Name}' has [{nameof(ConfigSectionAttribute)}] but is not a reference class type."
+                );
             }
 
             var nested = field.GetValue(target);
@@ -133,12 +139,14 @@ namespace Mfr.Utils.Config
             object target,
             FieldInfo field,
             string jsonName,
-            ConfigIntRangeAttribute intRange)
+            ConfigIntRangeAttribute intRange
+        )
         {
             if (field.FieldType != typeof(int))
             {
                 throw new InvalidOperationException(
-                    $"Field '{field.Name}' has [{nameof(ConfigIntRangeAttribute)}] but is not int.");
+                    $"Field '{field.Name}' has [{nameof(ConfigIntRangeAttribute)}] but is not int."
+                );
             }
 
             var value = (int)field.GetValue(target)!;
@@ -147,7 +155,8 @@ namespace Mfr.Utils.Config
                 jsonName,
                 ref value,
                 minInclusive: intRange.MinInclusive,
-                maxInclusive: intRange.MaxInclusive);
+                maxInclusive: intRange.MaxInclusive
+            );
             field.SetValue(target, value);
         }
 
@@ -159,12 +168,14 @@ namespace Mfr.Utils.Config
             object target,
             FieldInfo field,
             string jsonName,
-            ConfigStringMaxLengthAttribute strMax)
+            ConfigStringMaxLengthAttribute strMax
+        )
         {
             if (field.FieldType != typeof(string))
             {
                 throw new InvalidOperationException(
-                    $"Field '{field.Name}' has [{nameof(ConfigStringMaxLengthAttribute)}] but is not string.");
+                    $"Field '{field.Name}' has [{nameof(ConfigStringMaxLengthAttribute)}] but is not string."
+                );
             }
 
             var value = (string)field.GetValue(target)!;
@@ -172,18 +183,15 @@ namespace Mfr.Utils.Config
                 configObject,
                 jsonName,
                 ref value,
-                maxLengthInclusive: strMax.MaxLengthInclusive);
+                maxLengthInclusive: strMax.MaxLengthInclusive
+            );
             field.SetValue(target, value);
         }
 
         /// <summary>
         /// Reads and assigns an unannotated <c>bool</c> leaf.
         /// </summary>
-        private static void _ApplyBoolLeaf(
-            JsonElement configObject,
-            object target,
-            FieldInfo field,
-            string jsonName)
+        private static void _ApplyBoolLeaf(JsonElement configObject, object target, FieldInfo field, string jsonName)
         {
             var value = (bool)field.GetValue(target)!;
             ConfigValueReader.ReadBool(configObject, jsonName, ref value);
@@ -214,8 +222,7 @@ namespace Mfr.Utils.Config
 
                 if (kind != JsonValueKind.Object)
                 {
-                    throw new InvalidDataException(
-                        $"'{propertyName}' must be a JSON object or null.");
+                    throw new InvalidDataException($"'{propertyName}' must be a JSON object or null.");
                 }
 
                 value = prop.Value;

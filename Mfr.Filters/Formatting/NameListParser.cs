@@ -1,4 +1,3 @@
-
 namespace Mfr.Filters.Formatting
 {
     /// <summary>
@@ -24,8 +23,7 @@ namespace Mfr.Filters.Formatting
                 var line = rawLines[i];
                 if (line.Length > maxLineLen)
                 {
-                    throw new UserException(
-                        $"Name-list line {lineNumber} exceeds maximum length ({maxLineLen}).");
+                    throw new UserException($"Name-list line {lineNumber} exceeds maximum length ({maxLineLen}).");
                 }
 
                 if (ListFileParseHelpers.IsListFileCommentLine(line))

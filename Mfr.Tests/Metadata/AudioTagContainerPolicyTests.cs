@@ -2,9 +2,9 @@ using System.Collections.Immutable;
 using Mfr.Filters;
 using Mfr.Metadata;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v2;
 using MetadataContainerDetector = Mfr.Metadata.AudioTagContainerDetector;
 using ModelsContainerPolicy = Mfr.Models.Tags.AudioTagContainerPolicy;
-using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.Tests.Metadata
 {
@@ -27,7 +27,11 @@ namespace Mfr.Tests.Metadata
         public static TheoryData<AudioContainerFormat, AudioTagBlockKind[], AudioTagBlockKind?> PolicyMatrix { get; } =
             new()
             {
-                { AudioContainerFormat.Mpeg, [AudioTagBlockKind.Id3v1, AudioTagBlockKind.Id3v2], AudioTagBlockKind.Id3v2 },
+                {
+                    AudioContainerFormat.Mpeg,
+                    [AudioTagBlockKind.Id3v1, AudioTagBlockKind.Id3v2],
+                    AudioTagBlockKind.Id3v2
+                },
                 { AudioContainerFormat.Flac, [AudioTagBlockKind.Xiph, AudioTagBlockKind.Ape], AudioTagBlockKind.Xiph },
                 { AudioContainerFormat.Ogg, [AudioTagBlockKind.Xiph], AudioTagBlockKind.Xiph },
                 { AudioContainerFormat.Mpeg4, [AudioTagBlockKind.Apple], AudioTagBlockKind.Apple },
@@ -42,7 +46,8 @@ namespace Mfr.Tests.Metadata
         public void GetSupportedBlocks_MatchesPolicyMatrix(
             AudioContainerFormat container,
             AudioTagBlockKind[] expectedBlocks,
-            AudioTagBlockKind? expectedRecommended)
+            AudioTagBlockKind? expectedRecommended
+        )
         {
             Assert.Equal(expectedBlocks, ModelsContainerPolicy.GetSupportedBlocks(container));
             Assert.Equal(expectedRecommended, ModelsContainerPolicy.GetRecommendedBlock(container));
@@ -64,7 +69,8 @@ namespace Mfr.Tests.Metadata
         public void EnsureSupported_Id3v2OnFlac_ThrowsNotSupported()
         {
             var ex = Assert.Throws<NotSupportedException>(() =>
-                ModelsContainerPolicy.EnsureSupported(AudioContainerFormat.Flac, AudioTagBlockKind.Id3v2));
+                ModelsContainerPolicy.EnsureSupported(AudioContainerFormat.Flac, AudioTagBlockKind.Id3v2)
+            );
 
             Assert.Contains("ID3v2", ex.Message, StringComparison.Ordinal);
             Assert.Contains("FLAC", ex.Message, StringComparison.Ordinal);
@@ -75,7 +81,8 @@ namespace Mfr.Tests.Metadata
         public void EnsureSupported_UnknownContainer_ReportsNoSupportedBlocks()
         {
             var ex = Assert.Throws<NotSupportedException>(() =>
-                ModelsContainerPolicy.EnsureSupported(AudioContainerFormat.Unknown, AudioTagBlockKind.Xiph));
+                ModelsContainerPolicy.EnsureSupported(AudioContainerFormat.Unknown, AudioTagBlockKind.Xiph)
+            );
 
             Assert.Contains("no tag blocks are supported", ex.Message, StringComparison.Ordinal);
         }
@@ -155,14 +162,7 @@ namespace Mfr.Tests.Metadata
             preview.Id3v2 = new Id3v2TagData
             {
                 Version = 3,
-                Frames =
-                [
-                    new Id3v2ModeledFrame
-                    {
-                        FrameId = "TIT2",
-                        TextValues = ["SpecificId3v2Title"],
-                    },
-                ],
+                Frames = [new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["SpecificId3v2Title"] }],
             };
 
             var ex = Assert.Throws<NotSupportedException>(() => AudioTagPersistence.Apply(path, preview));
@@ -218,7 +218,8 @@ namespace Mfr.Tests.Metadata
             item.EnsureAudioTagBlockSupported(AudioTagBlockKind.Xiph);
 
             var ex = Assert.Throws<NotSupportedException>(() =>
-                item.EnsureAudioTagBlockSupported(AudioTagBlockKind.Id3v2));
+                item.EnsureAudioTagBlockSupported(AudioTagBlockKind.Id3v2)
+            );
             Assert.Contains("ID3v2", ex.Message, StringComparison.Ordinal);
         }
 
@@ -229,7 +230,8 @@ namespace Mfr.Tests.Metadata
                 inFolderIndex: 0,
                 directoryPath: Path.GetDirectoryName(absolutePath)!,
                 prefix: Path.GetFileNameWithoutExtension(absolutePath),
-                extension: Path.GetExtension(absolutePath));
+                extension: Path.GetExtension(absolutePath)
+            );
 
             return new RenameItem(meta);
         }
@@ -237,7 +239,10 @@ namespace Mfr.Tests.Metadata
         private string _CopyFixtureToTempDir(string fixtureFileName)
         {
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fixtureFileName);
-            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output.");
+            Assert.True(
+                File.Exists(fixturePath),
+                $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output."
+            );
 
             var dir = _tempDirectoryFixture.CreateTempDir();
             var dest = Path.Combine(dir, fixtureFileName);

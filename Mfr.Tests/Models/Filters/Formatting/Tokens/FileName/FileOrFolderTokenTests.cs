@@ -30,7 +30,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "Album",
                 extension: "",
-                attributes: FileAttributes.Directory);
+                attributes: FileAttributes.Directory
+            );
 
             Assert.Equal("Folder", token.Compile(tokenArgs: "")(item));
         }

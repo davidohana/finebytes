@@ -5,7 +5,5 @@ namespace Mfr.App.Ui.ViewModels
     /// <summary>
     /// Base type for GUI view models.
     /// </summary>
-    public abstract class ViewModelBase : ObservableObject
-    {
-    }
+    public abstract class ViewModelBase : ObservableObject { }
 }

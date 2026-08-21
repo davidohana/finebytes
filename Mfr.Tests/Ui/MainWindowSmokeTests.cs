@@ -16,10 +16,7 @@ namespace Mfr.Tests.Ui
         [AvaloniaFact]
         public void MainWindow_Constructs()
         {
-            var window = new MainWindow
-            {
-                DataContext = new MainWindowViewModel(),
-            };
+            var window = new MainWindow { DataContext = new MainWindowViewModel() };
 
             window.Show();
 
@@ -33,10 +30,7 @@ namespace Mfr.Tests.Ui
         [AvaloniaFact]
         public void MainWindow_RegistersGlobalKeyBindings()
         {
-            var window = new MainWindow
-            {
-                DataContext = new MainWindowViewModel(),
-            };
+            var window = new MainWindow { DataContext = new MainWindowViewModel() };
 
             window.Show();
 

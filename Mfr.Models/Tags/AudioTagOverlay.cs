@@ -289,13 +289,7 @@ namespace Mfr.Models.Tags
             {
                 ContainerFormat = ContainerFormat,
                 Id3v1 = Id3v1 is null ? null : Id3v1 with { },
-                Id3v2 = Id3v2 is null
-                    ? null
-                    : new Id3v2TagData
-                    {
-                        Version = Id3v2.Version,
-                        Frames = Id3v2.Frames,
-                    },
+                Id3v2 = Id3v2 is null ? null : new Id3v2TagData { Version = Id3v2.Version, Frames = Id3v2.Frames },
                 Xiph = Xiph is null ? null : new XiphTagData { Fields = Xiph.Fields },
                 Ape = Ape is null ? null : new ApeTagData { Fields = Ape.Fields },
                 RiffInfo = RiffInfo is null ? null : new RiffInfoTagData { Fields = RiffInfo.Fields },

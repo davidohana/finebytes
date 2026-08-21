@@ -86,10 +86,7 @@ namespace Mfr.Models.Config
         {
             ArgumentNullException.ThrowIfNull(assignments);
 
-            var list = assignments
-                .Where(a => !a.IsBlank())
-                .Select(a => a.Trim())
-                .ToList();
+            var list = assignments.Where(a => !a.IsBlank()).Select(a => a.Trim()).ToList();
             if (list.Count == 0)
                 return;
 

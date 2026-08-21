@@ -1,7 +1,7 @@
 using Mfr.Utils;
 using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace Mfr.App.Cli
 {
@@ -14,14 +14,13 @@ namespace Mfr.App.Cli
             LogSession.Start(
                 logLevel: logLevel,
                 logConfig: ConfigStore.Config.Log,
-                configureAdditionalSinks: _AddConsoleSink);
+                configureAdditionalSinks: _AddConsoleSink
+            );
         }
 
         internal static LogEventLevel ParseLogLevel(string? value)
         {
-            var normalized = value.IsBlank()
-                ? DefaultLogLevelName
-                : value.Trim().ToLowerInvariant();
+            var normalized = value.IsBlank() ? DefaultLogLevelName : value.Trim().ToLowerInvariant();
 
             return normalized switch
             {
@@ -29,7 +28,7 @@ namespace Mfr.App.Cli
                 "info" => LogEventLevel.Information,
                 "warn" => LogEventLevel.Warning,
                 "error" => LogEventLevel.Error,
-                _ => throw new UserException($"Unknown log level '{value}'. Use debug|info|warn|error.")
+                _ => throw new UserException($"Unknown log level '{value}'. Use debug|info|warn|error."),
             };
         }
 
@@ -42,7 +41,8 @@ namespace Mfr.App.Cli
             configuration.WriteTo.Console(
                 outputTemplate: ConfigStore.Config.Log.ConsoleOutputTemplate,
                 theme: AnsiConsoleTheme.Code,
-                standardErrorFromLevel: LogEventLevel.Error);
+                standardErrorFromLevel: LogEventLevel.Error
+            );
         }
     }
 }

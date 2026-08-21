@@ -28,7 +28,8 @@ namespace Mfr.Tests.TestSupport
             uint disc = 0,
             uint discCount = 0,
             uint beatsPerMinute = 0,
-            string? conductor = null)
+            string? conductor = null
+        )
         {
             var overlay = new AudioTagOverlay
             {
@@ -63,7 +64,8 @@ namespace Mfr.Tests.TestSupport
                 MusicBrainzReleaseType: null,
                 MusicBrainzReleaseCountry: null,
                 MusicIpId: null,
-                AmazonId: null);
+                AmazonId: null
+            );
 
             // Keep an empty Id3v2 block present so filter merges have a target (do not prune before first write).
             if (!merged.ContainsRenderableSemantics())

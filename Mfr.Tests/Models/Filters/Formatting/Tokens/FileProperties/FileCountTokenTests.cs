@@ -53,7 +53,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
                     prefix: "Album",
                     extension: "",
                     directory: parentDir,
-                    attributes: FileAttributes.Directory);
+                    attributes: FileAttributes.Directory
+                );
 
                 Assert.Equal("2", token.Compile(tokenArgs: "")(item));
             }

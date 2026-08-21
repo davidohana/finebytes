@@ -6,8 +6,7 @@ namespace Mfr.Filters.Trimming
     /// Options for <see cref="ShrinkDuplicateCharactersFilter"/>.
     /// </summary>
     /// <param name="Character">Character whose adjacent duplicate occurrences are collapsed.</param>
-    public sealed record ShrinkDuplicateCharactersOptions(
-        char Character);
+    public sealed record ShrinkDuplicateCharactersOptions(char Character);
 
     /// <summary>
     /// Collapses adjacent duplicate occurrences of a configured character to a single occurrence.
@@ -17,7 +16,9 @@ namespace Mfr.Filters.Trimming
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record ShrinkDuplicateCharactersFilter(
         FilterTarget Target,
-        ShrinkDuplicateCharactersOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        ShrinkDuplicateCharactersOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

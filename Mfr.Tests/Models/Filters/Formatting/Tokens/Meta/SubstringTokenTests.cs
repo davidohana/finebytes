@@ -54,8 +54,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void Resolve_SpecExample3_CrossedPositions_ReturnsCrossedRange()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "MyTestFileName", extension: ".123");
-            var compiled = FormatStringCompiler.Compile(
-                "<substr:start=-1,end=2,source=<file-extension>45>");
+            var compiled = FormatStringCompiler.Compile("<substr:start=-1,end=2,source=<file-extension>45>");
             Assert.Equal("2345", compiled(item));
         }
 
@@ -66,9 +65,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void Resolve_NamedOptions_OrderIndependent_ReturnsSameSlice()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
-            Assert.Equal(
-                "Hel",
-                _token.Compile("source=Hello,end=3,start=1")(item));
+            Assert.Equal("Hel", _token.Compile("source=Hello,end=3,start=1")(item));
         }
 
         // ── Positive positions ─────────────────────────────────────────────────
@@ -137,8 +134,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void ResolveTemplate_NestedFileName_ResolvesInnerFirst()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "MyTestFileName", extension: ".123");
-            var compiled = FormatStringCompiler.Compile(
-                "<substr:start=1,end=5,source=<file-name>>");
+            var compiled = FormatStringCompiler.Compile("<substr:start=1,end=5,source=<file-name>>");
             Assert.Equal("MyTes", compiled(item));
         }
 
@@ -149,8 +145,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         public void ResolveTemplate_SpecExample2_NestedFullName()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "MyTestFileName", extension: ".123");
-            var compiled = FormatStringCompiler.Compile(
-                "<substr:start=5,end=-6,source=<full-name>>");
+            var compiled = FormatStringCompiler.Compile("<substr:start=5,end=-6,source=<full-name>>");
             Assert.Equal("stFileNam", compiled(item));
         }
 
@@ -176,7 +171,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
             var compiled = FormatStringCompiler.Compile(
-                "<substr:start=1,end=3,source=<substr:start=2,end=5,source=<full-name>>>");
+                "<substr:start=1,end=3,source=<substr:start=2,end=5,source=<full-name>>>"
+            );
             Assert.Equal("ell", compiled(item));
         }
 
@@ -189,7 +185,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "Hello", extension: ".txt");
             var compiled = FormatStringCompiler.Compile(
-                "<substr:start=1,end=2,source=<substr:start=1,end=3,source=<substr:start=2,end=5,source=<full-name>>>>");
+                "<substr:start=1,end=2,source=<substr:start=1,end=3,source=<substr:start=2,end=5,source=<full-name>>>>"
+            );
             Assert.Equal("el", compiled(item));
         }
 
@@ -201,11 +198,10 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void ResolveTemplate_SubstrWrappingToken_TwoLevels()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "13_-_Smog_-_Cold",
-                extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "13_-_Smog_-_Cold", extension: ".mp3");
             var compiled = FormatStringCompiler.Compile(
-                "<substr:start=1,end=2,source=<token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<full-name>>>");
+                "<substr:start=1,end=2,source=<token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<full-name>>>"
+            );
             Assert.Equal("13", compiled(item));
         }
 
@@ -219,7 +215,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "My-Test-File", extension: ".txt");
             var compiled = FormatStringCompiler.Compile(
-                "<token:tokenNumber=2,separator=-,includeNext=false,includePrev=false,source=<substr:start=1,end=7,source=<full-name>>>");
+                "<token:tokenNumber=2,separator=-,includeNext=false,includePrev=false,source=<substr:start=1,end=7,source=<full-name>>>"
+            );
             Assert.Equal("Test", compiled(item));
         }
 

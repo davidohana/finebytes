@@ -20,9 +20,7 @@ namespace Mfr.App.Ui
             try
             {
                 ConfigStore.Load();
-                LogSession.Start(
-                    logLevel: LogEventLevel.Information,
-                    logConfig: ConfigStore.Config.Log);
+                LogSession.Start(logLevel: LogEventLevel.Information, logConfig: ConfigStore.Config.Log);
                 return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
             }
             catch (Exception ex)
@@ -42,7 +40,8 @@ namespace Mfr.App.Ui
         /// <returns>The configured application builder.</returns>
         public static AppBuilder BuildAvaloniaApp()
         {
-            return AppBuilder.Configure<App>()
+            return AppBuilder
+                .Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace()

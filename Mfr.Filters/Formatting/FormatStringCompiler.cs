@@ -160,7 +160,8 @@ namespace Mfr.Filters.Formatting
             var depth = 0;
             for (var j = openIndex; j < template.Length; j++)
             {
-                if (template[j] == '<') depth++;
+                if (template[j] == '<')
+                    depth++;
                 else if (template[j] == '>')
                 {
                     depth--;
@@ -177,15 +178,17 @@ namespace Mfr.Filters.Formatting
             var name = colonIndex < 0 ? tokenInner : tokenInner[..colonIndex];
             var tokenArgs = colonIndex < 0 ? "" : tokenInner[(colonIndex + 1)..];
             if (!_nameToToken.TryGetValue(name, out var token))
-                throw new NotSupportedException($"Unknown formatter token '<{name}>'. See the Formatter docs for supported tokens.");
+                throw new NotSupportedException(
+                    $"Unknown formatter token '<{name}>'. See the Formatter docs for supported tokens."
+                );
             return token.Compile(tokenArgs);
         }
 
         private static Dictionary<string, IFormatToken> _DiscoverTokens()
         {
             var map = new Dictionary<string, IFormatToken>(StringComparer.Ordinal);
-            var tokenTypes = typeof(FormatStringCompiler).Assembly
-                .GetTypes()
+            var tokenTypes = typeof(FormatStringCompiler)
+                .Assembly.GetTypes()
                 .Where(t => t.IsClass && !t.IsAbstract && typeof(IFormatToken).IsAssignableFrom(t));
 
             foreach (var tokenType in tokenTypes)
@@ -197,7 +200,8 @@ namespace Mfr.Filters.Formatting
                     {
                         throw new InvalidOperationException(
                             $"Format token name '{name}' is registered by multiple types "
-                            + $"('{registeredToken.GetType().FullName}' and '{tokenType.FullName}').");
+                                + $"('{registeredToken.GetType().FullName}' and '{tokenType.FullName}')."
+                        );
                     }
 
                     map[name] = token;

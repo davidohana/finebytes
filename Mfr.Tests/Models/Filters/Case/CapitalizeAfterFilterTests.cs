@@ -11,7 +11,10 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = new CapitalizeAfterFilter(_target, new CapitalizeAfterOptions());
 
-            Assert.Equal("hello,World!(Again)[Is]It-Fine?", FilterTestHelpers.ApplyToPrefix(filter, "hello,world!(again)[is]it-fine?"));
+            Assert.Equal(
+                "hello,World!(Again)[Is]It-Fine?",
+                FilterTestHelpers.ApplyToPrefix(filter, "hello,world!(again)[is]it-fine?")
+            );
         }
 
         [Fact]

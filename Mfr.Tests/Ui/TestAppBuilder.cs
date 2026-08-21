@@ -16,8 +16,7 @@ namespace Mfr.Tests.Ui
         /// <returns>The configured application builder.</returns>
         public static AppBuilder BuildAvaloniaApp()
         {
-            return AppBuilder.Configure<App.Ui.App>()
-                .UseHeadless(new AvaloniaHeadlessPlatformOptions());
+            return AppBuilder.Configure<App.Ui.App>().UseHeadless(new AvaloniaHeadlessPlatformOptions());
         }
     }
 }

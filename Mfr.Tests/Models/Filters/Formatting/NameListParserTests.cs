@@ -26,7 +26,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 A
 
                 B
-                """);
+                """
+            );
 
             var entries = NameListParser.ParseFile(path);
 
@@ -48,7 +49,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 Real1
                 # also a comment
                 Real2
-                """);
+                """
+            );
 
             var entries = NameListParser.ParseFile(path);
 

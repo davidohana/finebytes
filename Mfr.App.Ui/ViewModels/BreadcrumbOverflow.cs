@@ -22,7 +22,8 @@ namespace Mfr.App.Ui.ViewModels
         public static int PickVisibleStart(
             IReadOnlyList<double> segmentWidths,
             double availableWidth,
-            double overflowButtonWidth)
+            double overflowButtonWidth
+        )
         {
             if (segmentWidths.Count == 0)
                 return 0;

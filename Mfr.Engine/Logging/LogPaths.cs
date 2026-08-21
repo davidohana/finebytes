@@ -54,7 +54,8 @@ namespace Mfr.Engine.Logging
             return _CreateTimestampedFilePath(
                 logDirectoryPath: logDirectoryPath,
                 prefix: logConfig.FilePrefix,
-                extension: logConfig.FileExtension);
+                extension: logConfig.FileExtension
+            );
         }
 
         /// <summary>
@@ -72,7 +73,8 @@ namespace Mfr.Engine.Logging
             string logDirectoryPath,
             int maxSessionFiles,
             string sessionLogPrefix,
-            string sessionLogExtension)
+            string sessionLogExtension
+        )
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(logDirectoryPath);
 
@@ -82,10 +84,7 @@ namespace Mfr.Engine.Logging
             var prefix = sessionLogPrefix ?? string.Empty;
             var extension = sessionLogExtension ?? string.Empty;
             var sessionLogFilePaths = Directory
-                .EnumerateFiles(
-                    logDirectoryPath,
-                    $"{prefix}*{extension}",
-                    SearchOption.TopDirectoryOnly)
+                .EnumerateFiles(logDirectoryPath, $"{prefix}*{extension}", SearchOption.TopDirectoryOnly)
                 .Select(path => new FileInfo(path))
                 .OrderByDescending(fileInfo => fileInfo.CreationTimeUtc)
                 .ThenByDescending(fileInfo => fileInfo.Name, StringComparer.Ordinal)
@@ -99,16 +98,11 @@ namespace Mfr.Engine.Logging
                 try
                 {
                     fileInfo.Delete();
-                    Log.Information(
-                        "Deleted old log file '{LogFilePath}' during pruning.",
-                        fileInfo.FullName);
+                    Log.Information("Deleted old log file '{LogFilePath}' during pruning.", fileInfo.FullName);
                 }
                 catch (Exception ex)
                 {
-                    Log.Warning(
-                        ex,
-                        "Failed to delete old log file '{LogFilePath}' during pruning.",
-                        fileInfo.FullName);
+                    Log.Warning(ex, "Failed to delete old log file '{LogFilePath}' during pruning.", fileInfo.FullName);
                 }
             }
         }
@@ -122,9 +116,7 @@ namespace Mfr.Engine.Logging
         {
             ArgumentNullException.ThrowIfNull(exception);
 
-            var header = "An unexpected error occurred."
-                + Environment.NewLine
-                + "Application will be terminated.";
+            var header = "An unexpected error occurred." + Environment.NewLine + "Application will be terminated.";
             return header + Environment.NewLine + Environment.NewLine + exception.ToString();
         }
 
@@ -144,7 +136,8 @@ namespace Mfr.Engine.Logging
                 var crashFilePath = _CreateTimestampedFilePath(
                     logDirectoryPath: directoryPath,
                     prefix: CrashFilePrefix,
-                    extension: ".log");
+                    extension: ".log"
+                );
                 File.WriteAllText(crashFilePath, FormatCrashText(exception));
                 return crashFilePath;
             }
@@ -154,10 +147,7 @@ namespace Mfr.Engine.Logging
             }
         }
 
-        private static string _CreateTimestampedFilePath(
-            string logDirectoryPath,
-            string prefix,
-            string extension)
+        private static string _CreateTimestampedFilePath(string logDirectoryPath, string prefix, string extension)
         {
             var fileName = $"{prefix}{DateTimeOffset.UtcNow:yyyyMMdd-HHmmss-fff}{extension}";
             return logDirectoryPath.CombinePath(fileName);

@@ -41,17 +41,19 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         {
             Require.That(
                 !string.IsNullOrWhiteSpace(tokenArgs),
-                $"{tokenDisplayName} requires arguments: source and name separated by a comma " +
-                    "(for example 'Exif,Make' or 'ExifSub,36867').",
-                nameof(tokenArgs));
+                $"{tokenDisplayName} requires arguments: source and name separated by a comma "
+                    + "(for example 'Exif,Make' or 'ExifSub,36867').",
+                nameof(tokenArgs)
+            );
 
             var trimmed = tokenArgs.Trim();
             var firstComma = trimmed.IndexOf(',');
             Require.That(
                 firstComma >= 0,
-                $"{tokenDisplayName} requires source and name separated by a comma " +
-                    "(for example 'Exif,Make' or 'ExifSub,36867').",
-                nameof(tokenArgs));
+                $"{tokenDisplayName} requires source and name separated by a comma "
+                    + "(for example 'Exif,Make' or 'ExifSub,36867').",
+                nameof(tokenArgs)
+            );
 
             var source = trimmed[..firstComma].Trim();
             var name = trimmed[(firstComma + 1)..].Trim();
@@ -59,19 +61,22 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
             Require.That(
                 source.Length > 0,
                 $"{tokenDisplayName} source must not be empty (expected {FormatOptionsParsing.FormatExpectedKeywords(ExifData.SourceAliases)}).",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             Require.That(
                 name.Length > 0,
                 $"{tokenDisplayName} name must not be empty after the comma (tag name or decimal id).",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             if (!ExifData.IsKnownSourceAlias(source))
             {
                 throw new ArgumentException(
-                    $"{tokenDisplayName} invalid source '{source}' " +
-                        $"(expected {FormatOptionsParsing.FormatExpectedKeywords(ExifData.SourceAliases)}).",
-                    nameof(tokenArgs));
+                    $"{tokenDisplayName} invalid source '{source}' "
+                        + $"(expected {FormatOptionsParsing.FormatExpectedKeywords(ExifData.SourceAliases)}).",
+                    nameof(tokenArgs)
+                );
             }
 
             return new Options(Source: source, Name: name);

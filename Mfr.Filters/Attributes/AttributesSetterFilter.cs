@@ -20,7 +20,7 @@ namespace Mfr.Filters.Attributes
         /// <summary>
         /// Leave the attribute as on the current preview.
         /// </summary>
-        Keep
+        Keep,
     }
 
     /// <summary>
@@ -34,14 +34,14 @@ namespace Mfr.Filters.Attributes
         [property: JsonPropertyName("readOnly")] AttributeTriState ReadOnly,
         [property: JsonPropertyName("hidden")] AttributeTriState Hidden,
         [property: JsonPropertyName("archive")] AttributeTriState Archive,
-        [property: JsonPropertyName("system")] AttributeTriState System);
+        [property: JsonPropertyName("system")] AttributeTriState System
+    );
 
     /// <summary>
     /// Sets or clears filesystem attributes on each rename item (preview and commit).
     /// </summary>
     /// <param name="Options">Per-flag tri-state options.</param>
-    public sealed record AttributesSetterFilter(
-        AttributesSetterOptions Options) : BaseFilter
+    public sealed record AttributesSetterFilter(AttributesSetterOptions Options) : BaseFilter
     {
         /// <inheritdoc />
         public override string Type => "AttributesSetter";
@@ -57,17 +57,14 @@ namespace Mfr.Filters.Attributes
             item.Preview.Attributes = attrs;
         }
 
-        private static FileAttributes _ApplyOne(
-            FileAttributes current,
-            AttributeTriState mode,
-            FileAttributes flag)
+        private static FileAttributes _ApplyOne(FileAttributes current, AttributeTriState mode, FileAttributes flag)
         {
             return mode switch
             {
                 AttributeTriState.Keep => current,
                 AttributeTriState.Set => current | flag,
                 AttributeTriState.Clear => current & ~flag,
-                _ => current
+                _ => current,
             };
         }
     }

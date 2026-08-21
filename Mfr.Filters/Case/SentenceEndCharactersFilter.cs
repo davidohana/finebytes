@@ -1,4 +1,3 @@
-
 namespace Mfr.Filters.Case
 {
     /// <summary>
@@ -20,7 +19,9 @@ namespace Mfr.Filters.Case
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record SentenceEndCharactersFilter(
         FilterTarget Target,
-        SentenceEndCharactersOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        SentenceEndCharactersOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

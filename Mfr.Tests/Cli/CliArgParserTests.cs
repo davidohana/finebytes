@@ -44,7 +44,9 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void ParseArgs_Rejects_Unsupported_LogLevel()
         {
-            var ex = Assert.Throws<UserException>(() => CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--log-level", "trace"]));
+            var ex = Assert.Throws<UserException>(() =>
+                CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--log-level", "trace"])
+            );
             Assert.Contains("Unknown log level", ex.Message, StringComparison.Ordinal);
         }
 
@@ -54,7 +56,13 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void ParseArgs_Accepts_ConfigFilePath()
         {
-            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--config", "  C:\\Temp\\config.json  "])!;
+            var options = CliArgParser.ParseArgs([
+                "C:\\Music\\*.mp3",
+                "-p",
+                "clean",
+                "--config",
+                "  C:\\Temp\\config.json  ",
+            ])!;
             Assert.Equal("C:\\Temp\\config.json", options.ConfigFilePath);
         }
 
@@ -64,8 +72,7 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void ParseArgs_Accepts_ConfigOverrides()
         {
-            var options = CliArgParser.ParseArgs(
-            [
+            var options = CliArgParser.ParseArgs([
                 "C:\\Music\\*.mp3",
                 "-p",
                 "clean",
@@ -108,7 +115,9 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void ParseArgs_Rejects_Files_No_And_Folders_No()
         {
-            var ex = Assert.Throws<UserException>(() => CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "--files", "no", "--folders", "no"]));
+            var ex = Assert.Throws<UserException>(() =>
+                CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "--files", "no", "--folders", "no"])
+            );
             Assert.Contains("At least one of --files or --folders must be yes.", ex.Message, StringComparison.Ordinal);
         }
 
@@ -118,7 +127,9 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void ParseArgs_Rejects_Invalid_Files_Or_Folders_Value()
         {
-            var ex = Assert.Throws<UserException>(() => CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "--files", "maybe"]));
+            var ex = Assert.Throws<UserException>(() =>
+                CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "--files", "maybe"])
+            );
             Assert.Contains("Invalid value for --files", ex.Message, StringComparison.Ordinal);
         }
 
@@ -218,9 +229,10 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void ParseArgs_Rejects_Unknown_Option()
         {
-            var ex = Assert.Throws<UserException>(() => CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--not-a-real-option"]));
+            var ex = Assert.Throws<UserException>(() =>
+                CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--not-a-real-option"])
+            );
             Assert.Contains("Unknown option", ex.Message, StringComparison.Ordinal);
         }
-
     }
 }

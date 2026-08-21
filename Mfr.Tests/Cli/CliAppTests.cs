@@ -64,8 +64,7 @@ namespace Mfr.Tests.Cli
                 Id = Guid.NewGuid(),
                 Name = "counter",
                 Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
+                Chain = FilterChain.CreateAllEnabled([
                     new CounterFilter(
                         Target: new FilePrefixTarget(),
                         Options: new CounterOptions(
@@ -75,17 +74,20 @@ namespace Mfr.Tests.Cli
                             PadChar: "0",
                             Position: CounterPosition.Replace,
                             Separator: " - ",
-                            ResetPerFolder: false))
-                ])
+                            ResetPerFolder: false
+                        )
+                    ),
+                ]),
             };
             presetManager.SavePresets();
 
-            var exitCode = CliApp.Run(
-            [
+            var exitCode = CliApp.Run([
                 sourcePath,
-                "--preset", "counter",
-                "--presets-file", presetsFilePath,
-                "--dry-run"
+                "--preset",
+                "counter",
+                "--presets-file",
+                presetsFilePath,
+                "--dry-run",
             ]);
 
             Assert.Equal(CliExitCode.Success, exitCode);

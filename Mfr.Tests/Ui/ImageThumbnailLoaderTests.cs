@@ -159,8 +159,8 @@ namespace Mfr.Tests.Ui
             const int ifdEntryLength = 12;
             const int ifd1EntryCount = 3;
             const int nextIfdLength = 4;
-            var jpegOffset = tiffHeaderLength + ifd0Length + ifd1HeaderLength
-                + (ifd1EntryCount * ifdEntryLength) + nextIfdLength;
+            var jpegOffset =
+                tiffHeaderLength + ifd0Length + ifd1HeaderLength + (ifd1EntryCount * ifdEntryLength) + nextIfdLength;
 
             using var tiff = new MemoryStream();
             _WriteAscii(tiff, "II");
@@ -229,7 +229,8 @@ namespace Mfr.Tests.Ui
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
             Assert.True(
                 File.Exists(fixturePath),
-                $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output.");
+                $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output."
+            );
             return fixturePath;
         }
     }

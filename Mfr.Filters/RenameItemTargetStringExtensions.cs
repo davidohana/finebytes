@@ -36,8 +36,7 @@ namespace Mfr.Filters
                     item.EnsureAudioTagBlockSupported(AudioTagBlockKind.Xiph);
                     return;
                 default:
-                    throw new NotSupportedException(
-                        $"Unsupported audio filter target '{target.GetType().Name}'.");
+                    throw new NotSupportedException($"Unsupported audio filter target '{target.GetType().Name}'.");
             }
         }
     }

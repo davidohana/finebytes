@@ -15,9 +15,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_Tit2_ReturnsPreviewValue()
         {
             var token = new Id3v2Token();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
-                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Hello"] }));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(
+                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Hello"] }
+                )
+            );
 
             Assert.Equal("Hello", token.Compile("TIT2")(item));
             Assert.Contains("id3v2", token.Names);
@@ -27,8 +29,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_BareTxxx_ReturnsFirstOfMultiple()
         {
             var token = new Id3v2Token();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(
                     new Id3v2ModeledFrame
                     {
                         FrameId = "TXXX",
@@ -40,7 +42,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                         FrameId = "TXXX",
                         Description = "catalog",
                         TextValues = ["ABC-123"],
-                    }));
+                    }
+                )
+            );
 
             Assert.Equal("-6.5 dB", token.Compile("TXXX")(item));
         }
@@ -49,8 +53,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_TxxxWithDescription_ReturnsMatchingOnly()
         {
             var token = new Id3v2Token();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(
                     new Id3v2ModeledFrame
                     {
                         FrameId = "TXXX",
@@ -62,7 +66,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                         FrameId = "TXXX",
                         Description = "catalog",
                         TextValues = ["ABC-123"],
-                    }));
+                    }
+                )
+            );
 
             Assert.Equal("ABC-123", token.Compile("TXXX:catalog")(item));
             Assert.Equal(string.Empty, token.Compile("TXXX:missing")(item));
@@ -72,14 +78,16 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_TxxxMultiValue_JoinsWithSemicolon()
         {
             var token = new Id3v2Token();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(
                     new Id3v2ModeledFrame
                     {
                         FrameId = "TXXX",
                         Description = "tags",
                         TextValues = ["a", "b"],
-                    }));
+                    }
+                )
+            );
 
             Assert.Equal("a; b", token.Compile("TXXX:tags")(item));
         }
@@ -88,9 +96,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_MissingFrame_YieldsEmpty()
         {
             var token = new Id3v2Token();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
-                    new Id3v2ModeledFrame { FrameId = "TALB", TextValues = ["OnlyAlbum"] }));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(
+                    new Id3v2ModeledFrame { FrameId = "TALB", TextValues = ["OnlyAlbum"] }
+                )
+            );
 
             Assert.Equal(string.Empty, token.Compile("TIT2")(item));
             Assert.Equal(string.Empty, token.Compile("TXXX")(item));
@@ -100,17 +110,16 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_NullId3v2Block_YieldsEmpty()
         {
             var token = new Id3v2Token();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                // Non-null Xiph keeps EnsureSyntheticAudioOverlayWhenTagless from replacing the overlay.
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    // Non-null Xiph keeps EnsureSyntheticAudioOverlayWhenTagless from replacing the overlay.
-                    m.AudioTagOverlay = new AudioTagOverlay
-                    {
-                        ContainerFormat = AudioContainerFormat.Mpeg,
-                        Id3v2 = null,
-                        Xiph = new XiphTagData { Fields = [] },
-                    };
-                });
+                    ContainerFormat = AudioContainerFormat.Mpeg,
+                    Id3v2 = null,
+                    Xiph = new XiphTagData { Fields = [] },
+                };
+            });
 
             Assert.Equal(string.Empty, token.Compile("TIT2")(item));
             Assert.Equal(string.Empty, token.Compile("TXXX")(item));
@@ -120,14 +129,18 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_Version_FormatsMinorAsTwoDotN()
         {
             var token = new Id3v2VersionToken();
-            var v23 = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
+            var v23 = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(
                     version: 3,
-                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["A"] }));
-            var v24 = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
+                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["A"] }
+                )
+            );
+            var v24 = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(
                     version: 4,
-                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["B"] }));
+                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["B"] }
+                )
+            );
 
             Assert.Equal("2.3", token.Compile(string.Empty)(v23));
             Assert.Equal("2.4", token.Compile(string.Empty)(v24));
@@ -138,13 +151,14 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_Version_NullBlock_YieldsEmpty()
         {
             var token = new Id3v2VersionToken();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = new AudioTagOverlay
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
                     ContainerFormat = AudioContainerFormat.Mpeg,
                     Id3v2 = null,
                     Xiph = new XiphTagData { Fields = [] },
-                });
+                }
+            );
 
             Assert.Equal(string.Empty, token.Compile(string.Empty)(item));
         }
@@ -161,12 +175,15 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_PrefersPreviewOverlayOverOriginal()
         {
             var token = new Id3v2Token();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
-                    new Id3v2ModeledFrame { FrameId = "TALB", TextValues = ["OrigAlbum"] }));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(
+                    new Id3v2ModeledFrame { FrameId = "TALB", TextValues = ["OrigAlbum"] }
+                )
+            );
 
             item.Preview.AudioTagOverlay = _OverlayWithFrames(
-                new Id3v2ModeledFrame { FrameId = "TALB", TextValues = ["PrevAlbum"] });
+                new Id3v2ModeledFrame { FrameId = "TALB", TextValues = ["PrevAlbum"] }
+            );
 
             Assert.Equal("PrevAlbum", token.Compile("TALB")(item));
         }
@@ -175,8 +192,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_PrimaryComm_OmitsDescription()
         {
             var token = new Id3v2Token();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(
                     new Id3v2ModeledFrame
                     {
                         FrameId = "COMM",
@@ -190,7 +207,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                         Language = "eng",
                         Description = "other",
                         TextValues = ["Secondary"],
-                    }));
+                    }
+                )
+            );
 
             Assert.Equal("Primary", token.Compile("COMM")(item));
             Assert.Equal("Secondary", token.Compile("COMM:other")(item));
@@ -219,9 +238,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Compile_CaseInsensitiveFrameId()
         {
             var token = new Id3v2Token();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
-                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Hi"] }));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = _OverlayWithFrames(new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Hi"] })
+            );
 
             Assert.Equal("Hi", token.Compile("tit2")(item));
         }
@@ -231,17 +250,21 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         {
             var filter = new FormatterFilter(
                 new FilePrefixTarget(),
-                new FormatterOptions("<id3v2:TXXX:catalog>-<id3v2:TIT2>"));
+                new FormatterOptions("<id3v2:TXXX:catalog>-<id3v2:TIT2>")
+            );
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
-                configureOriginal: m => m.AudioTagOverlay = _OverlayWithFrames(
-                    new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Title"] },
-                    new Id3v2ModeledFrame
-                    {
-                        FrameId = "TXXX",
-                        Description = "catalog",
-                        TextValues = ["C1"],
-                    }));
+                configureOriginal: m =>
+                    m.AudioTagOverlay = _OverlayWithFrames(
+                        new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Title"] },
+                        new Id3v2ModeledFrame
+                        {
+                            FrameId = "TXXX",
+                            Description = "catalog",
+                            TextValues = ["C1"],
+                        }
+                    )
+            );
 
             filter.Setup();
             filter.Apply(item);

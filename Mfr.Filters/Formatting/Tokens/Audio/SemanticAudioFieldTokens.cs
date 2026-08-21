@@ -5,7 +5,8 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// <summary>
     /// Shared implementation for formatter tokens backed by <see cref="SemanticAudioField"/> projection.
     /// </summary>
-    internal abstract class SemanticAudioFieldTokenBase(IReadOnlyList<string> names, SemanticAudioField field) : IFormatToken
+    internal abstract class SemanticAudioFieldTokenBase(IReadOnlyList<string> names, SemanticAudioField field)
+        : IFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
@@ -29,9 +30,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-title&gt;</c>.</summary>
         public AudioTitleToken()
-            : base(["audio-title"], SemanticAudioField.Title)
-        {
-        }
+            : base(["audio-title"], SemanticAudioField.Title) { }
     }
 
     /// <inheritdoc />
@@ -39,9 +38,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-artist&gt;</c> (joined performers).</summary>
         public AudioArtistToken()
-            : base(["audio-artist"], SemanticAudioField.Performers)
-        {
-        }
+            : base(["audio-artist"], SemanticAudioField.Performers) { }
     }
 
     /// <inheritdoc />
@@ -49,9 +46,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-album-artist&gt;</c>.</summary>
         public AudioAlbumArtistToken()
-            : base(["audio-album-artist"], SemanticAudioField.AlbumArtists)
-        {
-        }
+            : base(["audio-album-artist"], SemanticAudioField.AlbumArtists) { }
     }
 
     /// <inheritdoc />
@@ -59,9 +54,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-album&gt;</c>.</summary>
         public AudioAlbumToken()
-            : base(["audio-album"], SemanticAudioField.Album)
-        {
-        }
+            : base(["audio-album"], SemanticAudioField.Album) { }
     }
 
     /// <inheritdoc />
@@ -69,9 +62,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-year&gt;</c>.</summary>
         public AudioYearToken()
-            : base(["audio-year"], SemanticAudioField.Year)
-        {
-        }
+            : base(["audio-year"], SemanticAudioField.Year) { }
     }
 
     /// <inheritdoc />
@@ -79,9 +70,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-genre&gt;</c>.</summary>
         public AudioGenreToken()
-            : base(["audio-genre"], SemanticAudioField.Genre)
-        {
-        }
+            : base(["audio-genre"], SemanticAudioField.Genre) { }
     }
 
     /// <inheritdoc />
@@ -89,9 +78,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-track&gt;</c>.</summary>
         public AudioTrackToken()
-            : base(["audio-track"], SemanticAudioField.Track)
-        {
-        }
+            : base(["audio-track"], SemanticAudioField.Track) { }
     }
 
     /// <inheritdoc />
@@ -99,9 +86,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-track-count&gt;</c>.</summary>
         public AudioTrackCountToken()
-            : base(["audio-track-count"], SemanticAudioField.TrackCount)
-        {
-        }
+            : base(["audio-track-count"], SemanticAudioField.TrackCount) { }
     }
 
     /// <inheritdoc />
@@ -109,9 +94,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-disc&gt;</c>.</summary>
         public AudioDiscToken()
-            : base(["audio-disc"], SemanticAudioField.Disc)
-        {
-        }
+            : base(["audio-disc"], SemanticAudioField.Disc) { }
     }
 
     /// <inheritdoc />
@@ -119,9 +102,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-disc-count&gt;</c>.</summary>
         public AudioDiscCountToken()
-            : base(["audio-disc-count"], SemanticAudioField.DiscCount)
-        {
-        }
+            : base(["audio-disc-count"], SemanticAudioField.DiscCount) { }
     }
 
     /// <inheritdoc />
@@ -129,9 +110,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-comment&gt;</c>.</summary>
         public AudioCommentToken()
-            : base(["audio-comment"], SemanticAudioField.Comment)
-        {
-        }
+            : base(["audio-comment"], SemanticAudioField.Comment) { }
     }
 
     /// <inheritdoc />
@@ -139,9 +118,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-composer&gt;</c>.</summary>
         public AudioComposerToken()
-            : base(["audio-composer"], SemanticAudioField.Composers)
-        {
-        }
+            : base(["audio-composer"], SemanticAudioField.Composers) { }
     }
 
     /// <inheritdoc />
@@ -149,9 +126,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-lyrics&gt;</c>.</summary>
         public AudioLyricsToken()
-            : base(["audio-lyrics"], SemanticAudioField.Lyrics)
-        {
-        }
+            : base(["audio-lyrics"], SemanticAudioField.Lyrics) { }
     }
 
     /// <inheritdoc />
@@ -159,9 +134,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-copyright&gt;</c>.</summary>
         public AudioCopyrightToken()
-            : base(["audio-copyright"], SemanticAudioField.Copyright)
-        {
-        }
+            : base(["audio-copyright"], SemanticAudioField.Copyright) { }
     }
 
     /// <inheritdoc />
@@ -169,9 +142,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-grouping&gt;</c>.</summary>
         public AudioGroupingToken()
-            : base(["audio-grouping"], SemanticAudioField.Grouping)
-        {
-        }
+            : base(["audio-grouping"], SemanticAudioField.Grouping) { }
     }
 
     /// <inheritdoc />
@@ -179,9 +150,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-bpm&gt;</c>.</summary>
         public AudioBpmToken()
-            : base(["audio-bpm"], SemanticAudioField.BeatsPerMinute)
-        {
-        }
+            : base(["audio-bpm"], SemanticAudioField.BeatsPerMinute) { }
     }
 
     /// <inheritdoc />
@@ -189,9 +158,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-conductor&gt;</c>.</summary>
         public AudioConductorToken()
-            : base(["audio-conductor"], SemanticAudioField.Conductor)
-        {
-        }
+            : base(["audio-conductor"], SemanticAudioField.Conductor) { }
     }
 
     /// <inheritdoc />
@@ -199,9 +166,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-mb-artist-id&gt;</c>.</summary>
         public AudioMbArtistIdToken()
-            : base(["audio-mb-artist-id"], SemanticAudioField.MusicBrainzArtistId)
-        {
-        }
+            : base(["audio-mb-artist-id"], SemanticAudioField.MusicBrainzArtistId) { }
     }
 
     /// <inheritdoc />
@@ -209,9 +174,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-mb-release-id&gt;</c>.</summary>
         public AudioMbReleaseIdToken()
-            : base(["audio-mb-release-id"], SemanticAudioField.MusicBrainzReleaseId)
-        {
-        }
+            : base(["audio-mb-release-id"], SemanticAudioField.MusicBrainzReleaseId) { }
     }
 
     /// <inheritdoc />
@@ -219,9 +182,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-mb-release-artist-id&gt;</c>.</summary>
         public AudioMbReleaseArtistIdToken()
-            : base(["audio-mb-release-artist-id"], SemanticAudioField.MusicBrainzReleaseArtistId)
-        {
-        }
+            : base(["audio-mb-release-artist-id"], SemanticAudioField.MusicBrainzReleaseArtistId) { }
     }
 
     /// <inheritdoc />
@@ -229,9 +190,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-mb-track-id&gt;</c>.</summary>
         public AudioMbTrackIdToken()
-            : base(["audio-mb-track-id"], SemanticAudioField.MusicBrainzTrackId)
-        {
-        }
+            : base(["audio-mb-track-id"], SemanticAudioField.MusicBrainzTrackId) { }
     }
 
     /// <inheritdoc />
@@ -239,9 +198,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-mb-disc-id&gt;</c>.</summary>
         public AudioMbDiscIdToken()
-            : base(["audio-mb-disc-id"], SemanticAudioField.MusicBrainzDiscId)
-        {
-        }
+            : base(["audio-mb-disc-id"], SemanticAudioField.MusicBrainzDiscId) { }
     }
 
     /// <inheritdoc />
@@ -249,9 +206,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-mb-release-status&gt;</c>.</summary>
         public AudioMbReleaseStatusToken()
-            : base(["audio-mb-release-status"], SemanticAudioField.MusicBrainzReleaseStatus)
-        {
-        }
+            : base(["audio-mb-release-status"], SemanticAudioField.MusicBrainzReleaseStatus) { }
     }
 
     /// <inheritdoc />
@@ -259,9 +214,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-mb-release-type&gt;</c>.</summary>
         public AudioMbReleaseTypeToken()
-            : base(["audio-mb-release-type"], SemanticAudioField.MusicBrainzReleaseType)
-        {
-        }
+            : base(["audio-mb-release-type"], SemanticAudioField.MusicBrainzReleaseType) { }
     }
 
     /// <inheritdoc />
@@ -269,9 +222,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-mb-release-country&gt;</c>.</summary>
         public AudioMbReleaseCountryToken()
-            : base(["audio-mb-release-country"], SemanticAudioField.MusicBrainzReleaseCountry)
-        {
-        }
+            : base(["audio-mb-release-country"], SemanticAudioField.MusicBrainzReleaseCountry) { }
     }
 
     /// <inheritdoc />
@@ -279,9 +230,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-musicip-id&gt;</c>.</summary>
         public AudioMusicIpIdToken()
-            : base(["audio-musicip-id"], SemanticAudioField.MusicIpId)
-        {
-        }
+            : base(["audio-musicip-id"], SemanticAudioField.MusicIpId) { }
     }
 
     /// <inheritdoc />
@@ -289,8 +238,6 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     {
         /// <summary>Registers <c>&lt;audio-amazon-id&gt;</c>.</summary>
         public AudioAmazonIdToken()
-            : base(["audio-amazon-id"], SemanticAudioField.AmazonId)
-        {
-        }
+            : base(["audio-amazon-id"], SemanticAudioField.AmazonId) { }
     }
 }

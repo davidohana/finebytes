@@ -16,7 +16,10 @@ test:
     dotnet test -c Debug  --logger "console;verbosity=detailed"
 
 format:
-    dotnet format --verbosity diagnostic
+    dotnet tool restore
+    dotnet csharpier format .
+    dotnet format style .\finebytes.slnx
+    dotnet format analyzers .\finebytes.slnx
 
 run-help:
     dotnet run --project ./Mfr.App.Cli/Mfr.App.Cli.csproj -- --help

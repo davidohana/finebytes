@@ -57,12 +57,23 @@ namespace Mfr.App.Ui.Services.FileList
             if (string.IsNullOrWhiteSpace(joinedPatterns))
                 return [];
 
-            return [.. joinedPatterns.Split([':', ';'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)];
+            return
+            [
+                .. joinedPatterns.Split(
+                    [':', ';'],
+                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+                ),
+            ];
         }
 
         private static string _ToAnchoredRegex(string pattern)
         {
-            return "^" + Regex.Escape(pattern).Replace("\\*", ".*", StringComparison.Ordinal).Replace("\\?", ".", StringComparison.Ordinal) + "$";
+            return "^"
+                + Regex
+                    .Escape(pattern)
+                    .Replace("\\*", ".*", StringComparison.Ordinal)
+                    .Replace("\\?", ".", StringComparison.Ordinal)
+                + "$";
         }
     }
 }

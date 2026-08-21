@@ -1,4 +1,3 @@
-
 namespace Mfr.Filters
 {
     /// <summary>
@@ -19,7 +18,6 @@ namespace Mfr.Filters
 
             if (!File.Exists(filePath))
                 throw new UserException($"{listKindLabel} file not found: '{filePath}'.");
-
         }
 
         /// <summary>
@@ -36,8 +34,8 @@ namespace Mfr.Filters
                 return false;
 
             return trimmedStart.StartsWith("//", StringComparison.Ordinal)
-                            || trimmedStart.StartsWith(@"\\", StringComparison.Ordinal)
-                            || trimmedStart.StartsWith("# ", StringComparison.Ordinal);
+                || trimmedStart.StartsWith(@"\\", StringComparison.Ordinal)
+                || trimmedStart.StartsWith("# ", StringComparison.Ordinal);
         }
     }
 }

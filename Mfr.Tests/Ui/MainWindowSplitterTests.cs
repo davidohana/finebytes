@@ -29,7 +29,8 @@ namespace Mfr.Tests.Ui
 
             Assert.True(
                 grid.ColumnDefinitions[0].ActualWidth > before + 40,
-                $"Expected left column to grow from {before}, got {grid.ColumnDefinitions[0].ActualWidth}.");
+                $"Expected left column to grow from {before}, got {grid.ColumnDefinitions[0].ActualWidth}."
+            );
         }
 
         /// <summary>
@@ -48,7 +49,8 @@ namespace Mfr.Tests.Ui
 
             Assert.True(
                 grid.ColumnDefinitions[0].ActualWidth > before + 20,
-                $"Expected available-filters column to grow from {before}, got {grid.ColumnDefinitions[0].ActualWidth}.");
+                $"Expected available-filters column to grow from {before}, got {grid.ColumnDefinitions[0].ActualWidth}."
+            );
         }
 
         /// <summary>
@@ -67,7 +69,8 @@ namespace Mfr.Tests.Ui
 
             Assert.True(
                 grid.RowDefinitions[0].ActualHeight > before + 20,
-                $"Expected filter-list row to grow from {before}, got {grid.RowDefinitions[0].ActualHeight}.");
+                $"Expected filter-list row to grow from {before}, got {grid.RowDefinitions[0].ActualHeight}."
+            );
         }
 
         /// <summary>
@@ -86,7 +89,8 @@ namespace Mfr.Tests.Ui
 
             Assert.True(
                 grid.RowDefinitions[0].ActualHeight > before + 20,
-                $"Expected top-panes row to grow from {before}, got {grid.RowDefinitions[0].ActualHeight}.");
+                $"Expected top-panes row to grow from {before}, got {grid.RowDefinitions[0].ActualHeight}."
+            );
         }
 
         private static MainWindow _ShowMainWindow()
@@ -104,21 +108,13 @@ namespace Mfr.Tests.Ui
 
         private static void _Drag(GridSplitter splitter, double deltaX, double deltaY)
         {
-            splitter.RaiseEvent(new VectorEventArgs
-            {
-                RoutedEvent = Thumb.DragStartedEvent,
-                Vector = default,
-            });
-            splitter.RaiseEvent(new VectorEventArgs
-            {
-                RoutedEvent = Thumb.DragDeltaEvent,
-                Vector = new Vector(deltaX, deltaY),
-            });
-            splitter.RaiseEvent(new VectorEventArgs
-            {
-                RoutedEvent = Thumb.DragCompletedEvent,
-                Vector = new Vector(deltaX, deltaY),
-            });
+            splitter.RaiseEvent(new VectorEventArgs { RoutedEvent = Thumb.DragStartedEvent, Vector = default });
+            splitter.RaiseEvent(
+                new VectorEventArgs { RoutedEvent = Thumb.DragDeltaEvent, Vector = new Vector(deltaX, deltaY) }
+            );
+            splitter.RaiseEvent(
+                new VectorEventArgs { RoutedEvent = Thumb.DragCompletedEvent, Vector = new Vector(deltaX, deltaY) }
+            );
         }
     }
 }

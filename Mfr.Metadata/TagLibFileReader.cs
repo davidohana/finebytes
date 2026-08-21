@@ -32,7 +32,8 @@ namespace Mfr.Metadata
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             return new TagLibFileSnapshot(
                 Overlay: AudioTagPersistence.ReadFrom(file),
-                Media: MediaPropertiesReader.ReadFrom(file));
+                Media: MediaPropertiesReader.ReadFrom(file)
+            );
         }
     }
 }

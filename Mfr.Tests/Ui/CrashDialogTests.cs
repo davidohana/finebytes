@@ -18,7 +18,8 @@ namespace Mfr.Tests.Ui
             var viewModel = new CrashDialogViewModel(
                 details: "details",
                 logFilePath: null,
-                logDirectoryPath: string.Empty);
+                logDirectoryPath: string.Empty
+            );
 
             Assert.Contains("terminated", viewModel.Summary, StringComparison.OrdinalIgnoreCase);
             Assert.Equal("Diagnostic log was not written.", viewModel.LogFileDisplay);
@@ -34,7 +35,8 @@ namespace Mfr.Tests.Ui
             var viewModel = new CrashDialogViewModel(
                 details: "System.InvalidOperationException: boom",
                 logFilePath: @"C:\logs\session-test.log",
-                logDirectoryPath: @"C:\logs");
+                logDirectoryPath: @"C:\logs"
+            );
             var dialog = new CrashDialog(viewModel);
             dialog.Show();
 

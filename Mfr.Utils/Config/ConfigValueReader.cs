@@ -27,7 +27,8 @@ namespace Mfr.Utils.Config
             string propertyName,
             ref int value,
             int minInclusive,
-            int maxInclusive)
+            int maxInclusive
+        )
         {
             var raw = _ReadOptionalStringProperty(configObject, propertyName);
             if (raw is null)
@@ -35,20 +36,19 @@ namespace Mfr.Utils.Config
 
             if (raw.IsBlank())
             {
-                throw new InvalidDataException(
-                    $"'{propertyName}' must be an integer (got '{raw}').");
+                throw new InvalidDataException($"'{propertyName}' must be an integer (got '{raw}').");
             }
 
             if (!int.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
-                throw new InvalidDataException(
-                    $"'{propertyName}' must be an integer (got '{raw}').");
+                throw new InvalidDataException($"'{propertyName}' must be an integer (got '{raw}').");
             }
 
             if (parsed < minInclusive || parsed > maxInclusive)
             {
                 throw new InvalidDataException(
-                    $"'{propertyName}' must be between {minInclusive} and {maxInclusive} (got {parsed}).");
+                    $"'{propertyName}' must be between {minInclusive} and {maxInclusive} (got {parsed})."
+                );
             }
 
             value = parsed;
@@ -71,7 +71,8 @@ namespace Mfr.Utils.Config
             JsonElement configObject,
             string propertyName,
             ref string value,
-            int? maxLengthInclusive = null)
+            int? maxLengthInclusive = null
+        )
         {
             var raw = _ReadOptionalStringProperty(configObject, propertyName);
             if (raw is null)
@@ -79,14 +80,14 @@ namespace Mfr.Utils.Config
 
             if (raw.IsBlank())
             {
-                throw new InvalidDataException(
-                    $"'{propertyName}' must be a non-empty string (got '{raw}').");
+                throw new InvalidDataException($"'{propertyName}' must be a non-empty string (got '{raw}').");
             }
 
             if (maxLengthInclusive is { } maxLen && raw.Length > maxLen)
             {
                 throw new InvalidDataException(
-                    $"'{propertyName}' must be at most {maxLen} characters (got {raw.Length}).");
+                    $"'{propertyName}' must be at most {maxLen} characters (got {raw.Length})."
+                );
             }
 
             value = raw;
@@ -105,10 +106,7 @@ namespace Mfr.Utils.Config
         /// <exception cref="InvalidDataException">
         /// Thrown when <paramref name="configObject"/> is not an object, the property is not a JSON string or null, or the text is not a boolean.
         /// </exception>
-        public static void ReadBool(
-            JsonElement configObject,
-            string propertyName,
-            ref bool value)
+        public static void ReadBool(JsonElement configObject, string propertyName, ref bool value)
         {
             var raw = _ReadOptionalStringProperty(configObject, propertyName);
             if (raw is null)
@@ -120,8 +118,7 @@ namespace Mfr.Utils.Config
                 return;
             }
 
-            throw new InvalidDataException(
-                $"'{propertyName}' must be a boolean (got '{raw}').");
+            throw new InvalidDataException($"'{propertyName}' must be a boolean (got '{raw}').");
         }
 
         /// <summary>
@@ -152,8 +149,7 @@ namespace Mfr.Utils.Config
                 if (kind == JsonValueKind.Null)
                     return null;
 
-                throw new InvalidDataException(
-                    $"'{propertyName}' must be a JSON string or null.");
+                throw new InvalidDataException($"'{propertyName}' must be a JSON string or null.");
             }
 
             return null;

@@ -33,7 +33,8 @@ namespace Mfr.Engine
             string DestinationPath,
             IReadOnlyList<RenamePropertyChange> Changes,
             RenameStatus Status,
-            string? ErrorMessage);
+            string? ErrorMessage
+        );
 
         /// <summary>
         /// Runs a commit plan and returns one result per item in <paramref name="allItems"/>.
@@ -53,7 +54,8 @@ namespace Mfr.Engine
             IReadOnlyList<RenameItem> allItems,
             Func<RenameItem, bool>? confirmBeforeApply,
             bool failFast,
-            bool dryRun)
+            bool dryRun
+        )
         {
             var outcomes = new Dictionary<RenameItem, PlanOutcome>(ReferenceEqualityComparer.Instance);
 
@@ -62,7 +64,8 @@ namespace Mfr.Engine
                 confirmBeforeApply: confirmBeforeApply,
                 failFast: failFast,
                 dryRun: dryRun,
-                outcomes: outcomes);
+                outcomes: outcomes
+            );
 
             return [.. allItems.Select(item => _BuildResultForItem(item: item, outcomes: outcomes))];
         }
@@ -80,7 +83,8 @@ namespace Mfr.Engine
             Func<RenameItem, bool>? confirmBeforeApply,
             bool failFast,
             bool dryRun,
-            Dictionary<RenameItem, PlanOutcome> outcomes)
+            Dictionary<RenameItem, PlanOutcome> outcomes
+        )
         {
             var stopped = false;
             var inFlightStashedItems = new HashSet<RenameItem>(ReferenceEqualityComparer.Instance);
@@ -107,23 +111,18 @@ namespace Mfr.Engine
                     // While a cycle resolution is in flight (stash+finalize pair), the callback is bypassed
                     // to avoid orphaning a source that is already stashed at a temp path.
                     var withinCycleResolution = inFlightStashedItems.Contains(finalizeStep.Item);
-                    var confirmed = withinCycleResolution
-                        || confirmBeforeApply is null
-                        || confirmBeforeApply(finalizeStep.Item);
+                    var confirmed =
+                        withinCycleResolution || confirmBeforeApply is null || confirmBeforeApply(finalizeStep.Item);
                     if (!confirmed)
                     {
                         inFlightStashedItems.Remove(finalizeStep.Item);
                         continue;
                     }
 
-                    var stepFailed = !_ExecuteFinalizeStep(
-                        step: finalizeStep,
-                        dryRun: dryRun,
-                        outcomes: outcomes);
+                    var stepFailed = !_ExecuteFinalizeStep(step: finalizeStep, dryRun: dryRun, outcomes: outcomes);
                     inFlightStashedItems.Remove(finalizeStep.Item);
                     if (stepFailed && failFast)
                         stopped = true;
-
                 }
             }
         }
@@ -135,7 +134,8 @@ namespace Mfr.Engine
         private static bool _TryExecuteStashStep(
             StashStep step,
             bool dryRun,
-            Dictionary<RenameItem, PlanOutcome> outcomes)
+            Dictionary<RenameItem, PlanOutcome> outcomes
+        )
         {
             if (dryRun)
                 return true;
@@ -152,12 +152,14 @@ namespace Mfr.Engine
                     outcomes: outcomes,
                     originalPathBeforeCommit: step.Item.Original.FullPath,
                     destinationPath: step.Item.Preview.FullPath,
-                    ex: ex);
+                    ex: ex
+                );
                 Log.Error(
                     ex,
                     "Stash failed for '{SourcePath}' -> '{TempPath}'.",
                     step.Item.Original.FullPath,
-                    step.TempPath);
+                    step.TempPath
+                );
                 return false;
             }
         }
@@ -165,7 +167,8 @@ namespace Mfr.Engine
         private static bool _ExecuteFinalizeStep(
             FinalizeStep step,
             bool dryRun,
-            Dictionary<RenameItem, PlanOutcome> outcomes)
+            Dictionary<RenameItem, PlanOutcome> outcomes
+        )
         {
             var item = step.Item;
             item.CommitError = null;
@@ -196,7 +199,8 @@ namespace Mfr.Engine
                         AudioTagPersistence.Apply(
                             item.Preview.FullPath,
                             applyOriginal,
-                            previewSnapshot.AudioTagOverlay);
+                            previewSnapshot.AudioTagOverlay
+                        );
                     }
                 }
 
@@ -206,7 +210,8 @@ namespace Mfr.Engine
                     DestinationPath: destinationPath,
                     Changes: changes,
                     Status: RenameStatus.CommitOk,
-                    ErrorMessage: null);
+                    ErrorMessage: null
+                );
                 return true;
             }
             catch (Exception ex)
@@ -216,13 +221,15 @@ namespace Mfr.Engine
                     outcomes: outcomes,
                     originalPathBeforeCommit: originalPathBeforeCommit,
                     destinationPath: destinationPath,
-                    ex: ex);
+                    ex: ex
+                );
                 Log.Error(
                     ex,
                     "Commit failed for '{SourcePath}' -> '{DestinationPath}' (actual source '{ActualSourcePath}').",
                     originalPathBeforeCommit,
                     destinationPath,
-                    step.ActualSourcePath);
+                    step.ActualSourcePath
+                );
                 return false;
             }
         }
@@ -235,7 +242,8 @@ namespace Mfr.Engine
             Dictionary<RenameItem, PlanOutcome> outcomes,
             string originalPathBeforeCommit,
             string destinationPath,
-            Exception ex)
+            Exception ex
+        )
         {
             item.CommitError = new RenameItemError(Message: ex.Message, Cause: ex);
             item.Status = RenameStatus.CommitError;
@@ -244,12 +252,14 @@ namespace Mfr.Engine
                 DestinationPath: destinationPath,
                 Changes: [],
                 Status: RenameStatus.CommitError,
-                ErrorMessage: ex.Message);
+                ErrorMessage: ex.Message
+            );
         }
 
         private static RenameResultItem _BuildResultForItem(
             RenameItem item,
-            Dictionary<RenameItem, PlanOutcome> outcomes)
+            Dictionary<RenameItem, PlanOutcome> outcomes
+        )
         {
             if (outcomes.TryGetValue(item, out var outcome))
             {
@@ -257,7 +267,8 @@ namespace Mfr.Engine
                     OriginalPath: outcome.OriginalPathBeforeCommit,
                     Status: outcome.Status,
                     Error: outcome.ErrorMessage,
-                    Changes: outcome.Changes);
+                    Changes: outcome.Changes
+                );
             }
 
             if (item.Status == RenameStatus.PreviewError)
@@ -267,7 +278,8 @@ namespace Mfr.Engine
                     OriginalPath: item.Original.FullPath,
                     Status: RenameStatus.PreviewError,
                     Error: previewMessage,
-                    Changes: []);
+                    Changes: []
+                );
             }
 
             // No plan-walk outcome was recorded for this item. That covers preview-only no-change
@@ -277,7 +289,8 @@ namespace Mfr.Engine
                 OriginalPath: item.Original.FullPath,
                 Status: RenameStatus.CommitSkipped,
                 Error: null,
-                Changes: []);
+                Changes: []
+            );
         }
     }
 }

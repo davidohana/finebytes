@@ -12,13 +12,14 @@ namespace Mfr.Tests.Models.Filters.Attributes
         [Fact]
         public void TimeShifter_LastWrite_adds_one_day()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                lastWriteTime: s_Base);
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
             var filter = new TimeShifterFilter(
                 Options: new TimeShifterOptions(
                     TimestampField: TimestampField.LastWrite,
                     Amount: 1,
-                    Unit: TimeShiftUnit.Days));
+                    Unit: TimeShiftUnit.Days
+                )
+            );
             filter.Setup();
             filter.Apply(item);
 
@@ -30,13 +31,14 @@ namespace Mfr.Tests.Models.Filters.Attributes
         [Fact]
         public void TimeShifter_Creation_negative_hours()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                creationTime: s_Base);
+            var item = FilterTestHelpers.CreateRenameItem(creationTime: s_Base);
             var filter = new TimeShifterFilter(
                 Options: new TimeShifterOptions(
                     TimestampField: TimestampField.Creation,
                     Amount: -2,
-                    Unit: TimeShiftUnit.Hours));
+                    Unit: TimeShiftUnit.Hours
+                )
+            );
             filter.Setup();
             filter.Apply(item);
 
@@ -46,17 +48,20 @@ namespace Mfr.Tests.Models.Filters.Attributes
         [Fact]
         public void Chain_DateSetter_then_TimeShifter_composes_on_last_access()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                lastAccessTime: s_Base);
+            var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: s_Base);
             var setDate = new DateSetterFilter(
                 Options: new DateSetterOptions(
                     TimestampField: TimestampField.LastAccess,
-                    Date: new DateOnly(2019, 1, 1)));
+                    Date: new DateOnly(2019, 1, 1)
+                )
+            );
             var shift = new TimeShifterFilter(
                 Options: new TimeShifterOptions(
                     TimestampField: TimestampField.LastAccess,
                     Amount: 3,
-                    Unit: TimeShiftUnit.Days));
+                    Unit: TimeShiftUnit.Days
+                )
+            );
             var chain = FilterChain.CreateAllEnabled([setDate, shift]);
             chain.SetupFilters();
             chain.ApplyFilters(item);

@@ -40,31 +40,28 @@ namespace Mfr.Utils.Config
                 var equalsIndex = trimmed.IndexOf('=');
                 if (equalsIndex <= 0)
                 {
-                    throw new InvalidDataException(
-                        $"Invalid --set argument (expected key=value): '{raw}'.");
+                    throw new InvalidDataException($"Invalid --set argument (expected key=value): '{raw}'.");
                 }
 
                 var dottedKey = trimmed[..equalsIndex].Trim();
                 var value = trimmed[(equalsIndex + 1)..].Trim();
                 if (dottedKey.IsBlank())
                 {
-                    throw new InvalidDataException(
-                        $"Invalid --set argument (missing key before '='): '{raw}'.");
+                    throw new InvalidDataException($"Invalid --set argument (missing key before '='): '{raw}'.");
                 }
 
-                var segments = dottedKey
-                    .Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var segments = dottedKey.Split(
+                    '.',
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+                );
                 if (segments.Length < 2)
                 {
                     throw new InvalidDataException(
-                        $"Config path must include a section and a field (e.g. log.maxSessionFiles); got '{dottedKey}'.");
+                        $"Config path must include a section and a field (e.g. log.maxSessionFiles); got '{dottedKey}'."
+                    );
                 }
 
-                _MergeValidated(
-                    merged,
-                    typeof(TConfig),
-                    segments,
-                    value);
+                _MergeValidated(merged, typeof(TConfig), segments, value);
             }
 
             if (merged.Count == 0)
@@ -79,24 +76,25 @@ namespace Mfr.Utils.Config
         {
             if (segments.Length == 1)
             {
-                var leaf = _FindLeafField(containerType, segments[0])
+                var leaf =
+                    _FindLeafField(containerType, segments[0])
                     ?? throw new InvalidDataException(
-                        $"Unknown config field '{segments[0]}' under '{containerType.Name}'.");
+                        $"Unknown config field '{segments[0]}' under '{containerType.Name}'."
+                    );
 
                 var jsonName = s_Naming.ConvertName(leaf.Name);
                 parent[jsonName] = value;
                 return;
             }
 
-            var section = _FindSectionField(containerType, segments[0])
-                ?? throw new InvalidDataException(
-                    $"Unknown config section '{segments[0]}'.");
+            var section =
+                _FindSectionField(containerType, segments[0])
+                ?? throw new InvalidDataException($"Unknown config section '{segments[0]}'.");
 
             var sectionKey = _GetSectionJsonKey(section);
             JsonObject sectionObject;
             if (parent[sectionKey] is JsonObject existingSection)
                 sectionObject = existingSection;
-
             else
             {
                 sectionObject = [];
@@ -115,12 +113,9 @@ namespace Mfr.Utils.Config
                 if (attr is null)
                     continue;
 
-                var jsonKey = string.IsNullOrEmpty(attr.JsonName)
-                                    ? s_Naming.ConvertName(field.Name)
-                                    : attr.JsonName;
+                var jsonKey = string.IsNullOrEmpty(attr.JsonName) ? s_Naming.ConvertName(field.Name) : attr.JsonName;
                 if (string.Equals(jsonKey, segment, StringComparison.OrdinalIgnoreCase))
                     return field;
-
             }
 
             return null;
@@ -143,7 +138,6 @@ namespace Mfr.Utils.Config
                 var jsonName = s_Naming.ConvertName(field.Name);
                 if (string.Equals(jsonName, segment, StringComparison.OrdinalIgnoreCase))
                     return field;
-
             }
 
             return null;
@@ -152,9 +146,7 @@ namespace Mfr.Utils.Config
         private static string _GetSectionJsonKey(FieldInfo sectionField)
         {
             var attr = sectionField.GetCustomAttribute<ConfigSectionAttribute>()!;
-            return string.IsNullOrEmpty(attr.JsonName)
-                ? s_Naming.ConvertName(sectionField.Name)
-                : attr.JsonName;
+            return string.IsNullOrEmpty(attr.JsonName) ? s_Naming.ConvertName(sectionField.Name) : attr.JsonName;
         }
     }
 }

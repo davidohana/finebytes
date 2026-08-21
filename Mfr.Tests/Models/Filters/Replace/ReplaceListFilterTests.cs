@@ -23,7 +23,8 @@ namespace Mfr.Tests.Models.Filters.Replace
 
                 S:.
                 R:_
-                """);
+                """
+            );
             try
             {
                 var filter = _CreateFilter(
@@ -31,7 +32,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                     mode: ReplacerMode.Literal,
                     caseSensitive: true,
                     replaceAll: true,
-                    wholeWord: false);
+                    wholeWord: false
+                );
 
                 var result = FilterTestHelpers.ApplyToPrefix(filter, "a.a");
 
@@ -54,7 +56,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                 S:x
                 R:<EMPTY>
 
-                """);
+                """
+            );
             try
             {
                 var filter = _CreateFilter(
@@ -62,7 +65,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                     mode: ReplacerMode.Literal,
                     caseSensitive: true,
                     replaceAll: true,
-                    wholeWord: false);
+                    wholeWord: false
+                );
 
                 var result = FilterTestHelpers.ApplyToPrefix(filter, "abxcx");
 
@@ -92,7 +96,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                 S:[0-9]+
                 R:<counter:initial=10,step=1,padding=none,length=2,resetScope=global>
                 // END OF REPLACE LIST
-                """);
+                """
+            );
             try
             {
                 var filter = _CreateFilter(
@@ -100,16 +105,19 @@ namespace Mfr.Tests.Models.Filters.Replace
                     mode: ReplacerMode.Regex,
                     caseSensitive: false,
                     replaceAll: true,
-                    wholeWord: false);
+                    wholeWord: false
+                );
 
                 var first = FilterTestHelpers.ApplyToPrefix(
                     filter: filter,
                     inputPrefix: "01.-.Blue.Train",
-                    renameListIndex: 0);
+                    renameListIndex: 0
+                );
                 var second = FilterTestHelpers.ApplyToPrefix(
                     filter: filter,
                     inputPrefix: "02.-.A.Moment's.Notice",
-                    renameListIndex: 1);
+                    renameListIndex: 1
+                );
 
                 Assert.Equal("10_-_Blue_Trbin", first);
                 Assert.Equal("11_-_b_Moment's_Notice", second);
@@ -130,7 +138,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                 """
                 S:f*o
                 R:X
-                """);
+                """
+            );
             try
             {
                 var filter = _CreateFilter(
@@ -138,7 +147,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                     mode: ReplacerMode.Wildcard,
                     caseSensitive: true,
                     replaceAll: true,
-                    wholeWord: false);
+                    wholeWord: false
+                );
 
                 var result = FilterTestHelpers.ApplyToPrefix(filter, "foo");
 
@@ -160,7 +170,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                 """
                 S:a
                 R:x
-                """);
+                """
+            );
             try
             {
                 var filter = _CreateFilter(
@@ -168,7 +179,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                     mode: ReplacerMode.Literal,
                     caseSensitive: true,
                     replaceAll: true,
-                    wholeWord: false);
+                    wholeWord: false
+                );
                 filter.Setup();
                 var firstItem = FilterTestHelpers.CreateRenameItem(prefix: "a");
                 filter.Apply(firstItem);
@@ -176,7 +188,8 @@ namespace Mfr.Tests.Models.Filters.Replace
 
                 File.WriteAllText(
                     path: replaceListFilePath,
-                    contents: "S:a" + Environment.NewLine + "R:y" + Environment.NewLine);
+                    contents: "S:a" + Environment.NewLine + "R:y" + Environment.NewLine
+                );
 
                 var secondItem = FilterTestHelpers.CreateRenameItem(prefix: "a");
                 filter.Apply(secondItem);
@@ -200,7 +213,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                 mode: ReplacerMode.Literal,
                 caseSensitive: true,
                 replaceAll: true,
-                wholeWord: false);
+                wholeWord: false
+            );
 
             var ex = Assert.Throws<UserException>(filter.Setup);
             Assert.Contains("Replace-list file not found", ex.Message, StringComparison.Ordinal);
@@ -211,17 +225,17 @@ namespace Mfr.Tests.Models.Filters.Replace
             ReplacerMode mode,
             bool caseSensitive,
             bool replaceAll,
-            bool wholeWord)
+            bool wholeWord
+        )
         {
             var options = new ReplaceListOptions(
                 FilePath: filePath,
                 Mode: mode,
                 CaseSensitive: caseSensitive,
                 ReplaceAll: replaceAll,
-                WholeWord: wholeWord);
-            return new ReplaceListFilter(
-                Target: _target,
-                Options: options);
+                WholeWord: wholeWord
+            );
+            return new ReplaceListFilter(Target: _target, Options: options);
         }
 
         private static string _CreateReplaceListFile(string content)

@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-
 using Mfr.Models.Rename;
 
 namespace Mfr.Models.Filters
@@ -9,9 +8,7 @@ namespace Mfr.Models.Filters
     /// </summary>
     /// <param name="Enabled">Whether this step participates when applying the chain.</param>
     /// <param name="Filter">The filter configuration for this step.</param>
-    public sealed record FilterChainStep(
-        bool Enabled,
-        [property: JsonPropertyName("filter")] BaseFilter Filter);
+    public sealed record FilterChainStep(bool Enabled, [property: JsonPropertyName("filter")] BaseFilter Filter);
 
     /// <summary>
     /// Ordered filter stack for a preset: each step has an enabled flag and a <see cref="BaseFilter"/>.
@@ -31,10 +28,7 @@ namespace Mfr.Models.Filters
         /// <returns>A new chain.</returns>
         internal static FilterChain CreateAllEnabled(IReadOnlyList<BaseFilter> filters)
         {
-            return new FilterChain
-            {
-                Steps = [.. filters.Select(f => new FilterChainStep(Enabled: true, Filter: f))],
-            };
+            return new FilterChain { Steps = [.. filters.Select(f => new FilterChainStep(Enabled: true, Filter: f))] };
         }
 
         /// <summary>

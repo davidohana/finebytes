@@ -29,14 +29,29 @@ namespace Mfr.Tests.Models
         public void CreateAllEnabled_AppliesFiltersInOrder()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "ab");
-            var chain = FilterChain.CreateAllEnabled(
-            [
+            var chain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: _target,
-                    Options: new ReplacerOptions("a", "x", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false)),
+                    Options: new ReplacerOptions(
+                        "a",
+                        "x",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
+                ),
                 new ReplacerFilter(
                     Target: _target,
-                    Options: new ReplacerOptions("b", "y", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
+                    Options: new ReplacerOptions(
+                        "b",
+                        "y",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
+                ),
             ]);
 
             Assert.All(chain.Steps, step => Assert.True(step.Enabled));
@@ -76,8 +91,8 @@ namespace Mfr.Tests.Models
                 Steps =
                 [
                     new FilterChainStep(Enabled: false, Filter: disabled),
-                    new FilterChainStep(Enabled: true, Filter: enabled)
-                ]
+                    new FilterChainStep(Enabled: true, Filter: enabled),
+                ],
             };
 
             chain.SetupFilters();

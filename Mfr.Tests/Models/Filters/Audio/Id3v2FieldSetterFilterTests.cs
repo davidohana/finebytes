@@ -19,21 +19,17 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Apply_Tit2_AlwaysOverwrites()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
+                    Id3v2 = new Id3v2TagData
                     {
-                        Id3v2 = new Id3v2TagData
-                        {
-                            Version = 3,
-                            Frames =
-                            [
-                                new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Old"] },
-                            ],
-                        },
-                    };
-                });
+                        Version = 3,
+                        Frames = [new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Old"] }],
+                    },
+                };
+            });
             var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(FrameId: "TIT2", Text: "New"));
 
             filter.Setup();
@@ -48,25 +44,20 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void OnlyIfEmpty_LeavesNonEmpty()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
+                    Id3v2 = new Id3v2TagData
                     {
-                        Id3v2 = new Id3v2TagData
-                        {
-                            Version = 3,
-                            Frames =
-                            [
-                                new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Kept"] },
-                            ],
-                        },
-                    };
-                });
-            var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(
-                FrameId: "TIT2",
-                Text: "Fill",
-                OnlyIfEmpty: true));
+                        Version = 3,
+                        Frames = [new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Kept"] }],
+                    },
+                };
+            });
+            var filter = new Id3v2FieldSetterFilter(
+                new Id3v2FieldSetterOptions(FrameId: "TIT2", Text: "Fill", OnlyIfEmpty: true)
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -80,18 +71,16 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void OnlyIfEmpty_FillsWhenEmpty()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
-                    {
-                        Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
-                    };
-                });
-            var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(
-                FrameId: "TIT2",
-                Text: "Fill",
-                OnlyIfEmpty: true));
+                    Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
+                };
+            });
+            var filter = new Id3v2FieldSetterFilter(
+                new Id3v2FieldSetterOptions(FrameId: "TIT2", Text: "Fill", OnlyIfEmpty: true)
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -105,15 +94,14 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Apply_CreatesId3v2_LeavesId3v1Alone()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
-                    {
-                        Id3v1 = new Id3v1TagData { Title = "TrailerOnly" },
-                        Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
-                    };
-                });
+                    Id3v1 = new Id3v1TagData { Title = "TrailerOnly" },
+                    Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
+                };
+            });
             item.Original.AudioTagOverlay.Id3v2 = null;
             item.Preview.AudioTagOverlay.Id3v2 = null;
 
@@ -124,7 +112,10 @@ namespace Mfr.Tests.Models.Filters.Audio
 
             Assert.Equal("TrailerOnly", item.Preview.AudioTagOverlay.Id3v1!.Title);
             Assert.Equal(3, item.Preview.AudioTagOverlay.Id3v2!.Version);
-            Assert.Equal("FrameTitle", AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2"));
+            Assert.Equal(
+                "FrameTitle",
+                AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2")
+            );
         }
 
         /// <summary>
@@ -134,9 +125,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Apply_TextWithFormatToken_Expands()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "MySong");
-            var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(
-                FrameId: "TIT2",
-                Text: "<file-name>"));
+            var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(FrameId: "TIT2", Text: "<file-name>"));
 
             filter.Setup();
             filter.Apply(item);
@@ -151,16 +140,14 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Apply_PrimaryComm_SetsEngLanguage()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(
-                FrameId: "COMM",
-                Text: "Primary comment"));
+            var filter = new Id3v2FieldSetterFilter(
+                new Id3v2FieldSetterOptions(FrameId: "COMM", Text: "Primary comment")
+            );
 
             filter.Setup();
             filter.Apply(item);
 
-            var frame = Assert.Single(
-                item.Preview.AudioTagOverlay.Id3v2!.Frames,
-                f => f.FrameId == "COMM");
+            var frame = Assert.Single(item.Preview.AudioTagOverlay.Id3v2!.Frames, f => f.FrameId == "COMM");
             Assert.Null(frame.Description);
             Assert.Equal("eng", frame.Language);
             Assert.Equal("Primary comment", Assert.Single(frame.TextValues));
@@ -176,11 +163,9 @@ namespace Mfr.Tests.Models.Filters.Audio
                 extension: ".flac",
                 configureOriginal: m =>
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
-                    {
-                        Xiph = new XiphTagData { Fields = [] },
-                    };
-                });
+                    m.AudioTagOverlay = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [] } };
+                }
+            );
             var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(FrameId: "TIT2", Text: "Nope"));
 
             filter.Setup();
@@ -205,16 +190,17 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void JsonDeserialize_Roundtrip()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "Id3v2FieldSetter",
-              "options": {
-                "frameId": "tit2",
-                "text": "<file-name>",
-                "onlyIfEmpty": true
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "Id3v2FieldSetter",
+                  "options": {
+                    "frameId": "tit2",
+                    "text": "<file-name>",
+                    "onlyIfEmpty": true
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             var typed = Assert.IsType<Id3v2FieldSetterFilter>(filter);
@@ -230,7 +216,8 @@ namespace Mfr.Tests.Models.Filters.Audio
                     {
                         Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
                     };
-                });
+                }
+            );
             typed.Apply(item);
             Assert.Equal("P", AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2"));
         }

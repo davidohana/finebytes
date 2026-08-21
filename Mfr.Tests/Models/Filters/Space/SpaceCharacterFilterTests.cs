@@ -23,7 +23,9 @@ namespace Mfr.Tests.Models.Filters.Space
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: true,
-                    CustomText: ""));
+                    CustomText: ""
+                )
+            );
             Assert.Equal("Gone_With_The_Wind", FilterTestHelpers.ApplyToPrefix(f, "Gone%20With%20The%20Wind"));
         }
 
@@ -40,7 +42,9 @@ namespace Mfr.Tests.Models.Filters.Space
                     ReplaceSpaces: true,
                     ReplaceUnderscores: true,
                     ReplacePercent20: true,
-                    CustomText: ""));
+                    CustomText: ""
+                )
+            );
             Assert.Equal("a b c d", FilterTestHelpers.ApplyToPrefix(f, "a_b c%20d"));
         }
 
@@ -57,7 +61,9 @@ namespace Mfr.Tests.Models.Filters.Space
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: false,
-                    CustomText: "++"));
+                    CustomText: "++"
+                )
+            );
             Assert.Equal("a-b", FilterTestHelpers.ApplyToPrefix(f, "a++b"));
         }
 
@@ -74,10 +80,13 @@ namespace Mfr.Tests.Models.Filters.Space
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: true,
-                    CustomText: ""));
+                    CustomText: ""
+                )
+            );
             var titleFilter = new LettersCaseFilter(
                 _target,
-                new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"]));
+                new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"])
+            );
 
             var item = FilterTestHelpers.CreateRenameItem(prefix: "gone%20with%20the%20wind");
             var chain = FilterChain.CreateAllEnabled([spaceFilter, titleFilter]);

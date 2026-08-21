@@ -10,8 +10,9 @@ namespace Mfr.Tests.Models
 
         public RenameItemAudioTagsTests()
         {
-            _tempRoot = Directory.GetCurrentDirectory().CombinePath(
-                "mfr_renameitem_audiotags_" + Guid.NewGuid().ToString("N"));
+            _tempRoot = Directory
+                .GetCurrentDirectory()
+                .CombinePath("mfr_renameitem_audiotags_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempRoot);
         }
 
@@ -31,17 +32,21 @@ namespace Mfr.Tests.Models
             TaggedMinimalWav.WriteTagged(path, title: "DiskTitle", album: "SnapshotAlbum");
 
             var directory = Path.GetDirectoryName(path)!;
-            var item = new RenameItem(new FileMeta(
-                renameListIndex: 0,
-                inFolderIndex: 0,
-                directoryPath: directory,
-                prefix: Path.GetFileNameWithoutExtension(path),
-                extension: Path.GetExtension(path),
-                renameListFolderSiblingCount: 1));
+            var item = new RenameItem(
+                new FileMeta(
+                    renameListIndex: 0,
+                    inFolderIndex: 0,
+                    directoryPath: directory,
+                    prefix: Path.GetFileNameWithoutExtension(path),
+                    extension: Path.GetExtension(path),
+                    renameListFolderSiblingCount: 1
+                )
+            );
 
-            var mutated = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay)
-                with
-            { Album = "PreviewOnlyMutated" };
+            var mutated = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay) with
+            {
+                Album = "PreviewOnlyMutated",
+            };
             item.Preview.AudioTagOverlay.MergeSemantic(mutated);
 
             item.EnsureEmbeddedTagsLoaded();
@@ -99,7 +104,10 @@ namespace Mfr.Tests.Models
 
             Assert.False(item.HasPreviewChanges());
 
-            var mergedPreview = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay) with { Title = "PreviewTitle" };
+            var mergedPreview = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay) with
+            {
+                Title = "PreviewTitle",
+            };
             item.Preview.AudioTagOverlay.MergeSemantic(mergedPreview);
 
             Assert.True(item.HasPreviewChanges());
@@ -121,13 +129,16 @@ namespace Mfr.Tests.Models
         private static RenameItem _CreateUnmarkedItem(string path)
         {
             var directory = Path.GetDirectoryName(path)!;
-            return new RenameItem(new FileMeta(
-                renameListIndex: 0,
-                inFolderIndex: 0,
-                directoryPath: directory,
-                prefix: Path.GetFileNameWithoutExtension(path),
-                extension: Path.GetExtension(path),
-                renameListFolderSiblingCount: 1));
+            return new RenameItem(
+                new FileMeta(
+                    renameListIndex: 0,
+                    inFolderIndex: 0,
+                    directoryPath: directory,
+                    prefix: Path.GetFileNameWithoutExtension(path),
+                    extension: Path.GetExtension(path),
+                    renameListFolderSiblingCount: 1
+                )
+            );
         }
 
         private static FileMeta _CreateMetaWithAlbum(string album)
@@ -138,7 +149,8 @@ namespace Mfr.Tests.Models
                 directoryPath: Path.GetTempPath(),
                 prefix: "x",
                 extension: ".mp3",
-                renameListFolderSiblingCount: 1)
+                renameListFolderSiblingCount: 1
+            )
             {
                 AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(album: album),
             };

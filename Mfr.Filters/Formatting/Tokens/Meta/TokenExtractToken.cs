@@ -38,10 +38,17 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             string Separator,
             bool IncludeNext,
             bool IncludePrev,
-            string SourceFormatString);
+            string SourceFormatString
+        );
 
         private static readonly string[] _tokenExtractOptionKeys =
-            ["tokenNumber", "separator", "includeNext", "includePrev", "source"];
+        [
+            "tokenNumber",
+            "separator",
+            "includeNext",
+            "includePrev",
+            "source",
+        ];
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["token"];
@@ -62,9 +69,10 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
 
                 Require.That(
                     options.TokenNumber <= parts.Length,
-                    $"{tokenDisplayName} token-number {options.TokenNumber} exceeds the number of parts ({parts.Length}) " +
-                        $"in '{source}' when split by '{options.Separator}'.",
-                    nameof(tokenArgs));
+                    $"{tokenDisplayName} token-number {options.TokenNumber} exceeds the number of parts ({parts.Length}) "
+                        + $"in '{source}' when split by '{options.Separator}'.",
+                    nameof(tokenArgs)
+                );
 
                 if (options.IncludeNext && options.IncludePrev)
                     return source;
@@ -84,11 +92,22 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             Require.That(
                 !string.IsNullOrEmpty(tokenArgs),
                 $"{tokenDisplayName} requires named options ({FormatOptionsParsing.FormatExpectedKeywords(_tokenExtractOptionKeys)}).",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             var map = FormatOptionsParsing.ParseNamedKeyValuePairs(tokenArgs.Trim(), tokenDisplayName);
-            FormatOptionsParsing.RequireKnownOptionKeysOnly(map, tokenDisplayName, _tokenExtractOptionKeys, nameof(tokenArgs));
-            FormatOptionsParsing.RequireAllOptionKeysPresent(map, tokenDisplayName, _tokenExtractOptionKeys, nameof(tokenArgs));
+            FormatOptionsParsing.RequireKnownOptionKeysOnly(
+                map,
+                tokenDisplayName,
+                _tokenExtractOptionKeys,
+                nameof(tokenArgs)
+            );
+            FormatOptionsParsing.RequireAllOptionKeysPresent(
+                map,
+                tokenDisplayName,
+                _tokenExtractOptionKeys,
+                nameof(tokenArgs)
+            );
 
             var tokenNumber = int.Parse(map["tokenNumber"].Trim(), CultureInfo.InvariantCulture);
             var separator = map["separator"];
@@ -96,16 +115,25 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             var includePrev = _ParseIncludeFlag(tokenDisplayName, fieldLabel: "includePrev", map["includePrev"]);
             var sourceFormatString = map["source"];
 
-            Require.That(tokenNumber >= 1, $"{tokenDisplayName} tokenNumber must be 1 or greater (got {tokenNumber}).", nameof(tokenArgs));
+            Require.That(
+                tokenNumber >= 1,
+                $"{tokenDisplayName} tokenNumber must be 1 or greater (got {tokenNumber}).",
+                nameof(tokenArgs)
+            );
 
-            Require.That(!string.IsNullOrEmpty(separator), $"{tokenDisplayName} separator must not be empty.", nameof(tokenArgs));
+            Require.That(
+                !string.IsNullOrEmpty(separator),
+                $"{tokenDisplayName} separator must not be empty.",
+                nameof(tokenArgs)
+            );
 
             return new Options(
                 TokenNumber: tokenNumber,
                 Separator: separator,
                 IncludeNext: includeNext,
                 IncludePrev: includePrev,
-                SourceFormatString: sourceFormatString);
+                SourceFormatString: sourceFormatString
+            );
         }
 
         /// <summary>
@@ -116,7 +144,8 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             if (!bool.TryParse(raw.Trim(), out var value))
                 throw new ArgumentException(
                     $"{tokenDisplayName} {fieldLabel} '{raw}' is not supported (expected {FormatOptionsParsing.FormatExpectedKeywords(_includeFlagKeywords)}).",
-                    paramName: nameof(raw));
+                    paramName: nameof(raw)
+                );
 
             return value;
         }

@@ -83,10 +83,7 @@ namespace Mfr.Metadata
         /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
         /// <exception cref="IOException">The file cannot be opened or saved.</exception>
         /// <exception cref="NotSupportedException">The preview introduces a tag block the container cannot hold.</exception>
-        public static void Apply(
-            string absolutePath,
-            AudioTagOverlay originalOverlay,
-            AudioTagOverlay previewOverlay)
+        public static void Apply(string absolutePath, AudioTagOverlay originalOverlay, AudioTagOverlay previewOverlay)
         {
             ArgumentNullException.ThrowIfNull(originalOverlay);
             ArgumentNullException.ThrowIfNull(previewOverlay);
@@ -143,7 +140,8 @@ namespace Mfr.Metadata
         private static void _EnsureIntroducedBlocksSupported(
             AudioContainerFormat containerFormat,
             AudioTagOverlay baselineOverlay,
-            AudioTagOverlay previewOverlay)
+            AudioTagOverlay previewOverlay
+        )
         {
             foreach (var kind in previewOverlay.GetPresentBlockKinds())
             {
@@ -161,7 +159,8 @@ namespace Mfr.Metadata
         private static void _RemoveDroppedTagBlocks(
             TagLib.File file,
             AudioTagOverlay baselineOverlay,
-            AudioTagOverlay previewOverlay)
+            AudioTagOverlay previewOverlay
+        )
         {
             foreach (var kind in baselineOverlay.GetPresentBlockKinds())
             {
@@ -227,7 +226,8 @@ namespace Mfr.Metadata
         private static void _PatchPresentTagBlocks(
             TagLib.File file,
             AudioTagOverlay originalOverlay,
-            AudioTagOverlay previewOverlay)
+            AudioTagOverlay previewOverlay
+        )
         {
             if (previewOverlay.Xiph is not null)
                 XiphTagFields.Apply(file, originalOverlay.Xiph, previewOverlay.Xiph);

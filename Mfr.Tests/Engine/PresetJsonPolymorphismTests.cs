@@ -11,11 +11,10 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Every_shipped_BaseFilter_is_registered_for_preset_JSON()
         {
-            var registered = PresetJsonOptions.BaseFilterDerivedTypes
-                .Select(d => d.DerivedType)
-                .ToHashSet();
+            var registered = PresetJsonOptions.BaseFilterDerivedTypes.Select(d => d.DerivedType).ToHashSet();
 
-            var shipped = typeof(LettersCaseFilter).Assembly.GetExportedTypes()
+            var shipped = typeof(LettersCaseFilter)
+                .Assembly.GetExportedTypes()
                 .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(BaseFilter).IsAssignableFrom(t))
                 .ToHashSet();
 
@@ -25,9 +24,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Preset_JSON_discriminators_are_unique()
         {
-            var names = PresetJsonOptions.BaseFilterDerivedTypes
-                .Select(d => d.TypeDiscriminator!.ToString()!)
-                .ToList();
+            var names = PresetJsonOptions.BaseFilterDerivedTypes.Select(d => d.TypeDiscriminator!.ToString()!).ToList();
             Assert.Equal(names.Count, names.Distinct(StringComparer.Ordinal).Count());
         }
     }

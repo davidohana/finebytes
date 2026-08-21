@@ -39,14 +39,9 @@ namespace Mfr.Tests.TestSupport
             {
                 if (Directory.Exists(TempDir))
                     Directory.Delete(TempDir, recursive: true);
-
             }
-            catch (IOException)
-            {
-            }
-            catch (UnauthorizedAccessException)
-            {
-            }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
         }
     }
 }

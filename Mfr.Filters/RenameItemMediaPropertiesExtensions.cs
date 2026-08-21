@@ -24,8 +24,7 @@ namespace Mfr.Filters
 
             if (item.Original.Attributes.IsDirectory())
             {
-                throw new InvalidOperationException(
-                    "Cannot read media properties for a directory.");
+                throw new InvalidOperationException("Cannot read media properties for a directory.");
             }
 
             var snapshot = TagLibFileReader.Read(item.Original.FullPath);

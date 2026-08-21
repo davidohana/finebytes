@@ -98,10 +98,8 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_TemplateWithStaticSegment_ProducesCompoundPath()
         {
-            var filter = new MoverFilter(
-                new MoverOptions(@"C:\Music", SubFolder: @"Artists\<parent-folder>"));
-            var item = FilterTestHelpers.ApplyReturnItem(
-                filter, "track", directory: @"C:\Downloads\Junkies");
+            var filter = new MoverFilter(new MoverOptions(@"C:\Music", SubFolder: @"Artists\<parent-folder>"));
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: @"C:\Downloads\Junkies");
 
             Assert.Equal(@"C:\Music\Artists\Junkies", item.Preview.DirectoryPath);
         }
@@ -176,13 +174,13 @@ namespace Mfr.Tests.Models.Filters.Misc
                 prefix: "Photos",
                 extension: string.Empty,
                 directory: @"C:\Inbox",
-                attributes: FileAttributes.Directory);
+                attributes: FileAttributes.Directory
+            );
             filter.Setup();
             filter.Apply(item);
 
             var entryIsDirectoryAfterMove =
-                item.Preview.Attributes.IsDirectory()
-                && item.Original.Attributes.IsDirectory();
+                item.Preview.Attributes.IsDirectory() && item.Original.Attributes.IsDirectory();
             Assert.True(entryIsDirectoryAfterMove);
             Assert.Equal(@"C:\Archive\Sorted", item.Preview.DirectoryPath);
             Assert.Equal(@"C:\Archive\Sorted\Photos", item.Preview.FullPath);
@@ -199,7 +197,8 @@ namespace Mfr.Tests.Models.Filters.Misc
                 prefix: "TheTrinitySession",
                 extension: string.Empty,
                 directory: @"C:\Downloads\CowboyJunkies",
-                attributes: FileAttributes.Directory);
+                attributes: FileAttributes.Directory
+            );
             filter.Setup();
             filter.Apply(item);
 

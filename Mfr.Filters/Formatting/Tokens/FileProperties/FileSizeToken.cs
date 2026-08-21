@@ -12,7 +12,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         Bytes,
         Kb,
         Mb,
-        Gb
+        Gb,
     }
 
     /// <summary>
@@ -33,7 +33,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         /// <summary>
         /// Unit keywords for the first argument segment (case-insensitive).
         /// </summary>
-        private static readonly Dictionary<string, FileSizeFormatUnitKind> _unitKeywordToKind = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, FileSizeFormatUnitKind> _unitKeywordToKind = new(
+            StringComparer.OrdinalIgnoreCase
+        )
         {
             [""] = FileSizeFormatUnitKind.Auto,
             ["auto"] = FileSizeFormatUnitKind.Auto,
@@ -79,7 +81,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
                     FileSizeFormatUnitKind.Kb => _Format(bytes, divisor: Kb, unit: "KB", options.Decimals),
                     FileSizeFormatUnitKind.Mb => _Format(bytes, divisor: Mb, unit: "MB", options.Decimals),
                     FileSizeFormatUnitKind.Gb => _Format(bytes, divisor: Gb, unit: "GB", options.Decimals),
-                    _ => throw new UnreachableException()
+                    _ => throw new UnreachableException(),
                 };
             };
         }
@@ -96,8 +98,9 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
             if (!_unitKeywordToKind.TryGetValue(unitArg, out var unitKind))
                 throw new NotSupportedException(
-                    $"{tokenDisplayName} unit '{unitArg}' is not supported " +
-                    $"(expected {FormatOptionsParsing.FormatExpectedKeywords(_UnitKeywordsForErrorHint())}).");
+                    $"{tokenDisplayName} unit '{unitArg}' is not supported "
+                        + $"(expected {FormatOptionsParsing.FormatExpectedKeywords(_UnitKeywordsForErrorHint())})."
+                );
 
             return new Options(Unit: unitKind, Decimals: decimals);
         }

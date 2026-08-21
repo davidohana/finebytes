@@ -15,8 +15,9 @@ namespace Mfr.Tests.Engine
         /// </summary>
         public AddedSourceResolverTests()
         {
-            _tempRoot = Directory.GetCurrentDirectory().CombinePath(
-                "mfr_sourcesolver_tests_" + Guid.NewGuid().ToString("N"));
+            _tempRoot = Directory
+                .GetCurrentDirectory()
+                .CombinePath("mfr_sourcesolver_tests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempRoot);
         }
 
@@ -35,17 +36,12 @@ namespace Mfr.Tests.Engine
                     var attrs = File.GetAttributes(file);
                     if (attrs.HasFlag(FileAttributes.Hidden))
                         File.SetAttributes(file, attrs & ~FileAttributes.Hidden);
-
                 }
 
                 Directory.Delete(_tempRoot, recursive: true);
             }
-            catch (IOException)
-            {
-            }
-            catch (UnauthorizedAccessException)
-            {
-            }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
         }
 
         [Fact]
@@ -58,11 +54,8 @@ namespace Mfr.Tests.Engine
             var source = missingParent.CombinePath("file.txt");
 
             var ex = Assert.Throws<UserException>(() =>
-                AddedSourceResolver.ResolveToPaths(
-                        source: source,
-                        includeFolders: true,
-                        includeSubdirs: false)
-                    .ToList());
+                AddedSourceResolver.ResolveToPaths(source: source, includeFolders: true, includeSubdirs: false).ToList()
+            );
 
             Assert.Contains("does not exist", ex.Message, StringComparison.Ordinal);
         }
@@ -73,10 +66,12 @@ namespace Mfr.Tests.Engine
         /// </summary>
         public void Resolve_MissingExactFile_ReturnsEmpty()
         {
-            var paths = AddedSourceResolver.ResolveToPaths(
+            var paths = AddedSourceResolver
+                .ResolveToPaths(
                     source: _tempRoot.CombinePath("definitely_missing.bin"),
                     includeFolders: true,
-                    includeSubdirs: false)
+                    includeSubdirs: false
+                )
                 .ToList();
 
             Assert.Empty(paths);
@@ -90,10 +85,8 @@ namespace Mfr.Tests.Engine
         {
             var filePath = TestHelpers.CreateFile(_tempRoot, "single.txt");
 
-            var paths = AddedSourceResolver.ResolveToPaths(
-                    source: filePath,
-                    includeFolders: true,
-                    includeSubdirs: false)
+            var paths = AddedSourceResolver
+                .ResolveToPaths(source: filePath, includeFolders: true, includeSubdirs: false)
                 .ToList();
 
             Assert.Equal([filePath], paths);
@@ -107,10 +100,8 @@ namespace Mfr.Tests.Engine
         {
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
 
-            var paths = AddedSourceResolver.ResolveToPaths(
-                    source: folderPath,
-                    includeFolders: true,
-                    includeSubdirs: false)
+            var paths = AddedSourceResolver
+                .ResolveToPaths(source: folderPath, includeFolders: true, includeSubdirs: false)
                 .ToList();
 
             Assert.Equal([folderPath], paths);
@@ -127,16 +118,12 @@ namespace Mfr.Tests.Engine
             var topB = TestHelpers.CreateFile(folderPath, "b.log");
             TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
 
-            var paths = AddedSourceResolver.ResolveToPaths(
-                    source: folderPath,
-                    includeFolders: false,
-                    includeSubdirs: false)
+            var paths = AddedSourceResolver
+                .ResolveToPaths(source: folderPath, includeFolders: false, includeSubdirs: false)
                 .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            var expected = new[] { topA, topB }
-                .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
-                .ToList();
+            var expected = new[] { topA, topB }.OrderBy(p => p, StringComparer.OrdinalIgnoreCase).ToList();
             Assert.Equal(expected, paths);
         }
 
@@ -149,10 +136,8 @@ namespace Mfr.Tests.Engine
             var top = TestHelpers.CreateFile(_tempRoot, "keep.txt");
             TestHelpers.CreateFile(_tempRoot.CombinePath("nested"), "skip.txt");
 
-            var paths = AddedSourceResolver.ResolveToPaths(
-                    source: _tempRoot.CombinePath("*.txt"),
-                    includeFolders: true,
-                    includeSubdirs: false)
+            var paths = AddedSourceResolver
+                .ResolveToPaths(source: _tempRoot.CombinePath("*.txt"), includeFolders: true, includeSubdirs: false)
                 .ToList();
 
             Assert.Equal([top], paths);
@@ -167,11 +152,8 @@ namespace Mfr.Tests.Engine
             var source = _tempRoot.CombinePath("absent_subdir", "**", "*.txt");
 
             var ex = Assert.Throws<UserException>(() =>
-                AddedSourceResolver.ResolveToPaths(
-                        source: source,
-                        includeFolders: true,
-                        includeSubdirs: false)
-                    .ToList());
+                AddedSourceResolver.ResolveToPaths(source: source, includeFolders: true, includeSubdirs: false).ToList()
+            );
 
             Assert.Contains("does not exist", ex.Message, StringComparison.Ordinal);
             Assert.Contains("absent_subdir", ex.Message, StringComparison.OrdinalIgnoreCase);

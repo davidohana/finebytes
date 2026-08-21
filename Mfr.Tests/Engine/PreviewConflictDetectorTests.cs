@@ -170,7 +170,8 @@ namespace Mfr.Tests.Engine
                 directoryPath: directoryPath,
                 prefix: prefix,
                 extension: extension,
-                attributes: FileAttributes.Normal);
+                attributes: FileAttributes.Normal
+            );
             var item = new RenameItem(meta) { Status = RenameStatus.PreviewOk };
             return item;
         }
@@ -183,7 +184,8 @@ namespace Mfr.Tests.Engine
                 directoryPath: directoryPath,
                 prefix: folderName,
                 extension: string.Empty,
-                attributes: FileAttributes.Directory);
+                attributes: FileAttributes.Directory
+            );
             var item = new RenameItem(meta) { Status = RenameStatus.PreviewOk };
             return item;
         }
@@ -193,16 +195,15 @@ namespace Mfr.Tests.Engine
             var directoryPath = Path.GetDirectoryName(sourcePath)!;
             var prefix = Path.GetFileNameWithoutExtension(sourcePath);
             var extension = Path.GetExtension(sourcePath);
-            var attributes = File.Exists(sourcePath)
-                ? FileAttributes.Normal
-                : FileAttributes.Directory;
+            var attributes = File.Exists(sourcePath) ? FileAttributes.Normal : FileAttributes.Directory;
             var meta = new FileMeta(
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
                 prefix: prefix,
                 extension: extension,
-                attributes: attributes);
+                attributes: attributes
+            );
             var item = new RenameItem(meta) { Status = RenameStatus.PreviewOk };
             return item;
         }

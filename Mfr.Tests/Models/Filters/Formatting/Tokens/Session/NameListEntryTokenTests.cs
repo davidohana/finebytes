@@ -28,7 +28,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 First
                 Second
                 Third
-                """);
+                """
+            );
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 1);
 
             var result = token.Compile(tokenArgs: filePath)(item);
@@ -48,7 +49,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 Alpha
 
                 Gamma
-                """);
+                """
+            );
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 1);
 
             var result = token.Compile(tokenArgs: filePath)(item);
@@ -67,7 +69,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 """
                 A
                 B
-                """);
+                """
+            );
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 4);
 
             var ex = Assert.Throws<UserException>(() => token.Compile(tokenArgs: filePath)(item));
@@ -101,7 +104,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 """
                 //first
                 second
-                """);
+                """
+            );
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
 
             var result = token.Compile(tokenArgs: filePath)(item);
@@ -135,7 +139,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
             var filePath = _CreateFile(
                 """
                 Old
-                """);
+                """
+            );
 
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0);
             Assert.Equal("Old", token.Compile(tokenArgs: filePath)(item));
@@ -144,7 +149,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 filePath,
                 """
                 New
-                """.ReplaceLineEndings(Environment.NewLine));
+                """.ReplaceLineEndings(Environment.NewLine)
+            );
 
             Assert.Equal("New", token.Compile(tokenArgs: filePath)(item));
         }
@@ -174,11 +180,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                 """
                 One
                 Two
-                """);
+                """
+            );
             var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 1);
 
-            var compiled = FormatStringCompiler.Compile(
-                template: $"<name-list-entry:{filePath}>");
+            var compiled = FormatStringCompiler.Compile(template: $"<name-list-entry:{filePath}>");
             var result = compiled(item);
 
             Assert.Equal("Two", result);

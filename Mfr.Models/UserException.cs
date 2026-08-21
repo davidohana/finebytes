@@ -8,18 +8,14 @@ namespace Mfr.Models
         /// <summary>
         /// Initializes a <see cref="UserException"/> with default state.
         /// </summary>
-        public UserException()
-        {
-        }
+        public UserException() { }
 
         /// <summary>
         /// Initializes with an error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         public UserException(string? message)
-            : base(message)
-        {
-        }
+            : base(message) { }
 
         /// <summary>
         /// Initializes with a message and an inner exception.
@@ -27,8 +23,6 @@ namespace Mfr.Models
         /// <param name="message">The message that describes the error.</param>
         /// <param name="innerException">The exception that is the cause of the current exception.</param>
         public UserException(string? message, Exception? innerException)
-            : base(message, innerException)
-        {
-        }
+            : base(message, innerException) { }
     }
 }

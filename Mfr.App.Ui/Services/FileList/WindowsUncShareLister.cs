@@ -40,12 +40,13 @@ namespace Mfr.App.Ui.Services.FileList
                     _MaxPreferredLength,
                     out var entriesRead,
                     out _,
-                    ref resumeHandle);
+                    ref resumeHandle
+                );
 
                 try
                 {
-                    var isReachable = status is _ErrorSuccess or _ErrorMoreData
-                        or _ErrorAccessDenied or _ErrorLogonFailure;
+                    var isReachable =
+                        status is _ErrorSuccess or _ErrorMoreData or _ErrorAccessDenied or _ErrorLogonFailure;
                     if (!isReachable)
                         return false;
 
@@ -59,17 +60,12 @@ namespace Mfr.App.Ui.Services.FileList
                     if (buffer != IntPtr.Zero)
                         _ = NativeMethods.NetApiBufferFree(buffer);
                 }
-            }
-            while (status == _ErrorMoreData);
+            } while (status == _ErrorMoreData);
 
             return true;
         }
 
-        private static void _AddDiskShares(
-            IntPtr buffer,
-            int entriesRead,
-            string serverRoot,
-            List<string> sharePaths)
+        private static void _AddDiskShares(IntPtr buffer, int entriesRead, string serverRoot, List<string> sharePaths)
         {
             var stride = Marshal.SizeOf<ShareInfo1>();
             var pathToIsAdded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -112,7 +108,8 @@ namespace Mfr.App.Ui.Services.FileList
                 int prefMaxLen,
                 out int entriesRead,
                 out int totalEntries,
-                ref uint resumeHandle);
+                ref uint resumeHandle
+            );
 
             [DllImport("Netapi32.dll")]
             public static extern uint NetApiBufferFree(IntPtr buffer);

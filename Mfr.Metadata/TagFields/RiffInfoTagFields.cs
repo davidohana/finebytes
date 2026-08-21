@@ -19,10 +19,7 @@ namespace Mfr.Metadata.TagFields
     /// </remarks>
     internal static class RiffInfoTagFields
     {
-        private static readonly string[] _KnownKeys =
-        [
-            "INAM", "IPRD", "IART", "IGNR", "ICMT", "ICOP", "ICRD", "ITRK",
-        ];
+        private static readonly string[] _KnownKeys = ["INAM", "IPRD", "IART", "IGNR", "ICMT", "ICOP", "ICRD", "ITRK"];
 
         /// <summary>
         /// Reads the file's known INFO chunks.
@@ -74,7 +71,8 @@ namespace Mfr.Metadata.TagFields
                 _IndexFields(preview.Fields),
                 valuesEqual: static (prior, value) => string.Equals(prior, value, StringComparison.Ordinal),
                 remove: key => live.RemoveValue(key),
-                set: (key, value) => live.SetValue(key, value));
+                set: (key, value) => live.SetValue(key, value)
+            );
         }
 
         private static void _WriteAll(InfoTag live, RiffInfoTagData data)

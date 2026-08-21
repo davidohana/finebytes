@@ -16,9 +16,7 @@ namespace Mfr.Tests.Ui
         {
             Assert.Equal(new KeyGesture(Key.G, KeyModifiers.Control), AppShortcuts.Go);
             Assert.Equal(new KeyGesture(Key.Z, KeyModifiers.Control), AppShortcuts.UndoLast);
-            Assert.Equal(
-                new KeyGesture(Key.L, KeyModifiers.Control | KeyModifiers.Shift),
-                AppShortcuts.ShowLog);
+            Assert.Equal(new KeyGesture(Key.L, KeyModifiers.Control | KeyModifiers.Shift), AppShortcuts.ShowLog);
             Assert.Equal(new KeyGesture(Key.OemComma, KeyModifiers.Control), AppShortcuts.ShowOptions);
             Assert.Equal(new KeyGesture(Key.F4, KeyModifiers.Alt), AppShortcuts.Exit);
             Assert.Equal(new KeyGesture(Key.F5), AppShortcuts.Refresh);
@@ -42,18 +40,13 @@ namespace Mfr.Tests.Ui
             Assert.Equal(new KeyGesture(Key.D4, KeyModifiers.Control), AppShortcuts.ViewList);
             Assert.Equal(new KeyGesture(Key.D5, KeyModifiers.Control), AppShortcuts.ViewTiles);
             Assert.Equal(new KeyGesture(Key.D6, KeyModifiers.Control), AppShortcuts.ViewThumbnails);
-            Assert.Equal(
-                new KeyGesture(Key.S, KeyModifiers.Control | KeyModifiers.Shift),
-                AppShortcuts.AddSelected);
-            Assert.Equal(
-                new KeyGesture(Key.A, KeyModifiers.Control | KeyModifiers.Shift),
-                AppShortcuts.AddAll);
-            Assert.Equal(
-                new KeyGesture(Key.R, KeyModifiers.Control | KeyModifiers.Shift),
-                AppShortcuts.RemoveSelected);
+            Assert.Equal(new KeyGesture(Key.S, KeyModifiers.Control | KeyModifiers.Shift), AppShortcuts.AddSelected);
+            Assert.Equal(new KeyGesture(Key.A, KeyModifiers.Control | KeyModifiers.Shift), AppShortcuts.AddAll);
+            Assert.Equal(new KeyGesture(Key.R, KeyModifiers.Control | KeyModifiers.Shift), AppShortcuts.RemoveSelected);
             Assert.Equal(
                 new KeyGesture(Key.C, KeyModifiers.Control | KeyModifiers.Shift),
-                AppShortcuts.ClearRenameList);
+                AppShortcuts.ClearRenameList
+            );
         }
     }
 }

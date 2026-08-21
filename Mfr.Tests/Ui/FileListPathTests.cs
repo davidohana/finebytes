@@ -116,14 +116,9 @@ namespace Mfr.Tests.Ui
 
             var segments = FileListPath.BuildBreadcrumbSegments(@"\\nas\music\albums");
             Assert.Equal(
-                [
-                    FileListPath.ComputerDisplayName,
-                    FileListPath.NetworkDisplayName,
-                    "nas",
-                    "music",
-                    "albums",
-                ],
-                segments.Select(segment => segment.Label));
+                [FileListPath.ComputerDisplayName, FileListPath.NetworkDisplayName, "nas", "music", "albums"],
+                segments.Select(segment => segment.Label)
+            );
             Assert.Equal(FileListPath.ComputerDisplayName, segments[0].TargetPath);
             Assert.Equal(FileListPath.NetworkDisplayName, segments[1].TargetPath);
             Assert.Equal(@"\\nas", segments[2].TargetPath);
@@ -145,7 +140,8 @@ namespace Mfr.Tests.Ui
             var segments = FileListPath.BuildBreadcrumbSegments(FileListPath.NetworkPath);
             Assert.Equal(
                 [FileListPath.ComputerDisplayName, FileListPath.NetworkDisplayName],
-                segments.Select(segment => segment.Label));
+                segments.Select(segment => segment.Label)
+            );
             Assert.Equal(FileListPath.ComputerDisplayName, segments[0].TargetPath);
             Assert.Equal(FileListPath.NetworkDisplayName, segments[1].TargetPath);
             Assert.False(segments[0].ShowLeadingChevron);
@@ -164,7 +160,8 @@ namespace Mfr.Tests.Ui
             var segments = FileListPath.BuildBreadcrumbSegments(@"\\ohanas");
             Assert.Equal(
                 [FileListPath.ComputerDisplayName, FileListPath.NetworkDisplayName, "ohanas"],
-                segments.Select(segment => segment.Label));
+                segments.Select(segment => segment.Label)
+            );
             Assert.Equal(@"\\ohanas", segments[2].TargetPath);
         }
 
@@ -179,14 +176,9 @@ namespace Mfr.Tests.Ui
 
             var segments = FileListPath.BuildBreadcrumbSegments(@"\\wsl$\Ubuntu\home");
             Assert.Equal(
-                [
-                    FileListPath.ComputerDisplayName,
-                    FileListPath.NetworkDisplayName,
-                    "wsl$",
-                    "Ubuntu",
-                    "home",
-                ],
-                segments.Select(segment => segment.Label));
+                [FileListPath.ComputerDisplayName, FileListPath.NetworkDisplayName, "wsl$", "Ubuntu", "home"],
+                segments.Select(segment => segment.Label)
+            );
             Assert.Equal(@"\\wsl$", segments[2].TargetPath);
             Assert.Equal(@"\\wsl$\Ubuntu", segments[3].TargetPath);
         }
@@ -222,9 +214,7 @@ namespace Mfr.Tests.Ui
                 return;
 
             var atPlace = FileListPath.BuildBreadcrumbSegments(documents);
-            Assert.Equal(
-                [FileListPath.ComputerDisplayName, "Documents"],
-                atPlace.Select(segment => segment.Label));
+            Assert.Equal([FileListPath.ComputerDisplayName, "Documents"], atPlace.Select(segment => segment.Label));
             Assert.Equal(documents, atPlace[1].TargetPath);
             Assert.False(atPlace[0].ShowLeadingChevron);
             Assert.True(atPlace[1].ShowLeadingChevron);
@@ -232,7 +222,8 @@ namespace Mfr.Tests.Ui
             var nested = FileListPath.BuildBreadcrumbSegments(Path.Combine(documents, "Work"));
             Assert.Equal(
                 [FileListPath.ComputerDisplayName, "Documents", "Work"],
-                nested.Select(segment => segment.Label));
+                nested.Select(segment => segment.Label)
+            );
         }
 
         private static string? _ExistingSpecialFolder(Environment.SpecialFolder folder)

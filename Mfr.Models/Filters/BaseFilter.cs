@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-
 using Mfr.Models.Rename;
 using Mfr.Utils;
 
@@ -39,7 +38,6 @@ namespace Mfr.Models.Filters
         protected void VerifySetupComplete()
         {
             Check.That(_isSetupComplete, $"Filter '{Type}' setup must complete before transform.");
-
         }
 
         /// <summary>
@@ -49,8 +47,6 @@ namespace Mfr.Models.Filters
         /// <param name="item">The item whose preview is updated.</param>
         protected internal abstract void ApplyCore(RenameItem item);
 
-        protected virtual void _Setup()
-        {
-        }
+        protected virtual void _Setup() { }
     }
 }

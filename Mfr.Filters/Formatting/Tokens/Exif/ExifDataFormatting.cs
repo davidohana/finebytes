@@ -58,9 +58,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
             if (exif is null)
                 return string.Empty;
 
-            return exif.TagToDescription.TryGetValue($"{source}/{name}", out var value)
-                ? value
-                : string.Empty;
+            return exif.TagToDescription.TryGetValue($"{source}/{name}", out var value) ? value : string.Empty;
         }
 
         private static string _FormatText(string? value)

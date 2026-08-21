@@ -25,8 +25,7 @@ namespace Mfr.Filters
 
             if (item.Original.Attributes.IsDirectory())
             {
-                throw new InvalidOperationException(
-                    "Cannot read audio tags for a directory.");
+                throw new InvalidOperationException("Cannot read audio tags for a directory.");
             }
 
             var snapshot = TagLibFileReader.Read(item.Original.FullPath);

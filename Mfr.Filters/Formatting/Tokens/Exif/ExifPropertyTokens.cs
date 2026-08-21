@@ -26,9 +26,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     {
         /// <summary>Registers <c>&lt;exif-make&gt;</c>.</summary>
         public ExifMakeToken()
-            : base(["exif-make"], ExifPropertyField.Make)
-        {
-        }
+            : base(["exif-make"], ExifPropertyField.Make) { }
     }
 
     /// <inheritdoc />
@@ -36,9 +34,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     {
         /// <summary>Registers <c>&lt;exif-model&gt;</c>.</summary>
         public ExifModelToken()
-            : base(["exif-model"], ExifPropertyField.Model)
-        {
-        }
+            : base(["exif-model"], ExifPropertyField.Model) { }
     }
 
     /// <inheritdoc />
@@ -46,9 +42,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     {
         /// <summary>Registers <c>&lt;exif-exposure&gt;</c>.</summary>
         public ExifExposureToken()
-            : base(["exif-exposure"], ExifPropertyField.Exposure)
-        {
-        }
+            : base(["exif-exposure"], ExifPropertyField.Exposure) { }
     }
 
     /// <inheritdoc />
@@ -56,9 +50,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     {
         /// <summary>Registers <c>&lt;exif-fnumber&gt;</c>.</summary>
         public ExifFNumberToken()
-            : base(["exif-fnumber"], ExifPropertyField.FNumber)
-        {
-        }
+            : base(["exif-fnumber"], ExifPropertyField.FNumber) { }
     }
 
     /// <inheritdoc />
@@ -66,9 +58,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     {
         /// <summary>Registers <c>&lt;exif-iso&gt;</c>.</summary>
         public ExifIsoToken()
-            : base(["exif-iso"], ExifPropertyField.Iso)
-        {
-        }
+            : base(["exif-iso"], ExifPropertyField.Iso) { }
     }
 
     /// <inheritdoc />
@@ -76,9 +66,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     {
         /// <summary>Registers <c>&lt;exif-focal&gt;</c>.</summary>
         public ExifFocalToken()
-            : base(["exif-focal"], ExifPropertyField.FocalLength)
-        {
-        }
+            : base(["exif-focal"], ExifPropertyField.FocalLength) { }
     }
 
     /// <inheritdoc />
@@ -86,8 +74,6 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     {
         /// <summary>Registers <c>&lt;exif-focal-35&gt;</c>.</summary>
         public ExifFocal35Token()
-            : base(["exif-focal-35"], ExifPropertyField.FocalLength35mm)
-        {
-        }
+            : base(["exif-focal-35"], ExifPropertyField.FocalLength35mm) { }
     }
 }

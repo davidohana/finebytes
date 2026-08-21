@@ -1,68 +1,72 @@
-<Application xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Mfr.App.Ui.App"
-             RequestedThemeVariant="Default">
-    <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="/Themes/FileList.axaml" />
-                <ResourceInclude Source="/Assets/Icons.axaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="PaneChromeBrush" Color="#F0F0F0" />
-                </ResourceDictionary>
-                <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="PaneChromeBrush" Color="#2B2B2B" />
-                </ResourceDictionary>
-            </ResourceDictionary.ThemeDictionaries>
+<Application
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="Mfr.App.Ui.App"
+  RequestedThemeVariant="Default"
+>
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Themes/FileList.axaml" />
+        <ResourceInclude Source="/Assets/Icons.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="PaneChromeBrush" Color="#F0F0F0" />
         </ResourceDictionary>
-    </Application.Resources>
-    <Application.Styles>
-        <FluentTheme />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
-        <Style Selector="TextBlock.pane-header">
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="8,6" />
-        </Style>
-        <Style Selector="Border.pane">
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
-            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
-            <Setter Property="Margin" Value="1" />
-        </Style>
-        <Style Selector=":is(GridSplitter)">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="MinWidth" Value="6" />
-            <Setter Property="MinHeight" Value="6" />
-            <Setter Property="(Panel.ZIndex)" Value="1" />
-        </Style>
-        <Style Selector=":is(GridSplitter)[ResizeDirection=Columns]">
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border Background="Transparent">
-                        <Rectangle x:Name="Hairline"
-                                   Width="1"
-                                   HorizontalAlignment="Center"
-                                   Fill="Transparent" />
-                    </Border>
-                </ControlTemplate>
-            </Setter>
-        </Style>
-        <Style Selector=":is(GridSplitter)[ResizeDirection=Rows]">
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border Background="Transparent">
-                        <Rectangle x:Name="Hairline"
-                                   Height="1"
-                                   VerticalAlignment="Center"
-                                   Fill="Transparent" />
-                    </Border>
-                </ControlTemplate>
-            </Setter>
-        </Style>
-        <Style Selector=":is(GridSplitter):pointerover /template/ Rectangle#Hairline">
-            <Setter Property="Fill" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
-        </Style>
-    </Application.Styles>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="PaneChromeBrush" Color="#2B2B2B" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+    <Style Selector="TextBlock.pane-header">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="8,6" />
+    </Style>
+    <Style Selector="Border.pane">
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter
+        Property="BorderBrush"
+        Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+      />
+      <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+      <Setter Property="Margin" Value="1" />
+    </Style>
+    <Style Selector=":is(GridSplitter)">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="MinWidth" Value="6" />
+      <Setter Property="MinHeight" Value="6" />
+      <Setter Property="(Panel.ZIndex)" Value="1" />
+    </Style>
+    <Style Selector=":is(GridSplitter)[ResizeDirection=Columns]">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="Transparent">
+            <Rectangle
+              x:Name="Hairline"
+              Width="1"
+              HorizontalAlignment="Center"
+              Fill="Transparent"
+            />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector=":is(GridSplitter)[ResizeDirection=Rows]">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="Transparent">
+            <Rectangle x:Name="Hairline" Height="1" VerticalAlignment="Center" Fill="Transparent" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector=":is(GridSplitter):pointerover /template/ Rectangle#Hairline">
+      <Setter Property="Fill" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+    </Style>
+  </Application.Styles>
 </Application>

@@ -82,10 +82,7 @@ namespace Mfr.Models.Tags
         /// <param name="field">Which semantic field to replace.</param>
         /// <param name="fieldString">Text as-is, or decimal digits for numeric fields; empty clears nullable fields.</param>
         /// <exception cref="ArgumentException">Thrown when a numeric field string is not empty and not a valid non-negative integer.</exception>
-        public static void SetSemanticField(
-            AudioTagOverlay overlay,
-            SemanticAudioField field,
-            string fieldString)
+        public static void SetSemanticField(AudioTagOverlay overlay, SemanticAudioField field, string fieldString)
         {
             ArgumentNullException.ThrowIfNull(overlay);
 
@@ -106,28 +103,46 @@ namespace Mfr.Models.Tags
                 SemanticAudioField.Grouping => semantic with { Grouping = trimmed.TrimmedOrNull() },
                 SemanticAudioField.Year => semantic with { Year = _ParseNullableUInt(trimmed, nameof(fieldString)) },
                 SemanticAudioField.Track => semantic with { Track = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                SemanticAudioField.TrackCount => semantic with { TrackCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                SemanticAudioField.TrackCount => semantic with
+                {
+                    TrackCount = _ParseNullableUInt(trimmed, nameof(fieldString)),
+                },
                 SemanticAudioField.Disc => semantic with { Disc = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                SemanticAudioField.DiscCount => semantic with { DiscCount = _ParseNullableUInt(trimmed, nameof(fieldString)) },
-                SemanticAudioField.BeatsPerMinute =>
-                    semantic with { BeatsPerMinute = _ParseNullableUInt(trimmed, nameof(fieldString)) },
+                SemanticAudioField.DiscCount => semantic with
+                {
+                    DiscCount = _ParseNullableUInt(trimmed, nameof(fieldString)),
+                },
+                SemanticAudioField.BeatsPerMinute => semantic with
+                {
+                    BeatsPerMinute = _ParseNullableUInt(trimmed, nameof(fieldString)),
+                },
                 SemanticAudioField.Conductor => semantic with { Conductor = trimmed.TrimmedOrNull() },
-                SemanticAudioField.MusicBrainzArtistId =>
-                    semantic with { MusicBrainzArtistId = trimmed.TrimmedOrNull() },
-                SemanticAudioField.MusicBrainzReleaseId =>
-                    semantic with { MusicBrainzReleaseId = trimmed.TrimmedOrNull() },
-                SemanticAudioField.MusicBrainzReleaseArtistId =>
-                    semantic with { MusicBrainzReleaseArtistId = trimmed.TrimmedOrNull() },
-                SemanticAudioField.MusicBrainzTrackId =>
-                    semantic with { MusicBrainzTrackId = trimmed.TrimmedOrNull() },
-                SemanticAudioField.MusicBrainzDiscId =>
-                    semantic with { MusicBrainzDiscId = trimmed.TrimmedOrNull() },
-                SemanticAudioField.MusicBrainzReleaseStatus =>
-                    semantic with { MusicBrainzReleaseStatus = trimmed.TrimmedOrNull() },
-                SemanticAudioField.MusicBrainzReleaseType =>
-                    semantic with { MusicBrainzReleaseType = trimmed.TrimmedOrNull() },
-                SemanticAudioField.MusicBrainzReleaseCountry =>
-                    semantic with { MusicBrainzReleaseCountry = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzArtistId => semantic with
+                {
+                    MusicBrainzArtistId = trimmed.TrimmedOrNull(),
+                },
+                SemanticAudioField.MusicBrainzReleaseId => semantic with
+                {
+                    MusicBrainzReleaseId = trimmed.TrimmedOrNull(),
+                },
+                SemanticAudioField.MusicBrainzReleaseArtistId => semantic with
+                {
+                    MusicBrainzReleaseArtistId = trimmed.TrimmedOrNull(),
+                },
+                SemanticAudioField.MusicBrainzTrackId => semantic with { MusicBrainzTrackId = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzDiscId => semantic with { MusicBrainzDiscId = trimmed.TrimmedOrNull() },
+                SemanticAudioField.MusicBrainzReleaseStatus => semantic with
+                {
+                    MusicBrainzReleaseStatus = trimmed.TrimmedOrNull(),
+                },
+                SemanticAudioField.MusicBrainzReleaseType => semantic with
+                {
+                    MusicBrainzReleaseType = trimmed.TrimmedOrNull(),
+                },
+                SemanticAudioField.MusicBrainzReleaseCountry => semantic with
+                {
+                    MusicBrainzReleaseCountry = trimmed.TrimmedOrNull(),
+                },
                 SemanticAudioField.MusicIpId => semantic with { MusicIpId = trimmed.TrimmedOrNull() },
                 SemanticAudioField.AmazonId => semantic with { AmazonId = trimmed.TrimmedOrNull() },
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
@@ -150,7 +165,8 @@ namespace Mfr.Models.Tags
             {
                 throw new ArgumentException(
                     $"Value must be empty or a non-negative integer, got '{trimmed}'.",
-                    valueParamName);
+                    valueParamName
+                );
             }
 
             return parsed;

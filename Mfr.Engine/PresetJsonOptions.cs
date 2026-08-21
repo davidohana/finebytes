@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Mfr.Filters.Audio;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
@@ -57,18 +57,14 @@ namespace Mfr.Engine
             new(typeof(TagRemoverFilter), "TagRemover"),
             new(typeof(DateSetterFilter), "DateSetter"),
             new(typeof(TimeSetterFilter), "TimeSetter"),
-            new(typeof(TimeShifterFilter), "TimeShifter")
+            new(typeof(TimeShifterFilter), "TimeShifter"),
         ];
 
         internal static JsonSerializerOptions Default { get; } = _CreateOptions();
 
         private static JsonSerializerOptions _CreateOptions()
         {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = true
-            };
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
             options.Converters.Add(new JsonStringEnumConverter());
 
             var resolver = new DefaultJsonTypeInfoResolver();

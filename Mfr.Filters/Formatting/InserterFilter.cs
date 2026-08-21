@@ -15,7 +15,7 @@ namespace Mfr.Filters.Formatting
         /// <summary>
         /// Counts from the last character; position <c>1</c> inserts before the last character.
         /// </summary>
-        End
+        End,
     }
 
     /// <summary>
@@ -28,11 +28,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Position">One-based index; see <see cref="InserterOrigin"/>.</param>
     /// <param name="StartFrom">Whether <paramref name="Position"/> counts from the start or end of the segment.</param>
     /// <param name="Overwrite">If <see langword="true"/>, inserted text overwrites existing characters instead of shifting them.</param>
-    public sealed record InserterOptions(
-        string Text,
-        int Position,
-        InserterOrigin StartFrom,
-        bool Overwrite);
+    public sealed record InserterOptions(string Text, int Position, InserterOrigin StartFrom, bool Overwrite);
 
     /// <summary>
     /// Inserts formatter-resolved text at a fixed position in the target segment.
@@ -42,7 +38,9 @@ namespace Mfr.Filters.Formatting
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record InserterFilter(
         FilterTarget Target,
-        InserterOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        InserterOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         private Formatter? _compiledText;
 
@@ -68,9 +66,7 @@ namespace Mfr.Filters.Formatting
         /// <inheritdoc />
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var compiledText = Check.NotNull(
-                _compiledText,
-                "InserterFilter setup must complete before transform.");
+            var compiledText = Check.NotNull(_compiledText, "InserterFilter setup must complete before transform.");
             var inserted = compiledText(item);
             if (inserted.Length == 0)
                 return value;

@@ -14,6 +14,5 @@ namespace Mfr.Utils
         {
             return attributes.HasFlag(FileAttributes.Directory);
         }
-
     }
 }

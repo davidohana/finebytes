@@ -12,12 +12,13 @@ namespace Mfr.Tests.Models.Filters.Attributes
         [Fact]
         public void DateSetter_LastWrite_preserves_time_of_day()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                lastWriteTime: s_Base);
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
             var filter = new DateSetterFilter(
                 Options: new DateSetterOptions(
                     TimestampField: TimestampField.LastWrite,
-                    Date: new DateOnly(2020, 12, 25)));
+                    Date: new DateOnly(2020, 12, 25)
+                )
+            );
             filter.Setup();
             filter.Apply(item);
 
@@ -28,12 +29,10 @@ namespace Mfr.Tests.Models.Filters.Attributes
         [Fact]
         public void TimeSetter_Creation_preserves_calendar_date()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                creationTime: s_Base);
+            var item = FilterTestHelpers.CreateRenameItem(creationTime: s_Base);
             var filter = new TimeSetterFilter(
-                Options: new TimeSetterOptions(
-                    TimestampField: TimestampField.Creation,
-                    Time: new TimeOnly(9, 0, 15)));
+                Options: new TimeSetterOptions(TimestampField: TimestampField.Creation, Time: new TimeOnly(9, 0, 15))
+            );
             filter.Setup();
             filter.Apply(item);
 
@@ -43,16 +42,16 @@ namespace Mfr.Tests.Models.Filters.Attributes
         [Fact]
         public void Chain_DateSetter_then_TimeSetter_composes_on_last_access()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                lastAccessTime: s_Base);
+            var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: s_Base);
             var setDate = new DateSetterFilter(
                 Options: new DateSetterOptions(
                     TimestampField: TimestampField.LastAccess,
-                    Date: new DateOnly(2019, 1, 1)));
+                    Date: new DateOnly(2019, 1, 1)
+                )
+            );
             var setTime = new TimeSetterFilter(
-                Options: new TimeSetterOptions(
-                    TimestampField: TimestampField.LastAccess,
-                    Time: new TimeOnly(23, 59, 1)));
+                Options: new TimeSetterOptions(TimestampField: TimestampField.LastAccess, Time: new TimeOnly(23, 59, 1))
+            );
             var chain = FilterChain.CreateAllEnabled([setDate, setTime]);
             chain.SetupFilters();
             chain.ApplyFilters(item);

@@ -17,29 +17,30 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void CamelCase_preset_json_roundtrips()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "presets": [
+            var json = /*lang=json,strict*/
+                """
                 {
-                  "id": "11111111-1111-1111-1111-111111111111",
-                  "name": "Probe",
-                  "chain": {
-                    "steps": [
-                      {
-                        "enabled": true,
-                        "filter": {
-                          "type": "SeparateCapitalizedText",
-                          "target": {
-                            "targetType": "FilePrefix"
+                  "presets": [
+                    {
+                      "id": "11111111-1111-1111-1111-111111111111",
+                      "name": "Probe",
+                      "chain": {
+                        "steps": [
+                          {
+                            "enabled": true,
+                            "filter": {
+                              "type": "SeparateCapitalizedText",
+                              "target": {
+                                "targetType": "FilePrefix"
+                              }
+                            }
                           }
-                        }
+                        ]
                       }
-                    ]
-                  }
+                    }
+                  ]
                 }
-              ]
-            }
-            """;
+                """;
 
             var container = JsonSerializer.Deserialize<PresetContainerWrapper>(json, PresetJsonOptions.Default);
             Assert.NotNull(container);
@@ -52,17 +53,18 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void AttributesSetter_roundtrips_without_target()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "AttributesSetter",
-              "options": {
-                "readOnly": "Set",
-                "hidden": "Clear",
-                "archive": "Keep",
-                "system": "Keep"
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "AttributesSetter",
+                  "options": {
+                    "readOnly": "Set",
+                    "hidden": "Clear",
+                    "archive": "Keep",
+                    "system": "Keep"
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -75,15 +77,16 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void DateSetter_roundtrips_with_timestamp_field()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "DateSetter",
-              "options": {
-                "timestampField": "lastWrite",
-                "date": "2021-07-04"
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "DateSetter",
+                  "options": {
+                    "timestampField": "lastWrite",
+                    "date": "2021-07-04"
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -96,15 +99,16 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void TimeSetter_roundtrips_with_timestamp_field()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "TimeSetter",
-              "options": {
-                "timestampField": "lastAccess",
-                "time": "18:30:00"
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "TimeSetter",
+                  "options": {
+                    "timestampField": "lastAccess",
+                    "time": "18:30:00"
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -117,16 +121,17 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void TimeShifter_roundtrips_with_timestamp_field()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "TimeShifter",
-              "options": {
-                "timestampField": "lastWrite",
-                "amount": -5,
-                "unit": "days"
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "TimeShifter",
+                  "options": {
+                    "timestampField": "lastWrite",
+                    "amount": -5,
+                    "unit": "days"
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -140,14 +145,15 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void TagRemover_roundtrips_block_names()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "TagRemover",
-              "options": {
-                "blocks": ["id3v1", "riffInfo"]
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "TagRemover",
+                  "options": {
+                    "blocks": ["id3v1", "riffInfo"]
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -161,14 +167,15 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void TagRemover_roundtrips_all_flag()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "TagRemover",
-              "options": {
-                "all": true
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "TagRemover",
+                  "options": {
+                    "all": true
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -180,23 +187,24 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Replacer_JSON_round_trips_AncestorFolder_target()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "Replacer",
-              "target": {
-                "targetType": "AncestorFolder",
-                "level": 2
-              },
-              "options": {
-                "find": "a",
-                "replacement": "b",
-                "mode": "Literal",
-                "caseSensitive": true,
-                "replaceAll": true,
-                "wholeWord": false
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "Replacer",
+                  "target": {
+                    "targetType": "AncestorFolder",
+                    "level": 2
+                  },
+                  "options": {
+                    "find": "a",
+                    "replacement": "b",
+                    "mode": "Literal",
+                    "caseSensitive": true,
+                    "replaceAll": true,
+                    "wholeWord": false
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -210,17 +218,18 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Formatter_JSON_round_trips_FullPath_target()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "Formatter",
-              "target": {
-                "targetType": "FullPath"
-              },
-              "options": {
-                "template": "D:\\Staging\\<full-name>"
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "Formatter",
+                  "target": {
+                    "targetType": "FullPath"
+                  },
+                  "options": {
+                    "template": "D:\\Staging\\<full-name>"
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -233,17 +242,18 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Formatter_JSON_round_trips_ParentDirectory_target()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "Formatter",
-              "target": {
-                "targetType": "ParentDirectory"
-              },
-              "options": {
-                "template": "D:\\Archived"
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "Formatter",
+                  "target": {
+                    "targetType": "ParentDirectory"
+                  },
+                  "options": {
+                    "template": "D:\\Archived"
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -255,18 +265,19 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Formatter_JSON_round_trips_AudioField_target()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "Formatter",
-              "target": {
-                "targetType": "SemanticAudioField",
-                "field": "title"
-              },
-              "options": {
-                "template": "<file-name>"
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "Formatter",
+                  "target": {
+                    "targetType": "SemanticAudioField",
+                    "field": "title"
+                  },
+                  "options": {
+                    "template": "<file-name>"
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -279,20 +290,21 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Formatter_JSON_round_trips_Id3v2Frame_target()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "Formatter",
-              "target": {
-                "targetType": "Id3v2Frame",
-                "frameId": "COMM",
-                "language": "eng",
-                "description": ""
-              },
-              "options": {
-                "template": "hi"
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "Formatter",
+                  "target": {
+                    "targetType": "Id3v2Frame",
+                    "frameId": "COMM",
+                    "language": "eng",
+                    "description": ""
+                  },
+                  "options": {
+                    "template": "hi"
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -307,36 +319,40 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Formatter_JSON_round_trips_XiphField_and_Id3v1Field_targets()
         {
-            var xiphJson = /*lang=json,strict*/ """
-            {
-              "type": "Formatter",
-              "target": {
-                "targetType": "XiphField",
-                "key": "TITLE"
-              },
-              "options": {
-                "template": "x"
-              }
-            }
-            """;
+            var xiphJson = /*lang=json,strict*/
+                """
+                {
+                  "type": "Formatter",
+                  "target": {
+                    "targetType": "XiphField",
+                    "key": "TITLE"
+                  },
+                  "options": {
+                    "template": "x"
+                  }
+                }
+                """;
             var xiphFilter = Assert.IsType<FormatterFilter>(
-                JsonSerializer.Deserialize<BaseFilter>(xiphJson, PresetJsonOptions.Default));
+                JsonSerializer.Deserialize<BaseFilter>(xiphJson, PresetJsonOptions.Default)
+            );
             Assert.Equal("TITLE", Assert.IsType<XiphFieldTarget>(xiphFilter.Target).Key);
 
-            var id3v1Json = /*lang=json,strict*/ """
-            {
-              "type": "Formatter",
-              "target": {
-                "targetType": "Id3v1Field",
-                "field": "artist"
-              },
-              "options": {
-                "template": "x"
-              }
-            }
-            """;
+            var id3v1Json = /*lang=json,strict*/
+                """
+                {
+                  "type": "Formatter",
+                  "target": {
+                    "targetType": "Id3v1Field",
+                    "field": "artist"
+                  },
+                  "options": {
+                    "template": "x"
+                  }
+                }
+                """;
             var id3v1Filter = Assert.IsType<FormatterFilter>(
-                JsonSerializer.Deserialize<BaseFilter>(id3v1Json, PresetJsonOptions.Default));
+                JsonSerializer.Deserialize<BaseFilter>(id3v1Json, PresetJsonOptions.Default)
+            );
             Assert.Equal(Id3v1Field.Artist, Assert.IsType<Id3v1FieldTarget>(id3v1Filter.Target).Field);
         }
 
@@ -346,32 +362,34 @@ namespace Mfr.Tests.Engine
             var expected = new LettersCaseFilter(
                 new FilePrefixTarget(),
                 new LettersCaseOptions(LettersCaseMode.UpperCase, []),
-                new TokenApplyScope(Separator: "-", TokenNumber: 2));
+                new TokenApplyScope(Separator: "-", TokenNumber: 2)
+            );
             var canonicalJson = JsonSerializer.Serialize<BaseFilter>(expected, PresetJsonOptions.Default);
             var fromObject = JsonSerializer.Deserialize<BaseFilter>(canonicalJson, PresetJsonOptions.Default);
             Assert.NotNull(fromObject);
             var typedFromObject = Assert.IsType<LettersCaseFilter>(fromObject);
             Assert.IsType<TokenApplyScope>(typedFromObject.ApplyScope);
 
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "LettersCase",
-              "target": {
-                "targetType": "FilePrefix"
-              },
-              "options": {
-                "mode": "UpperCase",
-                "skipWords": [],
-                "weirdUppercaseChancePercent": 50,
-                "weirdFixedPlaces": false
-              },
-              "applyScope": {
-                "scopeType": "Token",
-                "separator": "-",
-                "tokenNumber": 2
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "LettersCase",
+                  "target": {
+                    "targetType": "FilePrefix"
+                  },
+                  "options": {
+                    "mode": "UpperCase",
+                    "skipWords": [],
+                    "weirdUppercaseChancePercent": 50,
+                    "weirdFixedPlaces": false
+                  },
+                  "applyScope": {
+                    "scopeType": "Token",
+                    "separator": "-",
+                    "tokenNumber": 2
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
@@ -388,6 +406,7 @@ namespace Mfr.Tests.Engine
         }
 
         private sealed record PresetContainerWrapper(
-            [property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets);
+            [property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets
+        );
     }
 }

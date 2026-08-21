@@ -1,4 +1,3 @@
-
 namespace Mfr.Filters.Trimming
 {
     /// <summary>
@@ -7,7 +6,7 @@ namespace Mfr.Filters.Trimming
     public enum Side
     {
         Left,
-        Right
+        Right,
     }
 
     /// <summary>
@@ -36,7 +35,9 @@ namespace Mfr.Filters.Trimming
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record TrimBetweenFilter(
         FilterTarget Target,
-        TrimBetweenFilterOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        TrimBetweenFilterOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -65,7 +66,7 @@ namespace Mfr.Filters.Trimming
             {
                 Side.Left => position.Value - 1,
                 Side.Right => length - position.Value,
-                _ => throw new InvalidOperationException($"Unknown anchor side '{position.Anchor}'.")
+                _ => throw new InvalidOperationException($"Unknown anchor side '{position.Anchor}'."),
             };
 
             return Math.Clamp(index, 0, length - 1);

@@ -29,15 +29,17 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                 disc: 2,
                 discCount: 3,
                 beatsPerMinute: 128,
-                conductor: "Cond");
+                conductor: "Cond"
+            );
         }
 
         [Fact]
         public void Resolve_TitleToken_ReturnsPreviewValue()
         {
             var token = new AudioTitleToken();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Held"));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Held")
+            );
 
             Assert.Equal("Held", token.Compile(string.Empty)(item));
             Assert.Contains("audio-title", token.Names);
@@ -60,8 +62,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Resolve_PrefersPreviewOverlayOverOriginal()
         {
             var token = new AudioTitleToken();
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Orig"));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Orig")
+            );
 
             var merged = SemanticAudioTag.FromOverlay(item.Preview.AudioTagOverlay) with { Title = "Prev" };
             item.Preview.AudioTagOverlay.MergeSemantic(merged);
@@ -103,7 +106,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                     trackCount: 12,
                     disc: 2,
                     discCount: 3,
-                    beatsPerMinute: 128);
+                    beatsPerMinute: 128
+                );
             });
 
             Assert.Equal("2024", new AudioYearToken().Compile(string.Empty)(item));
@@ -174,7 +178,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                         MusicBrainzReleaseId = "mb-release",
                         AmazonId = "B00TEST",
                         MusicIpId = "puid-1",
-                    });
+                    }
+                );
             });
 
             Assert.Equal("mb-artist", new AudioMbArtistIdToken().Compile(string.Empty)(item));
@@ -194,7 +199,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
                 configureOriginal: m =>
                 {
                     m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Blue", year: 1999);
-                });
+                }
+            );
 
             filter.Setup();
             filter.Apply(item);

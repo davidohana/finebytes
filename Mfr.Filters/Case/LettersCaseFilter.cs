@@ -19,7 +19,8 @@ namespace Mfr.Filters.Case
         LettersCaseMode Mode,
         IReadOnlyList<string> SkipWords,
         int WeirdUppercaseChancePercent = 50,
-        bool WeirdFixedPlaces = false);
+        bool WeirdFixedPlaces = false
+    );
 
     /// <summary>
     /// Supported letter-case transformation modes.
@@ -97,7 +98,7 @@ namespace Mfr.Filters.Case
         /// <example>
         /// <para><c>Hello</c> → <c>hELLO</c></para>
         /// </example>
-        InvertCase
+        InvertCase,
     }
 
     /// <summary>
@@ -108,7 +109,9 @@ namespace Mfr.Filters.Case
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record LettersCaseFilter(
         FilterTarget Target,
-        LettersCaseOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        LettersCaseOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -126,11 +129,12 @@ namespace Mfr.Filters.Case
                     input: value,
                     item: item,
                     weirdUppercaseChancePercent: Options.WeirdUppercaseChancePercent,
-                    weirdFixedPlaces: Options.WeirdFixedPlaces),
+                    weirdFixedPlaces: Options.WeirdFixedPlaces
+                ),
                 LettersCaseMode.TitleCase => _ApplyTitleCase(value, Options.SkipWords, item.WordSeparator),
                 LettersCaseMode.SentenceCase => _ApplySentenceCase(value, item.WordSeparator, item.SentenceEndChars),
                 LettersCaseMode.InvertCase => _InvertCase(value),
-                _ => value
+                _ => value,
             };
         }
 
@@ -149,7 +153,8 @@ namespace Mfr.Filters.Case
             string input,
             RenameItem item,
             int weirdUppercaseChancePercent,
-            bool weirdFixedPlaces)
+            bool weirdFixedPlaces
+        )
         {
             if (input.Length == 0)
                 return input;
@@ -170,9 +175,7 @@ namespace Mfr.Filters.Case
 
                 var itemSeed = weirdFixedPlaces ? 0 : item.Original.RenameListIndex;
                 var score = _GetPseudoRandomPercent(position: i, itemSeed: itemSeed);
-                chars[i] = score < uppercaseChancePercent
-                    ? char.ToUpperInvariant(c)
-                    : char.ToLowerInvariant(c);
+                chars[i] = score < uppercaseChancePercent ? char.ToUpperInvariant(c) : char.ToLowerInvariant(c);
             }
 
             return new string(chars);
@@ -230,8 +233,8 @@ namespace Mfr.Filters.Case
                 return word;
 
             return word.Length == 1
-                            ? word.ToUpperInvariant()
-                            : char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant();
+                ? word.ToUpperInvariant()
+                : char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant();
         }
 
         private static string _ApplySentenceCase(string input, char wordSeparator, string sentenceEndChars)
@@ -286,7 +289,6 @@ namespace Mfr.Filters.Case
                 var c = chars[i];
                 if (char.IsUpper(c))
                     chars[i] = char.ToLowerInvariant(c);
-
                 else if (char.IsLower(c))
                 {
                     chars[i] = char.ToUpperInvariant(c);
@@ -295,6 +297,5 @@ namespace Mfr.Filters.Case
 
             return new string(chars);
         }
-
     }
 }

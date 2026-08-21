@@ -16,7 +16,8 @@ namespace Mfr.Tests.Models.Filters.Audio
             int renameListIndex = 0,
             Action<FileMeta>? configureOriginal = null,
             string prefix = "song",
-            string extension = ".mp3")
+            string extension = ".mp3"
+        )
         {
             var meta = new FileMeta(
                 renameListIndex,
@@ -30,7 +31,8 @@ namespace Mfr.Tests.Models.Filters.Audio
                 lastAccessTime: s_Baseline,
                 fileSize: 0,
                 renameListTotalCount: Math.Max(renameListIndex + 1, 1),
-                renameListFolderSiblingCount: 1);
+                renameListFolderSiblingCount: 1
+            );
 
             configureOriginal?.Invoke(meta);
             FilterTestHelpers.EnsureSyntheticAudioOverlayWhenTagless(meta);
@@ -50,7 +52,8 @@ namespace Mfr.Tests.Models.Filters.Audio
                 FileAttributes.Directory,
                 s_Baseline,
                 s_Baseline,
-                s_Baseline);
+                s_Baseline
+            );
 
             return new RenameItem(meta);
         }
@@ -62,8 +65,11 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Apply_Title_AlwaysOverwrites()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Old"));
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "New")));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Old")
+            );
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "New"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -79,8 +85,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Apply_Performers_SemicolonSeparated_SetsJoinedPreviewString()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Performers: new AudioTagStringFieldOptions(Text: "Alice ; Bob")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Performers: new AudioTagStringFieldOptions(Text: "Alice ; Bob"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -95,9 +102,11 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void IfEmpty_Title_LeavesNonEmpty()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Kept"));
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Title: new AudioTagStringFieldOptions(Text: "Other", OnlyIfEmpty: true)));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Kept")
+            );
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "Other", OnlyIfEmpty: true))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -112,8 +121,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void IfEmpty_Title_FillsWhenEmpty()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Title: new AudioTagStringFieldOptions(Text: "Filled", OnlyIfEmpty: true)));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "Filled", OnlyIfEmpty: true))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -128,7 +138,8 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void OmittedTitle_LeavesTitleUnchanged()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Stay"));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Stay")
+            );
             var filter = new AudioTagSetterFilter(new AudioTagSetterOptions());
 
             filter.Setup();
@@ -144,8 +155,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Title_TemplateSpan_CompilesFileNameToken()
         {
             var item = _CreateAudioItem(prefix: "TrackNine");
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Title: new AudioTagStringFieldOptions(Text: "<file-name>")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "<file-name>"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -161,8 +173,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         {
             var item = _CreateAudioItem();
             var literal = "Love < Hate";
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Title: new AudioTagStringFieldOptions(Text: literal)));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: literal))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -177,9 +190,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Track_AutoIncrement_AddsRenameListIndex()
         {
             var item = _CreateAudioItem(renameListIndex: 4);
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Track: new AudioTagStringFieldOptions(Text: "10"),
-                TrackAutoIncrement: true));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "10"), TrackAutoIncrement: true)
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -194,9 +207,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Track_AutoIncrement_ClampedTo255()
         {
             var item = _CreateAudioItem(renameListIndex: 10);
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Track: new AudioTagStringFieldOptions(Text: "250"),
-                TrackAutoIncrement: true));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "250"), TrackAutoIncrement: true)
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -211,8 +224,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Track_TemplateSpan_CompilesFileNameToken()
         {
             var item = _CreateAudioItem(prefix: "42");
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Track: new AudioTagStringFieldOptions(Text: "<file-name>")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "<file-name>"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -227,9 +241,12 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Track_TemplateSpan_AutoIncrement_AddsRenameListIndex()
         {
             var item = _CreateAudioItem(renameListIndex: 3, prefix: "10");
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Track: new AudioTagStringFieldOptions(Text: "<file-name>"),
-                TrackAutoIncrement: true));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(
+                    Track: new AudioTagStringFieldOptions(Text: "<file-name>"),
+                    TrackAutoIncrement: true
+                )
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -244,8 +261,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Track_TemplateSpan_NonNumeric_ThrowsFormatException()
         {
             var item = _CreateAudioItem(prefix: "Noise");
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Track: new AudioTagStringFieldOptions(Text: "<file-name>")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "<file-name>"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
@@ -259,9 +277,11 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Track_ZeroWithoutIncrement_Clears()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 7));
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Track: new AudioTagStringFieldOptions(Text: "0")));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 7)
+            );
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "0"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -276,9 +296,11 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Track_IfEmpty_KeepsExisting()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 3));
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Track: new AudioTagStringFieldOptions(Text: "9", OnlyIfEmpty: true)));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 3)
+            );
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "9", OnlyIfEmpty: true))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -293,8 +315,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Track_Text_NonInteger_Throws_FormatException()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Track: new AudioTagStringFieldOptions(Text: "nope")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "nope"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
@@ -308,8 +331,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Track_Text_BaseAbove255_Throws_FormatException()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Track: new AudioTagStringFieldOptions(Text: "256")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "256"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
@@ -323,8 +347,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Apply_Composers_SemicolonSeparated_SetsJoinedPreviewString()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Composers: new AudioTagStringFieldOptions(Text: "Bach ; Handel")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Composers: new AudioTagStringFieldOptions(Text: "Bach ; Handel"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -339,10 +364,13 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Apply_Lyrics_Grouping_Copyright_SetsValues()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Lyrics: new AudioTagStringFieldOptions(Text: "La la"),
-                Grouping: new AudioTagStringFieldOptions(Text: "Suite"),
-                Copyright: new AudioTagStringFieldOptions(Text: "© 2004")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(
+                    Lyrics: new AudioTagStringFieldOptions(Text: "La la"),
+                    Grouping: new AudioTagStringFieldOptions(Text: "Suite"),
+                    Copyright: new AudioTagStringFieldOptions(Text: "© 2004")
+                )
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -360,9 +388,12 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Apply_Conductor_BeatsPerMinute_SetsValues()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Conductor: new AudioTagStringFieldOptions(Text: "Karajan"),
-                BeatsPerMinute: new AudioTagStringFieldOptions(Text: "120")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(
+                    Conductor: new AudioTagStringFieldOptions(Text: "Karajan"),
+                    BeatsPerMinute: new AudioTagStringFieldOptions(Text: "120")
+                )
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -379,9 +410,11 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void BeatsPerMinute_Zero_Clears()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(beatsPerMinute: 128));
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                BeatsPerMinute: new AudioTagStringFieldOptions(Text: "0")));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(beatsPerMinute: 128)
+            );
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(BeatsPerMinute: new AudioTagStringFieldOptions(Text: "0"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -396,8 +429,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void BeatsPerMinute_Above65535_Throws_FormatException()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                BeatsPerMinute: new AudioTagStringFieldOptions(Text: "65536")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(BeatsPerMinute: new AudioTagStringFieldOptions(Text: "65536"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
@@ -411,9 +445,11 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void IfEmpty_Lyrics_LeavesNonEmpty()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(lyrics: "Kept"));
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Lyrics: new AudioTagStringFieldOptions(Text: "Other", OnlyIfEmpty: true)));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(lyrics: "Kept")
+            );
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Lyrics: new AudioTagStringFieldOptions(Text: "Other", OnlyIfEmpty: true))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -428,10 +464,13 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Apply_TrackCount_Disc_DiscCount_SetsValues()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                TrackCount: new AudioTagStringFieldOptions(Text: "12"),
-                Disc: new AudioTagStringFieldOptions(Text: "2"),
-                DiscCount: new AudioTagStringFieldOptions(Text: "3")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(
+                    TrackCount: new AudioTagStringFieldOptions(Text: "12"),
+                    Disc: new AudioTagStringFieldOptions(Text: "2"),
+                    DiscCount: new AudioTagStringFieldOptions(Text: "3")
+                )
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -449,9 +488,11 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Disc_Zero_Clears()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(disc: 2));
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Disc: new AudioTagStringFieldOptions(Text: "0")));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(disc: 2)
+            );
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Disc: new AudioTagStringFieldOptions(Text: "0"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -466,8 +507,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void TrackCount_Above255_Throws_FormatException()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                TrackCount: new AudioTagStringFieldOptions(Text: "256")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(TrackCount: new AudioTagStringFieldOptions(Text: "256"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
@@ -481,9 +523,11 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Disc_IfEmpty_KeepsExisting()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(disc: 1));
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Disc: new AudioTagStringFieldOptions(Text: "9", OnlyIfEmpty: true)));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(disc: 1)
+            );
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Disc: new AudioTagStringFieldOptions(Text: "9", OnlyIfEmpty: true))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -498,9 +542,11 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Year_Zero_Clears()
         {
             var item = _CreateAudioItem(configureOriginal: m =>
-                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999));
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Year: new AudioTagStringFieldOptions(Text: "0")));
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999)
+            );
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "0"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -515,8 +561,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Year_Above9999_Throws_FormatException()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Year: new AudioTagStringFieldOptions(Text: "12000")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "12000"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
@@ -530,8 +577,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Year_TemplateSpan_CompilesFileNameToken()
         {
             var item = _CreateAudioItem(prefix: "1999");
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Year: new AudioTagStringFieldOptions(Text: "<file-name>")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "<file-name>"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -546,8 +594,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Year_TemplateSpan_NonNumeric_ThrowsFormatException()
         {
             var item = _CreateAudioItem(prefix: "Noise");
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Year: new AudioTagStringFieldOptions(Text: "<file-name>")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "<file-name>"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
@@ -561,8 +610,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Year_TemplateSpan_Above9999_ThrowsFormatException()
         {
             var item = _CreateAudioItem(prefix: "12000");
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Year: new AudioTagStringFieldOptions(Text: "<file-name>")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "<file-name>"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
@@ -576,8 +626,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Year_TextLiteral_ParsesInteger()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Year: new AudioTagStringFieldOptions(Text: "2005")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "2005"))
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -592,8 +643,9 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Year_TextLiteral_NonInteger_Throws()
         {
             var item = _CreateAudioItem();
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Year: new AudioTagStringFieldOptions(Text: "nope")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "nope"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<FormatException>(() => filter.Apply(item));
@@ -609,8 +661,9 @@ namespace Mfr.Tests.Models.Filters.Audio
             var item = _CreateDirectoryItem();
             item.Preview.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PreviewOnly");
 
-            var filter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Title: new AudioTagStringFieldOptions(Text: "X")));
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "X"))
+            );
 
             filter.Setup();
             var ex = Assert.Throws<InvalidOperationException>(() => filter.Apply(item));
@@ -624,51 +677,52 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void JsonDeserialize_Roundtrip()
         {
-            var json = /*lang=json,strict*/ """
-            {
-              "type": "AudioTagSetter",
-              "options": {
-                "title": {
-                  "text": "<file-name>"
-                },
-                "composers": {
-                  "text": "Bach"
-                },
-                "lyrics": {
-                  "text": "Verse"
-                },
-                "grouping": {
-                  "text": "Work"
-                },
-                "copyright": {
-                  "text": "© Label"
-                },
-                "conductor": {
-                  "text": "Karajan"
-                },
-                "beatsPerMinute": {
-                  "text": "128"
-                },
-                "year": {
-                  "text": "2004",
-                  "onlyIfEmpty": true
-                },
-                "track": {
-                  "text": "1"
-                },
-                "trackCount": {
-                  "text": "12"
-                },
-                "disc": {
-                  "text": "2"
-                },
-                "discCount": {
-                  "text": "3"
-                },
-                "trackAutoIncrement": true
-              }
-            }
-            """;
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "AudioTagSetter",
+                  "options": {
+                    "title": {
+                      "text": "<file-name>"
+                    },
+                    "composers": {
+                      "text": "Bach"
+                    },
+                    "lyrics": {
+                      "text": "Verse"
+                    },
+                    "grouping": {
+                      "text": "Work"
+                    },
+                    "copyright": {
+                      "text": "© Label"
+                    },
+                    "conductor": {
+                      "text": "Karajan"
+                    },
+                    "beatsPerMinute": {
+                      "text": "128"
+                    },
+                    "year": {
+                      "text": "2004",
+                      "onlyIfEmpty": true
+                    },
+                    "track": {
+                      "text": "1"
+                    },
+                    "trackCount": {
+                      "text": "12"
+                    },
+                    "disc": {
+                      "text": "2"
+                    },
+                    "discCount": {
+                      "text": "3"
+                    },
+                    "trackAutoIncrement": true
+                  }
+                }
+                """;
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             var typed = Assert.IsType<AudioTagSetterFilter>(filter);

@@ -11,13 +11,16 @@ namespace Mfr.Tests.Models.Filters.Space
 
         private static SpaceAroundFilter _CreateFilter(
             string aroundChars,
-            bool onlyWhenNeighboringAreLettersOrDigits = false)
+            bool onlyWhenNeighboringAreLettersOrDigits = false
+        )
         {
             return new SpaceAroundFilter(
                 _target,
                 new SpaceAroundOptions(
                     AroundChars: aroundChars,
-                    OnlyWhenNeighboringAreLettersOrDigits: onlyWhenNeighboringAreLettersOrDigits));
+                    OnlyWhenNeighboringAreLettersOrDigits: onlyWhenNeighboringAreLettersOrDigits
+                )
+            );
         }
 
         /// <summary>
@@ -29,16 +32,20 @@ namespace Mfr.Tests.Models.Filters.Space
             var f = _CreateFilter("-", onlyWhenNeighboringAreLettersOrDigits: true);
             Assert.Equal(
                 "Aimee Mann - Stupid Thing.mp3",
-                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann-Stupid Thing.mp3"));
+                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann-Stupid Thing.mp3")
+            );
             Assert.Equal(
                 "Aimee Mann - Stupid Thing.mp3",
-                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann- Stupid Thing.mp3"));
+                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann- Stupid Thing.mp3")
+            );
             Assert.Equal(
                 "Aimee Mann - Stupid Thing.mp3",
-                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann - Stupid Thing.mp3"));
+                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann - Stupid Thing.mp3")
+            );
             Assert.Equal(
                 "Aimee Mann -- Stupid Thing.mp3",
-                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann--Stupid Thing.mp3"));
+                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann--Stupid Thing.mp3")
+            );
         }
 
         /// <summary>
@@ -64,7 +71,9 @@ namespace Mfr.Tests.Models.Filters.Space
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: false,
-                    CustomText: ""));
+                    CustomText: ""
+                )
+            );
             var aroundFilter = _CreateFilter("-", onlyWhenNeighboringAreLettersOrDigits: true);
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a-b");
             spaceFilter.Setup();

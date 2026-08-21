@@ -19,7 +19,9 @@ namespace Mfr.Tests.Models
                     Mode: ReplacerMode.Literal,
                     CaseSensitive: true,
                     ReplaceAll: false,
-                    WholeWord: false));
+                    WholeWord: false
+                )
+            );
         }
 
         /// <summary>
@@ -51,7 +53,11 @@ namespace Mfr.Tests.Models
             var root = OperatingSystem.IsWindows() ? @"C:\" : "/";
             var sep = Path.DirectorySeparatorChar;
             var directoryWithTrail = $"{root}a{sep}b{sep}c{sep}";
-            var expected = DirectoryPathAncestor.ReplaceSegment(directoryWithTrail, level: 1, newSegmentName: "cRenamed");
+            var expected = DirectoryPathAncestor.ReplaceSegment(
+                directoryWithTrail,
+                level: 1,
+                newSegmentName: "cRenamed"
+            );
 
             var item = FilterTestHelpers.CreateRenameItem(directory: directoryWithTrail);
             var filter = _Replacer(target: new AncestorFolderTarget(Level: 1), find: "c", replacement: "cRenamed");
@@ -77,7 +83,8 @@ namespace Mfr.Tests.Models
 
             var exFilter = Assert.Throws<ArgumentOutOfRangeException>(() => filter.Apply(item));
             var exDirect = Assert.Throws<ArgumentOutOfRangeException>(() =>
-                DirectoryPathAncestor.GetSegmentName(path, level: 0));
+                DirectoryPathAncestor.GetSegmentName(path, level: 0)
+            );
 
             Assert.Equal(exDirect.ParamName, exFilter.ParamName);
             Assert.Equal(exDirect.Message, exFilter.Message);
@@ -89,15 +96,15 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Replacer_empty_segment_replacement_throws_matching_DirectoryPathAncestor()
         {
-            var directory =
-                $"{(OperatingSystem.IsWindows() ? @"C:\" : "/")}a{Path.DirectorySeparatorChar}b";
+            var directory = $"{(OperatingSystem.IsWindows() ? @"C:\" : "/")}a{Path.DirectorySeparatorChar}b";
             var item = FilterTestHelpers.CreateRenameItem(directory: directory);
             var filter = _Replacer(target: new AncestorFolderTarget(Level: 1), find: "b", replacement: "");
             filter.Setup();
 
             var exFilter = Assert.Throws<ArgumentException>(() => filter.Apply(item));
             var exDirect = Assert.Throws<ArgumentException>(() =>
-                DirectoryPathAncestor.ReplaceSegment(directory, level: 1, newSegmentName: ""));
+                DirectoryPathAncestor.ReplaceSegment(directory, level: 1, newSegmentName: "")
+            );
 
             Assert.Equal(exDirect.ParamName, exFilter.ParamName);
         }

@@ -1,4 +1,3 @@
-
 namespace Mfr.Filters.Space
 {
     /// <summary>
@@ -14,7 +13,8 @@ namespace Mfr.Filters.Space
         bool ReplaceSpaces,
         bool ReplaceUnderscores,
         bool ReplacePercent20,
-        string CustomText);
+        string CustomText
+    );
 
     /// <summary>
     /// Defines the word-separator character and optionally maps common separators to that character.
@@ -24,7 +24,9 @@ namespace Mfr.Filters.Space
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record SpaceCharacterFilter(
         FilterTarget Target,
-        SpaceCharacterOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        SpaceCharacterOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

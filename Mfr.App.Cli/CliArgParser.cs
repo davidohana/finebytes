@@ -1,9 +1,7 @@
 using System.ComponentModel;
-
-using Spectre.Console.Cli;
-
 using Mfr.Engine;
 using Mfr.Utils;
+using Spectre.Console.Cli;
 
 namespace Mfr.App.Cli
 {
@@ -30,16 +28,12 @@ namespace Mfr.App.Cli
             }
             catch (CommandParseException exception)
             {
-                var parserMessage = exception.Message.IsBlank()
-                    ? "Invalid arguments."
-                    : exception.Message;
+                var parserMessage = exception.Message.IsBlank() ? "Invalid arguments." : exception.Message;
                 throw new UserException(parserMessage);
             }
             catch (CommandRuntimeException exception)
             {
-                var parserMessage = exception.Message.IsBlank()
-                    ? "Invalid arguments."
-                    : exception.Message;
+                var parserMessage = exception.Message.IsBlank() ? "Invalid arguments." : exception.Message;
                 throw new UserException(parserMessage);
             }
             finally
@@ -61,12 +55,14 @@ namespace Mfr.App.Cli
             if (!includeFiles && !includeFolders)
                 throw new UserException("At least one of --files or --folders must be yes.");
 
-            var sources = parsedSettings.Sources
-                            .Where(source => !source.IsBlank())
-                            .Select(source => source.Trim())
-                            .ToList();
+            var sources = parsedSettings
+                .Sources.Where(source => !source.IsBlank())
+                .Select(source => source.Trim())
+                .ToList();
             if (sources.Count == 0)
-                throw new UserException("Missing required argument: SOURCES. Provide one or more source paths or wildcards.");
+                throw new UserException(
+                    "Missing required argument: SOURCES. Provide one or more source paths or wildcards."
+                );
 
             var rawPresetsFilePath = _GetValueOrDefault(parsedSettings.PresetsFilePath, defaultValue: string.Empty);
             var presetsFilePath = rawPresetsFilePath.IsBlank()
@@ -75,8 +71,8 @@ namespace Mfr.App.Cli
             var outputFilePath = _GetValueOrDefault(parsedSettings.OutputFilePath, defaultValue: string.Empty);
             var logLevel = _GetValueOrDefault(parsedSettings.LogLevel, defaultValue: CliLogging.DefaultLogLevelName);
             var configFilePath = _GetValueOrDefault(parsedSettings.ConfigFilePath, defaultValue: string.Empty);
-            var configOverrides = parsedSettings.ConfigOverrides
-                .Where(o => !o.IsBlank())
+            var configOverrides = parsedSettings
+                .ConfigOverrides.Where(o => !o.IsBlank())
                 .Select(o => o.Trim())
                 .ToList();
             return new CliOptions(
@@ -93,7 +89,8 @@ namespace Mfr.App.Cli
                 LogLevel: CliLogging.ParseLogLevel(logLevel),
                 PresetsFilePath: presetsFilePath,
                 ConfigFilePath: configFilePath.IsBlank() ? null : configFilePath.Trim(),
-                ConfigOverrides: configOverrides);
+                ConfigOverrides: configOverrides
+            );
         }
 
         private static void _ConfigureCommandApp(IConfigurator configuration)
@@ -105,8 +102,27 @@ namespace Mfr.App.Cli
                 .AddExample(["C:\\Music\\*.mp3", "-p", "clean", "--dry-run"])
                 .AddExample(["C:\\Music\\**\\*.flac", "-p", "lowercase-extension", "--log-level", "debug"])
                 .AddExample(["C:\\Music", "-p", "name_from_id3", "-r"])
-                .AddExample(["C:\\Music", "C:\\Podcasts", "-p", "my_preset", "--files", "yes", "--folders", "yes", "--output-file", "C:\\Temp\\mfr-results.json"])
-                .AddExample(["C:\\Music", "-p", "clean", "--config", "C:\\Temp\\config.json", "--set", "log.maxSessionFiles=50"]);
+                .AddExample([
+                    "C:\\Music",
+                    "C:\\Podcasts",
+                    "-p",
+                    "my_preset",
+                    "--files",
+                    "yes",
+                    "--folders",
+                    "yes",
+                    "--output-file",
+                    "C:\\Temp\\mfr-results.json",
+                ])
+                .AddExample([
+                    "C:\\Music",
+                    "-p",
+                    "clean",
+                    "--config",
+                    "C:\\Temp\\config.json",
+                    "--set",
+                    "log.maxSessionFiles=50",
+                ]);
         }
 
         private static string _GetAssemblyVersionString()
@@ -126,13 +142,17 @@ namespace Mfr.App.Cli
             {
                 "yes" => true,
                 "no" => false,
-                _ => throw new UserException($"Invalid value for {optionName}: '{value}'. Expected yes or no.")
+                _ => throw new UserException($"Invalid value for {optionName}: '{value}'. Expected yes or no."),
             };
         }
 
         private sealed class ParseCommand : Command<ParseCommandSettings>
         {
-            protected override int Execute(CommandContext context, ParseCommandSettings settings, CancellationToken cancellationToken)
+            protected override int Execute(
+                CommandContext context,
+                ParseCommandSettings settings,
+                CancellationToken cancellationToken
+            )
             {
                 _parseCommandCaptureSettings?.Invoke(settings);
                 return 0;
@@ -194,9 +214,10 @@ namespace Mfr.App.Cli
             public string? ConfigFilePath { get; init; }
 
             [CommandOption("--set <KEY=VALUE>")]
-            [Description("Override a config field (repeatable). Key is section.leaf (value is everything after the first '='), e.g. log.maxSessionFiles=200.")]
+            [Description(
+                "Override a config field (repeatable). Key is section.leaf (value is everything after the first '='), e.g. log.maxSessionFiles=200."
+            )]
             public string[] ConfigOverrides { get; init; } = [];
         }
     }
-
 }

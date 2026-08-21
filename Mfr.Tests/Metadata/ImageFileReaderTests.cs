@@ -73,7 +73,8 @@ namespace Mfr.Tests.Metadata
             if (!File.Exists(fixturePath))
             {
                 throw new InvalidOperationException(
-                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output.");
+                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output."
+                );
             }
 
             return Path.GetFullPath(fixturePath);

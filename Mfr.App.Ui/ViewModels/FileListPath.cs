@@ -210,9 +210,7 @@ namespace Mfr.App.Ui.ViewModels
             if (OperatingSystem.IsWindows() && IsUncServerRoot(path))
                 return NetworkPath;
 
-            if (OperatingSystem.IsWindows()
-                && IsUncShareRoot(path)
-                && TryGetUncServerRoot(path, out var serverRoot))
+            if (OperatingSystem.IsWindows() && IsUncShareRoot(path) && TryGetUncServerRoot(path, out var serverRoot))
                 return serverRoot;
 
             if (WindowsKnownPlaces.TryGetPlace(path, out _))
@@ -331,7 +329,8 @@ namespace Mfr.App.Ui.ViewModels
         private static void _AddChildBreadcrumbSegments(
             List<PathBreadcrumbSegment> segments,
             string path,
-            string rootPath)
+            string rootPath
+        )
         {
             DirectoryInfo? current;
             string rootFullName;
@@ -340,8 +339,7 @@ namespace Mfr.App.Ui.ViewModels
                 current = new DirectoryInfo(path);
                 rootFullName = new DirectoryInfo(rootPath).FullName;
             }
-            catch (Exception ex) when (
-                ex is ArgumentException or NotSupportedException or IOException)
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException)
             {
                 return;
             }
@@ -361,10 +359,7 @@ namespace Mfr.App.Ui.ViewModels
             segments.AddRange(parts);
         }
 
-        private static PathBreadcrumbSegment _CreateSegment(
-            string label,
-            string targetPath,
-            bool showLeadingChevron)
+        private static PathBreadcrumbSegment _CreateSegment(string label, string targetPath, bool showLeadingChevron)
         {
             return new PathBreadcrumbSegment
             {
@@ -379,9 +374,7 @@ namespace Mfr.App.Ui.ViewModels
             try
             {
                 var drive = new DriveInfo(root);
-                var letter = drive.Name.TrimEnd(
-                    Path.DirectorySeparatorChar,
-                    Path.AltDirectorySeparatorChar);
+                var letter = drive.Name.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
                 if (drive.IsReady)
                 {
                     var volume = drive.VolumeLabel;
@@ -391,8 +384,7 @@ namespace Mfr.App.Ui.ViewModels
 
                 return letter;
             }
-            catch (Exception ex) when (
-                ex is ArgumentException or IOException or UnauthorizedAccessException)
+            catch (Exception ex) when (ex is ArgumentException or IOException or UnauthorizedAccessException)
             {
                 return root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             }

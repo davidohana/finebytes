@@ -1,4 +1,3 @@
-
 namespace Mfr.Filters.Case
 {
     /// <summary>
@@ -7,8 +6,7 @@ namespace Mfr.Filters.Case
     /// <param name="CapitalizeAfterChars">
     /// Characters after which the following character is uppercased.
     /// </param>
-    public sealed record CapitalizeAfterOptions(
-        string CapitalizeAfterChars = ",!()[]{};-");
+    public sealed record CapitalizeAfterOptions(string CapitalizeAfterChars = ",!()[]{};-");
 
     /// <summary>
     /// Uppercases each letter which appears after one of the characters in the defined list.
@@ -21,7 +19,9 @@ namespace Mfr.Filters.Case
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record CapitalizeAfterFilter(
         FilterTarget Target,
-        CapitalizeAfterOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        CapitalizeAfterOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -39,7 +39,6 @@ namespace Mfr.Filters.Case
             {
                 if (capitalizeAfterSet.Contains(chars[i]))
                     chars[i + 1] = char.ToUpperInvariant(chars[i + 1]);
-
             }
 
             return new string(chars);

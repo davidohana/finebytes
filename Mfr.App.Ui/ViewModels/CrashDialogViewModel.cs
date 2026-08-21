@@ -11,10 +11,7 @@ namespace Mfr.App.Ui.ViewModels
     /// <param name="details">Full exception text including inner exceptions.</param>
     /// <param name="logFilePath">Session or crash log path, when written.</param>
     /// <param name="logDirectoryPath">Directory to open from the dialog.</param>
-    public sealed class CrashDialogViewModel(
-        string details,
-        string? logFilePath,
-        string logDirectoryPath)
+    public sealed class CrashDialogViewModel(string details, string? logFilePath, string logDirectoryPath)
     {
         /// <summary>
         /// Gets the short user-facing summary.
@@ -34,9 +31,7 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Gets text to show for the log file (or a fallback when missing).
         /// </summary>
-        public string LogFileDisplay { get; } = logFilePath.IsBlank()
-                ? "Diagnostic log was not written."
-                : logFilePath;
+        public string LogFileDisplay { get; } = logFilePath.IsBlank() ? "Diagnostic log was not written." : logFilePath;
 
         /// <summary>
         /// Gets the diagnostic log directory.

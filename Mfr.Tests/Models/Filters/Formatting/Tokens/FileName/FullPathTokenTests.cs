@@ -17,7 +17,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
                 extension: ".mp3",
-                directory: @"D:\Music\Album");
+                directory: @"D:\Music\Album"
+            );
 
             Assert.Equal(item.Preview.FullPath, token.Compile(tokenArgs: "")(item));
         }
@@ -32,7 +33,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
                 extension: ".mp3",
-                directory: @"D:\Music\Album");
+                directory: @"D:\Music\Album"
+            );
             item.Preview.DirectoryPath = @"D:\Staging";
             item.Preview.Prefix = "renamed";
 

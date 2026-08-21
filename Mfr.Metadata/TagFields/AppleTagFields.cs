@@ -48,11 +48,13 @@ namespace Mfr.Metadata.TagFields
                 if (texts is null || texts.Length == 0)
                     continue;
 
-                rows.Add(new AppleAtomRow
-                {
-                    AtomType = ImmutableArray.Create(boxType.Data),
-                    Values = [.. texts.Select(static t => t.Trim())],
-                });
+                rows.Add(
+                    new AppleAtomRow
+                    {
+                        AtomType = ImmutableArray.Create(boxType.Data),
+                        Values = [.. texts.Select(static t => t.Trim())],
+                    }
+                );
             }
 
             if (rows.Count == 0)
@@ -90,7 +92,8 @@ namespace Mfr.Metadata.TagFields
                 _IndexAtoms(preview.Atoms),
                 valuesEqual: static (prior, row) => prior.Equals(row),
                 remove: hex => live.SetText(Convert.FromHexString(hex), []),
-                set: (_, row) => _SetAtom(live, row));
+                set: (_, row) => _SetAtom(live, row)
+            );
         }
 
         private static void _SetAtom(AppleTag live, AppleAtomRow row)

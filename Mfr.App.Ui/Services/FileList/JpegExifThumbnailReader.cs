@@ -32,10 +32,8 @@ namespace Mfr.App.Ui.Services.FileList
 
                 return _TryExtract(stream);
             }
-            catch (Exception ex) when (ex is IOException
-                or EndOfStreamException
-                or ArgumentException
-                or NotSupportedException)
+            catch (Exception ex)
+                when (ex is IOException or EndOfStreamException or ArgumentException or NotSupportedException)
             {
                 return null;
             }
@@ -86,12 +84,14 @@ namespace Mfr.App.Ui.Services.FileList
         {
             if (payload.Length < 14)
                 return null;
-            if (payload[0] != (byte)'E'
+            if (
+                payload[0] != (byte)'E'
                 || payload[1] != (byte)'x'
                 || payload[2] != (byte)'i'
                 || payload[3] != (byte)'f'
                 || payload[4] != 0
-                || payload[5] != 0)
+                || payload[5] != 0
+            )
                 return null;
 
             var tiff = payload[6..];
@@ -115,7 +115,8 @@ namespace Mfr.App.Ui.Services.FileList
             ReadOnlySpan<byte> tiff,
             uint ifdOffset,
             bool isLittleEndian,
-            out uint nextIfdOffset)
+            out uint nextIfdOffset
+        )
         {
             nextIfdOffset = 0;
             if (!_TryToIndex(ifdOffset, tiff.Length, minRemaining: 2, out var index))
@@ -146,11 +147,20 @@ namespace Mfr.App.Ui.Services.FileList
                     return null;
 
                 var tag = _ReadUInt16(tiff, entryIndex, isLittleEndian);
-                if (tag == _TagCompression && _TryReadIfdUInt(tiff, entryIndex, isLittleEndian, out var compressionValue))
+                if (
+                    tag == _TagCompression
+                    && _TryReadIfdUInt(tiff, entryIndex, isLittleEndian, out var compressionValue)
+                )
                     compression = compressionValue;
-                else if (tag == _TagJpegOffset && _TryReadIfdUInt(tiff, entryIndex, isLittleEndian, out var offsetValue))
+                else if (
+                    tag == _TagJpegOffset
+                    && _TryReadIfdUInt(tiff, entryIndex, isLittleEndian, out var offsetValue)
+                )
                     jpegOffset = offsetValue;
-                else if (tag == _TagJpegLength && _TryReadIfdUInt(tiff, entryIndex, isLittleEndian, out var lengthValue))
+                else if (
+                    tag == _TagJpegLength
+                    && _TryReadIfdUInt(tiff, entryIndex, isLittleEndian, out var lengthValue)
+                )
                     jpegLength = lengthValue;
 
                 entryIndex += 12;
@@ -170,7 +180,8 @@ namespace Mfr.App.Ui.Services.FileList
             ReadOnlySpan<byte> tiff,
             int entryOffset,
             bool isLittleEndian,
-            out uint value)
+            out uint value
+        )
         {
             value = 0;
             var type = _ReadUInt16(tiff, entryOffset + 2, isLittleEndian);
@@ -202,16 +213,14 @@ namespace Mfr.App.Ui.Services.FileList
                 current = stream.ReadByte();
                 if (current < 0)
                     return null;
-            }
-            while (current != 0xFF);
+            } while (current != 0xFF);
 
             do
             {
                 current = stream.ReadByte();
                 if (current < 0)
                     return null;
-            }
-            while (current == 0xFF);
+            } while (current == 0xFF);
 
             if (current == 0)
                 return _ReadMarker(stream);

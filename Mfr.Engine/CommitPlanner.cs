@@ -33,9 +33,7 @@ namespace Mfr.Engine
     /// </remarks>
     /// <param name="Steps">Commit steps to apply in order.</param>
     /// <param name="UnresolvableCycleItems">Items that participate in a cycle the planner could not break with a single stash.</param>
-    public sealed record CommitPlan(
-        IReadOnlyList<CommitStep> Steps,
-        IReadOnlyList<RenameItem> UnresolvableCycleItems);
+    public sealed record CommitPlan(IReadOnlyList<CommitStep> Steps, IReadOnlyList<RenameItem> UnresolvableCycleItems);
 
     /// <summary>
     /// Builds an ordered commit plan that respects ancestor/descendant containment, path-shift chains, and cycles.
@@ -89,7 +87,8 @@ namespace Mfr.Engine
                     var actualSourcePath = _ResolveActualSourcePath(
                         item: readyItem,
                         participants: participants,
-                        stashedTempPaths: stashedTempPaths);
+                        stashedTempPaths: stashedTempPaths
+                    );
                     steps.Add(new FinalizeStep(readyItem, actualSourcePath));
                     remaining.Remove(readyItem);
                     continue;
@@ -101,7 +100,8 @@ namespace Mfr.Engine
                     participants: participants,
                     stashedTempPaths: stashedTempPaths,
                     steps: steps,
-                    unresolvable: unresolvable);
+                    unresolvable: unresolvable
+                );
                 if (!cycleHandled)
                 {
                     unresolvable.AddRange(remaining);
@@ -135,7 +135,8 @@ namespace Mfr.Engine
         /// </para>
         /// </remarks>
         private static Dictionary<RenameItem, HashSet<RenameItem>> _BuildDependencyEdges(
-            IReadOnlyList<RenameItem> participants)
+            IReadOnlyList<RenameItem> participants
+        )
         {
             var dependsOn = new Dictionary<RenameItem, HashSet<RenameItem>>(ReferenceEqualityComparer.Instance);
             foreach (var item in participants)
@@ -154,7 +155,6 @@ namespace Mfr.Engine
                     var pathShiftEdge = _SubjectPreviewClaimsOtherSource(subject: subject, other: other);
                     if (containmentEdge || pathShiftEdge)
                         dependsOn[subject].Add(other);
-
                 }
             }
 
@@ -167,15 +167,17 @@ namespace Mfr.Engine
                 return false;
 
             var ancestorRenames = !string.Equals(
-                            ancestor.Original.FullPath,
-                            ancestor.Preview.FullPath,
-                            StringComparison.Ordinal);
+                ancestor.Original.FullPath,
+                ancestor.Preview.FullPath,
+                StringComparison.Ordinal
+            );
             if (!ancestorRenames)
                 return false;
 
             return PathRelations.IsDescendantOf(
-                            candidate: descendant.Original.FullPath,
-                            ancestor: ancestor.Original.FullPath);
+                candidate: descendant.Original.FullPath,
+                ancestor: ancestor.Original.FullPath
+            );
         }
 
         private static bool _SubjectPreviewClaimsOtherSource(RenameItem subject, RenameItem other)
@@ -183,14 +185,16 @@ namespace Mfr.Engine
             var subjectPathChanges = !string.Equals(
                 subject.Original.FullPath,
                 subject.Preview.FullPath,
-                StringComparison.Ordinal);
+                StringComparison.Ordinal
+            );
             if (!subjectPathChanges)
                 return false;
 
             var otherPathChanges = !string.Equals(
-                            other.Original.FullPath,
-                            other.Preview.FullPath,
-                            StringComparison.Ordinal);
+                other.Original.FullPath,
+                other.Preview.FullPath,
+                StringComparison.Ordinal
+            );
             if (!otherPathChanges)
                 return false;
 
@@ -199,10 +203,10 @@ namespace Mfr.Engine
 
         private static RenameItem? _PickReadyItem(
             HashSet<RenameItem> remaining,
-            Dictionary<RenameItem, HashSet<RenameItem>> dependsOn)
+            Dictionary<RenameItem, HashSet<RenameItem>> dependsOn
+        )
         {
-            return remaining.FirstOrDefault(
-                item => !dependsOn[item].Any(dependency => remaining.Contains(dependency)));
+            return remaining.FirstOrDefault(item => !dependsOn[item].Any(dependency => remaining.Contains(dependency)));
         }
 
         private static bool _TryHandleCycle(
@@ -211,7 +215,8 @@ namespace Mfr.Engine
             IReadOnlyList<RenameItem> participants,
             Dictionary<RenameItem, string> stashedTempPaths,
             List<CommitStep> steps,
-            List<RenameItem> unresolvable)
+            List<RenameItem> unresolvable
+        )
         {
             var cycle = _FindCycleNodes(remaining, dependsOn);
             if (cycle.Count == 0)
@@ -226,13 +231,15 @@ namespace Mfr.Engine
             // Commit the other cycle members in topological order (the stash broke the cycle for them).
             var otherCycleMembers = new HashSet<RenameItem>(
                 cycle.Where(item => !ReferenceEquals(item, stashItem)),
-                ReferenceEqualityComparer.Instance);
+                ReferenceEqualityComparer.Instance
+            );
             while (otherCycleMembers.Count > 0)
             {
                 var ready = _PickCycleReadyItem(
                     candidates: otherCycleMembers,
                     dependsOn: dependsOn,
-                    stashItem: stashItem);
+                    stashItem: stashItem
+                );
                 if (ready is null)
                 {
                     foreach (var stuck in otherCycleMembers)
@@ -253,7 +260,8 @@ namespace Mfr.Engine
                 var actualSourcePath = _ResolveActualSourcePath(
                     item: ready,
                     participants: participants,
-                    stashedTempPaths: stashedTempPaths);
+                    stashedTempPaths: stashedTempPaths
+                );
                 steps.Add(new FinalizeStep(ready, actualSourcePath));
                 otherCycleMembers.Remove(ready);
                 remaining.Remove(ready);
@@ -267,7 +275,8 @@ namespace Mfr.Engine
 
         private static List<RenameItem> _FindCycleNodes(
             HashSet<RenameItem> remaining,
-            Dictionary<RenameItem, HashSet<RenameItem>> dependsOn)
+            Dictionary<RenameItem, HashSet<RenameItem>> dependsOn
+        )
         {
             // Walk dependencies until we revisit a node. The portion of the path between visits forms a cycle.
             foreach (var startNode in remaining)
@@ -302,7 +311,8 @@ namespace Mfr.Engine
         private static RenameItem? _PickAnyRemainingDependency(
             RenameItem item,
             Dictionary<RenameItem, HashSet<RenameItem>> dependsOn,
-            HashSet<RenameItem> remaining)
+            HashSet<RenameItem> remaining
+        )
         {
             return dependsOn[item].FirstOrDefault(remaining.Contains);
         }
@@ -310,7 +320,8 @@ namespace Mfr.Engine
         private static RenameItem? _PickCycleReadyItem(
             HashSet<RenameItem> candidates,
             Dictionary<RenameItem, HashSet<RenameItem>> dependsOn,
-            RenameItem stashItem)
+            RenameItem stashItem
+        )
         {
             foreach (var item in candidates)
             {
@@ -325,12 +336,10 @@ namespace Mfr.Engine
 
                     if (candidates.Contains(dependency))
                         blocking++;
-
                 }
 
                 if (blocking == 0)
                     return item;
-
             }
 
             return null;
@@ -339,7 +348,8 @@ namespace Mfr.Engine
         private static string _ResolveActualSourcePath(
             RenameItem item,
             IReadOnlyList<RenameItem> participants,
-            Dictionary<RenameItem, string> stashedTempPaths)
+            Dictionary<RenameItem, string> stashedTempPaths
+        )
         {
             if (stashedTempPaths.TryGetValue(item, out var stashedTempPath))
                 return stashedTempPath;
@@ -356,7 +366,8 @@ namespace Mfr.Engine
                 actualSourcePath = PathRelations.ReplaceAncestor(
                     fullPath: actualSourcePath,
                     oldAncestor: ancestor.Original.FullPath,
-                    newAncestor: ancestor.Preview.FullPath);
+                    newAncestor: ancestor.Preview.FullPath
+                );
             }
 
             return actualSourcePath;

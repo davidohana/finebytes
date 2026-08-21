@@ -1,5 +1,5 @@
-using System.Text.Json;
 using System.Text.Encodings.Web;
+using System.Text.Json;
 
 namespace Mfr.Models.Rename
 {
@@ -20,7 +20,8 @@ namespace Mfr.Models.Rename
         int RenamedCount,
         int SkippedCount,
         int ErrorsCount,
-        IReadOnlyList<RenameResultItem> Results)
+        IReadOnlyList<RenameResultItem> Results
+    )
     {
         // Reused to avoid per-call allocations and CA1869 warnings when serializing output.
         private static readonly JsonSerializerOptions _jsonOutputSerializerOptions = new()
@@ -37,7 +38,12 @@ namespace Mfr.Models.Rename
         /// <param name="presetName">Preset name used for the rename run.</param>
         /// <param name="dryRun">Whether the run was a dry run (no filesystem changes).</param>
         /// <param name="results">Per-item rename results.</param>
-        public static void WriteJsonFile(string outputFilePath, string presetName, bool dryRun, IReadOnlyList<RenameResultItem> results)
+        public static void WriteJsonFile(
+            string outputFilePath,
+            string presetName,
+            bool dryRun,
+            IReadOnlyList<RenameResultItem> results
+        )
         {
             var summary = new RenameResultSummary(
                 Preset: presetName,
@@ -46,7 +52,8 @@ namespace Mfr.Models.Rename
                 RenamedCount: _CountStatus(results, RenameStatus.CommitOk),
                 SkippedCount: _CountStatus(results, RenameStatus.CommitSkipped),
                 ErrorsCount: _CountErrors(results),
-                Results: results);
+                Results: results
+            );
 
             var json = JsonSerializer.Serialize(summary, _jsonOutputSerializerOptions);
             var outputFilePathTrimmed = outputFilePath.Trim();

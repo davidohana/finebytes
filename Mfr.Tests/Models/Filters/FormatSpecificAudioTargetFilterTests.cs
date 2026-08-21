@@ -17,24 +17,24 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Formatter_Id3v2Frame_SetsTit2_OnMpeg()
         {
-            var filter = new FormatterFilter(
-                new Id3v2FrameTarget("TIT2"),
-                new FormatterOptions("FrameTitle"));
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var filter = new FormatterFilter(new Id3v2FrameTarget("TIT2"), new FormatterOptions("FrameTitle"));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
-                    {
-                        Id3v1 = new Id3v1TagData { Title = "TrailerOnly" },
-                        Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
-                    };
-                });
+                    Id3v1 = new Id3v1TagData { Title = "TrailerOnly" },
+                    Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
+                };
+            });
 
             filter.Setup();
             filter.Apply(item);
 
             Assert.Equal("TrailerOnly", item.Preview.AudioTagOverlay.Id3v1!.Title);
-            Assert.Equal("FrameTitle", AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2"));
+            Assert.Equal(
+                "FrameTitle",
+                AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2")
+            );
         }
 
         /// <summary>
@@ -43,17 +43,13 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Formatter_Id3v2Frame_SetsPrimaryComm()
         {
-            var filter = new FormatterFilter(
-                new Id3v2FrameTarget("COMM"),
-                new FormatterOptions("Primary comment"));
+            var filter = new FormatterFilter(new Id3v2FrameTarget("COMM"), new FormatterOptions("Primary comment"));
             var item = FilterTestHelpers.CreateRenameItem();
 
             filter.Setup();
             filter.Apply(item);
 
-            var frame = Assert.Single(
-                item.Preview.AudioTagOverlay.Id3v2!.Frames,
-                f => f.FrameId == "COMM");
+            var frame = Assert.Single(item.Preview.AudioTagOverlay.Id3v2!.Frames, f => f.FrameId == "COMM");
             Assert.Null(frame.Description);
             Assert.Equal("eng", frame.Language);
             Assert.Equal("Primary comment", Assert.Single(frame.TextValues));
@@ -65,18 +61,14 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Formatter_XiphField_SetsTitle_OnFlac()
         {
-            var filter = new FormatterFilter(
-                new XiphFieldTarget("title"),
-                new FormatterOptions("VorbisTitle"));
+            var filter = new FormatterFilter(new XiphFieldTarget("title"), new FormatterOptions("VorbisTitle"));
             var item = FilterTestHelpers.CreateRenameItem(
                 extension: ".flac",
                 configureOriginal: m =>
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
-                    {
-                        Xiph = new XiphTagData { Fields = [] },
-                    };
-                });
+                    m.AudioTagOverlay = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [] } };
+                }
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -91,31 +83,28 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Formatter_Id3v1Field_SetsTitle_OnlyOnId3v1()
         {
-            var filter = new FormatterFilter(
-                new Id3v1FieldTarget(Id3v1Field.Title),
-                new FormatterOptions("V1Title"));
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var filter = new FormatterFilter(new Id3v1FieldTarget(Id3v1Field.Title), new FormatterOptions("V1Title"));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
+                    Id3v1 = new Id3v1TagData { Title = "Old" },
+                    Id3v2 = new Id3v2TagData
                     {
-                        Id3v1 = new Id3v1TagData { Title = "Old" },
-                        Id3v2 = new Id3v2TagData
-                        {
-                            Version = 3,
-                            Frames =
-                            [
-                                new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["FrameStay"] },
-                            ],
-                        },
-                    };
-                });
+                        Version = 3,
+                        Frames = [new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["FrameStay"] }],
+                    },
+                };
+            });
 
             filter.Setup();
             filter.Apply(item);
 
             Assert.Equal("V1Title", item.Preview.AudioTagOverlay.Id3v1!.Title);
-            Assert.Equal("FrameStay", AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2"));
+            Assert.Equal(
+                "FrameStay",
+                AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2")
+            );
         }
 
         /// <summary>
@@ -124,18 +113,14 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Formatter_Id3v2Frame_OnFlac_ThrowsNotSupported()
         {
-            var filter = new FormatterFilter(
-                new Id3v2FrameTarget("TIT2"),
-                new FormatterOptions("Nope"));
+            var filter = new FormatterFilter(new Id3v2FrameTarget("TIT2"), new FormatterOptions("Nope"));
             var item = FilterTestHelpers.CreateRenameItem(
                 extension: ".flac",
                 configureOriginal: m =>
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
-                    {
-                        Xiph = new XiphTagData { Fields = [] },
-                    };
-                });
+                    m.AudioTagOverlay = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [] } };
+                }
+            );
 
             filter.Setup();
             var ex = Assert.Throws<NotSupportedException>(() => filter.Apply(item));
@@ -148,9 +133,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Formatter_XiphField_OnMp3_ThrowsNotSupported()
         {
-            var filter = new FormatterFilter(
-                new XiphFieldTarget("TITLE"),
-                new FormatterOptions("Nope"));
+            var filter = new FormatterFilter(new XiphFieldTarget("TITLE"), new FormatterOptions("Nope"));
             var item = FilterTestHelpers.CreateRenameItem();
 
             filter.Setup();
@@ -164,25 +147,22 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Formatter_Id3v2Frame_EmptyTemplate_ClearsFrame()
         {
-            var filter = new FormatterFilter(
-                new Id3v2FrameTarget("TIT2"),
-                new FormatterOptions(string.Empty));
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var filter = new FormatterFilter(new Id3v2FrameTarget("TIT2"), new FormatterOptions(string.Empty));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
+                    Id3v2 = new Id3v2TagData
                     {
-                        Id3v2 = new Id3v2TagData
-                        {
-                            Version = 3,
-                            Frames =
-                            [
-                                new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Gone"] },
-                                new Id3v2ModeledFrame { FrameId = "TALB", TextValues = ["Keep"] },
-                            ],
-                        },
-                    };
-                });
+                        Version = 3,
+                        Frames =
+                        [
+                            new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Gone"] },
+                            new Id3v2ModeledFrame { FrameId = "TALB", TextValues = ["Keep"] },
+                        ],
+                    },
+                };
+            });
 
             filter.Setup();
             filter.Apply(item);
@@ -197,17 +177,14 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Formatter_Id3v2Frame_TdrcOnV23_ThrowsNotSupported()
         {
-            var filter = new FormatterFilter(
-                new Id3v2FrameTarget("TDRC"),
-                new FormatterOptions("2020"));
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var filter = new FormatterFilter(new Id3v2FrameTarget("TDRC"), new FormatterOptions("2020"));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
-                    {
-                        Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
-                    };
-                });
+                    Id3v2 = new Id3v2TagData { Version = 3, Frames = [] },
+                };
+            });
 
             filter.Setup();
             var ex = Assert.Throws<NotSupportedException>(() => filter.Apply(item));
@@ -221,17 +198,14 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Formatter_Id3v2Frame_TdrcOnV24_Succeeds()
         {
-            var filter = new FormatterFilter(
-                new Id3v2FrameTarget("TDRC"),
-                new FormatterOptions("2020"));
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
+            var filter = new FormatterFilter(new Id3v2FrameTarget("TDRC"), new FormatterOptions("2020"));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = new AudioTagOverlay
                 {
-                    m.AudioTagOverlay = new AudioTagOverlay
-                    {
-                        Id3v2 = new Id3v2TagData { Version = 4, Frames = [] },
-                    };
-                });
+                    Id3v2 = new Id3v2TagData { Version = 4, Frames = [] },
+                };
+            });
 
             filter.Setup();
             filter.Apply(item);

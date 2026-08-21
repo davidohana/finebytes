@@ -20,7 +20,8 @@ namespace Mfr.Filters.Audio
     /// </param>
     public sealed record AudioTagStringFieldOptions(
         [property: JsonPropertyName("text")] string Text = "",
-        [property: JsonPropertyName("onlyIfEmpty")] bool OnlyIfEmpty = false);
+        [property: JsonPropertyName("onlyIfEmpty")] bool OnlyIfEmpty = false
+    );
 
     /// <summary>
     /// Batch options for <see cref="AudioTagSetterFilter"/> (legacy Audio / ID3 Tag Setter style).
@@ -78,7 +79,8 @@ namespace Mfr.Filters.Audio
         [property: JsonPropertyName("trackCount")] AudioTagStringFieldOptions? TrackCount = null,
         [property: JsonPropertyName("disc")] AudioTagStringFieldOptions? Disc = null,
         [property: JsonPropertyName("discCount")] AudioTagStringFieldOptions? DiscCount = null,
-        [property: JsonPropertyName("trackAutoIncrement")] bool TrackAutoIncrement = false);
+        [property: JsonPropertyName("trackAutoIncrement")] bool TrackAutoIncrement = false
+    );
 
     /// <summary>
     /// Sets common embedded audio-tag fields on each file row (multi-format via the shared overlay model).
@@ -92,8 +94,7 @@ namespace Mfr.Filters.Audio
     /// </para>
     /// </remarks>
     /// <param name="Options">Per-field behaviors and values.</param>
-    public sealed record AudioTagSetterFilter(
-        AudioTagSetterOptions Options) : BaseFilter
+    public sealed record AudioTagSetterFilter(AudioTagSetterOptions Options) : BaseFilter
     {
         /// <summary>
         /// Formatter used when a field is omitted from options: always expands to empty string (field is not applied).
@@ -155,7 +156,8 @@ namespace Mfr.Filters.Audio
                     Options.Performers.OnlyIfEmpty,
                     semanticTag.Performers,
                     PerformersFormatter,
-                    static (m, v) => m with { Performers = v });
+                    static (m, v) => m with { Performers = v }
+                );
 
             if (Options.AlbumArtists is not null)
                 semanticTag = _ApplyStringField(
@@ -164,7 +166,8 @@ namespace Mfr.Filters.Audio
                     Options.AlbumArtists.OnlyIfEmpty,
                     semanticTag.AlbumArtists,
                     AlbumArtistsFormatter,
-                    static (m, v) => m with { AlbumArtists = v });
+                    static (m, v) => m with { AlbumArtists = v }
+                );
 
             if (Options.Title is not null)
                 semanticTag = _ApplyStringField(
@@ -173,7 +176,8 @@ namespace Mfr.Filters.Audio
                     Options.Title.OnlyIfEmpty,
                     semanticTag.Title,
                     TitleFormatter,
-                    static (m, v) => m with { Title = v });
+                    static (m, v) => m with { Title = v }
+                );
 
             if (Options.Album is not null)
                 semanticTag = _ApplyStringField(
@@ -182,7 +186,8 @@ namespace Mfr.Filters.Audio
                     Options.Album.OnlyIfEmpty,
                     semanticTag.Album,
                     AlbumFormatter,
-                    static (m, v) => m with { Album = v });
+                    static (m, v) => m with { Album = v }
+                );
 
             if (Options.Genre is not null)
                 semanticTag = _ApplyStringField(
@@ -191,7 +196,8 @@ namespace Mfr.Filters.Audio
                     Options.Genre.OnlyIfEmpty,
                     semanticTag.Genre,
                     GenreFormatter,
-                    static (m, v) => m with { Genre = v });
+                    static (m, v) => m with { Genre = v }
+                );
 
             if (Options.Comment is not null)
                 semanticTag = _ApplyStringField(
@@ -200,7 +206,8 @@ namespace Mfr.Filters.Audio
                     Options.Comment.OnlyIfEmpty,
                     semanticTag.Comment,
                     CommentFormatter,
-                    static (m, v) => m with { Comment = v });
+                    static (m, v) => m with { Comment = v }
+                );
 
             if (Options.Composers is not null)
                 semanticTag = _ApplyStringField(
@@ -209,7 +216,8 @@ namespace Mfr.Filters.Audio
                     Options.Composers.OnlyIfEmpty,
                     semanticTag.Composers,
                     ComposersFormatter,
-                    static (m, v) => m with { Composers = v });
+                    static (m, v) => m with { Composers = v }
+                );
 
             if (Options.Lyrics is not null)
                 semanticTag = _ApplyStringField(
@@ -218,7 +226,8 @@ namespace Mfr.Filters.Audio
                     Options.Lyrics.OnlyIfEmpty,
                     semanticTag.Lyrics,
                     LyricsFormatter,
-                    static (m, v) => m with { Lyrics = v });
+                    static (m, v) => m with { Lyrics = v }
+                );
 
             if (Options.Grouping is not null)
                 semanticTag = _ApplyStringField(
@@ -227,7 +236,8 @@ namespace Mfr.Filters.Audio
                     Options.Grouping.OnlyIfEmpty,
                     semanticTag.Grouping,
                     GroupingFormatter,
-                    static (m, v) => m with { Grouping = v });
+                    static (m, v) => m with { Grouping = v }
+                );
 
             if (Options.Copyright is not null)
                 semanticTag = _ApplyStringField(
@@ -236,7 +246,8 @@ namespace Mfr.Filters.Audio
                     Options.Copyright.OnlyIfEmpty,
                     semanticTag.Copyright,
                     CopyrightFormatter,
-                    static (m, v) => m with { Copyright = v });
+                    static (m, v) => m with { Copyright = v }
+                );
 
             if (Options.Conductor is not null)
                 semanticTag = _ApplyStringField(
@@ -245,7 +256,8 @@ namespace Mfr.Filters.Audio
                     Options.Conductor.OnlyIfEmpty,
                     semanticTag.Conductor,
                     ConductorFormatter,
-                    static (m, v) => m with { Conductor = v });
+                    static (m, v) => m with { Conductor = v }
+                );
 
             if (Options.Year is not null)
             {
@@ -257,7 +269,8 @@ namespace Mfr.Filters.Audio
                     YearFormatter,
                     fieldLabel: "year",
                     maxValue: 9999u,
-                    static (m, v) => m with { Year = v });
+                    static (m, v) => m with { Year = v }
+                );
             }
 
             if (Options.BeatsPerMinute is not null)
@@ -270,7 +283,8 @@ namespace Mfr.Filters.Audio
                     BeatsPerMinuteFormatter,
                     fieldLabel: "beatsPerMinute",
                     maxValue: 65535u,
-                    static (m, v) => m with { BeatsPerMinute = v });
+                    static (m, v) => m with { BeatsPerMinute = v }
+                );
             }
 
             if (Options.Track is not null)
@@ -284,7 +298,8 @@ namespace Mfr.Filters.Audio
                     TrackFormatter,
                     fieldLabel: "track",
                     static (m, v) => m with { Track = v },
-                    autoIncrementBy: trackIncrement);
+                    autoIncrementBy: trackIncrement
+                );
             }
 
             if (Options.TrackCount is not null)
@@ -296,7 +311,8 @@ namespace Mfr.Filters.Audio
                     semanticTag.TrackCount,
                     TrackCountFormatter,
                     fieldLabel: "trackCount",
-                    static (m, v) => m with { TrackCount = v });
+                    static (m, v) => m with { TrackCount = v }
+                );
             }
 
             if (Options.Disc is not null)
@@ -308,7 +324,8 @@ namespace Mfr.Filters.Audio
                     semanticTag.Disc,
                     DiscFormatter,
                     fieldLabel: "disc",
-                    static (m, v) => m with { Disc = v });
+                    static (m, v) => m with { Disc = v }
+                );
             }
 
             if (Options.DiscCount is not null)
@@ -320,7 +337,8 @@ namespace Mfr.Filters.Audio
                     semanticTag.DiscCount,
                     DiscCountFormatter,
                     fieldLabel: "discCount",
-                    static (m, v) => m with { DiscCount = v });
+                    static (m, v) => m with { DiscCount = v }
+                );
             }
 
             if (!_HasAnyConfiguredSemanticField())
@@ -384,7 +402,8 @@ namespace Mfr.Filters.Audio
             bool onlyIfEmpty,
             string? currentValue,
             Formatter formatter,
-            Func<SemanticAudioTag, string?, SemanticAudioTag> assignUpdated)
+            Func<SemanticAudioTag, string?, SemanticAudioTag> assignUpdated
+        )
         {
             var overlayAlreadyHasValue = !string.IsNullOrWhiteSpace(currentValue);
             if (onlyIfEmpty && overlayAlreadyHasValue)
@@ -410,7 +429,8 @@ namespace Mfr.Filters.Audio
             Formatter formatter,
             string fieldLabel,
             uint maxValue,
-            Func<SemanticAudioTag, uint?, SemanticAudioTag> assignUpdated)
+            Func<SemanticAudioTag, uint?, SemanticAudioTag> assignUpdated
+        )
         {
             if (onlyIfEmpty && currentValue is not null)
                 return semantic;
@@ -423,13 +443,15 @@ namespace Mfr.Filters.Audio
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
                 throw new FormatException(
-                    $"AudioTagSetter {fieldLabel} must be empty, 0, or an integer 1-{maxValue} after formatting. Got '{trimmed}'.");
+                    $"AudioTagSetter {fieldLabel} must be empty, 0, or an integer 1-{maxValue} after formatting. Got '{trimmed}'."
+                );
             }
 
             if (parsed > maxValue)
             {
                 throw new FormatException(
-                    $"AudioTagSetter {fieldLabel} must be between 0 and {maxValue}. Got {parsed}.");
+                    $"AudioTagSetter {fieldLabel} must be between 0 and {maxValue}. Got {parsed}."
+                );
             }
 
             if (parsed == 0)
@@ -455,7 +477,8 @@ namespace Mfr.Filters.Audio
             Formatter formatter,
             string fieldLabel,
             Func<SemanticAudioTag, uint?, SemanticAudioTag> assignUpdated,
-            int autoIncrementBy = 0)
+            int autoIncrementBy = 0
+        )
         {
             if (onlyIfEmpty && currentValue is not null)
                 return semantic;
@@ -468,13 +491,13 @@ namespace Mfr.Filters.Audio
             if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
             {
                 throw new FormatException(
-                    $"AudioTagSetter {fieldLabel} must be empty, or an integer 0-255 after formatting. Got '{trimmed}'.");
+                    $"AudioTagSetter {fieldLabel} must be empty, or an integer 0-255 after formatting. Got '{trimmed}'."
+                );
             }
 
             if (parsed > 255u)
             {
-                throw new FormatException(
-                    $"AudioTagSetter {fieldLabel} must be between 0 and 255. Got {parsed}.");
+                throw new FormatException($"AudioTagSetter {fieldLabel} must be between 0 and 255. Got {parsed}.");
             }
 
             var raw = parsed + autoIncrementBy;

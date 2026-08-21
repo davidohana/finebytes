@@ -201,7 +201,8 @@ namespace Mfr.Models.Tags
             _SetAsf(
                 rows,
                 AsfDescriptorNames.BeatsPerMinute,
-                common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
+                common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture)
+            );
             _SetAsf(rows, AsfDescriptorNames.Conductor, common.Conductor);
             foreach (var catalog in AudioCatalogFieldMaps.All)
                 _SetAsf(rows, catalog.AsfDescriptor, _CatalogValue(common, catalog.Field));
@@ -209,11 +210,13 @@ namespace Mfr.Models.Tags
             if (rows.Count == 0)
                 return null;
 
-            rows.Sort(static (a, b) =>
-            {
-                var byName = string.CompareOrdinal(a.Name, b.Name);
-                return byName != 0 ? byName : string.CompareOrdinal(a.Value, b.Value);
-            });
+            rows.Sort(
+                static (a, b) =>
+                {
+                    var byName = string.CompareOrdinal(a.Name, b.Name);
+                    return byName != 0 ? byName : string.CompareOrdinal(a.Value, b.Value);
+                }
+            );
 
             return new AsfTagData { Descriptors = [.. rows] };
         }
@@ -238,14 +241,16 @@ namespace Mfr.Models.Tags
             if (atoms.Count == 0)
                 return null;
 
-            atoms.Sort(static (a, b) =>
-            {
-                var byType = a.AtomType.AsSpan().SequenceCompareTo(b.AtomType.AsSpan());
-                if (byType != 0)
-                    return byType;
+            atoms.Sort(
+                static (a, b) =>
+                {
+                    var byType = a.AtomType.AsSpan().SequenceCompareTo(b.AtomType.AsSpan());
+                    if (byType != 0)
+                        return byType;
 
-                return OrdinalSequence.Compare(a.Values, b.Values);
-            });
+                    return OrdinalSequence.Compare(a.Values, b.Values);
+                }
+            );
 
             return new AppleTagData { Atoms = [.. atoms] };
         }
@@ -259,7 +264,8 @@ namespace Mfr.Models.Tags
         private static void _MergeCatalogMap(
             Dictionary<string, ImmutableArray<string>> map,
             SemanticAudioTag common,
-            Func<AudioCatalogFieldMaps.CatalogKeyRow, string> keySelector)
+            Func<AudioCatalogFieldMaps.CatalogKeyRow, string> keySelector
+        )
         {
             foreach (var catalog in AudioCatalogFieldMaps.All)
                 _SetMapScalar(map, keySelector(catalog), _CatalogValue(common, catalog.Field));
@@ -275,7 +281,8 @@ namespace Mfr.Models.Tags
         {
             var index = frames.FindIndex(f =>
                 string.Equals(f.FrameId, "TXXX", StringComparison.Ordinal)
-                && string.Equals(f.Description, description, StringComparison.Ordinal));
+                && string.Equals(f.Description, description, StringComparison.Ordinal)
+            );
 
             var text = value.TrimmedOrNull();
             if (text is null)
@@ -323,8 +330,8 @@ namespace Mfr.Models.Tags
         private static void _SetPrimaryMulti(List<Id3v2ModeledFrame> frames, string frameId, string? value)
         {
             var primaryIndex = frames.FindIndex(f =>
-                string.Equals(f.FrameId, frameId, StringComparison.Ordinal)
-                && string.IsNullOrEmpty(f.Description));
+                string.Equals(f.FrameId, frameId, StringComparison.Ordinal) && string.IsNullOrEmpty(f.Description)
+            );
 
             var text = value.TrimmedOrNull();
             if (text is null)
@@ -353,17 +360,20 @@ namespace Mfr.Models.Tags
         {
             frames.RemoveAll(f =>
                 string.Equals(f.FrameId, "TYER", StringComparison.Ordinal)
-                || string.Equals(f.FrameId, "TDRC", StringComparison.Ordinal));
+                || string.Equals(f.FrameId, "TDRC", StringComparison.Ordinal)
+            );
 
             if (year is null)
                 return;
 
             var frameId = version >= 4 ? "TDRC" : "TYER";
-            frames.Add(new Id3v2ModeledFrame
-            {
-                FrameId = frameId,
-                TextValues = [year.Value.ToString(CultureInfo.InvariantCulture)],
-            });
+            frames.Add(
+                new Id3v2ModeledFrame
+                {
+                    FrameId = frameId,
+                    TextValues = [year.Value.ToString(CultureInfo.InvariantCulture)],
+                }
+            );
         }
 
         private static void _SetTrackPair(List<Id3v2ModeledFrame> frames, string frameId, uint? number, uint? count)
@@ -372,11 +382,12 @@ namespace Mfr.Models.Tags
             if (number is null && count is null)
                 return;
 
-            var text = number is null
-                ? "0/" + count!.Value.ToString(CultureInfo.InvariantCulture)
-                : count is null
-                ? number.Value.ToString(CultureInfo.InvariantCulture)
-                : number.Value.ToString(CultureInfo.InvariantCulture) + "/" + count.Value.ToString(CultureInfo.InvariantCulture);
+            var text =
+                number is null ? "0/" + count!.Value.ToString(CultureInfo.InvariantCulture)
+                : count is null ? number.Value.ToString(CultureInfo.InvariantCulture)
+                : number.Value.ToString(CultureInfo.InvariantCulture)
+                    + "/"
+                    + count.Value.ToString(CultureInfo.InvariantCulture);
             frames.Add(new Id3v2ModeledFrame { FrameId = frameId, TextValues = [text] });
         }
 
@@ -427,24 +438,33 @@ namespace Mfr.Models.Tags
 
             if (disc is not null && discCount is not null)
             {
-                rows.Add(new AsfDescriptorRow(
-                    AsfDescriptorNames.PartOfSet,
-                    string.Format(CultureInfo.InvariantCulture, "{0}/{1}", disc.Value, discCount.Value)));
+                rows.Add(
+                    new AsfDescriptorRow(
+                        AsfDescriptorNames.PartOfSet,
+                        string.Format(CultureInfo.InvariantCulture, "{0}/{1}", disc.Value, discCount.Value)
+                    )
+                );
                 return;
             }
 
             if (disc is not null)
             {
-                rows.Add(new AsfDescriptorRow(
-                    AsfDescriptorNames.PartOfSet,
-                    disc.Value.ToString(CultureInfo.InvariantCulture)));
+                rows.Add(
+                    new AsfDescriptorRow(
+                        AsfDescriptorNames.PartOfSet,
+                        disc.Value.ToString(CultureInfo.InvariantCulture)
+                    )
+                );
                 return;
             }
 
             // TagLib encodes count-only as "0/{count}".
-            rows.Add(new AsfDescriptorRow(
-                AsfDescriptorNames.PartOfSet,
-                string.Format(CultureInfo.InvariantCulture, "0/{0}", discCount!.Value)));
+            rows.Add(
+                new AsfDescriptorRow(
+                    AsfDescriptorNames.PartOfSet,
+                    string.Format(CultureInfo.InvariantCulture, "0/{0}", discCount!.Value)
+                )
+            );
         }
 
         private static void _SetAppleAtom(List<AppleAtomRow> atoms, ReadOnlySpan<byte> atomType, string? value)
@@ -455,11 +475,7 @@ namespace Mfr.Models.Tags
             if (text is null)
                 return;
 
-            atoms.Add(new AppleAtomRow
-            {
-                AtomType = ImmutableArray.Create(typeBytes),
-                Values = [text],
-            });
+            atoms.Add(new AppleAtomRow { AtomType = ImmutableArray.Create(typeBytes), Values = [text] });
         }
 
         private static void _SetAppleAtomList(List<AppleAtomRow> atoms, ReadOnlySpan<byte> atomType, string? joined)
@@ -470,14 +486,12 @@ namespace Mfr.Models.Tags
             if (values.Length == 0)
                 return;
 
-            atoms.Add(new AppleAtomRow
-            {
-                AtomType = ImmutableArray.Create(typeBytes),
-                Values = values,
-            });
+            atoms.Add(new AppleAtomRow { AtomType = ImmutableArray.Create(typeBytes), Values = values });
         }
 
-        private static Dictionary<string, ImmutableArray<string>> _ToMutableMultimap(ImmutableArray<TextFieldRow> fields)
+        private static Dictionary<string, ImmutableArray<string>> _ToMutableMultimap(
+            ImmutableArray<TextFieldRow> fields
+        )
         {
             var map = new Dictionary<string, ImmutableArray<string>>(StringComparer.Ordinal);
             foreach (var row in fields)
@@ -512,9 +526,7 @@ namespace Mfr.Models.Tags
 
         private static ImmutableArray<TextFieldRow> _SortedRows(Dictionary<string, ImmutableArray<string>> map)
         {
-            var rows = map
-                .Select(static kvp => new TextFieldRow(kvp.Key, kvp.Value))
-                .ToList();
+            var rows = map.Select(static kvp => new TextFieldRow(kvp.Key, kvp.Value)).ToList();
             rows.Sort(_CompareTextFieldRows);
             return [.. rows];
         }

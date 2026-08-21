@@ -76,7 +76,8 @@ namespace Mfr.Tests.Engine
                 logDirectoryPath: logDirectoryPath,
                 maxSessionFiles: 100,
                 sessionLogPrefix: "session-",
-                sessionLogExtension: ".log");
+                sessionLogExtension: ".log"
+            );
 
             var remainingNames = Directory
                 .EnumerateFiles(logDirectoryPath, "session-*.log", SearchOption.TopDirectoryOnly)
@@ -106,7 +107,8 @@ namespace Mfr.Tests.Engine
                 logDirectoryPath: logDirectoryPath,
                 maxSessionFiles: 1,
                 sessionLogPrefix: "session-",
-                sessionLogExtension: ".log");
+                sessionLogExtension: ".log"
+            );
 
             Assert.True(File.Exists(sessionPath));
             Assert.True(File.Exists(otherPath));
@@ -118,9 +120,7 @@ namespace Mfr.Tests.Engine
         /// </summary>
         public void FormatCrashText_Includes_Inner_Exception_And_Terminating_Header()
         {
-            var exception = new InvalidOperationException(
-                "outer boom",
-                new ArgumentException("inner boom"));
+            var exception = new InvalidOperationException("outer boom", new ArgumentException("inner boom"));
 
             var text = LogPaths.FormatCrashText(exception);
             Assert.Contains("An unexpected error occurred.", text, StringComparison.Ordinal);
@@ -146,10 +146,7 @@ namespace Mfr.Tests.Engine
                 Assert.NotNull(crashFilePath);
                 Assert.True(File.Exists(crashFilePath));
                 Assert.Equal(LogPaths.DefaultDirectoryPath, Path.GetDirectoryName(crashFilePath));
-                Assert.StartsWith(
-                    LogPaths.CrashFilePrefix,
-                    Path.GetFileName(crashFilePath),
-                    StringComparison.Ordinal);
+                Assert.StartsWith(LogPaths.CrashFilePrefix, Path.GetFileName(crashFilePath), StringComparison.Ordinal);
                 var content = File.ReadAllText(crashFilePath);
                 Assert.Contains("boom", content, StringComparison.Ordinal);
                 Assert.Contains("inner", content, StringComparison.Ordinal);

@@ -16,7 +16,8 @@ namespace Mfr.Filters.Replace
         ReplacerMode Mode,
         bool CaseSensitive,
         bool ReplaceAll,
-        bool WholeWord);
+        bool WholeWord
+    );
 
     /// <summary>
     /// Applies sequential replacements from a replace-list file.
@@ -30,7 +31,9 @@ namespace Mfr.Filters.Replace
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record ReplaceListFilter(
         FilterTarget Target,
-        ReplaceListOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        ReplaceListOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         private List<(string Search, Formatter CompiledReplacement)>? _compiledEntries;
 
@@ -47,9 +50,7 @@ namespace Mfr.Filters.Replace
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var compiledEntries = Check.NotNull(
-                _compiledEntries,
-                "Replace-list setup must complete before transform.");
+            var compiledEntries = Check.NotNull(_compiledEntries, "Replace-list setup must complete before transform.");
             if (compiledEntries.Count == 0)
                 return value;
 
@@ -63,7 +64,8 @@ namespace Mfr.Filters.Replace
                     Mode: Options.Mode,
                     CaseSensitive: Options.CaseSensitive,
                     ReplaceAll: Options.ReplaceAll,
-                    WholeWord: Options.WholeWord);
+                    WholeWord: Options.WholeWord
+                );
                 transformed = ReplacerFilter.ReplaceSegment(transformed, replacerOptions);
             }
 

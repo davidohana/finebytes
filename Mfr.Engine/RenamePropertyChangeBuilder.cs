@@ -33,11 +33,13 @@ namespace Mfr.Engine
                 changes,
                 renameItem.Original,
                 renameItem.Preview,
-                renameItem.StripAllEmbeddedTagsOnCommit);
+                renameItem.StripAllEmbeddedTagsOnCommit
+            );
             _AppendAudioTagOverlayDifferences(
                 changes,
                 renameItem.Original.AudioTagOverlay,
-                renameItem.Preview.AudioTagOverlay);
+                renameItem.Preview.AudioTagOverlay
+            );
             return changes;
         }
 
@@ -45,26 +47,30 @@ namespace Mfr.Engine
         private static void _AppendStructuredPathDifferences(
             List<RenamePropertyChange> changes,
             FileMeta original,
-            FileMeta preview)
+            FileMeta preview
+        )
         {
             _AddRenamePropertyChangeIfStringDiffers(
                 changes,
                 propertyName: "Prefix",
                 oldValue: original.Prefix,
                 newValue: preview.Prefix,
-                comparison: StringComparison.Ordinal);
+                comparison: StringComparison.Ordinal
+            );
             _AddRenamePropertyChangeIfStringDiffers(
                 changes,
                 propertyName: "Extension",
                 oldValue: original.Extension,
                 newValue: preview.Extension,
-                comparison: StringComparison.Ordinal);
+                comparison: StringComparison.Ordinal
+            );
             _AddRenamePropertyChangeIfStringDiffers(
                 changes,
                 propertyName: "DirectoryPath",
                 oldValue: original.DirectoryPath,
                 newValue: preview.DirectoryPath,
-                comparison: StringComparison.OrdinalIgnoreCase);
+                comparison: StringComparison.OrdinalIgnoreCase
+            );
         }
 
         /// <summary>Appends attributes and timestamp deltas between two snapshots.</summary>
@@ -72,38 +78,48 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             FileMeta original,
             FileMeta preview,
-            bool stripAllEmbeddedTagsOnCommit)
+            bool stripAllEmbeddedTagsOnCommit
+        )
         {
             if (original.Attributes != preview.Attributes)
             {
-                changes.Add(new RenamePropertyChange(
-                    Property: "Attributes",
-                    OldValue: original.Attributes.ToString(),
-                    NewValue: preview.Attributes.ToString()));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: "Attributes",
+                        OldValue: original.Attributes.ToString(),
+                        NewValue: preview.Attributes.ToString()
+                    )
+                );
             }
 
             _AddRenamePropertyChangeIfLocalTimestampDiffers(
                 changes,
                 propertyName: "CreationTime",
                 originalValue: original.CreationTime,
-                previewValue: preview.CreationTime);
+                previewValue: preview.CreationTime
+            );
             _AddRenamePropertyChangeIfLocalTimestampDiffers(
                 changes,
                 propertyName: "LastWriteTime",
                 originalValue: original.LastWriteTime,
-                previewValue: preview.LastWriteTime);
+                previewValue: preview.LastWriteTime
+            );
             _AddRenamePropertyChangeIfLocalTimestampDiffers(
                 changes,
                 propertyName: "LastAccessTime",
                 originalValue: original.LastAccessTime,
-                previewValue: preview.LastAccessTime);
+                previewValue: preview.LastAccessTime
+            );
 
             if (stripAllEmbeddedTagsOnCommit)
             {
-                changes.Add(new RenamePropertyChange(
-                    Property: "StripAllEmbeddedTagsOnCommit",
-                    OldValue: JsonSerializer.Serialize(false),
-                    NewValue: JsonSerializer.Serialize(true)));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: "StripAllEmbeddedTagsOnCommit",
+                        OldValue: JsonSerializer.Serialize(false),
+                        NewValue: JsonSerializer.Serialize(true)
+                    )
+                );
             }
         }
 
@@ -111,7 +127,8 @@ namespace Mfr.Engine
         private static void _AppendAudioTagOverlayDifferences(
             List<RenamePropertyChange> changes,
             AudioTagOverlay original,
-            AudioTagOverlay preview)
+            AudioTagOverlay preview
+        )
         {
             if (original.Equals(preview))
                 return;
@@ -125,7 +142,8 @@ namespace Mfr.Engine
         private static void _AppendAudioTagBlockLayoutDifferences(
             List<RenamePropertyChange> changes,
             AudioTagOverlay original,
-            AudioTagOverlay preview)
+            AudioTagOverlay preview
+        )
         {
             if (original.TagBlocksStructurallyEquals(preview))
                 return;
@@ -135,43 +153,38 @@ namespace Mfr.Engine
                 "AudioTag.Block.Id3v1",
                 original.Id3v1,
                 preview.Id3v1,
-                _DiffId3v1Fields);
+                _DiffId3v1Fields
+            );
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
                 "AudioTag.Block.Id3v2",
                 original.Id3v2,
                 preview.Id3v2,
-                _DiffId3v2Fields);
+                _DiffId3v2Fields
+            );
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
                 "AudioTag.Block.Xiph",
                 original.Xiph,
                 preview.Xiph,
-                _DiffXiphFields);
-            _AppendBlockPresenceAndFieldDiffs(
-                changes,
-                "AudioTag.Block.Ape",
-                original.Ape,
-                preview.Ape,
-                _DiffApeFields);
+                _DiffXiphFields
+            );
+            _AppendBlockPresenceAndFieldDiffs(changes, "AudioTag.Block.Ape", original.Ape, preview.Ape, _DiffApeFields);
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
                 "AudioTag.Block.RiffInfo",
                 original.RiffInfo,
                 preview.RiffInfo,
-                _DiffRiffInfoFields);
+                _DiffRiffInfoFields
+            );
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
                 "AudioTag.Block.Apple",
                 original.Apple,
                 preview.Apple,
-                _DiffAppleFields);
-            _AppendBlockPresenceAndFieldDiffs(
-                changes,
-                "AudioTag.Block.Asf",
-                original.Asf,
-                preview.Asf,
-                _DiffAsfFields);
+                _DiffAppleFields
+            );
+            _AppendBlockPresenceAndFieldDiffs(changes, "AudioTag.Block.Asf", original.Asf, preview.Asf, _DiffAsfFields);
         }
 
         private static void _AppendBlockPresenceAndFieldDiffs<T>(
@@ -179,7 +192,8 @@ namespace Mfr.Engine
             string blockProperty,
             T? original,
             T? preview,
-            Action<List<RenamePropertyChange>, string, T, T> appendFieldDiffs)
+            Action<List<RenamePropertyChange>, string, T, T> appendFieldDiffs
+        )
             where T : class
         {
             if (Equals(original, preview))
@@ -187,10 +201,13 @@ namespace Mfr.Engine
 
             if (original is null || preview is null)
             {
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty,
-                    OldValue: original is null ? "absent" : "present",
-                    NewValue: preview is null ? "absent" : "present"));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty,
+                        OldValue: original is null ? "absent" : "present",
+                        NewValue: preview is null ? "absent" : "present"
+                    )
+                );
                 return;
             }
 
@@ -201,7 +218,8 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             string blockProperty,
             Id3v1TagData original,
-            Id3v1TagData preview)
+            Id3v1TagData preview
+        )
         {
             _AddBlockStringDiff(changes, blockProperty + ".Title", original.Title, preview.Title);
             _AddBlockStringDiff(changes, blockProperty + ".Artist", original.Artist, preview.Artist);
@@ -209,26 +227,35 @@ namespace Mfr.Engine
             _AddBlockStringDiff(changes, blockProperty + ".Comment", original.Comment, preview.Comment);
             if (original.Year != preview.Year)
             {
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty + ".Year",
-                    OldValue: JsonSerializer.Serialize(original.Year),
-                    NewValue: JsonSerializer.Serialize(preview.Year)));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty + ".Year",
+                        OldValue: JsonSerializer.Serialize(original.Year),
+                        NewValue: JsonSerializer.Serialize(preview.Year)
+                    )
+                );
             }
 
             if (original.Track != preview.Track)
             {
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty + ".Track",
-                    OldValue: JsonSerializer.Serialize(original.Track),
-                    NewValue: JsonSerializer.Serialize(preview.Track)));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty + ".Track",
+                        OldValue: JsonSerializer.Serialize(original.Track),
+                        NewValue: JsonSerializer.Serialize(preview.Track)
+                    )
+                );
             }
 
             if (original.Genre != preview.Genre)
             {
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty + ".Genre",
-                    OldValue: JsonSerializer.Serialize(original.Genre),
-                    NewValue: JsonSerializer.Serialize(preview.Genre)));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty + ".Genre",
+                        OldValue: JsonSerializer.Serialize(original.Genre),
+                        NewValue: JsonSerializer.Serialize(preview.Genre)
+                    )
+                );
             }
         }
 
@@ -236,14 +263,18 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             string blockProperty,
             Id3v2TagData original,
-            Id3v2TagData preview)
+            Id3v2TagData preview
+        )
         {
             if (original.Version != preview.Version)
             {
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty + ".Version",
-                    OldValue: original.Version.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                    NewValue: preview.Version.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty + ".Version",
+                        OldValue: original.Version.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                        NewValue: preview.Version.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                    )
+                );
             }
 
             var originalById = original.Frames.ToDictionary(_FrameDiffKey, StringComparer.Ordinal);
@@ -256,10 +287,13 @@ namespace Mfr.Engine
                 if (Equals(oldFrame, newFrame))
                     continue;
 
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty + "." + key,
-                    OldValue: oldFrame is null ? "absent" : DelimitedText.Join(oldFrame.TextValues),
-                    NewValue: newFrame is null ? "absent" : DelimitedText.Join(newFrame.TextValues)));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty + "." + key,
+                        OldValue: oldFrame is null ? "absent" : DelimitedText.Join(oldFrame.TextValues),
+                        NewValue: newFrame is null ? "absent" : DelimitedText.Join(newFrame.TextValues)
+                    )
+                );
             }
         }
 
@@ -280,7 +314,8 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             string blockProperty,
             XiphTagData original,
-            XiphTagData preview)
+            XiphTagData preview
+        )
         {
             _DiffTextFieldRows(changes, blockProperty, original.Fields, preview.Fields);
         }
@@ -289,7 +324,8 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             string blockProperty,
             ApeTagData original,
-            ApeTagData preview)
+            ApeTagData preview
+        )
         {
             _DiffTextFieldRows(changes, blockProperty, original.Fields, preview.Fields);
         }
@@ -298,7 +334,8 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             string blockProperty,
             System.Collections.Immutable.ImmutableArray<TextFieldRow> original,
-            System.Collections.Immutable.ImmutableArray<TextFieldRow> preview)
+            System.Collections.Immutable.ImmutableArray<TextFieldRow> preview
+        )
         {
             var originalMap = original.ToDictionary(r => r.Key, r => r.Values, StringComparer.Ordinal);
             var previewMap = preview.ToDictionary(r => r.Key, r => r.Values, StringComparer.Ordinal);
@@ -312,10 +349,13 @@ namespace Mfr.Engine
                 if (string.Equals(oldText, newText, StringComparison.Ordinal))
                     continue;
 
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty + "." + key,
-                    OldValue: oldText ?? "absent",
-                    NewValue: newText ?? "absent"));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty + "." + key,
+                        OldValue: oldText ?? "absent",
+                        NewValue: newText ?? "absent"
+                    )
+                );
             }
         }
 
@@ -323,7 +363,8 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             string blockProperty,
             RiffInfoTagData original,
-            RiffInfoTagData preview)
+            RiffInfoTagData preview
+        )
         {
             var originalMap = original.Fields.ToDictionary(r => r.Key, r => r.Value, StringComparer.Ordinal);
             var previewMap = preview.Fields.ToDictionary(r => r.Key, r => r.Value, StringComparer.Ordinal);
@@ -335,10 +376,13 @@ namespace Mfr.Engine
                 if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
                     continue;
 
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty + "." + key,
-                    OldValue: oldValue ?? "absent",
-                    NewValue: newValue ?? "absent"));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty + "." + key,
+                        OldValue: oldValue ?? "absent",
+                        NewValue: newValue ?? "absent"
+                    )
+                );
             }
         }
 
@@ -346,16 +390,19 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             string blockProperty,
             AppleTagData original,
-            AppleTagData preview)
+            AppleTagData preview
+        )
         {
             var originalMap = original.Atoms.ToDictionary(
                 a => Convert.ToHexString(a.AtomType.AsSpan()),
                 a => DelimitedText.Join(a.Values),
-                StringComparer.Ordinal);
+                StringComparer.Ordinal
+            );
             var previewMap = preview.Atoms.ToDictionary(
                 a => Convert.ToHexString(a.AtomType.AsSpan()),
                 a => DelimitedText.Join(a.Values),
-                StringComparer.Ordinal);
+                StringComparer.Ordinal
+            );
 
             foreach (var key in originalMap.Keys.Union(previewMap.Keys).Order(StringComparer.Ordinal))
             {
@@ -364,10 +411,13 @@ namespace Mfr.Engine
                 if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
                     continue;
 
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty + "." + key,
-                    OldValue: oldValue ?? "absent",
-                    NewValue: newValue ?? "absent"));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty + "." + key,
+                        OldValue: oldValue ?? "absent",
+                        NewValue: newValue ?? "absent"
+                    )
+                );
             }
         }
 
@@ -375,7 +425,8 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             string blockProperty,
             AsfTagData original,
-            AsfTagData preview)
+            AsfTagData preview
+        )
         {
             var originalMap = original.Descriptors.ToDictionary(r => r.Name, r => r.Value, StringComparer.Ordinal);
             var previewMap = preview.Descriptors.ToDictionary(r => r.Name, r => r.Value, StringComparer.Ordinal);
@@ -387,10 +438,13 @@ namespace Mfr.Engine
                 if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
                     continue;
 
-                changes.Add(new RenamePropertyChange(
-                    Property: blockProperty + "." + key,
-                    OldValue: oldValue ?? "absent",
-                    NewValue: newValue ?? "absent"));
+                changes.Add(
+                    new RenamePropertyChange(
+                        Property: blockProperty + "." + key,
+                        OldValue: oldValue ?? "absent",
+                        NewValue: newValue ?? "absent"
+                    )
+                );
             }
         }
 
@@ -398,15 +452,19 @@ namespace Mfr.Engine
             List<RenamePropertyChange> changes,
             string property,
             string? oldValue,
-            string? newValue)
+            string? newValue
+        )
         {
             if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
                 return;
 
-            changes.Add(new RenamePropertyChange(
-                Property: property,
-                OldValue: oldValue ?? "absent",
-                NewValue: newValue ?? "absent"));
+            changes.Add(
+                new RenamePropertyChange(
+                    Property: property,
+                    OldValue: oldValue ?? "absent",
+                    NewValue: newValue ?? "absent"
+                )
+            );
         }
 
         private static void _AddRenamePropertyChangeIfStringDiffers(
@@ -414,30 +472,32 @@ namespace Mfr.Engine
             string propertyName,
             string oldValue,
             string newValue,
-            StringComparison comparison)
+            StringComparison comparison
+        )
         {
             if (string.Equals(oldValue, newValue, comparison))
                 return;
 
-            changes.Add(new RenamePropertyChange(
-                Property: propertyName,
-                OldValue: oldValue,
-                NewValue: newValue));
+            changes.Add(new RenamePropertyChange(Property: propertyName, OldValue: oldValue, NewValue: newValue));
         }
 
         private static void _AddRenamePropertyChangeIfLocalTimestampDiffers(
             List<RenamePropertyChange> changes,
             string propertyName,
             DateTime originalValue,
-            DateTime previewValue)
+            DateTime previewValue
+        )
         {
             if (originalValue == previewValue)
                 return;
 
-            changes.Add(new RenamePropertyChange(
-                Property: propertyName,
-                OldValue: originalValue.ToString("O"),
-                NewValue: previewValue.ToString("O")));
+            changes.Add(
+                new RenamePropertyChange(
+                    Property: propertyName,
+                    OldValue: originalValue.ToString("O"),
+                    NewValue: previewValue.ToString("O")
+                )
+            );
         }
     }
 }

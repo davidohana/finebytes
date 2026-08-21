@@ -53,7 +53,8 @@ namespace Mfr.App.Ui.Services.FileList
 
             var width = decodeWidth < 1 ? DecodeWidth : decodeWidth;
             var extension = Path.GetExtension(path);
-            var isJpeg = extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase)
+            var isJpeg =
+                extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase)
                 || extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase);
             try
             {
@@ -70,11 +71,14 @@ namespace Mfr.App.Ui.Services.FileList
 
                 return Bitmap.DecodeToWidth(stream, width);
             }
-            catch (Exception ex) when (ex is IOException
-                or UnauthorizedAccessException
-                or ArgumentException
-                or InvalidOperationException
-                or NotSupportedException)
+            catch (Exception ex)
+                when (ex
+                        is IOException
+                            or UnauthorizedAccessException
+                            or ArgumentException
+                            or InvalidOperationException
+                            or NotSupportedException
+                )
             {
                 return null;
             }
@@ -104,10 +108,8 @@ namespace Mfr.App.Ui.Services.FileList
                 thumbStream.Position = 0;
                 return Bitmap.DecodeToWidth(thumbStream, width);
             }
-            catch (Exception ex) when (ex is IOException
-                or ArgumentException
-                or InvalidOperationException
-                or NotSupportedException)
+            catch (Exception ex)
+                when (ex is IOException or ArgumentException or InvalidOperationException or NotSupportedException)
             {
                 return null;
             }

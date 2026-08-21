@@ -1,4 +1,3 @@
-
 namespace Mfr.Tests.Models
 {
     /// <summary>
@@ -75,15 +74,15 @@ namespace Mfr.Tests.Models
         public void ApplyCliOverrides_Rejects_Unknown_Section()
         {
             var ex = Assert.Throws<InvalidDataException>(() =>
-                ConfigStore.ApplyCliOverrides(["unknownSection.maxListFileLineLength=1"]));
+                ConfigStore.ApplyCliOverrides(["unknownSection.maxListFileLineLength=1"])
+            );
             Assert.Contains("Unknown config section 'unknownSection'", ex.Message, StringComparison.Ordinal);
         }
 
         [Fact]
         public void ApplyCliOverrides_Rejects_Unknown_Leaf()
         {
-            var ex = Assert.Throws<InvalidDataException>(() =>
-                ConfigStore.ApplyCliOverrides(["log.notARealField=x"]));
+            var ex = Assert.Throws<InvalidDataException>(() => ConfigStore.ApplyCliOverrides(["log.notARealField=x"]));
             Assert.Contains("Unknown config field 'notARealField'", ex.Message, StringComparison.Ordinal);
         }
 
@@ -91,7 +90,8 @@ namespace Mfr.Tests.Models
         public void ApplyCliOverrides_Rejects_Int_Out_Of_Range()
         {
             var ex = Assert.Throws<InvalidDataException>(() =>
-                ConfigStore.ApplyCliOverrides(["log.maxSessionFiles=0"]));
+                ConfigStore.ApplyCliOverrides(["log.maxSessionFiles=0"])
+            );
             Assert.Contains("CLI config override", ex.Message, StringComparison.Ordinal);
         }
 

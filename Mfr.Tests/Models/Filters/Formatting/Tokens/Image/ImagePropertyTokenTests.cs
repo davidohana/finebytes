@@ -39,8 +39,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
         [Fact]
         public void Resolve_ZeroIntsAndDpi_YieldEmpty()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Image = new ImageProperties());
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.Image = new ImageProperties());
 
             Assert.Equal(string.Empty, new ImageWidthToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new ImageHeightToken().Compile(string.Empty)(item));
@@ -78,17 +77,19 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
         [Fact]
         public void FormatterFilter_UsesSeededImage()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Image = new ImageProperties
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.Image = new ImageProperties
                 {
                     Width = 2048,
                     Height = 1536,
                     Format = "JPEG",
-                });
+                }
+            );
 
             var filter = new FormatterFilter(
                 Target: new FilePrefixTarget(),
-                Options: new FormatterOptions("<image-width>x<image-height>.<image-format>"));
+                Options: new FormatterOptions("<image-width>x<image-height>.<image-format>")
+            );
             filter.Setup();
             filter.Apply(item);
 
@@ -112,7 +113,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
                 directoryPath: directory,
                 prefix: prefix,
                 extension: extension,
-                fileSize: new FileInfo(fullPath).Length);
+                fileSize: new FileInfo(fullPath).Length
+            );
 
             var item = new RenameItem(meta);
             Assert.False(item.ImagePropertiesLoadAttempted);
@@ -131,16 +133,14 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
         {
             var item = FilterTestHelpers.CreateRenameItem(attributes: FileAttributes.Directory);
 
-            var ex = Assert.Throws<InvalidOperationException>(
-                () => new ImageWidthToken().Compile(string.Empty)(item));
+            var ex = Assert.Throws<InvalidOperationException>(() => new ImageWidthToken().Compile(string.Empty)(item));
             Assert.Contains("directory", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
         public void ClearImagePropertiesCache_ClearsSnapshot()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Image = _SampleImage());
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.Image = _SampleImage());
 
             Assert.NotNull(item.Original.Image);
             item.ClearImagePropertiesCache();

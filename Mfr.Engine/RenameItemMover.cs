@@ -41,7 +41,8 @@ namespace Mfr.Engine
             _MoveEntry(
                 sourceFullPath: item.Original.FullPath,
                 destinationFullPath: tempPath,
-                sourceIsDirectory: item.Original.Attributes.IsDirectory());
+                sourceIsDirectory: item.Original.Attributes.IsDirectory()
+            );
         }
 
         /// <summary>
@@ -68,14 +69,16 @@ namespace Mfr.Engine
             var pathDiffersFromPreview = !string.Equals(
                 actualSourcePath,
                 item.Preview.FullPath,
-                StringComparison.Ordinal);
+                StringComparison.Ordinal
+            );
             if (pathDiffersFromPreview)
             {
                 _EnsureDestinationParentExists(item.Preview.FullPath);
                 _MoveEntry(
                     sourceFullPath: actualSourcePath,
                     destinationFullPath: item.Preview.FullPath,
-                    sourceIsDirectory: item.Original.Attributes.IsDirectory());
+                    sourceIsDirectory: item.Original.Attributes.IsDirectory()
+                );
             }
 
             var pathOnDisk = item.Preview.FullPath;
@@ -87,11 +90,11 @@ namespace Mfr.Engine
                 pathOnDisk: pathOnDisk,
                 original: item.Original,
                 preview: item.Preview,
-                pathIsDirectory: pathIsDirectoryAfterApply);
+                pathIsDirectory: pathIsDirectoryAfterApply
+            );
 
             if (item.HasPreviewChanges())
                 item.Original = item.Preview.Clone();
-
         }
 
         /// <summary>
@@ -110,14 +113,11 @@ namespace Mfr.Engine
                 leaf = "entry";
 
             var suffix = _TempSuffixPrefix + Guid.NewGuid().ToString("N");
-            var candidate = string.IsNullOrEmpty(directory)
-                ? leaf + suffix
-                : Path.Combine(directory, leaf + suffix);
+            var candidate = string.IsNullOrEmpty(directory) ? leaf + suffix : Path.Combine(directory, leaf + suffix);
 
             if (File.Exists(candidate) || Directory.Exists(candidate))
             {
-                throw new InvalidOperationException(
-                    $"GUID-based temp path '{candidate}' is already occupied.");
+                throw new InvalidOperationException($"GUID-based temp path '{candidate}' is already occupied.");
             }
 
             return candidate;
@@ -129,7 +129,8 @@ namespace Mfr.Engine
             if (string.IsNullOrEmpty(destinationDirectoryPath))
             {
                 throw new InvalidOperationException(
-                    $"Cannot resolve a parent directory for destination path '{destinationFullPath}'.");
+                    $"Cannot resolve a parent directory for destination path '{destinationFullPath}'."
+                );
             }
 
             Directory.CreateDirectory(destinationDirectoryPath);
@@ -151,14 +152,18 @@ namespace Mfr.Engine
             string pathOnDisk,
             FileMeta original,
             FileMeta preview,
-            bool pathIsDirectory)
+            bool pathIsDirectory
+        )
         {
-            Action<string, DateTime> setCreationTime =
-                pathIsDirectory ? Directory.SetCreationTime : File.SetCreationTime;
-            Action<string, DateTime> setLastWriteTime =
-                pathIsDirectory ? Directory.SetLastWriteTime : File.SetLastWriteTime;
-            Action<string, DateTime> setLastAccessTime =
-                pathIsDirectory ? Directory.SetLastAccessTime : File.SetLastAccessTime;
+            Action<string, DateTime> setCreationTime = pathIsDirectory
+                ? Directory.SetCreationTime
+                : File.SetCreationTime;
+            Action<string, DateTime> setLastWriteTime = pathIsDirectory
+                ? Directory.SetLastWriteTime
+                : File.SetLastWriteTime;
+            Action<string, DateTime> setLastAccessTime = pathIsDirectory
+                ? Directory.SetLastAccessTime
+                : File.SetLastAccessTime;
 
             if (original.CreationTime != preview.CreationTime)
                 setCreationTime(pathOnDisk, preview.CreationTime);

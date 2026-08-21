@@ -29,7 +29,8 @@ namespace Mfr.Metadata.TagFields
             Dictionary<string, TValue> preview,
             Func<TValue, TValue, bool> valuesEqual,
             Action<string> remove,
-            Action<string, TValue> set)
+            Action<string, TValue> set
+        )
         {
             foreach (var key in original.Keys)
             {

@@ -15,13 +15,9 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_MoveSecondTokenThreeRight_LongName()
         {
-            var f = new TokenMoverFilter(
-                _target,
-                new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: 3));
+            var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: 3));
             var input = "milk,sugar,bread,potatoes,honey,salt,water";
-            Assert.Equal(
-                "milk,bread,potatoes,honey,sugar,salt,water",
-                FilterTestHelpers.ApplyToPrefix(f, input));
+            Assert.Equal("milk,bread,potatoes,honey,sugar,salt,water", FilterTestHelpers.ApplyToPrefix(f, input));
         }
 
         /// <summary>
@@ -30,12 +26,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_MoveSecondTokenThreeRight_ShortName_ClampsToEnd()
         {
-            var f = new TokenMoverFilter(
-                _target,
-                new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: 3));
-            Assert.Equal(
-                "milk,bread,potatoes,sugar",
-                FilterTestHelpers.ApplyToPrefix(f, "milk,sugar,bread,potatoes"));
+            var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: 3));
+            Assert.Equal("milk,bread,potatoes,sugar", FilterTestHelpers.ApplyToPrefix(f, "milk,sugar,bread,potatoes"));
         }
 
         /// <summary>
@@ -44,9 +36,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_MoveLeftPastStart_ClampsToFirst()
         {
-            var f = new TokenMoverFilter(
-                _target,
-                new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: -99));
+            var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: -99));
             Assert.Equal("b,a,c", FilterTestHelpers.ApplyToPrefix(f, "a,b,c"));
         }
 
@@ -56,9 +46,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_MoveOneLeft_SwapsWithPredecessor()
         {
-            var f = new TokenMoverFilter(
-                _target,
-                new TokenMoverOptions(Delimiter: "-", TokenNumber: 2, MoveBy: -1));
+            var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: "-", TokenNumber: 2, MoveBy: -1));
             Assert.Equal("b-a-c", FilterTestHelpers.ApplyToPrefix(f, "a-b-c"));
         }
 
@@ -68,9 +56,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_NoEffectiveMove_ReturnsOriginal()
         {
-            var f = new TokenMoverFilter(
-                _target,
-                new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: 0));
+            var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: 0));
             Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(f, "a,b"));
         }
 
@@ -80,9 +66,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_EmptyDelimiter_DoesNotChange()
         {
-            var f = new TokenMoverFilter(
-                _target,
-                new TokenMoverOptions(Delimiter: "", TokenNumber: 1, MoveBy: 1));
+            var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: "", TokenNumber: 1, MoveBy: 1));
             Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(f, "a,b"));
         }
 
@@ -92,9 +76,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_TokenNumberTooLarge_DoesNotChange()
         {
-            var f = new TokenMoverFilter(
-                _target,
-                new TokenMoverOptions(Delimiter: ",", TokenNumber: 3, MoveBy: 0));
+            var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 3, MoveBy: 0));
             Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(f, "a,b"));
         }
     }

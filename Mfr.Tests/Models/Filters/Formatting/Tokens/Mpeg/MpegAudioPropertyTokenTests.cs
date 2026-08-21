@@ -34,8 +34,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         [Fact]
         public void Resolve_SeededFields_FormatPerRules()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Media = _MediaWithMpeg(_SampleMpeg()));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.Media = _MediaWithMpeg(_SampleMpeg())
+            );
 
             Assert.Equal("128", new MpegBitrateToken().Compile(string.Empty)(item));
             Assert.Equal("Yes", new MpegCopyrightToken().Compile(string.Empty)(item));
@@ -53,8 +54,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         [Fact]
         public void Resolve_VbrBitrate_PrefixesVbr()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Media = _MediaWithMpeg(_SampleMpeg(isVbr: true)));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.Media = _MediaWithMpeg(_SampleMpeg(isVbr: true))
+            );
 
             Assert.Equal("VBR128", new MpegBitrateToken().Compile(string.Empty)(item));
             Assert.Equal("VBR", new MpegEncodingToken().Compile(string.Empty)(item));
@@ -79,13 +81,16 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         [Fact]
         public void Resolve_ZeroBitrateAndDuration_YieldEmpty()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Media = _MediaWithMpeg(new MpegAudioProperties
-                {
-                    IsCopyrighted = false,
-                    IsOriginal = true,
-                    IsProtected = false,
-                }));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.Media = _MediaWithMpeg(
+                    new MpegAudioProperties
+                    {
+                        IsCopyrighted = false,
+                        IsOriginal = true,
+                        IsProtected = false,
+                    }
+                )
+            );
 
             Assert.Equal(string.Empty, new MpegBitrateToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new MpegDurationToken().Compile(string.Empty)(item));
@@ -114,18 +119,22 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         [Fact]
         public void FormatterFilter_UsesSeededMpeg()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Media = _MediaWithMpeg(new MpegAudioProperties
-                {
-                    Bitrate = 320,
-                    IsVbr = true,
-                    Layer = 3,
-                    Duration = TimeSpan.FromSeconds(61),
-                }));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.Media = _MediaWithMpeg(
+                    new MpegAudioProperties
+                    {
+                        Bitrate = 320,
+                        IsVbr = true,
+                        Layer = 3,
+                        Duration = TimeSpan.FromSeconds(61),
+                    }
+                )
+            );
 
             var filter = new FormatterFilter(
                 Target: new FilePrefixTarget(),
-                Options: new FormatterOptions("<mpeg-bitrate>_<mpeg-layer>_<mpeg-duration>"));
+                Options: new FormatterOptions("<mpeg-bitrate>_<mpeg-layer>_<mpeg-duration>")
+            );
             filter.Setup();
             filter.Apply(item);
 
@@ -149,7 +158,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
                 directoryPath: directory,
                 prefix: prefix,
                 extension: extension,
-                fileSize: new FileInfo(fullPath).Length);
+                fileSize: new FileInfo(fullPath).Length
+            );
             meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Mpeg;
 
             var item = new RenameItem(meta);
@@ -169,12 +179,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         [Fact]
         public void ClearMediaPropertiesCache_ClearsNestedMpeg()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Media = new MediaProperties
-                {
-                    AudioBitrate = 128,
-                    Mpeg = _SampleMpeg(),
-                });
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.Media = new MediaProperties { AudioBitrate = 128, Mpeg = _SampleMpeg() }
+            );
 
             Assert.NotNull(item.Original.Media?.Mpeg);
             item.ClearMediaPropertiesCache();

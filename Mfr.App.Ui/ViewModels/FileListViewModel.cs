@@ -83,9 +83,7 @@ namespace Mfr.App.Ui.ViewModels
         /// Initializes the File List at the user profile folder with the default icon provider.
         /// </summary>
         public FileListViewModel()
-            : this(iconProvider: null, initialPath: null)
-        {
-        }
+            : this(iconProvider: null, initialPath: null) { }
 
         /// <summary>
         /// Initializes the File List.
@@ -622,8 +620,7 @@ namespace Mfr.App.Ui.ViewModels
 
             SelectedEntry = selectedPath is null
                 ? null
-                : Entries.FirstOrDefault(
-                    entry => PathComparers.Os.Equals(entry.FullPath, selectedPath));
+                : Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, selectedPath));
 
             if (ViewMode == FileListViewMode.Thumbnails)
                 _StartThumbnailLoad();
@@ -688,7 +685,8 @@ namespace Mfr.App.Ui.ViewModels
                 static completed => completed.Exception,
                 CancellationToken.None,
                 TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Default);
+                TaskScheduler.Default
+            );
         }
 
         private async Task _LoadThumbnailsAsync(IReadOnlyList<FileListEntry> pending, CancellationToken token)
@@ -701,25 +699,24 @@ namespace Mfr.App.Ui.ViewModels
 
             try
             {
-                await Parallel.ForEachAsync(pending, options, (entry, ct) =>
-                {
-                    var thumbnail = ImageThumbnailLoader.TryLoad(
-                        entry.FullPath,
-                        entry.Length,
-                        ThumbnailSizes.Huge);
-                    if (ct.IsCancellationRequested)
+                await Parallel.ForEachAsync(
+                    pending,
+                    options,
+                    (entry, ct) =>
                     {
-                        _DisposeImage(thumbnail);
+                        var thumbnail = ImageThumbnailLoader.TryLoad(entry.FullPath, entry.Length, ThumbnailSizes.Huge);
+                        if (ct.IsCancellationRequested)
+                        {
+                            _DisposeImage(thumbnail);
+                            return ValueTask.CompletedTask;
+                        }
+
+                        _PostToUi(() => _ApplyThumbnail(entry, thumbnail, ct));
                         return ValueTask.CompletedTask;
                     }
-
-                    _PostToUi(() => _ApplyThumbnail(entry, thumbnail, ct));
-                    return ValueTask.CompletedTask;
-                });
+                );
             }
-            catch (OperationCanceledException)
-            {
-            }
+            catch (OperationCanceledException) { }
         }
 
         private void _ApplyThumbnail(FileListEntry entry, IImage? thumbnail, CancellationToken token)
@@ -781,16 +778,12 @@ namespace Mfr.App.Ui.ViewModels
                     IsDirectory: true,
                     Length: null,
                     LastWriteTime: _TryGetLastWriteTime(path),
-                    ListingGroup: listingGroup);
+                    ListingGroup: listingGroup
+                );
             }
 
             var (length, lastWriteTime) = _TryGetFileInfo(path);
-            return new ListedItem(
-                path,
-                name,
-                IsDirectory: false,
-                Length: length,
-                LastWriteTime: lastWriteTime);
+            return new ListedItem(path, name, IsDirectory: false, Length: length, LastWriteTime: lastWriteTime);
         }
 
         private bool _PassesFileMasks(string path)
@@ -838,13 +831,16 @@ namespace Mfr.App.Ui.ViewModels
             var items = new List<ListedItem>();
             foreach (var place in WindowsKnownPlaces.GetPlaces())
             {
-                items.Add(new ListedItem(
-                    place.Path,
-                    place.Name,
-                    IsDirectory: true,
-                    Length: null,
-                    LastWriteTime: _TryGetLastWriteTime(place.Path),
-                    ListingGroup: _KnownPlaceListingGroup));
+                items.Add(
+                    new ListedItem(
+                        place.Path,
+                        place.Name,
+                        IsDirectory: true,
+                        Length: null,
+                        LastWriteTime: _TryGetLastWriteTime(place.Path),
+                        ListingGroup: _KnownPlaceListingGroup
+                    )
+                );
             }
 
             return items;
@@ -863,14 +859,13 @@ namespace Mfr.App.Ui.ViewModels
                 items.Add(drive);
             }
 
-            if (OperatingSystem.IsWindows() && WindowsWslUnc.TryGetLiveRoot(out var wslRoot) && pathToIsAdded.Add(wslRoot))
+            if (
+                OperatingSystem.IsWindows()
+                && WindowsWslUnc.TryGetLiveRoot(out var wslRoot)
+                && pathToIsAdded.Add(wslRoot)
+            )
             {
-                items.Add(new ListedItem(
-                    wslRoot,
-                    wslRoot[2..],
-                    IsDirectory: true,
-                    Length: null,
-                    LastWriteTime: null));
+                items.Add(new ListedItem(wslRoot, wslRoot[2..], IsDirectory: true, Length: null, LastWriteTime: null));
             }
 
             foreach (var historyPath in PathHistory)
@@ -882,12 +877,7 @@ namespace Mfr.App.Ui.ViewModels
                 if (!pathToIsAdded.Add(location))
                     continue;
 
-                items.Add(new ListedItem(
-                    location,
-                    location,
-                    IsDirectory: true,
-                    Length: null,
-                    LastWriteTime: null));
+                items.Add(new ListedItem(location, location, IsDirectory: true, Length: null, LastWriteTime: null));
             }
 
             return items;
@@ -902,12 +892,7 @@ namespace Mfr.App.Ui.ViewModels
             foreach (var distroPath in distroPaths)
             {
                 var name = _LastUncSegment(distroPath);
-                items.Add(new ListedItem(
-                    distroPath,
-                    name,
-                    IsDirectory: true,
-                    Length: null,
-                    LastWriteTime: null));
+                items.Add(new ListedItem(distroPath, name, IsDirectory: true, Length: null, LastWriteTime: null));
             }
 
             return items;
@@ -916,23 +901,25 @@ namespace Mfr.App.Ui.ViewModels
         [SupportedOSPlatform("windows")]
         private List<ListedItem> _ListUncShares(string serverRoot)
         {
-            if (!_TryRunWithTimeout(
-                    () => _TryReadUncShares(serverRoot),
-                    _UncServerProbeTimeout,
-                    out var sharePaths)
-                || sharePaths is null)
+            if (
+                !_TryRunWithTimeout(() => _TryReadUncShares(serverRoot), _UncServerProbeTimeout, out var sharePaths)
+                || sharePaths is null
+            )
                 return [];
 
             var items = new List<ListedItem>();
             foreach (var sharePath in sharePaths)
             {
                 var name = Path.GetFileName(sharePath.TrimTrailingSeparator());
-                items.Add(new ListedItem(
-                    sharePath,
-                    string.IsNullOrEmpty(name) ? sharePath : name,
-                    IsDirectory: true,
-                    Length: null,
-                    LastWriteTime: null));
+                items.Add(
+                    new ListedItem(
+                        sharePath,
+                        string.IsNullOrEmpty(name) ? sharePath : name,
+                        IsDirectory: true,
+                        Length: null,
+                        LastWriteTime: null
+                    )
+                );
             }
 
             return items;
@@ -953,8 +940,8 @@ namespace Mfr.App.Ui.ViewModels
             return _TryRunWithTimeout(
                     () => _TryReadUncShares(serverRoot) is not null,
                     _UncServerProbeTimeout,
-                    out var reachable)
-                && reachable;
+                    out var reachable
+                ) && reachable;
         }
 
         private static List<ListedItem> _ListNetworkDrives()
@@ -1001,13 +988,11 @@ namespace Mfr.App.Ui.ViewModels
                 IsDirectory: true,
                 Length: null,
                 LastWriteTime: null,
-                ListingGroup: _KnownPlaceListingGroup);
+                ListingGroup: _KnownPlaceListingGroup
+            );
         }
 
-        private bool _TryListFolder(
-            string path,
-            out List<ListedItem> folders,
-            out List<ListedItem> files)
+        private bool _TryListFolder(string path, out List<ListedItem> folders, out List<ListedItem> files)
         {
             folders = [];
             files = [];
@@ -1035,11 +1020,13 @@ namespace Mfr.App.Ui.ViewModels
 
         private (List<ListedItem> Folders, List<ListedItem> Files) _ReadFolderListing(string path)
         {
-            var folders = Directory.EnumerateDirectories(path, "*", _ListingOptions)
+            var folders = Directory
+                .EnumerateDirectories(path, "*", _ListingOptions)
                 .Select(folderPath => _CreateListedItem(folderPath, isDirectory: true))
                 .ToList();
 
-            var files = Directory.EnumerateFiles(path, "*", _ListingOptions)
+            var files = Directory
+                .EnumerateFiles(path, "*", _ListingOptions)
                 .Where(_PassesFileMasks)
                 .Select(filePath => _CreateListedItem(filePath, isDirectory: false))
                 .ToList();
@@ -1052,8 +1039,7 @@ namespace Mfr.App.Ui.ViewModels
             if (!_NeedsNetworkTimeout(path))
                 return Directory.Exists(path);
 
-            return _TryRunWithTimeout(() => Directory.Exists(path), _NetworkProbeTimeout, out var exists)
-                && exists;
+            return _TryRunWithTimeout(() => Directory.Exists(path), _NetworkProbeTimeout, out var exists) && exists;
         }
 
         private static bool _NeedsNetworkTimeout(string path)
@@ -1069,8 +1055,7 @@ namespace Mfr.App.Ui.ViewModels
 
                 return new DriveInfo(root).DriveType == DriveType.Network;
             }
-            catch (Exception ex) when (
-                ex is ArgumentException or IOException or UnauthorizedAccessException)
+            catch (Exception ex) when (ex is ArgumentException or IOException or UnauthorizedAccessException)
             {
                 return false;
             }
@@ -1098,7 +1083,8 @@ namespace Mfr.App.Ui.ViewModels
                 static completed => completed.Exception,
                 CancellationToken.None,
                 TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Default);
+                TaskScheduler.Default
+            );
             result = default!;
             return false;
         }
@@ -1272,7 +1258,8 @@ namespace Mfr.App.Ui.ViewModels
                 resolved = new DirectoryInfo(expanded).FullName;
                 return _DirectoryExists(resolved);
             }
-            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException or UnauthorizedAccessException)
+            catch (Exception ex)
+                when (ex is ArgumentException or NotSupportedException or IOException or UnauthorizedAccessException)
             {
                 resolved = ComputerPath;
                 return false;
@@ -1301,6 +1288,7 @@ namespace Mfr.App.Ui.ViewModels
             bool IsDirectory,
             long? Length,
             DateTime? LastWriteTime,
-            int ListingGroup = 0);
+            int ListingGroup = 0
+        );
     }
 }

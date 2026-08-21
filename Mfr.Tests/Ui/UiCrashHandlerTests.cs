@@ -48,10 +48,7 @@ namespace Mfr.Tests.Ui
                 Assert.NotNull(crashFilePath);
                 Assert.True(File.Exists(crashFilePath));
                 Assert.Equal(LogPaths.DefaultDirectoryPath, report.LogDirectoryPath);
-                Assert.StartsWith(
-                    LogPaths.CrashFilePrefix,
-                    Path.GetFileName(crashFilePath),
-                    StringComparison.Ordinal);
+                Assert.StartsWith(LogPaths.CrashFilePrefix, Path.GetFileName(crashFilePath), StringComparison.Ordinal);
                 Assert.Contains("boom", report.Details, StringComparison.Ordinal);
                 Assert.Contains("inner", report.Details, StringComparison.Ordinal);
                 var content = File.ReadAllText(crashFilePath);
@@ -73,7 +70,8 @@ namespace Mfr.Tests.Ui
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
             LogSession.Start(
                 logLevel: LogEventLevel.Information,
-                logConfig: new LogConfig { DirectoryPath = logDirectoryPath });
+                logConfig: new LogConfig { DirectoryPath = logDirectoryPath }
+            );
             var sessionLogFilePath = LogSession.LogFilePath;
             var sessionLogDirectoryPath = LogSession.LogDirectoryPath;
 

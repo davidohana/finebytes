@@ -63,7 +63,8 @@ namespace Mfr.App.Ui.Diagnostics
                 return new CrashReport(
                     Details: details,
                     LogFilePath: crashFilePath,
-                    LogDirectoryPath: LogPaths.DefaultDirectoryPath);
+                    LogDirectoryPath: LogPaths.DefaultDirectoryPath
+                );
             }
 
             var sessionLogFilePath = LogSession.LogFilePath!;
@@ -74,7 +75,8 @@ namespace Mfr.App.Ui.Diagnostics
             return new CrashReport(
                 Details: details,
                 LogFilePath: sessionLogFilePath,
-                LogDirectoryPath: sessionLogDirectoryPath);
+                LogDirectoryPath: sessionLogDirectoryPath
+            );
         }
 
         /// <summary>
@@ -99,7 +101,8 @@ namespace Mfr.App.Ui.Diagnostics
 
         private static void _OnUnhandledException(object sender, UnhandledExceptionEventArgs args)
         {
-            var exception = args.ExceptionObject as Exception
+            var exception =
+                args.ExceptionObject as Exception
                 ?? new Exception($"Non-exception unhandled object: {args.ExceptionObject}");
             Report(exception);
         }
@@ -118,9 +121,7 @@ namespace Mfr.App.Ui.Diagnostics
             args.SetObserved();
         }
 
-        private static void _OnDispatcherUnhandledException(
-            object sender,
-            DispatcherUnhandledExceptionEventArgs args)
+        private static void _OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             args.Handled = true;
             Report(args.Exception);
@@ -151,7 +152,8 @@ namespace Mfr.App.Ui.Diagnostics
                 var viewModel = new CrashDialogViewModel(
                     details: report.Details,
                     logFilePath: report.LogFilePath,
-                    logDirectoryPath: report.LogDirectoryPath);
+                    logDirectoryPath: report.LogDirectoryPath
+                );
                 var dialog = new CrashDialog(viewModel);
                 var owner = _TryGetMainWindow();
                 if (owner is not null)
@@ -195,7 +197,8 @@ namespace Mfr.App.Ui.Diagnostics
             task.ContinueWith(
                 static (_, state) => ((DispatcherFrame)state!).Continue = false,
                 frame,
-                TaskScheduler.Default);
+                TaskScheduler.Default
+            );
             dispatcher.PushFrame(frame);
             task.GetAwaiter().GetResult();
         }
@@ -207,8 +210,5 @@ namespace Mfr.App.Ui.Diagnostics
     /// <param name="Details">User-copyable crash text.</param>
     /// <param name="LogFilePath">Session or crash log file, when one was written.</param>
     /// <param name="LogDirectoryPath">Directory that contains diagnostic logs.</param>
-    internal readonly record struct CrashReport(
-        string Details,
-        string? LogFilePath,
-        string LogDirectoryPath);
+    internal readonly record struct CrashReport(string Details, string? LogFilePath, string LogDirectoryPath);
 }

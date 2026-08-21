@@ -52,8 +52,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
         [Fact]
         public void Resolve_EmptyAndNullExif_YieldEmpty()
         {
-            var emptyItem = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Exif = new ExifData());
+            var emptyItem = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.Exif = new ExifData());
             var nullItem = FilterTestHelpers.CreateRenameItem();
             Assert.Null(nullItem.Original.Exif);
 
@@ -120,7 +119,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
 
             var filter = new FormatterFilter(
                 Target: new FilePrefixTarget(),
-                Options: new FormatterOptions("<exif-make>_<exif-date:yyyy>"));
+                Options: new FormatterOptions("<exif-make>_<exif-date:yyyy>")
+            );
             filter.Setup();
             filter.Apply(item);
 
@@ -159,8 +159,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
         {
             var item = FilterTestHelpers.CreateRenameItem(attributes: FileAttributes.Directory);
 
-            var ex = Assert.Throws<InvalidOperationException>(
-                () => new ExifMakeToken().Compile(string.Empty)(item));
+            var ex = Assert.Throws<InvalidOperationException>(() => new ExifMakeToken().Compile(string.Empty)(item));
             Assert.Contains("directory", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -182,12 +181,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
         [Fact]
         public void ClearImagePropertiesCache_ClearsExif()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
-                {
-                    m.Image = new ImageProperties { Width = 8 };
-                    m.Exif = _SampleExif();
-                });
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.Image = new ImageProperties { Width = 8 };
+                m.Exif = _SampleExif();
+            });
 
             item.ClearImagePropertiesCache();
 
@@ -214,7 +212,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
                 directoryPath: directory,
                 prefix: prefix,
                 extension: extension,
-                fileSize: new FileInfo(fullPath).Length);
+                fileSize: new FileInfo(fullPath).Length
+            );
 
             return new RenameItem(meta);
         }

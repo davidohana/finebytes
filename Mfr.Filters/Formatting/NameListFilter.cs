@@ -8,10 +8,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="FilePath">Path to the name-list file (one name per line).</param>
     /// <param name="Prefix">Optional format string prepended to each list entry; supports formatter tokens (for example <c>&lt;counter:...&gt;</c>).</param>
     /// <param name="Suffix">Optional format string appended after each list entry; supports formatter tokens.</param>
-    public sealed record NameListOptions(
-        string FilePath,
-        string Prefix = "",
-        string Suffix = "");
+    public sealed record NameListOptions(string FilePath, string Prefix = "", string Suffix = "");
 
     /// <summary>
     /// Replaces the target field with the name-list line matching the item's list position, with optional prefix and suffix templates.
@@ -25,7 +22,9 @@ namespace Mfr.Filters.Formatting
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record NameListFilter(
         FilterTarget Target,
-        NameListOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        NameListOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         private IReadOnlyList<string>? _entries;
         private Formatter? _compiledPrefix;
@@ -63,7 +62,8 @@ namespace Mfr.Filters.Formatting
             if (index < 0 || index >= entries.Count)
             {
                 throw new UserException(
-                    $"Name-list has {entries.Count} line(s) but rename item index is {index} (expected 0..{entries.Count - 1}). Add lines or adjust the rename list.");
+                    $"Name-list has {entries.Count} line(s) but rename item index is {index} (expected 0..{entries.Count - 1}). Add lines or adjust the rename list."
+                );
             }
 
             var middle = entries[index];

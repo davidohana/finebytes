@@ -1,4 +1,3 @@
-
 namespace Mfr.Filters.Formatting
 {
     /// <summary>
@@ -7,10 +6,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="Delimiter">Substring that separates tokens; must be non-empty for the filter to split the segment.</param>
     /// <param name="TokenNumber">One-based index of the token to move (first token is <c>1</c>).</param>
     /// <param name="MoveBy">Offset in token positions: positive toward the end, negative toward the start.</param>
-    public sealed record TokenMoverOptions(
-        string Delimiter,
-        int TokenNumber,
-        int MoveBy);
+    public sealed record TokenMoverOptions(string Delimiter, int TokenNumber, int MoveBy);
 
     /// <summary>
     /// Moves one delimiter-separated token within the segment.
@@ -24,7 +20,9 @@ namespace Mfr.Filters.Formatting
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record TokenMoverFilter(
         FilterTarget Target,
-        TokenMoverOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        TokenMoverOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

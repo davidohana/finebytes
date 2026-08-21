@@ -21,7 +21,7 @@ namespace Mfr.Filters.Replace
         /// <summary>
         /// Pattern is a regular expression.
         /// </summary>
-        Regex
+        Regex,
     }
 
     /// <summary>
@@ -39,7 +39,8 @@ namespace Mfr.Filters.Replace
         ReplacerMode Mode,
         bool CaseSensitive,
         bool ReplaceAll,
-        bool WholeWord);
+        bool WholeWord
+    );
 
     /// <summary>
     /// Replaces text according to search options.
@@ -49,7 +50,9 @@ namespace Mfr.Filters.Replace
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record ReplacerFilter(
         FilterTarget Target,
-        ReplacerOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        ReplacerOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -74,7 +77,7 @@ namespace Mfr.Filters.Replace
                 ReplacerMode.Literal => Regex.Escape(options.Find),
                 ReplacerMode.Wildcard => _WildcardToRegex(options.Find),
                 ReplacerMode.Regex => options.Find,
-                _ => options.Find
+                _ => options.Find,
             };
 
             if (options.WholeWord)
@@ -92,12 +95,14 @@ namespace Mfr.Filters.Replace
             var sb = new StringBuilder();
             foreach (var ch in wildcard)
             {
-                sb.Append(ch switch
-                {
-                    '*' => ".*",
-                    '?' => ".",
-                    _ => Regex.Escape(ch.ToString())
-                });
+                sb.Append(
+                    ch switch
+                    {
+                        '*' => ".*",
+                        '?' => ".",
+                        _ => Regex.Escape(ch.ToString()),
+                    }
+                );
             }
 
             return sb.ToString();

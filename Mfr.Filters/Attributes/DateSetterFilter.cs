@@ -10,14 +10,14 @@ namespace Mfr.Filters.Attributes
     /// <param name="Date">Calendar date to set.</param>
     public sealed record DateSetterOptions(
         [property: JsonPropertyName("timestampField")] TimestampField TimestampField,
-        [property: JsonPropertyName("date")] DateOnly Date);
+        [property: JsonPropertyName("date")] DateOnly Date
+    );
 
     /// <summary>
     /// Sets the calendar date for creation, last write, or last access time. Does not change the time-of-day part.
     /// </summary>
     /// <param name="Options">Timestamp field and date value.</param>
-    public sealed record DateSetterFilter(
-        DateSetterOptions Options) : BaseFilter
+    public sealed record DateSetterFilter(DateSetterOptions Options) : BaseFilter
     {
         /// <inheritdoc />
         public override string Type => "DateSetter";
@@ -52,7 +52,8 @@ namespace Mfr.Filters.Attributes
                 current.Minute,
                 current.Second,
                 current.Millisecond,
-                current.Kind);
+                current.Kind
+            );
         }
     }
 }

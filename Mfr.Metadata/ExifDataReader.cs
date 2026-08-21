@@ -12,8 +12,9 @@ namespace Mfr.Metadata
     /// </summary>
     public static class ExifDataReader
     {
-        private static readonly IReadOnlyDictionary<string, string> _emptyTags =
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private static readonly IReadOnlyDictionary<string, string> _emptyTags = new Dictionary<string, string>(
+            StringComparer.OrdinalIgnoreCase
+        );
 
         /// <summary>
         /// Reads EXIF from an existing regular file that is a mapped raster type.
@@ -106,7 +107,8 @@ namespace Mfr.Metadata
         /// <param name="directories">Directories from one MetadataExtractor open.</param>
         /// <returns>A case-insensitive map, or empty when nothing flattened.</returns>
         private static IReadOnlyDictionary<string, string> _FlattenTagToDescription(
-            IReadOnlyList<MeDirectory> directories)
+            IReadOnlyList<MeDirectory> directories
+        )
         {
             Dictionary<string, string>? tagToDescription = null;
             foreach (var directory in directories)

@@ -74,7 +74,10 @@ namespace Mfr.Filters.Replace
                     _ThrowInvalidFormat(searchLine.LineNumber, "search line must start with 'S:'.");
 
                 if (i >= lines.Count)
-                    _ThrowInvalidFormat(searchLine.LineNumber, "found a search line without a corresponding replace line.");
+                    _ThrowInvalidFormat(
+                        searchLine.LineNumber,
+                        "found a search line without a corresponding replace line."
+                    );
 
                 var replaceLine = lines[i++];
                 if (!replaceLine.Text.StartsWith("R:", StringComparison.Ordinal))
@@ -87,7 +90,10 @@ namespace Mfr.Filters.Replace
                     _ThrowInvalidFormat(searchLine.LineNumber, "search line cannot be empty.");
 
                 if (string.IsNullOrEmpty(replaceText))
-                    _ThrowInvalidFormat(replaceLine.LineNumber, $"replace line cannot be empty. Use '{EmptyReplacementToken}' to strip matches.");
+                    _ThrowInvalidFormat(
+                        replaceLine.LineNumber,
+                        $"replace line cannot be empty. Use '{EmptyReplacementToken}' to strip matches."
+                    );
 
                 entries.Add(new ReplaceListEntry(searchText, _ResolveEmptyReplacementToken(replaceText)));
             }
@@ -101,8 +107,10 @@ namespace Mfr.Filters.Replace
             return
             [
                 .. lines
-                .Select((text, index) => new ReplaceListFileLine(Text: text, LineNumber: index + 1))
-                .Where(line => !string.IsNullOrWhiteSpace(line.Text) && !ListFileParseHelpers.IsListFileCommentLine(line.Text))
+                    .Select((text, index) => new ReplaceListFileLine(Text: text, LineNumber: index + 1))
+                    .Where(line =>
+                        !string.IsNullOrWhiteSpace(line.Text) && !ListFileParseHelpers.IsListFileCommentLine(line.Text)
+                    ),
             ];
         }
 
@@ -114,8 +122,9 @@ namespace Mfr.Filters.Replace
                 return;
 
             _ThrowInvalidFormat(
-                            lineNumber: firstInvalidLine.LineNumber,
-                            detail: $"line length exceeds {maxLen} characters.");
+                lineNumber: firstInvalidLine.LineNumber,
+                detail: $"line length exceeds {maxLen} characters."
+            );
         }
 
         private static string _ResolveEmptyReplacementToken(string replacement)

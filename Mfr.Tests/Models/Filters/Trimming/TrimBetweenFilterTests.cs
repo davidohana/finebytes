@@ -17,10 +17,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         [Fact]
         public void Apply_IssueExample()
         {
-            var options = new TrimBetweenFilterOptions(
-                new Position(13, Side.Left),
-                new Position(5, Side.Right)
-            );
+            var options = new TrimBetweenFilterOptions(new Position(13, Side.Left), new Position(5, Side.Right));
             var f = new TrimBetweenFilter(_target, options);
 
             // "Portishead - Glory Box"
@@ -42,10 +39,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         public void Apply_LeftToLeft()
         {
             // Remove from 2 to 4 (incl): "abcd" -> "a"
-            var options = new TrimBetweenFilterOptions(
-                new Position(2, Side.Left),
-                new Position(4, Side.Left)
-            );
+            var options = new TrimBetweenFilterOptions(new Position(2, Side.Left), new Position(4, Side.Left));
             var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("a", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
         }
@@ -55,10 +49,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         {
             // "abcd", pos 1 Right is 'd', pos 3 Right is 'b'.
             // Remove 'b', 'c', 'd' -> "a"
-            var options = new TrimBetweenFilterOptions(
-                new Position(3, Side.Right),
-                new Position(1, Side.Right)
-            );
+            var options = new TrimBetweenFilterOptions(new Position(3, Side.Right), new Position(1, Side.Right));
             var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("a", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
         }
@@ -66,10 +57,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         [Fact]
         public void Apply_FullTrim()
         {
-            var options = new TrimBetweenFilterOptions(
-                new Position(1, Side.Left),
-                new Position(1, Side.Right)
-            );
+            var options = new TrimBetweenFilterOptions(new Position(1, Side.Left), new Position(1, Side.Right));
             var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "anything"));
         }
@@ -78,10 +66,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         public void Apply_ReorderedPositions()
         {
             // Start at 4, End at 2 -> should be same as 2 to 4
-            var options = new TrimBetweenFilterOptions(
-                new Position(4, Side.Left),
-                new Position(2, Side.Left)
-            );
+            var options = new TrimBetweenFilterOptions(new Position(4, Side.Left), new Position(2, Side.Left));
             var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("ae", FilterTestHelpers.ApplyToPrefix(f, "abcde"));
         }

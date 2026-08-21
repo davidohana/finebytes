@@ -9,11 +9,11 @@ alwaysApply: true
 - Public API docs: every `public` member gets `summary` plus `param` / `returns` / `exception` as needed. Start `<summary>` with one short line; put extra detail in a following `<para>...</para>` block.
 - Private methods: prefix every `private` method name with `_` (including `static` and `async`).
 - Control flow: prefer early `return` and early `continue`/`break`; keep the happy path at base indentation.
-- Braces: omit braces for single-statement `if`/`else`/loop bodies; use braces for multi-statement blocks.
+- Braces: always use braces; CSharpier owns brace and whitespace layout (do not fight it with hand-tuned wrapping).
 - LINQ vs loops: prefer LINQ for filtering/projection/aggregation when it improves readability; use loops when a LINQ expression would be harder to read or too complex.
 - Ternary usage: only use ternary for simple value selection (`condition ? valueA : valueB` with trivial operands).
 - Avoid complex ternary branches that call functions, construct objects, throw, or span multiple lines; use `if`/`else` instead.
-- Line wrapping: keep statements on one line when they fit within 120 characters; only introduce line breaks when needed for readability.
+- Line wrapping: CSharpier wraps from `max_line_length` (120); prefer readable statement splits over fighting the printer.
 - Statement complexity: avoid complex single statements; split them into multiple statements with well-named local variables.
 - Boolean complexity: extract non-trivial boolean conditions into a well-named local (e.g. `isConflict`) before branching.
 - Named arguments: use named args when parameter meaning is not obvious by position (especially multiple same-type args).

@@ -49,10 +49,7 @@ namespace Mfr.App.Ui.Services.FileList
         /// <param name="liveRoot">Reachable <c>\\wsl$</c> or <c>\\wsl.localhost</c>.</param>
         /// <param name="mapped">Rewritten path when <paramref name="path"/> is a WSL UNC path.</param>
         /// <returns><see langword="true"/> when <paramref name="path"/> uses a WSL host.</returns>
-        public static bool TryMapPath(
-            string? path,
-            string liveRoot,
-            [NotNullWhen(true)] out string? mapped)
+        public static bool TryMapPath(string? path, string liveRoot, [NotNullWhen(true)] out string? mapped)
         {
             mapped = null;
             if (string.IsNullOrWhiteSpace(liveRoot) || !_TrySplit(path, out var host, out var remainder))
@@ -182,11 +179,13 @@ namespace Mfr.App.Ui.Services.FileList
                     names.Add(distroName);
                 }
             }
-            catch (Exception ex) when (
-                ex is ArgumentException
-                    or IOException
-                    or UnauthorizedAccessException
-                    or System.Security.SecurityException)
+            catch (Exception ex)
+                when (ex
+                        is ArgumentException
+                            or IOException
+                            or UnauthorizedAccessException
+                            or System.Security.SecurityException
+                )
             {
                 return names;
             }
@@ -217,9 +216,7 @@ namespace Mfr.App.Ui.Services.FileList
                     {
                         process.Kill(entireProcessTree: true);
                     }
-                    catch (InvalidOperationException)
-                    {
-                    }
+                    catch (InvalidOperationException) { }
 
                     return [];
                 }
@@ -227,11 +224,13 @@ namespace Mfr.App.Ui.Services.FileList
                 var output = process.StandardOutput.ReadToEnd();
                 return _ParseWslListOutput(output);
             }
-            catch (Exception ex) when (
-                ex is ArgumentException
-                    or InvalidOperationException
-                    or IOException
-                    or System.ComponentModel.Win32Exception)
+            catch (Exception ex)
+                when (ex
+                        is ArgumentException
+                            or InvalidOperationException
+                            or IOException
+                            or System.ComponentModel.Win32Exception
+                )
             {
                 return [];
             }
@@ -263,7 +262,8 @@ namespace Mfr.App.Ui.Services.FileList
         private static bool _TrySplit(
             string? path,
             [NotNullWhen(true)] out string? host,
-            [NotNullWhen(true)] out string? remainder)
+            [NotNullWhen(true)] out string? remainder
+        )
         {
             host = null;
             remainder = null;
@@ -303,11 +303,8 @@ namespace Mfr.App.Ui.Services.FileList
             {
                 return Directory.Exists(path);
             }
-            catch (Exception ex) when (
-                ex is ArgumentException
-                    or NotSupportedException
-                    or IOException
-                    or UnauthorizedAccessException)
+            catch (Exception ex)
+                when (ex is ArgumentException or NotSupportedException or IOException or UnauthorizedAccessException)
             {
                 return false;
             }

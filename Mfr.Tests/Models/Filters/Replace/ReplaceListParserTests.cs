@@ -28,7 +28,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                 {commentLine}
                 S:a
                 R:b
-                """);
+                """
+            );
 
             var entries = ReplaceListParser.ParseFile(path);
 
@@ -47,7 +48,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                 """
                 S:#a
                 R:b
-                """);
+                """
+            );
 
             var entries = ReplaceListParser.ParseFile(path);
 
@@ -98,7 +100,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                 """
                 S:x
                 R:<EMPTY>
-                """);
+                """
+            );
 
             var entries = ReplaceListParser.ParseFile(path);
 

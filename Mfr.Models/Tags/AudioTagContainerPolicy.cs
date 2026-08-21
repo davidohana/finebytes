@@ -86,12 +86,14 @@ namespace Mfr.Models.Tags
                 return;
 
             var supported = GetSupportedBlocks(container);
-            var alternatives = supported.Count == 0
-                ? "no tag blocks are supported there"
-                : "supported blocks: " + string.Join(", ", supported.Select(_DescribeBlock));
+            var alternatives =
+                supported.Count == 0
+                    ? "no tag blocks are supported there"
+                    : "supported blocks: " + string.Join(", ", supported.Select(_DescribeBlock));
 
             throw new NotSupportedException(
-                $"{_DescribeBlock(block)} tags are not supported in {_DescribeContainer(container)} files ({alternatives}).");
+                $"{_DescribeBlock(block)} tags are not supported in {_DescribeContainer(container)} files ({alternatives})."
+            );
         }
 
         private static string _DescribeBlock(AudioTagBlockKind block)

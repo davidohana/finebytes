@@ -18,11 +18,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
                 extension: ".mp3",
-                directory: @"D:\Music\Album");
+                directory: @"D:\Music\Album"
+            );
 
             Assert.Equal(
                 item.Preview.FullPath.Length.ToString(CultureInfo.InvariantCulture),
-                token.Compile(tokenArgs: "")(item));
+                token.Compile(tokenArgs: "")(item)
+            );
             Assert.Contains("full-path-length", token.Names);
         }
 
@@ -36,7 +38,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
                 extension: ".mp3",
-                directory: @"D:\Music\Album");
+                directory: @"D:\Music\Album"
+            );
             var originalLength = item.Original.FullPath.Length;
             item.Preview.DirectoryPath = @"D:\Music\Much\Deeper\Album";
 

@@ -54,7 +54,11 @@ namespace Mfr.Tests.Models.Filters
             Assert.Equal("Setup failed.", setupEx.Message);
 
             var applyEx = Assert.Throws<InvalidOperationException>(() => filter.Apply(item));
-            Assert.Contains("setup must complete before transform", applyEx.Message, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains(
+                "setup must complete before transform",
+                applyEx.Message,
+                StringComparison.OrdinalIgnoreCase
+            );
         }
 
         private sealed record SetupCountingFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)

@@ -32,7 +32,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         [Theory]
         [InlineData("song", ".mp3", "3")]
         [InlineData("clip", ".mp4", "4")]
-        public void Resolve_DigitsOnlyInExtension_ReturnsExtensionNumber(string prefix, string extension, string expected)
+        public void Resolve_DigitsOnlyInExtension_ReturnsExtensionNumber(
+            string prefix,
+            string extension,
+            string expected
+        )
         {
             var token = new FileNameNumericValueToken();
             var item = FilterTestHelpers.CreateRenameItem(prefix: prefix, extension: extension);

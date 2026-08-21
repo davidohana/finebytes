@@ -55,8 +55,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
         [Fact]
         public void Resolve_CorruptTrue_FormatsYes()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Media = new MediaProperties { PossiblyCorrupt = true });
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.Media = new MediaProperties { PossiblyCorrupt = true }
+            );
 
             Assert.Equal("Yes", new MediaCorruptToken().Compile(string.Empty)(item));
         }
@@ -64,8 +65,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
         [Fact]
         public void Resolve_ZeroDurationAndInts_YieldEmpty()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Media = new MediaProperties());
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.Media = new MediaProperties());
 
             Assert.Equal(string.Empty, new MediaDurationToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new MediaDurationSecToken().Compile(string.Empty)(item));
@@ -88,11 +88,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
         [Fact]
         public void Resolve_LongDuration_UsesTotalHours()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Media = new MediaProperties
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.Media = new MediaProperties
                 {
                     Duration = TimeSpan.FromHours(25) + TimeSpan.FromMinutes(1) + TimeSpan.FromSeconds(2),
-                });
+                }
+            );
 
             Assert.Equal("25:01:02", new MediaDurationToken().Compile(string.Empty)(item));
             Assert.Equal("90062", new MediaDurationSecToken().Compile(string.Empty)(item));
@@ -114,16 +115,14 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
         [Fact]
         public void FormatterFilter_UsesSeededMedia()
         {
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.Media = new MediaProperties
-                {
-                    AudioBitrate = 320,
-                    Duration = TimeSpan.FromSeconds(61),
-                });
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.Media = new MediaProperties { AudioBitrate = 320, Duration = TimeSpan.FromSeconds(61) }
+            );
 
             var filter = new FormatterFilter(
                 Target: new FilePrefixTarget(),
-                Options: new FormatterOptions("<media-audio-bitrate>_<media-duration>"));
+                Options: new FormatterOptions("<media-audio-bitrate>_<media-duration>")
+            );
             filter.Setup();
             filter.Apply(item);
 
@@ -147,7 +146,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
                 directoryPath: directory,
                 prefix: prefix,
                 extension: extension,
-                fileSize: new FileInfo(fullPath).Length);
+                fileSize: new FileInfo(fullPath).Length
+            );
             meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Riff;
 
             var item = new RenameItem(meta);

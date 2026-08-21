@@ -10,14 +10,14 @@ namespace Mfr.Filters.Attributes
     /// <param name="Time">Local time to set.</param>
     public sealed record TimeSetterOptions(
         [property: JsonPropertyName("timestampField")] TimestampField TimestampField,
-        [property: JsonPropertyName("time")] TimeOnly Time);
+        [property: JsonPropertyName("time")] TimeOnly Time
+    );
 
     /// <summary>
     /// Sets the time-of-day for creation, last write, or last access time. Does not change the calendar date part.
     /// </summary>
     /// <param name="Options">Timestamp field and time value.</param>
-    public sealed record TimeSetterFilter(
-        TimeSetterOptions Options) : BaseFilter
+    public sealed record TimeSetterFilter(TimeSetterOptions Options) : BaseFilter
     {
         /// <inheritdoc />
         public override string Type => "TimeSetter";

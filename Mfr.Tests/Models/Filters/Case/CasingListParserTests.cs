@@ -19,7 +19,8 @@ namespace Mfr.Tests.Models.Filters.Case
                 """
                 and
                 RMX
-                """);
+                """
+            );
 
             var map = CasingListParser.ParseFile(path);
 
@@ -42,7 +43,8 @@ namespace Mfr.Tests.Models.Filters.Case
                 {commentLine}
 
                 hello
-                """);
+                """
+            );
 
             var map = CasingListParser.ParseFile(path);
 
@@ -75,7 +77,8 @@ namespace Mfr.Tests.Models.Filters.Case
                 foo
                 Foo
                 FOO
-                """);
+                """
+            );
 
             var map = CasingListParser.ParseFile(path);
 
@@ -133,7 +136,8 @@ namespace Mfr.Tests.Models.Filters.Case
                 """
                 ok
                 not ok
-                """);
+                """
+            );
 
             var ex = Assert.Throws<UserException>(() => CasingListParser.ParseFile(path));
             Assert.Contains("line 2", ex.Message, StringComparison.Ordinal);

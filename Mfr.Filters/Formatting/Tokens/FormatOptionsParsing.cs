@@ -52,7 +52,8 @@ namespace Mfr.Filters.Formatting.Tokens
                 {
                     throw new ArgumentException(
                         $"{tokenDisplayName} has an empty name=value segment in '{arg}'.",
-                        nameof(arg));
+                        nameof(arg)
+                    );
                 }
 
                 var eq = trimmed.IndexOf('=');
@@ -60,7 +61,8 @@ namespace Mfr.Filters.Formatting.Tokens
                 {
                     throw new ArgumentException(
                         $"{tokenDisplayName} segment '{trimmed}' is not a valid name=value pair.",
-                        nameof(arg));
+                        nameof(arg)
+                    );
                 }
 
                 var key = trimmed[..eq].Trim();
@@ -69,14 +71,16 @@ namespace Mfr.Filters.Formatting.Tokens
                 {
                     throw new ArgumentException(
                         $"{tokenDisplayName} segment '{trimmed}' is missing a key before '='.",
-                        nameof(arg));
+                        nameof(arg)
+                    );
                 }
 
                 if (!map.TryAdd(key, value))
                 {
                     throw new ArgumentException(
                         $"{tokenDisplayName} duplicate option '{key}' in '{arg}'.",
-                        nameof(arg));
+                        nameof(arg)
+                    );
                 }
             }
 
@@ -95,7 +99,8 @@ namespace Mfr.Filters.Formatting.Tokens
             Dictionary<string, string> map,
             string tokenDisplayName,
             IReadOnlyList<string> allowedOptionKeys,
-            string argParamName)
+            string argParamName
+        )
         {
             var allowed = new HashSet<string>(allowedOptionKeys, StringComparer.OrdinalIgnoreCase);
             foreach (var key in map.Keys)
@@ -104,7 +109,8 @@ namespace Mfr.Filters.Formatting.Tokens
                 {
                     throw new ArgumentException(
                         $"{tokenDisplayName} unknown option '{key}' (expected {FormatExpectedKeywords(allowedOptionKeys)}).",
-                        argParamName);
+                        argParamName
+                    );
                 }
             }
         }
@@ -121,7 +127,8 @@ namespace Mfr.Filters.Formatting.Tokens
             Dictionary<string, string> map,
             string tokenDisplayName,
             IReadOnlyList<string> requiredOptionKeys,
-            string argParamName)
+            string argParamName
+        )
         {
             foreach (var req in requiredOptionKeys)
             {
@@ -129,7 +136,8 @@ namespace Mfr.Filters.Formatting.Tokens
                 {
                     throw new ArgumentException(
                         $"{tokenDisplayName} missing required option '{req}' (expected all of {FormatExpectedKeywords(requiredOptionKeys)}).",
-                        argParamName);
+                        argParamName
+                    );
                 }
             }
         }

@@ -26,13 +26,15 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_RemovesTrailingCustomSpaceCharacters()
         {
             var spaceFilter = new SpaceCharacterFilter(
-                                _target,
+                _target,
                 new SpaceCharacterOptions(
                     SpaceCharacter: '_',
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: false,
-                    CustomText: ""));
+                    CustomText: ""
+                )
+            );
 
             var trimFilter = new StripSpacesRightFilter(_target);
 

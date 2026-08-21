@@ -21,14 +21,33 @@ namespace Mfr.Metadata.TagFields
     {
         private static readonly string[] _KnownKeys =
         [
-            "Title", "Album", "Artist", "Album Artist", "Composer", "Genre",
-            "Comment", "Lyrics", "Copyright", "Grouping",
-            "Year", "Track", "TrackCount", "Disc", "DiscCount",
-            "BPM", "Conductor",
-            "MUSICBRAINZ_ARTISTID", "MUSICBRAINZ_ALBUMID", "MUSICBRAINZ_ALBUMARTISTID",
-            "MUSICBRAINZ_TRACKID", "MUSICBRAINZ_DISCID",
-            "MUSICBRAINZ_ALBUMSTATUS", "MUSICBRAINZ_ALBUMTYPE", "MUSICBRAINZ_RELEASECOUNTRY",
-            "MUSICIP_PUID", "ASIN",
+            "Title",
+            "Album",
+            "Artist",
+            "Album Artist",
+            "Composer",
+            "Genre",
+            "Comment",
+            "Lyrics",
+            "Copyright",
+            "Grouping",
+            "Year",
+            "Track",
+            "TrackCount",
+            "Disc",
+            "DiscCount",
+            "BPM",
+            "Conductor",
+            "MUSICBRAINZ_ARTISTID",
+            "MUSICBRAINZ_ALBUMID",
+            "MUSICBRAINZ_ALBUMARTISTID",
+            "MUSICBRAINZ_TRACKID",
+            "MUSICBRAINZ_DISCID",
+            "MUSICBRAINZ_ALBUMSTATUS",
+            "MUSICBRAINZ_ALBUMTYPE",
+            "MUSICBRAINZ_RELEASECOUNTRY",
+            "MUSICIP_PUID",
+            "ASIN",
         ];
 
         // Spellings other taggers use for a modeled APE key; values are stored under the modeled key.
@@ -103,7 +122,8 @@ namespace Mfr.Metadata.TagFields
                 TagFieldDiff.IndexTextFields(preview.Fields),
                 valuesEqual: OrdinalSequence.AreEqual,
                 remove: key => live.RemoveItem(key),
-                set: (key, values) => live.SetValue(key, [.. values]));
+                set: (key, values) => live.SetValue(key, [.. values])
+            );
         }
 
         private static void _WriteAll(ApeTag live, ApeTagData data)
@@ -132,7 +152,8 @@ namespace Mfr.Metadata.TagFields
         private static void _SplitCountPair(
             Dictionary<string, ImmutableArray<string>> keyToValues,
             string numberKey,
-            string countKey)
+            string countKey
+        )
         {
             if (!keyToValues.TryGetValue(numberKey, out var values) || values.Length == 0)
                 return;

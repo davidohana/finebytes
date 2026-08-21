@@ -106,7 +106,8 @@ namespace Mfr.App.Ui.Services.FileList
         /// <returns><see langword="true"/> when the path is a known place or under one.</returns>
         public static bool TryGetContainingPlace(
             string filesystemPath,
-            [NotNullWhen(true)] out WindowsKnownPlace? place)
+            [NotNullWhen(true)] out WindowsKnownPlace? place
+        )
         {
             place = null;
             if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(filesystemPath))
@@ -114,7 +115,8 @@ namespace Mfr.App.Ui.Services.FileList
 
             foreach (var candidate in GetPlaces())
             {
-                var isMatch = PathRelations.IsSamePath(filesystemPath, candidate.Path)
+                var isMatch =
+                    PathRelations.IsSamePath(filesystemPath, candidate.Path)
                     || PathRelations.IsDescendantOf(filesystemPath, candidate.Path);
                 if (!isMatch)
                     continue;
@@ -132,7 +134,8 @@ namespace Mfr.App.Ui.Services.FileList
             List<WindowsKnownPlace> places,
             HashSet<string> pathToIsAdded,
             string name,
-            Environment.SpecialFolder folder)
+            Environment.SpecialFolder folder
+        )
         {
             string folderPath;
             try
@@ -169,7 +172,8 @@ namespace Mfr.App.Ui.Services.FileList
             List<WindowsKnownPlace> places,
             HashSet<string> pathToIsAdded,
             string name,
-            string folderPath)
+            string folderPath
+        )
         {
             if (string.IsNullOrWhiteSpace(folderPath))
                 return;
@@ -182,8 +186,8 @@ namespace Mfr.App.Ui.Services.FileList
 
                 fullPath = new DirectoryInfo(folderPath).FullName;
             }
-            catch (Exception ex) when (
-                ex is ArgumentException or NotSupportedException or IOException or UnauthorizedAccessException)
+            catch (Exception ex)
+                when (ex is ArgumentException or NotSupportedException or IOException or UnauthorizedAccessException)
             {
                 return;
             }

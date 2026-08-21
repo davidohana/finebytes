@@ -18,9 +18,11 @@ namespace Mfr.Tests.Models.Filters
         {
             var filter = new FormatterFilter(
                 new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                new FormatterOptions("NextTitle"));
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PrevTitle"));
+                new FormatterOptions("NextTitle")
+            );
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PrevTitle")
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -40,14 +42,9 @@ namespace Mfr.Tests.Models.Filters
         [InlineData(SemanticAudioField.TrackCount, "12", 12u)]
         [InlineData(SemanticAudioField.Disc, "2", 2u)]
         [InlineData(SemanticAudioField.DiscCount, "3", 3u)]
-        public void Formatter_SetsNumericOverlayField(
-            SemanticAudioField field,
-            string template,
-            uint expected)
+        public void Formatter_SetsNumericOverlayField(SemanticAudioField field, string template, uint expected)
         {
-            var filter = new FormatterFilter(
-                new SemanticAudioFieldTarget(field),
-                new FormatterOptions(template));
+            var filter = new FormatterFilter(new SemanticAudioFieldTarget(field), new FormatterOptions(template));
             var item = FilterTestHelpers.CreateRenameItem();
 
             filter.Setup();
@@ -97,9 +94,11 @@ namespace Mfr.Tests.Models.Filters
         {
             var filter = new FormatterFilter(
                 new SemanticAudioFieldTarget(SemanticAudioField.Year),
-                new FormatterOptions(string.Empty));
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 2001));
+                new FormatterOptions(string.Empty)
+            );
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 2001)
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -115,9 +114,11 @@ namespace Mfr.Tests.Models.Filters
         {
             var filter = new FormatterFilter(
                 new SemanticAudioFieldTarget(SemanticAudioField.Track),
-                new FormatterOptions("   "));
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 9));
+                new FormatterOptions("   ")
+            );
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(track: 9)
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -133,7 +134,8 @@ namespace Mfr.Tests.Models.Filters
         {
             var filter = new FormatterFilter(
                 new SemanticAudioFieldTarget(SemanticAudioField.Disc),
-                new FormatterOptions("not-a-number"));
+                new FormatterOptions("not-a-number")
+            );
 
             var item = FilterTestHelpers.CreateRenameItem();
             filter.Setup();
@@ -156,13 +158,14 @@ namespace Mfr.Tests.Models.Filters
                     Mode: ReplacerMode.Literal,
                     CaseSensitive: true,
                     ReplaceAll: false,
-                    WholeWord: false));
+                    WholeWord: false
+                )
+            );
 
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m =>
-                {
-                    m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999);
-                });
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+            {
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999);
+            });
 
             filter.Setup();
             filter.Apply(item);
@@ -184,10 +187,13 @@ namespace Mfr.Tests.Models.Filters
                     Mode: ReplacerMode.Literal,
                     CaseSensitive: true,
                     ReplaceAll: false,
-                    WholeWord: false));
+                    WholeWord: false
+                )
+            );
 
-            var item = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: m => m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(genre: "Hard Rock"));
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
+                m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(genre: "Hard Rock")
+            );
 
             filter.Setup();
             filter.Apply(item);
@@ -203,11 +209,13 @@ namespace Mfr.Tests.Models.Filters
         {
             var filter = new FormatterFilter(
                 new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                new FormatterOptions("x"));
+                new FormatterOptions("x")
+            );
 
             var item = FilterTestHelpers.CreateRenameItem(
                 attributes: FileAttributes.Directory,
-                extension: string.Empty);
+                extension: string.Empty
+            );
 
             filter.Setup();
 

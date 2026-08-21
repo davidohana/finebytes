@@ -116,7 +116,10 @@ namespace Mfr.Metadata
         private static (int Width, int Height) _ReadGifDimensions(IReadOnlyList<MeDirectory> directories)
         {
             var header = directories.OfType<GifHeaderDirectory>().FirstOrDefault();
-            return (_TryGetInt(header, GifHeaderDirectory.TagImageWidth), _TryGetInt(header, GifHeaderDirectory.TagImageHeight));
+            return (
+                _TryGetInt(header, GifHeaderDirectory.TagImageWidth),
+                _TryGetInt(header, GifHeaderDirectory.TagImageHeight)
+            );
         }
 
         private static (int Width, int Height) _ReadBmpDimensions(IReadOnlyList<MeDirectory> directories)
@@ -133,7 +136,10 @@ namespace Mfr.Metadata
         private static (int Width, int Height) _ReadTiffDimensions(IReadOnlyList<MeDirectory> directories)
         {
             var ifd0 = directories.OfType<ExifIfd0Directory>().FirstOrDefault();
-            return (_TryGetInt(ifd0, ExifDirectoryBase.TagImageWidth), _TryGetInt(ifd0, ExifDirectoryBase.TagImageHeight));
+            return (
+                _TryGetInt(ifd0, ExifDirectoryBase.TagImageWidth),
+                _TryGetInt(ifd0, ExifDirectoryBase.TagImageHeight)
+            );
         }
 
         private static (int Width, int Height) _ReadWebPDimensions(IReadOnlyList<MeDirectory> directories)
@@ -145,7 +151,10 @@ namespace Mfr.Metadata
         private static (int Width, int Height) _ReadIcoDimensions(IReadOnlyList<MeDirectory> directories)
         {
             var ico = directories.OfType<IcoDirectory>().FirstOrDefault();
-            return (_ReadIcoDimension(ico, IcoDirectory.TagImageWidth), _ReadIcoDimension(ico, IcoDirectory.TagImageHeight));
+            return (
+                _ReadIcoDimension(ico, IcoDirectory.TagImageWidth),
+                _ReadIcoDimension(ico, IcoDirectory.TagImageHeight)
+            );
         }
 
         private static int _ReadIcoDimension(IcoDirectory? directory, int tag)
@@ -163,8 +172,14 @@ namespace Mfr.Metadata
             {
                 "JPEG" => _ReadJpegBitDepth(directories),
                 "PNG" => _ReadPngBitDepth(directories),
-                "GIF" => _TryGetInt(directories.OfType<GifHeaderDirectory>().FirstOrDefault(), GifHeaderDirectory.TagBitsPerPixel),
-                "BMP" => _TryGetInt(directories.OfType<BmpHeaderDirectory>().FirstOrDefault(), BmpHeaderDirectory.TagBitsPerPixel),
+                "GIF" => _TryGetInt(
+                    directories.OfType<GifHeaderDirectory>().FirstOrDefault(),
+                    GifHeaderDirectory.TagBitsPerPixel
+                ),
+                "BMP" => _TryGetInt(
+                    directories.OfType<BmpHeaderDirectory>().FirstOrDefault(),
+                    BmpHeaderDirectory.TagBitsPerPixel
+                ),
                 "ICO" => _TryGetInt(directories.OfType<IcoDirectory>().FirstOrDefault(), IcoDirectory.TagBitsPerPixel),
                 "TIFF" => _ReadTiffBitDepth(directories),
                 _ => 0,
@@ -284,7 +299,8 @@ namespace Mfr.Metadata
             double x,
             double y,
             int unit,
-            bool isJfifUnits)
+            bool isJfifUnits
+        )
         {
             if (isJfifUnits)
             {

@@ -1,0 +1,2 @@
+# CSharpier owns .cs layout only; leave MSBuild / Avalonia XML alone.
+**/*.{xml,csproj,props,targets,axaml,xaml,slnx,config,resx,nuspec,DotSettings}

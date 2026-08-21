@@ -13,7 +13,8 @@ namespace Mfr.Filters.Misc
         int Width,
         bool RemoveExtraZeros,
         int MaxCount = 0,
-        bool WholeWordOnly = false);
+        bool WholeWordOnly = false
+    );
 
     /// <summary>
     /// Normalizes leading zeros in numeric sequences.
@@ -23,7 +24,9 @@ namespace Mfr.Filters.Misc
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed partial record FixLeadingZerosFilter(
         FilterTarget Target,
-        FixLeadingZerosOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        FixLeadingZerosOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -36,38 +39,41 @@ namespace Mfr.Filters.Misc
                 return value;
 
             var count = 0;
-            return _DigitsRegex().Replace(value, m =>
-            {
-                if (Options.WholeWordOnly)
-                {
-                    var start = m.Index;
-                    var end = m.Index + m.Length;
+            return _DigitsRegex()
+                .Replace(
+                    value,
+                    m =>
+                    {
+                        if (Options.WholeWordOnly)
+                        {
+                            var start = m.Index;
+                            var end = m.Index + m.Length;
 
-                    var isLetterBefore = start > 0 && char.IsLetter(value[start - 1]);
-                    var isLetterAfter = end < value.Length && char.IsLetter(value[end]);
+                            var isLetterBefore = start > 0 && char.IsLetter(value[start - 1]);
+                            var isLetterAfter = end < value.Length && char.IsLetter(value[end]);
 
-                    if (isLetterBefore || isLetterAfter)
-                        return m.Value;
+                            if (isLetterBefore || isLetterAfter)
+                                return m.Value;
+                        }
 
-                }
+                        if (Options.MaxCount > 0 && count >= Options.MaxCount)
+                            return m.Value;
 
-                if (Options.MaxCount > 0 && count >= Options.MaxCount)
-                    return m.Value;
+                        count++;
 
-                count++;
+                        var digits = m.Value;
+                        if (Options.RemoveExtraZeros)
+                            digits = digits.TrimStart('0');
 
-                var digits = m.Value;
-                if (Options.RemoveExtraZeros)
-                    digits = digits.TrimStart('0');
+                        if (digits.Length == 0)
+                            digits = "0";
 
-                if (digits.Length == 0)
-                    digits = "0";
+                        if (digits.Length >= Options.Width)
+                            return digits;
 
-                if (digits.Length >= Options.Width)
-                    return digits;
-
-                return digits.PadLeft(Options.Width, '0');
-            });
+                        return digits.PadLeft(Options.Width, '0');
+                    }
+                );
         }
 
         [GeneratedRegex(@"\d+", RegexOptions.Compiled)]

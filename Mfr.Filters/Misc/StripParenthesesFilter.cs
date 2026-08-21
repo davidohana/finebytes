@@ -10,7 +10,7 @@ namespace Mfr.Filters.Misc
         Round,
         Square,
         Curly,
-        Angle
+        Angle,
     }
 
     /// <summary>
@@ -18,9 +18,7 @@ namespace Mfr.Filters.Misc
     /// </summary>
     /// <param name="Type">Pair type to target.</param>
     /// <param name="RemoveContents">Whether to remove bracketed contents or only delimiters.</param>
-    public sealed record StripParenthesesOptions(
-        ParenthesisType Type,
-        bool RemoveContents);
+    public sealed record StripParenthesesOptions(ParenthesisType Type, bool RemoveContents);
 
     /// <summary>
     /// Removes selected parenthesis/bracket delimiters and optionally their contents.
@@ -30,7 +28,9 @@ namespace Mfr.Filters.Misc
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed partial record StripParenthesesFilter(
         FilterTarget Target,
-        StripParenthesesOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        StripParenthesesOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -45,14 +45,12 @@ namespace Mfr.Filters.Misc
                 ParenthesisType.Square => Strip(value, _SquareParenRegex(), "[", "]"),
                 ParenthesisType.Curly => Strip(value, _CurlyParenRegex(), "{", "}"),
                 ParenthesisType.Angle => Strip(value, _AngleParenRegex(), "<", ">"),
-                _ => value
+                _ => value,
             };
 
             string Strip(string s, Regex regex, string open, string close)
             {
-                return Options.RemoveContents
-                    ? regex.Replace(s, "")
-                    : s.Replace(open, "").Replace(close, "");
+                return Options.RemoveContents ? regex.Replace(s, "") : s.Replace(open, "").Replace(close, "");
             }
         }
 

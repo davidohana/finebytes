@@ -164,7 +164,8 @@ namespace Mfr.Tests.Engine
         public void BuildChangeRows_AudioTagYearChange_EmitsId3v2TyerRow()
         {
             var original = _CloneBaseline(configureOverlay: o =>
-                o.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999));
+                o.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(year: 1999)
+            );
             var item = new RenameItem(original);
             var pv = item.Preview.AudioTagOverlay;
             pv.MergeSemantic(SemanticAudioTag.FromOverlay(pv) with { Year = 2001 });
@@ -204,17 +205,11 @@ namespace Mfr.Tests.Engine
         {
             var original = _CloneBaseline(configureOverlay: o =>
             {
-                o.AudioTagOverlay.Xiph = new XiphTagData
-                {
-                    Fields = [new TextFieldRow("DATE", ["1999"])],
-                };
+                o.AudioTagOverlay.Xiph = new XiphTagData { Fields = [new TextFieldRow("DATE", ["1999"])] };
             });
             var item = new RenameItem(original);
             // Same projected year via alternate known key — field layout differs, semantics align.
-            item.Preview.AudioTagOverlay.Xiph = new XiphTagData
-            {
-                Fields = [new TextFieldRow("YEAR", ["1999"])],
-            };
+            item.Preview.AudioTagOverlay.Xiph = new XiphTagData { Fields = [new TextFieldRow("YEAR", ["1999"])] };
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
@@ -229,27 +224,22 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void BuildChangeRows_MixedPathAndBlock_FollowsStableOrdering()
         {
-            var original = _CloneBaseline(directoryPath: @"D:\A", configureOverlay: o =>
-            {
-                o.AudioTagOverlay.Xiph = new XiphTagData
+            var original = _CloneBaseline(
+                directoryPath: @"D:\A",
+                configureOverlay: o =>
                 {
-                    Fields = [new TextFieldRow("TITLE", ["a"])],
-                };
-            });
+                    o.AudioTagOverlay.Xiph = new XiphTagData { Fields = [new TextFieldRow("TITLE", ["a"])] };
+                }
+            );
             var item = new RenameItem(original);
             item.Preview.DirectoryPath = @"D:\B";
-            item.Preview.AudioTagOverlay.Xiph = new XiphTagData
-            {
-                Fields = [new TextFieldRow("TITLE", ["a"])],
-            };
+            item.Preview.AudioTagOverlay.Xiph = new XiphTagData { Fields = [new TextFieldRow("TITLE", ["a"])] };
             var pv = item.Preview.AudioTagOverlay;
             pv.MergeSemantic(SemanticAudioTag.FromOverlay(pv) with { Genre = "Rock" });
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
-            Assert.Equal(
-                ["DirectoryPath", "AudioTag.Block.Xiph.GENRE"],
-                [.. rows.Select(r => r.Property)]);
+            Assert.Equal(["DirectoryPath", "AudioTag.Block.Xiph.GENRE"], [.. rows.Select(r => r.Property)]);
         }
 
         /// <summary>
@@ -269,7 +259,8 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal(
                 ["DirectoryPath", "Attributes", "AudioTag.Block.Id3v2.TCON"],
-                [.. rows.Select(r => r.Property)]);
+                [.. rows.Select(r => r.Property)]
+            );
         }
 
         /// <summary>
@@ -279,10 +270,7 @@ namespace Mfr.Tests.Engine
         public void BuildChangeRows_StripAllEmbeddedTagsOnCommit_FlagEmitsRow()
         {
             var original = _CloneBaseline();
-            var item = new RenameItem(original)
-            {
-                StripAllEmbeddedTagsOnCommit = true
-            };
+            var item = new RenameItem(original) { StripAllEmbeddedTagsOnCommit = true };
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
@@ -297,7 +285,8 @@ namespace Mfr.Tests.Engine
             DateTime? creationTime = null,
             DateTime? lastWriteTime = null,
             DateTime? lastAccessTime = null,
-            Action<FileMeta>? configureOverlay = null)
+            Action<FileMeta>? configureOverlay = null
+        )
         {
             var testItem = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
@@ -307,7 +296,8 @@ namespace Mfr.Tests.Engine
                 creationTime: creationTime ?? new DateTime(2024, 6, 1, 12, 30, 45, DateTimeKind.Unspecified),
                 lastWriteTime: lastWriteTime ?? new DateTime(2024, 6, 1, 12, 30, 46, DateTimeKind.Unspecified),
                 lastAccessTime: lastAccessTime ?? new DateTime(2024, 6, 1, 12, 30, 47, DateTimeKind.Unspecified),
-                configureOriginal: configureOverlay);
+                configureOriginal: configureOverlay
+            );
 
             return testItem.Original.Clone();
         }

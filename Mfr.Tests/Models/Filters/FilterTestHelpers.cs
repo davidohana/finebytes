@@ -45,7 +45,8 @@ namespace Mfr.Tests.Models.Filters
             long fileSize = 0,
             int? renameListTotalCount = null,
             int? renameListFolderSiblingCount = null,
-            Action<FileMeta>? configureOriginal = null)
+            Action<FileMeta>? configureOriginal = null
+        )
         {
             directory ??= @"C:\Music\Album";
             var baseline = new DateTime(2024, 6, 1, 12, 30, 45, DateTimeKind.Unspecified);
@@ -63,7 +64,8 @@ namespace Mfr.Tests.Models.Filters
                 lastAccessTime: lastAccessTime ?? baseline,
                 fileSize: fileSize,
                 renameListTotalCount: resolvedTotal,
-                renameListFolderSiblingCount: resolvedFolder);
+                renameListFolderSiblingCount: resolvedFolder
+            );
 
             configureOriginal?.Invoke(meta);
             EnsureSyntheticAudioOverlayWhenTagless(meta);
@@ -89,7 +91,13 @@ namespace Mfr.Tests.Models.Filters
         internal static void EnsureSyntheticAudioOverlayWhenTagless(FileMeta meta)
         {
             var o = meta.AudioTagOverlay;
-            if (o.Id3v2 is not null || o.Xiph is not null || o.Ape is not null || o.Apple is not null || o.Asf is not null)
+            if (
+                o.Id3v2 is not null
+                || o.Xiph is not null
+                || o.Ape is not null
+                || o.Apple is not null
+                || o.Asf is not null
+            )
                 return;
 
             meta.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay();
@@ -112,6 +120,7 @@ namespace Mfr.Tests.Models.Filters
                 _ => AudioContainerFormat.Unknown,
             };
         }
+
         /// <summary>
         /// Applies a filter to a prefix-targeted rename item and returns the resulting preview prefix.
         /// </summary>
@@ -128,7 +137,8 @@ namespace Mfr.Tests.Models.Filters
             string extension = ".mp3",
             int renameListIndex = 0,
             int inFolderIndex = 0,
-            string? directory = null)
+            string? directory = null
+        )
         {
             var item = CreateRenameItem(inputPrefix, extension, renameListIndex, inFolderIndex, directory);
             filter.Setup();
@@ -152,7 +162,8 @@ namespace Mfr.Tests.Models.Filters
             string extension = ".mp3",
             int renameListIndex = 0,
             int inFolderIndex = 0,
-            string? directory = null)
+            string? directory = null
+        )
         {
             var item = CreateRenameItem(inputPrefix, extension, renameListIndex, inFolderIndex, directory);
             filter.Setup();

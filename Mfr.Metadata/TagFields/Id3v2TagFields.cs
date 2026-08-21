@@ -22,11 +22,51 @@ namespace Mfr.Metadata.TagFields
     {
         private static readonly HashSet<string> _SingletonFrameIds = new(StringComparer.Ordinal)
         {
-            "TALB", "TBPM", "TCOM", "TCON", "TCOP", "TDAT", "TDEN", "TDOR", "TDRC", "TDRL", "TDTG",
-            "TENC", "TEXT", "TFLT", "TIPL", "TIT1", "TIT2", "TIT3", "TKEY", "TLAN", "TLEN",
-            "TMED", "TMOO", "TOAL", "TOFN", "TOLY", "TOPE", "TORY", "TOWN",
-            "TPE1", "TPE2", "TPE3", "TPE4", "TPOS", "TPUB", "TRCK", "TRDA", "TRSN", "TRSO",
-            "TSIZ", "TSOA", "TSOP", "TSSE", "TSST", "TYER",
+            "TALB",
+            "TBPM",
+            "TCOM",
+            "TCON",
+            "TCOP",
+            "TDAT",
+            "TDEN",
+            "TDOR",
+            "TDRC",
+            "TDRL",
+            "TDTG",
+            "TENC",
+            "TEXT",
+            "TFLT",
+            "TIPL",
+            "TIT1",
+            "TIT2",
+            "TIT3",
+            "TKEY",
+            "TLAN",
+            "TLEN",
+            "TMED",
+            "TMOO",
+            "TOAL",
+            "TOFN",
+            "TOLY",
+            "TOPE",
+            "TORY",
+            "TOWN",
+            "TPE1",
+            "TPE2",
+            "TPE3",
+            "TPE4",
+            "TPOS",
+            "TPUB",
+            "TRCK",
+            "TRDA",
+            "TRSN",
+            "TRSO",
+            "TSIZ",
+            "TSOA",
+            "TSOP",
+            "TSSE",
+            "TSST",
+            "TYER",
         };
 
         /// <summary>
@@ -44,11 +84,7 @@ namespace Mfr.Metadata.TagFields
                 return null;
 
             frames.Sort(_CompareFrames);
-            return new Id3v2TagData
-            {
-                Version = live.Version,
-                Frames = [.. frames],
-            };
+            return new Id3v2TagData { Version = live.Version, Frames = [.. frames] };
         }
 
         /// <summary>
@@ -84,7 +120,8 @@ namespace Mfr.Metadata.TagFields
                 {
                     _RemoveByIdentity(live, identity);
                     _AddFrame(live, frame);
-                });
+                }
+            );
         }
 
         private static void _WriteAll(Id3v2Tag live, Id3v2TagData data)
@@ -110,51 +147,53 @@ namespace Mfr.Metadata.TagFields
                 switch (frame)
                 {
                     case CommentsFrame comment:
-                        list.Add(new Id3v2ModeledFrame
-                        {
-                            FrameId = "COMM",
-                            Language = comment.Language.TrimmedOrNull(),
-                            Description = comment.Description.TrimmedOrNull(),
-                            TextValues = _SingleText(comment.Text),
-                        });
+                        list.Add(
+                            new Id3v2ModeledFrame
+                            {
+                                FrameId = "COMM",
+                                Language = comment.Language.TrimmedOrNull(),
+                                Description = comment.Description.TrimmedOrNull(),
+                                TextValues = _SingleText(comment.Text),
+                            }
+                        );
                         break;
 
                     case UnsynchronisedLyricsFrame lyrics:
-                        list.Add(new Id3v2ModeledFrame
-                        {
-                            FrameId = "USLT",
-                            Language = lyrics.Language.TrimmedOrNull(),
-                            Description = lyrics.Description.TrimmedOrNull(),
-                            TextValues = _SingleText(lyrics.Text),
-                        });
+                        list.Add(
+                            new Id3v2ModeledFrame
+                            {
+                                FrameId = "USLT",
+                                Language = lyrics.Language.TrimmedOrNull(),
+                                Description = lyrics.Description.TrimmedOrNull(),
+                                TextValues = _SingleText(lyrics.Text),
+                            }
+                        );
                         break;
 
                     case UserTextInformationFrame userText:
-                        list.Add(new Id3v2ModeledFrame
-                        {
-                            FrameId = "TXXX",
-                            Description = userText.Description.TrimmedOrNull(),
-                            TextValues = DelimitedText.TrimNonEmpty(userText.Text),
-                        });
+                        list.Add(
+                            new Id3v2ModeledFrame
+                            {
+                                FrameId = "TXXX",
+                                Description = userText.Description.TrimmedOrNull(),
+                                TextValues = DelimitedText.TrimNonEmpty(userText.Text),
+                            }
+                        );
                         break;
 
                     case TextInformationFrame text:
-                        {
-                            var frameId = text.FrameId.ToString(StringType.Latin1);
-                            if (!_SingletonFrameIds.Contains(frameId))
-                                break;
-
-                            var values = DelimitedText.TrimNonEmpty(text.Text);
-                            if (values.Length == 0)
-                                break;
-
-                            list.Add(new Id3v2ModeledFrame
-                            {
-                                FrameId = frameId,
-                                TextValues = values,
-                            });
+                    {
+                        var frameId = text.FrameId.ToString(StringType.Latin1);
+                        if (!_SingletonFrameIds.Contains(frameId))
                             break;
-                        }
+
+                        var values = DelimitedText.TrimNonEmpty(text.Text);
+                        if (values.Length == 0)
+                            break;
+
+                        list.Add(new Id3v2ModeledFrame { FrameId = frameId, TextValues = values });
+                        break;
+                    }
 
                     default:
                         break;
@@ -172,50 +211,52 @@ namespace Mfr.Metadata.TagFields
             switch (modeled.FrameId)
             {
                 case "COMM":
+                {
+                    var frame = new CommentsFrame(
+                        modeled.Description ?? string.Empty,
+                        modeled.Language ?? "eng",
+                        StringType.UTF8
+                    )
                     {
-                        var frame = new CommentsFrame(
-                            modeled.Description ?? string.Empty,
-                            modeled.Language ?? "eng",
-                            StringType.UTF8)
-                        {
-                            Text = modeled.TextValues[0],
-                        };
-                        live.AddFrame(frame);
-                        break;
-                    }
+                        Text = modeled.TextValues[0],
+                    };
+                    live.AddFrame(frame);
+                    break;
+                }
 
                 case "USLT":
+                {
+                    var frame = new UnsynchronisedLyricsFrame(
+                        modeled.Description ?? string.Empty,
+                        modeled.Language ?? "eng",
+                        StringType.UTF8
+                    )
                     {
-                        var frame = new UnsynchronisedLyricsFrame(
-                            modeled.Description ?? string.Empty,
-                            modeled.Language ?? "eng",
-                            StringType.UTF8)
-                        {
-                            Text = modeled.TextValues[0],
-                        };
-                        live.AddFrame(frame);
-                        break;
-                    }
+                        Text = modeled.TextValues[0],
+                    };
+                    live.AddFrame(frame);
+                    break;
+                }
 
                 case "TXXX":
+                {
+                    var frame = new UserTextInformationFrame(modeled.Description ?? string.Empty, StringType.UTF8)
                     {
-                        var frame = new UserTextInformationFrame(modeled.Description ?? string.Empty, StringType.UTF8)
-                        {
-                            Text = [.. modeled.TextValues],
-                        };
-                        live.AddFrame(frame);
-                        break;
-                    }
+                        Text = [.. modeled.TextValues],
+                    };
+                    live.AddFrame(frame);
+                    break;
+                }
 
                 default:
+                {
+                    var frame = new TextInformationFrame(modeled.FrameId, StringType.UTF8)
                     {
-                        var frame = new TextInformationFrame(modeled.FrameId, StringType.UTF8)
-                        {
-                            Text = [.. modeled.TextValues],
-                        };
-                        live.AddFrame(frame);
-                        break;
-                    }
+                        Text = [.. modeled.TextValues],
+                    };
+                    live.AddFrame(frame);
+                    break;
+                }
             }
         }
 
@@ -233,11 +274,7 @@ namespace Mfr.Metadata.TagFields
             if (!Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frame.FrameId))
                 return frame.FrameId;
 
-            return frame.FrameId
-                + '\0'
-                + (frame.Language ?? string.Empty)
-                + '\0'
-                + (frame.Description ?? string.Empty);
+            return frame.FrameId + '\0' + (frame.Language ?? string.Empty) + '\0' + (frame.Description ?? string.Empty);
         }
 
         private static void _RemoveByIdentity(Id3v2Tag live, string identity)
@@ -267,14 +304,21 @@ namespace Mfr.Metadata.TagFields
         {
             return frame switch
             {
-                CommentsFrame comment when frameId == "COMM" =>
-                    string.Equals(comment.Language ?? string.Empty, language, StringComparison.Ordinal)
-                    && string.Equals(comment.Description ?? string.Empty, description, StringComparison.Ordinal),
-                UnsynchronisedLyricsFrame lyrics when frameId == "USLT" =>
-                    string.Equals(lyrics.Language ?? string.Empty, language, StringComparison.Ordinal)
-                    && string.Equals(lyrics.Description ?? string.Empty, description, StringComparison.Ordinal),
-                UserTextInformationFrame userText when frameId == "TXXX" =>
-                    string.Equals(userText.Description ?? string.Empty, description, StringComparison.Ordinal),
+                CommentsFrame comment when frameId == "COMM" => string.Equals(
+                    comment.Language ?? string.Empty,
+                    language,
+                    StringComparison.Ordinal
+                ) && string.Equals(comment.Description ?? string.Empty, description, StringComparison.Ordinal),
+                UnsynchronisedLyricsFrame lyrics when frameId == "USLT" => string.Equals(
+                    lyrics.Language ?? string.Empty,
+                    language,
+                    StringComparison.Ordinal
+                ) && string.Equals(lyrics.Description ?? string.Empty, description, StringComparison.Ordinal),
+                UserTextInformationFrame userText when frameId == "TXXX" => string.Equals(
+                    userText.Description ?? string.Empty,
+                    description,
+                    StringComparison.Ordinal
+                ),
                 _ => false,
             };
         }

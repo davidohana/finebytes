@@ -50,7 +50,8 @@ namespace Mfr.App.Ui.Views
                     PathEditBox.Focus();
                     PathEditBox.SelectAll();
                 },
-                DispatcherPriority.Input);
+                DispatcherPriority.Input
+            );
         }
 
         private void _OnAddressBarPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -97,8 +98,7 @@ namespace Mfr.App.Ui.Views
             if (source is StyledElement { DataContext: string path })
                 return path;
 
-            if (source is Visual visual
-                && visual.FindAncestorOfType<ListBoxItem>()?.DataContext is string itemPath)
+            if (source is Visual visual && visual.FindAncestorOfType<ListBoxItem>()?.DataContext is string itemPath)
                 return itemPath;
 
             return null;
@@ -162,8 +162,10 @@ namespace Mfr.App.Ui.Views
             if (source is StyledElement { DataContext: PathBreadcrumbSegment segment })
                 return segment;
 
-            if (source is Visual visual
-                && visual.FindAncestorOfType<ListBoxItem>()?.DataContext is PathBreadcrumbSegment item)
+            if (
+                source is Visual visual
+                && visual.FindAncestorOfType<ListBoxItem>()?.DataContext is PathBreadcrumbSegment item
+            )
                 return item;
 
             return null;

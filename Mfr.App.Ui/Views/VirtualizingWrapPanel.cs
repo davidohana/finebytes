@@ -14,14 +14,18 @@ namespace Mfr.App.Ui.Views
         /// <summary>
         /// Defines the <see cref="ItemWidth"/> property.
         /// </summary>
-        public static readonly StyledProperty<double> ItemWidthProperty =
-            AvaloniaProperty.Register<VirtualizingWrapPanel, double>(nameof(ItemWidth), double.NaN);
+        public static readonly StyledProperty<double> ItemWidthProperty = AvaloniaProperty.Register<
+            VirtualizingWrapPanel,
+            double
+        >(nameof(ItemWidth), double.NaN);
 
         /// <summary>
         /// Defines the <see cref="ItemHeight"/> property.
         /// </summary>
-        public static readonly StyledProperty<double> ItemHeightProperty =
-            AvaloniaProperty.Register<VirtualizingWrapPanel, double>(nameof(ItemHeight), double.NaN);
+        public static readonly StyledProperty<double> ItemHeightProperty = AvaloniaProperty.Register<
+            VirtualizingWrapPanel,
+            double
+        >(nameof(ItemHeight), double.NaN);
 
         private const int _ViewportRowBuffer = 3;
 
@@ -128,10 +132,7 @@ namespace Mfr.App.Ui.Views
         }
 
         /// <inheritdoc />
-        protected override IInputElement? GetControl(
-            NavigationDirection direction,
-            IInputElement? from,
-            bool wrap)
+        protected override IInputElement? GetControl(NavigationDirection direction, IInputElement? from, bool wrap)
         {
             var itemCount = Items.Count;
             if (itemCount == 0)
@@ -178,7 +179,8 @@ namespace Mfr.App.Ui.Views
             var firstRow = Math.Max(0, (int)Math.Floor(viewport.Y / itemSize.Height) - _ViewportRowBuffer);
             var lastRow = Math.Max(
                 firstRow,
-                (int)Math.Floor((viewport.Bottom - 1) / itemSize.Height) + _ViewportRowBuffer);
+                (int)Math.Floor((viewport.Bottom - 1) / itemSize.Height) + _ViewportRowBuffer
+            );
             var firstIndex = Math.Min(itemCount - 1, firstRow * columns);
             var lastIndex = Math.Min(itemCount - 1, ((lastRow + 1) * columns) - 1);
             if (firstIndex < 0)
@@ -219,9 +221,11 @@ namespace Mfr.App.Ui.Views
                 container = (Control)item!;
                 _ownContainers.Add(container);
             }
-            else if (recycleKey is not null
+            else if (
+                recycleKey is not null
                 && _recycleKeyToPool.TryGetValue(recycleKey, out var pool)
-                && pool.Count > 0)
+                && pool.Count > 0
+            )
             {
                 container = pool.Pop();
                 container.IsVisible = true;

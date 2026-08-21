@@ -23,6 +23,6 @@ namespace Mfr.Models.Media
         /// Last access time.
         /// </summary>
         [JsonStringEnumMemberName("lastAccess")]
-        LastAccess
+        LastAccess,
     }
 }

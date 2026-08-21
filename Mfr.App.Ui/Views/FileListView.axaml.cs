@@ -22,7 +22,8 @@ namespace Mfr.App.Ui.Views
             ThumbnailsList.AddHandler(
                 PointerWheelChangedEvent,
                 _OnThumbnailsPointerWheelChanged,
-                RoutingStrategies.Tunnel);
+                RoutingStrategies.Tunnel
+            );
         }
 
         /// <inheritdoc />
@@ -128,21 +129,17 @@ namespace Mfr.App.Ui.Views
             if (view?.SortDescriptions is null)
                 return;
 
-            var direction = viewModel.IsSortAscending
-                ? ListSortDirection.Ascending
-                : ListSortDirection.Descending;
+            var direction = viewModel.IsSortAscending ? ListSortDirection.Ascending : ListSortDirection.Descending;
 
             using (view.DeferRefresh())
             {
                 view.SortDescriptions.Clear();
                 view.SortDescriptions.Add(
-                    DataGridSortDescription.FromPath(
-                        nameof(FileListEntry.ListingGroup),
-                        ListSortDirection.Ascending));
+                    DataGridSortDescription.FromPath(nameof(FileListEntry.ListingGroup), ListSortDirection.Ascending)
+                );
                 view.SortDescriptions.Add(
-                    DataGridSortDescription.FromPath(
-                        nameof(FileListEntry.IsDirectory),
-                        ListSortDirection.Descending));
+                    DataGridSortDescription.FromPath(nameof(FileListEntry.IsDirectory), ListSortDirection.Descending)
+                );
                 view.SortDescriptions.Add(_CreateColumnSort(viewModel.SortMemberPath, direction));
             }
         }

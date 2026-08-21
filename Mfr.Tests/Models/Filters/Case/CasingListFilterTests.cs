@@ -22,12 +22,11 @@ namespace Mfr.Tests.Models.Filters.Case
                 or
                 with
                 RMX
-                """);
+                """
+            );
             try
             {
-                var filter = _CreateFilter(
-                    filePath: casingListFilePath,
-                    uppercaseSentenceInitial: false);
+                var filter = _CreateFilter(filePath: casingListFilePath, uppercaseSentenceInitial: false);
 
                 var result = FilterTestHelpers.ApplyToPrefix(filter, "03 - WiTH Or Without You Rmx");
 
@@ -51,15 +50,15 @@ namespace Mfr.Tests.Models.Filters.Case
                 or
                 with
                 RMX
-                """);
+                """
+            );
             try
             {
                 var sentenceEndFilter = new SentenceEndCharactersFilter(
                     Target: _target,
-                    Options: new SentenceEndCharactersOptions(Characters: "-.!"));
-                var casingFilter = _CreateFilter(
-                    filePath: casingListFilePath,
-                    uppercaseSentenceInitial: true);
+                    Options: new SentenceEndCharactersOptions(Characters: "-.!")
+                );
+                var casingFilter = _CreateFilter(filePath: casingListFilePath, uppercaseSentenceInitial: true);
                 var item = FilterTestHelpers.CreateRenameItem(prefix: "03 - WiTH Or Without You Rmx");
                 var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, casingFilter]);
                 chain.SetupFilters();
@@ -85,7 +84,8 @@ namespace Mfr.Tests.Models.Filters.Case
                 and
                 us
                 them
-                """);
+                """
+            );
             try
             {
                 var spaceCharacterFilter = new SpaceCharacterFilter(
@@ -95,10 +95,10 @@ namespace Mfr.Tests.Models.Filters.Case
                         ReplaceSpaces: true,
                         ReplaceUnderscores: false,
                         ReplacePercent20: false,
-                        CustomText: ""));
-                var casingFilter = _CreateFilter(
-                    filePath: casingListFilePath,
-                    uppercaseSentenceInitial: true);
+                        CustomText: ""
+                    )
+                );
+                var casingFilter = _CreateFilter(filePath: casingListFilePath, uppercaseSentenceInitial: true);
                 var chain = FilterChain.CreateAllEnabled([spaceCharacterFilter, casingFilter]);
 
                 var item = FilterTestHelpers.CreateRenameItem(prefix: "US_AND_THEM");
@@ -120,24 +120,16 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Setup_MissingFile_ThrowsUserException()
         {
             var missingFilePath = Path.Combine(Path.GetTempPath(), $"mfr-casing-list-missing-{Guid.NewGuid():N}.txt");
-            var filter = _CreateFilter(
-                filePath: missingFilePath,
-                uppercaseSentenceInitial: false);
+            var filter = _CreateFilter(filePath: missingFilePath, uppercaseSentenceInitial: false);
 
             var ex = Assert.Throws<UserException>(filter.Setup);
             Assert.Contains("Casing-list file not found", ex.Message, StringComparison.Ordinal);
         }
 
-        private static CasingListFilter _CreateFilter(
-            string filePath,
-            bool uppercaseSentenceInitial)
+        private static CasingListFilter _CreateFilter(string filePath, bool uppercaseSentenceInitial)
         {
-            var options = new CasingListOptions(
-                FilePath: filePath,
-                UppercaseSentenceInitial: uppercaseSentenceInitial);
-            return new CasingListFilter(
-                Target: _target,
-                Options: options);
+            var options = new CasingListOptions(FilePath: filePath, UppercaseSentenceInitial: uppercaseSentenceInitial);
+            return new CasingListFilter(Target: _target, Options: options);
         }
 
         private static string _CreateCasingListFile(string content)

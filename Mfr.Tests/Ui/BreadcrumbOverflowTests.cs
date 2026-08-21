@@ -31,9 +31,7 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void Infinite_Width_Shows_All_Segments()
         {
-            Assert.Equal(
-                0,
-                BreadcrumbOverflow.PickVisibleStart([80, 80, 80], double.PositiveInfinity, 22));
+            Assert.Equal(0, BreadcrumbOverflow.PickVisibleStart([80, 80, 80], double.PositiveInfinity, 22));
         }
 
         /// <summary>

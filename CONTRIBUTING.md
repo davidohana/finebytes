@@ -15,35 +15,35 @@ If you have `just` installed, you can use shortcuts for the most common workflow
 
 ## C# formatting and linting
 
-This repository uses built-in .NET formatting and analyzers:
+- Layout: [CSharpier](https://csharpier.com/) (local tool; print width from `.editorconfig` `max_line_length = 120`)
+- Style / analyzers: `dotnet format style` and `dotnet format analyzers` (no whitespace — that conflicts with CSharpier)
+- Linting: `dotnet build` (analyzers and code style enforcement)
 
-- Formatting: `dotnet format`
-- Linting: `dotnet build` (with analyzers and code style enforcement enabled)
-
-Run these commands from the repository root before committing:
+Preferred shortcut:
 
 ```powershell
-dotnet format .\finebytes.slnx
+just format
 dotnet build .\finebytes.slnx
 ```
 
-If you prefer a single command in PowerShell:
+Equivalent without `just`:
 
 ```powershell
-dotnet format .\finebytes.slnx; if ($LASTEXITCODE -eq 0) { dotnet build .\finebytes.slnx }
+dotnet tool restore
+dotnet csharpier format .
+dotnet format style .\finebytes.slnx
+dotnet format analyzers .\finebytes.slnx
+dotnet build .\finebytes.slnx
 ```
 
-Linux/macOS usage:
+Linux/macOS:
 
 ```bash
-dotnet format ./finebytes.slnx
+dotnet tool restore
+dotnet csharpier format .
+dotnet format style ./finebytes.slnx
+dotnet format analyzers ./finebytes.slnx
 dotnet build ./finebytes.slnx
 ```
 
-Single command in bash:
-
-```bash
-dotnet format ./finebytes.slnx && dotnet build ./finebytes.slnx
-```
-
-Code style and diagnostic severities are configured in `.editorconfig`. Update that file when project conventions change.
+CSharpier formats `.cs` only (see `.csharpierignore`). Code style and diagnostic severities live in `.editorconfig`.

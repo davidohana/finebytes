@@ -30,7 +30,8 @@ namespace Mfr.Engine
             IEnumerable<string> sources,
             bool includeFiles = true,
             bool includeFolders = true,
-            bool includeSubdirs = false)
+            bool includeSubdirs = false
+        )
         {
             var sourceList = sources.ToList();
             Log.Information(
@@ -39,7 +40,8 @@ namespace Mfr.Engine
                 includeFiles,
                 includeFolders,
                 includeSubdirs,
-                _includeHidden);
+                _includeHidden
+            );
 
             foreach (var source in sourceList)
             {
@@ -47,7 +49,8 @@ namespace Mfr.Engine
                     source: source,
                     includeFiles: includeFiles,
                     includeFolders: includeFolders,
-                    includeSubdirs: includeSubdirs);
+                    includeSubdirs: includeSubdirs
+                );
             }
         }
 
@@ -63,33 +66,32 @@ namespace Mfr.Engine
             string source,
             bool includeFiles = true,
             bool includeFolders = true,
-            bool includeSubdirs = false)
+            bool includeSubdirs = false
+        )
         {
             if (string.IsNullOrWhiteSpace(source))
                 throw new UserException("Source cannot be empty.");
 
             var trimmedSource = source.Trim();
             var fullSource = Path.GetFullPath(trimmedSource);
-            var isRootPath = string.Equals(
-                Path.GetPathRoot(fullSource),
-                fullSource,
-                PathComparers.OsComparison);
+            var isRootPath = string.Equals(Path.GetPathRoot(fullSource), fullSource, PathComparers.OsComparison);
             if (isRootPath)
                 throw new UserException($"Root paths cannot be added as rename sources: '{trimmedSource}'.");
 
-            var resolvedPaths = AddedSourceResolver.ResolveToPaths(
-                            source: trimmedSource,
-                            includeFolders: includeFolders,
-                            includeSubdirs: includeSubdirs).ToList();
+            var resolvedPaths = AddedSourceResolver
+                .ResolveToPaths(source: trimmedSource, includeFolders: includeFolders, includeSubdirs: includeSubdirs)
+                .ToList();
             var addedCount = _AppendPaths(
                 resolvedPaths: resolvedPaths,
                 includeFiles: includeFiles,
-                includeFolders: includeFolders);
+                includeFolders: includeFolders
+            );
             Log.Information(
                 "Resolved source '{Source}' to {ResolvedCount} path(s), added {AddedCount} new item(s).",
                 trimmedSource,
                 resolvedPaths.Count,
-                addedCount);
+                addedCount
+            );
             return addedCount;
         }
 
@@ -109,7 +111,8 @@ namespace Mfr.Engine
             Log.Information(
                 "Starting preview for preset '{PresetName}' with {ItemCount} item(s).",
                 preset.Name,
-                _renameItems.Count);
+                _renameItems.Count
+            );
 
             _PopulateRenameListCounterContext();
 
@@ -130,10 +133,7 @@ namespace Mfr.Engine
                 catch (Exception ex)
                 {
                     renameItem.SetPreviewError(message: ex.Message, cause: ex);
-                    Log.Warning(
-                        ex,
-                        "Preview failed for '{SourcePath}'.",
-                        renameItem.Original.FullPath);
+                    Log.Warning(ex, "Preview failed for '{SourcePath}'.", renameItem.Original.FullPath);
                 }
             }
 
@@ -145,7 +145,8 @@ namespace Mfr.Engine
             {
                 unresolvableCycleItem.SetPreviewError(
                     message: $"Could not resolve rename cycle for '{unresolvableCycleItem.Original.FullPath}'.",
-                    cause: null);
+                    cause: null
+                );
             }
 
             foreach (var renameItem in _renameItems)
@@ -176,7 +177,8 @@ namespace Mfr.Engine
             CommitPlan plan,
             bool failFast,
             bool dryRun = false,
-            Func<RenameItem, bool>? confirmBeforeApply = null)
+            Func<RenameItem, bool>? confirmBeforeApply = null
+        )
         {
             ArgumentNullException.ThrowIfNull(plan);
 
@@ -185,14 +187,16 @@ namespace Mfr.Engine
                 _renameItems.Count,
                 failFast,
                 dryRun,
-                confirmBeforeApply is not null);
+                confirmBeforeApply is not null
+            );
 
             var results = CommitExecutor.Execute(
                 plan: plan,
                 allItems: _renameItems,
                 confirmBeforeApply: confirmBeforeApply,
                 failFast: failFast,
-                dryRun: dryRun);
+                dryRun: dryRun
+            );
 
             foreach (var item in _renameItems)
             {
@@ -211,7 +215,8 @@ namespace Mfr.Engine
                 "Finished commit. Success: {CommitOkCount}, Skipped: {CommitSkippedCount}, Errors: {CommitErrorCount}.",
                 commitOkCount,
                 commitSkippedCount,
-                commitErrorCount);
+                commitErrorCount
+            );
 
             return results;
         }
@@ -231,7 +236,8 @@ namespace Mfr.Engine
                 "Finished preview. Changed: {PreviewChangedCount}, Unchanged: {PreviewUnchangedCount}, Errors: {PreviewErrorCount}.",
                 changed,
                 unchanged,
-                errors);
+                errors
+            );
         }
 
         /// <summary>
@@ -251,8 +257,7 @@ namespace Mfr.Engine
                     continue;
 
                 var attrs = File.GetAttributes(fullPath);
-                if (!_includeHidden &&
-                    (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System)))
+                if (!_includeHidden && (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System)))
                 {
                     continue;
                 }
@@ -270,7 +275,8 @@ namespace Mfr.Engine
                     var isResolvedRootPath = string.Equals(
                         _NormalizePathKey(resolvedRoot),
                         normalizedResolvedPath,
-                        StringComparison.Ordinal);
+                        StringComparison.Ordinal
+                    );
                     if (isResolvedRootPath)
                     {
                         Log.Warning("Skipping root path '{Path}': root paths cannot be renamed.", fullPath);
@@ -284,7 +290,6 @@ namespace Mfr.Engine
 
                 if (isDirectory)
                     (directoryPath, prefix, extension) = _SplitRenamePathForDirectory(fullPath);
-
                 else
                     (directoryPath, prefix, extension) = _SplitRenamePathForFile(fullPath);
 
@@ -302,7 +307,8 @@ namespace Mfr.Engine
                     creationTime: File.GetCreationTime(fullPath),
                     lastWriteTime: File.GetLastWriteTime(fullPath),
                     lastAccessTime: File.GetLastAccessTime(fullPath),
-                    fileSize: isDirectory ? 0 : new FileInfo(fullPath).Length);
+                    fileSize: isDirectory ? 0 : new FileInfo(fullPath).Length
+                );
 
                 var renameItem = new RenameItem(originalFileMeta);
                 _renameItems.Add(renameItem);
@@ -339,8 +345,7 @@ namespace Mfr.Engine
         /// <summary>
         /// Splits a file path into rename metadata using file-style prefix and extension.
         /// </summary>
-        private static (string DirectoryPath, string Prefix, string Extension) _SplitRenamePathForFile(
-            string fullPath)
+        private static (string DirectoryPath, string Prefix, string Extension) _SplitRenamePathForFile(string fullPath)
         {
             var directoryPath = Path.GetDirectoryName(fullPath) ?? "";
             var prefix = Path.GetFileNameWithoutExtension(fullPath);
@@ -358,7 +363,8 @@ namespace Mfr.Engine
         /// </para>
         /// </remarks>
         private static (string DirectoryPath, string Prefix, string Extension) _SplitRenamePathForDirectory(
-            string fullPath)
+            string fullPath
+        )
         {
             var trimmed = fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             var directoryPath = Path.GetDirectoryName(trimmed) ?? "";

@@ -63,9 +63,10 @@ namespace Mfr.Tests.Models.Filters.Audio
                 "x",
                 ".wav",
                 renameListTotalCount: 1,
-                renameListFolderSiblingCount: 1)
+                renameListFolderSiblingCount: 1
+            )
             {
-                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PreservedForTest")
+                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "PreservedForTest"),
             };
 
             var item = new RenameItem(meta);
@@ -92,16 +93,18 @@ namespace Mfr.Tests.Models.Filters.Audio
                 "x",
                 ".wav",
                 renameListTotalCount: 1,
-                renameListFolderSiblingCount: 1)
+                renameListFolderSiblingCount: 1
+            )
             {
-                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Start")
+                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Start"),
             };
 
             var item = new RenameItem(meta);
             item.MarkEmbeddedTagsLoadAttempted();
             var formatter = new FormatterFilter(
                 Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                Options: new FormatterOptions("Formatted"));
+                Options: new FormatterOptions("Formatted")
+            );
             var remover = _CreateAllFilter();
             formatter.Setup();
             formatter.Apply(item);
@@ -127,15 +130,17 @@ namespace Mfr.Tests.Models.Filters.Audio
                 "x",
                 ".wav",
                 renameListTotalCount: 1,
-                renameListFolderSiblingCount: 1)
+                renameListFolderSiblingCount: 1
+            )
             {
-                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Disk")
+                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Disk"),
             };
 
             var item = new RenameItem(meta);
             item.MarkEmbeddedTagsLoadAttempted();
-            var setter = new AudioTagSetterFilter(new AudioTagSetterOptions(
-                Title: new AudioTagStringFieldOptions(Text: "FromSetter")));
+            var setter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "FromSetter"))
+            );
             var remover = _CreateAllFilter();
             setter.Setup();
             setter.Apply(item);
@@ -275,7 +280,8 @@ namespace Mfr.Tests.Models.Filters.Audio
                 inFolderIndex: 0,
                 directoryPath: Path.GetDirectoryName(absolutePath)!,
                 prefix: Path.GetFileNameWithoutExtension(absolutePath),
-                extension: Path.GetExtension(absolutePath));
+                extension: Path.GetExtension(absolutePath)
+            );
 
             return new RenameItem(meta);
         }

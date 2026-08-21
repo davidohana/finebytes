@@ -1,414 +1,428 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="using:Mfr.App.Ui.ViewModels"
-             xmlns:views="using:Mfr.App.Ui.Views"
-             mc:Ignorable="d"
-             d:DesignWidth="280"
-             d:DesignHeight="400"
-             x:Class="Mfr.App.Ui.Views.FileListView"
-             x:Name="FileListRoot"
-             x:DataType="vm:FileListViewModel">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <x:Double x:Key="DataGridRowSelectedBackgroundOpacity">1</x:Double>
-            <x:Double x:Key="DataGridRowSelectedHoveredBackgroundOpacity">1</x:Double>
-            <x:Double x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity">1</x:Double>
-            <x:Double x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundOpacity">1</x:Double>
-            <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
-        </ResourceDictionary>
-    </UserControl.Resources>
-    <UserControl.Styles>
-        <Style Selector="ListBox.file-list">
-            <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="2" />
-            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-            <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
-        </Style>
-        <Style Selector="ListBox.file-icons">
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-        </Style>
-        <Style Selector="ListBox.file-list ListBoxItem">
-            <Setter Property="MinHeight" Value="0" />
-            <Setter Property="Padding" Value="3,1" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="CornerRadius" Value="0" />
-            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-        </Style>
-        <Style Selector="ListBox.file-rows ListBoxItem">
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="Padding" Value="4,1" />
-            <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-        </Style>
-        <Style Selector="ListBox.file-rows ListBoxItem:nth-child(even)">
-            <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
-        </Style>
-        <Style Selector="ListBox.file-icons ListBoxItem">
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Stretch" />
-            <Setter Property="Padding" Value="2,1" />
-            <Setter Property="ClipToBounds" Value="True" />
-        </Style>
-        <Style Selector="ListBox.file-small-icons ListBoxItem">
-            <Setter Property="Width" Value="120" />
-        </Style>
-        <Style Selector="ListBox.file-list ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="BorderBrush" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="1" />
-        </Style>
-        <Style Selector="ListBox.file-icons ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-        </Style>
-        <Style Selector="ListBox.file-list ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
-        </Style>
-        <Style Selector="ListBox.file-list ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-        </Style>
-        <Style Selector="ListBox.file-list ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-        </Style>
-        <Style Selector="DataGrid.file-report">
-            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-            <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-            <Setter Property="RowBackground" Value="{DynamicResource FileListRowBrush}" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="ColumnHeaderHeight" Value="22" />
-            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
-            <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
-        </Style>
-        <Style Selector="DataGrid.file-report /template/ ScrollBar#PART_VerticalScrollbar">
-            <Setter Property="AllowAutoHide" Value="False" />
-        </Style>
-        <Style Selector="DataGrid.file-report /template/ ScrollBar#PART_HorizontalScrollbar">
-            <Setter Property="AllowAutoHide" Value="False" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridColumnHeader">
-            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-            <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="Foreground" Value="{DynamicResource FileListHeaderForegroundBrush}" />
-            <Setter Property="Background" Value="{DynamicResource FileListHeaderBrush}" />
-            <Setter Property="MinHeight" Value="22" />
-            <Setter Property="Padding" Value="6,0,4,0" />
-            <Setter Property="SeparatorBrush" Value="{DynamicResource FileListSeparatorBrush}" />
-            <Setter Property="AreSeparatorsVisible" Value="True" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridRow">
-            <Setter Property="MinHeight" Value="20" />
-            <Setter Property="Height" Value="20" />
-            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-            <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridRow:nth-child(even)">
-            <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridCell">
-            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-            <Setter Property="Padding" Value="4,0" />
-            <Setter Property="MinHeight" Value="0" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridCell:focus /template/ Grid#FocusVisual">
-            <Setter Property="IsVisible" Value="False" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridRow /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="Transparent" />
-            <Setter Property="Stroke" Value="Transparent" />
-            <Setter Property="StrokeThickness" Value="1" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{DynamicResource FileListHoverBrush}" />
-            <Setter Property="Opacity" Value="1" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-            <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="Opacity" Value="1" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-            <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="Opacity" Value="1" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-            <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="Opacity" Value="1" />
-        </Style>
-        <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-            <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
-            <Setter Property="Opacity" Value="1" />
-        </Style>
-    </UserControl.Styles>
-    <Border Classes="pane">
-        <DockPanel>
-            <views:FileListAddressBarView DockPanel.Dock="Top" />
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels"
+  xmlns:views="using:Mfr.App.Ui.Views"
+  mc:Ignorable="d"
+  d:DesignWidth="280"
+  d:DesignHeight="400"
+  x:Class="Mfr.App.Ui.Views.FileListView"
+  x:Name="FileListRoot"
+  x:DataType="vm:FileListViewModel"
+>
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <x:Double x:Key="DataGridRowSelectedBackgroundOpacity">1</x:Double>
+      <x:Double x:Key="DataGridRowSelectedHoveredBackgroundOpacity">1</x:Double>
+      <x:Double x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity">1</x:Double>
+      <x:Double x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundOpacity">1</x:Double>
+      <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
+    </ResourceDictionary>
+  </UserControl.Resources>
+  <UserControl.Styles>
+    <Style Selector="ListBox.file-list">
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="2" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
+      <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+    <Style Selector="ListBox.file-icons">
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    </Style>
+    <Style Selector="ListBox.file-list ListBoxItem">
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="3,1" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="ListBox.file-rows ListBoxItem">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="4,1" />
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+    </Style>
+    <Style Selector="ListBox.file-rows ListBoxItem:nth-child(even)">
+      <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
+    </Style>
+    <Style Selector="ListBox.file-icons ListBoxItem">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+      <Setter Property="Padding" Value="2,1" />
+      <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+    <Style Selector="ListBox.file-small-icons ListBoxItem">
+      <Setter Property="Width" Value="120" />
+    </Style>
+    <Style Selector="ListBox.file-list ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="ListBox.file-icons ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="ListBox.file-list ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="ListBox.file-list ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="ListBox.file-list ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="DataGrid.file-report">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="RowBackground" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="ColumnHeaderHeight" Value="22" />
+      <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+      <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+    </Style>
+    <Style Selector="DataGrid.file-report /template/ ScrollBar#PART_VerticalScrollbar">
+      <Setter Property="AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="DataGrid.file-report /template/ ScrollBar#PART_HorizontalScrollbar">
+      <Setter Property="AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridColumnHeader">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListHeaderForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FileListHeaderBrush}" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="6,0,4,0" />
+      <Setter Property="SeparatorBrush" Value="{DynamicResource FileListSeparatorBrush}" />
+      <Setter Property="AreSeparatorsVisible" Value="True" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridRow">
+      <Setter Property="MinHeight" Value="20" />
+      <Setter Property="Height" Value="20" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridRow:nth-child(even)">
+      <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridCell">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="MinHeight" Value="0" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridCell:focus /template/ Grid#FocusVisual">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridRow /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="Stroke" Value="Transparent" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </UserControl.Styles>
+  <Border Classes="pane">
+    <DockPanel>
+      <views:FileListAddressBarView DockPanel.Dock="Top" />
 
-            <Grid DockPanel.Dock="Bottom"
-                  ColumnDefinitions="Auto,*,Auto,Auto"
-                  Margin="4">
-                <TextBlock Text="Mask:"
-                           VerticalAlignment="Center"
-                           Margin="0,0,6,0" />
-                <ComboBox Grid.Column="1"
-                          IsEditable="True"
-                          ItemsSource="{Binding MaskSuggestions}"
-                          Text="{Binding Mask, Mode=TwoWay}" />
-                <TextBlock Grid.Column="2"
-                           Text="Exclude:"
-                           VerticalAlignment="Center"
-                           Margin="8,0,6,0" />
-                <TextBox Grid.Column="3"
-                         MinWidth="72"
-                         Watermark="*.tmp; *.bak"
-                         Text="{Binding ExcludeMasks, Mode=TwoWay}" />
-            </Grid>
+      <Grid DockPanel.Dock="Bottom" ColumnDefinitions="Auto,*,Auto,Auto" Margin="4">
+        <TextBlock Text="Mask:" VerticalAlignment="Center" Margin="0,0,6,0" />
+        <ComboBox
+          Grid.Column="1"
+          IsEditable="True"
+          ItemsSource="{Binding MaskSuggestions}"
+          Text="{Binding Mask, Mode=TwoWay}"
+        />
+        <TextBlock Grid.Column="2" Text="Exclude:" VerticalAlignment="Center" Margin="8,0,6,0" />
+        <TextBox
+          Grid.Column="3"
+          MinWidth="72"
+          Watermark="*.tmp; *.bak"
+          Text="{Binding ExcludeMasks, Mode=TwoWay}"
+        />
+      </Grid>
 
-            <Panel>
-                <DataGrid Classes="file-report"
-                          ItemsSource="{Binding Entries}"
-                          SelectedItem="{Binding SelectedEntry}"
-                          IsVisible="{Binding IsReportView}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          CanUserReorderColumns="False"
-                          CanUserSortColumns="True"
-                          CanUserResizeColumns="True"
-                          HeadersVisibility="Column"
-                          GridLinesVisibility="None"
-                          RowHeight="20"
-                          ColumnHeaderHeight="22"
-                          SelectionMode="Extended"
-                          Sorting="_OnEntriesSorting"
-                          Loaded="_OnReportGridLoaded"
-                          DoubleTapped="_OnEntriesDoubleTapped"
-                          KeyDown="_OnEntriesKeyDown">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Name"
-                                                Width="*"
-                                                SortMemberPath="Name">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="vm:FileListEntry">
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <Image Width="16"
-                                               Height="16"
-                                               VerticalAlignment="Center"
-                                               Source="{Binding Icon}" />
-                                        <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="Date modified"
-                                                Width="140"
-                                                SortMemberPath="LastWriteTime">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="vm:FileListEntry">
-                                    <TextBlock Text="{Binding DateModifiedDisplay}"
-                                               HorizontalAlignment="Left"
-                                               VerticalAlignment="Center" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Type"
-                                            Binding="{Binding Type}"
-                                            SortMemberPath="Type"
-                                            Width="110" />
-                        <DataGridTemplateColumn Header="Size"
-                                                Width="80"
-                                                SortMemberPath="Length">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="vm:FileListEntry">
-                                    <TextBlock Text="{Binding SizeDisplay}"
-                                               HorizontalAlignment="Right"
-                                               VerticalAlignment="Center"
-                                               Padding="0,0,8,0" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+      <Panel>
+        <DataGrid
+          Classes="file-report"
+          ItemsSource="{Binding Entries}"
+          SelectedItem="{Binding SelectedEntry}"
+          IsVisible="{Binding IsReportView}"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          CanUserReorderColumns="False"
+          CanUserSortColumns="True"
+          CanUserResizeColumns="True"
+          HeadersVisibility="Column"
+          GridLinesVisibility="None"
+          RowHeight="20"
+          ColumnHeaderHeight="22"
+          SelectionMode="Extended"
+          Sorting="_OnEntriesSorting"
+          Loaded="_OnReportGridLoaded"
+          DoubleTapped="_OnEntriesDoubleTapped"
+          KeyDown="_OnEntriesKeyDown"
+        >
+          <DataGrid.Columns>
+            <DataGridTemplateColumn Header="Name" Width="*" SortMemberPath="Name">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:FileListEntry">
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Image
+                      Width="16"
+                      Height="16"
+                      VerticalAlignment="Center"
+                      Source="{Binding Icon}"
+                    />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn
+              Header="Date modified"
+              Width="140"
+              SortMemberPath="LastWriteTime"
+            >
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:FileListEntry">
+                  <TextBlock
+                    Text="{Binding DateModifiedDisplay}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                  />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn
+              Header="Type"
+              Binding="{Binding Type}"
+              SortMemberPath="Type"
+              Width="110"
+            />
+            <DataGridTemplateColumn Header="Size" Width="80" SortMemberPath="Length">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="vm:FileListEntry">
+                  <TextBlock
+                    Text="{Binding SizeDisplay}"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Padding="0,0,8,0"
+                  />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
 
-                <ListBox Classes="file-list file-rows"
-                         ItemsSource="{Binding Entries}"
-                         SelectedItem="{Binding SelectedEntry}"
-                         IsVisible="{Binding IsListView}"
-                         SelectionMode="Multiple"
-                         DoubleTapped="_OnEntriesDoubleTapped"
-                         KeyDown="_OnEntriesKeyDown">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Width="16"
-                                       Height="16"
-                                       VerticalAlignment="Center"
-                                       Source="{Binding Icon}" />
-                                <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+        <ListBox
+          Classes="file-list file-rows"
+          ItemsSource="{Binding Entries}"
+          SelectedItem="{Binding SelectedEntry}"
+          IsVisible="{Binding IsListView}"
+          SelectionMode="Multiple"
+          DoubleTapped="_OnEntriesDoubleTapped"
+          KeyDown="_OnEntriesKeyDown"
+        >
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:FileListEntry">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Image Width="16" Height="16" VerticalAlignment="Center" Source="{Binding Icon}" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
 
-                <ListBox Classes="file-list file-icons file-small-icons"
-                         ItemsSource="{Binding Entries}"
-                         SelectedItem="{Binding SelectedEntry}"
-                         IsVisible="{Binding IsSmallIconsView}"
-                         SelectionMode="Multiple"
-                         DoubleTapped="_OnEntriesDoubleTapped"
-                         KeyDown="_OnEntriesKeyDown">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel ItemWidth="120" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:FileListEntry">
-                            <!-- Grid * column constrains width so TextTrimming applies (horizontal StackPanel does not). -->
-                            <Grid Width="116"
-                                  ColumnDefinitions="Auto,*"
-                                  Margin="0,0,4,0">
-                                <Image Width="16"
-                                       Height="16"
-                                       VerticalAlignment="Center"
-                                       Source="{Binding Icon}" />
-                                <TextBlock Grid.Column="1"
-                                           Margin="4,0,0,0"
-                                           VerticalAlignment="Center"
-                                           Text="{Binding Name}"
-                                           TextTrimming="CharacterEllipsis" />
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+        <ListBox
+          Classes="file-list file-icons file-small-icons"
+          ItemsSource="{Binding Entries}"
+          SelectedItem="{Binding SelectedEntry}"
+          IsVisible="{Binding IsSmallIconsView}"
+          SelectionMode="Multiple"
+          DoubleTapped="_OnEntriesDoubleTapped"
+          KeyDown="_OnEntriesKeyDown"
+        >
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel ItemWidth="120" />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:FileListEntry">
+              <!-- Grid * column constrains width so TextTrimming applies (horizontal StackPanel does not). -->
+              <Grid Width="116" ColumnDefinitions="Auto,*" Margin="0,0,4,0">
+                <Image Width="16" Height="16" VerticalAlignment="Center" Source="{Binding Icon}" />
+                <TextBlock
+                  Grid.Column="1"
+                  Margin="4,0,0,0"
+                  VerticalAlignment="Center"
+                  Text="{Binding Name}"
+                  TextTrimming="CharacterEllipsis"
+                />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
 
-                <ListBox Classes="file-list file-icons"
-                         ItemsSource="{Binding Entries}"
-                         SelectedItem="{Binding SelectedEntry}"
-                         IsVisible="{Binding IsLargeIconsView}"
-                         SelectionMode="Multiple"
-                         DoubleTapped="_OnEntriesDoubleTapped"
-                         KeyDown="_OnEntriesKeyDown">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel ItemWidth="76" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:FileListEntry">
-                            <StackPanel Width="72" Margin="2,1">
-                                <Image Width="32"
-                                       Height="32"
-                                       HorizontalAlignment="Center"
-                                       Source="{Binding Icon}" />
-                                <TextBlock Text="{Binding Name}"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"
-                                           TextTrimming="CharacterEllipsis"
-                                           MaxLines="2" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+        <ListBox
+          Classes="file-list file-icons"
+          ItemsSource="{Binding Entries}"
+          SelectedItem="{Binding SelectedEntry}"
+          IsVisible="{Binding IsLargeIconsView}"
+          SelectionMode="Multiple"
+          DoubleTapped="_OnEntriesDoubleTapped"
+          KeyDown="_OnEntriesKeyDown"
+        >
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel ItemWidth="76" />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:FileListEntry">
+              <StackPanel Width="72" Margin="2,1">
+                <Image
+                  Width="32"
+                  Height="32"
+                  HorizontalAlignment="Center"
+                  Source="{Binding Icon}"
+                />
+                <TextBlock
+                  Text="{Binding Name}"
+                  TextAlignment="Center"
+                  TextWrapping="Wrap"
+                  TextTrimming="CharacterEllipsis"
+                  MaxLines="2"
+                />
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
 
-                <ListBox x:Name="TilesList"
-                         Classes="file-list file-icons"
-                         ItemsSource="{Binding Entries}"
-                         SelectedItem="{Binding SelectedEntry}"
-                         IsVisible="{Binding IsTilesView}"
-                         SelectionMode="Multiple"
-                         DoubleTapped="_OnEntriesDoubleTapped"
-                         KeyDown="_OnEntriesKeyDown">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel ItemWidth="172" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:FileListEntry">
-                            <!-- Grid * column constrains width so TextTrimming applies (horizontal StackPanel does not). -->
-                            <Grid Width="168"
-                                  ColumnDefinitions="Auto,*"
-                                  Margin="1">
-                                <Image Width="32"
-                                       Height="32"
-                                       VerticalAlignment="Top"
-                                       Source="{Binding Icon}" />
-                                <StackPanel Grid.Column="1"
-                                            Margin="4,0,0,0"
-                                            VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding Name}"
-                                               TextTrimming="CharacterEllipsis" />
-                                    <TextBlock Text="{Binding Details}"
-                                               Opacity="0.7"
-                                               FontSize="11"
-                                               TextWrapping="Wrap"
-                                               TextTrimming="CharacterEllipsis"
-                                               MaxLines="2" />
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+        <ListBox
+          x:Name="TilesList"
+          Classes="file-list file-icons"
+          ItemsSource="{Binding Entries}"
+          SelectedItem="{Binding SelectedEntry}"
+          IsVisible="{Binding IsTilesView}"
+          SelectionMode="Multiple"
+          DoubleTapped="_OnEntriesDoubleTapped"
+          KeyDown="_OnEntriesKeyDown"
+        >
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel ItemWidth="172" />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:FileListEntry">
+              <!-- Grid * column constrains width so TextTrimming applies (horizontal StackPanel does not). -->
+              <Grid Width="168" ColumnDefinitions="Auto,*" Margin="1">
+                <Image Width="32" Height="32" VerticalAlignment="Top" Source="{Binding Icon}" />
+                <StackPanel Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock
+                    Text="{Binding Details}"
+                    Opacity="0.7"
+                    FontSize="11"
+                    TextWrapping="Wrap"
+                    TextTrimming="CharacterEllipsis"
+                    MaxLines="2"
+                  />
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
 
-                <ListBox x:Name="ThumbnailsList"
-                         Classes="file-list file-icons"
-                         ItemsSource="{Binding Entries}"
-                         SelectedItem="{Binding SelectedEntry}"
-                         IsVisible="{Binding IsThumbnailsView}"
-                         ClipToBounds="False"
-                         SelectionMode="Multiple"
-                         DoubleTapped="_OnEntriesDoubleTapped"
-                         KeyDown="_OnEntriesKeyDown">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <views:VirtualizingWrapPanel
-                                ItemWidth="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailCellWidth}"
-                                ItemHeight="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailCellHeight}" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:FileListEntry">
-                            <DockPanel Margin="2,1"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch">
-                                <TextBlock DockPanel.Dock="Bottom"
-                                           Text="{Binding Name}"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"
-                                           TextTrimming="CharacterEllipsis"
-                                           MaxLines="2" />
-                                <Panel x:Name="ThumbnailSquare"
-                                       Width="{Binding $parent[views:FileListView].((vm:FileListViewModel)DataContext).ThumbnailSize}"
-                                       Height="{Binding $parent[views:FileListView].((vm:FileListViewModel)DataContext).ThumbnailSize}"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       ClipToBounds="True">
-                                    <Image Stretch="Uniform"
-                                           RenderOptions.BitmapInterpolationMode="HighQuality"
-                                           Source="{Binding Icon}" />
-                                </Panel>
-                            </DockPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Panel>
-        </DockPanel>
-    </Border>
+        <ListBox
+          x:Name="ThumbnailsList"
+          Classes="file-list file-icons"
+          ItemsSource="{Binding Entries}"
+          SelectedItem="{Binding SelectedEntry}"
+          IsVisible="{Binding IsThumbnailsView}"
+          ClipToBounds="False"
+          SelectionMode="Multiple"
+          DoubleTapped="_OnEntriesDoubleTapped"
+          KeyDown="_OnEntriesKeyDown"
+        >
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <views:VirtualizingWrapPanel
+                ItemWidth="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailCellWidth}"
+                ItemHeight="{Binding #FileListRoot.((vm:FileListViewModel)DataContext).ThumbnailCellHeight}"
+              />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:FileListEntry">
+              <DockPanel Margin="2,1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <TextBlock
+                  DockPanel.Dock="Bottom"
+                  Text="{Binding Name}"
+                  TextAlignment="Center"
+                  TextWrapping="Wrap"
+                  TextTrimming="CharacterEllipsis"
+                  MaxLines="2"
+                />
+                <Panel
+                  x:Name="ThumbnailSquare"
+                  Width="{Binding $parent[views:FileListView].((vm:FileListViewModel)DataContext).ThumbnailSize}"
+                  Height="{Binding $parent[views:FileListView].((vm:FileListViewModel)DataContext).ThumbnailSize}"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  ClipToBounds="True"
+                >
+                  <Image
+                    Stretch="Uniform"
+                    RenderOptions.BitmapInterpolationMode="HighQuality"
+                    Source="{Binding Icon}"
+                  />
+                </Panel>
+              </DockPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Panel>
+    </DockPanel>
+  </Border>
 </UserControl>

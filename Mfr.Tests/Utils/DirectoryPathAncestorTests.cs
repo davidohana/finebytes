@@ -48,7 +48,8 @@ namespace Mfr.Tests.Utils
             Assert.Equal("c", DirectoryPathAncestor.GetSegmentName(pathWithTrailing, level: 1));
             Assert.Equal(
                 DirectoryPathAncestor.ReplaceSegment(pathWithTrailing, level: 1, newSegmentName: "cn"),
-                DirectoryPathAncestor.ReplaceSegment(pathTrimmed, level: 1, newSegmentName: "cn"));
+                DirectoryPathAncestor.ReplaceSegment(pathTrimmed, level: 1, newSegmentName: "cn")
+            );
         }
 
         /// <summary>
@@ -101,7 +102,9 @@ namespace Mfr.Tests.Utils
         {
             var pathOnly = OperatingSystem.IsWindows() ? @"C:\only" : "/only";
 
-            var ex = Assert.Throws<InvalidOperationException>(() => DirectoryPathAncestor.GetSegmentName(pathOnly, level: 2));
+            var ex = Assert.Throws<InvalidOperationException>(() =>
+                DirectoryPathAncestor.GetSegmentName(pathOnly, level: 2)
+            );
             Assert.Contains("level", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -114,7 +117,8 @@ namespace Mfr.Tests.Utils
             var pathOnly = OperatingSystem.IsWindows() ? @"C:\only" : "/only";
 
             var ex = Assert.Throws<InvalidOperationException>(() =>
-                DirectoryPathAncestor.ReplaceSegment(pathOnly, level: 2, newSegmentName: "x"));
+                DirectoryPathAncestor.ReplaceSegment(pathOnly, level: 2, newSegmentName: "x")
+            );
             Assert.Contains("level", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -131,7 +135,8 @@ namespace Mfr.Tests.Utils
             foreach (var badLevel in new[] { 0, -1, -99 })
             {
                 var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
-                    DirectoryPathAncestor.GetSegmentName(path, badLevel));
+                    DirectoryPathAncestor.GetSegmentName(path, badLevel)
+                );
                 Assert.Equal("level", ex.ParamName);
             }
         }
@@ -142,13 +147,13 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void ReplaceSegment_non_positive_level_Throws_ArgumentOutOfRange()
         {
-            var path =
-                $"{(OperatingSystem.IsWindows() ? @"C:\" : "/")}a{Path.DirectorySeparatorChar}b";
+            var path = $"{(OperatingSystem.IsWindows() ? @"C:\" : "/")}a{Path.DirectorySeparatorChar}b";
 
             foreach (var badLevel in new[] { 0, -1, -99 })
             {
                 var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
-                    DirectoryPathAncestor.ReplaceSegment(path, badLevel, newSegmentName: "x"));
+                    DirectoryPathAncestor.ReplaceSegment(path, badLevel, newSegmentName: "x")
+                );
                 Assert.Equal("level", ex.ParamName);
             }
         }
@@ -159,11 +164,11 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void ReplaceSegment_empty_NewSegment_throws_argument()
         {
-            var directory =
-                $"{(OperatingSystem.IsWindows() ? @"C:\" : "/")}a{Path.DirectorySeparatorChar}b";
+            var directory = $"{(OperatingSystem.IsWindows() ? @"C:\" : "/")}a{Path.DirectorySeparatorChar}b";
 
             var ex = Assert.Throws<ArgumentException>(() =>
-                DirectoryPathAncestor.ReplaceSegment(directory, level: 1, newSegmentName: ""));
+                DirectoryPathAncestor.ReplaceSegment(directory, level: 1, newSegmentName: "")
+            );
             Assert.Equal("newSegmentName", ex.ParamName);
         }
     }

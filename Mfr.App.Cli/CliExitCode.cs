@@ -18,6 +18,6 @@ namespace Mfr.App.Cli
         /// <summary>
         /// The command failed due to an unexpected application fault.
         /// </summary>
-        AppError = 2
+        AppError = 2,
     }
 }

@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
 using Mfr.Utils;
 
 namespace Mfr.Engine
@@ -42,8 +41,11 @@ namespace Mfr.Engine
             try
             {
                 var json = File.ReadAllText(PresetsFilePath);
-                container = JsonSerializer.Deserialize<PresetContainer>(json, PresetJsonOptions.Default)
-                    ?? throw new InvalidDataException("Presets JSON payload is null or invalid for the expected schema.");
+                container =
+                    JsonSerializer.Deserialize<PresetContainer>(json, PresetJsonOptions.Default)
+                    ?? throw new InvalidDataException(
+                        "Presets JSON payload is null or invalid for the expected schema."
+                    );
             }
             catch (Exception ex)
             {
@@ -56,8 +58,9 @@ namespace Mfr.Engine
             foreach (var preset in presets)
             {
                 if (!NameToPreset.TryAdd(preset.Name, preset))
-                    throw new UserException($"Duplicate preset names found in '{PresetsFilePath}'. Preset names must be unique.");
-
+                    throw new UserException(
+                        $"Duplicate preset names found in '{PresetsFilePath}'. Preset names must be unique."
+                    );
             }
         }
 
@@ -72,10 +75,10 @@ namespace Mfr.Engine
                 if (!string.IsNullOrWhiteSpace(directory))
                     Directory.CreateDirectory(directory);
 
-                var sortedPresets = NameToPreset.Values
-                                    .OrderBy(preset => preset.Name, StringComparer.OrdinalIgnoreCase)
-                                    .ThenBy(preset => preset.Name, StringComparer.Ordinal)
-                                    .ToList();
+                var sortedPresets = NameToPreset
+                    .Values.OrderBy(preset => preset.Name, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(preset => preset.Name, StringComparer.Ordinal)
+                    .ToList();
                 var container = new PresetContainer(sortedPresets);
                 var json = JsonSerializer.Serialize(container, PresetJsonOptions.Default);
                 File.WriteAllText(PresetsFilePath, json);
@@ -85,9 +88,7 @@ namespace Mfr.Engine
                 throw new UserException($"Failed to save presets file '{PresetsFilePath}': {ex.Message}", ex);
             }
         }
-
     }
 
-    internal sealed record PresetContainer(
-        [property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets);
+    internal sealed record PresetContainer([property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets);
 }

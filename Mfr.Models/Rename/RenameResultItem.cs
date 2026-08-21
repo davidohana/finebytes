@@ -8,10 +8,7 @@ namespace Mfr.Models.Rename
     /// <param name="Property">Name of the property that changed.</param>
     /// <param name="OldValue">Original value before rename.</param>
     /// <param name="NewValue">Updated value after rename.</param>
-    public sealed record RenamePropertyChange(
-        string Property,
-        string OldValue,
-        string NewValue)
+    public sealed record RenamePropertyChange(string Property, string OldValue, string NewValue)
     {
         /// <summary>
         /// Formats this change using the same layout as console preview output.
@@ -47,5 +44,6 @@ namespace Mfr.Models.Rename
         string OriginalPath,
         RenameStatus Status,
         string? Error,
-        IReadOnlyList<RenamePropertyChange> Changes);
+        IReadOnlyList<RenamePropertyChange> Changes
+    );
 }

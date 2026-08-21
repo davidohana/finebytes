@@ -16,15 +16,13 @@ namespace Mfr.Filters.Case
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
-    public sealed partial record UppercaseInitialsFilter(
-        FilterTarget Target, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+    public sealed partial record UppercaseInitialsFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)
+        : StringTargetFilter(Target, ApplyScope)
     {
         // Keep this runtime-compiled regex for readability and to avoid GeneratedRegex partial-method
         // analyzer noise in this project setup.
 #pragma warning disable SYSLIB1045
-        private static readonly Regex _regex = new(
-            @"(?<!\p{L})\p{L}(?:\.\p{L})+(?!\p{L})",
-            RegexOptions.Compiled);
+        private static readonly Regex _regex = new(@"(?<!\p{L})\p{L}(?:\.\p{L})+(?!\p{L})", RegexOptions.Compiled);
 #pragma warning restore SYSLIB1045
 
         /// <summary>
@@ -39,6 +37,5 @@ namespace Mfr.Filters.Case
 
             return _regex.Replace(value, m => m.Value.ToUpperInvariant());
         }
-
     }
 }

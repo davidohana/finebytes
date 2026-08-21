@@ -59,7 +59,8 @@ namespace Mfr.Models.Tags.Id3v2
                 return;
 
             throw new NotSupportedException(
-                $"ID3v2 frame '{normalizedId}' requires version 2.4; this tag is version 2.{tagVersion} (no silent upgrade).");
+                $"ID3v2 frame '{normalizedId}' requires version 2.4; this tag is version 2.{tagVersion} (no silent upgrade)."
+            );
         }
     }
 }

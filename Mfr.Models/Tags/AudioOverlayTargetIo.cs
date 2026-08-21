@@ -27,20 +27,25 @@ namespace Mfr.Models.Tags
 
             return target switch
             {
-                SemanticAudioFieldTarget audioFieldTarget =>
-                    SemanticFields.GetSemanticField(overlay, audioFieldTarget.Field),
-                Id3v1FieldTarget id3v1FieldTarget =>
-                    AudioOverlayBlockFieldIo.GetId3v1FieldString(overlay, id3v1FieldTarget.Field),
-                Id3v2FrameTarget id3v2FrameTarget =>
-                    AudioOverlayBlockFieldIo.GetId3v2FrameString(
-                        overlay,
-                        id3v2FrameTarget.FrameId,
-                        id3v2FrameTarget.Language,
-                        id3v2FrameTarget.Description),
-                XiphFieldTarget xiphFieldTarget =>
-                    AudioOverlayBlockFieldIo.GetXiphFieldString(overlay, xiphFieldTarget.Key),
-                _ => throw new NotSupportedException(
-                    $"Unsupported audio filter target '{target.GetType().Name}'."),
+                SemanticAudioFieldTarget audioFieldTarget => SemanticFields.GetSemanticField(
+                    overlay,
+                    audioFieldTarget.Field
+                ),
+                Id3v1FieldTarget id3v1FieldTarget => AudioOverlayBlockFieldIo.GetId3v1FieldString(
+                    overlay,
+                    id3v1FieldTarget.Field
+                ),
+                Id3v2FrameTarget id3v2FrameTarget => AudioOverlayBlockFieldIo.GetId3v2FrameString(
+                    overlay,
+                    id3v2FrameTarget.FrameId,
+                    id3v2FrameTarget.Language,
+                    id3v2FrameTarget.Description
+                ),
+                XiphFieldTarget xiphFieldTarget => AudioOverlayBlockFieldIo.GetXiphFieldString(
+                    overlay,
+                    xiphFieldTarget.Key
+                ),
+                _ => throw new NotSupportedException($"Unsupported audio filter target '{target.GetType().Name}'."),
             };
         }
 
@@ -62,7 +67,8 @@ namespace Mfr.Models.Tags
                     SemanticFields.SetSemanticField(
                         overlay: overlay,
                         field: audioFieldTarget.Field,
-                        fieldString: value);
+                        fieldString: value
+                    );
                     return;
                 case Id3v1FieldTarget id3v1FieldTarget:
                     AudioOverlayBlockFieldIo.SetId3v1FieldString(overlay, id3v1FieldTarget.Field, value);
@@ -73,14 +79,14 @@ namespace Mfr.Models.Tags
                         id3v2FrameTarget.FrameId,
                         value,
                         id3v2FrameTarget.Language,
-                        id3v2FrameTarget.Description);
+                        id3v2FrameTarget.Description
+                    );
                     return;
                 case XiphFieldTarget xiphFieldTarget:
                     AudioOverlayBlockFieldIo.SetXiphFieldString(overlay, xiphFieldTarget.Key, value);
                     return;
                 default:
-                    throw new NotSupportedException(
-                        $"Unsupported audio filter target '{target.GetType().Name}'.");
+                    throw new NotSupportedException($"Unsupported audio filter target '{target.GetType().Name}'.");
             }
         }
     }

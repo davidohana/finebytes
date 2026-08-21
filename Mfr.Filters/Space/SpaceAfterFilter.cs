@@ -9,9 +9,7 @@ namespace Mfr.Filters.Space
     /// <param name="OnlyWhenNextIsLetterOrDigit">
     /// When <c>true</c>, inserts only when the character immediately after the trigger is a Unicode letter or digit.
     /// </param>
-    public sealed record SpaceAfterOptions(
-        string AfterChars = "",
-        bool OnlyWhenNextIsLetterOrDigit = false);
+    public sealed record SpaceAfterOptions(string AfterChars = "", bool OnlyWhenNextIsLetterOrDigit = false);
 
     /// <summary>
     /// Ensures the current word separator appears after each listed character when missing.
@@ -25,7 +23,9 @@ namespace Mfr.Filters.Space
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record SpaceAfterFilter(
         FilterTarget Target,
-        SpaceAfterOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        SpaceAfterOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

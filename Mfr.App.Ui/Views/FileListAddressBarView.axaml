@@ -1,261 +1,299 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="using:Mfr.App.Ui.ViewModels"
-             xmlns:views="using:Mfr.App.Ui.Views"
-             xmlns:shortcuts="using:Mfr.App.Ui.Input"
-             mc:Ignorable="d"
-             d:DesignWidth="280"
-             d:DesignHeight="40"
-             x:Class="Mfr.App.Ui.Views.FileListAddressBarView"
-             x:Name="AddressBarRoot"
-             x:DataType="vm:FileListViewModel">
-    <UserControl.Styles>
-        <Style Selector="Border.address-bar">
-            <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="4" />
-            <Setter Property="MinHeight" Value="30" />
-            <Setter Property="Padding" Value="2,0,0,0" />
-            <Setter Property="ClipToBounds" Value="True" />
-            <Setter Property="Cursor" Value="IBeam" />
-        </Style>
-        <Style Selector="Button.breadcrumb">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="6,2" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="MinHeight" Value="0" />
-            <Setter Property="MinWidth" Value="0" />
-            <Setter Property="CornerRadius" Value="4" />
-            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-            <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="Cursor" Value="Arrow" />
-        </Style>
-        <Style Selector="Button.breadcrumb /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Cursor" Value="Arrow" />
-        </Style>
-        <Style Selector="Button.breadcrumb:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
-            <Setter Property="Cursor" Value="Arrow" />
-        </Style>
-        <Style Selector="Button.breadcrumb-overflow">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="4,0" />
-            <Setter Property="Width" Value="{x:Static vm:BreadcrumbOverflow.ButtonWidth}" />
-            <Setter Property="MinWidth" Value="{x:Static vm:BreadcrumbOverflow.ButtonWidth}" />
-            <Setter Property="MinHeight" Value="0" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="Cursor" Value="Arrow" />
-        </Style>
-        <Style Selector="Button.breadcrumb-overflow:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
-        </Style>
-        <Style Selector="Button.address-history">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="4,0" />
-            <Setter Property="MinWidth" Value="22" />
-            <Setter Property="MinHeight" Value="0" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="Cursor" Value="Arrow" />
-        </Style>
-        <Style Selector="Button.address-history:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
-        </Style>
-        <Style Selector="TextBox.address-edit">
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="MinHeight" Value="0" />
-            <Setter Property="Padding" Value="8,0,4,0" />
-            <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-            <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="AcceptsReturn" Value="False" />
-            <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
-            <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
-        </Style>
-        <Style Selector="TextBox.address-edit /template/ TextPresenter#PART_TextPresenter">
-            <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
-            <Setter Property="SelectionForegroundBrush" Value="{DynamicResource FileListForegroundBrush}" />
-        </Style>
-        <Style Selector="Button.address-tool">
-            <Setter Property="Width" Value="32" />
-            <Setter Property="MinWidth" Value="32" />
-            <Setter Property="MinHeight" Value="0" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="Margin" Value="4,0,0,0" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-    </UserControl.Styles>
-    <Grid ColumnDefinitions="*,Auto,Auto"
-          Margin="4">
-        <Border x:Name="AddressBar"
-                Classes="address-bar"
-                ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoToAddressTip}"
-                PointerPressed="_OnAddressBarPointerPressed">
-            <Grid ColumnDefinitions="*,Auto">
-                <Grid ColumnDefinitions="Auto,*"
-                      IsVisible="{Binding !IsPathEditing}">
-                    <Button Classes="breadcrumb"
-                            Focusable="False"
-                            Margin="2,0,0,0"
-                            Command="{Binding NavigateToCommand}"
-                            CommandParameter="{Binding RootTargetPath}"
-                            ToolTip.Tip="{Binding RootTargetPath}">
-                        <Panel Width="16" Height="16">
-                            <Viewbox IsVisible="{Binding ShowsComputerRoot}">
-                                <Path Width="16"
-                                      Height="16"
-                                      Stretch="Uniform"
-                                      Fill="{DynamicResource FileListForegroundBrush}"
-                                      Data="{StaticResource ComputerGeometry}" />
-                            </Viewbox>
-                            <Viewbox IsVisible="{Binding !ShowsComputerRoot}">
-                                <Path Width="16"
-                                      Height="16"
-                                      Stretch="Uniform"
-                                      Fill="{DynamicResource FileListForegroundBrush}"
-                                      Data="{StaticResource FolderGeometry}" />
-                            </Viewbox>
-                        </Panel>
-                    </Button>
-                    <Grid Grid.Column="1">
-                        <ItemsControl x:Name="BreadcrumbItems"
-                                      ItemsSource="{Binding BreadcrumbSegments}"
-                                      VerticalAlignment="Stretch">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <views:BreadcrumbTrailPanel
-                                        OverflowButtonWidth="{x:Static vm:BreadcrumbOverflow.ButtonWidth}" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:PathBreadcrumbSegment">
-                                    <DockPanel LastChildFill="True"
-                                               VerticalAlignment="Center"
-                                               Cursor="Arrow">
-                                        <Path Width="6"
-                                              Height="10"
-                                              Margin="4,0"
-                                              Stretch="Uniform"
-                                              VerticalAlignment="Center"
-                                              DockPanel.Dock="Left"
-                                              IsVisible="{Binding ShowLeadingChevron}"
-                                              Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
-                                              StrokeThickness="1.25"
-                                              StrokeLineCap="Round"
-                                              StrokeJoin="Round"
-                                              Data="M1,1.5 L5,5 L1,8.5" />
-                                        <Button Classes="breadcrumb"
-                                                HorizontalAlignment="Stretch"
-                                                HorizontalContentAlignment="Left"
-                                                ToolTip.Tip="{Binding TargetPath}"
-                                                Command="{Binding #AddressBarRoot.((vm:FileListViewModel)DataContext).NavigateToCommand}"
-                                                CommandParameter="{Binding TargetPath}">
-                                            <TextBlock Text="{Binding Label}"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       VerticalAlignment="Center" />
-                                        </Button>
-                                    </DockPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <Button x:Name="OverflowButton"
-                                Classes="breadcrumb-overflow"
-                                Focusable="False"
-                                IsVisible="False"
-                                ToolTip.Tip="Ancestor folders">
-                            <Path Width="10"
-                                  Height="10"
-                                  Stretch="Uniform"
-                                  Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
-                                  StrokeThickness="1.25"
-                                  StrokeLineCap="Round"
-                                  StrokeJoin="Round"
-                                  Data="M4,1.5 L0.5,5 L4,8.5 M8,1.5 L4.5,5 L8,8.5" />
-                            <Button.Flyout>
-                                <Flyout Placement="BottomEdgeAlignedLeft">
-                                    <ListBox MaxHeight="220"
-                                             MinWidth="180"
-                                             MaxWidth="360"
-                                             ItemsSource="{Binding OverflowBreadcrumbSegments, ElementName=AddressBarRoot}"
-                                             Tapped="_OnOverflowTapped">
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate x:DataType="vm:PathBreadcrumbSegment">
-                                                <TextBlock Text="{Binding Label}"
-                                                           TextTrimming="CharacterEllipsis" />
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                </Flyout>
-                            </Button.Flyout>
-                        </Button>
-                    </Grid>
-                </Grid>
-                <TextBox x:Name="PathEditBox"
-                         Classes="address-edit"
-                         IsVisible="{Binding IsPathEditing}"
-                         Text="{Binding PathText, Mode=TwoWay}"
-                         Watermark="Folder path or \\server\share"
-                         ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddressEditTip}"
-                         KeyDown="_OnPathKeyDown"
-                         LostFocus="_OnPathLostFocus" />
-                <Button x:Name="HistoryButton"
-                        Grid.Column="1"
-                        Classes="address-history"
-                        Focusable="False"
-                        Click="_OnHistoryClick"
-                        ToolTip.Tip="Recent locations">
-                    <Path Width="10"
-                          Height="6"
-                          Stretch="Uniform"
-                          Fill="{DynamicResource FileListBreadcrumbMutedBrush}"
-                          Data="M0,0 L10,0 L5,6 Z" />
-                    <Button.Flyout>
-                        <Flyout Placement="BottomEdgeAlignedRight"
-                                Opened="_OnHistoryOpened"
-                                Closed="_OnHistoryClosed">
-                            <ListBox MaxHeight="220"
-                                     MinWidth="280"
-                                     ItemsSource="{Binding PathHistory}"
-                                     Tapped="_OnHistoryTapped" />
-                        </Flyout>
-                    </Button.Flyout>
-                </Button>
-            </Grid>
-        </Border>
-        <Button Grid.Column="1"
-                Classes="address-tool"
-                Command="{Binding GoUpCommand}"
-                ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoUpTip}">
-            <TemplatedControl Width="16"
-                              Height="16"
-                              Template="{StaticResource GoUpIconTemplate}" />
-        </Button>
-        <Button Grid.Column="2"
-                Classes="address-tool"
-                Command="{Binding RefreshCommand}"
-                ToolTip.Tip="{x:Static shortcuts:AppShortcuts.RefreshTip}">
-            <Viewbox Width="16" Height="16">
-                <Path Width="16"
-                      Height="16"
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels"
+  xmlns:views="using:Mfr.App.Ui.Views"
+  xmlns:shortcuts="using:Mfr.App.Ui.Input"
+  mc:Ignorable="d"
+  d:DesignWidth="280"
+  d:DesignHeight="40"
+  x:Class="Mfr.App.Ui.Views.FileListAddressBarView"
+  x:Name="AddressBarRoot"
+  x:DataType="vm:FileListViewModel"
+>
+  <UserControl.Styles>
+    <Style Selector="Border.address-bar">
+      <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="MinHeight" Value="30" />
+      <Setter Property="Padding" Value="2,0,0,0" />
+      <Setter Property="ClipToBounds" Value="True" />
+      <Setter Property="Cursor" Value="IBeam" />
+    </Style>
+    <Style Selector="Button.breadcrumb">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="Button.breadcrumb /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="Button.breadcrumb:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="Button.breadcrumb-overflow">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="Width" Value="{x:Static vm:BreadcrumbOverflow.ButtonWidth}" />
+      <Setter Property="MinWidth" Value="{x:Static vm:BreadcrumbOverflow.ButtonWidth}" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="Button.breadcrumb-overflow:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.address-history">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="MinWidth" Value="22" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="Button.address-history:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="TextBox.address-edit">
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="8,0,4,0" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="AcceptsReturn" Value="False" />
+      <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter
+        Property="SelectionForegroundBrush"
+        Value="{DynamicResource FileListForegroundBrush}"
+      />
+    </Style>
+    <Style Selector="TextBox.address-edit /template/ TextPresenter#PART_TextPresenter">
+      <Setter Property="SelectionBrush" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter
+        Property="SelectionForegroundBrush"
+        Value="{DynamicResource FileListForegroundBrush}"
+      />
+    </Style>
+    <Style Selector="Button.address-tool">
+      <Setter Property="Width" Value="32" />
+      <Setter Property="MinWidth" Value="32" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="4,0,0,0" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+  </UserControl.Styles>
+  <Grid ColumnDefinitions="*,Auto,Auto" Margin="4">
+    <Border
+      x:Name="AddressBar"
+      Classes="address-bar"
+      ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoToAddressTip}"
+      PointerPressed="_OnAddressBarPointerPressed"
+    >
+      <Grid ColumnDefinitions="*,Auto">
+        <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding !IsPathEditing}">
+          <Button
+            Classes="breadcrumb"
+            Focusable="False"
+            Margin="2,0,0,0"
+            Command="{Binding NavigateToCommand}"
+            CommandParameter="{Binding RootTargetPath}"
+            ToolTip.Tip="{Binding RootTargetPath}"
+          >
+            <Panel Width="16" Height="16">
+              <Viewbox IsVisible="{Binding ShowsComputerRoot}">
+                <Path
+                  Width="16"
+                  Height="16"
+                  Stretch="Uniform"
+                  Fill="{DynamicResource FileListForegroundBrush}"
+                  Data="{StaticResource ComputerGeometry}"
+                />
+              </Viewbox>
+              <Viewbox IsVisible="{Binding !ShowsComputerRoot}">
+                <Path
+                  Width="16"
+                  Height="16"
+                  Stretch="Uniform"
+                  Fill="{DynamicResource FileListForegroundBrush}"
+                  Data="{StaticResource FolderGeometry}"
+                />
+              </Viewbox>
+            </Panel>
+          </Button>
+          <Grid Grid.Column="1">
+            <ItemsControl
+              x:Name="BreadcrumbItems"
+              ItemsSource="{Binding BreadcrumbSegments}"
+              VerticalAlignment="Stretch"
+            >
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <views:BreadcrumbTrailPanel OverflowButtonWidth="{x:Static vm:BreadcrumbOverflow.ButtonWidth}" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:PathBreadcrumbSegment">
+                  <DockPanel LastChildFill="True" VerticalAlignment="Center" Cursor="Arrow">
+                    <Path
+                      Width="6"
+                      Height="10"
+                      Margin="4,0"
                       Stretch="Uniform"
-                      Fill="{DynamicResource FileListForegroundBrush}"
-                      Data="{StaticResource RefreshGeometry}" />
-            </Viewbox>
+                      VerticalAlignment="Center"
+                      DockPanel.Dock="Left"
+                      IsVisible="{Binding ShowLeadingChevron}"
+                      Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
+                      StrokeThickness="1.25"
+                      StrokeLineCap="Round"
+                      StrokeJoin="Round"
+                      Data="M1,1.5 L5,5 L1,8.5"
+                    />
+                    <Button
+                      Classes="breadcrumb"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Left"
+                      ToolTip.Tip="{Binding TargetPath}"
+                      Command="{Binding #AddressBarRoot.((vm:FileListViewModel)DataContext).NavigateToCommand}"
+                      CommandParameter="{Binding TargetPath}"
+                    >
+                      <TextBlock
+                        Text="{Binding Label}"
+                        TextTrimming="CharacterEllipsis"
+                        VerticalAlignment="Center"
+                      />
+                    </Button>
+                  </DockPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Button
+              x:Name="OverflowButton"
+              Classes="breadcrumb-overflow"
+              Focusable="False"
+              IsVisible="False"
+              ToolTip.Tip="Ancestor folders"
+            >
+              <Path
+                Width="10"
+                Height="10"
+                Stretch="Uniform"
+                Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
+                StrokeThickness="1.25"
+                StrokeLineCap="Round"
+                StrokeJoin="Round"
+                Data="M4,1.5 L0.5,5 L4,8.5 M8,1.5 L4.5,5 L8,8.5"
+              />
+              <Button.Flyout>
+                <Flyout Placement="BottomEdgeAlignedLeft">
+                  <ListBox
+                    MaxHeight="220"
+                    MinWidth="180"
+                    MaxWidth="360"
+                    ItemsSource="{Binding OverflowBreadcrumbSegments, ElementName=AddressBarRoot}"
+                    Tapped="_OnOverflowTapped"
+                  >
+                    <ListBox.ItemTemplate>
+                      <DataTemplate x:DataType="vm:PathBreadcrumbSegment">
+                        <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
+                      </DataTemplate>
+                    </ListBox.ItemTemplate>
+                  </ListBox>
+                </Flyout>
+              </Button.Flyout>
+            </Button>
+          </Grid>
+        </Grid>
+        <TextBox
+          x:Name="PathEditBox"
+          Classes="address-edit"
+          IsVisible="{Binding IsPathEditing}"
+          Text="{Binding PathText, Mode=TwoWay}"
+          Watermark="Folder path or \\server\share"
+          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddressEditTip}"
+          KeyDown="_OnPathKeyDown"
+          LostFocus="_OnPathLostFocus"
+        />
+        <Button
+          x:Name="HistoryButton"
+          Grid.Column="1"
+          Classes="address-history"
+          Focusable="False"
+          Click="_OnHistoryClick"
+          ToolTip.Tip="Recent locations"
+        >
+          <Path
+            Width="10"
+            Height="6"
+            Stretch="Uniform"
+            Fill="{DynamicResource FileListBreadcrumbMutedBrush}"
+            Data="M0,0 L10,0 L5,6 Z"
+          />
+          <Button.Flyout>
+            <Flyout
+              Placement="BottomEdgeAlignedRight"
+              Opened="_OnHistoryOpened"
+              Closed="_OnHistoryClosed"
+            >
+              <ListBox
+                MaxHeight="220"
+                MinWidth="280"
+                ItemsSource="{Binding PathHistory}"
+                Tapped="_OnHistoryTapped"
+              />
+            </Flyout>
+          </Button.Flyout>
         </Button>
-    </Grid>
+      </Grid>
+    </Border>
+    <Button
+      Grid.Column="1"
+      Classes="address-tool"
+      Command="{Binding GoUpCommand}"
+      ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoUpTip}"
+    >
+      <TemplatedControl Width="16" Height="16" Template="{StaticResource GoUpIconTemplate}" />
+    </Button>
+    <Button
+      Grid.Column="2"
+      Classes="address-tool"
+      Command="{Binding RefreshCommand}"
+      ToolTip.Tip="{x:Static shortcuts:AppShortcuts.RefreshTip}"
+    >
+      <Viewbox Width="16" Height="16">
+        <Path
+          Width="16"
+          Height="16"
+          Stretch="Uniform"
+          Fill="{DynamicResource FileListForegroundBrush}"
+          Data="{StaticResource RefreshGeometry}"
+        />
+      </Viewbox>
+    </Button>
+  </Grid>
 </UserControl>

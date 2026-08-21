@@ -20,7 +20,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 Alpha
                 Beta
                 Gamma
-                """);
+                """
+            );
             try
             {
                 var f = _CreateFilter(path);
@@ -48,7 +49,9 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Options: new NameListOptions(
                         FilePath: path,
                         Prefix: "<counter:initial=10,step=1,padding=none,length=2,resetScope=global>_",
-                        Suffix: "_end"));
+                        Suffix: "_end"
+                    )
+                );
                 Assert.Equal("10_One_end", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
             }
             finally
@@ -68,7 +71,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 First
 
                 Second
-                """);
+                """
+            );
             try
             {
                 var f = _CreateFilter(path);
@@ -93,7 +97,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 A
 
                 B
-                """);
+                """
+            );
             try
             {
                 var f = _CreateFilter(path);
@@ -118,7 +123,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
             {
                 var f = _CreateFilter(path);
                 var ex = Assert.Throws<UserException>(() =>
-                    FilterTestHelpers.ApplyToPrefix(f, "old", renameListIndex: 1));
+                    FilterTestHelpers.ApplyToPrefix(f, "old", renameListIndex: 1)
+                );
                 Assert.Contains("Name-list has", ex.Message, StringComparison.Ordinal);
             }
             finally
@@ -139,7 +145,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 Real1
                 # also a comment
                 Real2
-                """);
+                """
+            );
             try
             {
                 var f = _CreateFilter(path);
@@ -156,10 +163,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             return new NameListFilter(
                 Target: _target,
-                Options: new NameListOptions(
-                    FilePath: path,
-                    Prefix: "",
-                    Suffix: ""));
+                Options: new NameListOptions(FilePath: path, Prefix: "", Suffix: "")
+            );
         }
 
         private static string _WriteTemp(string content)

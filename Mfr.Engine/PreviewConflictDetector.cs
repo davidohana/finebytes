@@ -41,7 +41,8 @@ namespace Mfr.Engine
                 {
                     item.SetPreviewError(
                         message: $"More than one rename targets the same path '{destinationPath}'.",
-                        cause: null);
+                        cause: null
+                    );
                     continue;
                 }
 
@@ -51,27 +52,26 @@ namespace Mfr.Engine
                     continue;
 
                 var willBeVacatedByBatch = _WillBeVacatedByBatch(
-                                    destinationPath: destinationPath,
-                                    movingSourcePaths: movingSourcePaths,
-                                    folderRenameAncestors: folderRenameAncestors);
+                    destinationPath: destinationPath,
+                    movingSourcePaths: movingSourcePaths,
+                    folderRenameAncestors: folderRenameAncestors
+                );
                 if (willBeVacatedByBatch)
                     continue;
 
                 // A case-only rename targets the item's own path on a case-insensitive filesystem;
                 // File.Move and Directory.Move accept this on .NET, so it's not a conflict.
-                var isCaseOnlySelfRename = PathRelations.DiffersOnlyInCase(
-                    item.Original.FullPath,
-                    destinationPath);
+                var isCaseOnlySelfRename = PathRelations.DiffersOnlyInCase(item.Original.FullPath, destinationPath);
                 if (isCaseOnlySelfRename)
                     continue;
 
-                var destinationOccupiedOnDisk =
-                                    Directory.Exists(destinationPath) || File.Exists(destinationPath);
+                var destinationOccupiedOnDisk = Directory.Exists(destinationPath) || File.Exists(destinationPath);
                 if (destinationOccupiedOnDisk)
                 {
                     item.SetPreviewError(
                         message: $"Destination '{destinationPath}' is already in use (not vacated by another rename item in this batch).",
-                        cause: null);
+                        cause: null
+                    );
                     continue;
                 }
             }
@@ -87,7 +87,12 @@ namespace Mfr.Engine
 
         private static List<RenameItem> _BuildFolderRenameList(IReadOnlyList<RenameItem> candidateItems)
         {
-            return [.. candidateItems.Where(item => item.Original.Attributes.IsDirectory() && !item.IsPreviewPathUnchanged())];
+            return
+            [
+                .. candidateItems.Where(item =>
+                    item.Original.Attributes.IsDirectory() && !item.IsPreviewPathUnchanged()
+                ),
+            ];
         }
 
         private static HashSet<string> _BuildDuplicateDestinationSet(IReadOnlyList<RenameItem> candidateItems)
@@ -116,14 +121,16 @@ namespace Mfr.Engine
         private static bool _WillBeVacatedByBatch(
             string destinationPath,
             HashSet<string> movingSourcePaths,
-            IReadOnlyList<RenameItem> folderRenameAncestors)
+            IReadOnlyList<RenameItem> folderRenameAncestors
+        )
         {
             if (movingSourcePaths.Contains(destinationPath))
                 return true;
 
             // A descendant path is implicitly vacated when its ancestor folder is renamed away.
             return folderRenameAncestors.Any(folderRename =>
-                PathRelations.IsDescendantOf(candidate: destinationPath, ancestor: folderRename.Original.FullPath));
+                PathRelations.IsDescendantOf(candidate: destinationPath, ancestor: folderRename.Original.FullPath)
+            );
         }
     }
 }

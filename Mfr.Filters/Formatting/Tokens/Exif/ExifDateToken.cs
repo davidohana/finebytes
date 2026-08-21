@@ -24,7 +24,8 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
             Require.That(
                 !string.IsNullOrWhiteSpace(tokenArgs),
                 $"{tokenDisplayName} requires a .NET format string argument (for example 'yyyy-MM-dd').",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             var format = tokenArgs.Trim();
             return item =>

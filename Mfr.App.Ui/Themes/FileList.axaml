@@ -1,35 +1,37 @@
-<ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <ResourceDictionary.ThemeDictionaries>
-        <ResourceDictionary x:Key="Light">
-            <SolidColorBrush x:Key="FileListRowBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="FileListAltRowBrush" Color="#F6F6F6" />
-            <SolidColorBrush x:Key="FileListSelectionBrush" Color="#CCE8FF" />
-            <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#99D1FF" />
-            <SolidColorBrush x:Key="FileListHoverBrush" Color="#E5F3FF" />
-            <SolidColorBrush x:Key="FileListHeaderBrush" Color="#F5F5F5" />
-            <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#1A1A1A" />
-            <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#E0E0E0" />
-            <SolidColorBrush x:Key="FileListForegroundBrush" Color="#000000" />
-            <SolidColorBrush x:Key="FileListAddressBarBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="FileListAddressBarBorderBrush" Color="#D0D0D0" />
-            <SolidColorBrush x:Key="FileListBreadcrumbMutedBrush" Color="#5C5C5C" />
-        </ResourceDictionary>
-        <ResourceDictionary x:Key="Dark">
-            <SolidColorBrush x:Key="FileListRowBrush" Color="#202020" />
-            <SolidColorBrush x:Key="FileListAltRowBrush" Color="#2A2A2A" />
-            <SolidColorBrush x:Key="FileListSelectionBrush" Color="#264F78" />
-            <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#3A6A9A" />
-            <SolidColorBrush x:Key="FileListHoverBrush" Color="#2A3F55" />
-            <SolidColorBrush x:Key="FileListHeaderBrush" Color="#2B2B2B" />
-            <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#F0F0F0" />
-            <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#3F3F3F" />
-            <SolidColorBrush x:Key="FileListForegroundBrush" Color="#F0F0F0" />
-            <SolidColorBrush x:Key="FileListAddressBarBrush" Color="#2B2B2B" />
-            <SolidColorBrush x:Key="FileListAddressBarBorderBrush" Color="#3F3F3F" />
-            <SolidColorBrush x:Key="FileListBreadcrumbMutedBrush" Color="#B0B0B0" />
-        </ResourceDictionary>
-    </ResourceDictionary.ThemeDictionaries>
-    <FontFamily x:Key="FileListFont">Segoe UI, SegoeUI</FontFamily>
-    <x:Double x:Key="FileListFontSize">12</x:Double>
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+>
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="FileListRowBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="FileListAltRowBrush" Color="#F6F6F6" />
+      <SolidColorBrush x:Key="FileListSelectionBrush" Color="#CCE8FF" />
+      <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#99D1FF" />
+      <SolidColorBrush x:Key="FileListHoverBrush" Color="#E5F3FF" />
+      <SolidColorBrush x:Key="FileListHeaderBrush" Color="#F5F5F5" />
+      <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#1A1A1A" />
+      <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#E0E0E0" />
+      <SolidColorBrush x:Key="FileListForegroundBrush" Color="#000000" />
+      <SolidColorBrush x:Key="FileListAddressBarBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="FileListAddressBarBorderBrush" Color="#D0D0D0" />
+      <SolidColorBrush x:Key="FileListBreadcrumbMutedBrush" Color="#5C5C5C" />
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="FileListRowBrush" Color="#202020" />
+      <SolidColorBrush x:Key="FileListAltRowBrush" Color="#2A2A2A" />
+      <SolidColorBrush x:Key="FileListSelectionBrush" Color="#264F78" />
+      <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#3A6A9A" />
+      <SolidColorBrush x:Key="FileListHoverBrush" Color="#2A3F55" />
+      <SolidColorBrush x:Key="FileListHeaderBrush" Color="#2B2B2B" />
+      <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#3F3F3F" />
+      <SolidColorBrush x:Key="FileListForegroundBrush" Color="#F0F0F0" />
+      <SolidColorBrush x:Key="FileListAddressBarBrush" Color="#2B2B2B" />
+      <SolidColorBrush x:Key="FileListAddressBarBorderBrush" Color="#3F3F3F" />
+      <SolidColorBrush x:Key="FileListBreadcrumbMutedBrush" Color="#B0B0B0" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+  <FontFamily x:Key="FileListFont">Segoe UI, SegoeUI</FontFamily>
+  <x:Double x:Key="FileListFontSize">12</x:Double>
 </ResourceDictionary>

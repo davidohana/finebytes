@@ -54,20 +54,24 @@ namespace Mfr.App.Ui.Services.FileList
                     {
                         return _GetCached(
                             "drive:" + path + ":" + sizeKey,
-                            () => _ExtractIcon(path, _FileAttributeDirectory, useFileAttributes: false, size));
+                            () => _ExtractIcon(path, _FileAttributeDirectory, useFileAttributes: false, size)
+                        );
                     }
 
                     return _GetCached(
                         "dir:" + sizeKey,
-                        () => _ExtractIcon("folder", _FileAttributeDirectory, useFileAttributes: true, size));
+                        () => _ExtractIcon("folder", _FileAttributeDirectory, useFileAttributes: true, size)
+                    );
                 }
 
                 var extension = Path.GetExtension(path);
                 return _GetCached(
                     "file:" + extension + ":" + sizeKey,
-                    () => _ExtractIcon("file" + extension, _FileAttributeNormal, useFileAttributes: true, size));
+                    () => _ExtractIcon("file" + extension, _FileAttributeNormal, useFileAttributes: true, size)
+                );
             }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or COMException)
+            catch (Exception ex)
+                when (ex is IOException or UnauthorizedAccessException or ArgumentException or COMException)
             {
                 return null;
             }
@@ -87,25 +91,18 @@ namespace Mfr.App.Ui.Services.FileList
             string path,
             uint fileAttributes,
             bool useFileAttributes,
-            ShellIconSize size)
+            ShellIconSize size
+        )
         {
             if (size == ShellIconSize.Jumbo)
             {
-                var jumbo = _ExtractFromImageList(
-                    path,
-                    fileAttributes,
-                    useFileAttributes,
-                    _ShilJumbo);
+                var jumbo = _ExtractFromImageList(path, fileAttributes, useFileAttributes, _ShilJumbo);
                 // Jumbo is 256px; missing glyphs are a small icon on an empty canvas.
                 if (jumbo is not null && _HasJumboContent(jumbo))
                     return jumbo;
 
                 jumbo?.Dispose();
-                var extraLarge = _ExtractFromImageList(
-                    path,
-                    fileAttributes,
-                    useFileAttributes,
-                    _ShilExtraLarge);
+                var extraLarge = _ExtractFromImageList(path, fileAttributes, useFileAttributes, _ShilExtraLarge);
                 if (extraLarge is not null)
                     return extraLarge;
             }
@@ -133,7 +130,8 @@ namespace Mfr.App.Ui.Services.FileList
             string path,
             uint fileAttributes,
             bool useFileAttributes,
-            int shil)
+            int shil
+        )
         {
             var iconIndex = _GetSysIconIndex(path, fileAttributes, useFileAttributes);
             if (iconIndex < 0)
@@ -169,7 +167,8 @@ namespace Mfr.App.Ui.Services.FileList
                 fileAttributes,
                 ref info,
                 (uint)Marshal.SizeOf<ShFileInfo>(),
-                flags);
+                flags
+            );
             if (result == IntPtr.Zero)
                 return -1;
 
@@ -258,10 +257,7 @@ namespace Mfr.App.Ui.Services.FileList
             {
                 var bmi = new BitmapInfo
                 {
-                    bmiHeader = new BitmapInfoHeader
-                    {
-                        biSize = (uint)Marshal.SizeOf<BitmapInfoHeader>(),
-                    },
+                    bmiHeader = new BitmapInfoHeader { biSize = (uint)Marshal.SizeOf<BitmapInfoHeader>() },
                 };
 
                 if (NativeMethods.GetDIBits(hdc, hBitmap, 0, 0, IntPtr.Zero, ref bmi, _DibRgbColors) == 0)
@@ -282,18 +278,22 @@ namespace Mfr.App.Ui.Services.FileList
                     new PixelSize(width, height),
                     new Vector(96, 96),
                     PixelFormat.Bgra8888,
-                    AlphaFormat.Unpremul);
+                    AlphaFormat.Unpremul
+                );
 
                 using (var framebuffer = bitmap.Lock())
                 {
-                    if (NativeMethods.GetDIBits(
+                    if (
+                        NativeMethods.GetDIBits(
                             hdc,
                             hBitmap,
                             0,
                             (uint)height,
                             framebuffer.Address,
                             ref bmi,
-                            _DibRgbColors) == 0)
+                            _DibRgbColors
+                        ) == 0
+                    )
                     {
                         return null;
                     }
@@ -313,8 +313,10 @@ namespace Mfr.App.Ui.Services.FileList
             public IntPtr hIcon;
             public int iIcon;
             public uint dwAttributes;
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
             public string szDisplayName;
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
             public string szTypeName;
         }
@@ -357,14 +359,29 @@ namespace Mfr.App.Ui.Services.FileList
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         private interface IImageList
         {
-            [PreserveSig] int Add(IntPtr hbmImage, IntPtr hbmMask, ref int pi);
-            [PreserveSig] int ReplaceIcon(int i, IntPtr hicon, ref int pi);
-            [PreserveSig] int SetOverlayImage(int iImage, int iOverlay);
-            [PreserveSig] int Replace(int i, IntPtr hbmImage, IntPtr hbmMask);
-            [PreserveSig] int AddMasked(IntPtr hbmImage, int crMask, ref int pi);
-            [PreserveSig] int Draw(IntPtr pimldp);
-            [PreserveSig] int Remove(int i);
-            [PreserveSig] int GetIcon(int i, int flags, out IntPtr picon);
+            [PreserveSig]
+            int Add(IntPtr hbmImage, IntPtr hbmMask, ref int pi);
+
+            [PreserveSig]
+            int ReplaceIcon(int i, IntPtr hicon, ref int pi);
+
+            [PreserveSig]
+            int SetOverlayImage(int iImage, int iOverlay);
+
+            [PreserveSig]
+            int Replace(int i, IntPtr hbmImage, IntPtr hbmMask);
+
+            [PreserveSig]
+            int AddMasked(IntPtr hbmImage, int crMask, ref int pi);
+
+            [PreserveSig]
+            int Draw(IntPtr pimldp);
+
+            [PreserveSig]
+            int Remove(int i);
+
+            [PreserveSig]
+            int GetIcon(int i, int flags, out IntPtr picon);
         }
 
         private static class NativeMethods
@@ -375,13 +392,11 @@ namespace Mfr.App.Ui.Services.FileList
                 uint dwFileAttributes,
                 ref ShFileInfo psfi,
                 uint cbFileInfo,
-                uint uFlags);
+                uint uFlags
+            );
 
             [DllImport("shell32.dll")]
-            public static extern int SHGetImageList(
-                int iImageList,
-                ref Guid riid,
-                out IImageList ppv);
+            public static extern int SHGetImageList(int iImageList, ref Guid riid, out IImageList ppv);
 
             [DllImport("user32.dll", SetLastError = true)]
             public static extern bool DestroyIcon(IntPtr hIcon);
@@ -406,7 +421,8 @@ namespace Mfr.App.Ui.Services.FileList
                 uint cLines,
                 IntPtr lpvBits,
                 ref BitmapInfo lpbmi,
-                uint usage);
+                uint usage
+            );
         }
     }
 }

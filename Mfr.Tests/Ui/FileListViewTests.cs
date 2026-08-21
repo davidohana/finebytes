@@ -32,8 +32,7 @@ namespace Mfr.Tests.Ui
         [AvaloniaFact]
         public void Tiles_Long_Names_Do_Not_Exceed_Cell_Width()
         {
-            const string longName =
-                "Unigine_Heaven_Benchmark_4.0_20241106_2059_extra_long_report_name.html";
+            const string longName = "Unigine_Heaven_Benchmark_4.0_20241106_2059_extra_long_report_name.html";
             var dir = _tempDirectoryFixture.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, longName), "x");
             File.WriteAllText(Path.Combine(dir, "short.txt"), "y");
@@ -61,15 +60,15 @@ namespace Mfr.Tests.Ui
             Assert.NotNull(container);
             Assert.True(container.ClipToBounds);
 
-            var nameBlock = container.GetVisualDescendants()
-                .OfType<TextBlock>()
-                .First(block => block.Text == longName);
+            var nameBlock = container.GetVisualDescendants().OfType<TextBlock>().First(block => block.Text == longName);
             Assert.True(
                 nameBlock.Bounds.Width <= 140,
-                $"Name width {nameBlock.Bounds.Width} should stay within the tile text column.");
+                $"Name width {nameBlock.Bounds.Width} should stay within the tile text column."
+            );
             Assert.True(
                 container.Bounds.Width <= 176,
-                $"Tile container width {container.Bounds.Width} should match the wrap cell.");
+                $"Tile container width {container.Bounds.Width} should match the wrap cell."
+            );
         }
 
         /// <summary>
@@ -87,7 +86,8 @@ namespace Mfr.Tests.Ui
             var presenter = _SelectionPresenter(list, entry);
             Assert.True(
                 presenter.Bounds.Width >= viewModel.ThumbnailSize,
-                $"Selection width {presenter.Bounds.Width} should cover thumbnail size {viewModel.ThumbnailSize}.");
+                $"Selection width {presenter.Bounds.Width} should cover thumbnail size {viewModel.ThumbnailSize}."
+            );
             Assert.Equal(viewModel.ThumbnailCellWidth, presenter.Bounds.Width, precision: 0);
             Assert.Equal(viewModel.ThumbnailCellHeight, presenter.Bounds.Height, precision: 0);
         }
@@ -179,7 +179,8 @@ namespace Mfr.Tests.Ui
 
         private static ContentPresenter _SelectionPresenter(ListBox list, FileListEntry entry)
         {
-            var presenter = _ThumbnailContainer(list, entry).GetVisualDescendants()
+            var presenter = _ThumbnailContainer(list, entry)
+                .GetVisualDescendants()
                 .OfType<ContentPresenter>()
                 .FirstOrDefault(item => item.Name == "PART_ContentPresenter");
             Assert.NotNull(presenter);
@@ -188,7 +189,8 @@ namespace Mfr.Tests.Ui
 
         private static Panel _ThumbnailSquare(ListBox list, FileListEntry entry)
         {
-            var square = _ThumbnailContainer(list, entry).GetVisualDescendants()
+            var square = _ThumbnailContainer(list, entry)
+                .GetVisualDescendants()
                 .OfType<Panel>()
                 .FirstOrDefault(item => item.Name == "ThumbnailSquare");
             Assert.NotNull(square);

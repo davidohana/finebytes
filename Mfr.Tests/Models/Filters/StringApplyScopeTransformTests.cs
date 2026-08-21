@@ -19,11 +19,9 @@ namespace Mfr.Tests.Models.Filters
                 StartPosition: 1,
                 StartAnchor: StringScopeAnchor.Left,
                 EndPosition: 3,
-                EndAnchor: StringScopeAnchor.Left);
-            var f = new LettersCaseFilter(
-                s_target,
-                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
-                scope);
+                EndAnchor: StringScopeAnchor.Left
+            );
+            var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
             Assert.Equal("ABCdef", FilterTestHelpers.ApplyToPrefix(f, "abcdef"));
         }
 
@@ -37,11 +35,9 @@ namespace Mfr.Tests.Models.Filters
                 StartPosition: 4,
                 StartAnchor: StringScopeAnchor.Left,
                 EndPosition: 2,
-                EndAnchor: StringScopeAnchor.Left);
-            var f = new LettersCaseFilter(
-                s_target,
-                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
-                scope);
+                EndAnchor: StringScopeAnchor.Left
+            );
+            var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
             Assert.Equal("aBCDef", FilterTestHelpers.ApplyToPrefix(f, "abcdef"));
         }
 
@@ -55,11 +51,9 @@ namespace Mfr.Tests.Models.Filters
                 StartPosition: 1,
                 StartAnchor: StringScopeAnchor.Right,
                 EndPosition: 1,
-                EndAnchor: StringScopeAnchor.Right);
-            var f = new LettersCaseFilter(
-                s_target,
-                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
-                scope);
+                EndAnchor: StringScopeAnchor.Right
+            );
+            var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
             Assert.Equal("abcdeF", FilterTestHelpers.ApplyToPrefix(f, "abcdef"));
         }
 
@@ -73,11 +67,9 @@ namespace Mfr.Tests.Models.Filters
                 StartPosition: 1,
                 StartAnchor: StringScopeAnchor.Left,
                 EndPosition: 99,
-                EndAnchor: StringScopeAnchor.Left);
-            var f = new LettersCaseFilter(
-                s_target,
-                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
-                scope);
+                EndAnchor: StringScopeAnchor.Left
+            );
+            var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
             Assert.Equal("AB", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
 
@@ -88,10 +80,7 @@ namespace Mfr.Tests.Models.Filters
         public void Token_SecondPart_UppercasesOnlyThatToken()
         {
             var scope = new TokenApplyScope(Separator: "-", TokenNumber: 2);
-            var f = new LettersCaseFilter(
-                s_target,
-                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
-                scope);
+            var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
             Assert.Equal("aa-BB-cc", FilterTestHelpers.ApplyToPrefix(f, "aa-bb-cc"));
         }
 
@@ -102,10 +91,7 @@ namespace Mfr.Tests.Models.Filters
         public void Token_MultiCharSeparator()
         {
             var scope = new TokenApplyScope(Separator: "--", TokenNumber: 2);
-            var f = new LettersCaseFilter(
-                s_target,
-                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
-                scope);
+            var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
             Assert.Equal("x--YY--z", FilterTestHelpers.ApplyToPrefix(f, "x--yy--z"));
         }
 
@@ -116,10 +102,7 @@ namespace Mfr.Tests.Models.Filters
         public void Token_OutOfRange_NoOp()
         {
             var scope = new TokenApplyScope(Separator: "-", TokenNumber: 5);
-            var f = new LettersCaseFilter(
-                s_target,
-                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
-                scope);
+            var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
             Assert.Equal("a-b", FilterTestHelpers.ApplyToPrefix(f, "a-b"));
         }
     }

@@ -43,10 +43,7 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
         /// Must be non-zero.
         /// </param>
         /// <param name="SourceFormatString">Raw format string (may contain nested tokens) to extract from.</param>
-        private sealed record Options(
-            int StartPosition,
-            int EndPosition,
-            string SourceFormatString);
+        private sealed record Options(int StartPosition, int EndPosition, string SourceFormatString);
 
         private static readonly string[] _substrOptionKeys = ["start", "end", "source"];
 
@@ -82,25 +79,48 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             Require.That(
                 !string.IsNullOrEmpty(tokenArgs),
                 $"{tokenDisplayName} requires named options ({FormatOptionsParsing.FormatExpectedKeywords(_substrOptionKeys)}).",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             var map = FormatOptionsParsing.ParseNamedKeyValuePairs(tokenArgs.Trim(), tokenDisplayName);
-            FormatOptionsParsing.RequireKnownOptionKeysOnly(map, tokenDisplayName, _substrOptionKeys, nameof(tokenArgs));
-            FormatOptionsParsing.RequireAllOptionKeysPresent(map, tokenDisplayName, _substrOptionKeys, nameof(tokenArgs));
+            FormatOptionsParsing.RequireKnownOptionKeysOnly(
+                map,
+                tokenDisplayName,
+                _substrOptionKeys,
+                nameof(tokenArgs)
+            );
+            FormatOptionsParsing.RequireAllOptionKeysPresent(
+                map,
+                tokenDisplayName,
+                _substrOptionKeys,
+                nameof(tokenArgs)
+            );
 
             var startText = map["start"].Trim();
-            var startParsedOk = int.TryParse(startText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var startPosition);
+            var startParsedOk = int.TryParse(
+                startText,
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out var startPosition
+            );
             Require.That(
                 startParsedOk,
                 $"{tokenDisplayName} start must be a non-zero integer (got '{startText}').",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             var endText = map["end"].Trim();
-            var endParsedOk = int.TryParse(endText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var endPosition);
+            var endParsedOk = int.TryParse(
+                endText,
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out var endPosition
+            );
             Require.That(
                 endParsedOk,
                 $"{tokenDisplayName} end must be a non-zero integer (got '{endText}').",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             Require.That(startPosition != 0, $"{tokenDisplayName} start must not be zero.", nameof(tokenArgs));
 
@@ -109,7 +129,8 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
             return new Options(
                 StartPosition: startPosition,
                 EndPosition: endPosition,
-                SourceFormatString: map["source"]);
+                SourceFormatString: map["source"]
+            );
         }
 
         /// <summary>

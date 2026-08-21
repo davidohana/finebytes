@@ -12,9 +12,7 @@ namespace Mfr.Filters.Case
     /// (see <see cref="RenameItem.SentenceEndChars"/>, set by <c>SentenceEndCharacters</c> when used earlier
     /// in the chain; default <c>".!?"</c>).
     /// </param>
-    public sealed record CasingListOptions(
-        string FilePath,
-        bool UppercaseSentenceInitial = false);
+    public sealed record CasingListOptions(string FilePath, bool UppercaseSentenceInitial = false);
 
     /// <summary>
     /// Changes each word's casing to match how it appears in a casing-list file.
@@ -27,7 +25,9 @@ namespace Mfr.Filters.Case
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record CasingListFilter(
         FilterTarget Target,
-        CasingListOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        CasingListOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         private Dictionary<string, string>? _lowerWordToCasing;
 
@@ -54,7 +54,8 @@ namespace Mfr.Filters.Case
         {
             var lowerWordToCasing = Check.NotNull(
                 _lowerWordToCasing,
-                "Casing-list setup must complete before transform.");
+                "Casing-list setup must complete before transform."
+            );
 
             if (value.Length == 0 || lowerWordToCasing.Count == 0)
                 return value;
@@ -64,9 +65,10 @@ namespace Mfr.Filters.Case
                 return transformed;
 
             return _UppercaseSentenceInitials(
-                            input: transformed,
-                            wordSeparator: item.WordSeparator,
-                            sentenceEndChars: item.SentenceEndChars);
+                input: transformed,
+                wordSeparator: item.WordSeparator,
+                sentenceEndChars: item.SentenceEndChars
+            );
         }
 
         /// <summary>
@@ -76,7 +78,11 @@ namespace Mfr.Filters.Case
         /// <param name="wordSeparator">Configured word separator character.</param>
         /// <param name="lowerWordToCasing">Lowercased-word to canonical-casing mapping.</param>
         /// <returns>Text with matched words replaced by canonical casing.</returns>
-        private static string _ApplyCasingList(string input, char wordSeparator, IReadOnlyDictionary<string, string> lowerWordToCasing)
+        private static string _ApplyCasingList(
+            string input,
+            char wordSeparator,
+            IReadOnlyDictionary<string, string> lowerWordToCasing
+        )
         {
             ReadOnlySpan<char> remaining = input;
             var output = new StringBuilder(input.Length);
@@ -106,7 +112,8 @@ namespace Mfr.Filters.Case
         private static void _AppendResolvedWord(
             StringBuilder output,
             ReadOnlySpan<char> word,
-            IReadOnlyDictionary<string, string> lowerWordToCasing)
+            IReadOnlyDictionary<string, string> lowerWordToCasing
+        )
         {
             if (word.IsEmpty)
                 return;
@@ -169,7 +176,6 @@ namespace Mfr.Filters.Case
 
                 if (char.IsAsciiLetterUpper(chars[i]))
                     return;
-
             }
         }
     }

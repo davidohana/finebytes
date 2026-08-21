@@ -11,7 +11,8 @@ namespace Mfr.Filters.Space
     /// </param>
     public sealed record SpaceAroundOptions(
         string AroundChars = "",
-        bool OnlyWhenNeighboringAreLettersOrDigits = false);
+        bool OnlyWhenNeighboringAreLettersOrDigits = false
+    );
 
     /// <summary>
     /// Ensures the current word separator appears before and after each listed character when missing.
@@ -25,7 +26,9 @@ namespace Mfr.Filters.Space
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed record SpaceAroundFilter(
         FilterTarget Target,
-        SpaceAroundOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        SpaceAroundOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.

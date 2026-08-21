@@ -1,4 +1,3 @@
-
 namespace Mfr.Filters.Replace
 {
     /// <summary>
@@ -7,10 +6,7 @@ namespace Mfr.Filters.Replace
     /// <param name="RemoveIllegalChars">Whether illegal file-name characters are removed/replaced.</param>
     /// <param name="CustomCharsToRemove">Custom characters to remove/replace.</param>
     /// <param name="Replacement">Replacement value for both illegal and custom characters.</param>
-    public sealed record CleanerOptions(
-        bool RemoveIllegalChars,
-        string CustomCharsToRemove,
-        string Replacement);
+    public sealed record CleanerOptions(bool RemoveIllegalChars, string CustomCharsToRemove, string Replacement);
 
     /// <summary>
     /// Cleans illegal and custom characters.
@@ -18,9 +14,8 @@ namespace Mfr.Filters.Replace
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Cleaner options.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
-    public sealed record CleanerFilter(
-        FilterTarget Target,
-        CleanerOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+    public sealed record CleanerFilter(FilterTarget Target, CleanerOptions Options, StringApplyScope? ApplyScope = null)
+        : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -41,10 +36,8 @@ namespace Mfr.Filters.Replace
             {
                 if (chars.Contains(c))
                     sb.Append(Options.Replacement);
-
                 else
                     sb.Append(c);
-
             }
 
             return sb.ToString();

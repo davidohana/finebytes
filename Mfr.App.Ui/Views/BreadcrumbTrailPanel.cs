@@ -16,10 +16,10 @@ namespace Mfr.App.Ui.Views
         /// <summary>
         /// Width reserved on the left when leading folders are collapsed.
         /// </summary>
-        public static readonly StyledProperty<double> OverflowButtonWidthProperty =
-            AvaloniaProperty.Register<BreadcrumbTrailPanel, double>(
-                nameof(OverflowButtonWidth),
-                BreadcrumbOverflow.ButtonWidth);
+        public static readonly StyledProperty<double> OverflowButtonWidthProperty = AvaloniaProperty.Register<
+            BreadcrumbTrailPanel,
+            double
+        >(nameof(OverflowButtonWidth), BreadcrumbOverflow.ButtonWidth);
 
         /// <summary>
         /// Whether any ancestor folder is hidden behind the overflow button.
@@ -27,7 +27,8 @@ namespace Mfr.App.Ui.Views
         public static readonly DirectProperty<BreadcrumbTrailPanel, bool> HasOverflowProperty =
             AvaloniaProperty.RegisterDirect<BreadcrumbTrailPanel, bool>(
                 nameof(HasOverflow),
-                panel => panel.HasOverflow);
+                panel => panel.HasOverflow
+            );
 
         /// <summary>
         /// Index of the first visible folder in root-to-current order.
@@ -35,7 +36,8 @@ namespace Mfr.App.Ui.Views
         public static readonly DirectProperty<BreadcrumbTrailPanel, int> VisibleStartIndexProperty =
             AvaloniaProperty.RegisterDirect<BreadcrumbTrailPanel, int>(
                 nameof(VisibleStartIndex),
-                panel => panel.VisibleStartIndex);
+                panel => panel.VisibleStartIndex
+            );
 
         static BreadcrumbTrailPanel()
         {
@@ -100,10 +102,7 @@ namespace Mfr.App.Ui.Views
                 height = Math.Max(height, child.DesiredSize.Height);
             }
 
-            var visibleStart = BreadcrumbOverflow.PickVisibleStart(
-                widths,
-                availableSize.Width,
-                OverflowButtonWidth);
+            var visibleStart = BreadcrumbOverflow.PickVisibleStart(widths, availableSize.Width, OverflowButtonWidth);
             VisibleStartIndex = visibleStart;
             HasOverflow = visibleStart > 0;
 

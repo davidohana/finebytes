@@ -22,7 +22,8 @@ namespace Mfr.Tests.Ui
                     ThumbnailSizes.ExtraLarge,
                     ThumbnailSizes.Huge,
                 ],
-                ThumbnailSizes.Steps);
+                ThumbnailSizes.Steps
+            );
             Assert.Equal(96, ThumbnailSizes.Default);
             Assert.Equal(ThumbnailSizes.Medium, ThumbnailSizes.Default);
             Assert.Equal(ThumbnailSizes.Huge, App.Ui.Services.FileList.ImageThumbnailLoader.DecodeWidth);

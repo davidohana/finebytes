@@ -25,7 +25,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void ReadInt_from_JsonElement_missing_property_leaves_ref_unchanged()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             var x = 1000;
             ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10_000_000);
             Assert.Equal(1000, x);
@@ -43,7 +45,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void ReadInt_from_JsonElement_parses_integer_with_surrounding_whitespace()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"n":"  42 "}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"n":"  42 "}"""
+            );
             var x = 1;
             ConfigValueReader.ReadInt(doc.RootElement, "n", ref x, 1, 100);
             Assert.Equal(42, x);
@@ -64,7 +68,8 @@ namespace Mfr.Tests.Utils.Config
             using var doc = JsonDocument.Parse(_IntPropertyJson("x"));
             var x = 0;
             var ex = Assert.Throws<InvalidDataException>(() =>
-                ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10_000_000));
+                ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10_000_000)
+            );
             Assert.Contains(IntSamplePropertyName, ex.Message);
             Assert.Contains("integer", ex.Message);
         }
@@ -75,22 +80,26 @@ namespace Mfr.Tests.Utils.Config
             using var doc = JsonDocument.Parse(_IntPropertyJson("0"));
             var x = 1;
             Assert.Throws<InvalidDataException>(() =>
-                ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10));
+                ConfigValueReader.ReadInt(doc.RootElement, IntSamplePropertyName, ref x, 1, 10)
+            );
         }
 
         [Fact]
         public void ReadInt_from_JsonElement_non_object_throws()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "[]");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "[]"
+            );
             var x = 1;
-            Assert.Throws<InvalidDataException>(() =>
-                ConfigValueReader.ReadInt(doc.RootElement, "x", ref x, 1, 10));
+            Assert.Throws<InvalidDataException>(() => ConfigValueReader.ReadInt(doc.RootElement, "x", ref x, 1, 10));
         }
 
         [Fact]
         public void ReadString_missing_property_leaves_ref_unchanged()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             var s = "d";
             ConfigValueReader.ReadString(doc.RootElement, "p", ref s);
             Assert.Equal("d", s);
@@ -99,7 +108,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void ReadString_json_null_leaves_ref_unchanged()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"p":null}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"p":null}"""
+            );
             var s = "d";
             ConfigValueReader.ReadString(doc.RootElement, "p", ref s);
             Assert.Equal("d", s);
@@ -108,10 +119,13 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void ReadString_blank_in_json_throws()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"p":"   "}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"p":"   "}"""
+            );
             var s = "d";
             var ex = Assert.Throws<InvalidDataException>(() =>
-                ConfigValueReader.ReadString(doc.RootElement, "p", ref s));
+                ConfigValueReader.ReadString(doc.RootElement, "p", ref s)
+            );
             Assert.Contains("p", ex.Message);
             Assert.Contains("non-empty", ex.Message);
         }
@@ -119,7 +133,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void ReadString_preserves_surrounding_whitespace()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"p":"  ab  "}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"p":"  ab  "}"""
+            );
             var s = "";
             ConfigValueReader.ReadString(doc.RootElement, "p", ref s);
             Assert.Equal("  ab  ", s);
@@ -128,21 +144,28 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void ReadString_exceeds_max_length_throws()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"p":"abcd"}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"p":"abcd"}"""
+            );
             var s = "";
             Assert.Throws<InvalidDataException>(() =>
-                ConfigValueReader.ReadString(doc.RootElement, "p", ref s, maxLengthInclusive: 2));
+                ConfigValueReader.ReadString(doc.RootElement, "p", ref s, maxLengthInclusive: 2)
+            );
         }
 
         [Fact]
         public void ReadBool_parses_true_and_false()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"flag":"true"}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"flag":"true"}"""
+            );
             var value = false;
             ConfigValueReader.ReadBool(doc.RootElement, "flag", ref value);
             Assert.True(value);
 
-            using var docFalse = JsonDocument.Parse(/*lang=json,strict*/ """{"flag":"False"}""");
+            using var docFalse = JsonDocument.Parse( /*lang=json,strict*/
+                """{"flag":"False"}"""
+            );
             value = true;
             ConfigValueReader.ReadBool(docFalse.RootElement, "flag", ref value);
             Assert.False(value);
@@ -151,7 +174,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void ReadBool_missing_property_leaves_ref_unchanged()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             var value = true;
             ConfigValueReader.ReadBool(doc.RootElement, "flag", ref value);
             Assert.True(value);
@@ -160,10 +185,11 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void ReadBool_invalid_text_throws()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"flag":"yes"}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"flag":"yes"}"""
+            );
             var value = false;
-            Assert.Throws<InvalidDataException>(() =>
-                ConfigValueReader.ReadBool(doc.RootElement, "flag", ref value));
+            Assert.Throws<InvalidDataException>(() => ConfigValueReader.ReadBool(doc.RootElement, "flag", ref value));
         }
     }
 }

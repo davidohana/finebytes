@@ -28,7 +28,8 @@ namespace Mfr.Utils
         /// <returns><paramref name="value"/>.</returns>
         /// <exception cref="InvalidOperationException">Thrown when <paramref name="value"/> is null.</exception>
         [return: NotNull]
-        public static T NotNull<T>(T? value, string message) where T : class
+        public static T NotNull<T>(T? value, string message)
+            where T : class
         {
             if (value is null)
                 throw new InvalidOperationException(message);

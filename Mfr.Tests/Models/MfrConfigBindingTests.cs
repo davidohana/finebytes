@@ -25,9 +25,10 @@ namespace Mfr.Tests.Models
                 var n = (hasSection ? 1 : 0) + (hasInt ? 1 : 0) + (hasStr ? 1 : 0) + (isBoolLeaf ? 1 : 0);
                 Assert.True(
                     n == 1,
-                    $"{configType.Name}.{field.Name} must be a [{nameof(ConfigSectionAttribute)}] section, " +
-                    $"a [{nameof(ConfigIntRangeAttribute)}] / [{nameof(ConfigStringMaxLengthAttribute)}] leaf, " +
-                    $"or an unannotated bool leaf.");
+                    $"{configType.Name}.{field.Name} must be a [{nameof(ConfigSectionAttribute)}] section, "
+                        + $"a [{nameof(ConfigIntRangeAttribute)}] / [{nameof(ConfigStringMaxLengthAttribute)}] leaf, "
+                        + $"or an unannotated bool leaf."
+                );
             }
         }
     }

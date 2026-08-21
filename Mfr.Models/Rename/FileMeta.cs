@@ -30,7 +30,8 @@ namespace Mfr.Models.Rename
         DateTime lastAccessTime = default,
         long fileSize = 0,
         int renameListTotalCount = 0,
-        int renameListFolderSiblingCount = 0)
+        int renameListFolderSiblingCount = 0
+    )
     {
         /// <summary>
         /// Gets or sets the zero-based index across all scanned files.
@@ -171,7 +172,8 @@ namespace Mfr.Models.Rename
                 lastAccessTime: LastAccessTime,
                 fileSize: FileSize,
                 renameListTotalCount: RenameListTotalCount,
-                renameListFolderSiblingCount: RenameListFolderSiblingCount)
+                renameListFolderSiblingCount: RenameListFolderSiblingCount
+            )
             {
                 AudioTagOverlay = AudioTagOverlay.Clone(),
                 Media = Media,

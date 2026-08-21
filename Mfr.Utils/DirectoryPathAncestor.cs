@@ -98,7 +98,8 @@ namespace Mfr.Utils
                 throw new ArgumentOutOfRangeException(
                     paramName: nameof(level),
                     actualValue: level,
-                    message: "Ancestor folder level must be at least 1.");
+                    message: "Ancestor folder level must be at least 1."
+                );
             }
         }
 
@@ -106,7 +107,8 @@ namespace Mfr.Utils
         private static void _ThrowInsufficientDepth(int level, string containingDirectoryPath)
         {
             throw new InvalidOperationException(
-                $"Cannot resolve ancestor folder at level {level}: directory path has insufficient depth ('{containingDirectoryPath}').");
+                $"Cannot resolve ancestor folder at level {level}: directory path has insufficient depth ('{containingDirectoryPath}')."
+            );
         }
 
         private static string _RequireValidNewSegmentName(string newSegmentName)
@@ -115,21 +117,24 @@ namespace Mfr.Utils
             {
                 throw new ArgumentException(
                     "Ancestor folder segment name cannot be empty or whitespace.",
-                    nameof(newSegmentName));
+                    nameof(newSegmentName)
+                );
             }
 
             if (newSegmentName != newSegmentName.Trim())
             {
                 throw new ArgumentException(
                     "Ancestor folder segment name cannot have leading or trailing whitespace.",
-                    nameof(newSegmentName));
+                    nameof(newSegmentName)
+                );
             }
 
             if (newSegmentName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
             {
                 throw new ArgumentException(
                     $"Ancestor folder segment '{newSegmentName}' contains invalid characters for this platform.",
-                    nameof(newSegmentName));
+                    nameof(newSegmentName)
+                );
             }
 
             return newSegmentName;

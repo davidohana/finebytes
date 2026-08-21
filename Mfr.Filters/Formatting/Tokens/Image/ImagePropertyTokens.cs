@@ -26,9 +26,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     {
         /// <summary>Registers <c>&lt;image-width&gt;</c>.</summary>
         public ImageWidthToken()
-            : base(["image-width"], ImagePropertyField.Width)
-        {
-        }
+            : base(["image-width"], ImagePropertyField.Width) { }
     }
 
     /// <inheritdoc />
@@ -36,9 +34,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     {
         /// <summary>Registers <c>&lt;image-height&gt;</c>.</summary>
         public ImageHeightToken()
-            : base(["image-height"], ImagePropertyField.Height)
-        {
-        }
+            : base(["image-height"], ImagePropertyField.Height) { }
     }
 
     /// <inheritdoc />
@@ -46,9 +42,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     {
         /// <summary>Registers <c>&lt;image-bit-depth&gt;</c>.</summary>
         public ImageBitDepthToken()
-            : base(["image-bit-depth"], ImagePropertyField.BitDepth)
-        {
-        }
+            : base(["image-bit-depth"], ImagePropertyField.BitDepth) { }
     }
 
     /// <inheritdoc />
@@ -56,9 +50,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     {
         /// <summary>Registers <c>&lt;image-format&gt;</c>.</summary>
         public ImageFormatToken()
-            : base(["image-format"], ImagePropertyField.Format)
-        {
-        }
+            : base(["image-format"], ImagePropertyField.Format) { }
     }
 
     /// <inheritdoc />
@@ -66,9 +58,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     {
         /// <summary>Registers <c>&lt;image-horz-res&gt;</c>.</summary>
         public ImageHorzResToken()
-            : base(["image-horz-res"], ImagePropertyField.HorizontalResolutionDpi)
-        {
-        }
+            : base(["image-horz-res"], ImagePropertyField.HorizontalResolutionDpi) { }
     }
 
     /// <inheritdoc />
@@ -76,9 +66,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     {
         /// <summary>Registers <c>&lt;image-vert-res&gt;</c>.</summary>
         public ImageVertResToken()
-            : base(["image-vert-res"], ImagePropertyField.VerticalResolutionDpi)
-        {
-        }
+            : base(["image-vert-res"], ImagePropertyField.VerticalResolutionDpi) { }
     }
 
     /// <inheritdoc />
@@ -86,8 +74,6 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     {
         /// <summary>Registers <c>&lt;image-frame-count&gt;</c>.</summary>
         public ImageFrameCountToken()
-            : base(["image-frame-count"], ImagePropertyField.FrameCount)
-        {
-        }
+            : base(["image-frame-count"], ImagePropertyField.FrameCount) { }
     }
 }

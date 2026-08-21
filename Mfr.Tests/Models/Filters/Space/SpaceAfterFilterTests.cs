@@ -9,15 +9,12 @@ namespace Mfr.Tests.Models.Filters.Space
     {
         private static readonly FilePrefixTarget _target = new();
 
-        private static SpaceAfterFilter _CreateFilter(
-            string afterChars,
-            bool onlyWhenNextIsLetterOrDigit = false)
+        private static SpaceAfterFilter _CreateFilter(string afterChars, bool onlyWhenNextIsLetterOrDigit = false)
         {
             return new SpaceAfterFilter(
                 _target,
-                new SpaceAfterOptions(
-                    AfterChars: afterChars,
-                    OnlyWhenNextIsLetterOrDigit: onlyWhenNextIsLetterOrDigit));
+                new SpaceAfterOptions(AfterChars: afterChars, OnlyWhenNextIsLetterOrDigit: onlyWhenNextIsLetterOrDigit)
+            );
         }
 
         /// <summary>
@@ -76,7 +73,9 @@ namespace Mfr.Tests.Models.Filters.Space
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: false,
-                    CustomText: ""));
+                    CustomText: ""
+                )
+            );
             var afterFilter = _CreateFilter(",", onlyWhenNextIsLetterOrDigit: true);
             var item = FilterTestHelpers.CreateRenameItem(prefix: "x,y");
             spaceFilter.Setup();

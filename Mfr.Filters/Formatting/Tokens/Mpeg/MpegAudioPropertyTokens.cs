@@ -27,9 +27,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-bitrate&gt;</c>.</summary>
         public MpegBitrateToken()
-            : base(["mpeg-bitrate"], MpegAudioPropertyField.Bitrate)
-        {
-        }
+            : base(["mpeg-bitrate"], MpegAudioPropertyField.Bitrate) { }
     }
 
     /// <inheritdoc />
@@ -37,9 +35,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-copyright&gt;</c>.</summary>
         public MpegCopyrightToken()
-            : base(["mpeg-copyright"], MpegAudioPropertyField.Copyright)
-        {
-        }
+            : base(["mpeg-copyright"], MpegAudioPropertyField.Copyright) { }
     }
 
     /// <inheritdoc />
@@ -47,9 +43,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-duration&gt;</c>.</summary>
         public MpegDurationToken()
-            : base(["mpeg-duration"], MpegAudioPropertyField.Duration)
-        {
-        }
+            : base(["mpeg-duration"], MpegAudioPropertyField.Duration) { }
     }
 
     /// <inheritdoc />
@@ -57,9 +51,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-duration-sec&gt;</c>.</summary>
         public MpegDurationSecToken()
-            : base(["mpeg-duration-sec"], MpegAudioPropertyField.DurationSec)
-        {
-        }
+            : base(["mpeg-duration-sec"], MpegAudioPropertyField.DurationSec) { }
     }
 
     /// <inheritdoc />
@@ -67,9 +59,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-encoding&gt;</c>.</summary>
         public MpegEncodingToken()
-            : base(["mpeg-encoding"], MpegAudioPropertyField.Encoding)
-        {
-        }
+            : base(["mpeg-encoding"], MpegAudioPropertyField.Encoding) { }
     }
 
     /// <inheritdoc />
@@ -77,9 +67,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-frequency&gt;</c>.</summary>
         public MpegFrequencyToken()
-            : base(["mpeg-frequency"], MpegAudioPropertyField.Frequency)
-        {
-        }
+            : base(["mpeg-frequency"], MpegAudioPropertyField.Frequency) { }
     }
 
     /// <inheritdoc />
@@ -87,9 +75,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-layer&gt;</c>.</summary>
         public MpegLayerToken()
-            : base(["mpeg-layer"], MpegAudioPropertyField.Layer)
-        {
-        }
+            : base(["mpeg-layer"], MpegAudioPropertyField.Layer) { }
     }
 
     /// <inheritdoc />
@@ -97,9 +83,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-ver&gt;</c>.</summary>
         public MpegVerToken()
-            : base(["mpeg-ver"], MpegAudioPropertyField.MpegVer)
-        {
-        }
+            : base(["mpeg-ver"], MpegAudioPropertyField.MpegVer) { }
     }
 
     /// <inheritdoc />
@@ -107,9 +91,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-mode&gt;</c>.</summary>
         public MpegModeToken()
-            : base(["mpeg-mode"], MpegAudioPropertyField.Mode)
-        {
-        }
+            : base(["mpeg-mode"], MpegAudioPropertyField.Mode) { }
     }
 
     /// <inheritdoc />
@@ -117,9 +99,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-original&gt;</c>.</summary>
         public MpegOriginalToken()
-            : base(["mpeg-original"], MpegAudioPropertyField.Original)
-        {
-        }
+            : base(["mpeg-original"], MpegAudioPropertyField.Original) { }
     }
 
     /// <inheritdoc />
@@ -127,8 +107,6 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     {
         /// <summary>Registers <c>&lt;mpeg-protection&gt;</c>.</summary>
         public MpegProtectionToken()
-            : base(["mpeg-protection"], MpegAudioPropertyField.Protection)
-        {
-        }
+            : base(["mpeg-protection"], MpegAudioPropertyField.Protection) { }
     }
 }

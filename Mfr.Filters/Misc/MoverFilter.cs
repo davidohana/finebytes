@@ -57,7 +57,8 @@ namespace Mfr.Filters.Misc
             Require.That(
                 rootIsAbsolute,
                 $"MoverFilter: RootFolder must be an absolute path (got '{root}').",
-                nameof(MoverOptions.RootFolder));
+                nameof(MoverOptions.RootFolder)
+            );
 
             if (!string.IsNullOrEmpty(Options.SubFolder))
                 _compiledSubFolder = FormatStringCompiler.Compile(Options.SubFolder);

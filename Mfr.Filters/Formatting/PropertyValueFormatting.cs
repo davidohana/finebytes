@@ -37,7 +37,8 @@ namespace Mfr.Filters.Formatting
             var totalHours = (int)duration.TotalHours;
             return string.Create(
                 CultureInfo.InvariantCulture,
-                $"{totalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}");
+                $"{totalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}"
+            );
         }
 
         /// <summary>

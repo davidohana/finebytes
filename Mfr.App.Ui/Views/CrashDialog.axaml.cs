@@ -51,11 +51,7 @@ namespace Mfr.App.Ui.Views
 
             try
             {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = viewModel.LogDirectoryPath,
-                    UseShellExecute = true,
-                });
+                Process.Start(new ProcessStartInfo { FileName = viewModel.LogDirectoryPath, UseShellExecute = true });
             }
             catch (Exception)
             {

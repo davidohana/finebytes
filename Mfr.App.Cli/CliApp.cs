@@ -91,7 +91,8 @@ namespace Mfr.App.Cli
                 sources: options.Sources,
                 includeFiles: options.IncludeFiles,
                 includeFolders: options.IncludeFolders,
-                includeSubdirs: options.RecursiveDirectoryFileAdd);
+                includeSubdirs: options.RecursiveDirectoryFileAdd
+            );
             var renameItems = renameList.RenameItems;
 
             if (renameItems.Count == 0)
@@ -103,14 +104,13 @@ namespace Mfr.App.Cli
                 return CliExitCode.UserError;
 
             var commitFailFast = !options.ContinueOnRenameError;
-            Func<RenameItem, bool>? confirmBeforeApply = options.ConfirmBeforeCommit
-                ? _ConfirmApplyRenameItem
-                : null;
+            Func<RenameItem, bool>? confirmBeforeApply = options.ConfirmBeforeCommit ? _ConfirmApplyRenameItem : null;
             var renameResults = renameList.Commit(
                 plan: commitPlan,
                 failFast: commitFailFast,
                 dryRun: options.DryRun,
-                confirmBeforeApply: confirmBeforeApply);
+                confirmBeforeApply: confirmBeforeApply
+            );
 
             if (!options.OutputFilePath.IsBlank())
             {
@@ -119,10 +119,13 @@ namespace Mfr.App.Cli
                     outputFilePath: options.OutputFilePath,
                     presetName: preset.Name,
                     dryRun: options.DryRun,
-                    results: renameResults);
+                    results: renameResults
+                );
             }
 
-            var hasCommitErrors = renameResults.Any(item => item.Status is RenameStatus.PreviewError or RenameStatus.CommitError);
+            var hasCommitErrors = renameResults.Any(item =>
+                item.Status is RenameStatus.PreviewError or RenameStatus.CommitError
+            );
             return hasCommitErrors ? CliExitCode.UserError : CliExitCode.Success;
         }
 
@@ -137,7 +140,5 @@ namespace Mfr.App.Cli
             Console.WriteLine();
             return apply;
         }
-
     }
-
 }

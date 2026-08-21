@@ -33,7 +33,9 @@ namespace Mfr.Tests.Models.Filters.Space
                     ReplaceSpaces: false,
                     ReplaceUnderscores: false,
                     ReplacePercent20: false,
-                    CustomText: ""));
+                    CustomText: ""
+                )
+            );
             var separateFilter = new SeparateCapitalizedTextFilter(_target);
             var item = FilterTestHelpers.CreateRenameItem(prefix: "aBc12x");
             spaceFilter.Setup();

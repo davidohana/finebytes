@@ -38,7 +38,8 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             Require.That(
                 !string.IsNullOrWhiteSpace(tokenArgs),
                 $"{tokenDisplayName} requires one argument: name-list-file-path.",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             var normalizedPath = Path.GetFullPath(tokenArgs);
             var entries = NameListParser.ParseFile(filePath: normalizedPath);
@@ -47,12 +48,14 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                 var index = item.Original.RenameListIndex;
                 if (index < 0)
                     throw new InvalidOperationException(
-                        $"{tokenDisplayName} requires non-negative global index (got {index}).");
+                        $"{tokenDisplayName} requires non-negative global index (got {index})."
+                    );
 
                 if (index >= entries.Count)
                     throw new UserException(
-                        $"{tokenDisplayName} index {index} is out of range for '{normalizedPath}' " +
-                        $"({entries.Count} parsed entries).");
+                        $"{tokenDisplayName} index {index} is out of range for '{normalizedPath}' "
+                            + $"({entries.Count} parsed entries)."
+                    );
 
                 return entries[index];
             };

@@ -17,7 +17,8 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = new SentenceEndCharactersFilter(
                 Target: _target,
-                Options: new SentenceEndCharactersOptions(Characters: ":;"));
+                Options: new SentenceEndCharactersOptions(Characters: ":;")
+            );
 
             var result = FilterTestHelpers.ApplyToPrefix(filter, "hello: world");
 
@@ -32,10 +33,12 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var sentenceEndFilter = new SentenceEndCharactersFilter(
                 Target: _target,
-                Options: new SentenceEndCharactersOptions(Characters: "-.!"));
+                Options: new SentenceEndCharactersOptions(Characters: "-.!")
+            );
             var lettersCaseFilter = new LettersCaseFilter(
                 Target: _target,
-                Options: new LettersCaseOptions(LettersCaseMode.SentenceCase, SkipWords: []));
+                Options: new LettersCaseOptions(LettersCaseMode.SentenceCase, SkipWords: [])
+            );
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a - b. c");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersCaseFilter]);
             chain.SetupFilters();

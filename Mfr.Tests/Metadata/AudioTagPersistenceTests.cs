@@ -28,19 +28,14 @@ namespace Mfr.Tests.Metadata
                     if (File.Exists(path))
                         File.Delete(path);
                 }
-                catch (IOException)
-                {
-                }
+                catch (IOException) { }
             }
         }
 
         [Fact]
         public void Read_MissingFile_ThrowsArgumentException()
         {
-            var path = Path.Combine(
-                Environment.CurrentDirectory,
-                "___no_such_absolute___",
-                "x.mp3");
+            var path = Path.Combine(Environment.CurrentDirectory, "___no_such_absolute___", "x.mp3");
 
             Assert.False(File.Exists(path));
             Assert.True(Path.IsPathFullyQualified(path));
@@ -64,8 +59,7 @@ namespace Mfr.Tests.Metadata
 
             var preview = new AudioTagOverlay();
 
-            var ex = Assert.Throws<ArgumentException>(() =>
-                AudioTagPersistence.Apply(tempDir.FullName, preview));
+            var ex = Assert.Throws<ArgumentException>(() => AudioTagPersistence.Apply(tempDir.FullName, preview));
             Assert.Contains("directory", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -107,9 +101,7 @@ namespace Mfr.Tests.Metadata
 
             var readBaseline = AudioTagPersistence.Read(candidate);
             var previewOverlay = readBaseline.Clone();
-            var merged = SemanticAudioTag.FromOverlay(previewOverlay)
-                with
-            { Performers = "Alice;Bob" };
+            var merged = SemanticAudioTag.FromOverlay(previewOverlay) with { Performers = "Alice;Bob" };
 
             previewOverlay.MergeSemantic(merged);
 
@@ -326,7 +318,8 @@ namespace Mfr.Tests.Metadata
                 MusicBrainzReleaseType: null,
                 MusicBrainzReleaseCountry: null,
                 MusicIpId: null,
-                AmazonId: null);
+                AmazonId: null
+            );
 
             overlay.MergeSemantic(merged);
 
@@ -370,7 +363,8 @@ namespace Mfr.Tests.Metadata
                 MusicBrainzReleaseType: null,
                 MusicBrainzReleaseCountry: null,
                 MusicIpId: null,
-                AmazonId: null);
+                AmazonId: null
+            );
 
             overlay.MergeSemantic(merged);
 
@@ -418,7 +412,8 @@ namespace Mfr.Tests.Metadata
                 MusicBrainzReleaseType: null,
                 MusicBrainzReleaseCountry: null,
                 MusicIpId: null,
-                AmazonId: null);
+                AmazonId: null
+            );
 
             overlay.MergeSemantic(merged);
 
@@ -564,7 +559,8 @@ namespace Mfr.Tests.Metadata
                 {
                     BeatsPerMinute = 128,
                     Conductor = "Karajan",
-                });
+                }
+            );
 
             AudioTagPersistence.Apply(path, preview);
 
@@ -593,9 +589,7 @@ namespace Mfr.Tests.Metadata
             }
 
             var original = AudioTagPersistence.Read(path);
-            Assert.Contains(
-                original.Id3v2!.Frames,
-                f => f.FrameId == "TXXX" && f.Description == "replaygain");
+            Assert.Contains(original.Id3v2!.Frames, f => f.FrameId == "TXXX" && f.Description == "replaygain");
 
             var preview = original.Clone();
             preview.MergeSemantic(
@@ -603,7 +597,8 @@ namespace Mfr.Tests.Metadata
                 {
                     MusicBrainzArtistId = "artist-mbid",
                     AmazonId = "B000ASIN01",
-                });
+                }
+            );
 
             AudioTagPersistence.Apply(path, preview);
 
@@ -612,15 +607,16 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("B000ASIN01", again.Semantic().AmazonId);
             Assert.Contains(
                 again.Id3v2!.Frames,
-                f => f.FrameId == "TXXX" && f.Description == "replaygain" && f.TextValues[0] == "-6.5 dB");
+                f => f.FrameId == "TXXX" && f.Description == "replaygain" && f.TextValues[0] == "-6.5 dB"
+            );
             Assert.Contains(
                 again.Id3v2.Frames,
-                f => f.FrameId == "TXXX"
-                    && f.Description == "MusicBrainz Artist Id"
-                    && f.TextValues[0] == "artist-mbid");
+                f => f.FrameId == "TXXX" && f.Description == "MusicBrainz Artist Id" && f.TextValues[0] == "artist-mbid"
+            );
             Assert.Contains(
                 again.Id3v2.Frames,
-                f => f.FrameId == "TXXX" && f.Description == "ASIN" && f.TextValues[0] == "B000ASIN01");
+                f => f.FrameId == "TXXX" && f.Description == "ASIN" && f.TextValues[0] == "B000ASIN01"
+            );
         }
 
         /// <summary>
@@ -639,7 +635,8 @@ namespace Mfr.Tests.Metadata
                     MusicBrainzTrackId = "track-mbid",
                     MusicIpId = "puid-value",
                     MusicBrainzReleaseCountry = "GB",
-                });
+                }
+            );
 
             AudioTagPersistence.Apply(path, preview);
 
@@ -648,9 +645,7 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("puid-value", again.Semantic().MusicIpId);
             Assert.Equal("GB", again.Semantic().MusicBrainzReleaseCountry);
             Assert.NotNull(again.Xiph);
-            Assert.Contains(
-                again.Xiph.Fields,
-                r => r.Key == "MUSICBRAINZ_TRACKID" && r.Values[0] == "track-mbid");
+            Assert.Contains(again.Xiph.Fields, r => r.Key == "MUSICBRAINZ_TRACKID" && r.Values[0] == "track-mbid");
         }
 
         private static string? _ApeValue(ApeTagData ape, string key)
@@ -672,7 +667,8 @@ namespace Mfr.Tests.Metadata
             if (!File.Exists(fixturePath))
             {
                 throw new InvalidOperationException(
-                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output.");
+                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output."
+                );
             }
 
             var dest = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}_{fileName}");
@@ -687,7 +683,8 @@ namespace Mfr.Tests.Metadata
             if (!File.Exists(fixturePath))
             {
                 throw new InvalidOperationException(
-                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output.");
+                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output."
+                );
             }
 
             var dest = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}_mfr-mp3.mp3");

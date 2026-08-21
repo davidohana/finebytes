@@ -1,4 +1,3 @@
-
 namespace Mfr.Filters.Case
 {
     /// <summary>
@@ -24,8 +23,7 @@ namespace Mfr.Filters.Case
                 var rawLine = lines[i];
                 if (rawLine.Length > maxLineLen)
                 {
-                    throw new UserException(
-                        $"Casing-list line {lineNumber} exceeds maximum length ({maxLineLen}).");
+                    throw new UserException($"Casing-list line {lineNumber} exceeds maximum length ({maxLineLen}).");
                 }
 
                 var trimmed = rawLine.Trim();
@@ -34,7 +32,9 @@ namespace Mfr.Filters.Case
                     continue;
 
                 if (trimmed.Contains(' '))
-                    throw new UserException($"Invalid casing-list format at line {lineNumber}: line must contain exactly one word.");
+                    throw new UserException(
+                        $"Invalid casing-list format at line {lineNumber}: line must contain exactly one word."
+                    );
 
                 var lowerWord = trimmed.ToLowerInvariant();
                 // Last duplicate wins, matching "reload from file" expectations.

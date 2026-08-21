@@ -17,10 +17,9 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "_-", Position: 3, StartFrom: InserterOrigin.Beginning, Overwrite: false));
-            Assert.Equal(
-                "01_-_Mercury_Rave_-_Holes",
-                FilterTestHelpers.ApplyToPrefix(f, "01_Mercury_Rave_-_Holes"));
+                new InserterOptions(Text: "_-", Position: 3, StartFrom: InserterOrigin.Beginning, Overwrite: false)
+            );
+            Assert.Equal("01_-_Mercury_Rave_-_Holes", FilterTestHelpers.ApplyToPrefix(f, "01_Mercury_Rave_-_Holes"));
         }
 
         /// <summary>
@@ -31,7 +30,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "X", Position: 99, StartFrom: InserterOrigin.Beginning, Overwrite: false));
+                new InserterOptions(Text: "X", Position: 99, StartFrom: InserterOrigin.Beginning, Overwrite: false)
+            );
             Assert.Equal("abX", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
 
@@ -43,7 +43,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "_", Position: 1, StartFrom: InserterOrigin.End, Overwrite: false));
+                new InserterOptions(Text: "_", Position: 1, StartFrom: InserterOrigin.End, Overwrite: false)
+            );
             Assert.Equal("a_b", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
 
@@ -55,7 +56,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "^", Position: 9, StartFrom: InserterOrigin.End, Overwrite: false));
+                new InserterOptions(Text: "^", Position: 9, StartFrom: InserterOrigin.End, Overwrite: false)
+            );
             Assert.Equal("^ab", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
 
@@ -67,7 +69,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "**", Position: 2, StartFrom: InserterOrigin.Beginning, Overwrite: true));
+                new InserterOptions(Text: "**", Position: 2, StartFrom: InserterOrigin.Beginning, Overwrite: true)
+            );
             Assert.Equal("a**d", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
         }
 
@@ -79,7 +82,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "a < b", Position: 1, StartFrom: InserterOrigin.Beginning, Overwrite: false));
+                new InserterOptions(Text: "a < b", Position: 1, StartFrom: InserterOrigin.Beginning, Overwrite: false)
+            );
             Assert.Equal("a < bhello", FilterTestHelpers.ApplyToPrefix(f, "hello"));
         }
 
@@ -91,7 +95,13 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "_<file-name>_", Position: 1, StartFrom: InserterOrigin.Beginning, Overwrite: false));
+                new InserterOptions(
+                    Text: "_<file-name>_",
+                    Position: 1,
+                    StartFrom: InserterOrigin.Beginning,
+                    Overwrite: false
+                )
+            );
             Assert.Equal("_new_new", FilterTestHelpers.ApplyToPrefix(f, "new", renameListIndex: 0));
         }
     }

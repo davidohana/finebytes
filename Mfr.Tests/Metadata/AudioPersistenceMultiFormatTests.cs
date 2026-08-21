@@ -41,9 +41,7 @@ namespace Mfr.Tests.Metadata
                     if (File.Exists(path))
                         File.Delete(path);
                 }
-                catch (IOException)
-                {
-                }
+                catch (IOException) { }
             }
         }
 
@@ -68,7 +66,8 @@ namespace Mfr.Tests.Metadata
                 new PersistenceFormatCase("mp3", "l3-compl-cut.mp3"),
                 new PersistenceFormatCase("flac", "metaflac.flac"),
                 new PersistenceFormatCase("ogg", "libnogg-bitrate-123.ogg"),
-                new PersistenceFormatCase("m4a", "homebrew-test.m4a"));
+                new PersistenceFormatCase("m4a", "homebrew-test.m4a")
+            );
 
         [Theory(DisplayName = nameof(Read_AfterTagWrite_ReturnsTitles))]
         [MemberData(nameof(FormatCases))]
@@ -105,8 +104,7 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("fmt-baseline", projected.Title);
             Assert.Equal("fmt-album", projected.Album);
 
-            var compareNumerics =
-                !string.Equals(format.Label, "m4a", StringComparison.OrdinalIgnoreCase);
+            var compareNumerics = !string.Equals(format.Label, "m4a", StringComparison.OrdinalIgnoreCase);
 
             if (!compareNumerics)
                 return;
@@ -150,20 +148,21 @@ namespace Mfr.Tests.Metadata
             if (!File.Exists(fixturePath))
             {
                 throw new InvalidOperationException(
-                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output, or restore binaries.");
+                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output, or restore binaries."
+                );
             }
 
             var extension = Path.GetExtension(format.FixtureFileName);
             var dest = Path.Combine(
                 Path.GetTempPath(),
-                $"mfr-fmt-{Path.GetFileNameWithoutExtension(format.FixtureFileName)}-{unique}{extension}");
+                $"mfr-fmt-{Path.GetFileNameWithoutExtension(format.FixtureFileName)}-{unique}{extension}"
+            );
             _pathsToDelete.Add(dest);
             File.Copy(fixturePath, dest, overwrite: false);
             return Path.GetFullPath(dest);
         }
 
-        private static string _FixturesDirectory =>
-            Path.Combine(AppContext.BaseDirectory, "Fixtures");
+        private static string _FixturesDirectory => Path.Combine(AppContext.BaseDirectory, "Fixtures");
 
         private static void _ApplyTags(string path, string baselineTitle, string baselineAlbum)
         {

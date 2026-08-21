@@ -37,8 +37,10 @@ namespace Mfr.Models.Media
             "Thumb", // Thumbnail IFD; DateTime is not copied into DateTaken
         ];
 
-        private static readonly HashSet<string> _sourceAliasToIsKnown =
-            new(SourceAliases, StringComparer.OrdinalIgnoreCase);
+        private static readonly HashSet<string> _sourceAliasToIsKnown = new(
+            SourceAliases,
+            StringComparer.OrdinalIgnoreCase
+        );
 
         /// <summary>
         /// Returns whether <paramref name="source"/> is a known <see cref="SourceAliases"/> value.

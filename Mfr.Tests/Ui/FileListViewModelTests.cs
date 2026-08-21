@@ -223,9 +223,7 @@ namespace Mfr.Tests.Ui
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
 
             Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
-            var network = Assert.Single(
-                viewModel.Entries,
-                entry => entry.Name == FileListViewModel.NetworkDisplayName);
+            var network = Assert.Single(viewModel.Entries, entry => entry.Name == FileListViewModel.NetworkDisplayName);
             Assert.Equal("Network location", network.Type);
             Assert.False(viewModel.CanGoUp);
 
@@ -237,7 +235,8 @@ namespace Mfr.Tests.Ui
             Assert.True(viewModel.CanGoUp);
             Assert.Equal(
                 [FileListViewModel.ComputerDisplayName, FileListViewModel.NetworkDisplayName],
-                viewModel.BreadcrumbSegments.Select(segment => segment.Label));
+                viewModel.BreadcrumbSegments.Select(segment => segment.Label)
+            );
 
             viewModel.GoUp();
             Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
@@ -310,9 +309,7 @@ namespace Mfr.Tests.Ui
 
             Assert.True(PathRelations.IsSamePath(liveRoot, viewModel.CurrentPath));
             Assert.Equal(liveRoot, viewModel.PathText);
-            Assert.Contains(
-                liveRoot[2..],
-                viewModel.BreadcrumbSegments.Select(segment => segment.Label));
+            Assert.Contains(liveRoot[2..], viewModel.BreadcrumbSegments.Select(segment => segment.Label));
             Assert.True(WindowsWslUnc.TryListDistroPaths(liveRoot, out var distroPaths));
             Assert.NotEmpty(distroPaths);
             Assert.Equal(distroPaths.Count, viewModel.Entries.Count);
@@ -467,12 +464,8 @@ namespace Mfr.Tests.Ui
 
             Assert.Equal(ThumbnailSizes.Medium, viewModel.ThumbnailSize);
             Assert.True(viewModel.IsThumbnailSizeMedium);
-            Assert.Equal(
-                ThumbnailSizes.Medium + ThumbnailSizes.CellPadding,
-                viewModel.ThumbnailCellWidth);
-            Assert.Equal(
-                ThumbnailSizes.Medium + ThumbnailSizes.CaptionHeight,
-                viewModel.ThumbnailCellHeight);
+            Assert.Equal(ThumbnailSizes.Medium + ThumbnailSizes.CellPadding, viewModel.ThumbnailCellWidth);
+            Assert.Equal(ThumbnailSizes.Medium + ThumbnailSizes.CaptionHeight, viewModel.ThumbnailCellHeight);
             Assert.False(viewModel.ZoomThumbnailsInCommand.CanExecute(null));
         }
 
@@ -489,9 +482,7 @@ namespace Mfr.Tests.Ui
             viewModel.ZoomThumbnailsIn();
             Assert.Equal(ThumbnailSizes.Large, viewModel.ThumbnailSize);
             Assert.True(viewModel.IsThumbnailSizeLarge);
-            Assert.Equal(
-                ThumbnailSizes.Large + ThumbnailSizes.CaptionHeight,
-                viewModel.ThumbnailCellHeight);
+            Assert.Equal(ThumbnailSizes.Large + ThumbnailSizes.CaptionHeight, viewModel.ThumbnailCellHeight);
 
             viewModel.ZoomThumbnailsIn();
             viewModel.ZoomThumbnailsIn();
@@ -703,7 +694,8 @@ namespace Mfr.Tests.Ui
             Assert.Equal(documents, viewModel.CurrentPath);
             Assert.Equal(
                 [FileListViewModel.ComputerDisplayName, "Documents"],
-                viewModel.BreadcrumbSegments.Select(segment => segment.Label));
+                viewModel.BreadcrumbSegments.Select(segment => segment.Label)
+            );
 
             viewModel.GoUp();
             Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
@@ -741,7 +733,8 @@ namespace Mfr.Tests.Ui
             List<string> names,
             string placeName,
             int lastDriveIndex,
-            Environment.SpecialFolder folder)
+            Environment.SpecialFolder folder
+        )
         {
             if (_ExistingSpecialFolder(folder) is null)
                 return;

@@ -72,7 +72,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_sets_annotated_fields_uses_camel_case_names()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"port":"50","name":"xyz","enabled":"false"}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"port":"50","name":"xyz","enabled":"false"}"""
+            );
             var o = new SampleOptions();
             ConfigJsonApplier.Apply(doc.RootElement, o);
             Assert.Equal(50, o.Port);
@@ -83,7 +85,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_missing_properties_leave_defaults()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             var o = new SampleOptions();
             ConfigJsonApplier.Apply(doc.RootElement, o);
             Assert.Equal(10, o.Port);
@@ -94,7 +98,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_unannotated_public_field_is_not_read_from_json()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"unmappedField":"999","port":"20"}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"unmappedField":"999","port":"20"}"""
+            );
             var o = new SampleOptions();
             ConfigJsonApplier.Apply(doc.RootElement, o);
             Assert.Equal(20, o.Port);
@@ -104,7 +110,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_int_out_of_range_throws_InvalidDataException()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"port":"0"}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"port":"0"}"""
+            );
             var o = new SampleOptions();
             Assert.Throws<InvalidDataException>(() => ConfigJsonApplier.Apply(doc.RootElement, o));
         }
@@ -112,7 +120,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_string_exceeds_max_length_throws_InvalidDataException()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"name":"hello"}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"name":"hello"}"""
+            );
             var o = new SampleOptions();
             Assert.Throws<InvalidDataException>(() => ConfigJsonApplier.Apply(doc.RootElement, o));
         }
@@ -120,7 +130,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_both_range_and_string_attributes_throws_InvalidOperationException()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             var o = new BadDualAttribute();
             Assert.Throws<InvalidOperationException>(() => ConfigJsonApplier.Apply(doc.RootElement, o));
         }
@@ -128,7 +140,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_int_range_on_non_int_field_throws_InvalidOperationException()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             var o = new BadIntRangeOnLong();
             Assert.Throws<InvalidOperationException>(() => ConfigJsonApplier.Apply(doc.RootElement, o));
         }
@@ -136,7 +150,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_string_max_on_non_string_field_throws_InvalidOperationException()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             var o = new BadStringMaxOnInt();
             Assert.Throws<InvalidOperationException>(() => ConfigJsonApplier.Apply(doc.RootElement, o));
         }
@@ -144,7 +160,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_target_null_throws_ArgumentNullException()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             object? target = null;
             Assert.Throws<ArgumentNullException>(() => ConfigJsonApplier.Apply(doc.RootElement, target!));
         }
@@ -152,7 +170,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_custom_naming_policy_is_used()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"PORT":"77"}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"PORT":"77"}"""
+            );
             var o = new SampleOptions();
             ConfigJsonApplier.Apply(doc.RootElement, o, new UpperInvariantNamingPolicy());
             Assert.Equal(77, o.Port);
@@ -161,7 +181,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_nested_section_reads_leaf_fields()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"outer":{"port":"77"}}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"outer":{"port":"77"}}"""
+            );
             var o = new RootWithNestedSection();
             ConfigJsonApplier.Apply(doc.RootElement, o);
             Assert.Equal(77, o.Outer.Port);
@@ -170,7 +192,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_missing_nested_section_leaves_defaults()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             var o = new RootWithNestedSection();
             ConfigJsonApplier.Apply(doc.RootElement, o);
             Assert.Equal(10, o.Outer.Port);
@@ -179,7 +203,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_nested_section_wrong_value_kind_throws_InvalidDataException()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ """{"outer":"not-an-object"}""");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"outer":"not-an-object"}"""
+            );
             var o = new RootWithNestedSection();
             Assert.Throws<InvalidDataException>(() => ConfigJsonApplier.Apply(doc.RootElement, o));
         }
@@ -187,7 +213,9 @@ namespace Mfr.Tests.Utils.Config
         [Fact]
         public void Apply_section_combined_with_leaf_attribute_throws_InvalidOperationException()
         {
-            using var doc = JsonDocument.Parse(/*lang=json,strict*/ "{}");
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
             var o = new BadSectionWithLeaf();
             Assert.Throws<InvalidOperationException>(() => ConfigJsonApplier.Apply(doc.RootElement, o));
         }

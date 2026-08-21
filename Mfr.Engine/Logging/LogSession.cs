@@ -39,7 +39,8 @@ namespace Mfr.Engine.Logging
         public static void Start(
             LogEventLevel logLevel,
             LogConfig logConfig,
-            Action<LoggerConfiguration>? configureAdditionalSinks = null)
+            Action<LoggerConfiguration>? configureAdditionalSinks = null
+        )
         {
             ArgumentNullException.ThrowIfNull(logConfig);
 
@@ -48,7 +49,8 @@ namespace Mfr.Engine.Logging
                 logLevel: logLevel,
                 logFilePath: logFilePath,
                 logConfig: logConfig,
-                configureAdditionalSinks: configureAdditionalSinks);
+                configureAdditionalSinks: configureAdditionalSinks
+            );
             LogFilePath = logFilePath;
             LogDirectoryPath = resolvedLogDirectoryPath;
 
@@ -56,12 +58,10 @@ namespace Mfr.Engine.Logging
                 logDirectoryPath: resolvedLogDirectoryPath,
                 maxSessionFiles: logConfig.MaxSessionFiles,
                 sessionLogPrefix: logConfig.FilePrefix,
-                sessionLogExtension: logConfig.FileExtension);
+                sessionLogExtension: logConfig.FileExtension
+            );
 
-            Log.Debug(
-                "Logging initialized. Level: {LogLevel}. File: {LogFilePath}",
-                logLevel,
-                logFilePath);
+            Log.Debug("Logging initialized. Level: {LogLevel}. File: {LogFilePath}", logLevel, logFilePath);
         }
 
         /// <summary>
@@ -84,9 +84,7 @@ namespace Mfr.Engine.Logging
         {
             var logDirectoryPath = LogPaths.ResolveDirectoryPath(logConfig.DirectoryPath);
             Directory.CreateDirectory(logDirectoryPath);
-            var logFilePath = LogPaths.CreateSessionFilePath(
-                logDirectoryPath: logDirectoryPath,
-                logConfig: logConfig);
+            var logFilePath = LogPaths.CreateSessionFilePath(logDirectoryPath: logDirectoryPath, logConfig: logConfig);
             return (logDirectoryPath, logFilePath);
         }
 
@@ -97,7 +95,8 @@ namespace Mfr.Engine.Logging
             LogEventLevel logLevel,
             string logFilePath,
             LogConfig logConfig,
-            Action<LoggerConfiguration>? configureAdditionalSinks)
+            Action<LoggerConfiguration>? configureAdditionalSinks
+        )
         {
             var configuration = new LoggerConfiguration()
                 .MinimumLevel.Is(logLevel)
@@ -105,7 +104,8 @@ namespace Mfr.Engine.Logging
                     path: logFilePath,
                     outputTemplate: logConfig.FileOutputTemplate,
                     rollingInterval: RollingInterval.Infinite,
-                    shared: false);
+                    shared: false
+                );
 
             configureAdditionalSinks?.Invoke(configuration);
             Log.Logger = configuration.CreateLogger();

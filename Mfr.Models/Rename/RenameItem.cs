@@ -44,7 +44,7 @@ namespace Mfr.Models.Rename
         /// <summary>
         /// Commit failed due to an error.
         /// </summary>
-        CommitError
+        CommitError,
     }
 
     /// <summary>

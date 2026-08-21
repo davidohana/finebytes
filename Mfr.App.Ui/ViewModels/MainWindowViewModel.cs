@@ -16,11 +16,11 @@ namespace Mfr.App.Ui.ViewModels
     /// </param>
     public partial class MainWindowViewModel(string? initialFileListPath = null) : ViewModelBase
     {
-
         /// <summary>
         /// Gets the File List pane.
         /// </summary>
-        public FileListViewModel FileList { get; } = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
+        public FileListViewModel FileList { get; } =
+            new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
 
         /// <summary>
         /// Gets the Available Filters pane.
@@ -76,33 +76,25 @@ namespace Mfr.App.Ui.ViewModels
         /// Applies pending rename changes. Disabled until preview/GO is implemented.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanExecuteUnimplemented))]
-        public void Go()
-        {
-        }
+        public void Go() { }
 
         /// <summary>
         /// Undoes the last GO. Placeholder until undo is implemented.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanExecuteUnimplemented))]
-        public void UndoLast()
-        {
-        }
+        public void UndoLast() { }
 
         /// <summary>
         /// Opens the log window. Placeholder until the log is implemented.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanExecuteUnimplemented))]
-        public void ShowLog()
-        {
-        }
+        public void ShowLog() { }
 
         /// <summary>
         /// Opens Options. Placeholder until the options window is implemented.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanExecuteUnimplemented))]
-        public void ShowOptions()
-        {
-        }
+        public void ShowOptions() { }
 
         /// <summary>
         /// Shuts down the application.

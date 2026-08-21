@@ -24,8 +24,7 @@ namespace Mfr.Filters
 
             if (item.Original.Attributes.IsDirectory())
             {
-                throw new InvalidOperationException(
-                    "Cannot read image properties for a directory.");
+                throw new InvalidOperationException("Cannot read image properties for a directory.");
             }
 
             var snapshot = ImageFileReader.Read(item.Original.FullPath);

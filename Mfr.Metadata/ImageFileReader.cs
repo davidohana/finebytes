@@ -29,7 +29,8 @@ namespace Mfr.Metadata
             var directories = ImageMetadataReader.ReadMetadata(absolutePath);
             return new ImageFileSnapshot(
                 Image: ImagePropertiesReader.MapFrom(directories),
-                Exif: ExifDataReader.MapFrom(directories));
+                Exif: ExifDataReader.MapFrom(directories)
+            );
         }
     }
 }

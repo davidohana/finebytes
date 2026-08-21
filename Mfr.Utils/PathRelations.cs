@@ -63,9 +63,7 @@ namespace Mfr.Utils
             ArgumentNullException.ThrowIfNull(first);
             ArgumentNullException.ThrowIfNull(second);
 
-            return PathComparers.Os.Equals(
-                first.TrimTrailingSeparator(),
-                second.TrimTrailingSeparator());
+            return PathComparers.Os.Equals(first.TrimTrailingSeparator(), second.TrimTrailingSeparator());
         }
 
         /// <summary>
@@ -91,8 +89,7 @@ namespace Mfr.Utils
 
             var separatorChar = trimmedCandidate[trimmedAncestor.Length];
             var nextCharIsSeparator =
-                separatorChar == Path.DirectorySeparatorChar
-                || separatorChar == Path.AltDirectorySeparatorChar;
+                separatorChar == Path.DirectorySeparatorChar || separatorChar == Path.AltDirectorySeparatorChar;
             if (!nextCharIsSeparator)
                 return false;
 

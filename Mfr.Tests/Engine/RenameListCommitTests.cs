@@ -1,6 +1,6 @@
 using Mfr.Engine;
-using Mfr.Filters.Audio;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
 using Mfr.Metadata;
@@ -44,9 +44,8 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "duplicate",
-                new FormatterFilter(
-                    Target: new FileFullNameTarget(),
-                    Options: new FormatterOptions("same.mp3")));
+                new FormatterFilter(Target: new FileFullNameTarget(), Options: new FormatterOptions("same.mp3"))
+            );
             var result = _PreviewAndCommit(renameList, preset);
 
             Assert.Equal(2, result.Count(x => x.Status == RenameStatus.PreviewError));
@@ -107,7 +106,9 @@ namespace Mfr.Tests.Engine
                 "audio-overlay-title",
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                    Options: new FormatterOptions("DiskTitleAfter")));
+                    Options: new FormatterOptions("DiskTitleAfter")
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
@@ -116,9 +117,7 @@ namespace Mfr.Tests.Engine
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Single(results);
             Assert.Equal(RenameStatus.CommitOk, results[0].Status);
-            Assert.Contains(
-                results[0].Changes,
-                c => c.Property == "AudioTag.Block.RiffInfo.INAM");
+            Assert.Contains(results[0].Changes, c => c.Property == "AudioTag.Block.RiffInfo.INAM");
 
             var readBack = AudioTagPersistence.Read(sourcePath);
             Assert.Equal("DiskTitleAfter", readBack.Semantic().Title);
@@ -142,8 +141,10 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "flac-audio-tag-setter-title",
-                new AudioTagSetterFilter(new AudioTagSetterOptions(
-                    Title: new AudioTagStringFieldOptions(Text: "CommitFlacTitle"))));
+                new AudioTagSetterFilter(
+                    new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "CommitFlacTitle"))
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
@@ -175,8 +176,10 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "m4a-audio-tag-setter-title",
-                new AudioTagSetterFilter(new AudioTagSetterOptions(
-                    Title: new AudioTagStringFieldOptions(Text: "CommitM4aTitle"))));
+                new AudioTagSetterFilter(
+                    new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "CommitM4aTitle"))
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
@@ -208,8 +211,10 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "wma-audio-tag-setter-title",
-                new AudioTagSetterFilter(new AudioTagSetterOptions(
-                    Title: new AudioTagStringFieldOptions(Text: "CommitWmaTitle"))));
+                new AudioTagSetterFilter(
+                    new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "CommitWmaTitle"))
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
@@ -226,7 +231,8 @@ namespace Mfr.Tests.Engine
             Assert.Equal("CommitWmaTitle", readBack.Semantic().Title);
             Assert.Contains(
                 readBack.Asf!.Descriptors,
-                d => d.Name == AsfDescriptorNames.Title && d.Value == "CommitWmaTitle");
+                d => d.Name == AsfDescriptorNames.Title && d.Value == "CommitWmaTitle"
+            );
         }
 
         [Fact]
@@ -275,7 +281,8 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "remove-id3v1",
-                new TagRemoverFilter(new TagRemoverOptions(Blocks: [AudioTagBlockKind.Id3v1])));
+                new TagRemoverFilter(new TagRemoverOptions(Blocks: [AudioTagBlockKind.Id3v1]))
+            );
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
@@ -310,7 +317,9 @@ namespace Mfr.Tests.Engine
                 new TagRemoverFilter(new TagRemoverOptions(Blocks: [AudioTagBlockKind.Id3v1])),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                    Options: new FormatterOptions("OnlyOnFrames")));
+                    Options: new FormatterOptions("OnlyOnFrames")
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
@@ -342,7 +351,8 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "remove-id3v2-on-flac",
-                new TagRemoverFilter(new TagRemoverOptions(Blocks: [AudioTagBlockKind.Id3v2])));
+                new TagRemoverFilter(new TagRemoverOptions(Blocks: [AudioTagBlockKind.Id3v2]))
+            );
             _ = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewError, item.Status);
@@ -367,9 +377,8 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "id3v2-on-flac",
-                new FormatterFilter(
-                    Target: new Id3v2FrameTarget("TIT2"),
-                    Options: new FormatterOptions("Nope")));
+                new FormatterFilter(Target: new Id3v2FrameTarget("TIT2"), Options: new FormatterOptions("Nope"))
+            );
             _ = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewError, item.Status);
@@ -392,9 +401,8 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "tdrc-on-v23",
-                new FormatterFilter(
-                    Target: new Id3v2FrameTarget("TDRC"),
-                    Options: new FormatterOptions("2020")));
+                new FormatterFilter(Target: new Id3v2FrameTarget("TDRC"), Options: new FormatterOptions("2020"))
+            );
             _ = _SetupPreview(renameList, preset);
 
             Assert.Equal(3, item.Original.AudioTagOverlay.Id3v2!.Version);
@@ -419,14 +427,16 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "tit2-only",
-                new FormatterFilter(
-                    Target: new Id3v2FrameTarget("TIT2"),
-                    Options: new FormatterOptions("NewFrame")));
+                new FormatterFilter(Target: new Id3v2FrameTarget("TIT2"), Options: new FormatterOptions("NewFrame"))
+            );
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.Equal("Trailer", item.Preview.AudioTagOverlay.Id3v1!.Title);
-            Assert.Equal("NewFrame", AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2"));
+            Assert.Equal(
+                "NewFrame",
+                AudioOverlayBlockFieldIo.GetId3v2FrameString(item.Preview.AudioTagOverlay, "TIT2")
+            );
 
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
@@ -456,7 +466,9 @@ namespace Mfr.Tests.Engine
                 "xiph-title",
                 new FormatterFilter(
                     Target: new XiphFieldTarget("TITLE"),
-                    Options: new FormatterOptions("XiphOnlyTitle")));
+                    Options: new FormatterOptions("XiphOnlyTitle")
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
@@ -488,7 +500,9 @@ namespace Mfr.Tests.Engine
                 new TagRemoverFilter(new TagRemoverOptions(All: true)),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                    Options: new FormatterOptions("AfterStrip")));
+                    Options: new FormatterOptions("AfterStrip")
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -523,7 +537,9 @@ namespace Mfr.Tests.Engine
                 new TagRemoverFilter(new TagRemoverOptions(All: true)),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                    Options: new FormatterOptions("RecommendedMp3")));
+                    Options: new FormatterOptions("RecommendedMp3")
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -562,7 +578,9 @@ namespace Mfr.Tests.Engine
                 new TagRemoverFilter(new TagRemoverOptions(All: true)),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                    Options: new FormatterOptions("RecommendedFlac")));
+                    Options: new FormatterOptions("RecommendedFlac")
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -597,8 +615,10 @@ namespace Mfr.Tests.Engine
                 "fmt-strip",
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                    Options: new FormatterOptions("PreviewStyled")),
-                new TagRemoverFilter(new TagRemoverOptions(All: true)));
+                    Options: new FormatterOptions("PreviewStyled")
+                ),
+                new TagRemoverFilter(new TagRemoverOptions(All: true))
+            );
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -628,9 +648,11 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreatePresetAllEnabled(
                 "setter-strip",
-                new AudioTagSetterFilter(new AudioTagSetterOptions(
-                    Title: new AudioTagStringFieldOptions(Text: "FromSetter"))),
-                new TagRemoverFilter(new TagRemoverOptions(All: true)));
+                new AudioTagSetterFilter(
+                    new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "FromSetter"))
+                ),
+                new TagRemoverFilter(new TagRemoverOptions(All: true))
+            );
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -662,11 +684,14 @@ namespace Mfr.Tests.Engine
                 "triple-chain",
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                    Options: new FormatterOptions("Intermediate")),
+                    Options: new FormatterOptions("Intermediate")
+                ),
                 new TagRemoverFilter(new TagRemoverOptions(All: true)),
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                    Options: new FormatterOptions("Final")));
+                    Options: new FormatterOptions("Final")
+                )
+            );
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -704,8 +729,11 @@ namespace Mfr.Tests.Engine
                         ReplacerMode.Literal,
                         CaseSensitive: true,
                         ReplaceAll: false,
-                        WholeWord: false)),
-                new TagRemoverFilter(new TagRemoverOptions(All: true)));
+                        WholeWord: false
+                    )
+                ),
+                new TagRemoverFilter(new TagRemoverOptions(All: true))
+            );
             var plan = _SetupPreview(renameList, preset);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -738,7 +766,10 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSource(sourcePath);
 
-            var preset = _CreatePresetAllEnabled("embed-strip-dry", new TagRemoverFilter(new TagRemoverOptions(All: true)));
+            var preset = _CreatePresetAllEnabled(
+                "embed-strip-dry",
+                new TagRemoverFilter(new TagRemoverOptions(All: true))
+            );
             var plan = _SetupPreview(renameList, preset);
             var results = renameList.Commit(plan, failFast: false, dryRun: true);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
@@ -764,7 +795,9 @@ namespace Mfr.Tests.Engine
                 "audio-overlay-dry",
                 new FormatterFilter(
                     Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                    Options: new FormatterOptions("PreviewOnly")));
+                    Options: new FormatterOptions("PreviewOnly")
+                )
+            );
             _ = _PreviewAndCommit(renameList, preset, dryRun: true);
 
             var readBack = AudioTagPersistence.Read(sourcePath);
@@ -903,10 +936,7 @@ namespace Mfr.Tests.Engine
             Directory.CreateDirectory(folderPath);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(
-                source: folderPath,
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
 
             var preset = _SetHiddenAttributesPreset("attrs-confirm");
             var plan = _SetupPreview(renameList, preset);
@@ -914,14 +944,16 @@ namespace Mfr.Tests.Engine
             Assert.True(renameList.RenameItems[0].IsPreviewPathUnchanged());
 
             var callbackInvocations = 0;
-            var result = renameList.Commit(plan,
+            var result = renameList.Commit(
+                plan,
                 failFast: false,
                 dryRun: false,
                 confirmBeforeApply: _ =>
                 {
                     callbackInvocations++;
                     return false;
-                });
+                }
+            );
 
             Assert.Equal(1, callbackInvocations);
             Assert.Single(result);
@@ -1171,10 +1203,7 @@ namespace Mfr.Tests.Engine
             File.WriteAllText(sourceFolderA.CombinePath("inside-a.txt"), "y");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources(
-                sources: [sourceFolderB, sourceFolderA],
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSources(sources: [sourceFolderB, sourceFolderA], includeFiles: false, includeFolders: true);
             var items = renameList.RenameItems;
             Assert.Equal(2, items.Count);
 
@@ -1419,10 +1448,7 @@ namespace Mfr.Tests.Engine
             var destinationFolderPath = dir.CombinePath("AlbumRenamed");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(
-                source: originalFolderPath,
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSource(source: originalFolderPath, includeFiles: false, includeFolders: true);
             Assert.Single(renameList.RenameItems);
 
             var preset = _FormatterFullPathPreset("folder-full-path-move", destinationFolderPath);
@@ -1452,10 +1478,7 @@ namespace Mfr.Tests.Engine
             Assert.True(attrsBefore.HasFlag(FileAttributes.Directory));
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(
-                source: folderPath,
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
             Assert.Single(renameList.RenameItems);
             Assert.True(renameList.RenameItems[0].Original.Attributes.HasFlag(FileAttributes.Directory));
 
@@ -1485,10 +1508,7 @@ namespace Mfr.Tests.Engine
             Directory.CreateDirectory(folderPath);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(
-                source: folderPath,
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
 
             var preset = _SetHiddenAttributesPreset("attrs-folder-dry");
             var result = _PreviewAndCommit(renameList, preset, dryRun: true);
@@ -1510,14 +1530,9 @@ namespace Mfr.Tests.Engine
             var before = File.GetLastWriteTime(folderPath);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(
-                source: folderPath,
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
 
-            var preset = _LastWriteDateSetterPreset(
-                "last-write-folder",
-                DateOnly.FromDateTime(before.AddDays(30)));
+            var preset = _LastWriteDateSetterPreset("last-write-folder", DateOnly.FromDateTime(before.AddDays(30)));
             var plan = _SetupPreview(renameList, preset);
             var item = renameList.RenameItems[0];
             Assert.True(item.HasPreviewChanges());
@@ -1542,10 +1557,7 @@ namespace Mfr.Tests.Engine
             var before = File.GetLastWriteTime(folderPath);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(
-                source: folderPath,
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
 
             var preset = _LastWriteTimeShifterDaysPreset("time-shifter-folder", days: 7);
             var plan = _SetupPreview(renameList, preset);
@@ -1567,7 +1579,8 @@ namespace Mfr.Tests.Engine
             PadChar: "0",
             Position: CounterPosition.Replace,
             Separator: " - ",
-            ResetPerFolder: false);
+            ResetPerFolder: false
+        );
 
         private static FilterPreset _CreatePresetAllEnabled(string name, params BaseFilter[] filters)
         {
@@ -1595,7 +1608,8 @@ namespace Mfr.Tests.Engine
         {
             return _CreatePresetAllEnabled(
                 name,
-                new CounterFilter(Target: new FilePrefixTarget(), Options: _CounterReplacePrefixOptions));
+                new CounterFilter(Target: new FilePrefixTarget(), Options: _CounterReplacePrefixOptions)
+            );
         }
 
         private static FilterPreset _SetHiddenAttributesPreset(string name)
@@ -1607,7 +1621,10 @@ namespace Mfr.Tests.Engine
                         ReadOnly: AttributeTriState.Keep,
                         Hidden: AttributeTriState.Set,
                         Archive: AttributeTriState.Keep,
-                        System: AttributeTriState.Keep)));
+                        System: AttributeTriState.Keep
+                    )
+                )
+            );
         }
 
         private static FilterPreset _LastWriteDateSetterPreset(string name, DateOnly date)
@@ -1615,9 +1632,9 @@ namespace Mfr.Tests.Engine
             return _CreatePresetAllEnabled(
                 name,
                 new DateSetterFilter(
-                    Options: new DateSetterOptions(
-                        TimestampField: TimestampField.LastWrite,
-                        Date: date)));
+                    Options: new DateSetterOptions(TimestampField: TimestampField.LastWrite, Date: date)
+                )
+            );
         }
 
         private static FilterPreset _LastWriteTimeShifterDaysPreset(string name, int days)
@@ -1628,7 +1645,10 @@ namespace Mfr.Tests.Engine
                     Options: new TimeShifterOptions(
                         TimestampField: TimestampField.LastWrite,
                         Amount: days,
-                        Unit: TimeShiftUnit.Days)));
+                        Unit: TimeShiftUnit.Days
+                    )
+                )
+            );
         }
 
         private static FilterPreset _PrefixChainShiftBToCThenAToBPreset(string name)
@@ -1643,7 +1663,9 @@ namespace Mfr.Tests.Engine
                         ReplacerMode.Literal,
                         CaseSensitive: true,
                         ReplaceAll: false,
-                        WholeWord: false)),
+                        WholeWord: false
+                    )
+                ),
                 new ReplacerFilter(
                     Target: new FilePrefixTarget(),
                     Options: new ReplacerOptions(
@@ -1652,7 +1674,10 @@ namespace Mfr.Tests.Engine
                         ReplacerMode.Literal,
                         CaseSensitive: true,
                         ReplaceAll: false,
-                        WholeWord: false)));
+                        WholeWord: false
+                    )
+                )
+            );
         }
 
         private static FilterPreset _RenameOldParentToNewParentPreset(string name)
@@ -1667,21 +1692,26 @@ namespace Mfr.Tests.Engine
                         Mode: ReplacerMode.Literal,
                         CaseSensitive: true,
                         ReplaceAll: false,
-                        WholeWord: false)));
+                        WholeWord: false
+                    )
+                )
+            );
         }
 
         private static FilterPreset _FormatterParentDirectoryPreset(string name, string parentPath)
         {
             return _CreatePresetAllEnabled(
                 name,
-                new FormatterFilter(Target: new ParentDirectoryTarget(), Options: new FormatterOptions(parentPath)));
+                new FormatterFilter(Target: new ParentDirectoryTarget(), Options: new FormatterOptions(parentPath))
+            );
         }
 
         private static FilterPreset _FormatterFullPathPreset(string name, string fullPath)
         {
             return _CreatePresetAllEnabled(
                 name,
-                new FormatterFilter(Target: new FullPathTarget(), Options: new FormatterOptions(fullPath)));
+                new FormatterFilter(Target: new FullPathTarget(), Options: new FormatterOptions(fullPath))
+            );
         }
 
         /// <summary>
@@ -1698,7 +1728,8 @@ namespace Mfr.Tests.Engine
             FilterPreset preset,
             bool failFast = false,
             bool dryRun = false,
-            Func<RenameItem, bool>? confirmBeforeApply = null)
+            Func<RenameItem, bool>? confirmBeforeApply = null
+        )
         {
             var plan = _SetupPreview(renameList, preset);
             return renameList.Commit(plan, failFast, dryRun, confirmBeforeApply);
@@ -1716,13 +1747,15 @@ namespace Mfr.Tests.Engine
             return renameList.Preview(preset);
         }
 
-        private static void _AssertSingleCommitOk(IReadOnlyList<RenameResultItem> result, string? expectChangeProperty = null)
+        private static void _AssertSingleCommitOk(
+            IReadOnlyList<RenameResultItem> result,
+            string? expectChangeProperty = null
+        )
         {
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
             if (expectChangeProperty is not null)
                 Assert.Contains(result[0].Changes, c => c.Property == expectChangeProperty);
-
         }
 
         private static FilterPreset _FailingReplacerUnsupportedTargetPreset(string name)
@@ -1737,7 +1770,10 @@ namespace Mfr.Tests.Engine
                         ReplacerMode.Literal,
                         CaseSensitive: true,
                         ReplaceAll: true,
-                        WholeWord: false)));
+                        WholeWord: false
+                    )
+                )
+            );
         }
 
         private sealed record UnsupportedTarget : FilterTarget;

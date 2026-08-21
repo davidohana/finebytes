@@ -24,9 +24,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             FormatOptionsParsing.RequireNoArgument(tokenArgs, FormatOptionsParsing.TokenDisplayName(this));
             return item =>
             {
-                var dir = item.Original.Attributes.IsDirectory()
-                    ? item.Original.FullPath
-                    : item.Original.DirectoryPath;
+                var dir = item.Original.Attributes.IsDirectory() ? item.Original.FullPath : item.Original.DirectoryPath;
                 if (!Directory.Exists(dir))
                     return string.Empty;
                 return Directory.GetFiles(dir).Length.ToString(CultureInfo.InvariantCulture);

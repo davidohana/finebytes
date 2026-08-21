@@ -17,7 +17,7 @@ namespace Mfr.Models.Filters
         /// Positions count from the last character toward the start (1 = last character).
         /// </summary>
         [JsonStringEnumMemberName("right")]
-        Right
+        Right,
     }
 
     /// <summary>
@@ -44,7 +44,8 @@ namespace Mfr.Models.Filters
         [property: JsonPropertyName("startPosition")] int StartPosition,
         [property: JsonPropertyName("startAnchor")] StringScopeAnchor StartAnchor,
         [property: JsonPropertyName("endPosition")] int EndPosition,
-        [property: JsonPropertyName("endAnchor")] StringScopeAnchor EndAnchor) : StringApplyScope;
+        [property: JsonPropertyName("endAnchor")] StringScopeAnchor EndAnchor
+    ) : StringApplyScope;
 
     /// <summary>
     /// Split the target by <paramref name="Separator"/> and apply the filter only to the selected 1-based token.
@@ -53,5 +54,6 @@ namespace Mfr.Models.Filters
     /// <param name="TokenNumber">1-based token index (must be at least 1).</param>
     public sealed record TokenApplyScope(
         [property: JsonPropertyName("separator")] string Separator,
-        [property: JsonPropertyName("tokenNumber")] int TokenNumber) : StringApplyScope;
+        [property: JsonPropertyName("tokenNumber")] int TokenNumber
+    ) : StringApplyScope;
 }

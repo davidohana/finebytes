@@ -24,7 +24,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Generators
                     result,
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.RoundtripKind,
-                    out var parsed));
+                    out var parsed
+                )
+            );
             Assert.Equal(DateTimeKind.Utc, parsed.UtcDateTime.Kind);
         }
 

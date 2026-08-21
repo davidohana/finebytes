@@ -30,9 +30,7 @@ namespace Mfr.Engine
             if (renameItem.Status == RenameStatus.PreviewError)
             {
                 var previewErrorMessage = renameItem.PreviewError?.Message ?? "Unknown preview error.";
-                Log.Debug(
-                    "  Error: '{PreviewErrorMessage}'",
-                    previewErrorMessage);
+                Log.Debug("  Error: '{PreviewErrorMessage}'", previewErrorMessage);
             }
         }
 

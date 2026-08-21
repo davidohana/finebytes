@@ -40,7 +40,8 @@ namespace Mfr.Metadata.TagFields
                     continue;
 
                 // Prefer Content Description for Title/Author/Copyright when both somehow exist.
-                var isDuplicateContentDescription = _IsContentDescriptionName(descriptor.Name)
+                var isDuplicateContentDescription =
+                    _IsContentDescriptionName(descriptor.Name)
                     && rows.Exists(r => string.Equals(r.Name, descriptor.Name, StringComparison.Ordinal));
                 if (isDuplicateContentDescription)
                     continue;
@@ -82,7 +83,8 @@ namespace Mfr.Metadata.TagFields
                 _IndexDescriptors(preview.Descriptors),
                 valuesEqual: static (prior, value) => string.Equals(prior, value, StringComparison.Ordinal),
                 remove: name => _SetNamedValue(live, name, null),
-                set: (name, value) => _SetNamedValue(live, name, value));
+                set: (name, value) => _SetNamedValue(live, name, value)
+            );
         }
 
         /// <remarks>

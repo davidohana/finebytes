@@ -28,7 +28,8 @@ namespace Mfr.Filters.Audio
         [property: JsonPropertyName("text")] string Text = "",
         [property: JsonPropertyName("onlyIfEmpty")] bool OnlyIfEmpty = false,
         [property: JsonPropertyName("language")] string? Language = null,
-        [property: JsonPropertyName("description")] string? Description = null);
+        [property: JsonPropertyName("description")] string? Description = null
+    );
 
     /// <summary>
     /// Sets one modeled ID3v2 text frame on each MPEG file row (legacy ID3v2 Field Setter).
@@ -45,8 +46,7 @@ namespace Mfr.Filters.Audio
     /// </para>
     /// </remarks>
     /// <param name="Options">Frame identity, value, and fill-if-empty behavior.</param>
-    public sealed record Id3v2FieldSetterFilter(
-        Id3v2FieldSetterOptions Options) : BaseFilter
+    public sealed record Id3v2FieldSetterFilter(Id3v2FieldSetterOptions Options) : BaseFilter
     {
         private Formatter _textFormatter = FormatStringCompiler.EmptyFormatter;
         private string _normalizedFrameId = string.Empty;
@@ -60,9 +60,7 @@ namespace Mfr.Filters.Audio
         {
             if (string.IsNullOrWhiteSpace(Options.FrameId))
             {
-                throw new ArgumentException(
-                    "Id3v2FieldSetter requires a non-empty 'frameId'.",
-                    nameof(Options));
+                throw new ArgumentException("Id3v2FieldSetter requires a non-empty 'frameId'.", nameof(Options));
             }
 
             _normalizedFrameId = Options.FrameId.Trim().ToUpperInvariant();
@@ -81,7 +79,8 @@ namespace Mfr.Filters.Audio
                 overlay,
                 _normalizedFrameId,
                 Options.Language,
-                Options.Description);
+                Options.Description
+            );
 
             if (Options.OnlyIfEmpty && !string.IsNullOrWhiteSpace(current))
                 return;
@@ -92,7 +91,8 @@ namespace Mfr.Filters.Audio
                 _normalizedFrameId,
                 resolved,
                 Options.Language,
-                Options.Description);
+                Options.Description
+            );
         }
     }
 }

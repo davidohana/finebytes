@@ -9,7 +9,7 @@ namespace Mfr.Filters.Formatting
     {
         Prepend,
         Append,
-        Replace
+        Replace,
     }
 
     /// <summary>
@@ -29,7 +29,8 @@ namespace Mfr.Filters.Formatting
         string PadChar,
         CounterPosition Position,
         string Separator,
-        bool ResetPerFolder);
+        bool ResetPerFolder
+    );
 
     /// <summary>
     /// Injects generated counter values into a segment.
@@ -37,9 +38,8 @@ namespace Mfr.Filters.Formatting
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Counter options.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
-    public sealed record CounterFilter(
-        FilterTarget Target,
-        CounterOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+    public sealed record CounterFilter(FilterTarget Target, CounterOptions Options, StringApplyScope? ApplyScope = null)
+        : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
         /// Gets the filter type discriminator.
@@ -55,7 +55,7 @@ namespace Mfr.Filters.Formatting
             {
                 "0" => '0',
                 "1" => ' ',
-                _ => string.IsNullOrEmpty(Options.PadChar) ? '0' : Options.PadChar[0]
+                _ => string.IsNullOrEmpty(Options.PadChar) ? '0' : Options.PadChar[0],
             };
 
             var raw = counter.ToString(CultureInfo.InvariantCulture);
@@ -66,7 +66,7 @@ namespace Mfr.Filters.Formatting
                 CounterPosition.Replace => formatted,
                 CounterPosition.Prepend => formatted + Options.Separator + value,
                 CounterPosition.Append => value + Options.Separator + formatted,
-                _ => value
+                _ => value,
             };
         }
     }

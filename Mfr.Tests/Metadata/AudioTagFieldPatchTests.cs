@@ -100,7 +100,8 @@ namespace Mfr.Tests.Metadata
             Assert.NotNull(after.Asf);
             Assert.Contains(
                 after.Asf.Descriptors,
-                d => d.Name == AsfDescriptorNames.Title && d.Value == "AsfPatchedTitle");
+                d => d.Name == AsfDescriptorNames.Title && d.Value == "AsfPatchedTitle"
+            );
             Assert.DoesNotContain(after.Asf.Descriptors, d => d.Name == "WM/Title");
             Assert.True(after.Asf.Descriptors.Length >= descriptorCountBefore - 1);
         }
@@ -147,8 +148,10 @@ namespace Mfr.Tests.Metadata
             Assert.Contains(asf, d => string.Equals(d.Name, "WM/Text", StringComparison.Ordinal));
             Assert.Contains(
                 asf,
-                d => string.Equals(d.Name, "WM/PartOfSet", StringComparison.Ordinal)
-                    && string.Equals(d.ToString(), "2/3", StringComparison.Ordinal));
+                d =>
+                    string.Equals(d.Name, "WM/PartOfSet", StringComparison.Ordinal)
+                    && string.Equals(d.ToString(), "2/3", StringComparison.Ordinal)
+            );
             Assert.Contains(asf, d => string.Equals(d.Name, "TrackTotal", StringComparison.Ordinal));
         }
 
@@ -243,8 +246,10 @@ namespace Mfr.Tests.Metadata
             using var afterClearAll = TagLib.File.Create(clearAllPath);
             Assert.False(afterClearAll.TagTypesOnDisk.HasFlag(TagTypes.Id3v1));
             Assert.Null(AudioTagPersistence.Read(clearAllPath).Id3v1);
-            Assert.Equal("FrameStay", AudioTagPersistence.Read(clearAllPath).Id3v2!.Frames
-                .Single(f => f.FrameId == "TIT2").TextValues[0]);
+            Assert.Equal(
+                "FrameStay",
+                AudioTagPersistence.Read(clearAllPath).Id3v2!.Frames.Single(f => f.FrameId == "TIT2").TextValues[0]
+            );
         }
 
         /// <summary>
@@ -260,24 +265,24 @@ namespace Mfr.Tests.Metadata
             var original = AudioTagPersistence.Read(path);
             Assert.Contains(
                 original.Id3v2!.Frames,
-                f => f.FrameId == "COMM"
+                f =>
+                    f.FrameId == "COMM"
                     && string.Equals(f.Language, "eng", StringComparison.Ordinal)
-                    && string.IsNullOrEmpty(f.Description));
+                    && string.IsNullOrEmpty(f.Description)
+            );
             Assert.Contains(
                 original.Id3v2.Frames,
-                f => f.FrameId == "COMM"
+                f =>
+                    f.FrameId == "COMM"
                     && string.Equals(f.Language, "deu", StringComparison.Ordinal)
-                    && string.Equals(f.Description, "liner", StringComparison.Ordinal));
+                    && string.Equals(f.Description, "liner", StringComparison.Ordinal)
+            );
             Assert.Contains(original.Id3v2.Frames, f => f.FrameId == "TXXX" && f.Description == "replaygain");
             Assert.Contains(original.Id3v2.Frames, f => f.FrameId == "TXXX" && f.Description == "catalog");
 
             var preview = original.Clone();
             AudioOverlayBlockFieldIo.SetId3v2FrameString(preview, "COMM", string.Empty);
-            AudioOverlayBlockFieldIo.SetId3v2FrameString(
-                preview,
-                "TXXX",
-                string.Empty,
-                description: "replaygain");
+            AudioOverlayBlockFieldIo.SetId3v2FrameString(preview, "TXXX", string.Empty, description: "replaygain");
 
             AudioTagPersistence.Apply(path, original, preview);
 
@@ -287,17 +292,24 @@ namespace Mfr.Tests.Metadata
             var comments = id3v2.GetFrames<CommentsFrame>("COMM").ToArray();
             Assert.DoesNotContain(
                 comments,
-                c => string.Equals(c.Language, "eng", StringComparison.OrdinalIgnoreCase)
-                    && string.IsNullOrEmpty(c.Description));
+                c =>
+                    string.Equals(c.Language, "eng", StringComparison.OrdinalIgnoreCase)
+                    && string.IsNullOrEmpty(c.Description)
+            );
             var secondaryComm = Assert.Single(
                 comments,
-                c => string.Equals(c.Language, "deu", StringComparison.OrdinalIgnoreCase)
-                    && string.Equals(c.Description, "liner", StringComparison.Ordinal));
+                c =>
+                    string.Equals(c.Language, "deu", StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(c.Description, "liner", StringComparison.Ordinal)
+            );
             Assert.Equal("German liner", secondaryComm.Text);
 
             var userText = id3v2.GetFrames<UserTextInformationFrame>("TXXX").ToArray();
             Assert.DoesNotContain(userText, t => string.Equals(t.Description, "replaygain", StringComparison.Ordinal));
-            var catalog = Assert.Single(userText, t => string.Equals(t.Description, "catalog", StringComparison.Ordinal));
+            var catalog = Assert.Single(
+                userText,
+                t => string.Equals(t.Description, "catalog", StringComparison.Ordinal)
+            );
             Assert.Equal("ABC-123", Assert.Single(catalog.Text));
             Assert.Equal("TitleStay", id3v2.Title);
         }
@@ -455,11 +467,73 @@ namespace Mfr.Tests.Metadata
 
         private static readonly byte[] _TinyPngBytes =
         [
-            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-            0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-            0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-            0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
-            0x42, 0x60, 0x82,
+            0x89,
+            0x50,
+            0x4E,
+            0x47,
+            0x0D,
+            0x0A,
+            0x1A,
+            0x0A,
+            0x00,
+            0x00,
+            0x00,
+            0x0D,
+            0x49,
+            0x48,
+            0x44,
+            0x52,
+            0x00,
+            0x00,
+            0x00,
+            0x01,
+            0x00,
+            0x00,
+            0x00,
+            0x01,
+            0x08,
+            0x06,
+            0x00,
+            0x00,
+            0x00,
+            0x1F,
+            0x15,
+            0xC4,
+            0x89,
+            0x00,
+            0x00,
+            0x00,
+            0x0A,
+            0x49,
+            0x44,
+            0x41,
+            0x54,
+            0x78,
+            0x9C,
+            0x63,
+            0x00,
+            0x01,
+            0x00,
+            0x00,
+            0x05,
+            0x00,
+            0x01,
+            0x0D,
+            0x0A,
+            0x2D,
+            0xB4,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x49,
+            0x45,
+            0x4E,
+            0x44,
+            0xAE,
+            0x42,
+            0x60,
+            0x82,
         ];
     }
 }

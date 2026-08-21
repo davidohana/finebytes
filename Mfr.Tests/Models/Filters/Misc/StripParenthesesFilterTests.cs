@@ -16,8 +16,9 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_RoundRemoveContents_RemovesParenthetical()
         {
             var f = new StripParenthesesFilter(
-                                _target,
-                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true));
+                _target,
+                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
+            );
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a(rem)b"));
         }
 
@@ -28,8 +29,9 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_RoundKeepContents_RemovesOnlyDelimiters()
         {
             var f = new StripParenthesesFilter(
-                                _target,
-                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: false));
+                _target,
+                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: false)
+            );
             Assert.Equal("arem", FilterTestHelpers.ApplyToPrefix(f, "a(rem)"));
         }
 
@@ -40,8 +42,9 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_SquareRemoveContents_RemovesBracketed()
         {
             var f = new StripParenthesesFilter(
-                                _target,
-                new StripParenthesesOptions(Type: ParenthesisType.Square, RemoveContents: true));
+                _target,
+                new StripParenthesesOptions(Type: ParenthesisType.Square, RemoveContents: true)
+            );
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a[xx]b"));
         }
 
@@ -52,8 +55,9 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_CurlyRemoveContents_RemovesBracedRegion()
         {
             var f = new StripParenthesesFilter(
-                                _target,
-                new StripParenthesesOptions(Type: ParenthesisType.Curly, RemoveContents: true));
+                _target,
+                new StripParenthesesOptions(Type: ParenthesisType.Curly, RemoveContents: true)
+            );
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a{xx}b"));
         }
 
@@ -64,8 +68,9 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_AngleRemoveContents_RemovesAngleRegion()
         {
             var f = new StripParenthesesFilter(
-                                _target,
-                new StripParenthesesOptions(Type: ParenthesisType.Angle, RemoveContents: true));
+                _target,
+                new StripParenthesesOptions(Type: ParenthesisType.Angle, RemoveContents: true)
+            );
             Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a<xx>b"));
         }
     }

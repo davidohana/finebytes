@@ -26,9 +26,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-mime&gt;</c>.</summary>
         public MediaMimeToken()
-            : base(["media-mime"], MediaPropertyField.MimeType)
-        {
-        }
+            : base(["media-mime"], MediaPropertyField.MimeType) { }
     }
 
     /// <inheritdoc />
@@ -36,9 +34,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-corrupt&gt;</c>.</summary>
         public MediaCorruptToken()
-            : base(["media-corrupt"], MediaPropertyField.Corrupt)
-        {
-        }
+            : base(["media-corrupt"], MediaPropertyField.Corrupt) { }
     }
 
     /// <inheritdoc />
@@ -46,9 +42,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-duration&gt;</c>.</summary>
         public MediaDurationToken()
-            : base(["media-duration"], MediaPropertyField.Duration)
-        {
-        }
+            : base(["media-duration"], MediaPropertyField.Duration) { }
     }
 
     /// <inheritdoc />
@@ -56,9 +50,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-duration-sec&gt;</c>.</summary>
         public MediaDurationSecToken()
-            : base(["media-duration-sec"], MediaPropertyField.DurationSec)
-        {
-        }
+            : base(["media-duration-sec"], MediaPropertyField.DurationSec) { }
     }
 
     /// <inheritdoc />
@@ -66,9 +58,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-types&gt;</c>.</summary>
         public MediaTypesToken()
-            : base(["media-types"], MediaPropertyField.MediaTypes)
-        {
-        }
+            : base(["media-types"], MediaPropertyField.MediaTypes) { }
     }
 
     /// <inheritdoc />
@@ -76,9 +66,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-description&gt;</c>.</summary>
         public MediaDescriptionToken()
-            : base(["media-description"], MediaPropertyField.Description)
-        {
-        }
+            : base(["media-description"], MediaPropertyField.Description) { }
     }
 
     /// <inheritdoc />
@@ -86,9 +74,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-audio-bitrate&gt;</c>.</summary>
         public MediaAudioBitrateToken()
-            : base(["media-audio-bitrate"], MediaPropertyField.AudioBitrate)
-        {
-        }
+            : base(["media-audio-bitrate"], MediaPropertyField.AudioBitrate) { }
     }
 
     /// <inheritdoc />
@@ -96,9 +82,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-samplerate&gt;</c>.</summary>
         public MediaSampleRateToken()
-            : base(["media-samplerate"], MediaPropertyField.SampleRate)
-        {
-        }
+            : base(["media-samplerate"], MediaPropertyField.SampleRate) { }
     }
 
     /// <inheritdoc />
@@ -106,9 +90,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-bits-per-sample&gt;</c>.</summary>
         public MediaBitsPerSampleToken()
-            : base(["media-bits-per-sample"], MediaPropertyField.BitsPerSample)
-        {
-        }
+            : base(["media-bits-per-sample"], MediaPropertyField.BitsPerSample) { }
     }
 
     /// <inheritdoc />
@@ -116,9 +98,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-channels&gt;</c>.</summary>
         public MediaChannelsToken()
-            : base(["media-channels"], MediaPropertyField.Channels)
-        {
-        }
+            : base(["media-channels"], MediaPropertyField.Channels) { }
     }
 
     /// <inheritdoc />
@@ -126,9 +106,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-video-width&gt;</c>.</summary>
         public MediaVideoWidthToken()
-            : base(["media-video-width"], MediaPropertyField.VideoWidth)
-        {
-        }
+            : base(["media-video-width"], MediaPropertyField.VideoWidth) { }
     }
 
     /// <inheritdoc />
@@ -136,9 +114,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-video-height&gt;</c>.</summary>
         public MediaVideoHeightToken()
-            : base(["media-video-height"], MediaPropertyField.VideoHeight)
-        {
-        }
+            : base(["media-video-height"], MediaPropertyField.VideoHeight) { }
     }
 
     /// <inheritdoc />
@@ -146,9 +122,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-photo-width&gt;</c>.</summary>
         public MediaPhotoWidthToken()
-            : base(["media-photo-width"], MediaPropertyField.PhotoWidth)
-        {
-        }
+            : base(["media-photo-width"], MediaPropertyField.PhotoWidth) { }
     }
 
     /// <inheritdoc />
@@ -156,9 +130,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-photo-height&gt;</c>.</summary>
         public MediaPhotoHeightToken()
-            : base(["media-photo-height"], MediaPropertyField.PhotoHeight)
-        {
-        }
+            : base(["media-photo-height"], MediaPropertyField.PhotoHeight) { }
     }
 
     /// <inheritdoc />
@@ -166,8 +138,6 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     {
         /// <summary>Registers <c>&lt;media-photo-quality&gt;</c>.</summary>
         public MediaPhotoQualityToken()
-            : base(["media-photo-quality"], MediaPropertyField.PhotoQuality)
-        {
-        }
+            : base(["media-photo-quality"], MediaPropertyField.PhotoQuality) { }
     }
 }

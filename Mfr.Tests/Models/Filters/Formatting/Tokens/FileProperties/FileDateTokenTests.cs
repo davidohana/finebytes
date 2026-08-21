@@ -135,6 +135,5 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
             var ex = Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: "yyyy,")(item));
             Assert.Contains("date-kind", ex.Message);
         }
-
     }
 }

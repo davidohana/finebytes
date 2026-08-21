@@ -1,5 +1,4 @@
 using System.Text.Json;
-
 using Mfr.Engine;
 using Mfr.Utils;
 
@@ -28,14 +27,17 @@ namespace Mfr.Tests.Engine
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var presetsPath = dir.CombinePath("presets.json");
-            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            _WritePresetsJson(
+                presetsPath, /*lang=json,strict*/
+                """
                 {
                   "presets": [
                     { "id": "5b5f7bbf-5fc4-45aa-9631-6ca18afae4f7", "name": "Rock", "chain": { "steps": [] } },
                     { "id": "43fdc61b-0a2b-4c8f-a8f4-77c550ea317a", "name": "Pop", "chain": { "steps": [] } }
                   ]
                 }
-                """);
+                """
+            );
 
             var manager = new PresetManager(presetsPath);
             manager.LoadPresets();
@@ -53,14 +55,17 @@ namespace Mfr.Tests.Engine
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var presetsPath = dir.CombinePath("presets.json");
-            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            _WritePresetsJson(
+                presetsPath, /*lang=json,strict*/
+                """
                 {
                   "presets": [
                     { "id": "6d770366-7ac5-41f5-857f-08a4f6b7fdcc", "name": "Rock", "chain": { "steps": [] } },
                     { "id": "1a0d6772-996e-4334-8755-054434f53b16", "name": "rock", "chain": { "steps": [] } }
                   ]
                 }
-                """);
+                """
+            );
 
             var manager = new PresetManager(presetsPath);
             manager.LoadPresets();
@@ -78,14 +83,17 @@ namespace Mfr.Tests.Engine
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var presetsPath = dir.CombinePath("presets.json");
-            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            _WritePresetsJson(
+                presetsPath, /*lang=json,strict*/
+                """
                 {
                   "presets": [
                     { "id": "8fd30889-4950-4c90-a5b3-81f5dd2ef825", "name": "Dup", "chain": { "steps": [] } },
                     { "id": "27dff4b4-4e0b-4bb3-8e4d-1656e5727d70", "name": "Dup", "chain": { "steps": [] } }
                   ]
                 }
-                """);
+                """
+            );
 
             var manager = new PresetManager(presetsPath);
             var ex = Assert.Throws<UserException>(manager.LoadPresets);
@@ -100,25 +108,31 @@ namespace Mfr.Tests.Engine
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var presetsPath = dir.CombinePath("presets.json");
-            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            _WritePresetsJson(
+                presetsPath, /*lang=json,strict*/
+                """
                 {
                   "presets": [
                     { "id": "95d14a63-cfdd-425a-b44e-c946f4fd2a78", "name": "First", "chain": { "steps": [] } }
                   ]
                 }
-                """);
+                """
+            );
 
             var manager = new PresetManager(presetsPath);
             manager.LoadPresets();
             Assert.True(manager.NameToPreset.ContainsKey("First"));
 
-            _WritePresetsJson(presetsPath, /*lang=json,strict*/ """
+            _WritePresetsJson(
+                presetsPath, /*lang=json,strict*/
+                """
                 {
                   "presets": [
                     { "id": "47f0f380-d44a-4f4d-baa9-0331816cce9f", "name": "Second", "chain": { "steps": [] } }
                   ]
                 }
-                """);
+                """
+            );
 
             manager.LoadPresets();
 
@@ -142,12 +156,15 @@ namespace Mfr.Tests.Engine
             manager.SavePresets();
 
             using var doc = JsonDocument.Parse(File.ReadAllText(presetsPath));
-            var presetsProperty = doc.RootElement.EnumerateObject().First(p => string.Equals(p.Name, "presets", StringComparison.OrdinalIgnoreCase));
-            var names = presetsProperty.Value
-                .EnumerateArray()
+            var presetsProperty = doc
+                .RootElement.EnumerateObject()
+                .First(p => string.Equals(p.Name, "presets", StringComparison.OrdinalIgnoreCase));
+            var names = presetsProperty
+                .Value.EnumerateArray()
                 .Select(p =>
                 {
-                    var nameProperty = p.EnumerateObject().First(prop => string.Equals(prop.Name, "name", StringComparison.OrdinalIgnoreCase));
+                    var nameProperty = p.EnumerateObject()
+                        .First(prop => string.Equals(prop.Name, "name", StringComparison.OrdinalIgnoreCase));
                     return nameProperty.Value.GetString()!;
                 })
                 .ToArray();
@@ -167,7 +184,7 @@ namespace Mfr.Tests.Engine
                 Id = Guid.NewGuid(),
                 Name = name,
                 Description = null,
-                Chain = new FilterChain { Steps = [] }
+                Chain = new FilterChain { Steps = [] },
             };
         }
     }

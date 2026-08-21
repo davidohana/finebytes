@@ -57,7 +57,8 @@ namespace Mfr.Models.Config
         /// Serilog output template for the session log file (CLI and UI).
         /// </summary>
         [ConfigStringMaxLength(4096)]
-        public string FileOutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
+        public string FileOutputTemplate =
+            "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
     }
 
     /// <summary>

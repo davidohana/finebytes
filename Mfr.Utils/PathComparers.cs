@@ -16,15 +16,13 @@ namespace Mfr.Utils
         /// <summary>
         /// Gets the comparer that matches the host filesystem's case sensitivity.
         /// </summary>
-        public static StringComparer Os { get; } = OperatingSystem.IsWindows()
-            ? StringComparer.OrdinalIgnoreCase
-            : StringComparer.Ordinal;
+        public static StringComparer Os { get; } =
+            OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         /// <summary>
         /// Gets the <see cref="StringComparison"/> mode that matches <see cref="Os"/>.
         /// </summary>
-        public static StringComparison OsComparison { get; } = OperatingSystem.IsWindows()
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal;
+        public static StringComparison OsComparison { get; } =
+            OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
     }
 }

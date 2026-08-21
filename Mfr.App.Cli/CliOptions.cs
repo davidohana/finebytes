@@ -33,5 +33,6 @@ namespace Mfr.App.Cli
         LogEventLevel LogLevel,
         string PresetsFilePath,
         string? ConfigFilePath,
-        IReadOnlyList<string> ConfigOverrides);
+        IReadOnlyList<string> ConfigOverrides
+    );
 }

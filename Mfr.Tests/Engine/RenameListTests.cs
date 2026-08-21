@@ -19,8 +19,9 @@ namespace Mfr.Tests.Engine
         /// </summary>
         public RenameListTests()
         {
-            _tempRoot = Directory.GetCurrentDirectory().CombinePath(
-                "mfr_renamelist_tests_" + Guid.NewGuid().ToString("N"));
+            _tempRoot = Directory
+                .GetCurrentDirectory()
+                .CombinePath("mfr_renamelist_tests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempRoot);
         }
 
@@ -39,17 +40,12 @@ namespace Mfr.Tests.Engine
                     var attrs = File.GetAttributes(file);
                     if (attrs.HasFlag(FileAttributes.Hidden))
                         File.SetAttributes(file, attrs & ~FileAttributes.Hidden);
-
                 }
 
                 Directory.Delete(_tempRoot, recursive: true);
             }
-            catch (IOException)
-            {
-            }
-            catch (UnauthorizedAccessException)
-            {
-            }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
         }
 
         [Fact]
@@ -62,14 +58,10 @@ namespace Mfr.Tests.Engine
                 _tempRoot,
                 "alpha.txt",
                 "beta.log",
-                "gamma.txt");
+                "gamma.txt"
+            );
 
-            var sources = new[]
-            {
-                betaPath,
-                _tempRoot.CombinePath("*.txt"),
-                _tempRoot,
-            };
+            var sources = new[] { betaPath, _tempRoot.CombinePath("*.txt"), _tempRoot };
 
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources(sources);
@@ -79,16 +71,15 @@ namespace Mfr.Tests.Engine
             var tempRootName = Path.GetFileName(_tempRoot);
 
             Assert.Equal(4, entries.Count);
-            Assert.Equal(
-                [betaPath, alphaPath, gammaPath, _tempRoot],
-                entries.Select(e => e.Original.FullPath));
+            Assert.Equal([betaPath, alphaPath, gammaPath, _tempRoot], entries.Select(e => e.Original.FullPath));
             Assert.Equal([0, 1, 2, 3], entries.Select(e => e.Original.RenameListIndex));
             Assert.Equal([0, 1, 2, 0], entries.Select(e => e.Original.InFolderIndex));
             Assert.Equal(["beta", "alpha", "gamma", tempRootName], entries.Select(e => e.Original.Prefix));
             Assert.Equal([".log", ".txt", ".txt", ""], entries.Select(e => e.Original.Extension));
             Assert.Equal(
                 [_tempRoot, _tempRoot, _tempRoot, tempRootParent],
-                entries.Select(e => e.Original.DirectoryPath));
+                entries.Select(e => e.Original.DirectoryPath)
+            );
         }
 
         [Fact]
@@ -178,10 +169,7 @@ namespace Mfr.Tests.Engine
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources(
-                sources: [filePath, folderPath],
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSources(sources: [filePath, folderPath], includeFiles: false, includeFolders: true);
 
             var entry = Assert.Single(renameList.RenameItems);
             Assert.Equal(folderPath, entry.Original.FullPath);
@@ -217,14 +205,9 @@ namespace Mfr.Tests.Engine
             TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources(
-                sources: [filePath, folderPath],
-                includeFiles: true,
-                includeFolders: false);
+            renameList.AddSources(sources: [filePath, folderPath], includeFiles: true, includeFolders: false);
 
-            Assert.Equal(
-                [filePath, folderFilePath],
-                renameList.RenameItems.Select(entry => entry.Original.FullPath));
+            Assert.Equal([filePath, folderFilePath], renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
 
         [Fact]
@@ -239,18 +222,14 @@ namespace Mfr.Tests.Engine
             var nestedFilePath = TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
 
             var renameList = new RenameList(includeHidden: true);
-            var addedCount = renameList.AddSource(
-                source: folderPath,
-                includeFiles: true,
-                includeFolders: false);
+            var addedCount = renameList.AddSource(source: folderPath, includeFiles: true, includeFolders: false);
 
             Assert.Equal(2, addedCount);
             Assert.Equal(
                 [topLevelFirstPath, topLevelSecondPath],
-                renameList.RenameItems.Select(entry => entry.Original.FullPath));
-            Assert.DoesNotContain(
-                nestedFilePath,
-                renameList.RenameItems.Select(entry => entry.Original.FullPath));
+                renameList.RenameItems.Select(entry => entry.Original.FullPath)
+            );
+            Assert.DoesNotContain(nestedFilePath, renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
 
         [Fact]
@@ -269,12 +248,14 @@ namespace Mfr.Tests.Engine
                 source: folderPath,
                 includeFiles: true,
                 includeFolders: false,
-                includeSubdirs: true);
+                includeSubdirs: true
+            );
 
             Assert.Equal(3, addedCount);
             Assert.Equal(
                 [topLevelPath, nestedPath, deeperPath],
-                renameList.RenameItems.Select(entry => entry.Original.FullPath));
+                renameList.RenameItems.Select(entry => entry.Original.FullPath)
+            );
         }
 
         [Fact]
@@ -319,7 +300,8 @@ namespace Mfr.Tests.Engine
                 _tempRoot,
                 "top.txt",
                 "nested/nested.txt",
-                "nested/deeper/deeper.txt");
+                "nested/deeper/deeper.txt"
+            );
 
             var renameList = new RenameList(includeHidden: true);
             var addedCount = renameList.AddSource(_tempRoot.CombinePath("**", "*.txt"));
@@ -327,7 +309,8 @@ namespace Mfr.Tests.Engine
             Assert.Equal(3, addedCount);
             Assert.Equal(
                 [topLevelMatch, nestedMatch, deeperMatch],
-                renameList.RenameItems.Select(entry => entry.Original.FullPath));
+                renameList.RenameItems.Select(entry => entry.Original.FullPath)
+            );
         }
 
         [Fact]
@@ -340,15 +323,14 @@ namespace Mfr.Tests.Engine
                 _tempRoot,
                 "nested/file1.txt",
                 "x/nested/file2.txt",
-                "x/other/file3.txt");
+                "x/other/file3.txt"
+            );
 
             var renameList = new RenameList(includeHidden: true);
             var addedCount = renameList.AddSource(_tempRoot.CombinePath("**", "nested", "*.txt"));
 
             Assert.Equal(2, addedCount);
-            Assert.Equal(
-                [nestedMatch, deeperMatch],
-                renameList.RenameItems.Select(entry => entry.Original.FullPath));
+            Assert.Equal([nestedMatch, deeperMatch], renameList.RenameItems.Select(entry => entry.Original.FullPath));
             Assert.DoesNotContain(nonMatch, renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
 
@@ -424,9 +406,7 @@ namespace Mfr.Tests.Engine
             Directory.CreateDirectory(folder);
 
             var renameList = new RenameList(includeHidden: true);
-            Assert.Equal(
-                1,
-                renameList.AddSource(folder, includeFiles: false, includeFolders: true));
+            Assert.Equal(1, renameList.AddSource(folder, includeFiles: false, includeFolders: true));
 
             var item = Assert.Single(renameList.RenameItems);
             Assert.Equal(new AudioTagOverlay(), item.Original.AudioTagOverlay);
@@ -471,12 +451,12 @@ namespace Mfr.Tests.Engine
                 Id = Guid.NewGuid(),
                 Name = "overlay-on-dir",
                 Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                    [
-                        new FormatterFilter(
-                            Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
-                            Options: new FormatterOptions("x")),
-                    ]),
+                Chain = FilterChain.CreateAllEnabled([
+                    new FormatterFilter(
+                        Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
+                        Options: new FormatterOptions("x")
+                    ),
+                ]),
             };
             _ = _SetupPreview(renameList, preset);
 
@@ -524,10 +504,10 @@ namespace Mfr.Tests.Engine
                 Id = Guid.NewGuid(),
                 Name = "bad-year",
                 Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                [
-                    new AudioTagSetterFilter(new AudioTagSetterOptions(
-                        Year: new AudioTagStringFieldOptions(Text: "nope"))),
+                Chain = FilterChain.CreateAllEnabled([
+                    new AudioTagSetterFilter(
+                        new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "nope"))
+                    ),
                 ]),
             };
 
@@ -545,12 +525,12 @@ namespace Mfr.Tests.Engine
                 Id = Guid.NewGuid(),
                 Name = "audio-title-album-preview",
                 Description = null,
-                Chain = FilterChain.CreateAllEnabled(
-                    [
-                        new FormatterFilter(
-                            Target: new FileFullNameTarget(),
-                            Options: new FormatterOptions("<audio-title>-<audio-album>")),
-                    ]),
+                Chain = FilterChain.CreateAllEnabled([
+                    new FormatterFilter(
+                        Target: new FileFullNameTarget(),
+                        Options: new FormatterOptions("<audio-title>-<audio-album>")
+                    ),
+                ]),
             };
         }
 
@@ -560,5 +540,4 @@ namespace Mfr.Tests.Engine
             return renameList.Preview(preset);
         }
     }
-
 }

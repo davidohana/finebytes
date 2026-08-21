@@ -28,9 +28,7 @@ namespace Mfr.Utils
             if (values is null)
                 return [];
 
-            return [.. values
-                .Where(static v => !string.IsNullOrWhiteSpace(v))
-                .Select(static v => v.Trim())];
+            return [.. values.Where(static v => !string.IsNullOrWhiteSpace(v)).Select(static v => v.Trim())];
         }
 
         /// <summary>
@@ -43,8 +41,12 @@ namespace Mfr.Utils
             if (string.IsNullOrWhiteSpace(joined))
                 return [];
 
-            return [.. joined.Split(_ListSeparators, StringSplitOptions.TrimEntries)
-                .Where(static part => !string.IsNullOrEmpty(part))];
+            return
+            [
+                .. joined
+                    .Split(_ListSeparators, StringSplitOptions.TrimEntries)
+                    .Where(static part => !string.IsNullOrEmpty(part)),
+            ];
         }
 
         /// <summary>

@@ -26,7 +26,8 @@ namespace Mfr.Tests.TestSupport
         internal static (string First, string Second) CreateFiles(
             string rootDirectory,
             string firstRelativePath,
-            string secondRelativePath)
+            string secondRelativePath
+        )
         {
             var createdPaths = _CreateFiles(rootDirectory, firstRelativePath, secondRelativePath);
             return (createdPaths[0], createdPaths[1]);
@@ -44,7 +45,8 @@ namespace Mfr.Tests.TestSupport
             string rootDirectory,
             string firstRelativePath,
             string secondRelativePath,
-            string thirdRelativePath)
+            string thirdRelativePath
+        )
         {
             var createdPaths = _CreateFiles(rootDirectory, firstRelativePath, secondRelativePath, thirdRelativePath);
             return (createdPaths[0], createdPaths[1], createdPaths[2]);
@@ -62,9 +64,9 @@ namespace Mfr.Tests.TestSupport
                     throw new ArgumentException("Relative file path cannot be empty.", nameof(relativePaths));
 
                 var normalizedRelativePath = relativePath
-                                    .Replace('\\', Path.DirectorySeparatorChar)
-                                    .Replace('/', Path.DirectorySeparatorChar)
-                                    .TrimStart(Path.DirectorySeparatorChar);
+                    .Replace('\\', Path.DirectorySeparatorChar)
+                    .Replace('/', Path.DirectorySeparatorChar)
+                    .TrimStart(Path.DirectorySeparatorChar);
                 var fullPath = Path.GetFullPath(Path.Combine(rootDirectory, normalizedRelativePath));
                 var parentDirectory = Path.GetDirectoryName(fullPath);
                 if (!string.IsNullOrWhiteSpace(parentDirectory))

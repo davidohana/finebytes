@@ -16,8 +16,9 @@ namespace Mfr.Tests.Models.Filters.Trimming
         public void Apply_CollapsesAdjacentDuplicatesOfConfiguredCharacter()
         {
             var filter = new ShrinkDuplicateCharactersFilter(
-                                _target,
-                new ShrinkDuplicateCharactersOptions(Character: '-'));
+                _target,
+                new ShrinkDuplicateCharactersOptions(Character: '-')
+            );
 
             Assert.Equal("I am Kloot - To You", FilterTestHelpers.ApplyToPrefix(filter, "I am Kloot --- To You"));
             Assert.Equal("a-b-c", FilterTestHelpers.ApplyToPrefix(filter, "a--b---c"));
@@ -30,8 +31,9 @@ namespace Mfr.Tests.Models.Filters.Trimming
         public void Apply_LeavesNonAdjacentOccurrencesUntouched()
         {
             var filter = new ShrinkDuplicateCharactersFilter(
-                                _target,
-                new ShrinkDuplicateCharactersOptions(Character: '>'));
+                _target,
+                new ShrinkDuplicateCharactersOptions(Character: '>')
+            );
 
             Assert.Equal("a>b>c", FilterTestHelpers.ApplyToPrefix(filter, "a>>b>>>c"));
             Assert.Equal(">a>b>", FilterTestHelpers.ApplyToPrefix(filter, ">>>a>>>b>>>"));
@@ -44,8 +46,9 @@ namespace Mfr.Tests.Models.Filters.Trimming
         public void Apply_NoTargetCharacter_ReturnsInputAsIs()
         {
             var filter = new ShrinkDuplicateCharactersFilter(
-                                _target,
-                new ShrinkDuplicateCharactersOptions(Character: '-'));
+                _target,
+                new ShrinkDuplicateCharactersOptions(Character: '-')
+            );
 
             Assert.Equal("abc def", FilterTestHelpers.ApplyToPrefix(filter, "abc def"));
         }

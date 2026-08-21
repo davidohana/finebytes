@@ -25,14 +25,16 @@ namespace Mfr.Filters.Formatting.Tokens.Generators
             Require.That(
                 segments.Length == 2,
                 $"Invalid {tokenDisplayName} arguments '{tokenArgs}'. Expected '{tokenDisplayName}:low,high' with two single-character endpoints.",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             var lowSegment = segments[0];
             var highSegment = segments[1];
             Require.That(
                 lowSegment.Length != 0 && highSegment.Length != 0,
                 $"Invalid {tokenDisplayName} token: each endpoint must contain at least one character.",
-                nameof(tokenArgs));
+                nameof(tokenArgs)
+            );
 
             var low = lowSegment[0];
             var high = highSegment[0];

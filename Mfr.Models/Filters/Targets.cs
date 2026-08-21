@@ -99,10 +99,9 @@ namespace Mfr.Models.Filters
     /// <param name="FrameId">Four-character frame id (case-insensitive; stored uppercase).</param>
     /// <param name="Language">ISO-639-2 language for <c>COMM</c>/<c>USLT</c>, or <see langword="null"/> when not applicable.</param>
     /// <param name="Description">Content descriptor for <c>COMM</c>/<c>USLT</c>/<c>TXXX</c>, or <see langword="null"/> for primary.</param>
-    public sealed record Id3v2FrameTarget(
-        string FrameId,
-        string? Language = null,
-        string? Description = null) : FilterTarget, IAudioOverlayFilterTarget;
+    public sealed record Id3v2FrameTarget(string FrameId, string? Language = null, string? Description = null)
+        : FilterTarget,
+            IAudioOverlayFilterTarget;
 
     /// <summary>
     /// Targets one known Xiph / Vorbis comment key on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Xiph"/>.

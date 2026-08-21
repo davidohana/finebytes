@@ -26,7 +26,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_CounterToken_UsesGlobalIndex()
         {
-            var f = new FormatterFilter(_target, new FormatterOptions("<counter:initial=10,step=2,padding=fixed,length=4,resetScope=global>"));
+            var f = new FormatterFilter(
+                _target,
+                new FormatterOptions("<counter:initial=10,step=2,padding=fixed,length=4,resetScope=global>")
+            );
             Assert.Equal("0016", FilterTestHelpers.ApplyToPrefix(f, "ignored", renameListIndex: 3));
         }
 
@@ -37,7 +40,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_ParentFolderToken_UsesDirectoryName()
         {
             var f = new FormatterFilter(_target, new FormatterOptions("<parent-folder>"));
-            Assert.Equal("My Album", FilterTestHelpers.ApplyToPrefix(f, "ignored", directory: "Music".CombinePath("My Album")));
+            Assert.Equal(
+                "My Album",
+                FilterTestHelpers.ApplyToPrefix(f, "ignored", directory: "Music".CombinePath("My Album"))
+            );
         }
 
         /// <summary>
@@ -48,10 +54,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var template = @"D:\Staging\<full-name>";
             var f = new FormatterFilter(new FullPathTarget(), new FormatterOptions(template));
-            var item = FilterTestHelpers.ApplyReturnItem(
-                f,
-                inputPrefix: "song",
-                directory: @"C:\Music\Album");
+            var item = FilterTestHelpers.ApplyReturnItem(f, inputPrefix: "song", directory: @"C:\Music\Album");
             Assert.Equal(@"D:\Staging\song.mp3", item.Preview.FullPath);
             Assert.Equal(@"D:\Staging", item.Preview.DirectoryPath);
             Assert.Equal("song", item.Preview.Prefix);
@@ -65,10 +68,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_ParentDirectoryTarget_LiteralTemplate_MovesDirectoryOnly()
         {
             var f = new FormatterFilter(new ParentDirectoryTarget(), new FormatterOptions(@"D:\Archived"));
-            var item = FilterTestHelpers.ApplyReturnItem(
-                f,
-                inputPrefix: "song",
-                directory: @"C:\Music\Album");
+            var item = FilterTestHelpers.ApplyReturnItem(f, inputPrefix: "song", directory: @"C:\Music\Album");
             Assert.Equal(@"D:\Archived", item.Preview.DirectoryPath);
             Assert.Equal("song", item.Preview.Prefix);
             Assert.Equal(".mp3", item.Preview.Extension);
@@ -81,13 +81,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_ParentDirectoryTarget_TokenFromPreviewDirectory()
         {
-            var f = new FormatterFilter(
-                new ParentDirectoryTarget(),
-                new FormatterOptions(@"D:\Libs\<parent-folder>"));
-            var item = FilterTestHelpers.ApplyReturnItem(
-                f,
-                inputPrefix: "track",
-                directory: @"C:\Music\Album");
+            var f = new FormatterFilter(new ParentDirectoryTarget(), new FormatterOptions(@"D:\Libs\<parent-folder>"));
+            var item = FilterTestHelpers.ApplyReturnItem(f, inputPrefix: "track", directory: @"C:\Music\Album");
             Assert.Equal(@"D:\Libs\Album", item.Preview.DirectoryPath);
         }
     }

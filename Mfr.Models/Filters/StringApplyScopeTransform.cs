@@ -15,7 +15,8 @@ namespace Mfr.Models.Filters
             StringApplyScope? scope,
             string value,
             RenameItem item,
-            Func<string, RenameItem, string> transform)
+            Func<string, RenameItem, string> transform
+        )
         {
             if (scope is null)
                 return transform(value, item);
@@ -33,7 +34,8 @@ namespace Mfr.Models.Filters
             SubstringApplyScope scope,
             string value,
             RenameItem item,
-            Func<string, RenameItem, string> transform)
+            Func<string, RenameItem, string> transform
+        )
         {
             var length = value.Length;
             if (length == 0)
@@ -70,17 +72,20 @@ namespace Mfr.Models.Filters
             TokenApplyScope scope,
             string value,
             RenameItem item,
-            Func<string, RenameItem, string> transform)
+            Func<string, RenameItem, string> transform
+        )
         {
             Require.That(
                 scope.TokenNumber >= 1,
                 $"Token apply-scope tokenNumber must be at least 1 (got {scope.TokenNumber}).",
-                nameof(scope));
+                nameof(scope)
+            );
 
             Require.That(
                 !string.IsNullOrEmpty(scope.Separator),
                 "Token apply-scope separator must be non-empty.",
-                nameof(scope));
+                nameof(scope)
+            );
 
             var parts = value.Split(scope.Separator, StringSplitOptions.None);
             if (scope.TokenNumber > parts.Length)

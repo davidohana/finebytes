@@ -17,11 +17,18 @@ namespace Mfr.Tests.Engine
         public void ApplyFilters_AllFiltersDisabled_LeavesPreviewAtOriginal()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: ".mp3");
-            var firstChain = FilterChain.CreateAllEnabled(
-            [
+            var firstChain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: new FilePrefixTarget(),
-                    Options: new ReplacerOptions("track", "stale", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
+                    Options: new ReplacerOptions(
+                        "track",
+                        "stale",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
+                ),
             ]);
             firstChain.SetupFilters();
             firstChain.ApplyFilters(item);
@@ -33,8 +40,17 @@ namespace Mfr.Tests.Engine
                         Enabled: false,
                         Filter: new ReplacerFilter(
                             Target: new FilePrefixTarget(),
-                            Options: new ReplacerOptions("track", "song", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false)))
-                ]
+                            Options: new ReplacerOptions(
+                                "track",
+                                "song",
+                                ReplacerMode.Literal,
+                                CaseSensitive: true,
+                                ReplaceAll: true,
+                                WholeWord: false
+                            )
+                        )
+                    ),
+                ],
             };
 
             chain.SetupFilters();
@@ -52,14 +68,29 @@ namespace Mfr.Tests.Engine
         public void ApplyFilters_PrefixFilters_ApplyInOrder()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "track old", extension: ".mp3");
-            var chain = FilterChain.CreateAllEnabled(
-            [
+            var chain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: new FilePrefixTarget(),
-                    Options: new ReplacerOptions("track", "song", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false)),
+                    Options: new ReplacerOptions(
+                        "track",
+                        "song",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
+                ),
                 new ReplacerFilter(
                     Target: new FilePrefixTarget(),
-                    Options: new ReplacerOptions("old", "new", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
+                    Options: new ReplacerOptions(
+                        "old",
+                        "new",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
+                ),
             ]);
 
             chain.SetupFilters();
@@ -77,14 +108,22 @@ namespace Mfr.Tests.Engine
         public void ApplyFilters_ExtensionAndFullModes_UpdatePreview()
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: ".mp3");
-            var chain = FilterChain.CreateAllEnabled(
-            [
+            var chain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: new FileExtensionTarget(),
-                    Options: new ReplacerOptions(".mp3", ".flac", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false)),
+                    Options: new ReplacerOptions(
+                        ".mp3",
+                        ".flac",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
+                ),
                 new FormatterFilter(
                     Target: new FileFullNameTarget(),
-                    Options: new FormatterOptions("renamed.final.wav"))
+                    Options: new FormatterOptions("renamed.final.wav")
+                ),
             ]);
 
             chain.SetupFilters();
@@ -102,11 +141,18 @@ namespace Mfr.Tests.Engine
         public void ApplyFilters_NonFileNameTarget_ThrowsNotSupported()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            var chain = FilterChain.CreateAllEnabled(
-            [
+            var chain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: new UnsupportedTarget(),
-                    Options: new ReplacerOptions("a", "b", ReplacerMode.Literal, CaseSensitive: true, ReplaceAll: true, WholeWord: false))
+                    Options: new ReplacerOptions(
+                        "a",
+                        "b",
+                        ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
+                ),
             ]);
 
             chain.SetupFilters();

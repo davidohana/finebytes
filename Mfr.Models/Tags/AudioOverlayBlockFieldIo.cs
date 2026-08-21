@@ -39,7 +39,9 @@ namespace Mfr.Models.Tags
                 Id3v1Field.Album => block.Album ?? string.Empty,
                 Id3v1Field.Comment => block.Comment ?? string.Empty,
                 Id3v1Field.Year => _DecimalDigitsOrEmpty(block.Year),
-                Id3v1Field.Track => block.Track is null ? string.Empty : block.Track.Value.ToString(CultureInfo.InvariantCulture),
+                Id3v1Field.Track => block.Track is null
+                    ? string.Empty
+                    : block.Track.Value.ToString(CultureInfo.InvariantCulture),
                 Id3v1Field.Genre => block.Genre == 0
                     ? string.Empty
                     : Id3v1Genres.IndexToAudio(block.Genre) ?? string.Empty,
@@ -89,7 +91,8 @@ namespace Mfr.Models.Tags
             AudioTagOverlay overlay,
             string frameId,
             string? language = null,
-            string? description = null)
+            string? description = null
+        )
         {
             ArgumentNullException.ThrowIfNull(overlay);
             ArgumentException.ThrowIfNullOrWhiteSpace(frameId);
@@ -120,7 +123,8 @@ namespace Mfr.Models.Tags
             string frameId,
             string fieldString,
             string? language = null,
-            string? description = null)
+            string? description = null
+        )
         {
             ArgumentNullException.ThrowIfNull(overlay);
             ArgumentException.ThrowIfNullOrWhiteSpace(frameId);
@@ -140,20 +144,21 @@ namespace Mfr.Models.Tags
                 var values = DelimitedText.Split(trimmed);
                 if (values.Length > 0)
                 {
-                    frames.Add(new Id3v2ModeledFrame
-                    {
-                        FrameId = normalizedId,
-                        Language = _ResolveLanguageForWrite(normalizedId, language, description),
-                        Description = _NormalizeDescription(description),
-                        TextValues = values,
-                    });
+                    frames.Add(
+                        new Id3v2ModeledFrame
+                        {
+                            FrameId = normalizedId,
+                            Language = _ResolveLanguageForWrite(normalizedId, language, description),
+                            Description = _NormalizeDescription(description),
+                            TextValues = values,
+                        }
+                    );
                 }
             }
 
             frames.Sort(_CompareFrames);
-            overlay.Id3v2 = frames.Count == 0
-                ? null
-                : new Id3v2TagData { Version = existing.Version, Frames = [.. frames] };
+            overlay.Id3v2 =
+                frames.Count == 0 ? null : new Id3v2TagData { Version = existing.Version, Frames = [.. frames] };
         }
 
         /// <summary>
@@ -198,8 +203,8 @@ namespace Mfr.Models.Tags
             var trimmed = fieldString.Trim();
             overlay.EnsureEmptyBlock(AudioTagBlockKind.Xiph);
             var existing = overlay.Xiph!;
-            var rows = existing.Fields
-                .Where(r => !string.Equals(r.Key, normalizedKey, StringComparison.Ordinal))
+            var rows = existing
+                .Fields.Where(r => !string.Equals(r.Key, normalizedKey, StringComparison.Ordinal))
                 .ToList();
 
             if (trimmed.Length > 0)
@@ -209,13 +214,15 @@ namespace Mfr.Models.Tags
                     rows.Add(new TextFieldRow(normalizedKey, values));
             }
 
-            rows.Sort(static (a, b) =>
-            {
-                var byKey = string.CompareOrdinal(a.Key, b.Key);
-                return byKey != 0 ? byKey : string.CompareOrdinal(
-                    string.Join('\0', a.Values),
-                    string.Join('\0', b.Values));
-            });
+            rows.Sort(
+                static (a, b) =>
+                {
+                    var byKey = string.CompareOrdinal(a.Key, b.Key);
+                    return byKey != 0
+                        ? byKey
+                        : string.CompareOrdinal(string.Join('\0', a.Values), string.Join('\0', b.Values));
+                }
+            );
 
             overlay.Xiph = rows.Count == 0 ? null : new XiphTagData { Fields = [.. rows] };
         }
@@ -224,7 +231,8 @@ namespace Mfr.Models.Tags
             ImmutableArray<Id3v2ModeledFrame> frames,
             string frameId,
             string? language,
-            string? description)
+            string? description
+        )
         {
             foreach (var frame in frames)
             {
@@ -239,7 +247,8 @@ namespace Mfr.Models.Tags
             List<Id3v2ModeledFrame> frames,
             string frameId,
             string? language,
-            string? description)
+            string? description
+        )
         {
             frames.RemoveAll(f => _FrameMatches(f, frameId, language, description));
         }
@@ -248,7 +257,8 @@ namespace Mfr.Models.Tags
             Id3v2ModeledFrame frame,
             string frameId,
             string? language,
-            string? description)
+            string? description
+        )
         {
             if (!string.Equals(frame.FrameId, frameId, StringComparison.Ordinal))
                 return false;
@@ -347,14 +357,13 @@ namespace Mfr.Models.Tags
             {
                 throw new ArgumentException(
                     $"Value must be empty or a non-negative integer, got '{trimmed}'.",
-                    valueParamName);
+                    valueParamName
+                );
             }
 
             if (parsed > max)
             {
-                throw new ArgumentException(
-                    $"Value must be between 0 and {max}, got {parsed}.",
-                    valueParamName);
+                throw new ArgumentException($"Value must be between 0 and {max}, got {parsed}.", valueParamName);
             }
 
             return parsed == 0 ? null : parsed;
@@ -369,7 +378,8 @@ namespace Mfr.Models.Tags
             {
                 throw new ArgumentException(
                     $"Value must be empty or an integer 0-255, got '{trimmed}'.",
-                    valueParamName);
+                    valueParamName
+                );
             }
 
             return parsed == 0 ? null : parsed;

@@ -44,7 +44,8 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
             {
                 item.EnsureEmbeddedTagsLoaded();
                 var overlay = item.Preview.AudioTagOverlay;
-                var isBareTxxx = string.Equals(options.FrameId, "TXXX", StringComparison.Ordinal)
+                var isBareTxxx =
+                    string.Equals(options.FrameId, "TXXX", StringComparison.Ordinal)
                     && options.ContentDescriptor is null;
                 if (isBareTxxx)
                     return _FirstTxxxText(overlay);
@@ -53,7 +54,8 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
                     overlay,
                     options.FrameId,
                     language: null,
-                    description: options.ContentDescriptor);
+                    description: options.ContentDescriptor
+                );
             };
         }
 
@@ -63,7 +65,8 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
             {
                 throw new ArgumentException(
                     $"{tokenDisplayName} requires a field-code argument (for example TXXX or TALB).",
-                    nameof(tokenArgs));
+                    nameof(tokenArgs)
+                );
             }
 
             var trimmed = tokenArgs.Trim();
@@ -74,13 +77,12 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
             var frameId = frameIdPart.Trim().ToUpperInvariant();
             if (frameId.Length == 0)
             {
-                throw new ArgumentException(
-                    $"{tokenDisplayName} field-code is missing a frame id.",
-                    nameof(tokenArgs));
+                throw new ArgumentException($"{tokenDisplayName} field-code is missing a frame id.", nameof(tokenArgs));
             }
 
             var contentDescriptor = string.IsNullOrWhiteSpace(remainder) ? null : remainder;
-            var allowsContentDescriptor = string.Equals(frameId, "TXXX", StringComparison.Ordinal)
+            var allowsContentDescriptor =
+                string.Equals(frameId, "TXXX", StringComparison.Ordinal)
                 || string.Equals(frameId, "COMM", StringComparison.Ordinal)
                 || string.Equals(frameId, "USLT", StringComparison.Ordinal);
 
@@ -88,7 +90,8 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
             {
                 throw new ArgumentException(
                     $"{tokenDisplayName} frame '{frameId}' does not accept a content-descriptor suffix.",
-                    nameof(tokenArgs));
+                    nameof(tokenArgs)
+                );
             }
 
             return new Options(frameId, contentDescriptor);

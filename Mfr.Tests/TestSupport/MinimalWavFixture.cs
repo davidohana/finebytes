@@ -11,8 +11,7 @@ namespace Mfr.Tests.TestSupport
     /// </remarks>
     internal static class MinimalWavFixture
     {
-        internal static string SourcePath =>
-            Path.Combine(AppContext.BaseDirectory, "Fixtures", "minimal-silent.wav");
+        internal static string SourcePath => Path.Combine(AppContext.BaseDirectory, "Fixtures", "minimal-silent.wav");
 
         internal static void CopyScratchTo(string absoluteDestinationPath)
         {
@@ -21,7 +20,8 @@ namespace Mfr.Tests.TestSupport
             if (!File.Exists(SourcePath))
             {
                 throw new InvalidOperationException(
-                    $"Missing fixture '{SourcePath}'. Run build so Fixtures copy to output beside the test assembly.");
+                    $"Missing fixture '{SourcePath}'. Run build so Fixtures copy to output beside the test assembly."
+                );
             }
 
             File.Copy(SourcePath, absoluteDestinationPath, overwrite: true);

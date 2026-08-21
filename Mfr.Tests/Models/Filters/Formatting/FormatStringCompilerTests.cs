@@ -24,10 +24,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
                 extension: ".mp3",
-                directory: @"C:\Music\My Album");
+                directory: @"C:\Music\My Album"
+            );
 
-            var compiled = FormatStringCompiler.Compile(
-                template: "<file-name><ext>-<parent-folder>");
+            var compiled = FormatStringCompiler.Compile(template: "<file-name><ext>-<parent-folder>");
             var result = compiled(item);
 
             Assert.Equal("song.mp3-My Album", result);
@@ -41,8 +41,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "song", extension: ".mp3");
 
-            var compiled = FormatStringCompiler.Compile(
-                template: "Track: <file-name> [<ext>]");
+            var compiled = FormatStringCompiler.Compile(template: "Track: <file-name> [<ext>]");
             var result = compiled(item);
 
             Assert.Equal("Track: song [.mp3]", result);
@@ -69,7 +68,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void ResolveTemplate_UnknownToken_Throws()
         {
             var ex = Assert.Throws<NotSupportedException>(() =>
-                FormatStringCompiler.Compile(template: "<does-not-exist>"));
+                FormatStringCompiler.Compile(template: "<does-not-exist>")
+            );
 
             Assert.Contains("Unknown formatter token", ex.Message);
             Assert.Contains("does-not-exist", ex.Message);

@@ -184,7 +184,8 @@ namespace Mfr.Tests.Engine
                 directoryPath: directoryPath,
                 prefix: Path.GetFileNameWithoutExtension(fileName),
                 extension: Path.GetExtension(fileName),
-                attributes: FileAttributes.Normal);
+                attributes: FileAttributes.Normal
+            );
             return new RenameItem(meta) { Status = RenameStatus.PreviewOk };
         }
 
@@ -196,7 +197,8 @@ namespace Mfr.Tests.Engine
                 directoryPath: directoryPath,
                 prefix: folderName,
                 extension: string.Empty,
-                attributes: FileAttributes.Directory);
+                attributes: FileAttributes.Directory
+            );
             return new RenameItem(meta) { Status = RenameStatus.PreviewOk };
         }
 

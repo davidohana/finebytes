@@ -42,7 +42,7 @@ namespace Mfr.Filters.Attributes
         /// Calendar years.
         /// </summary>
         [JsonStringEnumMemberName("years")]
-        Years
+        Years,
     }
 
     /// <summary>
@@ -54,14 +54,14 @@ namespace Mfr.Filters.Attributes
     public sealed record TimeShifterOptions(
         [property: JsonPropertyName("timestampField")] TimestampField TimestampField,
         [property: JsonPropertyName("amount")] int Amount,
-        [property: JsonPropertyName("unit")] TimeShiftUnit Unit);
+        [property: JsonPropertyName("unit")] TimeShiftUnit Unit
+    );
 
     /// <summary>
     /// Shifts creation, last write, or last access time by an amount in the chosen unit.
     /// </summary>
     /// <param name="Options">Timestamp field, amount, and unit.</param>
-    public sealed record TimeShifterFilter(
-        TimeShifterOptions Options) : BaseFilter
+    public sealed record TimeShifterFilter(TimeShifterOptions Options) : BaseFilter
     {
         /// <inheritdoc />
         public override string Type => "TimeShifter";
@@ -96,7 +96,7 @@ namespace Mfr.Filters.Attributes
                 TimeShiftUnit.Days => current.AddDays(amount),
                 TimeShiftUnit.Months => current.AddMonths(amount),
                 TimeShiftUnit.Years => current.AddYears(amount),
-                _ => throw new UnreachableException()
+                _ => throw new UnreachableException(),
             };
         }
     }

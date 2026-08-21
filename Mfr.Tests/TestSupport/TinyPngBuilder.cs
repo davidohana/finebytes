@@ -21,7 +21,8 @@ namespace Mfr.Tests.TestSupport
             int height,
             int pixelsPerMetreX = 0,
             int pixelsPerMetreY = 0,
-            bool physUnitIsMetre = true)
+            bool physUnitIsMetre = true
+        )
         {
             using var output = new MemoryStream();
             output.Write([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);

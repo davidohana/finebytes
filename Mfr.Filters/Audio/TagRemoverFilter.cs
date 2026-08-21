@@ -22,7 +22,8 @@ namespace Mfr.Filters.Audio
     /// </param>
     public sealed record TagRemoverOptions(
         [property: JsonPropertyName("all")] bool All = false,
-        [property: JsonPropertyName("blocks")] IReadOnlyList<AudioTagBlockKind>? Blocks = null);
+        [property: JsonPropertyName("blocks")] IReadOnlyList<AudioTagBlockKind>? Blocks = null
+    );
 
     /// <summary>
     /// Removes embedded tag blocks (selected types, or every TagLib type when <c>all</c> is set).
@@ -69,7 +70,8 @@ namespace Mfr.Filters.Audio
             {
                 throw new ArgumentException(
                     "TagRemover requires at least one tag block type in 'blocks' when 'all' is false.",
-                    nameof(Options));
+                    nameof(Options)
+                );
             }
         }
 

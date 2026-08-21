@@ -42,14 +42,8 @@ namespace Mfr.Tests.Engine
 
             var renameList = new RenameList(includeHidden: true);
             // Add the folder by itself (folders-only) and the file as a direct source.
-            renameList.AddSource(
-                source: oldFolderPath,
-                includeFiles: false,
-                includeFolders: true);
-            renameList.AddSource(
-                source: oldFilePath,
-                includeFiles: true,
-                includeFolders: false);
+            renameList.AddSource(source: oldFolderPath, includeFiles: false, includeFolders: true);
+            renameList.AddSource(source: oldFilePath, includeFiles: true, includeFolders: false);
             Assert.Equal(2, renameList.RenameItems.Count);
 
             var folderItem = renameList.RenameItems.Single(item => item.Original.FullPath == oldFolderPath);
@@ -61,7 +55,8 @@ namespace Mfr.Tests.Engine
             var preset = _CreatePresetAllEnabled(
                 "folder-and-child",
                 _LiteralPrefixReplacer("Album", "AlbumRenamed"),
-                _LiteralPrefixReplacer("track", "song"));
+                _LiteralPrefixReplacer("track", "song")
+            );
             var plan = _SetupPreview(renameList, preset);
 
             Assert.Equal(newFolderPath, folderItem.Preview.FullPath);
@@ -92,10 +87,7 @@ namespace Mfr.Tests.Engine
             File.WriteAllText(folderB.CombinePath("b.txt"), "from-b");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources(
-                sources: [folderA, folderB],
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSources(sources: [folderA, folderB], includeFiles: false, includeFolders: true);
             Assert.Equal(2, renameList.RenameItems.Count);
 
             // A pair of replacers performs FolderA -> tmp -> FolderB while FolderB -> FolderA via case differences
@@ -105,7 +97,8 @@ namespace Mfr.Tests.Engine
                 "folder-swap",
                 _LiteralPrefixReplacer("FolderA", "__SWAP_PLACEHOLDER__"),
                 _LiteralPrefixReplacer("FolderB", "FolderA"),
-                _LiteralPrefixReplacer("__SWAP_PLACEHOLDER__", "FolderB"));
+                _LiteralPrefixReplacer("__SWAP_PLACEHOLDER__", "FolderB")
+            );
             var plan = _SetupPreview(renameList, preset);
 
             var itemA = renameList.RenameItems.Single(item => item.Original.FullPath == folderA);
@@ -178,10 +171,7 @@ namespace Mfr.Tests.Engine
             var newFolder = dir.CombinePath("ALBUM");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(
-                source: oldFolder,
-                includeFiles: false,
-                includeFolders: true);
+            renameList.AddSource(source: oldFolder, includeFiles: false, includeFolders: true);
 
             var preset = _FormatterFullPathPreset("folder-case-rename", newFolder);
             var plan = _SetupPreview(renameList, preset);
@@ -193,9 +183,7 @@ namespace Mfr.Tests.Engine
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
 
-            var enumeratedDirNames = Directory.EnumerateDirectories(dir)
-                .Select(Path.GetFileName)
-                .ToList();
+            var enumeratedDirNames = Directory.EnumerateDirectories(dir).Select(Path.GetFileName).ToList();
             Assert.Contains("ALBUM", enumeratedDirNames);
             Assert.DoesNotContain("album", enumeratedDirNames);
             Assert.True(File.Exists(newFolder.CombinePath("track.mp3")));
@@ -218,10 +206,7 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList(includeHidden: true);
             // Order: file first, then folder. The planner must still commit the folder rename first
             // so the file's destination directory (newFolder) exists when the file is moved.
-            renameList.AddSources(
-                sources: [sourceFile, oldFolder],
-                includeFiles: true,
-                includeFolders: true);
+            renameList.AddSources(sources: [sourceFile, oldFolder], includeFiles: true, includeFolders: true);
             Assert.Equal(2, renameList.RenameItems.Count);
 
             // Two filters compose: Mover sends the loose file under newFolder,
@@ -229,13 +214,16 @@ namespace Mfr.Tests.Engine
             var preset = _CreatePresetAllEnabled(
                 "mover-into-renamed",
                 new MoverFilter(new MoverOptions(RootFolder: newFolder)),
-                _LiteralPrefixReplacer("Sink", "SinkRenamed"));
+                _LiteralPrefixReplacer("Sink", "SinkRenamed")
+            );
             var plan = _SetupPreview(renameList, preset);
 
             var folderItem = renameList.RenameItems.Single(item =>
-                string.Equals(item.Original.FullPath, oldFolder, StringComparison.Ordinal));
+                string.Equals(item.Original.FullPath, oldFolder, StringComparison.Ordinal)
+            );
             var fileItem = renameList.RenameItems.Single(item =>
-                string.Equals(item.Original.FullPath, sourceFile, StringComparison.Ordinal));
+                string.Equals(item.Original.FullPath, sourceFile, StringComparison.Ordinal)
+            );
             // The Mover applies to every item, so the folder also gets DirectoryPath=newFolder.
             // Combined with the prefix replacer, the folder ends up at newFolder/SinkRenamed (a sub-folder).
             // The loose file should be under newFolder.
@@ -271,16 +259,17 @@ namespace Mfr.Tests.Engine
                     Mode: ReplacerMode.Literal,
                     CaseSensitive: true,
                     ReplaceAll: false,
-                    WholeWord: false));
+                    WholeWord: false
+                )
+            );
         }
 
         private static FilterPreset _FormatterFullPathPreset(string name, string fullPath)
         {
             return _CreatePresetAllEnabled(
                 name,
-                new FormatterFilter(
-                    Target: new FullPathTarget(),
-                    Options: new FormatterOptions(fullPath)));
+                new FormatterFilter(Target: new FullPathTarget(), Options: new FormatterOptions(fullPath))
+            );
         }
 
         private static CommitPlan _SetupPreview(RenameList renameList, FilterPreset preset)

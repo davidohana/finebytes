@@ -15,10 +15,7 @@ namespace Mfr.Engine
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <param name="includeSubdirs">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
         /// <returns>Resolved file paths for the source.</returns>
-        internal static IEnumerable<string> ResolveToPaths(
-            string source,
-            bool includeFolders,
-            bool includeSubdirs)
+        internal static IEnumerable<string> ResolveToPaths(string source, bool includeFolders, bool includeSubdirs)
         {
             var fullSource = Path.GetFullPath(source);
             if (Directory.Exists(fullSource))
@@ -30,15 +27,15 @@ namespace Mfr.Engine
                 }
 
                 // When folder entries are excluded, directory sources expand to files based on recursion mode.
-                var searchOption = includeSubdirs
-                    ? SearchOption.AllDirectories
-                    : SearchOption.TopDirectoryOnly;
+                var searchOption = includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
                 return Directory.EnumerateFiles(fullSource, "*", searchOption);
             }
 
             // Non-directory sources resolve relative to their parent directory.
             var parentDirectory = Path.GetDirectoryName(fullSource);
-            parentDirectory = string.IsNullOrWhiteSpace(parentDirectory) ? Directory.GetCurrentDirectory() : parentDirectory;
+            parentDirectory = string.IsNullOrWhiteSpace(parentDirectory)
+                ? Directory.GetCurrentDirectory()
+                : parentDirectory;
             if (_TryResolveGlob(fullSource, out var globMatches))
                 return globMatches;
 
@@ -77,9 +74,7 @@ namespace Mfr.Engine
             var normalizedSource = fullSource.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             var root = Path.GetPathRoot(normalizedSource) ?? Directory.GetCurrentDirectory();
             var relativePath = normalizedSource[root.Length..];
-            var segments = relativePath.Split(
-                Path.DirectorySeparatorChar,
-                StringSplitOptions.RemoveEmptyEntries);
+            var segments = relativePath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
 
             var baseSegments = new List<string>();
             var globSegments = new List<string>();
@@ -116,15 +111,14 @@ namespace Mfr.Engine
 
             var includePattern = globSegments.Count == 0 ? "*" : string.Join('/', globSegments);
             var matcher = new Matcher(
-                OperatingSystem.IsWindows()
-                    ? StringComparison.OrdinalIgnoreCase
-                    : StringComparison.Ordinal);
+                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal
+            );
             matcher.AddInclude(includePattern);
             var matchResult = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(baseDirectory)));
 
-            resolvedPaths = matchResult.Files
-                .Select(match => Path.GetFullPath(
-                    Path.Combine(baseDirectory, match.Path.Replace('/', Path.DirectorySeparatorChar))));
+            resolvedPaths = matchResult.Files.Select(match =>
+                Path.GetFullPath(Path.Combine(baseDirectory, match.Path.Replace('/', Path.DirectorySeparatorChar)))
+            );
             return true;
         }
 

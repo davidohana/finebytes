@@ -78,7 +78,8 @@ namespace Mfr.Models.Tags
         string? MusicBrainzReleaseType,
         string? MusicBrainzReleaseCountry,
         string? MusicIpId,
-        string? AmazonId)
+        string? AmazonId
+    )
     {
         /// <summary>
         /// Projects merged semantic values from structured tag blocks only.
@@ -96,7 +97,8 @@ namespace Mfr.Models.Tags
                 _ApeFirst(overlay.Ape, "Title"),
                 _Riff(overlay.RiffInfo, "INAM"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomIds.Title),
-                _Asf(overlay.Asf, AsfDescriptorNames.Title));
+                _Asf(overlay.Asf, AsfDescriptorNames.Title)
+            );
             var album = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TALB"),
                 overlay.Id3v1?.Album.TrimmedOrNull(),
@@ -104,7 +106,8 @@ namespace Mfr.Models.Tags
                 _ApeFirst(overlay.Ape, "Album"),
                 _Riff(overlay.RiffInfo, "IPRD"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomIds.Album),
-                _Asf(overlay.Asf, AsfDescriptorNames.Album));
+                _Asf(overlay.Asf, AsfDescriptorNames.Album)
+            );
             var performers = Nullables.FirstNonNull(
                 _Id3v2Joined(overlay.Id3v2, "TPE1"),
                 overlay.Id3v1?.Artist.TrimmedOrNull(),
@@ -112,19 +115,22 @@ namespace Mfr.Models.Tags
                 _ApeJoined(overlay.Ape, "Artist"),
                 _Riff(overlay.RiffInfo, "IART"),
                 DelimitedText.JoinOrNull(_ReadAppleAtomValues(overlay.Apple, AppleAtomIds.Artist)),
-                _Asf(overlay.Asf, AsfDescriptorNames.Author));
+                _Asf(overlay.Asf, AsfDescriptorNames.Author)
+            );
             var albumArtists = Nullables.FirstNonNull(
                 _Id3v2Joined(overlay.Id3v2, "TPE2"),
                 _XiphJoined(overlay.Xiph, "ALBUMARTIST"),
                 _ApeJoined(overlay.Ape, "Album Artist"),
                 DelimitedText.JoinOrNull(_ReadAppleAtomValues(overlay.Apple, AppleAtomIds.AlbumArtist)),
-                _Asf(overlay.Asf, AsfDescriptorNames.AlbumArtist));
+                _Asf(overlay.Asf, AsfDescriptorNames.AlbumArtist)
+            );
             var composers = Nullables.FirstNonNull(
                 _Id3v2Joined(overlay.Id3v2, "TCOM"),
                 _XiphJoined(overlay.Xiph, "COMPOSER"),
                 _ApeJoined(overlay.Ape, "Composer"),
                 DelimitedText.JoinOrNull(_ReadAppleAtomValues(overlay.Apple, AppleAtomIds.Composer)),
-                _Asf(overlay.Asf, AsfDescriptorNames.Composer));
+                _Asf(overlay.Asf, AsfDescriptorNames.Composer)
+            );
             var genre = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TCON"),
                 _ReadId3v1Genre(overlay.Id3v1),
@@ -132,7 +138,8 @@ namespace Mfr.Models.Tags
                 _ApeFirst(overlay.Ape, "Genre"),
                 _Riff(overlay.RiffInfo, "IGNR"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomIds.Genre),
-                _Asf(overlay.Asf, AsfDescriptorNames.Genre));
+                _Asf(overlay.Asf, AsfDescriptorNames.Genre)
+            );
             var comment = Nullables.FirstNonNull(
                 _Id3v2PrimaryMulti(overlay.Id3v2, "COMM"),
                 overlay.Id3v1?.Comment.TrimmedOrNull(),
@@ -140,26 +147,30 @@ namespace Mfr.Models.Tags
                 _ApeFirst(overlay.Ape, "Comment"),
                 _Riff(overlay.RiffInfo, "ICMT"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomIds.Comment),
-                _Asf(overlay.Asf, AsfDescriptorNames.Comment));
+                _Asf(overlay.Asf, AsfDescriptorNames.Comment)
+            );
             var lyrics = Nullables.FirstNonNull(
                 _Id3v2PrimaryMulti(overlay.Id3v2, "USLT"),
                 _XiphFirst(overlay.Xiph, "LYRICS") ?? _XiphFirst(overlay.Xiph, "UNSYNCEDLYRICS"),
                 _ApeFirst(overlay.Ape, "Lyrics"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomIds.Lyrics),
-                _Asf(overlay.Asf, AsfDescriptorNames.Lyrics));
+                _Asf(overlay.Asf, AsfDescriptorNames.Lyrics)
+            );
             var copyright = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TCOP"),
                 _XiphFirst(overlay.Xiph, "COPYRIGHT"),
                 _ApeFirst(overlay.Ape, "Copyright"),
                 _Riff(overlay.RiffInfo, "ICOP"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomIds.Copyright),
-                _Asf(overlay.Asf, AsfDescriptorNames.Copyright));
+                _Asf(overlay.Asf, AsfDescriptorNames.Copyright)
+            );
             var grouping = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TIT1"),
                 _XiphFirst(overlay.Xiph, "GROUPING") ?? _XiphFirst(overlay.Xiph, "CONTENTGROUP"),
                 _ApeFirst(overlay.Ape, "Grouping"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomIds.Grouping),
-                _Asf(overlay.Asf, AsfDescriptorNames.Grouping));
+                _Asf(overlay.Asf, AsfDescriptorNames.Grouping)
+            );
             var year = Nullables.FirstNonNull(
                 _Id3v2Year(overlay.Id3v2),
                 overlay.Id3v1?.Year,
@@ -167,7 +178,8 @@ namespace Mfr.Models.Tags
                 _ParseUInt(_ApeFirst(overlay.Ape, "Year")),
                 _ParseUInt(_Riff(overlay.RiffInfo, "ICRD")),
                 _ReadAppleYear(overlay.Apple),
-                _ParseUInt(_Asf(overlay.Asf, AsfDescriptorNames.Year)));
+                _ParseUInt(_Asf(overlay.Asf, AsfDescriptorNames.Year))
+            );
             var (id3Track, id3TrackCount) = _Id3v2TrackPair(overlay.Id3v2, "TRCK");
             var track = Nullables.FirstNonNull(
                 id3Track,
@@ -175,35 +187,41 @@ namespace Mfr.Models.Tags
                 _ParseUInt(_XiphFirst(overlay.Xiph, "TRACKNUMBER")),
                 _ParseUInt(_ApeFirst(overlay.Ape, "Track")),
                 _ParseUInt(_Riff(overlay.RiffInfo, "ITRK")),
-                _ParseUInt(_Asf(overlay.Asf, AsfDescriptorNames.TrackNumber)));
+                _ParseUInt(_Asf(overlay.Asf, AsfDescriptorNames.TrackNumber))
+            );
             var trackCount = Nullables.FirstNonNull(
                 id3TrackCount,
                 _ParseUInt(_XiphFirst(overlay.Xiph, "TRACKTOTAL") ?? _XiphFirst(overlay.Xiph, "TOTALTRACKS")),
                 _ParseUInt(_ApeFirst(overlay.Ape, "TrackCount")),
-                _ParseUInt(_Asf(overlay.Asf, AsfDescriptorNames.TrackTotal)));
+                _ParseUInt(_Asf(overlay.Asf, AsfDescriptorNames.TrackTotal))
+            );
             var (id3Disc, id3DiscCount) = _Id3v2TrackPair(overlay.Id3v2, "TPOS");
             var (asfDisc, asfDiscCount) = _ParseAsfPartOfSet(_Asf(overlay.Asf, AsfDescriptorNames.PartOfSet));
             var disc = Nullables.FirstNonNull(
                 id3Disc,
                 _ParseUInt(_XiphFirst(overlay.Xiph, "DISCNUMBER")),
                 _ParseUInt(_ApeFirst(overlay.Ape, "Disc")),
-                asfDisc);
+                asfDisc
+            );
             var discCount = Nullables.FirstNonNull(
                 id3DiscCount,
                 _ParseUInt(_XiphFirst(overlay.Xiph, "DISCTOTAL") ?? _XiphFirst(overlay.Xiph, "TOTALDISCS")),
                 _ParseUInt(_ApeFirst(overlay.Ape, "DiscCount")),
-                asfDiscCount);
+                asfDiscCount
+            );
             var beatsPerMinute = Nullables.FirstNonNull(
                 _ParseUInt(_Id3v2Singleton(overlay.Id3v2, "TBPM")),
                 _ParseUInt(_XiphFirst(overlay.Xiph, "BPM") ?? _XiphFirst(overlay.Xiph, "TEMPO")),
                 _ParseUInt(_ApeFirst(overlay.Ape, "BPM")),
-                _ParseUInt(_Asf(overlay.Asf, AsfDescriptorNames.BeatsPerMinute)));
+                _ParseUInt(_Asf(overlay.Asf, AsfDescriptorNames.BeatsPerMinute))
+            );
             var conductor = Nullables.FirstNonNull(
                 _Id3v2Singleton(overlay.Id3v2, "TPE3"),
                 _XiphFirst(overlay.Xiph, "CONDUCTOR"),
                 _ApeFirst(overlay.Ape, "Conductor"),
                 _ReadApplePlainText(overlay.Apple, AppleAtomIds.Conductor),
-                _Asf(overlay.Asf, AsfDescriptorNames.Conductor));
+                _Asf(overlay.Asf, AsfDescriptorNames.Conductor)
+            );
             var musicBrainzArtistId = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzArtistId);
             var musicBrainzReleaseId = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzReleaseId);
             var musicBrainzReleaseArtistId = _ReadCatalogField(overlay, SemanticAudioField.MusicBrainzReleaseArtistId);
@@ -242,7 +260,8 @@ namespace Mfr.Models.Tags
                 MusicBrainzReleaseType: musicBrainzReleaseType,
                 MusicBrainzReleaseCountry: musicBrainzReleaseCountry,
                 MusicIpId: musicIpId,
-                AmazonId: amazonId);
+                AmazonId: amazonId
+            );
         }
 
         /// <summary>
@@ -287,7 +306,8 @@ namespace Mfr.Models.Tags
                 _Id3v2Txxx(overlay.Id3v2, row.Id3v2TxxxDescription),
                 _XiphFirst(overlay.Xiph, row.XiphKey),
                 _ApeFirst(overlay.Ape, row.ApeKey),
-                _Asf(overlay.Asf, row.AsfDescriptor));
+                _Asf(overlay.Asf, row.AsfDescriptor)
+            );
         }
 
         private static AudioCatalogFieldMaps.CatalogKeyRow _CatalogRow(SemanticAudioField field)
@@ -396,7 +416,8 @@ namespace Mfr.Models.Tags
 
             // TDRC may be a full timestamp; take leading year digits.
             var yearPart = text.Length >= 4 ? text[..4] : text;
-            return uint.TryParse(yearPart, NumberStyles.Integer, CultureInfo.InvariantCulture, out var year) && year != 0
+            return
+                uint.TryParse(yearPart, NumberStyles.Integer, CultureInfo.InvariantCulture, out var year) && year != 0
                 ? year
                 : null;
         }
@@ -417,14 +438,23 @@ namespace Mfr.Models.Tags
 
             uint? number = null;
             uint? count = null;
-            if (slash > 0
+            if (
+                slash > 0
                 && uint.TryParse(text[..slash], NumberStyles.Integer, CultureInfo.InvariantCulture, out var nParsed)
-                && nParsed != 0)
+                && nParsed != 0
+            )
                 number = nParsed;
 
-            if (slash + 1 < text.Length
-                && uint.TryParse(text[(slash + 1)..], NumberStyles.Integer, CultureInfo.InvariantCulture, out var cParsed)
-                && cParsed != 0)
+            if (
+                slash + 1 < text.Length
+                && uint.TryParse(
+                    text[(slash + 1)..],
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out var cParsed
+                )
+                && cParsed != 0
+            )
                 count = cParsed;
 
             return (number, count);
@@ -562,7 +592,10 @@ namespace Mfr.Models.Tags
         private static uint? _ReadAppleYear(AppleTagData? apple)
         {
             var day = _ReadApplePlainText(apple, AppleAtomIds.Day);
-            return day is not null && uint.TryParse(day.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var y) && y != 0
+            return
+                day is not null
+                && uint.TryParse(day.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var y)
+                && y != 0
                 ? y
                 : null;
         }

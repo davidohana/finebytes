@@ -30,9 +30,10 @@ namespace Mfr.Models.Rename
                 FileFullNameTarget => meta.Prefix + meta.Extension,
                 FullPathTarget => meta.FullPath,
                 ParentDirectoryTarget => meta.DirectoryPath,
-                AncestorFolderTarget ancestorFolderTarget =>
-                    meta.GetAncestorFolderSegmentName(ancestorFolderTarget.Level),
-                _ => throw new NotSupportedException($"Unsupported filter target '{target.GetType().Name}'.")
+                AncestorFolderTarget ancestorFolderTarget => meta.GetAncestorFolderSegmentName(
+                    ancestorFolderTarget.Level
+                ),
+                _ => throw new NotSupportedException($"Unsupported filter target '{target.GetType().Name}'."),
             };
         }
 
@@ -95,9 +96,7 @@ namespace Mfr.Models.Rename
         /// <param name="level">Ancestor level (<c>1</c>-based).</param>
         internal static string GetAncestorFolderSegmentName(this FileMeta meta, int level)
         {
-            return DirectoryPathAncestor.GetSegmentName(
-                containingDirectoryPath: meta.DirectoryPath,
-                level: level);
+            return DirectoryPathAncestor.GetSegmentName(containingDirectoryPath: meta.DirectoryPath, level: level);
         }
 
         /// <summary>
@@ -178,7 +177,8 @@ namespace Mfr.Models.Rename
             meta.DirectoryPath = DirectoryPathAncestor.ReplaceSegment(
                 containingDirectoryPath: meta.DirectoryPath,
                 level: level,
-                newSegmentName: newSegmentName);
+                newSegmentName: newSegmentName
+            );
         }
 
         private static bool _ContainsInvalidPathChar(string path)

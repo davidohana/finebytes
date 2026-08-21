@@ -16,7 +16,9 @@ namespace Mfr.Filters.Formatting
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     public sealed partial record FormatterFilter(
         FilterTarget Target,
-        FormatterOptions Options, StringApplyScope? ApplyScope = null) : StringTargetFilter(Target, ApplyScope)
+        FormatterOptions Options,
+        StringApplyScope? ApplyScope = null
+    ) : StringTargetFilter(Target, ApplyScope)
     {
         private Formatter? _compiledTemplate;
 

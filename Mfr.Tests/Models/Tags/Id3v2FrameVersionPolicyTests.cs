@@ -39,7 +39,8 @@ namespace Mfr.Tests.Models.Tags
         public void EnsureCompatible_TdrcOnV23_Throws()
         {
             var ex = Assert.Throws<NotSupportedException>(() =>
-                Id3v2FrameVersionPolicy.EnsureCompatible(tagVersion: 3, frameId: "TDRC"));
+                Id3v2FrameVersionPolicy.EnsureCompatible(tagVersion: 3, frameId: "TDRC")
+            );
             Assert.Contains("TDRC", ex.Message, StringComparison.Ordinal);
             Assert.Contains("2.4", ex.Message, StringComparison.Ordinal);
             Assert.Contains("2.3", ex.Message, StringComparison.Ordinal);

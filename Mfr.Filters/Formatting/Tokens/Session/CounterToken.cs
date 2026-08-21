@@ -46,7 +46,9 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         /// <summary>
         /// Padding keywords for <c>padding=…</c> (<c>none</c>, <c>auto</c>, <c>fixed</c>).
         /// </summary>
-        private static readonly Dictionary<string, CounterPaddingMode> _keywordToPaddingMode = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, CounterPaddingMode> _keywordToPaddingMode = new(
+            StringComparer.OrdinalIgnoreCase
+        )
         {
             ["none"] = CounterPaddingMode.None,
             ["auto"] = CounterPaddingMode.Auto,
@@ -56,7 +58,9 @@ namespace Mfr.Filters.Formatting.Tokens.Session
         /// <summary>
         /// Reset-scope keywords for <c>resetScope=…</c> (<c>global</c> vs <c>perFolder</c>).
         /// </summary>
-        private static readonly Dictionary<string, int> _keywordToResetOnFolderChange = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, int> _keywordToResetOnFolderChange = new(
+            StringComparer.OrdinalIgnoreCase
+        )
         {
             ["global"] = 0,
             ["perFolder"] = 1,
@@ -89,7 +93,8 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             int IncrementBy,
             CounterPaddingMode PaddingMode,
             int LeadingZeroesTotalLength,
-            int ResetOnFolderChange);
+            int ResetOnFolderChange
+        );
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["counter"];
@@ -113,7 +118,8 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                     options.InitialValue,
                     options.IncrementBy,
                     item,
-                    usePerFolder);
+                    usePerFolder
+                );
 
                 if (padWidth <= 0 || padWidth <= raw.Length)
                     return raw;
@@ -133,7 +139,12 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             else
             {
                 var parsed = FormatOptionsParsing.ParseNamedKeyValuePairs(tokenArgs.Trim(), tokenDisplayName);
-                FormatOptionsParsing.RequireKnownOptionKeysOnly(parsed, tokenDisplayName, _counterOptionKeys, nameof(tokenArgs));
+                FormatOptionsParsing.RequireKnownOptionKeysOnly(
+                    parsed,
+                    tokenDisplayName,
+                    _counterOptionKeys,
+                    nameof(tokenArgs)
+                );
 
                 merged = new Dictionary<string, string>(_counterDefaults, StringComparer.OrdinalIgnoreCase);
                 foreach (var kv in parsed)
@@ -148,7 +159,8 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                 IncrementBy: int.Parse(merged["step"], CultureInfo.InvariantCulture),
                 PaddingMode: paddingMode,
                 LeadingZeroesTotalLength: int.Parse(merged["length"], CultureInfo.InvariantCulture),
-                ResetOnFolderChange: resetOnFolderChange);
+                ResetOnFolderChange: resetOnFolderChange
+            );
         }
 
         /// <summary>
@@ -159,7 +171,8 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             if (!_keywordToPaddingMode.TryGetValue(raw.Trim(), out var mode))
                 throw new ArgumentException(
                     $"{tokenDisplayName} padding '{raw}' is not supported (expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToPaddingMode.Keys)}).",
-                    paramName: nameof(raw));
+                    paramName: nameof(raw)
+                );
 
             return mode;
         }
@@ -172,7 +185,8 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             if (!_keywordToResetOnFolderChange.TryGetValue(raw.Trim(), out var resetOnFolderChange))
                 throw new ArgumentException(
                     $"{tokenDisplayName} reset scope '{raw}' is not supported (expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToResetOnFolderChange.Keys)}).",
-                    paramName: nameof(raw));
+                    paramName: nameof(raw)
+                );
 
             return resetOnFolderChange;
         }
@@ -183,7 +197,8 @@ namespace Mfr.Filters.Formatting.Tokens.Session
             int start,
             int step,
             RenameItem item,
-            bool usePerFolder)
+            bool usePerFolder
+        )
         {
             switch (paddingMode)
             {
@@ -195,7 +210,8 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                         : item.Original.RenameListTotalCount;
                     Check.That(
                         listCount > 0,
-                        "Counter token automatic padding requires rename-list counts on the item (run preview from a populated rename list).");
+                        "Counter token automatic padding requires rename-list counts on the item (run preview from a populated rename list)."
+                    );
 
                     var maxIndex = Math.Max(listCount - 1, 0);
                     return _AutomaticCounterWidth(start: start, step: step, maxIndex: maxIndex);
@@ -203,7 +219,8 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                     Require.That(
                         leadingZeroesTotalLength >= 1,
                         $"Counter token fixed padding requires a positive total length (got {leadingZeroesTotalLength}).",
-                        "arg");
+                        "arg"
+                    );
 
                     return leadingZeroesTotalLength;
                 default:
