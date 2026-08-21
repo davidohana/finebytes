@@ -45,6 +45,12 @@ namespace Mfr.Models.Config
         public string? ExcludeMasks { get; set; }
 
         /// <summary>
+        /// Whether exclude masks are applied when listing and adding files.
+        /// </summary>
+        [JsonPropertyName("excludeMasksEnabled")]
+        public bool? ExcludeMasksEnabled { get; set; }
+
+        /// <summary>
         /// Recently used include masks.
         /// </summary>
         [JsonPropertyName("maskSuggestions")]

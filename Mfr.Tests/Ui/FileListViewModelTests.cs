@@ -159,17 +159,31 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies exclude masks hide matching files from the listing.
+        /// Verifies exclude masks hide matching files from the listing when enabled.
         /// </summary>
         [Fact]
-        public void ExcludeMasks_Hide_Matching_Files()
+        public void ExcludeMasks_Hide_Matching_Files_When_Enabled()
         {
             var dir = _CreateTree();
             var viewModel = _CreateViewModel(dir);
 
-            viewModel.ExcludeMasks = "*.txt;*.bak";
+            viewModel.ApplyExcludeMasks(enabled: true, editorText: "*.txt;*.bak");
 
             Assert.Equal(["zeta-folder", "beta.md"], _Names(viewModel));
+        }
+
+        /// <summary>
+        /// Verifies stored exclude masks do not filter until enabled.
+        /// </summary>
+        [Fact]
+        public void ExcludeMasks_Do_Not_Filter_When_Disabled()
+        {
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir);
+
+            viewModel.ApplyExcludeMasks(enabled: false, editorText: "*.txt;*.bak");
+
+            Assert.Equal(["zeta-folder", "alpha.txt", "beta.md"], _Names(viewModel));
         }
 
         /// <summary>

@@ -1,0 +1,59 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels"
+  x:Class="Mfr.App.Ui.Views.ExcludeMasksDialog"
+  x:DataType="vm:ExcludeMasksDialogViewModel"
+  Title="Exclude Masks"
+  Icon="/Assets/mfr.ico"
+  Width="460"
+  Height="240"
+  MinWidth="420"
+  MinHeight="200"
+  WindowStartupLocation="CenterOwner"
+  CanResize="True"
+  ShowInTaskbar="False"
+>
+  <DockPanel Margin="12">
+    <StackPanel
+      DockPanel.Dock="Bottom"
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      Spacing="12"
+      Margin="0,12,0,0"
+    >
+      <Button
+        Content="OK"
+        MinWidth="80"
+        HorizontalContentAlignment="Center"
+        VerticalContentAlignment="Center"
+        IsDefault="True"
+        Click="_OnOkClick"
+      />
+      <Button
+        Content="Cancel"
+        MinWidth="80"
+        HorizontalContentAlignment="Center"
+        VerticalContentAlignment="Center"
+        IsCancel="True"
+        Click="_OnCancelClick"
+      />
+    </StackPanel>
+
+    <CheckBox
+      DockPanel.Dock="Top"
+      Margin="0,0,0,8"
+      IsChecked="{Binding IsEnabled}"
+      Content="Do not add filename which matches the following masks:"
+    />
+
+    <TextBox
+      AcceptsReturn="True"
+      TextWrapping="NoWrap"
+      Text="{Binding MasksText}"
+      MaxLength="1000"
+      ScrollViewer.VerticalScrollBarVisibility="Auto"
+      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+    />
+  </DockPanel>
+</Window>

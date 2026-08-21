@@ -75,6 +75,11 @@ namespace Mfr.App.Ui.ViewModels
         private const int _ThumbnailLoadParallelismCap = 4;
         private const int _MaxRememberedMasks = 10;
 
+        /// <summary>
+        /// Default exclude patterns (same as MFR 7); applied only when exclude masks are enabled.
+        /// </summary>
+        public const string DefaultExcludeMasks = "*.exe;*.dll;*.sys";
+
         private readonly ISystemIconProvider _iconProvider;
         private readonly List<ListedItem> _listedItems = [];
         private readonly Dictionary<string, IImage?> _pathToThumbnail = new(PathComparers.Os);
@@ -156,10 +161,16 @@ namespace Mfr.App.Ui.ViewModels
         private string _mask = "*";
 
         /// <summary>
-        /// <c>:</c>- or <c>;</c>-delimited exclude masks applied to file names.
+        /// Whether <see cref="ExcludeMasks"/> are applied when listing and adding files.
         /// </summary>
         [ObservableProperty]
-        private string _excludeMasks = string.Empty;
+        private bool _excludeMasksEnabled;
+
+        /// <summary>
+        /// <c>;</c>-delimited exclude masks applied to file names when <see cref="ExcludeMasksEnabled"/> is true.
+        /// </summary>
+        [ObservableProperty]
+        private string _excludeMasks = DefaultExcludeMasks;
 
         /// <summary>
         /// Layout used to present <see cref="Entries"/>. Default is Report.
@@ -468,6 +479,22 @@ namespace Mfr.App.Ui.ViewModels
         partial void OnExcludeMasksChanged(string value)
         {
             _ReloadEntries();
+        }
+
+        partial void OnExcludeMasksEnabledChanged(bool value)
+        {
+            _ReloadEntries();
+        }
+
+        /// <summary>
+        /// Applies Exclude Masks dialog results (enable flag and multiline / delimited patterns).
+        /// </summary>
+        /// <param name="enabled">Whether exclude masks are active.</param>
+        /// <param name="editorText">Masks as typed in the dialog (one per line or delimited).</param>
+        public void ApplyExcludeMasks(bool enabled, string? editorText)
+        {
+            ExcludeMasks = WildcardMask.NormalizeForStorage(editorText);
+            ExcludeMasksEnabled = enabled;
         }
 
         partial void OnViewModeChanged(FileListViewMode value)
@@ -860,6 +887,11 @@ namespace Mfr.App.Ui.ViewModels
             if (!WildcardMask.IsMatch(fileName, Mask))
             {
                 return false;
+            }
+
+            if (!ExcludeMasksEnabled)
+            {
+                return true;
             }
 
             return !WildcardMask.MatchesAny(fileName, ExcludeMasks);

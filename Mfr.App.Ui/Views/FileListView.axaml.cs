@@ -58,6 +58,29 @@ namespace Mfr.App.Ui.Views
             Dispatcher.UIThread.Post(_CommitMaskIfInactive, DispatcherPriority.Input);
         }
 
+        private async void _OnExcludeMasksClick(object? sender, RoutedEventArgs e)
+        {
+            if (DataContext is not FileListViewModel viewModel)
+            {
+                return;
+            }
+
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            var dialogVm = new ExcludeMasksDialogViewModel(viewModel.ExcludeMasksEnabled, viewModel.ExcludeMasks);
+            var dialog = new ExcludeMasksDialog(dialogVm);
+            var accepted = await dialog.ShowDialog<bool?>(owner);
+            if (accepted != true)
+            {
+                return;
+            }
+
+            viewModel.ApplyExcludeMasks(dialogVm.IsEnabled, dialogVm.MasksText);
+        }
+
         private void _CommitMaskIfInactive()
         {
             if (DataContext is not FileListViewModel viewModel)
