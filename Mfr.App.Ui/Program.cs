@@ -45,7 +45,8 @@ namespace Mfr.App.Ui
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
-                .LogToTrace();
+                .LogToTrace()
+                .AfterSetup(_ => UiCrashHandler.RegisterDispatcherHandler());
         }
     }
 }

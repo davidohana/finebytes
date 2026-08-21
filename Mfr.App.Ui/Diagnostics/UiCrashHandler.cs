@@ -15,17 +15,14 @@ namespace Mfr.App.Ui.Diagnostics
     internal static class UiCrashHandler
     {
         private static int _isReporting;
-
-        /// <summary>
-        /// When <c>true</c>, faults are logged but the crash dialog is not shown (headless tests).
-        /// </summary>
-        internal static bool SuppressDialogs { get; set; }
+        private static Action<CrashReport>? _showCrashDialog;
 
         /// <summary>
         /// Hooks <see cref="AppDomain.UnhandledException"/> and
         /// <see cref="TaskScheduler.UnobservedTaskException"/>. Safe to call more than once.
         /// <para>
         /// Unobserved task faults are logged only; they do not show the crash dialog.
+        /// The crash dialog is shown only after <see cref="RegisterDispatcherHandler"/> has run.
         /// </para>
         /// </summary>
         internal static void RegisterProcessHandlers()
@@ -37,10 +34,15 @@ namespace Mfr.App.Ui.Diagnostics
         }
 
         /// <summary>
-        /// Hooks Avalonia dispatcher faults. UI-thread exceptions are treated as fatal after the crash dialog.
+        /// Hooks Avalonia dispatcher faults and enables the crash dialog plus process exit.
+        /// <para>
+        /// Call from the desktop entry point after Avalonia setup. Hosts that reuse
+        /// <see cref="App"/> without owning process lifetime should omit this.
+        /// </para>
         /// </summary>
         internal static void RegisterDispatcherHandler()
         {
+            _showCrashDialog = _ShowCrashDialog;
             Dispatcher.UIThread.UnhandledException -= _OnDispatcherUnhandledException;
             Dispatcher.UIThread.UnhandledException += _OnDispatcherUnhandledException;
         }
@@ -87,8 +89,7 @@ namespace Mfr.App.Ui.Diagnostics
             try
             {
                 var report = Persist(exception);
-                if (!SuppressDialogs)
-                    _ShowCrashDialog(report);
+                _showCrashDialog?.Invoke(report);
             }
             catch (Exception)
             {
@@ -127,13 +128,10 @@ namespace Mfr.App.Ui.Diagnostics
         }
 
         /// <summary>
-        /// Exits the desktop lifetime after a fatal UI-thread fault. No-op in headless tests.
+        /// Exits the desktop lifetime after a fatal UI-thread fault.
         /// </summary>
         private static void _ShutdownApplication()
         {
-            if (SuppressDialogs)
-                return;
-
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.Shutdown(1);
