@@ -62,7 +62,7 @@ namespace Mfr.Tests.Engine
 
                 logLevel: LogEventLevel.Information,
 
-                logSettings: new LogSettings { DirectoryPath = logDirectoryPath });
+                logConfig: new LogConfig { DirectoryPath = logDirectoryPath });
 
             var logFilePath = LogSession.LogFilePath;
 
@@ -98,7 +98,7 @@ namespace Mfr.Tests.Engine
 
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
 
-            var settings = new LogSettings
+            var config = new LogConfig
 
             {
 
@@ -128,7 +128,7 @@ namespace Mfr.Tests.Engine
 
                 logLevel: LogEventLevel.Information,
 
-                logSettings: settings);
+                logConfig: config);
 
             Assert.True(File.Exists(LogSession.LogFilePath));
 
@@ -160,7 +160,7 @@ namespace Mfr.Tests.Engine
 
         /// <summary>
 
-        /// Verifies a blank <see cref="LogSettings.DirectoryPath"/> uses the default log directory.
+        /// Verifies a blank <see cref="LogConfig.DirectoryPath"/> uses the default log directory.
 
         /// </summary>
 
@@ -178,7 +178,7 @@ namespace Mfr.Tests.Engine
 
                     logLevel: LogEventLevel.Information,
 
-                    logSettings: new LogSettings());
+                    logConfig: new LogConfig());
 
                 createdLogFilePath = LogSession.LogFilePath;
 

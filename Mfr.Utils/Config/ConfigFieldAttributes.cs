@@ -35,7 +35,7 @@ namespace Mfr.Utils.Config
     }
 
     /// <summary>
-    /// Marks a nested settings object mapped from a JSON object property.
+    /// Marks a nested config object mapped from a JSON object property.
     /// <para>
     /// <see cref="ConfigJsonApplier.Apply"/> reads by <see cref="JsonName"/> or the field name, then recurses.
     /// </para>

@@ -8,7 +8,7 @@ namespace Mfr.Engine.Logging
     /// Path and on-disk helpers for diagnostic session and crash log files.
     /// <para>
     /// CLI and UI session logs write under <see cref="DefaultDirectoryPath"/> unless
-    /// <see cref="LogSettings.DirectoryPath"/> is set. Crash files always use the default directory.
+    /// <see cref="LogConfig.DirectoryPath"/> is set. Crash files always use the default directory.
     /// These helpers do not configure Serilog; hosts assign <c>Log.Logger</c> via <see cref="LogSession.Start"/>.
     /// </para>
     /// </summary>
@@ -41,20 +41,20 @@ namespace Mfr.Engine.Logging
         }
 
         /// <summary>
-        /// Builds a new per-session log file path using <see cref="LogSettings"/> naming.
+        /// Builds a new per-session log file path using <see cref="LogConfig"/> naming.
         /// </summary>
         /// <param name="logDirectoryPath">Directory that will hold the file (not created here).</param>
-        /// <param name="logSettings">Prefix and extension for the session file name.</param>
+        /// <param name="logConfig">Prefix and extension for the session file name.</param>
         /// <returns>Full path for a new session log file.</returns>
-        public static string CreateSessionFilePath(string logDirectoryPath, LogSettings logSettings)
+        public static string CreateSessionFilePath(string logDirectoryPath, LogConfig logConfig)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(logDirectoryPath);
-            ArgumentNullException.ThrowIfNull(logSettings);
+            ArgumentNullException.ThrowIfNull(logConfig);
 
             return _CreateTimestampedFilePath(
                 logDirectoryPath: logDirectoryPath,
-                prefix: logSettings.FilePrefix,
-                extension: logSettings.FileExtension);
+                prefix: logConfig.FilePrefix,
+                extension: logConfig.FileExtension);
         }
 
         /// <summary>

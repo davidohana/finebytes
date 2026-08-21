@@ -106,7 +106,7 @@ namespace Mfr.App.Cli
                 .AddExample(["C:\\Music\\**\\*.flac", "-p", "lowercase-extension", "--log-level", "debug"])
                 .AddExample(["C:\\Music", "-p", "name_from_id3", "-r"])
                 .AddExample(["C:\\Music", "C:\\Podcasts", "-p", "my_preset", "--files", "yes", "--folders", "yes", "--output-file", "C:\\Temp\\mfr-results.json"])
-                .AddExample(["C:\\Music", "-p", "clean", "--config", "C:\\Temp\\mfr.config.json", "--set", "log.maxSessionFiles=50"]);
+                .AddExample(["C:\\Music", "-p", "clean", "--config", "C:\\Temp\\config.json", "--set", "log.maxSessionFiles=50"]);
         }
 
         private static string _GetAssemblyVersionString()
@@ -190,7 +190,7 @@ namespace Mfr.App.Cli
             public string? LogLevel { get; init; }
 
             [CommandOption("--config <PATH>")]
-            [Description("Optional mfr.config.json path (default: AppData). File must exist when this option is set.")]
+            [Description("Optional config.json path (default: AppData). File must exist when this option is set.")]
             public string? ConfigFilePath { get; init; }
 
             [CommandOption("--set <KEY=VALUE>")]

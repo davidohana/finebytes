@@ -17,7 +17,7 @@ namespace Mfr.Tests.Ui
         public void Dispose()
         {
             LogSession.Shutdown();
-            ConfigLoader.Load();
+            ConfigStore.Load();
             _tempDirectoryFixture.Dispose();
         }
 
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Ui
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
             LogSession.Start(
                 logLevel: LogEventLevel.Information,
-                logSettings: new LogSettings { DirectoryPath = logDirectoryPath });
+                logConfig: new LogConfig { DirectoryPath = logDirectoryPath });
             var sessionLogFilePath = LogSession.LogFilePath;
             var sessionLogDirectoryPath = LogSession.LogDirectoryPath;
 

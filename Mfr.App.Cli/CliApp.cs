@@ -39,8 +39,8 @@ namespace Mfr.App.Cli
 
             try
             {
-                ConfigLoader.Load(options.ConfigFilePath);
-                ConfigLoader.ApplyCliOverrides(options.ConfigOverrides);
+                ConfigStore.Load(options.ConfigFilePath);
+                ConfigStore.ApplyCliOverrides(options.ConfigOverrides);
             }
             catch (InvalidDataException ex)
             {

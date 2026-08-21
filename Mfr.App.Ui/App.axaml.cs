@@ -25,7 +25,7 @@ namespace Mfr.App.Ui
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var session = SessionStore.Load();
-                var ui = ConfigLoader.Settings.Ui;
+                var ui = ConfigStore.Config.Ui;
                 var initialFolder = ui.RememberLastFolder ? session.LastOpenedDirectory : null;
 
                 var mainWindow = new MainWindow

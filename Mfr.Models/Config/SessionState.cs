@@ -4,7 +4,7 @@ namespace Mfr.Models.Config
 {
     /// <summary>
     /// Persisted UI session state (window geometry and last File List folder).
-    /// <para>Stored in <c>session.json</c> under the same AppData root as <c>mfr.config.json</c>.</para>
+    /// <para>Stored in <c>session.json</c> under the same AppData root as <c>config.json</c>.</para>
     /// </summary>
     public sealed class SessionState
     {

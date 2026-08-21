@@ -28,7 +28,7 @@ namespace Mfr.Tests.Cli
 
         /// <summary>
 
-        /// Resets <see cref="ConfigLoader.Settings"/> via <see cref="ConfigLoader.Load()"/> before each test class instance.
+        /// Resets <see cref="ConfigStore.Config"/> via <see cref="ConfigStore.Load()"/> before each test class instance.
 
         /// </summary>
 
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Cli
 
         {
 
-            ConfigLoader.Load();
+            ConfigStore.Load();
 
         }
 
@@ -54,7 +54,7 @@ namespace Mfr.Tests.Cli
 
             LogSession.Shutdown();
 
-            ConfigLoader.Load();
+            ConfigStore.Load();
 
             _tempDirectoryFixture.Dispose();
 
@@ -66,7 +66,7 @@ namespace Mfr.Tests.Cli
 
         /// <summary>
 
-        /// Verifies startup creates a session file under <see cref="LogSettings.DirectoryPath"/>.
+        /// Verifies startup creates a session file under <see cref="LogConfig.DirectoryPath"/>.
 
         /// </summary>
 
@@ -76,7 +76,7 @@ namespace Mfr.Tests.Cli
 
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
 
-            ConfigLoader.Settings.Log.DirectoryPath = logDirectoryPath;
+            ConfigStore.Config.Log.DirectoryPath = logDirectoryPath;
 
 
 

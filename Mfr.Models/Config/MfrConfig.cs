@@ -3,9 +3,9 @@ using Mfr.Utils.Config;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Filter-related settings loaded from the <c>filters</c> section of the config file.
+    /// Filter-related config loaded from the <c>filters</c> section of the config file.
     /// </summary>
-    public sealed class FilterSettings
+    public sealed class FilterConfig
     {
         /// <summary>
         /// Maximum line length (characters) for name-list, casing-list, and replace-list text files.
@@ -15,10 +15,10 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Diagnostic session-log settings loaded from the <c>log</c> section of the config file.
+    /// Diagnostic session-log config loaded from the <c>log</c> section of the config file.
     /// <para>Used by both the CLI and the UI. The console template applies to CLI console output only.</para>
     /// </summary>
-    public sealed class LogSettings
+    public sealed class LogConfig
     {
         /// <summary>
         /// Directory for session log files.
@@ -62,9 +62,9 @@ namespace Mfr.Models.Config
 
     /// <summary>
     /// UI-related preferences loaded from the <c>ui</c> section of the config file.
-    /// <para>Options dialog will expose these later; until then edit <c>mfr.config.json</c> or use CLI <c>--set</c>.</para>
+    /// <para>Options dialog will expose these later; until then edit <c>config.json</c> or use CLI <c>--set</c>.</para>
     /// </summary>
-    public sealed class UiSettings
+    public sealed class UiConfig
     {
         /// <summary>
         /// When true, restore and save main-window size, position, and maximized state across launches.
@@ -78,26 +78,26 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Resolved settings for the current process (see <see cref="ConfigLoader.Settings"/>).
+    /// Resolved config for the current process (see <see cref="ConfigStore.Config"/>).
     /// </summary>
-    public sealed class MfrSettings
+    public sealed class MfrConfig
     {
         /// <summary>
-        /// Settings for list-based filters (name, casing, replace lists).
+        /// Config for list-based filters (name, casing, replace lists).
         /// </summary>
         [ConfigSection]
-        public FilterSettings Filters = new();
+        public FilterConfig Filters = new();
 
         /// <summary>
         /// Diagnostic session-log options (CLI file/console and UI file).
         /// </summary>
         [ConfigSection]
-        public LogSettings Log = new();
+        public LogConfig Log = new();
 
         /// <summary>
         /// UI preferences (window/folder restore toggles and future Options settings).
         /// </summary>
         [ConfigSection]
-        public UiSettings Ui = new();
+        public UiConfig Ui = new();
     }
 }

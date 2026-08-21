@@ -54,8 +54,8 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void ParseArgs_Accepts_ConfigFilePath()
         {
-            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--config", "  C:\\Temp\\mfr.config.json  "])!;
-            Assert.Equal("C:\\Temp\\mfr.config.json", options.ConfigFilePath);
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--config", "  C:\\Temp\\config.json  "])!;
+            Assert.Equal("C:\\Temp\\config.json", options.ConfigFilePath);
         }
 
         [Fact]

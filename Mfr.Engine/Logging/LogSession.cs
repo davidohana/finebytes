@@ -28,35 +28,35 @@ namespace Mfr.Engine.Logging
         /// Creates a session log file, assigns <see cref="Log.Logger"/>, and prunes old sessions.
         /// <para>
         /// Call once per process; then <see cref="Shutdown"/> at exit.
-        /// Directory comes from <see cref="LogSettings.DirectoryPath"/> (blank uses the default under LocalApplicationData).
+        /// Directory comes from <see cref="LogConfig.DirectoryPath"/> (blank uses the default under LocalApplicationData).
         /// </para>
         /// </summary>
         /// <param name="logLevel">Minimum level written to the file (and any host extras).</param>
-        /// <param name="logSettings">Directory, file naming, retention, and file output template.</param>
+        /// <param name="logConfig">Directory, file naming, retention, and file output template.</param>
         /// <param name="configureAdditionalSinks">
         /// Optional host extras (CLI console). Invoked after the file target is added.
         /// </param>
         public static void Start(
             LogEventLevel logLevel,
-            LogSettings logSettings,
+            LogConfig logConfig,
             Action<LoggerConfiguration>? configureAdditionalSinks = null)
         {
-            ArgumentNullException.ThrowIfNull(logSettings);
+            ArgumentNullException.ThrowIfNull(logConfig);
 
-            var (resolvedLogDirectoryPath, logFilePath) = _PrepareSessionPaths(logSettings);
+            var (resolvedLogDirectoryPath, logFilePath) = _PrepareSessionPaths(logConfig);
             _AssignProcessLogger(
                 logLevel: logLevel,
                 logFilePath: logFilePath,
-                logSettings: logSettings,
+                logConfig: logConfig,
                 configureAdditionalSinks: configureAdditionalSinks);
             LogFilePath = logFilePath;
             LogDirectoryPath = resolvedLogDirectoryPath;
 
             LogPaths.PruneSessionFiles(
                 logDirectoryPath: resolvedLogDirectoryPath,
-                maxSessionFiles: logSettings.MaxSessionFiles,
-                sessionLogPrefix: logSettings.FilePrefix,
-                sessionLogExtension: logSettings.FileExtension);
+                maxSessionFiles: logConfig.MaxSessionFiles,
+                sessionLogPrefix: logConfig.FilePrefix,
+                sessionLogExtension: logConfig.FileExtension);
 
             Log.Debug(
                 "Logging initialized. Level: {LogLevel}. File: {LogFilePath}",
@@ -80,13 +80,13 @@ namespace Mfr.Engine.Logging
         /// <summary>
         /// Resolves the log directory, creates it, and builds a new session file path.
         /// </summary>
-        private static (string LogDirectoryPath, string LogFilePath) _PrepareSessionPaths(LogSettings logSettings)
+        private static (string LogDirectoryPath, string LogFilePath) _PrepareSessionPaths(LogConfig logConfig)
         {
-            var logDirectoryPath = LogPaths.ResolveDirectoryPath(logSettings.DirectoryPath);
+            var logDirectoryPath = LogPaths.ResolveDirectoryPath(logConfig.DirectoryPath);
             Directory.CreateDirectory(logDirectoryPath);
             var logFilePath = LogPaths.CreateSessionFilePath(
                 logDirectoryPath: logDirectoryPath,
-                logSettings: logSettings);
+                logConfig: logConfig);
             return (logDirectoryPath, logFilePath);
         }
 
@@ -96,14 +96,14 @@ namespace Mfr.Engine.Logging
         private static void _AssignProcessLogger(
             LogEventLevel logLevel,
             string logFilePath,
-            LogSettings logSettings,
+            LogConfig logConfig,
             Action<LoggerConfiguration>? configureAdditionalSinks)
         {
             var configuration = new LoggerConfiguration()
                 .MinimumLevel.Is(logLevel)
                 .WriteTo.File(
                     path: logFilePath,
-                    outputTemplate: logSettings.FileOutputTemplate,
+                    outputTemplate: logConfig.FileOutputTemplate,
                     rollingInterval: RollingInterval.Infinite,
                     shared: false);
 

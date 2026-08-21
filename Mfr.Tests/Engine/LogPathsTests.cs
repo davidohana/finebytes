@@ -48,8 +48,8 @@ namespace Mfr.Tests.Engine
         public void CreateSessionFilePath_Uses_Prefix_And_Extension()
         {
             var directoryPath = _tempDirectoryFixture.CreateTempDir();
-            var settings = new LogSettings { FilePrefix = "session-", FileExtension = ".log" };
-            var path = LogPaths.CreateSessionFilePath(directoryPath, settings);
+            var config = new LogConfig { FilePrefix = "session-", FileExtension = ".log" };
+            var path = LogPaths.CreateSessionFilePath(directoryPath, config);
             var fileName = Path.GetFileName(path);
             Assert.StartsWith("session-", fileName, StringComparison.Ordinal);
             Assert.EndsWith(".log", fileName, StringComparison.Ordinal);

@@ -16,7 +16,7 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="windowGeometry">Captured main-window geometry when remembering window state.</param>
         public static void SaveOnClose(MainWindowViewModel? viewModel, SessionWindowState? windowGeometry)
         {
-            var ui = ConfigLoader.Settings.Ui;
+            var ui = ConfigStore.Config.Ui;
             if (!ui.RememberWindowState && !ui.RememberLastFolder)
                 return;
 

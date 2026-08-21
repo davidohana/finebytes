@@ -19,10 +19,10 @@ namespace Mfr.App.Ui
             UiCrashHandler.RegisterProcessHandlers();
             try
             {
-                ConfigLoader.Load();
+                ConfigStore.Load();
                 LogSession.Start(
                     logLevel: LogEventLevel.Information,
-                    logSettings: ConfigLoader.Settings.Log);
+                    logConfig: ConfigStore.Config.Log);
                 return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
             }
             catch (Exception ex)

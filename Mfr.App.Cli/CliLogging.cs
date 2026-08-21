@@ -13,7 +13,7 @@ namespace Mfr.App.Cli
         {
             LogSession.Start(
                 logLevel: logLevel,
-                logSettings: ConfigLoader.Settings.Log,
+                logConfig: ConfigStore.Config.Log,
                 configureAdditionalSinks: _AddConsoleSink);
         }
 
@@ -34,13 +34,13 @@ namespace Mfr.App.Cli
         }
 
         /// <summary>
-        /// Adds the CLI console sink (errors to stderr) using <see cref="ConfigLoader.Settings"/>.
+        /// Adds the CLI console sink (errors to stderr) using <see cref="ConfigStore.Config"/>.
         /// </summary>
         /// <param name="configuration">Serilog configuration after the shared file sink is attached.</param>
         private static void _AddConsoleSink(LoggerConfiguration configuration)
         {
             configuration.WriteTo.Console(
-                outputTemplate: ConfigLoader.Settings.Log.ConsoleOutputTemplate,
+                outputTemplate: ConfigStore.Config.Log.ConsoleOutputTemplate,
                 theme: AnsiConsoleTheme.Code,
                 standardErrorFromLevel: LogEventLevel.Error);
         }

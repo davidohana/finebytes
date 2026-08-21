@@ -17,7 +17,7 @@ namespace Mfr.App.Cli
     /// <param name="DryRun">Whether commit operations should be simulated without modifying the filesystem.</param>
     /// <param name="LogLevel">Minimum log level to emit.</param>
     /// <param name="PresetsFilePath">Path to the JSON file containing presets.</param>
-    /// <param name="ConfigFilePath">Optional path to <c>mfr.config.json</c>; when null, the default AppData path is used.</param>
+    /// <param name="ConfigFilePath">Optional path to <c>config.json</c>; when null, the default AppData path is used.</param>
     /// <param name="ConfigOverrides"><c>--set section.leaf=value</c> assignments applied after the config file.</param>
     public sealed record CliOptions(
         string PresetName,

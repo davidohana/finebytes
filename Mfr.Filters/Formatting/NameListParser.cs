@@ -17,7 +17,7 @@ namespace Mfr.Filters.Formatting
 
             var rawLines = File.ReadAllLines(filePath);
             var entries = new List<string>(rawLines.Length);
-            var maxLineLen = ConfigLoader.Settings.Filters.MaxListFileLineLength;
+            var maxLineLen = ConfigStore.Config.Filters.MaxListFileLineLength;
             for (var i = 0; i < rawLines.Length; i++)
             {
                 var lineNumber = i + 1;

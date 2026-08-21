@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 namespace Mfr.Utils.Config
 {
     /// <summary>
-    /// Applies CLI <c>--set</c> assignments to annotated settings.
+    /// Applies CLI <c>--set</c> assignments to annotated config.
     /// <para>
     /// Builds merged JSON from <c>section.leaf=value</c> keys, validates paths, then uses <see cref="ConfigJsonApplier"/>.
     /// </para>
@@ -15,20 +15,20 @@ namespace Mfr.Utils.Config
         private static readonly JsonNamingPolicy s_Naming = JsonNamingPolicy.CamelCase;
 
         /// <summary>
-        /// Applies parsed <c>--set</c> strings to <paramref name="settings"/>.
+        /// Applies parsed <c>--set</c> strings to <paramref name="config"/>.
         /// <para>
-        /// Validates dotted paths against <typeparamref name="TSettings"/>, merges JSON, then <see cref="ConfigJsonApplier.Apply"/>.
+        /// Validates dotted paths against <typeparamref name="TConfig"/>, merges JSON, then <see cref="ConfigJsonApplier.Apply"/>.
         /// </para>
         /// </summary>
-        /// <typeparam name="TSettings">Root settings type with <see cref="ConfigSectionAttribute"/> sections and leaf attributes.</typeparam>
+        /// <typeparam name="TConfig">Root config type with <see cref="ConfigSectionAttribute"/> sections and leaf attributes.</typeparam>
         /// <param name="assignments">Raw <c>key=value</c> strings; blank entries are skipped.</param>
-        /// <param name="settings">The object to update.</param>
+        /// <param name="config">The object to update.</param>
         /// <exception cref="InvalidDataException">Assignment format, path, or value is invalid.</exception>
-        public static void Apply<TSettings>(IReadOnlyList<string> assignments, TSettings settings)
-            where TSettings : class
+        public static void Apply<TConfig>(IReadOnlyList<string> assignments, TConfig config)
+            where TConfig : class
         {
             ArgumentNullException.ThrowIfNull(assignments);
-            ArgumentNullException.ThrowIfNull(settings);
+            ArgumentNullException.ThrowIfNull(config);
 
             var merged = new JsonObject();
             foreach (var raw in assignments)
@@ -62,7 +62,7 @@ namespace Mfr.Utils.Config
 
                 _MergeValidated(
                     merged,
-                    typeof(TSettings),
+                    typeof(TConfig),
                     segments,
                     value);
             }
@@ -72,7 +72,7 @@ namespace Mfr.Utils.Config
 
             var utf8Json = JsonSerializer.SerializeToUtf8Bytes(merged);
             using var doc = JsonDocument.Parse(utf8Json);
-            ConfigJsonApplier.Apply(doc.RootElement, settings);
+            ConfigJsonApplier.Apply(doc.RootElement, config);
         }
 
         private static void _MergeValidated(JsonObject parent, Type containerType, string[] segments, string value)
