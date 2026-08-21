@@ -21,10 +21,16 @@ namespace Mfr.App.Ui.Services.Session
             ArgumentNullException.ThrowIfNull(window);
             ArgumentNullException.ThrowIfNull(session);
 
+            var windowRestored = false;
             if (ConfigStore.Config.Ui.RememberWindowState)
             {
-                WindowSession.TryRestore(window, session.Window);
+                windowRestored = WindowSession.TryRestore(window, session.Window);
                 SplitterSession.TryRestore(window, session.Splitters);
+            }
+
+            if (!windowRestored)
+            {
+                WindowSession.ApplyDefault(window);
             }
 
             var viewModel = window.DataContext as MainWindowViewModel;

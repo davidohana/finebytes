@@ -89,7 +89,7 @@ namespace Mfr.Models.Config
         /// <summary>
         /// <c>Normal</c> or <c>Maximized</c>.
         /// <para>
-        /// When maximized, restore skips size/position and keeps the window's default dimensions.
+        /// When maximized, restore skips size/position and keeps the current dimensions as restore bounds.
         /// </para>
         /// </summary>
         [JsonPropertyName("state")]
