@@ -55,14 +55,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddAll))]
         public void AddAll()
         {
-            var uiConfig = ConfigStore.Config.Ui;
             _AddSources(
                 RenameListAddSources.ResolveSourcesFromCurrentFolder(
                     _fileListViewModel.CurrentPath,
                     _fileListViewModel.Mask,
-                    _fileListViewModel.CanAddAllToCurrentFolder,
-                    addFiles: uiConfig.AddFiles,
-                    addFolders: uiConfig.AddFolders
+                    _fileListViewModel.CanAddAllToCurrentFolder
                 )
             );
         }
@@ -111,11 +108,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private bool _CanAddAll()
         {
             var uiConfig = ConfigStore.Config.Ui;
-            return RenameListAddSources.CanResolveFromCurrentFolder(
-                _fileListViewModel.CanAddAllToCurrentFolder,
-                addFiles: uiConfig.AddFiles,
-                addFolders: uiConfig.AddFolders
-            );
+            return _fileListViewModel.CanAddAllToCurrentFolder && (uiConfig.AddFiles || uiConfig.AddFolders);
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

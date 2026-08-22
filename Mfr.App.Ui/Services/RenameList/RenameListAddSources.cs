@@ -52,35 +52,19 @@ namespace Mfr.App.Ui.Services.RenameList
         /// <param name="currentPath">Current File List folder path.</param>
         /// <param name="mask">File List include mask used as the last segment of the folder source.</param>
         /// <param name="canAddAllToCurrentFolder">Whether Add All is allowed for the current folder.</param>
-        /// <param name="addFiles">With <paramref name="addFolders"/>, gates whether the current folder is emitted.</param>
-        /// <param name="addFolders">With <paramref name="addFiles"/>, gates whether the current folder is emitted.</param>
         /// <returns>A single folder source with a last-segment filename mask, or empty.</returns>
         public static IReadOnlyList<string> ResolveSourcesFromCurrentFolder(
             string currentPath,
             string mask,
-            bool canAddAllToCurrentFolder,
-            bool addFiles,
-            bool addFolders
+            bool canAddAllToCurrentFolder
         )
         {
-            if (!CanResolveFromCurrentFolder(canAddAllToCurrentFolder, addFiles, addFolders))
+            if (!canAddAllToCurrentFolder)
             {
                 return [];
             }
 
             return [_BuildFolderSource(currentPath, mask)];
-        }
-
-        /// <summary>
-        /// Returns whether Add All would produce a current-folder engine source.
-        /// </summary>
-        /// <param name="canAddAllToCurrentFolder">Whether Add All is allowed for the current folder.</param>
-        /// <param name="addFiles">With <paramref name="addFolders"/>, gates whether the current folder is emitted.</param>
-        /// <param name="addFolders">With <paramref name="addFiles"/>, gates whether the current folder is emitted.</param>
-        /// <returns><see langword="true"/> when a current-folder source would be emitted.</returns>
-        public static bool CanResolveFromCurrentFolder(bool canAddAllToCurrentFolder, bool addFiles, bool addFolders)
-        {
-            return canAddAllToCurrentFolder && (addFiles || addFolders);
         }
 
         /// <summary>

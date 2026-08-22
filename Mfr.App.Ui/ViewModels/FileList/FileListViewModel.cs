@@ -1014,6 +1014,13 @@ namespace Mfr.App.Ui.ViewModels.FileList
             return !WildcardMask.MatchesAny(fileName, ExcludeMasks);
         }
 
+        /// <summary>
+        /// Returns whether Add All can target <see cref="CurrentPath"/>.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> when the path is a resolvable non-root folder (not This PC or Network);
+        /// otherwise <see langword="false"/>.
+        /// </returns>
         private bool _CanAddAllToCurrentFolder()
         {
             if (FileListPath.IsComputerPath(CurrentPath) || FileListPath.IsNetworkPath(CurrentPath))

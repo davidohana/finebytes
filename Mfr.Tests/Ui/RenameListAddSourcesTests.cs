@@ -65,9 +65,7 @@ namespace Mfr.Tests.Ui
             var sources = RenameListAddSources.ResolveSourcesFromCurrentFolder(
                 currentPath: _dir,
                 mask: "*.txt",
-                canAddAllToCurrentFolder: true,
-                addFiles: true,
-                addFolders: false
+                canAddAllToCurrentFolder: true
             );
 
             var source = Assert.Single(sources);
@@ -187,25 +185,16 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add All CanResolve matches Resolve emptiness when policy is off.
+        /// Verifies Add All returns no source when the current folder is not addable.
         /// </summary>
         [Fact]
-        public void CanResolveFromCurrentFolder_BothPolicyOff_IsFalse()
+        public void ResolveFromCurrentFolder_NotAddable_ReturnsEmpty()
         {
-            Assert.False(
-                RenameListAddSources.CanResolveFromCurrentFolder(
-                    canAddAllToCurrentFolder: true,
-                    addFiles: false,
-                    addFolders: false
-                )
-            );
             Assert.Empty(
                 RenameListAddSources.ResolveSourcesFromCurrentFolder(
                     currentPath: _dir,
                     mask: "*",
-                    canAddAllToCurrentFolder: true,
-                    addFiles: false,
-                    addFolders: false
+                    canAddAllToCurrentFolder: false
                 )
             );
         }
