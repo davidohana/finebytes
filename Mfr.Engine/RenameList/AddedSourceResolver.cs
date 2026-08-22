@@ -91,7 +91,8 @@ namespace Mfr.Engine.RenameList
             var searchOption = includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             if (includeFiles)
             {
-                foreach (var filePath in Directory.EnumerateFiles(directoryPath, "*", searchOption))
+                var filePaths = Directory.EnumerateFiles(directoryPath, "*", searchOption);
+                foreach (var filePath in filePaths)
                 {
                     _AddIfNameMatches(
                         fullPath: filePath,
@@ -104,9 +105,12 @@ namespace Mfr.Engine.RenameList
 
             if (includeFolders && includeSubdirs)
             {
-                foreach (
-                    var folderPath in Directory.EnumerateDirectories(directoryPath, "*", SearchOption.AllDirectories)
-                )
+                var folderPaths = Directory.EnumerateDirectories(
+                    directoryPath,
+                    "*",
+                    SearchOption.AllDirectories
+                );
+                foreach (var folderPath in folderPaths)
                 {
                     _AddIfNameMatches(
                         fullPath: folderPath,
