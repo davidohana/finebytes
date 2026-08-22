@@ -122,6 +122,9 @@
       <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
     </Style>
+    <Style Selector="Button.rename-list-action:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
   </UserControl.Styles>
   <Border Classes="pane">
     <Grid ColumnDefinitions="Auto,*">
