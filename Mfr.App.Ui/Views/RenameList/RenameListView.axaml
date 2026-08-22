@@ -98,29 +98,26 @@
     </Style>
   </UserControl.Styles>
   <Border Classes="pane">
-    <DockPanel>
-      <TextBlock DockPanel.Dock="Top" Classes="pane-header" Text="Rename List" />
-      <DataGrid
-        Classes="rename-list"
-        ItemsSource="{Binding Entries}"
-        AutoGenerateColumns="False"
-        IsReadOnly="True"
-        CanUserReorderColumns="False"
-        CanUserSortColumns="False"
-        CanUserResizeColumns="True"
-        HeadersVisibility="Column"
-        GridLinesVisibility="None"
-        RowHeight="20"
-        ColumnHeaderHeight="22"
-        SelectionMode="Extended"
-      >
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="File/Folder" Binding="{Binding FileFolder}" Width="50" />
-          <DataGridTextColumn Header="Parent Folder" Binding="{Binding ParentFolder}" Width="180" />
-          <DataGridTextColumn Header="Full File Name" Binding="{Binding FullFileName}" Width="180" />
-          <DataGridTextColumn Header="Full File Name (Preview)" Binding="{Binding FullFileNamePreview}" Width="*" />
-        </DataGrid.Columns>
-      </DataGrid>
-    </DockPanel>
+    <DataGrid
+      Classes="rename-list"
+      ItemsSource="{Binding Entries}"
+      AutoGenerateColumns="False"
+      IsReadOnly="True"
+      CanUserReorderColumns="False"
+      CanUserSortColumns="False"
+      CanUserResizeColumns="True"
+      HeadersVisibility="Column"
+      GridLinesVisibility="None"
+      RowHeight="20"
+      ColumnHeaderHeight="22"
+      SelectionMode="Extended"
+    >
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="File/Folder" Binding="{Binding FileFolder}" Width="50" />
+        <DataGridTextColumn Header="Parent Folder" Binding="{Binding ParentFolder}" Width="180" />
+        <DataGridTextColumn Header="Full File Name" Binding="{Binding FullFileName}" Width="180" />
+        <DataGridTextColumn Header="Full File Name (Preview)" Binding="{Binding FullFileNamePreview}" Width="*" />
+      </DataGrid.Columns>
+    </DataGrid>
   </Border>
 </UserControl>
