@@ -218,9 +218,9 @@
 
       <Panel>
         <DataGrid
+          x:Name="ReportGrid"
           Classes="file-report"
           ItemsSource="{Binding Entries}"
-          SelectedItem="{Binding SelectedEntry}"
           IsVisible="{Binding IsReportView}"
           AutoGenerateColumns="False"
           IsReadOnly="True"
@@ -236,6 +236,7 @@
           Loaded="_OnReportGridLoaded"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
+          SelectionChanged="_OnEntriesSelectionChanged"
         >
           <DataGrid.Columns>
             <DataGridTemplateColumn Header="Name" Width="*" SortMemberPath="Name">
@@ -276,13 +277,14 @@
         </DataGrid>
 
         <ListBox
+          x:Name="ListViewList"
           Classes="file-list file-rows"
           ItemsSource="{Binding Entries}"
-          SelectedItem="{Binding SelectedEntry}"
           IsVisible="{Binding IsListView}"
           SelectionMode="Multiple"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
+          SelectionChanged="_OnEntriesSelectionChanged"
         >
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:FileListEntry">
@@ -295,13 +297,14 @@
         </ListBox>
 
         <ListBox
+          x:Name="SmallIconsList"
           Classes="file-list file-icons file-small-icons"
           ItemsSource="{Binding Entries}"
-          SelectedItem="{Binding SelectedEntry}"
           IsVisible="{Binding IsSmallIconsView}"
           SelectionMode="Multiple"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
+          SelectionChanged="_OnEntriesSelectionChanged"
         >
           <ListBox.ItemsPanel>
             <ItemsPanelTemplate>
@@ -326,13 +329,14 @@
         </ListBox>
 
         <ListBox
+          x:Name="LargeIconsList"
           Classes="file-list file-icons"
           ItemsSource="{Binding Entries}"
-          SelectedItem="{Binding SelectedEntry}"
           IsVisible="{Binding IsLargeIconsView}"
           SelectionMode="Multiple"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
+          SelectionChanged="_OnEntriesSelectionChanged"
         >
           <ListBox.ItemsPanel>
             <ItemsPanelTemplate>
@@ -359,11 +363,11 @@
           x:Name="TilesList"
           Classes="file-list file-icons"
           ItemsSource="{Binding Entries}"
-          SelectedItem="{Binding SelectedEntry}"
           IsVisible="{Binding IsTilesView}"
           SelectionMode="Multiple"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
+          SelectionChanged="_OnEntriesSelectionChanged"
         >
           <ListBox.ItemsPanel>
             <ItemsPanelTemplate>
@@ -395,12 +399,12 @@
           x:Name="ThumbnailsList"
           Classes="file-list file-icons"
           ItemsSource="{Binding Entries}"
-          SelectedItem="{Binding SelectedEntry}"
           IsVisible="{Binding IsThumbnailsView}"
           ClipToBounds="False"
           SelectionMode="Multiple"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
+          SelectionChanged="_OnEntriesSelectionChanged"
         >
           <ListBox.ItemsPanel>
             <ItemsPanelTemplate>

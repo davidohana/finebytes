@@ -82,8 +82,10 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         private readonly ISystemIconProvider _iconProvider;
         private readonly List<ListedItem> _listedItems = [];
+        private readonly List<FileListEntry> _selectedEntries = [];
         private readonly Dictionary<string, IImage?> _pathToThumbnail = new(PathComparers.Os);
         private CancellationTokenSource? _thumbnailLoadCts;
+        private bool _suppressSelectionSync;
 
         /// <summary>
         /// Initializes the File List at the user profile folder with the default icon provider.
@@ -212,11 +214,16 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public bool IsSortAscending { get; private set; } = true;
 
         /// <summary>
-        /// The selected grid row, or <see langword="null"/> when nothing is selected.
+        /// The focused File List row, or <see langword="null"/> when nothing is selected.
         /// </summary>
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(OpenSelectedCommand))]
         private FileListEntry? _selectedEntry;
+
+        /// <summary>
+        /// Gets every selected File List row in the current folder.
+        /// </summary>
+        public IReadOnlyList<FileListEntry> SelectedEntries => _selectedEntries;
 
         /// <summary>
         /// Whether <see cref="GoUp"/> can move to a parent folder, Network, or This PC.
@@ -350,7 +357,70 @@ namespace Mfr.App.Ui.ViewModels.FileList
         [RelayCommand]
         public void Refresh()
         {
-            _ReloadEntries();
+            _ReloadEntries(preserveSelection: true);
+        }
+
+        /// <summary>
+        /// Replaces the current selection. The focused row defaults to the last entry.
+        /// </summary>
+        /// <param name="entries">Rows to select. Duplicates and <see langword="null"/> items are ignored.</param>
+        /// <param name="focusedEntry">Focused row, or <see langword="null"/> to use the last selected entry.</param>
+        public void SetSelectedEntries(IReadOnlyList<FileListEntry> entries, FileListEntry? focusedEntry = null)
+        {
+            _suppressSelectionSync = true;
+            try
+            {
+                _selectedEntries.Clear();
+                var pathToIsAdded = new HashSet<string>(PathComparers.Os);
+                foreach (var entry in entries)
+                {
+                    if (entry is null || !pathToIsAdded.Add(entry.FullPath))
+                    {
+                        continue;
+                    }
+
+                    _selectedEntries.Add(entry);
+                }
+
+                var focused = focusedEntry;
+                if (focused is not null && !pathToIsAdded.Contains(focused.FullPath))
+                {
+                    focused = null;
+                }
+
+                SelectedEntry = focused ?? _selectedEntries.LastOrDefault();
+                OnPropertyChanged(nameof(SelectedEntries));
+            }
+            finally
+            {
+                _suppressSelectionSync = false;
+            }
+        }
+
+        /// <summary>
+        /// Moves the focused row up or down. Replaces the current selection with the new row.
+        /// </summary>
+        /// <param name="delta">-1 for up, +1 for down.</param>
+        /// <returns><see langword="true"/> when the selection moved.</returns>
+        public bool TryMoveSelection(int delta)
+        {
+            if (delta == 0 || Entries.Count == 0)
+            {
+                return false;
+            }
+
+            var currentIndex = SelectedEntry is { } current ? Entries.IndexOf(current) : -1;
+            var nextIndex =
+                currentIndex < 0 ? (delta > 0 ? 0 : Entries.Count - 1) : currentIndex + delta;
+
+            if (nextIndex < 0 || nextIndex >= Entries.Count)
+            {
+                return false;
+            }
+
+            var next = Entries[nextIndex];
+            SetSelectedEntries([next], next);
+            return true;
         }
 
         /// <summary>
@@ -473,17 +543,17 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         partial void OnMaskChanged(string value)
         {
-            _ReloadEntries();
+            _ReloadEntries(preserveSelection: true);
         }
 
         partial void OnExcludeMasksChanged(IReadOnlyList<string> value)
         {
-            _ReloadEntries();
+            _ReloadEntries(preserveSelection: true);
         }
 
         partial void OnExcludeMasksEnabledChanged(bool value)
         {
-            _ReloadEntries();
+            _ReloadEntries(preserveSelection: true);
         }
 
         /// <summary>
@@ -507,6 +577,30 @@ namespace Mfr.App.Ui.ViewModels.FileList
             var clamped = ThumbnailSizes.Clamp(value);
             if (clamped != value)
                 ThumbnailSize = clamped;
+        }
+
+        partial void OnSelectedEntryChanged(FileListEntry? value)
+        {
+            if (_suppressSelectionSync)
+            {
+                return;
+            }
+
+            _suppressSelectionSync = true;
+            try
+            {
+                _selectedEntries.Clear();
+                if (value is not null)
+                {
+                    _selectedEntries.Add(value);
+                }
+
+                OnPropertyChanged(nameof(SelectedEntries));
+            }
+            finally
+            {
+                _suppressSelectionSync = false;
+            }
         }
 
         private bool _CanOpenSelected()
@@ -550,10 +644,13 @@ namespace Mfr.App.Ui.ViewModels.FileList
             }
         }
 
-        private void _ReloadEntries()
+        private void _ReloadEntries(bool preserveSelection = false)
         {
             _CancelThumbnailLoad();
-            SelectedEntry = null;
+            if (!preserveSelection)
+            {
+                SetSelectedEntries([]);
+            }
             Entries.Clear();
             _listedItems.Clear();
             _DisposeAndClearThumbnails();
@@ -568,7 +665,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 }
 
                 _ApplyListingSort();
-                _RebuildVisibleEntries(preserveSelection: false);
+                _RebuildVisibleEntries(preserveSelection);
                 return;
             }
 
@@ -576,7 +673,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             {
                 _listedItems.AddRange(_ListNetworkLocations());
                 _ApplyListingSort();
-                _RebuildVisibleEntries(preserveSelection: false);
+                _RebuildVisibleEntries(preserveSelection);
                 return;
             }
 
@@ -584,7 +681,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             {
                 _listedItems.AddRange(_ListWslDistros(CurrentPath));
                 _ApplyListingSort();
-                _RebuildVisibleEntries(preserveSelection: false);
+                _RebuildVisibleEntries(preserveSelection);
                 return;
             }
 
@@ -596,20 +693,20 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 }
 
                 _ApplyListingSort();
-                _RebuildVisibleEntries(preserveSelection: false);
+                _RebuildVisibleEntries(preserveSelection);
                 return;
             }
 
             if (!_TryListFolder(CurrentPath, out var folders, out var files))
             {
-                _RebuildVisibleEntries(preserveSelection: false);
+                _RebuildVisibleEntries(preserveSelection);
                 return;
             }
 
             _listedItems.AddRange(folders);
             _listedItems.AddRange(files);
             _ApplyListingSort();
-            _RebuildVisibleEntries(preserveSelection: false);
+            _RebuildVisibleEntries(preserveSelection);
         }
 
         private void _ApplyListingSort()
@@ -683,7 +780,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private void _RebuildVisibleEntries(bool preserveSelection)
         {
             _CancelThumbnailLoad();
-            var selectedPath = preserveSelection ? SelectedEntry?.FullPath : null;
+            var selectedPaths = preserveSelection ? _selectedEntries.Select(entry => entry.FullPath).ToList() : [];
+            var focusedPath = preserveSelection ? SelectedEntry?.FullPath : null;
             Entries.Clear();
 
             foreach (var item in _listedItems)
@@ -691,9 +789,19 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 Entries.Add(_CreateEntry(item));
             }
 
-            SelectedEntry = selectedPath is null
-                ? null
-                : Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, selectedPath));
+            if (selectedPaths.Count == 0)
+            {
+                SetSelectedEntries([]);
+            }
+            else
+            {
+                var pathToIsSelected = selectedPaths.ToHashSet(PathComparers.Os);
+                var restored = Entries.Where(entry => pathToIsSelected.Contains(entry.FullPath)).ToList();
+                var focused = focusedPath is null
+                    ? null
+                    : Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, focusedPath));
+                SetSelectedEntries(restored, focused);
+            }
 
             if (ViewMode == FileListViewMode.Thumbnails)
             {

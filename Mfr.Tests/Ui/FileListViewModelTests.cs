@@ -640,6 +640,128 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies SetSelectedEntries tracks multiple rows and keeps the focused entry.
+        /// </summary>
+        [Fact]
+        public void SetSelectedEntries_Tracks_Multiple_And_Focused_Entry()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+
+            viewModel.SetSelectedEntries([alpha, beta], focusedEntry: beta);
+
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+            Assert.Same(beta, viewModel.SelectedEntry);
+            Assert.Contains(alpha, viewModel.SelectedEntries);
+            Assert.Contains(beta, viewModel.SelectedEntries);
+        }
+
+        /// <summary>
+        /// Verifies assigning SelectedEntry collapses the selection to that one row.
+        /// </summary>
+        [Fact]
+        public void SelectedEntry_Set_Collapses_To_Single_Selection()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+
+            viewModel.SetSelectedEntries([alpha, beta]);
+            viewModel.SelectedEntry = alpha;
+
+            Assert.Single(viewModel.SelectedEntries);
+            Assert.Same(alpha, viewModel.SelectedEntry);
+        }
+
+        /// <summary>
+        /// Verifies refresh rebuilds entry objects but keeps multi-select by full path.
+        /// </summary>
+        [Fact]
+        public void Refresh_Preserves_Multi_Selection_By_Path()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var alphaPath = viewModel.Entries.First(entry => entry.Name == "alpha.txt").FullPath;
+            var betaPath = viewModel.Entries.First(entry => entry.Name == "beta.md").FullPath;
+
+            viewModel.SetSelectedEntries([
+                viewModel.Entries.First(entry => entry.Name == "alpha.txt"),
+                viewModel.Entries.First(entry => entry.Name == "beta.md"),
+            ]);
+            viewModel.Refresh();
+
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+            Assert.Contains(viewModel.SelectedEntries, entry => entry.FullPath == alphaPath);
+            Assert.Contains(viewModel.SelectedEntries, entry => entry.FullPath == betaPath);
+        }
+
+        /// <summary>
+        /// Verifies navigation clears the current selection.
+        /// </summary>
+        [Fact]
+        public void Navigate_Clears_Selection()
+        {
+            var dir = _CreateTree();
+            var nested = Path.Combine(dir, "zeta-folder", "nested.txt");
+            File.WriteAllText(nested, "n");
+            var viewModel = _CreateViewModel(dir);
+            viewModel.SetSelectedEntries([viewModel.Entries[0], viewModel.Entries[1]]);
+
+            viewModel.SelectedEntry = viewModel.Entries.First(entry => entry.IsDirectory);
+            viewModel.OpenSelected();
+
+            Assert.Empty(viewModel.SelectedEntries);
+            Assert.Null(viewModel.SelectedEntry);
+        }
+
+        /// <summary>
+        /// Verifies TryMoveSelection replaces multi-select with the adjacent row.
+        /// </summary>
+        [Fact]
+        public void TryMoveSelection_Replaces_Multi_Select_With_Adjacent_Row()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([alpha, beta], focusedEntry: beta);
+
+            Assert.True(viewModel.TryMoveSelection(delta: -1));
+
+            Assert.Single(viewModel.SelectedEntries);
+            Assert.Same(alpha, viewModel.SelectedEntry);
+        }
+
+        /// <summary>
+        /// Verifies TryMoveSelection moves down to the next row.
+        /// </summary>
+        [Fact]
+        public void TryMoveSelection_Moves_Down()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var folder = viewModel.Entries.First(entry => entry.IsDirectory);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SelectedEntry = folder;
+
+            Assert.True(viewModel.TryMoveSelection(delta: 1));
+
+            Assert.Single(viewModel.SelectedEntries);
+            Assert.Same(alpha, viewModel.SelectedEntry);
+        }
+
+        /// <summary>
+        /// Verifies TryMoveSelection stops at the first row.
+        /// </summary>
+        [Fact]
+        public void TryMoveSelection_Stops_At_List_Edge()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.SelectedEntry = viewModel.Entries[0];
+
+            Assert.False(viewModel.TryMoveSelection(delta: -1));
+            Assert.Same(viewModel.Entries[0], viewModel.SelectedEntry);
+        }
+
+        /// <summary>
         /// Verifies Thumbnails requests jumbo shell icons so glyphs are not upscaled from 32×32.
         /// </summary>
         [Fact]
