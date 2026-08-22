@@ -48,20 +48,25 @@ namespace Mfr.App.Ui.Services.RenameList
         /// </summary>
         /// <param name="currentPath">Current File List folder path.</param>
         /// <param name="mask">File List include mask used as the last segment of the folder source.</param>
-        /// <param name="canAddAllToCurrentFolder">Whether Add All is allowed for the current folder.</param>
         /// <returns>A single folder source with a last-segment filename mask, or empty.</returns>
-        public static IReadOnlyList<string> ResolveSourcesFromCurrentFolder(
-            string currentPath,
-            string mask,
-            bool canAddAllToCurrentFolder
-        )
+        public static IReadOnlyList<string> ResolveSourcesFromCurrentFolder(string currentPath, string mask)
         {
-            if (!canAddAllToCurrentFolder)
+            if (!_IsAddablePath(currentPath))
             {
                 return [];
             }
 
             return [_BuildFolderSource(currentPath, mask)];
+        }
+
+        /// <summary>
+        /// Returns whether the current folder would produce an engine add source.
+        /// </summary>
+        /// <param name="currentPath">Current File List folder path.</param>
+        /// <returns><see langword="true"/> when the folder is addable.</returns>
+        public static bool CanResolveFromCurrentFolder(string currentPath)
+        {
+            return _IsAddablePath(currentPath);
         }
 
         /// <summary>
@@ -116,12 +121,12 @@ namespace Mfr.App.Ui.Services.RenameList
         /// </summary>
         /// <param name="path">Candidate file or folder path from the File List.</param>
         /// <returns>
-        /// <see langword="true"/> when the path is non-blank, resolvable, and not a filesystem root;
+        /// <see langword="true"/> when the path is resolvable and not This PC, Network, or a filesystem root;
         /// otherwise <see langword="false"/>.
         /// </returns>
         private static bool _IsAddablePath(string path)
         {
-            if (string.IsNullOrWhiteSpace(path))
+            if (FileListPath.IsComputerPath(path) || FileListPath.IsNetworkPath(path))
             {
                 return false;
             }
@@ -132,7 +137,7 @@ namespace Mfr.App.Ui.Services.RenameList
                 var root = Path.GetPathRoot(fullPath);
                 return !string.IsNullOrEmpty(root) && !string.Equals(root, fullPath, PathComparers.OsComparison);
             }
-            catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException)
             {
                 return false;
             }

@@ -57,8 +57,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _AddSources(
                 RenameListAddSources.ResolveSourcesFromCurrentFolder(
                     _fileListViewModel.CurrentPath,
-                    _fileListViewModel.Mask,
-                    _fileListViewModel.CanAddAllToCurrentFolder
+                    _fileListViewModel.Mask
                 )
             );
         }
@@ -102,7 +101,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddAll()
         {
-            return _fileListViewModel.CanAddAllToCurrentFolder;
+            return RenameListAddSources.CanResolveFromCurrentFolder(_fileListViewModel.CurrentPath);
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

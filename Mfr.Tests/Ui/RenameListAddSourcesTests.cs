@@ -63,13 +63,13 @@ namespace Mfr.Tests.Ui
         {
             var sources = RenameListAddSources.ResolveSourcesFromCurrentFolder(
                 currentPath: _dir,
-                mask: "*.txt",
-                canAddAllToCurrentFolder: true
+                mask: "*.txt"
             );
 
             var source = Assert.Single(sources);
             Assert.Equal(Path.Combine(_dir, "*.txt"), source);
             Assert.DoesNotContain("**", source, StringComparison.Ordinal);
+            Assert.True(RenameListAddSources.CanResolveFromCurrentFolder(_dir));
         }
 
         /// <summary>
@@ -187,18 +187,50 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add All returns no source when the current folder is not addable.
+        /// Verifies Add All returns no source for a drive root.
         /// </summary>
         [Fact]
-        public void ResolveFromCurrentFolder_NotAddable_ReturnsEmpty()
+        public void ResolveFromCurrentFolder_RootPath_ReturnsEmpty()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var root = Path.GetPathRoot(_dir);
+            Assert.False(string.IsNullOrEmpty(root));
+            Assert.Empty(
+                RenameListAddSources.ResolveSourcesFromCurrentFolder(currentPath: root, mask: "*")
+            );
+            Assert.False(RenameListAddSources.CanResolveFromCurrentFolder(root));
+        }
+
+        /// <summary>
+        /// Verifies Add All returns no source for File List sentinel locations.
+        /// </summary>
+        [Fact]
+        public void ResolveFromCurrentFolder_SentinelPath_ReturnsEmpty()
         {
             Assert.Empty(
                 RenameListAddSources.ResolveSourcesFromCurrentFolder(
-                    currentPath: _dir,
-                    mask: "*",
-                    canAddAllToCurrentFolder: false
+                    currentPath: FileListPath.ComputerPath,
+                    mask: "*"
                 )
             );
+            Assert.False(RenameListAddSources.CanResolveFromCurrentFolder(FileListPath.ComputerPath));
+
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            Assert.Empty(
+                RenameListAddSources.ResolveSourcesFromCurrentFolder(
+                    currentPath: FileListPath.NetworkPath,
+                    mask: "*"
+                )
+            );
+            Assert.False(RenameListAddSources.CanResolveFromCurrentFolder(FileListPath.NetworkPath));
         }
     }
 }
