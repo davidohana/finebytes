@@ -39,13 +39,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public void AddSelected()
         {
             var addMode = ConfigStore.Config.Ui.AddMode;
-            _AddSources(
-                RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                    _fileListViewModel.SelectedEntries,
-                    _fileListViewModel.Mask,
-                    addMode
-                )
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
+                _fileListViewModel.SelectedEntries,
+                _fileListViewModel.Mask,
+                addMode
             );
+            _AddSources(sources);
         }
 
         /// <summary>
@@ -54,12 +53,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddAll))]
         public void AddAll()
         {
-            _AddSources(
-                RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(
-                    _fileListViewModel.CurrentPath,
-                    _fileListViewModel.Mask
-                )
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(
+                _fileListViewModel.CurrentPath,
+                _fileListViewModel.Mask
             );
+            _AddSources(sources);
         }
 
         private void _AddSources(IReadOnlyList<string> sources)
