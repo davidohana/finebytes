@@ -403,5 +403,70 @@ namespace Mfr.Tests.Engine
 
             Assert.Contains("last path segment", ex.Message, StringComparison.Ordinal);
         }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that inaccessible subdirectory contents are skipped during recursion without failing the add.
+        /// </summary>
+        public void Resolve_Directory_InaccessibleSubdir_IsSkipped_WhenRecursing()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var visibleFile = TestHelpers.CreateFile(folderPath, "visible.txt");
+            var deniedFolder = Directory.CreateDirectory(folderPath.CombinePath("Denied")).FullName;
+            TestHelpers.CreateFile(deniedFolder, "secret.txt");
+            _DenyDirectoryTraverse(deniedFolder);
+
+            try
+            {
+                var paths = AddedSourceResolver
+                    .ResolveToPaths(source: folderPath, includeFiles: true, includeFolders: true, includeSubdirs: true)
+                    .ToList();
+
+                Assert.Contains(folderPath, paths);
+                Assert.Contains(visibleFile, paths);
+                Assert.DoesNotContain(paths, path => path.EndsWith("secret.txt", StringComparison.OrdinalIgnoreCase));
+            }
+            finally
+            {
+                _AllowDirectoryTraverse(deniedFolder);
+            }
+        }
+
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        private static void _DenyDirectoryTraverse(string directoryPath)
+        {
+            var directoryInfo = new DirectoryInfo(directoryPath);
+            var security = directoryInfo.GetAccessControl();
+            security.AddAccessRule(
+                new System.Security.AccessControl.FileSystemAccessRule(
+                    identity: System.Security.Principal.WindowsIdentity.GetCurrent().Name,
+                    fileSystemRights: System.Security.AccessControl.FileSystemRights.ListDirectory
+                        | System.Security.AccessControl.FileSystemRights.Traverse,
+                    type: System.Security.AccessControl.AccessControlType.Deny
+                )
+            );
+            directoryInfo.SetAccessControl(security);
+        }
+
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        private static void _AllowDirectoryTraverse(string directoryPath)
+        {
+            var directoryInfo = new DirectoryInfo(directoryPath);
+            var security = directoryInfo.GetAccessControl();
+            security.RemoveAccessRuleAll(
+                new System.Security.AccessControl.FileSystemAccessRule(
+                    identity: System.Security.Principal.WindowsIdentity.GetCurrent().Name,
+                    fileSystemRights: System.Security.AccessControl.FileSystemRights.ListDirectory
+                        | System.Security.AccessControl.FileSystemRights.Traverse,
+                    type: System.Security.AccessControl.AccessControlType.Deny
+                )
+            );
+            directoryInfo.SetAccessControl(security);
+        }
     }
 }

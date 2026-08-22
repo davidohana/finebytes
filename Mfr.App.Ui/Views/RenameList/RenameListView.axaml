@@ -97,30 +97,47 @@
       <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
+    <Style Selector="Button.rename-list-action">
+      <Setter Property="Width" Value="30" />
+      <Setter Property="Height" Value="30" />
+      <Setter Property="MinWidth" Value="30" />
+      <Setter Property="MinHeight" Value="30" />
+      <Setter Property="Padding" Value="2" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
   </UserControl.Styles>
   <Border Classes="pane">
     <Grid ColumnDefinitions="Auto,*">
       <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="4" Margin="4,0,4,4">
         <Button
-          Content="Add Selected"
+          Classes="rename-list-action"
           Command="{Binding AddSelectedCommand}"
           ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddSelectedTip}"
-        />
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
+        </Button>
         <Button
-          Content="Add All"
+          Classes="rename-list-action"
           Command="{Binding AddAllCommand}"
           ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddAllTip}"
-        />
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddAll.png" />
+        </Button>
         <Button
-          Content="Remove"
+          Classes="rename-list-action"
           Command="{Binding RemoveSelectedCommand}"
           ToolTip.Tip="{x:Static shortcuts:AppShortcuts.RemoveSelectedTip}"
-        />
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/RemoveSelected.png" />
+        </Button>
         <Button
-          Content="Clear"
+          Classes="rename-list-action"
           Command="{Binding ClearCommand}"
           ToolTip.Tip="{x:Static shortcuts:AppShortcuts.ClearRenameListTip}"
-        />
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Clear.png" />
+        </Button>
       </StackPanel>
       <DataGrid
         x:Name="RenameGrid"

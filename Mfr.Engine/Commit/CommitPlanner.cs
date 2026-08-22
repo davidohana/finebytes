@@ -27,9 +27,9 @@ namespace Mfr.Engine.Commit
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Pass the instance returned from <see cref="Mfr.Engine.RenameList.RenameList.Preview"/> into
-    /// <see cref="Mfr.Engine.RenameList.RenameList.Commit"/> on the same
-    /// <see cref="Mfr.Engine.RenameList.RenameList"/>; steps reference that list's <see cref="RenameItem"/> instances.
+    /// Pass the instance returned from <see cref="RenameList.RenameList.Preview"/> into
+    /// <see cref="RenameList.RenameList.Commit"/> on the same
+    /// <see cref="RenameList.RenameList"/>; steps reference that list's <see cref="RenameItem"/> instances.
     /// </para>
     /// </remarks>
     /// <param name="Steps">Commit steps to apply in order.</param>

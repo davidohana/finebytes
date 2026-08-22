@@ -27,6 +27,7 @@
     <AvaloniaResource Include="Assets\mfr.ico" />
     <AvaloniaResource Include="Assets\mfr.png" />
     <AvaloniaResource Include="Assets\FilterGroups\*.png" />
+    <AvaloniaResource Include="Assets\RenameList\*.png" />
   </ItemGroup>
 
   <ItemGroup>

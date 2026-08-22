@@ -88,37 +88,49 @@ namespace Mfr.Engine.RenameList
                 results.Add(directoryPath);
             }
 
-            var searchOption = includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-            if (includeFiles)
+            // Match File List: skip entries we cannot open instead of failing the whole add.
+            // SearchOption overloads set IgnoreInaccessible=false and throw on access-denied subdirs.
+            var enumerationOptions = new EnumerationOptions
             {
-                var filePaths = Directory.EnumerateFiles(directoryPath, "*", searchOption);
-                foreach (var filePath in filePaths)
+                IgnoreInaccessible = true,
+                RecurseSubdirectories = includeSubdirs,
+                ReturnSpecialDirectories = false,
+            };
+
+            try
+            {
+                if (includeFiles)
                 {
-                    _AddIfNameMatches(
-                        fullPath: filePath,
-                        results: results,
-                        includeMask: includeMask,
-                        excludeMasks: excludeMasks
-                    );
+                    foreach (var filePath in Directory.EnumerateFiles(directoryPath, "*", enumerationOptions))
+                    {
+                        _AddIfNameMatches(
+                            fullPath: filePath,
+                            results: results,
+                            includeMask: includeMask,
+                            excludeMasks: excludeMasks
+                        );
+                    }
+                }
+
+                if (includeFolders && includeSubdirs)
+                {
+                    foreach (var folderPath in Directory.EnumerateDirectories(directoryPath, "*", enumerationOptions))
+                    {
+                        _AddIfNameMatches(
+                            fullPath: folderPath,
+                            results: results,
+                            includeMask: includeMask,
+                            excludeMasks: excludeMasks
+                        );
+                    }
                 }
             }
-
-            if (includeFolders && includeSubdirs)
+            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
             {
-                var folderPaths = Directory.EnumerateDirectories(
-                    directoryPath,
-                    "*",
-                    SearchOption.AllDirectories
+                throw new UserException(
+                    $"Failed to add folder '{directoryPath}'. Some or all of the files were not added.",
+                    ex
                 );
-                foreach (var folderPath in folderPaths)
-                {
-                    _AddIfNameMatches(
-                        fullPath: folderPath,
-                        results: results,
-                        includeMask: includeMask,
-                        excludeMasks: excludeMasks
-                    );
-                }
             }
 
             return results;

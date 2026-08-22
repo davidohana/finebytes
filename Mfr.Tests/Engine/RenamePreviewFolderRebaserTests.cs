@@ -1,4 +1,3 @@
-
 namespace Mfr.Tests.Engine
 {
     /// <summary>

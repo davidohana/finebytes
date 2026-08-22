@@ -132,6 +132,14 @@ namespace Mfr.App.Ui.ViewModels
             {
                 ItemCount = RenameListViewModel.ItemCount;
             }
+
+            if (
+                e.PropertyName is nameof(RenameListViewModel.LastAddError)
+                && !string.IsNullOrEmpty(RenameListViewModel.LastAddError)
+            )
+            {
+                StatusHint = RenameListViewModel.LastAddError;
+            }
         }
 
         private static bool _CanExecuteUnimplemented()

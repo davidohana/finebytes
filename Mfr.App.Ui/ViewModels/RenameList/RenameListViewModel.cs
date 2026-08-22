@@ -1,9 +1,12 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.Models;
 using Mfr.Models.Config;
+using Serilog;
 using EngineRenameList = Mfr.Engine.RenameList.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -42,6 +45,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets the count of items in the Rename List.
         /// </summary>
         public int ItemCount => Entries.Count;
+
+        /// <summary>
+        /// Gets the most recent user-facing add failure message, or empty when none.
+        /// </summary>
+        [ObservableProperty]
+        private string _lastAddError = string.Empty;
 
         /// <summary>
         /// Replaces the Rename List selection.
@@ -131,13 +140,24 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var uiConfig = ConfigStore.Config.Ui;
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
-            _renameList.AddSources(
-                sources: sources,
-                includeFiles: uiConfig.AddMode.IncludesFiles(),
-                includeFolders: uiConfig.AddMode.IncludesFolders(),
-                includeSubdirs: uiConfig.AddFolderContents,
-                excludeMasks: excludeMasks
-            );
+            try
+            {
+                LastAddError = string.Empty;
+                _renameList.AddSources(
+                    sources: sources,
+                    includeFiles: uiConfig.AddMode.IncludesFiles(),
+                    includeFolders: uiConfig.AddMode.IncludesFolders(),
+                    includeSubdirs: uiConfig.AddFolderContents,
+                    excludeMasks: excludeMasks
+                );
+            }
+            catch (UserException ex)
+            {
+                // Keep any items added before the failure; do not treat user-facing IO/validation as fatal.
+                Log.Warning(ex, "Failed to add rename sources.");
+                LastAddError = ex.Message;
+            }
+
             _SyncEntries();
         }
 
