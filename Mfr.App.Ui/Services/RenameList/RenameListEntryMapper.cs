@@ -24,6 +24,7 @@ namespace Mfr.App.Ui.Services.RenameList
 
             return new RenameListEntry
             {
+                EngineItem = item,
                 FileFolder = isDirectory ? "Folder" : "File",
                 ParentFolder = original.DirectoryPath,
                 FullFileName = fullFileName,

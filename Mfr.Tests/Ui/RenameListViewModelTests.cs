@@ -309,6 +309,57 @@ namespace Mfr.Tests.Ui
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
         }
 
+        /// <summary>
+        /// Verifies Remove Selected drops selected rows and leaves the rest.
+        /// </summary>
+        [Fact]
+        public void RemoveSelected_Removes_Only_Selected_Rows()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
+            Assert.Equal(2, renameListViewModel.ItemCount);
+            Assert.False(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
+
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+            Assert.True(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
+
+            renameListViewModel.RemoveSelectedCommand.Execute(null);
+
+            Assert.Single(renameListViewModel.Entries);
+            Assert.Equal("beta.md", renameListViewModel.Entries[0].FullFileName);
+            Assert.Empty(renameListViewModel.SelectedEntries);
+            Assert.Equal(1, renameListViewModel.ItemCount);
+            Assert.False(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Clear empties the list and updates ItemCount / CanExecute.
+        /// </summary>
+        [Fact]
+        public void Clear_Removes_All_Rows()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            Assert.False(renameListViewModel.ClearCommand.CanExecute(null));
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
+            Assert.True(renameListViewModel.ClearCommand.CanExecute(null));
+            Assert.Equal(2, renameListViewModel.ItemCount);
+
+            renameListViewModel.ClearCommand.Execute(null);
+
+            Assert.Empty(renameListViewModel.Entries);
+            Assert.Equal(0, renameListViewModel.ItemCount);
+            Assert.False(renameListViewModel.ClearCommand.CanExecute(null));
+        }
+
         private string _CreateSampleFolder()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();

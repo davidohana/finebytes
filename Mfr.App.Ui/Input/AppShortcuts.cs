@@ -97,6 +97,12 @@ namespace Mfr.App.Ui.Input
         /// <summary>Rename List Add All button and menu tip.</summary>
         public const string AddAllTip = "Add all (Ctrl+Shift+A)";
 
+        /// <summary>Rename List Remove Selected button and menu tip.</summary>
+        public const string RemoveSelectedTip = "Remove selected (Ctrl+Shift+R)";
+
+        /// <summary>Rename List Clear button and menu tip.</summary>
+        public const string ClearRenameListTip = "Clear Rename List (Ctrl+Shift+C)";
+
         /// <summary>File List refresh button tip.</summary>
         public const string RefreshTip = "Refresh (F5)";
 

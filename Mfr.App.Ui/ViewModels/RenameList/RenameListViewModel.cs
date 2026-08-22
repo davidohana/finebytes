@@ -15,6 +15,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     {
         private readonly FileListViewModel _fileListViewModel;
         private readonly EngineRenameList _renameList = new(includeHidden: false);
+        private readonly List<RenameListEntry> _selectedEntries = [];
 
         /// <summary>
         /// Initializes the Rename List and listens for File List changes that affect add commands.
@@ -31,6 +32,37 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets the rows shown in the Rename List grid.
         /// </summary>
         public ObservableCollection<RenameListEntry> Entries { get; } = [];
+
+        /// <summary>
+        /// Gets the currently selected Rename List rows.
+        /// </summary>
+        public IReadOnlyList<RenameListEntry> SelectedEntries => _selectedEntries;
+
+        /// <summary>
+        /// Gets the count of items in the Rename List.
+        /// </summary>
+        public int ItemCount => Entries.Count;
+
+        /// <summary>
+        /// Replaces the Rename List selection.
+        /// </summary>
+        /// <param name="entries">Selected grid rows.</param>
+        public void SetSelectedEntries(IReadOnlyList<RenameListEntry> entries)
+        {
+            ArgumentNullException.ThrowIfNull(entries);
+
+            _selectedEntries.Clear();
+            foreach (var entry in entries)
+            {
+                if (Entries.Contains(entry))
+                {
+                    _selectedEntries.Add(entry);
+                }
+            }
+
+            OnPropertyChanged(nameof(SelectedEntries));
+            RemoveSelectedCommand.NotifyCanExecuteChanged();
+        }
 
         /// <summary>
         /// Adds the File List selection to the Rename List.
@@ -60,6 +92,36 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _AddSources(sources);
         }
 
+        /// <summary>
+        /// Removes the selected Rename List rows.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanRemoveSelected))]
+        public void RemoveSelected()
+        {
+            if (_selectedEntries.Count == 0)
+            {
+                return;
+            }
+
+            _renameList.Remove(_selectedEntries.Select(entry => entry.EngineItem));
+            _SyncEntries();
+        }
+
+        /// <summary>
+        /// Removes every row from the Rename List.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanClear))]
+        public void Clear()
+        {
+            if (Entries.Count == 0)
+            {
+                return;
+            }
+
+            _renameList.Clear();
+            _SyncEntries();
+        }
+
         private void _AddSources(IReadOnlyList<string> sources)
         {
             if (sources.Count == 0)
@@ -86,6 +148,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 Entries.Add(RenameListEntryMapper.ToEntry(item));
             }
+
+            SetSelectedEntries([]);
+            OnPropertyChanged(nameof(ItemCount));
+            ClearCommand.NotifyCanExecuteChanged();
         }
 
         private bool _CanAddSelected()
@@ -100,6 +166,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private bool _CanAddAll()
         {
             return RenameListAddSourceResolver.CanResolveFromCurrentFolder(_fileListViewModel.CurrentPath);
+        }
+
+        private bool _CanRemoveSelected()
+        {
+            return _selectedEntries.Count > 0;
+        }
+
+        private bool _CanClear()
+        {
+            return Entries.Count > 0;
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

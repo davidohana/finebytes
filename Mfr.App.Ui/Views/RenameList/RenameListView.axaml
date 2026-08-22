@@ -111,8 +111,19 @@
           Command="{Binding AddAllCommand}"
           ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddAllTip}"
         />
+        <Button
+          Content="Remove"
+          Command="{Binding RemoveSelectedCommand}"
+          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.RemoveSelectedTip}"
+        />
+        <Button
+          Content="Clear"
+          Command="{Binding ClearCommand}"
+          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.ClearRenameListTip}"
+        />
       </StackPanel>
       <DataGrid
+        x:Name="RenameGrid"
         Grid.Column="1"
         Classes="rename-list"
         ItemsSource="{Binding Entries}"

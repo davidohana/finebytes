@@ -1,6 +1,7 @@
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.Input;
 using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.Views;
 
 namespace Mfr.Tests.Ui
@@ -8,8 +9,16 @@ namespace Mfr.Tests.Ui
     /// <summary>
     /// Headless smoke tests for the main window shell.
     /// </summary>
-    public sealed class MainWindowSmokeTests
+    public sealed class MainWindowSmokeTests : IDisposable
     {
+        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _tempDirectoryFixture.Dispose();
+        }
+
         /// <summary>
         /// Verifies the main window constructs with a File List pane.
         /// </summary>
@@ -63,9 +72,43 @@ namespace Mfr.Tests.Ui
             Assert.Contains(AppShortcuts.ViewList, gestures);
             Assert.Contains(AppShortcuts.ViewTiles, gestures);
             Assert.Contains(AppShortcuts.ViewThumbnails, gestures);
+            Assert.Contains(AppShortcuts.AddSelected, gestures);
+            Assert.Contains(AppShortcuts.AddAll, gestures);
+            Assert.Contains(AppShortcuts.RemoveSelected, gestures);
+            Assert.Contains(AppShortcuts.ClearRenameList, gestures);
             Assert.DoesNotContain(AppShortcuts.GoUp, gestures);
             Assert.DoesNotContain(AppShortcuts.Exit, gestures);
             Assert.DoesNotContain(AppShortcuts.ZoomIn, gestures);
+        }
+
+        /// <summary>
+        /// Verifies status-bar ItemCount tracks Rename List add and clear.
+        /// </summary>
+        [AvaloniaFact]
+        public void MainWindow_ItemCount_Tracks_RenameList()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
+
+            var viewModel = new MainWindowViewModel(dir);
+            var fileListViewModel = viewModel.FileListViewModel;
+            var renameListViewModel = viewModel.RenameListViewModel;
+
+            Assert.Equal(0, viewModel.ItemCount);
+
+            fileListViewModel.SetSelectedEntries([
+                new FileListEntry
+                {
+                    Name = "alpha.txt",
+                    FullPath = Path.Combine(dir, "alpha.txt"),
+                    IsDirectory = false,
+                },
+            ]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
+            Assert.Equal(1, viewModel.ItemCount);
+
+            renameListViewModel.ClearCommand.Execute(null);
+            Assert.Equal(0, viewModel.ItemCount);
         }
     }
 }

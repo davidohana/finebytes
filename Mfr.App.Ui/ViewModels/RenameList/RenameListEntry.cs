@@ -1,3 +1,5 @@
+using Mfr.Models.Rename;
+
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
@@ -5,6 +7,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// </summary>
     public sealed class RenameListEntry
     {
+        /// <summary>
+        /// Gets the engine item this row represents.
+        /// </summary>
+        internal RenameItem EngineItem { get; init; } = null!;
+
         /// <summary>
         /// Gets the file-or-folder label shown in the File/Folder column.
         /// </summary>

@@ -45,19 +45,24 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 
 **File List → Go Up** runs from the menu anywhere; Backspace is only handled when the listing has focus so it does not steal from text boxes.
 
+### Rename List
+
+| Action | Shortcut |
+|---|---|
+| Add selected | Ctrl+Shift+S |
+| Add all | Ctrl+Shift+A |
+| Remove selected | Ctrl+Shift+R |
+| Clear | Ctrl+Shift+C |
+
 ## Shown in menus, not implemented yet
 
 These shortcuts match MFR 7.4 and are already labeled on disabled menu items.
 
 | Action | Shortcut |
 |---|---|
-| Add selected to Rename List | Ctrl+Shift+S |
-| Add all to Rename List | Ctrl+Shift+A |
-| Remove selected from Rename List | Ctrl+Shift+R |
-| Clear Rename List | Ctrl+Shift+C |
 | Rename List refresh | F5 |
 
-Rename List refresh will share F5 with the File List later (MFR 7.4 used F5 in both). Until that pane exists, F5 only reloads the File List.
+Rename List refresh will share F5 with the File List later (MFR 7.4 used F5 in both). Until then, F5 only reloads the File List.
 
 ## Later (not on menus yet)
 

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -24,6 +25,8 @@ namespace Mfr.App.Ui.ViewModels
         {
             FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
             RenameListViewModel = new RenameListViewModel(FileListViewModel);
+            RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
+            ItemCount = RenameListViewModel.ItemCount;
             WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
         }
 
@@ -120,6 +123,14 @@ namespace Mfr.App.Ui.ViewModels
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.Shutdown();
+            }
+        }
+
+        private void _OnRenameListPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(RenameListViewModel.ItemCount))
+            {
+                ItemCount = RenameListViewModel.ItemCount;
             }
         }
 

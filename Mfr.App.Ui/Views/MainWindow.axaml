@@ -81,6 +81,14 @@
       Gesture="{x:Static shortcuts:AppShortcuts.AddAll}"
       Command="{Binding RenameListViewModel.AddAllCommand}"
     />
+    <KeyBinding
+      Gesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}"
+      Command="{Binding RenameListViewModel.RemoveSelectedCommand}"
+    />
+    <KeyBinding
+      Gesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}"
+      Command="{Binding RenameListViewModel.ClearCommand}"
+    />
   </Window.KeyBindings>
 
   <DockPanel>
@@ -244,8 +252,16 @@
           Command="{Binding RenameListViewModel.AddAllCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.AddAll}"
         />
-        <MenuItem Header="Remove" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}" />
-        <MenuItem Header="Clear" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}" />
+        <MenuItem
+          Header="Remove"
+          Command="{Binding RenameListViewModel.RemoveSelectedCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}"
+        />
+        <MenuItem
+          Header="Clear"
+          Command="{Binding RenameListViewModel.ClearCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}"
+        />
         <Separator />
         <MenuItem Header="Auto-Sort" IsEnabled="False" />
         <MenuItem Header="Auto-Preview" IsEnabled="False" />
