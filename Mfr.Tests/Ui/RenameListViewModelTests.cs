@@ -65,7 +65,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add Selected honors the File List include mask.
+        /// Verifies the include mask hides non-matching files from Add Selected.
         /// </summary>
         [Fact]
         public void AddSelected_Honors_Include_Mask()
@@ -75,7 +75,11 @@ namespace Mfr.Tests.Ui
             fileListViewModel.Mask = "*.txt";
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
+            Assert.Contains(fileListViewModel.Entries, entry => entry.Name == "alpha.txt");
+            Assert.DoesNotContain(fileListViewModel.Entries, entry => entry.Name == "beta.md");
+
+            var alpha = Assert.Single(fileListViewModel.Entries, entry => entry.Name == "alpha.txt");
+            fileListViewModel.SetSelectedEntries([alpha]);
             renameListViewModel.AddSelectedCommand.Execute(null);
 
             Assert.Single(renameListViewModel.Entries);
@@ -83,7 +87,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add Selected honors enabled exclude masks.
+        /// Verifies enabled exclude masks hide matching files from Add Selected.
         /// </summary>
         [Fact]
         public void AddSelected_Honors_Exclude_Masks()
@@ -93,7 +97,11 @@ namespace Mfr.Tests.Ui
             fileListViewModel.ApplyExcludeMasks(enabled: true, editorText: "*.txt");
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
+            Assert.DoesNotContain(fileListViewModel.Entries, entry => entry.Name == "alpha.txt");
+            Assert.Contains(fileListViewModel.Entries, entry => entry.Name == "beta.md");
+
+            var beta = Assert.Single(fileListViewModel.Entries, entry => entry.Name == "beta.md");
+            fileListViewModel.SetSelectedEntries([beta]);
             renameListViewModel.AddSelectedCommand.Execute(null);
 
             Assert.Single(renameListViewModel.Entries);

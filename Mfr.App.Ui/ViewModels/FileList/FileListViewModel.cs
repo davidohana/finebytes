@@ -994,11 +994,11 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
-        /// Whether the File List include/exclude masks allow adding this file path.
+        /// Whether the File List include/exclude masks allow listing this file path.
         /// </summary>
         /// <param name="path">Full file path to evaluate.</param>
         /// <returns><see langword="true"/> when the file name passes active masks.</returns>
-        public bool PassesFileMasks(string path)
+        private bool _PassesFileMasks(string path)
         {
             var fileName = Path.GetFileName(path);
             if (!WildcardMask.IsMatch(fileName, Mask))
@@ -1286,7 +1286,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
             var files = Directory
                 .EnumerateFiles(path, "*", _ListingOptions)
-                .Where(PassesFileMasks)
+                .Where(_PassesFileMasks)
                 .Select(filePath => _CreateListedItem(filePath, isDirectory: false))
                 .ToList();
 

@@ -12,7 +12,7 @@ namespace Mfr.App.Ui.Services.RenameList
         /// Resolves engine add sources from the File List's current selection.
         /// </summary>
         /// <param name="fileListViewModel">File List pane state.</param>
-        /// <param name="addFiles">When true, selected files that pass the File List masks are included.</param>
+        /// <param name="addFiles">When true, selected files are included.</param>
         /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         public static IReadOnlyList<string> ResolveSourcesFromSelection(
@@ -29,7 +29,7 @@ namespace Mfr.App.Ui.Services.RenameList
         /// Returns whether selection would produce at least one engine add source.
         /// </summary>
         /// <param name="fileListViewModel">File List pane state.</param>
-        /// <param name="addFiles">When true, selected files that pass the File List masks are included.</param>
+        /// <param name="addFiles">When true, selected files are included.</param>
         /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
         /// <returns><see langword="true"/> when at least one source would be emitted.</returns>
         public static bool CanResolveFromSelection(FileListViewModel fileListViewModel, bool addFiles, bool addFolders)
@@ -78,7 +78,7 @@ namespace Mfr.App.Ui.Services.RenameList
         /// Yields engine add sources for each addable selected File List entry.
         /// </summary>
         /// <param name="fileListViewModel">File List pane state.</param>
-        /// <param name="addFiles">When true, selected files that pass the File List masks are included.</param>
+        /// <param name="addFiles">When true, selected files are included.</param>
         /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         private static IEnumerable<string> _EnumerateSelectionSources(
@@ -105,7 +105,7 @@ namespace Mfr.App.Ui.Services.RenameList
                     continue;
                 }
 
-                if (!addFiles || !fileListViewModel.PassesFileMasks(entry.FullPath))
+                if (!addFiles)
                 {
                     continue;
                 }
