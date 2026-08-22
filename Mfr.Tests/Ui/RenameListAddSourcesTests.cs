@@ -10,7 +10,7 @@ namespace Mfr.Tests.Ui
     public sealed class RenameListAddSourcesTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
-        private readonly FileListViewModel _fileList;
+        private readonly FileListViewModel _fileListViewModel;
 
         /// <summary>
         /// Creates an isolated File List for adapter tests.
@@ -20,13 +20,13 @@ namespace Mfr.Tests.Ui
             var dir = _tempDirectoryFixture.CreateTempDir();
             Directory.CreateDirectory(Path.Combine(dir, "album"));
             File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
-            _fileList = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            _fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            _fileList.Dispose();
+            _fileListViewModel.Dispose();
             _tempDirectoryFixture.Dispose();
         }
 
@@ -36,9 +36,9 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void ResolveFromSelection_Folder_ReturnsFolderPlusMask()
         {
-            var albumPath = Path.Combine(_fileList.CurrentPath, "album");
-            _fileList.Mask = "*.mp3";
-            _fileList.SetSelectedEntries([
+            var albumPath = Path.Combine(_fileListViewModel.CurrentPath, "album");
+            _fileListViewModel.Mask = "*.mp3";
+            _fileListViewModel.SetSelectedEntries([
                 new FileListEntry
                 {
                     Name = "album",
@@ -48,7 +48,7 @@ namespace Mfr.Tests.Ui
             ]);
 
             var sources = RenameListAddSources.ResolveSourcesFromSelection(
-                _fileList,
+                _fileListViewModel,
                 addFiles: true,
                 addFolders: false
             );
@@ -64,15 +64,15 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void ResolveFromCurrentFolder_ReturnsCurrentFolderPlusMask()
         {
-            _fileList.Mask = "*.txt";
+            _fileListViewModel.Mask = "*.txt";
             var sources = RenameListAddSources.ResolveSourcesFromCurrentFolder(
-                _fileList,
+                _fileListViewModel,
                 addFiles: true,
                 addFolders: false
             );
 
             var source = Assert.Single(sources);
-            Assert.Equal(Path.Combine(_fileList.CurrentPath, "*.txt"), source);
+            Assert.Equal(Path.Combine(_fileListViewModel.CurrentPath, "*.txt"), source);
             Assert.DoesNotContain("**", source, StringComparison.Ordinal);
         }
 
@@ -82,9 +82,9 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void ResolveFromSelection_MatchingFile_ReturnsRawPath()
         {
-            var filePath = Path.Combine(_fileList.CurrentPath, "alpha.txt");
-            _fileList.Mask = "*.txt";
-            _fileList.SetSelectedEntries([
+            var filePath = Path.Combine(_fileListViewModel.CurrentPath, "alpha.txt");
+            _fileListViewModel.Mask = "*.txt";
+            _fileListViewModel.SetSelectedEntries([
                 new FileListEntry
                 {
                     Name = "alpha.txt",
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Ui
             ]);
 
             var sources = RenameListAddSources.ResolveSourcesFromSelection(
-                _fileList,
+                _fileListViewModel,
                 addFiles: true,
                 addFolders: false
             );
@@ -109,9 +109,9 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void ResolveFromSelection_BothPolicyOff_ReturnsEmpty()
         {
-            var albumPath = Path.Combine(_fileList.CurrentPath, "album");
-            var filePath = Path.Combine(_fileList.CurrentPath, "alpha.txt");
-            _fileList.SetSelectedEntries([
+            var albumPath = Path.Combine(_fileListViewModel.CurrentPath, "album");
+            var filePath = Path.Combine(_fileListViewModel.CurrentPath, "alpha.txt");
+            _fileListViewModel.SetSelectedEntries([
                 new FileListEntry
                 {
                     Name = "album",
@@ -127,13 +127,13 @@ namespace Mfr.Tests.Ui
             ]);
 
             var sources = RenameListAddSources.ResolveSourcesFromSelection(
-                _fileList,
+                _fileListViewModel,
                 addFiles: false,
                 addFolders: false
             );
 
             Assert.Empty(sources);
-            Assert.False(RenameListAddSources.CanResolveFromSelection(_fileList, addFiles: false, addFolders: false));
+            Assert.False(RenameListAddSources.CanResolveFromSelection(_fileListViewModel, addFiles: false, addFolders: false));
         }
 
         /// <summary>
@@ -147,9 +147,9 @@ namespace Mfr.Tests.Ui
                 return;
             }
 
-            var root = Path.GetPathRoot(_fileList.CurrentPath);
+            var root = Path.GetPathRoot(_fileListViewModel.CurrentPath);
             Assert.False(string.IsNullOrEmpty(root));
-            _fileList.SetSelectedEntries([
+            _fileListViewModel.SetSelectedEntries([
                 new FileListEntry
                 {
                     Name = root,
@@ -158,8 +158,8 @@ namespace Mfr.Tests.Ui
                 },
             ]);
 
-            Assert.Empty(RenameListAddSources.ResolveSourcesFromSelection(_fileList, addFiles: true, addFolders: true));
-            Assert.False(RenameListAddSources.CanResolveFromSelection(_fileList, addFiles: true, addFolders: true));
+            Assert.Empty(RenameListAddSources.ResolveSourcesFromSelection(_fileListViewModel, addFiles: true, addFolders: true));
+            Assert.False(RenameListAddSources.CanResolveFromSelection(_fileListViewModel, addFiles: true, addFolders: true));
         }
 
         /// <summary>
@@ -169,10 +169,10 @@ namespace Mfr.Tests.Ui
         public void CanResolveFromCurrentFolder_BothPolicyOff_IsFalse()
         {
             Assert.False(
-                RenameListAddSources.CanResolveFromCurrentFolder(_fileList, addFiles: false, addFolders: false)
+                RenameListAddSources.CanResolveFromCurrentFolder(_fileListViewModel, addFiles: false, addFolders: false)
             );
             Assert.Empty(
-                RenameListAddSources.ResolveSourcesFromCurrentFolder(_fileList, addFiles: false, addFolders: false)
+                RenameListAddSources.ResolveSourcesFromCurrentFolder(_fileListViewModel, addFiles: false, addFolders: false)
             );
         }
     }

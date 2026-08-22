@@ -13,18 +13,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// </summary>
     public sealed partial class RenameListViewModel : ViewModelBase
     {
-        private readonly FileListViewModel _fileList;
+        private readonly FileListViewModel _fileListViewModel;
         private readonly EngineRenameList _renameList = new(includeHidden: false);
 
         /// <summary>
         /// Initializes the Rename List and listens for File List changes that affect add commands.
         /// </summary>
-        /// <param name="fileList">File List pane used as the add source.</param>
-        public RenameListViewModel(FileListViewModel fileList)
+        /// <param name="fileListViewModel">File List pane used as the add source.</param>
+        public RenameListViewModel(FileListViewModel fileListViewModel)
         {
-            ArgumentNullException.ThrowIfNull(fileList);
-            _fileList = fileList;
-            _fileList.PropertyChanged += _OnFileListPropertyChanged;
+            ArgumentNullException.ThrowIfNull(fileListViewModel);
+            _fileListViewModel = fileListViewModel;
+            _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var uiConfig = ConfigStore.Config.Ui;
             _AddSources(
                 RenameListAddSources.ResolveSourcesFromSelection(
-                    _fileList,
+                    _fileListViewModel,
                     addFiles: uiConfig.AddFiles,
                     addFolders: uiConfig.AddFolders
                 )
@@ -57,7 +57,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var uiConfig = ConfigStore.Config.Ui;
             _AddSources(
                 RenameListAddSources.ResolveSourcesFromCurrentFolder(
-                    _fileList,
+                    _fileListViewModel,
                     addFiles: uiConfig.AddFiles,
                     addFolders: uiConfig.AddFolders
                 )
@@ -72,7 +72,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var uiConfig = ConfigStore.Config.Ui;
-            var excludeMasks = _fileList.ExcludeMasksEnabled ? _fileList.ExcludeMasks : null;
+            var excludeMasks = _fileListViewModel.ExcludeMasksEnabled
+                ? _fileListViewModel.ExcludeMasks
+                : null;
             _renameList.AddSources(
                 sources: sources,
                 includeFiles: uiConfig.AddFiles,
@@ -96,7 +98,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             var uiConfig = ConfigStore.Config.Ui;
             return RenameListAddSources.CanResolveFromSelection(
-                _fileList,
+                _fileListViewModel,
                 addFiles: uiConfig.AddFiles,
                 addFolders: uiConfig.AddFolders
             );
@@ -106,7 +108,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             var uiConfig = ConfigStore.Config.Ui;
             return RenameListAddSources.CanResolveFromCurrentFolder(
-                _fileList,
+                _fileListViewModel,
                 addFiles: uiConfig.AddFiles,
                 addFolders: uiConfig.AddFolders
             );

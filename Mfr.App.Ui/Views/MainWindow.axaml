@@ -31,50 +31,50 @@
     <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.UndoLast}" Command="{Binding UndoLastCommand}" />
     <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowLog}" Command="{Binding ShowLogCommand}" />
     <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowOptions}" Command="{Binding ShowOptionsCommand}" />
-    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.Refresh}" Command="{Binding FileList.RefreshCommand}" />
+    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.Refresh}" Command="{Binding FileListViewModel.RefreshCommand}" />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.GoToAddress}"
-      Command="{Binding FileList.BeginPathEditCommand}"
+      Command="{Binding FileListViewModel.BeginPathEditCommand}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.GoToAddressAlt}"
-      Command="{Binding FileList.BeginPathEditCommand}"
+      Command="{Binding FileListViewModel.BeginPathEditCommand}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewLargeIcons}"
-      Command="{Binding FileList.SetViewModeCommand}"
+      Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.LargeIcons}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewSmallIcons}"
-      Command="{Binding FileList.SetViewModeCommand}"
+      Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.SmallIcons}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewReport}"
-      Command="{Binding FileList.SetViewModeCommand}"
+      Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.Report}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewList}"
-      Command="{Binding FileList.SetViewModeCommand}"
+      Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.List}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewTiles}"
-      Command="{Binding FileList.SetViewModeCommand}"
+      Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.Tiles}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ViewThumbnails}"
-      Command="{Binding FileList.SetViewModeCommand}"
+      Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.Thumbnails}"
     />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.AddSelected}"
-      Command="{Binding RenameList.AddSelectedCommand}"
+      Command="{Binding RenameListViewModel.AddSelectedCommand}"
     />
-    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.AddAll}" Command="{Binding RenameList.AddAllCommand}" />
+    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.AddAll}" Command="{Binding RenameListViewModel.AddAllCommand}" />
   </Window.KeyBindings>
 
   <DockPanel>
@@ -107,121 +107,121 @@
         <MenuItem Header="_File List Type">
           <MenuItem
             Header="Large _Icons"
-            Command="{Binding FileList.SetViewModeCommand}"
+            Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.LargeIcons}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewLargeIcons}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsLargeIconsView, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsLargeIconsView, Mode=OneWay}"
           />
           <MenuItem
             Header="_Small Icons"
-            Command="{Binding FileList.SetViewModeCommand}"
+            Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.SmallIcons}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewSmallIcons}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsSmallIconsView, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsSmallIconsView, Mode=OneWay}"
           />
           <MenuItem
             Header="_Report"
-            Command="{Binding FileList.SetViewModeCommand}"
+            Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.Report}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewReport}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsReportView, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsReportView, Mode=OneWay}"
           />
           <MenuItem
             Header="_List"
-            Command="{Binding FileList.SetViewModeCommand}"
+            Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.List}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewList}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsListView, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsListView, Mode=OneWay}"
           />
           <MenuItem
             Header="_Tiles"
-            Command="{Binding FileList.SetViewModeCommand}"
+            Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.Tiles}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewTiles}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsTilesView, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsTilesView, Mode=OneWay}"
           />
           <MenuItem
             Header="Thumb_nails"
-            Command="{Binding FileList.SetViewModeCommand}"
+            Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.Thumbnails}"
             InputGesture="{x:Static shortcuts:AppShortcuts.ViewThumbnails}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsThumbnailsView, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsThumbnailsView, Mode=OneWay}"
           />
         </MenuItem>
-        <MenuItem Header="Thumbnail _Size" IsEnabled="{Binding FileList.IsThumbnailsView}">
+        <MenuItem Header="Thumbnail _Size" IsEnabled="{Binding FileListViewModel.IsThumbnailsView}">
           <MenuItem
             Header="_Extra Small"
-            Command="{Binding FileList.SetThumbnailSizeCommand}"
+            Command="{Binding FileListViewModel.SetThumbnailSizeCommand}"
             CommandParameter="{x:Static filelist:ThumbnailSizes.ExtraSmall}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsThumbnailSizeExtraSmall, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsThumbnailSizeExtraSmall, Mode=OneWay}"
           />
           <MenuItem
             Header="_Small"
-            Command="{Binding FileList.SetThumbnailSizeCommand}"
+            Command="{Binding FileListViewModel.SetThumbnailSizeCommand}"
             CommandParameter="{x:Static filelist:ThumbnailSizes.Small}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsThumbnailSizeSmall, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsThumbnailSizeSmall, Mode=OneWay}"
           />
           <MenuItem
             Header="_Medium"
-            Command="{Binding FileList.SetThumbnailSizeCommand}"
+            Command="{Binding FileListViewModel.SetThumbnailSizeCommand}"
             CommandParameter="{x:Static filelist:ThumbnailSizes.Medium}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsThumbnailSizeMedium, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsThumbnailSizeMedium, Mode=OneWay}"
           />
           <MenuItem
             Header="_Large"
-            Command="{Binding FileList.SetThumbnailSizeCommand}"
+            Command="{Binding FileListViewModel.SetThumbnailSizeCommand}"
             CommandParameter="{x:Static filelist:ThumbnailSizes.Large}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsThumbnailSizeLarge, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsThumbnailSizeLarge, Mode=OneWay}"
           />
           <MenuItem
             Header="E_xtra Large"
-            Command="{Binding FileList.SetThumbnailSizeCommand}"
+            Command="{Binding FileListViewModel.SetThumbnailSizeCommand}"
             CommandParameter="{x:Static filelist:ThumbnailSizes.ExtraLarge}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsThumbnailSizeExtraLarge, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsThumbnailSizeExtraLarge, Mode=OneWay}"
           />
           <MenuItem
             Header="_Huge"
-            Command="{Binding FileList.SetThumbnailSizeCommand}"
+            Command="{Binding FileListViewModel.SetThumbnailSizeCommand}"
             CommandParameter="{x:Static filelist:ThumbnailSizes.Huge}"
             ToggleType="Radio"
-            IsChecked="{Binding FileList.IsThumbnailSizeHuge, Mode=OneWay}"
+            IsChecked="{Binding FileListViewModel.IsThumbnailSizeHuge, Mode=OneWay}"
           />
         </MenuItem>
         <MenuItem
           Header="Zoom _In"
-          Command="{Binding FileList.ZoomThumbnailsInCommand}"
+          Command="{Binding FileListViewModel.ZoomThumbnailsInCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.ZoomIn}"
         />
         <MenuItem
           Header="Zoom _Out"
-          Command="{Binding FileList.ZoomThumbnailsOutCommand}"
+          Command="{Binding FileListViewModel.ZoomThumbnailsOutCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.ZoomOut}"
         />
         <MenuItem
           Header="_Reset Size"
-          Command="{Binding FileList.ResetThumbnailSizeCommand}"
+          Command="{Binding FileListViewModel.ResetThumbnailSizeCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.ResetZoom}"
         />
         <MenuItem
           Header="Go to _Address"
-          Command="{Binding FileList.BeginPathEditCommand}"
+          Command="{Binding FileListViewModel.BeginPathEditCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.GoToAddress}"
         />
-        <MenuItem Header="Go _Up" Command="{Binding FileList.GoUpCommand}" />
+        <MenuItem Header="Go _Up" Command="{Binding FileListViewModel.GoUpCommand}" />
         <MenuItem
           Header="_Refresh"
-          Command="{Binding FileList.RefreshCommand}"
+          Command="{Binding FileListViewModel.RefreshCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.Refresh}"
         />
         <Separator />
@@ -230,12 +230,12 @@
       <MenuItem Header="_Rename List">
         <MenuItem
           Header="Add Selected"
-          Command="{Binding RenameList.AddSelectedCommand}"
+          Command="{Binding RenameListViewModel.AddSelectedCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.AddSelected}"
         />
         <MenuItem
           Header="Add All"
-          Command="{Binding RenameList.AddAllCommand}"
+          Command="{Binding RenameListViewModel.AddAllCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.AddAll}"
         />
         <MenuItem Header="Remove" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}" />
@@ -328,7 +328,7 @@
           <ColumnDefinition Width="6" />
           <ColumnDefinition Width="3*" MinWidth="280" />
         </Grid.ColumnDefinitions>
-        <filelistviews:FileListView Grid.Column="0" DataContext="{Binding FileList}" />
+        <filelistviews:FileListView Grid.Column="0" DataContext="{Binding FileListViewModel}" />
         <views:PaneSplitter
           x:Name="FileListSplitter"
           Grid.Column="1"
@@ -349,7 +349,7 @@
               <ColumnDefinition Width="6" />
               <ColumnDefinition Width="*" MinWidth="120" />
             </Grid.ColumnDefinitions>
-            <filterpaletteviews:FilterPaletteView Grid.Column="0" DataContext="{Binding FilterPalette}" />
+            <filterpaletteviews:FilterPaletteView Grid.Column="0" DataContext="{Binding FilterPaletteViewModel}" />
             <views:PaneSplitter
               x:Name="AvailableAppliedSplitter"
               Grid.Column="1"
@@ -358,7 +358,7 @@
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
             />
-            <views:AppliedFiltersView Grid.Column="2" DataContext="{Binding AppliedFilters}" />
+            <views:AppliedFiltersView Grid.Column="2" DataContext="{Binding AppliedFiltersViewModel}" />
           </Grid>
           <views:PaneSplitter
             x:Name="FilterEditorSplitter"
@@ -368,7 +368,7 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
           />
-          <views:FilterEditorView Grid.Row="2" DataContext="{Binding FilterEditor}" />
+          <views:FilterEditorView Grid.Row="2" DataContext="{Binding FilterEditorViewModel}" />
         </Grid>
       </Grid>
       <views:PaneSplitter
@@ -379,7 +379,7 @@
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
       />
-      <renamelistviews:RenameListView Grid.Row="2" DataContext="{Binding RenameList}" />
+      <renamelistviews:RenameListView Grid.Row="2" DataContext="{Binding RenameListViewModel}" />
     </Grid>
   </DockPanel>
 </Window>

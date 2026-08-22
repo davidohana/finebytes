@@ -22,8 +22,8 @@ namespace Mfr.App.Ui.ViewModels
         /// </param>
         public MainWindowViewModel(string? initialFileListPath = null)
         {
-            FileList = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
-            RenameList = new RenameListViewModel(FileList);
+            FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
+            RenameListViewModel = new RenameListViewModel(FileListViewModel);
             WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
         }
 
@@ -35,27 +35,27 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Gets the File List pane.
         /// </summary>
-        public FileListViewModel FileList { get; }
+        public FileListViewModel FileListViewModel { get; }
 
         /// <summary>
         /// Gets the Available Filters pane.
         /// </summary>
-        public FilterPaletteViewModel FilterPalette { get; } = new FilterPaletteViewModel();
+        public FilterPaletteViewModel FilterPaletteViewModel { get; } = new FilterPaletteViewModel();
 
         /// <summary>
         /// Gets the Applied Filters pane.
         /// </summary>
-        public AppliedFiltersViewModel AppliedFilters { get; } = new AppliedFiltersViewModel();
+        public AppliedFiltersViewModel AppliedFiltersViewModel { get; } = new AppliedFiltersViewModel();
 
         /// <summary>
         /// Gets the Filter Configuration pane.
         /// </summary>
-        public FilterEditorViewModel FilterEditor { get; } = new FilterEditorViewModel();
+        public FilterEditorViewModel FilterEditorViewModel { get; } = new FilterEditorViewModel();
 
         /// <summary>
         /// Gets the Rename List pane.
         /// </summary>
-        public RenameListViewModel RenameList { get; }
+        public RenameListViewModel RenameListViewModel { get; }
 
         /// <summary>
         /// Status-bar hover hint. Empty until panes publish hints.

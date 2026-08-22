@@ -10,7 +10,7 @@ namespace Mfr.Tests.Ui
     public sealed class RenameListViewModelTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
-        private readonly List<FileListViewModel> _fileLists = [];
+        private readonly List<FileListViewModel> _fileListViewModels = [];
         private readonly UiConfig _originalUiConfig;
 
         /// <summary>
@@ -31,9 +31,9 @@ namespace Mfr.Tests.Ui
             ConfigStore.Config.Ui.AddFolders = _originalUiConfig.AddFolders;
             ConfigStore.Config.Ui.AddFolderContents = _originalUiConfig.AddFolderContents;
 
-            foreach (var fileList in _fileLists)
+            foreach (var fileListViewModel in _fileListViewModels)
             {
-                fileList.Dispose();
+                fileListViewModel.Dispose();
             }
 
             _tempDirectoryFixture.Dispose();
@@ -46,22 +46,22 @@ namespace Mfr.Tests.Ui
         public void AddSelected_Adds_Files_And_Ignores_Duplicates()
         {
             var dir = _CreateSampleFolder();
-            var fileList = _CreateFileList(dir);
-            var renameList = new RenameListViewModel(fileList);
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             var alpha = _FileEntry(dir, "alpha.txt");
             var beta = _FileEntry(dir, "beta.md");
-            fileList.SetSelectedEntries([alpha, beta]);
+            fileListViewModel.SetSelectedEntries([alpha, beta]);
 
-            renameList.AddSelectedCommand.Execute(null);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
-            Assert.Equal(2, renameList.Entries.Count);
-            Assert.Equal(["alpha.txt", "beta.md"], _PreviewNames(renameList));
+            Assert.Equal(2, renameListViewModel.Entries.Count);
+            Assert.Equal(["alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
 
-            fileList.SetSelectedEntries([alpha]);
-            renameList.AddSelectedCommand.Execute(null);
+            fileListViewModel.SetSelectedEntries([alpha]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
-            Assert.Equal(2, renameList.Entries.Count);
+            Assert.Equal(2, renameListViewModel.Entries.Count);
         }
 
         /// <summary>
@@ -71,15 +71,15 @@ namespace Mfr.Tests.Ui
         public void AddSelected_Honors_Include_Mask()
         {
             var dir = _CreateSampleFolder();
-            var fileList = _CreateFileList(dir);
-            fileList.Mask = "*.txt";
-            var renameList = new RenameListViewModel(fileList);
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            fileListViewModel.Mask = "*.txt";
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            fileList.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
-            renameList.AddSelectedCommand.Execute(null);
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
-            Assert.Single(renameList.Entries);
-            Assert.Equal("alpha.txt", renameList.Entries[0].FullFileName);
+            Assert.Single(renameListViewModel.Entries);
+            Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileName);
         }
 
         /// <summary>
@@ -89,15 +89,15 @@ namespace Mfr.Tests.Ui
         public void AddSelected_Honors_Exclude_Masks()
         {
             var dir = _CreateSampleFolder();
-            var fileList = _CreateFileList(dir);
-            fileList.ApplyExcludeMasks(enabled: true, editorText: "*.txt");
-            var renameList = new RenameListViewModel(fileList);
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            fileListViewModel.ApplyExcludeMasks(enabled: true, editorText: "*.txt");
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            fileList.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
-            renameList.AddSelectedCommand.Execute(null);
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
-            Assert.Single(renameList.Entries);
-            Assert.Equal("beta.md", renameList.Entries[0].FullFileName);
+            Assert.Single(renameListViewModel.Entries);
+            Assert.Equal("beta.md", renameListViewModel.Entries[0].FullFileName);
         }
 
         /// <summary>
@@ -107,14 +107,14 @@ namespace Mfr.Tests.Ui
         public void AddAll_Adds_Masked_Files_In_Current_Folder()
         {
             var dir = _CreateSampleFolder();
-            var fileList = _CreateFileList(dir);
-            fileList.Mask = "*.txt";
-            var renameList = new RenameListViewModel(fileList);
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            fileListViewModel.Mask = "*.txt";
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            renameList.AddAllCommand.Execute(null);
+            renameListViewModel.AddAllCommand.Execute(null);
 
-            Assert.Single(renameList.Entries);
-            Assert.Equal("alpha.txt", renameList.Entries[0].FullFileName);
+            Assert.Single(renameListViewModel.Entries);
+            Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileName);
         }
 
         /// <summary>
@@ -128,11 +128,11 @@ namespace Mfr.Tests.Ui
                 return;
             }
 
-            var fileList = _CreateFileList(_tempDirectoryFixture.CreateTempDir());
-            fileList.NavigateTo(FileListViewModel.ComputerPath);
-            var renameList = new RenameListViewModel(fileList);
+            var fileListViewModel = _CreateFileListViewModel(_tempDirectoryFixture.CreateTempDir());
+            fileListViewModel.NavigateTo(FileListViewModel.ComputerPath);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            Assert.False(renameList.AddAllCommand.CanExecute(null));
+            Assert.False(renameListViewModel.AddAllCommand.CanExecute(null));
         }
 
         /// <summary>
@@ -142,15 +142,15 @@ namespace Mfr.Tests.Ui
         public void Entries_Show_Identity_Preview()
         {
             var dir = _CreateSampleFolder();
-            var fileList = _CreateFileList(dir);
-            var renameList = new RenameListViewModel(fileList);
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            fileList.SetSelectedEntries([_FileEntry(dir, "alpha.txt")]);
-            renameList.AddSelectedCommand.Execute(null);
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt")]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
-            Assert.Equal("alpha.txt", renameList.Entries[0].FullFileName);
-            Assert.Equal("alpha.txt", renameList.Entries[0].FullFileNamePreview);
-            Assert.Equal("File", renameList.Entries[0].FileFolder);
+            Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileName);
+            Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileNamePreview);
+            Assert.Equal("File", renameListViewModel.Entries[0].FileFolder);
         }
 
         /// <summary>
@@ -160,18 +160,18 @@ namespace Mfr.Tests.Ui
         public void AddSelected_Folder_Default_AddsNestedFilesNotFolder()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileList = _CreateFileList(parent);
-            var renameList = new RenameListViewModel(fileList);
-            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
-            renameList.AddSelectedCommand.Execute(null);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
             Assert.Equal(
                 ["nested.mp3", "readme.txt", "track.mp3"],
-                _PreviewNames(renameList).OrderBy(n => n, StringComparer.Ordinal)
+                _PreviewNames(renameListViewModel).OrderBy(n => n, StringComparer.Ordinal)
             );
-            Assert.DoesNotContain("album", _PreviewNames(renameList));
-            Assert.DoesNotContain("disc1", _PreviewNames(renameList));
+            Assert.DoesNotContain("album", _PreviewNames(renameListViewModel));
+            Assert.DoesNotContain("disc1", _PreviewNames(renameListViewModel));
         }
 
         /// <summary>
@@ -182,13 +182,13 @@ namespace Mfr.Tests.Ui
         {
             var (parent, albumPath) = _CreateAlbumTree();
             ConfigStore.Config.Ui.AddFolders = true;
-            var fileList = _CreateFileList(parent);
-            var renameList = new RenameListViewModel(fileList);
-            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
-            renameList.AddSelectedCommand.Execute(null);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
-            var names = _PreviewNames(renameList);
+            var names = _PreviewNames(renameListViewModel);
             Assert.Contains("album", names);
             Assert.Contains("disc1", names);
             Assert.Contains("track.mp3", names);
@@ -204,13 +204,13 @@ namespace Mfr.Tests.Ui
             var (parent, albumPath) = _CreateAlbumTree();
             ConfigStore.Config.Ui.AddFolders = true;
             ConfigStore.Config.Ui.AddFolderContents = false;
-            var fileList = _CreateFileList(parent);
-            var renameList = new RenameListViewModel(fileList);
-            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
-            renameList.AddSelectedCommand.Execute(null);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
-            var names = _PreviewNames(renameList);
+            var names = _PreviewNames(renameListViewModel);
             Assert.Contains("album", names);
             Assert.Contains("disc1", names);
             Assert.Contains("track.mp3", names);
@@ -225,15 +225,15 @@ namespace Mfr.Tests.Ui
         public void AddAll_Adds_Nested_Masked_Files()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileList = _CreateFileList(albumPath);
-            fileList.Mask = "*.mp3";
-            var renameList = new RenameListViewModel(fileList);
+            var fileListViewModel = _CreateFileListViewModel(albumPath);
+            fileListViewModel.Mask = "*.mp3";
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            renameList.AddAllCommand.Execute(null);
+            renameListViewModel.AddAllCommand.Execute(null);
 
             Assert.Equal(
                 ["nested.mp3", "track.mp3"],
-                _PreviewNames(renameList).OrderBy(n => n, StringComparer.Ordinal)
+                _PreviewNames(renameListViewModel).OrderBy(n => n, StringComparer.Ordinal)
             );
         }
 
@@ -246,13 +246,13 @@ namespace Mfr.Tests.Ui
             var (parent, albumPath) = _CreateAlbumTree();
             var other = Path.Combine(parent, "other.txt");
             File.WriteAllText(other, "o");
-            var fileList = _CreateFileList(parent);
-            var renameList = new RenameListViewModel(fileList);
-            fileList.SetSelectedEntries([_FileEntry(parent, "other.txt"), _FolderEntry(albumPath)]);
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            fileListViewModel.SetSelectedEntries([_FileEntry(parent, "other.txt"), _FolderEntry(albumPath)]);
 
-            renameList.AddSelectedCommand.Execute(null);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
-            var names = _PreviewNames(renameList);
+            var names = _PreviewNames(renameListViewModel);
             Assert.Contains("other.txt", names);
             Assert.Contains("track.mp3", names);
         }
@@ -266,13 +266,13 @@ namespace Mfr.Tests.Ui
             var (parent, albumPath) = _CreateAlbumTree();
             ConfigStore.Config.Ui.AddFiles = false;
             ConfigStore.Config.Ui.AddFolders = true;
-            var fileList = _CreateFileList(parent);
-            var renameList = new RenameListViewModel(fileList);
-            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
-            renameList.AddSelectedCommand.Execute(null);
+            renameListViewModel.AddSelectedCommand.Execute(null);
 
-            Assert.Equal(["album"], _PreviewNames(renameList));
+            Assert.Equal(["album"], _PreviewNames(renameListViewModel));
         }
 
         /// <summary>
@@ -282,18 +282,18 @@ namespace Mfr.Tests.Ui
         public void AddSelected_CanExecute_FolderWhenFilesOrFoldersOn()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileList = _CreateFileList(parent);
-            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
-            var renameList = new RenameListViewModel(fileList);
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            Assert.True(renameList.AddSelectedCommand.CanExecute(null));
+            Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
             ConfigStore.Config.Ui.AddFiles = false;
             ConfigStore.Config.Ui.AddFolders = true;
-            Assert.True(renameList.AddSelectedCommand.CanExecute(null));
+            Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
             ConfigStore.Config.Ui.AddFolders = false;
-            Assert.False(renameList.AddSelectedCommand.CanExecute(null));
+            Assert.False(renameListViewModel.AddSelectedCommand.CanExecute(null));
         }
 
         private string _CreateSampleFolder()
@@ -315,11 +315,11 @@ namespace Mfr.Tests.Ui
             return (parent, albumPath);
         }
 
-        private FileListViewModel _CreateFileList(string path)
+        private FileListViewModel _CreateFileListViewModel(string path)
         {
-            var fileList = new FileListViewModel(NullSystemIconProvider.Instance, path);
-            _fileLists.Add(fileList);
-            return fileList;
+            var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path);
+            _fileListViewModels.Add(fileListViewModel);
+            return fileListViewModel;
         }
 
         private static FileListEntry _FolderEntry(string directoryPath)
@@ -342,9 +342,9 @@ namespace Mfr.Tests.Ui
             };
         }
 
-        private static IReadOnlyList<string> _PreviewNames(RenameListViewModel renameList)
+        private static IReadOnlyList<string> _PreviewNames(RenameListViewModel renameListViewModel)
         {
-            return [.. renameList.Entries.Select(entry => entry.FullFileName)];
+            return [.. renameListViewModel.Entries.Select(entry => entry.FullFileName)];
         }
 
         private static UiConfig _CloneUiConfig(UiConfig source)
