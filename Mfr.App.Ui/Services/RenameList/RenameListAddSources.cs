@@ -120,6 +120,14 @@ namespace Mfr.App.Ui.Services.RenameList
             return Path.Combine(folderPath, trimmedMask);
         }
 
+        /// <summary>
+        /// Returns whether <paramref name="path"/> can be used as an engine add source.
+        /// </summary>
+        /// <param name="path">Candidate file or folder path from the File List.</param>
+        /// <returns>
+        /// <see langword="true"/> when the path is non-blank, resolvable, and not a filesystem root;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
         private static bool _IsAddablePath(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
