@@ -18,8 +18,7 @@ namespace Mfr.Tests.Ui
         /// </summary>
         public RenameListViewModelTests()
         {
-            ConfigStore.Config.Ui.AddFiles = true;
-            ConfigStore.Config.Ui.AddFolders = false;
+            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
             ConfigStore.Config.Ui.AddFolderContents = true;
             _originalUiConfig = _CloneUiConfig(ConfigStore.Config.Ui);
         }
@@ -27,8 +26,7 @@ namespace Mfr.Tests.Ui
         /// <inheritdoc />
         public void Dispose()
         {
-            ConfigStore.Config.Ui.AddFiles = _originalUiConfig.AddFiles;
-            ConfigStore.Config.Ui.AddFolders = _originalUiConfig.AddFolders;
+            ConfigStore.Config.Ui.AddMode = _originalUiConfig.AddMode;
             ConfigStore.Config.Ui.AddFolderContents = _originalUiConfig.AddFolderContents;
 
             foreach (var fileListViewModel in _fileListViewModels)
@@ -189,7 +187,7 @@ namespace Mfr.Tests.Ui
         public void AddSelected_Folder_AddFoldersAndContents_AddsNestedFolderRows()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            ConfigStore.Config.Ui.AddFolders = true;
+            ConfigStore.Config.Ui.AddMode = RenameListAddMode.FilesAndFolders;
             var fileListViewModel = _CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
@@ -210,7 +208,7 @@ namespace Mfr.Tests.Ui
         public void AddSelected_Folder_ContentsOff_AddsOneLevel()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            ConfigStore.Config.Ui.AddFolders = true;
+            ConfigStore.Config.Ui.AddMode = RenameListAddMode.FilesAndFolders;
             ConfigStore.Config.Ui.AddFolderContents = false;
             var fileListViewModel = _CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
@@ -272,8 +270,7 @@ namespace Mfr.Tests.Ui
         public void AddSelected_Folder_FilesOffFoldersOn_AddsFolderOnly()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            ConfigStore.Config.Ui.AddFiles = false;
-            ConfigStore.Config.Ui.AddFolders = true;
+            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Folders;
             var fileListViewModel = _CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
@@ -284,24 +281,29 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add Selected is enabled for a folder when files or folders may be added.
+        /// Verifies Add Selected CanExecute for folder vs file selection under each add mode.
         /// </summary>
         [Fact]
-        public void AddSelected_CanExecute_FolderWhenFilesOrFoldersOn()
+        public void AddSelected_CanExecute_DependsOnAddModeAndSelection()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _CreateFileListViewModel(parent);
-            fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
+            var folderEntry = _FolderEntry(albumPath);
+            var fileEntry = _FileEntry(parent, "other.txt");
+            File.WriteAllText(fileEntry.FullPath, "o");
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
+            fileListViewModel.SetSelectedEntries([folderEntry]);
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
-            ConfigStore.Config.Ui.AddFiles = false;
-            ConfigStore.Config.Ui.AddFolders = true;
+            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Folders;
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
-            ConfigStore.Config.Ui.AddFolders = false;
+            fileListViewModel.SetSelectedEntries([fileEntry]);
             Assert.False(renameListViewModel.AddSelectedCommand.CanExecute(null));
+
+            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
+            Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
         }
 
         private string _CreateSampleFolder()
@@ -359,8 +361,7 @@ namespace Mfr.Tests.Ui
         {
             return new UiConfig
             {
-                AddFiles = source.AddFiles,
-                AddFolders = source.AddFolders,
+                AddMode = source.AddMode,
                 AddFolderContents = source.AddFolderContents,
                 RememberWindowState = source.RememberWindowState,
                 RememberLastFolder = source.RememberLastFolder,

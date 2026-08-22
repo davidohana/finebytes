@@ -144,7 +144,8 @@ namespace Mfr.Utils.Config
                 var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
                 var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
                 var isBoolLeaf = field.FieldType == typeof(bool);
-                if (intRange is null && strMax is null && !isBoolLeaf)
+                var isEnumLeaf = field.FieldType.IsEnum;
+                if (intRange is null && strMax is null && !isBoolLeaf && !isEnumLeaf)
                 {
                     continue;
                 }

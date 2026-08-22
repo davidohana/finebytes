@@ -191,5 +191,46 @@ namespace Mfr.Tests.Utils.Config
             var value = false;
             Assert.Throws<InvalidDataException>(() => ConfigValueReader.ReadBool(doc.RootElement, "flag", ref value));
         }
+
+        private enum SampleMode
+        {
+            Files = 0,
+            Folders = 1,
+            FilesAndFolders = 2,
+        }
+
+        [Fact]
+        public void ReadEnum_parses_member_name_case_insensitively()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"mode":"filesAndFolders"}"""
+            );
+            object value = SampleMode.Files;
+            ConfigValueReader.ReadEnum(doc.RootElement, "mode", typeof(SampleMode), ref value);
+            Assert.Equal(SampleMode.FilesAndFolders, value);
+        }
+
+        [Fact]
+        public void ReadEnum_missing_property_leaves_ref_unchanged()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
+            object value = SampleMode.Folders;
+            ConfigValueReader.ReadEnum(doc.RootElement, "mode", typeof(SampleMode), ref value);
+            Assert.Equal(SampleMode.Folders, value);
+        }
+
+        [Fact]
+        public void ReadEnum_invalid_member_throws()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"mode":"nope"}"""
+            );
+            object value = SampleMode.Files;
+            Assert.Throws<InvalidDataException>(() =>
+                ConfigValueReader.ReadEnum(doc.RootElement, "mode", typeof(SampleMode), ref value)
+            );
+        }
     }
 }

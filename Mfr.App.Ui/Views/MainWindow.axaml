@@ -31,7 +31,10 @@
     <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.UndoLast}" Command="{Binding UndoLastCommand}" />
     <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowLog}" Command="{Binding ShowLogCommand}" />
     <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowOptions}" Command="{Binding ShowOptionsCommand}" />
-    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.Refresh}" Command="{Binding FileListViewModel.RefreshCommand}" />
+    <KeyBinding
+      Gesture="{x:Static shortcuts:AppShortcuts.Refresh}"
+      Command="{Binding FileListViewModel.RefreshCommand}"
+    />
     <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.GoToAddress}"
       Command="{Binding FileListViewModel.BeginPathEditCommand}"
@@ -74,7 +77,10 @@
       Gesture="{x:Static shortcuts:AppShortcuts.AddSelected}"
       Command="{Binding RenameListViewModel.AddSelectedCommand}"
     />
-    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.AddAll}" Command="{Binding RenameListViewModel.AddAllCommand}" />
+    <KeyBinding
+      Gesture="{x:Static shortcuts:AppShortcuts.AddAll}"
+      Command="{Binding RenameListViewModel.AddAllCommand}"
+    />
   </Window.KeyBindings>
 
   <DockPanel>

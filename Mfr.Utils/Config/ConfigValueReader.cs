@@ -128,6 +128,53 @@ namespace Mfr.Utils.Config
         }
 
         /// <summary>
+        /// Reads an optional enum from a JSON string property.
+        /// <para>
+        /// When <paramref name="propertyName"/> is missing or JSON null, <paramref name="value"/> is unchanged.
+        /// Accepted text is a defined enum member name (case-insensitive).
+        /// </para>
+        /// </summary>
+        /// <param name="configObject">A JSON object (typically the document root).</param>
+        /// <param name="propertyName">Object property name; matching is case-insensitive.</param>
+        /// <param name="enumType">Non-flags enum type to parse into.</param>
+        /// <param name="value">Boxed enum field to update when the property is set.</param>
+        /// <exception cref="ArgumentException"><paramref name="enumType"/> is not an enum.</exception>
+        /// <exception cref="InvalidDataException">
+        /// Thrown when <paramref name="configObject"/> is not an object, the property is not a JSON string or null, or the text is not a defined member name.
+        /// </exception>
+        public static void ReadEnum(JsonElement configObject, string propertyName, Type enumType, ref object value)
+        {
+            ArgumentNullException.ThrowIfNull(enumType);
+            if (!enumType.IsEnum)
+            {
+                throw new ArgumentException($"Type '{enumType.FullName}' is not an enum.", nameof(enumType));
+            }
+
+            var raw = _ReadOptionalStringProperty(configObject, propertyName);
+            if (raw is null)
+            {
+                return;
+            }
+
+            if (raw.IsBlank())
+            {
+                throw new InvalidDataException($"'{propertyName}' must be an enum member name (got '{raw}').");
+            }
+
+            if (!Enum.TryParse(enumType, raw, ignoreCase: true, out var parsed) || parsed is null)
+            {
+                throw new InvalidDataException($"'{propertyName}' must be an enum member name (got '{raw}').");
+            }
+
+            if (!Enum.IsDefined(enumType, parsed))
+            {
+                throw new InvalidDataException($"'{propertyName}' must be an enum member name (got '{raw}').");
+            }
+
+            value = parsed;
+        }
+
+        /// <summary>
         /// Reads a case-insensitive object property whose value must be a JSON string or null.
         /// </summary>
         /// <param name="root">A JSON object (config root or nested object).</param>

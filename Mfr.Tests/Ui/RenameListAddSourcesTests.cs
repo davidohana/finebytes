@@ -47,8 +47,7 @@ namespace Mfr.Tests.Ui
             var sources = RenameListAddSources.ResolveSourcesFromSelection(
                 selectedEntries,
                 mask: "*.mp3",
-                addFiles: true,
-                addFolders: false
+                addMode: RenameListAddMode.Files
             );
 
             var source = Assert.Single(sources);
@@ -93,8 +92,7 @@ namespace Mfr.Tests.Ui
             var sources = RenameListAddSources.ResolveSourcesFromSelection(
                 selectedEntries,
                 mask: "*.txt",
-                addFiles: true,
-                addFolders: false
+                addMode: RenameListAddMode.Files
             );
 
             var source = Assert.Single(sources);
@@ -102,10 +100,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies both add-policy flags off yields no selection sources.
+        /// Verifies folders-only mode skips selected files but still emits folder sources.
         /// </summary>
         [Fact]
-        public void ResolveFromSelection_BothPolicyOff_ReturnsEmpty()
+        public void ResolveFromSelection_FoldersOnly_SkipsFiles()
         {
             var albumPath = Path.Combine(_dir, "album");
             var filePath = Path.Combine(_dir, "alpha.txt");
@@ -128,17 +126,23 @@ namespace Mfr.Tests.Ui
             var sources = RenameListAddSources.ResolveSourcesFromSelection(
                 selectedEntries,
                 mask: "*",
-                addFiles: false,
-                addFolders: false
+                addMode: RenameListAddMode.Folders
             );
 
-            Assert.Empty(sources);
-            Assert.False(
+            var source = Assert.Single(sources);
+            Assert.Equal(Path.Combine(albumPath, "*"), source);
+            Assert.True(
                 RenameListAddSources.CanResolveFromSelection(
                     selectedEntries,
                     mask: "*",
-                    addFiles: false,
-                    addFolders: false
+                    addMode: RenameListAddMode.Folders
+                )
+            );
+            Assert.False(
+                RenameListAddSources.CanResolveFromSelection(
+                    [selectedEntries[1]],
+                    mask: "*",
+                    addMode: RenameListAddMode.Folders
                 )
             );
         }
@@ -170,16 +174,14 @@ namespace Mfr.Tests.Ui
                 RenameListAddSources.ResolveSourcesFromSelection(
                     selectedEntries,
                     mask: "*",
-                    addFiles: true,
-                    addFolders: true
+                    addMode: RenameListAddMode.FilesAndFolders
                 )
             );
             Assert.False(
                 RenameListAddSources.CanResolveFromSelection(
                     selectedEntries,
                     mask: "*",
-                    addFiles: true,
-                    addFolders: true
+                    addMode: RenameListAddMode.FilesAndFolders
                 )
             );
         }

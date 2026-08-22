@@ -38,13 +38,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelected))]
         public void AddSelected()
         {
-            var uiConfig = ConfigStore.Config.Ui;
+            var addMode = ConfigStore.Config.Ui.AddMode;
             _AddSources(
                 RenameListAddSources.ResolveSourcesFromSelection(
                     _fileListViewModel.SelectedEntries,
                     _fileListViewModel.Mask,
-                    addFiles: uiConfig.AddFiles,
-                    addFolders: uiConfig.AddFolders
+                    addMode
                 )
             );
         }
@@ -72,13 +71,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var uiConfig = ConfigStore.Config.Ui;
-            var excludeMasks = _fileListViewModel.ExcludeMasksEnabled
-                ? _fileListViewModel.ExcludeMasks
-                : null;
+            var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             _renameList.AddSources(
                 sources: sources,
-                includeFiles: uiConfig.AddFiles,
-                includeFolders: uiConfig.AddFolders,
+                includeFiles: uiConfig.AddMode.IncludesFiles(),
+                includeFolders: uiConfig.AddMode.IncludesFolders(),
                 includeSubdirs: uiConfig.AddFolderContents,
                 excludeMasks: excludeMasks
             );
@@ -96,19 +93,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelected()
         {
-            var uiConfig = ConfigStore.Config.Ui;
             return RenameListAddSources.CanResolveFromSelection(
                 _fileListViewModel.SelectedEntries,
                 _fileListViewModel.Mask,
-                addFiles: uiConfig.AddFiles,
-                addFolders: uiConfig.AddFolders
+                ConfigStore.Config.Ui.AddMode
             );
         }
 
         private bool _CanAddAll()
         {
-            var uiConfig = ConfigStore.Config.Ui;
-            return _fileListViewModel.CanAddAllToCurrentFolder && (uiConfig.AddFiles || uiConfig.AddFolders);
+            return _fileListViewModel.CanAddAllToCurrentFolder;
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

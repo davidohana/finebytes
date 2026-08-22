@@ -8,8 +8,8 @@ namespace Mfr.Utils.Config
     /// <para>
     /// Uses <see cref="ConfigSectionAttribute"/> for nested objects,
     /// <see cref="ConfigIntRangeAttribute"/> / <see cref="ConfigStringMaxLengthAttribute"/> for constrained leaves,
-    /// and unannotated <c>bool</c> fields as boolean leaves (via <see cref="ConfigValueReader"/>; leaf values are JSON strings,
-    /// including integers and booleans).
+    /// and unannotated <c>bool</c> / enum fields as leaves (via <see cref="ConfigValueReader"/>; leaf values are JSON strings,
+    /// including integers, booleans, and enum member names).
     /// </para>
     /// </summary>
     public static class ConfigJsonApplier
@@ -18,7 +18,7 @@ namespace Mfr.Utils.Config
         /// Binds <paramref name="configObject"/> onto <paramref name="target"/>.
         /// <para>
         /// <see cref="ConfigSectionAttribute"/> fields recurse into nested JSON objects. Leaf attributes and public
-        /// <c>bool</c> fields read matching properties as JSON strings. Omitted properties and JSON null leave fields unchanged.
+        /// <c>bool</c> / enum fields read matching properties as JSON strings. Omitted properties and JSON null leave fields unchanged.
         /// </para>
         /// </summary>
         /// <param name="configObject">A JSON object (typically the document root).</param>
@@ -99,6 +99,12 @@ namespace Mfr.Utils.Config
             if (field.FieldType == typeof(bool))
             {
                 _ApplyBoolLeaf(configObject, target, field, jsonName);
+                return;
+            }
+
+            if (field.FieldType.IsEnum)
+            {
+                _ApplyEnumLeaf(configObject, target, field, jsonName);
             }
         }
 
@@ -205,6 +211,16 @@ namespace Mfr.Utils.Config
         {
             var value = (bool)field.GetValue(target)!;
             ConfigValueReader.ReadBool(configObject, jsonName, ref value);
+            field.SetValue(target, value);
+        }
+
+        /// <summary>
+        /// Reads and assigns an unannotated enum leaf.
+        /// </summary>
+        private static void _ApplyEnumLeaf(JsonElement configObject, object target, FieldInfo field, string jsonName)
+        {
+            var value = field.GetValue(target)!;
+            ConfigValueReader.ReadEnum(configObject, jsonName, field.FieldType, ref value);
             field.SetValue(target, value);
         }
 

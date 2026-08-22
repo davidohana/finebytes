@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.Models.Config;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.Services.RenameList
@@ -13,18 +14,16 @@ namespace Mfr.App.Ui.Services.RenameList
         /// </summary>
         /// <param name="selectedEntries">Selected File List rows.</param>
         /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
-        /// <param name="addFiles">When true, selected files are included.</param>
-        /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
+        /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         public static IReadOnlyList<string> ResolveSourcesFromSelection(
             IReadOnlyList<FileListEntry> selectedEntries,
             string mask,
-            bool addFiles,
-            bool addFolders
+            RenameListAddMode addMode
         )
         {
             ArgumentNullException.ThrowIfNull(selectedEntries);
-            return [.. _EnumerateSelectionSources(selectedEntries, mask, addFiles, addFolders)];
+            return [.. _EnumerateSelectionSources(selectedEntries, mask, addMode)];
         }
 
         /// <summary>
@@ -32,18 +31,16 @@ namespace Mfr.App.Ui.Services.RenameList
         /// </summary>
         /// <param name="selectedEntries">Selected File List rows.</param>
         /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
-        /// <param name="addFiles">When true, selected files are included.</param>
-        /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
+        /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
         /// <returns><see langword="true"/> when at least one source would be emitted.</returns>
         public static bool CanResolveFromSelection(
             IReadOnlyList<FileListEntry> selectedEntries,
             string mask,
-            bool addFiles,
-            bool addFolders
+            RenameListAddMode addMode
         )
         {
             ArgumentNullException.ThrowIfNull(selectedEntries);
-            return _EnumerateSelectionSources(selectedEntries, mask, addFiles, addFolders).Any();
+            return _EnumerateSelectionSources(selectedEntries, mask, addMode).Any();
         }
 
         /// <summary>
@@ -72,20 +69,15 @@ namespace Mfr.App.Ui.Services.RenameList
         /// </summary>
         /// <param name="selectedEntries">Selected File List rows.</param>
         /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
-        /// <param name="addFiles">When true, selected files are included.</param>
-        /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
+        /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         private static IEnumerable<string> _EnumerateSelectionSources(
             IReadOnlyList<FileListEntry> selectedEntries,
             string mask,
-            bool addFiles,
-            bool addFolders
+            RenameListAddMode addMode
         )
         {
-            if (!addFiles && !addFolders)
-            {
-                yield break;
-            }
+            var includeFiles = addMode.IncludesFiles();
 
             foreach (var entry in selectedEntries)
             {
@@ -96,11 +88,12 @@ namespace Mfr.App.Ui.Services.RenameList
 
                 if (entry.IsDirectory)
                 {
+                    // Folder sources expand under includeFiles / includeFolders at the engine layer.
                     yield return _BuildFolderSource(entry.FullPath, mask);
                     continue;
                 }
 
-                if (!addFiles)
+                if (!includeFiles)
                 {
                     continue;
                 }

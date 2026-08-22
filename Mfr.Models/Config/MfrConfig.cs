@@ -68,17 +68,12 @@ namespace Mfr.Models.Config
     public sealed class UiConfig
     {
         /// <summary>
-        /// When true, file paths added to the Rename List are included as rows.
+        /// Which path kinds become Rename List rows when adding from the File List.
         /// </summary>
-        public bool AddFiles = true;
+        public RenameListAddMode AddMode = RenameListAddMode.Files;
 
         /// <summary>
-        /// When true, folder paths added to the Rename List are included as rows.
-        /// </summary>
-        public bool AddFolders;
-
-        /// <summary>
-        /// When true, folder sources recurse: matching files in subfolders, and descendant folder rows when <see cref="AddFolders"/> is also on.
+        /// When true, folder sources recurse: matching files in subfolders, and descendant folder rows when <see cref="AddMode"/> includes folders.
         /// </summary>
         public bool AddFolderContents = true;
 

@@ -1,7 +1,7 @@
 namespace Mfr.Tests.Models
 {
     /// <summary>
-    /// Tests Rename List add-policy flags on <see cref="UiConfig"/>.
+    /// Tests Rename List add-policy settings on <see cref="UiConfig"/>.
     /// </summary>
     public sealed class UiConfigTests
     {
@@ -9,8 +9,7 @@ namespace Mfr.Tests.Models
         public void Add_policy_defaults_match_MFR7()
         {
             var ui = new UiConfig();
-            Assert.True(ui.AddFiles);
-            Assert.False(ui.AddFolders);
+            Assert.Equal(RenameListAddMode.Files, ui.AddMode);
             Assert.True(ui.AddFolderContents);
         }
 
@@ -21,13 +20,12 @@ namespace Mfr.Tests.Models
             File.WriteAllText(configPath, """{}""");
             ConfigStore.Load(configPath);
 
-            Assert.True(ConfigStore.Config.Ui.AddFiles);
-            Assert.False(ConfigStore.Config.Ui.AddFolders);
+            Assert.Equal(RenameListAddMode.Files, ConfigStore.Config.Ui.AddMode);
             Assert.True(ConfigStore.Config.Ui.AddFolderContents);
         }
 
         [Fact]
-        public void Load_json_round_trips_add_policy_flags()
+        public void Load_json_round_trips_add_policy()
         {
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-ui-config-" + Guid.NewGuid() + ".json");
             File.WriteAllText(
@@ -36,8 +34,7 @@ namespace Mfr.Tests.Models
                 """
                 {
                   "ui": {
-                    "addFiles": "false",
-                    "addFolders": "true",
+                    "addMode": "folders",
                     "addFolderContents": "false"
                   }
                 }
@@ -45,22 +42,20 @@ namespace Mfr.Tests.Models
             );
             ConfigStore.Load(configPath);
 
-            Assert.False(ConfigStore.Config.Ui.AddFiles);
-            Assert.True(ConfigStore.Config.Ui.AddFolders);
+            Assert.Equal(RenameListAddMode.Folders, ConfigStore.Config.Ui.AddMode);
             Assert.False(ConfigStore.Config.Ui.AddFolderContents);
         }
 
         [Fact]
-        public void ApplyCliOverrides_sets_add_policy_flags()
+        public void ApplyCliOverrides_sets_add_policy()
         {
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-ui-config-" + Guid.NewGuid() + ".json");
             File.WriteAllText(configPath, """{}""");
             ConfigStore.Load(configPath);
 
-            ConfigStore.ApplyCliOverrides(["ui.addFiles=false", "ui.addFolders=true", "ui.addFolderContents=false"]);
+            ConfigStore.ApplyCliOverrides(["ui.addMode=filesAndFolders", "ui.addFolderContents=false"]);
 
-            Assert.False(ConfigStore.Config.Ui.AddFiles);
-            Assert.True(ConfigStore.Config.Ui.AddFolders);
+            Assert.Equal(RenameListAddMode.FilesAndFolders, ConfigStore.Config.Ui.AddMode);
             Assert.False(ConfigStore.Config.Ui.AddFolderContents);
         }
     }

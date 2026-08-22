@@ -27,8 +27,16 @@ namespace Mfr.Tests.Utils.Config
 
             public bool Enabled = true;
 
+            public SampleLeafMode Mode = SampleLeafMode.Files;
+
             /// <summary>Not annotated; must stay at its default when matching JSON keys are present.</summary>
             public int UnmappedField = 5;
+        }
+
+        private enum SampleLeafMode
+        {
+            Files = 0,
+            Folders = 1,
         }
 
         private sealed class BadDualAttribute
@@ -73,13 +81,14 @@ namespace Mfr.Tests.Utils.Config
         public void Apply_sets_annotated_fields_uses_camel_case_names()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
-                """{"port":"50","name":"xyz","enabled":"false"}"""
+                """{"port":"50","name":"xyz","enabled":"false","mode":"folders"}"""
             );
             var o = new SampleOptions();
             ConfigJsonApplier.Apply(doc.RootElement, o);
             Assert.Equal(50, o.Port);
             Assert.Equal("xyz", o.Name);
             Assert.False(o.Enabled);
+            Assert.Equal(SampleLeafMode.Folders, o.Mode);
         }
 
         [Fact]
