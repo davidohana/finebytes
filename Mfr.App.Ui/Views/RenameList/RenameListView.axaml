@@ -98,18 +98,34 @@
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="Button.rename-list-action">
-      <Setter Property="Width" Value="30" />
-      <Setter Property="Height" Value="30" />
-      <Setter Property="MinWidth" Value="30" />
-      <Setter Property="MinHeight" Value="30" />
+      <Setter Property="Width" Value="28" />
+      <Setter Property="Height" Value="28" />
+      <Setter Property="MinWidth" Value="28" />
+      <Setter Property="MinHeight" Value="28" />
       <Setter Property="Padding" Value="2" />
+      <Setter Property="Margin" Value="1" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.rename-list-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
     </Style>
   </UserControl.Styles>
   <Border Classes="pane">
     <Grid ColumnDefinitions="Auto,*">
-      <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="4" Margin="4,0,4,4">
+      <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="0" Margin="4,0,4,4">
         <Button
           Classes="rename-list-action"
           Command="{Binding AddSelectedCommand}"
