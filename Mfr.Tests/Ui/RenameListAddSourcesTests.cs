@@ -102,5 +102,78 @@ namespace Mfr.Tests.Ui
             var source = Assert.Single(sources);
             Assert.Equal(filePath, source);
         }
+
+        /// <summary>
+        /// Verifies both add-policy flags off yields no selection sources.
+        /// </summary>
+        [Fact]
+        public void ResolveFromSelection_BothPolicyOff_ReturnsEmpty()
+        {
+            var albumPath = Path.Combine(_fileList.CurrentPath, "album");
+            var filePath = Path.Combine(_fileList.CurrentPath, "alpha.txt");
+            _fileList.SetSelectedEntries([
+                new FileListEntry
+                {
+                    Name = "album",
+                    FullPath = albumPath,
+                    IsDirectory = true,
+                },
+                new FileListEntry
+                {
+                    Name = "alpha.txt",
+                    FullPath = filePath,
+                    IsDirectory = false,
+                },
+            ]);
+
+            var sources = RenameListAddSources.ResolveSourcesFromSelection(
+                _fileList,
+                addFiles: false,
+                addFolders: false
+            );
+
+            Assert.Empty(sources);
+            Assert.False(RenameListAddSources.CanResolveFromSelection(_fileList, addFiles: false, addFolders: false));
+        }
+
+        /// <summary>
+        /// Verifies drive-root selection is not addable.
+        /// </summary>
+        [Fact]
+        public void ResolveFromSelection_RootPath_ReturnsEmpty()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var root = Path.GetPathRoot(_fileList.CurrentPath);
+            Assert.False(string.IsNullOrEmpty(root));
+            _fileList.SetSelectedEntries([
+                new FileListEntry
+                {
+                    Name = root,
+                    FullPath = root,
+                    IsDirectory = true,
+                },
+            ]);
+
+            Assert.Empty(RenameListAddSources.ResolveSourcesFromSelection(_fileList, addFiles: true, addFolders: true));
+            Assert.False(RenameListAddSources.CanResolveFromSelection(_fileList, addFiles: true, addFolders: true));
+        }
+
+        /// <summary>
+        /// Verifies Add All CanResolve matches Resolve emptiness when policy is off.
+        /// </summary>
+        [Fact]
+        public void CanResolveFromCurrentFolder_BothPolicyOff_IsFalse()
+        {
+            Assert.False(
+                RenameListAddSources.CanResolveFromCurrentFolder(_fileList, addFiles: false, addFolders: false)
+            );
+            Assert.Empty(
+                RenameListAddSources.ResolveSourcesFromCurrentFolder(_fileList, addFiles: false, addFolders: false)
+            );
+        }
     }
 }

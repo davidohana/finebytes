@@ -258,6 +258,24 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Add Selected with files off and folders on adds only the selected folder row.
+        /// </summary>
+        [Fact]
+        public void AddSelected_Folder_FilesOffFoldersOn_AddsFolderOnly()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            ConfigStore.Config.Ui.AddFiles = false;
+            ConfigStore.Config.Ui.AddFolders = true;
+            var fileList = _CreateFileList(parent);
+            var renameList = new RenameListViewModel(fileList);
+            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
+
+            renameList.AddSelectedCommand.Execute(null);
+
+            Assert.Equal(["album"], _PreviewNames(renameList));
+        }
+
+        /// <summary>
         /// Verifies Add Selected is enabled for a folder when files or folders may be added.
         /// </summary>
         [Fact]
@@ -271,6 +289,9 @@ namespace Mfr.Tests.Ui
             Assert.True(renameList.AddSelectedCommand.CanExecute(null));
 
             ConfigStore.Config.Ui.AddFiles = false;
+            ConfigStore.Config.Ui.AddFolders = true;
+            Assert.True(renameList.AddSelectedCommand.CanExecute(null));
+
             ConfigStore.Config.Ui.AddFolders = false;
             Assert.False(renameList.AddSelectedCommand.CanExecute(null));
         }

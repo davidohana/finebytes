@@ -78,7 +78,7 @@ namespace Mfr.Models.Config
         public bool AddFolders;
 
         /// <summary>
-        /// When true, folder sources expand into subdirectories.
+        /// When true, folder sources recurse: matching files in subfolders, and descendant folder rows when <see cref="AddFolders"/> is also on.
         /// </summary>
         public bool AddFolderContents = true;
 

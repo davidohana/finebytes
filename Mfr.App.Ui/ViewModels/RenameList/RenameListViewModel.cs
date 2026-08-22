@@ -38,12 +38,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelected))]
         public void AddSelected()
         {
-            var ui = ConfigStore.Config.Ui;
+            var uiConfig = ConfigStore.Config.Ui;
             _AddSources(
                 RenameListAddSources.ResolveSourcesFromSelection(
                     _fileList,
-                    addFiles: ui.AddFiles,
-                    addFolders: ui.AddFolders
+                    addFiles: uiConfig.AddFiles,
+                    addFolders: uiConfig.AddFolders
                 )
             );
         }
@@ -54,12 +54,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddAll))]
         public void AddAll()
         {
-            var ui = ConfigStore.Config.Ui;
+            var uiConfig = ConfigStore.Config.Ui;
             _AddSources(
                 RenameListAddSources.ResolveSourcesFromCurrentFolder(
                     _fileList,
-                    addFiles: ui.AddFiles,
-                    addFolders: ui.AddFolders
+                    addFiles: uiConfig.AddFiles,
+                    addFolders: uiConfig.AddFolders
                 )
             );
         }
@@ -71,13 +71,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var ui = ConfigStore.Config.Ui;
+            var uiConfig = ConfigStore.Config.Ui;
             var excludeMasks = _fileList.ExcludeMasksEnabled ? _fileList.ExcludeMasks : null;
             _renameList.AddSources(
                 sources: sources,
-                includeFiles: ui.AddFiles,
-                includeFolders: ui.AddFolders,
-                includeSubdirs: ui.AddFolderContents,
+                includeFiles: uiConfig.AddFiles,
+                includeFolders: uiConfig.AddFolders,
+                includeSubdirs: uiConfig.AddFolderContents,
                 excludeMasks: excludeMasks
             );
             _SyncEntries();
@@ -94,18 +94,22 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelected()
         {
-            var ui = ConfigStore.Config.Ui;
-            return RenameListAddSources
-                    .ResolveSourcesFromSelection(_fileList, addFiles: ui.AddFiles, addFolders: ui.AddFolders)
-                    .Count > 0;
+            var uiConfig = ConfigStore.Config.Ui;
+            return RenameListAddSources.CanResolveFromSelection(
+                _fileList,
+                addFiles: uiConfig.AddFiles,
+                addFolders: uiConfig.AddFolders
+            );
         }
 
         private bool _CanAddAll()
         {
-            var ui = ConfigStore.Config.Ui;
-            return RenameListAddSources
-                    .ResolveSourcesFromCurrentFolder(_fileList, addFiles: ui.AddFiles, addFolders: ui.AddFolders)
-                    .Count > 0;
+            var uiConfig = ConfigStore.Config.Ui;
+            return RenameListAddSources.CanResolveFromCurrentFolder(
+                _fileList,
+                addFiles: uiConfig.AddFiles,
+                addFolders: uiConfig.AddFolders
+            );
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)
