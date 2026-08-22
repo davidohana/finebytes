@@ -70,6 +70,11 @@
       Command="{Binding FileList.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.Thumbnails}"
     />
+    <KeyBinding
+      Gesture="{x:Static shortcuts:AppShortcuts.AddSelected}"
+      Command="{Binding RenameList.AddSelectedCommand}"
+    />
+    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.AddAll}" Command="{Binding RenameList.AddAllCommand}" />
   </Window.KeyBindings>
 
   <DockPanel>
@@ -225,10 +230,14 @@
       <MenuItem Header="_Rename List">
         <MenuItem
           Header="Add Selected"
-          IsEnabled="False"
+          Command="{Binding RenameList.AddSelectedCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.AddSelected}"
         />
-        <MenuItem Header="Add All" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.AddAll}" />
+        <MenuItem
+          Header="Add All"
+          Command="{Binding RenameList.AddAllCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.AddAll}"
+        />
         <MenuItem Header="Remove" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}" />
         <MenuItem Header="Clear" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}" />
         <Separator />

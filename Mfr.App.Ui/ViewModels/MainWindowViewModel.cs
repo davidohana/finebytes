@@ -12,24 +12,30 @@ namespace Mfr.App.Ui.ViewModels
     /// <summary>
     /// Root view model for the main window shell (menus, toolbar, status, pane hosts).
     /// </summary>
-    /// <remarks>
-    /// Initializes pane view models for the 7.4 layout.
-    /// </remarks>
-    /// <param name="initialFileListPath">
-    /// Optional File List start path (e.g. remembered last folder). When null, the File List uses its default.
-    /// </param>
-    public partial class MainWindowViewModel(string? initialFileListPath = null) : ViewModelBase
+    public partial class MainWindowViewModel : ViewModelBase
     {
+        /// <summary>
+        /// Initializes pane view models for the 7.4 layout.
+        /// </summary>
+        /// <param name="initialFileListPath">
+        /// Optional File List start path (e.g. remembered last folder). When null, the File List uses its default.
+        /// </param>
+        public MainWindowViewModel(string? initialFileListPath = null)
+        {
+            FileList = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
+            RenameList = new RenameListViewModel(FileList);
+            WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
+        }
+
         /// <summary>
         /// Gets the main window title, including the product version.
         /// </summary>
-        public string WindowTitle { get; } = $"Magic File Renamer {_GetDisplayVersion()}";
+        public string WindowTitle { get; }
 
         /// <summary>
         /// Gets the File List pane.
         /// </summary>
-        public FileListViewModel FileList { get; } =
-            new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
+        public FileListViewModel FileList { get; }
 
         /// <summary>
         /// Gets the Available Filters pane.
@@ -49,7 +55,7 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Gets the Rename List pane.
         /// </summary>
-        public RenameListViewModel RenameList { get; } = new RenameListViewModel();
+        public RenameListViewModel RenameList { get; }
 
         /// <summary>
         /// Status-bar hover hint. Empty until panes publish hints.

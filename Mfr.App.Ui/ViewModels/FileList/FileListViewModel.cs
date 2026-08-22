@@ -226,6 +226,11 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public IReadOnlyList<FileListEntry> SelectedEntries => _selectedEntries;
 
         /// <summary>
+        /// Gets whether Add All can target the current folder (not This PC, Network, or a root path).
+        /// </summary>
+        public bool CanAddAllToCurrentFolder => _CanAddAllToCurrentFolder();
+
+        /// <summary>
         /// Whether <see cref="GoUp"/> can move to a parent folder, Network, or This PC.
         /// </summary>
         [ObservableProperty]
@@ -988,6 +993,16 @@ namespace Mfr.App.Ui.ViewModels.FileList
             return new ListedItem(path, name, IsDirectory: false, Length: length, LastWriteTime: lastWriteTime);
         }
 
+        /// <summary>
+        /// Whether the File List include/exclude masks allow adding this file path.
+        /// </summary>
+        /// <param name="path">Full file path to evaluate.</param>
+        /// <returns><see langword="true"/> when the file name passes active masks.</returns>
+        public bool PassesFileMasks(string path)
+        {
+            return _PassesFileMasks(path);
+        }
+
         private bool _PassesFileMasks(string path)
         {
             var fileName = Path.GetFileName(path);
@@ -1002,6 +1017,30 @@ namespace Mfr.App.Ui.ViewModels.FileList
             }
 
             return !WildcardMask.MatchesAny(fileName, ExcludeMasks);
+        }
+
+        private bool _CanAddAllToCurrentFolder()
+        {
+            if (FileListPath.IsComputerPath(CurrentPath) || FileListPath.IsNetworkPath(CurrentPath))
+            {
+                return false;
+            }
+
+            try
+            {
+                var fullPath = Path.GetFullPath(CurrentPath);
+                var root = Path.GetPathRoot(fullPath);
+                if (string.IsNullOrEmpty(root))
+                {
+                    return false;
+                }
+
+                return !string.Equals(root, fullPath, PathComparers.OsComparison);
+            }
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException)
+            {
+                return false;
+            }
         }
 
         private List<ListedItem> _ListDrives()

@@ -91,6 +91,12 @@ namespace Mfr.App.Ui.Input
         /// <summary>Toolbar tip for Options.</summary>
         public const string ShowOptionsTip = "Options (Ctrl+,)";
 
+        /// <summary>Rename List Add Selected button and menu tip.</summary>
+        public const string AddSelectedTip = "Add selected (Ctrl+Shift+S)";
+
+        /// <summary>Rename List Add All button and menu tip.</summary>
+        public const string AddAllTip = "Add all (Ctrl+Shift+A)";
+
         /// <summary>File List refresh button tip.</summary>
         public const string RefreshTip = "Refresh (F5)";
 
