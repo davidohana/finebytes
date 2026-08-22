@@ -41,7 +41,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var uiConfig = ConfigStore.Config.Ui;
             _AddSources(
                 RenameListAddSources.ResolveSourcesFromSelection(
-                    _fileListViewModel,
+                    _fileListViewModel.SelectedEntries,
+                    _fileListViewModel.Mask,
                     addFiles: uiConfig.AddFiles,
                     addFolders: uiConfig.AddFolders
                 )
@@ -57,7 +58,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var uiConfig = ConfigStore.Config.Ui;
             _AddSources(
                 RenameListAddSources.ResolveSourcesFromCurrentFolder(
-                    _fileListViewModel,
+                    _fileListViewModel.CurrentPath,
+                    _fileListViewModel.Mask,
+                    _fileListViewModel.CanAddAllToCurrentFolder,
                     addFiles: uiConfig.AddFiles,
                     addFolders: uiConfig.AddFolders
                 )
@@ -98,7 +101,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             var uiConfig = ConfigStore.Config.Ui;
             return RenameListAddSources.CanResolveFromSelection(
-                _fileListViewModel,
+                _fileListViewModel.SelectedEntries,
+                _fileListViewModel.Mask,
                 addFiles: uiConfig.AddFiles,
                 addFolders: uiConfig.AddFolders
             );
@@ -108,7 +112,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             var uiConfig = ConfigStore.Config.Ui;
             return RenameListAddSources.CanResolveFromCurrentFolder(
-                _fileListViewModel,
+                _fileListViewModel.CanAddAllToCurrentFolder,
                 addFiles: uiConfig.AddFiles,
                 addFolders: uiConfig.AddFolders
             );

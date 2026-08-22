@@ -9,80 +9,91 @@ namespace Mfr.App.Ui.Services.RenameList
     internal static class RenameListAddSources
     {
         /// <summary>
-        /// Resolves engine add sources from the File List's current selection.
+        /// Resolves engine add sources from File List selection.
         /// </summary>
-        /// <param name="fileListViewModel">File List pane state.</param>
+        /// <param name="selectedEntries">Selected File List rows.</param>
+        /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
         /// <param name="addFiles">When true, selected files are included.</param>
         /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         public static IReadOnlyList<string> ResolveSourcesFromSelection(
-            FileListViewModel fileListViewModel,
+            IReadOnlyList<FileListEntry> selectedEntries,
+            string mask,
             bool addFiles,
             bool addFolders
         )
         {
-            ArgumentNullException.ThrowIfNull(fileListViewModel);
-            return [.. _EnumerateSelectionSources(fileListViewModel, addFiles, addFolders)];
+            ArgumentNullException.ThrowIfNull(selectedEntries);
+            return [.. _EnumerateSelectionSources(selectedEntries, mask, addFiles, addFolders)];
         }
 
         /// <summary>
         /// Returns whether selection would produce at least one engine add source.
         /// </summary>
-        /// <param name="fileListViewModel">File List pane state.</param>
+        /// <param name="selectedEntries">Selected File List rows.</param>
+        /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
         /// <param name="addFiles">When true, selected files are included.</param>
         /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
         /// <returns><see langword="true"/> when at least one source would be emitted.</returns>
-        public static bool CanResolveFromSelection(FileListViewModel fileListViewModel, bool addFiles, bool addFolders)
+        public static bool CanResolveFromSelection(
+            IReadOnlyList<FileListEntry> selectedEntries,
+            string mask,
+            bool addFiles,
+            bool addFolders
+        )
         {
-            ArgumentNullException.ThrowIfNull(fileListViewModel);
-            return _EnumerateSelectionSources(fileListViewModel, addFiles, addFolders).Any();
+            ArgumentNullException.ThrowIfNull(selectedEntries);
+            return _EnumerateSelectionSources(selectedEntries, mask, addFiles, addFolders).Any();
         }
 
         /// <summary>
         /// Resolves engine add sources from the File List's current folder.
         /// </summary>
-        /// <param name="fileListViewModel">File List pane state.</param>
+        /// <param name="currentPath">Current File List folder path.</param>
+        /// <param name="mask">File List include mask used as the last segment of the folder source.</param>
+        /// <param name="canAddAllToCurrentFolder">Whether Add All is allowed for the current folder.</param>
         /// <param name="addFiles">With <paramref name="addFolders"/>, gates whether the current folder is emitted.</param>
         /// <param name="addFolders">With <paramref name="addFiles"/>, gates whether the current folder is emitted.</param>
         /// <returns>A single folder source with a last-segment filename mask, or empty.</returns>
         public static IReadOnlyList<string> ResolveSourcesFromCurrentFolder(
-            FileListViewModel fileListViewModel,
+            string currentPath,
+            string mask,
+            bool canAddAllToCurrentFolder,
             bool addFiles,
             bool addFolders
         )
         {
-            ArgumentNullException.ThrowIfNull(fileListViewModel);
-
-            if (!CanResolveFromCurrentFolder(fileListViewModel, addFiles, addFolders))
+            if (!CanResolveFromCurrentFolder(canAddAllToCurrentFolder, addFiles, addFolders))
             {
                 return [];
             }
 
-            return [_BuildFolderSource(fileListViewModel.CurrentPath, fileListViewModel.Mask)];
+            return [_BuildFolderSource(currentPath, mask)];
         }
 
         /// <summary>
         /// Returns whether Add All would produce a current-folder engine source.
         /// </summary>
-        /// <param name="fileListViewModel">File List pane state.</param>
+        /// <param name="canAddAllToCurrentFolder">Whether Add All is allowed for the current folder.</param>
         /// <param name="addFiles">With <paramref name="addFolders"/>, gates whether the current folder is emitted.</param>
         /// <param name="addFolders">With <paramref name="addFiles"/>, gates whether the current folder is emitted.</param>
         /// <returns><see langword="true"/> when a current-folder source would be emitted.</returns>
-        public static bool CanResolveFromCurrentFolder(FileListViewModel fileListViewModel, bool addFiles, bool addFolders)
+        public static bool CanResolveFromCurrentFolder(bool canAddAllToCurrentFolder, bool addFiles, bool addFolders)
         {
-            ArgumentNullException.ThrowIfNull(fileListViewModel);
-            return fileListViewModel.CanAddAllToCurrentFolder && (addFiles || addFolders);
+            return canAddAllToCurrentFolder && (addFiles || addFolders);
         }
 
         /// <summary>
         /// Yields engine add sources for each addable selected File List entry.
         /// </summary>
-        /// <param name="fileListViewModel">File List pane state.</param>
+        /// <param name="selectedEntries">Selected File List rows.</param>
+        /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
         /// <param name="addFiles">When true, selected files are included.</param>
         /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         private static IEnumerable<string> _EnumerateSelectionSources(
-            FileListViewModel fileListViewModel,
+            IReadOnlyList<FileListEntry> selectedEntries,
+            string mask,
             bool addFiles,
             bool addFolders
         )
@@ -92,7 +103,7 @@ namespace Mfr.App.Ui.Services.RenameList
                 yield break;
             }
 
-            foreach (var entry in fileListViewModel.SelectedEntries)
+            foreach (var entry in selectedEntries)
             {
                 if (!_IsAddablePath(entry.FullPath))
                 {
@@ -101,7 +112,7 @@ namespace Mfr.App.Ui.Services.RenameList
 
                 if (entry.IsDirectory)
                 {
-                    yield return _BuildFolderSource(entry.FullPath, fileListViewModel.Mask);
+                    yield return _BuildFolderSource(entry.FullPath, mask);
                     continue;
                 }
 
