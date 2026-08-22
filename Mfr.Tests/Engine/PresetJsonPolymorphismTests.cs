@@ -1,4 +1,3 @@
-using Mfr.Engine;
 using Mfr.Filters.Case;
 
 namespace Mfr.Tests.Engine

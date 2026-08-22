@@ -2,7 +2,7 @@ using Mfr.Metadata;
 using Mfr.Models.Tags;
 using Serilog;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.Commit
 {
     /// <summary>
     /// Executes a <see cref="CommitPlan"/> against the filesystem and produces per-item results.

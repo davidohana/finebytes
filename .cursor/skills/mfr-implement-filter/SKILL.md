@@ -36,7 +36,7 @@ description: >-
    | `Id3v2Frame` | `frameId`, optional `language` / `description` | One modeled ID3v2 frame (MPEG only) |
    | `XiphField` | `key` | One Xiph / Vorbis comment key (FLAC/Ogg only) |
 
-7. **JSON registration.** In `Mfr.Engine/PresetJsonOptions.cs`, add `using Mfr.Filters.<Group>;` if missing and append `new JsonDerivedType(typeof(YourFilter), "YourFilterType")` to `DerivedTypes` (follow the ordering style already used in that list).
+7. **JSON registration.** In `Mfr.Engine/Presets/PresetJsonOptions.cs`, add `using Mfr.Filters.<Group>;` if missing and append `new JsonDerivedType(typeof(YourFilter), "YourFilterType")` to `DerivedTypes` (follow the ordering style already used in that list).
 
 8. **Palette catalog.** Add `[FilterPalette(FilterGroup.<Group>, "Display Name")]` on the filter class (same group folder / `FilterGroup` value). Display names use spaces in PascalCase; keep MFR 7 exceptions (`TagRemover` → `Audio Tag Remover`, `FixLeadingZeros` → `Fix Leading 0's`, `Id3v2FieldSetter` → `ID3v2 Field Setter`). `FilterCatalog` discovers entries by reflection; completeness is guarded by tests against `PresetJsonOptions`.
 

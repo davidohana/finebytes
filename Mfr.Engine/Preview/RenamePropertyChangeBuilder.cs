@@ -9,7 +9,7 @@ using Mfr.Models.Tags.RiffInfo;
 using Mfr.Models.Tags.Xiph;
 using Mfr.Utils;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.Preview
 {
     /// <summary>
     /// Builds <see cref="RenamePropertyChange"/> rows shared between preview formatting and commit outcomes.

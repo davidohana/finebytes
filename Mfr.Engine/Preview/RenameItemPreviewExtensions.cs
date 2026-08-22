@@ -1,11 +1,11 @@
 using Serilog;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.Preview
 {
     /// <summary>
-    /// Provides rename-item helpers for filter-based preview name transformation and preview formatting.
+    /// Provides rename-item helpers for preview change logging and display formatting.
     /// </summary>
-    public static class RenameItemExtensions
+    public static class RenameItemPreviewExtensions
     {
         /// <summary>
         /// Logs debug details for one item when preview produced path or attribute changes.

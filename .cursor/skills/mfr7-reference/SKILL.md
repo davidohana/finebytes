@@ -52,7 +52,7 @@ MFR7 reference:
 | Audio tags | `docs/audio-tag-model.md` | `Core/MfrFilters/Filters/Audio/`, `Help/id3*.html` |
 | Image / EXIF | `docs/image-metadata-model.md` | `Help/eximagefp.html`, `basicimagefp.html`, `MetaDataExtractor` usage in source |
 | CLI | `Mfr.App.Cli/` | `Core/MfrConsole/Console.cs`, `Help/console.html` |
-| Presets | `Mfr.Engine/PresetJsonOptions.cs` | MFR7 XML preset serialization in `Core/MfrLib/` (search `Preset`, `Serialize`) |
+| Presets | `Mfr.Engine/Presets/PresetJsonOptions.cs` | MFR7 XML preset serialization in `Core/MfrLib/` (search `Preset`, `Serialize`) |
 
 ### Step 2 — Check finebytes first
 

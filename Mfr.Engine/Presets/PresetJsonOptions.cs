@@ -10,7 +10,7 @@ using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.Presets
 {
     internal static class PresetJsonOptions
     {

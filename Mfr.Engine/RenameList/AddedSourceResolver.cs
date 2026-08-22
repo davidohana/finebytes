@@ -1,6 +1,6 @@
 using Mfr.Utils;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.RenameList
 {
     /// <summary>
     /// Resolves user-added rename sources (files, directories, and last-segment filename masks) into concrete paths.

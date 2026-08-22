@@ -1,7 +1,7 @@
 using Mfr.Utils;
 using Serilog;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.RenameList
 {
     /// <summary>
     /// Maintains ordered rename sources and resolves them into file entries.

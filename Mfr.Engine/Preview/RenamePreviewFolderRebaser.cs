@@ -1,6 +1,6 @@
 using Mfr.Utils;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.Preview
 {
     /// <summary>
     /// Rebases descendant items' preview directory paths so they follow ancestor folders being renamed in the same batch.

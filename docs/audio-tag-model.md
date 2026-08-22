@@ -262,5 +262,5 @@ same preview chain.
 | Shared text rules | `Mfr.Utils/DelimitedText.cs`, `Mfr.Utils/OrdinalSequence.cs`, `Mfr.Utils/StringExtensions.cs` |
 | Policy | `Mfr.Models/Tags/AudioTagContainerPolicy.cs` (capability), `Mfr.Metadata/AudioTagContainerDetector.cs` (detect), `Id3v2FrameVersionPolicy.cs`, `AsfDescriptorNames.cs` |
 | Filters | `Mfr.Filters/Audio/*`, `StringTargetFilter.cs`, `Mfr.Models/Filters/Targets.cs` |
-| Engine | `Mfr.Engine/CommitExecutor.cs`, `RenamePropertyChangeBuilder.cs` |
+| Engine | `Mfr.Engine/Commit/CommitExecutor.cs`, `Mfr.Engine/Preview/RenamePropertyChangeBuilder.cs` |
 | Tests | `Mfr.Tests/Metadata/*`, `Mfr.Tests/Models/Filters/Audio/*`, `RenameListCommitTests` embedded-tag cases |

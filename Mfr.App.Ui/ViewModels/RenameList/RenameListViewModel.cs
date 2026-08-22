@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Models.Config;
-using EngineRenameList = Mfr.Engine.RenameList;
+using EngineRenameList = Mfr.Engine.RenameList.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {

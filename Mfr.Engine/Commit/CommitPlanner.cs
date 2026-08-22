@@ -1,6 +1,6 @@
 using Mfr.Utils;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.Commit
 {
     /// <summary>
     /// Represents one operation in the commit plan for a rename batch.
@@ -27,8 +27,9 @@ namespace Mfr.Engine
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Pass the instance returned from <see cref="RenameList.Preview"/> into <see cref="RenameList.Commit"/> on the same
-    /// <see cref="RenameList"/>; steps reference that list's <see cref="RenameItem"/> instances.
+    /// Pass the instance returned from <see cref="Mfr.Engine.RenameList.RenameList.Preview"/> into
+    /// <see cref="Mfr.Engine.RenameList.RenameList.Commit"/> on the same
+    /// <see cref="Mfr.Engine.RenameList.RenameList"/>; steps reference that list's <see cref="RenameItem"/> instances.
     /// </para>
     /// </remarks>
     /// <param name="Steps">Commit steps to apply in order.</param>

@@ -1,6 +1,6 @@
 using Mfr.Utils;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.Preview
 {
     /// <summary>
     /// Surfaces preview-time conflicts that block a clean batch commit.

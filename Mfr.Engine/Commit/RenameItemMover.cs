@@ -1,6 +1,6 @@
 using Mfr.Utils;
 
-namespace Mfr.Engine
+namespace Mfr.Engine.Commit
 {
     /// <summary>
     /// Performs filesystem move operations on <see cref="RenameItem"/> instances during commit.
