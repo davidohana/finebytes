@@ -1000,11 +1000,6 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <returns><see langword="true"/> when the file name passes active masks.</returns>
         public bool PassesFileMasks(string path)
         {
-            return _PassesFileMasks(path);
-        }
-
-        private bool _PassesFileMasks(string path)
-        {
             var fileName = Path.GetFileName(path);
             if (!WildcardMask.IsMatch(fileName, Mask))
             {
@@ -1291,7 +1286,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
             var files = Directory
                 .EnumerateFiles(path, "*", _ListingOptions)
-                .Where(_PassesFileMasks)
+                .Where(PassesFileMasks)
                 .Select(filePath => _CreateListedItem(filePath, isDirectory: false))
                 .ToList();
 
