@@ -87,6 +87,11 @@ namespace Mfr.App.Ui.Services.RenameList
             bool addFolders
         )
         {
+            if (!addFiles && !addFolders)
+            {
+                yield break;
+            }
+
             foreach (var entry in fileListViewModel.SelectedEntries)
             {
                 if (!_IsAddablePath(entry.FullPath))
@@ -96,18 +101,16 @@ namespace Mfr.App.Ui.Services.RenameList
 
                 if (entry.IsDirectory)
                 {
-                    if (addFiles || addFolders)
-                    {
-                        yield return _BuildFolderSource(entry.FullPath, fileListViewModel.Mask);
-                    }
-
+                    yield return _BuildFolderSource(entry.FullPath, fileListViewModel.Mask);
                     continue;
                 }
 
-                if (addFiles && fileListViewModel.PassesFileMasks(entry.FullPath))
+                if (!addFiles || !fileListViewModel.PassesFileMasks(entry.FullPath))
                 {
-                    yield return entry.FullPath;
+                    continue;
                 }
+
+                yield return entry.FullPath;
             }
         }
 
