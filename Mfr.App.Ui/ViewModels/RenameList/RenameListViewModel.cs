@@ -40,7 +40,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             var addMode = ConfigStore.Config.Ui.AddMode;
             _AddSources(
-                RenameListAddSources.ResolveSourcesFromSelection(
+                RenameListAddSourceResolver.ResolveSourcesFromSelection(
                     _fileListViewModel.SelectedEntries,
                     _fileListViewModel.Mask,
                     addMode
@@ -55,7 +55,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public void AddAll()
         {
             _AddSources(
-                RenameListAddSources.ResolveSourcesFromCurrentFolder(
+                RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(
                     _fileListViewModel.CurrentPath,
                     _fileListViewModel.Mask
                 )
@@ -92,7 +92,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelected()
         {
-            return RenameListAddSources.CanResolveFromSelection(
+            return RenameListAddSourceResolver.CanResolveFromSelection(
                 _fileListViewModel.SelectedEntries,
                 _fileListViewModel.Mask,
                 ConfigStore.Config.Ui.AddMode
@@ -101,7 +101,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddAll()
         {
-            return RenameListAddSources.CanResolveFromCurrentFolder(_fileListViewModel.CurrentPath);
+            return RenameListAddSourceResolver.CanResolveFromCurrentFolder(_fileListViewModel.CurrentPath);
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

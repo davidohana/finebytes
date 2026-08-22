@@ -7,7 +7,7 @@ namespace Mfr.App.Ui.Services.RenameList
     /// <summary>
     /// Maps File List selection and current-folder state to engine add sources (no expansion).
     /// </summary>
-    internal static class RenameListAddSources
+    internal static class RenameListAddSourceResolver
     {
         /// <summary>
         /// Resolves engine add sources from File List selection.

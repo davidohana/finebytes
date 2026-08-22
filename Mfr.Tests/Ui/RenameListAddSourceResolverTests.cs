@@ -6,7 +6,7 @@ namespace Mfr.Tests.Ui
     /// <summary>
     /// Tests that the Rename List adapter emits folder+mask sources rather than expanding globs.
     /// </summary>
-    public sealed class RenameListAddSourcesTests : IDisposable
+    public sealed class RenameListAddSourceResolverTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
         private readonly string _dir;
@@ -14,7 +14,7 @@ namespace Mfr.Tests.Ui
         /// <summary>
         /// Creates an isolated temp tree for adapter tests.
         /// </summary>
-        public RenameListAddSourcesTests()
+        public RenameListAddSourceResolverTests()
         {
             _dir = _tempDirectoryFixture.CreateTempDir();
             Directory.CreateDirectory(Path.Combine(_dir, "album"));
@@ -44,7 +44,7 @@ namespace Mfr.Tests.Ui
                 },
             };
 
-            var sources = RenameListAddSources.ResolveSourcesFromSelection(
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 selectedEntries,
                 mask: "*.mp3",
                 addMode: RenameListAddMode.Files
@@ -61,7 +61,7 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void ResolveFromCurrentFolder_ReturnsCurrentFolderPlusMask()
         {
-            var sources = RenameListAddSources.ResolveSourcesFromCurrentFolder(
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(
                 currentPath: _dir,
                 mask: "*.txt"
             );
@@ -69,7 +69,7 @@ namespace Mfr.Tests.Ui
             var source = Assert.Single(sources);
             Assert.Equal(Path.Combine(_dir, "*.txt"), source);
             Assert.DoesNotContain("**", source, StringComparison.Ordinal);
-            Assert.True(RenameListAddSources.CanResolveFromCurrentFolder(_dir));
+            Assert.True(RenameListAddSourceResolver.CanResolveFromCurrentFolder(_dir));
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Mfr.Tests.Ui
                 },
             };
 
-            var sources = RenameListAddSources.ResolveSourcesFromSelection(
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 selectedEntries,
                 mask: "*.txt",
                 addMode: RenameListAddMode.Files
@@ -123,7 +123,7 @@ namespace Mfr.Tests.Ui
                 },
             };
 
-            var sources = RenameListAddSources.ResolveSourcesFromSelection(
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 selectedEntries,
                 mask: "*",
                 addMode: RenameListAddMode.Folders
@@ -132,14 +132,14 @@ namespace Mfr.Tests.Ui
             var source = Assert.Single(sources);
             Assert.Equal(Path.Combine(albumPath, "*"), source);
             Assert.True(
-                RenameListAddSources.CanResolveFromSelection(
+                RenameListAddSourceResolver.CanResolveFromSelection(
                     selectedEntries,
                     mask: "*",
                     addMode: RenameListAddMode.Folders
                 )
             );
             Assert.False(
-                RenameListAddSources.CanResolveFromSelection(
+                RenameListAddSourceResolver.CanResolveFromSelection(
                     [selectedEntries[1]],
                     mask: "*",
                     addMode: RenameListAddMode.Folders
@@ -171,14 +171,14 @@ namespace Mfr.Tests.Ui
             };
 
             Assert.Empty(
-                RenameListAddSources.ResolveSourcesFromSelection(
+                RenameListAddSourceResolver.ResolveSourcesFromSelection(
                     selectedEntries,
                     mask: "*",
                     addMode: RenameListAddMode.FilesAndFolders
                 )
             );
             Assert.False(
-                RenameListAddSources.CanResolveFromSelection(
+                RenameListAddSourceResolver.CanResolveFromSelection(
                     selectedEntries,
                     mask: "*",
                     addMode: RenameListAddMode.FilesAndFolders
@@ -200,9 +200,9 @@ namespace Mfr.Tests.Ui
             var root = Path.GetPathRoot(_dir);
             Assert.False(string.IsNullOrEmpty(root));
             Assert.Empty(
-                RenameListAddSources.ResolveSourcesFromCurrentFolder(currentPath: root, mask: "*")
+                RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(currentPath: root, mask: "*")
             );
-            Assert.False(RenameListAddSources.CanResolveFromCurrentFolder(root));
+            Assert.False(RenameListAddSourceResolver.CanResolveFromCurrentFolder(root));
         }
 
         /// <summary>
@@ -212,12 +212,12 @@ namespace Mfr.Tests.Ui
         public void ResolveFromCurrentFolder_SentinelPath_ReturnsEmpty()
         {
             Assert.Empty(
-                RenameListAddSources.ResolveSourcesFromCurrentFolder(
+                RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(
                     currentPath: FileListPath.ComputerPath,
                     mask: "*"
                 )
             );
-            Assert.False(RenameListAddSources.CanResolveFromCurrentFolder(FileListPath.ComputerPath));
+            Assert.False(RenameListAddSourceResolver.CanResolveFromCurrentFolder(FileListPath.ComputerPath));
 
             if (!OperatingSystem.IsWindows())
             {
@@ -225,12 +225,12 @@ namespace Mfr.Tests.Ui
             }
 
             Assert.Empty(
-                RenameListAddSources.ResolveSourcesFromCurrentFolder(
+                RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(
                     currentPath: FileListPath.NetworkPath,
                     mask: "*"
                 )
             );
-            Assert.False(RenameListAddSources.CanResolveFromCurrentFolder(FileListPath.NetworkPath));
+            Assert.False(RenameListAddSourceResolver.CanResolveFromCurrentFolder(FileListPath.NetworkPath));
         }
     }
 }
