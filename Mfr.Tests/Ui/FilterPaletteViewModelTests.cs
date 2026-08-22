@@ -1,3 +1,4 @@
+using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.Filters;
 
@@ -11,7 +12,7 @@ namespace Mfr.Tests.Ui
         /// <summary>
         /// Verifies All shows every catalog entry sorted by display name.
         /// </summary>
-        [Fact]
+        [AvaloniaFact]
         public void All_Shows_Every_Filter_Sorted_By_Display_Name()
         {
             var viewModel = new FilterPaletteViewModel();
@@ -29,7 +30,7 @@ namespace Mfr.Tests.Ui
         /// <summary>
         /// Verifies selecting Case shows only Case filters and updates selection flags.
         /// </summary>
-        [Fact]
+        [AvaloniaFact]
         public void SelectGroup_Case_Filters_List()
         {
             var viewModel = new FilterPaletteViewModel();
@@ -53,7 +54,7 @@ namespace Mfr.Tests.Ui
         /// <summary>
         /// Verifies switching groups keeps selection when the row remains visible.
         /// </summary>
-        [Fact]
+        [AvaloniaFact]
         public void Switching_Group_Keeps_Selection_When_Still_Visible()
         {
             var viewModel = new FilterPaletteViewModel();
@@ -68,7 +69,7 @@ namespace Mfr.Tests.Ui
         /// <summary>
         /// Verifies switching groups selects the first remaining row when the prior selection drops out.
         /// </summary>
-        [Fact]
+        [AvaloniaFact]
         public void Switching_Group_Reselects_First_When_Selection_Leaves()
         {
             var viewModel = new FilterPaletteViewModel();
@@ -85,7 +86,7 @@ namespace Mfr.Tests.Ui
         /// <summary>
         /// Verifies case-insensitive substring search against display name and type.
         /// </summary>
-        [Fact]
+        [AvaloniaFact]
         public void SearchText_Filters_By_Substring()
         {
             var viewModel = new FilterPaletteViewModel { SearchText = "tag" };
@@ -106,7 +107,7 @@ namespace Mfr.Tests.Ui
         /// <summary>
         /// Verifies group and search combine with AND.
         /// </summary>
-        [Fact]
+        [AvaloniaFact]
         public void Group_And_Search_Combine()
         {
             var viewModel = new FilterPaletteViewModel();
@@ -122,7 +123,7 @@ namespace Mfr.Tests.Ui
         /// <summary>
         /// Verifies clearing search restores the full group list.
         /// </summary>
-        [Fact]
+        [AvaloniaFact]
         public void Empty_Search_Restores_Group_List()
         {
             var viewModel = new FilterPaletteViewModel();

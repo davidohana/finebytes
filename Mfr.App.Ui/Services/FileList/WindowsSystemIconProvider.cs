@@ -42,7 +42,7 @@ namespace Mfr.App.Ui.Services.FileList
             {
                 ShellIconSize.Small => "small",
                 ShellIconSize.Jumbo => "jumbo",
-                ShellIconSize.Large => throw new NotImplementedException(),
+                ShellIconSize.Large => "large",
                 _ => "large",
             };
             try

@@ -1,4 +1,7 @@
-default:
+[private]
+default: help
+
+help:
     @just --list
 
 restore:
@@ -8,7 +11,8 @@ build:
     dotnet build 
 
 clean:
-    dotnet nuget locals all --clear
+    dotnet build-server shutdown
+    - dotnet nuget locals all --clear
     rm -rf **/bin **/obj
     dotnet clean
 

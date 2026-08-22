@@ -1,5 +1,3 @@
-using Mfr.Models.Config;
-
 namespace Mfr.Tests.Models
 {
     /// <summary>
@@ -59,9 +57,7 @@ namespace Mfr.Tests.Models
             File.WriteAllText(configPath, """{}""");
             ConfigStore.Load(configPath);
 
-            ConfigStore.ApplyCliOverrides(
-                ["ui.addFiles=false", "ui.addFolders=true", "ui.addFolderContents=false"]
-            );
+            ConfigStore.ApplyCliOverrides(["ui.addFiles=false", "ui.addFolders=true", "ui.addFolderContents=false"]);
 
             Assert.False(ConfigStore.Config.Ui.AddFiles);
             Assert.True(ConfigStore.Config.Ui.AddFolders);
