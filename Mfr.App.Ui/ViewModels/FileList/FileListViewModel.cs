@@ -410,8 +410,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             }
 
             var currentIndex = SelectedEntry is { } current ? Entries.IndexOf(current) : -1;
-            var nextIndex =
-                currentIndex < 0 ? (delta > 0 ? 0 : Entries.Count - 1) : currentIndex + delta;
+            var nextIndex = currentIndex < 0 ? (delta > 0 ? 0 : Entries.Count - 1) : currentIndex + delta;
 
             if (nextIndex < 0 || nextIndex >= Entries.Count)
             {

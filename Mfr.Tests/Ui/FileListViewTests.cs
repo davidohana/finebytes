@@ -5,7 +5,6 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
@@ -217,7 +216,7 @@ namespace Mfr.Tests.Ui
             viewModel.SetSelectedEntries([alpha, beta], beta);
             window.UpdateLayout();
 
-            Assert.Equal(2, grid.SelectedItems!.Count);
+            Assert.Equal(2, grid.SelectedItems.Count);
             var selected = grid.SelectedItems.Cast<FileListEntry>().ToList();
             Assert.Contains(selected, entry => entry.FullPath == alpha.FullPath);
             Assert.Contains(selected, entry => entry.FullPath == beta.FullPath);
@@ -264,7 +263,7 @@ namespace Mfr.Tests.Ui
             _SetGridSelection(grid, [alpha, beta], beta);
             window.UpdateLayout();
 
-            Assert.Equal(2, grid.SelectedItems!.Count);
+            Assert.Equal(2, grid.SelectedItems.Count);
             var selectedPaths = grid.SelectedItems.Cast<FileListEntry>().Select(entry => entry.FullPath).ToHashSet();
             Assert.Contains(alpha.FullPath, selectedPaths);
             Assert.Contains(beta.FullPath, selectedPaths);
@@ -436,9 +435,13 @@ namespace Mfr.Tests.Ui
             return (viewModel, view, window);
         }
 
-        private static void _SetGridSelection(DataGrid grid, IReadOnlyList<FileListEntry> entries, FileListEntry focused)
+        private static void _SetGridSelection(
+            DataGrid grid,
+            IReadOnlyList<FileListEntry> entries,
+            FileListEntry focused
+        )
         {
-            grid.SelectedItems!.Clear();
+            grid.SelectedItems.Clear();
             foreach (var entry in entries)
             {
                 grid.SelectedItems.Add(entry);

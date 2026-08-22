@@ -1,0 +1,126 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
+  mc:Ignorable="d"
+  d:DesignWidth="800"
+  d:DesignHeight="240"
+  x:Class="Mfr.App.Ui.Views.RenameList.RenameListView"
+  x:DataType="vm:RenameListViewModel"
+>
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <x:Double x:Key="DataGridRowSelectedBackgroundOpacity">1</x:Double>
+      <x:Double x:Key="DataGridRowSelectedHoveredBackgroundOpacity">1</x:Double>
+      <x:Double x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity">1</x:Double>
+      <x:Double x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundOpacity">1</x:Double>
+      <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
+    </ResourceDictionary>
+  </UserControl.Resources>
+  <UserControl.Styles>
+    <Style Selector="DataGrid.rename-list">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="RowBackground" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="ColumnHeaderHeight" Value="22" />
+      <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+      <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+    </Style>
+    <Style Selector="DataGrid.rename-list /template/ ScrollBar#PART_VerticalScrollbar">
+      <Setter Property="AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="DataGrid.rename-list /template/ ScrollBar#PART_HorizontalScrollbar">
+      <Setter Property="AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridColumnHeader">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListHeaderForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FileListHeaderBrush}" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="6,0,4,0" />
+      <Setter Property="SeparatorBrush" Value="{DynamicResource FileListSeparatorBrush}" />
+      <Setter Property="AreSeparatorsVisible" Value="True" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow">
+      <Setter Property="MinHeight" Value="20" />
+      <Setter Property="Height" Value="20" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:nth-child(even)">
+      <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridCell">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="MinHeight" Value="0" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridCell:focus /template/ Grid#FocusVisual">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="Stroke" Value="Transparent" />
+      <Setter Property="StrokeThickness" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </UserControl.Styles>
+  <Border Classes="pane">
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Top" Classes="pane-header" Text="Rename List" />
+      <DataGrid
+        Classes="rename-list"
+        ItemsSource="{Binding Entries}"
+        AutoGenerateColumns="False"
+        IsReadOnly="True"
+        CanUserReorderColumns="False"
+        CanUserSortColumns="False"
+        CanUserResizeColumns="True"
+        HeadersVisibility="Column"
+        GridLinesVisibility="None"
+        RowHeight="20"
+        ColumnHeaderHeight="22"
+        SelectionMode="Extended"
+      >
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="File/Folder" Binding="{Binding FileFolder}" Width="50" />
+          <DataGridTextColumn Header="Parent Folder" Binding="{Binding ParentFolder}" Width="180" />
+          <DataGridTextColumn Header="Full File Name" Binding="{Binding FullFileName}" Width="180" />
+          <DataGridTextColumn Header="Full File Name (Preview)" Binding="{Binding FullFileNamePreview}" Width="*" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </DockPanel>
+  </Border>
+</UserControl>

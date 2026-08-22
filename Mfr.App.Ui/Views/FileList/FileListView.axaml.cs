@@ -298,6 +298,8 @@ namespace Mfr.App.Ui.Views.FileList
                 case ListBox listBox:
                     _ApplySelection(listBox, force);
                     break;
+                default:
+                    break;
             }
         }
 
@@ -315,6 +317,8 @@ namespace Mfr.App.Ui.Views.FileList
                     break;
                 case ListBox listBox:
                     listBox.ContainerFromItem(focused)?.BringIntoView();
+                    break;
+                default:
                     break;
             }
         }

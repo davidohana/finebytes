@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.RenameList
 {
     /// <summary>
     /// Rename List pane host.

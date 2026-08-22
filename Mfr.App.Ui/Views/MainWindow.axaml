@@ -8,6 +8,7 @@
   xmlns:views="using:Mfr.App.Ui.Views"
   xmlns:filelistviews="using:Mfr.App.Ui.Views.FileList"
   xmlns:filterpaletteviews="using:Mfr.App.Ui.Views.FilterPalette"
+  xmlns:renamelistviews="using:Mfr.App.Ui.Views.RenameList"
   xmlns:shortcuts="using:Mfr.App.Ui.Input"
   mc:Ignorable="d"
   d:DesignWidth="1100"
@@ -369,7 +370,7 @@
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
       />
-      <views:RenameListView Grid.Row="2" DataContext="{Binding RenameList}" />
+      <renamelistviews:RenameListView Grid.Row="2" DataContext="{Binding RenameList}" />
     </Grid>
   </DockPanel>
 </Window>

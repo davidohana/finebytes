@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.FilterPalette;
+using Mfr.App.Ui.ViewModels.RenameList;
 
 namespace Mfr.App.Ui.ViewModels
 {
