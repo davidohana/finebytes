@@ -1,5 +1,4 @@
 using Mfr.App.Ui.ViewModels.FileList;
-using Mfr.Models.Config;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.Services.RenameList
@@ -13,12 +12,16 @@ namespace Mfr.App.Ui.Services.RenameList
         /// Resolves engine add sources from the File List's current selection.
         /// </summary>
         /// <param name="fileList">File List pane state.</param>
-        /// <param name="ui">Rename List add-policy flags.</param>
+        /// <param name="addFiles">When true, selected files that pass the File List masks are included.</param>
+        /// <param name="addFolders">When true with or without <paramref name="addFiles"/>, selected folders become folder sources.</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
-        public static IReadOnlyList<string> ResolveSourcesFromSelection(FileListViewModel fileList, UiConfig ui)
+        public static IReadOnlyList<string> ResolveSourcesFromSelection(
+            FileListViewModel fileList,
+            bool addFiles,
+            bool addFolders
+        )
         {
             ArgumentNullException.ThrowIfNull(fileList);
-            ArgumentNullException.ThrowIfNull(ui);
 
             var sources = new List<string>();
             foreach (var entry in fileList.SelectedEntries)
@@ -30,16 +33,15 @@ namespace Mfr.App.Ui.Services.RenameList
 
                 if (entry.IsDirectory)
                 {
-                    if (ui.AddFiles || ui.AddFolders)
+                    if (addFiles || addFolders)
                     {
-                        var folderSource = _BuildFolderSource(entry.FullPath, fileList.Mask);
-                        sources.Add(folderSource);
+                        sources.Add(_BuildFolderSource(entry.FullPath, fileList.Mask));
                     }
 
                     continue;
                 }
 
-                if (ui.AddFiles && fileList.PassesFileMasks(entry.FullPath))
+                if (addFiles && fileList.PassesFileMasks(entry.FullPath))
                 {
                     sources.Add(entry.FullPath);
                 }
@@ -52,34 +54,23 @@ namespace Mfr.App.Ui.Services.RenameList
         /// Resolves engine add sources from the File List's current folder.
         /// </summary>
         /// <param name="fileList">File List pane state.</param>
-        /// <param name="ui">Rename List add-policy flags.</param>
+        /// <param name="addFiles">With <paramref name="addFolders"/>, gates whether the current folder is emitted.</param>
+        /// <param name="addFolders">With <paramref name="addFiles"/>, gates whether the current folder is emitted.</param>
         /// <returns>A single folder source with a last-segment filename mask, or empty.</returns>
-        public static IReadOnlyList<string> ResolveSourcesFromCurrentFolder(FileListViewModel fileList, UiConfig ui)
+        public static IReadOnlyList<string> ResolveSourcesFromCurrentFolder(
+            FileListViewModel fileList,
+            bool addFiles,
+            bool addFolders
+        )
         {
             ArgumentNullException.ThrowIfNull(fileList);
-            ArgumentNullException.ThrowIfNull(ui);
 
-            if (!fileList.CanAddAllToCurrentFolder)
-            {
-                return [];
-            }
-
-            if (!ui.AddFiles && !ui.AddFolders)
+            if (!fileList.CanAddAllToCurrentFolder || (!addFiles && !addFolders))
             {
                 return [];
             }
 
             return [_BuildFolderSource(fileList.CurrentPath, fileList.Mask)];
-        }
-
-        /// <summary>
-        /// Whether <paramref name="path"/> can be passed to the engine add API.
-        /// </summary>
-        /// <param name="path">Candidate filesystem path.</param>
-        /// <returns><see langword="false"/> for blank or root paths the engine rejects.</returns>
-        public static bool IsAddablePath(string path)
-        {
-            return _IsAddablePath(path);
         }
 
         /// <summary>
@@ -102,12 +93,7 @@ namespace Mfr.App.Ui.Services.RenameList
             {
                 var fullPath = Path.GetFullPath(path);
                 var root = Path.GetPathRoot(fullPath);
-                if (string.IsNullOrEmpty(root))
-                {
-                    return false;
-                }
-
-                return !string.Equals(root, fullPath, PathComparers.OsComparison);
+                return !string.IsNullOrEmpty(root) && !string.Equals(root, fullPath, PathComparers.OsComparison);
             }
             catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
             {

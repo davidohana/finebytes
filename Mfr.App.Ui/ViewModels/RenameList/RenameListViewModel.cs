@@ -38,7 +38,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelected))]
         public void AddSelected()
         {
-            _AddSources(RenameListAddSources.ResolveSourcesFromSelection(_fileList, ConfigStore.Config.Ui));
+            var ui = ConfigStore.Config.Ui;
+            _AddSources(
+                RenameListAddSources.ResolveSourcesFromSelection(
+                    _fileList,
+                    addFiles: ui.AddFiles,
+                    addFolders: ui.AddFolders
+                )
+            );
         }
 
         /// <summary>
@@ -47,7 +54,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddAll))]
         public void AddAll()
         {
-            _AddSources(RenameListAddSources.ResolveSourcesFromCurrentFolder(_fileList, ConfigStore.Config.Ui));
+            var ui = ConfigStore.Config.Ui;
+            _AddSources(
+                RenameListAddSources.ResolveSourcesFromCurrentFolder(
+                    _fileList,
+                    addFiles: ui.AddFiles,
+                    addFolders: ui.AddFolders
+                )
+            );
         }
 
         private void _AddSources(IReadOnlyList<string> sources)
@@ -80,41 +94,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelected()
         {
-            if (_fileList.SelectedEntries.Count == 0)
-            {
-                return false;
-            }
-
-            foreach (var entry in _fileList.SelectedEntries)
-            {
-                if (!RenameListAddSources.IsAddablePath(entry.FullPath))
-                {
-                    continue;
-                }
-
-                if (entry.IsDirectory)
-                {
-                    return ConfigStore.Config.Ui.AddFiles || ConfigStore.Config.Ui.AddFolders;
-                }
-
-                if (ConfigStore.Config.Ui.AddFiles && _fileList.PassesFileMasks(entry.FullPath))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            var ui = ConfigStore.Config.Ui;
+            return RenameListAddSources
+                    .ResolveSourcesFromSelection(_fileList, addFiles: ui.AddFiles, addFolders: ui.AddFolders)
+                    .Count > 0;
         }
 
         private bool _CanAddAll()
         {
-            if (!_fileList.CanAddAllToCurrentFolder)
-            {
-                return false;
-            }
-
             var ui = ConfigStore.Config.Ui;
-            return ui.AddFiles || ui.AddFolders;
+            return RenameListAddSources
+                    .ResolveSourcesFromCurrentFolder(_fileList, addFiles: ui.AddFiles, addFolders: ui.AddFolders)
+                    .Count > 0;
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -47,13 +47,11 @@ namespace Mfr.Tests.Ui
                 },
             ]);
 
-            var ui = new UiConfig
-            {
-                AddFiles = true,
-                AddFolders = false,
-                AddFolderContents = true,
-            };
-            var sources = RenameListAddSources.ResolveSourcesFromSelection(_fileList, ui);
+            var sources = RenameListAddSources.ResolveSourcesFromSelection(
+                _fileList,
+                addFiles: true,
+                addFolders: false
+            );
 
             var source = Assert.Single(sources);
             Assert.Equal(Path.Combine(albumPath, "*.mp3"), source);
@@ -67,14 +65,11 @@ namespace Mfr.Tests.Ui
         public void ResolveFromCurrentFolder_ReturnsCurrentFolderPlusMask()
         {
             _fileList.Mask = "*.txt";
-            var ui = new UiConfig
-            {
-                AddFiles = true,
-                AddFolders = false,
-                AddFolderContents = true,
-            };
-
-            var sources = RenameListAddSources.ResolveSourcesFromCurrentFolder(_fileList, ui);
+            var sources = RenameListAddSources.ResolveSourcesFromCurrentFolder(
+                _fileList,
+                addFiles: true,
+                addFolders: false
+            );
 
             var source = Assert.Single(sources);
             Assert.Equal(Path.Combine(_fileList.CurrentPath, "*.txt"), source);
@@ -98,8 +93,11 @@ namespace Mfr.Tests.Ui
                 },
             ]);
 
-            var ui = new UiConfig { AddFiles = true };
-            var sources = RenameListAddSources.ResolveSourcesFromSelection(_fileList, ui);
+            var sources = RenameListAddSources.ResolveSourcesFromSelection(
+                _fileList,
+                addFiles: true,
+                addFolders: false
+            );
 
             var source = Assert.Single(sources);
             Assert.Equal(filePath, source);
