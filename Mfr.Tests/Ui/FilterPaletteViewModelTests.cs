@@ -88,10 +88,7 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void SearchText_Filters_By_Substring()
         {
-            var viewModel = new FilterPaletteViewModel
-            {
-                SearchText = "tag"
-            };
+            var viewModel = new FilterPaletteViewModel { SearchText = "tag" };
             Assert.Contains(viewModel.VisibleFilters, e => e.Type == "AudioTagSetter");
             Assert.Contains(viewModel.VisibleFilters, e => e.Type == "TagRemover");
             Assert.DoesNotContain(viewModel.VisibleFilters, e => e.Type == "Cleaner");

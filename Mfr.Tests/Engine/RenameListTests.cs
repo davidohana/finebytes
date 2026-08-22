@@ -104,6 +104,129 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies that removing an item reindexes remaining entries.
+        /// </summary>
+        public void Remove_Reindexes_Remaining_Items()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath, gammaPath]);
+            var betaItem = renameList.RenameItems[1];
+            Assert.Equal(1, renameList.Remove(betaItem));
+
+            var entries = renameList.RenameItems;
+            Assert.Equal(2, entries.Count);
+            Assert.Equal([alphaPath, gammaPath], entries.Select(entry => entry.Original.FullPath));
+            Assert.Equal([0, 1], entries.Select(entry => entry.Original.RenameListIndex));
+            Assert.Equal([0, 1], entries.Select(entry => entry.Original.InFolderIndex));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that removing by item reference drops the item from the list.
+        /// </summary>
+        public void Remove_ByItem_Removes_From_List()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(path);
+            var item = renameList.RenameItems[0];
+
+            Assert.Equal(1, renameList.Remove(item));
+            Assert.Empty(renameList.RenameItems);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that removing multiple items reindexes list and per-folder indices.
+        /// </summary>
+        public void Remove_MultipleItems_Reindexes_List_And_InFolderIndices()
+        {
+            var folderAPath = Directory.CreateDirectory(_tempRoot.CombinePath("A")).FullName;
+            var folderBPath = Directory.CreateDirectory(_tempRoot.CombinePath("B")).FullName;
+            var aFirstPath = TestHelpers.CreateFile(folderAPath, "a1.txt");
+            var aSecondPath = TestHelpers.CreateFile(folderAPath, "a2.txt");
+            var bFirstPath = TestHelpers.CreateFile(folderBPath, "b1.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([aFirstPath, aSecondPath, bFirstPath]);
+            var items = renameList.RenameItems;
+
+            Assert.Equal(2, renameList.Remove([items[0], items[2]]));
+
+            var entry = Assert.Single(renameList.RenameItems);
+            Assert.Equal(aSecondPath, entry.Original.FullPath);
+            Assert.Equal(0, entry.Original.RenameListIndex);
+            Assert.Equal(0, entry.Original.InFolderIndex);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that removing an item not in the list is a no-op.
+        /// </summary>
+        public void Remove_ItemNotInList_Returns_Zero()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(path);
+            var item = renameList.RenameItems[0];
+            renameList.Clear();
+
+            Assert.Equal(0, renameList.Remove(item));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that clear empties the list and resets deduplication so paths can be added again.
+        /// </summary>
+        public void Clear_Empties_List_And_Allows_Readd()
+        {
+            var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "alpha.txt", "beta.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSource(alphaPath);
+            renameList.AddSource(betaPath);
+            renameList.Clear();
+
+            Assert.Empty(renameList.RenameItems);
+            Assert.Equal(1, renameList.AddSource(alphaPath));
+            Assert.Equal(1, renameList.AddSource(betaPath));
+            Assert.Equal(2, renameList.RenameItems.Count);
+            Assert.Equal([0, 1], renameList.RenameItems.Select(entry => entry.Original.RenameListIndex));
+            Assert.Equal([0, 1], renameList.RenameItems.Select(entry => entry.Original.InFolderIndex));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that a removed path can be added again without dedupe blocking it.
+        /// </summary>
+        public void Remove_Allows_Readding_Same_Path()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            Assert.Equal(1, renameList.AddSource(path));
+            var item = renameList.RenameItems[0];
+            Assert.Equal(1, renameList.Remove(item));
+            Assert.Empty(renameList.RenameItems);
+            Assert.Equal(1, renameList.AddSource(path));
+
+            var entry = Assert.Single(renameList.RenameItems);
+            Assert.Equal(path, entry.Original.FullPath);
+            Assert.Equal(0, entry.Original.RenameListIndex);
+            Assert.Equal(0, entry.Original.InFolderIndex);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that an explicit root path throws a <see cref="UserException"/> immediately.
         /// </summary>
         public void AddSource_Throws_UserException_For_Root_Path()

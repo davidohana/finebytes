@@ -21,7 +21,11 @@ namespace Mfr.App.Ui.ViewModels.FilterPalette
             [
                 new FilterPaletteGroupViewModel(null, "All", "/Assets/FilterGroups/FilterGroupAll.png"),
                 new FilterPaletteGroupViewModel(FilterGroup.Case, "Case", "/Assets/FilterGroups/FilterGroupCase.png"),
-                new FilterPaletteGroupViewModel(FilterGroup.Space, "Space", "/Assets/FilterGroups/FilterGroupSpace.png"),
+                new FilterPaletteGroupViewModel(
+                    FilterGroup.Space,
+                    "Space",
+                    "/Assets/FilterGroups/FilterGroupSpace.png"
+                ),
                 new FilterPaletteGroupViewModel(
                     FilterGroup.Trimming,
                     "Trimming",
@@ -37,7 +41,11 @@ namespace Mfr.App.Ui.ViewModels.FilterPalette
                     "Formatting",
                     "/Assets/FilterGroups/FilterGroupFormatting.png"
                 ),
-                new FilterPaletteGroupViewModel(FilterGroup.Audio, "Audio", "/Assets/FilterGroups/FilterGroupAudio.png"),
+                new FilterPaletteGroupViewModel(
+                    FilterGroup.Audio,
+                    "Audio",
+                    "/Assets/FilterGroups/FilterGroupAudio.png"
+                ),
                 new FilterPaletteGroupViewModel(
                     FilterGroup.Attributes,
                     "Attributes",

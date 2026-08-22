@@ -9,8 +9,28 @@ namespace Mfr.Engine
     /// <param name="includeHidden">If <c>true</c>, includes hidden/system files while resolving.</param>
     public sealed class RenameList(bool includeHidden)
     {
-        private readonly HashSet<string> _resolvedPathToIsIncluded = new(PathComparers.Os);
+        /// <summary>
+        /// Normalized full paths already present in <see cref="RenameItems"/>; used to dedupe adds.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Paths are OS-normalized via <c>_NormalizePathKey</c>. Removed on
+        /// <see cref="Remove(RenameItem)"/> and cleared on <see cref="Clear"/> so a path can be added again.
+        /// </para>
+        /// </remarks>
+        private readonly HashSet<string> _includedResolvedPaths = new(PathComparers.Os);
         private readonly List<RenameItem> _renameItems = [];
+
+        /// <summary>
+        /// Parent directory path to how many rename items share that directory.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Used when assigning <see cref="FileMeta.InFolderIndex"/> on add and rebuilt by
+        /// <c>_ReindexItems</c> after remove. Also feeds <see cref="FileMeta.RenameListFolderSiblingCount"/>
+        /// during preview (for example per-folder <c>&lt;counter&gt;</c> width).
+        /// </para>
+        /// </remarks>
         private readonly Dictionary<string, int> _folderPathToCount = new(PathComparers.Os);
         private readonly bool _includeHidden = includeHidden;
 
@@ -97,6 +117,77 @@ namespace Mfr.Engine
                 addedCount
             );
             return addedCount;
+        }
+
+        /// <summary>
+        /// Removes a resolved item from the list.
+        /// </summary>
+        /// <param name="item">The item to remove.</param>
+        /// <returns><c>1</c> when the item was removed; otherwise <c>0</c>.</returns>
+        public int Remove(RenameItem item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            return Remove([item]);
+        }
+
+        /// <summary>
+        /// Removes multiple resolved items from the list.
+        /// </summary>
+        /// <param name="items">Items to remove; entries not in the list are ignored.</param>
+        /// <returns>The count of items removed.</returns>
+        public int Remove(IEnumerable<RenameItem> items)
+        {
+            ArgumentNullException.ThrowIfNull(items);
+
+            var itemsToRemove = items as IReadOnlyCollection<RenameItem> ?? [.. items];
+            if (itemsToRemove.Count == 0)
+            {
+                return 0;
+            }
+
+            var removeSet = new HashSet<RenameItem>(itemsToRemove);
+            var indicesToRemove = new List<int>();
+            for (var i = 0; i < _renameItems.Count; i++)
+            {
+                if (removeSet.Contains(_renameItems[i]))
+                {
+                    indicesToRemove.Add(i);
+                }
+            }
+
+            if (indicesToRemove.Count == 0)
+            {
+                return 0;
+            }
+
+            for (var i = indicesToRemove.Count - 1; i >= 0; i--)
+            {
+                var index = indicesToRemove[i];
+                var item = _renameItems[index];
+                _includedResolvedPaths.Remove(_NormalizePathKey(item.Original.FullPath));
+                _renameItems.RemoveAt(index);
+            }
+
+            _ReindexItems();
+            Log.Information("Removed {RemovedCount} item(s) from rename list.", indicesToRemove.Count);
+            return indicesToRemove.Count;
+        }
+
+        /// <summary>
+        /// Removes all resolved items from the list.
+        /// </summary>
+        public void Clear()
+        {
+            var removedCount = _renameItems.Count;
+            if (removedCount == 0)
+            {
+                return;
+            }
+
+            _renameItems.Clear();
+            _includedResolvedPaths.Clear();
+            _folderPathToCount.Clear();
+            Log.Information("Cleared rename list ({RemovedCount} item(s)).", removedCount);
         }
 
         /// <summary>
@@ -259,7 +350,7 @@ namespace Mfr.Engine
             foreach (var fullPath in resolvedPaths)
             {
                 var normalizedResolvedPath = _NormalizePathKey(fullPath);
-                if (!_resolvedPathToIsIncluded.Add(normalizedResolvedPath))
+                if (!_includedResolvedPaths.Add(normalizedResolvedPath))
                 {
                     continue;
                 }
@@ -332,6 +423,23 @@ namespace Mfr.Engine
             }
 
             return addedCount;
+        }
+
+        /// <summary>
+        /// Reassigns list and per-folder indices after items are removed.
+        /// </summary>
+        private void _ReindexItems()
+        {
+            _folderPathToCount.Clear();
+            for (var i = 0; i < _renameItems.Count; i++)
+            {
+                var item = _renameItems[i];
+                var directoryPath = item.Original.DirectoryPath;
+                var inFolderIndex = _folderPathToCount.GetValueOrDefault(directoryPath);
+                _folderPathToCount[directoryPath] = inFolderIndex + 1;
+                item.Original.RenameListIndex = i;
+                item.Original.InFolderIndex = inFolderIndex;
+            }
         }
 
         /// <summary>
