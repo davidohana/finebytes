@@ -1,6 +1,6 @@
-using Mfr.App.Ui.Services.FileList;
+using Mfr.Utils;
 
-namespace Mfr.Tests.Ui
+namespace Mfr.Tests.Utils
 {
     /// <summary>
     /// Tests Explorer wildcard mask matching.

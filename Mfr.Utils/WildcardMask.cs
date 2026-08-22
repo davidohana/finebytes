@@ -1,11 +1,11 @@
 using System.Text.RegularExpressions;
 
-namespace Mfr.App.Ui.Services.FileList
+namespace Mfr.Utils
 {
     /// <summary>
     /// Matches file names against Explorer-style wildcard masks (<c>*</c> / <c>?</c>).
     /// </summary>
-    internal static class WildcardMask
+    public static class WildcardMask
     {
         /// <summary>
         /// Whether <paramref name="fileName"/> matches <paramref name="pattern"/>.

@@ -100,40 +100,40 @@
   </UserControl.Styles>
   <Border Classes="pane">
     <Grid ColumnDefinitions="Auto,*">
-        <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="4" Margin="4,0,4,4">
-          <Button
-            Content="Add Selected"
-            Command="{Binding AddSelectedCommand}"
-            ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddSelectedTip}"
-          />
-          <Button
-            Content="Add All"
-            Command="{Binding AddAllCommand}"
-            ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddAllTip}"
-          />
-        </StackPanel>
-        <DataGrid
-          Grid.Column="1"
-          Classes="rename-list"
-          ItemsSource="{Binding Entries}"
-          AutoGenerateColumns="False"
-          IsReadOnly="True"
-          CanUserReorderColumns="False"
-          CanUserSortColumns="False"
-          CanUserResizeColumns="True"
-          HeadersVisibility="Column"
-          GridLinesVisibility="None"
-          RowHeight="20"
-          ColumnHeaderHeight="22"
-          SelectionMode="Extended"
-        >
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="File/Folder" Binding="{Binding FileFolder}" Width="50" />
-            <DataGridTextColumn Header="Parent Folder" Binding="{Binding ParentFolder}" Width="180" />
-            <DataGridTextColumn Header="Full File Name" Binding="{Binding FullFileName}" Width="180" />
-            <DataGridTextColumn Header="Full File Name (Preview)" Binding="{Binding FullFileNamePreview}" Width="*" />
-          </DataGrid.Columns>
-        </DataGrid>
+      <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="4" Margin="4,0,4,4">
+        <Button
+          Content="Add Selected"
+          Command="{Binding AddSelectedCommand}"
+          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddSelectedTip}"
+        />
+        <Button
+          Content="Add All"
+          Command="{Binding AddAllCommand}"
+          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddAllTip}"
+        />
+      </StackPanel>
+      <DataGrid
+        Grid.Column="1"
+        Classes="rename-list"
+        ItemsSource="{Binding Entries}"
+        AutoGenerateColumns="False"
+        IsReadOnly="True"
+        CanUserReorderColumns="False"
+        CanUserSortColumns="False"
+        CanUserResizeColumns="True"
+        HeadersVisibility="Column"
+        GridLinesVisibility="None"
+        RowHeight="20"
+        ColumnHeaderHeight="22"
+        SelectionMode="Extended"
+      >
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="File/Folder" Binding="{Binding FileFolder}" Width="50" />
+          <DataGridTextColumn Header="Parent Folder" Binding="{Binding ParentFolder}" Width="180" />
+          <DataGridTextColumn Header="Full File Name" Binding="{Binding FullFileName}" Width="180" />
+          <DataGridTextColumn Header="Full File Name (Preview)" Binding="{Binding FullFileNamePreview}" Width="*" />
+        </DataGrid.Columns>
+      </DataGrid>
     </Grid>
   </Border>
 </UserControl>
