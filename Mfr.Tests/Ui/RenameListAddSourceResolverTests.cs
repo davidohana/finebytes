@@ -61,10 +61,7 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void ResolveFromCurrentFolder_ReturnsCurrentFolderPlusMask()
         {
-            var sources = RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(
-                currentPath: _dir,
-                mask: "*.txt"
-            );
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(currentPath: _dir, mask: "*.txt");
 
             var source = Assert.Single(sources);
             Assert.Equal(Path.Combine(_dir, "*.txt"), source);
@@ -199,9 +196,7 @@ namespace Mfr.Tests.Ui
 
             var root = Path.GetPathRoot(_dir);
             Assert.False(string.IsNullOrEmpty(root));
-            Assert.Empty(
-                RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(currentPath: root, mask: "*")
-            );
+            Assert.Empty(RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(currentPath: root, mask: "*"));
             Assert.False(RenameListAddSourceResolver.CanResolveFromCurrentFolder(root));
         }
 

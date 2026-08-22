@@ -137,9 +137,9 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies that files and immediate child folders are returned for one-level directory expansion.
+        /// Verifies that a folder source without recursion returns the folder and its top-level files only.
         /// </summary>
-        public void Resolve_Directory_OneLevelRecursion_ReturnsFolderImmediateFilesAndChildFolders()
+        public void Resolve_Directory_WithoutSubdirs_ReturnsFolderAndTopLevelFiles()
         {
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
             var topFile = TestHelpers.CreateFile(folderPath, "track.mp3");
@@ -150,11 +150,8 @@ namespace Mfr.Tests.Engine
                 .ResolveToPaths(source: folderPath, includeFiles: true, includeFolders: true, includeSubdirs: false)
                 .ToList();
 
-            Assert.Equal(folderPath, paths[0]);
-            Assert.Equal(
-                new[] { topFile, childFolder }.OrderBy(static path => path, StringComparer.OrdinalIgnoreCase),
-                paths.Skip(1).OrderBy(static path => path, StringComparer.OrdinalIgnoreCase)
-            );
+            Assert.Equal([folderPath, topFile], paths);
+            Assert.DoesNotContain(childFolder, paths);
         }
 
         [Fact]
@@ -173,26 +170,52 @@ namespace Mfr.Tests.Engine
                 .ToList();
 
             Assert.Equal(folderPath, paths[0]);
-            Assert.Equal(childFolder, paths[1]);
-            Assert.Equal(nestedFile, paths[2]);
-            Assert.Equal(topFile, paths[3]);
+            Assert.Equal(
+                new[] { folderPath, topFile, childFolder, nestedFile }.OrderBy(
+                    static path => path,
+                    StringComparer.OrdinalIgnoreCase
+                ),
+                paths.OrderBy(static path => path, StringComparer.OrdinalIgnoreCase)
+            );
         }
 
         [Fact]
         /// <summary>
-        /// Verifies that nested folders are not added when folder inclusion is enabled but file inclusion is disabled.
+        /// Verifies that folders-only without recursion returns the explicit source folder only.
         /// </summary>
-        public void Resolve_Directory_FoldersOnly_DoesNotAddNestedFolders()
+        public void Resolve_Directory_FoldersOnly_WithoutSubdirs_ReturnsSourceFolder()
         {
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
             Directory.CreateDirectory(folderPath.CombinePath("Disc1"));
             TestHelpers.CreateFile(folderPath, "track.mp3");
 
             var paths = AddedSourceResolver
-                .ResolveToPaths(source: folderPath, includeFiles: false, includeFolders: true, includeSubdirs: true)
+                .ResolveToPaths(source: folderPath, includeFiles: false, includeFolders: true, includeSubdirs: false)
                 .ToList();
 
             Assert.Equal([folderPath], paths);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that folders-only with recursion returns the source folder and descendant folders.
+        /// </summary>
+        public void Resolve_Directory_FoldersOnly_WithSubdirs_AddsNestedFolders()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var childFolder = Directory.CreateDirectory(folderPath.CombinePath("Disc1")).FullName;
+            TestHelpers.CreateFile(folderPath, "track.mp3");
+            TestHelpers.CreateFile(childFolder, "nested.mp3");
+
+            var paths = AddedSourceResolver
+                .ResolveToPaths(source: folderPath, includeFiles: false, includeFolders: true, includeSubdirs: true)
+                .ToList();
+
+            Assert.Equal(folderPath, paths[0]);
+            Assert.Equal(
+                new[] { folderPath, childFolder }.OrderBy(static path => path, StringComparer.OrdinalIgnoreCase),
+                paths.OrderBy(static path => path, StringComparer.OrdinalIgnoreCase)
+            );
         }
 
         [Fact]
@@ -260,6 +283,29 @@ namespace Mfr.Tests.Engine
                 .ToList();
 
             Assert.Equal([top], paths);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that recursion matches nested files even when parent folder names do not match the include mask.
+        /// </summary>
+        public void Resolve_DirectoryMask_Recursive_MatchesNestedFiles_WhenParentFolderDoesNotMatchMask()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var nested = TestHelpers.CreateFile(folderPath.CombinePath("Disc1"), "track.mp3");
+            TestHelpers.CreateFile(folderPath, "readme.txt");
+
+            var paths = AddedSourceResolver
+                .ResolveToPaths(
+                    source: folderPath.CombinePath("*.mp3"),
+                    includeFiles: true,
+                    includeFolders: true,
+                    includeSubdirs: true
+                )
+                .ToList();
+
+            Assert.Equal(folderPath, paths[0]);
+            Assert.Equal([folderPath, nested], paths);
         }
 
         [Fact]

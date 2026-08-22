@@ -425,9 +425,15 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal(4, addedCount);
             Assert.Equal(folderPath, renameList.RenameItems[0].Original.FullPath);
-            Assert.Equal(childFolder, renameList.RenameItems[1].Original.FullPath);
-            Assert.Equal(nestedFile, renameList.RenameItems[2].Original.FullPath);
-            Assert.Equal(topFile, renameList.RenameItems[3].Original.FullPath);
+            Assert.Equal(
+                new[] { folderPath, topFile, childFolder, nestedFile }.OrderBy(
+                    static path => path,
+                    StringComparer.OrdinalIgnoreCase
+                ),
+                renameList
+                    .RenameItems.Select(entry => entry.Original.FullPath)
+                    .OrderBy(static path => path, StringComparer.OrdinalIgnoreCase)
+            );
         }
 
         [Fact]

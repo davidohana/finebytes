@@ -202,10 +202,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add Selected on a folder with contents off stays one level (files and immediate child folders).
+        /// Verifies Add Selected on a folder with contents off adds the folder and its top-level files only.
         /// </summary>
         [Fact]
-        public void AddSelected_Folder_ContentsOff_AddsOneLevel()
+        public void AddSelected_Folder_ContentsOff_AddsFolderAndTopLevelFiles()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             ConfigStore.Config.Ui.AddMode = RenameListAddMode.FilesAndFolders;
@@ -218,9 +218,9 @@ namespace Mfr.Tests.Ui
 
             var names = _PreviewNames(renameListViewModel);
             Assert.Contains("album", names);
-            Assert.Contains("disc1", names);
             Assert.Contains("track.mp3", names);
             Assert.Contains("readme.txt", names);
+            Assert.DoesNotContain("disc1", names);
             Assert.DoesNotContain("nested.mp3", names);
         }
 
@@ -264,10 +264,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add Selected with files off and folders on adds only the selected folder row.
+        /// Verifies Add Selected with files off and folders on adds the selected folder and descendant folders.
         /// </summary>
         [Fact]
-        public void AddSelected_Folder_FilesOffFoldersOn_AddsFolderOnly()
+        public void AddSelected_Folder_FilesOffFoldersOn_AddsFolderAndDescendants()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             ConfigStore.Config.Ui.AddMode = RenameListAddMode.Folders;
@@ -277,7 +277,10 @@ namespace Mfr.Tests.Ui
 
             renameListViewModel.AddSelectedCommand.Execute(null);
 
-            Assert.Equal(["album"], _PreviewNames(renameListViewModel));
+            Assert.Equal(
+                ["album", "disc1"],
+                _PreviewNames(renameListViewModel).OrderBy(n => n, StringComparer.Ordinal)
+            );
         }
 
         /// <summary>
