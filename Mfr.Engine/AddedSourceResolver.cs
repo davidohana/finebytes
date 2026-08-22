@@ -1,61 +1,85 @@
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+using Mfr.Utils;
 
 namespace Mfr.Engine
 {
     /// <summary>
-    /// Resolves user-added rename sources (files, directories, and wildcard patterns) into concrete paths.
+    /// Resolves user-added rename sources (files, directories, and last-segment filename masks) into concrete paths.
     /// </summary>
     internal static class AddedSourceResolver
     {
+        private enum FolderAddStyle
+        {
+            FilesOnlyTop,
+            FilesOnlyRecursive,
+            OneLevelRecursion,
+            FullRecursion,
+        }
+
         /// <summary>
-        /// Resolves a single source into file paths.
+        /// Resolves a single source into file and folder paths.
         /// </summary>
-        /// <param name="source">The source to resolve.</param>
+        /// <param name="source">A file, a directory, or a directory plus a filename mask in the last segment.</param>
+        /// <param name="includeFiles">Whether discovered file entries should be included.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
-        /// <param name="includeSubdirs">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
-        /// <returns>Resolved file paths for the source.</returns>
-        internal static IEnumerable<string> ResolveToPaths(string source, bool includeFolders, bool includeSubdirs)
+        /// <param name="includeSubdirs">Whether directory expansion should recurse into subdirectories.</param>
+        /// <param name="excludeMasks">Exclusive file-name masks for discovered entries.</param>
+        /// <returns>Resolved paths for the source.</returns>
+        internal static IEnumerable<string> ResolveToPaths(
+            string source,
+            bool includeFiles,
+            bool includeFolders,
+            bool includeSubdirs,
+            IReadOnlyList<string>? excludeMasks = null
+        )
         {
             var fullSource = Path.GetFullPath(source);
-            if (Directory.Exists(fullSource))
+            _EnsureWildcardOnlyInLastSegment(fullSource);
+
+            var lastSegment = Path.GetFileName(
+                fullSource.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            );
+            if (_ContainsGlobPattern(lastSegment))
             {
-                if (includeFolders)
+                var parentDirectory = Path.GetDirectoryName(fullSource);
+                if (string.IsNullOrWhiteSpace(parentDirectory))
                 {
-                    // Directory sources resolve to the directory path itself when folders are included.
-                    return [fullSource];
+                    parentDirectory = Directory.GetCurrentDirectory();
                 }
 
-                // When folder entries are excluded, directory sources expand to files based on recursion mode.
-                var searchOption = includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-                return Directory.EnumerateFiles(fullSource, "*", searchOption);
+                _ThrowIfDirectoryMissing(parentDirectory);
+                _ThrowIfRootPath(parentDirectory);
+                return _ResolveDirectory(
+                    fullSource: parentDirectory,
+                    includeFiles: includeFiles,
+                    includeFolders: includeFolders,
+                    includeSubdirs: includeSubdirs,
+                    includeMask: lastSegment,
+                    excludeMasks: excludeMasks
+                );
             }
 
-            // Non-directory sources resolve relative to their parent directory.
-            var parentDirectory = Path.GetDirectoryName(fullSource);
-            parentDirectory = string.IsNullOrWhiteSpace(parentDirectory)
-                ? Directory.GetCurrentDirectory()
-                : parentDirectory;
-            if (_TryResolveGlob(fullSource, out var globMatches))
+            if (Directory.Exists(fullSource))
             {
-                return globMatches;
+                return _ResolveDirectory(
+                    fullSource: fullSource,
+                    includeFiles: includeFiles,
+                    includeFolders: includeFolders,
+                    includeSubdirs: includeSubdirs,
+                    includeMask: null,
+                    excludeMasks: excludeMasks
+                );
             }
 
-            if (!Directory.Exists(parentDirectory))
+            var parentOfExact = Path.GetDirectoryName(fullSource);
+            parentOfExact = string.IsNullOrWhiteSpace(parentOfExact) ? Directory.GetCurrentDirectory() : parentOfExact;
+            if (!Directory.Exists(parentOfExact))
             {
-                throw new UserException($"Directory for source does not exist: '{parentDirectory}'.");
-            }
-
-            var filePattern = Path.GetFileName(fullSource);
-            if (_ContainsGlobPattern(filePattern))
-            {
-                // Simple file-name wildcards expand in the parent directory only.
-                return Directory.EnumerateFiles(parentDirectory, filePattern, SearchOption.TopDirectoryOnly);
+                throw new UserException($"Directory for source does not exist: '{parentOfExact}'.");
             }
 
             if (File.Exists(fullSource))
             {
-                // Exact file source resolves to that single file.
+                // Exact file sources resolve to that single file and bypass include/exclude masks.
                 return [fullSource];
             }
 
@@ -64,72 +88,256 @@ namespace Mfr.Engine
         }
 
         /// <summary>
-        /// Tries to resolve glob sources using standard matcher syntax.
+        /// Resolves a directory source using MFR7 Adder-style expansion rules.
         /// </summary>
-        /// <param name="fullSource">The full source path to inspect.</param>
-        /// <param name="resolvedPaths">Resolved file paths when glob syntax is recognized.</param>
-        /// <returns><c>true</c> if glob syntax was detected; otherwise <c>false</c>.</returns>
-        private static bool _TryResolveGlob(string fullSource, out IEnumerable<string> resolvedPaths)
+        private static List<string> _ResolveDirectory(
+            string fullSource,
+            bool includeFiles,
+            bool includeFolders,
+            bool includeSubdirs,
+            string? includeMask,
+            IReadOnlyList<string>? excludeMasks
+        )
         {
-            resolvedPaths = [];
-            if (!_ContainsGlobPattern(fullSource))
+            var results = new List<string>();
+
+            if (includeFolders)
             {
-                return false;
+                // The explicit directory source is always included when folders are requested.
+                results.Add(fullSource);
             }
 
-            var normalizedSource = fullSource.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            var root = Path.GetPathRoot(normalizedSource) ?? Directory.GetCurrentDirectory();
-            var relativePath = normalizedSource[root.Length..];
-            var segments = relativePath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-
-            var baseSegments = new List<string>();
-            var globSegments = new List<string>();
-            var foundGlob = false;
-            foreach (var segment in segments)
+            if (!includeFiles)
             {
-                if (!foundGlob && !_ContainsGlobPattern(segment))
+                return results;
+            }
+
+            var folderAddStyle = _ResolveFolderAddStyle(includeFolders: includeFolders, includeSubdirs: includeSubdirs);
+            _ExpandDirectory(
+                directoryPath: fullSource,
+                results: results,
+                folderAddStyle: folderAddStyle,
+                includeMask: includeMask,
+                excludeMasks: excludeMasks
+            );
+            return results;
+        }
+
+        /// <summary>
+        /// Maps add-policy flags to the directory expansion mode used while walking a source folder.
+        /// </summary>
+        private static FolderAddStyle _ResolveFolderAddStyle(bool includeFolders, bool includeSubdirs)
+        {
+            if (!includeFolders)
+            {
+                return includeSubdirs ? FolderAddStyle.FilesOnlyRecursive : FolderAddStyle.FilesOnlyTop;
+            }
+
+            return includeSubdirs ? FolderAddStyle.FullRecursion : FolderAddStyle.OneLevelRecursion;
+        }
+
+        /// <summary>
+        /// Expands directory contents depth-first, applying masks to discovered file and folder names.
+        /// </summary>
+        private static void _ExpandDirectory(
+            string directoryPath,
+            List<string> results,
+            FolderAddStyle folderAddStyle,
+            string? includeMask,
+            IReadOnlyList<string>? excludeMasks
+        )
+        {
+            if (folderAddStyle == FolderAddStyle.FilesOnlyTop)
+            {
+                foreach (var filePath in Directory.EnumerateFiles(directoryPath, "*", SearchOption.TopDirectoryOnly))
                 {
-                    baseSegments.Add(segment);
-                    continue;
+                    _TryAddDiscoveredPath(
+                        fullPath: filePath,
+                        results: results,
+                        includeMask: includeMask,
+                        excludeMasks: excludeMasks
+                    );
                 }
 
-                foundGlob = true;
-                globSegments.Add(segment);
+                return;
             }
 
-            if (!foundGlob)
+            if (folderAddStyle == FolderAddStyle.FilesOnlyRecursive)
+            {
+                foreach (var filePath in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
+                {
+                    _TryAddDiscoveredPath(
+                        fullPath: filePath,
+                        results: results,
+                        includeMask: includeMask,
+                        excludeMasks: excludeMasks
+                    );
+                }
+
+                return;
+            }
+
+            foreach (var entry in new DirectoryInfo(directoryPath).EnumerateFileSystemInfos())
+            {
+                var isDirectory = entry.Attributes.HasFlag(FileAttributes.Directory);
+                _AddDiscoveredEntry(
+                    fullPath: entry.FullName,
+                    isDirectory: isDirectory,
+                    results: results,
+                    folderAddStyle: folderAddStyle,
+                    includeMask: includeMask,
+                    excludeMasks: excludeMasks
+                );
+            }
+        }
+
+        /// <summary>
+        /// Adds a discovered child entry and optionally recurses into nested folders.
+        /// </summary>
+        private static void _AddDiscoveredEntry(
+            string fullPath,
+            bool isDirectory,
+            List<string> results,
+            FolderAddStyle folderAddStyle,
+            string? includeMask,
+            IReadOnlyList<string>? excludeMasks
+        )
+        {
+            if (
+                !_TryAddDiscoveredPath(
+                    fullPath: fullPath,
+                    results: results,
+                    includeMask: includeMask,
+                    excludeMasks: excludeMasks
+                )
+            )
+            {
+                return;
+            }
+
+            if (!isDirectory)
+            {
+                return;
+            }
+
+            if (folderAddStyle == FolderAddStyle.OneLevelRecursion)
+            {
+                return;
+            }
+
+            foreach (var entry in new DirectoryInfo(fullPath).EnumerateFileSystemInfos())
+            {
+                var isNestedDirectory = entry.Attributes.HasFlag(FileAttributes.Directory);
+                _AddDiscoveredEntry(
+                    fullPath: entry.FullName,
+                    isDirectory: isNestedDirectory,
+                    results: results,
+                    folderAddStyle: folderAddStyle,
+                    includeMask: includeMask,
+                    excludeMasks: excludeMasks
+                );
+            }
+        }
+
+        /// <summary>
+        /// Adds a discovered path when its file name passes include and exclude masks.
+        /// </summary>
+        /// <returns><c>true</c> when the path was added; otherwise <c>false</c>.</returns>
+        private static bool _TryAddDiscoveredPath(
+            string fullPath,
+            List<string> results,
+            string? includeMask,
+            IReadOnlyList<string>? excludeMasks
+        )
+        {
+            var fileName = Path.GetFileName(
+                fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            );
+            if (!_PassesFileNameMasks(fileName: fileName, includeMask: includeMask, excludeMasks: excludeMasks))
             {
                 return false;
             }
 
-            if (globSegments.Count == 1)
-            {
-                // Single-segment patterns are handled by Directory.EnumerateFiles in the caller.
-                return false;
-            }
-
-            var baseDirectory = root;
-            foreach (var segment in baseSegments)
-            {
-                baseDirectory = Path.Combine(baseDirectory, segment);
-            }
-
-            if (!Directory.Exists(baseDirectory))
-            {
-                throw new UserException($"Directory for source does not exist: '{baseDirectory}'.");
-            }
-
-            var includePattern = globSegments.Count == 0 ? "*" : string.Join('/', globSegments);
-            var matcher = new Matcher(
-                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal
-            );
-            matcher.AddInclude(includePattern);
-            var matchResult = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(baseDirectory)));
-
-            resolvedPaths = matchResult.Files.Select(match =>
-                Path.GetFullPath(Path.Combine(baseDirectory, match.Path.Replace('/', Path.DirectorySeparatorChar)))
-            );
+            results.Add(fullPath);
             return true;
+        }
+
+        /// <summary>
+        /// Whether a discovered file or folder name passes include and exclude masks.
+        /// </summary>
+        private static bool _PassesFileNameMasks(
+            string fileName,
+            string? includeMask,
+            IReadOnlyList<string>? excludeMasks
+        )
+        {
+            if (!WildcardMask.IsMatch(fileName, includeMask))
+            {
+                return false;
+            }
+
+            if (WildcardMask.MatchesAny(fileName, excludeMasks))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Rejects <c>**</c> and wildcards in any path segment except the last.
+        /// </summary>
+        private static void _EnsureWildcardOnlyInLastSegment(string fullSource)
+        {
+            var normalized = fullSource.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            var root = Path.GetPathRoot(normalized) ?? string.Empty;
+            var relativePath = normalized[root.Length..];
+            var segments = relativePath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+
+            for (var i = 0; i < segments.Length; i++)
+            {
+                var segment = segments[i];
+                var isLast = i == segments.Length - 1;
+                if (segment.Contains("**", StringComparison.Ordinal))
+                {
+                    throw new UserException(
+                        "Recursive '**' globs are not supported. Enable recursive directory expansion to include subdirectories."
+                    );
+                }
+
+                if (!isLast && _ContainsGlobPattern(segment))
+                {
+                    throw new UserException(
+                        "Wildcards are only allowed in the last path segment. Enable recursive directory expansion to include subdirectories."
+                    );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Throws when <paramref name="directoryPath"/> is a drive or filesystem root.
+        /// </summary>
+        private static void _ThrowIfRootPath(string directoryPath)
+        {
+            var fullDirectory = Path.GetFullPath(directoryPath);
+            var root = Path.GetPathRoot(fullDirectory) ?? string.Empty;
+            if (string.Equals(root, fullDirectory, PathComparers.OsComparison))
+            {
+                throw new UserException($"Root paths cannot be added as rename sources: '{directoryPath}'.");
+            }
+        }
+
+        /// <summary>
+        /// Throws when the directory that a last-segment mask applies to does not exist.
+        /// </summary>
+        private static void _ThrowIfDirectoryMissing(string directoryPath)
+        {
+            if (Directory.Exists(directoryPath))
+            {
+                return;
+            }
+
+            throw new UserException($"Directory for source does not exist: '{directoryPath}'.");
         }
 
         /// <summary>

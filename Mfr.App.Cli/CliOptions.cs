@@ -9,7 +9,7 @@ namespace Mfr.App.Cli
     /// <param name="Sources">List of source files, folders, or wildcard patterns to process.</param>
     /// <param name="IncludeFiles">Whether file entries should be included from resolved sources.</param>
     /// <param name="IncludeFolders">Whether folder entries should be included from resolved sources.</param>
-    /// <param name="RecursiveDirectoryFileAdd">Whether directory sources should add files recursively when folder inclusion is disabled.</param>
+    /// <param name="IncludeSubdirs">Whether directory sources should expand recursively into subdirectories.</param>
     /// <param name="OutputFilePath">Optional output file path where JSON results are written.</param>
     /// <param name="IncludeHidden">Whether to include hidden and system files.</param>
     /// <param name="ContinueOnRenameError">Whether commit should continue after per-item rename errors.</param>
@@ -24,7 +24,7 @@ namespace Mfr.App.Cli
         IReadOnlyList<string> Sources,
         bool IncludeFiles,
         bool IncludeFolders,
-        bool RecursiveDirectoryFileAdd,
+        bool IncludeSubdirs,
         string? OutputFilePath,
         bool IncludeHidden,
         bool ContinueOnRenameError,

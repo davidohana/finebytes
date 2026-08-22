@@ -65,25 +65,19 @@ namespace Mfr.Tests.Engine
                 "gamma.txt"
             );
 
-            var sources = new[] { betaPath, _tempRoot.CombinePath("*.txt"), _tempRoot };
+            var sources = new[] { betaPath, _tempRoot.CombinePath("*.txt") };
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources(sources);
+            renameList.AddSources(sources: sources, includeFiles: true, includeFolders: false);
             var entries = renameList.RenameItems;
 
-            var tempRootParent = Path.GetDirectoryName(_tempRoot) ?? "";
-            var tempRootName = Path.GetFileName(_tempRoot);
-
-            Assert.Equal(4, entries.Count);
-            Assert.Equal([betaPath, alphaPath, gammaPath, _tempRoot], entries.Select(e => e.Original.FullPath));
-            Assert.Equal([0, 1, 2, 3], entries.Select(e => e.Original.RenameListIndex));
-            Assert.Equal([0, 1, 2, 0], entries.Select(e => e.Original.InFolderIndex));
-            Assert.Equal(["beta", "alpha", "gamma", tempRootName], entries.Select(e => e.Original.Prefix));
-            Assert.Equal([".log", ".txt", ".txt", ""], entries.Select(e => e.Original.Extension));
-            Assert.Equal(
-                [_tempRoot, _tempRoot, _tempRoot, tempRootParent],
-                entries.Select(e => e.Original.DirectoryPath)
-            );
+            Assert.Equal(3, entries.Count);
+            Assert.Equal([betaPath, alphaPath, gammaPath], entries.Select(e => e.Original.FullPath));
+            Assert.Equal([0, 1, 2], entries.Select(e => e.Original.RenameListIndex));
+            Assert.Equal([0, 1, 2], entries.Select(e => e.Original.InFolderIndex));
+            Assert.Equal(["beta", "alpha", "gamma"], entries.Select(e => e.Original.Prefix));
+            Assert.Equal([".log", ".txt", ".txt"], entries.Select(e => e.Original.Extension));
+            Assert.Equal([_tempRoot, _tempRoot, _tempRoot], entries.Select(e => e.Original.DirectoryPath));
         }
 
         [Fact]
@@ -387,14 +381,69 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies that glob sources resolve files from the parent directory only.
+        /// Verifies that a directory source with files and folders expands one level and honors masks.
         /// </summary>
-        public void AddSource_Resolves_Glob_In_TopDirectoryOnly()
+        public void AddSource_DirectorySource_WithFilesAndFolders_OneLevel_AddsMatchingImmediateEntries()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            TestHelpers.CreateFile(folderPath, "keep.mp3");
+            var skipFile = TestHelpers.CreateFile(folderPath, "skip.mp3");
+            var childFolder = Directory.CreateDirectory(folderPath.CombinePath("Disc1")).FullName;
+            TestHelpers.CreateFile(childFolder, "nested.mp3");
+
+            var renameList = new RenameList(includeHidden: true);
+            var addedCount = renameList.AddSource(
+                source: folderPath.CombinePath("*.mp3"),
+                includeFiles: true,
+                includeFolders: true,
+                includeSubdirs: false,
+                excludeMasks: ["keep.*"]
+            );
+
+            Assert.Equal(2, addedCount);
+            Assert.Equal([folderPath, skipFile], renameList.RenameItems.Select(entry => entry.Original.FullPath));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that a directory source with files, folders, and recursion adds nested folder rows.
+        /// </summary>
+        public void AddSource_DirectorySource_WithFilesFoldersAndRecursion_AddsNestedFolders()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var topFile = TestHelpers.CreateFile(folderPath, "readme.txt");
+            var childFolder = Directory.CreateDirectory(folderPath.CombinePath("Disc1")).FullName;
+            var nestedFile = TestHelpers.CreateFile(childFolder, "track.mp3");
+
+            var renameList = new RenameList(includeHidden: true);
+            var addedCount = renameList.AddSource(
+                source: folderPath,
+                includeFiles: true,
+                includeFolders: true,
+                includeSubdirs: true
+            );
+
+            Assert.Equal(4, addedCount);
+            Assert.Equal(folderPath, renameList.RenameItems[0].Original.FullPath);
+            Assert.Equal(childFolder, renameList.RenameItems[1].Original.FullPath);
+            Assert.Equal(nestedFile, renameList.RenameItems[2].Original.FullPath);
+            Assert.Equal(topFile, renameList.RenameItems[3].Original.FullPath);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that a last-segment mask with folders disabled resolves matching top-level files only.
+        /// </summary>
+        public void AddSource_DirectoryMask_FoldersDisabled_AddsTopLevelMatchesOnly()
         {
             var (topLevelMatch, _) = TestHelpers.CreateFiles(_tempRoot, "top.txt", "nested/nested.txt");
 
             var renameList = new RenameList(includeHidden: true);
-            var addedCount = renameList.AddSource(_tempRoot.CombinePath("*.txt"));
+            var addedCount = renameList.AddSource(
+                source: _tempRoot.CombinePath("*.txt"),
+                includeFiles: true,
+                includeFolders: false
+            );
 
             Assert.Equal(1, addedCount);
             var entry = Assert.Single(renameList.RenameItems);
@@ -403,14 +452,17 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies that glob and exact-file sources deduplicate to a single resolved item.
+        /// Verifies that a last-segment mask and an exact-file source deduplicate to a single resolved item.
         /// </summary>
-        public void AddSource_GlobAndExactFile_Deduplicates_ResolvedItem()
+        public void AddSource_DirectoryMaskAndExactFile_Deduplicates_ResolvedItem()
         {
             var alphaPath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
             var renameList = new RenameList(includeHidden: true);
-            Assert.Equal(1, renameList.AddSource(_tempRoot.CombinePath("*.txt")));
+            Assert.Equal(
+                1,
+                renameList.AddSource(source: _tempRoot.CombinePath("*.txt"), includeFiles: true, includeFolders: false)
+            );
             Assert.Equal(0, renameList.AddSource(alphaPath));
 
             var entry = Assert.Single(renameList.RenameItems);
@@ -419,9 +471,9 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies that recursive glob syntax with ** resolves matches from nested folders.
+        /// Verifies that a last-segment mask with recursion resolves matching files from nested folders.
         /// </summary>
-        public void AddSource_Resolves_Recursive_Glob_With_DoubleStar_Syntax()
+        public void AddSource_DirectoryMask_Recursive_AddsNestedMatches()
         {
             var (topLevelMatch, nestedMatch, deeperMatch) = TestHelpers.CreateFiles(
                 _tempRoot,
@@ -431,34 +483,18 @@ namespace Mfr.Tests.Engine
             );
 
             var renameList = new RenameList(includeHidden: true);
-            var addedCount = renameList.AddSource(_tempRoot.CombinePath("**", "*.txt"));
+            var addedCount = renameList.AddSource(
+                source: _tempRoot.CombinePath("*.txt"),
+                includeFiles: true,
+                includeFolders: false,
+                includeSubdirs: true
+            );
 
             Assert.Equal(3, addedCount);
             Assert.Equal(
                 [topLevelMatch, nestedMatch, deeperMatch],
                 renameList.RenameItems.Select(entry => entry.Original.FullPath)
             );
-        }
-
-        [Fact]
-        /// <summary>
-        /// Verifies that matcher wildcard syntax resolves a nested path pattern with recursive traversal.
-        /// </summary>
-        public void AddSource_Resolves_Recursive_Nested_Path_Pattern()
-        {
-            var (nestedMatch, deeperMatch, nonMatch) = TestHelpers.CreateFiles(
-                _tempRoot,
-                "nested/file1.txt",
-                "x/nested/file2.txt",
-                "x/other/file3.txt"
-            );
-
-            var renameList = new RenameList(includeHidden: true);
-            var addedCount = renameList.AddSource(_tempRoot.CombinePath("**", "nested", "*.txt"));
-
-            Assert.Equal(2, addedCount);
-            Assert.Equal([nestedMatch, deeperMatch], renameList.RenameItems.Select(entry => entry.Original.FullPath));
-            Assert.DoesNotContain(nonMatch, renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
 
         [Fact]

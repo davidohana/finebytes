@@ -97,7 +97,7 @@ namespace Mfr.App.Cli
                 sources: options.Sources,
                 includeFiles: options.IncludeFiles,
                 includeFolders: options.IncludeFolders,
-                includeSubdirs: options.RecursiveDirectoryFileAdd
+                includeSubdirs: options.IncludeSubdirs
             );
             var renameItems = renameList.RenameItems;
 

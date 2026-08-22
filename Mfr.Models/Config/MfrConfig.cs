@@ -69,21 +69,16 @@ namespace Mfr.Models.Config
     {
         /// <summary>
         /// When true, file paths added to the Rename List are included as rows.
-        /// <para>MFR 7 Options default: yes.</para>
         /// </summary>
         public bool AddFiles = true;
 
         /// <summary>
         /// When true, folder paths added to the Rename List are included as rows.
-        /// <para>MFR 7 Options default: no.</para>
         /// </summary>
-#pragma warning disable CA1805 // Explicit false documents MFR 7 default alongside other add-policy flags.
-        public bool AddFolders = false;
-#pragma warning restore CA1805
+        public bool AddFolders;
 
         /// <summary>
-        /// When true, adding a folder source recursively includes files in that folder and its subfolders.
-        /// <para>MFR 7 Options default: yes.</para>
+        /// When true, folder sources expand into subdirectories.
         /// </summary>
         public bool AddFolderContents = true;
 

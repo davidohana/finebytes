@@ -58,7 +58,9 @@ namespace Mfr.Tests.Engine
             var source = missingParent.CombinePath("file.txt");
 
             var ex = Assert.Throws<UserException>(() =>
-                AddedSourceResolver.ResolveToPaths(source: source, includeFolders: true, includeSubdirs: false).ToList()
+                AddedSourceResolver
+                    .ResolveToPaths(source: source, includeFiles: true, includeFolders: true, includeSubdirs: false)
+                    .ToList()
             );
 
             Assert.Contains("does not exist", ex.Message, StringComparison.Ordinal);
@@ -73,6 +75,7 @@ namespace Mfr.Tests.Engine
             var paths = AddedSourceResolver
                 .ResolveToPaths(
                     source: _tempRoot.CombinePath("definitely_missing.bin"),
+                    includeFiles: true,
                     includeFolders: true,
                     includeSubdirs: false
                 )
@@ -90,7 +93,7 @@ namespace Mfr.Tests.Engine
             var filePath = TestHelpers.CreateFile(_tempRoot, "single.txt");
 
             var paths = AddedSourceResolver
-                .ResolveToPaths(source: filePath, includeFolders: true, includeSubdirs: false)
+                .ResolveToPaths(source: filePath, includeFiles: true, includeFolders: true, includeSubdirs: false)
                 .ToList();
 
             Assert.Equal([filePath], paths);
@@ -98,14 +101,15 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies that a directory source with folder inclusion yields the directory path.
+        /// Verifies that a directory source with folder inclusion yields the directory path only when files are disabled.
         /// </summary>
         public void Resolve_Directory_WithIncludeFolders_ReturnsDirectoryPath()
         {
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            TestHelpers.CreateFile(folderPath, "inside.txt");
 
             var paths = AddedSourceResolver
-                .ResolveToPaths(source: folderPath, includeFolders: true, includeSubdirs: false)
+                .ResolveToPaths(source: folderPath, includeFiles: false, includeFolders: true, includeSubdirs: false)
                 .ToList();
 
             Assert.Equal([folderPath], paths);
@@ -123,7 +127,7 @@ namespace Mfr.Tests.Engine
             TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
 
             var paths = AddedSourceResolver
-                .ResolveToPaths(source: folderPath, includeFolders: false, includeSubdirs: false)
+                .ResolveToPaths(source: folderPath, includeFiles: true, includeFolders: false, includeSubdirs: false)
                 .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
@@ -133,15 +137,126 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies that a simple filename wildcard resolves against the parent directory only.
+        /// Verifies that files and immediate child folders are returned for one-level directory expansion.
         /// </summary>
-        public void Resolve_SimpleFilenameGlob_MatchesTopDirectoryOnly()
+        public void Resolve_Directory_OneLevelRecursion_ReturnsFolderImmediateFilesAndChildFolders()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var topFile = TestHelpers.CreateFile(folderPath, "track.mp3");
+            var childFolder = Directory.CreateDirectory(folderPath.CombinePath("Disc1")).FullName;
+            TestHelpers.CreateFile(childFolder, "nested.mp3");
+
+            var paths = AddedSourceResolver
+                .ResolveToPaths(source: folderPath, includeFiles: true, includeFolders: true, includeSubdirs: false)
+                .ToList();
+
+            Assert.Equal(folderPath, paths[0]);
+            Assert.Equal(
+                new[] { topFile, childFolder }.OrderBy(static path => path, StringComparer.OrdinalIgnoreCase),
+                paths.Skip(1).OrderBy(static path => path, StringComparer.OrdinalIgnoreCase)
+            );
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that full recursion returns nested folders and files while keeping the explicit source folder first.
+        /// </summary>
+        public void Resolve_Directory_FullRecursion_ReturnsNestedFoldersAndFiles()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var topFile = TestHelpers.CreateFile(folderPath, "readme.txt");
+            var childFolder = Directory.CreateDirectory(folderPath.CombinePath("Disc1")).FullName;
+            var nestedFile = TestHelpers.CreateFile(childFolder, "track.mp3");
+
+            var paths = AddedSourceResolver
+                .ResolveToPaths(source: folderPath, includeFiles: true, includeFolders: true, includeSubdirs: true)
+                .ToList();
+
+            Assert.Equal(folderPath, paths[0]);
+            Assert.Equal(childFolder, paths[1]);
+            Assert.Equal(nestedFile, paths[2]);
+            Assert.Equal(topFile, paths[3]);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that nested folders are not added when folder inclusion is enabled but file inclusion is disabled.
+        /// </summary>
+        public void Resolve_Directory_FoldersOnly_DoesNotAddNestedFolders()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            Directory.CreateDirectory(folderPath.CombinePath("Disc1"));
+            TestHelpers.CreateFile(folderPath, "track.mp3");
+
+            var paths = AddedSourceResolver
+                .ResolveToPaths(source: folderPath, includeFiles: false, includeFolders: true, includeSubdirs: true)
+                .ToList();
+
+            Assert.Equal([folderPath], paths);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that a last-segment mask filters discovered names and still adds the explicit folder.
+        /// </summary>
+        public void Resolve_DirectoryMask_AppliesIncludeAndExcludeMasksToDiscoveredEntries()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            TestHelpers.CreateFile(folderPath, "keep.mp3");
+            var skipFile = TestHelpers.CreateFile(folderPath, "skip.mp3");
+            Directory.CreateDirectory(folderPath.CombinePath("Disc1"));
+            TestHelpers.CreateFile(folderPath.CombinePath("Disc1"), "nested.mp3");
+
+            var paths = AddedSourceResolver
+                .ResolveToPaths(
+                    source: folderPath.CombinePath("*.mp3"),
+                    includeFiles: true,
+                    includeFolders: true,
+                    includeSubdirs: false,
+                    excludeMasks: ["keep.*"]
+                )
+                .ToList();
+
+            Assert.Equal([folderPath, skipFile], paths);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that the explicit source folder is included even when its name does not match the mask.
+        /// </summary>
+        public void Resolve_DirectoryMask_ExplicitFolderBypassesIncludeMask()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album.v2")).FullName;
+            TestHelpers.CreateFile(folderPath, "track.mp3");
+
+            var paths = AddedSourceResolver
+                .ResolveToPaths(
+                    source: folderPath.CombinePath("*.mp3"),
+                    includeFiles: true,
+                    includeFolders: true,
+                    includeSubdirs: false
+                )
+                .ToList();
+
+            Assert.Equal(folderPath, paths[0]);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that a last-segment mask with folders disabled matches top-level files only.
+        /// </summary>
+        public void Resolve_DirectoryMask_FoldersDisabled_MatchesTopDirectoryOnly()
         {
             var top = TestHelpers.CreateFile(_tempRoot, "keep.txt");
             TestHelpers.CreateFile(_tempRoot.CombinePath("nested"), "skip.txt");
 
             var paths = AddedSourceResolver
-                .ResolveToPaths(source: _tempRoot.CombinePath("*.txt"), includeFolders: true, includeSubdirs: false)
+                .ResolveToPaths(
+                    source: _tempRoot.CombinePath("*.txt"),
+                    includeFiles: true,
+                    includeFolders: false,
+                    includeSubdirs: false
+                )
                 .ToList();
 
             Assert.Equal([top], paths);
@@ -149,18 +264,99 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies that a multi-segment glob with a missing base directory yields <see cref="UserException"/>.
+        /// Verifies that a last-segment mask with recursion includes nested files matching the mask.
         /// </summary>
-        public void Resolve_MultiSegmentGlob_MissingBaseDirectory_ThrowsUserException()
+        public void Resolve_DirectoryMask_FoldersDisabled_Recursive_MatchesNestedFiles()
         {
-            var source = _tempRoot.CombinePath("absent_subdir", "**", "*.txt");
+            var top = TestHelpers.CreateFile(_tempRoot, "keep.txt");
+            var nested = TestHelpers.CreateFile(_tempRoot.CombinePath("nested"), "skip.txt");
+
+            var paths = AddedSourceResolver
+                .ResolveToPaths(
+                    source: _tempRoot.CombinePath("*.txt"),
+                    includeFiles: true,
+                    includeFolders: false,
+                    includeSubdirs: true
+                )
+                .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            var expected = new[] { top, nested }.OrderBy(p => p, StringComparer.OrdinalIgnoreCase).ToList();
+            Assert.Equal(expected, paths);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that exclude masks still apply when the include mask is in the source.
+        /// </summary>
+        public void Resolve_DirectoryMask_AppliesExcludeMasks()
+        {
+            TestHelpers.CreateFile(_tempRoot, "keep.txt");
+            var skip = TestHelpers.CreateFile(_tempRoot, "skip.txt");
+
+            var paths = AddedSourceResolver
+                .ResolveToPaths(
+                    source: _tempRoot.CombinePath("*.txt"),
+                    includeFiles: true,
+                    includeFolders: false,
+                    includeSubdirs: false,
+                    excludeMasks: ["keep.*"]
+                )
+                .ToList();
+
+            Assert.Equal([skip], paths);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that a missing parent for a last-segment mask yields <see cref="UserException"/>.
+        /// </summary>
+        public void Resolve_DirectoryMask_MissingParent_ThrowsUserException()
+        {
+            var source = _tempRoot.CombinePath("absent_subdir", "*.txt");
 
             var ex = Assert.Throws<UserException>(() =>
-                AddedSourceResolver.ResolveToPaths(source: source, includeFolders: true, includeSubdirs: false).ToList()
+                AddedSourceResolver
+                    .ResolveToPaths(source: source, includeFiles: true, includeFolders: false, includeSubdirs: false)
+                    .ToList()
             );
 
             Assert.Contains("does not exist", ex.Message, StringComparison.Ordinal);
             Assert.Contains("absent_subdir", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>**</c> glob syntax is rejected in favor of recursive directory expansion.
+        /// </summary>
+        public void Resolve_DoubleStarGlob_ThrowsUserException()
+        {
+            var source = _tempRoot.CombinePath("**", "*.txt");
+
+            var ex = Assert.Throws<UserException>(() =>
+                AddedSourceResolver
+                    .ResolveToPaths(source: source, includeFiles: true, includeFolders: false, includeSubdirs: false)
+                    .ToList()
+            );
+
+            Assert.Contains("**", ex.Message, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that wildcards are rejected in any path segment except the last.
+        /// </summary>
+        public void Resolve_WildcardInNonLastSegment_ThrowsUserException()
+        {
+            var source = _tempRoot.CombinePath("*", "file.txt");
+
+            var ex = Assert.Throws<UserException>(() =>
+                AddedSourceResolver
+                    .ResolveToPaths(source: source, includeFiles: true, includeFolders: false, includeSubdirs: false)
+                    .ToList()
+            );
+
+            Assert.Contains("last path segment", ex.Message, StringComparison.Ordinal);
         }
     }
 }

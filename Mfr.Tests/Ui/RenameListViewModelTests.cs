@@ -153,6 +153,128 @@ namespace Mfr.Tests.Ui
             Assert.Equal("File", renameList.Entries[0].FileFolder);
         }
 
+        /// <summary>
+        /// Verifies Add Selected on a folder adds matching files recursively and no folder row (UI defaults).
+        /// </summary>
+        [Fact]
+        public void AddSelected_Folder_Default_AddsNestedFilesNotFolder()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            var fileList = _CreateFileList(parent);
+            var renameList = new RenameListViewModel(fileList);
+            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
+
+            renameList.AddSelectedCommand.Execute(null);
+
+            Assert.Equal(
+                ["nested.mp3", "readme.txt", "track.mp3"],
+                _PreviewNames(renameList).OrderBy(n => n, StringComparer.Ordinal)
+            );
+            Assert.DoesNotContain("album", _PreviewNames(renameList));
+            Assert.DoesNotContain("disc1", _PreviewNames(renameList));
+        }
+
+        /// <summary>
+        /// Verifies Add Selected on a folder with Add Folders and contents on adds nested folder rows.
+        /// </summary>
+        [Fact]
+        public void AddSelected_Folder_AddFoldersAndContents_AddsNestedFolderRows()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            ConfigStore.Config.Ui.AddFolders = true;
+            var fileList = _CreateFileList(parent);
+            var renameList = new RenameListViewModel(fileList);
+            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
+
+            renameList.AddSelectedCommand.Execute(null);
+
+            var names = _PreviewNames(renameList);
+            Assert.Contains("album", names);
+            Assert.Contains("disc1", names);
+            Assert.Contains("track.mp3", names);
+            Assert.Contains("nested.mp3", names);
+        }
+
+        /// <summary>
+        /// Verifies Add Selected on a folder with contents off stays one level (files and immediate child folders).
+        /// </summary>
+        [Fact]
+        public void AddSelected_Folder_ContentsOff_AddsOneLevel()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            ConfigStore.Config.Ui.AddFolders = true;
+            ConfigStore.Config.Ui.AddFolderContents = false;
+            var fileList = _CreateFileList(parent);
+            var renameList = new RenameListViewModel(fileList);
+            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
+
+            renameList.AddSelectedCommand.Execute(null);
+
+            var names = _PreviewNames(renameList);
+            Assert.Contains("album", names);
+            Assert.Contains("disc1", names);
+            Assert.Contains("track.mp3", names);
+            Assert.Contains("readme.txt", names);
+            Assert.DoesNotContain("nested.mp3", names);
+        }
+
+        /// <summary>
+        /// Verifies Add All adds nested files matching the File List mask.
+        /// </summary>
+        [Fact]
+        public void AddAll_Adds_Nested_Masked_Files()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            var fileList = _CreateFileList(albumPath);
+            fileList.Mask = "*.mp3";
+            var renameList = new RenameListViewModel(fileList);
+
+            renameList.AddAllCommand.Execute(null);
+
+            Assert.Equal(
+                ["nested.mp3", "track.mp3"],
+                _PreviewNames(renameList).OrderBy(n => n, StringComparer.Ordinal)
+            );
+        }
+
+        /// <summary>
+        /// Verifies Add Selected can mix an exact file with a folder source.
+        /// </summary>
+        [Fact]
+        public void AddSelected_MixedFileAndFolder_AddsBoth()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            var other = Path.Combine(parent, "other.txt");
+            File.WriteAllText(other, "o");
+            var fileList = _CreateFileList(parent);
+            var renameList = new RenameListViewModel(fileList);
+            fileList.SetSelectedEntries([_FileEntry(parent, "other.txt"), _FolderEntry(albumPath)]);
+
+            renameList.AddSelectedCommand.Execute(null);
+
+            var names = _PreviewNames(renameList);
+            Assert.Contains("other.txt", names);
+            Assert.Contains("track.mp3", names);
+        }
+
+        /// <summary>
+        /// Verifies Add Selected is enabled for a folder when files or folders may be added.
+        /// </summary>
+        [Fact]
+        public void AddSelected_CanExecute_FolderWhenFilesOrFoldersOn()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            var fileList = _CreateFileList(parent);
+            fileList.SetSelectedEntries([_FolderEntry(albumPath)]);
+            var renameList = new RenameListViewModel(fileList);
+
+            Assert.True(renameList.AddSelectedCommand.CanExecute(null));
+
+            ConfigStore.Config.Ui.AddFiles = false;
+            ConfigStore.Config.Ui.AddFolders = false;
+            Assert.False(renameList.AddSelectedCommand.CanExecute(null));
+        }
+
         private string _CreateSampleFolder()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
@@ -161,11 +283,32 @@ namespace Mfr.Tests.Ui
             return dir;
         }
 
+        private (string parent, string albumPath) _CreateAlbumTree()
+        {
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var albumPath = Path.Combine(parent, "album");
+            Directory.CreateDirectory(Path.Combine(albumPath, "disc1"));
+            File.WriteAllText(Path.Combine(albumPath, "track.mp3"), "t");
+            File.WriteAllText(Path.Combine(albumPath, "readme.txt"), "r");
+            File.WriteAllText(Path.Combine(albumPath, "disc1", "nested.mp3"), "n");
+            return (parent, albumPath);
+        }
+
         private FileListViewModel _CreateFileList(string path)
         {
             var fileList = new FileListViewModel(NullSystemIconProvider.Instance, path);
             _fileLists.Add(fileList);
             return fileList;
+        }
+
+        private static FileListEntry _FolderEntry(string directoryPath)
+        {
+            return new FileListEntry
+            {
+                Name = Path.GetFileName(directoryPath),
+                FullPath = directoryPath,
+                IsDirectory = true,
+            };
         }
 
         private static FileListEntry _FileEntry(string directory, string fileName)

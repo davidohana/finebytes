@@ -58,11 +58,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var ui = ConfigStore.Config.Ui;
+            var excludeMasks = _fileList.ExcludeMasksEnabled ? _fileList.ExcludeMasks : null;
             _renameList.AddSources(
                 sources: sources,
                 includeFiles: ui.AddFiles,
                 includeFolders: ui.AddFolders,
-                includeSubdirs: ui.AddFolderContents
+                includeSubdirs: ui.AddFolderContents,
+                excludeMasks: excludeMasks
             );
             _SyncEntries();
         }

@@ -88,7 +88,7 @@ namespace Mfr.App.Cli
                 Sources: sources,
                 IncludeFiles: includeFiles,
                 IncludeFolders: includeFolders,
-                RecursiveDirectoryFileAdd: parsedSettings.RecursiveDirectoryFileAdd,
+                IncludeSubdirs: parsedSettings.IncludeSubdirs,
                 OutputFilePath: outputFilePath.IsBlank() ? null : outputFilePath.Trim(),
                 IncludeHidden: parsedSettings.IncludeHidden,
                 ContinueOnRenameError: parsedSettings.ContinueOnRenameError,
@@ -108,7 +108,7 @@ namespace Mfr.App.Cli
                 .PropagateExceptions()
                 .UseStrictParsing()
                 .AddExample(["C:\\Music\\*.mp3", "-p", "clean", "--dry-run"])
-                .AddExample(["C:\\Music\\**\\*.flac", "-p", "lowercase-extension", "--log-level", "debug"])
+                .AddExample(["C:\\Music\\*.flac", "-r", "-p", "lowercase-extension", "--log-level", "debug"])
                 .AddExample(["C:\\Music", "-p", "name_from_id3", "-r"])
                 .AddExample([
                     "C:\\Music",
@@ -170,7 +170,7 @@ namespace Mfr.App.Cli
         private sealed class ParseCommandSettings : CommandSettings
         {
             [CommandArgument(0, "<SOURCES>")]
-            [Description("Files, directories, filemasks, globs to rename (space-seperated).")]
+            [Description("Files, directories, or filemasks (space-separated).")]
             public string[] Sources { get; init; } = [];
 
             [CommandOption("-p|--preset <NAME>")]
@@ -198,8 +198,8 @@ namespace Mfr.App.Cli
             public string? IncludeFolders { get; init; }
 
             [CommandOption("-r|--recursive")]
-            [Description("Expand directory sources recursively (when 'add folders' disabled).")]
-            public bool RecursiveDirectoryFileAdd { get; init; }
+            [Description("Expand directory sources recursively into subdirectories.")]
+            public bool IncludeSubdirs { get; init; }
 
             [CommandOption("--core")]
             [Description("Continue-On-Rename-Errors instead of stopping at the first failure.")]

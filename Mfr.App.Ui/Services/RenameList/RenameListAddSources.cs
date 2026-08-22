@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.Services.RenameList
         /// </summary>
         /// <param name="fileList">File List pane state.</param>
         /// <param name="ui">Rename List add-policy flags.</param>
-        /// <returns>Paths and glob patterns to pass to the engine add API.</returns>
+        /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         public static IReadOnlyList<string> ResolveSourcesFromSelection(FileListViewModel fileList, UiConfig ui)
         {
             ArgumentNullException.ThrowIfNull(fileList);
@@ -30,16 +30,12 @@ namespace Mfr.App.Ui.Services.RenameList
 
                 if (entry.IsDirectory)
                 {
-                    _AddFolderSource(
-                        sources: sources,
-                        folderPath: entry.FullPath,
-                        ui: ui,
-                        isAddAll: false,
-                        mask: fileList.Mask,
-                        excludeMasksEnabled: fileList.ExcludeMasksEnabled,
-                        excludeMasks: fileList.ExcludeMasks,
-                        passesFileMasks: fileList.PassesFileMasks
-                    );
+                    if (ui.AddFiles || ui.AddFolders)
+                    {
+                        var folderSource = _BuildFolderSource(entry.FullPath, fileList.Mask);
+                        sources.Add(folderSource);
+                    }
+
                     continue;
                 }
 
@@ -57,7 +53,7 @@ namespace Mfr.App.Ui.Services.RenameList
         /// </summary>
         /// <param name="fileList">File List pane state.</param>
         /// <param name="ui">Rename List add-policy flags.</param>
-        /// <returns>Paths and glob patterns to pass to the engine add API.</returns>
+        /// <returns>A single folder source with a last-segment filename mask, or empty.</returns>
         public static IReadOnlyList<string> ResolveSourcesFromCurrentFolder(FileListViewModel fileList, UiConfig ui)
         {
             ArgumentNullException.ThrowIfNull(fileList);
@@ -68,18 +64,12 @@ namespace Mfr.App.Ui.Services.RenameList
                 return [];
             }
 
-            var sources = new List<string>();
-            _AddFolderSource(
-                sources: sources,
-                folderPath: fileList.CurrentPath,
-                ui: ui,
-                isAddAll: true,
-                mask: fileList.Mask,
-                excludeMasksEnabled: fileList.ExcludeMasksEnabled,
-                excludeMasks: fileList.ExcludeMasks,
-                passesFileMasks: fileList.PassesFileMasks
-            );
-            return sources;
+            if (!ui.AddFiles && !ui.AddFolders)
+            {
+                return [];
+            }
+
+            return [_BuildFolderSource(fileList.CurrentPath, fileList.Mask)];
         }
 
         /// <summary>
@@ -92,88 +82,13 @@ namespace Mfr.App.Ui.Services.RenameList
             return _IsAddablePath(path);
         }
 
-        private static void _AddFolderSource(
-            List<string> sources,
-            string folderPath,
-            UiConfig ui,
-            bool isAddAll,
-            string mask,
-            bool excludeMasksEnabled,
-            IReadOnlyList<string> excludeMasks,
-            Func<string, bool> passesFileMasks
-        )
+        /// <summary>
+        /// Builds a directory source whose last segment is the File List include mask.
+        /// </summary>
+        private static string _BuildFolderSource(string folderPath, string mask)
         {
-            if (ui.AddFolders)
-            {
-                sources.Add(folderPath);
-            }
-
-            if (!ui.AddFiles)
-            {
-                return;
-            }
-
-            var includeSubdirs = _ResolveIncludeSubdirs(ui: ui, isAddAll: isAddAll);
-            if (_CanUseMaskGlob(mask, excludeMasksEnabled, excludeMasks))
-            {
-                sources.Add(_BuildMaskGlob(folderPath: folderPath, mask: mask, includeSubdirs: includeSubdirs));
-                return;
-            }
-
-            foreach (var filePath in _EnumerateFiles(folderPath: folderPath, includeSubdirs: includeSubdirs))
-            {
-                if (passesFileMasks(filePath))
-                {
-                    sources.Add(filePath);
-                }
-            }
-        }
-
-        private static bool _ResolveIncludeSubdirs(UiConfig ui, bool isAddAll)
-        {
-            if (ui.AddFolderContents)
-            {
-                return true;
-            }
-
-            if (isAddAll)
-            {
-                return false;
-            }
-
-            return false;
-        }
-
-        private static bool _CanUseMaskGlob(string mask, bool excludeMasksEnabled, IReadOnlyList<string> excludeMasks)
-        {
-            if (excludeMasksEnabled && excludeMasks.Count > 0)
-            {
-                return false;
-            }
-
-            return !string.IsNullOrWhiteSpace(mask);
-        }
-
-        private static string _BuildMaskGlob(string folderPath, string mask, bool includeSubdirs)
-        {
-            var trimmedMask = mask.Trim();
-            if (!includeSubdirs)
-            {
-                return Path.Combine(folderPath, trimmedMask);
-            }
-
-            if (trimmedMask == "*")
-            {
-                return Path.Combine(folderPath, "**", "*");
-            }
-
-            return Path.Combine(folderPath, "**", trimmedMask);
-        }
-
-        private static IEnumerable<string> _EnumerateFiles(string folderPath, bool includeSubdirs)
-        {
-            var searchOption = includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-            return Directory.EnumerateFiles(folderPath, "*", searchOption);
+            var trimmedMask = string.IsNullOrWhiteSpace(mask) ? "*" : mask.Trim();
+            return Path.Combine(folderPath, trimmedMask);
         }
 
         private static bool _IsAddablePath(string path)

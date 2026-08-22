@@ -45,12 +45,14 @@ namespace Mfr.Engine
         /// <param name="sources">Sources to add.</param>
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
-        /// <param name="includeSubdirs">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
+        /// <param name="includeSubdirs">Whether directory expansion should recurse into subdirectories.</param>
+        /// <param name="excludeMasks">Exclusive file-name masks for discovered directory entries.</param>
         public void AddSources(
             IEnumerable<string> sources,
             bool includeFiles = true,
             bool includeFolders = true,
-            bool includeSubdirs = false
+            bool includeSubdirs = false,
+            IReadOnlyList<string>? excludeMasks = null
         )
         {
             var sourceList = sources.ToList();
@@ -69,7 +71,8 @@ namespace Mfr.Engine
                     source: source,
                     includeFiles: includeFiles,
                     includeFolders: includeFolders,
-                    includeSubdirs: includeSubdirs
+                    includeSubdirs: includeSubdirs,
+                    excludeMasks: excludeMasks
                 );
             }
         }
@@ -77,16 +80,18 @@ namespace Mfr.Engine
         /// <summary>
         /// Adds and resolves a single source.
         /// </summary>
-        /// <param name="source">A file path, directory path, or wildcard source.</param>
+        /// <param name="source">A file, a directory, or a directory plus a filename mask in the last segment.</param>
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
-        /// <param name="includeSubdirs">Whether directory-source file expansion should include subdirectories when folders are excluded.</param>
+        /// <param name="includeSubdirs">Whether directory expansion should recurse into subdirectories.</param>
+        /// <param name="excludeMasks">Exclusive file-name masks for discovered directory entries.</param>
         /// <returns>The count of newly added resolved items.</returns>
         public int AddSource(
             string source,
             bool includeFiles = true,
             bool includeFolders = true,
-            bool includeSubdirs = false
+            bool includeSubdirs = false,
+            IReadOnlyList<string>? excludeMasks = null
         )
         {
             if (string.IsNullOrWhiteSpace(source))
@@ -103,7 +108,13 @@ namespace Mfr.Engine
             }
 
             var resolvedPaths = AddedSourceResolver
-                .ResolveToPaths(source: trimmedSource, includeFolders: includeFolders, includeSubdirs: includeSubdirs)
+                .ResolveToPaths(
+                    source: trimmedSource,
+                    includeFiles: includeFiles,
+                    includeFolders: includeFolders,
+                    includeSubdirs: includeSubdirs,
+                    excludeMasks: excludeMasks
+                )
                 .ToList();
             var addedCount = _AppendPaths(
                 resolvedPaths: resolvedPaths,
