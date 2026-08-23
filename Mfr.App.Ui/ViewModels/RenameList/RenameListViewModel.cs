@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -29,6 +30,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ArgumentNullException.ThrowIfNull(fileListViewModel);
             _fileListViewModel = fileListViewModel;
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
+            _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;
         }
 
         /// <summary>
@@ -89,14 +91,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Adds every item matching the File List mask in the current folder.
+        /// Adds every listed File List row to the Rename List (same rules as Add Selected).
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanAddAll))]
         public void AddAll()
         {
-            var sources = RenameListAddSourceResolver.ResolveSourcesFromCurrentFolder(
-                _fileListViewModel.CurrentPath,
-                _fileListViewModel.Mask
+            var addMode = ConfigStore.Config.Ui.AddMode;
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
+                _fileListViewModel.Entries,
+                _fileListViewModel.Mask,
+                addMode
             );
             _AddSources(sources);
         }
@@ -185,7 +189,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddAll()
         {
-            return RenameListAddSourceResolver.CanResolveFromCurrentFolder(_fileListViewModel.CurrentPath);
+            // Location gate keeps This PC / Network / drive roots from mass-adding listed places or volumes.
+            if (!RenameListAddSourceResolver.IsAddableLocation(_fileListViewModel.CurrentPath))
+            {
+                return false;
+            }
+
+            return RenameListAddSourceResolver.CanResolveFromSelection(
+                _fileListViewModel.Entries,
+                _fileListViewModel.Mask,
+                ConfigStore.Config.Ui.AddMode
+            );
         }
 
         private bool _CanRemoveSelected()
@@ -206,6 +220,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             AddSelectedCommand.NotifyCanExecuteChanged();
+            AddAllCommand.NotifyCanExecuteChanged();
+        }
+
+        private void _OnFileListEntriesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
             AddAllCommand.NotifyCanExecuteChanged();
         }
 

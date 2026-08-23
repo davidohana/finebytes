@@ -5,86 +5,72 @@ using Mfr.Utils;
 namespace Mfr.App.Ui.Services.RenameList
 {
     /// <summary>
-    /// Maps File List selection and current-folder state to engine add sources (no expansion).
+    /// Maps File List rows to engine add sources (no expansion).
     /// </summary>
     internal static class RenameListAddSourceResolver
     {
         /// <summary>
-        /// Resolves engine add sources from File List selection.
+        /// Resolves engine add sources from File List rows (selection or all listed entries).
         /// </summary>
-        /// <param name="selectedEntries">Selected File List rows.</param>
+        /// <param name="entries">File List rows to turn into add sources.</param>
         /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
         /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         public static IReadOnlyList<string> ResolveSourcesFromSelection(
-            IReadOnlyList<FileListEntry> selectedEntries,
+            IReadOnlyList<FileListEntry> entries,
             string mask,
             RenameListAddMode addMode
         )
         {
-            ArgumentNullException.ThrowIfNull(selectedEntries);
-            return [.. _EnumerateSelectionSources(selectedEntries, mask, addMode)];
+            ArgumentNullException.ThrowIfNull(entries);
+            return [.. _EnumerateSelectionSources(entries, mask, addMode)];
         }
 
         /// <summary>
-        /// Returns whether selection would produce at least one engine add source.
+        /// Returns whether the given File List rows would produce at least one engine add source.
         /// </summary>
-        /// <param name="selectedEntries">Selected File List rows.</param>
+        /// <param name="entries">File List rows to inspect.</param>
         /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
         /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
         /// <returns><see langword="true"/> when at least one source would be emitted.</returns>
         public static bool CanResolveFromSelection(
-            IReadOnlyList<FileListEntry> selectedEntries,
+            IReadOnlyList<FileListEntry> entries,
             string mask,
             RenameListAddMode addMode
         )
         {
-            ArgumentNullException.ThrowIfNull(selectedEntries);
-            return _EnumerateSelectionSources(selectedEntries, mask, addMode).Any();
+            ArgumentNullException.ThrowIfNull(entries);
+            return _EnumerateSelectionSources(entries, mask, addMode).Any();
         }
 
         /// <summary>
-        /// Resolves engine add sources from the File List's current folder.
+        /// Returns whether Add All may run from this File List location.
         /// </summary>
         /// <param name="currentPath">Current File List folder path.</param>
-        /// <param name="mask">File List include mask used as the last segment of the folder source.</param>
-        /// <returns>A single folder source with a last-segment filename mask, or empty.</returns>
-        public static IReadOnlyList<string> ResolveSourcesFromCurrentFolder(string currentPath, string mask)
-        {
-            if (!_IsAddablePath(currentPath))
-            {
-                return [];
-            }
-
-            return [_BuildFolderSource(currentPath, mask)];
-        }
-
-        /// <summary>
-        /// Returns whether the current folder would produce an engine add source.
-        /// </summary>
-        /// <param name="currentPath">Current File List folder path.</param>
-        /// <returns><see langword="true"/> when the folder is addable.</returns>
-        public static bool CanResolveFromCurrentFolder(string currentPath)
+        /// <returns>
+        /// <see langword="true"/> when the location is a normal folder (not This PC, Network, or a drive root).
+        /// </returns>
+        public static bool IsAddableLocation(string currentPath)
         {
             return _IsAddablePath(currentPath);
         }
 
         /// <summary>
-        /// Yields engine add sources for each addable selected File List entry.
+        /// Yields engine add sources for each addable File List entry.
         /// </summary>
-        /// <param name="selectedEntries">Selected File List rows.</param>
+        /// <param name="entries">File List rows to turn into add sources.</param>
         /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
         /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         private static IEnumerable<string> _EnumerateSelectionSources(
-            IReadOnlyList<FileListEntry> selectedEntries,
+            IReadOnlyList<FileListEntry> entries,
             string mask,
             RenameListAddMode addMode
         )
         {
             var includeFiles = addMode.IncludesFiles();
 
-            foreach (var entry in selectedEntries)
+            foreach (var entry in entries)
             {
                 if (!_IsAddablePath(entry.FullPath))
                 {

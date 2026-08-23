@@ -1,4 +1,5 @@
 using Mfr.App.Ui.Services.FileList;
+using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 
@@ -107,16 +108,17 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add All adds every masked file in the current folder.
+        /// Verifies Add All adds every listed File List row without needing a selection.
         /// </summary>
         [Fact]
-        public void AddAll_Adds_Masked_Files_In_Current_Folder()
+        public void AddAll_Adds_Listed_Masked_Files_Without_Selection()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             fileListViewModel.Mask = "*.txt";
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
+            Assert.Empty(fileListViewModel.SelectedEntries);
             renameListViewModel.AddAllCommand.Execute(null);
 
             Assert.Single(renameListViewModel.Entries);
@@ -124,7 +126,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add All is disabled on the This PC drive list.
+        /// Verifies Add All is disabled on This PC (location gate), even though listed places are addable.
         /// </summary>
         [Fact]
         public void AddAll_Is_Disabled_On_Computer_Path()
@@ -138,6 +140,8 @@ namespace Mfr.Tests.Ui
             fileListViewModel.NavigateTo(FileListViewModel.ComputerPath);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
+            Assert.True(fileListViewModel.Entries.Count > 0);
+            Assert.False(RenameListAddSourceResolver.IsAddableLocation(fileListViewModel.CurrentPath));
             Assert.False(renameListViewModel.AddAllCommand.CanExecute(null));
         }
 
@@ -225,21 +229,49 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add All adds nested files matching the File List mask.
+        /// Verifies Add All expands listed folder rows the same way as Add Selected (nested via contents).
         /// </summary>
         [Fact]
-        public void AddAll_Adds_Nested_Masked_Files()
+        public void AddAll_Expands_Listed_Folders_Like_AddSelected()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _CreateFileListViewModel(albumPath);
             fileListViewModel.Mask = "*.mp3";
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
+            Assert.Contains(fileListViewModel.Entries, entry => entry.Name == "disc1" && entry.IsDirectory);
+            Assert.Contains(fileListViewModel.Entries, entry => entry.Name == "track.mp3");
+
             renameListViewModel.AddAllCommand.Execute(null);
 
             Assert.Equal(
                 ["nested.mp3", "track.mp3"],
                 _PreviewNames(renameListViewModel).OrderBy(n => n, StringComparer.Ordinal)
+            );
+        }
+
+        /// <summary>
+        /// Verifies Add All matches Add Selected when every listed row is selected.
+        /// </summary>
+        [Fact]
+        public void AddAll_Matches_AddSelected_When_All_Listed_Rows_Selected()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            var other = Path.Combine(parent, "other.txt");
+            File.WriteAllText(other, "o");
+
+            var addAllList = _CreateFileListViewModel(parent);
+            var addAllRename = new RenameListViewModel(addAllList);
+            addAllRename.AddAllCommand.Execute(null);
+
+            var addSelectedList = _CreateFileListViewModel(parent);
+            var addSelectedRename = new RenameListViewModel(addSelectedList);
+            addSelectedList.SetSelectedEntries([.. addSelectedList.Entries]);
+            addSelectedRename.AddSelectedCommand.Execute(null);
+
+            Assert.Equal(
+                _PreviewNames(addAllRename).OrderBy(n => n, StringComparer.Ordinal),
+                _PreviewNames(addSelectedRename).OrderBy(n => n, StringComparer.Ordinal)
             );
         }
 
