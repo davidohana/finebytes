@@ -62,10 +62,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             ArgumentNullException.ThrowIfNull(entries);
 
+            var entrySet = Entries.ToHashSet();
             _selectedEntries.Clear();
             foreach (var entry in entries)
             {
-                if (Entries.Contains(entry))
+                if (entrySet.Contains(entry))
                 {
                     _selectedEntries.Add(entry);
                 }
@@ -116,8 +117,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
+            var selected = _selectedEntries.ToHashSet();
             _renameList.Remove(_selectedEntries.Select(entry => entry.EngineItem));
-            _SyncEntries();
+
+            for (var i = Entries.Count - 1; i >= 0; i--)
+            {
+                if (selected.Contains(Entries[i]))
+                {
+                    Entries.RemoveAt(i);
+                }
+            }
+
+            SetSelectedEntries([]);
+            _NotifyListChanged();
         }
 
         /// <summary>
@@ -132,7 +144,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _renameList.Clear();
-            _SyncEntries();
+            Entries.Clear();
+            SetSelectedEntries([]);
+            _NotifyListChanged();
         }
 
         private void _AddSources(IReadOnlyList<string> sources)
@@ -142,6 +156,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
+            var oldCount = _renameList.RenameItems.Count;
             var uiConfig = ConfigStore.Config.Ui;
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             try
@@ -162,18 +177,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 LastAddError = ex.Message;
             }
 
-            _SyncEntries();
-        }
-
-        private void _SyncEntries()
-        {
-            Entries.Clear();
-            foreach (var item in _renameList.RenameItems)
+            var renameItems = _renameList.RenameItems;
+            for (var i = oldCount; i < renameItems.Count; i++)
             {
-                Entries.Add(RenameListEntryMapper.ToEntry(item));
+                Entries.Add(RenameListEntryMapper.ToEntry(renameItems[i]));
             }
 
-            SetSelectedEntries([]);
+            _NotifyListChanged();
+        }
+
+        private void _NotifyListChanged()
+        {
             OnPropertyChanged(nameof(ItemCount));
             ClearCommand.NotifyCanExecuteChanged();
         }

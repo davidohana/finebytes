@@ -391,6 +391,58 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Add appends new rows without recreating existing entry objects.
+        /// </summary>
+        [Fact]
+        public void AddSelected_Preserves_Existing_Entry_Identity()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
+            var alphaEntry = renameListViewModel.Entries[0];
+            var betaEntry = renameListViewModel.Entries[1];
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "gamma.log")]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
+
+            Assert.Equal(3, renameListViewModel.Entries.Count);
+            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
+            Assert.Same(betaEntry, renameListViewModel.Entries[1]);
+            Assert.Equal("gamma.log", renameListViewModel.Entries[2].FullFileName);
+        }
+
+        /// <summary>
+        /// Verifies Remove keeps remaining row objects and order.
+        /// </summary>
+        [Fact]
+        public void RemoveSelected_Preserves_Remaining_Entry_Identity()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            renameListViewModel.AddSelectedCommand.Execute(null);
+            var alphaEntry = renameListViewModel.Entries[0];
+            var gammaEntry = renameListViewModel.Entries[2];
+
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[1]]);
+            renameListViewModel.RemoveSelectedCommand.Execute(null);
+
+            Assert.Equal(2, renameListViewModel.Entries.Count);
+            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
+            Assert.Same(gammaEntry, renameListViewModel.Entries[1]);
+            Assert.Equal(["alpha.txt", "gamma.log"], _PreviewNames(renameListViewModel));
+        }
+
+        /// <summary>
         /// Verifies Clear empties the list and updates ItemCount / CanExecute.
         /// </summary>
         [Fact]
@@ -419,6 +471,15 @@ namespace Mfr.Tests.Ui
             var dir = _tempDirectoryFixture.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
             File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
+            return dir;
+        }
+
+        private string _CreateThreeFileFolder()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
+            File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
+            File.WriteAllText(Path.Combine(dir, "gamma.log"), "g");
             return dir;
         }
 
