@@ -189,7 +189,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddAll()
         {
-            // Location gate keeps This PC / Network / drive roots from mass-adding listed places or volumes.
+            // Sentinel gate: This PC / Network list Known Places and volumes; Add All would mass-add those.
+            // Drive roots are fine — Add All walks listed children, not the root path itself.
             if (!RenameListAddSourceResolver.IsAddableLocation(_fileListViewModel.CurrentPath))
             {
                 return false;

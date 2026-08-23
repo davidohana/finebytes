@@ -170,10 +170,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies File List sentinel locations and drive roots are not addable locations.
+        /// Verifies Add All location gate rejects only This PC / Network, not drive roots.
         /// </summary>
         [Fact]
-        public void IsAddableLocation_Rejects_Sentinels_And_Roots()
+        public void IsAddableLocation_Rejects_Sentinels_Allows_Drive_Roots()
         {
             Assert.False(RenameListAddSourceResolver.IsAddableLocation(FileListPath.ComputerPath));
             Assert.True(RenameListAddSourceResolver.IsAddableLocation(_dir));
@@ -186,7 +186,7 @@ namespace Mfr.Tests.Ui
             Assert.False(RenameListAddSourceResolver.IsAddableLocation(FileListPath.NetworkPath));
             var root = Path.GetPathRoot(_dir);
             Assert.False(string.IsNullOrEmpty(root));
-            Assert.False(RenameListAddSourceResolver.IsAddableLocation(root));
+            Assert.True(RenameListAddSourceResolver.IsAddableLocation(root));
         }
 
         /// <summary>

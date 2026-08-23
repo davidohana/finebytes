@@ -126,7 +126,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add All is disabled on This PC (location gate), even though listed places are addable.
+        /// Verifies Add All is disabled on This PC (sentinel gate), even though listed places are addable.
         /// </summary>
         [Fact]
         public void AddAll_Is_Disabled_On_Computer_Path()
@@ -143,6 +143,28 @@ namespace Mfr.Tests.Ui
             Assert.True(fileListViewModel.Entries.Count > 0);
             Assert.False(RenameListAddSourceResolver.IsAddableLocation(fileListViewModel.CurrentPath));
             Assert.False(renameListViewModel.AddAllCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Add All is enabled on a drive root when listed child rows are addable.
+        /// </summary>
+        [Fact]
+        public void AddAll_Is_Enabled_On_Drive_Root_With_Listed_Children()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var dir = _CreateSampleFolder();
+            var root = Path.GetPathRoot(dir);
+            Assert.False(string.IsNullOrEmpty(root));
+
+            var fileListViewModel = _CreateFileListViewModel(root);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            Assert.True(RenameListAddSourceResolver.IsAddableLocation(fileListViewModel.CurrentPath));
+            Assert.True(renameListViewModel.AddAllCommand.CanExecute(null));
         }
 
         /// <summary>

@@ -48,11 +48,12 @@ namespace Mfr.App.Ui.Services.RenameList
         /// </summary>
         /// <param name="currentPath">Current File List folder path.</param>
         /// <returns>
-        /// <see langword="true"/> when the location is a normal folder (not This PC, Network, or a drive root).
+        /// <see langword="true"/> when the location is not This PC or Network.
+        /// Drive roots are allowed: Add All targets listed child rows, not the root itself.
         /// </returns>
         public static bool IsAddableLocation(string currentPath)
         {
-            return _IsAddablePath(currentPath);
+            return !FileListPath.IsComputerPath(currentPath) && !FileListPath.IsNetworkPath(currentPath);
         }
 
         /// <summary>
