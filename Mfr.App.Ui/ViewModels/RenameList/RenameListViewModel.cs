@@ -229,9 +229,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _SyncEntriesFromEngine(oldCount);
-            LastAddError = _FormatAddOutcome(
-                addedCount: _renameList.RenameItems.Count - oldCount,
-                skippedSourceCount: addSummary.SkippedSourceCount
+            var addedCount = _renameList.RenameItems.Count - oldCount;
+            LastAddError = _FormatAddOutcome(addedCount: addedCount, skippedSourceCount: addSummary.SkippedSourceCount);
+            _LogAddOutcome(
+                addedCount: addedCount,
+                skippedSourceCount: addSummary.SkippedSourceCount,
+                sourceCount: sources.Count
             );
             _NotifyListChanged();
         }
@@ -252,6 +255,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Writes a batch summary when the add had skips or added nothing.
+        /// </summary>
+        private static void _LogAddOutcome(int addedCount, int skippedSourceCount, int sourceCount)
+        {
+            if (skippedSourceCount > 0)
+            {
+                Log.Warning(
+                    "Rename list add finished. Added {AddedCount} item(s) from {SourceCount} source(s). Skipped {SkippedSourceCount} inaccessible source(s).",
+                    addedCount,
+                    sourceCount,
+                    skippedSourceCount
+                );
+                return;
+            }
+
+            if (addedCount == 0)
+            {
+                Log.Warning("Rename list add finished with no items added from {SourceCount} source(s).", sourceCount);
+            }
         }
 
         private void _SyncEntriesFromEngine(int oldCount)
