@@ -437,6 +437,41 @@ namespace Mfr.Tests.Engine
             }
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies that an inaccessible directory source throws a <see cref="UserException"/>.
+        /// </summary>
+        public void Resolve_InaccessibleDirectory_ThrowsUserException()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var deniedFolder = Directory.CreateDirectory(_tempRoot.CombinePath("Denied")).FullName;
+            _DenyDirectoryTraverse(deniedFolder);
+
+            try
+            {
+                var ex = Assert.Throws<UserException>(() =>
+                    AddedSourceResolver
+                        .ResolveToPaths(
+                            source: deniedFolder,
+                            includeFiles: true,
+                            includeFolders: false,
+                            includeSubdirs: false
+                        )
+                        .ToList()
+                );
+
+                Assert.Contains("Access denied", ex.Message, StringComparison.Ordinal);
+            }
+            finally
+            {
+                _AllowDirectoryTraverse(deniedFolder);
+            }
+        }
+
         [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         private static void _DenyDirectoryTraverse(string directoryPath)
         {

@@ -690,5 +690,80 @@ namespace Mfr.Tests.Ui
                 RememberLastFolder = source.RememberLastFolder,
             };
         }
+
+        /// <summary>
+        /// Verifies adding an inaccessible folder sets a skip summary on the Rename List.
+        /// </summary>
+        [Fact]
+        public async Task AddSelected_Inaccessible_Folder_Sets_LastAddError()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var parent = Directory
+                .CreateDirectory(
+                    Path.Combine(Directory.GetCurrentDirectory(), "mfr_rename_ui_" + Guid.NewGuid().ToString("N"))
+                )
+                .FullName;
+            var deniedFolder = Directory.CreateDirectory(Path.Combine(parent, "Denied")).FullName;
+            _DenyDirectoryTraverse(deniedFolder);
+
+            try
+            {
+                var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, parent);
+                var renameListViewModel = new RenameListViewModel(fileListViewModel);
+                var deniedEntry = fileListViewModel.Entries.Single(entry => entry.IsDirectory);
+                fileListViewModel.SetSelectedEntries([deniedEntry]);
+
+                await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+                Assert.Empty(renameListViewModel.Entries);
+                Assert.Equal("Added 0 item(s). Skipped 1 inaccessible source(s).", renameListViewModel.LastAddError);
+            }
+            finally
+            {
+                _AllowDirectoryTraverse(deniedFolder);
+                try
+                {
+                    Directory.Delete(parent, recursive: true);
+                }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
+            }
+        }
+
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        private static void _DenyDirectoryTraverse(string directoryPath)
+        {
+            var directoryInfo = new DirectoryInfo(directoryPath);
+            var security = directoryInfo.GetAccessControl();
+            security.AddAccessRule(
+                new System.Security.AccessControl.FileSystemAccessRule(
+                    identity: System.Security.Principal.WindowsIdentity.GetCurrent().Name,
+                    fileSystemRights: System.Security.AccessControl.FileSystemRights.ListDirectory
+                        | System.Security.AccessControl.FileSystemRights.Traverse,
+                    type: System.Security.AccessControl.AccessControlType.Deny
+                )
+            );
+            directoryInfo.SetAccessControl(security);
+        }
+
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        private static void _AllowDirectoryTraverse(string directoryPath)
+        {
+            var directoryInfo = new DirectoryInfo(directoryPath);
+            var security = directoryInfo.GetAccessControl();
+            security.RemoveAccessRuleAll(
+                new System.Security.AccessControl.FileSystemAccessRule(
+                    identity: System.Security.Principal.WindowsIdentity.GetCurrent().Name,
+                    fileSystemRights: System.Security.AccessControl.FileSystemRights.ListDirectory
+                        | System.Security.AccessControl.FileSystemRights.Traverse,
+                    type: System.Security.AccessControl.AccessControlType.Deny
+                )
+            );
+            directoryInfo.SetAccessControl(security);
+        }
     }
 }

@@ -90,6 +90,7 @@ namespace Mfr.Engine.RenameList
         )
         {
             _ThrowIfRootPath(directoryPath);
+            _EnsureDirectoryReadable(directoryPath);
 
             if (includeFolders)
             {
@@ -231,6 +232,35 @@ namespace Mfr.Engine.RenameList
             }
 
             throw new UserException($"Directory for source does not exist: '{directoryPath}'.");
+        }
+
+        /// <summary>
+        /// Throws when <paramref name="directoryPath"/> cannot be listed (for example access denied).
+        /// </summary>
+        /// <para>
+        /// Uses <see cref="EnumerationOptions.IgnoreInaccessible"/> = false so denial on the directory itself
+        /// surfaces as an exception instead of an empty resolution.
+        /// </para>
+        private static void _EnsureDirectoryReadable(string directoryPath)
+        {
+            try
+            {
+                var probeOptions = new EnumerationOptions
+                {
+                    IgnoreInaccessible = false,
+                    RecurseSubdirectories = false,
+                    ReturnSpecialDirectories = false,
+                };
+                _ = Directory.EnumerateFileSystemEntries(directoryPath, "*", probeOptions).Any();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                throw new UserException($"Access denied reading folder: '{directoryPath}'.", ex);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                throw new UserException($"Directory for source does not exist: '{directoryPath}'.", ex);
+            }
         }
 
         /// <summary>

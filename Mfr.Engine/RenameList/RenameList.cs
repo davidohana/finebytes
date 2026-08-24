@@ -49,7 +49,8 @@ namespace Mfr.Engine.RenameList
         /// <param name="excludeMasks">Exclusive file-name masks for discovered directory entries.</param>
         /// <param name="cancellationToken">When canceled, stops resolution and returns without throwing.</param>
         /// <param name="progress">Optional progress sink (scanned / added / last path).</param>
-        public void AddSources(
+        /// <returns>Summary of sources that were skipped during resolution.</returns>
+        public RenameListAddSummary AddSources(
             IEnumerable<string> sources,
             bool includeFiles = true,
             bool includeFolders = true,
@@ -70,6 +71,7 @@ namespace Mfr.Engine.RenameList
             );
 
             var tracker = new AddProgressTracker(progress, cancellationToken);
+            var skippedSourceCount = 0;
             foreach (var source in sourceList)
             {
                 if (tracker.IsCanceled)
@@ -77,6 +79,40 @@ namespace Mfr.Engine.RenameList
                     break;
                 }
 
+                if (
+                    !_TryAddSource(
+                        source: source,
+                        includeFiles: includeFiles,
+                        includeFolders: includeFolders,
+                        includeSubdirs: includeSubdirs,
+                        excludeMasks: excludeMasks,
+                        tracker: tracker
+                    )
+                )
+                {
+                    skippedSourceCount++;
+                }
+            }
+
+            tracker.ReportFinal();
+            return new RenameListAddSummary(skippedSourceCount);
+        }
+
+        /// <summary>
+        /// Adds and resolves a single source using a shared progress tracker.
+        /// </summary>
+        /// <returns><see langword="false"/> when the source was skipped; otherwise <see langword="true"/>.</returns>
+        private bool _TryAddSource(
+            string source,
+            bool includeFiles,
+            bool includeFolders,
+            bool includeSubdirs,
+            IReadOnlyList<string>? excludeMasks,
+            AddProgressTracker tracker
+        )
+        {
+            try
+            {
                 _AddSource(
                     source: source,
                     includeFiles: includeFiles,
@@ -85,9 +121,18 @@ namespace Mfr.Engine.RenameList
                     excludeMasks: excludeMasks,
                     tracker: tracker
                 );
+                return true;
             }
-
-            tracker.ReportFinal();
+            catch (UserException ex)
+            {
+                Log.Warning(ex, "Skipped rename source '{Source}'.", source);
+                return false;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+            {
+                Log.Warning(ex, "Skipped rename source '{Source}'.", source);
+                return false;
+            }
         }
 
         /// <summary>

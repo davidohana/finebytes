@@ -232,28 +232,34 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies that an explicit root path throws a <see cref="UserException"/> immediately.
+        /// Verifies that an explicit root path is skipped without aborting the add batch.
         /// </summary>
-        public void AddSources_SingleRootPath_Throws_UserException()
+        public void AddSources_SingleRootPath_IsSkipped()
         {
             var rootPath = Path.GetPathRoot(Directory.GetCurrentDirectory())!;
             var renameList = new RenameList(includeHidden: false);
 
-            var ex = Assert.Throws<UserException>(() => renameList.AddSources([rootPath]));
-            Assert.Contains(rootPath.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), ex.Message);
+            var summary = renameList.AddSources([rootPath]);
+
+            Assert.Equal(1, summary.SkippedSourceCount);
+            Assert.Empty(renameList.RenameItems);
         }
 
         [Fact]
         /// <summary>
-        /// Verifies that root paths passed via <see cref="RenameList.AddSources"/> also throw a <see cref="UserException"/>.
+        /// Verifies that root paths in a mixed batch are skipped while other sources still add.
         /// </summary>
-        public void AddSources_Throws_UserException_For_Root_Path()
+        public void AddSources_Skips_Root_Path_In_Mixed_Batch()
         {
             var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
             var rootPath = Path.GetPathRoot(Directory.GetCurrentDirectory())!;
             var renameList = new RenameList(includeHidden: false);
 
-            Assert.Throws<UserException>(() => renameList.AddSources([filePath, rootPath]));
+            var summary = renameList.AddSources([filePath, rootPath]);
+
+            Assert.Equal(1, summary.SkippedSourceCount);
+            Assert.Single(renameList.RenameItems);
+            Assert.Equal(filePath, renameList.RenameItems[0].Original.FullPath);
         }
 
         [Fact]
@@ -788,6 +794,96 @@ namespace Mfr.Tests.Engine
             Assert.Equal(RenameStatus.PreviewError, item.Status);
             Assert.NotNull(item.PreviewError);
             Assert.Contains("1-9999", item.PreviewError.Message, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies an inaccessible folder source is skipped without aborting the batch.
+        /// </summary>
+        public void AddSources_Skips_Inaccessible_Folder()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var deniedFolder = Directory.CreateDirectory(_tempRoot.CombinePath("Denied")).FullName;
+            _DenyDirectoryTraverse(deniedFolder);
+
+            try
+            {
+                var renameList = new RenameList(includeHidden: false);
+                var summary = renameList.AddSources([deniedFolder.CombinePath("*")]);
+
+                Assert.Equal(1, summary.SkippedSourceCount);
+                Assert.Empty(renameList.RenameItems);
+            }
+            finally
+            {
+                _AllowDirectoryTraverse(deniedFolder);
+            }
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies Add All-style mixed sources keep readable entries and skip inaccessible folders.
+        /// </summary>
+        public void AddSources_Mixed_Accessible_And_Inaccessible_Sources()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var goodFile = TestHelpers.CreateFile(_tempRoot, "good.txt");
+            var deniedFolder = Directory.CreateDirectory(_tempRoot.CombinePath("Denied")).FullName;
+            _DenyDirectoryTraverse(deniedFolder);
+
+            try
+            {
+                var renameList = new RenameList(includeHidden: false);
+                var summary = renameList.AddSources([goodFile, deniedFolder.CombinePath("*")]);
+
+                Assert.Equal(1, summary.SkippedSourceCount);
+                Assert.Single(renameList.RenameItems);
+                Assert.Equal(goodFile, renameList.RenameItems[0].Original.FullPath);
+            }
+            finally
+            {
+                _AllowDirectoryTraverse(deniedFolder);
+            }
+        }
+
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        private static void _DenyDirectoryTraverse(string directoryPath)
+        {
+            var directoryInfo = new DirectoryInfo(directoryPath);
+            var security = directoryInfo.GetAccessControl();
+            security.AddAccessRule(
+                new System.Security.AccessControl.FileSystemAccessRule(
+                    identity: System.Security.Principal.WindowsIdentity.GetCurrent().Name,
+                    fileSystemRights: System.Security.AccessControl.FileSystemRights.ListDirectory
+                        | System.Security.AccessControl.FileSystemRights.Traverse,
+                    type: System.Security.AccessControl.AccessControlType.Deny
+                )
+            );
+            directoryInfo.SetAccessControl(security);
+        }
+
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        private static void _AllowDirectoryTraverse(string directoryPath)
+        {
+            var directoryInfo = new DirectoryInfo(directoryPath);
+            var security = directoryInfo.GetAccessControl();
+            security.RemoveAccessRuleAll(
+                new System.Security.AccessControl.FileSystemAccessRule(
+                    identity: System.Security.Principal.WindowsIdentity.GetCurrent().Name,
+                    fileSystemRights: System.Security.AccessControl.FileSystemRights.ListDirectory
+                        | System.Security.AccessControl.FileSystemRights.Traverse,
+                    type: System.Security.AccessControl.AccessControlType.Deny
+                )
+            );
+            directoryInfo.SetAccessControl(security);
         }
 
         private static FilterPreset _CreateAudioTitleAlbumPreset()

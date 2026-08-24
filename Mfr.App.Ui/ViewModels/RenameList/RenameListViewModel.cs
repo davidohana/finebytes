@@ -6,7 +6,7 @@ using Mfr.App.Ui.Collections;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
-using Mfr.Models;
+using Mfr.Engine.RenameList;
 using Mfr.Models.Config;
 using Serilog;
 using EngineRenameList = Mfr.Engine.RenameList.RenameList;
@@ -193,13 +193,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             LastAddError = string.Empty;
 
+            var addSummary = new RenameListAddSummary(0);
             bool completed;
             try
             {
                 completed = await AddProgress
                     .RunAsync(
                         (token, progress) =>
-                            _renameList.AddSources(
+                            addSummary = _renameList.AddSources(
                                 sources: sources,
                                 includeFiles: includeFiles,
                                 includeFolders: includeFolders,
@@ -210,13 +211,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                             )
                     )
                     .ConfigureAwait(true);
-            }
-            catch (UserException ex)
-            {
-                // Keep any items added before the failure; do not treat user-facing IO/validation as fatal.
-                Log.Warning(ex, "Failed to add rename sources.");
-                LastAddError = ex.Message;
-                completed = true;
             }
             catch (Exception ex)
             {
@@ -235,7 +229,29 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _SyncEntriesFromEngine(oldCount);
+            LastAddError = _FormatAddOutcome(
+                addedCount: _renameList.RenameItems.Count - oldCount,
+                skippedSourceCount: addSummary.SkippedSourceCount
+            );
             _NotifyListChanged();
+        }
+
+        /// <summary>
+        /// Builds the status-bar message after a completed add.
+        /// </summary>
+        private static string _FormatAddOutcome(int addedCount, int skippedSourceCount)
+        {
+            if (skippedSourceCount > 0)
+            {
+                return $"Added {addedCount} item(s). Skipped {skippedSourceCount} inaccessible source(s).";
+            }
+
+            if (addedCount == 0)
+            {
+                return "No items were added.";
+            }
+
+            return string.Empty;
         }
 
         private void _SyncEntriesFromEngine(int oldCount)
