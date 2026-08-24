@@ -8,12 +8,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     internal static class RenameListCellHint
     {
         /// <summary>
-        /// Theme brush key for preview-kind labels in cell hints.
-        /// </summary>
-        internal const string PreviewKindBrushKey = "StatusHintPreviewBrush";
-
-        /// <summary>
-        /// Builds a rich status-bar hint for a grid cell, matching MFR7 original/preview prefixes.
+        /// Builds a rich status-bar hint: bold column name, colon, then the cell value.
         /// </summary>
         /// <param name="columnHeader">Grid column header text.</param>
         /// <param name="cellText">Cell display value.</param>
@@ -21,22 +16,30 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns>Hint shown in the main window status bar.</returns>
         public static StatusHintDisplay FormatParts(string columnHeader, string cellText, bool isPreviewColumn)
         {
-            if (isPreviewColumn)
+            var hintColumnHeader = _GetHintColumnHeader(columnHeader, isPreviewColumn);
+            return StatusHintDisplay.FromRuns(
+                new StatusHintRun(hintColumnHeader) { FontWeight = FontWeight.Bold },
+                new StatusHintRun($": {cellText}")
+            );
+        }
+
+        /// <summary>
+        /// Strips grid-only preview suffixes so the kind label is not repeated in the column name.
+        /// </summary>
+        private static string _GetHintColumnHeader(string columnHeader, bool isPreviewColumn)
+        {
+            if (!isPreviewColumn)
             {
-                return StatusHintDisplay.FromRuns(
-                    new StatusHintRun("["),
-                    new StatusHintRun("Preview") { ForegroundResourceKey = PreviewKindBrushKey },
-                    new StatusHintRun(" "),
-                    new StatusHintRun(columnHeader) { FontWeight = FontWeight.Bold },
-                    new StatusHintRun($"] {cellText}")
-                );
+                return columnHeader;
             }
 
-            return StatusHintDisplay.FromRuns(
-                new StatusHintRun("[Original "),
-                new StatusHintRun(columnHeader) { FontWeight = FontWeight.Bold },
-                new StatusHintRun($"] {cellText}")
-            );
+            const string previewSuffix = " (Preview)";
+            if (columnHeader.EndsWith(previewSuffix, StringComparison.Ordinal))
+            {
+                return columnHeader[..^previewSuffix.Length];
+            }
+
+            return columnHeader;
         }
 
         /// <summary>

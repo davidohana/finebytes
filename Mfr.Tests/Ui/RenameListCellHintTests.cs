@@ -10,36 +10,31 @@ namespace Mfr.Tests.Ui
     public sealed class RenameListCellHintTests
     {
         /// <summary>
-        /// Verifies original hints bold the column header run.
+        /// Verifies hints use bold column name, colon, then value.
         /// </summary>
         [Fact]
-        public void FormatParts_Bolds_Original_Column_Header()
+        public void FormatParts_Uses_Bold_Column_Name_Colon_Value()
         {
             var hint = RenameListCellHint.FormatParts("Full File Name", "alpha.txt", isPreviewColumn: false);
 
-            Assert.Equal(3, hint.Runs.Count);
-            Assert.Equal("[Original ", hint.Runs[0].Text);
-            Assert.Equal("Full File Name", hint.Runs[1].Text);
-            Assert.Equal(FontWeight.Bold, hint.Runs[1].FontWeight);
-            Assert.Equal("] alpha.txt", hint.Runs[2].Text);
-            Assert.Equal("[Original Full File Name] alpha.txt", hint.ToPlainText());
+            Assert.Equal(2, hint.Runs.Count);
+            Assert.Equal("Full File Name", hint.Runs[0].Text);
+            Assert.Equal(FontWeight.Bold, hint.Runs[0].FontWeight);
+            Assert.Equal(": alpha.txt", hint.Runs[1].Text);
+            Assert.Equal("Full File Name: alpha.txt", hint.ToPlainText());
         }
 
         /// <summary>
-        /// Verifies preview hints color the kind label and bold the column header.
+        /// Verifies preview columns strip the grid-only preview suffix from the column name.
         /// </summary>
         [Fact]
-        public void FormatParts_Colors_Preview_Kind_And_Bolds_Column_Header()
+        public void FormatParts_Strips_Preview_Suffix_From_Column_Name()
         {
             var hint = RenameListCellHint.FormatParts("Full File Name (Preview)", "beta.txt", isPreviewColumn: true);
 
-            Assert.Equal(5, hint.Runs.Count);
-            Assert.Equal("[", hint.Runs[0].Text);
-            Assert.Equal("Preview", hint.Runs[1].Text);
-            Assert.Equal(RenameListCellHint.PreviewKindBrushKey, hint.Runs[1].ForegroundResourceKey);
-            Assert.Equal("Full File Name (Preview)", hint.Runs[3].Text);
-            Assert.Equal(FontWeight.Bold, hint.Runs[3].FontWeight);
-            Assert.Equal("[Preview Full File Name (Preview)] beta.txt", hint.ToPlainText());
+            Assert.Equal("Full File Name", hint.Runs[0].Text);
+            Assert.Equal(": beta.txt", hint.Runs[1].Text);
+            Assert.Equal("Full File Name: beta.txt", hint.ToPlainText());
         }
 
         /// <summary>
