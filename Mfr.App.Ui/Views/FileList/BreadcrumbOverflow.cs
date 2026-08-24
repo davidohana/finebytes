@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.ViewModels.FileList
+namespace Mfr.App.Ui.Views.FileList
 {
     /// <summary>
     /// Chooses which address-bar folders stay visible when the trail is too wide.

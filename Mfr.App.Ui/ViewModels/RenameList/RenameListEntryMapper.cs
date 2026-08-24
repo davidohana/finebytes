@@ -1,8 +1,7 @@
-using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.Rename;
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.Services.RenameList
+namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
     /// Maps engine rename items to Rename List grid rows.

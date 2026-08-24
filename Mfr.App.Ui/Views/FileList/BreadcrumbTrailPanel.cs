@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Mfr.App.Ui.ViewModels.FileList;
 
 namespace Mfr.App.Ui.Views.FileList
 {
