@@ -988,6 +988,121 @@ namespace Mfr.Tests.Ui
             Assert.True(networkIndex > lastDriveIndex, "Network should appear with folders after drives");
         }
 
+        /// <summary>
+        /// Verifies Open is enabled for files as well as folders.
+        /// </summary>
+        [Fact]
+        public void OpenSelectedCommand_CanExecute_For_Files()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var file = viewModel.Entries.First(entry => !entry.IsDirectory);
+            viewModel.SetSelectedEntries([file], file);
+
+            Assert.True(viewModel.OpenSelectedCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Open launches the default app for a selected file.
+        /// </summary>
+        [Fact]
+        public void OpenSelected_Opens_File_With_Shell()
+        {
+            var shell = new RecordingShellOpener();
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shell);
+            var file = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([file], file);
+
+            viewModel.OpenSelected();
+
+            Assert.Equal([file.FullPath], shell.OpenedWithDefaultApp);
+            Assert.Empty(shell.RevealedInFileManager);
+        }
+
+        /// <summary>
+        /// Verifies Copy path writes every selected full path, one per line.
+        /// </summary>
+        [Fact]
+        public async Task CopyPath_Writes_Selected_Paths_To_Clipboard()
+        {
+            var clipboard = new RecordingClipboard();
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, clipboard: clipboard);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([alpha, beta], beta);
+
+            await viewModel.CopyPathCommand.ExecuteAsync(null);
+
+            Assert.Equal($"{alpha.FullPath}{Environment.NewLine}{beta.FullPath}", clipboard.LastText);
+        }
+
+        /// <summary>
+        /// Verifies Copy path is disabled when nothing is selected.
+        /// </summary>
+        [Fact]
+        public void CopyPathCommand_Disabled_When_Selection_Empty()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.SetSelectedEntries([]);
+
+            Assert.False(viewModel.CopyPathCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Show in Explorer reveals the focused selection.
+        /// </summary>
+        [Fact]
+        public void ShowInExplorer_Reveals_Selected_Entry()
+        {
+            var shell = new RecordingShellOpener();
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shell);
+            var file = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([file], file);
+
+            viewModel.ShowInExplorer();
+
+            Assert.Equal([file.FullPath], shell.RevealedInFileManager);
+            Assert.Empty(shell.OpenedFolders);
+        }
+
+        /// <summary>
+        /// Verifies Show in Explorer opens the current folder when the selection is empty.
+        /// </summary>
+        [Fact]
+        public void ShowInExplorer_Opens_Current_Folder_When_Selection_Empty()
+        {
+            var shell = new RecordingShellOpener();
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shell);
+            viewModel.SetSelectedEntries([]);
+
+            Assert.True(viewModel.ShowInExplorerCommand.CanExecute(null));
+            viewModel.ShowInExplorer();
+
+            Assert.Equal([viewModel.CurrentPath], shell.OpenedFolders);
+            Assert.Empty(shell.RevealedInFileManager);
+        }
+
+        /// <summary>
+        /// Verifies Show in Explorer is disabled on This PC with no selection.
+        /// </summary>
+        [Fact]
+        public void ShowInExplorerCommand_Disabled_On_ThisPc_Without_Selection()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            viewModel.SetSelectedEntries([]);
+
+            Assert.False(viewModel.ShowInExplorerCommand.CanExecute(null));
+        }
+
         private static bool _IsDriveName(string name)
         {
             return name.Contains(':', StringComparison.Ordinal);
@@ -1013,9 +1128,18 @@ namespace Mfr.Tests.Ui
             return dir;
         }
 
-        private FileListViewModel _CreateViewModel(string dir)
+        private FileListViewModel _CreateViewModel(
+            string dir,
+            IFileShellOpener? shellOpener = null,
+            ITextClipboard? clipboard = null
+        )
         {
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                dir,
+                shellOpener ?? NullFileShellOpener.Instance,
+                clipboard ?? NullTextClipboard.Instance
+            );
             _viewModels.Add(viewModel);
             return viewModel;
         }
@@ -1033,6 +1157,39 @@ namespace Mfr.Tests.Ui
             {
                 RequestedSizes.Add(size);
                 return null;
+            }
+        }
+
+        private sealed class RecordingShellOpener : IFileShellOpener
+        {
+            public List<string> OpenedWithDefaultApp { get; } = [];
+            public List<string> RevealedInFileManager { get; } = [];
+            public List<string> OpenedFolders { get; } = [];
+
+            public void OpenWithDefaultApp(string path)
+            {
+                OpenedWithDefaultApp.Add(path);
+            }
+
+            public void RevealInFileManager(string path)
+            {
+                RevealedInFileManager.Add(path);
+            }
+
+            public void OpenFolderInFileManager(string folderPath)
+            {
+                OpenedFolders.Add(folderPath);
+            }
+        }
+
+        private sealed class RecordingClipboard : ITextClipboard
+        {
+            public string? LastText { get; private set; }
+
+            public Task SetTextAsync(string text)
+            {
+                LastText = text;
+                return Task.CompletedTask;
             }
         }
     }

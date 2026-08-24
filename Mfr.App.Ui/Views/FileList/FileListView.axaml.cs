@@ -1,10 +1,13 @@
 using System.Collections;
 using System.ComponentModel;
+using System.Windows.Input;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Utils;
 
@@ -15,9 +18,43 @@ namespace Mfr.App.Ui.Views.FileList
     /// </summary>
     public partial class FileListView : UserControl
     {
+        /// <summary>
+        /// Rename List Add Selected command, set by the main window shell.
+        /// </summary>
+        public static readonly StyledProperty<ICommand?> AddSelectedCommandProperty = AvaloniaProperty.Register<
+            FileListView,
+            ICommand?
+        >(nameof(AddSelectedCommand));
+
+        /// <summary>
+        /// Rename List Add All command, set by the main window shell.
+        /// </summary>
+        public static readonly StyledProperty<ICommand?> AddAllCommandProperty = AvaloniaProperty.Register<
+            FileListView,
+            ICommand?
+        >(nameof(AddAllCommand));
+
         private FileListViewModel? _viewModel;
         private bool _isSyncingSelection;
         private bool _selectionChangeFromView;
+
+        /// <summary>
+        /// Gets or sets the Rename List Add Selected command.
+        /// </summary>
+        public ICommand? AddSelectedCommand
+        {
+            get => GetValue(AddSelectedCommandProperty);
+            set => SetValue(AddSelectedCommandProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Rename List Add All command.
+        /// </summary>
+        public ICommand? AddAllCommand
+        {
+            get => GetValue(AddAllCommandProperty);
+            set => SetValue(AddAllCommandProperty, value);
+        }
 
         /// <summary>
         /// Initializes the File List pane.
@@ -137,6 +174,66 @@ namespace Mfr.App.Ui.Views.FileList
             {
                 viewModel.OpenSelected();
             }
+        }
+
+        private void _OnEntriesContextRequested(object? sender, ContextRequestedEventArgs e)
+        {
+            if (_viewModel is null || !_IsActiveListingSender(sender))
+            {
+                return;
+            }
+
+            var hit = _FindEntryFromSource(e.Source);
+            if (hit is null)
+            {
+                return;
+            }
+
+            var alreadySelected = _viewModel.SelectedEntries.Any(entry =>
+                PathComparers.Os.Equals(entry.FullPath, hit.FullPath)
+            );
+            if (alreadySelected)
+            {
+                return;
+            }
+
+            _selectionChangeFromView = true;
+            try
+            {
+                _viewModel.SetSelectedEntries([hit], hit);
+            }
+            finally
+            {
+                _selectionChangeFromView = false;
+            }
+
+            _isSyncingSelection = true;
+            try
+            {
+                _ApplySelectionToSender(sender, force: true);
+            }
+            finally
+            {
+                _isSyncingSelection = false;
+            }
+        }
+
+        private static FileListEntry? _FindEntryFromSource(object? source)
+        {
+            for (var current = source as Visual; current is not null; current = current.GetVisualParent())
+            {
+                if (current is ListBoxItem { DataContext: FileListEntry listEntry })
+                {
+                    return listEntry;
+                }
+
+                if (current is DataGridRow { DataContext: FileListEntry gridEntry })
+                {
+                    return gridEntry;
+                }
+            }
+
+            return null;
         }
 
         private void _OnEntriesSelectionChanged(object? sender, SelectionChangedEventArgs e)

@@ -81,6 +81,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public static IReadOnlyList<string> DefaultExcludeMasks { get; } = ["*.exe", "*.dll", "*.sys"];
 
         private readonly ISystemIconProvider _iconProvider;
+        private readonly IFileShellOpener _shellOpener;
+        private readonly ITextClipboard _clipboard;
         private readonly List<ListedItem> _listedItems = [];
         private readonly List<FileListEntry> _selectedEntries = [];
         private readonly Dictionary<string, IImage?> _pathToThumbnail = new(PathComparers.Os);
@@ -98,9 +100,22 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         /// <param name="iconProvider">Shell icons, or <see langword="null"/> to use the OS default.</param>
         /// <param name="initialPath">Directory to open, or <see langword="null"/> for the user profile.</param>
-        public FileListViewModel(ISystemIconProvider? iconProvider, string? initialPath)
+        /// <param name="shellOpener">
+        /// Opens paths with the OS shell, or <see langword="null"/> to use the OS default.
+        /// </param>
+        /// <param name="clipboard">
+        /// Clipboard for Copy path, or <see langword="null"/> to use the desktop main-window clipboard.
+        /// </param>
+        public FileListViewModel(
+            ISystemIconProvider? iconProvider,
+            string? initialPath,
+            IFileShellOpener? shellOpener = null,
+            ITextClipboard? clipboard = null
+        )
         {
             _iconProvider = iconProvider ?? SystemIconProvider.CreateDefault();
+            _shellOpener = shellOpener ?? FileShellOpener.CreateDefault();
+            _clipboard = clipboard ?? new DesktopTextClipboard();
             Entries = [];
             MaskSuggestions = [.. _DefaultMasks];
             PathHistory = [];
@@ -218,6 +233,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(OpenSelectedCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CopyPathCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ShowInExplorerCommand))]
         private FileListEntry? _selectedEntry;
 
         /// <summary>
@@ -390,6 +407,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
                 SelectedEntry = focused ?? _selectedEntries.LastOrDefault();
                 OnPropertyChanged(nameof(SelectedEntries));
+                _NotifySelectionCommandsChanged();
             }
             finally
             {
@@ -423,17 +441,58 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
-        /// Navigates into the selected folder. Files are ignored until add-to-list (G2).
+        /// Opens the focused row: folders navigate in-app; files open with the OS default app.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanOpenSelected))]
         public void OpenSelected()
         {
-            if (SelectedEntry is not { IsDirectory: true, FullPath: var path })
+            if (SelectedEntry is null)
             {
                 return;
             }
 
-            _Navigate(path);
+            if (SelectedEntry.IsDirectory)
+            {
+                _Navigate(SelectedEntry.FullPath);
+                return;
+            }
+
+            _shellOpener.OpenWithDefaultApp(SelectedEntry.FullPath);
+        }
+
+        /// <summary>
+        /// Copies selected full paths to the clipboard, one per line.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanCopyPath))]
+        public async Task CopyPathAsync()
+        {
+            if (_selectedEntries.Count == 0)
+            {
+                return;
+            }
+
+            var text = string.Join(Environment.NewLine, _selectedEntries.Select(entry => entry.FullPath));
+            await _clipboard.SetTextAsync(text).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// Reveals the focused selection in the OS file manager, or opens the current folder when empty.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanShowInExplorer))]
+        public void ShowInExplorer()
+        {
+            if (SelectedEntry is not null)
+            {
+                _shellOpener.RevealInFileManager(SelectedEntry.FullPath);
+                return;
+            }
+
+            if (!_IsFilesystemFolderPath(CurrentPath))
+            {
+                return;
+            }
+
+            _shellOpener.OpenFolderInFileManager(CurrentPath);
         }
 
         /// <summary>
@@ -595,6 +654,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 }
 
                 OnPropertyChanged(nameof(SelectedEntries));
+                _NotifySelectionCommandsChanged();
             }
             finally
             {
@@ -604,7 +664,39 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         private bool _CanOpenSelected()
         {
-            return SelectedEntry is { IsDirectory: true };
+            return SelectedEntry is not null;
+        }
+
+        private bool _CanCopyPath()
+        {
+            return _selectedEntries.Count > 0;
+        }
+
+        private bool _CanShowInExplorer()
+        {
+            if (SelectedEntry is not null)
+            {
+                return true;
+            }
+
+            return _IsFilesystemFolderPath(CurrentPath);
+        }
+
+        private void _NotifySelectionCommandsChanged()
+        {
+            OpenSelectedCommand.NotifyCanExecuteChanged();
+            CopyPathCommand.NotifyCanExecuteChanged();
+            ShowInExplorerCommand.NotifyCanExecuteChanged();
+        }
+
+        private static bool _IsFilesystemFolderPath(string path)
+        {
+            if (FileListPath.IsComputerPath(path) || FileListPath.IsNetworkPath(path))
+            {
+                return false;
+            }
+
+            return !string.IsNullOrWhiteSpace(path);
         }
 
         private void _Navigate(string? path)

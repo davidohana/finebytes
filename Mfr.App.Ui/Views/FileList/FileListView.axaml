@@ -19,6 +19,18 @@
       <x:Double x:Key="DataGridRowSelectedUnfocusedBackgroundOpacity">1</x:Double>
       <x:Double x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundOpacity">1</x:Double>
       <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
+      <ContextMenu x:Key="FileListContextMenu" x:Shared="False">
+        <MenuItem Header="Open" Command="{Binding OpenSelectedCommand}" />
+        <Separator />
+        <MenuItem Header="Add Selected" Command="{Binding #FileListRoot.AddSelectedCommand}" />
+        <MenuItem Header="Add All" Command="{Binding #FileListRoot.AddAllCommand}" />
+        <Separator />
+        <MenuItem Header="Show in Explorer" Command="{Binding ShowInExplorerCommand}" />
+        <MenuItem Header="Copy path" Command="{Binding CopyPathCommand}" />
+        <Separator />
+        <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />
+        <MenuItem Header="Go Up" Command="{Binding GoUpCommand}" />
+      </ContextMenu>
     </ResourceDictionary>
   </UserControl.Resources>
   <UserControl.Styles>
@@ -232,6 +244,8 @@
           RowHeight="20"
           ColumnHeaderHeight="22"
           SelectionMode="Extended"
+          ContextMenu="{StaticResource FileListContextMenu}"
+          ContextRequested="_OnEntriesContextRequested"
           Sorting="_OnEntriesSorting"
           Loaded="_OnReportGridLoaded"
           DoubleTapped="_OnEntriesDoubleTapped"
@@ -282,6 +296,8 @@
           ItemsSource="{Binding Entries}"
           IsVisible="{Binding IsListView}"
           SelectionMode="Multiple"
+          ContextMenu="{StaticResource FileListContextMenu}"
+          ContextRequested="_OnEntriesContextRequested"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
           SelectionChanged="_OnEntriesSelectionChanged"
@@ -302,6 +318,8 @@
           ItemsSource="{Binding Entries}"
           IsVisible="{Binding IsSmallIconsView}"
           SelectionMode="Multiple"
+          ContextMenu="{StaticResource FileListContextMenu}"
+          ContextRequested="_OnEntriesContextRequested"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
           SelectionChanged="_OnEntriesSelectionChanged"
@@ -334,6 +352,8 @@
           ItemsSource="{Binding Entries}"
           IsVisible="{Binding IsLargeIconsView}"
           SelectionMode="Multiple"
+          ContextMenu="{StaticResource FileListContextMenu}"
+          ContextRequested="_OnEntriesContextRequested"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
           SelectionChanged="_OnEntriesSelectionChanged"
@@ -365,6 +385,8 @@
           ItemsSource="{Binding Entries}"
           IsVisible="{Binding IsTilesView}"
           SelectionMode="Multiple"
+          ContextMenu="{StaticResource FileListContextMenu}"
+          ContextRequested="_OnEntriesContextRequested"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
           SelectionChanged="_OnEntriesSelectionChanged"
@@ -402,6 +424,8 @@
           IsVisible="{Binding IsThumbnailsView}"
           ClipToBounds="False"
           SelectionMode="Multiple"
+          ContextMenu="{StaticResource FileListContextMenu}"
+          ContextRequested="_OnEntriesContextRequested"
           DoubleTapped="_OnEntriesDoubleTapped"
           KeyDown="_OnEntriesKeyDown"
           SelectionChanged="_OnEntriesSelectionChanged"

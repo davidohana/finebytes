@@ -33,6 +33,54 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies every listing host shares a context menu with the expected verbs.
+        /// </summary>
+        [AvaloniaFact]
+        public void Listing_Hosts_Have_ContextMenu()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            File.WriteAllText(Path.Combine(dir, "a.txt"), "x");
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            _viewModels.Add(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 400,
+                Height = 300,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            Control[] hosts =
+            [
+                view.FindControl<DataGrid>("ReportGrid")!,
+                view.FindControl<ListBox>("ListViewList")!,
+                view.FindControl<ListBox>("SmallIconsList")!,
+                view.FindControl<ListBox>("LargeIconsList")!,
+                view.FindControl<ListBox>("TilesList")!,
+                view.FindControl<ListBox>("ThumbnailsList")!,
+            ];
+
+            foreach (var host in hosts)
+            {
+                Assert.NotNull(host.ContextMenu);
+                var headers = host
+                    .ContextMenu.Items.OfType<MenuItem>()
+                    .Select(item => item.Header?.ToString())
+                    .ToList();
+                Assert.Contains("Open", headers);
+                Assert.Contains("Add Selected", headers);
+                Assert.Contains("Add All", headers);
+                Assert.Contains("Show in Explorer", headers);
+                Assert.Contains("Copy path", headers);
+                Assert.Contains("Refresh", headers);
+                Assert.Contains("Go Up", headers);
+            }
+        }
+
+        /// <summary>
         /// Verifies long tile names stay inside the cell instead of painting over neighbors.
         /// </summary>
         [AvaloniaFact]

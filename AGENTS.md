@@ -14,6 +14,7 @@
 - `docs/keyboard-shortcuts.md` (menu/toolbar/File List keys; keep in sync with `AppShortcuts`)
 - `docs/audio-tag-model.md` (embedded audio tag read/write/Apply)
 - `docs/image-metadata-model.md` (lazy MetadataExtractor image properties + EXIF cache)
+- `docs/debts.md` (deferred / later-work list)
 - `.editorconfig`
 - `.cursor/rules/refactor-no-legacy-compat.mdc`
 - `.cursor/rules/csharp-style.mdc`
