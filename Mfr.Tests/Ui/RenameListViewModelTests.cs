@@ -491,9 +491,35 @@ namespace Mfr.Tests.Ui
 
             Assert.Single(renameListViewModel.Entries);
             Assert.Equal("beta.md", renameListViewModel.Entries[0].FullFileName);
-            Assert.Empty(renameListViewModel.SelectedEntries);
+            Assert.Single(renameListViewModel.SelectedEntries);
+            Assert.Same(renameListViewModel.Entries[0], renameListViewModel.SelectedEntries[0]);
             Assert.Equal(1, renameListViewModel.ItemCount);
-            Assert.False(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
+            Assert.True(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Remove Selected keeps focus on the row that slides into the deleted index.
+        /// </summary>
+        [Fact]
+        public async Task RemoveSelected_Selects_Row_At_Same_Index()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[1]]);
+            renameListViewModel.RemoveSelectedCommand.Execute(null);
+
+            Assert.Equal(["alpha.txt", "gamma.log"], _PreviewNames(renameListViewModel));
+            Assert.Single(renameListViewModel.SelectedEntries);
+            Assert.Equal("gamma.log", renameListViewModel.SelectedEntries[0].FullFileName);
         }
 
         /// <summary>
@@ -546,6 +572,8 @@ namespace Mfr.Tests.Ui
             Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
             Assert.Same(gammaEntry, renameListViewModel.Entries[1]);
             Assert.Equal(["alpha.txt", "gamma.log"], _PreviewNames(renameListViewModel));
+            Assert.Single(renameListViewModel.SelectedEntries);
+            Assert.Same(gammaEntry, renameListViewModel.SelectedEntries[0]);
         }
 
         /// <summary>

@@ -160,6 +160,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var selected = _selectedEntries.ToHashSet();
+            var anchorIndex = _FindFirstSelectedIndex(selected);
             _renameList.Remove(_selectedEntries.Select(entry => entry.EngineItem));
 
             for (var i = Entries.Count - 1; i >= 0; i--)
@@ -170,8 +171,39 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 }
             }
 
-            SetSelectedEntries([]);
+            var nextSelection = _SelectEntryAfterRemove(anchorIndex);
+            SetSelectedEntries(nextSelection is null ? [] : [nextSelection]);
             _NotifyListChanged();
+        }
+
+        /// <summary>
+        /// Finds the list index of the first selected row, matching MFR7 remove behavior.
+        /// </summary>
+        private int _FindFirstSelectedIndex(HashSet<RenameListEntry> selected)
+        {
+            for (var i = 0; i < Entries.Count; i++)
+            {
+                if (selected.Contains(Entries[i]))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Picks the row to focus after delete: same index when possible, otherwise the last row.
+        /// </summary>
+        private RenameListEntry? _SelectEntryAfterRemove(int anchorIndex)
+        {
+            if (Entries.Count == 0 || anchorIndex < 0)
+            {
+                return null;
+            }
+
+            var nextIndex = Math.Min(anchorIndex, Entries.Count - 1);
+            return Entries[nextIndex];
         }
 
         /// <summary>

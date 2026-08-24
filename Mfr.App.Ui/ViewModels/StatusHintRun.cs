@@ -11,7 +11,6 @@ namespace Mfr.App.Ui.ViewModels
     /// <param name="text">Segment text.</param>
     public sealed class StatusHintRun(string text)
     {
-
         /// <summary>
         /// Gets the segment text.
         /// </summary>
