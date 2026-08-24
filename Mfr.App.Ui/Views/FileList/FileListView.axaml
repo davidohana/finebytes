@@ -470,6 +470,19 @@
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
+
+        <TextBlock
+          x:Name="ListingErrorText"
+          Margin="24"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          TextAlignment="Center"
+          TextWrapping="Wrap"
+          IsVisible="{Binding HasListingError}"
+          Text="{Binding ListingError}"
+          Foreground="{DynamicResource FileListForegroundBrush}"
+          Opacity="0.85"
+        />
       </Panel>
     </DockPanel>
   </Border>

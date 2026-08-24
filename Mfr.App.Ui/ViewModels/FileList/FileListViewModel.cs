@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.Utils;
+using Serilog;
 
 namespace Mfr.App.Ui.ViewModels.FileList
 {
@@ -188,6 +189,18 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         [ObservableProperty]
         private IReadOnlyList<string> _excludeMasks = DefaultExcludeMasks;
+
+        /// <summary>
+        /// User-facing message when the current folder could not be listed; empty when listing succeeded.
+        /// </summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasListingError))]
+        private string _listingError = string.Empty;
+
+        /// <summary>
+        /// Gets whether <see cref="ListingError"/> should be shown in the listing pane.
+        /// </summary>
+        public bool HasListingError => !string.IsNullOrEmpty(ListingError);
 
         /// <summary>
         /// Layout used to present <see cref="Entries"/>. Default is Report.
@@ -745,6 +758,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             Entries.Clear();
             _listedItems.Clear();
             _DisposeAndClearThumbnails();
+            ListingError = string.Empty;
 
             if (FileListPath.IsComputerPath(CurrentPath))
             {
@@ -788,8 +802,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return;
             }
 
-            if (!_TryListFolder(CurrentPath, out var folders, out var files))
+            if (!_TryListFolder(CurrentPath, out var folders, out var files, out var failure))
             {
+                ListingError = _FormatListingError(failure);
                 _RebuildVisibleEntries(preserveSelection);
                 return;
             }
@@ -1312,10 +1327,16 @@ namespace Mfr.App.Ui.ViewModels.FileList
             );
         }
 
-        private bool _TryListFolder(string path, out List<ListedItem> folders, out List<ListedItem> files)
+        private bool _TryListFolder(
+            string path,
+            out List<ListedItem> folders,
+            out List<ListedItem> files,
+            out FolderListFailure failure
+        )
         {
             folders = [];
             files = [];
+            failure = FolderListFailure.None;
             try
             {
                 if (!_NeedsNetworkTimeout(path))
@@ -1325,23 +1346,92 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 }
 
                 var timeout = WindowsWslUnc.IsWslUncPath(path) ? _UncServerProbeTimeout : _NetworkProbeTimeout;
-                if (!_TryRunWithTimeout(() => _ReadFolderListing(path), timeout, out var listing))
+                var listTask = Task.Run(() => _ReadFolderListing(path));
+                try
                 {
+                    if (!listTask.Wait(timeout))
+                    {
+                        // Exists/enumerate cannot be cancelled; observe later faults so they are not unhandled.
+                        _ = listTask.ContinueWith(
+                            static completed => completed.Exception,
+                            CancellationToken.None,
+                            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+                            TaskScheduler.Default
+                        );
+                        failure = FolderListFailure.TimedOut;
+                        Log.Warning("Timed out listing folder {Path} after {Timeout}.", path, timeout);
+                        return false;
+                    }
+
+                    (folders, files) = listTask.Result;
+                    return true;
+                }
+                catch (AggregateException ex)
+                {
+                    failure = _MapListingException(ex.GetBaseException());
+                    Log.Warning(ex, "Failed to list folder {Path}.", path);
                     return false;
                 }
-
-                folders = listing.Folders;
-                files = listing.Files;
-                return true;
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
             {
+                failure = _MapListingException(ex);
+                Log.Warning(ex, "Failed to list folder {Path}.", path);
                 return false;
             }
         }
 
+        /// <summary>
+        /// Maps a filesystem listing exception to a user-facing failure kind.
+        /// </summary>
+        private static FolderListFailure _MapListingException(Exception ex)
+        {
+            if (ex is UnauthorizedAccessException)
+            {
+                return FolderListFailure.AccessDenied;
+            }
+
+            if (ex is DirectoryNotFoundException)
+            {
+                return FolderListFailure.NotFound;
+            }
+
+            return FolderListFailure.Unavailable;
+        }
+
+        /// <summary>
+        /// Builds the empty-state message for a folder listing failure.
+        /// </summary>
+        private static string _FormatListingError(FolderListFailure failure)
+        {
+            return failure switch
+            {
+                FolderListFailure.AccessDenied => "Access denied reading this folder.",
+                FolderListFailure.NotFound => "This folder could not be found.",
+                FolderListFailure.TimedOut => "Timed out reading this folder.",
+                FolderListFailure.Unavailable => "Could not read this folder.",
+                FolderListFailure.None => string.Empty,
+                _ => "Could not read this folder.",
+            };
+        }
+
+        /// <summary>
+        /// Why listing the current folder failed.
+        /// </summary>
+        private enum FolderListFailure
+        {
+            None,
+            AccessDenied,
+            NotFound,
+            TimedOut,
+            Unavailable,
+        }
+
         private (List<ListedItem> Folders, List<ListedItem> Files) _ReadFolderListing(string path)
         {
+            // IgnoreInaccessible would treat an unreadable directory as empty; probe first so browse can show an error.
+            _EnsureDirectoryReadable(path);
+
             var folders = Directory
                 .EnumerateDirectories(path, "*", _ListingOptions)
                 .Select(folderPath => _CreateListedItem(folderPath, isDirectory: true))
@@ -1354,6 +1444,24 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 .ToList();
 
             return (folders, files);
+        }
+
+        /// <summary>
+        /// Throws when <paramref name="path"/> cannot be listed (e.g. access denied).
+        /// </summary>
+        /// <para>
+        /// Uses <see cref="EnumerationOptions.IgnoreInaccessible"/> = false so denial on the directory itself
+        /// surfaces as an exception instead of an empty listing.
+        /// </para>
+        private static void _EnsureDirectoryReadable(string path)
+        {
+            var probeOptions = new EnumerationOptions
+            {
+                IgnoreInaccessible = false,
+                RecurseSubdirectories = false,
+                ReturnSpecialDirectories = false,
+            };
+            _ = Directory.EnumerateFileSystemEntries(path, "*", probeOptions).Any();
         }
 
         private static bool _DirectoryExists(string path)

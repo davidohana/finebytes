@@ -526,6 +526,82 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies a readable empty folder does not show a listing error.
+        /// </summary>
+        [Fact]
+        public void Empty_Folder_Has_No_ListingError()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var viewModel = _CreateViewModel(dir);
+
+            Assert.Empty(viewModel.Entries);
+            Assert.False(viewModel.HasListingError);
+            Assert.Equal(string.Empty, viewModel.ListingError);
+        }
+
+        /// <summary>
+        /// Verifies navigating into an unreadable folder shows an in-pane listing error.
+        /// </summary>
+        [Fact]
+        public void NavigateTo_Inaccessible_Folder_Sets_ListingError()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var deniedFolder = Directory.CreateDirectory(Path.Combine(parent, "Denied")).FullName;
+            _DenyDirectoryTraverse(deniedFolder);
+
+            try
+            {
+                var viewModel = _CreateViewModel(parent);
+                viewModel.NavigateTo(deniedFolder);
+
+                Assert.Equal(deniedFolder, viewModel.CurrentPath);
+                Assert.Empty(viewModel.Entries);
+                Assert.True(viewModel.HasListingError);
+                Assert.Contains("Access denied", viewModel.ListingError, StringComparison.Ordinal);
+            }
+            finally
+            {
+                _AllowDirectoryTraverse(deniedFolder);
+            }
+        }
+
+        /// <summary>
+        /// Verifies leaving an unreadable folder clears the listing error.
+        /// </summary>
+        [Fact]
+        public void NavigateAway_From_Inaccessible_Folder_Clears_ListingError()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var deniedFolder = Directory.CreateDirectory(Path.Combine(parent, "Denied")).FullName;
+            _DenyDirectoryTraverse(deniedFolder);
+
+            try
+            {
+                var viewModel = _CreateViewModel(deniedFolder);
+                Assert.True(viewModel.HasListingError);
+
+                viewModel.NavigateTo(parent);
+
+                Assert.False(viewModel.HasListingError);
+                Assert.Equal(string.Empty, viewModel.ListingError);
+            }
+            finally
+            {
+                _AllowDirectoryTraverse(deniedFolder);
+            }
+        }
+
+        /// <summary>
         /// Verifies the File List starts in Report view.
         /// </summary>
         [Fact]
@@ -1147,6 +1223,38 @@ namespace Mfr.Tests.Ui
         private static List<string> _Names(FileListViewModel viewModel)
         {
             return [.. viewModel.Entries.Select(entry => entry.Name)];
+        }
+
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        private static void _DenyDirectoryTraverse(string directoryPath)
+        {
+            var directoryInfo = new DirectoryInfo(directoryPath);
+            var security = directoryInfo.GetAccessControl();
+            security.AddAccessRule(
+                new System.Security.AccessControl.FileSystemAccessRule(
+                    identity: System.Security.Principal.WindowsIdentity.GetCurrent().Name,
+                    fileSystemRights: System.Security.AccessControl.FileSystemRights.ListDirectory
+                        | System.Security.AccessControl.FileSystemRights.Traverse,
+                    type: System.Security.AccessControl.AccessControlType.Deny
+                )
+            );
+            directoryInfo.SetAccessControl(security);
+        }
+
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+        private static void _AllowDirectoryTraverse(string directoryPath)
+        {
+            var directoryInfo = new DirectoryInfo(directoryPath);
+            var security = directoryInfo.GetAccessControl();
+            security.RemoveAccessRuleAll(
+                new System.Security.AccessControl.FileSystemAccessRule(
+                    identity: System.Security.Principal.WindowsIdentity.GetCurrent().Name,
+                    fileSystemRights: System.Security.AccessControl.FileSystemRights.ListDirectory
+                        | System.Security.AccessControl.FileSystemRights.Traverse,
+                    type: System.Security.AccessControl.AccessControlType.Deny
+                )
+            );
+            directoryInfo.SetAccessControl(security);
         }
 
         private sealed class RecordingIconProvider : ISystemIconProvider
