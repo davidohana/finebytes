@@ -176,7 +176,13 @@ namespace Mfr.Tests.Ui
 
             var (view, window) = _Show(renameListViewModel);
             var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
-            var dragOverArgs = new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.None);
+            var dragOverArgs = new DragEventArgs(
+                DragDrop.DragOverEvent,
+                dataTransfer,
+                view,
+                default,
+                KeyModifiers.None
+            );
             view.RaiseEvent(dragOverArgs);
 
             Assert.Single(renameListViewModel.Entries);
@@ -202,9 +208,7 @@ namespace Mfr.Tests.Ui
 
             var (view, window) = _Show(renameListViewModel);
             var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
-            view.RaiseEvent(
-                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt)
-            );
+            view.RaiseEvent(new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt));
             Assert.Empty(renameListViewModel.Entries);
 
             view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, default, KeyModifiers.None));

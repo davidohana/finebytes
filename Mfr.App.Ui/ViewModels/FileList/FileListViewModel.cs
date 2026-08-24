@@ -603,6 +603,44 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
+        /// Navigates the File List to <paramref name="fullPath"/>'s folder and selects that item.
+        /// </summary>
+        /// <param name="fullPath">Full file or folder path to locate.</param>
+        /// <returns><see langword="true"/> when the row was found in the current listing.</returns>
+        public bool TryLocatePath(string fullPath)
+        {
+            if (string.IsNullOrWhiteSpace(fullPath))
+            {
+                return false;
+            }
+
+            var directoryPath = Path.GetDirectoryName(fullPath);
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                return false;
+            }
+
+            if (!FileListCatalog.TryResolvePath(directoryPath, out var resolvedDirectory))
+            {
+                return false;
+            }
+
+            if (!PathComparers.Os.Equals(resolvedDirectory, CurrentPath))
+            {
+                _Navigate(resolvedDirectory);
+            }
+
+            var match = Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, fullPath));
+            if (match is null)
+            {
+                return false;
+            }
+
+            SetSelectedEntries([match], match);
+            return true;
+        }
+
+        /// <summary>
         /// Remembers the current include mask after the user commits it (Enter or leave the combo).
         /// </summary>
         public void CommitMask()

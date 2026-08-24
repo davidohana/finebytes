@@ -76,6 +76,8 @@ namespace Mfr.Tests.Ui
             Assert.Contains(AppShortcuts.AddAll, gestures);
             Assert.Contains(AppShortcuts.RemoveSelected, gestures);
             Assert.Contains(AppShortcuts.ClearRenameList, gestures);
+            Assert.DoesNotContain(AppShortcuts.RemoveSelectedDelete, gestures);
+            Assert.DoesNotContain(AppShortcuts.LocateInFileList, gestures);
             Assert.DoesNotContain(AppShortcuts.GoUp, gestures);
             Assert.DoesNotContain(AppShortcuts.Exit, gestures);
             Assert.DoesNotContain(AppShortcuts.ZoomIn, gestures);

@@ -71,6 +71,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private string _lastAddError = string.Empty;
 
         /// <summary>
+        /// Gets the most recent locate-in-File-List failure message, or empty when none.
+        /// </summary>
+        [ObservableProperty]
+        private string _lastLocateError = string.Empty;
+
+        /// <summary>
+        /// Status-bar hint for the Rename List cell under the pointer or keyboard focus.
+        /// </summary>
+        [ObservableProperty]
+        private string _cellStatusHint = string.Empty;
+
+        /// <summary>
         /// Replaces the Rename List selection.
         /// </summary>
         /// <param name="entries">Selected grid rows.</param>
@@ -90,6 +102,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             OnPropertyChanged(nameof(SelectedEntries));
             RemoveSelectedCommand.NotifyCanExecuteChanged();
+            LocateInFileListCommand.NotifyCanExecuteChanged();
         }
 
         /// <summary>
@@ -175,7 +188,30 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _renameList.Clear();
             Entries.Clear();
             SetSelectedEntries([]);
+            CellStatusHint = string.Empty;
             _NotifyListChanged();
+        }
+
+        /// <summary>
+        /// Navigates the File List to the focused Rename List row and selects it there.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanLocateInFileList))]
+        public void LocateInFileList()
+        {
+            var entry = _GetFocusedSelectedEntry();
+            if (entry is null)
+            {
+                return;
+            }
+
+            var fullPath = entry.EngineItem.Original.FullPath;
+            if (_fileListViewModel.TryLocatePath(fullPath))
+            {
+                LastLocateError = string.Empty;
+                return;
+            }
+
+            LastLocateError = $"Failed to locate \"{fullPath}\" in the File List.";
         }
 
         private async Task _AddSourcesAsync(IReadOnlyList<string> sources)
@@ -369,6 +405,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return !IsAdding && Entries.Count > 0;
         }
 
+        private bool _CanLocateInFileList()
+        {
+            return !IsAdding && _GetFocusedSelectedEntry() is not null;
+        }
+
+        private RenameListEntry? _GetFocusedSelectedEntry()
+        {
+            return _selectedEntries.Count > 0 ? _selectedEntries[^1] : null;
+        }
+
         private void _OnAddProgressPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName is not nameof(RenameListAddProgressViewModel.IsAdding))
@@ -381,6 +427,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             AddAllCommand.NotifyCanExecuteChanged();
             RemoveSelectedCommand.NotifyCanExecuteChanged();
             ClearCommand.NotifyCanExecuteChanged();
+            LocateInFileListCommand.NotifyCanExecuteChanged();
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -47,6 +47,8 @@ namespace Mfr.Tests.Ui
                 new KeyGesture(Key.C, KeyModifiers.Control | KeyModifiers.Shift),
                 AppShortcuts.ClearRenameList
             );
+            Assert.Equal(new KeyGesture(Key.Delete), AppShortcuts.RemoveSelectedDelete);
+            Assert.Equal(new KeyGesture(Key.F4), AppShortcuts.LocateInFileList);
         }
     }
 }

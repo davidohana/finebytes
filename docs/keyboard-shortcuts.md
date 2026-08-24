@@ -47,12 +47,16 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 
 ### Rename List
 
-| Action | Shortcut |
-|---|---|
-| Add selected | Ctrl+Shift+S |
-| Add all | Ctrl+Shift+A |
-| Remove selected | Ctrl+Shift+R |
-| Clear | Ctrl+Shift+C |
+| Action | Shortcut | Where it works |
+|---|---|---|
+| Add selected | Ctrl+Shift+S | Main window |
+| Add all | Ctrl+Shift+A | Main window |
+| Remove selected | Ctrl+Shift+R | Main window |
+| Remove selected rows | Del | Rename List grid focused |
+| Clear | Ctrl+Shift+C | Main window |
+| Locate in File List | F4 | Rename List grid focused |
+
+Hovering or focusing a Rename List cell shows the full cell value in the status bar.
 
 ## Shown in menus, not implemented yet
 
@@ -70,6 +74,4 @@ Rename List refresh will share F5 with the File List later (MFR 7.4 used F5 in b
 |---|---|---|
 | Help | F1 | Help UI is not in this build |
 | Manual rename | F2 | Rename List |
-| Locate in File List | F4 | Rename List |
-| Remove selected rows | Del | Rename List, in addition to Ctrl+Shift+R |
 | Move selected rows | Ctrl+↑ / Ctrl+↓ | Rename List manual sort |

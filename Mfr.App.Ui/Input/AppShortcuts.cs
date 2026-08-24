@@ -79,6 +79,12 @@ namespace Mfr.App.Ui.Input
         /// <summary>Clears the Rename List.</summary>
         public static KeyGesture ClearRenameList { get; } = new(Key.C, KeyModifiers.Control | KeyModifiers.Shift);
 
+        /// <summary>Removes the Rename List selection when the grid has focus.</summary>
+        public static KeyGesture RemoveSelectedDelete { get; } = new(Key.Delete);
+
+        /// <summary>Locates the selected Rename List row in the File List when the grid has focus.</summary>
+        public static KeyGesture LocateInFileList { get; } = new(Key.F4);
+
         /// <summary>Toolbar and menu tip for GO.</summary>
         public const string GoTip = "GO (Ctrl+G)";
 
@@ -102,6 +108,9 @@ namespace Mfr.App.Ui.Input
 
         /// <summary>Rename List Clear button and menu tip.</summary>
         public const string ClearRenameListTip = "Clear Rename List (Ctrl+Shift+C)";
+
+        /// <summary>Rename List Locate in File List menu tip.</summary>
+        public const string LocateInFileListTip = "Locate in File List (F4)";
 
         /// <summary>File List refresh button tip.</summary>
         public const string RefreshTip = "Refresh (F5)";

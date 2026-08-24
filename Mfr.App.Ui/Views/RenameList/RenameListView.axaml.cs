@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
+using Mfr.App.Ui.Input;
 using Mfr.App.Ui.ViewModels.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -25,6 +26,9 @@ namespace Mfr.App.Ui.Views.RenameList
             InitializeComponent();
             DataContextChanged += _OnDataContextChanged;
             RenameGrid.SelectionChanged += _OnSelectionChanged;
+            RenameGrid.CurrentCellChanged += _OnCurrentCellChanged;
+            RenameGrid.CellPointerPressed += _OnCellPointerPressed;
+            RenameGrid.PointerExited += _OnGridPointerExited;
             DragDrop.SetAllowDrop(this, true);
             AddHandler(DragDrop.DragOverEvent, _OnDragOver);
             AddHandler(DragDrop.DropEvent, _OnDrop);
@@ -47,6 +51,110 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
             _SyncSelectionToGrid();
+        }
+
+        /// <inheritdoc />
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (_viewModel is null || _viewModel.IsAdding)
+            {
+                base.OnKeyDown(e);
+                return;
+            }
+
+            if (_MatchesGesture(e, AppShortcuts.RemoveSelectedDelete))
+            {
+                if (_viewModel.RemoveSelectedCommand.CanExecute(null))
+                {
+                    _viewModel.RemoveSelectedCommand.Execute(null);
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            if (_MatchesGesture(e, AppShortcuts.LocateInFileList))
+            {
+                if (_viewModel.LocateInFileListCommand.CanExecute(null))
+                {
+                    _viewModel.LocateInFileListCommand.Execute(null);
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            base.OnKeyDown(e);
+        }
+
+        private static bool _MatchesGesture(KeyEventArgs e, KeyGesture gesture)
+        {
+            return e.Key == gesture.Key && e.KeyModifiers == gesture.KeyModifiers;
+        }
+
+        private void _OnCurrentCellChanged(object? sender, EventArgs e)
+        {
+            _PublishFocusedCellHint();
+        }
+
+        private void _OnCellPointerPressed(object? sender, DataGridCellPointerPressedEventArgs e)
+        {
+            _PublishCellHint(e.Row?.DataContext as RenameListEntry, e.Column);
+        }
+
+        private void _OnGridPointerExited(object? sender, PointerEventArgs e)
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            _viewModel.CellStatusHint = string.Empty;
+        }
+
+        private void _PublishFocusedCellHint()
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            _PublishCellHint(_ReadFocusedEntry(), RenameGrid.CurrentColumn);
+        }
+
+        private RenameListEntry? _ReadFocusedEntry()
+        {
+            if (RenameGrid.SelectedItem is RenameListEntry entry)
+            {
+                return entry;
+            }
+
+            var selected = _viewModel?.SelectedEntries;
+            if (selected is { Count: > 0 })
+            {
+                return selected[^1];
+            }
+
+            return null;
+        }
+
+        private void _PublishCellHint(RenameListEntry? entry, DataGridColumn? column)
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            if (entry is null || column?.Header is not string columnHeader || string.IsNullOrEmpty(columnHeader))
+            {
+                _viewModel.CellStatusHint = string.Empty;
+                return;
+            }
+
+            var cellText = RenameListCellHint.GetCellText(entry, columnHeader);
+            _viewModel.CellStatusHint = RenameListCellHint.Format(
+                columnHeader,
+                cellText,
+                RenameListCellHint.IsPreviewColumn(columnHeader)
+            );
         }
 
         private void _OnDragOver(object? sender, DragEventArgs e)

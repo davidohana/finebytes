@@ -573,6 +573,54 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Locate in File List navigates to the row folder and selects the item.
+        /// </summary>
+        [Fact]
+        public async Task LocateInFileList_Selects_Row_In_File_List()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            var nestedDir = Path.Combine(albumPath, "disc1");
+            var nestedPath = Path.Combine(nestedDir, "nested.mp3");
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.NavigateTo(parent);
+            fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            var nestedEntry = renameListViewModel.Entries.Single(entry => entry.FullFileName == "nested.mp3");
+            renameListViewModel.SetSelectedEntries([nestedEntry]);
+            Assert.True(renameListViewModel.LocateInFileListCommand.CanExecute(null));
+
+            renameListViewModel.LocateInFileListCommand.Execute(null);
+
+            Assert.Equal(nestedDir, fileListViewModel.CurrentPath);
+            Assert.NotNull(fileListViewModel.SelectedEntry);
+            Assert.Equal(nestedPath, fileListViewModel.SelectedEntry!.FullPath);
+            Assert.Empty(renameListViewModel.LastLocateError);
+        }
+
+        /// <summary>
+        /// Verifies Locate in File List sets an error when the path is not in the listing.
+        /// </summary>
+        [Fact]
+        public async Task LocateInFileList_Sets_Error_When_Item_Not_Listed()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            fileListViewModel.Mask = "*.md";
+            renameListViewModel.LocateInFileListCommand.Execute(null);
+
+            Assert.Contains("Failed to locate", renameListViewModel.LastLocateError);
+        }
+
+        /// <summary>
         /// Verifies canceling a long add discards the in-progress batch and leaves add commands enabled.
         /// </summary>
         [Fact]

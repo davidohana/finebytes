@@ -263,6 +263,11 @@
           Command="{Binding RenameListViewModel.ClearCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}"
         />
+        <MenuItem
+          Header="Locate in File List"
+          Command="{Binding RenameListViewModel.LocateInFileListCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.LocateInFileList}"
+        />
         <Separator />
         <MenuItem Header="Auto-Sort" IsEnabled="False" />
         <MenuItem Header="Auto-Preview" IsEnabled="False" />

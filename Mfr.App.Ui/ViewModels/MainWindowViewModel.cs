@@ -18,6 +18,9 @@ namespace Mfr.App.Ui.ViewModels
         private const int StatusHintClearMilliseconds = 8_000;
 
         private CancellationTokenSource? _statusHintClearCts;
+        private string _transientStatusHint = string.Empty;
+        private string _paneStatusHint = string.Empty;
+
         /// <summary>
         /// Initializes pane view models for the 7.4 layout.
         /// </summary>
@@ -143,6 +146,20 @@ namespace Mfr.App.Ui.ViewModels
             {
                 _ShowTransientStatusHint(RenameListViewModel.LastAddError);
             }
+
+            if (
+                e.PropertyName is nameof(RenameListViewModel.LastLocateError)
+                && !string.IsNullOrEmpty(RenameListViewModel.LastLocateError)
+            )
+            {
+                _ShowTransientStatusHint(RenameListViewModel.LastLocateError);
+            }
+
+            if (e.PropertyName is nameof(RenameListViewModel.CellStatusHint))
+            {
+                _paneStatusHint = RenameListViewModel.CellStatusHint;
+                _UpdateStatusHintDisplay();
+            }
         }
 
         /// <summary>
@@ -152,11 +169,17 @@ namespace Mfr.App.Ui.ViewModels
         {
             _statusHintClearCts?.Cancel();
             _statusHintClearCts?.Dispose();
-            StatusHint = message;
+            _transientStatusHint = message;
+            _UpdateStatusHintDisplay();
 
             _statusHintClearCts = new CancellationTokenSource();
             var token = _statusHintClearCts.Token;
             _ = _ClearStatusHintAfterDelayAsync(message, token);
+        }
+
+        private void _UpdateStatusHintDisplay()
+        {
+            StatusHint = !string.IsNullOrEmpty(_transientStatusHint) ? _transientStatusHint : _paneStatusHint;
         }
 
         private async Task _ClearStatusHintAfterDelayAsync(string message, CancellationToken token)
@@ -164,9 +187,10 @@ namespace Mfr.App.Ui.ViewModels
             try
             {
                 await Task.Delay(StatusHintClearMilliseconds, token).ConfigureAwait(true);
-                if (string.Equals(StatusHint, message, StringComparison.Ordinal))
+                if (string.Equals(_transientStatusHint, message, StringComparison.Ordinal))
                 {
-                    StatusHint = string.Empty;
+                    _transientStatusHint = string.Empty;
+                    _UpdateStatusHintDisplay();
                 }
             }
             catch (OperationCanceledException) { }
