@@ -19,7 +19,7 @@ namespace Mfr.App.Ui.ViewModels
 
         private CancellationTokenSource? _statusHintClearCts;
         private string _transientStatusHint = string.Empty;
-        private string _paneStatusHint = string.Empty;
+        private StatusHintDisplay _paneStatusHintDisplay = StatusHintDisplay.Empty;
 
         /// <summary>
         /// Initializes pane view models for the 7.4 layout.
@@ -67,10 +67,10 @@ namespace Mfr.App.Ui.ViewModels
         public RenameListViewModel RenameListViewModel { get; }
 
         /// <summary>
-        /// Status-bar hover hint. Empty until panes publish hints.
+        /// Status-bar hint content. Plain text or a rich Rename List cell hint.
         /// </summary>
         [ObservableProperty]
-        private string _statusHint = string.Empty;
+        private StatusHintDisplay _statusHintDisplay = StatusHintDisplay.Empty;
 
         /// <summary>
         /// Count of items in the rename list.
@@ -155,9 +155,9 @@ namespace Mfr.App.Ui.ViewModels
                 _ShowTransientStatusHint(RenameListViewModel.LastLocateError);
             }
 
-            if (e.PropertyName is nameof(RenameListViewModel.CellStatusHint))
+            if (e.PropertyName is nameof(RenameListViewModel.CellStatusHintDisplay))
             {
-                _paneStatusHint = RenameListViewModel.CellStatusHint;
+                _paneStatusHintDisplay = RenameListViewModel.CellStatusHintDisplay;
                 _UpdateStatusHintDisplay();
             }
         }
@@ -179,7 +179,9 @@ namespace Mfr.App.Ui.ViewModels
 
         private void _UpdateStatusHintDisplay()
         {
-            StatusHint = !string.IsNullOrEmpty(_transientStatusHint) ? _transientStatusHint : _paneStatusHint;
+            StatusHintDisplay = !string.IsNullOrEmpty(_transientStatusHint)
+                ? StatusHintDisplay.FromPlain(_transientStatusHint)
+                : _paneStatusHintDisplay;
         }
 
         private async Task _ClearStatusHintAfterDelayAsync(string message, CancellationToken token)

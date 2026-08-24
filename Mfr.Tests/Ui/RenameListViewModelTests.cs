@@ -596,7 +596,7 @@ namespace Mfr.Tests.Ui
 
             Assert.Equal(nestedDir, fileListViewModel.CurrentPath);
             Assert.NotNull(fileListViewModel.SelectedEntry);
-            Assert.Equal(nestedPath, fileListViewModel.SelectedEntry!.FullPath);
+            Assert.Equal(nestedPath, fileListViewModel.SelectedEntry.FullPath);
             Assert.Empty(renameListViewModel.LastLocateError);
         }
 

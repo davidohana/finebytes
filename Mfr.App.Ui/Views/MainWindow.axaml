@@ -316,7 +316,7 @@
       BorderBrush="{DynamicResource ThemeControlMidBrush}"
     >
       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
-        <TextBlock VerticalAlignment="Center" Text="{Binding StatusHint}" />
+        <views:StatusHintView Grid.Column="0" VerticalAlignment="Center" Hint="{Binding StatusHintDisplay}" />
         <TextBlock
           Grid.Column="1"
           Margin="16,0,0,0"

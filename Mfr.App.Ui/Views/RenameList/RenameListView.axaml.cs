@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Mfr.App.Ui.Input;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -107,7 +108,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            _viewModel.CellStatusHint = string.Empty;
+            _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
         }
 
         private void _PublishFocusedCellHint()
@@ -145,12 +146,12 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (entry is null || column?.Header is not string columnHeader || string.IsNullOrEmpty(columnHeader))
             {
-                _viewModel.CellStatusHint = string.Empty;
+                _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
 
             var cellText = RenameListCellHint.GetCellText(entry, columnHeader);
-            _viewModel.CellStatusHint = RenameListCellHint.Format(
+            _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatParts(
                 columnHeader,
                 cellText,
                 RenameListCellHint.IsPreviewColumn(columnHeader)

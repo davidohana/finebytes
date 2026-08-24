@@ -1,3 +1,5 @@
+using Avalonia.Media;
+
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
@@ -6,16 +8,47 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     internal static class RenameListCellHint
     {
         /// <summary>
-        /// Builds status-bar text for a grid cell, matching MFR7 original/preview prefixes.
+        /// Theme brush key for preview-kind labels in cell hints.
+        /// </summary>
+        internal const string PreviewKindBrushKey = "StatusHintPreviewBrush";
+
+        /// <summary>
+        /// Builds a rich status-bar hint for a grid cell, matching MFR7 original/preview prefixes.
         /// </summary>
         /// <param name="columnHeader">Grid column header text.</param>
         /// <param name="cellText">Cell display value.</param>
         /// <param name="isPreviewColumn">Whether the column shows preview values.</param>
         /// <returns>Hint shown in the main window status bar.</returns>
-        public static string Format(string columnHeader, string cellText, bool isPreviewColumn)
+        public static StatusHintDisplay FormatParts(string columnHeader, string cellText, bool isPreviewColumn)
         {
-            var kind = isPreviewColumn ? "Preview" : "Original";
-            return $"[{kind} {columnHeader}] {cellText}";
+            if (isPreviewColumn)
+            {
+                return StatusHintDisplay.FromRuns(
+                    new StatusHintRun("["),
+                    new StatusHintRun("Preview") { ForegroundResourceKey = PreviewKindBrushKey },
+                    new StatusHintRun(" "),
+                    new StatusHintRun(columnHeader) { FontWeight = FontWeight.Bold },
+                    new StatusHintRun($"] {cellText}")
+                );
+            }
+
+            return StatusHintDisplay.FromRuns(
+                new StatusHintRun("[Original "),
+                new StatusHintRun(columnHeader) { FontWeight = FontWeight.Bold },
+                new StatusHintRun($"] {cellText}")
+            );
+        }
+
+        /// <summary>
+        /// Builds plain status-bar text for a grid cell (tests and accessibility).
+        /// </summary>
+        /// <param name="columnHeader">Grid column header text.</param>
+        /// <param name="cellText">Cell display value.</param>
+        /// <param name="isPreviewColumn">Whether the column shows preview values.</param>
+        /// <returns>Single-line hint text.</returns>
+        public static string FormatPlainText(string columnHeader, string cellText, bool isPreviewColumn)
+        {
+            return FormatParts(columnHeader, cellText, isPreviewColumn).ToPlainText();
         }
 
         /// <summary>

@@ -80,7 +80,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Status-bar hint for the Rename List cell under the pointer or keyboard focus.
         /// </summary>
         [ObservableProperty]
-        private string _cellStatusHint = string.Empty;
+        private StatusHintDisplay _cellStatusHintDisplay = StatusHintDisplay.Empty;
 
         /// <summary>
         /// Replaces the Rename List selection.
@@ -188,7 +188,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _renameList.Clear();
             Entries.Clear();
             SetSelectedEntries([]);
-            CellStatusHint = string.Empty;
+            CellStatusHintDisplay = StatusHintDisplay.Empty;
             _NotifyListChanged();
         }
 
