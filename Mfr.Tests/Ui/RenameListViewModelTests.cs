@@ -64,6 +64,112 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies AddPathsAsync adds dropped files with the same rules as Add Selected.
+        /// </summary>
+        [Fact]
+        public async Task AddPaths_Adds_Files_And_Ignores_Duplicates()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+
+            Assert.Equal(2, renameListViewModel.Entries.Count);
+            Assert.Equal(["alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
+
+            await renameListViewModel.AddPathsAsync([alphaPath]);
+
+            Assert.Equal(2, renameListViewModel.Entries.Count);
+        }
+
+        /// <summary>
+        /// Verifies AddPathsAsync expands a dropped folder using the File List mask.
+        /// </summary>
+        [Fact]
+        public async Task AddPaths_Folder_Uses_FileList_Mask()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            fileListViewModel.Mask = "*.mp3";
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            await renameListViewModel.AddPathsAsync([albumPath]);
+
+            Assert.Equal(2, renameListViewModel.Entries.Count);
+            Assert.Contains(renameListViewModel.Entries, entry => entry.FullFileName == "track.mp3");
+            Assert.Contains(renameListViewModel.Entries, entry => entry.FullFileName == "nested.mp3");
+            Assert.DoesNotContain(renameListViewModel.Entries, entry => entry.FullFileName == "readme.txt");
+        }
+
+        /// <summary>
+        /// Verifies AddPathsAsync honors folders-only AddMode by skipping files.
+        /// </summary>
+        [Fact]
+        public async Task AddPaths_FoldersOnly_Skips_Files()
+        {
+            var (parent, albumPath) = _CreateAlbumTree();
+            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Folders;
+            ConfigStore.Config.Ui.AddFolderContents = false;
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            await renameListViewModel.AddPathsAsync([albumPath, Path.Combine(parent, "other.txt")]);
+
+            Assert.Single(renameListViewModel.Entries);
+            Assert.Equal("album", renameListViewModel.Entries[0].FullFileName);
+            Assert.Equal("Folder", renameListViewModel.Entries[0].FileFolder);
+        }
+
+        /// <summary>
+        /// Verifies AddPathsAsync no-ops for empty or non-addable path lists.
+        /// </summary>
+        [Fact]
+        public async Task AddPaths_Empty_Or_NonAddable_Does_Nothing()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            await renameListViewModel.AddPathsAsync([]);
+            Assert.Empty(renameListViewModel.Entries);
+
+            await renameListViewModel.AddPathsAsync([FileListPath.ComputerPath]);
+            Assert.Empty(renameListViewModel.Entries);
+        }
+
+        /// <summary>
+        /// Verifies AddPathsAsync is ignored while an add is already running.
+        /// </summary>
+        [Fact]
+        public async Task AddPaths_Blocked_While_IsAdding()
+        {
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var tree = Path.Combine(parent, "tree");
+            Directory.CreateDirectory(tree);
+            for (var i = 0; i < 200; i++)
+            {
+                var nested = Path.Combine(tree, $"d{i:D3}");
+                Directory.CreateDirectory(nested);
+                File.WriteAllText(Path.Combine(nested, $"f{i:D3}.txt"), "x");
+            }
+
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            fileListViewModel.SetSelectedEntries([_FolderEntry(tree)]);
+
+            var addSelected = renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            await _WaitUntil(() => renameListViewModel.IsAdding);
+
+            await renameListViewModel.AddPathsAsync([Path.Combine(tree, "d000", "f000.txt")]);
+            await addSelected;
+
+            Assert.Equal(200, renameListViewModel.Entries.Count);
+        }
+
+        /// <summary>
         /// Verifies the include mask hides non-matching files from Add Selected.
         /// </summary>
         [Fact]
@@ -141,7 +247,7 @@ namespace Mfr.Tests.Ui
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             Assert.True(fileListViewModel.Entries.Count > 0);
-            Assert.False(RenameListAddSourceResolver.IsAddableLocation(fileListViewModel.CurrentPath));
+            Assert.False(RenameListAddSourceResolver.CanAddAllFrom(fileListViewModel.CurrentPath));
             Assert.False(renameListViewModel.AddAllCommand.CanExecute(null));
         }
 
@@ -163,7 +269,7 @@ namespace Mfr.Tests.Ui
             var fileListViewModel = _CreateFileListViewModel(root);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            Assert.True(RenameListAddSourceResolver.IsAddableLocation(fileListViewModel.CurrentPath));
+            Assert.True(RenameListAddSourceResolver.CanAddAllFrom(fileListViewModel.CurrentPath));
             Assert.True(renameListViewModel.AddAllCommand.CanExecute(null));
         }
 

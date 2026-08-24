@@ -6,8 +6,10 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Utils;
 
@@ -18,6 +20,8 @@ namespace Mfr.App.Ui.Views.FileList
     /// </summary>
     public partial class FileListView : UserControl
     {
+        private const double DragThreshold = 4;
+
         /// <summary>
         /// Rename List Add Selected command, set by the main window shell.
         /// </summary>
@@ -37,6 +41,9 @@ namespace Mfr.App.Ui.Views.FileList
         private FileListViewModel? _viewModel;
         private bool _isSyncingSelection;
         private bool _selectionChangeFromView;
+        private Point? _dragStartPoint;
+        private PointerEventArgs? _dragStartArgs;
+        private bool _isDragPending;
 
         /// <summary>
         /// Gets or sets the Rename List Add Selected command.
@@ -67,6 +74,275 @@ namespace Mfr.App.Ui.Views.FileList
                 _OnThumbnailsPointerWheelChanged,
                 RoutingStrategies.Tunnel
             );
+            ReportGrid.CellPointerPressed += _OnReportCellPointerPressed;
+            _WireListingDrag(ReportGrid);
+            _WireListBoxDrag(ListViewList);
+            _WireListBoxDrag(SmallIconsList);
+            _WireListBoxDrag(LargeIconsList);
+            _WireListBoxDrag(TilesList);
+            _WireListBoxDrag(ThumbnailsList);
+        }
+
+        private void _WireListBoxDrag(ListBox listBox)
+        {
+            listBox.AddHandler(PointerPressedEvent, _OnListBoxPointerPressed, RoutingStrategies.Tunnel);
+            _WireListingDrag(listBox);
+        }
+
+        private void _WireListingDrag(Control host)
+        {
+            host.AddHandler(PointerMovedEvent, _OnListingPointerMoved, RoutingStrategies.Tunnel);
+            host.AddHandler(PointerReleasedEvent, _OnListingPointerReleased, RoutingStrategies.Tunnel);
+            host.AddHandler(PointerCaptureLostEvent, _OnListingPointerCaptureLost, RoutingStrategies.Tunnel);
+        }
+
+        private void _OnReportCellPointerPressed(object? sender, DataGridCellPointerPressedEventArgs e)
+        {
+            if (!_IsActiveListingSender(ReportGrid))
+            {
+                return;
+            }
+
+            _BeginPotentialDrag(e.Row?.DataContext as FileListEntry, e.PointerPressedEventArgs);
+        }
+
+        private void _OnListBoxPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (!_IsActiveListingSender(sender))
+            {
+                return;
+            }
+
+            _BeginPotentialDrag(_FindEntryFromSource(e.Source), e);
+        }
+
+        private void _BeginPotentialDrag(FileListEntry? hit, PointerEventArgs e)
+        {
+            _ClearDragState();
+
+            if (_viewModel is null || hit is null)
+            {
+                return;
+            }
+
+            if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                return;
+            }
+
+            _EnsureEntrySelectedForDrag(hit, e.Source);
+            _dragStartPoint = e.GetPosition(this);
+            _dragStartArgs = e;
+            _isDragPending = true;
+        }
+
+        private void _EnsureEntrySelectedForDrag(FileListEntry hit, object? source)
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            var alreadySelected = _viewModel.SelectedEntries.Any(entry =>
+                PathComparers.Os.Equals(entry.FullPath, hit.FullPath)
+            );
+            if (alreadySelected)
+            {
+                return;
+            }
+
+            _selectionChangeFromView = true;
+            try
+            {
+                _viewModel.SetSelectedEntries([hit], hit);
+            }
+            finally
+            {
+                _selectionChangeFromView = false;
+            }
+
+            var host = _FindListingHost(source) ?? _GetActiveListingHost();
+            if (host is null)
+            {
+                return;
+            }
+
+            _isSyncingSelection = true;
+            try
+            {
+                _ApplySelectionToSender(host, force: true);
+            }
+            finally
+            {
+                _isSyncingSelection = false;
+            }
+        }
+
+        private async void _OnListingPointerMoved(object? sender, PointerEventArgs e)
+        {
+            if (!_isDragPending || _dragStartPoint is null || _dragStartArgs is null || _viewModel is null)
+            {
+                return;
+            }
+
+            if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                _ClearDragState();
+                return;
+            }
+
+            var delta = e.GetPosition(this) - _dragStartPoint.Value;
+            var movedFarEnough = Math.Abs(delta.X) >= DragThreshold || Math.Abs(delta.Y) >= DragThreshold;
+            if (!movedFarEnough)
+            {
+                return;
+            }
+
+            var paths = _GetAddableSelectedPaths();
+            var dragArgs = _dragStartArgs;
+            _ClearDragState();
+            if (paths.Count == 0)
+            {
+                return;
+            }
+
+            var dataTransfer = await _BuildFileDataTransferAsync(paths).ConfigureAwait(true);
+            if (dataTransfer is null)
+            {
+                return;
+            }
+
+            await DragDrop.DoDragDropAsync(dragArgs, dataTransfer, DragDropEffects.Copy).ConfigureAwait(true);
+        }
+
+        private async Task<DataTransfer?> _BuildFileDataTransferAsync(IReadOnlyList<string> paths)
+        {
+            var storage = TopLevel.GetTopLevel(this)?.StorageProvider;
+            if (storage is null)
+            {
+                return null;
+            }
+
+            var dataTransfer = new DataTransfer();
+            foreach (var path in paths)
+            {
+                var item = await _TryGetStorageItemAsync(storage, path).ConfigureAwait(true);
+                if (item is null)
+                {
+                    continue;
+                }
+
+                dataTransfer.Add(DataTransferItem.CreateFile(item));
+            }
+
+            if (dataTransfer.Items.Count == 0)
+            {
+                return null;
+            }
+
+            return dataTransfer;
+        }
+
+        private static async Task<IStorageItem?> _TryGetStorageItemAsync(IStorageProvider storage, string path)
+        {
+            if (Directory.Exists(path))
+            {
+                return await storage.TryGetFolderFromPathAsync(path).ConfigureAwait(true);
+            }
+
+            return await storage.TryGetFileFromPathAsync(path).ConfigureAwait(true);
+        }
+
+        private void _OnListingPointerReleased(object? sender, PointerReleasedEventArgs e)
+        {
+            _ClearDragState();
+        }
+
+        private void _OnListingPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+        {
+            _ClearDragState();
+        }
+
+        private void _ClearDragState()
+        {
+            _isDragPending = false;
+            _dragStartPoint = null;
+            _dragStartArgs = null;
+        }
+
+        private IReadOnlyList<string> _GetAddableSelectedPaths()
+        {
+            if (_viewModel is null)
+            {
+                return [];
+            }
+
+            return
+            [
+                .. _viewModel
+                    .SelectedEntries.Where(entry => RenameListAddSourceResolver.IsValidSourcePath(entry.FullPath))
+                    .Select(entry => entry.FullPath),
+            ];
+        }
+
+        private Control? _FindListingHost(object? source)
+        {
+            for (var current = source as Visual; current is not null; current = current.GetVisualParent())
+            {
+                if (
+                    ReferenceEquals(current, ReportGrid)
+                    || ReferenceEquals(current, ListViewList)
+                    || ReferenceEquals(current, SmallIconsList)
+                    || ReferenceEquals(current, LargeIconsList)
+                    || ReferenceEquals(current, TilesList)
+                    || ReferenceEquals(current, ThumbnailsList)
+                )
+                {
+                    return (Control)current;
+                }
+            }
+
+            return null;
+        }
+
+        private Control? _GetActiveListingHost()
+        {
+            if (_viewModel is null)
+            {
+                return null;
+            }
+
+            if (_viewModel.IsReportView)
+            {
+                return ReportGrid;
+            }
+
+            if (_viewModel.IsListView)
+            {
+                return ListViewList;
+            }
+
+            if (_viewModel.IsSmallIconsView)
+            {
+                return SmallIconsList;
+            }
+
+            if (_viewModel.IsLargeIconsView)
+            {
+                return LargeIconsList;
+            }
+
+            if (_viewModel.IsTilesView)
+            {
+                return TilesList;
+            }
+
+            if (_viewModel.IsThumbnailsView)
+            {
+                return ThumbnailsList;
+            }
+
+            return null;
         }
 
         /// <inheritdoc />

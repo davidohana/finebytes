@@ -170,23 +170,23 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add All location gate rejects only This PC / Network, not drive roots.
+        /// Verifies Add All browse-location gate rejects only This PC / Network, not drive roots.
         /// </summary>
         [Fact]
-        public void IsAddableLocation_Rejects_Sentinels_Allows_Drive_Roots()
+        public void CanAddAllFrom_Rejects_Sentinels_Allows_Drive_Roots()
         {
-            Assert.False(RenameListAddSourceResolver.IsAddableLocation(FileListPath.ComputerPath));
-            Assert.True(RenameListAddSourceResolver.IsAddableLocation(_dir));
+            Assert.False(RenameListAddSourceResolver.CanAddAllFrom(FileListPath.ComputerPath));
+            Assert.True(RenameListAddSourceResolver.CanAddAllFrom(_dir));
 
             if (!OperatingSystem.IsWindows())
             {
                 return;
             }
 
-            Assert.False(RenameListAddSourceResolver.IsAddableLocation(FileListPath.NetworkPath));
+            Assert.False(RenameListAddSourceResolver.CanAddAllFrom(FileListPath.NetworkPath));
             var root = Path.GetPathRoot(_dir);
             Assert.False(string.IsNullOrEmpty(root));
-            Assert.True(RenameListAddSourceResolver.IsAddableLocation(root));
+            Assert.True(RenameListAddSourceResolver.CanAddAllFrom(root));
         }
 
         /// <summary>
@@ -249,6 +249,66 @@ namespace Mfr.Tests.Ui
                     addMode: RenameListAddMode.FilesAndFolders
                 )
             );
+        }
+
+        /// <summary>
+        /// Verifies dropped paths use Directory.Exists for folder+mask sources.
+        /// </summary>
+        [Fact]
+        public void ResolveFromPaths_FolderAndFile_MatchSelectionRules()
+        {
+            var albumPath = Path.Combine(_dir, "album");
+            var filePath = Path.Combine(_dir, "alpha.txt");
+
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromPaths(
+                [albumPath, filePath],
+                mask: "*.mp3",
+                addMode: RenameListAddMode.Files
+            );
+
+            Assert.Equal(2, sources.Count);
+            Assert.Contains(Path.Combine(albumPath, "*.mp3"), sources);
+            Assert.Contains(filePath, sources);
+        }
+
+        /// <summary>
+        /// Verifies folders-only mode skips file paths from drag-drop.
+        /// </summary>
+        [Fact]
+        public void ResolveFromPaths_FoldersOnly_SkipsFiles()
+        {
+            var albumPath = Path.Combine(_dir, "album");
+            var filePath = Path.Combine(_dir, "alpha.txt");
+
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromPaths(
+                [albumPath, filePath],
+                mask: "*",
+                addMode: RenameListAddMode.Folders
+            );
+
+            var source = Assert.Single(sources);
+            Assert.Equal(Path.Combine(albumPath, "*"), source);
+        }
+
+        /// <summary>
+        /// Verifies IsValidSourcePath rejects roots and sentinels.
+        /// </summary>
+        [Fact]
+        public void IsValidSourcePath_Rejects_Roots_And_Sentinels()
+        {
+            Assert.True(RenameListAddSourceResolver.IsValidSourcePath(Path.Combine(_dir, "alpha.txt")));
+            Assert.False(RenameListAddSourceResolver.IsValidSourcePath(FileListPath.ComputerPath));
+            Assert.False(RenameListAddSourceResolver.IsValidSourcePath(""));
+
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var root = Path.GetPathRoot(_dir);
+            Assert.False(string.IsNullOrEmpty(root));
+            Assert.False(RenameListAddSourceResolver.IsValidSourcePath(root));
+            Assert.False(RenameListAddSourceResolver.IsValidSourcePath(FileListPath.NetworkPath));
         }
     }
 }

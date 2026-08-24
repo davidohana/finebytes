@@ -122,6 +122,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Adds dropped filesystem paths to the Rename List using the same rules as Add Selected.
+        /// </summary>
+        /// <param name="paths">Full file or folder paths from File List or Explorer drag-drop.</param>
+        public async Task AddPathsAsync(IReadOnlyList<string> paths)
+        {
+            ArgumentNullException.ThrowIfNull(paths);
+
+            var addMode = ConfigStore.Config.Ui.AddMode;
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromPaths(paths, _fileListViewModel.Mask, addMode);
+            await _AddSourcesAsync(sources).ConfigureAwait(true);
+        }
+
+        /// <summary>
         /// Removes the selected Rename List rows.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanRemoveSelected))]
@@ -287,7 +300,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             // Sentinel gate: This PC / Network list Known Places and volumes; Add All would mass-add those.
             // Drive roots are fine — Add All walks listed children, not the root path itself.
-            if (!RenameListAddSourceResolver.IsAddableLocation(_fileListViewModel.CurrentPath))
+            if (!RenameListAddSourceResolver.CanAddAllFrom(_fileListViewModel.CurrentPath))
             {
                 return false;
             }

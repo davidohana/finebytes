@@ -44,16 +44,100 @@ namespace Mfr.App.Ui.Services.RenameList
         }
 
         /// <summary>
-        /// Returns whether Add All may run from this File List location.
+        /// Returns whether Add All may run from this File List browse location.
         /// </summary>
         /// <param name="currentPath">Current File List folder path.</param>
         /// <returns>
         /// <see langword="true"/> when the location is not This PC or Network.
         /// Drive roots are allowed: Add All targets listed child rows, not the root itself.
         /// </returns>
-        public static bool IsAddableLocation(string currentPath)
+        public static bool CanAddAllFrom(string currentPath)
         {
             return !FileListPath.IsComputerPath(currentPath) && !FileListPath.IsNetworkPath(currentPath);
+        }
+
+        /// <summary>
+        /// Returns whether <paramref name="path"/> can be emitted as an engine add source.
+        /// </summary>
+        /// <param name="path">Candidate file or folder path.</param>
+        /// <returns>
+        /// <see langword="true"/> when the path is resolvable and not This PC, Network, or a filesystem root;
+        /// otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool IsValidSourcePath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+
+            if (FileListPath.IsComputerPath(path) || FileListPath.IsNetworkPath(path))
+            {
+                return false;
+            }
+
+            try
+            {
+                var fullPath = Path.GetFullPath(path);
+                var root = Path.GetPathRoot(fullPath);
+                return !string.IsNullOrEmpty(root) && !string.Equals(root, fullPath, PathComparers.OsComparison);
+            }
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Resolves engine add sources from filesystem paths (drag-drop or Explorer).
+        /// </summary>
+        /// <param name="paths">Full file or folder paths to turn into add sources.</param>
+        /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
+        /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
+        /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
+        public static IReadOnlyList<string> ResolveSourcesFromPaths(
+            IReadOnlyList<string> paths,
+            string mask,
+            RenameListAddMode addMode
+        )
+        {
+            ArgumentNullException.ThrowIfNull(paths);
+            return ResolveSourcesFromSelection(_BuildEntriesFromPaths(paths), mask, addMode);
+        }
+
+        /// <summary>
+        /// Builds File List-shaped rows from filesystem paths for source resolution.
+        /// </summary>
+        private static List<FileListEntry> _BuildEntriesFromPaths(IReadOnlyList<string> paths)
+        {
+            var entries = new List<FileListEntry>(paths.Count);
+            var pathToIsAdded = new HashSet<string>(PathComparers.Os);
+
+            foreach (var path in paths)
+            {
+                if (string.IsNullOrWhiteSpace(path) || !pathToIsAdded.Add(path))
+                {
+                    continue;
+                }
+
+                var isDirectory = Directory.Exists(path);
+                var name = Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = path;
+                }
+
+                entries.Add(
+                    new FileListEntry
+                    {
+                        Name = name,
+                        FullPath = path,
+                        IsDirectory = isDirectory,
+                    }
+                );
+            }
+
+            return entries;
         }
 
         /// <summary>
@@ -73,7 +157,7 @@ namespace Mfr.App.Ui.Services.RenameList
 
             foreach (var entry in entries)
             {
-                if (!_IsAddablePath(entry.FullPath))
+                if (!IsValidSourcePath(entry.FullPath))
                 {
                     continue;
                 }
@@ -101,33 +185,6 @@ namespace Mfr.App.Ui.Services.RenameList
         {
             var trimmedMask = string.IsNullOrWhiteSpace(mask) ? "*" : mask.Trim();
             return Path.Combine(folderPath, trimmedMask);
-        }
-
-        /// <summary>
-        /// Returns whether <paramref name="path"/> can be used as an engine add source.
-        /// </summary>
-        /// <param name="path">Candidate file or folder path from the File List.</param>
-        /// <returns>
-        /// <see langword="true"/> when the path is resolvable and not This PC, Network, or a filesystem root;
-        /// otherwise <see langword="false"/>.
-        /// </returns>
-        private static bool _IsAddablePath(string path)
-        {
-            if (FileListPath.IsComputerPath(path) || FileListPath.IsNetworkPath(path))
-            {
-                return false;
-            }
-
-            try
-            {
-                var fullPath = Path.GetFullPath(path);
-                var root = Path.GetPathRoot(fullPath);
-                return !string.IsNullOrEmpty(root) && !string.Equals(root, fullPath, PathComparers.OsComparison);
-            }
-            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException)
-            {
-                return false;
-            }
         }
     }
 }

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.ComponentModel;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Platform.Storage;
 using Mfr.App.Ui.ViewModels.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -23,6 +25,9 @@ namespace Mfr.App.Ui.Views.RenameList
             InitializeComponent();
             DataContextChanged += _OnDataContextChanged;
             RenameGrid.SelectionChanged += _OnSelectionChanged;
+            DragDrop.SetAllowDrop(this, true);
+            AddHandler(DragDrop.DragOverEvent, _OnDragOver);
+            AddHandler(DragDrop.DropEvent, _OnDrop);
         }
 
         private void _OnDataContextChanged(object? sender, EventArgs e)
@@ -42,6 +47,59 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
             _SyncSelectionToGrid();
+        }
+
+        private void _OnDragOver(object? sender, DragEventArgs e)
+        {
+            var canAccept = _CanAcceptFileDrop(e) && _viewModel is { IsAdding: false };
+            e.DragEffects = canAccept ? DragDropEffects.Copy : DragDropEffects.None;
+            e.Handled = true;
+        }
+
+        private async void _OnDrop(object? sender, DragEventArgs e)
+        {
+            e.Handled = true;
+
+            if (_viewModel is null || _viewModel.IsAdding || !_CanAcceptFileDrop(e))
+            {
+                return;
+            }
+
+            var paths = _ReadDroppedFilePaths(e);
+            if (paths.Count == 0)
+            {
+                return;
+            }
+
+            await _viewModel.AddPathsAsync(paths).ConfigureAwait(true);
+        }
+
+        private static bool _CanAcceptFileDrop(DragEventArgs e)
+        {
+            return e.DataTransfer?.Formats.Contains(DataFormat.File) == true;
+        }
+
+        private static List<string> _ReadDroppedFilePaths(DragEventArgs e)
+        {
+            var files = e.DataTransfer?.TryGetFiles();
+            if (files is null || files.Length == 0)
+            {
+                return [];
+            }
+
+            var paths = new List<string>(files.Length);
+            foreach (var file in files)
+            {
+                var path = file.TryGetLocalPath();
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    continue;
+                }
+
+                paths.Add(path);
+            }
+
+            return paths;
         }
 
         private void _OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
