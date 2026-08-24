@@ -47,12 +47,16 @@ namespace Mfr.Engine.RenameList
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <param name="includeSubdirs">Whether directory expansion should recurse into subdirectories.</param>
         /// <param name="excludeMasks">Exclusive file-name masks for discovered directory entries.</param>
+        /// <param name="cancellationToken">When canceled, stops resolution and returns without throwing.</param>
+        /// <param name="progress">Optional progress sink (scanned / added / last path).</param>
         public void AddSources(
             IEnumerable<string> sources,
             bool includeFiles = true,
             bool includeFolders = true,
             bool includeSubdirs = false,
-            IReadOnlyList<string>? excludeMasks = null
+            IReadOnlyList<string>? excludeMasks = null,
+            CancellationToken cancellationToken = default,
+            IProgress<RenameListAddProgress>? progress = null
         )
         {
             var sourceList = sources.ToList();
@@ -65,33 +69,37 @@ namespace Mfr.Engine.RenameList
                 _includeHidden
             );
 
+            var tracker = new AddProgressTracker(progress, cancellationToken);
             foreach (var source in sourceList)
             {
-                AddSource(
+                if (tracker.IsCanceled)
+                {
+                    break;
+                }
+
+                _AddSource(
                     source: source,
                     includeFiles: includeFiles,
                     includeFolders: includeFolders,
                     includeSubdirs: includeSubdirs,
-                    excludeMasks: excludeMasks
+                    excludeMasks: excludeMasks,
+                    tracker: tracker
                 );
             }
+
+            tracker.ReportFinal();
         }
 
         /// <summary>
-        /// Adds and resolves a single source.
+        /// Adds and resolves a single source using a shared progress tracker.
         /// </summary>
-        /// <param name="source">A file, a directory, or a directory plus a filename mask in the last segment.</param>
-        /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
-        /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
-        /// <param name="includeSubdirs">Whether directory expansion should recurse into subdirectories.</param>
-        /// <param name="excludeMasks">Exclusive file-name masks for discovered directory entries.</param>
-        /// <returns>The count of newly added resolved items.</returns>
-        public int AddSource(
+        private void _AddSource(
             string source,
-            bool includeFiles = true,
-            bool includeFolders = true,
-            bool includeSubdirs = false,
-            IReadOnlyList<string>? excludeMasks = null
+            bool includeFiles,
+            bool includeFolders,
+            bool includeSubdirs,
+            IReadOnlyList<string>? excludeMasks,
+            AddProgressTracker tracker
         )
         {
             if (string.IsNullOrWhiteSpace(source))
@@ -107,27 +115,26 @@ namespace Mfr.Engine.RenameList
                 throw new UserException($"Root paths cannot be added as rename sources: '{trimmedSource}'.");
             }
 
-            var resolvedPaths = AddedSourceResolver
-                .ResolveToPaths(
-                    source: trimmedSource,
-                    includeFiles: includeFiles,
-                    includeFolders: includeFolders,
-                    includeSubdirs: includeSubdirs,
-                    excludeMasks: excludeMasks
-                )
-                .ToList();
+            var resolvedPaths = AddedSourceResolver.ResolveToPaths(
+                source: trimmedSource,
+                includeFiles: includeFiles,
+                includeFolders: includeFolders,
+                includeSubdirs: includeSubdirs,
+                excludeMasks: excludeMasks,
+                cancellationToken: tracker.Token
+            );
             var addedCount = _AppendPaths(
                 resolvedPaths: resolvedPaths,
                 includeFiles: includeFiles,
-                includeFolders: includeFolders
+                includeFolders: includeFolders,
+                tracker: tracker
             );
             Log.Information(
-                "Resolved source '{Source}' to {ResolvedCount} path(s), added {AddedCount} new item(s).",
+                "Resolved source '{Source}', added {AddedCount} new item(s) (scanned {ScannedCount}).",
                 trimmedSource,
-                resolvedPaths.Count,
-                addedCount
+                addedCount,
+                tracker.ScannedCount
             );
-            return addedCount;
         }
 
         /// <summary>
@@ -354,12 +361,25 @@ namespace Mfr.Engine.RenameList
         /// <param name="resolvedPaths">Resolved file paths to append.</param>
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
+        /// <param name="tracker">Shared progress and cancel state for this add operation.</param>
         /// <returns>The count of newly added resolved items.</returns>
-        private int _AppendPaths(IEnumerable<string> resolvedPaths, bool includeFiles, bool includeFolders)
+        private int _AppendPaths(
+            IEnumerable<string> resolvedPaths,
+            bool includeFiles,
+            bool includeFolders,
+            AddProgressTracker tracker
+        )
         {
             var addedCount = 0;
             foreach (var fullPath in resolvedPaths)
             {
+                if (tracker.IsCanceled)
+                {
+                    return addedCount;
+                }
+
+                tracker.OnScanned(fullPath);
+
                 var normalizedResolvedPath = _NormalizePathKey(fullPath);
                 if (!_includedResolvedPaths.Add(normalizedResolvedPath))
                 {
@@ -430,6 +450,7 @@ namespace Mfr.Engine.RenameList
 
                 var renameItem = new RenameItem(originalFileMeta);
                 _renameItems.Add(renameItem);
+                tracker.OnAdded(fullPath);
                 addedCount++;
             }
 

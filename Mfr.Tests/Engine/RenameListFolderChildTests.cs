@@ -41,8 +41,8 @@ namespace Mfr.Tests.Engine
 
             var renameList = new RenameList(includeHidden: true);
             // Add the folder by itself (folders-only) and the file as a direct source.
-            renameList.AddSource(source: oldFolderPath, includeFiles: false, includeFolders: true);
-            renameList.AddSource(source: oldFilePath, includeFiles: true, includeFolders: false);
+            renameList.AddSources(sources: [oldFolderPath], includeFiles: false, includeFolders: true);
+            renameList.AddSources(sources: [oldFilePath], includeFiles: true, includeFolders: false);
             Assert.Equal(2, renameList.RenameItems.Count);
 
             var folderItem = renameList.RenameItems.Single(item => item.Original.FullPath == oldFolderPath);
@@ -174,7 +174,7 @@ namespace Mfr.Tests.Engine
             var newFolder = dir.CombinePath("ALBUM");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(source: oldFolder, includeFiles: false, includeFolders: true);
+            renameList.AddSources(sources: [oldFolder], includeFiles: false, includeFolders: true);
 
             var preset = _FormatterFullPathPreset("folder-case-rename", newFolder);
             var plan = _SetupPreview(renameList, preset);

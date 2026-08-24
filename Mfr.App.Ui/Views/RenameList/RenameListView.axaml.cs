@@ -13,6 +13,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private RenameListViewModel? _viewModel;
         private bool _isSyncingSelection;
         private bool _selectionChangeFromView;
+        private AddProgressDialog? _addProgressDialog;
 
         /// <summary>
         /// Initializes the Rename List pane.
@@ -67,6 +68,50 @@ namespace Mfr.App.Ui.Views.RenameList
             if (e.PropertyName is nameof(RenameListViewModel.SelectedEntries))
             {
                 _SyncSelectionToGrid();
+                return;
+            }
+
+            if (e.PropertyName is nameof(RenameListViewModel.IsAddProgressVisible))
+            {
+                _ = _SyncAddProgressDialogAsync();
+            }
+        }
+
+        private async Task _SyncAddProgressDialogAsync()
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            if (!_viewModel.IsAddProgressVisible)
+            {
+                _addProgressDialog?.Close();
+                return;
+            }
+
+            if (_addProgressDialog is not null)
+            {
+                return;
+            }
+
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            var dialog = new AddProgressDialog(_viewModel);
+            _addProgressDialog = dialog;
+            try
+            {
+                await dialog.ShowDialog(owner);
+            }
+            finally
+            {
+                if (ReferenceEquals(_addProgressDialog, dialog))
+                {
+                    _addProgressDialog = null;
+                }
             }
         }
 

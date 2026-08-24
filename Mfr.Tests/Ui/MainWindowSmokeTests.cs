@@ -85,7 +85,7 @@ namespace Mfr.Tests.Ui
         /// Verifies status-bar ItemCount tracks Rename List add and clear.
         /// </summary>
         [AvaloniaFact]
-        public void MainWindow_ItemCount_Tracks_RenameList()
+        public async Task MainWindow_ItemCount_Tracks_RenameList()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
@@ -104,7 +104,7 @@ namespace Mfr.Tests.Ui
                     IsDirectory = false,
                 },
             ]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
             Assert.Equal(1, viewModel.ItemCount);
 
             renameListViewModel.ClearCommand.Execute(null);

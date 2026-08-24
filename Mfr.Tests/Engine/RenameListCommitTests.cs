@@ -98,7 +98,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(sourcePath, title: "DiskTitleBefore", album: null);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -135,7 +135,7 @@ namespace Mfr.Tests.Engine
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -170,7 +170,7 @@ namespace Mfr.Tests.Engine
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -205,7 +205,7 @@ namespace Mfr.Tests.Engine
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -247,7 +247,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(sourcePath, title: "DiskTitleBefore", album: "AlbumZ");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled("embed-strip", new TagRemoverFilter(new TagRemoverOptions(All: true)));
@@ -277,7 +277,7 @@ namespace Mfr.Tests.Engine
             TaggedMp3Fixture.WriteTagged(sourcePath, id3v1Title: "TrailerTitle", id3v2Title: "FrameTitle");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -310,7 +310,7 @@ namespace Mfr.Tests.Engine
             TaggedMp3Fixture.WriteTagged(sourcePath, id3v1Title: "TrailerTitle", id3v2Title: "FrameTitle");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -347,7 +347,7 @@ namespace Mfr.Tests.Engine
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -373,7 +373,7 @@ namespace Mfr.Tests.Engine
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -397,7 +397,7 @@ namespace Mfr.Tests.Engine
             TaggedMp3Fixture.WriteTagged(sourcePath, id3v2Title: "HasV23");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -423,7 +423,7 @@ namespace Mfr.Tests.Engine
             TaggedMp3Fixture.WriteTagged(sourcePath, id3v1Title: "Trailer", id3v2Title: "OldFrame");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -460,7 +460,7 @@ namespace Mfr.Tests.Engine
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
             var item = Assert.Single(renameList.RenameItems);
 
             var preset = _CreatePresetAllEnabled(
@@ -494,7 +494,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(sourcePath, title: "OldTitle", album: null);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
 
             var preset = _CreatePresetAllEnabled(
                 "strip-then-title",
@@ -531,7 +531,7 @@ namespace Mfr.Tests.Engine
             TaggedMp3Fixture.WriteTagged(sourcePath, id3v1Title: "Trailer", id3v2Title: "Frames");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
 
             var preset = _CreatePresetAllEnabled(
                 "strip-then-title-mp3",
@@ -572,7 +572,7 @@ namespace Mfr.Tests.Engine
             File.Copy(fixturePath, sourcePath, overwrite: false);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
 
             var preset = _CreatePresetAllEnabled(
                 "strip-then-title-flac",
@@ -610,7 +610,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(sourcePath, title: "Disk", album: null);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
 
             var preset = _CreatePresetAllEnabled(
                 "fmt-strip",
@@ -645,7 +645,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(sourcePath, title: "DiskOnly", album: null);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
 
             var preset = _CreatePresetAllEnabled(
                 "setter-strip",
@@ -679,7 +679,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(sourcePath, title: "Old", album: null);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
 
             var preset = _CreatePresetAllEnabled(
                 "triple-chain",
@@ -718,7 +718,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(sourcePath, title: "Tagged", album: null);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
 
             var preset = _CreatePresetAllEnabled(
                 "prefix-strip",
@@ -765,7 +765,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(sourcePath, title: "OnlyOnDisk", album: null);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
 
             var preset = _CreatePresetAllEnabled(
                 "embed-strip-dry",
@@ -790,7 +790,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(sourcePath, title: "OnlyOnDisk", album: null);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(sourcePath);
+            renameList.AddSources([sourcePath]);
 
             var preset = _CreatePresetAllEnabled(
                 "audio-overlay-dry",
@@ -937,7 +937,7 @@ namespace Mfr.Tests.Engine
             Directory.CreateDirectory(folderPath);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
+            renameList.AddSources(sources: [folderPath], includeFiles: false, includeFolders: true);
 
             var preset = _SetHiddenAttributesPreset("attrs-confirm");
             var plan = _SetupPreview(renameList, preset);
@@ -1449,7 +1449,7 @@ namespace Mfr.Tests.Engine
             var destinationFolderPath = dir.CombinePath("AlbumRenamed");
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(source: originalFolderPath, includeFiles: false, includeFolders: true);
+            renameList.AddSources(sources: [originalFolderPath], includeFiles: false, includeFolders: true);
             Assert.Single(renameList.RenameItems);
 
             var preset = _FormatterFullPathPreset("folder-full-path-move", destinationFolderPath);
@@ -1479,7 +1479,7 @@ namespace Mfr.Tests.Engine
             Assert.True(attrsBefore.HasFlag(FileAttributes.Directory));
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
+            renameList.AddSources(sources: [folderPath], includeFiles: false, includeFolders: true);
             Assert.Single(renameList.RenameItems);
             Assert.True(renameList.RenameItems[0].Original.Attributes.HasFlag(FileAttributes.Directory));
 
@@ -1509,7 +1509,7 @@ namespace Mfr.Tests.Engine
             Directory.CreateDirectory(folderPath);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
+            renameList.AddSources(sources: [folderPath], includeFiles: false, includeFolders: true);
 
             var preset = _SetHiddenAttributesPreset("attrs-folder-dry");
             var result = _PreviewAndCommit(renameList, preset, dryRun: true);
@@ -1531,7 +1531,7 @@ namespace Mfr.Tests.Engine
             var before = File.GetLastWriteTime(folderPath);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
+            renameList.AddSources(sources: [folderPath], includeFiles: false, includeFolders: true);
 
             var preset = _LastWriteDateSetterPreset("last-write-folder", DateOnly.FromDateTime(before.AddDays(30)));
             var plan = _SetupPreview(renameList, preset);
@@ -1558,7 +1558,7 @@ namespace Mfr.Tests.Engine
             var before = File.GetLastWriteTime(folderPath);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSource(source: folderPath, includeFiles: false, includeFolders: true);
+            renameList.AddSources(sources: [folderPath], includeFiles: false, includeFolders: true);
 
             var preset = _LastWriteTimeShifterDaysPreset("time-shifter-folder", days: 7);
             var plan = _SetupPreview(renameList, preset);

@@ -15,13 +15,15 @@ namespace Mfr.Engine.RenameList
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <param name="includeSubdirs">Whether directory expansion should recurse into subdirectories.</param>
         /// <param name="excludeMasks">Exclusive file-name masks for discovered entries.</param>
+        /// <param name="cancellationToken">When canceled, stops enumeration and returns without throwing.</param>
         /// <returns>Resolved paths for the source.</returns>
         internal static IEnumerable<string> ResolveToPaths(
             string source,
             bool includeFiles,
             bool includeFolders,
             bool includeSubdirs,
-            IReadOnlyList<string>? excludeMasks = null
+            IReadOnlyList<string>? excludeMasks = null,
+            CancellationToken cancellationToken = default
         )
         {
             var fullSource = Path.GetFullPath(source);
@@ -39,7 +41,8 @@ namespace Mfr.Engine.RenameList
                     includeFolders: includeFolders,
                     includeSubdirs: includeSubdirs,
                     includeMask: lastSegment,
-                    excludeMasks: excludeMasks
+                    excludeMasks: excludeMasks,
+                    cancellationToken: cancellationToken
                 );
             }
 
@@ -51,13 +54,19 @@ namespace Mfr.Engine.RenameList
                     includeFolders: includeFolders,
                     includeSubdirs: includeSubdirs,
                     includeMask: null,
-                    excludeMasks: excludeMasks
+                    excludeMasks: excludeMasks,
+                    cancellationToken: cancellationToken
                 );
             }
 
             _RequireExistingDirectory(Path.GetDirectoryName(fullSource));
             if (File.Exists(fullSource))
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return [];
+                }
+
                 // Exact file sources resolve to that single file and bypass include/exclude masks.
                 return [fullSource];
             }
@@ -70,26 +79,30 @@ namespace Mfr.Engine.RenameList
         /// Resolves a directory source: the directory itself when folders are requested, then matching files
         /// and (when recursing) matching descendant folders.
         /// </summary>
-        private static List<string> _ResolveDirectory(
+        private static IEnumerable<string> _ResolveDirectory(
             string directoryPath,
             bool includeFiles,
             bool includeFolders,
             bool includeSubdirs,
             string? includeMask,
-            IReadOnlyList<string>? excludeMasks
+            IReadOnlyList<string>? excludeMasks,
+            CancellationToken cancellationToken
         )
         {
             _ThrowIfRootPath(directoryPath);
 
-            var results = new List<string>();
             if (includeFolders)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    yield break;
+                }
+
                 // The explicit directory source is always included when folders are requested.
-                results.Add(directoryPath);
+                yield return directoryPath;
             }
 
-            // Match File List: skip entries we cannot open instead of failing the whole add.
-            // SearchOption overloads set IgnoreInaccessible=false and throw on access-denied subdirs.
+            // Skip entries we cannot open instead of failing the whole add (File List does the same).
             var enumerationOptions = new EnumerationOptions
             {
                 IgnoreInaccessible = true,
@@ -97,67 +110,78 @@ namespace Mfr.Engine.RenameList
                 ReturnSpecialDirectories = false,
             };
 
-            try
+            if (includeFiles)
             {
-                if (includeFiles)
-                {
-                    foreach (var filePath in Directory.EnumerateFiles(directoryPath, "*", enumerationOptions))
-                    {
-                        _AddIfNameMatches(
-                            fullPath: filePath,
-                            results: results,
-                            includeMask: includeMask,
-                            excludeMasks: excludeMasks
-                        );
-                    }
-                }
-
-                if (includeFolders && includeSubdirs)
-                {
-                    foreach (var folderPath in Directory.EnumerateDirectories(directoryPath, "*", enumerationOptions))
-                    {
-                        _AddIfNameMatches(
-                            fullPath: folderPath,
-                            results: results,
-                            includeMask: includeMask,
-                            excludeMasks: excludeMasks
-                        );
-                    }
-                }
-            }
-            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
-            {
-                throw new UserException(
-                    $"Failed to add folder '{directoryPath}'. Some or all of the files were not added.",
-                    ex
+                var matchingFiles = _YieldMatching(
+                    Directory.EnumerateFiles(directoryPath, "*", enumerationOptions),
+                    includeMask,
+                    excludeMasks,
+                    cancellationToken
                 );
+                foreach (var filePath in matchingFiles)
+                {
+                    yield return filePath;
+                }
             }
 
-            return results;
+            if (!includeFolders || !includeSubdirs)
+            {
+                yield break;
+            }
+
+            var matchingFolders = _YieldMatching(
+                Directory.EnumerateDirectories(directoryPath, "*", enumerationOptions),
+                includeMask,
+                excludeMasks,
+                cancellationToken
+            );
+            foreach (var folderPath in matchingFolders)
+            {
+                yield return folderPath;
+            }
         }
 
         /// <summary>
-        /// Adds a discovered path when its file name passes include and exclude masks.
+        /// Yields paths whose file names pass include and exclude masks until canceled.
         /// </summary>
-        private static void _AddIfNameMatches(
-            string fullPath,
-            List<string> results,
+        private static IEnumerable<string> _YieldMatching(
+            IEnumerable<string> paths,
             string? includeMask,
-            IReadOnlyList<string>? excludeMasks
+            IReadOnlyList<string>? excludeMasks,
+            CancellationToken cancellationToken
         )
+        {
+            foreach (var path in paths)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    yield break;
+                }
+
+                if (_NameMatches(path, includeMask, excludeMasks))
+                {
+                    yield return path;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns whether a discovered path's file name passes include and exclude masks.
+        /// </summary>
+        private static bool _NameMatches(string fullPath, string? includeMask, IReadOnlyList<string>? excludeMasks)
         {
             var fileName = Path.GetFileName(fullPath);
             if (!WildcardMask.IsMatch(fileName, includeMask))
             {
-                return;
+                return false;
             }
 
             if (WildcardMask.MatchesAny(fileName, excludeMasks))
             {
-                return;
+                return false;
             }
 
-            results.Add(fullPath);
+            return true;
         }
 
         /// <summary>

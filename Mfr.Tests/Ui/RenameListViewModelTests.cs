@@ -42,7 +42,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Add Selected adds visible file rows and ignores duplicates.
         /// </summary>
         [Fact]
-        public void AddSelected_Adds_Files_And_Ignores_Duplicates()
+        public async Task AddSelected_Adds_Files_And_Ignores_Duplicates()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
@@ -52,13 +52,13 @@ namespace Mfr.Tests.Ui
             var beta = _FileEntry(dir, "beta.md");
             fileListViewModel.SetSelectedEntries([alpha, beta]);
 
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Equal(2, renameListViewModel.Entries.Count);
             Assert.Equal(["alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
 
             fileListViewModel.SetSelectedEntries([alpha]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Equal(2, renameListViewModel.Entries.Count);
         }
@@ -67,7 +67,7 @@ namespace Mfr.Tests.Ui
         /// Verifies the include mask hides non-matching files from Add Selected.
         /// </summary>
         [Fact]
-        public void AddSelected_Honors_Include_Mask()
+        public async Task AddSelected_Honors_Include_Mask()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
@@ -79,7 +79,7 @@ namespace Mfr.Tests.Ui
 
             var alpha = Assert.Single(fileListViewModel.Entries, entry => entry.Name == "alpha.txt");
             fileListViewModel.SetSelectedEntries([alpha]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Single(renameListViewModel.Entries);
             Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileName);
@@ -89,7 +89,7 @@ namespace Mfr.Tests.Ui
         /// Verifies enabled exclude masks hide matching files from Add Selected.
         /// </summary>
         [Fact]
-        public void AddSelected_Honors_Exclude_Masks()
+        public async Task AddSelected_Honors_Exclude_Masks()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
@@ -101,7 +101,7 @@ namespace Mfr.Tests.Ui
 
             var beta = Assert.Single(fileListViewModel.Entries, entry => entry.Name == "beta.md");
             fileListViewModel.SetSelectedEntries([beta]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Single(renameListViewModel.Entries);
             Assert.Equal("beta.md", renameListViewModel.Entries[0].FullFileName);
@@ -111,7 +111,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Add All adds every listed File List row without needing a selection.
         /// </summary>
         [Fact]
-        public void AddAll_Adds_Listed_Masked_Files_Without_Selection()
+        public async Task AddAll_Adds_Listed_Masked_Files_Without_Selection()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
@@ -119,7 +119,7 @@ namespace Mfr.Tests.Ui
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             Assert.Empty(fileListViewModel.SelectedEntries);
-            renameListViewModel.AddAllCommand.Execute(null);
+            await renameListViewModel.AddAllCommand.ExecuteAsync(null);
 
             Assert.Single(renameListViewModel.Entries);
             Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileName);
@@ -171,14 +171,14 @@ namespace Mfr.Tests.Ui
         /// Verifies preview names match originals before filter preview exists.
         /// </summary>
         [Fact]
-        public void Entries_Show_Identity_Preview()
+        public async Task Entries_Show_Identity_Preview()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt")]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileName);
             Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileNamePreview);
@@ -189,14 +189,14 @@ namespace Mfr.Tests.Ui
         /// Verifies Add Selected on a folder adds matching files recursively and no folder row (UI defaults).
         /// </summary>
         [Fact]
-        public void AddSelected_Folder_Default_AddsNestedFilesNotFolder()
+        public async Task AddSelected_Folder_Default_AddsNestedFilesNotFolder()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Equal(
                 ["nested.mp3", "readme.txt", "track.mp3"],
@@ -210,7 +210,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Add Selected on a folder with Add Folders and contents on adds nested folder rows.
         /// </summary>
         [Fact]
-        public void AddSelected_Folder_AddFoldersAndContents_AddsNestedFolderRows()
+        public async Task AddSelected_Folder_AddFoldersAndContents_AddsNestedFolderRows()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             ConfigStore.Config.Ui.AddMode = RenameListAddMode.FilesAndFolders;
@@ -218,7 +218,7 @@ namespace Mfr.Tests.Ui
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             var names = _PreviewNames(renameListViewModel);
             Assert.Contains("album", names);
@@ -231,7 +231,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Add Selected on a folder with contents off adds the folder and its top-level files only.
         /// </summary>
         [Fact]
-        public void AddSelected_Folder_ContentsOff_AddsFolderAndTopLevelFiles()
+        public async Task AddSelected_Folder_ContentsOff_AddsFolderAndTopLevelFiles()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             ConfigStore.Config.Ui.AddMode = RenameListAddMode.FilesAndFolders;
@@ -240,7 +240,7 @@ namespace Mfr.Tests.Ui
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             var names = _PreviewNames(renameListViewModel);
             Assert.Contains("album", names);
@@ -254,7 +254,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Add All expands listed folder rows the same way as Add Selected (nested via contents).
         /// </summary>
         [Fact]
-        public void AddAll_Expands_Listed_Folders_Like_AddSelected()
+        public async Task AddAll_Expands_Listed_Folders_Like_AddSelected()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _CreateFileListViewModel(albumPath);
@@ -264,7 +264,7 @@ namespace Mfr.Tests.Ui
             Assert.Contains(fileListViewModel.Entries, entry => entry.Name == "disc1" && entry.IsDirectory);
             Assert.Contains(fileListViewModel.Entries, entry => entry.Name == "track.mp3");
 
-            renameListViewModel.AddAllCommand.Execute(null);
+            await renameListViewModel.AddAllCommand.ExecuteAsync(null);
 
             Assert.Equal(
                 ["nested.mp3", "track.mp3"],
@@ -276,7 +276,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Add All matches Add Selected when every listed row is selected.
         /// </summary>
         [Fact]
-        public void AddAll_Matches_AddSelected_When_All_Listed_Rows_Selected()
+        public async Task AddAll_Matches_AddSelected_When_All_Listed_Rows_Selected()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var other = Path.Combine(parent, "other.txt");
@@ -284,12 +284,12 @@ namespace Mfr.Tests.Ui
 
             var addAllList = _CreateFileListViewModel(parent);
             var addAllRename = new RenameListViewModel(addAllList);
-            addAllRename.AddAllCommand.Execute(null);
+            await addAllRename.AddAllCommand.ExecuteAsync(null);
 
             var addSelectedList = _CreateFileListViewModel(parent);
             var addSelectedRename = new RenameListViewModel(addSelectedList);
             addSelectedList.SetSelectedEntries([.. addSelectedList.Entries]);
-            addSelectedRename.AddSelectedCommand.Execute(null);
+            await addSelectedRename.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Equal(
                 _PreviewNames(addAllRename).OrderBy(n => n, StringComparer.Ordinal),
@@ -301,7 +301,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Add Selected can mix an exact file with a folder source.
         /// </summary>
         [Fact]
-        public void AddSelected_MixedFileAndFolder_AddsBoth()
+        public async Task AddSelected_MixedFileAndFolder_AddsBoth()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var other = Path.Combine(parent, "other.txt");
@@ -310,7 +310,7 @@ namespace Mfr.Tests.Ui
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FileEntry(parent, "other.txt"), _FolderEntry(albumPath)]);
 
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             var names = _PreviewNames(renameListViewModel);
             Assert.Contains("other.txt", names);
@@ -321,7 +321,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Add Selected with files off and folders on adds the selected folder and descendant folders.
         /// </summary>
         [Fact]
-        public void AddSelected_Folder_FilesOffFoldersOn_AddsFolderAndDescendants()
+        public async Task AddSelected_Folder_FilesOffFoldersOn_AddsFolderAndDescendants()
         {
             var (parent, albumPath) = _CreateAlbumTree();
             ConfigStore.Config.Ui.AddMode = RenameListAddMode.Folders;
@@ -329,7 +329,7 @@ namespace Mfr.Tests.Ui
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Equal(
                 ["album", "disc1"],
@@ -367,14 +367,14 @@ namespace Mfr.Tests.Ui
         /// Verifies Remove Selected drops selected rows and leaves the rest.
         /// </summary>
         [Fact]
-        public void RemoveSelected_Removes_Only_Selected_Rows()
+        public async Task RemoveSelected_Removes_Only_Selected_Rows()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
             Assert.Equal(2, renameListViewModel.ItemCount);
             Assert.False(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
 
@@ -394,19 +394,19 @@ namespace Mfr.Tests.Ui
         /// Verifies Add appends new rows without recreating existing entry objects.
         /// </summary>
         [Fact]
-        public void AddSelected_Preserves_Existing_Entry_Identity()
+        public async Task AddSelected_Preserves_Existing_Entry_Identity()
         {
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
             var alphaEntry = renameListViewModel.Entries[0];
             var betaEntry = renameListViewModel.Entries[1];
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "gamma.log")]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Equal(3, renameListViewModel.Entries.Count);
             Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
@@ -418,7 +418,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Remove keeps remaining row objects and order.
         /// </summary>
         [Fact]
-        public void RemoveSelected_Preserves_Remaining_Entry_Identity()
+        public async Task RemoveSelected_Preserves_Remaining_Entry_Identity()
         {
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
@@ -429,7 +429,7 @@ namespace Mfr.Tests.Ui
                 _FileEntry(dir, "beta.md"),
                 _FileEntry(dir, "gamma.log"),
             ]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
             var alphaEntry = renameListViewModel.Entries[0];
             var gammaEntry = renameListViewModel.Entries[2];
 
@@ -446,7 +446,7 @@ namespace Mfr.Tests.Ui
         /// Verifies Clear empties the list and updates ItemCount / CanExecute.
         /// </summary>
         [Fact]
-        public void Clear_Removes_All_Rows()
+        public async Task Clear_Removes_All_Rows()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
@@ -455,7 +455,7 @@ namespace Mfr.Tests.Ui
             Assert.False(renameListViewModel.ClearCommand.CanExecute(null));
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
-            renameListViewModel.AddSelectedCommand.Execute(null);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
             Assert.True(renameListViewModel.ClearCommand.CanExecute(null));
             Assert.Equal(2, renameListViewModel.ItemCount);
 
@@ -464,6 +464,51 @@ namespace Mfr.Tests.Ui
             Assert.Empty(renameListViewModel.Entries);
             Assert.Equal(0, renameListViewModel.ItemCount);
             Assert.False(renameListViewModel.ClearCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies canceling a long add discards the in-progress batch.
+        /// </summary>
+        [Fact]
+        public async Task AddSelected_Cancel_Discards_Partial_Batch()
+        {
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var tree = Path.Combine(parent, "tree");
+            Directory.CreateDirectory(tree);
+            for (var i = 0; i < 800; i++)
+            {
+                var nested = Path.Combine(tree, $"d{i:D3}");
+                Directory.CreateDirectory(nested);
+                File.WriteAllText(Path.Combine(nested, $"f{i:D3}.txt"), "x");
+            }
+
+            var fileListViewModel = _CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            fileListViewModel.SetSelectedEntries([_FolderEntry(tree)]);
+
+            var addTask = renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            for (var i = 0; i < 400 && !addTask.IsCompleted; i++)
+            {
+                if (renameListViewModel.IsAdding)
+                {
+                    renameListViewModel.CancelAddCommand.Execute(null);
+                    break;
+                }
+
+                await Task.Delay(1);
+            }
+
+            if (!addTask.IsCompleted && renameListViewModel.IsAdding)
+            {
+                renameListViewModel.CancelAddCommand.Execute(null);
+            }
+
+            await addTask;
+
+            Assert.False(renameListViewModel.IsAdding);
+            Assert.Empty(renameListViewModel.Entries);
+            Assert.Equal(0, renameListViewModel.ItemCount);
         }
 
         private string _CreateSampleFolder()
