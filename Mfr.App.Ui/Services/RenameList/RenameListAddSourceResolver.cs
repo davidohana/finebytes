@@ -1,5 +1,4 @@
 using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Models.Config;
 using Mfr.Utils;
 
@@ -13,35 +12,35 @@ namespace Mfr.App.Ui.Services.RenameList
         /// <summary>
         /// Resolves engine add sources from File List rows (selection or all listed entries).
         /// </summary>
-        /// <param name="entries">File List rows to turn into add sources.</param>
+        /// <param name="items">File List rows to turn into add sources.</param>
         /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
         /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         public static IReadOnlyList<string> ResolveSourcesFromSelection(
-            IReadOnlyList<FileListEntry> entries,
+            IReadOnlyList<FileListSourceItem> items,
             string mask,
             RenameListAddMode addMode
         )
         {
-            ArgumentNullException.ThrowIfNull(entries);
-            return [.. _EnumerateSelectionSources(entries, mask, addMode)];
+            ArgumentNullException.ThrowIfNull(items);
+            return [.. _EnumerateSelectionSources(items, mask, addMode)];
         }
 
         /// <summary>
         /// Returns whether the given File List rows would produce at least one engine add source.
         /// </summary>
-        /// <param name="entries">File List rows to inspect.</param>
+        /// <param name="items">File List rows to inspect.</param>
         /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
         /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
         /// <returns><see langword="true"/> when at least one source would be emitted.</returns>
         public static bool CanResolveFromSelection(
-            IReadOnlyList<FileListEntry> entries,
+            IReadOnlyList<FileListSourceItem> items,
             string mask,
             RenameListAddMode addMode
         )
         {
-            ArgumentNullException.ThrowIfNull(entries);
-            return _EnumerateSelectionSources(entries, mask, addMode).Any();
+            ArgumentNullException.ThrowIfNull(items);
+            return _EnumerateSelectionSources(items, mask, addMode).Any();
         }
 
         /// <summary>
@@ -103,15 +102,15 @@ namespace Mfr.App.Ui.Services.RenameList
         )
         {
             ArgumentNullException.ThrowIfNull(paths);
-            return ResolveSourcesFromSelection(_BuildEntriesFromPaths(paths), mask, addMode);
+            return ResolveSourcesFromSelection(_BuildItemsFromPaths(paths), mask, addMode);
         }
 
         /// <summary>
-        /// Builds File List-shaped rows from filesystem paths for source resolution.
+        /// Builds source items from filesystem paths for source resolution.
         /// </summary>
-        private static List<FileListEntry> _BuildEntriesFromPaths(IReadOnlyList<string> paths)
+        private static List<FileListSourceItem> _BuildItemsFromPaths(IReadOnlyList<string> paths)
         {
-            var entries = new List<FileListEntry>(paths.Count);
+            var items = new List<FileListSourceItem>(paths.Count);
             var pathToIsAdded = new HashSet<string>(PathComparers.Os);
 
             foreach (var path in paths)
@@ -121,52 +120,38 @@ namespace Mfr.App.Ui.Services.RenameList
                     continue;
                 }
 
-                var isDirectory = Directory.Exists(path);
-                var name = Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-                if (string.IsNullOrEmpty(name))
-                {
-                    name = path;
-                }
-
-                entries.Add(
-                    new FileListEntry
-                    {
-                        Name = name,
-                        FullPath = path,
-                        IsDirectory = isDirectory,
-                    }
-                );
+                items.Add(new FileListSourceItem(path, Directory.Exists(path)));
             }
 
-            return entries;
+            return items;
         }
 
         /// <summary>
         /// Yields engine add sources for each addable File List entry.
         /// </summary>
-        /// <param name="entries">File List rows to turn into add sources.</param>
+        /// <param name="items">File List rows to turn into add sources.</param>
         /// <param name="mask">File List include mask used as the last segment of folder sources.</param>
         /// <param name="addMode">Which path kinds may contribute sources (files and/or folders).</param>
         /// <returns>File paths and folder sources with a last-segment filename mask.</returns>
         private static IEnumerable<string> _EnumerateSelectionSources(
-            IReadOnlyList<FileListEntry> entries,
+            IReadOnlyList<FileListSourceItem> items,
             string mask,
             RenameListAddMode addMode
         )
         {
             var includeFiles = addMode.IncludesFiles();
 
-            foreach (var entry in entries)
+            foreach (var item in items)
             {
-                if (!IsValidSourcePath(entry.FullPath))
+                if (!IsValidSourcePath(item.FullPath))
                 {
                     continue;
                 }
 
-                if (entry.IsDirectory)
+                if (item.IsDirectory)
                 {
                     // Folder sources expand under includeFiles / includeFolders at the engine layer.
-                    yield return _BuildFolderSource(entry.FullPath, mask);
+                    yield return _BuildFolderSource(item.FullPath, mask);
                     continue;
                 }
 
@@ -175,7 +160,7 @@ namespace Mfr.App.Ui.Services.RenameList
                     continue;
                 }
 
-                yield return entry.FullPath;
+                yield return item.FullPath;
             }
         }
 

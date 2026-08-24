@@ -3,6 +3,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Collections;
+using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Models;
@@ -99,7 +100,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             var addMode = ConfigStore.Config.Ui.AddMode;
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                _fileListViewModel.SelectedEntries,
+                _ToSourceItems(_fileListViewModel.SelectedEntries),
                 _fileListViewModel.Mask,
                 addMode
             );
@@ -114,7 +115,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             var addMode = ConfigStore.Config.Ui.AddMode;
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                _fileListViewModel.Entries,
+                _ToSourceItems(_fileListViewModel.Entries),
                 _fileListViewModel.Mask,
                 addMode
             );
@@ -285,7 +286,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return RenameListAddSourceResolver.CanResolveFromSelection(
-                _fileListViewModel.SelectedEntries,
+                _ToSourceItems(_fileListViewModel.SelectedEntries),
                 _fileListViewModel.Mask,
                 ConfigStore.Config.Ui.AddMode
             );
@@ -306,10 +307,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return RenameListAddSourceResolver.CanResolveFromSelection(
-                _fileListViewModel.Entries,
+                _ToSourceItems(_fileListViewModel.Entries),
                 _fileListViewModel.Mask,
                 ConfigStore.Config.Ui.AddMode
             );
+        }
+
+        private static IReadOnlyList<FileListSourceItem> _ToSourceItems(IEnumerable<FileListEntry> entries)
+        {
+            return [.. entries.Select(entry => new FileListSourceItem(entry.FullPath, entry.IsDirectory))];
         }
 
         private bool _CanRemoveSelected()

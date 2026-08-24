@@ -1,6 +1,5 @@
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.RenameList;
-using Mfr.App.Ui.ViewModels.FileList;
 
 namespace Mfr.Tests.Ui
 {
@@ -35,18 +34,10 @@ namespace Mfr.Tests.Ui
         public void ResolveFromSelection_Folder_ReturnsFolderPlusMask()
         {
             var albumPath = Path.Combine(_dir, "album");
-            var selectedEntries = new[]
-            {
-                new FileListEntry
-                {
-                    Name = "album",
-                    FullPath = albumPath,
-                    IsDirectory = true,
-                },
-            };
+            var selectedItems = new[] { new FileListSourceItem(albumPath, IsDirectory: true) };
 
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                selectedEntries,
+                selectedItems,
                 mask: "*.mp3",
                 addMode: RenameListAddMode.Files
             );
@@ -63,18 +54,10 @@ namespace Mfr.Tests.Ui
         public void ResolveFromSelection_MatchingFile_ReturnsRawPath()
         {
             var filePath = Path.Combine(_dir, "alpha.txt");
-            var selectedEntries = new[]
-            {
-                new FileListEntry
-                {
-                    Name = "alpha.txt",
-                    FullPath = filePath,
-                    IsDirectory = false,
-                },
-            };
+            var selectedItems = new[] { new FileListSourceItem(filePath, IsDirectory: false) };
 
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                selectedEntries,
+                selectedItems,
                 mask: "*.txt",
                 addMode: RenameListAddMode.Files
             );
@@ -91,24 +74,14 @@ namespace Mfr.Tests.Ui
         {
             var albumPath = Path.Combine(_dir, "album");
             var filePath = Path.Combine(_dir, "alpha.txt");
-            var selectedEntries = new[]
+            var selectedItems = new[]
             {
-                new FileListEntry
-                {
-                    Name = "album",
-                    FullPath = albumPath,
-                    IsDirectory = true,
-                },
-                new FileListEntry
-                {
-                    Name = "alpha.txt",
-                    FullPath = filePath,
-                    IsDirectory = false,
-                },
+                new FileListSourceItem(albumPath, IsDirectory: true),
+                new FileListSourceItem(filePath, IsDirectory: false),
             };
 
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                selectedEntries,
+                selectedItems,
                 mask: "*",
                 addMode: RenameListAddMode.Folders
             );
@@ -117,14 +90,14 @@ namespace Mfr.Tests.Ui
             Assert.Equal(Path.Combine(albumPath, "*"), source);
             Assert.True(
                 RenameListAddSourceResolver.CanResolveFromSelection(
-                    selectedEntries,
+                    selectedItems,
                     mask: "*",
                     addMode: RenameListAddMode.Folders
                 )
             );
             Assert.False(
                 RenameListAddSourceResolver.CanResolveFromSelection(
-                    [selectedEntries[1]],
+                    [selectedItems[1]],
                     mask: "*",
                     addMode: RenameListAddMode.Folders
                 )
@@ -144,26 +117,18 @@ namespace Mfr.Tests.Ui
 
             var root = Path.GetPathRoot(_dir);
             Assert.False(string.IsNullOrEmpty(root));
-            var selectedEntries = new[]
-            {
-                new FileListEntry
-                {
-                    Name = root,
-                    FullPath = root,
-                    IsDirectory = true,
-                },
-            };
+            var selectedItems = new[] { new FileListSourceItem(root, IsDirectory: true) };
 
             Assert.Empty(
                 RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                    selectedEntries,
+                    selectedItems,
                     mask: "*",
                     addMode: RenameListAddMode.FilesAndFolders
                 )
             );
             Assert.False(
                 RenameListAddSourceResolver.CanResolveFromSelection(
-                    selectedEntries,
+                    selectedItems,
                     mask: "*",
                     addMode: RenameListAddMode.FilesAndFolders
                 )
@@ -196,26 +161,18 @@ namespace Mfr.Tests.Ui
         [Fact]
         public void ResolveFromSelection_SentinelPath_ReturnsEmpty()
         {
-            var selectedEntries = new[]
-            {
-                new FileListEntry
-                {
-                    Name = FileListPath.ComputerDisplayName,
-                    FullPath = FileListPath.ComputerPath,
-                    IsDirectory = true,
-                },
-            };
+            var selectedItems = new[] { new FileListSourceItem(FileListPath.ComputerPath, IsDirectory: true) };
 
             Assert.Empty(
                 RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                    selectedEntries,
+                    selectedItems,
                     mask: "*",
                     addMode: RenameListAddMode.FilesAndFolders
                 )
             );
             Assert.False(
                 RenameListAddSourceResolver.CanResolveFromSelection(
-                    selectedEntries,
+                    selectedItems,
                     mask: "*",
                     addMode: RenameListAddMode.FilesAndFolders
                 )
@@ -226,26 +183,18 @@ namespace Mfr.Tests.Ui
                 return;
             }
 
-            selectedEntries =
-            [
-                new FileListEntry
-                {
-                    Name = FileListPath.NetworkDisplayName,
-                    FullPath = FileListPath.NetworkPath,
-                    IsDirectory = true,
-                },
-            ];
+            selectedItems = [new FileListSourceItem(FileListPath.NetworkPath, IsDirectory: true)];
 
             Assert.Empty(
                 RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                    selectedEntries,
+                    selectedItems,
                     mask: "*",
                     addMode: RenameListAddMode.FilesAndFolders
                 )
             );
             Assert.False(
                 RenameListAddSourceResolver.CanResolveFromSelection(
-                    selectedEntries,
+                    selectedItems,
                     mask: "*",
                     addMode: RenameListAddMode.FilesAndFolders
                 )
