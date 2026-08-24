@@ -5,6 +5,8 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
@@ -331,6 +333,50 @@ namespace Mfr.Tests.Ui
             var selectedPaths = list.SelectedItems.Cast<FileListEntry>().Select(entry => entry.FullPath).ToHashSet();
             Assert.Contains(alpha.FullPath, selectedPaths);
             Assert.Contains(beta.FullPath, selectedPaths);
+        }
+
+        /// <summary>
+        /// Verifies committing a mask picked from the combo keeps the displayed text.
+        /// </summary>
+        [AvaloniaFact]
+        public void Mask_Combo_Keeps_Text_After_Commit()
+        {
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, _CreateSampleDir());
+            _viewModels.Add(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 420,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            var combo = view.FindControl<ComboBox>("MaskCombo");
+            Assert.NotNull(combo);
+
+            const string mask = "*.txt";
+            var existingIndex = viewModel.MaskSuggestions.IndexOf(mask);
+            Assert.True(existingIndex > 0, "Test mask should start below the front of suggestions.");
+
+            combo.SelectedItem = viewModel.MaskSuggestions[existingIndex];
+            combo.Text = mask;
+            viewModel.Mask = mask;
+            window.UpdateLayout();
+
+            var grid = view.FindControl<DataGrid>("ReportGrid");
+            Assert.NotNull(grid);
+            combo.Focus();
+            window.UpdateLayout();
+            grid.Focus();
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+
+            Assert.Equal(mask, viewModel.Mask);
+            Assert.Equal(mask, combo.Text);
+            Assert.Equal(mask, viewModel.MaskSuggestions[0]);
         }
 
         /// <summary>

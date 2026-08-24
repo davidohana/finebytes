@@ -467,7 +467,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies canceling a long add discards the in-progress batch.
+        /// Verifies canceling a long add discards the in-progress batch and leaves add commands enabled.
         /// </summary>
         [Fact]
         public async Task AddSelected_Cancel_Discards_Partial_Batch()
@@ -475,7 +475,7 @@ namespace Mfr.Tests.Ui
             var parent = _tempDirectoryFixture.CreateTempDir();
             var tree = Path.Combine(parent, "tree");
             Directory.CreateDirectory(tree);
-            for (var i = 0; i < 800; i++)
+            for (var i = 0; i < 200; i++)
             {
                 var nested = Path.Combine(tree, $"d{i:D3}");
                 Directory.CreateDirectory(nested);
@@ -487,28 +487,16 @@ namespace Mfr.Tests.Ui
             fileListViewModel.SetSelectedEntries([_FolderEntry(tree)]);
 
             var addTask = renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            await _WaitUntil(() => renameListViewModel.IsAdding).ConfigureAwait(true);
 
-            for (var i = 0; i < 400 && !addTask.IsCompleted; i++)
-            {
-                if (renameListViewModel.IsAdding)
-                {
-                    renameListViewModel.AddProgress.CancelCommand.Execute(null);
-                    break;
-                }
-
-                await Task.Delay(1);
-            }
-
-            if (!addTask.IsCompleted && renameListViewModel.IsAdding)
-            {
-                renameListViewModel.AddProgress.CancelCommand.Execute(null);
-            }
-
-            await addTask;
+            Assert.False(renameListViewModel.AddSelectedCommand.CanExecute(null));
+            renameListViewModel.AddProgress.CancelCommand.Execute(null);
+            await addTask.ConfigureAwait(true);
 
             Assert.False(renameListViewModel.IsAdding);
             Assert.Empty(renameListViewModel.Entries);
             Assert.Equal(0, renameListViewModel.ItemCount);
+            Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
         }
 
         private string _CreateSampleFolder()
@@ -564,6 +552,21 @@ namespace Mfr.Tests.Ui
                 FullPath = Path.Combine(directory, fileName),
                 IsDirectory = false,
             };
+        }
+
+        private static async Task _WaitUntil(Func<bool> condition)
+        {
+            for (var i = 0; i < 200; i++)
+            {
+                if (condition())
+                {
+                    return;
+                }
+
+                await Task.Delay(10).ConfigureAwait(true);
+            }
+
+            Assert.Fail("Timed out waiting for condition.");
         }
 
         private static IReadOnlyList<string> _PreviewNames(RenameListViewModel renameListViewModel)

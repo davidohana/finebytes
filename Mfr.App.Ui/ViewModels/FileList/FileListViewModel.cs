@@ -1352,17 +1352,32 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return;
             }
 
-            for (var i = MaskSuggestions.Count - 1; i >= 0; i--)
+            var existingIndex = -1;
+            for (var i = 0; i < MaskSuggestions.Count; i++)
             {
                 if (!string.Equals(MaskSuggestions[i], mask, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                MaskSuggestions.RemoveAt(i);
+                existingIndex = i;
+                break;
             }
 
-            MaskSuggestions.Insert(0, mask);
+            if (existingIndex == 0)
+            {
+                return;
+            }
+
+            if (existingIndex > 0)
+            {
+                // Move keeps the same item instance so an editable ComboBox selection stays valid.
+                MaskSuggestions.Move(existingIndex, 0);
+            }
+            else
+            {
+                MaskSuggestions.Insert(0, mask);
+            }
 
             while (MaskSuggestions.Count > _MaxRememberedMasks)
             {

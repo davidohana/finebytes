@@ -66,7 +66,7 @@ namespace Mfr.App.Ui.Views.FileList
 
             if (DataContext is FileListViewModel viewModel)
             {
-                viewModel.CommitMask();
+                _CommitMask(viewModel);
             }
 
             e.Handled = true;
@@ -112,7 +112,23 @@ namespace Mfr.App.Ui.Views.FileList
                 return;
             }
 
+            _CommitMask(viewModel);
+        }
+
+        private void _CommitMask(FileListViewModel viewModel)
+        {
+            var mask = viewModel.Mask;
             viewModel.CommitMask();
+            _SyncMaskComboText(mask);
+            Dispatcher.UIThread.Post(() => _SyncMaskComboText(mask), DispatcherPriority.Background);
+        }
+
+        private void _SyncMaskComboText(string mask)
+        {
+            if (!string.Equals(MaskCombo.Text, mask, StringComparison.Ordinal))
+            {
+                MaskCombo.Text = mask;
+            }
         }
 
         private void _OnEntriesDoubleTapped(object? sender, TappedEventArgs e)

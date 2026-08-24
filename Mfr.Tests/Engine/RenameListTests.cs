@@ -551,6 +551,27 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies an already-canceled token adds nothing and does not throw.
+        /// </summary>
+        public void AddSources_PreCanceled_Adds_Nothing()
+        {
+            TestHelpers.CreateFiles(_tempRoot, "a.txt", "b.txt");
+
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources(
+                sources: [_tempRoot.CombinePath("*.txt")],
+                includeFiles: true,
+                includeFolders: false,
+                cancellationToken: cts.Token
+            );
+
+            Assert.Empty(renameList.RenameItems);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies canceling mid-walk returns without throwing and may leave a partial engine list.
         /// </summary>
         public void AddSources_Cancel_Stops_Without_Throwing()
