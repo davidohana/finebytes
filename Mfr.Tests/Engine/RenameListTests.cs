@@ -379,9 +379,12 @@ namespace Mfr.Tests.Engine
 
             var renameList = new RenameList(includeHidden: true);
             var beforeCount = renameList.RenameItems.Count;
-            renameList.AddSources(sources: [folderPath], includeFiles: true,
+            renameList.AddSources(
+                sources: [folderPath],
+                includeFiles: true,
                 includeFolders: false,
-                includeSubdirs: true);
+                includeSubdirs: true
+            );
             var addedCount = renameList.RenameItems.Count - beforeCount;
 
             Assert.Equal(3, addedCount);
@@ -405,10 +408,13 @@ namespace Mfr.Tests.Engine
 
             var renameList = new RenameList(includeHidden: true);
             var beforeCount = renameList.RenameItems.Count;
-            renameList.AddSources(sources: [folderPath.CombinePath("*.mp3")], includeFiles: true,
+            renameList.AddSources(
+                sources: [folderPath.CombinePath("*.mp3")],
+                includeFiles: true,
                 includeFolders: true,
                 includeSubdirs: false,
-                excludeMasks: ["keep.*"]);
+                excludeMasks: ["keep.*"]
+            );
             var addedCount = renameList.RenameItems.Count - beforeCount;
 
             Assert.Equal(2, addedCount);
@@ -428,9 +434,12 @@ namespace Mfr.Tests.Engine
 
             var renameList = new RenameList(includeHidden: true);
             var beforeCount = renameList.RenameItems.Count;
-            renameList.AddSources(sources: [folderPath], includeFiles: true,
+            renameList.AddSources(
+                sources: [folderPath],
+                includeFiles: true,
                 includeFolders: true,
-                includeSubdirs: true);
+                includeSubdirs: true
+            );
             var addedCount = renameList.RenameItems.Count - beforeCount;
 
             Assert.Equal(4, addedCount);
@@ -456,8 +465,7 @@ namespace Mfr.Tests.Engine
 
             var renameList = new RenameList(includeHidden: true);
             var beforeCount = renameList.RenameItems.Count;
-            renameList.AddSources(sources: [_tempRoot.CombinePath("*.txt")], includeFiles: true,
-                includeFolders: false);
+            renameList.AddSources(sources: [_tempRoot.CombinePath("*.txt")], includeFiles: true, includeFolders: false);
             var addedCount = renameList.RenameItems.Count - beforeCount;
 
             Assert.Equal(1, addedCount);
@@ -500,9 +508,12 @@ namespace Mfr.Tests.Engine
 
             var renameList = new RenameList(includeHidden: true);
             var beforeCount = renameList.RenameItems.Count;
-            renameList.AddSources(sources: [_tempRoot.CombinePath("*.txt")], includeFiles: true,
+            renameList.AddSources(
+                sources: [_tempRoot.CombinePath("*.txt")],
+                includeFiles: true,
                 includeFolders: false,
-                includeSubdirs: true);
+                includeSubdirs: true
+            );
             var addedCount = renameList.RenameItems.Count - beforeCount;
 
             Assert.Equal(3, addedCount);

@@ -27,7 +27,11 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnDataContextChanged(object? sender, EventArgs e)
         {
-            _viewModel?.PropertyChanged -= _OnViewModelPropertyChanged;
+            if (_viewModel is not null)
+            {
+                _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
+                _viewModel.AddProgress.PropertyChanged -= _OnAddProgressPropertyChanged;
+            }
 
             _viewModel = DataContext as RenameListViewModel;
             if (_viewModel is null)
@@ -36,6 +40,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
+            _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
             _SyncSelectionToGrid();
         }
 
@@ -68,10 +73,12 @@ namespace Mfr.App.Ui.Views.RenameList
             if (e.PropertyName is nameof(RenameListViewModel.SelectedEntries))
             {
                 _SyncSelectionToGrid();
-                return;
             }
+        }
 
-            if (e.PropertyName is nameof(RenameListViewModel.IsAddProgressVisible))
+        private void _OnAddProgressPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(RenameListAddProgressViewModel.IsDialogVisible))
             {
                 _ = _SyncAddProgressDialogAsync();
             }
@@ -84,7 +91,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            if (!_viewModel.IsAddProgressVisible)
+            if (!_viewModel.AddProgress.IsDialogVisible)
             {
                 _addProgressDialog?.Close();
                 return;
@@ -100,7 +107,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var dialog = new AddProgressDialog(_viewModel);
+            var dialog = new AddProgressDialog(_viewModel.AddProgress);
             _addProgressDialog = dialog;
             try
             {

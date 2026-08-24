@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Collections;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
-using Mfr.Engine.RenameList;
 using Mfr.Models;
 using Mfr.Models.Config;
 using Serilog;
@@ -18,12 +17,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// </summary>
     public sealed partial class RenameListViewModel : ViewModelBase
     {
-        private const int ProgressDialogDelayMilliseconds = 200;
-
         private readonly FileListViewModel _fileListViewModel;
         private readonly EngineRenameList _renameList = new(includeHidden: false);
         private readonly List<RenameListEntry> _selectedEntries = [];
-        private CancellationTokenSource? _addCts;
 
         /// <summary>
         /// Initializes the Rename List and listens for File List changes that affect add commands.
@@ -35,7 +31,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _fileListViewModel = fileListViewModel;
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;
+            AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
         }
+
+        /// <summary>
+        /// Gets progress, cancel, and delayed-dialog state for the current add.
+        /// </summary>
+        public RenameListAddProgressViewModel AddProgress { get; } = new();
 
         /// <summary>
         /// Gets the rows shown in the Rename List grid.
@@ -57,45 +59,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public int ItemCount => Entries.Count;
 
         /// <summary>
+        /// Gets whether an add operation is in progress.
+        /// </summary>
+        public bool IsAdding => AddProgress.IsAdding;
+
+        /// <summary>
         /// Gets the most recent user-facing add failure message, or empty when none.
         /// </summary>
         [ObservableProperty]
         private string _lastAddError = string.Empty;
-
-        /// <summary>
-        /// Gets whether an add operation is in progress.
-        /// </summary>
-        [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(AddSelectedCommand))]
-        [NotifyCanExecuteChangedFor(nameof(AddAllCommand))]
-        [NotifyCanExecuteChangedFor(nameof(RemoveSelectedCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ClearCommand))]
-        [NotifyCanExecuteChangedFor(nameof(CancelAddCommand))]
-        private bool _isAdding;
-
-        /// <summary>
-        /// Gets whether the add-progress dialog should be shown (delayed until the add exceeds a short threshold).
-        /// </summary>
-        [ObservableProperty]
-        private bool _isAddProgressVisible;
-
-        /// <summary>
-        /// Gets how many filesystem entries have been scanned during the current add.
-        /// </summary>
-        [ObservableProperty]
-        private int _addScannedCount;
-
-        /// <summary>
-        /// Gets how many items have been accepted during the current add.
-        /// </summary>
-        [ObservableProperty]
-        private int _addAddedCount;
-
-        /// <summary>
-        /// Gets the most recent path considered during the current add.
-        /// </summary>
-        [ObservableProperty]
-        private string _addLastPath = string.Empty;
 
         /// <summary>
         /// Replaces the Rename List selection.
@@ -147,15 +119,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 addMode
             );
             await _AddSourcesAsync(sources).ConfigureAwait(true);
-        }
-
-        /// <summary>
-        /// Cancels an in-progress add and discards items from that batch.
-        /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanCancelAdd))]
-        public void CancelAdd()
-        {
-            _addCts?.Cancel();
         }
 
         /// <summary>
@@ -214,96 +177,51 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var includeFolders = uiConfig.AddMode.IncludesFolders();
             var includeSubdirs = uiConfig.AddFolderContents;
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
-
-            _addCts = new CancellationTokenSource();
-            var token = _addCts.Token;
-            var progress = new Progress<RenameListAddProgress>(_OnAddProgress);
-
-            IsAdding = true;
-            IsAddProgressVisible = false;
-            AddScannedCount = 0;
-            AddAddedCount = 0;
-            AddLastPath = string.Empty;
             LastAddError = string.Empty;
 
-            var showProgressDelay = Task.Delay(ProgressDialogDelayMilliseconds, CancellationToken.None);
-            var addTask = Task.Run(
-                () =>
-                    _renameList.AddSources(
-                        sources: sources,
-                        includeFiles: includeFiles,
-                        includeFolders: includeFolders,
-                        includeSubdirs: includeSubdirs,
-                        excludeMasks: excludeMasks,
-                        cancellationToken: token,
-                        progress: progress
-                    ),
-                token
-            );
-
-            var completed = await Task.WhenAny(addTask, showProgressDelay).ConfigureAwait(true);
-            if (completed == showProgressDelay && !addTask.IsCompleted)
-            {
-                IsAddProgressVisible = true;
-            }
-
-            Exception? addError = null;
-            var canceled = false;
+            bool completed;
             try
             {
-                await addTask.ConfigureAwait(true);
-            }
-            catch (OperationCanceledException)
-            {
-                // Task.Run may still fault if cancel wins before the worker starts.
-                canceled = true;
+                completed = await AddProgress
+                    .RunAsync(
+                        (token, progress) =>
+                            _renameList.AddSources(
+                                sources: sources,
+                                includeFiles: includeFiles,
+                                includeFolders: includeFolders,
+                                includeSubdirs: includeSubdirs,
+                                excludeMasks: excludeMasks,
+                                cancellationToken: token,
+                                progress: progress
+                            )
+                    )
+                    .ConfigureAwait(true);
             }
             catch (UserException ex)
             {
                 // Keep any items added before the failure; do not treat user-facing IO/validation as fatal.
                 Log.Warning(ex, "Failed to add rename sources.");
                 LastAddError = ex.Message;
+                completed = true;
             }
             catch (Exception ex)
             {
-                addError = ex;
-            }
-            finally
-            {
-                // Engine stops the walk without throwing; treat a signaled token as user cancel.
-                canceled = canceled || token.IsCancellationRequested;
-                // Clear IsAdding before hiding the dialog so programmatic Close is not canceled.
-                IsAdding = false;
-                IsAddProgressVisible = false;
-                _addCts.Dispose();
-                _addCts = null;
-            }
-
-            if (canceled)
-            {
                 _RollbackAddedItems(oldCount);
+                LastAddError = ex.Message;
+                Log.Error(ex, "Unexpected failure while adding rename sources.");
                 _NotifyListChanged();
                 return;
             }
 
-            if (addError is not null)
+            if (!completed)
             {
                 _RollbackAddedItems(oldCount);
-                LastAddError = addError.Message;
-                Log.Error(addError, "Unexpected failure while adding rename sources.");
                 _NotifyListChanged();
                 return;
             }
 
             _SyncEntriesFromEngine(oldCount);
             _NotifyListChanged();
-        }
-
-        private void _OnAddProgress(RenameListAddProgress progress)
-        {
-            AddScannedCount = progress.ScannedCount;
-            AddAddedCount = progress.AddedCount;
-            AddLastPath = progress.LastPath;
         }
 
         private void _SyncEntriesFromEngine(int oldCount)
@@ -391,9 +309,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return !IsAdding && Entries.Count > 0;
         }
 
-        private bool _CanCancelAdd()
+        private void _OnAddProgressPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            return IsAdding;
+            if (e.PropertyName is not nameof(RenameListAddProgressViewModel.IsAdding))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(IsAdding));
+            AddSelectedCommand.NotifyCanExecuteChanged();
+            AddAllCommand.NotifyCanExecuteChanged();
+            RemoveSelectedCommand.NotifyCanExecuteChanged();
+            ClearCommand.NotifyCanExecuteChanged();
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

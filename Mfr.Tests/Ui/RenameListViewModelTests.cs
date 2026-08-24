@@ -492,7 +492,7 @@ namespace Mfr.Tests.Ui
             {
                 if (renameListViewModel.IsAdding)
                 {
-                    renameListViewModel.CancelAddCommand.Execute(null);
+                    renameListViewModel.AddProgress.CancelCommand.Execute(null);
                     break;
                 }
 
@@ -501,7 +501,7 @@ namespace Mfr.Tests.Ui
 
             if (!addTask.IsCompleted && renameListViewModel.IsAdding)
             {
-                renameListViewModel.CancelAddCommand.Execute(null);
+                renameListViewModel.AddProgress.CancelCommand.Execute(null);
             }
 
             await addTask;

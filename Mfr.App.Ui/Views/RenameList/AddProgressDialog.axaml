@@ -3,7 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
   x:Class="Mfr.App.Ui.Views.RenameList.AddProgressDialog"
-  x:DataType="vm:RenameListViewModel"
+  x:DataType="vm:RenameListAddProgressViewModel"
   Title="Adding to Rename List"
   Icon="/Assets/mfr.ico"
   Width="560"
@@ -24,19 +24,19 @@
       VerticalContentAlignment="Center"
       Margin="0,16,0,0"
       IsCancel="True"
-      Command="{Binding CancelAddCommand}"
+      Command="{Binding CancelCommand}"
     />
 
     <StackPanel Spacing="12" VerticalAlignment="Center">
-      <TextBlock HorizontalAlignment="Center" Text="{Binding AddScannedCount, StringFormat=Scanned {0} files}" />
-      <TextBlock HorizontalAlignment="Center" Text="{Binding AddAddedCount, StringFormat=Added {0} files}" />
+      <TextBlock HorizontalAlignment="Center" Text="{Binding ScannedCount, StringFormat=Scanned {0} files}" />
+      <TextBlock HorizontalAlignment="Center" Text="{Binding AddedCount, StringFormat=Added {0} files}" />
       <TextBlock
         HorizontalAlignment="Stretch"
         TextWrapping="Wrap"
         TextAlignment="Center"
         MinHeight="60"
         MaxHeight="72"
-        Text="{Binding AddLastPath}"
+        Text="{Binding LastPath}"
       />
     </StackPanel>
   </DockPanel>
