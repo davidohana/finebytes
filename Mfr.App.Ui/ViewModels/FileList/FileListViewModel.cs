@@ -1,16 +1,10 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Runtime.Versioning;
-using Avalonia;
 using Avalonia.Media;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.Engine.Logging;
 using Mfr.Utils;
-using Serilog;
 
 namespace Mfr.App.Ui.ViewModels.FileList
 {
@@ -57,24 +51,6 @@ namespace Mfr.App.Ui.ViewModels.FileList
             "*.htm*",
         ];
 
-        private static readonly EnumerationOptions _ListingOptions = new()
-        {
-            IgnoreInaccessible = true,
-            RecurseSubdirectories = false,
-            ReturnSpecialDirectories = false,
-            AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
-        };
-
-        // Caps how long a disconnected UNC or mapped drive may block Exists/enumerate.
-        // The OS SMB timeout cannot be cancelled; this bound keeps the File List responsive.
-        private static readonly TimeSpan _NetworkProbeTimeout = TimeSpan.FromSeconds(3);
-
-        // First contact with a UNC server (\\ohanas) is often slower than a share Exists check.
-        private static readonly TimeSpan _UncServerProbeTimeout = TimeSpan.FromSeconds(8);
-
-        private const int _VolumeListingGroup = 0;
-        private const int _KnownPlaceListingGroup = 1;
-        private const int _ThumbnailLoadParallelismCap = 4;
         private const int _MaxRememberedMasks = 10;
 
         /// <summary>
@@ -85,10 +61,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private readonly ISystemIconProvider _iconProvider;
         private readonly IFileShellOpener _shellOpener;
         private readonly ITextClipboard _clipboard;
-        private readonly List<ListedItem> _listedItems = [];
+        private readonly FileListThumbnailSession _thumbnails = new();
+        private readonly List<FileListListedItem> _listedItems = [];
         private readonly List<FileListEntry> _selectedEntries = [];
-        private readonly Dictionary<string, IImage?> _pathToThumbnail = new(PathComparers.Os);
-        private CancellationTokenSource? _thumbnailLoadCts;
         private bool _suppressSelectionSync;
 
         /// <summary>
@@ -122,7 +97,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             MaskSuggestions = [.. _DefaultMasks];
             PathHistory = [];
             BreadcrumbSegments = [];
-            _Navigate(_ResolveStartPath(initialPath));
+            _Navigate(FileListCatalog.ResolveStartPath(initialPath));
         }
 
         /// <summary>
@@ -508,7 +483,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return;
             }
 
-            if (!_IsFilesystemFolderPath(CurrentPath))
+            if (!FileListPath.IsFilesystemFolderPath(CurrentPath))
             {
                 return;
             }
@@ -583,8 +558,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         public void Dispose()
         {
-            _CancelThumbnailLoad();
-            _DisposeAndClearThumbnails();
+            _thumbnails.Dispose();
         }
 
         /// <summary>
@@ -599,7 +573,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </param>
         public void SortByColumn(string? memberPath)
         {
-            var column = _NormalizeSortMemberPath(memberPath);
+            var column = FileListListingSort.NormalizeMemberPath(memberPath);
             if (column == SortMemberPath)
             {
                 IsSortAscending = !IsSortAscending;
@@ -610,7 +584,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 IsSortAscending = true;
             }
 
-            _ApplyListingSort();
+            FileListListingSort.Apply(_listedItems, SortMemberPath, IsSortAscending);
             _RebuildVisibleEntries(preserveSelection: true);
         }
 
@@ -670,7 +644,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
         {
             var clamped = ThumbnailSizes.Clamp(value);
             if (clamped != value)
+            {
                 ThumbnailSize = clamped;
+            }
         }
 
         partial void OnSelectedEntryChanged(FileListEntry? value)
@@ -715,7 +691,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return true;
             }
 
-            return _IsFilesystemFolderPath(CurrentPath);
+            return FileListPath.IsFilesystemFolderPath(CurrentPath);
         }
 
         private void _NotifySelectionCommandsChanged()
@@ -725,19 +701,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
             ShowInExplorerCommand.NotifyCanExecuteChanged();
         }
 
-        private static bool _IsFilesystemFolderPath(string path)
-        {
-            if (FileListPath.IsComputerPath(path) || FileListPath.IsNetworkPath(path))
-            {
-                return false;
-            }
-
-            return !string.IsNullOrWhiteSpace(path);
-        }
-
         private void _Navigate(string? path)
         {
-            if (!_TryResolvePath(path, out var resolved))
+            if (!FileListCatalog.TryResolvePath(path, out var resolved))
             {
                 return;
             }
@@ -773,142 +739,33 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         private void _ReloadEntries(bool preserveSelection = false)
         {
-            _CancelThumbnailLoad();
+            _thumbnails.CancelLoad();
             if (!preserveSelection)
             {
                 SetSelectedEntries([]);
             }
+
             Entries.Clear();
             _listedItems.Clear();
-            _DisposeAndClearThumbnails();
+            _thumbnails.ClearCache();
             ListingError = string.Empty;
 
-            if (FileListPath.IsComputerPath(CurrentPath))
+            var result = FileListCatalog.List(CurrentPath, Mask, ExcludeMasksEnabled, ExcludeMasks, PathHistory);
+            if (result.Failure != FileListListingFailure.None)
             {
-                _listedItems.AddRange(_ListKnownPlaces());
-                _listedItems.AddRange(_ListDrives());
-                if (OperatingSystem.IsWindows())
-                {
-                    _listedItems.Add(_CreateNetworkRootItem());
-                }
-
-                _ApplyListingSort();
+                ListingError = FileListCatalog.FormatListingError(result.Failure);
                 _RebuildVisibleEntries(preserveSelection);
                 return;
             }
 
-            if (FileListPath.IsNetworkPath(CurrentPath))
-            {
-                _listedItems.AddRange(_ListNetworkLocations());
-                _ApplyListingSort();
-                _RebuildVisibleEntries(preserveSelection);
-                return;
-            }
-
-            if (OperatingSystem.IsWindows() && WindowsWslUnc.IsWslServerRoot(CurrentPath))
-            {
-                _listedItems.AddRange(_ListWslDistros(CurrentPath));
-                _ApplyListingSort();
-                _RebuildVisibleEntries(preserveSelection);
-                return;
-            }
-
-            if (FileListPath.IsUncServerRoot(CurrentPath))
-            {
-                if (OperatingSystem.IsWindows())
-                {
-                    _listedItems.AddRange(_ListUncShares(CurrentPath));
-                }
-
-                _ApplyListingSort();
-                _RebuildVisibleEntries(preserveSelection);
-                return;
-            }
-
-            if (!_TryListFolder(CurrentPath, out var folders, out var files, out var failure))
-            {
-                ListingError = _FormatListingError(failure);
-                _RebuildVisibleEntries(preserveSelection);
-                return;
-            }
-
-            _listedItems.AddRange(folders);
-            _listedItems.AddRange(files);
-            _ApplyListingSort();
+            _listedItems.AddRange(result.Items);
+            FileListListingSort.Apply(_listedItems, SortMemberPath, IsSortAscending);
             _RebuildVisibleEntries(preserveSelection);
-        }
-
-        private void _ApplyListingSort()
-        {
-            _listedItems.Sort(_CompareListedItems);
-        }
-
-        private int _CompareListedItems(ListedItem left, ListedItem right)
-        {
-            var groupCmp = left.ListingGroup.CompareTo(right.ListingGroup);
-            if (groupCmp != 0)
-            {
-                return groupCmp;
-            }
-
-            var folderCmp = right.IsDirectory.CompareTo(left.IsDirectory);
-            if (folderCmp != 0)
-            {
-                return folderCmp;
-            }
-
-            var fieldCmp = _CompareSortField(left, right);
-            if (fieldCmp == 0)
-            {
-                fieldCmp = PathComparers.Os.Compare(left.Name, right.Name);
-            }
-
-            return IsSortAscending ? fieldCmp : -fieldCmp;
-        }
-
-        private int _CompareSortField(ListedItem left, ListedItem right)
-        {
-            if (SortMemberPath == nameof(FileListEntry.LastWriteTime))
-            {
-                return Comparer<DateTime?>.Default.Compare(left.LastWriteTime, right.LastWriteTime);
-            }
-
-            if (SortMemberPath == nameof(FileListEntry.Length))
-            {
-                return Comparer<long?>.Default.Compare(left.Length, right.Length);
-            }
-
-            if (SortMemberPath == nameof(FileListEntry.Type))
-            {
-                return PathComparers.Os.Compare(_TypeLabel(left), _TypeLabel(right));
-            }
-
-            return PathComparers.Os.Compare(left.Name, right.Name);
-        }
-
-        private static string _NormalizeSortMemberPath(string? memberPath)
-        {
-            if (string.Equals(memberPath, nameof(FileListEntry.LastWriteTime), StringComparison.Ordinal))
-            {
-                return nameof(FileListEntry.LastWriteTime);
-            }
-
-            if (string.Equals(memberPath, nameof(FileListEntry.Type), StringComparison.Ordinal))
-            {
-                return nameof(FileListEntry.Type);
-            }
-
-            if (string.Equals(memberPath, nameof(FileListEntry.Length), StringComparison.Ordinal))
-            {
-                return nameof(FileListEntry.Length);
-            }
-
-            return nameof(FileListEntry.Name);
         }
 
         private void _RebuildVisibleEntries(bool preserveSelection)
         {
-            _CancelThumbnailLoad();
+            _thumbnails.CancelLoad();
             var selectedPaths = preserveSelection ? _selectedEntries.Select(entry => entry.FullPath).ToList() : [];
             var focusedPath = preserveSelection ? SelectedEntry?.FullPath : null;
             Entries.Clear();
@@ -934,11 +791,11 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
             if (ViewMode == FileListViewMode.Thumbnails)
             {
-                _StartThumbnailLoad();
+                _thumbnails.BeginLoad(Entries);
             }
         }
 
-        private FileListEntry _CreateEntry(ListedItem item)
+        private FileListEntry _CreateEntry(FileListListedItem item)
         {
             return new FileListEntry
             {
@@ -947,20 +804,21 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 IsDirectory = item.IsDirectory,
                 ListingGroup = item.ListingGroup,
                 Icon = _ResolveIcon(item),
-                Details = ViewMode == FileListViewMode.Tiles ? _FormatDetails(item) : string.Empty,
-                Type = _TypeLabel(item),
-                DateModifiedDisplay = _FormatDate(item.LastWriteTime),
-                SizeDisplay = item.Length is { } bytes ? _FormatSize(bytes) : string.Empty,
+                Details = ViewMode == FileListViewMode.Tiles ? FileListEntryDisplay.FormatDetails(item) : string.Empty,
+                Type = FileListEntryDisplay.TypeLabel(item),
+                DateModifiedDisplay = FileListEntryDisplay.FormatDate(item.LastWriteTime),
+                SizeDisplay = item.Length is { } bytes ? FileListEntryDisplay.FormatSize(bytes) : string.Empty,
                 LastWriteTime = item.LastWriteTime,
                 Length = item.Length,
             };
         }
 
-        private IImage? _ResolveIcon(ListedItem item)
+        private IImage? _ResolveIcon(FileListListedItem item)
         {
             if (ViewMode == FileListViewMode.Thumbnails)
             {
-                if (_pathToThumbnail.TryGetValue(item.Path, out var cached) && cached is not null)
+                var cached = _thumbnails.TryGetCached(item.Path);
+                if (cached is not null)
                 {
                     return cached;
                 }
@@ -971,581 +829,6 @@ namespace Mfr.App.Ui.ViewModels.FileList
             var usesLargeIcon = ViewMode is FileListViewMode.LargeIcons or FileListViewMode.Tiles;
             var size = usesLargeIcon ? ShellIconSize.Large : ShellIconSize.Small;
             return _iconProvider.GetIcon(item.Path, item.IsDirectory, size);
-        }
-
-        private void _StartThumbnailLoad()
-        {
-            var pending = new List<FileListEntry>();
-            foreach (var entry in Entries)
-            {
-                if (entry.IsDirectory)
-                {
-                    continue;
-                }
-
-                if (_pathToThumbnail.ContainsKey(entry.FullPath))
-                {
-                    continue;
-                }
-
-                if (!ImageThumbnailLoader.CanLoad(entry.FullPath, entry.Length))
-                {
-                    continue;
-                }
-
-                pending.Add(entry);
-            }
-
-            if (pending.Count == 0)
-            {
-                return;
-            }
-
-            var cts = new CancellationTokenSource();
-            _thumbnailLoadCts = cts;
-            var token = cts.Token;
-            var loadTask = _LoadThumbnailsAsync(pending, token);
-            _ = loadTask.ContinueWith(
-                static completed => completed.Exception,
-                CancellationToken.None,
-                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Default
-            );
-        }
-
-        private async Task _LoadThumbnailsAsync(IReadOnlyList<FileListEntry> pending, CancellationToken token)
-        {
-            var options = new ParallelOptions
-            {
-                CancellationToken = token,
-                MaxDegreeOfParallelism = Math.Min(_ThumbnailLoadParallelismCap, Environment.ProcessorCount),
-            };
-
-            try
-            {
-                await Parallel.ForEachAsync(
-                    pending,
-                    options,
-                    (entry, ct) =>
-                    {
-                        var thumbnail = ImageThumbnailLoader.TryLoad(entry.FullPath, entry.Length, ThumbnailSizes.Huge);
-                        if (ct.IsCancellationRequested)
-                        {
-                            _DisposeImage(thumbnail);
-                            return ValueTask.CompletedTask;
-                        }
-
-                        _PostToUi(() => _ApplyThumbnail(entry, thumbnail, ct));
-                        return ValueTask.CompletedTask;
-                    }
-                );
-            }
-            catch (OperationCanceledException) { }
-        }
-
-        private void _ApplyThumbnail(FileListEntry entry, IImage? thumbnail, CancellationToken token)
-        {
-            if (token.IsCancellationRequested)
-            {
-                _DisposeImage(thumbnail);
-                return;
-            }
-
-            _pathToThumbnail[entry.FullPath] = thumbnail;
-            if (thumbnail is not null)
-            {
-                entry.Icon = thumbnail;
-            }
-        }
-
-        private void _CancelThumbnailLoad()
-        {
-            if (_thumbnailLoadCts is null)
-            {
-                return;
-            }
-
-            _thumbnailLoadCts.Cancel();
-            _thumbnailLoadCts.Dispose();
-            _thumbnailLoadCts = null;
-        }
-
-        private void _DisposeAndClearThumbnails()
-        {
-            foreach (var image in _pathToThumbnail.Values)
-            {
-                _DisposeImage(image);
-            }
-
-            _pathToThumbnail.Clear();
-        }
-
-        private static void _DisposeImage(IImage? image)
-        {
-            if (image is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
-
-        private static void _PostToUi(Action action)
-        {
-            if (Application.Current is null)
-            {
-                action();
-                return;
-            }
-
-            Dispatcher.UIThread.Post(action);
-        }
-
-        private static ListedItem _CreateListedItem(string path, bool isDirectory, int listingGroup = 0)
-        {
-            var name = isDirectory ? _DirectoryDisplayName(path) : Path.GetFileName(path);
-            if (isDirectory)
-            {
-                return new ListedItem(
-                    path,
-                    name,
-                    IsDirectory: true,
-                    Length: null,
-                    LastWriteTime: _TryGetLastWriteTime(path),
-                    ListingGroup: listingGroup
-                );
-            }
-
-            var (length, lastWriteTime) = _TryGetFileInfo(path);
-            return new ListedItem(path, name, IsDirectory: false, Length: length, LastWriteTime: lastWriteTime);
-        }
-
-        /// <summary>
-        /// Whether the File List include/exclude masks allow listing this file path.
-        /// </summary>
-        /// <param name="path">Full file path to evaluate.</param>
-        /// <returns><see langword="true"/> when the file name passes active masks.</returns>
-        private bool _PassesFileMasks(string path)
-        {
-            var fileName = Path.GetFileName(path);
-            if (!WildcardMask.IsMatch(fileName, Mask))
-            {
-                return false;
-            }
-
-            if (!ExcludeMasksEnabled)
-            {
-                return true;
-            }
-
-            return !WildcardMask.MatchesAny(fileName, ExcludeMasks);
-        }
-
-        private List<ListedItem> _ListDrives()
-        {
-            DriveInfo[] drives;
-            try
-            {
-                drives = DriveInfo.GetDrives();
-            }
-            catch (IOException)
-            {
-                return [];
-            }
-
-            var items = new List<ListedItem>();
-            foreach (var drive in drives)
-            {
-                string name;
-                try
-                {
-                    name = drive.Name;
-                }
-                catch (IOException)
-                {
-                    continue;
-                }
-
-                items.Add(_CreateListedItem(name, isDirectory: true, listingGroup: _VolumeListingGroup));
-            }
-
-            return items;
-        }
-
-        private static List<ListedItem> _ListKnownPlaces()
-        {
-            var items = new List<ListedItem>();
-            foreach (var place in WindowsKnownPlaces.GetPlaces())
-            {
-                items.Add(
-                    new ListedItem(
-                        place.Path,
-                        place.Name,
-                        IsDirectory: true,
-                        Length: null,
-                        LastWriteTime: _TryGetLastWriteTime(place.Path),
-                        ListingGroup: _KnownPlaceListingGroup
-                    )
-                );
-            }
-
-            return items;
-        }
-
-        private List<ListedItem> _ListNetworkLocations()
-        {
-            var items = new List<ListedItem>();
-            var pathToIsAdded = new HashSet<string>(PathComparers.Os);
-
-            foreach (var drive in _ListNetworkDrives())
-            {
-                if (!pathToIsAdded.Add(drive.Path))
-                {
-                    continue;
-                }
-
-                items.Add(drive);
-            }
-
-            if (
-                OperatingSystem.IsWindows()
-                && WindowsWslUnc.TryGetLiveRoot(out var wslRoot)
-                && pathToIsAdded.Add(wslRoot)
-            )
-            {
-                items.Add(new ListedItem(wslRoot, wslRoot[2..], IsDirectory: true, Length: null, LastWriteTime: null));
-            }
-
-            foreach (var historyPath in PathHistory)
-            {
-                if (!FileListPath.IsUncPath(historyPath))
-                {
-                    continue;
-                }
-
-                var location = historyPath.TrimTrailingSeparator();
-                if (!pathToIsAdded.Add(location))
-                {
-                    continue;
-                }
-
-                items.Add(new ListedItem(location, location, IsDirectory: true, Length: null, LastWriteTime: null));
-            }
-
-            return items;
-        }
-
-        private static List<ListedItem> _ListWslDistros(string serverRoot)
-        {
-            if (!WindowsWslUnc.TryListDistroPaths(serverRoot, out var distroPaths))
-            {
-                return [];
-            }
-
-            var items = new List<ListedItem>();
-            foreach (var distroPath in distroPaths)
-            {
-                var name = _LastUncSegment(distroPath);
-                items.Add(new ListedItem(distroPath, name, IsDirectory: true, Length: null, LastWriteTime: null));
-            }
-
-            return items;
-        }
-
-        [SupportedOSPlatform("windows")]
-        private List<ListedItem> _ListUncShares(string serverRoot)
-        {
-            if (
-                !_TryRunWithTimeout(() => _TryReadUncShares(serverRoot), _UncServerProbeTimeout, out var sharePaths)
-                || sharePaths is null
-            )
-            {
-                return [];
-            }
-
-            var items = new List<ListedItem>();
-            foreach (var sharePath in sharePaths)
-            {
-                var name = Path.GetFileName(sharePath.TrimTrailingSeparator());
-                items.Add(
-                    new ListedItem(
-                        sharePath,
-                        string.IsNullOrEmpty(name) ? sharePath : name,
-                        IsDirectory: true,
-                        Length: null,
-                        LastWriteTime: null
-                    )
-                );
-            }
-
-            return items;
-        }
-
-        [SupportedOSPlatform("windows")]
-        private static List<string>? _TryReadUncShares(string serverRoot)
-        {
-            if (!WindowsUncShareLister.TryListDiskShares(serverRoot, out var sharePaths))
-            {
-                return null;
-            }
-
-            return sharePaths;
-        }
-
-        [SupportedOSPlatform("windows")]
-        private static bool _UncServerIsReachable(string serverRoot)
-        {
-            return _TryRunWithTimeout(
-                    () => _TryReadUncShares(serverRoot) is not null,
-                    _UncServerProbeTimeout,
-                    out var reachable
-                ) && reachable;
-        }
-
-        private static List<ListedItem> _ListNetworkDrives()
-        {
-            DriveInfo[] drives;
-            try
-            {
-                drives = DriveInfo.GetDrives();
-            }
-            catch (IOException)
-            {
-                return [];
-            }
-
-            var items = new List<ListedItem>();
-            foreach (var drive in drives)
-            {
-                DriveType driveType;
-                string name;
-                try
-                {
-                    driveType = drive.DriveType;
-                    name = drive.Name;
-                }
-                catch (IOException)
-                {
-                    continue;
-                }
-
-                if (driveType != DriveType.Network)
-                {
-                    continue;
-                }
-
-                items.Add(_CreateListedItem(name, isDirectory: true));
-            }
-
-            return items;
-        }
-
-        private static ListedItem _CreateNetworkRootItem()
-        {
-            return new ListedItem(
-                NetworkPath,
-                NetworkDisplayName,
-                IsDirectory: true,
-                Length: null,
-                LastWriteTime: null,
-                ListingGroup: _KnownPlaceListingGroup
-            );
-        }
-
-        private bool _TryListFolder(
-            string path,
-            out List<ListedItem> folders,
-            out List<ListedItem> files,
-            out FolderListFailure failure
-        )
-        {
-            folders = [];
-            files = [];
-            failure = FolderListFailure.None;
-            try
-            {
-                if (!_NeedsNetworkTimeout(path))
-                {
-                    (folders, files) = _ReadFolderListing(path);
-                    return true;
-                }
-
-                var timeout = WindowsWslUnc.IsWslUncPath(path) ? _UncServerProbeTimeout : _NetworkProbeTimeout;
-                var listTask = Task.Run(() => _ReadFolderListing(path));
-                try
-                {
-                    if (!listTask.Wait(timeout))
-                    {
-                        // Exists/enumerate cannot be cancelled; observe later faults so they are not unhandled.
-                        _ = listTask.ContinueWith(
-                            static completed => completed.Exception,
-                            CancellationToken.None,
-                            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-                            TaskScheduler.Default
-                        );
-                        failure = FolderListFailure.TimedOut;
-                        Log.Warning("Timed out listing folder {Path} after {Timeout}.", path, timeout);
-                        return false;
-                    }
-
-                    (folders, files) = listTask.Result;
-                    return true;
-                }
-                catch (AggregateException ex)
-                {
-                    failure = _MapListingException(ex.GetBaseException());
-                    Log.Warning(ex, "Failed to list folder {Path}.", path);
-                    return false;
-                }
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
-            {
-                failure = _MapListingException(ex);
-                Log.Warning(ex, "Failed to list folder {Path}.", path);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Maps a filesystem listing exception to a user-facing failure kind.
-        /// </summary>
-        private static FolderListFailure _MapListingException(Exception ex)
-        {
-            if (ex is UnauthorizedAccessException)
-            {
-                return FolderListFailure.AccessDenied;
-            }
-
-            if (ex is DirectoryNotFoundException)
-            {
-                return FolderListFailure.NotFound;
-            }
-
-            return FolderListFailure.Unavailable;
-        }
-
-        /// <summary>
-        /// Builds the empty-state message for a folder listing failure.
-        /// </summary>
-        private static string _FormatListingError(FolderListFailure failure)
-        {
-            return failure switch
-            {
-                FolderListFailure.AccessDenied => "Access denied reading this folder.",
-                FolderListFailure.NotFound => "This folder could not be found.",
-                FolderListFailure.TimedOut => "Timed out reading this folder.",
-                FolderListFailure.Unavailable => "Could not read this folder.",
-                FolderListFailure.None => string.Empty,
-                _ => "Could not read this folder.",
-            };
-        }
-
-        /// <summary>
-        /// Why listing the current folder failed.
-        /// </summary>
-        private enum FolderListFailure
-        {
-            None,
-            AccessDenied,
-            NotFound,
-            TimedOut,
-            Unavailable,
-        }
-
-        private (List<ListedItem> Folders, List<ListedItem> Files) _ReadFolderListing(string path)
-        {
-            // IgnoreInaccessible would treat an unreadable directory as empty; probe first so browse can show an error.
-            _EnsureDirectoryReadable(path);
-
-            var folders = Directory
-                .EnumerateDirectories(path, "*", _ListingOptions)
-                .Select(folderPath => _CreateListedItem(folderPath, isDirectory: true))
-                .ToList();
-
-            var files = Directory
-                .EnumerateFiles(path, "*", _ListingOptions)
-                .Where(_PassesFileMasks)
-                .Select(filePath => _CreateListedItem(filePath, isDirectory: false))
-                .ToList();
-
-            return (folders, files);
-        }
-
-        /// <summary>
-        /// Throws when <paramref name="path"/> cannot be listed (e.g. access denied).
-        /// </summary>
-        /// <para>
-        /// Uses <see cref="EnumerationOptions.IgnoreInaccessible"/> = false so denial on the directory itself
-        /// surfaces as an exception instead of an empty listing.
-        /// </para>
-        private static void _EnsureDirectoryReadable(string path)
-        {
-            var probeOptions = new EnumerationOptions
-            {
-                IgnoreInaccessible = false,
-                RecurseSubdirectories = false,
-                ReturnSpecialDirectories = false,
-            };
-            _ = Directory.EnumerateFileSystemEntries(path, "*", probeOptions).Any();
-        }
-
-        private static bool _DirectoryExists(string path)
-        {
-            if (!_NeedsNetworkTimeout(path))
-            {
-                return Directory.Exists(path);
-            }
-
-            return _TryRunWithTimeout(() => Directory.Exists(path), _NetworkProbeTimeout, out var exists) && exists;
-        }
-
-        private static bool _NeedsNetworkTimeout(string path)
-        {
-            if (FileListPath.IsUncPath(path))
-            {
-                return true;
-            }
-
-            try
-            {
-                var root = Path.GetPathRoot(path);
-                if (string.IsNullOrEmpty(root))
-                {
-                    return false;
-                }
-
-                return new DriveInfo(root).DriveType == DriveType.Network;
-            }
-            catch (Exception ex) when (ex is ArgumentException or IOException or UnauthorizedAccessException)
-            {
-                return false;
-            }
-        }
-
-        private static bool _TryRunWithTimeout<T>(Func<T> action, TimeSpan timeout, out T result)
-        {
-            var task = Task.Run(action);
-            try
-            {
-                if (task.Wait(timeout))
-                {
-                    result = task.Result;
-                    return true;
-                }
-            }
-            catch (AggregateException)
-            {
-                result = default!;
-                return false;
-            }
-
-            // Exists/enumerate cannot be cancelled; observe later faults so they are not unhandled.
-            _ = task.ContinueWith(
-                static completed => completed.Exception,
-                CancellationToken.None,
-                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Default
-            );
-            result = default!;
-            return false;
         }
 
         private void _UpdateNavigationFlags()
@@ -1607,206 +890,5 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 MaskSuggestions.RemoveAt(MaskSuggestions.Count - 1);
             }
         }
-
-        private static string _FormatDetails(ListedItem item)
-        {
-            var typeLabel = _TypeLabel(item);
-            if (item.IsDirectory || item.Length is null)
-            {
-                return typeLabel;
-            }
-
-            return typeLabel + "\n" + _FormatSize(item.Length.Value);
-        }
-
-        private static string _TypeLabel(ListedItem item)
-        {
-            if (FileListPath.IsNetworkPath(item.Path))
-            {
-                return "Network location";
-            }
-
-            if (item.IsDirectory)
-            {
-                return "File folder";
-            }
-
-            var extension = Path.GetExtension(item.Name);
-            if (string.IsNullOrEmpty(extension))
-            {
-                return "File";
-            }
-
-            return extension.TrimStart('.').ToUpperInvariant() + " File";
-        }
-
-        private static string _FormatDate(DateTime? lastWriteTime)
-        {
-            if (lastWriteTime is null)
-            {
-                return string.Empty;
-            }
-
-            return lastWriteTime.Value.ToString("g", CultureInfo.CurrentCulture);
-        }
-
-        private static string _FormatSize(long bytes)
-        {
-            const double kb = 1024;
-            const double mb = kb * 1024;
-            const double gb = mb * 1024;
-
-            if (bytes >= gb)
-            {
-                return (bytes / gb).ToString("0.#", CultureInfo.InvariantCulture) + " GB";
-            }
-
-            if (bytes >= mb)
-            {
-                return (bytes / mb).ToString("0.#", CultureInfo.InvariantCulture) + " MB";
-            }
-
-            if (bytes >= kb)
-            {
-                return (bytes / kb).ToString("0.#", CultureInfo.InvariantCulture) + " KB";
-            }
-
-            return bytes.ToString(CultureInfo.InvariantCulture) + " B";
-        }
-
-        private static (long? Length, DateTime? LastWriteTime) _TryGetFileInfo(string path)
-        {
-            try
-            {
-                var info = new FileInfo(path);
-                return (info.Length, info.LastWriteTime);
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
-            {
-                return (null, null);
-            }
-        }
-
-        private static DateTime? _TryGetLastWriteTime(string path)
-        {
-            try
-            {
-                return Directory.GetLastWriteTime(path);
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
-            {
-                return null;
-            }
-        }
-
-        private static string _ResolveStartPath(string? initialPath)
-        {
-            if (_TryResolvePath(initialPath, out var resolved) && !FileListPath.IsComputerPath(resolved))
-            {
-                return resolved;
-            }
-
-            var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if (_TryResolvePath(profile, out resolved) && !FileListPath.IsComputerPath(resolved))
-            {
-                return resolved;
-            }
-
-            return Directory.GetCurrentDirectory();
-        }
-
-        private static bool _TryResolvePath(string? path, [NotNullWhen(true)] out string resolved)
-        {
-            if (FileListPath.IsComputerPath(path))
-            {
-                if (!OperatingSystem.IsWindows())
-                {
-                    resolved = ComputerPath;
-                    return false;
-                }
-
-                resolved = ComputerPath;
-                return true;
-            }
-
-            if (FileListPath.IsNetworkPath(path))
-            {
-                resolved = NetworkPath;
-                return true;
-            }
-
-            if (WindowsKnownPlaces.TryResolveAlias(path, out var aliasPath))
-            {
-                resolved = aliasPath;
-                return true;
-            }
-
-            if (OperatingSystem.IsWindows() && WindowsWslUnc.IsWslUncPath(path))
-            {
-                if (WindowsWslUnc.TryResolve(path, out var wslPath))
-                {
-                    resolved = wslPath;
-                    return true;
-                }
-
-                resolved = ComputerPath;
-                return false;
-            }
-
-            if (OperatingSystem.IsWindows())
-            {
-                var isUncServer = path is not null && FileListPath.IsUncServerRoot(path);
-                if (isUncServer && FileListPath.TryGetUncServerRoot(path!, out var serverRoot))
-                {
-                    resolved = serverRoot;
-                    return _UncServerIsReachable(serverRoot);
-                }
-            }
-
-            try
-            {
-                var expanded = Environment.ExpandEnvironmentVariables(path!);
-                if (FileListPath.TryGetDriveRoot(expanded, out var driveRoot))
-                {
-                    expanded = driveRoot;
-                }
-
-                resolved = new DirectoryInfo(expanded).FullName;
-                return _DirectoryExists(resolved);
-            }
-            catch (Exception ex)
-                when (ex is ArgumentException or NotSupportedException or IOException or UnauthorizedAccessException)
-            {
-                resolved = ComputerPath;
-                return false;
-            }
-        }
-
-        private static string _DirectoryDisplayName(string path)
-        {
-            var name = Path.GetFileName(path.TrimTrailingSeparator());
-            return string.IsNullOrEmpty(name) ? _LastUncSegment(path) : name;
-        }
-
-        private static string _LastUncSegment(string path)
-        {
-            var trimmed = path.TrimTrailingSeparator();
-            var slash = trimmed.LastIndexOf('\\');
-            if (slash < 0 || slash == trimmed.Length - 1)
-            {
-                return trimmed;
-            }
-
-            return trimmed[(slash + 1)..];
-        }
-
-        private sealed record ListedItem(
-            string Path,
-            string Name,
-            bool IsDirectory,
-            long? Length,
-            DateTime? LastWriteTime,
-            int ListingGroup = 0
-        );
     }
 }

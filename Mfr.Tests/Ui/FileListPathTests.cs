@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.App.Ui.Services.FileList;
 
 namespace Mfr.Tests.Ui
 {
@@ -249,6 +249,33 @@ namespace Mfr.Tests.Ui
                 [FileListPath.ComputerDisplayName, "Documents", "Work"],
                 nested.Select(segment => segment.Label)
             );
+        }
+
+        /// <summary>
+        /// Verifies This PC and Network are not OS folders that Explorer can open as a path.
+        /// </summary>
+        [Fact]
+        public void IsFilesystemFolderPath_Rejects_Sentinels()
+        {
+            Assert.False(FileListPath.IsFilesystemFolderPath(FileListPath.ComputerPath));
+            Assert.False(FileListPath.IsFilesystemFolderPath(" "));
+            if (OperatingSystem.IsWindows())
+            {
+                Assert.False(FileListPath.IsFilesystemFolderPath(FileListPath.NetworkPath));
+            }
+
+            Assert.True(FileListPath.IsFilesystemFolderPath(@"C:\Music"));
+        }
+
+        /// <summary>
+        /// Verifies listing labels use the last folder segment, including UNC shares.
+        /// </summary>
+        [Fact]
+        public void DirectoryDisplayName_Uses_Last_Segment()
+        {
+            Assert.Equal("Music", FileListPath.DirectoryDisplayName(@"C:\Music"));
+            Assert.Equal("share", FileListPath.LastUncSegment(@"\\server\share"));
+            Assert.Equal("server", FileListPath.LastUncSegment(@"\\server"));
         }
 
         private static string? _ExistingSpecialFolder(Environment.SpecialFolder folder)

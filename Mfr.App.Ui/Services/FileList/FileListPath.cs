@@ -1,8 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using Mfr.App.Ui.Services.FileList;
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.ViewModels.FileList
+namespace Mfr.App.Ui.Services.FileList
 {
     /// <summary>
     /// File List location sentinels and Windows UNC path rules.
@@ -269,6 +268,51 @@ namespace Mfr.App.Ui.ViewModels.FileList
             }
 
             return parent;
+        }
+
+        /// <summary>
+        /// Whether <paramref name="path"/> is a real folder the OS file manager can open.
+        /// </summary>
+        /// <param name="path">File List path or sentinel.</param>
+        /// <returns><see langword="false"/> for This PC, Network, or blank.</returns>
+        public static bool IsFilesystemFolderPath(string path)
+        {
+            if (IsComputerPath(path) || IsNetworkPath(path))
+            {
+                return false;
+            }
+
+            return !string.IsNullOrWhiteSpace(path);
+        }
+
+        /// <summary>
+        /// Folder name shown in the listing for <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">Filesystem directory path.</param>
+        /// <returns>
+        /// Last path segment, or the last UNC segment when the folder name is empty.
+        /// </returns>
+        public static string DirectoryDisplayName(string path)
+        {
+            var name = Path.GetFileName(path.TrimTrailingSeparator());
+            return string.IsNullOrEmpty(name) ? LastUncSegment(path) : name;
+        }
+
+        /// <summary>
+        /// Last <c>\</c>-separated segment of a UNC or Windows path.
+        /// </summary>
+        /// <param name="path">Path that may include a server, share, or folder.</param>
+        /// <returns>Text after the last backslash, or <paramref name="path"/> when none is present.</returns>
+        public static string LastUncSegment(string path)
+        {
+            var trimmed = path.TrimTrailingSeparator();
+            var slash = trimmed.LastIndexOf('\\');
+            if (slash < 0 || slash == trimmed.Length - 1)
+            {
+                return trimmed;
+            }
+
+            return trimmed[(slash + 1)..];
         }
 
         /// <summary>
