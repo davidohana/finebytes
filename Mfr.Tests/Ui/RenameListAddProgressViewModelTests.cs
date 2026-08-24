@@ -1,5 +1,4 @@
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.Engine.RenameList;
 
 namespace Mfr.Tests.Ui
 {
