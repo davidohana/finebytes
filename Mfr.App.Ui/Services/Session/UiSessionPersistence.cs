@@ -1,5 +1,4 @@
 using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
 using Mfr.Models.Config;
 using Mfr.Utils;
@@ -12,10 +11,14 @@ namespace Mfr.App.Ui.Services.Session
     internal static class UiSessionPersistence
     {
         /// <summary>
-        /// Restores remembered main-window layout sections from <paramref name="session"/>.
+        /// Restores remembered main-window layout from <paramref name="session"/>.
         /// </summary>
         /// <param name="window">Main window to configure.</param>
         /// <param name="session">Loaded session document.</param>
+        /// <remarks>
+        /// File List mask fields are restored separately via
+        /// <see cref="FileListSessionSnapshot.FromSessionState"/> and the File List view model.
+        /// </remarks>
         public static void TryRestore(MainWindow window, SessionState session)
         {
             ArgumentNullException.ThrowIfNull(window);
@@ -32,19 +35,16 @@ namespace Mfr.App.Ui.Services.Session
             {
                 WindowSession.ApplyDefault(window);
             }
-
-            if (window.DataContext is MainWindowViewModel viewModel)
-            {
-                viewModel.FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
-            }
         }
 
         /// <summary>
         /// Updates <c>session.json</c> for enabled remember flags; leaves disabled fields unchanged.
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
-        /// <param name="viewModel">Root VM providing the File List path.</param>
-        public static void SaveOnClose(MainWindow window, MainWindowViewModel? viewModel)
+        /// <param name="fileListSnapshot">
+        /// File List mask and folder fields to persist, or <see langword="null"/> when unavailable.
+        /// </param>
+        public static void SaveOnClose(MainWindow window, FileListSessionSnapshot? fileListSnapshot)
         {
             ArgumentNullException.ThrowIfNull(window);
 
@@ -64,19 +64,21 @@ namespace Mfr.App.Ui.Services.Session
                     session.Splitters = SplitterSession.Capture(window);
                 }
 
-                if (viewModel is not null)
+                if (fileListSnapshot is not null)
                 {
-                    var snapshot = viewModel.FileListViewModel.CaptureSession();
-
-                    if (ui.RememberLastFolder && _IsPersistableFolder(snapshot.LastOpenedDirectory))
+                    if (ui.RememberLastFolder && _IsPersistableFolder(fileListSnapshot.LastOpenedDirectory))
                     {
-                        session.LastOpenedDirectory = snapshot.LastOpenedDirectory;
+                        session.LastOpenedDirectory = fileListSnapshot.LastOpenedDirectory;
                     }
 
-                    session.FileMask = snapshot.FileMask;
-                    session.ExcludeMasks = snapshot.ExcludeMasks is null ? null : [.. snapshot.ExcludeMasks];
-                    session.ExcludeMasksEnabled = snapshot.ExcludeMasksEnabled;
-                    session.MaskSuggestions = snapshot.MaskSuggestions is null ? null : [.. snapshot.MaskSuggestions];
+                    session.FileMask = fileListSnapshot.FileMask;
+                    session.ExcludeMasks = fileListSnapshot.ExcludeMasks is null
+                        ? null
+                        : [.. fileListSnapshot.ExcludeMasks];
+                    session.ExcludeMasksEnabled = fileListSnapshot.ExcludeMasksEnabled;
+                    session.MaskSuggestions = fileListSnapshot.MaskSuggestions is null
+                        ? null
+                        : [.. fileListSnapshot.MaskSuggestions];
                 }
 
                 SessionStore.Save(session);

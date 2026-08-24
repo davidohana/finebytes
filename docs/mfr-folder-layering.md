@@ -37,3 +37,11 @@ Illustrative spine (typical flow, not exhaustive):
 
 - Enforced by `.csproj` project references.
 - Keep architecture tests in `Mfr.Tests` for guardrails.
+
+## UI project internal layering
+
+Inside [`Mfr.App.Ui/`](../Mfr.App.Ui), keep dependencies one-way:
+
+`Views → ViewModels → Services → Engine / Models / Utils`
+
+Do not import `ViewModels` (or Views) from `Services`. Session restore/save passes snapshot DTOs across that boundary (`FileListSessionSnapshot`); apply/capture lives on the File List view model. Guarded by `UiServicesLayerArchitectureTests`.

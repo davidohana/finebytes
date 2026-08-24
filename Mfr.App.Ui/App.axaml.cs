@@ -34,6 +34,10 @@ namespace Mfr.App.Ui
                 };
 
                 UiSessionPersistence.TryRestore(mainWindow, session);
+                if (mainWindow.DataContext is MainWindowViewModel viewModel)
+                {
+                    viewModel.FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
+                }
 
                 desktop.MainWindow = mainWindow;
 #if DEBUG

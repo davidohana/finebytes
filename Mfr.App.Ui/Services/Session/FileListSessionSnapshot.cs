@@ -28,7 +28,7 @@ namespace Mfr.App.Ui.Services.Session
         /// Builds a snapshot from persisted session fields.
         /// </summary>
         /// <param name="session">Loaded session document.</param>
-        /// <returns>Snapshot for <see cref="ViewModels.FileList.FileListViewModel.ApplySession"/>.</returns>
+        /// <returns>Snapshot used when restoring File List mask fields from session.</returns>
         public static FileListSessionSnapshot FromSessionState(SessionState session)
         {
             ArgumentNullException.ThrowIfNull(session);

@@ -20,7 +20,8 @@ namespace Mfr.App.Ui.Views
 
         private void _OnClosing(object? sender, WindowClosingEventArgs e)
         {
-            UiSessionPersistence.SaveOnClose(this, DataContext as MainWindowViewModel);
+            var fileListSnapshot = (DataContext as MainWindowViewModel)?.FileListViewModel.CaptureSession();
+            UiSessionPersistence.SaveOnClose(this, fileListSnapshot);
         }
     }
 }
