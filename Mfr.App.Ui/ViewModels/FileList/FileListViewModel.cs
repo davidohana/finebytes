@@ -3,6 +3,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
+using Mfr.App.Ui.Services.Session;
 using Mfr.Engine.Logging;
 using Mfr.Utils;
 
@@ -633,6 +634,55 @@ namespace Mfr.App.Ui.ViewModels.FileList
         {
             ExcludeMasks = WildcardMask.NormalizeForStorage(editorText);
             ExcludeMasksEnabled = enabled;
+        }
+
+        /// <summary>
+        /// Restores mask, exclude-mask, and suggestion fields from a session snapshot.
+        /// </summary>
+        /// <param name="snapshot">Persisted File List session fields.</param>
+        internal void ApplySession(FileListSessionSnapshot snapshot)
+        {
+            ArgumentNullException.ThrowIfNull(snapshot);
+
+            if (!string.IsNullOrEmpty(snapshot.FileMask))
+            {
+                Mask = snapshot.FileMask;
+            }
+
+            // Null means unset: keep the defaults. An empty list means the user cleared them.
+            if (snapshot.ExcludeMasks is not null)
+            {
+                ExcludeMasks = [.. snapshot.ExcludeMasks];
+            }
+
+            if (snapshot.ExcludeMasksEnabled is { } excludeEnabled)
+            {
+                ExcludeMasksEnabled = excludeEnabled;
+            }
+
+            if (snapshot.MaskSuggestions is { Count: > 0 })
+            {
+                MaskSuggestions.Clear();
+                foreach (var mask in snapshot.MaskSuggestions)
+                {
+                    MaskSuggestions.Add(mask);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Captures current mask, exclude-mask, and suggestion fields for session save.
+        /// </summary>
+        /// <returns>Snapshot to merge into persisted session state.</returns>
+        internal FileListSessionSnapshot CaptureSession()
+        {
+            return new FileListSessionSnapshot(
+                LastOpenedDirectory: CurrentPath,
+                FileMask: Mask,
+                ExcludeMasks: [.. ExcludeMasks],
+                ExcludeMasksEnabled: ExcludeMasksEnabled,
+                MaskSuggestions: [.. MaskSuggestions]
+            );
         }
 
         partial void OnViewModeChanged(FileListViewMode value)

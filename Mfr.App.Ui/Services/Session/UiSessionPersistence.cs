@@ -33,34 +33,9 @@ namespace Mfr.App.Ui.Services.Session
                 WindowSession.ApplyDefault(window);
             }
 
-            var viewModel = window.DataContext as MainWindowViewModel;
-            if (viewModel is not null)
+            if (window.DataContext is MainWindowViewModel viewModel)
             {
-                var fileListViewModel = viewModel.FileListViewModel;
-                if (!string.IsNullOrEmpty(session.FileMask))
-                {
-                    fileListViewModel.Mask = session.FileMask;
-                }
-
-                // Null means unset: keep the defaults. An empty list means the user cleared them.
-                if (session.ExcludeMasks is not null)
-                {
-                    fileListViewModel.ExcludeMasks = [.. session.ExcludeMasks];
-                }
-
-                if (session.ExcludeMasksEnabled is { } excludeEnabled)
-                {
-                    fileListViewModel.ExcludeMasksEnabled = excludeEnabled;
-                }
-
-                if (session.MaskSuggestions is { Count: > 0 })
-                {
-                    fileListViewModel.MaskSuggestions.Clear();
-                    foreach (var mask in session.MaskSuggestions)
-                    {
-                        fileListViewModel.MaskSuggestions.Add(mask);
-                    }
-                }
+                viewModel.FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
             }
         }
 
@@ -91,21 +66,17 @@ namespace Mfr.App.Ui.Services.Session
 
                 if (viewModel is not null)
                 {
-                    var fileListViewModel = viewModel.FileListViewModel;
+                    var snapshot = viewModel.FileListViewModel.CaptureSession();
 
-                    if (ui.RememberLastFolder)
+                    if (ui.RememberLastFolder && _IsPersistableFolder(snapshot.LastOpenedDirectory))
                     {
-                        var path = fileListViewModel.CurrentPath;
-                        if (_IsPersistableFolder(path))
-                        {
-                            session.LastOpenedDirectory = path;
-                        }
+                        session.LastOpenedDirectory = snapshot.LastOpenedDirectory;
                     }
 
-                    session.FileMask = fileListViewModel.Mask;
-                    session.ExcludeMasks = [.. fileListViewModel.ExcludeMasks];
-                    session.ExcludeMasksEnabled = fileListViewModel.ExcludeMasksEnabled;
-                    session.MaskSuggestions = [.. fileListViewModel.MaskSuggestions];
+                    session.FileMask = snapshot.FileMask;
+                    session.ExcludeMasks = snapshot.ExcludeMasks is null ? null : [.. snapshot.ExcludeMasks];
+                    session.ExcludeMasksEnabled = snapshot.ExcludeMasksEnabled;
+                    session.MaskSuggestions = snapshot.MaskSuggestions is null ? null : [.. snapshot.MaskSuggestions];
                 }
 
                 SessionStore.Save(session);
