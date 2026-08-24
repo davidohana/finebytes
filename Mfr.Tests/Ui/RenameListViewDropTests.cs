@@ -127,6 +127,93 @@ namespace Mfr.Tests.Ui
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies Alt+DragOver clears existing Rename List rows (MFR7 tip).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragOver_Alt_Clears_Existing_Entries()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var existingPath = Path.Combine(dir, "existing.txt");
+            var dragPath = Path.Combine(dir, "drag.txt");
+            File.WriteAllText(existingPath, "e");
+            File.WriteAllText(dragPath, "d");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([existingPath]);
+            Assert.Single(renameListViewModel.Entries);
+
+            var (view, window) = _Show(renameListViewModel);
+            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            var dragOverArgs = new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt)
+            {
+                DragEffects = DragDropEffects.None,
+            };
+            view.RaiseEvent(dragOverArgs);
+
+            Assert.Empty(renameListViewModel.Entries);
+            Assert.Equal(DragDropEffects.Copy, dragOverArgs.DragEffects);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies DragOver without Alt leaves existing Rename List rows alone.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragOver_Without_Alt_Does_Not_Clear()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var existingPath = Path.Combine(dir, "existing.txt");
+            var dragPath = Path.Combine(dir, "drag.txt");
+            File.WriteAllText(existingPath, "e");
+            File.WriteAllText(dragPath, "d");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([existingPath]);
+            Assert.Single(renameListViewModel.Entries);
+
+            var (view, window) = _Show(renameListViewModel);
+            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            var dragOverArgs = new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.None);
+            view.RaiseEvent(dragOverArgs);
+
+            Assert.Single(renameListViewModel.Entries);
+            Assert.Equal("existing.txt", renameListViewModel.Entries[0].FullFileName);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Alt+DragOver then Drop replaces the list with only the dropped files.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragOver_Alt_Then_Drop_Replaces_List()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var existingPath = Path.Combine(dir, "existing.txt");
+            var dragPath = Path.Combine(dir, "drag.txt");
+            File.WriteAllText(existingPath, "e");
+            File.WriteAllText(dragPath, "d");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([existingPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt)
+            );
+            Assert.Empty(renameListViewModel.Entries);
+
+            view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, default, KeyModifiers.None));
+            await _WaitUntil(() => renameListViewModel.Entries.Count == 1);
+
+            Assert.Equal("drag.txt", renameListViewModel.Entries[0].FullFileName);
+            window.Close();
+        }
+
         private FileListViewModel _CreateFileListViewModel(string path)
         {
             var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path);

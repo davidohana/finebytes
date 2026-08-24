@@ -51,9 +51,22 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnDragOver(object? sender, DragEventArgs e)
         {
-            var canAccept = _CanAcceptFileDrop(e) && _viewModel is { IsAdding: false };
-            e.DragEffects = canAccept ? DragDropEffects.Copy : DragDropEffects.None;
             e.Handled = true;
+
+            // Match MFR7: Alt while dragging external files over Rename List clears it immediately.
+            // Only file payloads (File List / Explorer); internal reorder would not clear.
+            if (_viewModel is null || _viewModel.IsAdding || !_CanAcceptFileDrop(e))
+            {
+                e.DragEffects = DragDropEffects.None;
+                return;
+            }
+
+            if (e.KeyModifiers.HasFlag(KeyModifiers.Alt))
+            {
+                _viewModel.Clear();
+            }
+
+            e.DragEffects = DragDropEffects.Copy;
         }
 
         private async void _OnDrop(object? sender, DragEventArgs e)
