@@ -15,6 +15,9 @@ namespace Mfr.App.Ui.ViewModels
     /// </summary>
     public partial class MainWindowViewModel : ViewModelBase
     {
+        private const int StatusHintClearMilliseconds = 8_000;
+
+        private CancellationTokenSource? _statusHintClearCts;
         /// <summary>
         /// Initializes pane view models for the 7.4 layout.
         /// </summary>
@@ -138,8 +141,35 @@ namespace Mfr.App.Ui.ViewModels
                 && !string.IsNullOrEmpty(RenameListViewModel.LastAddError)
             )
             {
-                StatusHint = RenameListViewModel.LastAddError;
+                _ShowTransientStatusHint(RenameListViewModel.LastAddError);
             }
+        }
+
+        /// <summary>
+        /// Shows a status-bar message and clears it after a short delay unless replaced sooner.
+        /// </summary>
+        private void _ShowTransientStatusHint(string message)
+        {
+            _statusHintClearCts?.Cancel();
+            _statusHintClearCts?.Dispose();
+            StatusHint = message;
+
+            _statusHintClearCts = new CancellationTokenSource();
+            var token = _statusHintClearCts.Token;
+            _ = _ClearStatusHintAfterDelayAsync(message, token);
+        }
+
+        private async Task _ClearStatusHintAfterDelayAsync(string message, CancellationToken token)
+        {
+            try
+            {
+                await Task.Delay(StatusHintClearMilliseconds, token).ConfigureAwait(true);
+                if (string.Equals(StatusHint, message, StringComparison.Ordinal))
+                {
+                    StatusHint = string.Empty;
+                }
+            }
+            catch (OperationCanceledException) { }
         }
 
         private static bool _CanExecuteUnimplemented()
