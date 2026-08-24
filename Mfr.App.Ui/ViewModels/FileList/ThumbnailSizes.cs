@@ -41,12 +41,12 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public const int Default = Medium;
 
         /// <summary>
-        /// Extra width around the image so ListBoxItem padding, border, and template margin fit.
+        /// Extra width around the image so ListBoxItem padding and selection border fit.
         /// </summary>
         public const int CellPadding = 10;
 
         /// <summary>
-        /// Extra height under the image for two name lines, item padding, and margin.
+        /// Extra height under the image for two name lines and ListBoxItem padding.
         /// </summary>
         public const int CaptionHeight = 44;
 

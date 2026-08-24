@@ -67,11 +67,12 @@
       <Setter Property="VerticalAlignment" Value="Stretch" />
       <Setter Property="HorizontalContentAlignment" Value="Stretch" />
       <Setter Property="VerticalContentAlignment" Value="Stretch" />
-      <Setter Property="Padding" Value="2,1" />
+      <!-- Padding is the only inset; template margins must not exceed the content slot or selection clips. -->
+      <Setter Property="Padding" Value="4,3" />
       <Setter Property="ClipToBounds" Value="True" />
     </Style>
     <Style Selector="ListBox.file-small-icons ListBoxItem">
-      <Setter Property="Width" Value="120" />
+      <Setter Property="Width" Value="124" />
     </Style>
     <Style Selector="ListBox.file-list ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="BorderBrush" Value="Transparent" />
@@ -326,13 +327,13 @@
         >
           <ListBox.ItemsPanel>
             <ItemsPanelTemplate>
-              <WrapPanel ItemWidth="120" />
+              <WrapPanel ItemWidth="124" />
             </ItemsPanelTemplate>
           </ListBox.ItemsPanel>
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:FileListEntry">
               <!-- Grid * column constrains width so TextTrimming applies (horizontal StackPanel does not). -->
-              <Grid Width="116" ColumnDefinitions="Auto,*" Margin="0,0,4,0">
+              <Grid ColumnDefinitions="Auto,*">
                 <Image Width="16" Height="16" VerticalAlignment="Center" Source="{Binding Icon}" />
                 <TextBlock
                   Grid.Column="1"
@@ -360,12 +361,13 @@
         >
           <ListBox.ItemsPanel>
             <ItemsPanelTemplate>
-              <WrapPanel ItemWidth="76" />
+              <!-- Cell = content (~72) + ListBoxItem padding (8) + selection border (2). -->
+              <WrapPanel ItemWidth="82" />
             </ItemsPanelTemplate>
           </ListBox.ItemsPanel>
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:FileListEntry">
-              <StackPanel Width="72" Margin="2,1">
+              <StackPanel>
                 <Image Width="32" Height="32" HorizontalAlignment="Center" Source="{Binding Icon}" />
                 <TextBlock
                   Text="{Binding Name}"
@@ -393,13 +395,13 @@
         >
           <ListBox.ItemsPanel>
             <ItemsPanelTemplate>
-              <WrapPanel ItemWidth="172" />
+              <WrapPanel ItemWidth="176" />
             </ItemsPanelTemplate>
           </ListBox.ItemsPanel>
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:FileListEntry">
               <!-- Grid * column constrains width so TextTrimming applies (horizontal StackPanel does not). -->
-              <Grid Width="168" ColumnDefinitions="Auto,*" Margin="1">
+              <Grid ColumnDefinitions="Auto,*">
                 <Image Width="32" Height="32" VerticalAlignment="Top" Source="{Binding Icon}" />
                 <StackPanel Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center">
                   <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
@@ -440,7 +442,8 @@
           </ListBox.ItemsPanel>
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:FileListEntry">
-              <DockPanel Margin="2,1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <!-- No extra margin: ThumbnailSizes.CellPadding already budgets ListBoxItem padding + border. -->
+              <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <TextBlock
                   DockPanel.Dock="Bottom"
                   Text="{Binding Name}"

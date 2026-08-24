@@ -126,6 +126,50 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Large Icons selection chrome fully covers the icon and caption (no clipped look).
+        /// </summary>
+        [AvaloniaFact]
+        public void LargeIcons_Selection_Contains_Icon_And_Caption()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            Directory.CreateDirectory(Path.Combine(dir, "Downloads"));
+            Directory.CreateDirectory(Path.Combine(dir, "Documents"));
+
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            _viewModels.Add(viewModel);
+            viewModel.SetViewMode(FileListViewMode.LargeIcons);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 480,
+                Height = 320,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            var list = view.FindControl<ListBox>("LargeIconsList");
+            Assert.NotNull(list);
+            Assert.True(list.IsVisible);
+
+            var entry = Assert.Single(viewModel.Entries, item => item.Name == "Downloads");
+            viewModel.SelectedEntry = entry;
+            window.UpdateLayout();
+
+            var container = _ListContainer(list, entry);
+            var presenter = _SelectionPresenter(list, entry);
+            var icon = container.GetVisualDescendants().OfType<Image>().First();
+            var caption = container
+                .GetVisualDescendants()
+                .OfType<TextBlock>()
+                .First(block => block.Text == "Downloads");
+
+            Assert.True(_IsFullyInside(icon, presenter), "Icon should sit inside the selection presenter.");
+            Assert.True(_IsFullyInside(caption, presenter), "Caption should sit inside the selection presenter.");
+        }
+
+        /// <summary>
         /// Verifies thumbnail selection fills the cell even when the caption is narrower than the icon.
         /// </summary>
         [AvaloniaFact]
@@ -623,7 +667,7 @@ namespace Mfr.Tests.Ui
             return (window, list);
         }
 
-        private static ListBoxItem _ThumbnailContainer(ListBox list, FileListEntry entry)
+        private static ListBoxItem _ListContainer(ListBox list, FileListEntry entry)
         {
             var index = list.Items.Cast<FileListEntry>().ToList().IndexOf(entry);
             Assert.True(index >= 0);
@@ -634,7 +678,7 @@ namespace Mfr.Tests.Ui
 
         private static ContentPresenter _SelectionPresenter(ListBox list, FileListEntry entry)
         {
-            var presenter = _ThumbnailContainer(list, entry)
+            var presenter = _ListContainer(list, entry)
                 .GetVisualDescendants()
                 .OfType<ContentPresenter>()
                 .FirstOrDefault(item => item.Name == "PART_ContentPresenter");
@@ -642,9 +686,23 @@ namespace Mfr.Tests.Ui
             return presenter;
         }
 
+        private static bool _IsFullyInside(Visual child, Visual parent)
+        {
+            var topLeft = child.TranslatePoint(new Point(0, 0), parent);
+            var bottomRight = child.TranslatePoint(new Point(child.Bounds.Width, child.Bounds.Height), parent);
+            Assert.NotNull(topLeft);
+            Assert.NotNull(bottomRight);
+
+            const double tolerance = 0.5;
+            return topLeft.Value.X >= -tolerance
+                && topLeft.Value.Y >= -tolerance
+                && bottomRight.Value.X <= parent.Bounds.Width + tolerance
+                && bottomRight.Value.Y <= parent.Bounds.Height + tolerance;
+        }
+
         private static Panel _ThumbnailSquare(ListBox list, FileListEntry entry)
         {
-            var square = _ThumbnailContainer(list, entry)
+            var square = _ListContainer(list, entry)
                 .GetVisualDescendants()
                 .OfType<Panel>()
                 .FirstOrDefault(item => item.Name == "ThumbnailSquare");
