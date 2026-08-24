@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
+using Mfr.Engine.Logging;
 using Mfr.Utils;
 using Serilog;
 
@@ -195,12 +196,19 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasListingError))]
+        [NotifyPropertyChangedFor(nameof(CanShowLogInExplorer))]
+        [NotifyCanExecuteChangedFor(nameof(ShowLogInExplorerCommand))]
         private string _listingError = string.Empty;
 
         /// <summary>
         /// Gets whether <see cref="ListingError"/> should be shown in the listing pane.
         /// </summary>
         public bool HasListingError => !string.IsNullOrEmpty(ListingError);
+
+        /// <summary>
+        /// Gets whether the listing-error empty state may offer revealing the session log file.
+        /// </summary>
+        public bool CanShowLogInExplorer => HasListingError && !string.IsNullOrEmpty(LogSession.LogFilePath);
 
         /// <summary>
         /// Layout used to present <see cref="Entries"/>. Default is Report.
@@ -506,6 +514,21 @@ namespace Mfr.App.Ui.ViewModels.FileList
             }
 
             _shellOpener.OpenFolderInFileManager(CurrentPath);
+        }
+
+        /// <summary>
+        /// Reveals the current session log file in the OS file manager.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(CanShowLogInExplorer))]
+        public void ShowLogInExplorer()
+        {
+            var logFilePath = LogSession.LogFilePath;
+            if (string.IsNullOrEmpty(logFilePath))
+            {
+                return;
+            }
+
+            _shellOpener.RevealInFileManager(logFilePath);
         }
 
         /// <summary>

@@ -471,18 +471,29 @@
           </ListBox.ItemTemplate>
         </ListBox>
 
-        <TextBlock
-          x:Name="ListingErrorText"
+        <StackPanel
           Margin="24"
           HorizontalAlignment="Center"
           VerticalAlignment="Center"
-          TextAlignment="Center"
-          TextWrapping="Wrap"
+          Spacing="8"
           IsVisible="{Binding HasListingError}"
-          Text="{Binding ListingError}"
-          Foreground="{DynamicResource FileListForegroundBrush}"
-          Opacity="0.85"
-        />
+        >
+          <TextBlock
+            x:Name="ListingErrorText"
+            TextAlignment="Center"
+            TextWrapping="Wrap"
+            Text="{Binding ListingError}"
+            Foreground="{DynamicResource FileListForegroundBrush}"
+            Opacity="0.85"
+          />
+          <Button
+            x:Name="ShowLogInExplorerButton"
+            Content="Show log in Explorer"
+            HorizontalAlignment="Center"
+            IsVisible="{Binding CanShowLogInExplorer}"
+            Command="{Binding ShowLogInExplorerCommand}"
+          />
+        </StackPanel>
       </Panel>
     </DockPanel>
   </Border>

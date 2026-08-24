@@ -563,6 +563,7 @@ namespace Mfr.Tests.Ui
                 Assert.Empty(viewModel.Entries);
                 Assert.True(viewModel.HasListingError);
                 Assert.Contains("Access denied", viewModel.ListingError, StringComparison.Ordinal);
+                Assert.False(viewModel.CanShowLogInExplorer);
             }
             finally
             {
