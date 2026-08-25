@@ -1,10 +1,12 @@
 # Handoff: Rename List status-bar hint jumps after Delete
 
-**Status:** Fixed (Aug 2026).
+**Status:** Fixed (Aug 2026). Context-menu / toolbar remove re-regression also fixed (same month).
 
 **Fix:** After remove, freeze the status-bar hint to a snapshot of the new selection and last hovered column. Ignore pointer hit-test and grid selection events until the mouse moves ≥8px or the user clicks a cell. Suppress row `:pointerover` styling while frozen (`hint-frozen` class). Restore vertical scroll offset after layout so the viewport does not jump under a stationary cursor. `RenameListViewModel.SelectedEntriesRemoving` fires before any `RemoveAt`.
 
-Regression: `Mfr.Tests/Ui/RenameListViewHintTests.cs`.
+**Context-menu follow-up:** Freeze no longer anchors to the pre-menu row position. The next pointer event after remove re-anchors; cell presses are ignored for one Background dispatcher pass so a menu click cannot clear the freeze or steal the hint via hit-test.
+
+Regression: `Mfr.Tests/Ui/RenameListViewHintTests.cs` (`Delete_…` and `RemoveCommand_…`).
 
 **Goal:** After pressing **Del** on a Rename List row, the status-bar cell hint should show the **new selection** (row at same index that slid up). It must not jump to another row—especially the **last visible row in the viewport** when the list is scrolled and the mouse stays on the deleted row’s screen position.
 

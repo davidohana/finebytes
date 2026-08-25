@@ -117,6 +117,72 @@ namespace Mfr.Tests.Ui
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies context-menu / toolbar remove keeps the frozen hint when the pointer jumps (menu click).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task RemoveCommand_Keeps_Hint_When_Pointer_Jumps_Like_Context_Menu()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var paths = new List<string>(30);
+            for (var i = 0; i < 30; i++)
+            {
+                var path = Path.Combine(dir, $"row-{i:00}.txt");
+                File.WriteAllText(path, "x");
+                paths.Add(path);
+            }
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync(paths);
+            Assert.Equal(30, renameListViewModel.Entries.Count);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            var deleteIndex = 12;
+            var deletedName = renameListViewModel.Entries[deleteIndex].FullFileName;
+            var expectedName = renameListViewModel.Entries[deleteIndex + 1].FullFileName;
+            var lastName = renameListViewModel.Entries[^1].FullFileName;
+
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[deleteIndex]]);
+            grid.ScrollIntoView(renameListViewModel.Entries[deleteIndex], grid.Columns[2]);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var hoverPoint = _HoverFullFileNameCell(window, grid, renameListViewModel.Entries[deleteIndex]);
+            Assert.Contains(
+                deletedName,
+                renameListViewModel.CellStatusHintDisplay.ToPlainText(),
+                StringComparison.Ordinal
+            );
+
+            // Menu click is typically far from the row; freeze must re-anchor instead of clearing.
+            var menuClickPoint = hoverPoint + new Vector(20, 48);
+            renameListViewModel.RemoveSelectedCommand.Execute(null);
+            Dispatcher.UIThread.RunJobs();
+
+            window.MouseMove(menuClickPoint, RawInputModifiers.None);
+            window.MouseDown(menuClickPoint, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(menuClickPoint, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            // Still under the 8px threshold from the post-remove re-anchor.
+            window.MouseMove(menuClickPoint + new Vector(5, 0), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            grid.SelectedItem = renameListViewModel.Entries[^1];
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(29, renameListViewModel.Entries.Count);
+            Assert.Equal(expectedName, renameListViewModel.SelectedEntries[0].FullFileName);
+            var hint = renameListViewModel.CellStatusHintDisplay.ToPlainText();
+            Assert.Contains(expectedName, hint, StringComparison.Ordinal);
+            Assert.DoesNotContain(lastName, hint, StringComparison.Ordinal);
+            Assert.DoesNotContain(deletedName, hint, StringComparison.Ordinal);
+
+            window.Close();
+        }
+
         private FileListViewModel _CreateFileListViewModel(string path)
         {
             var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path);

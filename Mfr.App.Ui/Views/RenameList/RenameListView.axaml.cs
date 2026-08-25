@@ -28,10 +28,10 @@ namespace Mfr.App.Ui.Views.RenameList
         private bool _selectionChangeFromView;
         private bool _isPointerOverGrid;
         private bool _freezeHint;
+        private bool _suppressCellPressUnfreeze;
         private RenameListEntry? _frozenHintEntry;
         private DataGridColumn? _frozenHintColumn;
         private Point? _pointerHintAnchor;
-        private Point? _lastPointerPositionOverGrid;
         private DataGridColumn? _lastHintColumn;
         private AddProgressDialog? _addProgressDialog;
         private double? _savedVerticalScroll;
@@ -93,9 +93,18 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _BeginHintFreeze()
         {
             _freezeHint = true;
-            _pointerHintAnchor ??= _lastPointerPositionOverGrid;
+            // Context-menu / toolbar remove: cursor may already be far from the row. Re-anchor on
+            // the next pointer event so a menu click does not immediately clear the freeze.
+            _pointerHintAnchor = null;
+            _suppressCellPressUnfreeze = true;
             _CaptureVerticalScroll();
             _SetHintFrozenClass(true);
+            Dispatcher.UIThread.Post(_LiftCellPressUnfreezeSuppress, DispatcherPriority.Background);
+        }
+
+        private void _LiftCellPressUnfreezeSuppress()
+        {
+            _suppressCellPressUnfreeze = false;
         }
 
         private void _EndHintFreeze()
@@ -106,6 +115,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _freezeHint = false;
+            _suppressCellPressUnfreeze = false;
             _frozenHintEntry = null;
             _frozenHintColumn = null;
             _pointerHintAnchor = null;
@@ -122,7 +132,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (_pointerHintAnchor is not { } anchor)
             {
-                return false;
+                return true;
             }
 
             var deltaX = position.X - anchor.X;
@@ -197,15 +207,22 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnCellPointerPressed(object? sender, DataGridCellPointerPressedEventArgs e)
         {
+            var position = e.PointerPressedEventArgs.GetPosition(RenameGrid);
+
+            // Menu-item click can deliver a press to the row under the menu after remove.
+            if (_freezeHint && (_suppressCellPressUnfreeze || _pointerHintAnchor is null))
+            {
+                _pointerHintAnchor ??= position;
+                return;
+            }
+
             _EndHintFreeze();
-            _lastPointerPositionOverGrid = e.PointerPressedEventArgs.GetPosition(RenameGrid);
             _PublishCellHint(e.Row?.DataContext as RenameListEntry, e.Column);
         }
 
         private void _OnGridPointerEntered(object? sender, PointerEventArgs e)
         {
             _isPointerOverGrid = true;
-            _lastPointerPositionOverGrid = e.GetPosition(RenameGrid);
         }
 
         private void _OnGridPointerMoved(object? sender, PointerEventArgs e)
@@ -216,7 +233,12 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var position = e.GetPosition(RenameGrid);
-            _lastPointerPositionOverGrid = position;
+
+            if (_freezeHint && _pointerHintAnchor is null)
+            {
+                _pointerHintAnchor = position;
+                return;
+            }
 
             if (_IsHintFrozenAt(position))
             {
@@ -237,7 +259,6 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _isPointerOverGrid = false;
-            _lastPointerPositionOverGrid = null;
 
             if (_viewModel is null)
             {
