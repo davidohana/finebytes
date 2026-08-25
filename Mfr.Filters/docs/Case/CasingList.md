@@ -8,10 +8,10 @@ Example list files use words like `and`, `or`, `with`, `RMX` or `and`, `us`, `th
 
 ## Options
 
-| Property                   | Type   | Default    | Description                                                                                                                    |
-| -------------------------- | ------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `filePath`                 | string | (required) | Path to the casing-list file.                                                                                                  |
-| `uppercaseSentenceInitial` | bool   | `false`    | If `true`, after list application, uppercases the first letter at the start of the segment and after configured sentence ends. |
+- **`filePath`** (string, required) — Path to the casing-list file.
+- **`uppercaseSentenceInitial`** (bool, default `false`)
+  - If `true`, after list application, uppercases the first letter at the start of the segment and after configured
+    sentence ends.
 
 ## List file format
 
@@ -22,11 +22,18 @@ Example list files use words like `and`, `or`, `with`, `RMX` or `and`, `us`, `th
 
 ## Examples
 
-| Options                                                                                                                                                                            | Before                         | After                          | Comment                                                      |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------ | ------------------------------------------------------------ |
-| `filePath`: list (`and`, `or`, `with`, `RMX`)<br>`uppercaseSentenceInitial`: `false`                                                                                               | `03 - WiTH Or Without You Rmx` | `03 - with or Without You RMX` |                                                              |
-| [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `"-.!"`<br>`filePath`: same list as above<br>`uppercaseSentenceInitial`: `true`                                 | `03 - WiTH Or Without You Rmx` | `03 - With or Without You RMX` |                                                              |
-| [SpaceCharacter](../Space/SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>`replaceSpaces`: `true`<br>`filePath`: list (`and`, `us`, `them`)<br>`uppercaseSentenceInitial`: `true` | `US_AND_THEM`                  | `Us_and_them`                  | Underscore word boundaries + casing list + sentence initial. |
+- `filePath`: list (`and`, `or`, `with`, `RMX`); `uppercaseSentenceInitial`: `false`
+  - Before: `03 - WiTH Or Without You Rmx`
+  - After: `03 - with or Without You RMX`
+- [SentenceEndCharacters](SentenceEndCharacters.md); `characters`: `"-.!"`; `filePath`: same list as
+  above; `uppercaseSentenceInitial`: `true`
+  - Before: `03 - WiTH Or Without You Rmx`
+  - After: `03 - With or Without You RMX`
+- [SpaceCharacter](../Space/SpaceCharacter.md); `spaceCharacter`: `"_"`; `replaceSpaces`: `true`;
+  `filePath`: list (`and`, `us`, `them`); `uppercaseSentenceInitial`: `true`
+  - Before: `US_AND_THEM`
+  - After: `Us_and_them`
+  - Comment: Underscore word boundaries + casing list + sentence initial.
 
 Put [SpaceCharacter](../Space/SpaceCharacter.md) first if words are separated by `_` or another character.
 

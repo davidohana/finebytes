@@ -4,15 +4,15 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 
 ## Options
 
-| Property         | Type          | Description                                                                                                            |
-| ---------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `start`          | int           | First counter value for index `0`.                                                                                     |
-| `step`           | int           | `value = start + step * n`.                                                                                            |
-| `width`          | int           | Minimum width; left-pad numeric string (see `padChar`). Use `0` for no padding.                                        |
-| `padChar`        | string        | `"0"` → pad with `0`; `"1"` → pad with space; any other non-empty string uses its **first** character; empty uses `0`. |
-| `position`       | string (enum) | `Replace`, `Prepend`, or `Append` — see **Position** below.                                                            |
-| `separator`      | string        | Between counter and original segment for `Prepend` / `Append`.                                                         |
-| `resetPerFolder` | bool          | If `true`, `n` is the file’s index **within its folder**; if `false`, **global** index.                                |
+- **`start`** (int) — First counter value for index `0`.
+- **`step`** (int) — `value = start + step * n`.
+- **`width`** (int) — Minimum width; left-pad numeric string (see `padChar`). Use `0` for no padding.
+- **`padChar`** (string)
+  - `"0"` → pad with `0`; `"1"` → pad with space; any other non-empty string uses its **first** character; empty uses
+    `0`.
+- **`position`** (string (enum)) — `Replace`, `Prepend`, or `Append` — see **Position** below.
+- **`separator`** (string) — Between counter and original segment for `Prepend` / `Append`.
+- **`resetPerFolder`** (bool) — If `true`, `n` is the file’s index **within its folder**; if `false`, **global** index.
 
 ### Position (`position`)
 
@@ -26,12 +26,23 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 
 Assume **global** index as in each row unless `resetPerFolder` is noted.
 
-| Options                                                                                                                                    | Before | After    | Comment                               |
-| ------------------------------------------------------------------------------------------------------------------------------------------ | ------ | -------- | ------------------------------------- |
-| `start`: `1`<br>`step`: `1`<br>`width`: `3`<br>`padChar`: `"0"`<br>`position`: `Replace`<br>`resetPerFolder`: `false`<br>global index: `4` | `old`  | `005`    |                                       |
-| `start`: `0`<br>`step`: `1`<br>`width`: `0`<br>`padChar`: `"0"`<br>`position`: `Prepend`<br>`separator`: `"_"`<br>global index: `2`        | `name` | `2_name` |                                       |
-| `start`: `0`<br>`step`: `1`<br>`width`: `0`<br>`padChar`: `"0"`<br>`position`: `Append`<br>`separator`: `"-"`<br>global index: `1`         | `name` | `name-1` |                                       |
-| `start`: `10`<br>`step`: `5`<br>`width`: `0`<br>`position`: `Replace`<br>`resetPerFolder`: `true`<br>in-folder index: `2`                  | `x`    | `20`     | Uses in-folder index, not global `n`. |
+- `start`: `1`; `step`: `1`; `width`: `3`; `padChar`: `"0"`; `position`: `Replace`; `resetPerFolder`:
+  `false`; global index: `4`
+  - Before: `old`
+  - After: `005`
+- `start`: `0`; `step`: `1`; `width`: `0`; `padChar`: `"0"`; `position`: `Prepend`; `separator`: `"_"`;
+  global index: `2`
+  - Before: `name`
+  - After: `2_name`
+- `start`: `0`; `step`: `1`; `width`: `0`; `padChar`: `"0"`; `position`: `Append`; `separator`: `"-"`;
+  global index: `1`
+  - Before: `name`
+  - After: `name-1`
+- `start`: `10`; `step`: `5`; `width`: `0`; `position`: `Replace`; `resetPerFolder`: `true`; in-folder
+  index: `2`
+  - Before: `x`
+  - After: `20`
+  - Comment: Uses in-folder index, not global `n`.
 
 For templates with `<file-name>`-style tokens, see [Formatter](Formatter.md).
 

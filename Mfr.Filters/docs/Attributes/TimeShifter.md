@@ -14,10 +14,12 @@ Preview updates the corresponding `DateTime` on `FileMeta`; commit applies the f
 
 ## Examples
 
-| Options                                                           | Before                           | After                            | Comment |
-| ----------------------------------------------------------------- | -------------------------------- | -------------------------------- | ------- |
-| `amount`: `1`<br>`unit`: `days`<br>`timestampField`: `lastWrite`  | Last write `2024-03-15 14:05:30` | Last write `2024-03-16 14:05:30` |         |
-| `amount`: `-2`<br>`unit`: `hours`<br>`timestampField`: `creation` | Creation `2024-03-15 14:05:30`   | Creation `2024-03-15 12:05:30`   |         |
+- `amount`: `1`; `unit`: `days`; `timestampField`: `lastWrite`
+  - Before: Last write `2024-03-15 14:05:30`
+  - After: Last write `2024-03-16 14:05:30`
+- `amount`: `-2`; `unit`: `hours`; `timestampField`: `creation`
+  - Before: Creation `2024-03-15 14:05:30`
+  - After: Creation `2024-03-15 12:05:30`
 
 ## Sample preset (JSON)
 

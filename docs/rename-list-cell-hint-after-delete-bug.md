@@ -12,11 +12,12 @@ ______________________________________________________________________
 
 ## Symptom
 
-| What works                                                | What breaks                                                     |
-| --------------------------------------------------------- | --------------------------------------------------------------- |
-| Grid **selection** after Delete (same index, MFR7 parity) | Status-bar **hover hint** (`CellStatusHintDisplay`)             |
-| Hint when list is **not** scrolled                        | Hint when a **vertical scrollbar** is present                   |
-| Hint when mouse is **not** over the deleted row           | Hint when cursor **stays** on the deleted row’s screen position |
+- Works: Grid **selection** after Delete (same index, MFR7 parity)
+  - Breaks: Status-bar **hover hint** (`CellStatusHintDisplay`)
+- Works: Hint when list is **not** scrolled
+  - Breaks: Hint when a **vertical scrollbar** is present
+- Works: Hint when mouse is **not** over the deleted row
+  - Breaks: Hint when cursor **stays** on the deleted row’s screen position
 
 **Observed wrong behavior:** Hint text changes to match the **bottom visible item on screen** (virtualized DataGrid recycle), not the newly selected row and not necessarily the row under the cursor.
 
@@ -46,14 +47,13 @@ RenameListView (pointer / selection events)
   → StatusHintView (TextBlock inlines)
 ```
 
-| File                                                      | Role                                                            |
-| --------------------------------------------------------- | --------------------------------------------------------------- |
-| `Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs`     | **All hint event handling** — primary bug surface               |
-| `Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.cs` | `RemoveSelected`, `SetSelectedEntries`, `CellStatusHintDisplay` |
-| `Mfr.App.Ui/ViewModels/RenameList/RenameListCellHint.cs`  | Column → cell text formatting                                   |
-| `Mfr.App.Ui/ViewModels/MainWindowViewModel.cs`            | `_paneStatusHintDisplay` merge                                  |
-| `Mfr.App.Ui/Views/StatusHintView.axaml.cs`                | Renders `StatusHintRun` segments                                |
-| `Mfr.App.Ui/Views/RenameList/RenameListView.axaml`        | Virtualized `DataGrid` (`ItemsSource="{Binding Entries}"`)      |
+- **`Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs`** — **All hint event handling** — primary bug surface
+- **`Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.cs`**
+  - `RemoveSelected`, `SetSelectedEntries`, `CellStatusHintDisplay`
+- **`Mfr.App.Ui/ViewModels/RenameList/RenameListCellHint.cs`** — Column → cell text formatting
+- **`Mfr.App.Ui/ViewModels/MainWindowViewModel.cs`** — `_paneStatusHintDisplay` merge
+- **`Mfr.App.Ui/Views/StatusHintView.axaml.cs`** — Renders `StatusHintRun` segments
+- **`Mfr.App.Ui/Views/RenameList/RenameListView.axaml`** — Virtualized `DataGrid` (`ItemsSource="{Binding Entries}"`)
 
 Hint format: **`Column Name: value`** with bold column (`RenameListCellHint.FormatParts`).
 

@@ -6,13 +6,21 @@ With **`onlyWhenNextIsLetterOrDigit`** **true**, insertion happens only when the
 
 ## Examples
 
-| Options                                                                                                                                                                                      | Before           | After             | Comment                                                                                         |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ----------------- | ----------------------------------------------------------------------------------------------- |
-| `afterChars`: `",;!"`<br>`onlyWhenNextIsLetterOrDigit`: `true`                                                                                                                               | `one,two,three`  | `one, two, three` |                                                                                                 |
-| `afterChars`: `",;!"`<br>`onlyWhenNextIsLetterOrDigit`: `true`                                                                                                                               | `one, two,three` | `one, two, three` |                                                                                                 |
-| `afterChars`: `",;!"`<br>`onlyWhenNextIsLetterOrDigit`: `true`                                                                                                                               | `Blaaa!blaaa!!`  | `Blaaa! blaaa!!`  | Second `!` is followed by `!`, not a letter/digit.                                              |
-| `afterChars`: `","`<br>`onlyWhenNextIsLetterOrDigit`: `false`                                                                                                                                | `a,b`            | `a, b`            | Inserts even when the next character is not a letter/digit.                                     |
-| [SpaceCharacter](SpaceCharacter.md)<br>`spaceCharacter`: `"_"` (prefix target; no replacements required)<br>then SpaceAfter<br>`afterChars`: `","`<br>`onlyWhenNextIsLetterOrDigit`: `false` | `x,y`            | `x,_y`            | Separator is `_`; insertion is immediately after the comma, before the original next character. |
+- `afterChars`: `",;!"`; `onlyWhenNextIsLetterOrDigit`: `true` — `one,two,three` → `one, two, three`
+- `afterChars`: `",;!"`; `onlyWhenNextIsLetterOrDigit`: `true` — `one, two,three` → `one, two, three`
+- `afterChars`: `",;!"`; `onlyWhenNextIsLetterOrDigit`: `true`
+  - Before: `Blaaa!blaaa!!`
+  - After: `Blaaa! blaaa!!`
+  - Comment: Second `!` is followed by `!`, not a letter/digit.
+- `afterChars`: `","`; `onlyWhenNextIsLetterOrDigit`: `false`
+  - Before: `a,b`
+  - After: `a, b`
+  - Comment: Inserts even when the next character is not a letter/digit.
+- [SpaceCharacter](SpaceCharacter.md); `spaceCharacter`: `"_"` (prefix target; no replacements required);
+  then SpaceAfter; `afterChars`: `","`; `onlyWhenNextIsLetterOrDigit`: `false`
+  - Before: `x,y`
+  - After: `x,_y`
+  - Comment: Separator is `_`; insertion is immediately after the comma, before the original next character.
 
 ## Sample preset (JSON)
 

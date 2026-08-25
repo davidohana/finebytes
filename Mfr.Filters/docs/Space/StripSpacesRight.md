@@ -6,12 +6,10 @@ No `options` object.
 
 ## Examples
 
-| Options                                                                                 | Before          | After        | Comment |
-| --------------------------------------------------------------------------------------- | --------------- | ------------ | ------- |
-| (no options)<br>default word separator                                                  | `New_York__   ` | `New_York__` |         |
-| (no options)<br>default word separator                                                  | ` a b`          | `  a b`      |         |
-| (no options)<br>default word separator                                                  | `    `          | _(empty)_    |         |
-| [SpaceCharacter](SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>then StripSpacesRight | `__New_York__`  | `__New_York` |         |
+- (no options); default word separator: `New_York__   ` → `New_York__`
+- (no options); default word separator: ` a b` → `  a b`
+- (no options); default word separator: `    ` → _(empty)_
+- [SpaceCharacter](SpaceCharacter.md); `spaceCharacter`: `"_"`; then StripSpacesRight: `__New_York__` → `__New_York`
 
 ## Sample preset (JSON)
 

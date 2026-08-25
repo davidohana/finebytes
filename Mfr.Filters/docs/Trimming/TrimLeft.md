@@ -4,9 +4,8 @@ Removes a fixed number of characters from the **left** end of the segment. The c
 
 ## Options
 
-| Property | Type | Description                                                                                           |
-| -------- | ---- | ----------------------------------------------------------------------------------------------------- |
-| `count`  | int  | How many characters to remove from the start (minimum 0; values beyond length are treated as length). |
+- **`count`** (int)
+  - How many characters to remove from the start (minimum 0; values beyond length are treated as length).
 
 ## Examples
 

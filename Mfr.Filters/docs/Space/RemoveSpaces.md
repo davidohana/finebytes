@@ -6,10 +6,11 @@ No `options` object.
 
 ## Examples
 
-| Options                                | Before      | After      | Comment                                                           |
-| -------------------------------------- | ----------- | ---------- | ----------------------------------------------------------------- |
-| (no options)<br>default word separator | `a b`       | `ab`       |                                                                   |
-| (no options)<br>default word separator | `a \t\r\nb` | `a\t\r\nb` | Only the word-separator char (space) removed, not `\t`/`\r`/`\n`. |
+- (no options); default word separator: `a b` → `ab`
+- (no options); default word separator
+  - Before: `a \t\r\nb`
+  - After: `a\t\r\nb`
+  - Comment: Only the word-separator char (space) removed, not `\t`/`\r`/`\n`.
 
 After [SpaceCharacter](SpaceCharacter.md) with `_` as separator, each `_` is removed the same way.
 

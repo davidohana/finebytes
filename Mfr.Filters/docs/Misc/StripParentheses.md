@@ -4,10 +4,12 @@ Removes **one kind** of bracket pair: round `()`, square `[]`, curly `{}`, or an
 
 ## Options
 
-| Property         | Type          | Description                                                                                                                                |
-| ---------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `type`           | string (enum) | Bracket style: `Round`, `Square`, `Curly`, or `Angle`. (This is the `type` field **inside** `options`, not the filter’s top-level `type`.) |
-| `removeContents` | bool          | If `true`, remove opening + closing + everything between. If `false`, remove only the opening and closing characters (content stays).      |
+- **`type`** (string (enum))
+  - Bracket style: `Round`, `Square`, `Curly`, or `Angle`. (This is the `type` field **inside** `options`, not the
+    filter’s top-level `type`.)
+- **`removeContents`** (bool)
+  - If `true`, remove opening + closing + everything between. If `false`, remove only the opening and closing
+    characters (content stays).
 
 ## Examples
 

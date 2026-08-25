@@ -47,13 +47,12 @@ flowchart LR
 
 ## Layer map
 
-| Concern                       | Project / type                                                                                              |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Snapshot records              | `Mfr.Models` — `ImageProperties` on `FileMeta.Image`; `ExifData` on `FileMeta.Exif`                         |
-| Disk read / raster + EXIF map | `Mfr.Metadata` — `ImageFileReader`, `ImagePropertiesReader`, `ExifDataReader`                               |
-| Lazy load                     | `Mfr.Filters` — `RenameItemImagePropertiesExtensions.EnsureImagePropertiesLoaded`                           |
-| Tokens                        | `Mfr.Filters` — `ImagePropertyTokenBase` (`image-*`); `ExifPropertyTokenBase`, `ExifDateToken`, `ExifToken` |
-| Commit cache clear            | `Mfr.Engine` — `RenameList.Commit` calls `ClearMetadataCaches`                                              |
+- **Snapshot records** — `Mfr.Models` — `ImageProperties` on `FileMeta.Image`; `ExifData` on `FileMeta.Exif`
+- **Disk read / raster + EXIF map** — `Mfr.Metadata` — `ImageFileReader`, `ImagePropertiesReader`, `ExifDataReader`
+- **Lazy load** — `Mfr.Filters` — `RenameItemImagePropertiesExtensions.EnsureImagePropertiesLoaded`
+- **Tokens**
+  - `Mfr.Filters` — `ImagePropertyTokenBase` (`image-*`); `ExifPropertyTokenBase`, `ExifDateToken`, `ExifToken`
+- **Commit cache clear** — `Mfr.Engine` — `RenameList.Commit` calls `ClearMetadataCaches`
 
 ## Cache lifetime
 
@@ -67,14 +66,13 @@ tests never hit disk. Integration-style tests construct an unmarked `RenameItem`
 
 ## Empty vs PreviewError
 
-| Situation                                                             | Result                                                     |
-| --------------------------------------------------------------------- | ---------------------------------------------------------- |
-| Directory row                                                         | `InvalidOperationException` from ensure → PreviewError     |
-| Missing / relative path                                               | `ArgumentException` from the reader → PreviewError         |
-| Unknown format / ME processing or IO failure (e.g. `.txt`)            | Propagated ME exception → PreviewError                     |
-| ME opens a non-allowlist type (MP3, WAV, MP4, …)                      | `InvalidOperationException` naming the type → PreviewError |
-| Mapped raster, missing image field (no DPI, WebP bit depth, `0` dims) | That `image-*` token expands **empty**, not an error       |
-| Mapped raster, missing EXIF / missing EXIF field                      | That `exif-*` token expands **empty**, not an error        |
+- **Directory row** — `InvalidOperationException` from ensure → PreviewError
+- **Missing / relative path** — `ArgumentException` from the reader → PreviewError
+- **Unknown format / ME processing or IO failure (e.g. `.txt`)** — Propagated ME exception → PreviewError
+- **ME opens a non-allowlist type (MP3, WAV, MP4, …)** — `InvalidOperationException` naming the type → PreviewError
+- **Mapped raster, missing image field (no DPI, WebP bit depth, `0` dims)**
+  - That `image-*` token expands **empty**, not an error
+- **Mapped raster, missing EXIF / missing EXIF field** — That `exif-*` token expands **empty**, not an error
 
 ## Mapped image fields (5a)
 
@@ -90,12 +88,17 @@ JPEG/PNG/BMP/WebP are `1` when width or height is known.
 Text and camera fields use MetadataExtractor `GetDescription(tag)`, then `\n` → space and trim; blank
 becomes null. That keeps display strings such as `1/60 sec`, `f/8.0`, `50 mm`.
 
-| Field                                                                  | Directory             | Tag                                                                                                                                    |
-| ---------------------------------------------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| DateTaken                                                              | `ExifSubIfdDirectory` | `TagDateTimeOriginal` (36867) via `TryGetDateTime` only; `DateTimeKind.Unspecified`; no fallback to DateTimeDigitized or IFD0 DateTime |
-| Make / Model / Artist / Description                                    | `ExifIfd0Directory`   | Make / Model / Artist / Image Description                                                                                              |
-| Title / Subject / Author / Keywords / Comments                         | `ExifIfd0Directory`   | Windows XP Title / Subject / Author / Keywords / Comment                                                                               |
-| Exposure / FNumber / Iso / FocalLength / FocalLength35mm / UserComment | `ExifSubIfdDirectory` | Exposure Time / F-Number / ISO Speed Ratings / Focal Length / Focal Length 35 / User Comment                                           |
+- **DateTaken**
+  - Directory: `ExifSubIfdDirectory`
+  - Tag: `TagDateTimeOriginal` (36867) via `TryGetDateTime` only; `DateTimeKind.Unspecified`; no fallback to
+    DateTimeDigitized or IFD0 DateTime
+- **Make / Model / Artist / Description** — `ExifIfd0Directory`: Make / Model / Artist / Image Description
+- **Title / Subject / Author / Keywords / Comments**
+  - Directory: `ExifIfd0Directory`
+  - Tag: Windows XP Title / Subject / Author / Keywords / Comment
+- **Exposure / FNumber / Iso / FocalLength / FocalLength35mm / UserComment**
+  - Directory: `ExifSubIfdDirectory`
+  - Tag: Exposure Time / F-Number / ISO Speed Ratings / Focal Length / Focal Length 35 / User Comment
 
 JPEG Tag extras (Title, Subject, Author, Keywords, Comments, Artist, UserComment, Description) are
 stored for later columns and reachable via `<exif:Exif,…>` / `<exif:ExifSub,User Comment>`. There are

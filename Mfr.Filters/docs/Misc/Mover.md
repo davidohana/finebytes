@@ -6,20 +6,28 @@ The preview **Parent Directory** is replaced with `RootFolder` + `\` + resolved 
 
 ## Options
 
-| Property     | Type   | Description                                                                                                                                                                                                                                |
-| ------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `rootFolder` | string | Required. Absolute destination path. All items move under this root.                                                                                                                                                                       |
-| `subFolder`  | string | Optional. Template appended below `rootFolder`. Use `\` to build nested levels. Supports formatter tokens (`<file-name>`, `<parent-folder>`, `<now:format>`, `<counter:…>`). Use `""` when none; items then land directly in `rootFolder`. |
+- **`rootFolder`** (string) — Required. Absolute destination path. All items move under this root.
+- **`subFolder`** (string)
+  - Optional. Template appended below `rootFolder`. Use `\` to build nested levels. Supports formatter tokens
+    (`<file-name>`, `<parent-folder>`, `<now:format>`, `<counter:…>`). Use `""` when none; items then land directly in
+    `rootFolder`.
 
 ## Examples
 
-| Options                                                                    | Before (directory)                                     | After (directory)                            | Comment                                         |
-| -------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------- | ----------------------------------------------- |
-| `rootFolder`: `C:\Dest`                                                    | `C:\Source`                                            | `C:\Dest`                                    | No sub-folder; flat move.                       |
-| `rootFolder`: `C:\Music`<br>`subFolder`: `Albums`                          | `C:\Downloads`                                         | `C:\Music\Albums`                            | Static sub-folder.                              |
-| `rootFolder`: `C:\Music`<br>`subFolder`: `<parent-folder>`                 | `C:\Downloads\Junkies`                                 | `C:\Music\Junkies`                           | Parent folder name resolved from original path. |
-| `rootFolder`: `C:\Music\New`<br>`subFolder`: `<parent-folder>\<file-name>` | `C:\Downloads\Cowboy Junkies` (file: `03 - Blue Moon`) | `C:\Music\New\Cowboy Junkies\03 - Blue Moon` | Two-level dynamic sub-folder.                   |
-| `rootFolder`: `C:\Archive`<br>`subFolder`: `<now:yyyy>`                    | `C:\Inbox`                                             | `C:\Archive\2026`                            | Year-based folder using the `now` token.        |
+- `rootFolder`: `C:\Dest` — `C:\Source` → `C:\Dest` — No sub-folder; flat move.
+- `rootFolder`: `C:\Music`; `subFolder`: `Albums` — `C:\Downloads` → `C:\Music\Albums` — Static sub-folder.
+- `rootFolder`: `C:\Music`; `subFolder`: `<parent-folder>`
+  - Before: `C:\Downloads\Junkies`
+  - After: `C:\Music\Junkies`
+  - Comment: Parent folder name resolved from original path.
+- `rootFolder`: `C:\Music\New`; `subFolder`: `<parent-folder>\<file-name>`
+  - Before: `C:\Downloads\Cowboy Junkies` (file: `03 - Blue Moon`)
+  - After: `C:\Music\New\Cowboy Junkies\03 - Blue Moon`
+  - Comment: Two-level dynamic sub-folder.
+- `rootFolder`: `C:\Archive`; `subFolder`: `<now:yyyy>`
+  - Before: `C:\Inbox`
+  - After: `C:\Archive\2026`
+  - Comment: Year-based folder using the `now` token.
 
 ## Sample preset (JSON)
 

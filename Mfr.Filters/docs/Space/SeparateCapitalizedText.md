@@ -14,11 +14,12 @@ No `options` object.
 
 ## Examples
 
-| Options                                                                                                    | Before                  | After                      | Comment                                   |
-| ---------------------------------------------------------------------------------------------------------- | ----------------------- | -------------------------- | ----------------------------------------- |
-| (no options)<br>default word separator                                                                     | `DandyWorhols01Godless` | `Dandy Worhols 01 Godless` |                                           |
-| (no options)<br>default word separator                                                                     | `song2remix`            | `song 2 remix`             | Letter–digit and digit–letter boundaries. |
-| [SpaceCharacter](SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>other flags: `false`<br>then this filter | `aBc12x`                | `a_Bc_12_x`                | Same rules; inserts underscores.          |
+- (no options); default word separator: `DandyWorhols01Godless` → `Dandy Worhols 01 Godless`
+- (no options); default word separator: `song2remix` → `song 2 remix` — Letter–digit and digit–letter boundaries.
+- [SpaceCharacter](SpaceCharacter.md); `spaceCharacter`: `"_"`; other flags: `false`; then this filter
+  - Before: `aBc12x`
+  - After: `a_Bc_12_x`
+  - Comment: Same rules; inserts underscores.
 
 Put [SpaceCharacter](SpaceCharacter.md) **before** this filter when you want a non-space separator.
 

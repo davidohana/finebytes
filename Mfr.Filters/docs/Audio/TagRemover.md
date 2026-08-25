@@ -4,10 +4,12 @@ Removes embedded tag blocks — either **selected** types, or a **nuclear** wipe
 
 ## Modes
 
-| `options`         | Preview                                              | Commit                                                                             |
-| ----------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `"all": true`     | Clears all modeled overlay blocks (`ClearAllBlocks`) | Nuclear: `RemoveTags(AllTags)` (see below)                                         |
-| `"blocks": [...]` | Nulls each listed block                              | `RemoveTags` for those types only; surviving blocks stay writable by later filters |
+- **`"all": true`**
+  - Preview: Clears all modeled overlay blocks (`ClearAllBlocks`)
+  - Commit: Nuclear: `RemoveTags(AllTags)` (see below)
+- **`"blocks": [...]`**
+  - Preview: Nulls each listed block
+  - Commit: `RemoveTags` for those types only; surviving blocks stay writable by later filters
 
 When `all` is true, `blocks` is ignored. When `all` is false (or omitted), `blocks` must list at least one type.
 
@@ -37,10 +39,9 @@ So for a normal MP3/FLAC/M4A that only carries modeled blocks, `all: true` and `
 
 ## Options
 
-| Option   | Type             | Description                                                                                      |
-| -------- | ---------------- | ------------------------------------------------------------------------------------------------ |
-| `all`    | boolean          | When `true`, nuclear strip (see above). Default `false`.                                         |
-| `blocks` | array of strings | Tag block types to remove when `all` is false. At least one entry required unless `all` is true. |
+- **`all`** (boolean) — When `true`, nuclear strip (see above). Default `false`.
+- **`blocks`** (array of strings)
+  - Tag block types to remove when `all` is false. At least one entry required unless `all` is true.
 
 Valid `blocks` values and the containers that can hold them:
 
@@ -80,12 +81,22 @@ Naming a block the row's container cannot hold is a **preview error** (for examp
 
 ## Examples
 
-| Options                                          | Before                                         | After                         | Comment                                                            |
-| ------------------------------------------------ | ---------------------------------------------- | ----------------------------- | ------------------------------------------------------------------ |
-| `all: true`                                      | Tagged `.wav` / `.mp3` / image with XMP        | No embedded tags left         | XMP and other unmodeled TagLib types go too                        |
-| `all: true`                                      | Chain: TagRemover → Formatter on `audio-title` | New title written after strip | Commit runs strip **then** overlay merge                           |
-| `blocks: ["id3v1"]`                              | `.mp3` with ID3v1 + ID3v2                      | ID3v2 only                    | ID3v2 frames, including art, are untouched                         |
-| `blocks: ["id3v1"]`                              | `.mp3` with ID3v2 only                         | Unchanged                     | Supported block that is absent is a no-op                          |
-| `blocks: ["id3v1", "id3v2"]`                     | `.mp3` with ID3v1 + ID3v2                      | No modeled tags               | Unlike `all: true`, unmodeled TagLib types (if any) stay           |
-| `blocks: ["id3v2"]`                              | `.flac`                                        | Preview error                 | FLAC cannot hold ID3v2; supported blocks are listed in the message |
-| `blocks: ["id3v1"]` → Formatter on `audio-title` | `.mp3` with conflicting ID3v1/ID3v2 titles     | Title written to ID3v2 only   | Removing the block first keeps the generic write off the trailer   |
+- `all: true`
+  - Before: Tagged `.wav` / `.mp3` / image with XMP
+  - After: `No embedded tags left`
+  - Comment: XMP and other unmodeled TagLib types go too
+- `all: true`
+  - Before: Chain: TagRemover → Formatter on `audio-title`
+  - After: `New title written after strip`
+  - Comment: Commit runs strip **then** overlay merge
+- `blocks: ["id3v1"]`: `.mp3` with ID3v1 + ID3v2 → `ID3v2 only` — ID3v2 frames, including art, are untouched
+- `blocks: ["id3v1"]`: `.mp3` with ID3v2 only → `Unchanged` — Supported block that is absent is a no-op
+- `blocks: ["id3v1", "id3v2"]`
+  - Before: `.mp3` with ID3v1 + ID3v2
+  - After: `No modeled tags`
+  - Comment: Unlike `all: true`, unmodeled TagLib types (if any) stay
+- `blocks: ["id3v2"]` — `.flac` → `Preview error` — FLAC cannot hold ID3v2; supported blocks are listed in the message
+- `blocks: ["id3v1"]` → Formatter on `audio-title`
+  - Before: `.mp3` with conflicting ID3v1/ID3v2 titles
+  - After: `Title written to ID3v2 only`
+  - Comment: Removing the block first keeps the generic write off the trailer

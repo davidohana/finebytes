@@ -12,10 +12,13 @@ Preview updates the corresponding `DateTime` on `FileMeta`; commit applies `File
 
 ## Examples
 
-| Options                                              | Before                            | After                             | Comment         |
-| ---------------------------------------------------- | --------------------------------- | --------------------------------- | --------------- |
-| `time`: `09:00:15`<br>`timestampField`: `creation`   | Creation `2024-03-15 14:05:30`    | Creation `2024-03-15 09:00:15`    | Date preserved. |
-| `time`: `23:59:01`<br>`timestampField`: `lastAccess` | Last access `2019-01-01 12:00:00` | Last access `2019-01-01 23:59:01` |                 |
+- `time`: `09:00:15`; `timestampField`: `creation`
+  - Before: Creation `2024-03-15 14:05:30`
+  - After: Creation `2024-03-15 09:00:15`
+  - Comment: Date preserved.
+- `time`: `23:59:01`; `timestampField`: `lastAccess`
+  - Before: Last access `2019-01-01 12:00:00`
+  - After: Last access `2019-01-01 23:59:01`
 
 ## Sample preset (JSON)
 

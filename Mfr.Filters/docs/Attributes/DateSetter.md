@@ -12,10 +12,11 @@ Preview updates the corresponding `DateTime` on `FileMeta`; commit applies the f
 
 ## Examples
 
-| Options                                               | Before                           | After                            | Comment                |
-| ----------------------------------------------------- | -------------------------------- | -------------------------------- | ---------------------- |
-| `date`: `2020-12-25`<br>`timestampField`: `lastWrite` | Last write `2024-03-15 14:05:30` | Last write `2020-12-25 14:05:30` | Time of day preserved. |
-| `date`: `2019-01-01`<br>`timestampField`: `creation`  | Creation `2010-06-01 09:00:00`   | Creation `2019-01-01 09:00:00`   |                        |
+- `date`: `2020-12-25`; `timestampField`: `lastWrite`
+  - Before: Last write `2024-03-15 14:05:30`
+  - After: Last write `2020-12-25 14:05:30`
+  - Comment: Time of day preserved.
+- `date`: `2019-01-01`; `timestampField`: `creation`: Creation `2010-06-01 09:00:00` → Creation `2019-01-01 09:00:00`
 
 ## Sample preset (JSON)
 

@@ -14,11 +14,12 @@ If there is nothing to remove, the segment is unchanged.
 
 ## Examples
 
-| Options                                                                                | Before           | After       | Comment                             |
-| -------------------------------------------------------------------------------------- | ---------------- | ----------- | ----------------------------------- |
-| `removeIllegalChars`: `true`<br>`customCharsToRemove`: `""`<br>`replacement`: `"_"`    | `a/b`            | `a_b`       |                                     |
-| `removeIllegalChars`: `false`<br>`customCharsToRemove`: `"@#"`<br>`replacement`: `"-"` | `a@b#c`          | `a-b-c`     |                                     |
-| `removeIllegalChars`: `true`<br>`customCharsToRemove`: `"@#"`<br>`replacement`: `"X"`  | `a/b@c#d&#124;e` | `aXbXcXdXe` | Illegal + custom chars in one pass. |
+- `removeIllegalChars`: `true`; `customCharsToRemove`: `""`; `replacement`: `"_"` — `a/b` → `a_b`
+- `removeIllegalChars`: `false`; `customCharsToRemove`: `"@#"`; `replacement`: `"-"` — `a@b#c` → `a-b-c`
+- `removeIllegalChars`: `true`; `customCharsToRemove`: `"@#"`; `replacement`: `"X"`
+  - Before: `a/b@c#d&#124;e`
+  - After: `aXbXcXdXe`
+  - Comment: Illegal + custom chars in one pass.
 
 Run **Cleaner** early if later filters assume a safe file name.
 

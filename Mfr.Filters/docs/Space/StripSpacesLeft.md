@@ -6,12 +6,12 @@ No `options` object.
 
 ## Examples
 
-| Options                                                                                | Before              | After            | Comment |
-| -------------------------------------------------------------------------------------- | ------------------- | ---------------- | ------- |
-| (no options)<br>default word separator                                                 | `   New_York__.jpg` | `New_York__.jpg` |         |
-| (no options)<br>default word separator                                                 | ` a b`              | `a b `           |         |
-| (no options)<br>default word separator                                                 | `    `              | _(empty)_        |         |
-| [SpaceCharacter](SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>then StripSpacesLeft | `__New_York__.jpg`  | `New_York__.jpg` |         |
+- (no options); default word separator: `   New_York__.jpg` → `New_York__.jpg`
+- (no options); default word separator: ` a b` → `a b `
+- (no options); default word separator: `    ` → _(empty)_
+- [SpaceCharacter](SpaceCharacter.md); `spaceCharacter`: `"_"`; then StripSpacesLeft
+  - Before: `__New_York__.jpg`
+  - After: `New_York__.jpg`
 
 ## Sample preset (JSON)
 
