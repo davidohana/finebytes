@@ -88,6 +88,12 @@ namespace Mfr.App.Ui.Input
         /// <summary>Locates the selected Rename List row in the File List when the grid has focus.</summary>
         public static KeyGesture LocateInFileList { get; } = new(Key.F4);
 
+        /// <summary>Moves selected Rename List rows up when the grid has focus.</summary>
+        public static KeyGesture MoveSelectedUp { get; } = new(Key.Up, KeyModifiers.Control);
+
+        /// <summary>Moves selected Rename List rows down when the grid has focus.</summary>
+        public static KeyGesture MoveSelectedDown { get; } = new(Key.Down, KeyModifiers.Control);
+
         /// <summary>Toolbar and menu tip for GO.</summary>
         public const string GoTip = "GO (Ctrl+G)";
 
@@ -117,6 +123,12 @@ namespace Mfr.App.Ui.Input
 
         /// <summary>Rename List Locate in File List menu tip.</summary>
         public const string LocateInFileListTip = "Locate in File List (F4)";
+
+        /// <summary>Rename List Move Selected Up button and menu tip.</summary>
+        public const string MoveSelectedUpTip = "Move selected up (Ctrl+Up)";
+
+        /// <summary>Rename List Move Selected Down button and menu tip.</summary>
+        public const string MoveSelectedDownTip = "Move selected down (Ctrl+Down)";
 
         /// <summary>File List refresh button tip.</summary>
         public const string RefreshTip = "Refresh (F5)";

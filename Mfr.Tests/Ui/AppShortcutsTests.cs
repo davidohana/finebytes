@@ -53,6 +53,8 @@ namespace Mfr.Tests.Ui
             );
             Assert.Equal(new KeyGesture(Key.Delete), AppShortcuts.RemoveSelectedDelete);
             Assert.Equal(new KeyGesture(Key.F4), AppShortcuts.LocateInFileList);
+            Assert.Equal(new KeyGesture(Key.Up, KeyModifiers.Control), AppShortcuts.MoveSelectedUp);
+            Assert.Equal(new KeyGesture(Key.Down, KeyModifiers.Control), AppShortcuts.MoveSelectedDown);
         }
     }
 }

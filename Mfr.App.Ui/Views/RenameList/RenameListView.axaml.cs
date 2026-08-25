@@ -49,6 +49,7 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameGrid.PointerEntered += _OnGridPointerEntered;
             RenameGrid.PointerExited += _OnGridPointerExited;
             RenameGrid.AddHandler(PointerMovedEvent, _OnGridPointerMoved, RoutingStrategies.Tunnel);
+            RenameGrid.AddHandler(KeyDownEvent, _OnGridKeyDown, RoutingStrategies.Tunnel);
             DragDrop.SetAllowDrop(this, true);
             AddHandler(DragDrop.DragOverEvent, _OnDragOver);
             AddHandler(DragDrop.DropEvent, _OnDrop);
@@ -84,7 +85,9 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnEntriesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action is NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Reset)
+            // Only row removals: Reset is used for bulk add and reorder, which must not freeze the hint
+            // (and must allow selection sync while the grid rebuilds).
+            if (e.Action is NotifyCollectionChangedAction.Remove)
             {
                 _BeginHintFreeze();
             }
@@ -157,10 +160,25 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <inheritdoc />
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (_viewModel is null || _viewModel.IsAdding)
+            if (_TryHandleRenameListShortcut(e))
             {
-                base.OnKeyDown(e);
                 return;
+            }
+
+            base.OnKeyDown(e);
+        }
+
+        private void _OnGridKeyDown(object? sender, KeyEventArgs e)
+        {
+            // Tunnel so Ctrl+Up/Down are not consumed by DataGrid navigation.
+            _ = _TryHandleRenameListShortcut(e);
+        }
+
+        private bool _TryHandleRenameListShortcut(KeyEventArgs e)
+        {
+            if (_viewModel is null || _viewModel.IsAdding || e.Handled)
+            {
+                return false;
             }
 
             if (_MatchesGesture(e, AppShortcuts.RemoveSelectedDelete))
@@ -173,7 +191,7 @@ namespace Mfr.App.Ui.Views.RenameList
                     _PublishFrozenHint();
                     _ScheduleVerticalScrollRestore();
                     e.Handled = true;
-                    return;
+                    return true;
                 }
             }
 
@@ -183,11 +201,31 @@ namespace Mfr.App.Ui.Views.RenameList
                 {
                     _viewModel.LocateInFileListCommand.Execute(null);
                     e.Handled = true;
-                    return;
+                    return true;
                 }
             }
 
-            base.OnKeyDown(e);
+            if (_MatchesGesture(e, AppShortcuts.MoveSelectedUp))
+            {
+                if (_viewModel.MoveSelectedUpCommand.CanExecute(null))
+                {
+                    _viewModel.MoveSelectedUpCommand.Execute(null);
+                    e.Handled = true;
+                    return true;
+                }
+            }
+
+            if (_MatchesGesture(e, AppShortcuts.MoveSelectedDown))
+            {
+                if (_viewModel.MoveSelectedDownCommand.CanExecute(null))
+                {
+                    _viewModel.MoveSelectedDownCommand.Execute(null);
+                    e.Handled = true;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool _MatchesGesture(KeyEventArgs e, KeyGesture gesture)

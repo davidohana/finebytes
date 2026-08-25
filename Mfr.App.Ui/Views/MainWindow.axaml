@@ -277,6 +277,16 @@
           Command="{Binding RenameListViewModel.LocateInFileListCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.LocateInFileList}"
         />
+        <MenuItem
+          Header="Move Selected Up"
+          Command="{Binding RenameListViewModel.MoveSelectedUpCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.MoveSelectedUp}"
+        />
+        <MenuItem
+          Header="Move Selected Down"
+          Command="{Binding RenameListViewModel.MoveSelectedDownCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.MoveSelectedDown}"
+        />
         <Separator />
         <MenuItem Header="Auto-Sort" IsEnabled="False" />
         <MenuItem Header="Auto-Preview" IsEnabled="False" />

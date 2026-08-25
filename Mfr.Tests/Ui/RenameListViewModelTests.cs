@@ -661,6 +661,82 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Move Selected Up reorders a contiguous selection as a block.
+        /// </summary>
+        [Fact]
+        public async Task MoveSelectedUp_Moves_Contiguous_Selection_As_Block()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            Assert.False(renameListViewModel.MoveSelectedUpCommand.CanExecute(null));
+
+            var beta = renameListViewModel.Entries[1];
+            var gamma = renameListViewModel.Entries[2];
+            renameListViewModel.SetSelectedEntries([beta, gamma]);
+            Assert.True(renameListViewModel.MoveSelectedUpCommand.CanExecute(null));
+
+            renameListViewModel.MoveSelectedUpCommand.Execute(null);
+
+            Assert.Equal(["beta.md", "gamma.log", "alpha.txt"], _PreviewNames(renameListViewModel));
+            Assert.Equal([beta, gamma], renameListViewModel.SelectedEntries);
+        }
+
+        /// <summary>
+        /// Verifies Move Selected Down reorders a contiguous selection as a block.
+        /// </summary>
+        [Fact]
+        public async Task MoveSelectedDown_Moves_Contiguous_Selection_As_Block()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            var alpha = renameListViewModel.Entries[0];
+            var beta = renameListViewModel.Entries[1];
+            renameListViewModel.SetSelectedEntries([alpha, beta]);
+
+            renameListViewModel.MoveSelectedDownCommand.Execute(null);
+
+            Assert.Equal(["gamma.log", "alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
+            Assert.Equal([alpha, beta], renameListViewModel.SelectedEntries);
+        }
+
+        /// <summary>
+        /// Verifies Move Selected Up at the top leaves order unchanged.
+        /// </summary>
+        [Fact]
+        public async Task MoveSelectedUp_At_Top_Is_NoOp()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+            renameListViewModel.MoveSelectedUpCommand.Execute(null);
+
+            Assert.Equal(["alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
+        }
+
+        /// <summary>
         /// Verifies Locate in File List navigates to the row folder and selects the item.
         /// </summary>
         [Fact]

@@ -27,7 +27,7 @@ namespace Mfr.Engine.RenameList
         /// <remarks>
         /// <para>
         /// Used when assigning <see cref="FileMeta.InFolderIndex"/> on add and rebuilt by
-        /// <c>_ReindexItems</c> after remove. Also feeds <see cref="FileMeta.RenameListFolderSiblingCount"/>
+        /// <c>_ReindexItems</c> after remove or move. Also feeds <see cref="FileMeta.RenameListFolderSiblingCount"/>
         /// during preview (for example per-folder <c>&lt;counter&gt;</c> width).
         /// </para>
         /// </remarks>
@@ -35,7 +35,7 @@ namespace Mfr.Engine.RenameList
         private readonly bool _includeHidden = includeHidden;
 
         /// <summary>
-        /// Gets the resolved file items in insertion/discovery order.
+        /// Gets the resolved file items in current list order.
         /// </summary>
         public IReadOnlyList<RenameItem> RenameItems => _renameItems;
 
@@ -251,6 +251,76 @@ namespace Mfr.Engine.RenameList
             _includedResolvedPaths.Clear();
             _folderPathToCount.Clear();
             Log.Information("Cleared rename list ({RemovedCount} item(s)).", removedCount);
+        }
+
+        /// <summary>
+        /// Moves the given items one position by <paramref name="offset"/>.
+        /// </summary>
+        /// <param name="items">Items to move; entries not in the list are ignored.</param>
+        /// <param name="offset">Negative moves toward the start; positive toward the end.</param>
+        /// <returns><see langword="true"/> when at least one item changed position.</returns>
+        /// <remarks>
+        /// <para>
+        /// Contiguous selected blocks move as a unit. Items already at the list edge (or blocked by
+        /// another selected neighbor in that direction) stay put. Matches MFR7 manual sort.
+        /// </para>
+        /// </remarks>
+        public bool MoveSelected(IEnumerable<RenameItem> items, int offset)
+        {
+            ArgumentNullException.ThrowIfNull(items);
+
+            if (offset is not (-1 or 1))
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset), offset, "Offset must be -1 or 1.");
+            }
+
+            var selected = items.ToHashSet();
+            if (selected.Count == 0 || _renameItems.Count == 0)
+            {
+                return false;
+            }
+
+            var moved = false;
+            var walkStep = -offset;
+            var startIndex = walkStep > 0 ? 0 : _renameItems.Count - 1;
+            for (var i = startIndex; i >= 0 && i < _renameItems.Count; i += walkStep)
+            {
+                if (!_CanSwapTowardNeighbor(selected, i, offset))
+                {
+                    continue;
+                }
+
+                var neighborIndex = i + offset;
+                (_renameItems[i], _renameItems[neighborIndex]) = (_renameItems[neighborIndex], _renameItems[i]);
+                moved = true;
+            }
+
+            if (!moved)
+            {
+                return false;
+            }
+
+            _ReindexItems();
+            return true;
+        }
+
+        /// <summary>
+        /// Whether the item at <paramref name="index"/> is selected and can swap with the neighbor.
+        /// </summary>
+        private bool _CanSwapTowardNeighbor(HashSet<RenameItem> selected, int index, int offset)
+        {
+            if (!selected.Contains(_renameItems[index]))
+            {
+                return false;
+            }
+
+            var neighborIndex = index + offset;
+            if (neighborIndex < 0 || neighborIndex >= _renameItems.Count)
+            {
+                return false;
+            }
+
+            return !selected.Contains(_renameItems[neighborIndex]);
         }
 
         /// <summary>
@@ -503,7 +573,7 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Reassigns list and per-folder indices after items are removed.
+        /// Reassigns list and per-folder indices after items are removed or moved.
         /// </summary>
         private void _ReindexItems()
         {

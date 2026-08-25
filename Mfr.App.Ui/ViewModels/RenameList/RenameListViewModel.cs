@@ -108,6 +108,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             OnPropertyChanged(nameof(SelectedEntries));
             RemoveSelectedCommand.NotifyCanExecuteChanged();
             RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
+            MoveSelectedUpCommand.NotifyCanExecuteChanged();
+            MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
         }
 
@@ -257,6 +259,46 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             SetSelectedEntries([]);
             CellStatusHintDisplay = StatusHintDisplay.Empty;
             _NotifyListChanged();
+        }
+
+        /// <summary>
+        /// Moves the selected Rename List rows one position up.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanRemoveSelected))]
+        public void MoveSelectedUp()
+        {
+            _MoveSelected(offset: -1);
+        }
+
+        /// <summary>
+        /// Moves the selected Rename List rows one position down.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanRemoveSelected))]
+        public void MoveSelectedDown()
+        {
+            _MoveSelected(offset: 1);
+        }
+
+        /// <summary>
+        /// Reorders selected rows in the engine and grid by one step.
+        /// </summary>
+        private void _MoveSelected(int offset)
+        {
+            if (_selectedEntries.Count == 0)
+            {
+                return;
+            }
+
+            var engineItems = _selectedEntries.Select(entry => entry.EngineItem);
+            if (!_renameList.MoveSelected(engineItems, offset))
+            {
+                return;
+            }
+
+            // DataGrid ignores Move; ReplaceAll raises Reset so the grid refreshes.
+            var engineItemToEntry = Entries.ToDictionary(entry => entry.EngineItem);
+            Entries.ReplaceAll(_renameList.RenameItems.Select(item => engineItemToEntry[item]));
+            SetSelectedEntries([.. _selectedEntries]);
         }
 
         /// <summary>
@@ -501,6 +543,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             RemoveSelectedCommand.NotifyCanExecuteChanged();
             RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
             ClearCommand.NotifyCanExecuteChanged();
+            MoveSelectedUpCommand.NotifyCanExecuteChanged();
+            MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
         }
 

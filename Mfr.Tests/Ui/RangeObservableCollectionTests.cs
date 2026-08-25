@@ -50,5 +50,21 @@ namespace Mfr.Tests.Ui
             var collection = new RangeObservableCollection<int>();
             Assert.Throws<ArgumentNullException>(() => collection.AddRange(null!));
         }
+
+        /// <summary>
+        /// Verifies <see cref="RangeObservableCollection{T}.ReplaceAll"/> replaces contents with one Reset.
+        /// </summary>
+        [Fact]
+        public void ReplaceAll_Replaces_With_Single_Reset()
+        {
+            var collection = new RangeObservableCollection<string> { "a", "b", "c" };
+            var notifications = new List<NotifyCollectionChangedAction>();
+            collection.CollectionChanged += (_, e) => notifications.Add(e.Action);
+
+            collection.ReplaceAll(["c", "a"]);
+
+            Assert.Equal(["c", "a"], collection);
+            Assert.Equal([NotifyCollectionChangedAction.Reset], notifications);
+        }
     }
 }

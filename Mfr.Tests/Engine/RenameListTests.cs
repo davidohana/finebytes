@@ -126,6 +126,90 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies MoveUp shifts a contiguous selection as a block and reindexes.
+        /// </summary>
+        public void MoveUp_Moves_Contiguous_Selection_As_Block()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath, gammaPath]);
+            var items = renameList.RenameItems;
+
+            Assert.True(renameList.MoveSelected([items[1], items[2]], offset: -1));
+
+            Assert.Equal([betaPath, gammaPath, alphaPath], items.Select(entry => entry.Original.FullPath));
+            Assert.Equal([0, 1, 2], items.Select(entry => entry.Original.RenameListIndex));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies MoveUp is a no-op when the selection already starts at the top.
+        /// </summary>
+        public void MoveUp_At_Top_Is_NoOp()
+        {
+            var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "alpha.txt", "beta.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath]);
+            var items = renameList.RenameItems;
+
+            Assert.False(renameList.MoveSelected([items[0]], offset: -1));
+            Assert.Equal([alphaPath, betaPath], items.Select(entry => entry.Original.FullPath));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies MoveDown shifts a contiguous selection as a block and reindexes.
+        /// </summary>
+        public void MoveDown_Moves_Contiguous_Selection_As_Block()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath, gammaPath]);
+            var items = renameList.RenameItems;
+
+            Assert.True(renameList.MoveSelected([items[0], items[1]], offset: 1));
+
+            Assert.Equal([gammaPath, alphaPath, betaPath], items.Select(entry => entry.Original.FullPath));
+            Assert.Equal([0, 1, 2], items.Select(entry => entry.Original.RenameListIndex));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies non-contiguous MoveUp only advances items that have a free slot above.
+        /// </summary>
+        public void MoveUp_NonContiguous_Moves_Items_Independently()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath, gammaPath]);
+            var items = renameList.RenameItems;
+
+            Assert.True(renameList.MoveSelected([items[0], items[2]], offset: -1));
+
+            Assert.Equal([alphaPath, gammaPath, betaPath], items.Select(entry => entry.Original.FullPath));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that removing by item reference drops the item from the list.
         /// </summary>
         public void Remove_ByItem_Removes_From_List()

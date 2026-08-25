@@ -26,6 +26,17 @@
         />
         <Separator />
         <MenuItem
+          Header="Move Selected Up"
+          Command="{Binding MoveSelectedUpCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.MoveSelectedUp}"
+        />
+        <MenuItem
+          Header="Move Selected Down"
+          Command="{Binding MoveSelectedDownCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.MoveSelectedDown}"
+        />
+        <Separator />
+        <MenuItem
           Header="Remove Selected Item(s)"
           Command="{Binding RemoveSelectedCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelectedDelete}"
@@ -188,6 +199,20 @@
           ToolTip.Tip="{x:Static shortcuts:AppShortcuts.ClearRenameListTip}"
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Clear.png" />
+        </Button>
+        <Button
+          Classes="rename-list-action"
+          Command="{Binding MoveSelectedUpCommand}"
+          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.MoveSelectedUpTip}"
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveUp.png" />
+        </Button>
+        <Button
+          Classes="rename-list-action"
+          Command="{Binding MoveSelectedDownCommand}"
+          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.MoveSelectedDownTip}"
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
         </Button>
       </StackPanel>
       <DataGrid
