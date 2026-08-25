@@ -880,6 +880,81 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies ReorderEntriesToDropMark inserts the dragged block before the marked row.
+        /// </summary>
+        [Fact]
+        public async Task ReorderEntriesToDropMark_Inserts_Before_Marked_Row()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            var alpha = renameListViewModel.Entries[0];
+            renameListViewModel.SetDropMarkIndex(2);
+
+            Assert.True(renameListViewModel.ReorderEntriesToDropMark([alpha]));
+            Assert.Equal(["beta.md", "alpha.txt", "gamma.log"], _PreviewNames(renameListViewModel));
+            Assert.Equal([alpha], renameListViewModel.SelectedEntries);
+            Assert.Null(renameListViewModel.DropMarkIndex);
+        }
+
+        /// <summary>
+        /// Verifies ReorderEntriesToDropMark with no mark appends the dragged rows.
+        /// </summary>
+        [Fact]
+        public async Task ReorderEntriesToDropMark_Without_Mark_Appends()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            var alpha = renameListViewModel.Entries[0];
+            Assert.True(renameListViewModel.ReorderEntriesToDropMark([alpha]));
+            Assert.Equal(["beta.md", "gamma.log", "alpha.txt"], _PreviewNames(renameListViewModel));
+            Assert.Equal([alpha], renameListViewModel.SelectedEntries);
+        }
+
+        /// <summary>
+        /// Verifies ReorderEntriesToDropMark is a no-op when the mark is on a dragged row.
+        /// </summary>
+        [Fact]
+        public async Task ReorderEntriesToDropMark_On_Dragged_Row_Is_NoOp()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            var alpha = renameListViewModel.Entries[0];
+            var beta = renameListViewModel.Entries[1];
+            renameListViewModel.SetDropMarkIndex(1);
+
+            Assert.False(renameListViewModel.ReorderEntriesToDropMark([alpha, beta]));
+            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
+            Assert.Null(renameListViewModel.DropMarkIndex);
+        }
+
+        /// <summary>
         /// Verifies Locate in File List navigates to the row folder and selects the item.
         /// </summary>
         [Fact]

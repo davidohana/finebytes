@@ -362,6 +362,66 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
+        /// Moves the given items as a block to insert before <paramref name="beforeItem"/>.
+        /// </summary>
+        /// <param name="items">Items to move; entries not in the list are ignored. Relative order is preserved.</param>
+        /// <param name="beforeItem">
+        /// Item to insert before, or <see langword="null"/> to append. When this item is among
+        /// <paramref name="items"/>, the call is a no-op (drop onto selection).
+        /// </param>
+        /// <returns><see langword="true"/> when the list order changed.</returns>
+        /// <remarks>
+        /// <para>
+        /// Matches MFR7 internal drag-reorder: remove the selection, then insert at the marked row
+        /// (or at the end when there is no mark target). Does not touch the path dedupe set.
+        /// </para>
+        /// </remarks>
+        public bool MoveSelectedBefore(IEnumerable<RenameItem> items, RenameItem? beforeItem)
+        {
+            ArgumentNullException.ThrowIfNull(items);
+
+            var selected = items.ToHashSet();
+            if (selected.Count == 0 || _renameItems.Count == 0)
+            {
+                return false;
+            }
+
+            if (beforeItem is not null && selected.Contains(beforeItem))
+            {
+                return false;
+            }
+
+            var toMove = new List<RenameItem>(selected.Count);
+            foreach (var item in _renameItems)
+            {
+                if (selected.Contains(item))
+                {
+                    toMove.Add(item);
+                }
+            }
+
+            if (toMove.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (var item in toMove)
+            {
+                _renameItems.Remove(item);
+            }
+
+            var insertAt = beforeItem is null ? _renameItems.Count : _renameItems.IndexOf(beforeItem);
+            if (insertAt < 0)
+            {
+                insertAt = _renameItems.Count;
+            }
+
+            _renameItems.InsertRange(insertAt, toMove);
+            _ReindexItems();
+            return true;
+        }
+
+        /// <summary>
         /// Whether the item at <paramref name="index"/> is selected and can swap with the neighbor.
         /// </summary>
         private bool _CanSwapTowardNeighbor(HashSet<RenameItem> selected, int index, int offset)

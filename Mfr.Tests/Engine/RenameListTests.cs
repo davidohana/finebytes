@@ -250,6 +250,73 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies MoveSelectedBefore inserts the selection before the target and reindexes.
+        /// </summary>
+        public void MoveSelectedBefore_Reorders_Block_Before_Target()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+            var deltaPath = TestHelpers.CreateFile(_tempRoot, "delta.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath, gammaPath, deltaPath]);
+            var items = renameList.RenameItems;
+
+            Assert.True(renameList.MoveSelectedBefore([items[0], items[1]], beforeItem: items[3]));
+
+            Assert.Equal([gammaPath, alphaPath, betaPath, deltaPath], items.Select(entry => entry.Original.FullPath));
+            Assert.Equal([0, 1, 2, 3], items.Select(entry => entry.Original.RenameListIndex));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies MoveSelectedBefore with a null target appends the selection.
+        /// </summary>
+        public void MoveSelectedBefore_Null_Target_Appends()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath, gammaPath]);
+            var items = renameList.RenameItems;
+
+            Assert.True(renameList.MoveSelectedBefore([items[0]], beforeItem: null));
+
+            Assert.Equal([betaPath, gammaPath, alphaPath], items.Select(entry => entry.Original.FullPath));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies MoveSelectedBefore is a no-op when the drop target is in the selection.
+        /// </summary>
+        public void MoveSelectedBefore_Target_In_Selection_Is_NoOp()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath, gammaPath]);
+            var items = renameList.RenameItems;
+
+            Assert.False(renameList.MoveSelectedBefore([items[0], items[1]], beforeItem: items[1]));
+            Assert.Equal([alphaPath, betaPath, gammaPath], items.Select(entry => entry.Original.FullPath));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that removing by item reference drops the item from the list.
         /// </summary>
         public void Remove_ByItem_Removes_From_List()

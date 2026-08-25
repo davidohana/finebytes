@@ -337,6 +337,154 @@ namespace Mfr.Tests.Ui
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies DragOver of an internal reorder payload sets Move and the drop mark.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragOver_Internal_Reorder_Sets_Move_And_DropMark()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(betaPath, "b");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1]);
+            var dataTransfer = _CreateInternalReorderDataTransfer();
+            var dragOverArgs = new DragEventArgs(
+                DragDrop.DragOverEvent,
+                dataTransfer,
+                view,
+                pointOnView,
+                KeyModifiers.None
+            )
+            {
+                DragEffects = DragDropEffects.None,
+            };
+            view.RaiseEvent(dragOverArgs);
+
+            Assert.Equal(DragDropEffects.Move, dragOverArgs.DragEffects);
+            Assert.Equal(1, renameListViewModel.DropMarkIndex);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Alt during internal reorder does not clear the list.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragOver_Internal_Reorder_Alt_Does_Not_Clear()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(betaPath, "b");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+            var dataTransfer = _CreateInternalReorderDataTransfer();
+            view.RaiseEvent(new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt));
+
+            Assert.Equal(2, renameListViewModel.Entries.Count);
+            Assert.Equal(["alpha.txt", "beta.md"], renameListViewModel.Entries.Select(e => e.FullFileName));
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Drop of an internal reorder payload moves the selection before the mark.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Drop_Internal_Reorder_Moves_Selection_Before_Mark()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            var gammaPath = Path.Combine(dir, "gamma.log");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(betaPath, "b");
+            File.WriteAllText(gammaPath, "g");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath, gammaPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+            var alpha = renameListViewModel.Entries[0];
+            renameListViewModel.SetSelectedEntries([alpha]);
+
+            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[2]);
+            var dataTransfer = _CreateInternalReorderDataTransfer();
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+            Assert.Equal(2, renameListViewModel.DropMarkIndex);
+
+            view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, pointOnView, KeyModifiers.None));
+
+            Assert.Equal(
+                ["beta.md", "alpha.txt", "gamma.log"],
+                renameListViewModel.Entries.Select(entry => entry.FullFileName)
+            );
+            Assert.Equal([alpha], renameListViewModel.SelectedEntries);
+            Assert.Null(renameListViewModel.DropMarkIndex);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Drop onto a selected row is a no-op.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Drop_Internal_Reorder_On_Selection_Is_NoOp()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(betaPath, "b");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0], renameListViewModel.Entries[1]]);
+
+            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1]);
+            var dataTransfer = _CreateInternalReorderDataTransfer();
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+            view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, pointOnView, KeyModifiers.None));
+
+            Assert.Equal(["alpha.txt", "beta.md"], renameListViewModel.Entries.Select(entry => entry.FullFileName));
+            Assert.Null(renameListViewModel.DropMarkIndex);
+
+            window.Close();
+        }
+
         private FileListViewModel _CreateFileListViewModel(string path)
         {
             var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path);
@@ -382,6 +530,13 @@ namespace Mfr.Tests.Ui
                 dataTransfer.Add(DataTransferItem.CreateFile(item));
             }
 
+            return dataTransfer;
+        }
+
+        private static DataTransfer _CreateInternalReorderDataTransfer()
+        {
+            var dataTransfer = new DataTransfer();
+            dataTransfer.Add(DataTransferItem.Create(RenameListView.InternalReorderFormat, "1"));
             return dataTransfer;
         }
 

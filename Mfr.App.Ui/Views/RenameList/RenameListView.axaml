@@ -131,7 +131,7 @@
       <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
-    <!-- MFR7 MarkedRow (Color.Salmon) while dragging files over a row -->
+    <!-- MFR7 MarkedRow (Color.Salmon) while dragging over a row (files or internal reorder) -->
     <Style Selector="DataGrid.rename-list DataGridRow.drop-mark">
       <Setter Property="Background" Value="#FA8072" />
     </Style>

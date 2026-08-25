@@ -8,6 +8,7 @@ using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Engine.RenameList;
 using Mfr.Models.Config;
+using Mfr.Models.Rename;
 using Serilog;
 using EngineRenameList = Mfr.Engine.RenameList.RenameList;
 
@@ -55,7 +56,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<RenameListEntry> SelectedEntries => _selectedEntries;
 
         /// <summary>
-        /// Gets the row index under an external file drag (insert-before target), or null when unset.
+        /// Gets the row index under a file or internal drag (insert-before target), or null when unset.
         /// </summary>
         public int? DropMarkIndex { get; private set; }
 
@@ -114,7 +115,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Sets or clears the external-drag insert marker (row index to insert before).
+        /// Sets or clears the drag insert marker (row index to insert before).
         /// </summary>
         /// <param name="index">Zero-based row index under the pointer, or null to clear.</param>
         public void SetDropMarkIndex(int? index)
@@ -296,6 +297,78 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public void MoveSelectedDown()
         {
             _MoveSelected(offset: 1);
+        }
+
+        /// <summary>
+        /// Reorders dragged rows to insert before the drop mark (or appends when unset).
+        /// </summary>
+        /// <param name="entries">Rows being dragged; must still be in <see cref="Entries"/>.</param>
+        /// <returns><see langword="true"/> when the list order changed.</returns>
+        /// <remarks>
+        /// <para>
+        /// Dropping onto a selected/marked row that is part of the drag is a no-op (MFR7). Clears the
+        /// drop mark afterward. Auto-Sort cancel lands in Phase 4e.
+        /// </para>
+        /// </remarks>
+        public bool ReorderEntriesToDropMark(IReadOnlyList<RenameListEntry> entries)
+        {
+            ArgumentNullException.ThrowIfNull(entries);
+
+            if (IsAdding || entries.Count == 0)
+            {
+                SetDropMarkIndex(null);
+                return false;
+            }
+
+            var entrySet = Entries.ToHashSet();
+            var toMove = new List<RenameListEntry>(entries.Count);
+            foreach (var entry in entries)
+            {
+                if (entrySet.Contains(entry))
+                {
+                    toMove.Add(entry);
+                }
+            }
+
+            if (toMove.Count == 0)
+            {
+                SetDropMarkIndex(null);
+                return false;
+            }
+
+            RenameItem? beforeItem = null;
+            if (DropMarkIndex is { } markIndex)
+            {
+                if (markIndex < 0 || markIndex >= Entries.Count)
+                {
+                    SetDropMarkIndex(null);
+                    return false;
+                }
+
+                var markedEntry = Entries[markIndex];
+                var movingSet = toMove.ToHashSet();
+                if (movingSet.Contains(markedEntry))
+                {
+                    SetDropMarkIndex(null);
+                    return false;
+                }
+
+                beforeItem = markedEntry.EngineItem;
+            }
+
+            if (!_renameList.MoveSelectedBefore(toMove.Select(entry => entry.EngineItem), beforeItem: beforeItem))
+            {
+                SetDropMarkIndex(null);
+                return false;
+            }
+
+            var engineItemToEntry = Entries.ToDictionary(entry => entry.EngineItem);
+            Entries.ReplaceAll(_renameList.RenameItems.Select(item => engineItemToEntry[item]));
+
+            var movedSet = toMove.ToHashSet();
+            SetSelectedEntries([.. Entries.Where(movedSet.Contains)]);
+            SetDropMarkIndex(null);
+            return true;
         }
 
         /// <summary>
