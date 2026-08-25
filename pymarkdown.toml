@@ -1,6 +1,6 @@
 [tool.pymarkdown]
-# Mirror .markdownlint-cli2.jsonc ignores (also enforced by git pathspec in just)
-system.exclude_path = [".cursor/**", "**/bin/**", "**/obj/**", "node_modules/**"]
+# Extra safety if someone scans broader than the justfile git pathspec
+system.exclude_path = [".cursor/**", "**/bin/**", "**/obj/**", ".venv/**"]
 
 [tool.pymarkdown.extensions]
 front-matter.enabled = true

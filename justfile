@@ -37,10 +37,10 @@ lint-cs:
     dotnet format style ./finebytes.slnx --verify-no-changes
     dotnet format analyzers ./finebytes.slnx --verify-no-changes
 
-# Tracked + untracked *.md (respects .gitignore); skip .cursor like .prettierignore.
+# Tracked + untracked *.md (respects .gitignore); skip .cursor/**
 # One-time: python -m venv .venv && .venv/Scripts/pip install -r requirements-md.txt
 md_python := if os_family() == "windows" { ".venv/Scripts/python.exe" } else { ".venv/bin/python" }
-md_files := `git ls-files -c -o --exclude-standard -- "*.md" ":!.cursor/**" | tr "\n" " "`
+md_files := `git ls-files -c -o --exclude-standard -- "*.md" ":!.cursor/**" | while IFS= read -r f; do [ -f "$f" ] && printf '%s ' "$f"; done`
 
 format-md:
     {{md_python}} -m mdformat {{md_files}}

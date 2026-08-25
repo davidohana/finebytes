@@ -42,5 +42,3 @@ Desktop.ini
 
 # Python (markdown formatter/linter dev tools)
 .venv/
-.venv-spike/
-.spike-md/
