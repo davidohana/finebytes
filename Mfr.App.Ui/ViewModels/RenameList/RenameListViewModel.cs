@@ -209,7 +209,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Finds the list index of the first selected row, matching MFR7 remove behavior.
         /// </summary>
-        private int _FindFirstSelectedIndex(HashSet<RenameListEntry> selected)
+        private int _FindFirstSelectedIndex(IReadOnlyCollection<RenameListEntry> selected)
         {
             for (var i = 0; i < Entries.Count; i++)
             {
@@ -323,7 +323,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var (insertAt, selectFirstAdded) = _ResolveInsertAt();
+            var selectFirstAdded = _selectedEntries.Count > 0;
+            var insertAt = _ResolveInsertAt();
             var oldCount = _renameList.RenameItems.Count;
             var uiConfig = ConfigStore.Config.Ui;
             var includeFiles = uiConfig.AddMode.IncludesFiles();
@@ -385,30 +386,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Chooses where new rows go in manual mode (MFR7 help Manual Sort).
+        /// Index to insert new rows: after the first selected row, or the end when nothing is selected.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Until Auto-Sort exists, the list is always manual: insert after the first selected row and
-        /// select the first newly added row; with no selection, append and leave selection unchanged.
-        /// Matches MFR7 help (“below the selected item”); legacy source inserted before.
-        /// </para>
-        /// </remarks>
-        private (int InsertAt, bool SelectFirstAdded) _ResolveInsertAt()
+        private int _ResolveInsertAt()
         {
             if (_selectedEntries.Count == 0)
             {
-                return (Entries.Count, false);
+                return Entries.Count;
             }
 
-            var selected = _selectedEntries.ToHashSet();
-            var firstSelectedIndex = _FindFirstSelectedIndex(selected);
-            if (firstSelectedIndex < 0)
-            {
-                return (Entries.Count, false);
-            }
-
-            return (firstSelectedIndex + 1, true);
+            return _FindFirstSelectedIndex(_selectedEntries) + 1;
         }
 
         /// <summary>
@@ -452,14 +439,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Syncs <see cref="Entries"/> with engine items added by the latest batch.
+        /// Mirrors a committed engine add into <see cref="Entries"/>.
         /// </summary>
-        /// <param name="insertAt">Index where the batch was inserted.</param>
-        /// <param name="oldCount">Rename List size before the add started.</param>
+        /// <param name="insertAt">Index where the engine inserted the new items.</param>
+        /// <param name="oldCount">Engine list size before this add; used to count new rows.</param>
         /// <remarks>
         /// <para>
-        /// Appends when the batch landed at the end; for mid-list inserts, rebuilds row order while
-        /// keeping existing <see cref="RenameListEntry"/> object identity.
+        /// Called only after a successful <c>AddSources</c> that committed its staging batch. Creates
+        /// UI rows for the newly inserted engine items at the same index.
         /// </para>
         /// </remarks>
         private void _SyncEntriesAfterAdd(int insertAt, int oldCount)
@@ -471,45 +458,24 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            if (insertAt >= oldCount)
+            var newEntries = new List<RenameListEntry>(addedCount);
+            for (var i = insertAt; i < insertAt + addedCount; i++)
             {
-                var newEntries = new List<RenameListEntry>(addedCount);
-                for (var i = insertAt; i < insertAt + addedCount; i++)
-                {
-                    newEntries.Add(RenameListEntryMapper.ToEntry(renameItems[i]));
-                }
-
-                Entries.AddRange(newEntries);
-                return;
+                newEntries.Add(RenameListEntryMapper.ToEntry(renameItems[i]));
             }
 
-            // Mid-list insert: rebuild order while keeping existing entry object identity.
-            var engineItemToEntry = Entries.ToDictionary(entry => entry.EngineItem);
-            var rebuilt = new List<RenameListEntry>(renameItems.Count);
-            foreach (var item in renameItems)
-            {
-                if (engineItemToEntry.TryGetValue(item, out var existing))
-                {
-                    rebuilt.Add(existing);
-                }
-                else
-                {
-                    rebuilt.Add(RenameListEntryMapper.ToEntry(item));
-                }
-            }
-
-            Entries.ReplaceAll(rebuilt);
+            Entries.InsertRange(insertAt, newEntries);
         }
 
         /// <summary>
-        /// Removes items added by a canceled or failed add, including mid-list inserts.
+        /// Undoes an engine commit if cancel raced after the staging batch was inserted.
         /// </summary>
-        /// <param name="insertAt">Index where the batch was inserted.</param>
-        /// <param name="oldCount">Rename List size before the add started.</param>
+        /// <param name="insertAt">Index where the engine inserted the new items.</param>
+        /// <param name="oldCount">Engine list size before this add; used to count new rows.</param>
         /// <remarks>
         /// <para>
-        /// Engine rows from <paramref name="insertAt"/> for <c>Count - oldCount</c> items are removed.
-        /// <see cref="Entries"/> is trimmed only if it was already synced (normally it is not until success).
+        /// Usually a no-op: cancel discards the staging batch before it reaches <c>RenameItems</c>.
+        /// This only runs when the walk finished and inserted, but the UI still saw cancel/failure.
         /// </para>
         /// </remarks>
         private void _RollbackAddedItems(int insertAt, int oldCount)
@@ -521,32 +487,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var toRemove = renameItems.Skip(insertAt).Take(addedCount).ToList();
-            _renameList.Remove(toRemove);
-
-            // Entries are only synced after a successful add; trim is defensive.
-            if (Entries.Count <= oldCount)
-            {
-                return;
-            }
-
-            if (insertAt >= oldCount)
-            {
-                while (Entries.Count > oldCount)
-                {
-                    Entries.RemoveAt(Entries.Count - 1);
-                }
-
-                return;
-            }
-
-            for (var i = insertAt + addedCount - 1; i >= insertAt; i--)
-            {
-                if (i < Entries.Count)
-                {
-                    Entries.RemoveAt(i);
-                }
-            }
+            _renameList.Remove([.. renameItems.Skip(insertAt).Take(addedCount)]);
         }
 
         private void _NotifyListChanged()

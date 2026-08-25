@@ -26,8 +26,8 @@ namespace Mfr.Engine.RenameList
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Used when assigning <see cref="FileMeta.InFolderIndex"/> on add and rebuilt by
-        /// <c>_ReindexItems</c> after remove or move. Also feeds <see cref="FileMeta.RenameListFolderSiblingCount"/>
+        /// Used when assigning <see cref="FileMeta.InFolderIndex"/> and rebuilt by
+        /// <c>_ReindexItems</c> after add, remove, or move. Also feeds <see cref="FileMeta.RenameListFolderSiblingCount"/>
         /// during preview (for example per-folder <c>&lt;counter&gt;</c> width).
         /// </para>
         /// </remarks>
@@ -50,14 +50,16 @@ namespace Mfr.Engine.RenameList
         /// <param name="cancellationToken">When canceled, stops resolution and returns without throwing.</param>
         /// <param name="progress">Optional progress sink (scanned / added / last path).</param>
         /// <param name="insertAtIndex">
-        /// 0-based index to insert new items before; <see langword="null"/> appends at the end.
+        /// 0-based index to insert new items; <see langword="null"/> appends at the end.
         /// </param>
         /// <returns>Summary of sources that were skipped during resolution.</returns>
         /// <remarks>
         /// <para>
-        /// Manual-sort add inserts at the given index (UI typically passes one past the first selected
-        /// row so new items appear below the selection), or appends when no insert index is given.
-        /// Values outside <c>[0, Count]</c> are clamped.
+        /// One call builds a <c>batch</c>: a staging list of new <see cref="RenameItem"/>s that is not
+        /// part of <see cref="RenameItems"/> yet. Paths are reserved in the dedupe set while they sit
+        /// in the batch. On success the batch is inserted at <paramref name="insertAtIndex"/> and
+        /// reindexed; on cancel or unexpected failure it is discarded (dedupe keys released) so the
+        /// live list never shows a partial add.
         /// </para>
         /// </remarks>
         public RenameListAddSummary AddSources(
@@ -84,34 +86,47 @@ namespace Mfr.Engine.RenameList
 
             var tracker = new AddProgressTracker(progress, cancellationToken);
             var skippedSourceCount = 0;
-            var insertCursor = _ClampInsertAtIndex(insertAtIndex);
-            var countBefore = _renameItems.Count;
-            foreach (var source in sourceList)
+            var insertAt = insertAtIndex ?? _renameItems.Count;
+            var batch = new List<RenameItem>();
+            try
             {
+                foreach (var source in sourceList)
+                {
+                    if (tracker.IsCanceled)
+                    {
+                        break;
+                    }
+
+                    if (
+                        !_TryAddSource(
+                            source: source,
+                            includeFiles: includeFiles,
+                            includeFolders: includeFolders,
+                            includeSubdirs: includeSubdirs,
+                            excludeMasks: excludeMasks,
+                            tracker: tracker,
+                            batch: batch
+                        )
+                    )
+                    {
+                        skippedSourceCount++;
+                    }
+                }
+
                 if (tracker.IsCanceled)
                 {
-                    break;
+                    _DiscardCollectedItems(batch);
                 }
-
-                if (
-                    !_TryAddSource(
-                        source: source,
-                        includeFiles: includeFiles,
-                        includeFolders: includeFolders,
-                        includeSubdirs: includeSubdirs,
-                        excludeMasks: excludeMasks,
-                        tracker: tracker,
-                        insertCursor: ref insertCursor
-                    )
-                )
+                else if (batch.Count > 0)
                 {
-                    skippedSourceCount++;
+                    _renameItems.InsertRange(insertAt, batch);
+                    _ReindexItems();
                 }
             }
-
-            if (_renameItems.Count > countBefore)
+            catch
             {
-                _ReindexItems();
+                _DiscardCollectedItems(batch);
+                throw;
             }
 
             tracker.ReportFinal();
@@ -119,31 +134,9 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Clamps an optional insert index to <c>[0, Count]</c>; <see langword="null"/> means append.
+        /// Adds and resolves a single source into the staging <paramref name="batch"/>.
         /// </summary>
-        private int _ClampInsertAtIndex(int? insertAtIndex)
-        {
-            if (insertAtIndex is null)
-            {
-                return _renameItems.Count;
-            }
-
-            if (insertAtIndex.Value < 0)
-            {
-                return 0;
-            }
-
-            if (insertAtIndex.Value > _renameItems.Count)
-            {
-                return _renameItems.Count;
-            }
-
-            return insertAtIndex.Value;
-        }
-
-        /// <summary>
-        /// Adds and resolves a single source using a shared progress tracker.
-        /// </summary>
+        /// <param name="batch">Staging list for this <see cref="AddSources"/> call (see that method's remarks).</param>
         /// <returns><see langword="false"/> when the source was skipped; otherwise <see langword="true"/>.</returns>
         private bool _TryAddSource(
             string source,
@@ -152,7 +145,7 @@ namespace Mfr.Engine.RenameList
             bool includeSubdirs,
             IReadOnlyList<string>? excludeMasks,
             AddProgressTracker tracker,
-            ref int insertCursor
+            List<RenameItem> batch
         )
         {
             try
@@ -164,7 +157,7 @@ namespace Mfr.Engine.RenameList
                     includeSubdirs: includeSubdirs,
                     excludeMasks: excludeMasks,
                     tracker: tracker,
-                    insertCursor: ref insertCursor
+                    batch: batch
                 );
                 return true;
             }
@@ -181,8 +174,9 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Adds and resolves a single source using a shared progress tracker.
+        /// Resolves one source and appends accepted items to the staging <paramref name="batch"/>.
         /// </summary>
+        /// <param name="batch">Staging list for this <see cref="AddSources"/> call (see that method's remarks).</param>
         private void _AddSource(
             string source,
             bool includeFiles,
@@ -190,7 +184,7 @@ namespace Mfr.Engine.RenameList
             bool includeSubdirs,
             IReadOnlyList<string>? excludeMasks,
             AddProgressTracker tracker,
-            ref int insertCursor
+            List<RenameItem> batch
         )
         {
             if (string.IsNullOrWhiteSpace(source))
@@ -214,20 +208,37 @@ namespace Mfr.Engine.RenameList
                 excludeMasks: excludeMasks,
                 cancellationToken: tracker.Token
             );
-            var addedCount = _InsertPaths(
+            var addedCount = _CollectResolvedItems(
                 resolvedPaths: resolvedPaths,
                 includeFiles: includeFiles,
                 includeFolders: includeFolders,
                 tracker: tracker,
-                insertAt: insertCursor
+                batch: batch
             );
-            insertCursor += addedCount;
             Log.Information(
                 "Resolved source '{Source}', added {AddedCount} new item(s) (scanned {ScannedCount}).",
                 trimmedSource,
                 addedCount,
                 tracker.ScannedCount
             );
+        }
+
+        /// <summary>
+        /// Drops a staging batch that was never inserted into <see cref="RenameItems"/>.
+        /// </summary>
+        /// <param name="batch">Items reserved during the walk but not committed to the live list.</param>
+        /// <remarks>
+        /// <para>
+        /// Only clears their paths from the dedupe set so a later add can accept them again. The batch
+        /// itself was never appended to <see cref="RenameItems"/>.
+        /// </para>
+        /// </remarks>
+        private void _DiscardCollectedItems(List<RenameItem> batch)
+        {
+            foreach (var item in batch)
+            {
+                _includedResolvedPaths.Remove(_NormalizePathKey(item.Original.FullPath));
+            }
         }
 
         /// <summary>
@@ -519,26 +530,22 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Inserts resolved paths into <see cref="RenameItems"/> while enforcing deduplication and filtering.
+        /// Appends accepted resolved paths to the staging <paramref name="batch"/>.
         /// </summary>
-        /// <param name="resolvedPaths">Resolved file paths to insert.</param>
+        /// <param name="resolvedPaths">Resolved file paths to collect.</param>
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <param name="tracker">Shared progress and cancel state for this add operation.</param>
-        /// <param name="insertAt">0-based index of the first new item; later items follow contiguously.</param>
-        /// <returns>The count of newly added resolved items.</returns>
-        /// <remarks>
-        /// <para>
-        /// List and per-folder indices are placeholders until <see cref="AddSources"/> calls
-        /// <c>_ReindexItems</c> after the batch finishes.
-        /// </para>
-        /// </remarks>
-        private int _InsertPaths(
+        /// <param name="batch">
+        /// Staging list for this <see cref="AddSources"/> call; not yet in <see cref="RenameItems"/>.
+        /// </param>
+        /// <returns>The count of items appended to <paramref name="batch"/>.</returns>
+        private int _CollectResolvedItems(
             IEnumerable<string> resolvedPaths,
             bool includeFiles,
             bool includeFolders,
             AddProgressTracker tracker,
-            int insertAt
+            List<RenameItem> batch
         )
         {
             var addedCount = 0;
@@ -602,7 +609,7 @@ namespace Mfr.Engine.RenameList
                     (directoryPath, prefix, extension) = _SplitRenamePathForFile(fullPath);
                 }
 
-                // Indices are provisional; AddSources reindexes after the full batch.
+                // Indices are filled by _ReindexItems after the batch is committed to RenameItems.
                 var originalFileMeta = new FileMeta(
                     renameListIndex: 0,
                     inFolderIndex: 0,
@@ -617,7 +624,7 @@ namespace Mfr.Engine.RenameList
                 );
 
                 var renameItem = new RenameItem(originalFileMeta);
-                _renameItems.Insert(insertAt + addedCount, renameItem);
+                batch.Add(renameItem);
                 tracker.OnAdded(fullPath);
                 addedCount++;
             }
@@ -626,7 +633,7 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Reassigns list and per-folder indices after items are removed or moved.
+        /// Reassigns list and per-folder indices after add, remove, or move.
         /// </summary>
         private void _ReindexItems()
         {

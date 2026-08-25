@@ -48,8 +48,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private string _lastPath = string.Empty;
 
         /// <summary>
-        /// Requests cancel for the in-progress add. The engine stops the walk; the caller discards the batch.
+        /// Requests cancel for the in-progress add.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The engine stops resolving sources and discards its staging batch (items not yet in the
+        /// rename list), so the live list stays unchanged.
+        /// </para>
+        /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanCancel))]
         public void Cancel()
         {

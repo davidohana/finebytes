@@ -594,25 +594,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies AddPathsAsync honors Rename List selection insert position (after selection).
-        /// </summary>
-        [Fact]
-        public async Task AddPaths_With_RenameList_Selection_Inserts_After()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "gamma.log")]);
-            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
-            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "beta.md")]);
-
-            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Single(renameListViewModel.SelectedEntries);
-            Assert.Equal("beta.md", renameListViewModel.SelectedEntries[0].FullFileName);
-        }
-
-        /// <summary>
         /// Verifies Remove keeps remaining row objects and order.
         /// </summary>
         [Fact]

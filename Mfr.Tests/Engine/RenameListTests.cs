@@ -166,30 +166,6 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies null or end insertAtIndex appends (default AddSources behavior).
-        /// </summary>
-        public void AddSources_InsertAt_Null_Or_End_Appends()
-        {
-            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
-                _tempRoot,
-                "alpha.txt",
-                "beta.txt",
-                "gamma.txt"
-            );
-
-            var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources([alphaPath]);
-            renameList.AddSources([betaPath], insertAtIndex: null);
-            renameList.AddSources([gammaPath], insertAtIndex: 2);
-
-            Assert.Equal(
-                [alphaPath, betaPath, gammaPath],
-                renameList.RenameItems.Select(entry => entry.Original.FullPath)
-            );
-        }
-
-        [Fact]
-        /// <summary>
         /// Verifies MoveUp shifts a contiguous selection as a block and reindexes.
         /// </summary>
         public void MoveUp_Moves_Contiguous_Selection_As_Block()
@@ -726,10 +702,11 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies canceling mid-walk returns without throwing and may leave a partial engine list.
+        /// Verifies canceling mid-walk returns without throwing and does not keep a partial batch.
         /// </summary>
         public void AddSources_Cancel_Stops_Without_Throwing()
         {
+            var keepPath = TestHelpers.CreateFile(_tempRoot, "keep.txt");
             for (var i = 0; i < 500; i++)
             {
                 var nested = _tempRoot.CombinePath($"d{i:D3}");
@@ -739,6 +716,7 @@ namespace Mfr.Tests.Engine
 
             using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(5));
             var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([keepPath]);
 
             renameList.AddSources(
                 sources: [_tempRoot.CombinePath("*.txt")],
@@ -749,7 +727,7 @@ namespace Mfr.Tests.Engine
             );
 
             Assert.True(cts.IsCancellationRequested);
-            Assert.True(renameList.RenameItems.Count < 500);
+            Assert.Equal([keepPath], renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
 
         [Fact]

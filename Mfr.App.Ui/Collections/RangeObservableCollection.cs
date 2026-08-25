@@ -45,6 +45,30 @@ namespace Mfr.App.Ui.Collections
         }
 
         /// <summary>
+        /// Inserts many items at <paramref name="index"/> and notifies bound views once.
+        /// </summary>
+        /// <param name="index">0-based index of the first inserted item; equal to Count appends.</param>
+        /// <param name="items">Items to insert.</param>
+        public void InsertRange(int index, IEnumerable<T> items)
+        {
+            ArgumentNullException.ThrowIfNull(items);
+
+            var batch = items as IReadOnlyList<T> ?? [.. items];
+            if (batch.Count == 0)
+            {
+                return;
+            }
+
+            CheckReentrancy();
+            for (var i = 0; i < batch.Count; i++)
+            {
+                Items.Insert(index + i, batch[i]);
+            }
+
+            _NotifyReset();
+        }
+
+        /// <summary>
         /// Replaces all items and notifies bound views once.
         /// </summary>
         /// <param name="items">New contents in display order.</param>
