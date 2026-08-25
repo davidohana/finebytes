@@ -454,6 +454,79 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies pressing a row in a multi-selection keeps the full selection (no collapse flicker).
+        /// </summary>
+        [AvaloniaFact]
+        public void List_View_Press_On_Multi_Select_Keeps_Selection()
+        {
+            var (viewModel, view, window) = _ShowListView();
+            var list = view.FindControl<ListBox>("ListViewList");
+            Assert.NotNull(list);
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+
+            _ClickEntry(window, list, alpha, RawInputModifiers.None);
+            _ClickEntry(window, list, beta, RawInputModifiers.Control);
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+
+            var pressPoint = _EntryClickPoint(window, list, beta);
+            window.MouseMove(pressPoint, RawInputModifiers.None);
+            window.MouseDown(pressPoint, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+            Assert.Equal(2, list.SelectedItems!.Count);
+
+            window.MouseUp(pressPoint, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            // Release without drag collapses to the pressed row (Explorer).
+            Assert.Single(viewModel.SelectedEntries);
+            Assert.Equal(beta.FullPath, viewModel.SelectedEntry!.FullPath);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies dragging from one row of a multi-selection keeps the full selection (Explorer-style).
+        /// </summary>
+        [AvaloniaFact]
+        public void List_View_Drag_From_Multi_Select_Restores_Selection()
+        {
+            var (viewModel, view, window) = _ShowListView();
+            var list = view.FindControl<ListBox>("ListViewList");
+            Assert.NotNull(list);
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+
+            _ClickEntry(window, list, alpha, RawInputModifiers.None);
+            _ClickEntry(window, list, beta, RawInputModifiers.Control);
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+
+            var pressPoint = _EntryClickPoint(window, list, beta);
+            window.MouseMove(pressPoint, RawInputModifiers.None);
+            window.MouseDown(pressPoint, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+
+            // Restore runs synchronously before DoDragDropAsync awaits, so assert before pumping.
+            var dragPoint = pressPoint + new Vector(12, 0);
+            window.MouseMove(dragPoint, RawInputModifiers.LeftMouseButton);
+
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+            var selectedPaths = viewModel.SelectedEntries.Select(entry => entry.FullPath).ToHashSet();
+            Assert.Contains(alpha.FullPath, selectedPaths);
+            Assert.Contains(beta.FullPath, selectedPaths);
+
+            window.MouseUp(dragPoint, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Tiles view multi-select from the view model syncs to the listing control.
         /// </summary>
         [AvaloniaFact]

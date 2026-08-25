@@ -45,6 +45,7 @@ namespace Mfr.App.Ui.Views.FileList
         private PointerEventArgs? _dragStartArgs;
         private FileListEntry? _dragHitEntry;
         private object? _dragHitSource;
+        private IReadOnlyList<FileListEntry>? _dragSelectionSnapshot;
         private bool _isDragPending;
 
         /// <summary>
@@ -132,9 +133,19 @@ namespace Mfr.App.Ui.Views.FileList
                 return;
             }
 
-            // Do not force selection here: tunnel PointerPressed runs before the listing control
-            // updates multi-select (Ctrl/Shift or SelectionMode=Multiple). Select-on-drag waits
-            // until the drag threshold so clicks can build a multi-selection first.
+            // Tunnel PointerPressed runs before the listing updates selection. Snapshot a
+            // multi-selection when pressing an already-selected row so a later drag can
+            // restore it (Avalonia collapses to the pressed row on the bubble pass).
+            var isExtendingSelection =
+                e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+            var alreadySelected = _viewModel.SelectedEntries.Any(entry =>
+                PathComparers.Os.Equals(entry.FullPath, hit.FullPath)
+            );
+            if (alreadySelected && !isExtendingSelection && _viewModel.SelectedEntries.Count > 1)
+            {
+                _dragSelectionSnapshot = [.. _viewModel.SelectedEntries];
+            }
+
             _dragHitEntry = hit;
             _dragHitSource = e.Source;
             _dragStartPoint = e.GetPosition(this);
@@ -164,10 +175,56 @@ namespace Mfr.App.Ui.Views.FileList
                 return;
             }
 
+            _ApplySelectionForDrag([hit], hit, source);
+        }
+
+        private void _RestoreDragSelectionSnapshot()
+        {
+            if (_viewModel is null || _dragSelectionSnapshot is not { Count: > 0 } snapshot)
+            {
+                return;
+            }
+
+            var pathToEntry = _viewModel.Entries.ToDictionary(entry => entry.FullPath, PathComparers.Os);
+            var restored = new List<FileListEntry>(snapshot.Count);
+            foreach (var entry in snapshot)
+            {
+                if (pathToEntry.TryGetValue(entry.FullPath, out var current))
+                {
+                    restored.Add(current);
+                    continue;
+                }
+
+                restored.Add(entry);
+            }
+
+            if (restored.Count == 0)
+            {
+                return;
+            }
+
+            FileListEntry? focused = null;
+            if (_dragHitEntry is not null)
+            {
+                focused = restored.FirstOrDefault(entry =>
+                    PathComparers.Os.Equals(entry.FullPath, _dragHitEntry.FullPath)
+                );
+            }
+
+            _ApplySelectionForDrag(restored, focused ?? restored[^1], _dragHitSource);
+        }
+
+        private void _ApplySelectionForDrag(IReadOnlyList<FileListEntry> entries, FileListEntry focused, object? source)
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
             _selectionChangeFromView = true;
             try
             {
-                _viewModel.SetSelectedEntries([hit], hit);
+                _viewModel.SetSelectedEntries(entries, focused);
             }
             finally
             {
@@ -211,7 +268,11 @@ namespace Mfr.App.Ui.Views.FileList
                 return;
             }
 
-            if (_dragHitEntry is not null)
+            if (_dragSelectionSnapshot is { Count: > 0 })
+            {
+                _RestoreDragSelectionSnapshot();
+            }
+            else if (_dragHitEntry is not null)
             {
                 _EnsureEntrySelectedForDrag(_dragHitEntry, _dragHitSource, _dragStartArgs.KeyModifiers);
             }
@@ -273,6 +334,21 @@ namespace Mfr.App.Ui.Views.FileList
 
         private void _OnListingPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
+            // Explorer: press on a multi-selected row without dragging collapses to that row on release.
+            if (
+                _isDragPending
+                && _dragSelectionSnapshot is { Count: > 0 }
+                && _dragHitEntry is not null
+                && _viewModel is not null
+            )
+            {
+                var hitPath = _dragHitEntry.FullPath;
+                var hit =
+                    _viewModel.Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, hitPath))
+                    ?? _dragHitEntry;
+                _ApplySelectionForDrag([hit], hit, _dragHitSource ?? sender);
+            }
+
             _ClearDragState();
         }
 
@@ -288,6 +364,7 @@ namespace Mfr.App.Ui.Views.FileList
             _dragStartArgs = null;
             _dragHitEntry = null;
             _dragHitSource = null;
+            _dragSelectionSnapshot = null;
         }
 
         private IReadOnlyList<string> _GetAddableSelectedPaths()
@@ -541,6 +618,24 @@ namespace Mfr.App.Ui.Views.FileList
 
             if (!_IsActiveListingSender(sender))
             {
+                return;
+            }
+
+            // Keep multi-select visible while a drag may start: Avalonia collapses on press, so
+            // undo that synchronously here instead of waiting for the drag threshold (avoids flicker).
+            if (_isDragPending && _dragSelectionSnapshot is { Count: > 0 } snapshot)
+            {
+                var hostItems = sender switch
+                {
+                    ListBox listBox => listBox.SelectedItems,
+                    DataGrid grid => grid.SelectedItems,
+                    _ => null,
+                };
+                if (hostItems is IList selectedItems && !_SelectionMatchesByPath(selectedItems, snapshot))
+                {
+                    _RestoreDragSelectionSnapshot();
+                }
+
                 return;
             }
 
