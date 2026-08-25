@@ -4,17 +4,17 @@ Keeps only the **last** `count` characters of the segment; the leading part is r
 
 ## Options
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `count` | int | Number of characters to keep from the right (clamped 0…length). |
+| Property | Type | Description                                                     |
+|----------|------|-----------------------------------------------------------------|
+| `count`  | int  | Number of characters to keep from the right (clamped 0…length). |
 
 ## Examples
 
-| Options | Before | After | Comment |
-|---------|--------|-------|---------|
-| `count`: `3` | `abcdef` | `def` | |
-| `count`: `0` | `abc` | *(empty)* | |
-| `count`: `100`<br>(segment shorter than count) | `ab` | `ab` | |
+| Options                                        | Before   | After     | Comment |
+|------------------------------------------------|----------|-----------|---------|
+| `count`: `3`                                   | `abcdef` | `def`     |         |
+| `count`: `0`                                   | `abc`    | _(empty)_ |         |
+| `count`: `100`<br>(segment shorter than count) | `ab`     | `ab`      |         |
 
 See [TrimRight](TrimRight.md) to **drop** a fixed number of characters from the right instead.
 

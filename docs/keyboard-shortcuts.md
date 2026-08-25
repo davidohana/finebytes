@@ -8,14 +8,14 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 
 ### Global
 
-| Action | Shortcut |
-|---|---|
-| GO | Ctrl+G |
-| Undo last | Ctrl+Z |
-| Log | Ctrl+Shift+L |
-| Options | Ctrl+, |
-| Exit | Alt+F4 |
-| Refresh File List | F5 |
+| Action            | Shortcut        |
+|-------------------|-----------------|
+| GO                | Ctrl+G          |
+| Undo last         | Ctrl+Z          |
+| Log               | Ctrl+Shift+L    |
+| Options           | Ctrl+,          |
+| Exit              | Alt+F4          |
+| Refresh File List | F5              |
 | Go to address bar | Ctrl+L or Alt+D |
 
 GO, Undo, Log, and Options appear in the menu and toolbar now; the commands themselves are still stubs.
@@ -24,22 +24,22 @@ Ctrl+L is the address bar (Explorer / Chrome). Log is Ctrl+Shift+L so the two do
 
 ### File List
 
-| Action | Shortcut | Where it works |
-|---|---|---|
-| Go to address bar | Ctrl+L, Alt+D | Main window |
-| Up (parent folder) | Backspace | File listing focused, not while typing |
-| Refresh | F5 | Main window |
-| Large Icons | Ctrl+1 | Main window |
-| Small Icons | Ctrl+2 | Main window |
-| Report | Ctrl+3 | Main window |
-| List | Ctrl+4 | Main window |
-| Tiles | Ctrl+5 | Main window |
-| Thumbnails | Ctrl+6 | Main window |
-| Zoom thumbnails in | Ctrl++, Ctrl+Shift+=, Ctrl+numpad +, Ctrl+wheel up | Thumbnails view, not while typing |
-| Zoom thumbnails out | Ctrl+-, Ctrl+numpad -, Ctrl+wheel down | Thumbnails view, not while typing |
-| Reset thumbnail size | Ctrl+0, Ctrl+numpad 0 | Thumbnails view, not while typing |
-| Commit typed path | Enter | Address bar edit |
-| Cancel typed path | Esc | Address bar edit |
+| Action               | Shortcut                                           | Where it works                         |
+|----------------------|----------------------------------------------------|----------------------------------------|
+| Go to address bar    | Ctrl+L, Alt+D                                      | Main window                            |
+| Up (parent folder)   | Backspace                                          | File listing focused, not while typing |
+| Refresh              | F5                                                 | Main window                            |
+| Large Icons          | Ctrl+1                                             | Main window                            |
+| Small Icons          | Ctrl+2                                             | Main window                            |
+| Report               | Ctrl+3                                             | Main window                            |
+| List                 | Ctrl+4                                             | Main window                            |
+| Tiles                | Ctrl+5                                             | Main window                            |
+| Thumbnails           | Ctrl+6                                             | Main window                            |
+| Zoom thumbnails in   | Ctrl++, Ctrl+Shift+=, Ctrl+numpad +, Ctrl+wheel up | Thumbnails view, not while typing      |
+| Zoom thumbnails out  | Ctrl+-, Ctrl+numpad -, Ctrl+wheel down             | Thumbnails view, not while typing      |
+| Reset thumbnail size | Ctrl+0, Ctrl+numpad 0                              | Thumbnails view, not while typing      |
+| Commit typed path    | Enter                                              | Address bar edit                       |
+| Cancel typed path    | Esc                                                | Address bar edit                       |
 
 Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 
@@ -47,14 +47,14 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 
 ### Rename List
 
-| Action | Shortcut | Where it works |
-|---|---|---|
-| Add selected | Ctrl+Shift+S | Main window |
-| Add all | Ctrl+Shift+A | Main window |
-| Remove selected | Ctrl+Shift+R | Main window |
-| Remove selected rows | Del | Rename List grid focused |
-| Clear | Ctrl+Shift+C | Main window |
-| Locate in File List | F4 | Rename List grid focused |
+| Action               | Shortcut     | Where it works           |
+|----------------------|--------------|--------------------------|
+| Add selected         | Ctrl+Shift+S | Main window              |
+| Add all              | Ctrl+Shift+A | Main window              |
+| Remove selected      | Ctrl+Shift+R | Main window              |
+| Remove selected rows | Del          | Rename List grid focused |
+| Clear                | Ctrl+Shift+C | Main window              |
+| Locate in File List  | F4           | Rename List grid focused |
 
 Hovering or focusing a Rename List cell shows the full cell value in the status bar.
 
@@ -62,16 +62,16 @@ Hovering or focusing a Rename List cell shows the full cell value in the status 
 
 These shortcuts match MFR 7.4 and are already labeled on disabled menu items.
 
-| Action | Shortcut |
-|---|---|
-| Rename List refresh | F5 |
+| Action              | Shortcut |
+|---------------------|----------|
+| Rename List refresh | F5       |
 
 Rename List refresh will share F5 with the File List later (MFR 7.4 used F5 in both). Until then, F5 only reloads the File List.
 
 ## Later (not on menus yet)
 
-| Action | Shortcut | Notes |
-|---|---|---|
-| Help | F1 | Help UI is not in this build |
-| Manual rename | F2 | Rename List |
-| Move selected rows | Ctrl+↑ / Ctrl+↓ | Rename List manual sort |
+| Action             | Shortcut        | Notes                        |
+|--------------------|-----------------|------------------------------|
+| Help               | F1              | Help UI is not in this build |
+| Manual rename      | F2              | Rename List                  |
+| Move selected rows | Ctrl+↑ / Ctrl+↓ | Rename List manual sort      |

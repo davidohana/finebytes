@@ -24,24 +24,24 @@ Each included field object uses:
 
 ## Examples
 
-| Options | Before (overlay) | After | Comment |
-|---------|------------------|-------|---------|
-| `text`: `Fixed` | title empty or any | title `Fixed` | Overwrites. |
-| `onlyIfEmpty`, `text`: `Fill` | title `Already` | unchanged | |
-| `onlyIfEmpty`, `text`: `Fill` | title empty | title `Fill` | |
-| `track`: `text`: `1`; `trackAutoIncrement`: `true` | (list index `0`) | track `1` | |
-| `track`: `text`: `1`; `trackAutoIncrement`: `true` | (list index `4`) | track `5` | |
-| `track`: `text`: `0`; `trackAutoIncrement`: `false` | track `3` | cleared | |
-| `trackCount`: `text`: `12` | any | track count `12` | |
-| `disc`: `text`: `2`; `discCount`: `text`: `3` | any | disc `2` of `3` | |
-| `composers`: `text`: `Bach ; Handel` | any | composers `Bach; Handel` | |
-| `lyrics`: `text`: `La la` | any | lyrics `La la` | |
-| `grouping`: `text`: `Suite` | any | grouping `Suite` | |
-| `copyright`: `text`: `© 2004` | any | copyright set | |
-| `conductor`: `text`: `Karajan` | any | conductor set | |
-| `beatsPerMinute`: `text`: `120` | any | BPM `120` | |
-| `year`: `text`: `0` | year `1999` | cleared | |
-| `year`: `text`: `12000` | any | preview error | Not a valid tag year. |
+| Options                                             | Before (overlay)   | After                    | Comment               |
+|-----------------------------------------------------|--------------------|--------------------------|-----------------------|
+| `text`: `Fixed`                                     | title empty or any | title `Fixed`            | Overwrites.           |
+| `onlyIfEmpty`, `text`: `Fill`                       | title `Already`    | unchanged                |                       |
+| `onlyIfEmpty`, `text`: `Fill`                       | title empty        | title `Fill`             |                       |
+| `track`: `text`: `1`; `trackAutoIncrement`: `true`  | (list index `0`)   | track `1`                |                       |
+| `track`: `text`: `1`; `trackAutoIncrement`: `true`  | (list index `4`)   | track `5`                |                       |
+| `track`: `text`: `0`; `trackAutoIncrement`: `false` | track `3`          | cleared                  |                       |
+| `trackCount`: `text`: `12`                          | any                | track count `12`         |                       |
+| `disc`: `text`: `2`; `discCount`: `text`: `3`       | any                | disc `2` of `3`          |                       |
+| `composers`: `text`: `Bach ; Handel`                | any                | composers `Bach; Handel` |                       |
+| `lyrics`: `text`: `La la`                           | any                | lyrics `La la`           |                       |
+| `grouping`: `text`: `Suite`                         | any                | grouping `Suite`         |                       |
+| `copyright`: `text`: `© 2004`                       | any                | copyright set            |                       |
+| `conductor`: `text`: `Karajan`                      | any                | conductor set            |                       |
+| `beatsPerMinute`: `text`: `120`                     | any                | BPM `120`                |                       |
+| `year`: `text`: `0`                                 | year `1999`        | cleared                  |                       |
+| `year`: `text`: `12000`                             | any                | preview error            | Not a valid tag year. |
 
 ## Sample preset (JSON)
 

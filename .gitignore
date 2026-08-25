@@ -39,3 +39,6 @@ Desktop.ini
 
 # macOS
 .DS_Store
+
+# Node (markdown formatter/linter dev tools)
+node_modules/

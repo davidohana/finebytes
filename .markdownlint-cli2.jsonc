@@ -1,0 +1,19 @@
+{
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD025": false,
+    "MD033": {
+      "allowed_elements": ["br"]
+    },
+    "MD036": false,
+    "MD038": false,
+    "MD041": false
+  },
+  "ignores": [
+    "node_modules",
+    "**/bin/**",
+    "**/obj/**",
+    ".cursor/**"
+  ]
+}

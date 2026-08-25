@@ -4,13 +4,13 @@ Loads a **replace list file** and applies **search/replace pairs** in file order
 
 ## Options
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `filePath` | string | Path to the replace-list file. |
-| `mode` | string (enum) | `Literal`, `Wildcard`, or `Regex` — applies to **every** pair in the file. |
-| `caseSensitive` | bool | Matching flag for all pairs. |
-| `replaceAll` | bool | Replace all matches per pair. |
-| `wholeWord` | bool | Whole-word restriction for all pairs. |
+| Property        | Type          | Description                                                                |
+|-----------------|---------------|----------------------------------------------------------------------------|
+| `filePath`      | string        | Path to the replace-list file.                                             |
+| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — applies to **every** pair in the file. |
+| `caseSensitive` | bool          | Matching flag for all pairs.                                               |
+| `replaceAll`    | bool          | Replace all matches per pair.                                              |
+| `wholeWord`     | bool          | Whole-word restriction for all pairs.                                      |
 
 ## Replace-list file format
 
@@ -33,13 +33,13 @@ R:_
 
 ## Examples
 
-| Options | Before | After | Comment |
-|---------|--------|-------|---------|
-| `filePath`: pairs `a`→`b`, then `.`→`_`<br>`mode`: `Literal`<br>`replaceAll`: `true` | `a.a` | `b_b` | Order matters: `a`→`b` first, then `.`→`_`. |
-| `filePath`: `S:x` / `R:<EMPTY>`<br>`mode`: `Literal`<br>`replaceAll`: `true` | `abxcx` | `abc` | |
-| `filePath`: `S:f*o` / `R:X`<br>`mode`: `Wildcard`<br>`replaceAll`: `true` | `foo` | `X` | |
-| `filePath`: `a`→`b`, `.`→`_`, `[0-9]+`→`<counter:initial=10,step=1,padding=none,length=2,resetScope=global>`<br>`mode`: `Regex`<br>`caseSensitive`: `false`<br>`replaceAll`: `true`<br>global index: `0` | `01.-.Blue.Train` | `10_-_Blue_Trbin` | Regex replaces digit runs; yields `Trbin`. |
-| (same file as row above)<br>global index: `1` | `02.-.A.Moment's.Notice` | `11_-_b_Moment's_Notice` | |
+| Options                                                                                                                                                                                                  | Before                   | After                    | Comment                                     |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|--------------------------|---------------------------------------------|
+| `filePath`: pairs `a`→`b`, then `.`→`_`<br>`mode`: `Literal`<br>`replaceAll`: `true`                                                                                                                     | `a.a`                    | `b_b`                    | Order matters: `a`→`b` first, then `.`→`_`. |
+| `filePath`: `S:x` / `R:<EMPTY>`<br>`mode`: `Literal`<br>`replaceAll`: `true`                                                                                                                             | `abxcx`                  | `abc`                    |                                             |
+| `filePath`: `S:f*o` / `R:X`<br>`mode`: `Wildcard`<br>`replaceAll`: `true`                                                                                                                                | `foo`                    | `X`                      |                                             |
+| `filePath`: `a`→`b`, `.`→`_`, `[0-9]+`→`<counter:initial=10,step=1,padding=none,length=2,resetScope=global>`<br>`mode`: `Regex`<br>`caseSensitive`: `false`<br>`replaceAll`: `true`<br>global index: `0` | `01.-.Blue.Train`        | `10_-_Blue_Trbin`        | Regex replaces digit runs; yields `Trbin`.  |
+| (same file as row above)<br>global index: `1`                                                                                                                                                            | `02.-.A.Moment's.Notice` | `11_-_b_Moment's_Notice` |                                             |
 
 The list is loaded at filter **setup**; reload the preset or app after editing the file.
 

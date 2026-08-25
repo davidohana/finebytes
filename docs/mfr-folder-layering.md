@@ -7,14 +7,14 @@ description: Current layers and allowed project dependencies.
 
 ## Projects by layer
 
-| Layer | Project |
-|---|---|
-| L5 Entry | [`Mfr.App.Cli/`](../Mfr.App.Cli), [`Mfr.App.Ui/`](../Mfr.App.Ui) |
-| L4 Engine | [`Mfr.Engine/`](../Mfr.Engine) |
-| L3 Domain rules | [`Mfr.Filters/`](../Mfr.Filters) |
-| L2 Tagged media I/O | [`Mfr.Metadata/`](../Mfr.Metadata) |
-| L1 Domain model | [`Mfr.Models/`](../Mfr.Models) |
-| L0 Shared utilities | [`Mfr.Utils/`](../Mfr.Utils) |
+| Layer               | Project                                                          |
+|---------------------|------------------------------------------------------------------|
+| L5 Entry            | [`Mfr.App.Cli/`](../Mfr.App.Cli), [`Mfr.App.Ui/`](../Mfr.App.Ui) |
+| L4 Engine           | [`Mfr.Engine/`](../Mfr.Engine)                                   |
+| L3 Domain rules     | [`Mfr.Filters/`](../Mfr.Filters)                                 |
+| L2 Tagged media I/O | [`Mfr.Metadata/`](../Mfr.Metadata)                               |
+| L1 Domain model     | [`Mfr.Models/`](../Mfr.Models)                                   |
+| L0 Shared utilities | [`Mfr.Utils/`](../Mfr.Utils)                                     |
 
 Supporting:
 

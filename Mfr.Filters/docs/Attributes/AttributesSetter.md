@@ -12,11 +12,11 @@ Other attribute bits (for example `Directory`) are preserved; only the four flag
 
 ## Examples
 
-| Options | Before | After | Comment |
-|---------|--------|-------|---------|
-| `readOnly`: `Keep`<br>`hidden`: `Set`<br>`archive`: `Keep`<br>`system`: `Keep` | (file on disk without H) | Preview/commit adds **Hidden** | Path unchanged; commit still runs. |
-| `readOnly`: `Keep`<br>`hidden`: `Keep`<br>`archive`: `Clear`<br>`system`: `Keep` | File had **Archive** | Archive cleared | |
-| All `Keep` | any | unchanged | No preview delta from this filter. |
+| Options                                                                          | Before                   | After                          | Comment                            |
+|----------------------------------------------------------------------------------|--------------------------|--------------------------------|------------------------------------|
+| `readOnly`: `Keep`<br>`hidden`: `Set`<br>`archive`: `Keep`<br>`system`: `Keep`   | (file on disk without H) | Preview/commit adds **Hidden** | Path unchanged; commit still runs. |
+| `readOnly`: `Keep`<br>`hidden`: `Keep`<br>`archive`: `Clear`<br>`system`: `Keep` | File had **Archive**     | Archive cleared                |                                    |
+| All `Keep`                                                                       | any                      | unchanged                      | No preview delta from this filter. |
 
 ## Sample preset (JSON)
 

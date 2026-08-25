@@ -1,13 +1,16 @@
 # AGENTS
 
 ## What to know
-- Use `just` for common tasks: `restore`, `build`, `test`, `format`, `run-ui`.
-- Before committing, run `just format` then `dotnet build .\finebytes.slnx`.
-- Formatting: CSharpier for `.cs` / `.csproj` / `.axaml` / `.slnx` layout; `dotnet format style` / `analyzers` for non-whitespace rules.
+
+- Use `just` for common tasks: `restore`, `build`, `test`, `format`, `lint`, `run-ui`.
+- Before committing, run `just format` then `just lint` (or `just build` after format if you only need compile/analyzer checks).
+- Formatting: CSharpier for `.cs` / `.csproj` / `.axaml` / `.slnx` layout; `dotnet format style` / `analyzers` for non-whitespace rules; Prettier + markdown-table-formatter for `.md` (via `just format-md`, also part of `just format`).
+- Linting: `just lint` runs C# checks (`dotnet build`, `csharpier check`, `dotnet format … --verify-no-changes`) and markdown checks (`just lint-md`: Prettier check, markdownlint-cli2, table alignment).
 - Follow project code style from `.editorconfig`.
 - Follow constraints in `.cursor/rules/*.mdc`.
 
 ## References
+
 - `CONTRIBUTING.md`
 - `docs/mfr-folder-layering.md`
 - `docs/magic-file-renamer-design.md` (consult for architecture/feature-level changes)

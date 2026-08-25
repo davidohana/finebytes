@@ -6,12 +6,12 @@ With **`onlyWhenNeighboringAreLettersOrDigits`** **true**, a separator is added 
 
 ## Examples
 
-| Options | Before | After | Comment |
-|---------|--------|-------|---------|
-| `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann-Stupid Thing` | `Aimee Mann - Stupid Thing` | |
-| `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann- Stupid Thing` | `Aimee Mann - Stupid Thing` | Space already after hyphen on one side. |
-| `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann - Stupid Thing` | `Aimee Mann - Stupid Thing` | Already normalized. |
-| `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann--Stupid Thing` | `Aimee Mann -- Stupid Thing` | Each `-` is handled separately: no space between the two hyphens; space after the run before `S`. |
+| Options                                                                 | Before                      | After                        | Comment                                                                                           |
+|-------------------------------------------------------------------------|-----------------------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann-Stupid Thing`   | `Aimee Mann - Stupid Thing`  |                                                                                                   |
+| `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann- Stupid Thing`  | `Aimee Mann - Stupid Thing`  | Space already after hyphen on one side.                                                           |
+| `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann - Stupid Thing` | `Aimee Mann - Stupid Thing`  | Already normalized.                                                                               |
+| `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann--Stupid Thing`  | `Aimee Mann -- Stupid Thing` | Each `-` is handled separately: no space between the two hyphens; space after the run before `S`. |
 
 ## Sample preset (JSON)
 

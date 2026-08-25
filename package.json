@@ -1,0 +1,13 @@
+{
+  "name": "finebytes",
+  "private": true,
+  "scripts": {
+    "format:md": "prettier --write \"**/*.md\" && node scripts/format-markdown-tables.mjs",
+    "lint:md": "prettier --check \"**/*.md\" && markdownlint-cli2 \"**/*.md\" && node scripts/check-markdown-tables.mjs"
+  },
+  "devDependencies": {
+    "markdown-table-formatter": "^1.7.0",
+    "markdownlint-cli2": "^0.17.2",
+    "prettier": "^3.5.3"
+  }
+}
