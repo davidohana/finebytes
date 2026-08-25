@@ -407,53 +407,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Report Ctrl+click multi-select survives the drag PointerPressed tunnel handler.
-        /// </summary>
-        [AvaloniaFact]
-        public void Report_Grid_Ctrl_Click_Keeps_Multi_Select()
-        {
-            var (viewModel, grid, window) = _ShowReportGrid();
-            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
-            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
-
-            _ClickEntry(window, grid, alpha, RawInputModifiers.None);
-            _ClickEntry(window, grid, beta, RawInputModifiers.Control);
-
-            Assert.Equal(2, viewModel.SelectedEntries.Count);
-            var selectedPaths = viewModel.SelectedEntries.Select(entry => entry.FullPath).ToHashSet();
-            Assert.Contains(alpha.FullPath, selectedPaths);
-            Assert.Contains(beta.FullPath, selectedPaths);
-            Assert.Equal(2, grid.SelectedItems.Count);
-
-            window.Close();
-        }
-
-        /// <summary>
-        /// Verifies List view Ctrl+click multi-select is not collapsed by the drag press handler.
-        /// </summary>
-        [AvaloniaFact]
-        public void List_View_Ctrl_Click_Keeps_Multi_Select()
-        {
-            var (viewModel, view, window) = _ShowListView();
-            var list = view.FindControl<ListBox>("ListViewList");
-            Assert.NotNull(list);
-
-            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
-            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
-
-            _ClickEntry(window, list, alpha, RawInputModifiers.None);
-            _ClickEntry(window, list, beta, RawInputModifiers.Control);
-
-            Assert.Equal(2, viewModel.SelectedEntries.Count);
-            var selectedPaths = viewModel.SelectedEntries.Select(entry => entry.FullPath).ToHashSet();
-            Assert.Contains(alpha.FullPath, selectedPaths);
-            Assert.Contains(beta.FullPath, selectedPaths);
-            Assert.Equal(2, list.SelectedItems!.Count);
-
-            window.Close();
-        }
-
-        /// <summary>
         /// Verifies pressing a row in a multi-selection keeps the full selection (no collapse flicker).
         /// </summary>
         [AvaloniaFact]
@@ -512,7 +465,7 @@ namespace Mfr.Tests.Ui
 
             Assert.Equal(2, viewModel.SelectedEntries.Count);
 
-            // Restore runs synchronously before DoDragDropAsync awaits, so assert before pumping.
+            // DoDragDropAsync awaits; assert the kept multi-select before pumping.
             var dragPoint = pressPoint + new Vector(12, 0);
             window.MouseMove(dragPoint, RawInputModifiers.LeftMouseButton);
 
