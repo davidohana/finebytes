@@ -7,7 +7,7 @@ The first row is a track-title style trim (artist–title → shorter title).
 ## Options
 
 | Property | Type   | Description                                                                 |
-|----------|--------|-----------------------------------------------------------------------------|
+| -------- | ------ | --------------------------------------------------------------------------- |
 | `start`  | object | `{ "value": int, "anchor": "Left" \| "Right" }` — 1-based from that anchor. |
 | `end`    | object | Same shape as `start`.                                                      |
 
@@ -16,7 +16,7 @@ The first row is a track-title style trim (artist–title → shorter title).
 ## Examples
 
 | Options                                                                                    | Before                   | After              | Comment                                             |
-|--------------------------------------------------------------------------------------------|--------------------------|--------------------|-----------------------------------------------------|
+| ------------------------------------------------------------------------------------------ | ------------------------ | ------------------ | --------------------------------------------------- |
 | `start`: `{ "value": 13, "anchor": "Left" }`<br>`end`: `{ "value": 5, "anchor": "Right" }` | `Portishead - Glory Box` | `Portishead - Box` | Left+right anchors remove the middle title segment. |
 | `start`: `{ "value": 2, "anchor": "Left" }`<br>`end`: `{ "value": 4, "anchor": "Left" }`   | `abcd`                   | `a`                |                                                     |
 | `start`: `{ "value": 3, "anchor": "Right" }`<br>`end`: `{ "value": 1, "anchor": "Right" }` | `abcd`                   | `a`                |                                                     |

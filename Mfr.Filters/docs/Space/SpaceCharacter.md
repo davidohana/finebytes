@@ -5,7 +5,7 @@ Sets the **word separator** character for the rest of the rename pass and option
 ## Options
 
 | Property             | Type           | Description                                                                                             |
-|----------------------|----------------|---------------------------------------------------------------------------------------------------------|
+| -------------------- | -------------- | ------------------------------------------------------------------------------------------------------- |
 | `spaceCharacter`     | string or char | **Single** character that becomes the word separator (first character used if a longer string is sent). |
 | `replaceSpaces`      | bool           | Replace U+0020 SPACE with `spaceCharacter`.                                                             |
 | `replaceUnderscores` | bool           | Replace `_` with `spaceCharacter`.                                                                      |
@@ -17,7 +17,7 @@ Replacements are applied in order: `%20`, then space, then underscore, then cust
 ## Examples
 
 | Options                                                                                                                                         | Before                     | After                | Comment                                                             |
-|-------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|----------------------|---------------------------------------------------------------------|
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | -------------------- | ------------------------------------------------------------------- |
 | `spaceCharacter`: `"_"`<br>`replacePercent20`: `true`<br>other flags: `false`                                                                   | `Gone%20With%20The%20Wind` | `Gone_With_The_Wind` |                                                                     |
 | `spaceCharacter`: space<br>`replaceSpaces`: `true`<br>`replaceUnderscores`: `true`<br>`replacePercent20`: `true`                                | `a_b c%20d`                | `a b c d`            |                                                                     |
 | `spaceCharacter`: `"-"`<br>`customText`: `"++"`<br>other flags: `false`                                                                         | `a++b`                     | `a-b`                |                                                                     |

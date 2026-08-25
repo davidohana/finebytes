@@ -7,14 +7,14 @@ The preview **Parent Directory** is replaced with `RootFolder` + `\` + resolved 
 ## Options
 
 | Property     | Type   | Description                                                                                                                                                                                                                                |
-|--------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `rootFolder` | string | Required. Absolute destination path. All items move under this root.                                                                                                                                                                       |
 | `subFolder`  | string | Optional. Template appended below `rootFolder`. Use `\` to build nested levels. Supports formatter tokens (`<file-name>`, `<parent-folder>`, `<now:format>`, `<counter:…>`). Use `""` when none; items then land directly in `rootFolder`. |
 
 ## Examples
 
 | Options                                                                    | Before (directory)                                     | After (directory)                            | Comment                                         |
-|----------------------------------------------------------------------------|--------------------------------------------------------|----------------------------------------------|-------------------------------------------------|
+| -------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------- | ----------------------------------------------- |
 | `rootFolder`: `C:\Dest`                                                    | `C:\Source`                                            | `C:\Dest`                                    | No sub-folder; flat move.                       |
 | `rootFolder`: `C:\Music`<br>`subFolder`: `Albums`                          | `C:\Downloads`                                         | `C:\Music\Albums`                            | Static sub-folder.                              |
 | `rootFolder`: `C:\Music`<br>`subFolder`: `<parent-folder>`                 | `C:\Downloads\Junkies`                                 | `C:\Music\Junkies`                           | Parent folder name resolved from original path. |

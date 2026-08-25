@@ -13,7 +13,7 @@ String filters such as [Formatter](../Formatting/Formatter.md) with an `Id3v2Fra
 ## Options
 
 | Option        | Type           | Description                                                                                                                                                                                                                                                             |
-|---------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `frameId`     | string         | Four-character frame id (case-insensitive; stored uppercase). **Required.**                                                                                                                                                                                             |
 | `text`        | string         | Plain text, **or** a formatter template when it contains at least one balanced `<...>` span that looks like a formatter token (same rules as [AudioTagSetter](AudioTagSetter.md) / [Formatter](../Formatting/Formatter.md)). Default empty (clears the frame instance). |
 | `onlyIfEmpty` | boolean        | When `true`, set only if the current frame text is empty/whitespace. Default `false` (overwrite).                                                                                                                                                                       |
@@ -25,7 +25,7 @@ String filters such as [Formatter](../Formatting/Formatter.md) with an `Id3v2Fra
 ## Examples
 
 | Options                                                      | Before            | After                          | Comment              |
-|--------------------------------------------------------------|-------------------|--------------------------------|----------------------|
+| ------------------------------------------------------------ | ----------------- | ------------------------------ | -------------------- |
 | `frameId`: `TIT2`<br>`text`: `Fixed`                         | TIT2 empty or any | TIT2 `Fixed`                   | Overwrites.          |
 | `frameId`: `TIT2`<br>`text`: `Fill`<br>`onlyIfEmpty`: `true` | TIT2 `Already`    | unchanged                      |                      |
 | `frameId`: `TIT2`<br>`text`: `Fill`<br>`onlyIfEmpty`: `true` | TIT2 empty        | TIT2 `Fill`                    |                      |

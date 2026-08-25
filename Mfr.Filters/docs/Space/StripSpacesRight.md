@@ -7,7 +7,7 @@ No `options` object.
 ## Examples
 
 | Options                                                                                 | Before          | After        | Comment |
-|-----------------------------------------------------------------------------------------|-----------------|--------------|---------|
+| --------------------------------------------------------------------------------------- | --------------- | ------------ | ------- |
 | (no options)<br>default word separator                                                  | `New_York__   ` | `New_York__` |         |
 | (no options)<br>default word separator                                                  | ` a b`          | `  a b`      |         |
 | (no options)<br>default word separator                                                  | `    `          | _(empty)_    |         |

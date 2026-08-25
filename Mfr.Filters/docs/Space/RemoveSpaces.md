@@ -7,7 +7,7 @@ No `options` object.
 ## Examples
 
 | Options                                | Before      | After      | Comment                                                           |
-|----------------------------------------|-------------|------------|-------------------------------------------------------------------|
+| -------------------------------------- | ----------- | ---------- | ----------------------------------------------------------------- |
 | (no options)<br>default word separator | `a b`       | `ab`       |                                                                   |
 | (no options)<br>default word separator | `a \t\r\nb` | `a\t\r\nb` | Only the word-separator char (space) removed, not `\t`/`\r`/`\n`. |
 

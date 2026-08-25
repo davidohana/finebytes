@@ -9,7 +9,7 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 ### Global
 
 | Action            | Shortcut        |
-|-------------------|-----------------|
+| ----------------- | --------------- |
 | GO                | Ctrl+G          |
 | Undo last         | Ctrl+Z          |
 | Log               | Ctrl+Shift+L    |
@@ -25,7 +25,7 @@ Ctrl+L is the address bar (Explorer / Chrome). Log is Ctrl+Shift+L so the two do
 ### File List
 
 | Action               | Shortcut                                           | Where it works                         |
-|----------------------|----------------------------------------------------|----------------------------------------|
+| -------------------- | -------------------------------------------------- | -------------------------------------- |
 | Go to address bar    | Ctrl+L, Alt+D                                      | Main window                            |
 | Up (parent folder)   | Backspace                                          | File listing focused, not while typing |
 | Refresh              | F5                                                 | Main window                            |
@@ -48,7 +48,7 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 ### Rename List
 
 | Action               | Shortcut     | Where it works           |
-|----------------------|--------------|--------------------------|
+| -------------------- | ------------ | ------------------------ |
 | Add selected         | Ctrl+Shift+S | Main window              |
 | Add all              | Ctrl+Shift+A | Main window              |
 | Remove selected      | Ctrl+Shift+R | Main window              |
@@ -63,7 +63,7 @@ Hovering or focusing a Rename List cell shows the full cell value in the status 
 These shortcuts match MFR 7.4 and are already labeled on disabled menu items.
 
 | Action              | Shortcut |
-|---------------------|----------|
+| ------------------- | -------- |
 | Rename List refresh | F5       |
 
 Rename List refresh will share F5 with the File List later (MFR 7.4 used F5 in both). Until then, F5 only reloads the File List.
@@ -71,7 +71,7 @@ Rename List refresh will share F5 with the File List later (MFR 7.4 used F5 in b
 ## Later (not on menus yet)
 
 | Action             | Shortcut        | Notes                        |
-|--------------------|-----------------|------------------------------|
+| ------------------ | --------------- | ---------------------------- |
 | Help               | F1              | Help UI is not in this build |
 | Manual rename      | F2              | Rename List                  |
 | Move selected rows | Ctrl+↑ / Ctrl+↓ | Rename List manual sort      |

@@ -5,13 +5,13 @@ Keeps only the **last** `count` characters of the segment; the leading part is r
 ## Options
 
 | Property | Type | Description                                                     |
-|----------|------|-----------------------------------------------------------------|
+| -------- | ---- | --------------------------------------------------------------- |
 | `count`  | int  | Number of characters to keep from the right (clamped 0…length). |
 
 ## Examples
 
 | Options                                        | Before   | After     | Comment |
-|------------------------------------------------|----------|-----------|---------|
+| ---------------------------------------------- | -------- | --------- | ------- |
 | `count`: `3`                                   | `abcdef` | `def`     |         |
 | `count`: `0`                                   | `abc`    | _(empty)_ |         |
 | `count`: `100`<br>(segment shorter than count) | `ab`     | `ab`      |         |

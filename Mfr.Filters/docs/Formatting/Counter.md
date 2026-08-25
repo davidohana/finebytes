@@ -5,7 +5,7 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 ## Options
 
 | Property         | Type          | Description                                                                                                            |
-|------------------|---------------|------------------------------------------------------------------------------------------------------------------------|
+| ---------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `start`          | int           | First counter value for index `0`.                                                                                     |
 | `step`           | int           | `value = start + step * n`.                                                                                            |
 | `width`          | int           | Minimum width; left-pad numeric string (see `padChar`). Use `0` for no padding.                                        |
@@ -17,7 +17,7 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 ### Position (`position`)
 
 | Value     | Result                                      |
-|-----------|---------------------------------------------|
+| --------- | ------------------------------------------- |
 | `Replace` | Segment becomes only the formatted counter. |
 | `Prepend` | `formatted + separator + originalSegment`   |
 | `Append`  | `originalSegment + separator + formatted`   |
@@ -27,7 +27,7 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 Assume **global** index as in each row unless `resetPerFolder` is noted.
 
 | Options                                                                                                                                    | Before | After    | Comment                               |
-|--------------------------------------------------------------------------------------------------------------------------------------------|--------|----------|---------------------------------------|
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ------ | -------- | ------------------------------------- |
 | `start`: `1`<br>`step`: `1`<br>`width`: `3`<br>`padChar`: `"0"`<br>`position`: `Replace`<br>`resetPerFolder`: `false`<br>global index: `4` | `old`  | `005`    |                                       |
 | `start`: `0`<br>`step`: `1`<br>`width`: `0`<br>`padChar`: `"0"`<br>`position`: `Prepend`<br>`separator`: `"_"`<br>global index: `2`        | `name` | `2_name` |                                       |
 | `start`: `0`<br>`step`: `1`<br>`width`: `0`<br>`padChar`: `"0"`<br>`position`: `Append`<br>`separator`: `"-"`<br>global index: `1`         | `name` | `name-1` |                                       |

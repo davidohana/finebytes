@@ -1,0 +1,7 @@
+# Match .editorconfig
+wrap = "keep"
+end_of_line = "crlf"
+
+# Column-aligned tables (default; do NOT set compact_tables = true)
+[plugin.tables]
+compact_tables = false

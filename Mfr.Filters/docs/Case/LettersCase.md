@@ -5,7 +5,7 @@ Changes letter casing on the target segment. **Title case** and **sentence case*
 ## Options
 
 | Property                      | Type            | Default    | Description                                                                                                                                              |
-|-------------------------------|-----------------|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ----------------------------- | --------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mode`                        | string (enum)   | (required) | One of the **Modes** below.                                                                                                                              |
 | `skipWords`                   | array of string | `[]`       | **Title case only:** words matched case-insensitively stay lowercase.                                                                                    |
 | `weirdUppercaseChancePercent` | int             | `50`       | **Weird case only:** chance each letter is uppercased (clamped 0–100).                                                                                   |
@@ -14,7 +14,7 @@ Changes letter casing on the target segment. **Title case** and **sentence case*
 ### Modes (`mode`)
 
 | Value           | Behavior                                                                                                                                                               |
-|-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `UpperCase`     | All letters uppercase.                                                                                                                                                 |
 | `LowerCase`     | All letters lowercase.                                                                                                                                                 |
 | `FirstLetterUp` | First character uppercased if it is a letter; rest of segment lowercased.                                                                                              |
@@ -26,7 +26,7 @@ Changes letter casing on the target segment. **Title case** and **sentence case*
 ## Examples
 
 | Options                                                                                                                                                   | Before                          | After                           | Comment                                             |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|---------------------------------|-----------------------------------------------------|
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------------------- | --------------------------------------------------- |
 | `mode`: `UpperCase`                                                                                                                                       | `hello`                         | `HELLO`                         |                                                     |
 | `mode`: `LowerCase`                                                                                                                                       | `HELLO`                         | `hello`                         |                                                     |
 | `mode`: `FirstLetterUp`                                                                                                                                   | `hELLO world`                   | `Hello world`                   |                                                     |

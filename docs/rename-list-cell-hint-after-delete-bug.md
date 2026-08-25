@@ -8,12 +8,12 @@ Regression: `Mfr.Tests/Ui/RenameListViewHintTests.cs`.
 
 **Goal:** After pressing **Del** on a Rename List row, the status-bar cell hint should show the **new selection** (row at same index that slid up). It must not jump to another row—especially the **last visible row in the viewport** when the list is scrolled and the mouse stays on the deleted row’s screen position.
 
----
+______________________________________________________________________
 
 ## Symptom
 
 | What works                                                | What breaks                                                     |
-|-----------------------------------------------------------|-----------------------------------------------------------------|
+| --------------------------------------------------------- | --------------------------------------------------------------- |
 | Grid **selection** after Delete (same index, MFR7 parity) | Status-bar **hover hint** (`CellStatusHintDisplay`)             |
 | Hint when list is **not** scrolled                        | Hint when a **vertical scrollbar** is present                   |
 | Hint when mouse is **not** over the deleted row           | Hint when cursor **stays** on the deleted row’s screen position |
@@ -22,20 +22,20 @@ Regression: `Mfr.Tests/Ui/RenameListViewHintTests.cs`.
 
 **Not the issue:** Initial report confused selection jump with hint jump; selection behavior is fixed in `RenameListViewModel.RemoveSelected`.
 
----
+______________________________________________________________________
 
 ## Reproduction
 
 1. Add enough Rename List entries that the grid shows a vertical scrollbar (20+ rows; `RowHeight="20"`).
-2. Scroll so the target row is somewhere in the middle of the viewport.
-3. Hover a cell — status bar shows `**Column**: value` (rich text via `StatusHintView`).
-4. With the mouse **still over that row**, press **Del** (grid focused).
-5. **Expected:** Hint updates to the row that slid into the deleted index (same as new selection).
-6. **Actual:** Hint jumps to the **bottom visible row** on screen (or otherwise wrong row). User reports this persists after all fixes below.
+1. Scroll so the target row is somewhere in the middle of the viewport.
+1. Hover a cell — status bar shows `**Column**: value` (rich text via `StatusHintView`).
+1. With the mouse **still over that row**, press **Del** (grid focused).
+1. **Expected:** Hint updates to the row that slid into the deleted index (same as new selection).
+1. **Actual:** Hint jumps to the **bottom visible row** on screen (or otherwise wrong row). User reports this persists after all fixes below.
 
 Also try: toolbar Remove, Ctrl+Shift+R — focus whether Del-only or all remove paths.
 
----
+______________________________________________________________________
 
 ## Architecture (hint pipeline)
 
@@ -47,7 +47,7 @@ RenameListView (pointer / selection events)
 ```
 
 | File                                                      | Role                                                            |
-|-----------------------------------------------------------|-----------------------------------------------------------------|
+| --------------------------------------------------------- | --------------------------------------------------------------- |
 | `Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs`     | **All hint event handling** — primary bug surface               |
 | `Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.cs` | `RemoveSelected`, `SetSelectedEntries`, `CellStatusHintDisplay` |
 | `Mfr.App.Ui/ViewModels/RenameList/RenameListCellHint.cs`  | Column → cell text formatting                                   |
@@ -57,7 +57,7 @@ RenameListView (pointer / selection events)
 
 Hint format: **`Column Name: value`** with bold column (`RenameListCellHint.FormatParts`).
 
----
+______________________________________________________________________
 
 ## Correct delete + selection behavior (already implemented)
 
@@ -75,7 +75,7 @@ Tests in `Mfr.Tests/Ui/RenameListViewModelTests.cs`:
 
 **No automated test** for post-delete status hint with virtualized grid + scroll.
 
----
+______________________________________________________________________
 
 ## Current mitigation code (still insufficient)
 
@@ -92,7 +92,7 @@ After delete, pointer-based hint updates should be suppressed until the mouse mo
 ### Event handlers
 
 | Event                           | Behavior while locked                                                |
-|---------------------------------|----------------------------------------------------------------------|
+| ------------------------------- | -------------------------------------------------------------------- |
 | `PointerMoved` (tunnel on grid) | Re-publish selection hint; skip hit-test                             |
 | `PointerExited`                 | **Ignored** while locked (spurious recycle exits)                    |
 | `CurrentCellChanged`            | Ignored while locked                                                 |
@@ -107,27 +107,27 @@ After delete, pointer-based hint updates should be suppressed until the mouse mo
 
 `_HitTestRowAt(position)` uses `RenameGrid.InputHitTest(position)` instead of `e.Source`.
 
----
+______________________________________________________________________
 
 ## Leading hypotheses (for next agent)
 
 1. **Wrong entry despite lock** — `_ReadFocusedEntry()` may still fall through to `RenameGrid.SelectedItem` if VM selection is briefly empty or stale during recycle; bottom row may be grid’s transient `SelectedItem`.
 
-2. **Lock cleared unexpectedly** — `_EndSelectionHintLock()` still runs from `_OnCellPointerPressed` or pointer move ≥2px from layout jitter (not just user move). Anchor uses `_pointerHintAnchor ??= _lastPointerPositionOverGrid`; if anchor is null/wrong, behavior differs.
+1. **Lock cleared unexpectedly** — `_EndSelectionHintLock()` still runs from `_OnCellPointerPressed` or pointer move ≥2px from layout jitter (not just user move). Anchor uses `_pointerHintAnchor ??= _lastPointerPositionOverGrid`; if anchor is null/wrong, behavior differs.
 
-3. **`SelectedEntries` PropertyChanged always locks** — `_OnViewModelPropertyChanged` calls `_BeginSelectionHintLock()` on **every** selection change, not only delete. May interact badly with normal selection sync.
+1. **`SelectedEntries` PropertyChanged always locks** — `_OnViewModelPropertyChanged` calls `_BeginSelectionHintLock()` on **every** selection change, not only delete. May interact badly with normal selection sync.
 
-4. **Grid fires events before lock** — If Avalonia DataGrid handles `CollectionChanged` before the view’s handler, `SelectionChanged` might push wrong grid selection into VM before `_preferSelectionHint` is set (toolbar path; Del path sets lock _before_ `Execute`).
+1. **Grid fires events before lock** — If Avalonia DataGrid handles `CollectionChanged` before the view’s handler, `SelectionChanged` might push wrong grid selection into VM before `_preferSelectionHint` is set (toolbar path; Del path sets lock _before_ `Execute`).
 
-5. **Another publisher** — Something outside `RenameListView` may set `CellStatusHintDisplay` (grep shows only ViewModel default clear on `Clear()` and this view).
+1. **Another publisher** — Something outside `RenameListView` may set `CellStatusHintDisplay` (grep shows only ViewModel default clear on `Clear()` and this view).
 
-6. **`RenameGrid.CurrentColumn` stale** — Hint uses `CurrentColumn ?? _lastHintColumn` for column; entry is forced from selection when locked, but if **entry** is wrong the column doesn’t explain “bottom row” symptom unless entry itself is wrong.
+1. **`RenameGrid.CurrentColumn` stale** — Hint uses `CurrentColumn ?? _lastHintColumn` for column; entry is forced from selection when locked, but if **entry** is wrong the column doesn’t explain “bottom row” symptom unless entry itself is wrong.
 
-7. **Virtualization + scroll offset** — After remove, scroll position may shift; hit-test at fixed screen Y resolves to last slot in viewport. Lock should prevent hit-test; if lock fails, this explains “bottom item on screen.”
+1. **Virtualization + scroll offset** — After remove, scroll position may shift; hit-test at fixed screen Y resolves to last slot in viewport. Lock should prevent hit-test; if lock fails, this explains “bottom item on screen.”
 
-8. **Double PropertyChanged / race** — `RemoveSelected` → `SetSelectedEntries` → PropertyChanged schedules refresh; Del handler also schedules refresh. Order vs grid layout pass may still allow a late pointer/grid event to win.
+1. **Double PropertyChanged / race** — `RemoveSelected` → `SetSelectedEntries` → PropertyChanged schedules refresh; Del handler also schedules refresh. Order vs grid layout pass may still allow a late pointer/grid event to win.
 
----
+______________________________________________________________________
 
 ## Suggested approaches (not yet tried)
 
@@ -136,9 +136,9 @@ After delete, pointer-based hint updates should be suppressed until the mouse mo
 On delete while pointer over grid:
 
 1. Capture **entry + column** from VM selection and `_lastHintColumn` immediately after `RemoveSelected`.
-2. Set hint once from that snapshot.
-3. Ignore **all** pointer/grid hint updates until `PointerMoved` exceeds a **larger** threshold (e.g. 8px) **or** explicit cell click.
-4. Do not use hit-test at all during freeze.
+1. Set hint once from that snapshot.
+1. Ignore **all** pointer/grid hint updates until `PointerMoved` exceeds a **larger** threshold (e.g. 8px) **or** explicit cell click.
+1. Do not use hit-test at all during freeze.
 
 ### B. Clear hint on delete when mouse was on deleted row
 
@@ -163,7 +163,7 @@ Extend `Mfr.Tests/Ui/` pattern (`RenameListViewDropTests._Show`):
 
 Log on every `_PublishCellHint`: source (pointer/selection/scheduled), entry path, `_preferSelectionHint`, lock state, `SelectedEntries` count, grid `SelectedItem`, hit-test result. User can capture one delete sequence.
 
----
+______________________________________________________________________
 
 ## Key code references
 
@@ -207,7 +207,7 @@ var nextSelection = _SelectEntryAfterRemove(anchorIndex);
 SetSelectedEntries(nextSelection is null ? [] : [nextSelection]);
 ```
 
----
+______________________________________________________________________
 
 ## Tests to run after fix
 
@@ -225,7 +225,7 @@ Manual checklist:
 - [ ] After fix: move mouse — hover hint resumes on correct row
 - [ ] Click different cell after delete — hint follows click
 
----
+______________________________________________________________________
 
 ## Related docs / constraints
 
@@ -234,12 +234,12 @@ Manual checklist:
 - `.cursor/rules/refactor-no-legacy-compat.mdc` — prefer clean fix over compatibility layers
 - Prior chat: [Rename List Phase 2 / hint jump fixes](agent-transcripts) — search “hover”, “bottom item”, “scrollbar”
 
----
+______________________________________________________________________
 
 ## Agent checklist
 
 1. Reproduce locally with `just run-ui` (scroll + Del + mouse on row).
-2. Add temporary logging or a failing headless test to capture the bad publish path.
-3. Prefer a **simple, deterministic** model (snapshot or clear-on-delete) over more event-order guards unless necessary.
-4. Add regression test if feasible in `Mfr.Tests/Ui/`.
-5. Run `just format` before commit.
+1. Add temporary logging or a failing headless test to capture the bad publish path.
+1. Prefer a **simple, deterministic** model (snapshot or clear-on-delete) over more event-order guards unless necessary.
+1. Add regression test if feasible in `Mfr.Tests/Ui/`.
+1. Run `just format` before commit.

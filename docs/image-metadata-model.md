@@ -32,23 +32,23 @@ flowchart LR
 ## Design principles
 
 1. **Read-only.** Image properties and EXIF are never written on commit. There is no Apply path in this slice.
-2. **Lazy, one open.** The first `<image-*>` or `<exif-*>` token on a file row in a Preview run opens the
+1. **Lazy, one open.** The first `<image-*>` or `<exif-*>` token on a file row in a Preview run opens the
    file once, maps directories to `ImageProperties` **and** `ExifData`, and caches both records.
    Later tokens in the same cycle reuse them. Commit clears the cache so the next preview reloads from disk.
-3. **DTO only.** Raw MetadataExtractor `Directory` lists are not stored on `FileMeta`. Mapping discards them.
+1. **DTO only.** Raw MetadataExtractor `Directory` lists are not stored on `FileMeta`. Mapping discards them.
    Extended EXIF is flattened into `ExifData.TagToDescription` (string dictionary) at map time.
-4. **Original snapshot.** Tokens read `item.Original.Image` and `item.Original.Exif` (disk-backed facts), not Preview.
-5. **Mapped rasters only.** Empty tokens apply only after a successful allowlist map when a field is
+1. **Original snapshot.** Tokens read `item.Original.Image` and `item.Original.Exif` (disk-backed facts), not Preview.
+1. **Mapped rasters only.** Empty tokens apply only after a successful allowlist map when a field is
    missing (`0` / null). Anything that is not JPEG, PNG, GIF, BMP, TIFF, ICO, or WebP is PreviewError —
    including types MetadataExtractor will open (MP3, WAV, MP4, HEIF, RAW, …). Missing EXIF on a mapped
    raster is an **empty** snapshot, not PreviewError. PNG/TIFF/WebP with EXIF are supported (not JPEG-only).
-6. **Separate from TagLib.** `<media-photo-*>` stays on the TagLib `FileMeta.Media` cache. `<image-*>`
+1. **Separate from TagLib.** `<media-photo-*>` stays on the TagLib `FileMeta.Media` cache. `<image-*>`
    and `<exif-*>` values may differ from TagLib/GDI+.
 
 ## Layer map
 
 | Concern                       | Project / type                                                                                              |
-|-------------------------------|-------------------------------------------------------------------------------------------------------------|
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | Snapshot records              | `Mfr.Models` — `ImageProperties` on `FileMeta.Image`; `ExifData` on `FileMeta.Exif`                         |
 | Disk read / raster + EXIF map | `Mfr.Metadata` — `ImageFileReader`, `ImagePropertiesReader`, `ExifDataReader`                               |
 | Lazy load                     | `Mfr.Filters` — `RenameItemImagePropertiesExtensions.EnsureImagePropertiesLoaded`                           |
@@ -68,7 +68,7 @@ tests never hit disk. Integration-style tests construct an unmarked `RenameItem`
 ## Empty vs PreviewError
 
 | Situation                                                             | Result                                                     |
-|-----------------------------------------------------------------------|------------------------------------------------------------|
+| --------------------------------------------------------------------- | ---------------------------------------------------------- |
 | Directory row                                                         | `InvalidOperationException` from ensure → PreviewError     |
 | Missing / relative path                                               | `ArgumentException` from the reader → PreviewError         |
 | Unknown format / ME processing or IO failure (e.g. `.txt`)            | Propagated ME exception → PreviewError                     |
@@ -91,7 +91,7 @@ Text and camera fields use MetadataExtractor `GetDescription(tag)`, then `\n` �
 becomes null. That keeps display strings such as `1/60 sec`, `f/8.0`, `50 mm`.
 
 | Field                                                                  | Directory             | Tag                                                                                                                                    |
-|------------------------------------------------------------------------|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| ---------------------------------------------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | DateTaken                                                              | `ExifSubIfdDirectory` | `TagDateTimeOriginal` (36867) via `TryGetDateTime` only; `DateTimeKind.Unspecified`; no fallback to DateTimeDigitized or IFD0 DateTime |
 | Make / Model / Artist / Description                                    | `ExifIfd0Directory`   | Make / Model / Artist / Image Description                                                                                              |
 | Title / Subject / Author / Keywords / Comments                         | `ExifIfd0Directory`   | Windows XP Title / Subject / Author / Keywords / Comment                                                                               |
@@ -108,7 +108,7 @@ two keys are stored (existing keys are not overwritten): `{Alias}/{Tag.Name}` an
 (decimal id, e.g. `Exif/271`). Alias table (case-insensitive):
 
 | Alias      | Directory                                                      |
-|------------|----------------------------------------------------------------|
+| ---------- | -------------------------------------------------------------- |
 | `Exif`     | `ExifIfd0Directory`                                            |
 | `ExifSub`  | `ExifSubIfdDirectory`                                          |
 | `GPS`      | `GpsDirectory` (string descriptions only; typed lat/lon is 5c) |

@@ -40,5 +40,7 @@ Desktop.ini
 # macOS
 .DS_Store
 
-# Node (markdown formatter/linter dev tools)
-node_modules/
+# Python (markdown formatter/linter dev tools)
+.venv/
+.venv-spike/
+.spike-md/

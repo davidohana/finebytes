@@ -1,0 +1,17 @@
+[tool.pymarkdown]
+# Mirror .markdownlint-cli2.jsonc ignores (also enforced by git pathspec in just)
+system.exclude_path = [".cursor/**", "**/bin/**", "**/obj/**", "node_modules/**"]
+
+[tool.pymarkdown.extensions]
+front-matter.enabled = true
+
+[tool.pymarkdown.plugins]
+md003.style = "atx"
+# Filter examples often contain `(…)[…]` strings (e.g. CapitalizeAfter Before/After).
+md011.enabled = false
+md013.enabled = false
+md025.enabled = false
+md033.allowed_elements = "br,!--,![CDATA["
+md036.enabled = false
+md038.enabled = false
+md041.enabled = false

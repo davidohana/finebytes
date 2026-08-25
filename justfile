@@ -37,23 +37,17 @@ lint-cs:
     dotnet format style ./finebytes.slnx --verify-no-changes
     dotnet format analyzers ./finebytes.slnx --verify-no-changes
 
-[unix]
+# Tracked + untracked *.md (respects .gitignore); skip .cursor like .prettierignore.
+# One-time: python -m venv .venv && .venv/Scripts/pip install -r requirements-md.txt
+md_python := if os_family() == "windows" { ".venv/Scripts/python.exe" } else { ".venv/bin/python" }
+md_files := `git ls-files -c -o --exclude-standard -- "*.md" ":!.cursor/**" | tr "\n" " "`
+
 format-md:
-    npm ci
-    npm run format:md
+    {{md_python}} -m mdformat {{md_files}}
 
-[windows]
-format-md:
-    cmd.exe //c "scripts\\run-npm.cmd ci && scripts\\run-npm.cmd run format:md"
-
-[unix]
 lint-md:
-    npm ci
-    npm run lint:md
-
-[windows]
-lint-md:
-    cmd.exe //c "scripts\\run-npm.cmd ci && scripts\\run-npm.cmd run lint:md"
+    {{md_python}} -m mdformat --check {{md_files}}
+    {{md_python}} -m pymarkdown --config pymarkdown.toml scan {{md_files}}
 
 run-help:
     dotnet run --project ./Mfr.App.Cli/Mfr.App.Cli.csproj -- --help

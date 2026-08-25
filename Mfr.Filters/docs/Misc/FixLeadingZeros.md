@@ -5,7 +5,7 @@ Finds **runs of digits** in the segment and rewrites them so their length matche
 ## Options
 
 | Property           | Type | Default    | Description                                                                            |
-|--------------------|------|------------|----------------------------------------------------------------------------------------|
+| ------------------ | ---- | ---------- | -------------------------------------------------------------------------------------- |
 | `width`            | int  | (required) | Desired minimum digit count after normalization.                                       |
 | `removeExtraZeros` | bool | (required) | If `true`, strip leading zeros from the match first, then pad to `width` when shorter. |
 | `maxCount`         | int  | `0`        | Maximum number of digit groups to change; `0` = all matches.                           |
@@ -14,7 +14,7 @@ Finds **runs of digits** in the segment and rewrites them so their length matche
 ## Examples
 
 | Options                                                                | Before           | After              | Comment                                        |
-|------------------------------------------------------------------------|------------------|--------------------|------------------------------------------------|
+| ---------------------------------------------------------------------- | ---------------- | ------------------ | ---------------------------------------------- |
 | `width`: `0`<br>`removeExtraZeros`: `true`                             | `track12`        | `track12`          | Non-positive `width` → no change.              |
 | `width`: `4`<br>`removeExtraZeros`: `false`                            | `track9`         | `track0009`        |                                                |
 | `width`: `3`<br>`removeExtraZeros`: `true`                             | `x0007`          | `x007`             |                                                |

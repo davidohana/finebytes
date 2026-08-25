@@ -5,7 +5,7 @@ Removes embedded tag blocks — either **selected** types, or a **nuclear** wipe
 ## Modes
 
 | `options`         | Preview                                              | Commit                                                                             |
-|-------------------|------------------------------------------------------|------------------------------------------------------------------------------------|
+| ----------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | `"all": true`     | Clears all modeled overlay blocks (`ClearAllBlocks`) | Nuclear: `RemoveTags(AllTags)` (see below)                                         |
 | `"blocks": [...]` | Nulls each listed block                              | `RemoveTags` for those types only; surviving blocks stay writable by later filters |
 
@@ -22,7 +22,7 @@ On **preview**, nuclear looks the same as clearing every modeled block: the over
 On **commit**, nuclear does **more** than listing all seven `blocks` values. Selective Apply only deletes tag types that appear in the Original→Preview diff for modeled kinds. Nuclear sets `StripAllEmbeddedTagsOnCommit` and the engine calls TagLib `RemoveTags(AllTags)`, which also strips types **outside** `AudioTagBlockKind`:
 
 | TagLib `TagTypes`                    | Typical meaning                                    |
-|--------------------------------------|----------------------------------------------------|
+| ------------------------------------ | -------------------------------------------------- |
 | `MovieId`                            | RIFF / MOVIEID                                     |
 | `DivX`                               | DivX tags                                          |
 | `FlacMetadata`                       | FLAC native metadata (separate from Xiph comments) |
@@ -38,14 +38,14 @@ So for a normal MP3/FLAC/M4A that only carries modeled blocks, `all: true` and `
 ## Options
 
 | Option   | Type             | Description                                                                                      |
-|----------|------------------|--------------------------------------------------------------------------------------------------|
+| -------- | ---------------- | ------------------------------------------------------------------------------------------------ |
 | `all`    | boolean          | When `true`, nuclear strip (see above). Default `false`.                                         |
 | `blocks` | array of strings | Tag block types to remove when `all` is false. At least one entry required unless `all` is true. |
 
 Valid `blocks` values and the containers that can hold them:
 
 | Value      | Tag block           | Containers           |
-|------------|---------------------|----------------------|
+| ---------- | ------------------- | -------------------- |
 | `id3v1`    | ID3v1 trailer       | MP3                  |
 | `id3v2`    | ID3v2 frames        | MP3                  |
 | `xiph`     | Xiph/Vorbis comment | FLAC, Ogg, Opus      |
@@ -81,7 +81,7 @@ Naming a block the row's container cannot hold is a **preview error** (for examp
 ## Examples
 
 | Options                                          | Before                                         | After                         | Comment                                                            |
-|--------------------------------------------------|------------------------------------------------|-------------------------------|--------------------------------------------------------------------|
+| ------------------------------------------------ | ---------------------------------------------- | ----------------------------- | ------------------------------------------------------------------ |
 | `all: true`                                      | Tagged `.wav` / `.mp3` / image with XMP        | No embedded tags left         | XMP and other unmodeled TagLib types go too                        |
 | `all: true`                                      | Chain: TagRemover → Formatter on `audio-title` | New title written after strip | Commit runs strip **then** overlay merge                           |
 | `blocks: ["id3v1"]`                              | `.mp3` with ID3v1 + ID3v2                      | ID3v2 only                    | ID3v2 frames, including art, are untouched                         |

@@ -8,7 +8,7 @@ description: Current layers and allowed project dependencies.
 ## Projects by layer
 
 | Layer               | Project                                                          |
-|---------------------|------------------------------------------------------------------|
+| ------------------- | ---------------------------------------------------------------- |
 | L5 Entry            | [`Mfr.App.Cli/`](../Mfr.App.Cli), [`Mfr.App.Ui/`](../Mfr.App.Ui) |
 | L4 Engine           | [`Mfr.Engine/`](../Mfr.Engine)                                   |
 | L3 Domain rules     | [`Mfr.Filters/`](../Mfr.Filters)                                 |

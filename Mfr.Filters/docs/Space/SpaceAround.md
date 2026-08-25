@@ -7,7 +7,7 @@ With **`onlyWhenNeighboringAreLettersOrDigits`** **true**, a separator is added 
 ## Examples
 
 | Options                                                                 | Before                      | After                        | Comment                                                                                           |
-|-------------------------------------------------------------------------|-----------------------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| ----------------------------------------------------------------------- | --------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------- |
 | `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann-Stupid Thing`   | `Aimee Mann - Stupid Thing`  |                                                                                                   |
 | `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann- Stupid Thing`  | `Aimee Mann - Stupid Thing`  | Space already after hyphen on one side.                                                           |
 | `aroundChars`: `"-"`<br>`onlyWhenNeighboringAreLettersOrDigits`: `true` | `Aimee Mann - Stupid Thing` | `Aimee Mann - Stupid Thing`  | Already normalized.                                                                               |

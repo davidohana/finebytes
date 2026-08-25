@@ -5,7 +5,7 @@
 ## Options
 
 | Property     | Type   | Default | Description                                                                                                                                                                                                                                                                                              |
-|--------------|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------ | ------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `characters` | string | `".!?"` | Each character can end a sentence for sentence-style rules. Characters equal to the current [word separator](../Space/SpaceCharacter.md) are ignored when building the set. If empty, only the **start** of the segment gets a capital (for sentence case / sentence initials), not “after punctuation.” |
 
 ## Examples
@@ -13,7 +13,7 @@
 The first two rows are no-ops on the segment (see **Comment**). The last row chains into [LettersCase](LettersCase.md) `SentenceCase`.
 
 | Options                                                                                                                               | Before         | After          | Comment                                   |
-|---------------------------------------------------------------------------------------------------------------------------------------|----------------|----------------|-------------------------------------------|
+| ------------------------------------------------------------------------------------------------------------------------------------- | -------------- | -------------- | ----------------------------------------- |
 | `characters`: `":;"`                                                                                                                  | `hello: world` | `hello: world` | No-op on text; only updates rename state. |
 | `characters`: `"-.!"`                                                                                                                 | `hello`        | `hello`        | Same.                                     |
 | [SentenceEndCharacters](SentenceEndCharacters.md)<br>`characters`: `"-.!"`<br>[LettersCase](LettersCase.md)<br>`mode`: `SentenceCase` | `a - b. c`     | `A - B. C`     |                                           |

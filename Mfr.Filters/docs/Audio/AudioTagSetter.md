@@ -16,16 +16,16 @@ Each included field object uses:
 **String fields** (`performers`, `albumArtists`, `title`, `album`, `genre`, `comment`, `composers`, `lyrics`, `grouping`, `copyright`, `conductor`, **`year`**, **`beatsPerMinute`**, **`track`**, **`trackCount`**, **`disc`**, **`discCount`**):
 
 - **Year-specific:** after formatting (or as literal `text`), the result is trimmed. **Empty** clears the year. **`0`** clears. Otherwise the value must parse as an integer **1–9999**; anything else (non-numeric, out of range) causes a **preview error** for that row (`FormatException`, surfaced like other filter failures).
-- **`beatsPerMinute`:** same shape as year — **empty** or **`0`** clears; **1–65535** sets; non-numeric or **&gt; 65535** → preview error.
-- **Track-specific:** after formatting, **empty** clears the track. Otherwise the value must parse as an integer **0–255** (base value before increment). **`0`** with **`trackAutoIncrement`** `false` clears; with **`trackAutoIncrement`** `true`, **0 + RenameListIndex** is applied (then clamped to **255**). Base **&gt; 255** or non-numeric → preview error.
-- **`trackCount` / `disc` / `discCount`:** same parse rules as **track** without auto-increment — **empty** or **`0`** clears; **1–255** sets; non-numeric or **&gt; 255** → preview error.
+- **`beatsPerMinute`:** same shape as year — **empty** or **`0`** clears; **1–65535** sets; non-numeric or **> 65535** → preview error.
+- **Track-specific:** after formatting, **empty** clears the track. Otherwise the value must parse as an integer **0–255** (base value before increment). **`0`** with **`trackAutoIncrement`** `false` clears; with **`trackAutoIncrement`** `true`, **0 + RenameListIndex** is applied (then clamped to **255**). Base **> 255** or non-numeric → preview error.
+- **`trackCount` / `disc` / `discCount`:** same parse rules as **track** without auto-increment — **empty** or **`0`** clears; **1–255** sets; non-numeric or **> 255** → preview error.
 - **`trackAutoIncrement`** (on `options`, sibling of `track`) — add **`RenameListIndex`** to the parsed base track before clamping to **255**.
 - Multiple performers/composers/genres in one string: use **`;`** as separator in `text` (normalized with `; ` when persisting).
 
 ## Examples
 
 | Options                                             | Before (overlay)   | After                    | Comment               |
-|-----------------------------------------------------|--------------------|--------------------------|-----------------------|
+| --------------------------------------------------- | ------------------ | ------------------------ | --------------------- |
 | `text`: `Fixed`                                     | title empty or any | title `Fixed`            | Overwrites.           |
 | `onlyIfEmpty`, `text`: `Fill`                       | title `Already`    | unchanged                |                       |
 | `onlyIfEmpty`, `text`: `Fill`                       | title empty        | title `Fill`             |                       |

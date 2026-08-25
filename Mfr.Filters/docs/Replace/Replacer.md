@@ -5,7 +5,7 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 ## Options
 
 | Property        | Type          | Description                                                           |
-|-----------------|---------------|-----------------------------------------------------------------------|
+| --------------- | ------------- | --------------------------------------------------------------------- |
 | `find`          | string        | Search pattern (meaning depends on `mode`).                           |
 | `replacement`   | string        | Replacement text.                                                     |
 | `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — see **Modes**.                    |
@@ -16,7 +16,7 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 ### Modes (`mode`)
 
 | Value      | `find` meaning                                    |
-|------------|---------------------------------------------------|
+| ---------- | ------------------------------------------------- |
 | `Literal`  | Exact substring.                                  |
 | `Wildcard` | `*` = any run of characters, `?` = one character. |
 | `Regex`    | .NET regular expression.                          |
@@ -24,7 +24,7 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 ## Examples
 
 | Options                                                                                                                                   | Before         | After      | Comment                                                           |
-|-------------------------------------------------------------------------------------------------------------------------------------------|----------------|------------|-------------------------------------------------------------------|
+| ----------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ---------- | ----------------------------------------------------------------- |
 | `find`: `"a"`<br>`replacement`: `"X"`<br>`mode`: `Literal`<br>`caseSensitive`: `true`<br>`replaceAll`: `true`                             | `aba`          | `XbX`      |                                                                   |
 | `find`: `"a"`<br>`replacement`: `"X"`<br>`mode`: `Literal`<br>`caseSensitive`: `true`<br>`replaceAll`: `false`                            | `aba`          | `Xba`      | First match only.                                                 |
 | `find`: `"f*o"`<br>`replacement`: `"X"`<br>`mode`: `Wildcard`<br>`replaceAll`: `true`                                                     | `foo`          | `X`        |                                                                   |

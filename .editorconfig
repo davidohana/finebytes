@@ -57,7 +57,7 @@ dotnet_diagnostic.IDE0058.severity = none
 dotnet_diagnostic.CA1822.severity = suggestion
 dotnet_diagnostic.CA2007.severity = none
 
-# Markdown: Prettier + markdownlint-cli2 (see package.json, just format-md).
+# Markdown: mdformat + pymarkdown (see requirements-md.txt, just format-md).
 [*.md]
 end_of_line = crlf
 insert_final_newline = true

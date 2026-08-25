@@ -20,7 +20,7 @@ If you have `just` installed, you can use shortcuts for the most common workflow
 
 - [.NET SDK](https://dotnet.microsoft.com/download) (see global.json if present)
 - [just](https://github.com/casey/just#installation) (optional task runner)
-- [Node.js LTS](https://nodejs.org/) (includes npm; dev-only, for markdown format/lint)
+- [Python 3.12+](https://www.python.org/downloads/) (dev-only, for markdown format/lint)
 
 ## C# formatting and linting
 
@@ -73,25 +73,26 @@ CSharpier formats `.cs`, `.csproj`, `.axaml`, and `.slnx` (see `.csharpierignore
 
 ## Markdown formatting and linting
 
-- Layout: [Prettier](https://prettier.io/) (`.prettierrc.json`, `.prettierignore`); [markdown-table-formatter](https://github.com/nvuillam/markdown-table-formatter) aligns table columns after Prettier
-- Lint: [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2) (`.markdownlint-cli2.jsonc`); Prettier `--check`; table alignment check
-- Formats project `.md` under `docs/`, `Mfr.Filters/docs/`, and repo root docs; skips `.cursor/**`
-
-Preferred shortcuts:
+One-time (dev machine):
 
 ```powershell
-just format-md
-just lint-md
+python -m venv .venv
+.\.venv\Scripts\pip install -r requirements-md.txt
 ```
 
-`just format` runs C# formatters and then `just format-md`. `just lint` runs `just lint-cs` and then `just lint-md`.
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-md.txt
+```
 
-Equivalent without `just`:
+Then:
 
 ```powershell
-npm ci
-npm run format:md
-
-npm ci
-npm run lint:md
+just format
+just lint
 ```
+
+- Layout: [mdformat](https://github.com/hukkin/mdformat) with [mdformat-gfm](https://github.com/hukkin/mdformat-gfm) and [mdformat-frontmatter](https://pypi.org/project/mdformat-frontmatter/) (`.mdformat.toml`)
+- Lint: [pymarkdownlnt](https://github.com/jackdewinter/pymarkdown) (`pymarkdown.toml`); `mdformat --check` (includes table alignment)
+- File set: tracked + untracked `.md` via `git ls-files` in the `justfile`; skips `.cursor/**` and gitignored paths
+- Shortcuts: `just format-md` / `just lint-md` (also run from `just format` / `just lint`)

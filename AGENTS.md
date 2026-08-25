@@ -4,8 +4,9 @@
 
 - Use `just` for common tasks: `restore`, `build`, `test`, `format`, `lint`, `run-ui`.
 - Before committing, run `just format` then `just lint` (or `just build` after format if you only need compile/analyzer checks).
-- Formatting: CSharpier for `.cs` / `.csproj` / `.axaml` / `.slnx` layout; `dotnet format style` / `analyzers` for non-whitespace rules; Prettier + markdown-table-formatter for `.md` (via `just format-md`, also part of `just format`).
-- Linting: `just lint` runs C# checks (`dotnet build`, `csharpier check`, `dotnet format … --verify-no-changes`) and markdown checks (`just lint-md`: Prettier check, markdownlint-cli2, table alignment).
+- Markdown tools need a local `.venv` once: `python -m venv .venv` and `pip install -r requirements-md.txt` (see `CONTRIBUTING.md`).
+- Formatting: CSharpier for `.cs` / `.csproj` / `.axaml` / `.slnx` layout; `dotnet format style` / `analyzers` for non-whitespace rules; mdformat (+ gfm, frontmatter) for `.md` (via `just format-md`, also part of `just format`).
+- Linting: `just lint` runs C# checks (`dotnet build`, `csharpier check`, `dotnet format … --verify-no-changes`) and markdown checks (`just lint-md`: `mdformat --check`, `pymarkdown scan`).
 - Follow project code style from `.editorconfig`.
 - Follow constraints in `.cursor/rules/*.mdc`.
 

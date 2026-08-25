@@ -1,9 +1,0 @@
-# Build output
-**/bin/**
-**/obj/**
-
-# Cursor agent/skills (not project docs)
-.cursor/**
-
-# Dependencies
-node_modules/**

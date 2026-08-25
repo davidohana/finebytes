@@ -7,7 +7,7 @@ No `options` object.
 ## Examples
 
 | Options      | Before                                  | After                                   | Comment                                    |
-|--------------|-----------------------------------------|-----------------------------------------|--------------------------------------------|
+| ------------ | --------------------------------------- | --------------------------------------- | ------------------------------------------ |
 | (no options) | `bruce springsteen - born in the u.s.a` | `bruce springsteen - born in the U.S.A` |                                            |
 | (no options) | `live in the u.k and the u.s.a and e.u` | `live in the U.K and the U.S.A and E.U` |                                            |
 | (no options) | `the u.s.a. is great`                   | `the U.S.A. is great`                   |                                            |

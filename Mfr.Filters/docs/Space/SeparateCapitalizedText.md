@@ -15,7 +15,7 @@ No `options` object.
 ## Examples
 
 | Options                                                                                                    | Before                  | After                      | Comment                                   |
-|------------------------------------------------------------------------------------------------------------|-------------------------|----------------------------|-------------------------------------------|
+| ---------------------------------------------------------------------------------------------------------- | ----------------------- | -------------------------- | ----------------------------------------- |
 | (no options)<br>default word separator                                                                     | `DandyWorhols01Godless` | `Dandy Worhols 01 Godless` |                                           |
 | (no options)<br>default word separator                                                                     | `song2remix`            | `song 2 remix`             | Letter–digit and digit–letter boundaries. |
 | [SpaceCharacter](SpaceCharacter.md)<br>`spaceCharacter`: `"_"`<br>other flags: `false`<br>then this filter | `aBc12x`                | `a_Bc_12_x`                | Same rules; inserts underscores.          |
