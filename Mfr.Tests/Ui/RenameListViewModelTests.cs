@@ -577,6 +577,66 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Remove All But Selected keeps selected rows and drops the rest.
+        /// </summary>
+        [Fact]
+        public async Task RemoveAllButSelected_Keeps_Only_Selected_Rows()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            Assert.False(renameListViewModel.RemoveAllButSelectedCommand.CanExecute(null));
+
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0], renameListViewModel.Entries[2]]);
+            Assert.True(renameListViewModel.RemoveAllButSelectedCommand.CanExecute(null));
+
+            renameListViewModel.RemoveAllButSelectedCommand.Execute(null);
+
+            Assert.Equal(["alpha.txt", "gamma.log"], _PreviewNames(renameListViewModel));
+            Assert.Equal(2, renameListViewModel.ItemCount);
+            Assert.Equal(2, renameListViewModel.SelectedEntries.Count);
+            Assert.Equal("alpha.txt", renameListViewModel.SelectedEntries[0].FullFileName);
+            Assert.Equal("gamma.log", renameListViewModel.SelectedEntries[1].FullFileName);
+            Assert.False(renameListViewModel.RemoveAllButSelectedCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Remove All But Selected keeps the same entry objects and list order.
+        /// </summary>
+        [Fact]
+        public async Task RemoveAllButSelected_Preserves_Kept_Entry_Identity()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            var alphaEntry = renameListViewModel.Entries[0];
+            var gammaEntry = renameListViewModel.Entries[2];
+
+            renameListViewModel.SetSelectedEntries([alphaEntry, gammaEntry]);
+            renameListViewModel.RemoveAllButSelectedCommand.Execute(null);
+
+            Assert.Equal(2, renameListViewModel.Entries.Count);
+            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
+            Assert.Same(gammaEntry, renameListViewModel.Entries[1]);
+            Assert.Same(alphaEntry, renameListViewModel.SelectedEntries[0]);
+            Assert.Same(gammaEntry, renameListViewModel.SelectedEntries[1]);
+        }
+
+        /// <summary>
         /// Verifies Clear empties the list and updates ItemCount / CanExecute.
         /// </summary>
         [Fact]

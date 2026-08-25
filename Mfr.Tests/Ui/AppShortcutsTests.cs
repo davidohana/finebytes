@@ -44,6 +44,10 @@ namespace Mfr.Tests.Ui
             Assert.Equal(new KeyGesture(Key.A, KeyModifiers.Control | KeyModifiers.Shift), AppShortcuts.AddAll);
             Assert.Equal(new KeyGesture(Key.R, KeyModifiers.Control | KeyModifiers.Shift), AppShortcuts.RemoveSelected);
             Assert.Equal(
+                new KeyGesture(Key.B, KeyModifiers.Control | KeyModifiers.Shift),
+                AppShortcuts.RemoveAllButSelected
+            );
+            Assert.Equal(
                 new KeyGesture(Key.C, KeyModifiers.Control | KeyModifiers.Shift),
                 AppShortcuts.ClearRenameList
             );

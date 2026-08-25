@@ -87,6 +87,10 @@
       Command="{Binding RenameListViewModel.RemoveSelectedCommand}"
     />
     <KeyBinding
+      Gesture="{x:Static shortcuts:AppShortcuts.RemoveAllButSelected}"
+      Command="{Binding RenameListViewModel.RemoveAllButSelectedCommand}"
+    />
+    <KeyBinding
       Gesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}"
       Command="{Binding RenameListViewModel.ClearCommand}"
     />
@@ -257,6 +261,11 @@
           Header="Remove"
           Command="{Binding RenameListViewModel.RemoveSelectedCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}"
+        />
+        <MenuItem
+          Header="Remove All But Selected"
+          Command="{Binding RenameListViewModel.RemoveAllButSelectedCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.RemoveAllButSelected}"
         />
         <MenuItem
           Header="Clear"

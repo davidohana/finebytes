@@ -47,14 +47,15 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 
 ### Rename List
 
-| Action               | Shortcut     | Where it works           |
-| -------------------- | ------------ | ------------------------ |
-| Add selected         | Ctrl+Shift+S | Main window              |
-| Add all              | Ctrl+Shift+A | Main window              |
-| Remove selected      | Ctrl+Shift+R | Main window              |
-| Remove selected rows | Del          | Rename List grid focused |
-| Clear                | Ctrl+Shift+C | Main window              |
-| Locate in File List  | F4           | Rename List grid focused |
+| Action                  | Shortcut     | Where it works           |
+| ----------------------- | ------------ | ------------------------ |
+| Add selected            | Ctrl+Shift+S | Main window              |
+| Add all                 | Ctrl+Shift+A | Main window              |
+| Remove selected         | Ctrl+Shift+R | Main window              |
+| Remove all but selected | Ctrl+Shift+B | Main window              |
+| Remove selected rows    | Del          | Rename List grid focused |
+| Clear                   | Ctrl+Shift+C | Main window              |
+| Locate in File List     | F4           | Rename List grid focused |
 
 Hovering or focusing a Rename List cell shows the full cell value in the status bar.
 

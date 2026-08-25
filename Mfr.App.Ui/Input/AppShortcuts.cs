@@ -76,6 +76,9 @@ namespace Mfr.App.Ui.Input
         /// <summary>Removes the Rename List selection.</summary>
         public static KeyGesture RemoveSelected { get; } = new(Key.R, KeyModifiers.Control | KeyModifiers.Shift);
 
+        /// <summary>Removes every Rename List row except the selection.</summary>
+        public static KeyGesture RemoveAllButSelected { get; } = new(Key.B, KeyModifiers.Control | KeyModifiers.Shift);
+
         /// <summary>Clears the Rename List.</summary>
         public static KeyGesture ClearRenameList { get; } = new(Key.C, KeyModifiers.Control | KeyModifiers.Shift);
 
@@ -105,6 +108,9 @@ namespace Mfr.App.Ui.Input
 
         /// <summary>Rename List Remove Selected button and menu tip.</summary>
         public const string RemoveSelectedTip = "Remove selected (Ctrl+Shift+R)";
+
+        /// <summary>Rename List Remove All But Selected menu tip.</summary>
+        public const string RemoveAllButSelectedTip = "Remove all but selected (Ctrl+Shift+B)";
 
         /// <summary>Rename List Clear button and menu tip.</summary>
         public const string ClearRenameListTip = "Clear Rename List (Ctrl+Shift+C)";

@@ -107,6 +107,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             OnPropertyChanged(nameof(SelectedEntries));
             RemoveSelectedCommand.NotifyCanExecuteChanged();
+            RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
         }
 
@@ -180,6 +181,33 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var nextSelection = _SelectEntryAfterRemove(anchorIndex);
             SetSelectedEntries(nextSelection is null ? [] : [nextSelection]);
+            _NotifyListChanged();
+        }
+
+        /// <summary>
+        /// Removes every Rename List row that is not selected, keeping the selection.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanRemoveAllButSelected))]
+        public void RemoveAllButSelected()
+        {
+            if (_selectedEntries.Count == 0 || _selectedEntries.Count >= Entries.Count)
+            {
+                return;
+            }
+
+            var selected = _selectedEntries.ToHashSet();
+            var toRemove = Entries.Where(entry => !selected.Contains(entry)).Select(entry => entry.EngineItem).ToList();
+            _renameList.Remove(toRemove);
+
+            for (var i = Entries.Count - 1; i >= 0; i--)
+            {
+                if (!selected.Contains(Entries[i]))
+                {
+                    Entries.RemoveAt(i);
+                }
+            }
+
+            SetSelectedEntries([.. Entries.Where(selected.Contains)]);
             _NotifyListChanged();
         }
 
@@ -392,6 +420,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             OnPropertyChanged(nameof(ItemCount));
             ClearCommand.NotifyCanExecuteChanged();
+            RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
         }
 
         private bool _CanAddSelected()
@@ -439,6 +468,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return !IsAdding && _selectedEntries.Count > 0;
         }
 
+        private bool _CanRemoveAllButSelected()
+        {
+            return !IsAdding && _selectedEntries.Count > 0 && _selectedEntries.Count < Entries.Count;
+        }
+
         private bool _CanClear()
         {
             return !IsAdding && Entries.Count > 0;
@@ -465,6 +499,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             AddSelectedCommand.NotifyCanExecuteChanged();
             AddAllCommand.NotifyCanExecuteChanged();
             RemoveSelectedCommand.NotifyCanExecuteChanged();
+            RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
             ClearCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
         }

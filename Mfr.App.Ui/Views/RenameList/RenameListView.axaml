@@ -31,6 +31,11 @@
           InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelectedDelete}"
         />
         <MenuItem
+          Header="Remove All But Selected"
+          Command="{Binding RemoveAllButSelectedCommand}"
+          InputGesture="{x:Static shortcuts:AppShortcuts.RemoveAllButSelected}"
+        />
+        <MenuItem
           Header="Remove All"
           Command="{Binding ClearCommand}"
           InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}"
