@@ -136,7 +136,6 @@ namespace Mfr.Engine.RenameList
         /// <summary>
         /// Adds and resolves a single source into the staging <paramref name="batch"/>.
         /// </summary>
-        /// <param name="batch">Staging list for this <see cref="AddSources"/> call (see that method's remarks).</param>
         /// <returns><see langword="false"/> when the source was skipped; otherwise <see langword="true"/>.</returns>
         private bool _TryAddSource(
             string source,
@@ -176,7 +175,6 @@ namespace Mfr.Engine.RenameList
         /// <summary>
         /// Resolves one source and appends accepted items to the staging <paramref name="batch"/>.
         /// </summary>
-        /// <param name="batch">Staging list for this <see cref="AddSources"/> call (see that method's remarks).</param>
         private void _AddSource(
             string source,
             bool includeFiles,

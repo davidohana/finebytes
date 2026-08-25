@@ -316,6 +316,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             LastLocateError = $"Failed to locate \"{fullPath}\" in the File List.";
         }
 
+        /// <summary>
+        /// Resolves sources into the engine, then mirrors a successful commit into <see cref="Entries"/>.
+        /// </summary>
         private async Task _AddSourcesAsync(IReadOnlyList<string> sources)
         {
             if (sources.Count == 0 || IsAdding)
@@ -326,15 +329,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var selectFirstAdded = _selectedEntries.Count > 0;
             var insertAt = _ResolveInsertAt();
             var oldCount = _renameList.RenameItems.Count;
-            var uiConfig = ConfigStore.Config.Ui;
-            var includeFiles = uiConfig.AddMode.IncludesFiles();
-            var includeFolders = uiConfig.AddMode.IncludesFolders();
-            var includeSubdirs = uiConfig.AddFolderContents;
-            var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             LastAddError = string.Empty;
 
+            var ui = ConfigStore.Config.Ui;
+            var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             var addSummary = new RenameListAddSummary(0);
-            bool completed;
+            var completed = false;
             try
             {
                 completed = await AddProgress
@@ -342,9 +342,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                         (token, progress) =>
                             addSummary = _renameList.AddSources(
                                 sources: sources,
-                                includeFiles: includeFiles,
-                                includeFolders: includeFolders,
-                                includeSubdirs: includeSubdirs,
+                                includeFiles: ui.AddMode.IncludesFiles(),
+                                includeFolders: ui.AddMode.IncludesFolders(),
+                                includeSubdirs: ui.AddFolderContents,
                                 excludeMasks: excludeMasks,
                                 cancellationToken: token,
                                 progress: progress,
@@ -355,11 +355,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
             catch (Exception ex)
             {
-                _RollbackAddedItems(insertAt, oldCount);
                 LastAddError = ex.Message;
                 Log.Error(ex, "Unexpected failure while adding rename sources.");
-                _NotifyListChanged();
-                return;
             }
 
             if (!completed)

@@ -573,6 +573,32 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Add inserts after a non-last selected row, keeping existing row identity.
+        /// </summary>
+        [Fact]
+        public async Task AddSelected_With_First_Row_Selected_Inserts_After_It()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "gamma.log")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            var alphaEntry = renameListViewModel.Entries[0];
+            var gammaEntry = renameListViewModel.Entries[1];
+
+            renameListViewModel.SetSelectedEntries([alphaEntry]);
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "beta.md")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
+            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
+            Assert.Same(gammaEntry, renameListViewModel.Entries[2]);
+            Assert.Single(renameListViewModel.SelectedEntries);
+            Assert.Equal("beta.md", renameListViewModel.SelectedEntries[0].FullFileName);
+        }
+
+        /// <summary>
         /// Verifies Add with no Rename List selection still appends.
         /// </summary>
         [Fact]
