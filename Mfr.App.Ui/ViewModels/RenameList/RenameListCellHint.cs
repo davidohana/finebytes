@@ -43,18 +43,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Builds plain status-bar text for a grid cell (tests and accessibility).
-        /// </summary>
-        /// <param name="columnHeader">Grid column header text.</param>
-        /// <param name="cellText">Cell display value.</param>
-        /// <param name="isPreviewColumn">Whether the column shows preview values.</param>
-        /// <returns>Single-line hint text.</returns>
-        public static string FormatPlainText(string columnHeader, string cellText, bool isPreviewColumn)
-        {
-            return FormatParts(columnHeader, cellText, isPreviewColumn).ToPlainText();
-        }
-
-        /// <summary>
         /// Reads the display value for a Rename List column from a grid row.
         /// </summary>
         /// <param name="entry">Rename List row.</param>
