@@ -13,7 +13,7 @@ using Mfr.App.Ui.Views.RenameList;
 namespace Mfr.Tests.Ui
 {
     /// <summary>
-    /// Headless tests for Rename List status-bar cell hints after delete.
+    /// Headless tests for Rename List status-bar cell hints.
     /// </summary>
     public sealed class RenameListViewHintTests : IDisposable
     {
@@ -52,38 +52,42 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Del keeps the hint on the row that slides into the deleted index, not a recycled viewport row.
+        /// Verifies clicking a cell publishes that cell's value to the status-bar hint.
         /// </summary>
         [AvaloniaFact]
-        public async Task Delete_Keeps_Hint_On_New_Selection_When_Pointer_Stays()
+        public async Task Click_Sets_Hint_From_Cell()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var paths = new List<string>(30);
-            for (var i = 0; i < 30; i++)
-            {
-                var path = Path.Combine(dir, $"row-{i:00}.txt");
-                File.WriteAllText(path, "x");
-                paths.Add(path);
-            }
+            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 8);
+            var target = renameListViewModel.Entries[3];
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            await renameListViewModel.AddPathsAsync(paths);
-            Assert.Equal(30, renameListViewModel.Entries.Count);
+            _ClickFullFileNameCell(window, grid, target);
 
-            var (view, window) = _Show(renameListViewModel);
-            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            Assert.Contains(
+                target.FullFileName,
+                renameListViewModel.CellStatusHintDisplay.ToPlainText(),
+                StringComparison.Ordinal
+            );
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Del updates the hint to the row that slides into the deleted index.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Delete_Updates_Hint_To_New_Selection()
+        {
+            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 30);
             var deleteIndex = 12;
             var deletedName = renameListViewModel.Entries[deleteIndex].FullFileName;
             var expectedName = renameListViewModel.Entries[deleteIndex + 1].FullFileName;
-            var lastName = renameListViewModel.Entries[^1].FullFileName;
 
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[deleteIndex]]);
             grid.ScrollIntoView(renameListViewModel.Entries[deleteIndex], grid.Columns[2]);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var hoverPoint = _HoverFullFileNameCell(window, grid, renameListViewModel.Entries[deleteIndex]);
+            _ClickFullFileNameCell(window, grid, renameListViewModel.Entries[deleteIndex]);
             Assert.Contains(
                 deletedName,
                 renameListViewModel.CellStatusHintDisplay.ToPlainText(),
@@ -100,32 +104,49 @@ namespace Mfr.Tests.Ui
                 Dispatcher.UIThread.RunJobs();
             }
 
-            // Below the 8px freeze threshold; verifies hit-test cannot override the frozen hint.
-            window.MouseMove(hoverPoint + new Vector(5, 0), RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
-
-            grid.SelectedItem = renameListViewModel.Entries[^1];
-            Dispatcher.UIThread.RunJobs();
-
             Assert.Equal(29, renameListViewModel.Entries.Count);
             Assert.Equal(expectedName, renameListViewModel.SelectedEntries[0].FullFileName);
             var hint = renameListViewModel.CellStatusHintDisplay.ToPlainText();
             Assert.Contains(expectedName, hint, StringComparison.Ordinal);
-            Assert.DoesNotContain(lastName, hint, StringComparison.Ordinal);
             Assert.DoesNotContain(deletedName, hint, StringComparison.Ordinal);
 
             window.Close();
         }
 
         /// <summary>
-        /// Verifies context-menu / toolbar remove keeps the frozen hint when the pointer jumps (menu click).
+        /// Verifies moving the pointer over another row does not steal the status-bar hint.
         /// </summary>
         [AvaloniaFact]
-        public async Task RemoveCommand_Keeps_Hint_When_Pointer_Jumps_Like_Context_Menu()
+        public async Task PointerMove_Does_Not_Change_Hint()
+        {
+            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 8);
+            var selected = renameListViewModel.Entries[1];
+            var other = renameListViewModel.Entries[4];
+
+            _ClickFullFileNameCell(window, grid, selected);
+            Assert.Contains(
+                selected.FullFileName,
+                renameListViewModel.CellStatusHintDisplay.ToPlainText(),
+                StringComparison.Ordinal
+            );
+
+            _MoveOverFullFileNameCell(window, grid, other);
+            Dispatcher.UIThread.RunJobs();
+
+            var hint = renameListViewModel.CellStatusHintDisplay.ToPlainText();
+            Assert.Contains(selected.FullFileName, hint, StringComparison.Ordinal);
+            Assert.DoesNotContain(other.FullFileName, hint, StringComparison.Ordinal);
+
+            window.Close();
+        }
+
+        private async Task<(RenameListViewModel ViewModel, Window Window, DataGrid Grid)> _ShowWithRowsAsync(
+            int rowCount
+        )
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            var paths = new List<string>(30);
-            for (var i = 0; i < 30; i++)
+            var paths = new List<string>(rowCount);
+            for (var i = 0; i < rowCount; i++)
             {
                 var path = Path.Combine(dir, $"row-{i:00}.txt");
                 File.WriteAllText(path, "x");
@@ -135,64 +156,9 @@ namespace Mfr.Tests.Ui
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             await renameListViewModel.AddPathsAsync(paths);
-            Assert.Equal(30, renameListViewModel.Entries.Count);
+            Assert.Equal(rowCount, renameListViewModel.Entries.Count);
 
-            var (view, window) = _Show(renameListViewModel);
-            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
-            var deleteIndex = 12;
-            var deletedName = renameListViewModel.Entries[deleteIndex].FullFileName;
-            var expectedName = renameListViewModel.Entries[deleteIndex + 1].FullFileName;
-            var lastName = renameListViewModel.Entries[^1].FullFileName;
-
-            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[deleteIndex]]);
-            grid.ScrollIntoView(renameListViewModel.Entries[deleteIndex], grid.Columns[2]);
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var hoverPoint = _HoverFullFileNameCell(window, grid, renameListViewModel.Entries[deleteIndex]);
-            Assert.Contains(
-                deletedName,
-                renameListViewModel.CellStatusHintDisplay.ToPlainText(),
-                StringComparison.Ordinal
-            );
-
-            // Menu click is typically far from the row; freeze must re-anchor instead of clearing.
-            var menuClickPoint = hoverPoint + new Vector(20, 48);
-            renameListViewModel.RemoveSelectedCommand.Execute(null);
-            Dispatcher.UIThread.RunJobs();
-
-            window.MouseMove(menuClickPoint, RawInputModifiers.None);
-            window.MouseDown(menuClickPoint, MouseButton.Left, RawInputModifiers.None);
-            window.MouseUp(menuClickPoint, MouseButton.Left, RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
-
-            // Still under the 8px threshold from the post-remove re-anchor.
-            window.MouseMove(menuClickPoint + new Vector(5, 0), RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
-
-            grid.SelectedItem = renameListViewModel.Entries[^1];
-            Dispatcher.UIThread.RunJobs();
-
-            Assert.Equal(29, renameListViewModel.Entries.Count);
-            Assert.Equal(expectedName, renameListViewModel.SelectedEntries[0].FullFileName);
-            var hint = renameListViewModel.CellStatusHintDisplay.ToPlainText();
-            Assert.Contains(expectedName, hint, StringComparison.Ordinal);
-            Assert.DoesNotContain(lastName, hint, StringComparison.Ordinal);
-            Assert.DoesNotContain(deletedName, hint, StringComparison.Ordinal);
-
-            window.Close();
-        }
-
-        private FileListViewModel _CreateFileListViewModel(string path)
-        {
-            var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path);
-            _fileListViewModels.Add(fileListViewModel);
-            return fileListViewModel;
-        }
-
-        private static (RenameListView View, Window Window) _Show(RenameListViewModel viewModel)
-        {
-            var view = new RenameListView { DataContext = viewModel };
+            var view = new RenameListView { DataContext = renameListViewModel };
             var window = new Window
             {
                 Width = 800,
@@ -202,10 +168,35 @@ namespace Mfr.Tests.Ui
             window.Show();
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
-            return (view, window);
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            return (renameListViewModel, window, grid);
         }
 
-        private static Point _HoverFullFileNameCell(Window window, DataGrid grid, RenameListEntry entry)
+        private FileListViewModel _CreateFileListViewModel(string path)
+        {
+            var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path);
+            _fileListViewModels.Add(fileListViewModel);
+            return fileListViewModel;
+        }
+
+        private static void _ClickFullFileNameCell(Window window, DataGrid grid, RenameListEntry entry)
+        {
+            var windowPoint = _FullFileNameCellPoint(window, grid, entry);
+            window.MouseMove(windowPoint, RawInputModifiers.None);
+            window.MouseDown(windowPoint, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(windowPoint, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        private static void _MoveOverFullFileNameCell(Window window, DataGrid grid, RenameListEntry entry)
+        {
+            var windowPoint = _FullFileNameCellPoint(window, grid, entry);
+            window.MouseMove(windowPoint, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        private static Point _FullFileNameCellPoint(Window window, DataGrid grid, RenameListEntry entry)
         {
             var row = grid.GetVisualDescendants()
                 .OfType<DataGridRow>()
@@ -220,11 +211,6 @@ namespace Mfr.Tests.Ui
             var local = new Point(Math.Max(8, cellText.Bounds.Width / 2), Math.Max(1, cellText.Bounds.Height / 2));
             var windowPoint = cellText.TranslatePoint(local, window);
             Assert.True(windowPoint.HasValue);
-
-            window.MouseMove(windowPoint.Value, RawInputModifiers.None);
-            window.MouseDown(windowPoint.Value, MouseButton.Left, RawInputModifiers.None);
-            window.MouseUp(windowPoint.Value, MouseButton.Left, RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
             return windowPoint.Value;
         }
     }

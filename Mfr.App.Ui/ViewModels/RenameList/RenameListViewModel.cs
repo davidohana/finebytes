@@ -77,15 +77,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private string _lastLocateError = string.Empty;
 
         /// <summary>
-        /// Status-bar hint for the Rename List cell under the pointer or keyboard focus.
+        /// Status-bar hint for the focused or selected Rename List cell.
         /// </summary>
         [ObservableProperty]
         private StatusHintDisplay _cellStatusHintDisplay = StatusHintDisplay.Empty;
-
-        /// <summary>
-        /// Raised immediately before selected rows are removed so the view can freeze the cell hint.
-        /// </summary>
-        internal event EventHandler? SelectedEntriesRemoving;
 
         /// <summary>
         /// Replaces the Rename List selection.
@@ -166,8 +161,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 return;
             }
-
-            SelectedEntriesRemoving?.Invoke(this, EventArgs.Empty);
 
             var selected = _selectedEntries.ToHashSet();
             var anchorIndex = _FindFirstSelectedIndex(selected);

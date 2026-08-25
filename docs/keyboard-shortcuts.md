@@ -59,7 +59,7 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 | Move selected up        | Ctrl+↑       | Rename List grid focused |
 | Move selected down      | Ctrl+↓       | Rename List grid focused |
 
-Hovering or focusing a Rename List cell shows the full cell value in the status bar.
+Selecting or focusing a Rename List cell shows the full cell value in the status bar.
 
 ## Shown in menus, not implemented yet
 
