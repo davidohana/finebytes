@@ -43,6 +43,8 @@ namespace Mfr.App.Ui.Views.FileList
         private bool _selectionChangeFromView;
         private Point? _dragStartPoint;
         private PointerEventArgs? _dragStartArgs;
+        private FileListEntry? _dragHitEntry;
+        private object? _dragHitSource;
         private bool _isDragPending;
 
         /// <summary>
@@ -130,15 +132,26 @@ namespace Mfr.App.Ui.Views.FileList
                 return;
             }
 
-            _EnsureEntrySelectedForDrag(hit, e.Source);
+            // Do not force selection here: tunnel PointerPressed runs before the listing control
+            // updates multi-select (Ctrl/Shift or SelectionMode=Multiple). Select-on-drag waits
+            // until the drag threshold so clicks can build a multi-selection first.
+            _dragHitEntry = hit;
+            _dragHitSource = e.Source;
             _dragStartPoint = e.GetPosition(this);
             _dragStartArgs = e;
             _isDragPending = true;
         }
 
-        private void _EnsureEntrySelectedForDrag(FileListEntry hit, object? source)
+        private void _EnsureEntrySelectedForDrag(FileListEntry hit, object? source, KeyModifiers modifiers)
         {
             if (_viewModel is null)
+            {
+                return;
+            }
+
+            // Let the listing control own toggle/range selection while modifiers are held.
+            var isExtendingSelection = modifiers.HasFlag(KeyModifiers.Control) || modifiers.HasFlag(KeyModifiers.Shift);
+            if (isExtendingSelection)
             {
                 return;
             }
@@ -196,6 +209,11 @@ namespace Mfr.App.Ui.Views.FileList
             if (!movedFarEnough)
             {
                 return;
+            }
+
+            if (_dragHitEntry is not null)
+            {
+                _EnsureEntrySelectedForDrag(_dragHitEntry, _dragHitSource, _dragStartArgs.KeyModifiers);
             }
 
             var paths = _GetAddableSelectedPaths();
@@ -268,6 +286,8 @@ namespace Mfr.App.Ui.Views.FileList
             _isDragPending = false;
             _dragStartPoint = null;
             _dragStartArgs = null;
+            _dragHitEntry = null;
+            _dragHitSource = null;
         }
 
         private IReadOnlyList<string> _GetAddableSelectedPaths()

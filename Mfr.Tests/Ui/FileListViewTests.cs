@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -406,6 +407,53 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Report Ctrl+click multi-select survives the drag PointerPressed tunnel handler.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_Grid_Ctrl_Click_Keeps_Multi_Select()
+        {
+            var (viewModel, grid, window) = _ShowReportGrid();
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+
+            _ClickEntry(window, grid, alpha, RawInputModifiers.None);
+            _ClickEntry(window, grid, beta, RawInputModifiers.Control);
+
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+            var selectedPaths = viewModel.SelectedEntries.Select(entry => entry.FullPath).ToHashSet();
+            Assert.Contains(alpha.FullPath, selectedPaths);
+            Assert.Contains(beta.FullPath, selectedPaths);
+            Assert.Equal(2, grid.SelectedItems.Count);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies List view Ctrl+click multi-select is not collapsed by the drag press handler.
+        /// </summary>
+        [AvaloniaFact]
+        public void List_View_Ctrl_Click_Keeps_Multi_Select()
+        {
+            var (viewModel, view, window) = _ShowListView();
+            var list = view.FindControl<ListBox>("ListViewList");
+            Assert.NotNull(list);
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+
+            _ClickEntry(window, list, alpha, RawInputModifiers.None);
+            _ClickEntry(window, list, beta, RawInputModifiers.Control);
+
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+            var selectedPaths = viewModel.SelectedEntries.Select(entry => entry.FullPath).ToHashSet();
+            Assert.Contains(alpha.FullPath, selectedPaths);
+            Assert.Contains(beta.FullPath, selectedPaths);
+            Assert.Equal(2, list.SelectedItems!.Count);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Tiles view multi-select from the view model syncs to the listing control.
         /// </summary>
         [AvaloniaFact]
@@ -632,6 +680,46 @@ namespace Mfr.Tests.Ui
                     KeyModifiers = modifiers,
                 }
             );
+        }
+
+        private static void _ClickEntry(
+            Window window,
+            Control listingHost,
+            FileListEntry entry,
+            RawInputModifiers modifiers
+        )
+        {
+            var windowPoint = _EntryClickPoint(window, listingHost, entry);
+            window.MouseMove(windowPoint, modifiers);
+            window.MouseDown(windowPoint, MouseButton.Left, modifiers);
+            window.MouseUp(windowPoint, MouseButton.Left, modifiers);
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        private static Point _EntryClickPoint(Window window, Control listingHost, FileListEntry entry)
+        {
+            var container = listingHost switch
+            {
+                DataGrid grid => grid.GetVisualDescendants()
+                    .OfType<DataGridRow>()
+                    .FirstOrDefault(row => ReferenceEquals(row.DataContext, entry)),
+                ListBox list => list.ContainerFromItem(entry) as Visual
+                    ?? list.GetVisualDescendants()
+                        .OfType<ListBoxItem>()
+                        .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry)),
+                _ => null,
+            };
+            Assert.NotNull(container);
+
+            var nameText = container
+                .GetVisualDescendants()
+                .OfType<TextBlock>()
+                .FirstOrDefault(text => text.Text == entry.Name);
+            var target = (Visual?)nameText ?? container;
+            var local = new Point(Math.Max(8, target.Bounds.Width / 2), Math.Max(1, target.Bounds.Height / 2));
+            var windowPoint = target.TranslatePoint(local, window);
+            Assert.True(windowPoint.HasValue);
+            return windowPoint.Value;
         }
 
         private FileListViewModel _CreateThumbnailsViewModel(int folderCount)
