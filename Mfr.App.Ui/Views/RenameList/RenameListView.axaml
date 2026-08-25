@@ -77,12 +77,21 @@
       <Setter Property="Fill" Value="{DynamicResource FileListHoverBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
+    <Style Selector="DataGrid.rename-list.hint-frozen DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="Transparent" />
+      <Setter Property="Stroke" Value="Transparent" />
+    </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
       <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
       <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.rename-list.hint-frozen DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
       <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
       <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />

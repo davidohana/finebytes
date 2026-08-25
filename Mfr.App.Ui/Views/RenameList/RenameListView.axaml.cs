@@ -1,8 +1,15 @@
 using System.Collections;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -14,10 +21,20 @@ namespace Mfr.App.Ui.Views.RenameList
     /// </summary>
     public partial class RenameListView : UserControl
     {
+        private const double PointerHintMoveThreshold = 8.0;
+
         private RenameListViewModel? _viewModel;
         private bool _isSyncingSelection;
         private bool _selectionChangeFromView;
+        private bool _isPointerOverGrid;
+        private bool _freezeHint;
+        private RenameListEntry? _frozenHintEntry;
+        private DataGridColumn? _frozenHintColumn;
+        private Point? _pointerHintAnchor;
+        private Point? _lastPointerPositionOverGrid;
+        private DataGridColumn? _lastHintColumn;
         private AddProgressDialog? _addProgressDialog;
+        private double? _savedVerticalScroll;
 
         /// <summary>
         /// Initializes the Rename List pane.
@@ -29,7 +46,9 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameGrid.SelectionChanged += _OnSelectionChanged;
             RenameGrid.CurrentCellChanged += _OnCurrentCellChanged;
             RenameGrid.CellPointerPressed += _OnCellPointerPressed;
+            RenameGrid.PointerEntered += _OnGridPointerEntered;
             RenameGrid.PointerExited += _OnGridPointerExited;
+            RenameGrid.AddHandler(PointerMovedEvent, _OnGridPointerMoved, RoutingStrategies.Tunnel);
             DragDrop.SetAllowDrop(this, true);
             AddHandler(DragDrop.DragOverEvent, _OnDragOver);
             AddHandler(DragDrop.DropEvent, _OnDrop);
@@ -40,7 +59,9 @@ namespace Mfr.App.Ui.Views.RenameList
             if (_viewModel is not null)
             {
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
+                _viewModel.SelectedEntriesRemoving -= _OnSelectedEntriesRemoving;
                 _viewModel.AddProgress.PropertyChanged -= _OnAddProgressPropertyChanged;
+                _viewModel.Entries.CollectionChanged -= _OnEntriesCollectionChanged;
             }
 
             _viewModel = DataContext as RenameListViewModel;
@@ -50,8 +71,77 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
+            _viewModel.SelectedEntriesRemoving += _OnSelectedEntriesRemoving;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
+            _viewModel.Entries.CollectionChanged += _OnEntriesCollectionChanged;
             _SyncSelectionToGrid();
+        }
+
+        private void _OnSelectedEntriesRemoving(object? sender, EventArgs e)
+        {
+            _BeginHintFreeze();
+        }
+
+        private void _OnEntriesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action is NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Reset)
+            {
+                _BeginHintFreeze();
+            }
+        }
+
+        private void _BeginHintFreeze()
+        {
+            _freezeHint = true;
+            _pointerHintAnchor ??= _lastPointerPositionOverGrid;
+            _CaptureVerticalScroll();
+            _SetHintFrozenClass(true);
+        }
+
+        private void _EndHintFreeze()
+        {
+            if (!_freezeHint && _frozenHintEntry is null)
+            {
+                return;
+            }
+
+            _freezeHint = false;
+            _frozenHintEntry = null;
+            _frozenHintColumn = null;
+            _pointerHintAnchor = null;
+            _savedVerticalScroll = null;
+            _SetHintFrozenClass(false);
+        }
+
+        private bool _IsHintFrozenAt(Point position)
+        {
+            if (!_freezeHint)
+            {
+                return false;
+            }
+
+            if (_pointerHintAnchor is not { } anchor)
+            {
+                return false;
+            }
+
+            var deltaX = position.X - anchor.X;
+            var deltaY = position.Y - anchor.Y;
+            var movedFarEnough =
+                Math.Abs(deltaX) >= PointerHintMoveThreshold || Math.Abs(deltaY) >= PointerHintMoveThreshold;
+            return !movedFarEnough;
+        }
+
+        private void _CaptureFrozenHint()
+        {
+            var selected = _viewModel?.SelectedEntries;
+            _frozenHintEntry = selected is { Count: > 0 } ? selected[^1] : null;
+            _frozenHintColumn = _lastHintColumn ?? RenameGrid.CurrentColumn;
+        }
+
+        private void _PublishFrozenHint()
+        {
+            _PublishCellHint(_frozenHintEntry, _frozenHintColumn);
         }
 
         /// <inheritdoc />
@@ -67,7 +157,11 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 if (_viewModel.RemoveSelectedCommand.CanExecute(null))
                 {
+                    _BeginHintFreeze();
                     _viewModel.RemoveSelectedCommand.Execute(null);
+                    _CaptureFrozenHint();
+                    _PublishFrozenHint();
+                    _ScheduleVerticalScrollRestore();
                     e.Handled = true;
                     return;
                 }
@@ -93,16 +187,58 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnCurrentCellChanged(object? sender, EventArgs e)
         {
-            _PublishFocusedCellHint();
+            if (_freezeHint || !_isPointerOverGrid || _viewModel is null)
+            {
+                return;
+            }
+
+            _PublishCellHint(_ReadFocusedEntry(), RenameGrid.CurrentColumn);
         }
 
         private void _OnCellPointerPressed(object? sender, DataGridCellPointerPressedEventArgs e)
         {
+            _EndHintFreeze();
+            _lastPointerPositionOverGrid = e.PointerPressedEventArgs.GetPosition(RenameGrid);
             _PublishCellHint(e.Row?.DataContext as RenameListEntry, e.Column);
+        }
+
+        private void _OnGridPointerEntered(object? sender, PointerEventArgs e)
+        {
+            _isPointerOverGrid = true;
+            _lastPointerPositionOverGrid = e.GetPosition(RenameGrid);
+        }
+
+        private void _OnGridPointerMoved(object? sender, PointerEventArgs e)
+        {
+            if (!_isPointerOverGrid || _viewModel is null)
+            {
+                return;
+            }
+
+            var position = e.GetPosition(RenameGrid);
+            _lastPointerPositionOverGrid = position;
+
+            if (_IsHintFrozenAt(position))
+            {
+                return;
+            }
+
+            _EndHintFreeze();
+            var entry = _HitTestRowAt(position);
+            _PublishCellHint(entry, RenameGrid.CurrentColumn ?? _lastHintColumn);
         }
 
         private void _OnGridPointerExited(object? sender, PointerEventArgs e)
         {
+            // Virtualized row recycle can spuriously exit/re-enter while the cursor is unchanged.
+            if (_freezeHint)
+            {
+                return;
+            }
+
+            _isPointerOverGrid = false;
+            _lastPointerPositionOverGrid = null;
+
             if (_viewModel is null)
             {
                 return;
@@ -118,20 +254,20 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            _PublishCellHint(_ReadFocusedEntry(), RenameGrid.CurrentColumn);
+            _PublishCellHint(_ReadFocusedEntry(), RenameGrid.CurrentColumn ?? _lastHintColumn);
         }
 
         private RenameListEntry? _ReadFocusedEntry()
         {
-            if (RenameGrid.SelectedItem is RenameListEntry entry)
-            {
-                return entry;
-            }
-
             var selected = _viewModel?.SelectedEntries;
             if (selected is { Count: > 0 })
             {
                 return selected[^1];
+            }
+
+            if (RenameGrid.SelectedItem is RenameListEntry entry)
+            {
+                return entry;
             }
 
             return null;
@@ -144,11 +280,24 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
+            if (_freezeHint)
+            {
+                if (_frozenHintEntry is null)
+                {
+                    return;
+                }
+
+                entry = _frozenHintEntry;
+                column = _frozenHintColumn ?? column;
+            }
+
             if (entry is null || column?.Header is not string columnHeader || string.IsNullOrEmpty(columnHeader))
             {
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
+
+            _lastHintColumn = column;
 
             var cellText = RenameListCellHint.GetCellText(entry, columnHeader);
             _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatParts(
@@ -226,7 +375,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            if (_isSyncingSelection || _viewModel is null)
+            if (_isSyncingSelection || _viewModel is null || _freezeHint)
             {
                 return;
             }
@@ -235,7 +384,16 @@ namespace Mfr.App.Ui.Views.RenameList
             try
             {
                 var selected = _ReadSelectedEntries();
+                if (_ContainsStaleSelection(selected))
+                {
+                    return;
+                }
+
                 _viewModel.SetSelectedEntries(selected);
+                if (!_isPointerOverGrid)
+                {
+                    _PublishFocusedCellHint();
+                }
             }
             finally
             {
@@ -253,6 +411,12 @@ namespace Mfr.App.Ui.Views.RenameList
             if (e.PropertyName is nameof(RenameListViewModel.SelectedEntries))
             {
                 _SyncSelectionToGrid();
+                if (_freezeHint)
+                {
+                    _CaptureFrozenHint();
+                    _PublishFrozenHint();
+                    _ScheduleVerticalScrollRestore();
+                }
             }
         }
 
@@ -334,6 +498,54 @@ namespace Mfr.App.Ui.Views.RenameList
             }
         }
 
+        private RenameListEntry? _HitTestRowAt(Point position)
+        {
+            var hit = RenameGrid.InputHitTest(position);
+            return _HitTestRow(hit);
+        }
+
+        private static RenameListEntry? _HitTestRow(object? source)
+        {
+            if (source is DataGridRow row && row.DataContext is RenameListEntry rowEntry)
+            {
+                return rowEntry;
+            }
+
+            if (source is not Visual visual)
+            {
+                return null;
+            }
+
+            for (var current = visual; current is not null; current = current.GetVisualParent())
+            {
+                if (current is DataGridRow dataGridRow && dataGridRow.DataContext is RenameListEntry entry)
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        private bool _ContainsStaleSelection(IReadOnlyList<RenameListEntry> selected)
+        {
+            if (_viewModel is null || selected.Count == 0)
+            {
+                return false;
+            }
+
+            var entries = _viewModel.Entries;
+            foreach (var entry in selected)
+            {
+                if (!entries.Contains(entry))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private IReadOnlyList<RenameListEntry> _ReadSelectedEntries()
         {
             if (RenameGrid.SelectedItems is not IList items)
@@ -360,6 +572,56 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             return true;
+        }
+
+        private void _SetHintFrozenClass(bool isFrozen)
+        {
+            RenameGrid.Classes.Set("hint-frozen", isFrozen);
+        }
+
+        private void _CaptureVerticalScroll()
+        {
+            _savedVerticalScroll ??= _ReadVerticalScroll();
+        }
+
+        private void _ScheduleVerticalScrollRestore()
+        {
+            if (_savedVerticalScroll is null)
+            {
+                return;
+            }
+
+            Dispatcher.UIThread.Post(_RestoreVerticalScroll, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.Post(_RestoreVerticalScroll, DispatcherPriority.Render);
+        }
+
+        private void _RestoreVerticalScroll()
+        {
+            if (_savedVerticalScroll is not { } saved || !_freezeHint)
+            {
+                return;
+            }
+
+            var bar = _GetVerticalScrollBar();
+            if (bar is null || Math.Abs(bar.Value - saved) < 0.5)
+            {
+                return;
+            }
+
+            bar.Value = saved;
+        }
+
+        private double? _ReadVerticalScroll()
+        {
+            return _GetVerticalScrollBar()?.Value;
+        }
+
+        private ScrollBar? _GetVerticalScrollBar()
+        {
+            return RenameGrid
+                .GetVisualDescendants()
+                .OfType<ScrollBar>()
+                .FirstOrDefault(bar => bar.Orientation == Orientation.Vertical);
         }
     }
 }

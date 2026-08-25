@@ -83,6 +83,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private StatusHintDisplay _cellStatusHintDisplay = StatusHintDisplay.Empty;
 
         /// <summary>
+        /// Raised immediately before selected rows are removed so the view can freeze the cell hint.
+        /// </summary>
+        internal event EventHandler? SelectedEntriesRemoving;
+
+        /// <summary>
         /// Replaces the Rename List selection.
         /// </summary>
         /// <param name="entries">Selected grid rows.</param>
@@ -158,6 +163,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 return;
             }
+
+            SelectedEntriesRemoving?.Invoke(this, EventArgs.Empty);
 
             var selected = _selectedEntries.ToHashSet();
             var anchorIndex = _FindFirstSelectedIndex(selected);
