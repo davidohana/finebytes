@@ -126,6 +126,70 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies AddSources insertAtIndex inserts before that row and reindexes.
+        /// </summary>
+        public void AddSources_InsertAt_Inserts_Before_Index_And_Reindexes()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+            var deltaPath = TestHelpers.CreateFile(_tempRoot, "delta.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath, gammaPath]);
+            renameList.AddSources([deltaPath], insertAtIndex: 1);
+
+            var entries = renameList.RenameItems;
+            Assert.Equal([alphaPath, deltaPath, betaPath, gammaPath], entries.Select(entry => entry.Original.FullPath));
+            Assert.Equal([0, 1, 2, 3], entries.Select(entry => entry.Original.RenameListIndex));
+            Assert.Equal([0, 1, 2, 3], entries.Select(entry => entry.Original.InFolderIndex));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies AddSources with insertAtIndex 0 inserts at the start.
+        /// </summary>
+        public void AddSources_InsertAt_Zero_Inserts_At_Start()
+        {
+            var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "alpha.txt", "beta.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath]);
+            renameList.AddSources([betaPath], insertAtIndex: 0);
+
+            Assert.Equal([betaPath, alphaPath], renameList.RenameItems.Select(entry => entry.Original.FullPath));
+            Assert.Equal([0, 1], renameList.RenameItems.Select(entry => entry.Original.RenameListIndex));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies null or end insertAtIndex appends (default AddSources behavior).
+        /// </summary>
+        public void AddSources_InsertAt_Null_Or_End_Appends()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.txt",
+                "gamma.txt"
+            );
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath]);
+            renameList.AddSources([betaPath], insertAtIndex: null);
+            renameList.AddSources([gammaPath], insertAtIndex: 2);
+
+            Assert.Equal(
+                [alphaPath, betaPath, gammaPath],
+                renameList.RenameItems.Select(entry => entry.Original.FullPath)
+            );
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies MoveUp shifts a contiguous selection as a block and reindexes.
         /// </summary>
         public void MoveUp_Moves_Contiguous_Selection_As_Block()

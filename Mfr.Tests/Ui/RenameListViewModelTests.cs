@@ -547,6 +547,72 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Add with a Rename List selection inserts after the first selected row (MFR7 help).
+        /// </summary>
+        [Fact]
+        public async Task AddSelected_With_RenameList_Selection_Inserts_After_And_Selects_First_New()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "gamma.log")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            var alphaEntry = renameListViewModel.Entries[0];
+            var gammaEntry = renameListViewModel.Entries[1];
+
+            renameListViewModel.SetSelectedEntries([gammaEntry]);
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "beta.md")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            Assert.Equal(["alpha.txt", "gamma.log", "beta.md"], _PreviewNames(renameListViewModel));
+            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
+            Assert.Same(gammaEntry, renameListViewModel.Entries[1]);
+            Assert.Single(renameListViewModel.SelectedEntries);
+            Assert.Equal("beta.md", renameListViewModel.SelectedEntries[0].FullFileName);
+        }
+
+        /// <summary>
+        /// Verifies Add with no Rename List selection still appends.
+        /// </summary>
+        [Fact]
+        public async Task AddSelected_Without_RenameList_Selection_Appends()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "gamma.log")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            renameListViewModel.SetSelectedEntries([]);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "beta.md")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            Assert.Equal(["alpha.txt", "gamma.log", "beta.md"], _PreviewNames(renameListViewModel));
+            Assert.Empty(renameListViewModel.SelectedEntries);
+        }
+
+        /// <summary>
+        /// Verifies AddPathsAsync honors Rename List selection insert position (after selection).
+        /// </summary>
+        [Fact]
+        public async Task AddPaths_With_RenameList_Selection_Inserts_After()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "gamma.log")]);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "beta.md")]);
+
+            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
+            Assert.Single(renameListViewModel.SelectedEntries);
+            Assert.Equal("beta.md", renameListViewModel.SelectedEntries[0].FullFileName);
+        }
+
+        /// <summary>
         /// Verifies Remove keeps remaining row objects and order.
         /// </summary>
         [Fact]

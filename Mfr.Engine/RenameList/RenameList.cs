@@ -49,7 +49,17 @@ namespace Mfr.Engine.RenameList
         /// <param name="excludeMasks">Exclusive file-name masks for discovered directory entries.</param>
         /// <param name="cancellationToken">When canceled, stops resolution and returns without throwing.</param>
         /// <param name="progress">Optional progress sink (scanned / added / last path).</param>
+        /// <param name="insertAtIndex">
+        /// 0-based index to insert new items before; <see langword="null"/> appends at the end.
+        /// </param>
         /// <returns>Summary of sources that were skipped during resolution.</returns>
+        /// <remarks>
+        /// <para>
+        /// Manual-sort add inserts at the given index (UI typically passes one past the first selected
+        /// row so new items appear below the selection), or appends when no insert index is given.
+        /// Values outside <c>[0, Count]</c> are clamped.
+        /// </para>
+        /// </remarks>
         public RenameListAddSummary AddSources(
             IEnumerable<string> sources,
             bool includeFiles = true,
@@ -57,21 +67,25 @@ namespace Mfr.Engine.RenameList
             bool includeSubdirs = false,
             IReadOnlyList<string>? excludeMasks = null,
             CancellationToken cancellationToken = default,
-            IProgress<RenameListAddProgress>? progress = null
+            IProgress<RenameListAddProgress>? progress = null,
+            int? insertAtIndex = null
         )
         {
             var sourceList = sources.ToList();
             Log.Information(
-                "Received {SourceCount} source(s) for resolution. IncludeFiles: {IncludeFiles}, IncludeFolders: {IncludeFolders}, IncludeSubdirs: {IncludeSubdirs}, IncludeHidden: {IncludeHidden}.",
+                "Received {SourceCount} source(s) for resolution. IncludeFiles: {IncludeFiles}, IncludeFolders: {IncludeFolders}, IncludeSubdirs: {IncludeSubdirs}, IncludeHidden: {IncludeHidden}, InsertAtIndex: {InsertAtIndex}.",
                 sourceList.Count,
                 includeFiles,
                 includeFolders,
                 includeSubdirs,
-                _includeHidden
+                _includeHidden,
+                insertAtIndex
             );
 
             var tracker = new AddProgressTracker(progress, cancellationToken);
             var skippedSourceCount = 0;
+            var insertCursor = _ClampInsertAtIndex(insertAtIndex);
+            var countBefore = _renameItems.Count;
             foreach (var source in sourceList)
             {
                 if (tracker.IsCanceled)
@@ -86,7 +100,8 @@ namespace Mfr.Engine.RenameList
                         includeFolders: includeFolders,
                         includeSubdirs: includeSubdirs,
                         excludeMasks: excludeMasks,
-                        tracker: tracker
+                        tracker: tracker,
+                        insertCursor: ref insertCursor
                     )
                 )
                 {
@@ -94,8 +109,36 @@ namespace Mfr.Engine.RenameList
                 }
             }
 
+            if (_renameItems.Count > countBefore)
+            {
+                _ReindexItems();
+            }
+
             tracker.ReportFinal();
             return new RenameListAddSummary(skippedSourceCount);
+        }
+
+        /// <summary>
+        /// Clamps an optional insert index to <c>[0, Count]</c>; <see langword="null"/> means append.
+        /// </summary>
+        private int _ClampInsertAtIndex(int? insertAtIndex)
+        {
+            if (insertAtIndex is null)
+            {
+                return _renameItems.Count;
+            }
+
+            if (insertAtIndex.Value < 0)
+            {
+                return 0;
+            }
+
+            if (insertAtIndex.Value > _renameItems.Count)
+            {
+                return _renameItems.Count;
+            }
+
+            return insertAtIndex.Value;
         }
 
         /// <summary>
@@ -108,7 +151,8 @@ namespace Mfr.Engine.RenameList
             bool includeFolders,
             bool includeSubdirs,
             IReadOnlyList<string>? excludeMasks,
-            AddProgressTracker tracker
+            AddProgressTracker tracker,
+            ref int insertCursor
         )
         {
             try
@@ -119,7 +163,8 @@ namespace Mfr.Engine.RenameList
                     includeFolders: includeFolders,
                     includeSubdirs: includeSubdirs,
                     excludeMasks: excludeMasks,
-                    tracker: tracker
+                    tracker: tracker,
+                    insertCursor: ref insertCursor
                 );
                 return true;
             }
@@ -144,7 +189,8 @@ namespace Mfr.Engine.RenameList
             bool includeFolders,
             bool includeSubdirs,
             IReadOnlyList<string>? excludeMasks,
-            AddProgressTracker tracker
+            AddProgressTracker tracker,
+            ref int insertCursor
         )
         {
             if (string.IsNullOrWhiteSpace(source))
@@ -168,12 +214,14 @@ namespace Mfr.Engine.RenameList
                 excludeMasks: excludeMasks,
                 cancellationToken: tracker.Token
             );
-            var addedCount = _AppendPaths(
+            var addedCount = _InsertPaths(
                 resolvedPaths: resolvedPaths,
                 includeFiles: includeFiles,
                 includeFolders: includeFolders,
-                tracker: tracker
+                tracker: tracker,
+                insertAt: insertCursor
             );
+            insertCursor += addedCount;
             Log.Information(
                 "Resolved source '{Source}', added {AddedCount} new item(s) (scanned {ScannedCount}).",
                 trimmedSource,
@@ -471,18 +519,26 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Appends resolved paths to <see cref="RenameItems"/> while enforcing deduplication and filtering.
+        /// Inserts resolved paths into <see cref="RenameItems"/> while enforcing deduplication and filtering.
         /// </summary>
-        /// <param name="resolvedPaths">Resolved file paths to append.</param>
+        /// <param name="resolvedPaths">Resolved file paths to insert.</param>
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <param name="tracker">Shared progress and cancel state for this add operation.</param>
+        /// <param name="insertAt">0-based index of the first new item; later items follow contiguously.</param>
         /// <returns>The count of newly added resolved items.</returns>
-        private int _AppendPaths(
+        /// <remarks>
+        /// <para>
+        /// List and per-folder indices are placeholders until <see cref="AddSources"/> calls
+        /// <c>_ReindexItems</c> after the batch finishes.
+        /// </para>
+        /// </remarks>
+        private int _InsertPaths(
             IEnumerable<string> resolvedPaths,
             bool includeFiles,
             bool includeFolders,
-            AddProgressTracker tracker
+            AddProgressTracker tracker,
+            int insertAt
         )
         {
             var addedCount = 0;
@@ -546,13 +602,10 @@ namespace Mfr.Engine.RenameList
                     (directoryPath, prefix, extension) = _SplitRenamePathForFile(fullPath);
                 }
 
-                var inFolderIndex = _folderPathToCount.GetValueOrDefault(directoryPath);
-                _folderPathToCount[directoryPath] = inFolderIndex + 1;
-
-                var renameListIndex = _renameItems.Count;
+                // Indices are provisional; AddSources reindexes after the full batch.
                 var originalFileMeta = new FileMeta(
-                    renameListIndex: renameListIndex,
-                    inFolderIndex: inFolderIndex,
+                    renameListIndex: 0,
+                    inFolderIndex: 0,
                     directoryPath: directoryPath,
                     prefix: prefix,
                     extension: extension,
@@ -564,7 +617,7 @@ namespace Mfr.Engine.RenameList
                 );
 
                 var renameItem = new RenameItem(originalFileMeta);
-                _renameItems.Add(renameItem);
+                _renameItems.Insert(insertAt + addedCount, renameItem);
                 tracker.OnAdded(fullPath);
                 addedCount++;
             }
