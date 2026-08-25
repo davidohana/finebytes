@@ -55,6 +55,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<RenameListEntry> SelectedEntries => _selectedEntries;
 
         /// <summary>
+        /// Gets the row index under an external file drag (insert-before target), or null when unset.
+        /// </summary>
+        public int? DropMarkIndex { get; private set; }
+
+        /// <summary>
         /// Gets the count of items in the Rename List.
         /// </summary>
         public int ItemCount => Entries.Count;
@@ -106,6 +111,26 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Sets or clears the external-drag insert marker (row index to insert before).
+        /// </summary>
+        /// <param name="index">Zero-based row index under the pointer, or null to clear.</param>
+        public void SetDropMarkIndex(int? index)
+        {
+            if (index is { } i && (i < 0 || i >= Entries.Count))
+            {
+                index = null;
+            }
+
+            if (DropMarkIndex == index)
+            {
+                return;
+            }
+
+            DropMarkIndex = index;
+            OnPropertyChanged(nameof(DropMarkIndex));
         }
 
         /// <summary>
@@ -249,6 +274,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             _renameList.Clear();
             Entries.Clear();
+            SetDropMarkIndex(null);
             SetSelectedEntries([]);
             CellStatusHintDisplay = StatusHintDisplay.Empty;
             _NotifyListChanged();
@@ -326,8 +352,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var selectFirstAdded = _selectedEntries.Count > 0;
+            var usedDropMark = DropMarkIndex is not null;
+            var selectFirstAdded = usedDropMark || _selectedEntries.Count > 0;
             var insertAt = _ResolveInsertAt();
+            SetDropMarkIndex(null);
             var oldCount = _renameList.RenameItems.Count;
             LastAddError = string.Empty;
 
@@ -383,10 +411,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Index to insert new rows: after the first selected row, or the end when nothing is selected.
+        /// Index to insert new rows: before the drop mark when set; else after the first selected row; else append.
         /// </summary>
         private int _ResolveInsertAt()
         {
+            if (DropMarkIndex is { } markIndex)
+            {
+                return markIndex;
+            }
+
             if (_selectedEntries.Count == 0)
             {
                 return Entries.Count;

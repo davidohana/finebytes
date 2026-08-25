@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -15,6 +16,8 @@ namespace Mfr.App.Ui.Views.RenameList
     /// </summary>
     public partial class RenameListView : UserControl
     {
+        private const string DropMarkClass = "drop-mark";
+
         private RenameListViewModel? _viewModel;
         private bool _isSyncingSelection;
         private bool _selectionChangeFromView;
@@ -31,9 +34,11 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameGrid.SelectionChanged += _OnSelectionChanged;
             RenameGrid.CurrentCellChanged += _OnCurrentCellChanged;
             RenameGrid.CellPointerPressed += _OnCellPointerPressed;
+            RenameGrid.LoadingRow += _OnLoadingRow;
             RenameGrid.AddHandler(KeyDownEvent, _OnGridKeyDown, RoutingStrategies.Tunnel);
             DragDrop.SetAllowDrop(this, true);
             AddHandler(DragDrop.DragOverEvent, _OnDragOver);
+            AddHandler(DragDrop.DragLeaveEvent, _OnDragLeave);
             AddHandler(DragDrop.DropEvent, _OnDrop);
         }
 
@@ -54,6 +59,7 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
             _SyncSelectionToGrid();
+            _ApplyDropMarkVisuals();
         }
 
         /// <inheritdoc />
@@ -196,15 +202,26 @@ namespace Mfr.App.Ui.Views.RenameList
             if (_viewModel is null || _viewModel.IsAdding || !_CanAcceptFileDrop(e))
             {
                 e.DragEffects = DragDropEffects.None;
+                _ClearDropMark();
                 return;
             }
 
             if (e.KeyModifiers.HasFlag(KeyModifiers.Alt))
             {
                 _viewModel.Clear();
+                _ClearDropMark();
+                e.DragEffects = DragDropEffects.Copy;
+                return;
             }
 
+            _UpdateDropMarkFromPointer(e);
             e.DragEffects = DragDropEffects.Copy;
+        }
+
+        private void _OnDragLeave(object? sender, DragEventArgs e)
+        {
+            e.Handled = true;
+            _ClearDropMark();
         }
 
         private async void _OnDrop(object? sender, DragEventArgs e)
@@ -213,16 +230,79 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (_viewModel is null || _viewModel.IsAdding || !_CanAcceptFileDrop(e))
             {
+                _ClearDropMark();
                 return;
             }
 
             var paths = _ReadDroppedFilePaths(e);
             if (paths.Count == 0)
             {
+                _ClearDropMark();
                 return;
             }
 
+            // DropMarkIndex is consumed (then cleared) inside AddPathsAsync / _AddSourcesAsync.
             await _viewModel.AddPathsAsync(paths).ConfigureAwait(true);
+            _ApplyDropMarkVisuals();
+        }
+
+        private void _UpdateDropMarkFromPointer(DragEventArgs e)
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            var row = _HitTestDataGridRow(e);
+            if (row is null)
+            {
+                _ClearDropMark();
+                return;
+            }
+
+            var index = row.Index;
+            if (index < 0 || index >= _viewModel.Entries.Count)
+            {
+                _ClearDropMark();
+                return;
+            }
+
+            _viewModel.SetDropMarkIndex(index);
+        }
+
+        private DataGridRow? _HitTestDataGridRow(DragEventArgs e)
+        {
+            var position = e.GetPosition(RenameGrid);
+            if (RenameGrid.InputHitTest(position) is not Control hit)
+            {
+                return null;
+            }
+
+            return DataGridRow.GetRowContainingElement(hit);
+        }
+
+        private void _ClearDropMark()
+        {
+            _viewModel?.SetDropMarkIndex(null);
+        }
+
+        private void _OnLoadingRow(object? sender, DataGridRowEventArgs e)
+        {
+            _ApplyDropMarkClass(e.Row);
+        }
+
+        private void _ApplyDropMarkVisuals()
+        {
+            foreach (var row in RenameGrid.GetVisualDescendants().OfType<DataGridRow>())
+            {
+                _ApplyDropMarkClass(row);
+            }
+        }
+
+        private void _ApplyDropMarkClass(DataGridRow row)
+        {
+            var isMarked = _viewModel?.DropMarkIndex is { } markIndex && row.Index == markIndex;
+            row.Classes.Set(DropMarkClass, isMarked);
         }
 
         private static bool _CanAcceptFileDrop(DragEventArgs e)
@@ -289,6 +369,11 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 _SyncSelectionToGrid();
                 _PublishFocusedCellHint();
+            }
+
+            if (e.PropertyName is nameof(RenameListViewModel.DropMarkIndex))
+            {
+                _ApplyDropMarkVisuals();
             }
         }
 

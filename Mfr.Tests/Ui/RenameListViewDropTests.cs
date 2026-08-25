@@ -1,8 +1,10 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -218,6 +220,123 @@ namespace Mfr.Tests.Ui
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies DragOver over a row sets the salmon drop mark index (MFR7 MarkedRow).
+        /// </summary>
+        [AvaloniaFact]
+        [Obsolete]
+        public async Task DragOver_Over_Row_Sets_DropMarkIndex()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            var dragPath = Path.Combine(dir, "drag.txt");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(betaPath, "b");
+            File.WriteAllText(dragPath, "d");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+
+            var betaEntry = renameListViewModel.Entries[1];
+            var pointOnView = _PointOverEntry(view, grid, betaEntry);
+            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+
+            Assert.Equal(1, renameListViewModel.DropMarkIndex);
+            var markedRow = grid.GetVisualDescendants().OfType<DataGridRow>().First(row => row.Index == 1);
+            Assert.Contains("drop-mark", markedRow.Classes);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies DragLeave clears the drop mark.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragLeave_Clears_DropMark()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var dragPath = Path.Combine(dir, "drag.txt");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(dragPath, "d");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+
+            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[0]);
+            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+            Assert.Equal(0, renameListViewModel.DropMarkIndex);
+
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragLeaveEvent, dataTransfer, view, new Point(-1, -1), KeyModifiers.None)
+            );
+            Assert.Null(renameListViewModel.DropMarkIndex);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Drop with an active mark inserts before the marked row.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Drop_With_DropMark_Inserts_Before_Marked_Row()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            var dragPath = Path.Combine(dir, "drag.txt");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(betaPath, "b");
+            File.WriteAllText(dragPath, "d");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+            renameListViewModel.SetSelectedEntries([]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+
+            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1]);
+            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+            Assert.Equal(1, renameListViewModel.DropMarkIndex);
+
+            view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, pointOnView, KeyModifiers.None));
+            await _WaitUntil(() => renameListViewModel.Entries.Count == 3);
+
+            Assert.Equal(
+                ["alpha.txt", "drag.txt", "beta.md"],
+                renameListViewModel.Entries.Select(entry => entry.FullFileName)
+            );
+            Assert.Null(renameListViewModel.DropMarkIndex);
+
+            window.Close();
+        }
+
         private FileListViewModel _CreateFileListViewModel(string path)
         {
             var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path);
@@ -237,6 +356,19 @@ namespace Mfr.Tests.Ui
             window.Show();
             window.UpdateLayout();
             return (view, window);
+        }
+
+        private static Point _PointOverEntry(RenameListView view, DataGrid grid, RenameListEntry entry)
+        {
+            var row = grid.GetVisualDescendants()
+                .OfType<DataGridRow>()
+                .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
+            Assert.NotNull(row);
+
+            var local = new Point(Math.Max(8, row.Bounds.Width / 2), Math.Max(4, row.Bounds.Height / 2));
+            var pointOnView = row.TranslatePoint(local, view);
+            Assert.True(pointOnView.HasValue);
+            return pointOnView.Value;
         }
 
         private static async Task<DataTransfer> _CreateFileDataTransferAsync(Window window, IReadOnlyList<string> paths)

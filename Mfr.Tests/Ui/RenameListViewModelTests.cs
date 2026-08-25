@@ -620,6 +620,76 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies a drop mark inserts before the marked row and overrides selection insert (MFR7 MarkedRow).
+        /// </summary>
+        [Fact]
+        public async Task AddPaths_With_DropMark_Inserts_Before_Marked_Row()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "gamma.log")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            var alphaEntry = renameListViewModel.Entries[0];
+            var gammaEntry = renameListViewModel.Entries[1];
+
+            // Selection alone would insert after gamma; mark on gamma inserts before it.
+            renameListViewModel.SetSelectedEntries([gammaEntry]);
+            renameListViewModel.SetDropMarkIndex(1);
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "beta.md")]);
+
+            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
+            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
+            Assert.Same(gammaEntry, renameListViewModel.Entries[2]);
+            Assert.Null(renameListViewModel.DropMarkIndex);
+            Assert.Single(renameListViewModel.SelectedEntries);
+            Assert.Equal("beta.md", renameListViewModel.SelectedEntries[0].FullFileName);
+        }
+
+        /// <summary>
+        /// Verifies a drop mark on the first row inserts at the start.
+        /// </summary>
+        [Fact]
+        public async Task AddPaths_With_DropMark_On_First_Row_Inserts_At_Start()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "beta.md"), _FileEntry(dir, "gamma.log")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            renameListViewModel.SetSelectedEntries([]);
+
+            renameListViewModel.SetDropMarkIndex(0);
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt")]);
+
+            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
+            Assert.Null(renameListViewModel.DropMarkIndex);
+            Assert.Equal("alpha.txt", renameListViewModel.SelectedEntries[0].FullFileName);
+        }
+
+        /// <summary>
+        /// Verifies SetDropMarkIndex ignores out-of-range indices.
+        /// </summary>
+        [Fact]
+        public async Task SetDropMarkIndex_Out_Of_Range_Clears()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt")]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            renameListViewModel.SetDropMarkIndex(0);
+            Assert.Equal(0, renameListViewModel.DropMarkIndex);
+
+            renameListViewModel.SetDropMarkIndex(5);
+            Assert.Null(renameListViewModel.DropMarkIndex);
+        }
+
+        /// <summary>
         /// Verifies Remove keeps remaining row objects and order.
         /// </summary>
         [Fact]
