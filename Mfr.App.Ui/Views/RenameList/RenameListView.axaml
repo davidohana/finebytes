@@ -4,7 +4,8 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
-  xmlns:shortcuts="using:Mfr.App.Ui.Input"
+  xmlns:input="using:Mfr.App.Ui.Input"
+  xmlns:resources="using:Mfr.App.Ui.Resources"
   mc:Ignorable="d"
   d:DesignWidth="800"
   d:DesignHeight="240"
@@ -22,34 +23,34 @@
         <MenuItem
           Header="Locate in File List"
           Command="{Binding LocateInFileListCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.LocateInFileList}"
+          InputGesture="{x:Static input:AppShortcuts.LocateInFileList}"
         />
         <Separator />
         <MenuItem
           Header="Move Selected Up"
           Command="{Binding MoveSelectedUpCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.MoveSelectedUp}"
+          InputGesture="{x:Static input:AppShortcuts.MoveSelectedUp}"
         />
         <MenuItem
           Header="Move Selected Down"
           Command="{Binding MoveSelectedDownCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.MoveSelectedDown}"
+          InputGesture="{x:Static input:AppShortcuts.MoveSelectedDown}"
         />
         <Separator />
         <MenuItem
           Header="Remove Selected Item(s)"
           Command="{Binding RemoveSelectedCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelectedDelete}"
+          InputGesture="{x:Static input:AppShortcuts.RemoveSelectedDelete}"
         />
         <MenuItem
           Header="Remove All But Selected"
           Command="{Binding RemoveAllButSelectedCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.RemoveAllButSelected}"
+          InputGesture="{x:Static input:AppShortcuts.RemoveAllButSelected}"
         />
         <MenuItem
           Header="Remove All"
           Command="{Binding ClearCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}"
+          InputGesture="{x:Static input:AppShortcuts.ClearRenameList}"
         />
       </ContextMenu>
     </ResourceDictionary>
@@ -209,42 +210,42 @@
         <Button
           Classes="rename-list-action"
           Command="{Binding AddSelectedCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddSelectedTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.AddSelected}"
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
         </Button>
         <Button
           Classes="rename-list-action"
           Command="{Binding AddAllCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddAllTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.AddAll}"
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddAll.png" />
         </Button>
         <Button
           Classes="rename-list-action"
           Command="{Binding RemoveSelectedCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.RemoveSelectedTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.RemoveSelected}"
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/RemoveSelected.png" />
         </Button>
         <Button
           Classes="rename-list-action"
           Command="{Binding ClearCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.ClearRenameListTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.ClearRenameList}"
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Clear.png" />
         </Button>
         <Button
           Classes="rename-list-action"
           Command="{Binding MoveSelectedUpCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.MoveSelectedUpTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.MoveSelectedUp}"
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveUp.png" />
         </Button>
         <Button
           Classes="rename-list-action"
           Command="{Binding MoveSelectedDownCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.MoveSelectedDownTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.MoveSelectedDown}"
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
         </Button>
@@ -252,7 +253,7 @@
           Classes="rename-list-action"
           IsChecked="{Binding IsAutoSort, Mode=OneWay}"
           Command="{Binding ToggleAutoSortCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AutoSortTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.AutoSort}"
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AutoSort.png" />
         </ToggleButton>

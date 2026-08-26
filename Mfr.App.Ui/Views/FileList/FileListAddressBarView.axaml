@@ -6,7 +6,7 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FileList"
   xmlns:fl="using:Mfr.App.Ui.Services.FileList"
   xmlns:views="using:Mfr.App.Ui.Views.FileList"
-  xmlns:shortcuts="using:Mfr.App.Ui.Input"
+  xmlns:resources="using:Mfr.App.Ui.Resources"
   mc:Ignorable="d"
   d:DesignWidth="280"
   d:DesignHeight="40"
@@ -107,7 +107,7 @@
     <Border
       x:Name="AddressBar"
       Classes="address-bar"
-      ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoToAddressTip}"
+      ToolTip.Tip="{x:Static resources:AppTips.GoToAddress}"
       PointerPressed="_OnAddressBarPointerPressed"
     >
       <Grid ColumnDefinitions="*,Auto">
@@ -226,7 +226,7 @@
           IsVisible="{Binding IsPathEditing}"
           Text="{Binding PathText, Mode=TwoWay}"
           Watermark="Folder path or \\server\share"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AddressEditTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.AddressEdit}"
           KeyDown="_OnPathKeyDown"
           LostFocus="_OnPathLostFocus"
         />
@@ -257,7 +257,7 @@
       Grid.Column="1"
       Classes="address-tool"
       Command="{Binding GoUpCommand}"
-      ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoUpTip}"
+      ToolTip.Tip="{x:Static resources:AppTips.GoUp}"
     >
       <TemplatedControl Width="16" Height="16" Template="{StaticResource GoUpIconTemplate}" />
     </Button>
@@ -265,7 +265,7 @@
       Grid.Column="2"
       Classes="address-tool"
       Command="{Binding RefreshCommand}"
-      ToolTip.Tip="{x:Static shortcuts:AppShortcuts.RefreshTip}"
+      ToolTip.Tip="{x:Static resources:AppTips.Refresh}"
     >
       <Viewbox Width="16" Height="16">
         <Path

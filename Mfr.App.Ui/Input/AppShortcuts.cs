@@ -3,12 +3,13 @@ using Avalonia.Input;
 namespace Mfr.App.Ui.Input
 {
     /// <summary>
-    /// Keyboard shortcuts shown in menus and tooltips, and bound on the main window.
+    /// Keyboard shortcuts shown in menus and bound on the main window.
     /// <para>
     /// Keep <c>docs/keyboard-shortcuts.md</c> in sync with these gestures.
     /// Window-level <see cref="KeyBinding"/>s use the members here, including File List
     /// view types (Ctrl+1 through Ctrl+6). Pane-local keys (Backspace, thumbnail zoom,
-    /// address Enter/Esc) are handled in the File List view.
+    /// address Enter/Esc) are handled in the File List view. Toolbar tip text lives in
+    /// <see cref="Mfr.App.Ui.Resources.AppTips"/>.
     /// </para>
     /// </summary>
     public static class AppShortcuts
@@ -93,58 +94,5 @@ namespace Mfr.App.Ui.Input
 
         /// <summary>Moves selected Rename List rows down when the grid has focus.</summary>
         public static KeyGesture MoveSelectedDown { get; } = new(Key.Down, KeyModifiers.Control);
-
-        /// <summary>Toolbar and menu tip for GO.</summary>
-        public const string GoTip = "GO (Ctrl+G)";
-
-        /// <summary>Toolbar tip for Undo Last.</summary>
-        public const string UndoLastTip = "Undo last (Ctrl+Z)";
-
-        /// <summary>Toolbar tip for the log window.</summary>
-        public const string ShowLogTip = "Log (Ctrl+Shift+L)";
-
-        /// <summary>Toolbar tip for Options.</summary>
-        public const string ShowOptionsTip = "Options (Ctrl+,)";
-
-        /// <summary>Rename List Add Selected button and menu tip.</summary>
-        public const string AddSelectedTip = "Add selected (Ctrl+Shift+S)";
-
-        /// <summary>Rename List Add All button and menu tip.</summary>
-        public const string AddAllTip = "Add all (Ctrl+Shift+A)";
-
-        /// <summary>Rename List Remove Selected button and menu tip.</summary>
-        public const string RemoveSelectedTip = "Remove selected (Ctrl+Shift+R)";
-
-        /// <summary>Rename List Remove All But Selected menu tip.</summary>
-        public const string RemoveAllButSelectedTip = "Remove all but selected (Ctrl+Shift+B)";
-
-        /// <summary>Rename List Clear button and menu tip.</summary>
-        public const string ClearRenameListTip = "Clear Rename List (Ctrl+Shift+C)";
-
-        /// <summary>Rename List Locate in File List menu tip.</summary>
-        public const string LocateInFileListTip = "Locate in File List (F4)";
-
-        /// <summary>Rename List Move Selected Up button and menu tip.</summary>
-        public const string MoveSelectedUpTip = "Move selected up (Ctrl+Up)";
-
-        /// <summary>Rename List Move Selected Down button and menu tip.</summary>
-        public const string MoveSelectedDownTip = "Move selected down (Ctrl+Down)";
-
-        /// <summary>
-        /// Tooltip for the Rename List Auto-Sort toolbar toggle (MFR7 #AutoSort).
-        /// </summary>
-        public const string AutoSortTip = "Auto-Sort. Unpush to deactivate Auto-Sort.";
-
-        /// <summary>File List refresh button tip.</summary>
-        public const string RefreshTip = "Refresh (F5)";
-
-        /// <summary>Address bar tip for focusing the typed path.</summary>
-        public const string GoToAddressTip = "Go to folder (Ctrl+L)";
-
-        /// <summary>Up button tip. Backspace is File List–focused, not a window hotkey.</summary>
-        public const string GoUpTip = "Up (Backspace)";
-
-        /// <summary>Typed-path box tip.</summary>
-        public const string AddressEditTip = "Enter to go, Esc to cancel";
     }
 }

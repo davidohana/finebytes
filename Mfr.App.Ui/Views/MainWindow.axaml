@@ -9,7 +9,8 @@
   xmlns:filelistviews="using:Mfr.App.Ui.Views.FileList"
   xmlns:filterpaletteviews="using:Mfr.App.Ui.Views.FilterPalette"
   xmlns:renamelistviews="using:Mfr.App.Ui.Views.RenameList"
-  xmlns:shortcuts="using:Mfr.App.Ui.Input"
+  xmlns:input="using:Mfr.App.Ui.Input"
+  xmlns:resources="using:Mfr.App.Ui.Resources"
   mc:Ignorable="d"
   d:DesignWidth="1100"
   d:DesignHeight="720"
@@ -28,70 +29,70 @@
   </Design.DataContext>
 
   <Window.KeyBindings>
-    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.Go}" Command="{Binding GoCommand}" />
-    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.UndoLast}" Command="{Binding UndoLastCommand}" />
-    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowLog}" Command="{Binding ShowLogCommand}" />
-    <KeyBinding Gesture="{x:Static shortcuts:AppShortcuts.ShowOptions}" Command="{Binding ShowOptionsCommand}" />
+    <KeyBinding Gesture="{x:Static input:AppShortcuts.Go}" Command="{Binding GoCommand}" />
+    <KeyBinding Gesture="{x:Static input:AppShortcuts.UndoLast}" Command="{Binding UndoLastCommand}" />
+    <KeyBinding Gesture="{x:Static input:AppShortcuts.ShowLog}" Command="{Binding ShowLogCommand}" />
+    <KeyBinding Gesture="{x:Static input:AppShortcuts.ShowOptions}" Command="{Binding ShowOptionsCommand}" />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.Refresh}"
+      Gesture="{x:Static input:AppShortcuts.Refresh}"
       Command="{Binding FileListViewModel.RefreshCommand}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.GoToAddress}"
+      Gesture="{x:Static input:AppShortcuts.GoToAddress}"
       Command="{Binding FileListViewModel.BeginPathEditCommand}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.GoToAddressAlt}"
+      Gesture="{x:Static input:AppShortcuts.GoToAddressAlt}"
       Command="{Binding FileListViewModel.BeginPathEditCommand}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.ViewLargeIcons}"
+      Gesture="{x:Static input:AppShortcuts.ViewLargeIcons}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.LargeIcons}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.ViewSmallIcons}"
+      Gesture="{x:Static input:AppShortcuts.ViewSmallIcons}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.SmallIcons}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.ViewReport}"
+      Gesture="{x:Static input:AppShortcuts.ViewReport}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.Report}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.ViewList}"
+      Gesture="{x:Static input:AppShortcuts.ViewList}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.List}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.ViewTiles}"
+      Gesture="{x:Static input:AppShortcuts.ViewTiles}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.Tiles}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.ViewThumbnails}"
+      Gesture="{x:Static input:AppShortcuts.ViewThumbnails}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
       CommandParameter="{x:Static filelist:FileListViewMode.Thumbnails}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.AddSelected}"
+      Gesture="{x:Static input:AppShortcuts.AddSelected}"
       Command="{Binding RenameListViewModel.AddSelectedCommand}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.AddAll}"
+      Gesture="{x:Static input:AppShortcuts.AddAll}"
       Command="{Binding RenameListViewModel.AddAllCommand}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}"
+      Gesture="{x:Static input:AppShortcuts.RemoveSelected}"
       Command="{Binding RenameListViewModel.RemoveSelectedCommand}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.RemoveAllButSelected}"
+      Gesture="{x:Static input:AppShortcuts.RemoveAllButSelected}"
       Command="{Binding RenameListViewModel.RemoveAllButSelectedCommand}"
     />
     <KeyBinding
-      Gesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}"
+      Gesture="{x:Static input:AppShortcuts.ClearRenameList}"
       Command="{Binding RenameListViewModel.ClearCommand}"
     />
   </Window.KeyBindings>
@@ -99,27 +100,27 @@
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="_MFR">
-        <MenuItem Header="_GO" Command="{Binding GoCommand}" InputGesture="{x:Static shortcuts:AppShortcuts.Go}" />
+        <MenuItem Header="_GO" Command="{Binding GoCommand}" InputGesture="{x:Static input:AppShortcuts.Go}" />
         <MenuItem
           Header="_Undo Last"
           Command="{Binding UndoLastCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.UndoLast}"
+          InputGesture="{x:Static input:AppShortcuts.UndoLast}"
         />
         <MenuItem
           Header="_Log"
           Command="{Binding ShowLogCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.ShowLog}"
+          InputGesture="{x:Static input:AppShortcuts.ShowLog}"
         />
         <MenuItem
           Header="_Options"
           Command="{Binding ShowOptionsCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.ShowOptions}"
+          InputGesture="{x:Static input:AppShortcuts.ShowOptions}"
         />
         <Separator />
         <MenuItem
           Header="E_xit"
           Command="{Binding ExitCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.Exit}"
+          InputGesture="{x:Static input:AppShortcuts.Exit}"
         />
       </MenuItem>
       <MenuItem Header="_File List">
@@ -128,7 +129,7 @@
             Header="Large _Icons"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.LargeIcons}"
-            InputGesture="{x:Static shortcuts:AppShortcuts.ViewLargeIcons}"
+            InputGesture="{x:Static input:AppShortcuts.ViewLargeIcons}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsLargeIconsView, Mode=OneWay}"
           />
@@ -136,7 +137,7 @@
             Header="_Small Icons"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.SmallIcons}"
-            InputGesture="{x:Static shortcuts:AppShortcuts.ViewSmallIcons}"
+            InputGesture="{x:Static input:AppShortcuts.ViewSmallIcons}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsSmallIconsView, Mode=OneWay}"
           />
@@ -144,7 +145,7 @@
             Header="_Report"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.Report}"
-            InputGesture="{x:Static shortcuts:AppShortcuts.ViewReport}"
+            InputGesture="{x:Static input:AppShortcuts.ViewReport}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsReportView, Mode=OneWay}"
           />
@@ -152,7 +153,7 @@
             Header="_List"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.List}"
-            InputGesture="{x:Static shortcuts:AppShortcuts.ViewList}"
+            InputGesture="{x:Static input:AppShortcuts.ViewList}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsListView, Mode=OneWay}"
           />
@@ -160,7 +161,7 @@
             Header="_Tiles"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.Tiles}"
-            InputGesture="{x:Static shortcuts:AppShortcuts.ViewTiles}"
+            InputGesture="{x:Static input:AppShortcuts.ViewTiles}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsTilesView, Mode=OneWay}"
           />
@@ -168,7 +169,7 @@
             Header="Thumb_nails"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelist:FileListViewMode.Thumbnails}"
-            InputGesture="{x:Static shortcuts:AppShortcuts.ViewThumbnails}"
+            InputGesture="{x:Static input:AppShortcuts.ViewThumbnails}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsThumbnailsView, Mode=OneWay}"
           />
@@ -220,28 +221,28 @@
         <MenuItem
           Header="Zoom _In"
           Command="{Binding FileListViewModel.ZoomThumbnailsInCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.ZoomIn}"
+          InputGesture="{x:Static input:AppShortcuts.ZoomIn}"
         />
         <MenuItem
           Header="Zoom _Out"
           Command="{Binding FileListViewModel.ZoomThumbnailsOutCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.ZoomOut}"
+          InputGesture="{x:Static input:AppShortcuts.ZoomOut}"
         />
         <MenuItem
           Header="_Reset Size"
           Command="{Binding FileListViewModel.ResetThumbnailSizeCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.ResetZoom}"
+          InputGesture="{x:Static input:AppShortcuts.ResetZoom}"
         />
         <MenuItem
           Header="Go to _Address"
           Command="{Binding FileListViewModel.BeginPathEditCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.GoToAddress}"
+          InputGesture="{x:Static input:AppShortcuts.GoToAddress}"
         />
         <MenuItem Header="Go _Up" Command="{Binding FileListViewModel.GoUpCommand}" />
         <MenuItem
           Header="_Refresh"
           Command="{Binding FileListViewModel.RefreshCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.Refresh}"
+          InputGesture="{x:Static input:AppShortcuts.Refresh}"
         />
         <Separator />
         <MenuItem Header="Show Hidden/System Files" IsEnabled="False" />
@@ -250,42 +251,42 @@
         <MenuItem
           Header="Add Selected"
           Command="{Binding RenameListViewModel.AddSelectedCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.AddSelected}"
+          InputGesture="{x:Static input:AppShortcuts.AddSelected}"
         />
         <MenuItem
           Header="Add All"
           Command="{Binding RenameListViewModel.AddAllCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.AddAll}"
+          InputGesture="{x:Static input:AppShortcuts.AddAll}"
         />
         <MenuItem
           Header="Remove"
           Command="{Binding RenameListViewModel.RemoveSelectedCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.RemoveSelected}"
+          InputGesture="{x:Static input:AppShortcuts.RemoveSelected}"
         />
         <MenuItem
           Header="Remove All But Selected"
           Command="{Binding RenameListViewModel.RemoveAllButSelectedCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.RemoveAllButSelected}"
+          InputGesture="{x:Static input:AppShortcuts.RemoveAllButSelected}"
         />
         <MenuItem
           Header="Clear"
           Command="{Binding RenameListViewModel.ClearCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.ClearRenameList}"
+          InputGesture="{x:Static input:AppShortcuts.ClearRenameList}"
         />
         <MenuItem
           Header="Locate in File List"
           Command="{Binding RenameListViewModel.LocateInFileListCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.LocateInFileList}"
+          InputGesture="{x:Static input:AppShortcuts.LocateInFileList}"
         />
         <MenuItem
           Header="Move Selected Up"
           Command="{Binding RenameListViewModel.MoveSelectedUpCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.MoveSelectedUp}"
+          InputGesture="{x:Static input:AppShortcuts.MoveSelectedUp}"
         />
         <MenuItem
           Header="Move Selected Down"
           Command="{Binding RenameListViewModel.MoveSelectedDownCommand}"
-          InputGesture="{x:Static shortcuts:AppShortcuts.MoveSelectedDown}"
+          InputGesture="{x:Static input:AppShortcuts.MoveSelectedDown}"
         />
         <Separator />
         <MenuItem
@@ -294,7 +295,7 @@
           IsChecked="{Binding RenameListViewModel.IsAutoSort, Mode=OneWay}"
         />
         <MenuItem Header="Auto-Preview" IsEnabled="False" />
-        <MenuItem Header="Refresh" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.Refresh}" />
+        <MenuItem Header="Refresh" IsEnabled="False" InputGesture="{x:Static input:AppShortcuts.Refresh}" />
       </MenuItem>
       <MenuItem Header="F_ilters">
         <MenuItem Header="Presets" IsEnabled="False" />
@@ -312,22 +313,22 @@
           Content="GO ▶"
           Command="{Binding GoCommand}"
           MinWidth="72"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.GoTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.Go}"
         />
         <Button
           Content="Undo"
           Command="{Binding UndoLastCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.UndoLastTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.UndoLast}"
         />
         <Button
           Content="Log"
           Command="{Binding ShowLogCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.ShowLogTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.ShowLog}"
         />
         <Button
           Content="Options"
           Command="{Binding ShowOptionsCommand}"
-          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.ShowOptionsTip}"
+          ToolTip.Tip="{x:Static resources:AppTips.ShowOptions}"
         />
       </StackPanel>
     </Border>

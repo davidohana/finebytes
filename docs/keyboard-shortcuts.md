@@ -2,7 +2,7 @@
 
 Keys below use **Ctrl** on Windows and Linux. macOS Command equivalents are not wired yet.
 
-Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items show the same shortcuts on the right; toolbar and address-bar buttons include them in tooltips.
+Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items show the same shortcuts on the right; toolbar and address-bar tooltip copy lives in `Mfr.App.Ui/Resources/AppTips.cs`.
 
 ## Working now
 
