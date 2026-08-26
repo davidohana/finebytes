@@ -1066,7 +1066,7 @@ namespace Mfr.Tests.Ui
 
         private FileListViewModel _CreateFileListViewModel(string path)
         {
-            var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path);
+            var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path, NullFileShellOpener.Instance);
             _fileListViewModels.Add(fileListViewModel);
             return fileListViewModel;
         }
@@ -1143,7 +1143,7 @@ namespace Mfr.Tests.Ui
 
             try
             {
-                var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, parent);
+                var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, parent, NullFileShellOpener.Instance);
                 var renameListViewModel = new RenameListViewModel(fileListViewModel);
                 var deniedEntry = fileListViewModel.Entries.Single(entry => entry.IsDirectory);
                 fileListViewModel.SetSelectedEntries([deniedEntry]);

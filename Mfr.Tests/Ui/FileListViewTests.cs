@@ -41,7 +41,7 @@ namespace Mfr.Tests.Ui
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, "a.txt"), "x");
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
@@ -92,7 +92,7 @@ namespace Mfr.Tests.Ui
             File.WriteAllText(Path.Combine(dir, longName), "x");
             File.WriteAllText(Path.Combine(dir, "short.txt"), "y");
 
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
             viewModel.SetViewMode(FileListViewMode.Tiles);
 
@@ -136,7 +136,7 @@ namespace Mfr.Tests.Ui
             Directory.CreateDirectory(Path.Combine(dir, "Downloads"));
             Directory.CreateDirectory(Path.Combine(dir, "Documents"));
 
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
             viewModel.SetViewMode(FileListViewMode.LargeIcons);
 
@@ -247,7 +247,7 @@ namespace Mfr.Tests.Ui
             File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
             File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
 
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
             viewModel.SetViewMode(FileListViewMode.List);
 
@@ -287,7 +287,7 @@ namespace Mfr.Tests.Ui
             File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
             File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
 
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
             Assert.True(viewModel.IsReportView);
 
@@ -506,7 +506,11 @@ namespace Mfr.Tests.Ui
         [AvaloniaFact]
         public void Mask_Combo_Keeps_Text_After_Commit()
         {
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, _CreateSampleDir());
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance
+            );
             _viewModels.Add(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
@@ -551,7 +555,7 @@ namespace Mfr.Tests.Ui
         public void Thumbnails_View_Syncs_Multi_Select_From_ViewModel()
         {
             var dir = _CreateSampleDir();
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
             viewModel.SetViewMode(FileListViewMode.Thumbnails);
 
@@ -590,7 +594,11 @@ namespace Mfr.Tests.Ui
 
         private (FileListViewModel ViewModel, DataGrid Grid, Window Window) _ShowReportGrid()
         {
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, _CreateSampleDir());
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance
+            );
             _viewModels.Add(viewModel);
             Assert.True(viewModel.IsReportView);
 
@@ -612,7 +620,11 @@ namespace Mfr.Tests.Ui
 
         private (FileListViewModel ViewModel, FileListView View, Window Window) _ShowListView()
         {
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, _CreateSampleDir());
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance
+            );
             _viewModels.Add(viewModel);
             viewModel.SetViewMode(FileListViewMode.List);
 
@@ -630,7 +642,11 @@ namespace Mfr.Tests.Ui
 
         private (FileListViewModel ViewModel, FileListView View, Window Window) _ShowTilesView()
         {
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, _CreateSampleDir());
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance
+            );
             _viewModels.Add(viewModel);
             viewModel.SetViewMode(FileListViewMode.Tiles);
 
@@ -757,7 +773,7 @@ namespace Mfr.Tests.Ui
                 Directory.CreateDirectory(Path.Combine(dir, $"folder{i:D3}"));
             }
 
-            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir);
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
             viewModel.SetViewMode(FileListViewMode.Thumbnails);
             return viewModel;

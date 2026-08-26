@@ -175,7 +175,7 @@ namespace Mfr.Tests.Ui
 
         private FileListViewModel _CreateFileListViewModel(string path)
         {
-            var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path);
+            var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path, NullFileShellOpener.Instance);
             _fileListViewModels.Add(fileListViewModel);
             return fileListViewModel;
         }

@@ -845,7 +845,7 @@ namespace Mfr.Tests.Ui
         public void Thumbnails_View_Requests_Jumbo_Shell_Icons()
         {
             var provider = new RecordingIconProvider();
-            var viewModel = new FileListViewModel(provider, _CreateTree());
+            var viewModel = new FileListViewModel(provider, _CreateTree(), NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
 
             provider.RequestedSizes.Clear();
