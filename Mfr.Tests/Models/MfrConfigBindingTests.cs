@@ -22,12 +22,18 @@ namespace Mfr.Tests.Models
                 var hasInt = field.GetCustomAttribute<ConfigIntRangeAttribute>() is not null;
                 var hasStr = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>() is not null;
                 var isBoolLeaf = field.FieldType == typeof(bool);
-                var n = (hasSection ? 1 : 0) + (hasInt ? 1 : 0) + (hasStr ? 1 : 0) + (isBoolLeaf ? 1 : 0);
+                var isEnumLeaf = field.FieldType.IsEnum;
+                var n =
+                    (hasSection ? 1 : 0)
+                    + (hasInt ? 1 : 0)
+                    + (hasStr ? 1 : 0)
+                    + (isBoolLeaf ? 1 : 0)
+                    + (isEnumLeaf ? 1 : 0);
                 Assert.True(
                     n == 1,
                     $"{configType.Name}.{field.Name} must be a [{nameof(ConfigSectionAttribute)}] section, "
                         + $"a [{nameof(ConfigIntRangeAttribute)}] / [{nameof(ConfigStringMaxLengthAttribute)}] leaf, "
-                        + $"or an unannotated bool leaf."
+                        + $"or an unannotated bool / enum leaf."
                 );
             }
         }
