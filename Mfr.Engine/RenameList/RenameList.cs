@@ -381,35 +381,19 @@ namespace Mfr.Engine.RenameList
             ArgumentNullException.ThrowIfNull(items);
 
             var selected = items.ToHashSet();
-            if (selected.Count == 0 || _renameItems.Count == 0)
+            var dropOnSelection = beforeItem is not null && selected.Contains(beforeItem);
+            if (selected.Count == 0 || dropOnSelection)
             {
                 return false;
             }
 
-            if (beforeItem is not null && selected.Contains(beforeItem))
-            {
-                return false;
-            }
-
-            var toMove = new List<RenameItem>(selected.Count);
-            foreach (var item in _renameItems)
-            {
-                if (selected.Contains(item))
-                {
-                    toMove.Add(item);
-                }
-            }
-
+            var toMove = _renameItems.Where(selected.Contains).ToList();
             if (toMove.Count == 0)
             {
                 return false;
             }
 
-            foreach (var item in toMove)
-            {
-                _renameItems.Remove(item);
-            }
-
+            _renameItems.RemoveAll(selected.Contains);
             var insertAt = beforeItem is null ? _renameItems.Count : _renameItems.IndexOf(beforeItem);
             if (insertAt < 0)
             {

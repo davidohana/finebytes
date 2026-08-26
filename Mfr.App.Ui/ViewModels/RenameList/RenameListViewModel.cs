@@ -8,7 +8,6 @@ using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Engine.RenameList;
 using Mfr.Models.Config;
-using Mfr.Models.Rename;
 using Serilog;
 using EngineRenameList = Mfr.Engine.RenameList.RenameList;
 
@@ -300,75 +299,38 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Reorders dragged rows to insert before the drop mark (or appends when unset).
+        /// Reorders the selection to insert before the drop mark (or appends when unset).
         /// </summary>
-        /// <param name="entries">Rows being dragged; must still be in <see cref="Entries"/>.</param>
         /// <returns><see langword="true"/> when the list order changed.</returns>
         /// <remarks>
         /// <para>
-        /// Dropping onto a selected/marked row that is part of the drag is a no-op (MFR7). Clears the
+        /// Dropping onto a marked row that is part of the selection is a no-op (MFR7). Clears the
         /// drop mark afterward. Auto-Sort cancel lands in Phase 4e.
         /// </para>
         /// </remarks>
-        public bool ReorderEntriesToDropMark(IReadOnlyList<RenameListEntry> entries)
+        public bool ReorderSelectedToDropMark()
         {
-            ArgumentNullException.ThrowIfNull(entries);
-
-            if (IsAdding || entries.Count == 0)
+            try
             {
-                SetDropMarkIndex(null);
-                return false;
-            }
-
-            var entrySet = Entries.ToHashSet();
-            var toMove = new List<RenameListEntry>(entries.Count);
-            foreach (var entry in entries)
-            {
-                if (entrySet.Contains(entry))
+                if (IsAdding || _selectedEntries.Count == 0)
                 {
-                    toMove.Add(entry);
-                }
-            }
-
-            if (toMove.Count == 0)
-            {
-                SetDropMarkIndex(null);
-                return false;
-            }
-
-            RenameItem? beforeItem = null;
-            if (DropMarkIndex is { } markIndex)
-            {
-                if (markIndex < 0 || markIndex >= Entries.Count)
-                {
-                    SetDropMarkIndex(null);
                     return false;
                 }
 
-                var markedEntry = Entries[markIndex];
-                var movingSet = toMove.ToHashSet();
-                if (movingSet.Contains(markedEntry))
+                var beforeItem = DropMarkIndex is { } markIndex ? Entries[markIndex].EngineItem : null;
+                var engineItems = _selectedEntries.Select(entry => entry.EngineItem);
+                if (!_renameList.MoveSelectedBefore(engineItems, beforeItem: beforeItem))
                 {
-                    SetDropMarkIndex(null);
                     return false;
                 }
 
-                beforeItem = markedEntry.EngineItem;
+                _SyncEntriesToEngineOrder();
+                return true;
             }
-
-            if (!_renameList.MoveSelectedBefore(toMove.Select(entry => entry.EngineItem), beforeItem: beforeItem))
+            finally
             {
                 SetDropMarkIndex(null);
-                return false;
             }
-
-            var engineItemToEntry = Entries.ToDictionary(entry => entry.EngineItem);
-            Entries.ReplaceAll(_renameList.RenameItems.Select(item => engineItemToEntry[item]));
-
-            var movedSet = toMove.ToHashSet();
-            SetSelectedEntries([.. Entries.Where(movedSet.Contains)]);
-            SetDropMarkIndex(null);
-            return true;
         }
 
         /// <summary>
@@ -387,7 +349,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            // DataGrid ignores Move; ReplaceAll raises Reset so the grid refreshes.
+            _SyncEntriesToEngineOrder();
+        }
+
+        /// <summary>
+        /// Rebuilds <see cref="Entries"/> to match engine order.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// DataGrid ignores Move; ReplaceAll raises Reset so the grid refreshes.
+        /// </para>
+        /// </remarks>
+        private void _SyncEntriesToEngineOrder()
+        {
             var engineItemToEntry = Entries.ToDictionary(entry => entry.EngineItem);
             Entries.ReplaceAll(_renameList.RenameItems.Select(item => engineItemToEntry[item]));
             SetSelectedEntries([.. _selectedEntries]);

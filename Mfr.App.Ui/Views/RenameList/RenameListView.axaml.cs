@@ -36,8 +36,6 @@ namespace Mfr.App.Ui.Views.RenameList
         private PointerEventArgs? _dragStartArgs;
         private RenameListEntry? _dragHitEntry;
         private IReadOnlyList<RenameListEntry>? _dragSelectionSnapshot;
-        private IReadOnlyList<RenameListEntry>? _dragEntries;
-        private bool _isDragPending;
 
         /// <summary>
         /// Initializes the Rename List pane.
@@ -190,12 +188,11 @@ namespace Mfr.App.Ui.Views.RenameList
             _dragHitEntry = hit;
             _dragStartPoint = e.GetPosition(this);
             _dragStartArgs = e;
-            _isDragPending = true;
         }
 
         private async void _OnGridPointerMoved(object? sender, PointerEventArgs e)
         {
-            if (!_isDragPending || _dragStartPoint is null || _dragStartArgs is null || _viewModel is null)
+            if (_dragStartArgs is null || _dragStartPoint is null || _viewModel is null)
             {
                 return;
             }
@@ -207,8 +204,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var delta = e.GetPosition(this) - _dragStartPoint.Value;
-            var movedFarEnough = Math.Abs(delta.X) >= DragThreshold || Math.Abs(delta.Y) >= DragThreshold;
-            if (!movedFarEnough)
+            if (Math.Abs(delta.X) < DragThreshold && Math.Abs(delta.Y) < DragThreshold)
             {
                 return;
             }
@@ -218,15 +214,13 @@ namespace Mfr.App.Ui.Views.RenameList
                 _ApplySelectionForDrag(_dragSelectionSnapshot);
             }
 
-            var dragEntries = _ResolveDragEntries();
             var dragArgs = _dragStartArgs;
             _ClearDragState();
-            if (dragEntries.Count == 0)
+            if (_viewModel.SelectedEntries.Count == 0)
             {
                 return;
             }
 
-            _dragEntries = dragEntries;
             var dataTransfer = new DataTransfer();
             dataTransfer.Add(DataTransferItem.Create(InternalReorderFormat, "1"));
             try
@@ -235,14 +229,13 @@ namespace Mfr.App.Ui.Views.RenameList
             }
             finally
             {
-                _dragEntries = null;
                 _ClearDropMark();
             }
         }
 
         private void _OnGridPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
-            if (_isDragPending && _dragSelectionSnapshot is { Count: > 0 } && _dragHitEntry is not null)
+            if (_dragSelectionSnapshot is { Count: > 0 } && _dragHitEntry is not null)
             {
                 _ApplySelectionForDrag([_dragHitEntry]);
             }
@@ -275,24 +268,8 @@ namespace Mfr.App.Ui.Views.RenameList
             _SyncSelectionToGrid();
         }
 
-        private IReadOnlyList<RenameListEntry> _ResolveDragEntries()
-        {
-            if (_viewModel is null || _dragHitEntry is null)
-            {
-                return [];
-            }
-
-            if (_viewModel.SelectedEntries.Contains(_dragHitEntry))
-            {
-                return [.. _viewModel.SelectedEntries];
-            }
-
-            return [_dragHitEntry];
-        }
-
         private void _ClearDragState()
         {
-            _isDragPending = false;
             _dragStartPoint = null;
             _dragStartArgs = null;
             _dragHitEntry = null;
@@ -352,30 +329,18 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             e.Handled = true;
 
-            if (_viewModel is null || _viewModel.IsAdding)
+            var isReorder = _IsInternalReorder(e);
+            var canAccept = isReorder || _CanAcceptFileDrop(e);
+            if (_viewModel is null || _viewModel.IsAdding || !canAccept)
             {
                 e.DragEffects = DragDropEffects.None;
                 _ClearDropMark();
-                return;
-            }
-
-            if (_IsInternalReorder(e))
-            {
-                _UpdateDropMarkFromPointer(e);
-                e.DragEffects = DragDropEffects.Move;
                 return;
             }
 
             // Match MFR7: Alt while dragging external files over Rename List clears it immediately.
-            // Only file payloads (File List / Explorer); internal reorder would not clear.
-            if (!_CanAcceptFileDrop(e))
-            {
-                e.DragEffects = DragDropEffects.None;
-                _ClearDropMark();
-                return;
-            }
-
-            if (e.KeyModifiers.HasFlag(KeyModifiers.Alt))
+            // File payloads only (File List / Explorer); internal reorder does not clear.
+            if (!isReorder && e.KeyModifiers.HasFlag(KeyModifiers.Alt))
             {
                 _viewModel.Clear();
                 _ClearDropMark();
@@ -384,7 +349,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _UpdateDropMarkFromPointer(e);
-            e.DragEffects = DragDropEffects.Copy;
+            e.DragEffects = isReorder ? DragDropEffects.Move : DragDropEffects.Copy;
         }
 
         private void _OnDragLeave(object? sender, DragEventArgs e)
@@ -405,9 +370,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (_IsInternalReorder(e))
             {
-                var dragged = _dragEntries is { Count: > 0 } ? _dragEntries : _viewModel.SelectedEntries;
-                _ = _viewModel.ReorderEntriesToDropMark(dragged);
-                _ApplyDropMarkVisuals();
+                _ = _viewModel.ReorderSelectedToDropMark();
                 return;
             }
 
@@ -529,7 +492,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             // Undo Avalonia's press collapse before paint so a multi-select drag has no flicker.
-            if (_isDragPending && _dragSelectionSnapshot is { Count: > 0 } snapshot)
+            if (_dragSelectionSnapshot is { Count: > 0 } snapshot)
             {
                 _ApplySelectionForDrag(snapshot);
                 return;
