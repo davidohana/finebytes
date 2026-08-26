@@ -259,7 +259,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies DragLeave clears the drop mark.
+        /// Verifies DragLeave clears the drop mark when the pointer left the pane.
         /// </summary>
         [AvaloniaFact]
         public async Task DragLeave_Clears_DropMark()
@@ -290,6 +290,42 @@ namespace Mfr.Tests.Ui
                 new DragEventArgs(DragDrop.DragLeaveEvent, dataTransfer, view, new Point(-1, -1), KeyModifiers.None)
             );
             Assert.Null(renameListViewModel.DropMarkIndex);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies DragLeave while still inside the pane keeps the drop mark (no nested-child flicker).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragLeave_Inside_Pane_Keeps_DropMark()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var dragPath = Path.Combine(dir, "drag.txt");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(dragPath, "d");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+
+            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[0]);
+            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+            Assert.Equal(0, renameListViewModel.DropMarkIndex);
+
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragLeaveEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+            Assert.Equal(0, renameListViewModel.DropMarkIndex);
 
             window.Close();
         }

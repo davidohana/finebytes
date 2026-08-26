@@ -355,6 +355,15 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _OnDragLeave(object? sender, DragEventArgs e)
         {
             e.Handled = true;
+
+            // Avalonia raises DragLeave when crossing child visuals; only clear when the pointer
+            // actually left this control.
+            var position = e.GetPosition(this);
+            if (new Rect(Bounds.Size).Contains(position))
+            {
+                return;
+            }
+
             _ClearDropMark();
         }
 
@@ -402,14 +411,14 @@ namespace Mfr.App.Ui.Views.RenameList
             var row = _HitTestDataGridRow(e);
             if (row is null)
             {
-                _ClearDropMark();
+                // Keep the last mark when the pointer is briefly between cells / over gaps so the
+                // salmon highlight does not flicker during DragOver.
                 return;
             }
 
             var index = row.Index;
             if (index < 0 || index >= _viewModel.Entries.Count)
             {
-                _ClearDropMark();
                 return;
             }
 
@@ -419,12 +428,21 @@ namespace Mfr.App.Ui.Views.RenameList
         private DataGridRow? _HitTestDataGridRow(DragEventArgs e)
         {
             var position = e.GetPosition(RenameGrid);
-            if (RenameGrid.InputHitTest(position) is not Control hit)
+            foreach (var row in RenameGrid.GetVisualDescendants().OfType<DataGridRow>())
             {
-                return null;
+                var origin = row.TranslatePoint(default, RenameGrid);
+                if (origin is null)
+                {
+                    continue;
+                }
+
+                if (new Rect(origin.Value, row.Bounds.Size).Contains(position))
+                {
+                    return row;
+                }
             }
 
-            return DataGridRow.GetRowContainingElement(hit);
+            return null;
         }
 
         private void _ClearDropMark()
