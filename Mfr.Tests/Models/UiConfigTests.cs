@@ -11,7 +11,6 @@ namespace Mfr.Tests.Models
             var ui = new UiConfig();
             Assert.Equal(RenameListAddMode.Files, ui.AddMode);
             Assert.True(ui.AddFolderContents);
-            Assert.Equal(RenameListSortKey.Default, ui.RenameListSortFields);
         }
 
         [Fact]
@@ -23,7 +22,6 @@ namespace Mfr.Tests.Models
 
             Assert.Equal(RenameListAddMode.Files, ConfigStore.Config.Ui.AddMode);
             Assert.True(ConfigStore.Config.Ui.AddFolderContents);
-            Assert.Equal(RenameListSortKey.Default, ConfigStore.Config.Ui.RenameListSortFields);
         }
 
         [Fact]
@@ -37,8 +35,7 @@ namespace Mfr.Tests.Models
                 {
                   "ui": {
                     "addMode": "folders",
-                    "addFolderContents": "false",
-                    "renameListSortFields": "fullFileName:desc"
+                    "addFolderContents": "false"
                   }
                 }
                 """
@@ -47,7 +44,6 @@ namespace Mfr.Tests.Models
 
             Assert.Equal(RenameListAddMode.Folders, ConfigStore.Config.Ui.AddMode);
             Assert.False(ConfigStore.Config.Ui.AddFolderContents);
-            Assert.Equal("fullFileName:desc", ConfigStore.Config.Ui.RenameListSortFields);
         }
 
         [Fact]
@@ -57,35 +53,10 @@ namespace Mfr.Tests.Models
             File.WriteAllText(configPath, """{}""");
             ConfigStore.Load(configPath);
 
-            ConfigStore.ApplyCliOverrides([
-                "ui.addMode=filesAndFolders",
-                "ui.addFolderContents=false",
-                "ui.renameListSortFields=parentFolder",
-            ]);
+            ConfigStore.ApplyCliOverrides(["ui.addMode=filesAndFolders", "ui.addFolderContents=false"]);
 
             Assert.Equal(RenameListAddMode.FilesAndFolders, ConfigStore.Config.Ui.AddMode);
             Assert.False(ConfigStore.Config.Ui.AddFolderContents);
-            Assert.Equal("parentFolder", ConfigStore.Config.Ui.RenameListSortFields);
-        }
-
-        [Fact]
-        public void SortKey_parses_default_and_desc()
-        {
-            var keys = RenameListSortKey.Parse(RenameListSortKey.Default);
-            Assert.Equal(
-                [
-                    new RenameListSortKey(RenameListSortColumn.FileFolder),
-                    new RenameListSortKey(RenameListSortColumn.FullPath),
-                ],
-                keys
-            );
-
-            Assert.Equal(
-                [new RenameListSortKey(RenameListSortColumn.ParentFolder, Descending: true)],
-                RenameListSortKey.Parse("parentFolder:desc")
-            );
-            Assert.Empty(RenameListSortKey.Parse(string.Empty));
-            Assert.Equal("FileFolder,FullPath", RenameListSortKey.Format(keys));
         }
     }
 }

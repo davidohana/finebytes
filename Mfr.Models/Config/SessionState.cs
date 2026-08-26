@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
+using Mfr.Models.Rename;
 
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Persisted UI session state (window geometry, pane splitters, and last File List folder).
+    /// Persisted UI session state (window geometry, pane splitters, last File List folder, and Rename List Auto-Sort).
     /// <para>Stored in <c>session.json</c> under the same AppData root as <c>config.json</c>.</para>
     /// </summary>
     public sealed class SessionState
@@ -55,6 +56,17 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("maskSuggestions")]
         public List<string>? MaskSuggestions { get; set; }
+
+        /// <summary>
+        /// Last Rename List Auto-Sort keys. Empty disables Auto-Sort (MFR7).
+        /// <para>
+        /// Comma-separated <c>Column</c> or <c>Column:desc</c> tokens
+        /// (<c>FileFolder</c>, <c>ParentFolder</c>, <c>FullFileName</c>, <c>FullPath</c>).
+        /// Null means unset (first launch uses <see cref="RenameListSortKey.Default"/>).
+        /// </para>
+        /// </summary>
+        [JsonPropertyName("renameListSortFields")]
+        public string? RenameListSortFields { get; set; }
     }
 
     /// <summary>

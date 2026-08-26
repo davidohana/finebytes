@@ -35,7 +35,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;
             AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
-            _sortKeys = [.. RenameListSortKey.Parse(ConfigStore.Config.Ui.RenameListSortFields)];
         }
 
         /// <summary>
@@ -652,10 +651,30 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
         }
 
+        /// <summary>
+        /// Restores Auto-Sort keys from a session value.
+        /// </summary>
+        /// <param name="encodedSortFields">
+        /// Encoded keys, empty to disable Auto-Sort, or <see langword="null"/> for the MFR7 default.
+        /// </param>
+        internal void ApplySession(string? encodedSortFields)
+        {
+            var encoded = encodedSortFields ?? RenameListSortKey.Default;
+            _SetSortKeys(RenameListSortKey.Parse(encoded), resort: true);
+        }
+
+        /// <summary>
+        /// Captures the current Auto-Sort keys for session save.
+        /// </summary>
+        /// <returns>Encoded keys, or empty when Auto-Sort is off.</returns>
+        internal string CaptureSortFields()
+        {
+            return RenameListSortKey.Format(_sortKeys);
+        }
+
         private void _SetSortKeys(IReadOnlyList<RenameListSortKey> keys, bool resort)
         {
             _sortKeys = [.. keys];
-            ConfigStore.Config.Ui.RenameListSortFields = RenameListSortKey.Format(_sortKeys);
             OnPropertyChanged(nameof(IsAutoSort));
             OnPropertyChanged(nameof(SortKeys));
             SetDropMarkIndex(null);

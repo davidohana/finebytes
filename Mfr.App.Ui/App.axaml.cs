@@ -37,6 +37,7 @@ namespace Mfr.App.Ui
                 if (mainWindow.DataContext is MainWindowViewModel viewModel)
                 {
                     viewModel.FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
+                    viewModel.RenameListViewModel.ApplySession(session.RenameListSortFields);
                 }
 
                 desktop.MainWindow = mainWindow;

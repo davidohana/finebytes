@@ -22,8 +22,6 @@ namespace Mfr.Tests.Ui
             _originalUiConfig = _CloneUiConfig(ConfigStore.Config.Ui);
             ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
             ConfigStore.Config.Ui.AddFolderContents = true;
-            // Manual order for existing insert/move tests; Auto-Sort cases set fields explicitly.
-            ConfigStore.Config.Ui.RenameListSortFields = string.Empty;
         }
 
         /// <inheritdoc />
@@ -33,7 +31,6 @@ namespace Mfr.Tests.Ui
             ConfigStore.Config.Ui.AddFolderContents = _originalUiConfig.AddFolderContents;
             ConfigStore.Config.Ui.RememberWindowState = _originalUiConfig.RememberWindowState;
             ConfigStore.Config.Ui.RememberLastFolder = _originalUiConfig.RememberLastFolder;
-            ConfigStore.Config.Ui.RenameListSortFields = _originalUiConfig.RenameListSortFields;
 
             foreach (var fileListViewModel in _fileListViewModels)
             {
@@ -982,7 +979,7 @@ namespace Mfr.Tests.Ui
 
             Assert.True(renameListViewModel.IsAutoSort);
             Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Equal("FullFileName", ConfigStore.Config.Ui.RenameListSortFields);
+            Assert.Equal("FullFileName", RenameListSortKey.Format(renameListViewModel.SortKeys));
         }
 
         /// <summary>
@@ -1006,7 +1003,7 @@ namespace Mfr.Tests.Ui
             renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
 
             Assert.Equal(["gamma.log", "beta.md", "alpha.txt"], _PreviewNames(renameListViewModel));
-            Assert.Equal("FullFileName:desc", ConfigStore.Config.Ui.RenameListSortFields);
+            Assert.Equal("FullFileName:desc", RenameListSortKey.Format(renameListViewModel.SortKeys));
         }
 
         /// <summary>
@@ -1016,9 +1013,9 @@ namespace Mfr.Tests.Ui
         public async Task AutoSort_Add_Appends_And_Resorts_Ignoring_Selection()
         {
             var dir = _CreateThreeFileFolder();
-            ConfigStore.Config.Ui.RenameListSortFields = "fullFileName";
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            renameListViewModel.ApplySession("fullFileName");
             Assert.True(renameListViewModel.IsAutoSort);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "gamma.log"), _FileEntry(dir, "alpha.txt")]);
@@ -1039,9 +1036,9 @@ namespace Mfr.Tests.Ui
         public async Task MoveSelected_Cancels_AutoSort()
         {
             var dir = _CreateThreeFileFolder();
-            ConfigStore.Config.Ui.RenameListSortFields = "fullFileName";
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            renameListViewModel.ApplySession("fullFileName");
 
             fileListViewModel.SetSelectedEntries([
                 _FileEntry(dir, "alpha.txt"),
@@ -1055,7 +1052,7 @@ namespace Mfr.Tests.Ui
             renameListViewModel.MoveSelectedUpCommand.Execute(null);
 
             Assert.False(renameListViewModel.IsAutoSort);
-            Assert.Equal(string.Empty, ConfigStore.Config.Ui.RenameListSortFields);
+            Assert.Equal(string.Empty, RenameListSortKey.Format(renameListViewModel.SortKeys));
             Assert.Equal(["alpha.txt", "gamma.log", "beta.md"], _PreviewNames(renameListViewModel));
         }
 
@@ -1073,11 +1070,50 @@ namespace Mfr.Tests.Ui
             renameListViewModel.ToggleAutoSortCommand.Execute(null);
 
             Assert.True(renameListViewModel.IsAutoSort);
-            Assert.Equal(RenameListSortKey.Default, ConfigStore.Config.Ui.RenameListSortFields);
+            Assert.Equal(RenameListSortKey.Default, RenameListSortKey.Format(renameListViewModel.SortKeys));
 
             renameListViewModel.ToggleAutoSortCommand.Execute(null);
             Assert.False(renameListViewModel.IsAutoSort);
-            Assert.Equal(string.Empty, ConfigStore.Config.Ui.RenameListSortFields);
+            Assert.Equal(string.Empty, RenameListSortKey.Format(renameListViewModel.SortKeys));
+        }
+
+        /// <summary>
+        /// Verifies a missing session value restores the MFR7 default Auto-Sort keys.
+        /// </summary>
+        [Fact]
+        public void ApplySession_Null_Uses_Default()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            Assert.False(renameListViewModel.IsAutoSort);
+
+            renameListViewModel.ApplySession(null);
+
+            Assert.True(renameListViewModel.IsAutoSort);
+            Assert.Equal(RenameListSortKey.Default, renameListViewModel.CaptureSortFields());
+        }
+
+        /// <summary>
+        /// Verifies an empty session value disables Auto-Sort and round-trips through capture.
+        /// </summary>
+        [Fact]
+        public void ApplySession_Empty_Disables_And_Capture_RoundTrips()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            renameListViewModel.ApplySession("FullFileName:desc");
+            Assert.Equal("FullFileName:desc", renameListViewModel.CaptureSortFields());
+
+            renameListViewModel.ApplySession(string.Empty);
+
+            Assert.False(renameListViewModel.IsAutoSort);
+            Assert.Equal(string.Empty, renameListViewModel.CaptureSortFields());
+
+            var restored = new RenameListViewModel(_CreateFileListViewModel(dir));
+            restored.ApplySession(renameListViewModel.CaptureSortFields());
+            Assert.False(restored.IsAutoSort);
         }
 
         /// <summary>
@@ -1087,9 +1123,9 @@ namespace Mfr.Tests.Ui
         public async Task AutoSort_Ignores_DropMark()
         {
             var dir = _CreateThreeFileFolder();
-            ConfigStore.Config.Ui.RenameListSortFields = "fullFileName";
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            renameListViewModel.ApplySession("fullFileName");
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
@@ -1266,7 +1302,6 @@ namespace Mfr.Tests.Ui
                 AddFolderContents = source.AddFolderContents,
                 RememberWindowState = source.RememberWindowState,
                 RememberLastFolder = source.RememberLastFolder,
-                RenameListSortFields = source.RenameListSortFields,
             };
         }
 

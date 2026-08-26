@@ -16,8 +16,8 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="window">Main window to configure.</param>
         /// <param name="session">Loaded session document.</param>
         /// <remarks>
-        /// File List mask fields are restored separately via
-        /// <see cref="FileListSessionSnapshot.FromSessionState"/> and the File List view model.
+        /// File List mask fields and Rename List Auto-Sort are restored separately via
+        /// <see cref="FileListSessionSnapshot.FromSessionState"/> / <c>ApplySession</c>.
         /// </remarks>
         public static void TryRestore(MainWindow window, SessionState session)
         {
@@ -38,25 +38,27 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Updates <c>session.json</c> for enabled remember flags; leaves disabled fields unchanged.
+        /// Updates <c>session.json</c>: window/folder when their remember flags are on; masks and Auto-Sort always.
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
         /// <param name="fileListSnapshot">
         /// File List mask and folder fields to persist, or <see langword="null"/> when unavailable.
         /// </param>
-        public static void SaveOnClose(MainWindow window, FileListSessionSnapshot? fileListSnapshot)
+        /// <param name="renameListSortFields">
+        /// Encoded Rename List Auto-Sort keys, or <see langword="null"/> to leave the saved value unchanged.
+        /// </param>
+        public static void SaveOnClose(
+            MainWindow window,
+            FileListSessionSnapshot? fileListSnapshot,
+            string? renameListSortFields = null
+        )
         {
             ArgumentNullException.ThrowIfNull(window);
-
-            var ui = ConfigStore.Config.Ui;
-            if (!ui.RememberWindowState && !ui.RememberLastFolder)
-            {
-                return;
-            }
 
             try
             {
                 var session = SessionStore.Load();
+                var ui = ConfigStore.Config.Ui;
 
                 if (ui.RememberWindowState)
                 {
@@ -79,6 +81,11 @@ namespace Mfr.App.Ui.Services.Session
                     session.MaskSuggestions = fileListSnapshot.MaskSuggestions is null
                         ? null
                         : [.. fileListSnapshot.MaskSuggestions];
+                }
+
+                if (renameListSortFields is not null)
+                {
+                    session.RenameListSortFields = renameListSortFields;
                 }
 
                 SessionStore.Save(session);

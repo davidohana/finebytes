@@ -14,6 +14,7 @@ namespace Mfr.Tests.Models
             Assert.Null(session.LastOpenedDirectory);
             Assert.Null(session.Window);
             Assert.Null(session.Splitters);
+            Assert.Null(session.RenameListSortFields);
         }
 
         [Fact]
@@ -27,6 +28,7 @@ namespace Mfr.Tests.Models
                 Assert.Null(session.LastOpenedDirectory);
                 Assert.Null(session.Window);
                 Assert.Null(session.Splitters);
+                Assert.Null(session.RenameListSortFields);
             }
             finally
             {
@@ -63,6 +65,7 @@ namespace Mfr.Tests.Models
                     ExcludeMasks = ["*.wav", "*.ogg"],
                     ExcludeMasksEnabled = true,
                     MaskSuggestions = ["*.mp3", "*.flac"],
+                    RenameListSortFields = "FullFileName:desc",
                 };
 
                 SessionStore.Save(original, path);
@@ -87,6 +90,7 @@ namespace Mfr.Tests.Models
                 Assert.Equal(2, loaded.MaskSuggestions?.Count);
                 Assert.Contains("*.mp3", loaded.MaskSuggestions!);
                 Assert.Contains("*.flac", loaded.MaskSuggestions!);
+                Assert.Equal("FullFileName:desc", loaded.RenameListSortFields);
             }
             finally
             {

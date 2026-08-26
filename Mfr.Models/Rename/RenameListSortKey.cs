@@ -34,7 +34,7 @@ namespace Mfr.Models.Rename
     public readonly record struct RenameListSortKey(RenameListSortColumn Column, bool Descending = false)
     {
         /// <summary>
-        /// Default Auto-Sort keys: File/Folder then Full Path (MFR7). Empty config disables Auto-Sort.
+        /// Default Auto-Sort keys: File/Folder then Full Path (MFR7). Empty session value disables Auto-Sort.
         /// </summary>
         public const string Default = "FileFolder,FullPath";
 
@@ -81,10 +81,10 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
-        /// Formats <paramref name="keys"/> as a config string.
+        /// Formats <paramref name="keys"/> as a session string.
         /// </summary>
         /// <param name="keys">Sort keys; empty yields an empty string (Auto-Sort off).</param>
-        /// <returns>Encoded config string.</returns>
+        /// <returns>Encoded session string.</returns>
         public static string Format(IReadOnlyList<RenameListSortKey> keys)
         {
             ArgumentNullException.ThrowIfNull(keys);
