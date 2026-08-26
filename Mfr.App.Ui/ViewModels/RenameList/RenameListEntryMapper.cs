@@ -27,6 +27,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 FileFolder = isDirectory ? "Folder" : "File",
                 ParentFolder = original.DirectoryPath,
                 FullFileName = fullFileName,
+                FullPath = original.FullPath,
                 FullFileNamePreview = fullFileName,
             };
         }

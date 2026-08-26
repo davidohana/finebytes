@@ -315,6 +315,57 @@ namespace Mfr.Tests.Engine
             Assert.Equal([alphaPath, betaPath, gammaPath], items.Select(entry => entry.Original.FullPath));
         }
 
+        /// <summary>
+        /// Verifies Sort by File/Folder then Full Path orders files before folders (ascending labels).
+        /// </summary>
+        [Fact]
+        public void Sort_FileFolder_Then_FullPath_Orders_Files_Before_Folders()
+        {
+            var filePath = TestHelpers.CreateFile(_tempRoot, "zeta.txt");
+            var folderPath = Path.Combine(_tempRoot, "alpha-folder");
+            Directory.CreateDirectory(folderPath);
+            var earlyFile = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([filePath, folderPath, earlyFile], includeFolders: true, includeFiles: true);
+
+            Assert.True(
+                renameList.Sort([
+                    new RenameListSortKey(RenameListSortColumn.FileFolder),
+                    new RenameListSortKey(RenameListSortColumn.FullPath),
+                ])
+            );
+
+            Assert.Equal(
+                [earlyFile, filePath, folderPath],
+                renameList.RenameItems.Select(item => item.Original.FullPath)
+            );
+        }
+
+        /// <summary>
+        /// Verifies Sort descending by Full File Name reverses name order.
+        /// </summary>
+        [Fact]
+        public void Sort_FullFileName_Descending()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath, gammaPath]);
+
+            Assert.True(renameList.Sort([new RenameListSortKey(RenameListSortColumn.FullFileName, Descending: true)]));
+
+            Assert.Equal(
+                [gammaPath, betaPath, alphaPath],
+                renameList.RenameItems.Select(item => item.Original.FullPath)
+            );
+        }
+
         [Fact]
         /// <summary>
         /// Verifies that removing by item reference drops the item from the list.

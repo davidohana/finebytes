@@ -1,3 +1,4 @@
+using Mfr.Models.Rename;
 using Mfr.Utils.Config;
 
 namespace Mfr.Models.Config
@@ -86,6 +87,17 @@ namespace Mfr.Models.Config
         /// When true, restore and save the last File List folder across launches.
         /// </summary>
         public bool RememberLastFolder = true;
+
+        /// <summary>
+        /// Rename List Auto-Sort keys. Empty disables Auto-Sort (MFR7).
+        /// <para>
+        /// Comma-separated <c>Column</c> or <c>Column:desc</c> tokens
+        /// (<c>FileFolder</c>, <c>ParentFolder</c>, <c>FullFileName</c>, <c>FullPath</c>).
+        /// Default is File/Folder then Full Path.
+        /// </para>
+        /// </summary>
+        [ConfigStringMaxLength(256)]
+        public string RenameListSortFields = RenameListSortKey.Default;
     }
 
     /// <summary>

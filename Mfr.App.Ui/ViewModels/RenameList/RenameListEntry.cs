@@ -28,6 +28,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public string FullFileName { get; init; } = string.Empty;
 
         /// <summary>
+        /// Gets the absolute path used for Auto-Sort (and as a CollectionView sort member).
+        /// </summary>
+        public string FullPath { get; init; } = string.Empty;
+
+        /// <summary>
         /// Gets the preview full file name shown in the Full File Name (Preview) column.
         /// </summary>
         public string FullFileNamePreview { get; init; } = string.Empty;

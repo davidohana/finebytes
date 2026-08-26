@@ -130,6 +130,11 @@ namespace Mfr.App.Ui.Input
         /// <summary>Rename List Move Selected Down button and menu tip.</summary>
         public const string MoveSelectedDownTip = "Move selected down (Ctrl+Down)";
 
+        /// <summary>
+        /// Tooltip for the Rename List Auto-Sort toolbar toggle (MFR7 #AutoSort).
+        /// </summary>
+        public const string AutoSortTip = "Auto-Sort. Unpush to deactivate Auto-Sort.";
+
         /// <summary>File List refresh button tip.</summary>
         public const string RefreshTip = "Refresh (F5)";
 

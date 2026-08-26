@@ -288,7 +288,11 @@
           InputGesture="{x:Static shortcuts:AppShortcuts.MoveSelectedDown}"
         />
         <Separator />
-        <MenuItem Header="Auto-Sort" IsEnabled="False" />
+        <MenuItem
+          Header="Auto-Sort"
+          Command="{Binding RenameListViewModel.ToggleAutoSortCommand}"
+          IsChecked="{Binding RenameListViewModel.IsAutoSort, Mode=OneWay}"
+        />
         <MenuItem Header="Auto-Preview" IsEnabled="False" />
         <MenuItem Header="Refresh" IsEnabled="False" InputGesture="{x:Static shortcuts:AppShortcuts.Refresh}" />
       </MenuItem>

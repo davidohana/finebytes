@@ -406,6 +406,61 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
+        /// Sorts the list by <paramref name="keys"/> and reindexes.
+        /// </summary>
+        /// <param name="keys">Sort keys in priority order. Empty is a no-op.</param>
+        /// <returns><see langword="true"/> when the list order may have changed.</returns>
+        public bool Sort(IReadOnlyList<RenameListSortKey> keys)
+        {
+            ArgumentNullException.ThrowIfNull(keys);
+
+            if (keys.Count == 0 || _renameItems.Count <= 1)
+            {
+                return false;
+            }
+
+            _renameItems.Sort((left, right) => _CompareItems(left, right, keys));
+            _ReindexItems();
+            return true;
+        }
+
+        private static int _CompareItems(RenameItem left, RenameItem right, IReadOnlyList<RenameListSortKey> keys)
+        {
+            foreach (var key in keys)
+            {
+                var cmp = _CompareColumn(left.Original, right.Original, key.Column);
+                if (key.Descending)
+                {
+                    cmp = -cmp;
+                }
+
+                if (cmp != 0)
+                {
+                    return cmp;
+                }
+            }
+
+            return 0;
+        }
+
+        private static int _CompareColumn(FileMeta left, FileMeta right, RenameListSortColumn column)
+        {
+            return column switch
+            {
+                RenameListSortColumn.FileFolder => left
+                    .Attributes.IsDirectory()
+                    .CompareTo(right.Attributes.IsDirectory()),
+                RenameListSortColumn.ParentFolder => PathComparers.Os.Compare(left.DirectoryPath, right.DirectoryPath),
+                RenameListSortColumn.FullFileName => PathComparers.Os.Compare(
+                    left.Prefix + left.Extension,
+                    right.Prefix + right.Extension
+                ),
+                RenameListSortColumn.FullPath => PathComparers.Os.Compare(left.FullPath, right.FullPath),
+                _ => 0,
+            };
+        }
+
+        /// <summary>
         /// Whether the item at <paramref name="index"/> is selected and can swap with the neighbor.
         /// </summary>
         private bool _CanSwapTowardNeighbor(HashSet<RenameItem> selected, int index, int offset)

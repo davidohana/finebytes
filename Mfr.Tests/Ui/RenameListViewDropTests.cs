@@ -26,15 +26,17 @@ namespace Mfr.Tests.Ui
         /// </summary>
         public RenameListViewDropTests()
         {
-            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
-            ConfigStore.Config.Ui.AddFolderContents = true;
             _originalUiConfig = new UiConfig
             {
                 AddMode = ConfigStore.Config.Ui.AddMode,
                 AddFolderContents = ConfigStore.Config.Ui.AddFolderContents,
                 RememberWindowState = ConfigStore.Config.Ui.RememberWindowState,
                 RememberLastFolder = ConfigStore.Config.Ui.RememberLastFolder,
+                RenameListSortFields = ConfigStore.Config.Ui.RenameListSortFields,
             };
+            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
+            ConfigStore.Config.Ui.AddFolderContents = true;
+            ConfigStore.Config.Ui.RenameListSortFields = string.Empty;
         }
 
         /// <inheritdoc />
@@ -42,6 +44,9 @@ namespace Mfr.Tests.Ui
         {
             ConfigStore.Config.Ui.AddMode = _originalUiConfig.AddMode;
             ConfigStore.Config.Ui.AddFolderContents = _originalUiConfig.AddFolderContents;
+            ConfigStore.Config.Ui.RememberWindowState = _originalUiConfig.RememberWindowState;
+            ConfigStore.Config.Ui.RememberLastFolder = _originalUiConfig.RememberLastFolder;
+            ConfigStore.Config.Ui.RenameListSortFields = _originalUiConfig.RenameListSortFields;
 
             foreach (var fileListViewModel in _fileListViewModels)
             {
@@ -523,7 +528,11 @@ namespace Mfr.Tests.Ui
 
         private FileListViewModel _CreateFileListViewModel(string path)
         {
-            var fileListViewModel = new FileListViewModel(NullSystemIconProvider.Instance, path, NullFileShellOpener.Instance);
+            var fileListViewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                path,
+                NullFileShellOpener.Instance
+            );
             _fileListViewModels.Add(fileListViewModel);
             return fileListViewModel;
         }

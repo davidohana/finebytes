@@ -8,6 +8,7 @@ using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Engine.RenameList;
 using Mfr.Models.Config;
+using Mfr.Models.Rename;
 using Serilog;
 using EngineRenameList = Mfr.Engine.RenameList.RenameList;
 
@@ -21,6 +22,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private readonly FileListViewModel _fileListViewModel;
         private readonly EngineRenameList _renameList = new(includeHidden: false);
         private readonly List<RenameListEntry> _selectedEntries = [];
+        private List<RenameListSortKey> _sortKeys = [];
 
         /// <summary>
         /// Initializes the Rename List and listens for File List changes that affect add commands.
@@ -33,6 +35,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;
             AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
+            _sortKeys = [.. RenameListSortKey.Parse(ConfigStore.Config.Ui.RenameListSortFields)];
         }
 
         /// <summary>
@@ -68,6 +71,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets whether an add operation is in progress.
         /// </summary>
         public bool IsAdding => AddProgress.IsAdding;
+
+        /// <summary>
+        /// Gets whether Auto-Sort is active (one or more sort keys).
+        /// </summary>
+        public bool IsAutoSort => _sortKeys.Count > 0;
+
+        /// <summary>
+        /// Gets the active Auto-Sort keys (empty when Auto-Sort is off).
+        /// </summary>
+        public IReadOnlyList<RenameListSortKey> SortKeys => _sortKeys;
 
         /// <summary>
         /// Gets the most recent user-facing add failure message, or empty when none.
@@ -117,8 +130,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Sets or clears the drag insert marker (row index to insert before).
         /// </summary>
         /// <param name="index">Zero-based row index under the pointer, or null to clear.</param>
+        /// <remarks>
+        /// <para>
+        /// Ignored while Auto-Sort is on (MFR7: external drops append and resort; no mark).
+        /// </para>
+        /// </remarks>
         public void SetDropMarkIndex(int? index)
         {
+            if (IsAutoSort)
+            {
+                index = null;
+            }
+
             if (index is { } i && (i < 0 || i >= Entries.Count))
             {
                 index = null;
@@ -299,13 +322,46 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Toggles Auto-Sort. Turning it on restores the MFR7 default keys.
+        /// </summary>
+        [RelayCommand]
+        public void ToggleAutoSort()
+        {
+            if (IsAutoSort)
+            {
+                _SetSortKeys([], resort: false);
+                return;
+            }
+
+            _SetSortKeys(RenameListSortKey.Parse(RenameListSortKey.Default), resort: true);
+        }
+
+        /// <summary>
+        /// Sets Auto-Sort to a single original column (header click), inverting when already ascending on that column.
+        /// </summary>
+        /// <param name="memberPath">
+        /// <see cref="RenameListEntry"/> property name (<c>FileFolder</c>, <c>ParentFolder</c>, <c>FullFileName</c>).
+        /// </param>
+        public void SortByColumn(string? memberPath)
+        {
+            if (!_TryMapSortMemberPath(memberPath, out var column))
+            {
+                return;
+            }
+
+            // MFR7 RenameGridCells.SetSortMode: desc = GetSortMode() == Ascending (None → ascending).
+            var descending = _sortKeys.Any(key => key.Column == column && !key.Descending);
+            _SetSortKeys([new RenameListSortKey(column, descending)], resort: true);
+        }
+
+        /// <summary>
         /// Reorders the selection to insert before the drop mark (or appends when unset).
         /// </summary>
         /// <returns><see langword="true"/> when the list order changed.</returns>
         /// <remarks>
         /// <para>
         /// Dropping onto a marked row that is part of the selection is a no-op (MFR7). Clears the
-        /// drop mark afterward. Auto-Sort cancel lands in Phase 4e.
+        /// drop mark afterward. Cancels Auto-Sort (MFR7 manual reorder).
         /// </para>
         /// </remarks>
         public bool ReorderSelectedToDropMark()
@@ -322,6 +378,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 if (!_renameList.MoveSelectedBefore(engineItems, beforeItem: beforeItem))
                 {
                     return false;
+                }
+
+                if (IsAutoSort)
+                {
+                    _SetSortKeys([], resort: false);
                 }
 
                 _SyncEntriesToEngineOrder();
@@ -347,6 +408,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             if (!_renameList.MoveSelected(engineItems, offset))
             {
                 return;
+            }
+
+            if (IsAutoSort)
+            {
+                _SetSortKeys([], resort: false);
             }
 
             _SyncEntriesToEngineOrder();
@@ -399,8 +465,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var usedDropMark = DropMarkIndex is not null;
-            var selectFirstAdded = usedDropMark || _selectedEntries.Count > 0;
+            var autoSort = IsAutoSort;
+            var usedDropMark = !autoSort && DropMarkIndex is not null;
+            var selectFirstAdded = !autoSort && (usedDropMark || _selectedEntries.Count > 0);
             var insertAt = _ResolveInsertAt();
             SetDropMarkIndex(null);
             var oldCount = _renameList.RenameItems.Count;
@@ -442,6 +509,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _SyncEntriesAfterAdd(insertAt, oldCount);
+            if (autoSort)
+            {
+                _renameList.Sort(_sortKeys);
+                _SyncEntriesToEngineOrder();
+            }
+
             var addedCount = _renameList.RenameItems.Count - oldCount;
             if (selectFirstAdded && addedCount > 0)
             {
@@ -458,10 +531,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Index to insert new rows: before the drop mark when set; else after the first selected row; else append.
+        /// Index to insert new rows: append when Auto-Sort; else before drop mark / after first selected / append.
         /// </summary>
         private int _ResolveInsertAt()
         {
+            if (IsAutoSort)
+            {
+                return Entries.Count;
+            }
+
             if (DropMarkIndex is { } markIndex)
             {
                 return markIndex;
@@ -572,6 +650,40 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             OnPropertyChanged(nameof(ItemCount));
             ClearCommand.NotifyCanExecuteChanged();
             RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
+        }
+
+        private void _SetSortKeys(IReadOnlyList<RenameListSortKey> keys, bool resort)
+        {
+            _sortKeys = [.. keys];
+            ConfigStore.Config.Ui.RenameListSortFields = RenameListSortKey.Format(_sortKeys);
+            OnPropertyChanged(nameof(IsAutoSort));
+            OnPropertyChanged(nameof(SortKeys));
+            SetDropMarkIndex(null);
+
+            if (resort && IsAutoSort && Entries.Count > 1)
+            {
+                _renameList.Sort(_sortKeys);
+                _SyncEntriesToEngineOrder();
+            }
+        }
+
+        private static bool _TryMapSortMemberPath(string? memberPath, out RenameListSortColumn column)
+        {
+            switch (memberPath)
+            {
+                case nameof(RenameListEntry.FileFolder):
+                    column = RenameListSortColumn.FileFolder;
+                    return true;
+                case nameof(RenameListEntry.ParentFolder):
+                    column = RenameListSortColumn.ParentFolder;
+                    return true;
+                case nameof(RenameListEntry.FullFileName):
+                    column = RenameListSortColumn.FullFileName;
+                    return true;
+                default:
+                    column = default;
+                    return false;
+            }
         }
 
         private bool _CanAddSelected()

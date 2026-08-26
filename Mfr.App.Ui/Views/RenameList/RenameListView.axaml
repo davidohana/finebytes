@@ -173,6 +173,35 @@
     <Style Selector="Button.rename-list-action:disabled">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
+    <Style Selector="ToggleButton.rename-list-action">
+      <Setter Property="Width" Value="28" />
+      <Setter Property="Height" Value="28" />
+      <Setter Property="MinWidth" Value="28" />
+      <Setter Property="MinHeight" Value="28" />
+      <Setter Property="Padding" Value="2" />
+      <Setter Property="Margin" Value="1" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ToggleButton.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="ToggleButton.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.rename-list-action:checked /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.rename-list-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+    </Style>
   </UserControl.Styles>
   <Border Classes="pane">
     <Grid ColumnDefinitions="Auto,*">
@@ -219,6 +248,14 @@
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
         </Button>
+        <ToggleButton
+          Classes="rename-list-action"
+          IsChecked="{Binding IsAutoSort, Mode=OneWay}"
+          Command="{Binding ToggleAutoSortCommand}"
+          ToolTip.Tip="{x:Static shortcuts:AppShortcuts.AutoSortTip}"
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AutoSort.png" />
+        </ToggleButton>
       </StackPanel>
       <DataGrid
         x:Name="RenameGrid"
@@ -228,20 +265,41 @@
         AutoGenerateColumns="False"
         IsReadOnly="True"
         CanUserReorderColumns="False"
-        CanUserSortColumns="False"
+        CanUserSortColumns="True"
         CanUserResizeColumns="True"
         HeadersVisibility="Column"
         GridLinesVisibility="None"
         RowHeight="20"
         ColumnHeaderHeight="22"
         SelectionMode="Extended"
+        Sorting="_OnEntriesSorting"
         ContextMenu="{StaticResource RenameListRowContextMenu}"
       >
         <DataGrid.Columns>
-          <DataGridTextColumn Header="File/Folder" Binding="{Binding FileFolder}" Width="50" />
-          <DataGridTextColumn Header="Parent Folder" Binding="{Binding ParentFolder}" Width="180" />
-          <DataGridTextColumn Header="Full File Name" Binding="{Binding FullFileName}" Width="180" />
-          <DataGridTextColumn Header="Full File Name (Preview)" Binding="{Binding FullFileNamePreview}" Width="*" />
+          <DataGridTextColumn
+            Header="File/Folder"
+            Binding="{Binding FileFolder}"
+            SortMemberPath="FileFolder"
+            Width="50"
+          />
+          <DataGridTextColumn
+            Header="Parent Folder"
+            Binding="{Binding ParentFolder}"
+            SortMemberPath="ParentFolder"
+            Width="180"
+          />
+          <DataGridTextColumn
+            Header="Full File Name"
+            Binding="{Binding FullFileName}"
+            SortMemberPath="FullFileName"
+            Width="180"
+          />
+          <DataGridTextColumn
+            Header="Full File Name (Preview)"
+            Binding="{Binding FullFileNamePreview}"
+            CanUserSort="False"
+            Width="*"
+          />
         </DataGrid.Columns>
       </DataGrid>
     </Grid>

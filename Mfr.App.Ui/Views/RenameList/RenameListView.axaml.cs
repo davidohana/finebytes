@@ -1,6 +1,7 @@
 using System.Collections;
 using System.ComponentModel;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -9,6 +10,8 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Models.Rename;
+using Mfr.Utils;
 
 namespace Mfr.App.Ui.Views.RenameList
 {
@@ -76,6 +79,7 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
             _SyncSelectionToGrid();
             _ApplyDropMarkVisuals();
+            _SyncSortGlyphs();
         }
 
         /// <inheritdoc />
@@ -551,6 +555,66 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 _ApplyDropMarkVisuals();
             }
+
+            if (e.PropertyName is nameof(RenameListViewModel.SortKeys))
+            {
+                _SyncSortGlyphs();
+            }
+        }
+
+        private void _OnEntriesSorting(object? sender, DataGridColumnEventArgs e)
+        {
+            e.Handled = true;
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            _viewModel.SortByColumn(e.Column.SortMemberPath);
+        }
+
+        private void _SyncSortGlyphs()
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            var view = RenameGrid.CollectionView;
+            if (view?.SortDescriptions is null)
+            {
+                return;
+            }
+
+            using (view.DeferRefresh())
+            {
+                view.SortDescriptions.Clear();
+                foreach (var key in _viewModel.SortKeys)
+                {
+                    if (!_TryMapSortColumn(key.Column, out var memberPath))
+                    {
+                        continue;
+                    }
+
+                    var direction = key.Descending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+                    view.SortDescriptions.Add(
+                        DataGridSortDescription.FromPath(memberPath, direction, PathComparers.Os)
+                    );
+                }
+            }
+        }
+
+        private static bool _TryMapSortColumn(RenameListSortColumn column, out string memberPath)
+        {
+            memberPath = column switch
+            {
+                RenameListSortColumn.FileFolder => nameof(RenameListEntry.FileFolder),
+                RenameListSortColumn.ParentFolder => nameof(RenameListEntry.ParentFolder),
+                RenameListSortColumn.FullFileName => nameof(RenameListEntry.FullFileName),
+                RenameListSortColumn.FullPath => nameof(RenameListEntry.FullPath),
+                _ => string.Empty,
+            };
+            return memberPath.Length > 0;
         }
 
         private void _OnAddProgressPropertyChanged(object? sender, PropertyChangedEventArgs e)
