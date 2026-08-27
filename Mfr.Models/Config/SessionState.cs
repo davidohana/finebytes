@@ -121,16 +121,22 @@ namespace Mfr.Models.Config
     public sealed class SessionStateRenameList
     {
         /// <summary>
-        /// Last Rename List Auto-Sort keys. Empty disables Auto-Sort (MFR7).
-        /// <para>
-        /// Comma-separated <c>Column</c> or <c>Column:desc</c> tokens
-        /// (<c>FileFolder</c>, <c>ParentFolder</c>, <c>FullFileName</c>, <c>FullPath</c>).
-        /// Null means unset (first launch uses <see cref="RenameListSortKey.Default"/>).
-        /// </para>
+        /// Last Rename List Auto-Sort keys in priority order. Empty disables Auto-Sort (MFR7).
+        /// <para>Null means unset (first launch uses <see cref="RenameListSortKey.DefaultKeys"/>).</para>
         /// </summary>
         [JsonPropertyName("sortFields")]
-        public string? SortFields { get; set; }
+        public List<SessionStateRenameListSortField>? SortFields { get; set; }
     }
+
+    /// <summary>
+    /// One persisted Rename List Auto-Sort key: column plus sort direction.
+    /// </summary>
+    /// <param name="Column">Column to compare.</param>
+    /// <param name="Descending">When <see langword="true"/>, sort that column descending.</param>
+    public sealed record SessionStateRenameListSortField(
+        [property: JsonPropertyName("column")] RenameListSortColumn Column,
+        [property: JsonPropertyName("descending")] bool Descending = false
+    );
 
     /// <summary>
     /// Saved main-window pane splitter positions as star ratios of the first pane in each pair.

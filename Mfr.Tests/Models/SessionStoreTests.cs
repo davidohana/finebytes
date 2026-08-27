@@ -66,7 +66,10 @@ namespace Mfr.Tests.Models
                         ExcludeMasksEnabled = true,
                         MaskSuggestions = ["*.mp3", "*.flac"],
                     },
-                    RenameList = new SessionStateRenameList { SortFields = "FullFileName:desc" },
+                    RenameList = new SessionStateRenameList
+                    {
+                        SortFields = [new SessionStateRenameListSortField(RenameListSortColumn.FullFileName, Descending: true)],
+                    },
                 };
 
                 SessionStore.Save(original, path);
@@ -93,7 +96,10 @@ namespace Mfr.Tests.Models
                 Assert.Contains("*.mp3", loaded.FileList.MaskSuggestions!);
                 Assert.Contains("*.flac", loaded.FileList.MaskSuggestions!);
                 Assert.NotNull(loaded.RenameList);
-                Assert.Equal("FullFileName:desc", loaded.RenameList.SortFields);
+                Assert.NotNull(loaded.RenameList.SortFields);
+                Assert.Single(loaded.RenameList.SortFields);
+                Assert.Equal(RenameListSortColumn.FullFileName, loaded.RenameList.SortFields[0].Column);
+                Assert.True(loaded.RenameList.SortFields[0].Descending);
             }
             finally
             {

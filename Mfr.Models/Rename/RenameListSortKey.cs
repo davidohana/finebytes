@@ -1,3 +1,5 @@
+using Mfr.Models.Config;
+
 namespace Mfr.Models.Rename
 {
     /// <summary>
@@ -36,59 +38,43 @@ namespace Mfr.Models.Rename
         /// <summary>
         /// Default Auto-Sort keys: File/Folder then Full Path (MFR7). Empty session value disables Auto-Sort.
         /// </summary>
-        public const string Default = "FileFolder,FullPath";
+        public static IReadOnlyList<RenameListSortKey> DefaultKeys { get; } =
+        [
+            new RenameListSortKey(RenameListSortColumn.FileFolder),
+            new RenameListSortKey(RenameListSortColumn.FullPath),
+        ];
 
         /// <summary>
-        /// Parses <paramref name="encoded"/> into sort keys.
+        /// Default Auto-Sort keys as session fields.
         /// </summary>
-        /// <param name="encoded">Comma-separated <c>Column</c> or <c>Column:desc</c> tokens; empty is off.</param>
-        /// <returns>Sort keys in priority order; empty when Auto-Sort is off.</returns>
-        public static IReadOnlyList<RenameListSortKey> Parse(string? encoded)
+        public static IReadOnlyList<SessionStateRenameListSortField> DefaultSessionFields { get; } =
+            ToSessionFields(DefaultKeys);
+
+        /// <summary>
+        /// Converts persisted session fields into sort keys.
+        /// </summary>
+        /// <param name="fields">Session fields in priority order.</param>
+        /// <returns>Sort keys; empty when Auto-Sort is off.</returns>
+        public static IReadOnlyList<RenameListSortKey> FromSessionFields(IReadOnlyList<SessionStateRenameListSortField> fields)
         {
-            if (string.IsNullOrWhiteSpace(encoded))
+            ArgumentNullException.ThrowIfNull(fields);
+            if (fields.Count == 0)
             {
                 return [];
             }
 
-            var keys = new List<RenameListSortKey>();
-            var parts = encoded.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            foreach (var part in parts)
-            {
-                var descending = false;
-                var name = part;
-                var colon = part.IndexOf(':');
-                if (colon >= 0)
-                {
-                    name = part[..colon].Trim();
-                    var suffix = part[(colon + 1)..].Trim();
-                    if (!suffix.Equals("desc", StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    descending = true;
-                }
-
-                if (!Enum.TryParse(name, ignoreCase: true, out RenameListSortColumn column) || !Enum.IsDefined(column))
-                {
-                    continue;
-                }
-
-                keys.Add(new RenameListSortKey(column, descending));
-            }
-
-            return keys;
+            return [.. fields.Select(field => new RenameListSortKey(field.Column, field.Descending))];
         }
 
         /// <summary>
-        /// Formats <paramref name="keys"/> as a session string.
+        /// Converts sort keys into persisted session fields.
         /// </summary>
-        /// <param name="keys">Sort keys; empty yields an empty string (Auto-Sort off).</param>
-        /// <returns>Encoded session string.</returns>
-        public static string Format(IReadOnlyList<RenameListSortKey> keys)
+        /// <param name="keys">Sort keys in priority order.</param>
+        /// <returns>Session fields; empty when Auto-Sort is off.</returns>
+        public static List<SessionStateRenameListSortField> ToSessionFields(IReadOnlyList<RenameListSortKey> keys)
         {
             ArgumentNullException.ThrowIfNull(keys);
-            return string.Join(',', keys.Select(key => key.Descending ? $"{key.Column}:desc" : key.Column.ToString()));
+            return [.. keys.Select(key => new SessionStateRenameListSortField(key.Column, key.Descending))];
         }
     }
 }

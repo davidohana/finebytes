@@ -979,7 +979,7 @@ namespace Mfr.Tests.Ui
 
             Assert.True(renameListViewModel.IsAutoSort);
             Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Equal("FullFileName", RenameListSortKey.Format(renameListViewModel.SortKeys));
+            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FullFileName)], renameListViewModel.SortKeys);
         }
 
         /// <summary>
@@ -1003,7 +1003,10 @@ namespace Mfr.Tests.Ui
             renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
 
             Assert.Equal(["gamma.log", "beta.md", "alpha.txt"], _PreviewNames(renameListViewModel));
-            Assert.Equal("FullFileName:desc", RenameListSortKey.Format(renameListViewModel.SortKeys));
+            Assert.Equal(
+                [new RenameListSortKey(RenameListSortColumn.FullFileName, Descending: true)],
+                renameListViewModel.SortKeys
+            );
         }
 
         /// <summary>
@@ -1015,7 +1018,7 @@ namespace Mfr.Tests.Ui
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession("fullFileName");
+            renameListViewModel.ApplySession(_SortSession(RenameListSortColumn.FullFileName));
             Assert.True(renameListViewModel.IsAutoSort);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "gamma.log"), _FileEntry(dir, "alpha.txt")]);
@@ -1038,7 +1041,7 @@ namespace Mfr.Tests.Ui
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession("fullFileName");
+            renameListViewModel.ApplySession(_SortSession(RenameListSortColumn.FullFileName));
 
             fileListViewModel.SetSelectedEntries([
                 _FileEntry(dir, "alpha.txt"),
@@ -1052,7 +1055,7 @@ namespace Mfr.Tests.Ui
             renameListViewModel.MoveSelectedUpCommand.Execute(null);
 
             Assert.False(renameListViewModel.IsAutoSort);
-            Assert.Equal(string.Empty, RenameListSortKey.Format(renameListViewModel.SortKeys));
+            Assert.Empty(renameListViewModel.SortKeys);
             Assert.Equal(["alpha.txt", "gamma.log", "beta.md"], _PreviewNames(renameListViewModel));
         }
 
@@ -1070,11 +1073,11 @@ namespace Mfr.Tests.Ui
             renameListViewModel.ToggleAutoSortCommand.Execute(null);
 
             Assert.True(renameListViewModel.IsAutoSort);
-            Assert.Equal(RenameListSortKey.Default, RenameListSortKey.Format(renameListViewModel.SortKeys));
+            Assert.Equal(RenameListSortKey.DefaultKeys, renameListViewModel.SortKeys);
 
             renameListViewModel.ToggleAutoSortCommand.Execute(null);
             Assert.False(renameListViewModel.IsAutoSort);
-            Assert.Equal(string.Empty, RenameListSortKey.Format(renameListViewModel.SortKeys));
+            Assert.Empty(renameListViewModel.SortKeys);
         }
 
         /// <summary>
@@ -1091,7 +1094,7 @@ namespace Mfr.Tests.Ui
             renameListViewModel.ApplySession(null);
 
             Assert.True(renameListViewModel.IsAutoSort);
-            Assert.Equal(RenameListSortKey.Default, renameListViewModel.CaptureSortFields());
+            Assert.Equal(RenameListSortKey.DefaultSessionFields, renameListViewModel.CaptureSortFields());
         }
 
         /// <summary>
@@ -1103,13 +1106,18 @@ namespace Mfr.Tests.Ui
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession("FullFileName:desc");
-            Assert.Equal("FullFileName:desc", renameListViewModel.CaptureSortFields());
+            renameListViewModel.ApplySession(
+                _SortSession(RenameListSortColumn.FullFileName, descending: true)
+            );
+            Assert.Equal(
+                _SortSession(RenameListSortColumn.FullFileName, descending: true),
+                renameListViewModel.CaptureSortFields()
+            );
 
-            renameListViewModel.ApplySession(string.Empty);
+            renameListViewModel.ApplySession([]);
 
             Assert.False(renameListViewModel.IsAutoSort);
-            Assert.Equal(string.Empty, renameListViewModel.CaptureSortFields());
+            Assert.Empty(renameListViewModel.CaptureSortFields());
 
             var restored = new RenameListViewModel(_CreateFileListViewModel(dir));
             restored.ApplySession(renameListViewModel.CaptureSortFields());
@@ -1125,7 +1133,7 @@ namespace Mfr.Tests.Ui
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession("fullFileName");
+            renameListViewModel.ApplySession(_SortSession(RenameListSortColumn.FullFileName));
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
@@ -1143,7 +1151,7 @@ namespace Mfr.Tests.Ui
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession("fullFileName");
+            renameListViewModel.ApplySession(_SortSession(RenameListSortColumn.FullFileName));
 
             fileListViewModel.SetSelectedEntries([
                 _FileEntry(dir, "alpha.txt"),
@@ -1380,6 +1388,11 @@ namespace Mfr.Tests.Ui
                 catch (UnauthorizedAccessException) { }
             }
         }
+
+        private static List<SessionStateRenameListSortField> _SortSession(
+            RenameListSortColumn column,
+            bool descending = false
+        ) => [new SessionStateRenameListSortField(column, descending)];
 
         [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         private static void _DenyDirectoryTraverse(string directoryPath)

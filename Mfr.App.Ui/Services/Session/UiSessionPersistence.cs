@@ -48,12 +48,12 @@ namespace Mfr.App.Ui.Services.Session
         /// File List mask and folder fields to persist, or <see langword="null"/> when unavailable.
         /// </param>
         /// <param name="renameListSortFields">
-        /// Encoded Rename List Auto-Sort keys, or <see langword="null"/> to leave the saved value unchanged.
+        /// Rename List Auto-Sort session fields, or <see langword="null"/> to leave the saved value unchanged.
         /// </param>
         public static void SaveOnClose(
             MainWindow window,
             FileListSessionSnapshot? fileListSnapshot,
-            string? renameListSortFields = null
+            IReadOnlyList<SessionStateRenameListSortField>? renameListSortFields = null
         )
         {
             ArgumentNullException.ThrowIfNull(window);
@@ -99,7 +99,9 @@ namespace Mfr.App.Ui.Services.Session
                 {
                     session.RenameList ??= new SessionStateRenameList();
 
-                    session.RenameList.SortFields = renameListSortFields;
+                    session.RenameList.SortFields = renameListSortFields is null
+                        ? null
+                        : [.. renameListSortFields];
                 }
 
                 SessionStore.Save(session);

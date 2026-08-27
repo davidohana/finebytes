@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Mfr.Utils;
 
 namespace Mfr.Models.Config
@@ -13,6 +14,7 @@ namespace Mfr.Models.Config
         {
             WriteIndented = true,
             PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() },
         };
 
         /// <summary>
