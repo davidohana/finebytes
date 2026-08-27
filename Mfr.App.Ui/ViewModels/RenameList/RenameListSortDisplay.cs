@@ -100,5 +100,30 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             return string.Join('\n', lines);
         }
+
+        /// <summary>
+        /// Maps a grid <c>SortMemberPath</c> to a sort column.
+        /// </summary>
+        /// <param name="memberPath"><see cref="RenameListEntry"/> property name.</param>
+        /// <param name="column">Mapped column when the path is a visible sortable field.</param>
+        /// <returns><see langword="true"/> when <paramref name="memberPath"/> is a header-sortable column.</returns>
+        public static bool TryMapMemberPath(string? memberPath, out RenameListSortColumn column)
+        {
+            switch (memberPath)
+            {
+                case nameof(RenameListEntry.FileFolder):
+                    column = RenameListSortColumn.FileFolder;
+                    return true;
+                case nameof(RenameListEntry.ParentFolder):
+                    column = RenameListSortColumn.ParentFolder;
+                    return true;
+                case nameof(RenameListEntry.FullFileName):
+                    column = RenameListSortColumn.FullFileName;
+                    return true;
+                default:
+                    column = default;
+                    return false;
+            }
+        }
     }
 }
