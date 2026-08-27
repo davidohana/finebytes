@@ -29,7 +29,7 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="window">Main window to configure.</param>
         /// <param name="saved">Persisted geometry, or null to skip.</param>
         /// <returns>True when a saved layout was applied; false when the caller should use defaults.</returns>
-        public static bool TryRestore(Window window, SessionWindowState? saved)
+        public static bool TryRestore(Window window, SessionStateMainWindow? saved)
         {
             if (saved is null)
             {
@@ -91,13 +91,13 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Builds a <see cref="SessionWindowState"/> from the window's current geometry and state.
+        /// Builds a <see cref="SessionStateMainWindow"/> from the window's current geometry and state.
         /// </summary>
         /// <param name="window">Window being closed.</param>
-        /// <returns>Session payload ready to persist.</returns>
-        public static SessionWindowState Capture(Window window)
+        /// <returns>Session payload ready to persist (splitters are captured separately).</returns>
+        public static SessionStateMainWindow Capture(Window window)
         {
-            return new SessionWindowState
+            return new SessionStateMainWindow
             {
                 X = window.Position.X,
                 Y = window.Position.Y,

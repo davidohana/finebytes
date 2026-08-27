@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.Input
     /// Window-level <see cref="KeyBinding"/>s use the members here, including File List
     /// view types (Ctrl+1 through Ctrl+6). Pane-local keys (Backspace, thumbnail zoom,
     /// address Enter/Esc) are handled in the File List view. Toolbar tip text lives in
-    /// <see cref="Mfr.App.Ui.Resources.AppTips"/>.
+    /// <see cref="Resources.AppTips"/>.
     /// </para>
     /// </summary>
     public static class AppShortcuts

@@ -11,10 +11,9 @@ namespace Mfr.Tests.Models
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-missing-" + Guid.NewGuid() + ".json");
             var session = SessionStore.Load(path);
             Assert.Equal(1, session.Version);
-            Assert.Null(session.LastOpenedDirectory);
-            Assert.Null(session.Window);
-            Assert.Null(session.Splitters);
-            Assert.Null(session.RenameListSortFields);
+            Assert.Null(session.MainWindow);
+            Assert.Null(session.FileList);
+            Assert.Null(session.RenameList);
         }
 
         [Fact]
@@ -25,10 +24,9 @@ namespace Mfr.Tests.Models
             {
                 File.WriteAllText(path, "{ not-json");
                 var session = SessionStore.Load(path);
-                Assert.Null(session.LastOpenedDirectory);
-                Assert.Null(session.Window);
-                Assert.Null(session.Splitters);
-                Assert.Null(session.RenameListSortFields);
+                Assert.Null(session.MainWindow);
+                Assert.Null(session.FileList);
+                Assert.Null(session.RenameList);
             }
             finally
             {
@@ -45,52 +43,57 @@ namespace Mfr.Tests.Models
                 var original = new SessionState
                 {
                     Version = 1,
-                    LastOpenedDirectory = Path.Combine(Path.GetTempPath(), "music"),
-                    Window = new SessionWindowState
+                    MainWindow = new SessionStateMainWindow
                     {
                         X = 12,
                         Y = 34,
                         Width = 1100,
                         Height = 720,
                         State = "Maximized",
+                        Splitters = new SessionStateSplitters
+                        {
+                            FileList = 0.35,
+                            AvailableApplied = 0.45,
+                            FilterLists = 0.55,
+                            TopPanes = 0.65,
+                        },
                     },
-                    Splitters = new SessionSplitterState
+                    FileList = new SessionStateFileList
                     {
-                        FileList = 0.35,
-                        AvailableApplied = 0.45,
-                        FilterLists = 0.55,
-                        TopPanes = 0.65,
+                        LastOpenedDirectory = Path.Combine(Path.GetTempPath(), "music"),
+                        FileMask = "*.mp3",
+                        ExcludeMasks = ["*.wav", "*.ogg"],
+                        ExcludeMasksEnabled = true,
+                        MaskSuggestions = ["*.mp3", "*.flac"],
                     },
-                    FileMask = "*.mp3",
-                    ExcludeMasks = ["*.wav", "*.ogg"],
-                    ExcludeMasksEnabled = true,
-                    MaskSuggestions = ["*.mp3", "*.flac"],
-                    RenameListSortFields = "FullFileName:desc",
+                    RenameList = new SessionStateRenameList { SortFields = "FullFileName:desc" },
                 };
 
                 SessionStore.Save(original, path);
                 var loaded = SessionStore.Load(path);
 
                 Assert.Equal(1, loaded.Version);
-                Assert.Equal(original.LastOpenedDirectory, loaded.LastOpenedDirectory);
-                Assert.NotNull(loaded.Window);
-                Assert.Equal(12, loaded.Window.X);
-                Assert.Equal(34, loaded.Window.Y);
-                Assert.Equal(1100, loaded.Window.Width);
-                Assert.Equal(720, loaded.Window.Height);
-                Assert.Equal("Maximized", loaded.Window.State);
-                Assert.NotNull(loaded.Splitters);
-                Assert.Equal(0.35, loaded.Splitters.FileList);
-                Assert.Equal(0.45, loaded.Splitters.AvailableApplied);
-                Assert.Equal(0.55, loaded.Splitters.FilterLists);
-                Assert.Equal(0.65, loaded.Splitters.TopPanes);
-                Assert.Equal("*.mp3", loaded.FileMask);
-                Assert.Equal(["*.wav", "*.ogg"], loaded.ExcludeMasks);
-                Assert.True(loaded.ExcludeMasksEnabled);
-                Assert.Equal(2, loaded.MaskSuggestions?.Count);
-                Assert.Contains("*.mp3", loaded.MaskSuggestions!);
-                Assert.Contains("*.flac", loaded.MaskSuggestions!);
-                Assert.Equal("FullFileName:desc", loaded.RenameListSortFields);
+                Assert.NotNull(loaded.MainWindow);
+                Assert.Equal(12, loaded.MainWindow.X);
+                Assert.Equal(34, loaded.MainWindow.Y);
+                Assert.Equal(1100, loaded.MainWindow.Width);
+                Assert.Equal(720, loaded.MainWindow.Height);
+                Assert.Equal("Maximized", loaded.MainWindow.State);
+                Assert.NotNull(loaded.MainWindow.Splitters);
+                Assert.Equal(0.35, loaded.MainWindow.Splitters.FileList);
+                Assert.Equal(0.45, loaded.MainWindow.Splitters.AvailableApplied);
+                Assert.Equal(0.55, loaded.MainWindow.Splitters.FilterLists);
+                Assert.Equal(0.65, loaded.MainWindow.Splitters.TopPanes);
+                Assert.NotNull(loaded.FileList);
+                Assert.Equal(original.FileList.LastOpenedDirectory, loaded.FileList.LastOpenedDirectory);
+                Assert.Equal("*.mp3", loaded.FileList.FileMask);
+                Assert.Equal(["*.wav", "*.ogg"], loaded.FileList.ExcludeMasks);
+                Assert.True(loaded.FileList.ExcludeMasksEnabled);
+                Assert.Equal(2, loaded.FileList.MaskSuggestions?.Count);
+                Assert.Contains("*.mp3", loaded.FileList.MaskSuggestions!);
+                Assert.Contains("*.flac", loaded.FileList.MaskSuggestions!);
+                Assert.NotNull(loaded.RenameList);
+                Assert.Equal("FullFileName:desc", loaded.RenameList.SortFields);
             }
             finally
             {

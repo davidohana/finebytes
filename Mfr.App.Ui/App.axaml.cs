@@ -26,7 +26,7 @@ namespace Mfr.App.Ui
             {
                 var session = SessionStore.Load();
                 var ui = ConfigStore.Config.Ui;
-                var initialFolder = ui.RememberLastFolder ? session.LastOpenedDirectory : null;
+                var initialFolder = ui.RememberLastFolder ? session.FileList?.LastOpenedDirectory : null;
 
                 var mainWindow = new MainWindow
                 {
@@ -37,7 +37,7 @@ namespace Mfr.App.Ui
                 if (mainWindow.DataContext is MainWindowViewModel viewModel)
                 {
                     viewModel.FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
-                    viewModel.RenameListViewModel.ApplySession(session.RenameListSortFields);
+                    viewModel.RenameListViewModel.ApplySession(session.RenameList?.SortFields);
                 }
 
                 desktop.MainWindow = mainWindow;

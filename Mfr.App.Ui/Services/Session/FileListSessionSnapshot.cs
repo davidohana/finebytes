@@ -33,12 +33,14 @@ namespace Mfr.App.Ui.Services.Session
         {
             ArgumentNullException.ThrowIfNull(session);
 
+            var fileList = session.FileList;
+
             return new FileListSessionSnapshot(
-                session.LastOpenedDirectory,
-                session.FileMask,
-                session.ExcludeMasks,
-                session.ExcludeMasksEnabled,
-                session.MaskSuggestions
+                fileList?.LastOpenedDirectory,
+                fileList?.FileMask,
+                fileList?.ExcludeMasks,
+                fileList?.ExcludeMasksEnabled,
+                fileList?.MaskSuggestions
             );
         }
     }

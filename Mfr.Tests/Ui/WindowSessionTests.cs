@@ -40,7 +40,7 @@ namespace Mfr.Tests.Ui
             Assert.False(
                 WindowSession.TryRestore(
                     window,
-                    new SessionWindowState
+                    new SessionStateMainWindow
                     {
                         X = 10,
                         Y = 20,
@@ -53,7 +53,7 @@ namespace Mfr.Tests.Ui
             Assert.False(
                 WindowSession.TryRestore(
                     window,
-                    new SessionWindowState
+                    new SessionStateMainWindow
                     {
                         X = 10,
                         Y = 20,
@@ -75,7 +75,7 @@ namespace Mfr.Tests.Ui
 
             var restored = WindowSession.TryRestore(
                 window,
-                new SessionWindowState
+                new SessionStateMainWindow
                 {
                     X = 40,
                     Y = 60,
@@ -104,7 +104,7 @@ namespace Mfr.Tests.Ui
 
             var restored = WindowSession.TryRestore(
                 window,
-                new SessionWindowState
+                new SessionStateMainWindow
                 {
                     X = 0,
                     Y = 0,

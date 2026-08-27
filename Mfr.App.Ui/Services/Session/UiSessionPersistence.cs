@@ -22,13 +22,16 @@ namespace Mfr.App.Ui.Services.Session
         public static void TryRestore(MainWindow window, SessionState session)
         {
             ArgumentNullException.ThrowIfNull(window);
+
             ArgumentNullException.ThrowIfNull(session);
 
             var windowRestored = false;
+
             if (ConfigStore.Config.Ui.RememberWindowState)
             {
-                windowRestored = WindowSession.TryRestore(window, session.Window);
-                SplitterSession.TryRestore(window, session.Splitters);
+                windowRestored = WindowSession.TryRestore(window, session.MainWindow);
+
+                SplitterSession.TryRestore(window, session.MainWindow?.Splitters);
             }
 
             if (!windowRestored)
@@ -58,34 +61,45 @@ namespace Mfr.App.Ui.Services.Session
             try
             {
                 var session = SessionStore.Load();
+
                 var ui = ConfigStore.Config.Ui;
 
                 if (ui.RememberWindowState)
                 {
-                    session.Window = WindowSession.Capture(window);
-                    session.Splitters = SplitterSession.Capture(window);
+                    session.MainWindow = WindowSession.Capture(window);
+
+                    session.MainWindow.Splitters = SplitterSession.Capture(window);
                 }
 
                 if (fileListSnapshot is not null)
                 {
+                    session.FileList ??= new SessionStateFileList();
+
+                    var fileList = session.FileList;
+
                     if (ui.RememberLastFolder && _IsPersistableFolder(fileListSnapshot.LastOpenedDirectory))
                     {
-                        session.LastOpenedDirectory = fileListSnapshot.LastOpenedDirectory;
+                        fileList.LastOpenedDirectory = fileListSnapshot.LastOpenedDirectory;
                     }
 
-                    session.FileMask = fileListSnapshot.FileMask;
-                    session.ExcludeMasks = fileListSnapshot.ExcludeMasks is null
+                    fileList.FileMask = fileListSnapshot.FileMask;
+
+                    fileList.ExcludeMasks = fileListSnapshot.ExcludeMasks is null
                         ? null
                         : [.. fileListSnapshot.ExcludeMasks];
-                    session.ExcludeMasksEnabled = fileListSnapshot.ExcludeMasksEnabled;
-                    session.MaskSuggestions = fileListSnapshot.MaskSuggestions is null
+
+                    fileList.ExcludeMasksEnabled = fileListSnapshot.ExcludeMasksEnabled;
+
+                    fileList.MaskSuggestions = fileListSnapshot.MaskSuggestions is null
                         ? null
                         : [.. fileListSnapshot.MaskSuggestions];
                 }
 
                 if (renameListSortFields is not null)
                 {
-                    session.RenameListSortFields = renameListSortFields;
+                    session.RenameList ??= new SessionStateRenameList();
+
+                    session.RenameList.SortFields = renameListSortFields;
                 }
 
                 SessionStore.Save(session);

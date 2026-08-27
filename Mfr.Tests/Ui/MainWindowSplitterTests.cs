@@ -110,7 +110,7 @@ namespace Mfr.Tests.Ui
             Assert.NotNull(captured.FileList);
 
             var other = _ShowMainWindow();
-            SplitterSession.TryRestore(other, new SessionSplitterState { FileList = captured.FileList });
+            SplitterSession.TryRestore(other, new SessionStateSplitters { FileList = captured.FileList });
             other.UpdateLayout();
 
             var restored = other.TopPanesGrid;

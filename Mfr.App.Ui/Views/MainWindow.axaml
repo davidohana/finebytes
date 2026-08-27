@@ -33,10 +33,7 @@
     <KeyBinding Gesture="{x:Static input:AppShortcuts.UndoLast}" Command="{Binding UndoLastCommand}" />
     <KeyBinding Gesture="{x:Static input:AppShortcuts.ShowLog}" Command="{Binding ShowLogCommand}" />
     <KeyBinding Gesture="{x:Static input:AppShortcuts.ShowOptions}" Command="{Binding ShowOptionsCommand}" />
-    <KeyBinding
-      Gesture="{x:Static input:AppShortcuts.Refresh}"
-      Command="{Binding FileListViewModel.RefreshCommand}"
-    />
+    <KeyBinding Gesture="{x:Static input:AppShortcuts.Refresh}" Command="{Binding FileListViewModel.RefreshCommand}" />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.GoToAddress}"
       Command="{Binding FileListViewModel.BeginPathEditCommand}"
@@ -79,10 +76,7 @@
       Gesture="{x:Static input:AppShortcuts.AddSelected}"
       Command="{Binding RenameListViewModel.AddSelectedCommand}"
     />
-    <KeyBinding
-      Gesture="{x:Static input:AppShortcuts.AddAll}"
-      Command="{Binding RenameListViewModel.AddAllCommand}"
-    />
+    <KeyBinding Gesture="{x:Static input:AppShortcuts.AddAll}" Command="{Binding RenameListViewModel.AddAllCommand}" />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.RemoveSelected}"
       Command="{Binding RenameListViewModel.RemoveSelectedCommand}"
@@ -117,11 +111,7 @@
           InputGesture="{x:Static input:AppShortcuts.ShowOptions}"
         />
         <Separator />
-        <MenuItem
-          Header="E_xit"
-          Command="{Binding ExitCommand}"
-          InputGesture="{x:Static input:AppShortcuts.Exit}"
-        />
+        <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGesture="{x:Static input:AppShortcuts.Exit}" />
       </MenuItem>
       <MenuItem Header="_File List">
         <MenuItem Header="_File List Type">
@@ -320,11 +310,7 @@
           Command="{Binding UndoLastCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.UndoLast}"
         />
-        <Button
-          Content="Log"
-          Command="{Binding ShowLogCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.ShowLog}"
-        />
+        <Button Content="Log" Command="{Binding ShowLogCommand}" ToolTip.Tip="{x:Static resources:AppTips.ShowLog}" />
         <Button
           Content="Options"
           Command="{Binding ShowOptionsCommand}"

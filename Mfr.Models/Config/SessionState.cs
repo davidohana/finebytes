@@ -4,7 +4,7 @@ using Mfr.Models.Rename;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Persisted UI session state (window geometry, pane splitters, last File List folder, and Rename List Auto-Sort).
+    /// Persisted UI session state grouped by owning component.
     /// <para>Stored in <c>session.json</c> under the same AppData root as <c>config.json</c>.</para>
     /// </summary>
     public sealed class SessionState
@@ -16,63 +16,28 @@ namespace Mfr.Models.Config
         public int Version { get; set; } = 1;
 
         /// <summary>
-        /// Last File List directory path, when remembered.
+        /// Last main-window geometry and pane splitters, when remembered.
         /// </summary>
-        [JsonPropertyName("lastOpenedDirectory")]
-        public string? LastOpenedDirectory { get; set; }
+        [JsonPropertyName("mainWindow")]
+        public SessionStateMainWindow? MainWindow { get; set; }
 
         /// <summary>
-        /// Last main-window geometry, when remembered.
+        /// Last File List folder, masks, and mask suggestions.
         /// </summary>
-        [JsonPropertyName("window")]
-        public SessionWindowState? Window { get; set; }
+        [JsonPropertyName("fileList")]
+        public SessionStateFileList? FileList { get; set; }
 
         /// <summary>
-        /// Last main-window pane splitter ratios, when remembered.
+        /// Last Rename List Auto-Sort and related session fields.
         /// </summary>
-        [JsonPropertyName("splitters")]
-        public SessionSplitterState? Splitters { get; set; }
-
-        /// <summary>
-        /// Last include mask applied to file names.
-        /// </summary>
-        [JsonPropertyName("fileMask")]
-        public string? FileMask { get; set; }
-
-        /// <summary>
-        /// Last exclude masks applied to file names.
-        /// </summary>
-        [JsonPropertyName("excludeMasks")]
-        public List<string>? ExcludeMasks { get; set; }
-
-        /// <summary>
-        /// Whether exclude masks are applied when listing and adding files.
-        /// </summary>
-        [JsonPropertyName("excludeMasksEnabled")]
-        public bool? ExcludeMasksEnabled { get; set; }
-
-        /// <summary>
-        /// Recently used include masks.
-        /// </summary>
-        [JsonPropertyName("maskSuggestions")]
-        public List<string>? MaskSuggestions { get; set; }
-
-        /// <summary>
-        /// Last Rename List Auto-Sort keys. Empty disables Auto-Sort (MFR7).
-        /// <para>
-        /// Comma-separated <c>Column</c> or <c>Column:desc</c> tokens
-        /// (<c>FileFolder</c>, <c>ParentFolder</c>, <c>FullFileName</c>, <c>FullPath</c>).
-        /// Null means unset (first launch uses <see cref="RenameListSortKey.Default"/>).
-        /// </para>
-        /// </summary>
-        [JsonPropertyName("renameListSortFields")]
-        public string? RenameListSortFields { get; set; }
+        [JsonPropertyName("renameList")]
+        public SessionStateRenameList? RenameList { get; set; }
     }
 
     /// <summary>
-    /// Saved main-window size, position, and state.
+    /// Saved main-window size, position, state, and pane splitter ratios.
     /// </summary>
-    public sealed class SessionWindowState
+    public sealed class SessionStateMainWindow
     {
         /// <summary>
         /// Window left edge in screen pixels (used when <see cref="State"/> is <c>Normal</c>).
@@ -106,6 +71,65 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("state")]
         public string State { get; set; } = "Normal";
+
+        /// <summary>
+        /// Last main-window pane splitter ratios, when remembered.
+        /// </summary>
+        [JsonPropertyName("splitters")]
+        public SessionStateSplitters? Splitters { get; set; }
+    }
+
+    /// <summary>
+    /// Saved File List folder and mask fields.
+    /// </summary>
+    public sealed class SessionStateFileList
+    {
+        /// <summary>
+        /// Last File List directory path, when remembered.
+        /// </summary>
+        [JsonPropertyName("lastOpenedDirectory")]
+        public string? LastOpenedDirectory { get; set; }
+
+        /// <summary>
+        /// Last include mask applied to file names.
+        /// </summary>
+        [JsonPropertyName("fileMask")]
+        public string? FileMask { get; set; }
+
+        /// <summary>
+        /// Last exclude masks applied to file names.
+        /// </summary>
+        [JsonPropertyName("excludeMasks")]
+        public List<string>? ExcludeMasks { get; set; }
+
+        /// <summary>
+        /// Whether exclude masks are applied when listing and adding files.
+        /// </summary>
+        [JsonPropertyName("excludeMasksEnabled")]
+        public bool? ExcludeMasksEnabled { get; set; }
+
+        /// <summary>
+        /// Recently used include masks.
+        /// </summary>
+        [JsonPropertyName("maskSuggestions")]
+        public List<string>? MaskSuggestions { get; set; }
+    }
+
+    /// <summary>
+    /// Saved Rename List session fields.
+    /// </summary>
+    public sealed class SessionStateRenameList
+    {
+        /// <summary>
+        /// Last Rename List Auto-Sort keys. Empty disables Auto-Sort (MFR7).
+        /// <para>
+        /// Comma-separated <c>Column</c> or <c>Column:desc</c> tokens
+        /// (<c>FileFolder</c>, <c>ParentFolder</c>, <c>FullFileName</c>, <c>FullPath</c>).
+        /// Null means unset (first launch uses <see cref="RenameListSortKey.Default"/>).
+        /// </para>
+        /// </summary>
+        [JsonPropertyName("sortFields")]
+        public string? SortFields { get; set; }
     }
 
     /// <summary>
@@ -114,7 +138,7 @@ namespace Mfr.Models.Config
     /// Each ratio is firstPane / (firstPane + secondPane) in the range (0, 1). Null means leave XAML defaults.
     /// </para>
     /// </summary>
-    public sealed class SessionSplitterState
+    public sealed class SessionStateSplitters
     {
         /// <summary>
         /// File List column share of File List + filter panes (horizontal).
