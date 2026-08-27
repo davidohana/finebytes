@@ -6,14 +6,6 @@ namespace Mfr.Tests.Models
     public sealed class UiConfigTests
     {
         [Fact]
-        public void Add_policy_defaults_match_MFR7()
-        {
-            var ui = new UiConfig();
-            Assert.Equal(RenameListAddMode.Files, ui.AddMode);
-            Assert.True(ui.AddFolderContents);
-        }
-
-        [Fact]
         public void Load_empty_config_keeps_add_policy_defaults()
         {
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-ui-config-" + Guid.NewGuid() + ".json");

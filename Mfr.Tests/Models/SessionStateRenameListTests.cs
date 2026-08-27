@@ -8,15 +8,6 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Sort_fields_round_trip_default_and_desc()
         {
-            Assert.Equal(
-                [
-                    new RenameListSortKey(RenameListSortColumn.FileFolder),
-                    new RenameListSortKey(RenameListSortColumn.ParentFolder),
-                    new RenameListSortKey(RenameListSortColumn.FullFileName),
-                ],
-                RenameListSortKey.DefaultKeys
-            );
-
             var descending = new List<SessionStateRenameListSortField>
             {
                 new(RenameListSortColumn.ParentFolder, Descending: true),

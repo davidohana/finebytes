@@ -48,10 +48,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies capture and apply round-trip mask and exclude fields.
+        /// Verifies capture round-trips mask, exclude, and current path fields.
         /// </summary>
         [Fact]
-        public void CaptureSession_RoundTrips_Mask_And_Exclude_Fields()
+        public void CaptureSession_RoundTrips_Mask_Exclude_And_Path()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var viewModel = _CreateViewModel(dir);
@@ -63,6 +63,8 @@ namespace Mfr.Tests.Ui
             viewModel.MaskSuggestions.Add("*.png");
 
             var captured = viewModel.CaptureSession();
+            Assert.Equal(dir, captured.LastOpenedDirectory);
+
             var restored = _CreateViewModel(_tempDirectoryFixture.CreateTempDir());
             restored.ApplySession(captured);
 
@@ -70,20 +72,6 @@ namespace Mfr.Tests.Ui
             Assert.Equal(captured.ExcludeMasksEnabled, restored.ExcludeMasksEnabled);
             Assert.Equal(captured.ExcludeMasks, restored.ExcludeMasks);
             Assert.Equal(captured.MaskSuggestions, restored.MaskSuggestions);
-        }
-
-        /// <summary>
-        /// Verifies capture includes the current folder path for last-opened persistence.
-        /// </summary>
-        [Fact]
-        public void CaptureSession_Includes_Current_Path()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var viewModel = _CreateViewModel(dir);
-
-            var captured = viewModel.CaptureSession();
-
-            Assert.Equal(dir, captured.LastOpenedDirectory);
         }
 
         /// <summary>

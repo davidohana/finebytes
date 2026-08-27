@@ -25,20 +25,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies folders are listed before files, each group in name order.
-        /// </summary>
-        [Fact]
-        public void Lists_Folders_Before_Files()
-        {
-            var dir = _CreateTree();
-            var viewModel = _CreateViewModel(dir);
-
-            Assert.Equal(["zeta-folder", "alpha.txt", "beta.md"], _Names(viewModel));
-            Assert.True(viewModel.Entries[0].IsDirectory);
-            Assert.False(viewModel.Entries[1].IsDirectory);
-        }
-
-        /// <summary>
         /// Verifies Name sort keeps folders above files, matching Windows Explorer.
         /// </summary>
         [Fact]

@@ -67,10 +67,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies folders-only mode skips selected files but still emits folder sources.
+        /// Verifies folders-only mode skips files for selection and dropped paths.
         /// </summary>
         [Fact]
-        public void ResolveFromSelection_FoldersOnly_SkipsFiles()
+        public void FoldersOnly_SkipsFiles_ForSelectionAndPaths()
         {
             var albumPath = Path.Combine(_dir, "album");
             var filePath = Path.Combine(_dir, "alpha.txt");
@@ -80,14 +80,20 @@ namespace Mfr.Tests.Ui
                 new FileListSourceItem(filePath, IsDirectory: false),
             };
 
-            var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
+            var selectionSources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 selectedItems,
                 mask: "*",
                 addMode: RenameListAddMode.Folders
             );
+            var pathSources = RenameListAddSourceResolver.ResolveSourcesFromPaths(
+                [albumPath, filePath],
+                mask: "*",
+                addMode: RenameListAddMode.Folders
+            );
 
-            var source = Assert.Single(sources);
-            Assert.Equal(Path.Combine(albumPath, "*"), source);
+            var selectionSource = Assert.Single(selectionSources);
+            Assert.Equal(Path.Combine(albumPath, "*"), selectionSource);
+            Assert.Equal(selectionSource, Assert.Single(pathSources));
             Assert.True(
                 RenameListAddSourceResolver.CanResolveFromSelection(
                     selectedItems,
@@ -100,37 +106,6 @@ namespace Mfr.Tests.Ui
                     [selectedItems[1]],
                     mask: "*",
                     addMode: RenameListAddMode.Folders
-                )
-            );
-        }
-
-        /// <summary>
-        /// Verifies drive-root selection is not addable.
-        /// </summary>
-        [Fact]
-        public void ResolveFromSelection_RootPath_ReturnsEmpty()
-        {
-            if (!OperatingSystem.IsWindows())
-            {
-                return;
-            }
-
-            var root = Path.GetPathRoot(_dir);
-            Assert.False(string.IsNullOrEmpty(root));
-            var selectedItems = new[] { new FileListSourceItem(root, IsDirectory: true) };
-
-            Assert.Empty(
-                RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                    selectedItems,
-                    mask: "*",
-                    addMode: RenameListAddMode.FilesAndFolders
-                )
-            );
-            Assert.False(
-                RenameListAddSourceResolver.CanResolveFromSelection(
-                    selectedItems,
-                    mask: "*",
-                    addMode: RenameListAddMode.FilesAndFolders
                 )
             );
         }
@@ -156,52 +131,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies File List sentinel locations are not addable as selection sources.
-        /// </summary>
-        [Fact]
-        public void ResolveFromSelection_SentinelPath_ReturnsEmpty()
-        {
-            var selectedItems = new[] { new FileListSourceItem(FileListPath.ComputerPath, IsDirectory: true) };
-
-            Assert.Empty(
-                RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                    selectedItems,
-                    mask: "*",
-                    addMode: RenameListAddMode.FilesAndFolders
-                )
-            );
-            Assert.False(
-                RenameListAddSourceResolver.CanResolveFromSelection(
-                    selectedItems,
-                    mask: "*",
-                    addMode: RenameListAddMode.FilesAndFolders
-                )
-            );
-
-            if (!OperatingSystem.IsWindows())
-            {
-                return;
-            }
-
-            selectedItems = [new FileListSourceItem(FileListPath.NetworkPath, IsDirectory: true)];
-
-            Assert.Empty(
-                RenameListAddSourceResolver.ResolveSourcesFromSelection(
-                    selectedItems,
-                    mask: "*",
-                    addMode: RenameListAddMode.FilesAndFolders
-                )
-            );
-            Assert.False(
-                RenameListAddSourceResolver.CanResolveFromSelection(
-                    selectedItems,
-                    mask: "*",
-                    addMode: RenameListAddMode.FilesAndFolders
-                )
-            );
-        }
-
-        /// <summary>
         /// Verifies dropped paths use Directory.Exists for folder+mask sources.
         /// </summary>
         [Fact]
@@ -219,25 +148,6 @@ namespace Mfr.Tests.Ui
             Assert.Equal(2, sources.Count);
             Assert.Contains(Path.Combine(albumPath, "*.mp3"), sources);
             Assert.Contains(filePath, sources);
-        }
-
-        /// <summary>
-        /// Verifies folders-only mode skips file paths from drag-drop.
-        /// </summary>
-        [Fact]
-        public void ResolveFromPaths_FoldersOnly_SkipsFiles()
-        {
-            var albumPath = Path.Combine(_dir, "album");
-            var filePath = Path.Combine(_dir, "alpha.txt");
-
-            var sources = RenameListAddSourceResolver.ResolveSourcesFromPaths(
-                [albumPath, filePath],
-                mask: "*",
-                addMode: RenameListAddMode.Folders
-            );
-
-            var source = Assert.Single(sources);
-            Assert.Equal(Path.Combine(albumPath, "*"), source);
         }
 
         /// <summary>

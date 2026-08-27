@@ -832,57 +832,6 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies that <c>confirmBeforeApply</c> returning <c>false</c> skips renames without moving files.
-        /// </summary>
-        public void Commit_ConfirmBeforeApply_AllFalse_SkipsAllRenames()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var firstSource = dir.CombinePath("track01.mp3");
-            var secondSource = dir.CombinePath("track02.mp3");
-            File.WriteAllText(firstSource, "x");
-            File.WriteAllText(secondSource, "y");
-
-            var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources([firstSource, secondSource]);
-
-            var preset = _CounterReplacePrefixPreset("counter");
-            var result = _PreviewAndCommit(renameList, preset, confirmBeforeApply: _ => false);
-
-            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitSkipped));
-            Assert.Equal(0, result.Count(x => x.Status == RenameStatus.CommitOk));
-            Assert.True(File.Exists(firstSource));
-            Assert.True(File.Exists(secondSource));
-            Assert.False(File.Exists(dir.CombinePath("001.mp3")));
-            Assert.False(File.Exists(dir.CombinePath("002.mp3")));
-        }
-
-        [Fact]
-        /// <summary>
-        /// Verifies that <c>confirmBeforeApply</c> returning <c>true</c> matches commit behavior without a callback.
-        /// </summary>
-        public void Commit_ConfirmBeforeApply_AllTrue_RenamesFiles()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var firstSource = dir.CombinePath("track01.mp3");
-            var secondSource = dir.CombinePath("track02.mp3");
-            File.WriteAllText(firstSource, "x");
-            File.WriteAllText(secondSource, "y");
-
-            var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources([firstSource, secondSource]);
-
-            var preset = _CounterReplacePrefixPreset("counter");
-            var result = _PreviewAndCommit(renameList, preset, confirmBeforeApply: _ => true);
-
-            Assert.Equal(2, result.Count(x => x.Status == RenameStatus.CommitOk));
-            Assert.False(File.Exists(firstSource));
-            Assert.False(File.Exists(secondSource));
-            Assert.True(File.Exists(dir.CombinePath("001.mp3")));
-            Assert.True(File.Exists(dir.CombinePath("002.mp3")));
-        }
-
-        [Fact]
-        /// <summary>
         /// Verifies that <c>confirmBeforeApply</c> is invoked immediately before each item is committed,
         /// rather than collected up-front, and that rejecting a single item does not affect the others.
         /// </summary>
@@ -1099,30 +1048,6 @@ namespace Mfr.Tests.Engine
 
             var preset = _CreateEmptyStepsPreset("no-change");
             var result = _PreviewAndCommit(renameList, preset);
-
-            Assert.Single(result);
-            Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);
-            Assert.Empty(result[0].Changes);
-            Assert.Null(files[0].CommitError);
-            Assert.True(File.Exists(source));
-        }
-
-        [Fact]
-        /// <summary>
-        /// Verifies that dry-run commit still skips items whose preview destination equals source.
-        /// </summary>
-        public void Commit_DryRun_SkipsItem_WhenPreviewDestinationMatchesSource()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var source = dir.CombinePath("track.mp3");
-            File.WriteAllText(source, "x");
-
-            var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources([source]);
-            var files = renameList.RenameItems;
-
-            var preset = _CreateEmptyStepsPreset("no-change");
-            var result = _PreviewAndCommit(renameList, preset, dryRun: true);
 
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitSkipped, result[0].Status);

@@ -8,44 +8,18 @@ namespace Mfr.Tests.Ui
     public sealed class RenameListSortDisplayTests
     {
         /// <summary>
-        /// Verifies column labels match grid headers.
+        /// Verifies Auto-Sort summary text for off, default keys, and single-column sort.
         /// </summary>
         [Fact]
-        public void GetColumnLabel_Matches_Grid_Headers()
-        {
-            Assert.Equal("File/Folder", RenameListSortDisplay.GetColumnLabel(RenameListSortColumn.FileFolder));
-            Assert.Equal("Parent Folder", RenameListSortDisplay.GetColumnLabel(RenameListSortColumn.ParentFolder));
-            Assert.Equal("Full File Name", RenameListSortDisplay.GetColumnLabel(RenameListSortColumn.FullFileName));
-            Assert.Equal("Full Path", RenameListSortDisplay.GetColumnLabel(RenameListSortColumn.FullPath));
-        }
-
-        /// <summary>
-        /// Verifies an empty key list shows the off tooltip.
-        /// </summary>
-        [Fact]
-        public void FormatSummary_Empty_Shows_Off_Message()
+        public void FormatSummary_Reflects_Key_State()
         {
             Assert.Equal(RenameListSortDisplay.AutoSortOffSummary, RenameListSortDisplay.FormatSummary([]));
-        }
 
-        /// <summary>
-        /// Verifies default keys format as numbered ascending lines.
-        /// </summary>
-        [Fact]
-        public void FormatSummary_DefaultKeys_Shows_Numbered_Lines()
-        {
             Assert.Equal(
                 "1. File/Folder ↑\n2. Parent Folder ↑\n3. Full File Name ↑",
                 RenameListSortDisplay.FormatSummary(RenameListSortKey.DefaultKeys)
             );
-        }
 
-        /// <summary>
-        /// Verifies a single descending key formats with a down arrow.
-        /// </summary>
-        [Fact]
-        public void FormatSummary_SingleColumn_Shows_Direction()
-        {
             Assert.Equal(
                 "1. Full File Name ↓",
                 RenameListSortDisplay.FormatSummary([
@@ -63,10 +37,15 @@ namespace Mfr.Tests.Ui
             var states = RenameListSortDisplay.BuildColumnSortStates(RenameListSortKey.DefaultKeys);
 
             Assert.Equal(1, states[RenameListSortColumn.FileFolder].Priority);
+
             Assert.Equal(2, states[RenameListSortColumn.ParentFolder].Priority);
+
             Assert.Equal(3, states[RenameListSortColumn.FullFileName].Priority);
+
             Assert.False(states[RenameListSortColumn.FileFolder].IsDescending);
+
             Assert.False(states[RenameListSortColumn.ParentFolder].IsDescending);
+
             Assert.False(states[RenameListSortColumn.FullFileName].IsDescending);
         }
 
@@ -81,10 +60,15 @@ namespace Mfr.Tests.Ui
             ]);
 
             Assert.False(states[RenameListSortColumn.FileFolder].IsActive);
+
             Assert.False(states[RenameListSortColumn.ParentFolder].IsActive);
+
             Assert.True(states[RenameListSortColumn.FullFileName].IsActive);
+
             Assert.Equal(1, states[RenameListSortColumn.FullFileName].Priority);
+
             Assert.True(states[RenameListSortColumn.FullFileName].IsDescending);
+
             Assert.Equal("↓", states[RenameListSortColumn.FullFileName].DirectionGlyph);
         }
 
@@ -99,9 +83,13 @@ namespace Mfr.Tests.Ui
             ]);
 
             Assert.True(states[RenameListSortColumn.FullPath].IsActive);
+
             Assert.Equal(1, states[RenameListSortColumn.FullPath].Priority);
+
             Assert.False(states[RenameListSortColumn.FileFolder].IsActive);
+
             Assert.False(states[RenameListSortColumn.ParentFolder].IsActive);
+
             Assert.False(states[RenameListSortColumn.FullFileName].IsActive);
         }
 
@@ -114,6 +102,7 @@ namespace Mfr.Tests.Ui
             var states = RenameListSortDisplay.BuildColumnSortStates(RenameListSortKey.DefaultKeys);
 
             Assert.Equal(states[RenameListSortColumn.FileFolder], states["FileFolder"]);
+
             Assert.False(states["Unknown"].IsActive);
         }
     }

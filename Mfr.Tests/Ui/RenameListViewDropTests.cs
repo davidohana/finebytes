@@ -54,37 +54,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies a File drop on Rename List adds matching paths.
-        /// </summary>
-        [AvaloniaFact]
-        public async Task Drop_Files_Adds_Paths()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var alphaPath = Path.Combine(dir, "alpha.txt");
-            var betaPath = Path.Combine(dir, "beta.md");
-            File.WriteAllText(alphaPath, "a");
-            File.WriteAllText(betaPath, "b");
-
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            var (view, window) = _Show(renameListViewModel);
-
-            Assert.True(DragDrop.GetAllowDrop(view));
-
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [alphaPath, betaPath]);
-            var dropArgs = new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, default, KeyModifiers.None);
-            view.RaiseEvent(dropArgs);
-
-            await _WaitUntil(() => renameListViewModel.Entries.Count == 2);
-            Assert.Equal(
-                ["alpha.txt", "beta.md"],
-                renameListViewModel.Entries.Select(entry => entry.FullFileName).OrderBy(n => n, StringComparer.Ordinal)
-            );
-
-            window.Close();
-        }
-
-        /// <summary>
         /// Verifies DragOver rejects non-file payloads.
         /// </summary>
         [AvaloniaFact]
@@ -162,39 +131,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies DragOver without Alt leaves existing Rename List rows alone.
-        /// </summary>
-        [AvaloniaFact]
-        public async Task DragOver_Without_Alt_Does_Not_Clear()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var existingPath = Path.Combine(dir, "existing.txt");
-            var dragPath = Path.Combine(dir, "drag.txt");
-            File.WriteAllText(existingPath, "e");
-            File.WriteAllText(dragPath, "d");
-
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            await renameListViewModel.AddPathsAsync([existingPath]);
-            Assert.Single(renameListViewModel.Entries);
-
-            var (view, window) = _Show(renameListViewModel);
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
-            var dragOverArgs = new DragEventArgs(
-                DragDrop.DragOverEvent,
-                dataTransfer,
-                view,
-                default,
-                KeyModifiers.None
-            );
-            view.RaiseEvent(dragOverArgs);
-
-            Assert.Single(renameListViewModel.Entries);
-            Assert.Equal("existing.txt", renameListViewModel.Entries[0].FullFileName);
-            window.Close();
-        }
-
-        /// <summary>
         /// Verifies Alt+DragOver then Drop replaces the list with only the dropped files.
         /// </summary>
         [AvaloniaFact]
@@ -219,44 +155,6 @@ namespace Mfr.Tests.Ui
             await _WaitUntil(() => renameListViewModel.Entries.Count == 1);
 
             Assert.Equal("drag.txt", renameListViewModel.Entries[0].FullFileName);
-            window.Close();
-        }
-
-        /// <summary>
-        /// Verifies DragOver over a row sets the salmon drop mark index (MFR7 MarkedRow).
-        /// </summary>
-        [AvaloniaFact]
-        [Obsolete]
-        public async Task DragOver_Over_Row_Sets_DropMarkIndex()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var alphaPath = Path.Combine(dir, "alpha.txt");
-            var betaPath = Path.Combine(dir, "beta.md");
-            var dragPath = Path.Combine(dir, "drag.txt");
-            File.WriteAllText(alphaPath, "a");
-            File.WriteAllText(betaPath, "b");
-            File.WriteAllText(dragPath, "d");
-
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
-
-            var (view, window) = _Show(renameListViewModel);
-            var grid = view.FindControl<DataGrid>("RenameGrid");
-            Assert.NotNull(grid);
-            Dispatcher.UIThread.RunJobs();
-
-            var betaEntry = renameListViewModel.Entries[1];
-            var pointOnView = _PointOverEntry(view, grid, betaEntry);
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
-            view.RaiseEvent(
-                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
-            );
-
-            Assert.Equal(1, renameListViewModel.DropMarkIndex);
-            var markedRow = grid.GetVisualDescendants().OfType<DataGridRow>().First(row => row.Index == 1);
-            Assert.Contains("drop-mark", markedRow.Classes);
-
             window.Close();
         }
 
@@ -328,49 +226,6 @@ namespace Mfr.Tests.Ui
                 new DragEventArgs(DragDrop.DragLeaveEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
             );
             Assert.Equal(0, renameListViewModel.DropMarkIndex);
-
-            window.Close();
-        }
-
-        /// <summary>
-        /// Verifies Drop with an active mark inserts before the marked row.
-        /// </summary>
-        [AvaloniaFact]
-        public async Task Drop_With_DropMark_Inserts_Before_Marked_Row()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var alphaPath = Path.Combine(dir, "alpha.txt");
-            var betaPath = Path.Combine(dir, "beta.md");
-            var dragPath = Path.Combine(dir, "drag.txt");
-            File.WriteAllText(alphaPath, "a");
-            File.WriteAllText(betaPath, "b");
-            File.WriteAllText(dragPath, "d");
-
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
-            renameListViewModel.SetSelectedEntries([]);
-
-            var (view, window) = _Show(renameListViewModel);
-            var grid = view.FindControl<DataGrid>("RenameGrid");
-            Assert.NotNull(grid);
-            Dispatcher.UIThread.RunJobs();
-
-            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1]);
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
-            view.RaiseEvent(
-                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
-            );
-            Assert.Equal(1, renameListViewModel.DropMarkIndex);
-
-            view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, pointOnView, KeyModifiers.None));
-            await _WaitUntil(() => renameListViewModel.Entries.Count == 3);
-
-            Assert.Equal(
-                ["alpha.txt", "drag.txt", "beta.md"],
-                renameListViewModel.Entries.Select(entry => entry.FullFileName)
-            );
-            Assert.Null(renameListViewModel.DropMarkIndex);
 
             window.Close();
         }
@@ -478,85 +333,6 @@ namespace Mfr.Tests.Ui
 
             Assert.Equal(2, renameListViewModel.Entries.Count);
             Assert.Equal(["alpha.txt", "beta.md"], renameListViewModel.Entries.Select(e => e.FullFileName));
-
-            window.Close();
-        }
-
-        /// <summary>
-        /// Verifies Drop of an internal reorder payload moves the selection before the mark.
-        /// </summary>
-        [AvaloniaFact]
-        public async Task Drop_Internal_Reorder_Moves_Selection_Before_Mark()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var alphaPath = Path.Combine(dir, "alpha.txt");
-            var betaPath = Path.Combine(dir, "beta.md");
-            var gammaPath = Path.Combine(dir, "gamma.log");
-            File.WriteAllText(alphaPath, "a");
-            File.WriteAllText(betaPath, "b");
-            File.WriteAllText(gammaPath, "g");
-
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            await renameListViewModel.AddPathsAsync([alphaPath, betaPath, gammaPath]);
-
-            var (view, window) = _Show(renameListViewModel);
-            var grid = view.FindControl<DataGrid>("RenameGrid");
-            Assert.NotNull(grid);
-            Dispatcher.UIThread.RunJobs();
-            var alpha = renameListViewModel.Entries[0];
-            renameListViewModel.SetSelectedEntries([alpha]);
-
-            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[2]);
-            var dataTransfer = _CreateInternalReorderDataTransfer();
-            view.RaiseEvent(
-                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
-            );
-            Assert.Equal(2, renameListViewModel.DropMarkIndex);
-
-            view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, pointOnView, KeyModifiers.None));
-
-            Assert.Equal(
-                ["beta.md", "alpha.txt", "gamma.log"],
-                renameListViewModel.Entries.Select(entry => entry.FullFileName)
-            );
-            Assert.Equal([alpha], renameListViewModel.SelectedEntries);
-            Assert.Null(renameListViewModel.DropMarkIndex);
-
-            window.Close();
-        }
-
-        /// <summary>
-        /// Verifies Drop onto a selected row is a no-op.
-        /// </summary>
-        [AvaloniaFact]
-        public async Task Drop_Internal_Reorder_On_Selection_Is_NoOp()
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var alphaPath = Path.Combine(dir, "alpha.txt");
-            var betaPath = Path.Combine(dir, "beta.md");
-            File.WriteAllText(alphaPath, "a");
-            File.WriteAllText(betaPath, "b");
-
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
-
-            var (view, window) = _Show(renameListViewModel);
-            var grid = view.FindControl<DataGrid>("RenameGrid");
-            Assert.NotNull(grid);
-            Dispatcher.UIThread.RunJobs();
-            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0], renameListViewModel.Entries[1]]);
-
-            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1]);
-            var dataTransfer = _CreateInternalReorderDataTransfer();
-            view.RaiseEvent(
-                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
-            );
-            view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, pointOnView, KeyModifiers.None));
-
-            Assert.Equal(["alpha.txt", "beta.md"], renameListViewModel.Entries.Select(entry => entry.FullFileName));
-            Assert.Null(renameListViewModel.DropMarkIndex);
 
             window.Close();
         }

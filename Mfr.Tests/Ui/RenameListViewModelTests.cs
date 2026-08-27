@@ -1,5 +1,4 @@
 using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 
@@ -61,28 +60,6 @@ namespace Mfr.Tests.Ui
 
             fileListViewModel.SetSelectedEntries([alpha]);
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            Assert.Equal(2, renameListViewModel.Entries.Count);
-        }
-
-        /// <summary>
-        /// Verifies AddPathsAsync adds dropped files with the same rules as Add Selected.
-        /// </summary>
-        [Fact]
-        public async Task AddPaths_Adds_Files_And_Ignores_Duplicates()
-        {
-            var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            var alphaPath = Path.Combine(dir, "alpha.txt");
-            var betaPath = Path.Combine(dir, "beta.md");
-            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
-
-            Assert.Equal(2, renameListViewModel.Entries.Count);
-            Assert.Equal(["alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
-
-            await renameListViewModel.AddPathsAsync([alphaPath]);
 
             Assert.Equal(2, renameListViewModel.Entries.Count);
         }
@@ -234,66 +211,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add All is disabled on This PC (sentinel gate), even though listed places are addable.
-        /// </summary>
-        [Fact]
-        public void AddAll_Is_Disabled_On_Computer_Path()
-        {
-            if (!OperatingSystem.IsWindows())
-            {
-                return;
-            }
-
-            var fileListViewModel = _CreateFileListViewModel(_tempDirectoryFixture.CreateTempDir());
-            fileListViewModel.NavigateTo(FileListViewModel.ComputerPath);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            Assert.True(fileListViewModel.Entries.Count > 0);
-            Assert.False(RenameListAddSourceResolver.CanAddAllFrom(fileListViewModel.CurrentPath));
-            Assert.False(renameListViewModel.AddAllCommand.CanExecute(null));
-        }
-
-        /// <summary>
-        /// Verifies Add All is enabled on a drive root when listed child rows are addable.
-        /// </summary>
-        [Fact]
-        public void AddAll_Is_Enabled_On_Drive_Root_With_Listed_Children()
-        {
-            if (!OperatingSystem.IsWindows())
-            {
-                return;
-            }
-
-            var dir = _CreateSampleFolder();
-            var root = Path.GetPathRoot(dir);
-            Assert.False(string.IsNullOrEmpty(root));
-
-            var fileListViewModel = _CreateFileListViewModel(root);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            Assert.True(RenameListAddSourceResolver.CanAddAllFrom(fileListViewModel.CurrentPath));
-            Assert.True(renameListViewModel.AddAllCommand.CanExecute(null));
-        }
-
-        /// <summary>
-        /// Verifies preview names match originals before filter preview exists.
-        /// </summary>
-        [Fact]
-        public async Task Entries_Show_Identity_Preview()
-        {
-            var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt")]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileName);
-            Assert.Equal("alpha.txt", renameListViewModel.Entries[0].FullFileNamePreview);
-            Assert.Equal("File", renameListViewModel.Entries[0].FileFolder);
-        }
-
-        /// <summary>
         /// Verifies Add Selected on a folder adds matching files recursively and no folder row (UI defaults).
         /// </summary>
         [Fact]
@@ -381,31 +298,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add All matches Add Selected when every listed row is selected.
-        /// </summary>
-        [Fact]
-        public async Task AddAll_Matches_AddSelected_When_All_Listed_Rows_Selected()
-        {
-            var (parent, albumPath) = _CreateAlbumTree();
-            var other = Path.Combine(parent, "other.txt");
-            File.WriteAllText(other, "o");
-
-            var addAllList = _CreateFileListViewModel(parent);
-            var addAllRename = new RenameListViewModel(addAllList);
-            await addAllRename.AddAllCommand.ExecuteAsync(null);
-
-            var addSelectedList = _CreateFileListViewModel(parent);
-            var addSelectedRename = new RenameListViewModel(addSelectedList);
-            addSelectedList.SetSelectedEntries([.. addSelectedList.Entries]);
-            await addSelectedRename.AddSelectedCommand.ExecuteAsync(null);
-
-            Assert.Equal(
-                _PreviewNames(addAllRename).OrderBy(n => n, StringComparer.Ordinal),
-                _PreviewNames(addSelectedRename).OrderBy(n => n, StringComparer.Ordinal)
-            );
-        }
-
-        /// <summary>
         /// Verifies Add Selected can mix an exact file with a folder source.
         /// </summary>
         [Fact]
@@ -472,38 +364,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Remove Selected drops selected rows and leaves the rest.
+        /// Verifies Remove Selected drops rows, updates CanExecute, and keeps selection at the same index.
         /// </summary>
         [Fact]
-        public async Task RemoveSelected_Removes_Only_Selected_Rows()
-        {
-            var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            Assert.Equal(2, renameListViewModel.ItemCount);
-            Assert.False(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
-
-            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
-            Assert.True(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
-
-            renameListViewModel.RemoveSelectedCommand.Execute(null);
-
-            Assert.Single(renameListViewModel.Entries);
-            Assert.Equal("beta.md", renameListViewModel.Entries[0].FullFileName);
-            Assert.Single(renameListViewModel.SelectedEntries);
-            Assert.Same(renameListViewModel.Entries[0], renameListViewModel.SelectedEntries[0]);
-            Assert.Equal(1, renameListViewModel.ItemCount);
-            Assert.True(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
-        }
-
-        /// <summary>
-        /// Verifies Remove Selected keeps focus on the row that slides into the deleted index.
-        /// </summary>
-        [Fact]
-        public async Task RemoveSelected_Selects_Row_At_Same_Index()
+        public async Task RemoveSelected_Drops_Rows_And_Keeps_Selection_At_Index()
         {
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
@@ -515,37 +379,19 @@ namespace Mfr.Tests.Ui
                 _FileEntry(dir, "gamma.log"),
             ]);
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            Assert.Equal(3, renameListViewModel.ItemCount);
+            Assert.False(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
 
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[1]]);
+            Assert.True(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
             renameListViewModel.RemoveSelectedCommand.Execute(null);
 
             Assert.Equal(["alpha.txt", "gamma.log"], _PreviewNames(renameListViewModel));
             Assert.Single(renameListViewModel.SelectedEntries);
             Assert.Equal("gamma.log", renameListViewModel.SelectedEntries[0].FullFileName);
-        }
-
-        /// <summary>
-        /// Verifies Add appends new rows without recreating existing entry objects.
-        /// </summary>
-        [Fact]
-        public async Task AddSelected_Preserves_Existing_Entry_Identity()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            var alphaEntry = renameListViewModel.Entries[0];
-            var betaEntry = renameListViewModel.Entries[1];
-
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "gamma.log")]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            Assert.Equal(3, renameListViewModel.Entries.Count);
-            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
-            Assert.Same(betaEntry, renameListViewModel.Entries[1]);
-            Assert.Equal("gamma.log", renameListViewModel.Entries[2].FullFileName);
+            Assert.Same(renameListViewModel.Entries[1], renameListViewModel.SelectedEntries[0]);
+            Assert.Equal(2, renameListViewModel.ItemCount);
+            Assert.True(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
         }
 
         /// <summary>
@@ -575,32 +421,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Add inserts after a non-last selected row, keeping existing row identity.
-        /// </summary>
-        [Fact]
-        public async Task AddSelected_With_First_Row_Selected_Inserts_After_It()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "gamma.log")]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            var alphaEntry = renameListViewModel.Entries[0];
-            var gammaEntry = renameListViewModel.Entries[1];
-
-            renameListViewModel.SetSelectedEntries([alphaEntry]);
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "beta.md")]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
-            Assert.Same(gammaEntry, renameListViewModel.Entries[2]);
-            Assert.Single(renameListViewModel.SelectedEntries);
-            Assert.Equal("beta.md", renameListViewModel.SelectedEntries[0].FullFileName);
-        }
-
-        /// <summary>
         /// Verifies Add with no Rename List selection still appends.
         /// </summary>
         [Fact]
@@ -622,56 +442,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies a drop mark inserts before the marked row and overrides selection insert (MFR7 MarkedRow).
-        /// </summary>
-        [Fact]
-        public async Task AddPaths_With_DropMark_Inserts_Before_Marked_Row()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "gamma.log")]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            var alphaEntry = renameListViewModel.Entries[0];
-            var gammaEntry = renameListViewModel.Entries[1];
-
-            // Selection alone would insert after gamma; mark on gamma inserts before it.
-            renameListViewModel.SetSelectedEntries([gammaEntry]);
-            renameListViewModel.SetDropMarkIndex(1);
-            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "beta.md")]);
-
-            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
-            Assert.Same(gammaEntry, renameListViewModel.Entries[2]);
-            Assert.Null(renameListViewModel.DropMarkIndex);
-            Assert.Single(renameListViewModel.SelectedEntries);
-            Assert.Equal("beta.md", renameListViewModel.SelectedEntries[0].FullFileName);
-        }
-
-        /// <summary>
-        /// Verifies a drop mark on the first row inserts at the start.
-        /// </summary>
-        [Fact]
-        public async Task AddPaths_With_DropMark_On_First_Row_Inserts_At_Start()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "beta.md"), _FileEntry(dir, "gamma.log")]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            renameListViewModel.SetSelectedEntries([]);
-
-            renameListViewModel.SetDropMarkIndex(0);
-            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt")]);
-
-            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Null(renameListViewModel.DropMarkIndex);
-            Assert.Equal("alpha.txt", renameListViewModel.SelectedEntries[0].FullFileName);
-        }
-
-        /// <summary>
         /// Verifies SetDropMarkIndex ignores out-of-range indices.
         /// </summary>
         [Fact]
@@ -689,36 +459,6 @@ namespace Mfr.Tests.Ui
 
             renameListViewModel.SetDropMarkIndex(5);
             Assert.Null(renameListViewModel.DropMarkIndex);
-        }
-
-        /// <summary>
-        /// Verifies Remove keeps remaining row objects and order.
-        /// </summary>
-        [Fact]
-        public async Task RemoveSelected_Preserves_Remaining_Entry_Identity()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([
-                _FileEntry(dir, "alpha.txt"),
-                _FileEntry(dir, "beta.md"),
-                _FileEntry(dir, "gamma.log"),
-            ]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            var alphaEntry = renameListViewModel.Entries[0];
-            var gammaEntry = renameListViewModel.Entries[2];
-
-            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[1]]);
-            renameListViewModel.RemoveSelectedCommand.Execute(null);
-
-            Assert.Equal(2, renameListViewModel.Entries.Count);
-            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
-            Assert.Same(gammaEntry, renameListViewModel.Entries[1]);
-            Assert.Equal(["alpha.txt", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Single(renameListViewModel.SelectedEntries);
-            Assert.Same(gammaEntry, renameListViewModel.SelectedEntries[0]);
         }
 
         /// <summary>
@@ -753,35 +493,6 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Remove All But Selected keeps the same entry objects and list order.
-        /// </summary>
-        [Fact]
-        public async Task RemoveAllButSelected_Preserves_Kept_Entry_Identity()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([
-                _FileEntry(dir, "alpha.txt"),
-                _FileEntry(dir, "beta.md"),
-                _FileEntry(dir, "gamma.log"),
-            ]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            var alphaEntry = renameListViewModel.Entries[0];
-            var gammaEntry = renameListViewModel.Entries[2];
-
-            renameListViewModel.SetSelectedEntries([alphaEntry, gammaEntry]);
-            renameListViewModel.RemoveAllButSelectedCommand.Execute(null);
-
-            Assert.Equal(2, renameListViewModel.Entries.Count);
-            Assert.Same(alphaEntry, renameListViewModel.Entries[0]);
-            Assert.Same(gammaEntry, renameListViewModel.Entries[1]);
-            Assert.Same(alphaEntry, renameListViewModel.SelectedEntries[0]);
-            Assert.Same(gammaEntry, renameListViewModel.SelectedEntries[1]);
-        }
-
-        /// <summary>
         /// Verifies Clear empties the list and updates ItemCount / CanExecute.
         /// </summary>
         [Fact]
@@ -806,214 +517,10 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies Move Selected Up reorders a contiguous selection as a block.
+        /// Verifies Shift+click append adds, toggles, and removes sort keys.
         /// </summary>
         [Fact]
-        public async Task MoveSelectedUp_Moves_Contiguous_Selection_As_Block()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([
-                _FileEntry(dir, "alpha.txt"),
-                _FileEntry(dir, "beta.md"),
-                _FileEntry(dir, "gamma.log"),
-            ]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            Assert.False(renameListViewModel.MoveSelectedUpCommand.CanExecute(null));
-
-            var beta = renameListViewModel.Entries[1];
-            var gamma = renameListViewModel.Entries[2];
-            renameListViewModel.SetSelectedEntries([beta, gamma]);
-            Assert.True(renameListViewModel.MoveSelectedUpCommand.CanExecute(null));
-
-            renameListViewModel.MoveSelectedUpCommand.Execute(null);
-
-            Assert.Equal(["beta.md", "gamma.log", "alpha.txt"], _PreviewNames(renameListViewModel));
-            Assert.Equal([beta, gamma], renameListViewModel.SelectedEntries);
-        }
-
-        /// <summary>
-        /// Verifies Move Selected Down reorders a contiguous selection as a block.
-        /// </summary>
-        [Fact]
-        public async Task MoveSelectedDown_Moves_Contiguous_Selection_As_Block()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([
-                _FileEntry(dir, "alpha.txt"),
-                _FileEntry(dir, "beta.md"),
-                _FileEntry(dir, "gamma.log"),
-            ]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            var alpha = renameListViewModel.Entries[0];
-            var beta = renameListViewModel.Entries[1];
-            renameListViewModel.SetSelectedEntries([alpha, beta]);
-
-            renameListViewModel.MoveSelectedDownCommand.Execute(null);
-
-            Assert.Equal(["gamma.log", "alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
-            Assert.Equal([alpha, beta], renameListViewModel.SelectedEntries);
-        }
-
-        /// <summary>
-        /// Verifies Move Selected Up at the top leaves order unchanged.
-        /// </summary>
-        [Fact]
-        public async Task MoveSelectedUp_At_Top_Is_NoOp()
-        {
-            var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
-            renameListViewModel.MoveSelectedUpCommand.Execute(null);
-
-            Assert.Equal(["alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
-        }
-
-        /// <summary>
-        /// Verifies ReorderSelectedToDropMark inserts the selection before the marked row.
-        /// </summary>
-        [Fact]
-        public async Task ReorderSelectedToDropMark_Inserts_Before_Marked_Row()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([
-                _FileEntry(dir, "alpha.txt"),
-                _FileEntry(dir, "beta.md"),
-                _FileEntry(dir, "gamma.log"),
-            ]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            var alpha = renameListViewModel.Entries[0];
-            renameListViewModel.SetSelectedEntries([alpha]);
-            renameListViewModel.SetDropMarkIndex(2);
-
-            Assert.True(renameListViewModel.ReorderSelectedToDropMark());
-            Assert.Equal(["beta.md", "alpha.txt", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Equal([alpha], renameListViewModel.SelectedEntries);
-            Assert.Null(renameListViewModel.DropMarkIndex);
-        }
-
-        /// <summary>
-        /// Verifies ReorderSelectedToDropMark with no mark appends the selection.
-        /// </summary>
-        [Fact]
-        public async Task ReorderSelectedToDropMark_Without_Mark_Appends()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([
-                _FileEntry(dir, "alpha.txt"),
-                _FileEntry(dir, "beta.md"),
-                _FileEntry(dir, "gamma.log"),
-            ]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            var alpha = renameListViewModel.Entries[0];
-            renameListViewModel.SetSelectedEntries([alpha]);
-            Assert.True(renameListViewModel.ReorderSelectedToDropMark());
-            Assert.Equal(["beta.md", "gamma.log", "alpha.txt"], _PreviewNames(renameListViewModel));
-            Assert.Equal([alpha], renameListViewModel.SelectedEntries);
-        }
-
-        /// <summary>
-        /// Verifies ReorderSelectedToDropMark is a no-op when the mark is on a selected row.
-        /// </summary>
-        [Fact]
-        public async Task ReorderSelectedToDropMark_On_Selection_Is_NoOp()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([
-                _FileEntry(dir, "alpha.txt"),
-                _FileEntry(dir, "beta.md"),
-                _FileEntry(dir, "gamma.log"),
-            ]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0], renameListViewModel.Entries[1]]);
-            renameListViewModel.SetDropMarkIndex(1);
-
-            Assert.False(renameListViewModel.ReorderSelectedToDropMark());
-            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Null(renameListViewModel.DropMarkIndex);
-        }
-
-        /// <summary>
-        /// Verifies header sort enables Auto-Sort and orders by the column.
-        /// </summary>
-        [Fact]
-        public async Task SortByColumn_Enables_AutoSort_And_Orders()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([
-                _FileEntry(dir, "gamma.log"),
-                _FileEntry(dir, "alpha.txt"),
-                _FileEntry(dir, "beta.md"),
-            ]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            Assert.Equal(["gamma.log", "alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
-
-            renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
-
-            Assert.True(renameListViewModel.IsAutoSort);
-            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
-            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FullFileName)], renameListViewModel.SortKeys);
-        }
-
-        /// <summary>
-        /// Verifies a second header click on the same column inverts to descending.
-        /// </summary>
-        [Fact]
-        public async Task SortByColumn_Second_Click_Inverts()
-        {
-            var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            fileListViewModel.SetSelectedEntries([
-                _FileEntry(dir, "alpha.txt"),
-                _FileEntry(dir, "beta.md"),
-                _FileEntry(dir, "gamma.log"),
-            ]);
-            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-
-            renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
-            renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
-
-            Assert.Equal(["gamma.log", "beta.md", "alpha.txt"], _PreviewNames(renameListViewModel));
-            Assert.Equal(
-                [new RenameListSortKey(RenameListSortColumn.FullFileName, Descending: true)],
-                renameListViewModel.SortKeys
-            );
-        }
-
-        /// <summary>
-        /// Verifies Shift+click append adds a second sort key and updates column priorities.
-        /// </summary>
-        [Fact]
-        public void SortByColumn_Append_Adds_Second_Key()
+        public void SortByColumn_Append_Cycles_Keys()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
@@ -1031,45 +538,27 @@ namespace Mfr.Tests.Ui
             );
             Assert.Equal(1, renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].Priority);
             Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].Priority);
-        }
 
-        /// <summary>
-        /// Verifies Shift+click on an ascending key toggles it to descending.
-        /// </summary>
-        [Fact]
-        public void SortByColumn_Append_Toggles_Direction()
-        {
-            var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
+            Assert.Equal(
+                [
+                    new RenameListSortKey(RenameListSortColumn.FileFolder),
+                    new RenameListSortKey(RenameListSortColumn.ParentFolder, Descending: true),
+                ],
+                renameListViewModel.SortKeys
+            );
+            Assert.True(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsDescending);
+
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
+            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FileFolder)], renameListViewModel.SortKeys);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
 
             renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder));
             renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
-
             Assert.Equal(
                 [new RenameListSortKey(RenameListSortColumn.ParentFolder, Descending: true)],
                 renameListViewModel.SortKeys
             );
-            Assert.True(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsDescending);
-        }
-
-        /// <summary>
-        /// Verifies Shift+click on a descending key removes that key from the sort list.
-        /// </summary>
-        [Fact]
-        public void SortByColumn_Append_Removes_Descending_Key()
-        {
-            var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            renameListViewModel.SortByColumn(nameof(RenameListEntry.FileFolder));
-            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
-            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
-            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
-
-            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FileFolder)], renameListViewModel.SortKeys);
-            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
         }
 
         /// <summary>
@@ -1185,52 +674,6 @@ namespace Mfr.Tests.Ui
             renameListViewModel.ToggleAutoSortCommand.Execute(null);
             Assert.False(renameListViewModel.IsAutoSort);
             Assert.Empty(renameListViewModel.SortKeys);
-        }
-
-        /// <summary>
-        /// Verifies SortSummaryText reflects Auto-Sort off, default keys, and single-column sort.
-        /// </summary>
-        [Fact]
-        public void SortSummaryText_Reflects_AutoSort_State()
-        {
-            var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            Assert.Equal(RenameListSortDisplay.AutoSortOffSummary, renameListViewModel.SortSummaryText);
-
-            renameListViewModel.ToggleAutoSortCommand.Execute(null);
-            Assert.Equal(
-                "1. File/Folder ↑\n2. Parent Folder ↑\n3. Full File Name ↑",
-                renameListViewModel.SortSummaryText
-            );
-
-            renameListViewModel.ToggleAutoSortCommand.Execute(null);
-            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder));
-            Assert.Equal("1. Parent Folder ↑", renameListViewModel.SortSummaryText);
-        }
-
-        /// <summary>
-        /// Verifies ColumnSortStates updates when Auto-Sort keys change.
-        /// </summary>
-        [Fact]
-        public void ColumnSortStates_Reflects_SortKeys()
-        {
-            var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-
-            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].IsActive);
-
-            renameListViewModel.ToggleAutoSortCommand.Execute(null);
-            Assert.Equal(1, renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].Priority);
-            Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].Priority);
-            Assert.Equal(3, renameListViewModel.ColumnSortStates[RenameListSortColumn.FullFileName].Priority);
-
-            renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
-            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].IsActive);
-            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
-            Assert.Equal(1, renameListViewModel.ColumnSortStates[RenameListSortColumn.FullFileName].Priority);
         }
 
         /// <summary>

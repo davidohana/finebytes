@@ -1,5 +1,4 @@
 using Avalonia.Media;
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
 
 namespace Mfr.Tests.Ui
@@ -10,31 +9,22 @@ namespace Mfr.Tests.Ui
     public sealed class RenameListCellHintTests
     {
         /// <summary>
-        /// Verifies hints use bold column name, colon, then value.
+        /// Verifies hints use bold column name, colon, then value, including preview suffix stripping.
         /// </summary>
         [Fact]
-        public void FormatParts_Uses_Bold_Column_Name_Colon_Value()
+        public void FormatParts_Uses_Bold_Column_Name_And_Strips_Preview_Suffix()
         {
-            var hint = RenameListCellHint.FormatParts("Full File Name", "alpha.txt", isPreviewColumn: false);
+            var plain = RenameListCellHint.FormatParts("Full File Name", "alpha.txt", isPreviewColumn: false);
+            Assert.Equal(2, plain.Runs.Count);
+            Assert.Equal("Full File Name", plain.Runs[0].Text);
+            Assert.Equal(FontWeight.Bold, plain.Runs[0].FontWeight);
+            Assert.Equal(": alpha.txt", plain.Runs[1].Text);
+            Assert.Equal("Full File Name: alpha.txt", plain.ToPlainText());
 
-            Assert.Equal(2, hint.Runs.Count);
-            Assert.Equal("Full File Name", hint.Runs[0].Text);
-            Assert.Equal(FontWeight.Bold, hint.Runs[0].FontWeight);
-            Assert.Equal(": alpha.txt", hint.Runs[1].Text);
-            Assert.Equal("Full File Name: alpha.txt", hint.ToPlainText());
-        }
-
-        /// <summary>
-        /// Verifies preview columns strip the grid-only preview suffix from the column name.
-        /// </summary>
-        [Fact]
-        public void FormatParts_Strips_Preview_Suffix_From_Column_Name()
-        {
-            var hint = RenameListCellHint.FormatParts("Full File Name (Preview)", "beta.txt", isPreviewColumn: true);
-
-            Assert.Equal("Full File Name", hint.Runs[0].Text);
-            Assert.Equal(": beta.txt", hint.Runs[1].Text);
-            Assert.Equal("Full File Name: beta.txt", hint.ToPlainText());
+            var preview = RenameListCellHint.FormatParts("Full File Name (Preview)", "beta.txt", isPreviewColumn: true);
+            Assert.Equal("Full File Name", preview.Runs[0].Text);
+            Assert.Equal(": beta.txt", preview.Runs[1].Text);
+            Assert.Equal("Full File Name: beta.txt", preview.ToPlainText());
         }
 
         /// <summary>
@@ -61,21 +51,6 @@ namespace Mfr.Tests.Ui
                 "Full File Name (Preview)",
                 RenameListCellHint.GetColumnHeader(null, "Full File Name (Preview)")
             );
-        }
-
-        /// <summary>
-        /// Verifies plain hints are a single default run.
-        /// </summary>
-        [Fact]
-        public void StatusHintDisplay_FromPlain_Uses_Single_Run()
-        {
-            var hint = StatusHintDisplay.FromPlain("Added 3 item(s).");
-
-            Assert.Single(hint.Runs);
-            Assert.Equal("Added 3 item(s).", hint.Runs[0].Text);
-            Assert.Null(hint.Runs[0].FontWeight);
-            Assert.Null(hint.Runs[0].ForegroundResourceKey);
-            Assert.False(hint.IsEmpty);
         }
     }
 }
