@@ -606,6 +606,130 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies the sort editor API sets keys and updates summary plus column glyphs.
+        /// </summary>
+        [Fact]
+        public void SetSortKeys_Updates_Summary_And_ColumnStates()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            renameListViewModel.SetSortKeys([
+                new RenameListSortKey(RenameListSortColumn.FullPath),
+                new RenameListSortKey(RenameListSortColumn.FileFolder, Descending: true),
+            ]);
+
+            Assert.Equal(
+                [
+                    new RenameListSortKey(RenameListSortColumn.FullPath),
+                    new RenameListSortKey(RenameListSortColumn.FileFolder, Descending: true),
+                ],
+                renameListViewModel.SortKeys
+            );
+            Assert.Equal("1. Full Path ↑\n2. File/Folder ↓", renameListViewModel.SortSummaryText);
+            Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].Priority);
+            Assert.True(renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].IsDescending);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
+            Assert.Equal(2, renameListViewModel.SortEditorRows.Count);
+            Assert.Equal(0, renameListViewModel.SortEditorRows[0].Index);
+            Assert.Equal(RenameListSortColumn.FullPath, renameListViewModel.SortEditorRows[0].Key.Column);
+        }
+
+        /// <summary>
+        /// Verifies MoveSortKey reorders keys and resorts the list.
+        /// </summary>
+        [Fact]
+        public async Task MoveSortKey_Reorders_And_Resorts()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "gamma.log"),
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            renameListViewModel.SetSortKeys([
+                new RenameListSortKey(RenameListSortColumn.FullFileName),
+                new RenameListSortKey(RenameListSortColumn.FileFolder),
+            ]);
+            Assert.Equal(["alpha.txt", "beta.md", "gamma.log"], _PreviewNames(renameListViewModel));
+
+            renameListViewModel.MoveSortKey(index: 0, offset: 1);
+            Assert.Equal(
+                [
+                    new RenameListSortKey(RenameListSortColumn.FileFolder),
+                    new RenameListSortKey(RenameListSortColumn.FullFileName),
+                ],
+                renameListViewModel.SortKeys
+            );
+        }
+
+        /// <summary>
+        /// Verifies editor reset, clear, add, remove, and direction helpers.
+        /// </summary>
+        [Fact]
+        public void SortEditor_Api_Reset_Clear_Add_Remove_And_Direction()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            renameListViewModel.ResetSortToDefault();
+            Assert.Equal(RenameListSortKey.DefaultKeys, renameListViewModel.SortKeys);
+            Assert.True(renameListViewModel.IsAutoSort);
+
+            renameListViewModel.ClearAllSortKeys();
+            Assert.Empty(renameListViewModel.SortKeys);
+            Assert.False(renameListViewModel.IsAutoSort);
+            Assert.True(renameListViewModel.CanAddSortKey);
+
+            renameListViewModel.AddSortKeyCommand.Execute(null);
+            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FileFolder)], renameListViewModel.SortKeys);
+            Assert.True(renameListViewModel.CanAddSortKey);
+
+            renameListViewModel.AddSortKeyCommand.Execute(null);
+            renameListViewModel.AddSortKeyCommand.Execute(null);
+            Assert.Equal(3, renameListViewModel.SortKeys.Count);
+            Assert.True(renameListViewModel.CanAddSortKey);
+
+            renameListViewModel.AddSortKeyCommand.Execute(null);
+            Assert.Equal(4, renameListViewModel.SortKeys.Count);
+            Assert.False(renameListViewModel.CanAddSortKey);
+
+            renameListViewModel.ToggleSortKeyDirection(index: 1);
+            Assert.True(renameListViewModel.SortKeys[1].Descending);
+
+            renameListViewModel.SetSortKeyColumn(index: 0, RenameListSortColumn.FullPath);
+            Assert.Equal(RenameListSortColumn.FullPath, renameListViewModel.SortKeys[0].Column);
+
+            renameListViewModel.RemoveSortKey(index: 2);
+            Assert.Equal(3, renameListViewModel.SortKeys.Count);
+            Assert.DoesNotContain(renameListViewModel.SortKeys, key => key.Column == RenameListSortColumn.FullFileName);
+        }
+
+        /// <summary>
+        /// Verifies OpenSortEditor raises <see cref="RenameListViewModel.SortEditorRequested"/>.
+        /// </summary>
+        [Fact]
+        public void OpenSortEditor_Raises_SortEditorRequested()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var raised = false;
+            renameListViewModel.SortEditorRequested += (_, _) => raised = true;
+
+            renameListViewModel.OpenSortEditorCommand.Execute(null);
+
+            Assert.True(raised);
+        }
+
+        /// <summary>
         /// Verifies Auto-Sort adds append then resort, ignoring selection insert.
         /// </summary>
         [Fact]

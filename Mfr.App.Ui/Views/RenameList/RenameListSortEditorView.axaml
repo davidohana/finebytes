@@ -1,0 +1,294 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
+  mc:Ignorable="d"
+  d:DesignWidth="340"
+  d:DesignHeight="260"
+  x:Class="Mfr.App.Ui.Views.RenameList.RenameListSortEditorView"
+  x:DataType="vm:RenameListViewModel"
+>
+  <UserControl.Styles>
+    <Style Selector="Border.sort-editor-panel">
+      <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="12" />
+      <Setter Property="MinWidth" Value="300" />
+    </Style>
+    <Style Selector="TextBlock.sort-editor-title">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.sort-editor-hint">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+    <Style Selector="Border.sort-editor-row">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Padding" Value="4,2" />
+      <Setter Property="Margin" Value="0,1" />
+    </Style>
+    <Style Selector="Border.sort-editor-row:pointerover">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Border.sort-editor-priority">
+      <Setter Property="Background" Value="{DynamicResource FileListSortGlyphBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSortGlyphBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="MinWidth" Value="22" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.sort-editor-priority TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListSortGlyphForegroundBrush}" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.sort-editor-icon">
+      <Setter Property="Width" Value="20" />
+      <Setter Property="Height" Value="14" />
+      <Setter Property="MinWidth" Value="20" />
+      <Setter Property="MinHeight" Value="14" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
+    </Style>
+    <Style Selector="Button.sort-editor-icon /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.sort-editor-icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.sort-editor-icon:disabled">
+      <Setter Property="Opacity" Value="0.35" />
+    </Style>
+    <Style Selector="Button.sort-editor-direction">
+      <Setter Property="MinWidth" Value="28" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="6,0" />
+      <Setter Property="Margin" Value="4,0,0,0" />
+      <Setter Property="Background" Value="{DynamicResource FileListSortGlyphBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSortGlyphBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListSortGlyphForegroundBrush}" />
+    </Style>
+    <Style Selector="Button.sort-editor-direction:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.sort-editor-remove">
+      <Setter Property="Width" Value="22" />
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinWidth" Value="22" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="4,0,0,0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
+    </Style>
+    <Style Selector="Button.sort-editor-remove:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="ComboBox.sort-editor-column">
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Margin" Value="6,0,0,0" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="Button.sort-editor-footer">
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="Padding" Value="10,4" />
+      <Setter Property="Margin" Value="0,0,6,0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="Button.sort-editor-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.sort-editor-footer:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+    <Style Selector="Button.sort-editor-footer-primary">
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="Padding" Value="10,4" />
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="Button.sort-editor-footer-primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.sort-editor-footer-primary:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+    <Style Selector="Rectangle.sort-editor-divider">
+      <Setter Property="Height" Value="1" />
+      <Setter Property="Fill" Value="{DynamicResource FileListSeparatorBrush}" />
+      <Setter Property="Margin" Value="0,8" />
+    </Style>
+  </UserControl.Styles>
+  <Border Classes="sort-editor-panel">
+    <StackPanel Spacing="6">
+      <TextBlock Classes="sort-editor-title" Text="Sort order" />
+      <TextBlock
+        Classes="sort-editor-hint"
+        Text="Auto-Sort is off. Add fields or choose Reset for the default order."
+        IsVisible="{Binding !IsAutoSort}"
+      />
+      <ScrollViewer MaxHeight="220" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding SortEditorRows}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:RenameListSortEditorRow">
+              <Border Classes="sort-editor-row">
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" VerticalAlignment="Center">
+                  <Border Grid.Column="0" Classes="sort-editor-priority">
+                    <TextBlock Text="{Binding DisplayPriority}" />
+                  </Border>
+                  <StackPanel Grid.Column="1" Margin="4,0,0,0" Spacing="0" VerticalAlignment="Center">
+                    <Button
+                      Classes="sort-editor-icon"
+                      ToolTip.Tip="Move up"
+                      Command="{Binding $parent[UserControl].((vm:RenameListViewModel)DataContext).MoveSortKeyUpCommand}"
+                      CommandParameter="{Binding Index}"
+                    >
+                      <Path
+                        Width="8"
+                        Height="5"
+                        Stretch="Uniform"
+                        Data="M0,5 L4,0 L8,5 Z"
+                        Fill="{DynamicResource FileListBreadcrumbMutedBrush}"
+                      />
+                    </Button>
+                    <Button
+                      Classes="sort-editor-icon"
+                      ToolTip.Tip="Move down"
+                      Command="{Binding $parent[UserControl].((vm:RenameListViewModel)DataContext).MoveSortKeyDownCommand}"
+                      CommandParameter="{Binding Index}"
+                    >
+                      <Path
+                        Width="8"
+                        Height="5"
+                        Stretch="Uniform"
+                        Data="M0,0 L4,5 L8,0 Z"
+                        Fill="{DynamicResource FileListBreadcrumbMutedBrush}"
+                      />
+                    </Button>
+                  </StackPanel>
+                  <ComboBox
+                    Grid.Column="2"
+                    Classes="sort-editor-column"
+                    ItemsSource="{x:Static vm:RenameListSortDisplay.EditorColumnOptions}"
+                    Loaded="_OnColumnComboBoxLoaded"
+                    SelectionChanged="_OnColumnSelectionChanged"
+                  >
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate x:DataType="vm:RenameListSortColumnOption">
+                        <TextBlock
+                          Text="{Binding Label}"
+                          FontFamily="{StaticResource FileListFont}"
+                          FontSize="{StaticResource FileListFontSize}"
+                        />
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <Button
+                    Grid.Column="3"
+                    Classes="sort-editor-direction"
+                    Content="{Binding DirectionGlyph}"
+                    ToolTip.Tip="Toggle ascending / descending"
+                    Click="_OnToggleDirectionClick"
+                  />
+                  <Button
+                    Grid.Column="4"
+                    Classes="sort-editor-remove"
+                    ToolTip.Tip="Remove sort level"
+                    Command="{Binding $parent[UserControl].((vm:RenameListViewModel)DataContext).RemoveSortKeyAtCommand}"
+                    CommandParameter="{Binding Index}"
+                  >
+                    <Path
+                      Width="8"
+                      Height="8"
+                      Stretch="Uniform"
+                      Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
+                      StrokeThickness="1.25"
+                      StrokeLineCap="Round"
+                      Data="M1,1 L7,7 M7,1 L1,7"
+                    />
+                  </Button>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+      <Rectangle Classes="sort-editor-divider" />
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+        <Button
+          Grid.Column="0"
+          Classes="sort-editor-footer-primary"
+          Content="Add field"
+          Command="{Binding AddSortKeyCommand}"
+        />
+        <Button
+          Grid.Column="2"
+          Classes="sort-editor-footer"
+          Content="Reset"
+          Command="{Binding ResetSortToDefaultCommand}"
+        />
+        <Button
+          Grid.Column="3"
+          Classes="sort-editor-footer"
+          Content="Clear all"
+          Command="{Binding ClearAllSortKeysCommand}"
+        />
+      </Grid>
+    </StackPanel>
+  </Border>
+</UserControl>

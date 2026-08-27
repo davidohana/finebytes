@@ -82,6 +82,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<RenameListSortKey> SortKeys => _sortKeys;
 
         /// <summary>
+        /// Gets indexed rows for the sort editor flyout.
+        /// </summary>
+        public IReadOnlyList<RenameListSortEditorRow> SortEditorRows =>
+            [.. _sortKeys.Select((key, index) => new RenameListSortEditorRow(index, key))];
+
+        /// <summary>
+        /// Gets whether another sort field can be added in the editor.
+        /// </summary>
+        public bool CanAddSortKey => _sortKeys.Count < RenameListSortDisplay.EditorColumns.Count;
+
+        /// <summary>
         /// Auto-Sort tooltip: active keys when on, or prompt to enable with default keys when off.
         /// </summary>
         public string SortSummaryText => RenameListSortDisplay.FormatSummary(_sortKeys);
@@ -356,6 +367,180 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _SetSortKeys(RenameListSortKey.DefaultKeys, resort: true);
+        }
+
+        /// <summary>
+        /// Replaces the active sort keys and resorts when non-empty.
+        /// </summary>
+        /// <param name="keys">New sort keys in priority order.</param>
+        public void SetSortKeys(IReadOnlyList<RenameListSortKey> keys)
+        {
+            ArgumentNullException.ThrowIfNull(keys);
+            _SetSortKeys(keys, resort: true);
+        }
+
+        /// <summary>
+        /// Reorders one sort key by <paramref name="offset"/> positions (-1 up, +1 down).
+        /// </summary>
+        /// <param name="index">Zero-based key index.</param>
+        /// <param name="offset">Position delta.</param>
+        public void MoveSortKey(int index, int offset)
+        {
+            var newIndex = index + offset;
+            if (index < 0 || index >= _sortKeys.Count || newIndex < 0 || newIndex >= _sortKeys.Count)
+            {
+                return;
+            }
+
+            var keys = _sortKeys.ToList();
+            var key = keys[index];
+            keys.RemoveAt(index);
+            keys.Insert(newIndex, key);
+            _SetSortKeys(keys, resort: true);
+        }
+
+        /// <summary>
+        /// Removes the sort key at <paramref name="index"/>.
+        /// </summary>
+        /// <param name="index">Zero-based key index.</param>
+        public void RemoveSortKey(int index)
+        {
+            if (index < 0 || index >= _sortKeys.Count)
+            {
+                return;
+            }
+
+            var keys = _sortKeys.Where((_, i) => i != index).ToList();
+            _SetSortKeys(keys, resort: keys.Count > 0);
+        }
+
+        /// <summary>
+        /// Restores the default Auto-Sort keys.
+        /// </summary>
+        [RelayCommand]
+        public void ResetSortToDefault()
+        {
+            _SetSortKeys(RenameListSortKey.DefaultKeys, resort: true);
+        }
+
+        /// <summary>
+        /// Clears all sort keys (Auto-Sort off).
+        /// </summary>
+        [RelayCommand]
+        public void ClearAllSortKeys()
+        {
+            _SetSortKeys([], resort: false);
+        }
+
+        /// <summary>
+        /// Raised when the view should open the sort editor flyout.
+        /// </summary>
+        public event EventHandler? SortEditorRequested;
+
+        /// <summary>
+        /// Requests the sort editor flyout (Rename List context menu).
+        /// </summary>
+        [RelayCommand]
+        public void OpenSortEditor()
+        {
+            SortEditorRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Appends a sort key for the first unused editor column.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(CanAddSortKey))]
+        public void AddSortKey()
+        {
+            var usedColumns = _sortKeys.Select(key => key.Column).ToHashSet();
+            var nextColumn = RenameListSortDisplay.EditorColumns.First(column => !usedColumns.Contains(column));
+            var keys = new List<RenameListSortKey>(_sortKeys) { new(nextColumn) };
+            _SetSortKeys(keys, resort: true);
+        }
+
+        /// <summary>
+        /// Changes the column for one sort key.
+        /// </summary>
+        /// <param name="index">Zero-based key index.</param>
+        /// <param name="column">New column.</param>
+        public void SetSortKeyColumn(int index, RenameListSortColumn column)
+        {
+            if (index < 0 || index >= _sortKeys.Count)
+            {
+                return;
+            }
+
+            var existing = _sortKeys[index];
+            if (existing.Column == column)
+            {
+                return;
+            }
+
+            var keys = _sortKeys.ToList();
+            keys[index] = existing with { Column = column };
+            _SetSortKeys(keys, resort: true);
+        }
+
+        /// <summary>
+        /// Toggles ascending/descending for one sort key.
+        /// </summary>
+        /// <param name="index">Zero-based key index.</param>
+        public void ToggleSortKeyDirection(int index)
+        {
+            if (index < 0 || index >= _sortKeys.Count)
+            {
+                return;
+            }
+
+            var keys = _sortKeys.ToList();
+            var existing = keys[index];
+            keys[index] = existing with { Descending = !existing.Descending };
+            _SetSortKeys(keys, resort: true);
+        }
+
+        /// <summary>
+        /// Moves one sort key up in priority.
+        /// </summary>
+        /// <param name="index">Zero-based key index.</param>
+        [RelayCommand(CanExecute = nameof(_CanMoveSortKeyUp))]
+        public void MoveSortKeyUp(int index)
+        {
+            MoveSortKey(index, offset: -1);
+        }
+
+        /// <summary>
+        /// Moves one sort key down in priority.
+        /// </summary>
+        /// <param name="index">Zero-based key index.</param>
+        [RelayCommand(CanExecute = nameof(_CanMoveSortKeyDown))]
+        public void MoveSortKeyDown(int index)
+        {
+            MoveSortKey(index, offset: 1);
+        }
+
+        /// <summary>
+        /// Removes one sort key from the editor.
+        /// </summary>
+        /// <param name="index">Zero-based key index.</param>
+        [RelayCommand(CanExecute = nameof(_CanRemoveSortKey))]
+        public void RemoveSortKeyAt(int index)
+        {
+            RemoveSortKey(index);
+        }
+
+        private bool _CanMoveSortKeyUp(int index)
+        {
+            return index > 0 && index < _sortKeys.Count;
+        }
+
+        private bool _CanMoveSortKeyDown(int index)
+        {
+            return index >= 0 && index < _sortKeys.Count - 1;
+        }
+
+        private bool _CanRemoveSortKey(int index)
+        {
+            return index >= 0 && index < _sortKeys.Count;
         }
 
         /// <summary>
@@ -732,8 +917,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ColumnSortStates = RenameListSortDisplay.BuildColumnSortStates(_sortKeys);
             OnPropertyChanged(nameof(IsAutoSort));
             OnPropertyChanged(nameof(SortKeys));
+            OnPropertyChanged(nameof(SortEditorRows));
+            OnPropertyChanged(nameof(CanAddSortKey));
             OnPropertyChanged(nameof(SortSummaryText));
             OnPropertyChanged(nameof(ColumnSortStates));
+            AddSortKeyCommand.NotifyCanExecuteChanged();
+            MoveSortKeyUpCommand.NotifyCanExecuteChanged();
+            MoveSortKeyDownCommand.NotifyCanExecuteChanged();
+            RemoveSortKeyAtCommand.NotifyCanExecuteChanged();
             SetDropMarkIndex(null);
 
             if (resort && IsAutoSort && Entries.Count > 1)

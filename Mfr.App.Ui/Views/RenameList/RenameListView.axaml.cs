@@ -2,8 +2,10 @@ using System.Collections;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
@@ -60,10 +62,27 @@ namespace Mfr.App.Ui.Views.RenameList
             AddHandler(DragDrop.DropEvent, _OnDrop);
         }
 
+        private void _OnSortEditorRequested(object? sender, EventArgs e)
+        {
+            // Defer until the context menu closes so pointer placement and focus work.
+            Dispatcher.UIThread.Post(_ShowSortEditorFlyout);
+        }
+
+        private void _ShowSortEditorFlyout()
+        {
+            if (FlyoutBase.GetAttachedFlyout(RenameGrid) is null)
+            {
+                return;
+            }
+
+            FlyoutBase.ShowAttachedFlyout(RenameGrid);
+        }
+
         private void _OnDataContextChanged(object? sender, EventArgs e)
         {
             if (_viewModel is not null)
             {
+                _viewModel.SortEditorRequested -= _OnSortEditorRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.AddProgress.PropertyChanged -= _OnAddProgressPropertyChanged;
             }
@@ -74,6 +93,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
+            _viewModel.SortEditorRequested += _OnSortEditorRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
             _SyncSelectionToGrid();
