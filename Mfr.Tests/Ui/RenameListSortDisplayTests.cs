@@ -53,5 +53,54 @@ namespace Mfr.Tests.Ui
                 ])
             );
         }
+
+        /// <summary>
+        /// Verifies default keys assign priorities 1–3 to visible columns.
+        /// </summary>
+        [Fact]
+        public void BuildColumnSortStates_DefaultKeys_Assigns_Priorities_1_2_3()
+        {
+            var states = RenameListSortDisplay.BuildColumnSortStates(RenameListSortKey.DefaultKeys);
+
+            Assert.Equal(1, states.FileFolder.Priority);
+            Assert.Equal(2, states.ParentFolder.Priority);
+            Assert.Equal(3, states.FullFileName.Priority);
+            Assert.False(states.FileFolder.IsDescending);
+            Assert.False(states.ParentFolder.IsDescending);
+            Assert.False(states.FullFileName.IsDescending);
+        }
+
+        /// <summary>
+        /// Verifies a single-column sort shows priority 1 on that column only.
+        /// </summary>
+        [Fact]
+        public void BuildColumnSortStates_SingleColumn_Only_One_Active()
+        {
+            var states = RenameListSortDisplay.BuildColumnSortStates([
+                new RenameListSortKey(RenameListSortColumn.FullFileName, Descending: true),
+            ]);
+
+            Assert.False(states.FileFolder.IsActive);
+            Assert.False(states.ParentFolder.IsActive);
+            Assert.True(states.FullFileName.IsActive);
+            Assert.Equal(1, states.FullFileName.Priority);
+            Assert.True(states.FullFileName.IsDescending);
+            Assert.Equal("↓", states.FullFileName.DirectionGlyph);
+        }
+
+        /// <summary>
+        /// Verifies a Full Path key does not produce a visible-column header glyph.
+        /// </summary>
+        [Fact]
+        public void BuildColumnSortStates_FullPathKey_Has_No_Visible_Header()
+        {
+            var states = RenameListSortDisplay.BuildColumnSortStates([
+                new RenameListSortKey(RenameListSortColumn.FullPath),
+            ]);
+
+            Assert.False(states.FileFolder.IsActive);
+            Assert.False(states.ParentFolder.IsActive);
+            Assert.False(states.FullFileName.IsActive);
+        }
     }
 }

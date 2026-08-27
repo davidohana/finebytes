@@ -43,6 +43,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Gets the status-bar column label for a grid column (string header or sort member path).
+        /// </summary>
+        /// <param name="sortMemberPath">Original-field sort member path, when the header is templated.</param>
+        /// <param name="headerText">Plain header text for non-sortable columns.</param>
+        /// <returns>Column label used in hints, or <see langword="null"/> when unknown.</returns>
+        public static string? GetColumnHeader(string? sortMemberPath, string? headerText)
+        {
+            if (!string.IsNullOrEmpty(headerText))
+            {
+                return headerText;
+            }
+
+            return sortMemberPath switch
+            {
+                nameof(RenameListEntry.FileFolder) => "File/Folder",
+                nameof(RenameListEntry.ParentFolder) => "Parent Folder",
+                nameof(RenameListEntry.FullFileName) => "Full File Name",
+                _ => null,
+            };
+        }
+
+        /// <summary>
         /// Reads the display value for a Rename List column from a grid row.
         /// </summary>
         /// <param name="entry">Rename List row.</param>

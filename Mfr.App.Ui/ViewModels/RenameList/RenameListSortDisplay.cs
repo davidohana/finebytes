@@ -30,6 +30,22 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Builds header glyph state for visible Rename List columns from active sort keys.
+        /// </summary>
+        /// <param name="keys">Active sort keys in priority order.</param>
+        /// <returns>Per-column priority and direction for header templates.</returns>
+        public static RenameListColumnSortStates BuildColumnSortStates(IReadOnlyList<RenameListSortKey> keys)
+        {
+            ArgumentNullException.ThrowIfNull(keys);
+
+            return new RenameListColumnSortStates(
+                _FindColumnSortState(keys, RenameListSortColumn.FileFolder),
+                _FindColumnSortState(keys, RenameListSortColumn.ParentFolder),
+                _FindColumnSortState(keys, RenameListSortColumn.FullFileName)
+            );
+        }
+
+        /// <summary>
         /// Formats active sort keys for the Auto-Sort tooltip, or the off message when empty.
         /// </summary>
         /// <param name="keys">Active sort keys in priority order.</param>
@@ -51,6 +67,23 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return string.Join('\n', lines);
+        }
+
+        private static RenameListColumnSortState _FindColumnSortState(
+            IReadOnlyList<RenameListSortKey> keys,
+            RenameListSortColumn column
+        )
+        {
+            for (var i = 0; i < keys.Count; i++)
+            {
+                var key = keys[i];
+                if (key.Column == column)
+                {
+                    return new RenameListColumnSortState(i + 1, key.Descending);
+                }
+            }
+
+            return default;
         }
     }
 }

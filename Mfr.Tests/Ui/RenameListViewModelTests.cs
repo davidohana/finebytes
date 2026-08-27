@@ -1104,6 +1104,29 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies ColumnSortStates updates when Auto-Sort keys change.
+        /// </summary>
+        [Fact]
+        public void ColumnSortStates_Reflects_SortKeys()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            Assert.False(renameListViewModel.ColumnSortStates.FileFolder.IsActive);
+
+            renameListViewModel.ToggleAutoSortCommand.Execute(null);
+            Assert.Equal(1, renameListViewModel.ColumnSortStates.FileFolder.Priority);
+            Assert.Equal(2, renameListViewModel.ColumnSortStates.ParentFolder.Priority);
+            Assert.Equal(3, renameListViewModel.ColumnSortStates.FullFileName.Priority);
+
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
+            Assert.False(renameListViewModel.ColumnSortStates.FileFolder.IsActive);
+            Assert.False(renameListViewModel.ColumnSortStates.ParentFolder.IsActive);
+            Assert.Equal(1, renameListViewModel.ColumnSortStates.FullFileName.Priority);
+        }
+
+        /// <summary>
         /// Verifies a missing session value restores the default Auto-Sort keys.
         /// </summary>
         [Fact]

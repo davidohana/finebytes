@@ -87,6 +87,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public string SortSummaryText => RenameListSortDisplay.FormatSummary(_sortKeys);
 
         /// <summary>
+        /// Sort priority and direction glyphs for visible Rename List column headers.
+        /// </summary>
+        public RenameListColumnSortStates ColumnSortStates { get; private set; } = RenameListColumnSortStates.Inactive;
+
+        /// <summary>
         /// Gets the most recent user-facing add failure message, or empty when none.
         /// </summary>
         [ObservableProperty]
@@ -689,9 +694,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private void _SetSortKeys(IReadOnlyList<RenameListSortKey> keys, bool resort)
         {
             _sortKeys = [.. keys];
+            ColumnSortStates = RenameListSortDisplay.BuildColumnSortStates(_sortKeys);
             OnPropertyChanged(nameof(IsAutoSort));
             OnPropertyChanged(nameof(SortKeys));
             OnPropertyChanged(nameof(SortSummaryText));
+            OnPropertyChanged(nameof(ColumnSortStates));
             SetDropMarkIndex(null);
 
             if (resort && IsAutoSort && Entries.Count > 1)

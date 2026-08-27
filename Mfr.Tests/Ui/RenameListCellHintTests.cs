@@ -48,6 +48,22 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies templated sort columns resolve labels from sort member paths.
+        /// </summary>
+        [Fact]
+        public void GetColumnHeader_Resolves_SortMemberPath_When_Header_Is_Templated()
+        {
+            Assert.Equal(
+                "Full File Name",
+                RenameListCellHint.GetColumnHeader(nameof(RenameListEntry.FullFileName), null)
+            );
+            Assert.Equal(
+                "Full File Name (Preview)",
+                RenameListCellHint.GetColumnHeader(null, "Full File Name (Preview)")
+            );
+        }
+
+        /// <summary>
         /// Verifies plain hints are a single default run.
         /// </summary>
         [Fact]
