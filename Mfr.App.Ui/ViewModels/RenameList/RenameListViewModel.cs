@@ -359,21 +359,56 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Sets Auto-Sort to a single original column (header click), inverting when already ascending on that column.
+        /// Sets Auto-Sort from a column header click.
         /// </summary>
         /// <param name="memberPath">
         /// <see cref="RenameListEntry"/> property name (<c>FileFolder</c>, <c>ParentFolder</c>, <c>FullFileName</c>).
         /// </param>
-        public void SortByColumn(string? memberPath)
+        /// <param name="append">
+        /// When <see langword="true"/> (Shift+click), append or adjust an existing key instead of replacing the list.
+        /// </param>
+        public void SortByColumn(string? memberPath, bool append = false)
         {
             if (!_TryMapSortMemberPath(memberPath, out var column))
             {
                 return;
             }
 
+            if (append)
+            {
+                _SortByColumnAppend(column);
+                return;
+            }
+
             // MFR7 RenameGridCells.SetSortMode: desc = GetSortMode() == Ascending (None → ascending).
             var descending = _sortKeys.Any(key => key.Column == column && !key.Descending);
             _SetSortKeys([new RenameListSortKey(column, descending)], resort: true);
+        }
+
+        /// <summary>
+        /// Appends a sort key, toggles direction on an existing key, or removes a descending key (Shift+click).
+        /// </summary>
+        private void _SortByColumnAppend(RenameListSortColumn column)
+        {
+            var index = _sortKeys.FindIndex(key => key.Column == column);
+            if (index < 0)
+            {
+                var keys = new List<RenameListSortKey>(_sortKeys) { new(column) };
+                _SetSortKeys(keys, resort: true);
+                return;
+            }
+
+            var existing = _sortKeys[index];
+            if (!existing.Descending)
+            {
+                var keys = _sortKeys.ToList();
+                keys[index] = existing with { Descending = true };
+                _SetSortKeys(keys, resort: true);
+                return;
+            }
+
+            var withoutColumn = _sortKeys.Where((_, i) => i != index).ToList();
+            _SetSortKeys(withoutColumn, resort: withoutColumn.Count > 0);
         }
 
         /// <summary>

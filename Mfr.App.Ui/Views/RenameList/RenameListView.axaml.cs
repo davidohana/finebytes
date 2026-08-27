@@ -36,6 +36,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private PointerEventArgs? _dragStartArgs;
         private RenameListEntry? _dragHitEntry;
         private IReadOnlyList<RenameListEntry>? _dragSelectionSnapshot;
+        private KeyModifiers _lastSortClickModifiers = KeyModifiers.None;
 
         /// <summary>
         /// Initializes the Rename List pane.
@@ -52,6 +53,7 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameGrid.AddHandler(PointerMovedEvent, _OnGridPointerMoved, RoutingStrategies.Tunnel);
             RenameGrid.AddHandler(PointerReleasedEvent, _OnGridPointerReleased, RoutingStrategies.Tunnel);
             RenameGrid.AddHandler(PointerCaptureLostEvent, _OnGridPointerCaptureLost, RoutingStrategies.Tunnel);
+            RenameGrid.AddHandler(PointerPressedEvent, _OnGridPointerPressed, RoutingStrategies.Tunnel);
             DragDrop.SetAllowDrop(this, true);
             AddHandler(DragDrop.DragOverEvent, _OnDragOver);
             AddHandler(DragDrop.DragLeaveEvent, _OnDragLeave);
@@ -568,6 +570,16 @@ namespace Mfr.App.Ui.Views.RenameList
             }
         }
 
+        private void _OnGridPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (e.Source is not Visual source || source.FindAncestorOfType<DataGridColumnHeader>() is null)
+            {
+                return;
+            }
+
+            _lastSortClickModifiers = e.KeyModifiers;
+        }
+
         private void _OnEntriesSorting(object? sender, DataGridColumnEventArgs e)
         {
             e.Handled = true;
@@ -576,7 +588,9 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            _viewModel.SortByColumn(e.Column.SortMemberPath);
+            var append = _lastSortClickModifiers.HasFlag(KeyModifiers.Shift);
+            _lastSortClickModifiers = KeyModifiers.None;
+            _viewModel.SortByColumn(e.Column.SortMemberPath, append);
             _ClearSortDescriptions();
         }
 

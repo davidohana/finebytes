@@ -1010,6 +1010,113 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies Shift+click append adds a second sort key and updates column priorities.
+        /// </summary>
+        [Fact]
+        public void SortByColumn_Append_Adds_Second_Key()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.FileFolder));
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
+
+            Assert.Equal(
+                [
+                    new RenameListSortKey(RenameListSortColumn.FileFolder),
+                    new RenameListSortKey(RenameListSortColumn.ParentFolder),
+                ],
+                renameListViewModel.SortKeys
+            );
+            Assert.Equal(1, renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].Priority);
+            Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].Priority);
+        }
+
+        /// <summary>
+        /// Verifies Shift+click on an ascending key toggles it to descending.
+        /// </summary>
+        [Fact]
+        public void SortByColumn_Append_Toggles_Direction()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder));
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
+
+            Assert.Equal(
+                [new RenameListSortKey(RenameListSortColumn.ParentFolder, Descending: true)],
+                renameListViewModel.SortKeys
+            );
+            Assert.True(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsDescending);
+        }
+
+        /// <summary>
+        /// Verifies Shift+click on a descending key removes that key from the sort list.
+        /// </summary>
+        [Fact]
+        public void SortByColumn_Append_Removes_Descending_Key()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.FileFolder));
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder), append: true);
+
+            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FileFolder)], renameListViewModel.SortKeys);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
+        }
+
+        /// <summary>
+        /// Verifies removing the last sort key via Shift+click turns Auto-Sort off without resorting.
+        /// </summary>
+        [Fact]
+        public async Task SortByColumn_Append_Removing_Last_Key_Disables_AutoSort()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "gamma.log"),
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            Assert.Equal(["gamma.log", "alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
+
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName), append: true);
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName), append: true);
+
+            Assert.False(renameListViewModel.IsAutoSort);
+            Assert.Empty(renameListViewModel.SortKeys);
+            Assert.Equal(["gamma.log", "beta.md", "alpha.txt"], _PreviewNames(renameListViewModel));
+        }
+
+        /// <summary>
+        /// Verifies a plain header click still replaces the entire sort key list.
+        /// </summary>
+        [Fact]
+        public void SortByColumn_Replace_Still_Replaces_Entire_List()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder));
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
+
+            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FullFileName)], renameListViewModel.SortKeys);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
+        }
+
+        /// <summary>
         /// Verifies Auto-Sort adds append then resort, ignoring selection insert.
         /// </summary>
         [Fact]
