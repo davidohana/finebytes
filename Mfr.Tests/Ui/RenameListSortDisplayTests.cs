@@ -55,19 +55,19 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies default keys assign priorities 1–3 to visible columns.
+        /// Verifies default keys assign priorities 1–3 by column.
         /// </summary>
         [Fact]
         public void BuildColumnSortStates_DefaultKeys_Assigns_Priorities_1_2_3()
         {
             var states = RenameListSortDisplay.BuildColumnSortStates(RenameListSortKey.DefaultKeys);
 
-            Assert.Equal(1, states.FileFolder.Priority);
-            Assert.Equal(2, states.ParentFolder.Priority);
-            Assert.Equal(3, states.FullFileName.Priority);
-            Assert.False(states.FileFolder.IsDescending);
-            Assert.False(states.ParentFolder.IsDescending);
-            Assert.False(states.FullFileName.IsDescending);
+            Assert.Equal(1, states[RenameListSortColumn.FileFolder].Priority);
+            Assert.Equal(2, states[RenameListSortColumn.ParentFolder].Priority);
+            Assert.Equal(3, states[RenameListSortColumn.FullFileName].Priority);
+            Assert.False(states[RenameListSortColumn.FileFolder].IsDescending);
+            Assert.False(states[RenameListSortColumn.ParentFolder].IsDescending);
+            Assert.False(states[RenameListSortColumn.FullFileName].IsDescending);
         }
 
         /// <summary>
@@ -80,27 +80,41 @@ namespace Mfr.Tests.Ui
                 new RenameListSortKey(RenameListSortColumn.FullFileName, Descending: true),
             ]);
 
-            Assert.False(states.FileFolder.IsActive);
-            Assert.False(states.ParentFolder.IsActive);
-            Assert.True(states.FullFileName.IsActive);
-            Assert.Equal(1, states.FullFileName.Priority);
-            Assert.True(states.FullFileName.IsDescending);
-            Assert.Equal("↓", states.FullFileName.DirectionGlyph);
+            Assert.False(states[RenameListSortColumn.FileFolder].IsActive);
+            Assert.False(states[RenameListSortColumn.ParentFolder].IsActive);
+            Assert.True(states[RenameListSortColumn.FullFileName].IsActive);
+            Assert.Equal(1, states[RenameListSortColumn.FullFileName].Priority);
+            Assert.True(states[RenameListSortColumn.FullFileName].IsDescending);
+            Assert.Equal("↓", states[RenameListSortColumn.FullFileName].DirectionGlyph);
         }
 
         /// <summary>
-        /// Verifies a Full Path key does not produce a visible-column header glyph.
+        /// Verifies a Full Path key is stored and does not mark other columns active.
         /// </summary>
         [Fact]
-        public void BuildColumnSortStates_FullPathKey_Has_No_Visible_Header()
+        public void BuildColumnSortStates_FullPathKey_Does_Not_Activate_Other_Columns()
         {
             var states = RenameListSortDisplay.BuildColumnSortStates([
                 new RenameListSortKey(RenameListSortColumn.FullPath),
             ]);
 
-            Assert.False(states.FileFolder.IsActive);
-            Assert.False(states.ParentFolder.IsActive);
-            Assert.False(states.FullFileName.IsActive);
+            Assert.True(states[RenameListSortColumn.FullPath].IsActive);
+            Assert.Equal(1, states[RenameListSortColumn.FullPath].Priority);
+            Assert.False(states[RenameListSortColumn.FileFolder].IsActive);
+            Assert.False(states[RenameListSortColumn.ParentFolder].IsActive);
+            Assert.False(states[RenameListSortColumn.FullFileName].IsActive);
+        }
+
+        /// <summary>
+        /// Verifies XAML-style string keys resolve the same as enum keys.
+        /// </summary>
+        [Fact]
+        public void ColumnSortStates_StringIndexer_Matches_Enum()
+        {
+            var states = RenameListSortDisplay.BuildColumnSortStates(RenameListSortKey.DefaultKeys);
+
+            Assert.Equal(states[RenameListSortColumn.FileFolder], states["FileFolder"]);
+            Assert.False(states["Unknown"].IsActive);
         }
     }
 }

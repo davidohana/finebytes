@@ -306,11 +306,11 @@
                   <Border
                     Grid.Column="1"
                     Classes="rename-list-sort-glyph"
-                    IsVisible="{Binding ColumnSortStates.FileFolder.IsActive}"
+                    IsVisible="{Binding ColumnSortStates[FileFolder].IsActive}"
                   >
                     <StackPanel Orientation="Horizontal" Spacing="1">
-                      <TextBlock Text="{Binding ColumnSortStates.FileFolder.Priority}" />
-                      <TextBlock Text="{Binding ColumnSortStates.FileFolder.DirectionGlyph}" />
+                      <TextBlock Text="{Binding ColumnSortStates[FileFolder].Priority}" />
+                      <TextBlock Text="{Binding ColumnSortStates[FileFolder].DirectionGlyph}" />
                     </StackPanel>
                   </Border>
                 </Grid>
@@ -328,11 +328,11 @@
                   <Border
                     Grid.Column="1"
                     Classes="rename-list-sort-glyph"
-                    IsVisible="{Binding ColumnSortStates.ParentFolder.IsActive}"
+                    IsVisible="{Binding ColumnSortStates[ParentFolder].IsActive}"
                   >
                     <StackPanel Orientation="Horizontal" Spacing="1">
-                      <TextBlock Text="{Binding ColumnSortStates.ParentFolder.Priority}" />
-                      <TextBlock Text="{Binding ColumnSortStates.ParentFolder.DirectionGlyph}" />
+                      <TextBlock Text="{Binding ColumnSortStates[ParentFolder].Priority}" />
+                      <TextBlock Text="{Binding ColumnSortStates[ParentFolder].DirectionGlyph}" />
                     </StackPanel>
                   </Border>
                 </Grid>
@@ -350,11 +350,11 @@
                   <Border
                     Grid.Column="1"
                     Classes="rename-list-sort-glyph"
-                    IsVisible="{Binding ColumnSortStates.FullFileName.IsActive}"
+                    IsVisible="{Binding ColumnSortStates[FullFileName].IsActive}"
                   >
                     <StackPanel Orientation="Horizontal" Spacing="1">
-                      <TextBlock Text="{Binding ColumnSortStates.FullFileName.Priority}" />
-                      <TextBlock Text="{Binding ColumnSortStates.FullFileName.DirectionGlyph}" />
+                      <TextBlock Text="{Binding ColumnSortStates[FullFileName].Priority}" />
+                      <TextBlock Text="{Binding ColumnSortStates[FullFileName].DirectionGlyph}" />
                     </StackPanel>
                   </Border>
                 </Grid>

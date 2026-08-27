@@ -87,7 +87,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public string SortSummaryText => RenameListSortDisplay.FormatSummary(_sortKeys);
 
         /// <summary>
-        /// Sort priority and direction glyphs for visible Rename List column headers.
+        /// Sort priority and direction glyphs keyed by column for Rename List headers.
         /// </summary>
         public RenameListColumnSortStates ColumnSortStates { get; private set; } = RenameListColumnSortStates.Inactive;
 

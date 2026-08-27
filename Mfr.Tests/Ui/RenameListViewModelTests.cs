@@ -1113,17 +1113,17 @@ namespace Mfr.Tests.Ui
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
-            Assert.False(renameListViewModel.ColumnSortStates.FileFolder.IsActive);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].IsActive);
 
             renameListViewModel.ToggleAutoSortCommand.Execute(null);
-            Assert.Equal(1, renameListViewModel.ColumnSortStates.FileFolder.Priority);
-            Assert.Equal(2, renameListViewModel.ColumnSortStates.ParentFolder.Priority);
-            Assert.Equal(3, renameListViewModel.ColumnSortStates.FullFileName.Priority);
+            Assert.Equal(1, renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].Priority);
+            Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].Priority);
+            Assert.Equal(3, renameListViewModel.ColumnSortStates[RenameListSortColumn.FullFileName].Priority);
 
             renameListViewModel.SortByColumn(nameof(RenameListEntry.FullFileName));
-            Assert.False(renameListViewModel.ColumnSortStates.FileFolder.IsActive);
-            Assert.False(renameListViewModel.ColumnSortStates.ParentFolder.IsActive);
-            Assert.Equal(1, renameListViewModel.ColumnSortStates.FullFileName.Priority);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].IsActive);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
+            Assert.Equal(1, renameListViewModel.ColumnSortStates[RenameListSortColumn.FullFileName].Priority);
         }
 
         /// <summary>
