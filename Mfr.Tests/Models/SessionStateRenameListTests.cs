@@ -11,7 +11,8 @@ namespace Mfr.Tests.Models
             Assert.Equal(
                 [
                     new RenameListSortKey(RenameListSortColumn.FileFolder),
-                    new RenameListSortKey(RenameListSortColumn.FullPath),
+                    new RenameListSortKey(RenameListSortColumn.ParentFolder),
+                    new RenameListSortKey(RenameListSortColumn.FullFileName),
                 ],
                 RenameListSortKey.DefaultKeys
             );
@@ -28,7 +29,8 @@ namespace Mfr.Tests.Models
             Assert.Equal(
                 [
                     new SessionStateRenameListSortField(RenameListSortColumn.FileFolder),
-                    new SessionStateRenameListSortField(RenameListSortColumn.FullPath),
+                    new SessionStateRenameListSortField(RenameListSortColumn.ParentFolder),
+                    new SessionStateRenameListSortField(RenameListSortColumn.FullFileName),
                 ],
                 SessionStateRenameList.FromSortKeys(RenameListSortKey.DefaultKeys)
             );

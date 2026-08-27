@@ -316,6 +316,34 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies Sort with default keys orders by type, parent folder, then file name.
+        /// </summary>
+        [Fact]
+        public void Sort_DefaultKeys_Orders_By_Type_Then_Parent_Then_Name()
+        {
+            var subDir = Path.Combine(_tempRoot, "beta");
+            Directory.CreateDirectory(subDir);
+            var alphaDir = Path.Combine(_tempRoot, "alpha");
+            Directory.CreateDirectory(alphaDir);
+
+            var rootFile = TestHelpers.CreateFile(_tempRoot, "zeta.txt");
+            var subFile = TestHelpers.CreateFile(subDir, "alpha.txt");
+            var alphaFile = TestHelpers.CreateFile(alphaDir, "beta.txt");
+            var folderPath = Path.Combine(_tempRoot, "folder-item");
+            Directory.CreateDirectory(folderPath);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([rootFile, subFile, alphaFile, folderPath], includeFolders: true, includeFiles: true);
+
+            Assert.True(renameList.Sort(RenameListSortKey.DefaultKeys));
+
+            Assert.Equal(
+                [rootFile, alphaFile, subFile, folderPath],
+                renameList.RenameItems.Select(item => item.Original.FullPath)
+            );
+        }
+
+        /// <summary>
         /// Verifies Sort by File/Folder then Full Path orders files before folders (ascending labels).
         /// </summary>
         [Fact]

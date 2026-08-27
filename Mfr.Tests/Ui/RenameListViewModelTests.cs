@@ -1060,7 +1060,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies ToggleAutoSort restores the default File/Folder + Full Path keys.
+        /// Verifies ToggleAutoSort restores the default visible-column keys.
         /// </summary>
         [Fact]
         public void ToggleAutoSort_Restores_Default_Keys()
@@ -1081,7 +1081,30 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies a missing session value restores the MFR7 default Auto-Sort keys.
+        /// Verifies SortSummaryText reflects Auto-Sort off, default keys, and single-column sort.
+        /// </summary>
+        [Fact]
+        public void SortSummaryText_Reflects_AutoSort_State()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            Assert.Equal(RenameListSortDisplay.AutoSortOffSummary, renameListViewModel.SortSummaryText);
+
+            renameListViewModel.ToggleAutoSortCommand.Execute(null);
+            Assert.Equal(
+                "1. File/Folder ↑\n2. Parent Folder ↑\n3. Full File Name ↑",
+                renameListViewModel.SortSummaryText
+            );
+
+            renameListViewModel.ToggleAutoSortCommand.Execute(null);
+            renameListViewModel.SortByColumn(nameof(RenameListEntry.ParentFolder));
+            Assert.Equal("1. Parent Folder ↑", renameListViewModel.SortSummaryText);
+        }
+
+        /// <summary>
+        /// Verifies a missing session value restores the default Auto-Sort keys.
         /// </summary>
         [Fact]
         public void ApplySession_Null_Uses_Default()

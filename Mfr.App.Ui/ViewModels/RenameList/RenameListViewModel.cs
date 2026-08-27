@@ -82,6 +82,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<RenameListSortKey> SortKeys => _sortKeys;
 
         /// <summary>
+        /// Auto-Sort tooltip: active keys when on, or prompt to enable with default keys when off.
+        /// </summary>
+        public string SortSummaryText => RenameListSortDisplay.FormatSummary(_sortKeys);
+
+        /// <summary>
         /// Gets the most recent user-facing add failure message, or empty when none.
         /// </summary>
         [ObservableProperty]
@@ -334,7 +339,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Toggles Auto-Sort. Turning it on restores the MFR7 default keys.
+        /// Toggles Auto-Sort. Turning it on restores the default keys.
         /// </summary>
         [RelayCommand]
         public void ToggleAutoSort()
@@ -662,7 +667,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Restores Auto-Sort keys from a session value.
         /// </summary>
         /// <param name="sortFields">
-        /// Session sort fields, empty to disable Auto-Sort, or <see langword="null"/> for the MFR7 default.
+        /// Session sort fields, empty to disable Auto-Sort, or <see langword="null"/> for the default keys.
         /// </param>
         internal void ApplySession(IReadOnlyList<SessionStateRenameListSortField>? sortFields)
         {
@@ -686,6 +691,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _sortKeys = [.. keys];
             OnPropertyChanged(nameof(IsAutoSort));
             OnPropertyChanged(nameof(SortKeys));
+            OnPropertyChanged(nameof(SortSummaryText));
             SetDropMarkIndex(null);
 
             if (resort && IsAutoSort && Entries.Count > 1)

@@ -283,6 +283,7 @@
           Header="Auto-Sort"
           Command="{Binding RenameListViewModel.ToggleAutoSortCommand}"
           IsChecked="{Binding RenameListViewModel.IsAutoSort, Mode=OneWay}"
+          ToolTip.Tip="{Binding RenameListViewModel.SortSummaryText}"
         />
         <MenuItem Header="Auto-Preview" IsEnabled="False" />
         <MenuItem Header="Refresh" IsEnabled="False" InputGesture="{x:Static input:AppShortcuts.Refresh}" />

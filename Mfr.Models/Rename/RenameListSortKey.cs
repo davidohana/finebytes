@@ -21,7 +21,7 @@ namespace Mfr.Models.Rename
         FullFileName = 2,
 
         /// <summary>
-        /// Absolute full path (default secondary key; not a visible grid column yet).
+        /// Absolute full path (not a visible grid column).
         /// </summary>
         FullPath = 3,
     }
@@ -34,9 +34,13 @@ namespace Mfr.Models.Rename
     public readonly record struct RenameListSortKey(RenameListSortColumn Column, bool Descending = false)
     {
         /// <summary>
-        /// Default Auto-Sort keys: File/Folder then Full Path (MFR7). Empty session value disables Auto-Sort.
+        /// Default Auto-Sort keys: File/Folder, Parent Folder, then Full File Name. Empty session value disables Auto-Sort.
         /// </summary>
         public static IReadOnlyList<RenameListSortKey> DefaultKeys { get; } =
-        [new RenameListSortKey(RenameListSortColumn.FileFolder), new RenameListSortKey(RenameListSortColumn.FullPath)];
+        [
+            new RenameListSortKey(RenameListSortColumn.FileFolder),
+            new RenameListSortKey(RenameListSortColumn.ParentFolder),
+            new RenameListSortKey(RenameListSortColumn.FullFileName),
+        ];
     }
 }

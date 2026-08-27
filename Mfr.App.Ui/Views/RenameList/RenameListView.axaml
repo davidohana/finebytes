@@ -253,7 +253,7 @@
           Classes="rename-list-action"
           IsChecked="{Binding IsAutoSort, Mode=OneWay}"
           Command="{Binding ToggleAutoSortCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.AutoSort}"
+          ToolTip.Tip="{Binding SortSummaryText}"
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AutoSort.png" />
         </ToggleButton>
