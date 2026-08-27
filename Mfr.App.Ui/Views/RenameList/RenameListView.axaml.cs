@@ -225,6 +225,8 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
+            _viewModel.CancelAutoSort();
+
             var dataTransfer = new DataTransfer();
             dataTransfer.Add(DataTransferItem.Create(InternalReorderFormat, "1"));
             try
@@ -350,6 +352,11 @@ namespace Mfr.App.Ui.Views.RenameList
                 _ClearDropMark();
                 e.DragEffects = DragDropEffects.Copy;
                 return;
+            }
+
+            if (isReorder)
+            {
+                _viewModel.CancelAutoSort();
             }
 
             _UpdateDropMarkFromPointer(e);

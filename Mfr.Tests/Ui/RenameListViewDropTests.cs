@@ -418,6 +418,44 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies internal reorder DragOver cancels Auto-Sort and sets the salmon drop mark.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragOver_Internal_Reorder_With_AutoSort_Cancels_AutoSort_And_Sets_DropMark()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(betaPath, "b");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            renameListViewModel.ApplySession("fullFileName");
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+            Assert.True(renameListViewModel.IsAutoSort);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1]);
+            var dataTransfer = _CreateInternalReorderDataTransfer();
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+
+            Assert.False(renameListViewModel.IsAutoSort);
+            Assert.Equal(1, renameListViewModel.DropMarkIndex);
+            var markedRow = grid.GetVisualDescendants().OfType<DataGridRow>().First(row => row.Index == 1);
+            Assert.Contains("drop-mark", markedRow.Classes);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Alt during internal reorder does not clear the list.
         /// </summary>
         [AvaloniaFact]

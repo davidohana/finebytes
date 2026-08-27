@@ -1117,7 +1117,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies SetDropMarkIndex is ignored while Auto-Sort is on.
+        /// Verifies SetDropMarkIndex is ignored while Auto-Sort is on (external drop target).
         /// </summary>
         [Fact]
         public async Task AutoSort_Ignores_DropMark()
@@ -1132,6 +1132,35 @@ namespace Mfr.Tests.Ui
 
             renameListViewModel.SetDropMarkIndex(1);
             Assert.Null(renameListViewModel.DropMarkIndex);
+        }
+
+        /// <summary>
+        /// Verifies CancelAutoSort disables sorting without reordering and allows a drop mark.
+        /// </summary>
+        [Fact]
+        public async Task CancelAutoSort_Disables_Without_Resort_And_Allows_DropMark()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            renameListViewModel.ApplySession("fullFileName");
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            Assert.True(renameListViewModel.IsAutoSort);
+            var orderBefore = _PreviewNames(renameListViewModel);
+
+            renameListViewModel.CancelAutoSort();
+
+            Assert.False(renameListViewModel.IsAutoSort);
+            Assert.Equal(orderBefore, _PreviewNames(renameListViewModel));
+
+            renameListViewModel.SetDropMarkIndex(1);
+            Assert.Equal(1, renameListViewModel.DropMarkIndex);
         }
 
         /// <summary>

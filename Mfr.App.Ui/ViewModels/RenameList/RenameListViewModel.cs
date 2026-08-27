@@ -321,6 +321,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Turns off Auto-Sort for a manual reorder (drag or keyboard move) without resorting.
+        /// </summary>
+        public void CancelAutoSort()
+        {
+            if (!IsAutoSort)
+            {
+                return;
+            }
+
+            _SetSortKeys([], resort: false);
+        }
+
+        /// <summary>
         /// Toggles Auto-Sort. Turning it on restores the MFR7 default keys.
         /// </summary>
         [RelayCommand]
@@ -379,10 +392,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     return false;
                 }
 
-                if (IsAutoSort)
-                {
-                    _SetSortKeys([], resort: false);
-                }
+                CancelAutoSort();
 
                 _SyncEntriesToEngineOrder();
                 return true;
@@ -409,10 +419,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            if (IsAutoSort)
-            {
-                _SetSortKeys([], resort: false);
-            }
+            CancelAutoSort();
 
             _SyncEntriesToEngineOrder();
         }
