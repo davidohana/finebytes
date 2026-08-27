@@ -1,4 +1,4 @@
-using Mfr.Models.Rename;
+using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {

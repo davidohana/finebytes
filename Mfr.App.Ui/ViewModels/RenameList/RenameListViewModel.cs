@@ -3,7 +3,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.Collections;
 using Mfr.App.Ui.ViewModels.FileList;
-using Mfr.Models.Rename;
+using Mfr.Models.RenameList;
 using EngineRenameList = Mfr.Engine.RenameList.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList

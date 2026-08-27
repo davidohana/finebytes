@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Models.Config;
-using Mfr.Models.Rename;
+using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {

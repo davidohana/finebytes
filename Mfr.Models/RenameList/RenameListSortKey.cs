@@ -1,4 +1,4 @@
-namespace Mfr.Models.Rename
+namespace Mfr.Models.RenameList
 {
     /// <summary>
     /// Rename List columns that can participate in Auto-Sort (original fields only).

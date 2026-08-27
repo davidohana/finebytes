@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Mfr.Models.Rename;
+using Mfr.Models.RenameList;
 
 namespace Mfr.Models.Config
 {
