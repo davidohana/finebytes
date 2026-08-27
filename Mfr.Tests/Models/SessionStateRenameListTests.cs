@@ -1,15 +1,12 @@
-using Mfr.Models.Config;
-using Mfr.Models.Rename;
-
 namespace Mfr.Tests.Models
 {
     /// <summary>
-    /// Tests <see cref="RenameListSortKey"/> session field conversion.
+    /// Tests <see cref="SessionStateRenameList"/> sort-field conversion.
     /// </summary>
-    public sealed class RenameListSortKeyTests
+    public sealed class SessionStateRenameListTests
     {
         [Fact]
-        public void Session_fields_round_trip_default_and_desc()
+        public void Sort_fields_round_trip_default_and_desc()
         {
             Assert.Equal(
                 [
@@ -25,10 +22,16 @@ namespace Mfr.Tests.Models
             };
             Assert.Equal(
                 [new RenameListSortKey(RenameListSortColumn.ParentFolder, Descending: true)],
-                RenameListSortKey.FromSessionFields(descending)
+                SessionStateRenameList.ToSortKeys(descending)
             );
-            Assert.Empty(RenameListSortKey.FromSessionFields([]));
-            Assert.Equal(RenameListSortKey.DefaultSessionFields, RenameListSortKey.ToSessionFields(RenameListSortKey.DefaultKeys));
+            Assert.Empty(SessionStateRenameList.ToSortKeys([]));
+            Assert.Equal(
+                [
+                    new SessionStateRenameListSortField(RenameListSortColumn.FileFolder),
+                    new SessionStateRenameListSortField(RenameListSortColumn.FullPath),
+                ],
+                SessionStateRenameList.FromSortKeys(RenameListSortKey.DefaultKeys)
+            );
         }
     }
 }

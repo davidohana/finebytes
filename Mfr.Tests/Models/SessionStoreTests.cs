@@ -68,7 +68,10 @@ namespace Mfr.Tests.Models
                     },
                     RenameList = new SessionStateRenameList
                     {
-                        SortFields = [new SessionStateRenameListSortField(RenameListSortColumn.FullFileName, Descending: true)],
+                        SortFields =
+                        [
+                            new SessionStateRenameListSortField(RenameListSortColumn.FullFileName, Descending: true),
+                        ],
                     },
                 };
 

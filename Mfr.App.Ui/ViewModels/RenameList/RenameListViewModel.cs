@@ -668,7 +668,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             var keys = sortFields is null
                 ? RenameListSortKey.DefaultKeys
-                : RenameListSortKey.FromSessionFields(sortFields);
+                : SessionStateRenameList.ToSortKeys(sortFields);
             _SetSortKeys(keys, resort: true);
         }
 
@@ -678,7 +678,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns>Session sort fields, or empty when Auto-Sort is off.</returns>
         internal IReadOnlyList<SessionStateRenameListSortField> CaptureSortFields()
         {
-            return RenameListSortKey.ToSessionFields(_sortKeys);
+            return SessionStateRenameList.FromSortKeys(_sortKeys);
         }
 
         private void _SetSortKeys(IReadOnlyList<RenameListSortKey> keys, bool resort)

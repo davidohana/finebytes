@@ -99,9 +99,7 @@ namespace Mfr.App.Ui.Services.Session
                 {
                     session.RenameList ??= new SessionStateRenameList();
 
-                    session.RenameList.SortFields = renameListSortFields is null
-                        ? null
-                        : [.. renameListSortFields];
+                    session.RenameList.SortFields = [.. renameListSortFields];
                 }
 
                 SessionStore.Save(session);

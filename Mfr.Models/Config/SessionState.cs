@@ -126,6 +126,33 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("sortFields")]
         public List<SessionStateRenameListSortField>? SortFields { get; set; }
+
+        /// <summary>
+        /// Converts persisted session fields into sort keys.
+        /// </summary>
+        /// <param name="fields">Session fields in priority order.</param>
+        /// <returns>Sort keys; empty when Auto-Sort is off.</returns>
+        public static IReadOnlyList<RenameListSortKey> ToSortKeys(IReadOnlyList<SessionStateRenameListSortField> fields)
+        {
+            ArgumentNullException.ThrowIfNull(fields);
+            if (fields.Count == 0)
+            {
+                return [];
+            }
+
+            return [.. fields.Select(field => new RenameListSortKey(field.Column, field.Descending))];
+        }
+
+        /// <summary>
+        /// Converts sort keys into persisted session fields.
+        /// </summary>
+        /// <param name="keys">Sort keys in priority order.</param>
+        /// <returns>Session fields; empty when Auto-Sort is off.</returns>
+        public static List<SessionStateRenameListSortField> FromSortKeys(IReadOnlyList<RenameListSortKey> keys)
+        {
+            ArgumentNullException.ThrowIfNull(keys);
+            return [.. keys.Select(key => new SessionStateRenameListSortField(key.Column, key.Descending))];
+        }
     }
 
     /// <summary>
