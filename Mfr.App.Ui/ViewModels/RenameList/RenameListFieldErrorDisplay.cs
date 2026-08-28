@@ -8,17 +8,21 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Short summary shown at the top of the error dialog.
         /// </summary>
-        internal const string Summary = "The original value for this field could not be read from disk.";
+        internal const string Summary = "Metadata for this file could not be read from disk.";
 
         /// <summary>
-        /// Note shown under the grid explaining gray Error cells (MFR7 field-load highlighting).
+        /// Builds the details box: friendly explanation plus technical line for each reader failure.
         /// </summary>
-        internal const string GrayCellNote =
-            "Gray Error cells mean metadata for that column could not be loaded for the row. "
-            + "Columns in the same reader group (Audio Tag / media, or image/EXIF) share one failure.";
+        /// <param name="content">Dialog content.</param>
+        /// <returns>Folded error text for the single details box.</returns>
+        internal static string FormatDetailsText(RenameListFieldErrorDialogContent content)
+        {
+            var blocks = content.Errors.Select(error => $"{error.UserExplanation}{Environment.NewLine}{error.TechnicalDetails}");
+            return string.Join($"{Environment.NewLine}{Environment.NewLine}", blocks);
+        }
 
         /// <summary>
-        /// Builds clipboard text for Show Field Error (summary, explanation, and raw details).
+        /// Builds clipboard text for Show Field Error (summary, file, and folded errors).
         /// </summary>
         /// <param name="content">Dialog content.</param>
         /// <returns>Multi-line text suitable for copy/paste.</returns>
@@ -27,12 +31,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return string.Join(
                 Environment.NewLine,
                 Summary,
+                content.FilePath,
                 string.Empty,
-                $"Field: {content.FieldDisplayName}",
-                content.UserExplanation,
-                string.Empty,
-                "Technical details:",
-                content.TechnicalDetails
+                FormatDetailsText(content)
             );
         }
     }

@@ -50,23 +50,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Returns whether the focused original cell failed to load metadata from disk.
+        /// Returns whether this original cell failed to load metadata from disk.
         /// </summary>
         /// <param name="key">Field key (original or preview).</param>
         /// <returns><see langword="true"/> when the cell should show <c>Error</c>.</returns>
         public bool IsFieldLoadError(RenameListFieldKey key)
         {
             return RenameListFieldCatalog.HasFieldLoadError(EngineItem, key);
-        }
-
-        /// <summary>
-        /// Returns the stored metadata load exception for one original field, when present.
-        /// </summary>
-        /// <param name="key">Field key (original or preview).</param>
-        /// <returns>Exception message source for Show Field Error, or <see langword="null"/>.</returns>
-        public Exception? TryGetFieldLoadError(RenameListFieldKey key)
-        {
-            return RenameListFieldCatalog.GetFieldLoadError(EngineItem, key);
         }
 
         /// <summary>

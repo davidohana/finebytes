@@ -43,11 +43,11 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(item.EmbeddedTagsLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.True(item.MediaPropertiesLoadAttempted);
-            Assert.NotNull(item.GetTagLibMetadataLoadError());
+            Assert.NotNull(item.TagLibMetadataLoadError);
             Assert.NotNull(item.ImagePropertiesLoadError);
-            Assert.Equal(RenameListFieldLoadError.DisplayText, RenameListFieldCatalog.Resolve(item, audioKey));
-            Assert.Equal(RenameListFieldLoadError.DisplayText, RenameListFieldCatalog.Resolve(item, imageKey));
-            Assert.Equal(RenameListFieldLoadError.DisplayText, RenameListFieldCatalog.Resolve(item, mediaKey));
+            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, RenameListFieldCatalog.Resolve(item, audioKey));
+            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, RenameListFieldCatalog.Resolve(item, imageKey));
+            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, RenameListFieldCatalog.Resolve(item, mediaKey));
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace Mfr.Tests.Models.Filters
             RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
 
             Assert.True(item.EmbeddedTagsLoadAttempted);
-            Assert.Null(item.GetTagLibMetadataLoadError());
+            Assert.Null(item.TagLibMetadataLoadError);
             Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, titleKey));
         }
 
@@ -141,10 +141,10 @@ namespace Mfr.Tests.Models.Filters
             var audioKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
             RenameListMetadataLoader.TryEnsureLoaded(item, audioKey);
-            Assert.NotNull(item.GetTagLibMetadataLoadError());
+            Assert.NotNull(item.TagLibMetadataLoadError);
 
             item.ClearMetadataCaches();
-            Assert.Null(item.GetTagLibMetadataLoadError());
+            Assert.Null(item.TagLibMetadataLoadError);
             Assert.False(item.EmbeddedTagsLoadAttempted);
         }
 

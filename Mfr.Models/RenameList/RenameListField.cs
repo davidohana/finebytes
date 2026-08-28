@@ -107,9 +107,9 @@ namespace Mfr.Models.RenameList
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (!isPreview && RenameListFieldLoadError.TryGetLoadError(item, MetadataRequirement, out _))
+            if (!isPreview && RenameListMetadataLoadErrors.TryGetLoadError(item, MetadataRequirement, out _))
             {
-                return RenameListFieldLoadError.DisplayText;
+                return RenameListMetadataLoadErrors.DisplayText;
             }
 
             var meta = isPreview ? item.Preview : item.Original;

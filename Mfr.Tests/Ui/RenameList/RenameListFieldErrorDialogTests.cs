@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
+using Mfr.Models.RenameList;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -11,26 +12,41 @@ namespace Mfr.Tests.Ui.RenameList
     public sealed class RenameListFieldErrorDialogTests
     {
         /// <summary>
-        /// Verifies the dialog explains the failure and exposes copyable raw details.
+        /// Verifies the dialog shows a single copyable box with folded friendly and technical text.
         /// </summary>
         [AvaloniaFact]
-        public void Dialog_shows_explanation_and_copyable_details()
+        public void Dialog_shows_all_row_errors_and_one_details_box()
         {
-            var message = @"D:\Music\General\UVWXYZ\U2 - 1991 - Achtung Baby\info.htm (taglib/mht)";
-            var userExplanation = "This file could not be read as audio or media metadata.";
-            var content = new RenameListFieldErrorDialogContent("Title", userExplanation, message);
+            var tagLibMessage = @"D:\Music\PLAYLIST.M3U (taglib/m3u)";
+            var imageMessage = "Cannot read image properties";
+            var content = new RenameListFieldErrorDialogContent(
+                @"D:\Music\PLAYLIST.M3U",
+                [
+                    new RenameListLoadError(
+                        "This file could not be read as audio or media metadata.",
+                        tagLibMessage
+                    ),
+                    new RenameListLoadError(
+                        "This file could not be read as image or EXIF metadata.",
+                        imageMessage
+                    ),
+                ]
+            );
             var dialog = new RenameListFieldErrorDialog(content);
             dialog.Show();
             dialog.UpdateLayout();
 
-            var explanationText = dialog.FindControl<TextBlock>("ExplanationText");
+            var filePathText = dialog.FindControl<TextBlock>("FilePathText");
             var detailsText = dialog.FindControl<TextBox>("DetailsText");
-            Assert.NotNull(explanationText);
+            Assert.NotNull(filePathText);
             Assert.NotNull(detailsText);
 
             Assert.Equal("Error", dialog.Title);
-            Assert.Equal(userExplanation, explanationText.Text);
-            Assert.Equal(message, detailsText.Text);
+            Assert.Equal(@"D:\Music\PLAYLIST.M3U", filePathText.Text);
+            Assert.Contains(tagLibMessage, detailsText.Text, StringComparison.Ordinal);
+            Assert.Contains(imageMessage, detailsText.Text, StringComparison.Ordinal);
+            Assert.Contains("audio or media metadata", detailsText.Text, StringComparison.Ordinal);
+            Assert.Contains("image or EXIF metadata", detailsText.Text, StringComparison.Ordinal);
             Assert.True(detailsText.IsReadOnly);
             Assert.NotNull(dialog.FindControl<Button>("CopyButton"));
         }

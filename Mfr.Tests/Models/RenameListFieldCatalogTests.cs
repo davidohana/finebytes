@@ -541,7 +541,7 @@ namespace Mfr.Tests.Models
             var ok = _ItemWithSemantic(SemanticAudioField.Title, "Alpha");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
-            Assert.Equal(RenameListFieldLoadError.DisplayText, RenameListFieldCatalog.Resolve(errored, titleKey));
+            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, RenameListFieldCatalog.Resolve(errored, titleKey));
             Assert.True(RenameListFieldCatalog.CompareForSort(errored, titleKey, ok) > 0);
             Assert.True(RenameListFieldCatalog.CompareForSort(ok, titleKey, errored) < 0);
         }
@@ -554,7 +554,7 @@ namespace Mfr.Tests.Models
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
             Assert.Equal("Error", RenameListFieldCatalog.Resolve(literalErrorTitle, titleKey));
-            Assert.False(RenameListFieldLoadError.HasLoadError(literalErrorTitle, titleKey));
+            Assert.False(RenameListMetadataLoadErrors.HasLoadError(literalErrorTitle, titleKey));
             Assert.True(RenameListFieldCatalog.CompareForSort(alphaTitle, titleKey, literalErrorTitle) < 0);
         }
 

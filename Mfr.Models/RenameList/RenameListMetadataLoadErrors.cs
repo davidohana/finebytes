@@ -5,7 +5,7 @@ namespace Mfr.Models.RenameList
     /// <summary>
     /// Display and lookup for original Rename List metadata load failures (Phase 6b).
     /// </summary>
-    internal static class RenameListFieldLoadError
+    internal static class RenameListMetadataLoadErrors
     {
         /// <summary>
         /// Grid text for a failed original metadata bucket (MFR7 <c>PropDisplay</c> with exception).
@@ -71,6 +71,54 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
+        /// Returns whether the row has any original metadata load failure.
+        /// </summary>
+        /// <param name="item">Rename row.</param>
+        /// <returns><see langword="true"/> when TagLib or image metadata failed to load.</returns>
+        internal static bool HasAny(RenameItem item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            return item.TagLibMetadataLoadError is not null || item.ImagePropertiesLoadError is not null;
+        }
+
+        /// <summary>
+        /// Lists distinct reader failures stored on the row (at most one TagLib and one image).
+        /// </summary>
+        /// <param name="item">Rename row.</param>
+        /// <returns>User-facing entries for Show Load Errors, in reader order.</returns>
+        internal static IReadOnlyList<RenameListLoadError> List(RenameItem item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            var errors = new List<RenameListLoadError>(2);
+            if (item.TagLibMetadataLoadError is { } tagLibError)
+            {
+                errors.Add(
+                    new RenameListLoadError(
+                        DescribeUserMessage(
+                            tagLibError,
+                            RenameListMetadataRequirement.EmbeddedAudioTags
+                                | RenameListMetadataRequirement.MediaProperties
+                        ),
+                        tagLibError.Message
+                    )
+                );
+            }
+
+            if (item.ImagePropertiesLoadError is { } imageError)
+            {
+                errors.Add(
+                    new RenameListLoadError(
+                        DescribeUserMessage(imageError, RenameListMetadataRequirement.ImageProperties),
+                        imageError.Message
+                    )
+                );
+            }
+
+            return errors;
+        }
+
+        /// <summary>
         /// Returns a plain-language explanation for a stored metadata load failure.
         /// </summary>
         /// <param name="error">Stored reader exception.</param>
@@ -118,7 +166,7 @@ namespace Mfr.Models.RenameList
                 || requirement.HasFlag(RenameListMetadataRequirement.MediaProperties)
             )
             {
-                error = item.GetTagLibMetadataLoadError();
+                error = item.TagLibMetadataLoadError;
                 if (error is not null)
                 {
                     return true;

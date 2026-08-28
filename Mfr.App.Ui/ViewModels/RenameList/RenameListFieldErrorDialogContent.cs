@@ -1,14 +1,11 @@
+using Mfr.Models.RenameList;
+
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Content for the Rename List Show Field Error dialog.
+    /// Content for the Rename List Show Field Error dialog (all reader failures on the row).
     /// </summary>
-    /// <param name="FieldDisplayName">Grid column label for the failed field.</param>
-    /// <param name="UserExplanation">Plain-language explanation for the failure.</param>
-    /// <param name="TechnicalDetails">Stored reader exception message for support and copy/paste.</param>
-    public sealed record RenameListFieldErrorDialogContent(
-        string FieldDisplayName,
-        string UserExplanation,
-        string TechnicalDetails
-    );
+    /// <param name="FilePath">Original absolute path for the selected row.</param>
+    /// <param name="Errors">Distinct TagLib and/or image load failures.</param>
+    public sealed record RenameListFieldErrorDialogContent(string FilePath, IReadOnlyList<RenameListLoadError> Errors);
 }

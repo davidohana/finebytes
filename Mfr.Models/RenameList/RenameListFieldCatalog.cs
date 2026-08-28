@@ -156,7 +156,7 @@ namespace Mfr.Models.RenameList
 
             var leftText = Resolve(left, key);
             var rightText = Resolve(right, key);
-            if (RenameListFieldLoadError.HasLoadError(left, key) || RenameListFieldLoadError.HasLoadError(right, key))
+            if (RenameListMetadataLoadErrors.HasLoadError(left, key) || RenameListMetadataLoadErrors.HasLoadError(right, key))
             {
                 return RenameListFieldSortCompare.String(leftText, rightText);
             }
@@ -191,18 +191,29 @@ namespace Mfr.Models.RenameList
         /// <returns><see langword="true"/> when the cell should show <c>Error</c>.</returns>
         public static bool HasFieldLoadError(RenameItem item, RenameListFieldKey key)
         {
-            return RenameListFieldLoadError.HasLoadError(item, key);
+            return RenameListMetadataLoadErrors.HasLoadError(item, key);
         }
 
         /// <summary>
-        /// Returns the stored metadata load exception for one original field, when present.
+        /// Returns whether the row has any original metadata load failure.
         /// </summary>
         /// <param name="item">Engine rename item.</param>
-        /// <param name="key">Field key (original or preview).</param>
-        /// <returns>Exception for Show Field Error, or <see langword="null"/>.</returns>
-        public static Exception? GetFieldLoadError(RenameItem item, RenameListFieldKey key)
+        /// <returns><see langword="true"/> when TagLib or image metadata failed to load.</returns>
+        public static bool HasAnyFieldLoadError(RenameItem item)
         {
-            return RenameListFieldLoadError.TryGetLoadError(item, key, out var error) ? error : null;
+            ArgumentNullException.ThrowIfNull(item);
+            return RenameListMetadataLoadErrors.HasAny(item);
+        }
+
+        /// <summary>
+        /// Lists distinct original metadata-reader failures on the row.
+        /// </summary>
+        /// <param name="item">Engine rename item.</param>
+        /// <returns>At most one TagLib and one image failure, in that order.</returns>
+        public static IReadOnlyList<RenameListLoadError> ListFieldLoadErrors(RenameItem item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            return RenameListMetadataLoadErrors.List(item);
         }
 
         /// <summary>
@@ -220,12 +231,12 @@ namespace Mfr.Models.RenameList
                 return string.Empty;
             }
 
-            if (!RenameListFieldLoadError.TryGetLoadError(item, key, out var error) || error is null)
+            if (!RenameListMetadataLoadErrors.TryGetLoadError(item, key, out var error) || error is null)
             {
                 return string.Empty;
             }
 
-            return RenameListFieldLoadError.DescribeUserMessage(error, field.MetadataRequirement);
+            return RenameListMetadataLoadErrors.DescribeUserMessage(error, field.MetadataRequirement);
         }
 
         /// <summary>

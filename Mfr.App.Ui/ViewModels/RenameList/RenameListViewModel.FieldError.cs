@@ -19,12 +19,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool CanShowFieldError => _CanShowFieldError();
 
         /// <summary>
-        /// Gets the focused Rename List column for status hints and Show Field Error.
+        /// Gets the focused Rename List column for status hints.
         /// </summary>
         public RenameListFieldKey? FocusedFieldKey { get; private set; }
 
         /// <summary>
-        /// Updates the focused column and refreshes Show Field Error availability.
+        /// Updates the focused column used for status-bar cell hints.
         /// </summary>
         /// <param name="fieldKey">Focused grid column key, or <see langword="null"/> when unset.</param>
         public void SetFocusedFieldKey(RenameListFieldKey? fieldKey)
@@ -36,47 +36,40 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             FocusedFieldKey = fieldKey;
             OnPropertyChanged(nameof(FocusedFieldKey));
-            _NotifyShowFieldErrorChanged();
         }
 
         /// <summary>
-        /// Shows the stored metadata load exception for the focused original cell.
+        /// Shows stored metadata load failures for the selected row.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanShowFieldError))]
         public void ShowFieldError()
         {
-            var entry = _GetFocusedSelectedEntry();
-            if (entry is null || FocusedFieldKey is not { } fieldKey)
+            if (_selectedEntries.Count != 1)
             {
                 return;
             }
 
-            var error = entry.TryGetFieldLoadError(fieldKey);
-            var field = RenameListFieldCatalog.GetField(fieldKey);
-            var userExplanation = RenameListFieldCatalog.DescribeFieldLoadError(entry.EngineItem, fieldKey);
+            var entry = _selectedEntries[0];
+            var errors = RenameListFieldCatalog.ListFieldLoadErrors(entry.EngineItem);
+            if (errors.Count == 0)
+            {
+                return;
+            }
+
             FieldErrorDialogRequested?.Invoke(
                 this,
-                new RenameListFieldErrorDialogContent(
-                    field.DisplayName,
-                    userExplanation,
-                    error?.Message ?? string.Empty
-                )
+                new RenameListFieldErrorDialogContent(entry.FullPath, errors)
             );
         }
 
         private bool _CanShowFieldError()
         {
-            if (IsAdding || _selectedEntries.Count != 1 || FocusedFieldKey is not { } fieldKey)
+            if (IsAdding || _selectedEntries.Count != 1)
             {
                 return false;
             }
 
-            if (fieldKey.IsPreview)
-            {
-                return false;
-            }
-
-            return _selectedEntries[0].IsFieldLoadError(fieldKey);
+            return RenameListFieldCatalog.HasAnyFieldLoadError(_selectedEntries[0].EngineItem);
         }
 
         private void _NotifyShowFieldErrorChanged()

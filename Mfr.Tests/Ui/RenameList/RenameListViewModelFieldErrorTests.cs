@@ -18,10 +18,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies Show Field Error is available only for a single selected row with a metadata error cell.
+        /// Verifies Show Field Error is available for a single selected row with any load error.
         /// </summary>
         [Fact]
-        public async Task ShowFieldError_available_for_metadata_error_cell_only()
+        public async Task ShowFieldError_available_for_row_with_load_error()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "info.htm");
@@ -41,13 +41,10 @@ namespace Mfr.Tests.Ui.RenameList
 
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.Equal("info.htm", entry.GetFieldText(fullNameKey));
-            Assert.Equal(RenameListFieldLoadError.DisplayText, entry.GetFieldText(titleKey));
+            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, entry.GetFieldText(titleKey));
 
             renameListViewModel.SetSelectedEntries([entry]);
             renameListViewModel.SetFocusedFieldKey(fullNameKey);
-            Assert.False(renameListViewModel.CanShowFieldError);
-
-            renameListViewModel.SetFocusedFieldKey(titleKey);
             Assert.True(renameListViewModel.CanShowFieldError);
 
             RenameListFieldErrorDialogContent? content = null;
@@ -55,16 +52,17 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.ShowFieldErrorCommand.Execute(null);
 
             Assert.NotNull(content);
-            Assert.Equal("Title", content.FieldDisplayName);
-            Assert.Equal("This file could not be read as audio or media metadata.", content.UserExplanation);
-            Assert.False(string.IsNullOrWhiteSpace(content.TechnicalDetails));
+            Assert.Equal(path, content.FilePath);
+            var error = Assert.Single(content.Errors);
+            Assert.Equal("This file could not be read as audio or media metadata.", error.UserExplanation);
+            Assert.False(string.IsNullOrWhiteSpace(error.TechnicalDetails));
         }
 
         /// <summary>
-        /// Verifies preview columns never offer Show Field Error.
+        /// Verifies Show Field Error remains available when the focused column is a preview field.
         /// </summary>
         [Fact]
-        public async Task ShowFieldError_not_available_for_preview_columns()
+        public async Task ShowFieldError_available_when_preview_column_is_focused()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "info.htm");
@@ -86,7 +84,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([entry]);
             renameListViewModel.SetFocusedFieldKey(previewFullNameKey);
 
-            Assert.False(renameListViewModel.CanShowFieldError);
+            Assert.True(renameListViewModel.CanShowFieldError);
         }
     }
 }

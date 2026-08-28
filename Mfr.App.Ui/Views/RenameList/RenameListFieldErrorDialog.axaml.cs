@@ -5,23 +5,23 @@ using Mfr.App.Ui.ViewModels.RenameList;
 namespace Mfr.App.Ui.Views.RenameList
 {
     /// <summary>
-    /// Modal dialog for Rename List original field-load errors (MFR7 Show Field Error).
+    /// Modal dialog for Rename List original metadata load errors (MFR7 Show Field Error).
     /// </summary>
     public partial class RenameListFieldErrorDialog : Window
     {
         private readonly string _copyText;
 
         /// <summary>
-        /// Initializes the dialog with field error content.
+        /// Initializes the dialog with all reader failures on the selected row.
         /// </summary>
-        /// <param name="content">Field label and stored exception message.</param>
+        /// <param name="content">File path and stored load errors.</param>
         public RenameListFieldErrorDialog(RenameListFieldErrorDialogContent content)
         {
             ArgumentNullException.ThrowIfNull(content);
 
             InitializeComponent();
-            ExplanationText.Text = content.UserExplanation;
-            DetailsText.Text = content.TechnicalDetails;
+            FilePathText.Text = content.FilePath;
+            DetailsText.Text = RenameListFieldErrorDisplay.FormatDetailsText(content);
             _copyText = RenameListFieldErrorDisplay.FormatCopyText(content);
         }
 
