@@ -78,6 +78,11 @@
       <Setter Property="ColumnHeaderHeight" Value="22" />
       <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
       <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+      <Setter Property="DropLocationIndicatorTemplate">
+        <Template>
+          <Rectangle Width="3" Fill="{DynamicResource RenameListDropIndicatorBrush}" />
+        </Template>
+      </Setter>
     </Style>
     <Style Selector="DataGrid.rename-list /template/ ScrollBar#PART_VerticalScrollbar">
       <Setter Property="AllowAutoHide" Value="False" />
