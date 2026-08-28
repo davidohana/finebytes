@@ -307,7 +307,7 @@
           </Flyout>
         </FlyoutBase.AttachedFlyout>
         <DataGrid.Columns>
-          <DataGridTextColumn Binding="{Binding FileFolder}" SortMemberPath="FileFolder" Width="50">
+          <DataGridTextColumn Binding="{Binding FileFolder}" SortMemberPath="FileFolder" Width="80">
             <DataGridTextColumn.HeaderTemplate>
               <DataTemplate>
                 <Grid
@@ -329,7 +329,7 @@
               </DataTemplate>
             </DataGridTextColumn.HeaderTemplate>
           </DataGridTextColumn>
-          <DataGridTextColumn Binding="{Binding ParentFolder}" SortMemberPath="ParentFolder" Width="180">
+          <DataGridTextColumn Binding="{Binding ParentFolder}" SortMemberPath="ParentFolder" Width="240">
             <DataGridTextColumn.HeaderTemplate>
               <DataTemplate>
                 <Grid

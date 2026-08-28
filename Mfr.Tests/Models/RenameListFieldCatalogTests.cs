@@ -82,7 +82,8 @@ namespace Mfr.Tests.Models
 
         [Theory]
         [InlineData(BasicNameField.Key, "File Name", 150, true, true)]
-        [InlineData(BasicItemTypeField.Key, "File/Folder", 50, true, false)]
+        [InlineData(BasicItemTypeField.Key, "File/Folder", 80, true, false)]
+        [InlineData(BasicFolderField.Key, "Parent Folder", 240, true, true)]
         [InlineData(BasicFileNameNumericField.Key, "File Name Numeric Value", 50, true, false)]
         public void Field_definitions_carry_mfr7_labels_and_flags(
             string propertyKey,
