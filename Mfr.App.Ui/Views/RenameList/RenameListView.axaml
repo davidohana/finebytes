@@ -276,6 +276,13 @@
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
         </Button>
+        <Button
+          Classes="rename-list-action"
+          Command="{Binding OpenFieldShuttleCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/SelectFields.png" />
+        </Button>
         <ToggleButton
           Classes="rename-list-action"
           IsChecked="{Binding IsAutoSort, Mode=OneWay}"
