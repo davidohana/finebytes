@@ -11,6 +11,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
 {
@@ -96,6 +97,7 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.SortEditorRequested += _OnSortEditorRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
+            _RebuildColumns();
             _SyncSelectionToGrid();
             _ApplyDropMarkVisuals();
             _ClearSortDescriptions();
@@ -340,8 +342,14 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var columnHeader = RenameListCellHint.GetColumnHeader(column.SortMemberPath, column.Header as string);
-            if (string.IsNullOrEmpty(columnHeader))
+            var fieldKey = RenameListGridColumns.GetFieldKey(column);
+            if (fieldKey is null)
+            {
+                _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
+                return;
+            }
+
+            if (!RenameListFieldCatalog.TryGetField(fieldKey.Value, out var field))
             {
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
@@ -349,11 +357,12 @@ namespace Mfr.App.Ui.Views.RenameList
 
             _lastHintColumn = column;
 
-            var cellText = RenameListCellHint.GetCellText(entry, columnHeader);
+            var columnHeader = RenameListFieldDisplay.GetColumnHeaderText(field, fieldKey.Value.IsPreview);
+            var cellText = entry.GetFieldText(fieldKey.Value);
             _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatParts(
                 columnHeader,
                 cellText,
-                RenameListCellHint.IsPreviewColumn(columnHeader)
+                fieldKey.Value.IsPreview
             );
         }
 
@@ -588,6 +597,11 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 _ApplyDropMarkVisuals();
             }
+
+            if (e.PropertyName is nameof(RenameListViewModel.VisibleColumns))
+            {
+                _RebuildColumns();
+            }
         }
 
         private void _OnGridPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -610,7 +624,17 @@ namespace Mfr.App.Ui.Views.RenameList
 
             var append = _lastSortClickModifiers.HasFlag(KeyModifiers.Shift);
             _lastSortClickModifiers = KeyModifiers.None;
-            _viewModel.SortByColumn(e.Column.SortMemberPath, append);
+
+            var fieldKey = RenameListGridColumns.GetFieldKey(e.Column);
+            if (fieldKey is not null)
+            {
+                _viewModel.SortByFieldKey(fieldKey.Value, append);
+            }
+            else
+            {
+                _viewModel.SortByColumn(e.Column.SortMemberPath, append);
+            }
+
             _ClearSortDescriptions();
         }
 

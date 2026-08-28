@@ -227,6 +227,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
+            _SortByColumn(column, append);
+        }
+
+        /// <summary>
+        /// Sets Auto-Sort from a visible grid column field key.
+        /// </summary>
+        /// <param name="key">Catalog field key for the clicked column.</param>
+        /// <param name="append">
+        /// When <see langword="true"/> (Shift+click), append or adjust an existing key instead of replacing the list.
+        /// </param>
+        public void SortByFieldKey(RenameListFieldKey key, bool append = false)
+        {
+            if (key.IsPreview || !RenameListFieldCatalog.TryMapFieldKeyToSortColumn(key, out var column))
+            {
+                return;
+            }
+
+            _SortByColumn(column, append);
+        }
+
+        private void _SortByColumn(RenameListSortColumn column, bool append)
+        {
             if (append)
             {
                 _SortByColumnAppend(column);

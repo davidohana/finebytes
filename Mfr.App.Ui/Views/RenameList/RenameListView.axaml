@@ -92,6 +92,9 @@
       <Setter Property="SeparatorBrush" Value="{DynamicResource FileListSeparatorBrush}" />
       <Setter Property="AreSeparatorsVisible" Value="True" />
     </Style>
+    <Style Selector="TextBlock.rename-list-preview-header">
+      <Setter Property="Foreground" Value="Red" />
+    </Style>
     <Style Selector="DataGrid.rename-list DataGridColumnHeader /template/ Path#SortIcon">
       <Setter Property="IsVisible" Value="False" />
     </Style>
@@ -306,80 +309,7 @@
             <renameviews:RenameListSortEditorView DataContext="{Binding #RenameGrid.DataContext}" />
           </Flyout>
         </FlyoutBase.AttachedFlyout>
-        <DataGrid.Columns>
-          <DataGridTextColumn Binding="{Binding FileFolder}" SortMemberPath="FileFolder" Width="80">
-            <DataGridTextColumn.HeaderTemplate>
-              <DataTemplate>
-                <Grid
-                  ColumnDefinitions="*,Auto"
-                  DataContext="{Binding #RenameGrid.((vm:RenameListViewModel)DataContext)}"
-                >
-                  <TextBlock Grid.Column="0" Text="File/Folder" VerticalAlignment="Center" />
-                  <Border
-                    Grid.Column="1"
-                    Classes="rename-list-sort-glyph"
-                    IsVisible="{Binding ColumnSortStates[FileFolder].IsActive}"
-                  >
-                    <StackPanel Orientation="Horizontal" Spacing="1">
-                      <TextBlock Text="{Binding ColumnSortStates[FileFolder].Priority}" />
-                      <TextBlock Text="{Binding ColumnSortStates[FileFolder].DirectionGlyph}" />
-                    </StackPanel>
-                  </Border>
-                </Grid>
-              </DataTemplate>
-            </DataGridTextColumn.HeaderTemplate>
-          </DataGridTextColumn>
-          <DataGridTextColumn Binding="{Binding ParentFolder}" SortMemberPath="ParentFolder" Width="240">
-            <DataGridTextColumn.HeaderTemplate>
-              <DataTemplate>
-                <Grid
-                  ColumnDefinitions="*,Auto"
-                  DataContext="{Binding #RenameGrid.((vm:RenameListViewModel)DataContext)}"
-                >
-                  <TextBlock Grid.Column="0" Text="Parent Folder" VerticalAlignment="Center" />
-                  <Border
-                    Grid.Column="1"
-                    Classes="rename-list-sort-glyph"
-                    IsVisible="{Binding ColumnSortStates[ParentFolder].IsActive}"
-                  >
-                    <StackPanel Orientation="Horizontal" Spacing="1">
-                      <TextBlock Text="{Binding ColumnSortStates[ParentFolder].Priority}" />
-                      <TextBlock Text="{Binding ColumnSortStates[ParentFolder].DirectionGlyph}" />
-                    </StackPanel>
-                  </Border>
-                </Grid>
-              </DataTemplate>
-            </DataGridTextColumn.HeaderTemplate>
-          </DataGridTextColumn>
-          <DataGridTextColumn Binding="{Binding FullFileName}" SortMemberPath="FullFileName" Width="180">
-            <DataGridTextColumn.HeaderTemplate>
-              <DataTemplate>
-                <Grid
-                  ColumnDefinitions="*,Auto"
-                  DataContext="{Binding #RenameGrid.((vm:RenameListViewModel)DataContext)}"
-                >
-                  <TextBlock Grid.Column="0" Text="Full File Name" VerticalAlignment="Center" />
-                  <Border
-                    Grid.Column="1"
-                    Classes="rename-list-sort-glyph"
-                    IsVisible="{Binding ColumnSortStates[FullFileName].IsActive}"
-                  >
-                    <StackPanel Orientation="Horizontal" Spacing="1">
-                      <TextBlock Text="{Binding ColumnSortStates[FullFileName].Priority}" />
-                      <TextBlock Text="{Binding ColumnSortStates[FullFileName].DirectionGlyph}" />
-                    </StackPanel>
-                  </Border>
-                </Grid>
-              </DataTemplate>
-            </DataGridTextColumn.HeaderTemplate>
-          </DataGridTextColumn>
-          <DataGridTextColumn
-            Header="Full File Name (Preview)"
-            Binding="{Binding FullFileNamePreview}"
-            CanUserSort="False"
-            Width="*"
-          />
-        </DataGrid.Columns>
+        <DataGrid.Columns />
       </DataGrid>
     </Grid>
   </Border>

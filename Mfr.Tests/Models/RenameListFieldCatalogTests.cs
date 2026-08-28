@@ -82,7 +82,7 @@ namespace Mfr.Tests.Models
 
         [Theory]
         [InlineData(BasicNameField.Key, "File Name", 150, true, true)]
-        [InlineData(BasicItemTypeField.Key, "File/Folder", 80, true, false)]
+        [InlineData(BasicItemTypeField.Key, "File/Folder", 100, true, false)]
         [InlineData(BasicFolderField.Key, "Parent Folder", 240, true, true)]
         [InlineData(BasicFileNameNumericField.Key, "File Name Numeric Value", 50, true, false)]
         public void Field_definitions_carry_mfr7_labels_and_flags(
@@ -164,14 +164,9 @@ namespace Mfr.Tests.Models
         [Fact]
         public void GetField_returns_registered_field()
         {
-            var expected = RenameListFieldCatalog.All.Single(field =>
-                field.PropertyKey == BasicItemTypeField.Key
-            );
+            var expected = RenameListFieldCatalog.All.Single(field => field.PropertyKey == BasicItemTypeField.Key);
 
-            Assert.Same(
-                expected,
-                RenameListFieldCatalog.GetField(BasicRenameListField.Group, BasicItemTypeField.Key)
-            );
+            Assert.Same(expected, RenameListFieldCatalog.GetField(BasicRenameListField.Group, BasicItemTypeField.Key));
             Assert.Same(
                 expected,
                 RenameListFieldCatalog.GetField(
@@ -185,9 +180,7 @@ namespace Mfr.Tests.Models
         {
             var key = RenameListFieldKey.Original("Unknown", "Missing");
 
-            Assert.Throws<ArgumentException>(() =>
-                RenameListFieldCatalog.GetField("Unknown", "Missing")
-            );
+            Assert.Throws<ArgumentException>(() => RenameListFieldCatalog.GetField("Unknown", "Missing"));
             Assert.Throws<ArgumentException>(() => RenameListFieldCatalog.GetField(key));
         }
 

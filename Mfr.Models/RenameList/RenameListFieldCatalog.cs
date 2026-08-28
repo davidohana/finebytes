@@ -97,10 +97,7 @@ namespace Mfr.Models.RenameList
                 return field;
             }
 
-            throw new ArgumentException(
-                $"Unknown Rename List field '{groupId}/{propertyKey}'.",
-                nameof(propertyKey)
-            );
+            throw new ArgumentException($"Unknown Rename List field '{groupId}/{propertyKey}'.", nameof(propertyKey));
         }
 
         /// <summary>
@@ -116,10 +113,7 @@ namespace Mfr.Models.RenameList
                 return field;
             }
 
-            throw new ArgumentException(
-                $"Unknown Rename List field '{key.GroupId}/{key.PropertyKey}'.",
-                nameof(key)
-            );
+            throw new ArgumentException($"Unknown Rename List field '{key.GroupId}/{key.PropertyKey}'.", nameof(key));
         }
 
         /// <summary>

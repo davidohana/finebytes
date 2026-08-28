@@ -120,6 +120,33 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             return [.. _visibleColumns];
         }
+
+        /// <summary>
+        /// Updates the pixel width for one visible column after a grid resize.
+        /// </summary>
+        /// <param name="key">Field key for the resized column.</param>
+        /// <param name="width">New width in pixels.</param>
+        /// <remarks>
+        /// <para>Does not raise <see cref="VisibleColumns"/> change notifications to avoid rebuilding columns mid-resize.</para>
+        /// </remarks>
+        internal void UpdateVisibleColumnWidth(RenameListFieldKey key, int width)
+        {
+            var index = _visibleColumns.FindIndex(column => column.Key == key);
+            if (index < 0)
+            {
+                return;
+            }
+
+            var column = _visibleColumns[index];
+            if (column.Width == width)
+            {
+                return;
+            }
+
+            var updated = _visibleColumns.ToList();
+            updated[index] = column with { Width = width };
+            _visibleColumns = updated;
+        }
     }
 
     /// <summary>
