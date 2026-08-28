@@ -124,6 +124,73 @@ namespace Mfr.Tests.Ui
             Assert.Throws<ArgumentException>(() => renameListViewModel.SetVisibleColumns([]));
         }
 
+        [Fact]
+        public void ApplyVisibleColumnsFromSession_null_restores_defaults()
+        {
+            var renameListViewModel = _CreateRenameListViewModel();
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicNameField.Key)
+                ),
+            ]);
+
+            renameListViewModel.ApplyVisibleColumnsFromSession(null);
+
+            Assert.Equal(RenameListVisibleColumn.CreateDefaults(), renameListViewModel.VisibleColumns);
+        }
+
+        [Fact]
+        public void CaptureVisibleColumnsForSession_omits_catalog_default_widths()
+        {
+            var renameListViewModel = _CreateRenameListViewModel();
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicNameField.Key)
+                ),
+                new RenameListVisibleColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicExtensionField.Key),
+                    Width: 120
+                ),
+            ]);
+
+            var sessionColumns = renameListViewModel.CaptureVisibleColumnsForSession();
+
+            Assert.Equal(2, sessionColumns.Count);
+            Assert.Null(sessionColumns[0].Width);
+            Assert.Equal(120, sessionColumns[1].Width);
+        }
+
+        [Fact]
+        public void Visible_columns_session_round_trips_layout_and_widths()
+        {
+            var renameListViewModel = _CreateRenameListViewModel();
+            var sessionColumns = new[]
+            {
+                new SessionStateRenameListColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicNameField.Key),
+                    Width: 150
+                ),
+                new SessionStateRenameListColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicExtensionField.Key)
+                ),
+            };
+            renameListViewModel.ApplyVisibleColumnsFromSession(sessionColumns);
+
+            Assert.Equal(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicNameField.Key),
+                        Width: 150
+                    ),
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicExtensionField.Key)
+                    ),
+                ],
+                renameListViewModel.VisibleColumns
+            );
+            Assert.Equal(sessionColumns, renameListViewModel.CaptureVisibleColumnsForSession());
+        }
+
         private RenameListViewModel _CreateRenameListViewModel()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();

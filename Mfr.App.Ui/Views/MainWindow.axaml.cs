@@ -23,7 +23,8 @@ namespace Mfr.App.Ui.Views
             var viewModel = DataContext as MainWindowViewModel;
             var fileListSnapshot = viewModel?.FileListViewModel.CaptureSession();
             var renameListSortFields = viewModel?.RenameListViewModel.CaptureSortFields();
-            UiSessionPersistence.SaveOnClose(this, fileListSnapshot, renameListSortFields);
+            var renameListVisibleColumns = viewModel?.RenameListViewModel.CaptureVisibleColumnsForSession();
+            UiSessionPersistence.SaveOnClose(this, fileListSnapshot, renameListSortFields, renameListVisibleColumns);
         }
     }
 }

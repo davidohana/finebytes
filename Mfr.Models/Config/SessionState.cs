@@ -128,6 +128,13 @@ namespace Mfr.Models.Config
         public List<SessionStateRenameListSortField>? SortFields { get; set; }
 
         /// <summary>
+        /// Last Rename List visible grid columns in left-to-right order.
+        /// <para>Null means unset (first launch uses MFR7 defaults).</para>
+        /// </summary>
+        [JsonPropertyName("visibleColumns")]
+        public List<SessionStateRenameListColumn>? VisibleColumns { get; set; }
+
+        /// <summary>
         /// Converts persisted session fields into sort keys.
         /// </summary>
         /// <param name="fields">Session fields in priority order.</param>
@@ -163,6 +170,18 @@ namespace Mfr.Models.Config
     public sealed record SessionStateRenameListSortField(
         [property: JsonPropertyName("column")] RenameListSortColumn Column,
         [property: JsonPropertyName("descending")] bool Descending = false
+    );
+
+    /// <summary>
+    /// One persisted Rename List visible grid column: field identity plus optional width override.
+    /// </summary>
+    /// <param name="Key">Field key (original or preview).</param>
+    /// <param name="Width">
+    /// Column width in pixels, or <see langword="null"/> to use catalog/header defaults on restore.
+    /// </param>
+    public sealed record SessionStateRenameListColumn(
+        [property: JsonPropertyName("key")] RenameListFieldKey Key,
+        [property: JsonPropertyName("width")] int? Width = null
     );
 
     /// <summary>

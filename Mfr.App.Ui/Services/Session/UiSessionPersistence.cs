@@ -16,8 +16,9 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="window">Main window to configure.</param>
         /// <param name="session">Loaded session document.</param>
         /// <remarks>
-        /// File List mask fields and Rename List Auto-Sort are restored separately via
-        /// <see cref="FileListSessionSnapshot.FromSessionState"/> / <c>ApplySession</c>.
+        /// File List mask fields and Rename List session fields are restored separately via
+        /// <see cref="FileListSessionSnapshot.FromSessionState"/> / <c>ApplySession</c> /
+        /// <c>ApplyVisibleColumnsFromSession</c>.
         /// </remarks>
         public static void TryRestore(MainWindow window, SessionState session)
         {
@@ -50,10 +51,14 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="renameListSortFields">
         /// Rename List Auto-Sort session fields, or <see langword="null"/> to leave the saved value unchanged.
         /// </param>
+        /// <param name="renameListVisibleColumns">
+        /// Rename List visible column session fields, or <see langword="null"/> to leave the saved value unchanged.
+        /// </param>
         public static void SaveOnClose(
             MainWindow window,
             FileListSessionSnapshot? fileListSnapshot,
-            IReadOnlyList<SessionStateRenameListSortField>? renameListSortFields = null
+            IReadOnlyList<SessionStateRenameListSortField>? renameListSortFields = null,
+            IReadOnlyList<SessionStateRenameListColumn>? renameListVisibleColumns = null
         )
         {
             ArgumentNullException.ThrowIfNull(window);
@@ -95,11 +100,19 @@ namespace Mfr.App.Ui.Services.Session
                         : [.. fileListSnapshot.MaskSuggestions];
                 }
 
-                if (renameListSortFields is not null)
+                if (renameListSortFields is not null || renameListVisibleColumns is not null)
                 {
                     session.RenameList ??= new SessionStateRenameList();
 
-                    session.RenameList.SortFields = [.. renameListSortFields];
+                    if (renameListSortFields is not null)
+                    {
+                        session.RenameList.SortFields = [.. renameListSortFields];
+                    }
+
+                    if (renameListVisibleColumns is not null)
+                    {
+                        session.RenameList.VisibleColumns = [.. renameListVisibleColumns];
+                    }
                 }
 
                 SessionStore.Save(session);

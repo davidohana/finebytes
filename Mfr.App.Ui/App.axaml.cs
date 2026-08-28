@@ -38,6 +38,7 @@ namespace Mfr.App.Ui
                 {
                     viewModel.FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
                     viewModel.RenameListViewModel.ApplySession(session.RenameList?.SortFields);
+                    viewModel.RenameListViewModel.ApplyVisibleColumnsFromSession(session.RenameList?.VisibleColumns);
                 }
 
                 desktop.MainWindow = mainWindow;

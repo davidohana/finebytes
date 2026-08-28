@@ -1,3 +1,5 @@
+using Mfr.Models.RenameList.Fields.Basic;
+
 namespace Mfr.Tests.Models
 {
     /// <summary>
@@ -72,6 +74,16 @@ namespace Mfr.Tests.Models
                         [
                             new SessionStateRenameListSortField(RenameListSortColumn.FullFileName, Descending: true),
                         ],
+                        VisibleColumns =
+                        [
+                            new SessionStateRenameListColumn(
+                                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullPathField.Key),
+                                Width: 220
+                            ),
+                            new SessionStateRenameListColumn(
+                                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key)
+                            ),
+                        ],
                     },
                 };
 
@@ -103,6 +115,18 @@ namespace Mfr.Tests.Models
                 Assert.Single(loaded.RenameList.SortFields);
                 Assert.Equal(RenameListSortColumn.FullFileName, loaded.RenameList.SortFields[0].Column);
                 Assert.True(loaded.RenameList.SortFields[0].Descending);
+                Assert.NotNull(loaded.RenameList.VisibleColumns);
+                Assert.Equal(2, loaded.RenameList.VisibleColumns.Count);
+                Assert.Equal(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullPathField.Key),
+                    loaded.RenameList.VisibleColumns[0].Key
+                );
+                Assert.Equal(220, loaded.RenameList.VisibleColumns[0].Width);
+                Assert.Equal(
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key),
+                    loaded.RenameList.VisibleColumns[1].Key
+                );
+                Assert.Null(loaded.RenameList.VisibleColumns[1].Width);
             }
             finally
             {
