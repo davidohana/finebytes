@@ -106,6 +106,12 @@ namespace Mfr.Models.RenameList
         public string Resolve(RenameItem item, bool isPreview)
         {
             ArgumentNullException.ThrowIfNull(item);
+
+            if (!isPreview && RenameListFieldLoadError.TryGetLoadError(item, MetadataRequirement, out _))
+            {
+                return RenameListFieldLoadError.DisplayText;
+            }
+
             var meta = isPreview ? item.Preview : item.Original;
             return Resolve(meta);
         }

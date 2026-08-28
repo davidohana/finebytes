@@ -117,11 +117,28 @@ namespace Mfr.App.Ui.Views.RenameList
             }
         }
 
+        private void _OnFieldErrorDialogRequested(object? sender, RenameListFieldErrorDialogContent content)
+        {
+            Dispatcher.UIThread.Post(() => _ = _ShowFieldErrorDialogAsync(content));
+        }
+
+        private async Task _ShowFieldErrorDialogAsync(RenameListFieldErrorDialogContent content)
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            var dialog = new RenameListFieldErrorDialog(content);
+            await dialog.ShowDialog(owner);
+        }
+
         private void _OnDataContextChanged(object? sender, EventArgs e)
         {
             if (_viewModel is not null)
             {
                 _viewModel.FieldShuttleRequested -= _OnFieldShuttleRequested;
+                _viewModel.FieldErrorDialogRequested -= _OnFieldErrorDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.AddProgress.PropertyChanged -= _OnAddProgressPropertyChanged;
             }
@@ -133,6 +150,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _viewModel.FieldShuttleRequested += _OnFieldShuttleRequested;
+            _viewModel.FieldErrorDialogRequested += _OnFieldErrorDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
             _RebuildColumns();
@@ -377,6 +395,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (entry is null || column is null)
             {
+                _viewModel.SetFocusedFieldKey(null);
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
@@ -384,17 +403,33 @@ namespace Mfr.App.Ui.Views.RenameList
             var fieldKey = RenameListGridColumns.GetFieldKey(column);
             if (fieldKey is null)
             {
+                _viewModel.SetFocusedFieldKey(null);
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
 
             if (!RenameListFieldCatalog.TryGetField(fieldKey.Value, out var field))
             {
+                _viewModel.SetFocusedFieldKey(null);
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
 
             _lastHintColumn = column;
+            _viewModel.SetFocusedFieldKey(fieldKey);
+
+            if (entry.IsFieldLoadError(fieldKey.Value))
+            {
+                var userExplanation = RenameListFieldCatalog.DescribeFieldLoadError(
+                    entry.EngineItem,
+                    fieldKey.Value
+                );
+                _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatFieldError(
+                    field.DisplayName,
+                    userExplanation
+                );
+                return;
+            }
 
             var cellText = entry.GetFieldText(fieldKey.Value);
             _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatParts(field.DisplayName, cellText);
@@ -533,6 +568,25 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _OnLoadingRow(object? sender, DataGridRowEventArgs e)
         {
             _ApplyDropMarkClass(e.Row);
+            _ApplyFieldLoadErrorForeground(e.Row);
+        }
+
+        private void _ApplyFieldLoadErrorForeground(DataGridRow row)
+        {
+            Dispatcher.UIThread.Post(() => _ApplyFieldLoadErrorForegroundCore(row), DispatcherPriority.Loaded);
+        }
+
+        private void _ApplyFieldLoadErrorForegroundCore(DataGridRow row)
+        {
+            foreach (var textBlock in row.GetVisualDescendants().OfType<TextBlock>())
+            {
+                if (!string.Equals(textBlock.Text, RenameListFieldCatalog.FieldLoadErrorText, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                textBlock.Foreground = RenameListFieldForegroundConverter.ErrorBrush;
+            }
         }
 
         private void _ApplyDropMarkVisuals()

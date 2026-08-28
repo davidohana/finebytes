@@ -22,6 +22,12 @@
       <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
       <ContextMenu x:Key="RenameListRowContextMenu" x:Shared="False">
         <MenuItem
+          Header="Show Field Error"
+          Command="{Binding ShowFieldErrorCommand}"
+          IsVisible="{Binding CanShowFieldError}"
+        />
+        <Separator IsVisible="{Binding CanShowFieldError}" />
+        <MenuItem
           Header="Locate in File List"
           Command="{Binding LocateInFileListCommand}"
           InputGesture="{x:Static input:AppShortcuts.LocateInFileList}"

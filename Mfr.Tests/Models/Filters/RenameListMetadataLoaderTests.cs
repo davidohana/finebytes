@@ -43,9 +43,11 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(item.EmbeddedTagsLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.True(item.MediaPropertiesLoadAttempted);
-            Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, audioKey));
-            Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, imageKey));
-            Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, mediaKey));
+            Assert.NotNull(item.GetTagLibMetadataLoadError());
+            Assert.NotNull(item.ImagePropertiesLoadError);
+            Assert.Equal(RenameListFieldLoadError.DisplayText, RenameListFieldCatalog.Resolve(item, audioKey));
+            Assert.Equal(RenameListFieldLoadError.DisplayText, RenameListFieldCatalog.Resolve(item, imageKey));
+            Assert.Equal(RenameListFieldLoadError.DisplayText, RenameListFieldCatalog.Resolve(item, mediaKey));
         }
 
         [Fact]
@@ -120,7 +122,7 @@ namespace Mfr.Tests.Models.Filters
         }
 
         [Fact]
-        public void Jpeg_file_with_audio_column_does_not_throw()
+        public void Jpeg_file_with_audio_column_does_not_throw_and_shows_empty_tags()
         {
             var item = _UnmarkedFixtureItem("tiny.jpeg");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
@@ -128,7 +130,22 @@ namespace Mfr.Tests.Models.Filters
             RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
 
             Assert.True(item.EmbeddedTagsLoadAttempted);
+            Assert.Null(item.GetTagLibMetadataLoadError());
             Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, titleKey));
+        }
+
+        [Fact]
+        public void Clear_metadata_cache_clears_load_errors()
+        {
+            var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
+            var audioKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+
+            RenameListMetadataLoader.TryEnsureLoaded(item, audioKey);
+            Assert.NotNull(item.GetTagLibMetadataLoadError());
+
+            item.ClearMetadataCaches();
+            Assert.Null(item.GetTagLibMetadataLoadError());
+            Assert.False(item.EmbeddedTagsLoadAttempted);
         }
 
         [Fact]

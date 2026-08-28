@@ -154,6 +154,13 @@ namespace Mfr.Models.RenameList
                 throw new ArgumentException($"Field '{key.GroupId}/{key.PropertyKey}' is not sortable.", nameof(key));
             }
 
+            var leftText = Resolve(left, key);
+            var rightText = Resolve(right, key);
+            if (RenameListFieldLoadError.HasLoadError(left, key) || RenameListFieldLoadError.HasLoadError(right, key))
+            {
+                return RenameListFieldSortCompare.String(leftText, rightText);
+            }
+
             return GetField(key).CompareForSort(left.Original, right.Original);
         }
 
@@ -169,6 +176,56 @@ namespace Mfr.Models.RenameList
         {
             ArgumentNullException.ThrowIfNull(item);
             return GetField(key).Resolve(item, key.IsPreview);
+        }
+
+        /// <summary>
+        /// Grid text when original metadata load fails (MFR7 <c>PropDisplay</c> with exception).
+        /// </summary>
+        public const string FieldLoadErrorText = "Error";
+
+        /// <summary>
+        /// Returns whether an original field failed to load metadata from disk.
+        /// </summary>
+        /// <param name="item">Engine rename item.</param>
+        /// <param name="key">Field key (original or preview).</param>
+        /// <returns><see langword="true"/> when the cell should show <c>Error</c>.</returns>
+        public static bool HasFieldLoadError(RenameItem item, RenameListFieldKey key)
+        {
+            return RenameListFieldLoadError.HasLoadError(item, key);
+        }
+
+        /// <summary>
+        /// Returns the stored metadata load exception for one original field, when present.
+        /// </summary>
+        /// <param name="item">Engine rename item.</param>
+        /// <param name="key">Field key (original or preview).</param>
+        /// <returns>Exception for Show Field Error, or <see langword="null"/>.</returns>
+        public static Exception? GetFieldLoadError(RenameItem item, RenameListFieldKey key)
+        {
+            return RenameListFieldLoadError.TryGetLoadError(item, key, out var error) ? error : null;
+        }
+
+        /// <summary>
+        /// Returns a plain-language explanation for a field-load failure on one original column.
+        /// </summary>
+        /// <param name="item">Engine rename item.</param>
+        /// <param name="key">Original field key with a load error.</param>
+        /// <returns>User-facing explanation, or an empty string when no error is stored.</returns>
+        public static string DescribeFieldLoadError(RenameItem item, RenameListFieldKey key)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            if (!TryGetField(key, out var field))
+            {
+                return string.Empty;
+            }
+
+            if (!RenameListFieldLoadError.TryGetLoadError(item, key, out var error) || error is null)
+            {
+                return string.Empty;
+            }
+
+            return RenameListFieldLoadError.DescribeUserMessage(error, field.MetadataRequirement);
         }
 
         /// <summary>

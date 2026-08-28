@@ -534,6 +534,31 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
+        public void CompareForSort_orders_field_load_errors_as_display_text()
+        {
+            var errored = FilterTestHelpers.CreateRenameItem(prefix: "bad", extension: ".mp3");
+            errored.SetTagLibMetadataLoadError(new IOException("missing file"));
+            var ok = _ItemWithSemantic(SemanticAudioField.Title, "Alpha");
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+
+            Assert.Equal(RenameListFieldLoadError.DisplayText, RenameListFieldCatalog.Resolve(errored, titleKey));
+            Assert.True(RenameListFieldCatalog.CompareForSort(errored, titleKey, ok) > 0);
+            Assert.True(RenameListFieldCatalog.CompareForSort(ok, titleKey, errored) < 0);
+        }
+
+        [Fact]
+        public void CompareForSort_does_not_treat_literal_Error_tag_value_as_load_failure()
+        {
+            var literalErrorTitle = _ItemWithSemantic(SemanticAudioField.Title, "Error");
+            var alphaTitle = _ItemWithSemantic(SemanticAudioField.Title, "Alpha");
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+
+            Assert.Equal("Error", RenameListFieldCatalog.Resolve(literalErrorTitle, titleKey));
+            Assert.False(RenameListFieldLoadError.HasLoadError(literalErrorTitle, titleKey));
+            Assert.True(RenameListFieldCatalog.CompareForSort(alphaTitle, titleKey, literalErrorTitle) < 0);
+        }
+
+        [Fact]
         public void CompareForSort_orders_audio_title_string()
         {
             var betaTitle = _ItemWithSemantic(SemanticAudioField.Title, "Beta");

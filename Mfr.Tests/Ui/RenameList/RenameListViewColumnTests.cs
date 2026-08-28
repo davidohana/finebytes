@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -617,6 +618,96 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(expectedWidth, grid.Columns[0].Width.Value);
             Assert.Equal(expectedWidth, renameListViewModel.VisibleColumns[0].Width);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies default grid cells render basic field text (not blank/invisible).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Grid_cells_show_basic_field_text()
+        {
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
+
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var firstRow = grid.GetVisualDescendants().OfType<DataGridRow>().First();
+            var expected = renameListViewModel.Entries[0].FullFileName;
+            var rowTexts = firstRow
+                .GetVisualDescendants()
+                .OfType<TextBlock>()
+                .Select(textBlock => textBlock.Text)
+                .Where(text => !string.IsNullOrEmpty(text))
+                .ToList();
+
+            Assert.Contains(expected, rowTexts);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies basic columns still render when a sibling metadata column failed (6b grid regression).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Grid_shows_basic_text_and_Error_for_metadata_failure_on_same_row()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "info.htm");
+            await File.WriteAllTextAsync(path, "<html></html>");
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(fullNameKey),
+                new RenameListVisibleColumn(titleKey),
+            ]);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 900,
+                Height = 200,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.Equal("info.htm", entry.GetFieldText(fullNameKey));
+            Assert.Equal(RenameListFieldLoadError.DisplayText, entry.GetFieldText(titleKey));
+
+            var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
+            var rowTexts = row.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .Select(textBlock => textBlock.Text)
+                .Where(text => !string.IsNullOrEmpty(text))
+                .ToList();
+            Assert.Contains("info.htm", rowTexts);
+            Assert.Contains(RenameListFieldLoadError.DisplayText, rowTexts);
+
+            var errorTextBlock = row.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .First(textBlock => textBlock.Text == RenameListFieldLoadError.DisplayText);
+            var errorBrush = Assert.IsType<SolidColorBrush>(errorTextBlock.Foreground);
+            Assert.Equal(Color.Parse("#808080"), errorBrush.Color);
+
+            var fullNameTextBlock = row.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .First(textBlock => textBlock.Text == "info.htm");
+            Assert.NotSame(RenameListFieldForegroundConverter.ErrorBrush, fullNameTextBlock.Foreground);
 
             window.Close();
         }

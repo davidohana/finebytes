@@ -127,6 +127,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
+            _NotifyShowFieldErrorChanged();
         }
 
         /// <summary>

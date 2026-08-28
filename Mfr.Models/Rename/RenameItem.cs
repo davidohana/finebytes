@@ -119,6 +119,51 @@ namespace Mfr.Models.Rename
         internal bool ImagePropertiesLoadAttempted { get; private set; }
 
         /// <summary>
+        /// Gets the last embedded-tag read failure for this row, when present.
+        /// </summary>
+        internal Exception? EmbeddedTagsLoadError { get; private set; }
+
+        /// <summary>
+        /// Gets the last TagLib media-properties read failure for this row, when present.
+        /// </summary>
+        internal Exception? MediaPropertiesLoadError { get; private set; }
+
+        /// <summary>
+        /// Gets the last image-metadata read failure for this row, when present.
+        /// </summary>
+        internal Exception? ImagePropertiesLoadError { get; private set; }
+
+        /// <summary>
+        /// Returns the stored TagLib failure for audio-tag or media columns (group-level in MFR7).
+        /// </summary>
+        /// <returns>Embedded- or media-bucket exception, whichever was recorded first.</returns>
+        internal Exception? GetTagLibMetadataLoadError()
+        {
+            return EmbeddedTagsLoadError ?? MediaPropertiesLoadError;
+        }
+
+        /// <summary>
+        /// Records a TagLib read failure on both embedded-tag and media buckets for this row.
+        /// </summary>
+        /// <param name="ex">Failure from TagLib while reading the row path.</param>
+        internal void SetTagLibMetadataLoadError(Exception ex)
+        {
+            ArgumentNullException.ThrowIfNull(ex);
+            EmbeddedTagsLoadError = ex;
+            MediaPropertiesLoadError = ex;
+        }
+
+        /// <summary>
+        /// Records an image-metadata read failure for this row.
+        /// </summary>
+        /// <param name="ex">Failure from MetadataExtractor while reading the row path.</param>
+        internal void SetImagePropertiesLoadError(Exception ex)
+        {
+            ArgumentNullException.ThrowIfNull(ex);
+            ImagePropertiesLoadError = ex;
+        }
+
+        /// <summary>
         /// Marks embedded-tag load as attempted for this preview cycle.
         /// </summary>
         internal void MarkEmbeddedTagsLoadAttempted()
@@ -212,6 +257,7 @@ namespace Mfr.Models.Rename
         internal void ClearEmbeddedTagsCache()
         {
             EmbeddedTagsLoadAttempted = false;
+            EmbeddedTagsLoadError = null;
             Original.AudioTagOverlay = new AudioTagOverlay();
             Preview.AudioTagOverlay = new AudioTagOverlay();
             StripAllEmbeddedTagsOnCommit = false;
@@ -223,6 +269,7 @@ namespace Mfr.Models.Rename
         internal void ClearMediaPropertiesCache()
         {
             MediaPropertiesLoadAttempted = false;
+            MediaPropertiesLoadError = null;
             Original.Media = null;
             Preview.Media = null;
         }
@@ -233,6 +280,7 @@ namespace Mfr.Models.Rename
         internal void ClearImagePropertiesCache()
         {
             ImagePropertiesLoadAttempted = false;
+            ImagePropertiesLoadError = null;
             Original.Image = null;
             Preview.Image = null;
             Original.Exif = null;

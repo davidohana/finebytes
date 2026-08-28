@@ -112,7 +112,7 @@ namespace Mfr.Filters
             }
             catch (Exception ex) when (_IsMetadataReadFailure(ex))
             {
-                // Grid cells show empty when tags cannot be read (missing file, unsupported format).
+                item.SetTagLibMetadataLoadError(ex);
             }
         }
 
@@ -129,7 +129,7 @@ namespace Mfr.Filters
             }
             catch (Exception ex) when (_IsMetadataReadFailure(ex))
             {
-                // Grid cells show empty when media properties cannot be read.
+                item.SetTagLibMetadataLoadError(ex);
             }
         }
 
@@ -146,7 +146,7 @@ namespace Mfr.Filters
             }
             catch (Exception ex) when (_IsMetadataReadFailure(ex))
             {
-                // Grid cells show empty when image metadata cannot be read.
+                item.SetImagePropertiesLoadError(ex);
             }
         }
 

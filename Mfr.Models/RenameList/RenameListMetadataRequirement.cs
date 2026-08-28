@@ -9,21 +9,21 @@ namespace Mfr.Models.RenameList
         /// <summary>
         /// Field reads only scan-time <see cref="Rename.FileMeta"/> data.
         /// </summary>
-        None,
+        None = 0,
 
         /// <summary>
         /// Field reads embedded audio tags from disk via TagLib.
         /// </summary>
-        EmbeddedAudioTags,
+        EmbeddedAudioTags = 1,
 
         /// <summary>
         /// Field reads TagLib media and MPEG stream properties from disk.
         /// </summary>
-        MediaProperties,
+        MediaProperties = 2,
 
         /// <summary>
         /// Field reads MetadataExtractor image properties and/or EXIF from disk.
         /// </summary>
-        ImageProperties,
+        ImageProperties = 4,
     }
 }
