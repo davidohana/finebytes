@@ -16,7 +16,7 @@ namespace Mfr.Models.RenameList.Fields.Image
             propertyKey,
             displayName,
             defaultWidth,
-            RenameListFieldMetadataLoad.ImageProperties
+            RenameListMetadataRequirement.ImageProperties
         );
 
     /// <summary>

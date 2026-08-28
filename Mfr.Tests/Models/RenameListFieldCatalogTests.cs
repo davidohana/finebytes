@@ -356,8 +356,8 @@ namespace Mfr.Tests.Models
 
             Assert.False(RenameListFieldCatalog.GetField(AudioTagRenameListFields.Group, "Title").SupportsPreview);
             Assert.Equal(
-                RenameListFieldMetadataLoad.EmbeddedAudioTags,
-                RenameListFieldCatalog.GetMetadataLoad(
+                RenameListMetadataRequirement.EmbeddedAudioTags,
+                RenameListFieldCatalog.GetMetadataRequirement(
                     RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title")
                 )
             );
@@ -410,20 +410,20 @@ namespace Mfr.Tests.Models
 
             Assert.False(RenameListFieldCatalog.GetField(ImageRenameListFields.Group, "Width").SupportsPreview);
             Assert.Equal(
-                RenameListFieldMetadataLoad.ImageProperties,
-                RenameListFieldCatalog.GetMetadataLoad(
+                RenameListMetadataRequirement.ImageProperties,
+                RenameListFieldCatalog.GetMetadataRequirement(
                     RenameListFieldKey.Original(ImageRenameListFields.Group, "Width")
                 )
             );
             Assert.Equal(
-                RenameListFieldMetadataLoad.ImageProperties,
-                RenameListFieldCatalog.GetMetadataLoad(
+                RenameListMetadataRequirement.ImageProperties,
+                RenameListFieldCatalog.GetMetadataRequirement(
                     RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271")
                 )
             );
             Assert.Equal(
-                RenameListFieldMetadataLoad.None,
-                RenameListFieldCatalog.GetMetadataLoad(RenameListFieldKey.Original("Unknown", "Missing"))
+                RenameListMetadataRequirement.None,
+                RenameListFieldCatalog.GetMetadataRequirement(RenameListFieldKey.Original("Unknown", "Missing"))
             );
         }
 
@@ -493,14 +493,14 @@ namespace Mfr.Tests.Models
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*41989", "75 mm");
 
             Assert.Equal(
-                RenameListFieldMetadataLoad.MediaProperties,
-                RenameListFieldCatalog.GetMetadataLoad(
+                RenameListMetadataRequirement.MediaProperties,
+                RenameListFieldCatalog.GetMetadataRequirement(
                     RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType")
                 )
             );
             Assert.Equal(
-                RenameListFieldMetadataLoad.MediaProperties,
-                RenameListFieldCatalog.GetMetadataLoad(
+                RenameListMetadataRequirement.MediaProperties,
+                RenameListFieldCatalog.GetMetadataRequirement(
                     RenameListFieldKey.Original(MpegRenameListFields.Group, "Bitrate")
                 )
             );

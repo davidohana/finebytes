@@ -8,14 +8,14 @@ namespace Mfr.Models.RenameList
     /// <param name="propertyKey">Property key within the group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    /// <param name="metadataLoad">Lazy disk metadata required before resolving this field.</param>
+    /// <param name="metadataRequirement">Lazy disk metadata required before resolving this field.</param>
     internal abstract class OriginalOnlyRenameListField(
         string groupId,
         string groupDisplayName,
         string propertyKey,
         string displayName,
         int? defaultWidth = null,
-        RenameListFieldMetadataLoad metadataLoad = RenameListFieldMetadataLoad.None
+        RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None
     )
         : RenameListField(
             groupId,
@@ -26,6 +26,6 @@ namespace Mfr.Models.RenameList
             isSortable: false,
             supportsPreview: false,
             sortColumn: null,
-            metadataLoad
+            metadataRequirement
         );
 }

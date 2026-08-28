@@ -17,7 +17,7 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
             propertyKey,
             displayName,
             defaultWidth,
-            RenameListFieldMetadataLoad.MediaProperties
+            RenameListMetadataRequirement.MediaProperties
         );
 
     /// <summary>

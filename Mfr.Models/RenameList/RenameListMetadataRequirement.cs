@@ -1,10 +1,10 @@
 namespace Mfr.Models.RenameList
 {
     /// <summary>
-    /// Lazy metadata loads required before resolving some Rename List catalog fields.
+    /// Lazy metadata requirements before resolving some Rename List catalog fields.
     /// </summary>
     [Flags]
-    public enum RenameListFieldMetadataLoad
+    public enum RenameListMetadataRequirement
     {
         /// <summary>
         /// Field reads only scan-time <see cref="Rename.FileMeta"/> data.

@@ -4,31 +4,30 @@ using Mfr.Utils;
 namespace Mfr.Filters
 {
     /// <summary>
-    /// Loads lazy rename-row metadata for Rename List grid columns (original-only Phase 7a fields).
+    /// Lazy-loads rename-row metadata for Rename List grid columns (original-only Phase 7a fields).
     /// </summary>
-    public static class RenameListFieldMetadataLoader
+    public static class RenameListLazyMetadataLoader
     {
         /// <summary>
-        /// Ensures embedded audio tags are loaded when <paramref name="metadataLoad"/> includes
-        /// <see cref="RenameListFieldMetadataLoad.EmbeddedAudioTags"/>.
+        /// Ensures lazy rename-row metadata is loaded for each requirement in <paramref name="metadataRequirement"/>.
         /// </summary>
         /// <param name="item">Rename row to load.</param>
-        /// <param name="metadataLoad">Combined metadata-load flags for visible columns.</param>
-        public static void TryEnsureLoaded(RenameItem item, RenameListFieldMetadataLoad metadataLoad)
+        /// <param name="metadataRequirement">Combined metadata requirements for visible columns.</param>
+        public static void TryEnsureLoaded(RenameItem item, RenameListMetadataRequirement metadataRequirement)
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (metadataLoad.HasFlag(RenameListFieldMetadataLoad.EmbeddedAudioTags))
+            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags))
             {
                 _TryEnsureEmbeddedTagsLoaded(item);
             }
 
-            if (metadataLoad.HasFlag(RenameListFieldMetadataLoad.MediaProperties))
+            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.MediaProperties))
             {
                 _TryEnsureMediaPropertiesLoaded(item);
             }
 
-            if (metadataLoad.HasFlag(RenameListFieldMetadataLoad.ImageProperties))
+            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.ImageProperties))
             {
                 _TryEnsureImagePropertiesLoaded(item);
             }
@@ -42,7 +41,7 @@ namespace Mfr.Filters
         public static void TryEnsureLoaded(RenameItem item, RenameListFieldKey key)
         {
             ArgumentNullException.ThrowIfNull(item);
-            TryEnsureLoaded(item, RenameListFieldCatalog.GetMetadataLoad(key));
+            TryEnsureLoaded(item, RenameListFieldCatalog.GetMetadataRequirement(key));
         }
 
         private static void _TryEnsureEmbeddedTagsLoaded(RenameItem item)

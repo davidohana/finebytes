@@ -184,13 +184,13 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Returns the lazy metadata-load requirement for one field key.
+        /// Returns the lazy metadata requirement for one field key.
         /// </summary>
         /// <param name="key">Field key.</param>
-        /// <returns>Metadata-load flag for the registered field, or <see cref="RenameListFieldMetadataLoad.None"/>.</returns>
-        public static RenameListFieldMetadataLoad GetMetadataLoad(RenameListFieldKey key)
+        /// <returns>Metadata requirement for the registered field, or <see cref="RenameListMetadataRequirement.None"/>.</returns>
+        public static RenameListMetadataRequirement GetMetadataRequirement(RenameListFieldKey key)
         {
-            return TryGetField(key, out var field) ? field.MetadataLoad : RenameListFieldMetadataLoad.None;
+            return TryGetField(key, out var field) ? field.MetadataRequirement : RenameListMetadataRequirement.None;
         }
 
         private static List<RenameListField> _Register(List<RenameListField> fields)

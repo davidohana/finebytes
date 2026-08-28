@@ -17,7 +17,7 @@ namespace Mfr.Models.RenameList
     /// When <see langword="true"/>, a preview column variant may be added (MFR7 non-<c>ReadOnly</c> fields).
     /// </param>
     /// <param name="sortColumn">Engine Auto-Sort column when this field maps to one.</param>
-    /// <param name="metadataLoad">Lazy disk metadata required before resolving this field.</param>
+    /// <param name="metadataRequirement">Lazy disk metadata required before resolving this field.</param>
     public abstract class RenameListField(
         string groupId,
         string groupDisplayName,
@@ -27,7 +27,7 @@ namespace Mfr.Models.RenameList
         bool isSortable = true,
         bool supportsPreview = true,
         RenameListSortColumn? sortColumn = null,
-        RenameListFieldMetadataLoad metadataLoad = RenameListFieldMetadataLoad.None
+        RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None
     )
     {
         /// <summary>
@@ -71,9 +71,9 @@ namespace Mfr.Models.RenameList
         public RenameListSortColumn? SortColumn { get; } = sortColumn;
 
         /// <summary>
-        /// Gets whether resolving this field may require lazy metadata loaded from disk.
+        /// Gets lazy disk metadata that must be loaded before resolving this field.
         /// </summary>
-        public RenameListFieldMetadataLoad MetadataLoad { get; } = metadataLoad;
+        public RenameListMetadataRequirement MetadataRequirement { get; } = metadataRequirement;
 
         /// <summary>
         /// Gets the original (non-preview) field key for this field.

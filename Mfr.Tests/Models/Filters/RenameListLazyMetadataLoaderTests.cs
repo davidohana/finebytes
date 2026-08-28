@@ -7,9 +7,9 @@ using Mfr.Models.RenameList.Fields.Mpeg;
 namespace Mfr.Tests.Models.Filters
 {
     /// <summary>
-    /// Tests for <see cref="RenameListFieldMetadataLoader"/>.
+    /// Tests for <see cref="RenameListLazyMetadataLoader"/>.
     /// </summary>
-    public sealed class RenameListFieldMetadataLoaderTests
+    public sealed class RenameListLazyMetadataLoaderTests
     {
         [Fact]
         public void Directory_rows_skip_disk_loads()
@@ -19,9 +19,9 @@ namespace Mfr.Tests.Models.Filters
             var imageKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
             var mediaKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType");
 
-            RenameListFieldMetadataLoader.TryEnsureLoaded(item, audioKey);
-            RenameListFieldMetadataLoader.TryEnsureLoaded(item, imageKey);
-            RenameListFieldMetadataLoader.TryEnsureLoaded(item, mediaKey);
+            RenameListLazyMetadataLoader.TryEnsureLoaded(item, audioKey);
+            RenameListLazyMetadataLoader.TryEnsureLoaded(item, imageKey);
+            RenameListLazyMetadataLoader.TryEnsureLoaded(item, mediaKey);
 
             Assert.False(item.EmbeddedTagsLoadAttempted);
             Assert.False(item.ImagePropertiesLoadAttempted);
@@ -36,9 +36,9 @@ namespace Mfr.Tests.Models.Filters
             var imageKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
             var mediaKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType");
 
-            RenameListFieldMetadataLoader.TryEnsureLoaded(item, audioKey);
-            RenameListFieldMetadataLoader.TryEnsureLoaded(item, imageKey);
-            RenameListFieldMetadataLoader.TryEnsureLoaded(item, mediaKey);
+            RenameListLazyMetadataLoader.TryEnsureLoaded(item, audioKey);
+            RenameListLazyMetadataLoader.TryEnsureLoaded(item, imageKey);
+            RenameListLazyMetadataLoader.TryEnsureLoaded(item, mediaKey);
 
             Assert.True(item.EmbeddedTagsLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
@@ -61,13 +61,13 @@ namespace Mfr.Tests.Models.Filters
                 var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
                 Assert.False(item.EmbeddedTagsLoadAttempted);
-                RenameListFieldMetadataLoader.TryEnsureLoaded(item, titleKey);
+                RenameListLazyMetadataLoader.TryEnsureLoaded(item, titleKey);
 
                 Assert.True(item.EmbeddedTagsLoadAttempted);
                 Assert.Equal("DiskTitle", RenameListFieldCatalog.Resolve(item, titleKey));
 
                 item.Original.AudioTagOverlay.ClearAllBlocks();
-                RenameListFieldMetadataLoader.TryEnsureLoaded(item, titleKey);
+                RenameListLazyMetadataLoader.TryEnsureLoaded(item, titleKey);
                 Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, titleKey));
             }
             finally
@@ -83,7 +83,7 @@ namespace Mfr.Tests.Models.Filters
             var makeKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
 
             Assert.False(item.ImagePropertiesLoadAttempted);
-            RenameListFieldMetadataLoader.TryEnsureLoaded(item, makeKey);
+            RenameListLazyMetadataLoader.TryEnsureLoaded(item, makeKey);
 
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.Equal("Canon", RenameListFieldCatalog.Resolve(item, makeKey));
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Models.Filters
 
                 Assert.False(item.MediaPropertiesLoadAttempted);
                 Assert.False(item.EmbeddedTagsLoadAttempted);
-                RenameListFieldMetadataLoader.TryEnsureLoaded(item, layerKey);
+                RenameListLazyMetadataLoader.TryEnsureLoaded(item, layerKey);
 
                 Assert.True(item.MediaPropertiesLoadAttempted);
                 Assert.True(item.EmbeddedTagsLoadAttempted);
@@ -125,7 +125,7 @@ namespace Mfr.Tests.Models.Filters
             var item = _UnmarkedFixtureItem("tiny.jpeg");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
-            RenameListFieldMetadataLoader.TryEnsureLoaded(item, titleKey);
+            RenameListLazyMetadataLoader.TryEnsureLoaded(item, titleKey);
 
             Assert.True(item.EmbeddedTagsLoadAttempted);
             Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, titleKey));

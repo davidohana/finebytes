@@ -47,7 +47,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns>Resolved display string.</returns>
         public string GetFieldText(RenameListFieldKey key)
         {
-            RenameListFieldMetadataLoader.TryEnsureLoaded(EngineItem, key);
+            RenameListLazyMetadataLoader.TryEnsureLoaded(EngineItem, key);
             return RenameListFieldCatalog.Resolve(EngineItem, key);
         }
 
