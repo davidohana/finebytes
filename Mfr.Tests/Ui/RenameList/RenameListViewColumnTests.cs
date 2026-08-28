@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -89,7 +90,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies default grid columns use at least catalog or header-fit widths, and a star preview column.
+        /// Verifies default grid columns use catalog or header-fit pixel widths, including the last preview column.
         /// </summary>
         [AvaloniaFact]
         public async Task Default_columns_use_catalog_or_header_widths()
@@ -113,6 +114,10 @@ namespace Mfr.Tests.Ui.RenameList
                 "Full File Name",
                 reserveSortGlyph: true
             );
+            var previewFullFileNameMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Full File Name",
+                reservePreviewGlyph: true
+            );
             Assert.True(fileFolderMinWidth > fileFolderHeaderOnlyWidth);
             Assert.Equal(fileFolderMinWidth, grid.Columns[0].Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
@@ -120,10 +125,12 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
             Assert.Equal(Math.Max(180, fullFileNameMinWidth), grid.Columns[2].Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[2].Width.UnitType);
-            Assert.True(grid.Columns[3].Width.IsStar);
+            Assert.Equal(Math.Max(180, previewFullFileNameMinWidth), grid.Columns[3].Width.Value);
+            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[3].Width.UnitType);
             Assert.Equal(fileFolderMinWidth, grid.Columns[0].MinWidth);
             Assert.Equal(parentFolderMinWidth, grid.Columns[1].MinWidth);
             Assert.Equal(fullFileNameMinWidth, grid.Columns[2].MinWidth);
+            Assert.Equal(previewFullFileNameMinWidth, grid.Columns[3].MinWidth);
 
             window.Close();
         }
@@ -162,7 +169,8 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(previewFileNameLengthMin > 0);
             Assert.Equal(fullPathLengthMin, grid.Columns[0].Width.Value);
             Assert.Equal(fullPathLengthMin, grid.Columns[0].MinWidth);
-            Assert.True(grid.Columns[1].Width.IsStar);
+            Assert.Equal(previewFileNameLengthMin, grid.Columns[1].Width.Value);
+            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
             Assert.Equal(previewFileNameLengthMin, grid.Columns[1].MinWidth);
 
             window.Close();
@@ -264,6 +272,76 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies session column widths survive the initial grid layout pass.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Session_column_widths_survive_initial_layout()
+        {
+            const int savedWidth = 400;
+            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([path]);
+            renameListViewModel.ApplyVisibleColumnsFromSession([
+                new SessionStateRenameListColumn(folderKey, Width: savedWidth),
+            ]);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 600,
+                Height = 180,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+
+            Assert.Equal(savedWidth, renameListViewModel.VisibleColumns[0].Width);
+            Assert.Equal(savedWidth, grid.Columns[0].Width.Value);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies pixel column widths can exceed the viewport instead of being compressed.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Pixel_column_widths_can_overflow_viewport()
+        {
+            const int wideWidth = 500;
+            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key);
+            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            window.Width = 420;
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(folderKey, wideWidth),
+                new RenameListVisibleColumn(nameKey, wideWidth),
+            ]);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(wideWidth, grid.Columns[0].Width.Value);
+            Assert.Equal(wideWidth, grid.Columns[1].Width.Value);
+            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
+            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
+            Assert.Equal(ScrollBarVisibility.Auto, grid.HorizontalScrollBarVisibility);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies user-expanded column widths do not raise MinWidth above the header-fit minimum.
         /// </summary>
         [AvaloniaFact]
@@ -289,10 +367,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies reordering visible columns moves the star preview width to the new last column.
+        /// Verifies reordering visible columns keeps pixel widths so columns can overflow the viewport.
         /// </summary>
         [AvaloniaFact]
-        public async Task Reordered_visible_columns_move_star_preview_width()
+        public async Task Reordered_visible_columns_keep_pixel_widths()
         {
             var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key);
@@ -312,7 +390,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
-            Assert.True(grid.Columns[1].Width.IsStar);
+            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
 
             window.Close();
         }

@@ -65,9 +65,9 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 RenameGrid.Columns.Clear();
                 var visibleColumns = _viewModel.VisibleColumns;
-                for (var index = 0; index < visibleColumns.Count; index++)
+                foreach (var visibleColumn in visibleColumns)
                 {
-                    RenameGrid.Columns.Add(_CreateGridColumn(visibleColumns[index], index, visibleColumns.Count));
+                    RenameGrid.Columns.Add(_CreateGridColumn(visibleColumn));
                 }
             }
             finally
@@ -79,7 +79,7 @@ namespace Mfr.App.Ui.Views.RenameList
             Dispatcher.UIThread.Post(() => _columnWidthSyncEnabled = true, DispatcherPriority.Loaded);
         }
 
-        private DataGridTextColumn _CreateGridColumn(RenameListVisibleColumn visibleColumn, int index, int columnCount)
+        private DataGridTextColumn _CreateGridColumn(RenameListVisibleColumn visibleColumn)
         {
             var key = visibleColumn.Key;
             var field = RenameListFieldCatalog.GetField(key);
@@ -87,23 +87,18 @@ namespace Mfr.App.Ui.Views.RenameList
             var sortColumn = field.SortColumn;
             var canUserSort = !key.IsPreview && sortColumn is not null;
 
-            var catalogWidth = visibleColumn.ResolveCatalogWidth();
-            var reserveSortGlyph = !key.IsPreview;
             var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 headerText,
-                reserveSortGlyph: reserveSortGlyph,
+                reserveSortGlyph: !key.IsPreview,
                 reservePreviewGlyph: key.IsPreview
             );
-            var effectiveWidth = catalogWidth is int catalogPixelWidth
-                ? Math.Max(catalogPixelWidth, minHeaderWidth)
-                : minHeaderWidth;
-            var width = _ResolveColumnWidth(visibleColumn, index, columnCount, effectiveWidth);
+            var pixelWidth = _ResolveEffectivePixelWidth(visibleColumn, minHeaderWidth);
 
             var column = new DataGridTextColumn
             {
                 Binding = new Binding { Converter = RenameListFieldTextConverter.Instance, ConverterParameter = key },
                 CanUserSort = canUserSort,
-                Width = width,
+                Width = new DataGridLength(pixelWidth, DataGridLengthUnitType.Pixel),
                 MinWidth = minHeaderWidth,
             };
 
@@ -119,20 +114,25 @@ namespace Mfr.App.Ui.Views.RenameList
             return column;
         }
 
-        private static DataGridLength _ResolveColumnWidth(
+        private static int _ResolveEffectivePixelWidth(
             RenameListVisibleColumn visibleColumn,
-            int index,
-            int columnCount,
-            int effectiveWidth
+            int? minHeaderWidth = null
         )
         {
-            var isLastColumn = index == columnCount - 1;
-            if (isLastColumn && visibleColumn.Key.IsPreview)
-            {
-                return new DataGridLength(1, DataGridLengthUnitType.Star);
-            }
-
-            return new DataGridLength(effectiveWidth, DataGridLengthUnitType.Pixel);
+            var key = visibleColumn.Key;
+            var field = RenameListFieldCatalog.GetField(key);
+            var headerText = RenameListFieldDisplay.GetColumnHeaderText(field, key.IsPreview);
+            var resolvedMinHeaderWidth =
+                minHeaderWidth
+                ?? RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                    headerText,
+                    reserveSortGlyph: !key.IsPreview,
+                    reservePreviewGlyph: key.IsPreview
+                );
+            var catalogWidth = visibleColumn.ResolveCatalogWidth();
+            return catalogWidth is int catalogPixelWidth
+                ? Math.Max(catalogPixelWidth, resolvedMinHeaderWidth)
+                : resolvedMinHeaderWidth;
         }
 
         private static Control _CreateHeaderContent(string headerText, RenameListFieldKey key)
@@ -234,13 +234,8 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            if (args.OldValue is not DataGridLength oldWidth || oldWidth.IsStar || oldWidth.IsAuto)
-            {
-                return;
-            }
-
             var width = column.Width;
-            if (width.IsStar || width.IsAuto)
+            if (!width.IsAbsolute)
             {
                 return;
             }
