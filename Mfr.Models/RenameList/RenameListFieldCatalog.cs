@@ -19,15 +19,7 @@ namespace Mfr.Models.RenameList
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
             _Register([
-                new BasicItemTypeField(),
-                new BasicFolderField(),
-                new BasicFullNameField(),
-                new BasicFullPathField(),
-                new BasicNameField(),
-                new BasicExtensionField(),
-                new BasicFileNameNumericField(),
-                new BasicFileNameLengthField(),
-                new BasicFullPathLengthField(),
+                .. BasicRenameListFields.All,
                 .. ExtendedRenameListFields.All,
                 .. AudioTagRenameListFields.All,
                 .. ImageRenameListFields.All,
@@ -47,10 +39,10 @@ namespace Mfr.Models.RenameList
         /// </summary>
         public static IReadOnlyList<RenameListFieldKey> DefaultVisibleColumns { get; } =
             _RegisterDefaultVisibleColumns([
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicItemTypeField.Key),
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key),
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key),
-                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
             ]);
 
         /// <summary>

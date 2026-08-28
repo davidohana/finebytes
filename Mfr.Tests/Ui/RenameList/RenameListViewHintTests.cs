@@ -56,7 +56,7 @@ namespace Mfr.Tests.Ui.RenameList
             var expectedName = renameListViewModel.Entries[deleteIndex + 1].FullFileName;
             var fullNameColumn = grid.Columns.First(column =>
                 RenameListGridColumns.GetFieldKey(column)
-                == RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key)
+                == RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
             );
 
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[deleteIndex]]);
@@ -141,7 +141,7 @@ namespace Mfr.Tests.Ui.RenameList
                 .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
             Assert.NotNull(row);
 
-            var fullNameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key);
+            var fullNameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
             var x = 0.0;
             var found = false;
             foreach (var column in grid.Columns.OrderBy(column => column.DisplayIndex))

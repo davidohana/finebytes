@@ -77,11 +77,11 @@ namespace Mfr.Tests.Models
                         VisibleColumns =
                         [
                             new SessionStateRenameListColumn(
-                                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullPathField.Key),
+                                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath),
                                 Width: 220
                             ),
                             new SessionStateRenameListColumn(
-                                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key)
+                                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
                             ),
                         ],
                     },
@@ -118,12 +118,12 @@ namespace Mfr.Tests.Models
                 Assert.NotNull(loaded.RenameList.VisibleColumns);
                 Assert.Equal(2, loaded.RenameList.VisibleColumns.Count);
                 Assert.Equal(
-                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullPathField.Key),
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath),
                     loaded.RenameList.VisibleColumns[0].Key
                 );
                 Assert.Equal(220, loaded.RenameList.VisibleColumns[0].Width);
                 Assert.Equal(
-                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key),
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
                     loaded.RenameList.VisibleColumns[1].Key
                 );
                 Assert.Null(loaded.RenameList.VisibleColumns[1].Width);

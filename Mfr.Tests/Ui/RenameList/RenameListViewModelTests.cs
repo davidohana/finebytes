@@ -528,10 +528,10 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicItemTypeField.Key)
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
             );
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
                 append: true
             );
 
@@ -546,7 +546,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].Priority);
 
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
                 append: true
             );
             Assert.Equal(
@@ -559,17 +559,17 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsDescending);
 
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
                 append: true
             );
             Assert.Equal([new RenameListSortKey(RenameListSortColumn.FileFolder)], renameListViewModel.SortKeys);
             Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
 
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key)
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder)
             );
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
                 append: true
             );
             Assert.Equal(
@@ -597,14 +597,14 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(["gamma.log", "alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
 
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key)
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
             );
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
                 append: true
             );
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
                 append: true
             );
 
@@ -624,10 +624,10 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key)
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder)
             );
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key)
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
             );
 
             Assert.Equal([new RenameListSortKey(RenameListSortColumn.FullFileName)], renameListViewModel.SortKeys);
@@ -710,10 +710,10 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSortKeys([new RenameListSortKey(RenameListSortColumn.FullFileName)]);
 
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key)
+                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
             );
             renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicExtensionField.Key)
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Extension)
             );
 
             Assert.Equal([new RenameListSortKey(RenameListSortColumn.FullFileName)], renameListViewModel.SortKeys);

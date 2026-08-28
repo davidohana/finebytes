@@ -14,7 +14,7 @@ namespace Mfr.Tests.Ui.RenameList
             var columns = new[]
             {
                 new RenameListVisibleColumn(
-                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicNameField.Key)
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
                 ),
             };
             var sortKeys = new[] { new RenameListSortKey(RenameListSortColumn.FullPath) };
@@ -40,23 +40,23 @@ namespace Mfr.Tests.Ui.RenameList
                 columnsWithoutPreview,
                 RenameListSortKey.DefaultKeys
             );
-            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key);
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
             dialogVm.SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
                 BasicRenameListField.Group,
-                BasicNameField.Key
+                BasicRenameListFields.Key.Name
             );
             dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
             Assert.Equal(4, dialogVm.SelectedColumnRows.Count);
-            Assert.DoesNotContain(dialogVm.AvailableOriginalFields, field => field.PropertyKey == BasicNameField.Key);
+            Assert.DoesNotContain(dialogVm.AvailableOriginalFields, field => field.PropertyKey == BasicRenameListFields.Key.Name);
 
             dialogVm.SelectedColumnRowIndex = 0;
             dialogVm.MoveSelectedColumnDownCommand.Execute(null);
-            Assert.Equal(BasicFolderField.Key, dialogVm.SelectedColumnRows[0].Column.Key.PropertyKey);
+            Assert.Equal(BasicRenameListFields.Key.Folder, dialogVm.SelectedColumnRows[0].Column.Key.PropertyKey);
 
             dialogVm.SelectedAvailablePreviewField = RenameListFieldCatalog.GetField(
                 BasicRenameListField.Group,
-                BasicFullNameField.Key
+                BasicRenameListFields.Key.FullName
             );
             dialogVm.AddSelectedPreviewFieldCommand.Execute(null);
             Assert.Equal(5, dialogVm.SelectedColumnRows.Count);
@@ -79,7 +79,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dialogVm = new RenameListFieldShuttleDialogViewModel(
                 [
                     new RenameListVisibleColumn(
-                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicItemTypeField.Key)
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
                     ),
                 ],
                 []
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Empty(dialogVm.AvailableOriginalFields);
             Assert.DoesNotContain(
                 dialogVm.SelectedColumnRows,
-                row => row.Column.Key.IsPreview && row.Column.Key.PropertyKey == BasicFullNameField.Key
+                row => row.Column.Key.IsPreview && row.Column.Key.PropertyKey == BasicRenameListFields.Key.FullName
             );
 
             dialogVm.AddAllPreviewFieldsCommand.Execute(null);
@@ -99,7 +99,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(16, dialogVm.SelectedColumnRows.Count);
             Assert.Contains(
                 dialogVm.SelectedColumnRows,
-                row => row.Column.Key.IsPreview && row.Column.Key.PropertyKey == BasicFullNameField.Key
+                row => row.Column.Key.IsPreview && row.Column.Key.PropertyKey == BasicRenameListFields.Key.FullName
             );
         }
 
@@ -110,7 +110,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             dialogVm.SelectedAvailableSortField = RenameListFieldCatalog.GetField(
                 BasicRenameListField.Group,
-                BasicFullPathField.Key
+                BasicRenameListFields.Key.FullPath
             );
             dialogVm.AddSelectedSortFieldCommand.Execute(null);
             Assert.Equal(4, dialogVm.SelectedSortRows.Count);
@@ -142,19 +142,19 @@ namespace Mfr.Tests.Ui.RenameList
 
             dialogVm.SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
                 BasicRenameListField.Group,
-                BasicNameField.Key
+                BasicRenameListFields.Key.Name
             );
             dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
 
             dialogVm.SelectedAvailableSortField = RenameListFieldCatalog.GetField(
                 BasicRenameListField.Group,
-                BasicFullPathField.Key
+                BasicRenameListFields.Key.FullPath
             );
             dialogVm.AddSelectedSortFieldCommand.Execute(null);
 
             Assert.Single(dialogVm.SelectedColumnRows);
             Assert.Single(dialogVm.SelectedSortRows);
-            Assert.Equal(BasicNameField.Key, dialogVm.SelectedColumnRows[0].Column.Key.PropertyKey);
+            Assert.Equal(BasicRenameListFields.Key.Name, dialogVm.SelectedColumnRows[0].Column.Key.PropertyKey);
             Assert.Equal(RenameListSortColumn.FullPath, dialogVm.SelectedSortRows[0].Key.Column);
         }
 
@@ -176,7 +176,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dialogVm = new RenameListFieldShuttleDialogViewModel(
                 [
                     new RenameListVisibleColumn(
-                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicItemTypeField.Key)
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
                     ),
                 ],
                 []
@@ -184,7 +184,7 @@ namespace Mfr.Tests.Ui.RenameList
             {
                 SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
                     BasicRenameListField.Group,
-                    BasicNameField.Key
+                    BasicRenameListFields.Key.Name
                 ),
             };
             dialogVm.AddSelectedOriginalFieldCommand.Execute(null);

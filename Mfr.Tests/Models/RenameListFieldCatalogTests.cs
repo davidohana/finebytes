@@ -29,15 +29,15 @@ namespace Mfr.Tests.Models
         {
             Assert.Equal(
                 [
-                    BasicItemTypeField.Key,
-                    BasicFolderField.Key,
-                    BasicFullNameField.Key,
-                    BasicFullPathField.Key,
-                    BasicNameField.Key,
-                    BasicExtensionField.Key,
-                    BasicFileNameNumericField.Key,
-                    BasicFileNameLengthField.Key,
-                    BasicFullPathLengthField.Key,
+                    BasicRenameListFields.Key.ItemType,
+                    BasicRenameListFields.Key.Folder,
+                    BasicRenameListFields.Key.FullName,
+                    BasicRenameListFields.Key.FullPath,
+                    BasicRenameListFields.Key.Name,
+                    BasicRenameListFields.Key.Extension,
+                    BasicRenameListFields.Key.FileNameNumeric,
+                    BasicRenameListFields.Key.FileNameLength,
+                    BasicRenameListFields.Key.FullPathLength,
                 ],
                 [
                     .. RenameListFieldCatalog
@@ -57,21 +57,21 @@ namespace Mfr.Tests.Models
         {
             var keys = RenameListFieldCatalog.DefaultVisibleColumns;
             Assert.Equal(4, keys.Count);
-            Assert.Equal(BasicItemTypeField.Key, keys[0].PropertyKey);
+            Assert.Equal(BasicRenameListFields.Key.ItemType, keys[0].PropertyKey);
             Assert.False(keys[0].IsPreview);
-            Assert.Equal(BasicFolderField.Key, keys[1].PropertyKey);
+            Assert.Equal(BasicRenameListFields.Key.Folder, keys[1].PropertyKey);
             Assert.False(keys[1].IsPreview);
-            Assert.Equal(BasicFullNameField.Key, keys[2].PropertyKey);
+            Assert.Equal(BasicRenameListFields.Key.FullName, keys[2].PropertyKey);
             Assert.False(keys[2].IsPreview);
-            Assert.Equal(BasicFullNameField.Key, keys[3].PropertyKey);
+            Assert.Equal(BasicRenameListFields.Key.FullName, keys[3].PropertyKey);
             Assert.True(keys[3].IsPreview);
         }
 
         [Theory]
-        [InlineData(RenameListSortColumn.FileFolder, BasicItemTypeField.Key)]
-        [InlineData(RenameListSortColumn.ParentFolder, BasicFolderField.Key)]
-        [InlineData(RenameListSortColumn.FullFileName, BasicFullNameField.Key)]
-        [InlineData(RenameListSortColumn.FullPath, BasicFullPathField.Key)]
+        [InlineData(RenameListSortColumn.FileFolder, BasicRenameListFields.Key.ItemType)]
+        [InlineData(RenameListSortColumn.ParentFolder, BasicRenameListFields.Key.Folder)]
+        [InlineData(RenameListSortColumn.FullFileName, BasicRenameListFields.Key.FullName)]
+        [InlineData(RenameListSortColumn.FullPath, BasicRenameListFields.Key.FullPath)]
         public void Sort_column_maps_to_original_field_key(RenameListSortColumn column, string propertyKey)
         {
             Assert.True(RenameListFieldCatalog.TryMapSortColumn(column, out var key));
@@ -94,16 +94,16 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Preview_field_keys_do_not_map_to_sort_columns()
         {
-            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key);
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
             Assert.False(RenameListFieldCatalog.TryMapFieldKeyToSortColumn(previewKey, out _));
         }
 
         [Theory]
-        [InlineData(BasicNameField.Key, "File Name", 150, true, true)]
-        [InlineData(BasicFolderField.Key, "Parent Folder", 240, true, true)]
-        [InlineData(BasicFullNameField.Key, "Full File Name", 180, true, true)]
-        [InlineData(BasicFullPathField.Key, "Full File Path", 180, true, true)]
+        [InlineData(BasicRenameListFields.Key.Name, "File Name", 150, true, true)]
+        [InlineData(BasicRenameListFields.Key.Folder, "Parent Folder", 240, true, true)]
+        [InlineData(BasicRenameListFields.Key.FullName, "Full File Name", 180, true, true)]
+        [InlineData(BasicRenameListFields.Key.FullPath, "Full File Path", 180, true, true)]
         public void Field_definitions_with_width_overrides_carry_mfr7_labels_and_flags(
             string propertyKey,
             string displayName,
@@ -123,11 +123,11 @@ namespace Mfr.Tests.Models
         }
 
         [Theory]
-        [InlineData(BasicItemTypeField.Key, "File/Folder", false)]
-        [InlineData(BasicExtensionField.Key, "File Extension", true)]
-        [InlineData(BasicFileNameNumericField.Key, "File Name Numeric Value", false)]
-        [InlineData(BasicFileNameLengthField.Key, "File Name Length", true)]
-        [InlineData(BasicFullPathLengthField.Key, "Full Path Name Length", true)]
+        [InlineData(BasicRenameListFields.Key.ItemType, "File/Folder", false)]
+        [InlineData(BasicRenameListFields.Key.Extension, "File Extension", true)]
+        [InlineData(BasicRenameListFields.Key.FileNameNumeric, "File Name Numeric Value", false)]
+        [InlineData(BasicRenameListFields.Key.FileNameLength, "File Name Length", true)]
+        [InlineData(BasicRenameListFields.Key.FullPathLength, "Full Path Name Length", true)]
         public void Field_definitions_without_width_overrides_use_header_fit_default(
             string propertyKey,
             string displayName,
@@ -149,15 +149,15 @@ namespace Mfr.Tests.Models
                 directory: @"D:\Photos\2024"
             );
 
-            _AssertField(item, BasicItemTypeField.Key, "File");
-            _AssertField(item, BasicNameField.Key, "vacation007");
-            _AssertField(item, BasicExtensionField.Key, "jpg");
-            _AssertField(item, BasicFullNameField.Key, "vacation007.jpg");
-            _AssertField(item, BasicFolderField.Key, @"D:\Photos\2024");
-            _AssertField(item, BasicFullPathField.Key, @"D:\Photos\2024\vacation007.jpg");
-            _AssertField(item, BasicFileNameNumericField.Key, "7");
-            _AssertField(item, BasicFileNameLengthField.Key, "15");
-            _AssertField(item, BasicFullPathLengthField.Key, "30");
+            _AssertField(item, BasicRenameListFields.Key.ItemType, "File");
+            _AssertField(item, BasicRenameListFields.Key.Name, "vacation007");
+            _AssertField(item, BasicRenameListFields.Key.Extension, "jpg");
+            _AssertField(item, BasicRenameListFields.Key.FullName, "vacation007.jpg");
+            _AssertField(item, BasicRenameListFields.Key.Folder, @"D:\Photos\2024");
+            _AssertField(item, BasicRenameListFields.Key.FullPath, @"D:\Photos\2024\vacation007.jpg");
+            _AssertField(item, BasicRenameListFields.Key.FileNameNumeric, "7");
+            _AssertField(item, BasicRenameListFields.Key.FileNameLength, "15");
+            _AssertField(item, BasicRenameListFields.Key.FullPathLength, "30");
         }
 
         [Fact]
@@ -170,15 +170,15 @@ namespace Mfr.Tests.Models
                 attributes: FileAttributes.Directory
             );
 
-            _AssertField(item, BasicItemTypeField.Key, "Folder");
-            _AssertField(item, BasicNameField.Key, "Album");
-            _AssertField(item, BasicExtensionField.Key, "");
-            _AssertField(item, BasicFullNameField.Key, "Album");
-            _AssertField(item, BasicFolderField.Key, @"D:\Music");
-            _AssertField(item, BasicFullPathField.Key, @"D:\Music\Album");
-            _AssertField(item, BasicFileNameNumericField.Key, "0");
-            _AssertField(item, BasicFileNameLengthField.Key, "5");
-            _AssertField(item, BasicFullPathLengthField.Key, "14");
+            _AssertField(item, BasicRenameListFields.Key.ItemType, "Folder");
+            _AssertField(item, BasicRenameListFields.Key.Name, "Album");
+            _AssertField(item, BasicRenameListFields.Key.Extension, "");
+            _AssertField(item, BasicRenameListFields.Key.FullName, "Album");
+            _AssertField(item, BasicRenameListFields.Key.Folder, @"D:\Music");
+            _AssertField(item, BasicRenameListFields.Key.FullPath, @"D:\Music\Album");
+            _AssertField(item, BasicRenameListFields.Key.FileNameNumeric, "0");
+            _AssertField(item, BasicRenameListFields.Key.FileNameLength, "5");
+            _AssertField(item, BasicRenameListFields.Key.FullPathLength, "14");
         }
 
         [Fact]
@@ -187,8 +187,8 @@ namespace Mfr.Tests.Models
             var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: ".txt");
             item.Preview.Prefix = "after";
 
-            var originalKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key);
-            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key);
+            var originalKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
             Assert.Equal("before.txt", RenameListFieldCatalog.Resolve(item, originalKey));
             Assert.Equal("after.txt", RenameListFieldCatalog.Resolve(item, previewKey));
@@ -201,13 +201,13 @@ namespace Mfr.Tests.Models
         [Fact]
         public void GetField_returns_registered_field()
         {
-            var expected = RenameListFieldCatalog.All.Single(field => field.PropertyKey == BasicItemTypeField.Key);
+            var expected = RenameListFieldCatalog.All.Single(field => field.PropertyKey == BasicRenameListFields.Key.ItemType);
 
-            Assert.Same(expected, RenameListFieldCatalog.GetField(BasicRenameListField.Group, BasicItemTypeField.Key));
+            Assert.Same(expected, RenameListFieldCatalog.GetField(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType));
             Assert.Same(
                 expected,
                 RenameListFieldCatalog.GetField(
-                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicItemTypeField.Key)
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
                 )
             );
         }
@@ -241,7 +241,7 @@ namespace Mfr.Tests.Models
         )
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: prefix, extension: extension);
-            var key = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFileNameNumericField.Key);
+            var key = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FileNameNumeric);
 
             Assert.Equal(expected, RenameListFieldCatalog.Resolve(item, key));
         }

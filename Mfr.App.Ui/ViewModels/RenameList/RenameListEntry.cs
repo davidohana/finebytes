@@ -12,27 +12,27 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     {
         private static readonly RenameListFieldKey _itemTypeKey = RenameListFieldKey.Original(
             BasicRenameListField.Group,
-            BasicItemTypeField.Key
+            BasicRenameListFields.Key.ItemType
         );
 
         private static readonly RenameListFieldKey _folderKey = RenameListFieldKey.Original(
             BasicRenameListField.Group,
-            BasicFolderField.Key
+            BasicRenameListFields.Key.Folder
         );
 
         private static readonly RenameListFieldKey _fullNameKey = RenameListFieldKey.Original(
             BasicRenameListField.Group,
-            BasicFullNameField.Key
+            BasicRenameListFields.Key.FullName
         );
 
         private static readonly RenameListFieldKey _fullPathKey = RenameListFieldKey.Original(
             BasicRenameListField.Group,
-            BasicFullPathField.Key
+            BasicRenameListFields.Key.FullPath
         );
 
         private static readonly RenameListFieldKey _fullNamePreviewKey = RenameListFieldKey.Preview(
             BasicRenameListField.Group,
-            BasicFullNameField.Key
+            BasicRenameListFields.Key.FullName
         );
 
         /// <summary>
