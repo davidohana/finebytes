@@ -8,3 +8,13 @@ alwaysApply: true
 - This project is new; when refactoring, do not preserve legacy behavior solely for backward compatibility.
 - Prefer clean, current designs over compatibility shims, adapter layers, or deprecated-path fallbacks.
 - If a breaking change is needed during refactor, implement the simpler forward path and update tests/docs accordingly.
+
+## Persistence and session (no legacy migrations)
+
+- Do **not** add JSON converters, dual-property records, or load-time adapters to read old saved shapes (renamed keys, removed enums, old property names).
+- Persist **one current schema** per field (`session.json`, config snapshots, etc.). Use normal `[JsonPropertyName]` / record properties — not custom migration converters.
+- On load, missing or unrecognized persisted data may fall back to **defaults** (same as first launch). Do not silently remap obsolete values unless the user explicitly asks for migration.
+- Do **not** add tests whose only purpose is proving legacy JSON still loads after a schema change.
+- When replacing a persisted type (e.g. sort keys: enum → field key), delete the old type and update callers/tests; do not keep both paths “just in case.”
+
+Example (Rename List Auto-Sort): session `sortFields` entries are `{ "key": …, "descending": … }` only — no `"column"` enum, no `SessionState*JsonConverter` for backward compatibility.
