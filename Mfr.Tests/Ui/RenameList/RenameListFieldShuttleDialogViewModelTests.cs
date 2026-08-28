@@ -26,7 +26,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Single(dialogVm.SelectedColumnRows);
             Assert.Single(dialogVm.SelectedSortRows);
             Assert.Equal("File Name", dialogVm.SelectedColumnRows[0].DisplayName);
-            Assert.Equal("Full Path", dialogVm.SelectedSortRows[0].Label);
+            Assert.Equal("Full File Path", dialogVm.SelectedSortRows[0].Label);
         }
 
         [Fact]
@@ -168,6 +168,58 @@ namespace Mfr.Tests.Ui.RenameList
             );
 
             Assert.Equal(1, dialogVm.SelectedTabIndex);
+        }
+
+        [Fact]
+        public void Adding_a_column_twice_is_a_noop()
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicItemTypeField.Key)
+                    ),
+                ],
+                []
+            );
+
+            dialogVm.SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
+                BasicRenameListField.Group,
+                BasicNameField.Key
+            );
+            dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
+            var count = dialogVm.SelectedColumnRows.Count;
+            dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
+
+            Assert.Equal(count, dialogVm.SelectedColumnRows.Count);
+        }
+
+        [Fact]
+        public void Column_move_commands_follow_selected_index()
+        {
+            var dialogVm = _CreateDefaultDialog();
+
+            dialogVm.SelectedColumnRowIndex = 0;
+            Assert.False(dialogVm.MoveSelectedColumnUpCommand.CanExecute(null));
+            Assert.True(dialogVm.MoveSelectedColumnDownCommand.CanExecute(null));
+
+            dialogVm.SelectedColumnRowIndex = dialogVm.SelectedColumnRows.Count - 1;
+            Assert.True(dialogVm.MoveSelectedColumnUpCommand.CanExecute(null));
+            Assert.False(dialogVm.MoveSelectedColumnDownCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void Preview_tab_flag_toggles_original_tab()
+        {
+            var dialogVm = _CreateDefaultDialog();
+
+            Assert.True(dialogVm.IsOriginalColumnsTab);
+            dialogVm.IsPreviewColumnsTab = true;
+            Assert.True(dialogVm.IsPreviewColumnsTab);
+            Assert.False(dialogVm.IsOriginalColumnsTab);
+
+            dialogVm.IsOriginalColumnsTab = true;
+            Assert.False(dialogVm.IsPreviewColumnsTab);
+            Assert.True(dialogVm.IsOriginalColumnsTab);
         }
 
         private static RenameListFieldShuttleDialogViewModel _CreateDefaultDialog()

@@ -254,14 +254,12 @@
                     GroupName="ColumnAvailableFields"
                     Content="Original Fields"
                     IsChecked="{Binding IsOriginalColumnsTab}"
-                    Command="{Binding SelectOriginalColumnsTabCommand}"
                   />
                   <RadioButton
                     Classes="field-shuttle-subtab"
                     GroupName="ColumnAvailableFields"
                     Content="Preview Fields"
                     IsChecked="{Binding IsPreviewColumnsTab}"
-                    Command="{Binding SelectPreviewColumnsTabCommand}"
                   />
                 </StackPanel>
                 <ListBox

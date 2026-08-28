@@ -5,10 +5,9 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
+using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -17,40 +16,12 @@ namespace Mfr.Tests.Ui.RenameList
     /// </summary>
     public sealed class RenameListViewHintTests : IDisposable
     {
-        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
-        private readonly List<FileListViewModel> _fileListViewModels = [];
-        private readonly UiConfig _originalUiConfig;
-
-        /// <summary>
-        /// Snapshots UI add-policy config for tests that may change it.
-        /// </summary>
-        public RenameListViewHintTests()
-        {
-            _originalUiConfig = new UiConfig
-            {
-                AddMode = ConfigStore.Config.Ui.AddMode,
-                AddFolderContents = ConfigStore.Config.Ui.AddFolderContents,
-                RememberWindowState = ConfigStore.Config.Ui.RememberWindowState,
-                RememberLastFolder = ConfigStore.Config.Ui.RememberLastFolder,
-            };
-            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
-            ConfigStore.Config.Ui.AddFolderContents = true;
-        }
+        private readonly RenameListUiTestContext _context = new(pinAddPolicy: true);
 
         /// <inheritdoc />
         public void Dispose()
         {
-            ConfigStore.Config.Ui.AddMode = _originalUiConfig.AddMode;
-            ConfigStore.Config.Ui.AddFolderContents = _originalUiConfig.AddFolderContents;
-            ConfigStore.Config.Ui.RememberWindowState = _originalUiConfig.RememberWindowState;
-            ConfigStore.Config.Ui.RememberLastFolder = _originalUiConfig.RememberLastFolder;
-
-            foreach (var fileListViewModel in _fileListViewModels)
-            {
-                fileListViewModel.Dispose();
-            }
-
-            _tempDirectoryFixture.Dispose();
+            _context.Dispose();
         }
 
         /// <summary>
@@ -59,7 +30,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task Click_Sets_Hint_From_Cell()
         {
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 8);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 8);
             var target = renameListViewModel.Entries[3];
 
             _ClickFullFileNameCell(window, grid, target);
@@ -79,13 +50,18 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task Delete_Updates_Hint_To_New_Selection()
         {
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 30);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 30);
             var deleteIndex = 12;
             var deletedName = renameListViewModel.Entries[deleteIndex].FullFileName;
             var expectedName = renameListViewModel.Entries[deleteIndex + 1].FullFileName;
+            var fullNameColumn = grid.Columns.First(column =>
+                RenameListGridColumns.GetFieldKey(column)
+                == RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key)
+            );
 
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[deleteIndex]]);
-            grid.ScrollIntoView(renameListViewModel.Entries[deleteIndex], grid.Columns[2]);
+            grid.CurrentColumn = fullNameColumn;
+            grid.ScrollIntoView(renameListViewModel.Entries[deleteIndex], fullNameColumn);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -121,7 +97,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task PointerMove_Does_Not_Change_Hint()
         {
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 8);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 8);
             var selected = renameListViewModel.Entries[1];
             var other = renameListViewModel.Entries[4];
 
@@ -140,50 +116,6 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.DoesNotContain(other.FullFileName, hint, StringComparison.Ordinal);
 
             window.Close();
-        }
-
-        private async Task<(RenameListViewModel ViewModel, Window Window, DataGrid Grid)> _ShowWithRowsAsync(
-            int rowCount
-        )
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var paths = new List<string>(rowCount);
-            for (var i = 0; i < rowCount; i++)
-            {
-                var path = Path.Combine(dir, $"row-{i:00}.txt");
-                File.WriteAllText(path, "x");
-                paths.Add(path);
-            }
-
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            await renameListViewModel.AddPathsAsync(paths);
-            Assert.Equal(rowCount, renameListViewModel.Entries.Count);
-
-            var view = new RenameListView { DataContext = renameListViewModel };
-            var window = new Window
-            {
-                Width = 800,
-                Height = 180,
-                Content = view,
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
-            return (renameListViewModel, window, grid);
-        }
-
-        private FileListViewModel _CreateFileListViewModel(string path)
-        {
-            var fileListViewModel = new FileListViewModel(
-                NullSystemIconProvider.Instance,
-                path,
-                NullFileShellOpener.Instance
-            );
-            _fileListViewModels.Add(fileListViewModel);
-            return fileListViewModel;
         }
 
         private static void _ClickFullFileNameCell(Window window, DataGrid grid, RenameListEntry entry)
@@ -209,13 +141,24 @@ namespace Mfr.Tests.Ui.RenameList
                 .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
             Assert.NotNull(row);
 
-            var cellText = row.GetVisualDescendants()
-                .OfType<TextBlock>()
-                .FirstOrDefault(item => item.Text == entry.FullFileName);
-            Assert.NotNull(cellText);
+            var fullNameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key);
+            var x = 0.0;
+            var found = false;
+            foreach (var column in grid.Columns.OrderBy(column => column.DisplayIndex))
+            {
+                var width = column.Width.IsAbsolute ? column.Width.Value : column.ActualWidth;
+                if (RenameListGridColumns.GetFieldKey(column) == fullNameKey)
+                {
+                    x += width / 2;
+                    found = true;
+                    break;
+                }
 
-            var local = new Point(Math.Max(8, cellText.Bounds.Width / 2), Math.Max(1, cellText.Bounds.Height / 2));
-            var windowPoint = cellText.TranslatePoint(local, window);
+                x += width;
+            }
+
+            Assert.True(found);
+            var windowPoint = row.TranslatePoint(new Point(x, Math.Max(1, row.Bounds.Height / 2)), window);
             Assert.True(windowPoint.HasValue);
             return windowPoint.Value;
         }

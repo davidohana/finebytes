@@ -341,12 +341,13 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _PublishFocusedCellHint()
         {
-            if (_viewModel is null)
-            {
-                return;
-            }
-
             _PublishCellHint(_ReadFocusedEntry(), RenameGrid.CurrentColumn ?? _lastHintColumn);
+        }
+
+        private void _PublishSelectionHint()
+        {
+            // Keep the last clicked/focused column when only the row selection changes.
+            _PublishCellHint(_ReadFocusedEntry(), _lastHintColumn ?? RenameGrid.CurrentColumn);
         }
 
         private RenameListEntry? _ReadFocusedEntry()
@@ -393,13 +394,8 @@ namespace Mfr.App.Ui.Views.RenameList
 
             _lastHintColumn = column;
 
-            var columnHeader = RenameListFieldDisplay.GetColumnHeaderText(field, fieldKey.Value.IsPreview);
             var cellText = entry.GetFieldText(fieldKey.Value);
-            _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatParts(
-                columnHeader,
-                cellText,
-                fieldKey.Value.IsPreview
-            );
+            _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatParts(field.DisplayName, cellText);
         }
 
         private void _OnDragOver(object? sender, DragEventArgs e)
@@ -608,7 +604,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
 
                 _viewModel.SetSelectedEntries(selected);
-                _PublishFocusedCellHint();
+                _PublishSelectionHint();
             }
             finally
             {
@@ -626,7 +622,7 @@ namespace Mfr.App.Ui.Views.RenameList
             if (e.PropertyName is nameof(RenameListViewModel.SelectedEntries))
             {
                 _SyncSelectionToGrid();
-                _PublishFocusedCellHint();
+                _PublishSelectionHint();
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.DropMarkIndex))

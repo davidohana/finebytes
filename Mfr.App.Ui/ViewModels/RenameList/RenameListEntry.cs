@@ -9,6 +9,31 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// </summary>
     public sealed class RenameListEntry
     {
+        private static readonly RenameListFieldKey _itemTypeKey = RenameListFieldKey.Original(
+            BasicRenameListField.Group,
+            BasicItemTypeField.Key
+        );
+
+        private static readonly RenameListFieldKey _folderKey = RenameListFieldKey.Original(
+            BasicRenameListField.Group,
+            BasicFolderField.Key
+        );
+
+        private static readonly RenameListFieldKey _fullNameKey = RenameListFieldKey.Original(
+            BasicRenameListField.Group,
+            BasicFullNameField.Key
+        );
+
+        private static readonly RenameListFieldKey _fullPathKey = RenameListFieldKey.Original(
+            BasicRenameListField.Group,
+            BasicFullPathField.Key
+        );
+
+        private static readonly RenameListFieldKey _fullNamePreviewKey = RenameListFieldKey.Preview(
+            BasicRenameListField.Group,
+            BasicFullNameField.Key
+        );
+
         /// <summary>
         /// Gets the engine item this row represents.
         /// </summary>
@@ -27,27 +52,27 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the file-or-folder label shown in the File/Folder column.
         /// </summary>
-        public string FileFolder => _ItemTypeField.Resolve(EngineItem, isPreview: false);
+        public string FileFolder => GetFieldText(_itemTypeKey);
 
         /// <summary>
         /// Gets the parent folder path shown in the Parent Folder column.
         /// </summary>
-        public string ParentFolder => _FolderField.Resolve(EngineItem, isPreview: false);
+        public string ParentFolder => GetFieldText(_folderKey);
 
         /// <summary>
         /// Gets the original full file name shown in the Full File Name column.
         /// </summary>
-        public string FullFileName => _FullNameField.Resolve(EngineItem, isPreview: false);
+        public string FullFileName => GetFieldText(_fullNameKey);
 
         /// <summary>
-        /// Gets the absolute path used for Auto-Sort (and as a CollectionView sort member).
+        /// Gets the original absolute path.
         /// </summary>
-        public string FullPath => _FullPathField.Resolve(EngineItem, isPreview: false);
+        public string FullPath => GetFieldText(_fullPathKey);
 
         /// <summary>
         /// Gets the preview full file name shown in the Full File Name (Preview) column.
         /// </summary>
-        public string FullFileNamePreview => _FullNameField.Resolve(EngineItem, isPreview: true);
+        public string FullFileNamePreview => GetFieldText(_fullNamePreviewKey);
 
         /// <summary>
         /// Builds a grid row from a rename item (identity preview until filter preview exists).
@@ -60,25 +85,5 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             return new RenameListEntry { EngineItem = item };
         }
-
-        private static readonly RenameListField _ItemTypeField = RenameListFieldCatalog.GetField(
-            groupId: BasicRenameListField.Group,
-            propertyKey: BasicItemTypeField.Key
-        );
-
-        private static readonly RenameListField _FolderField = RenameListFieldCatalog.GetField(
-            groupId: BasicRenameListField.Group,
-            propertyKey: BasicFolderField.Key
-        );
-
-        private static readonly RenameListField _FullNameField = RenameListFieldCatalog.GetField(
-            groupId: BasicRenameListField.Group,
-            propertyKey: BasicFullNameField.Key
-        );
-
-        private static readonly RenameListField _FullPathField = RenameListFieldCatalog.GetField(
-            groupId: BasicRenameListField.Group,
-            propertyKey: BasicFullPathField.Key
-        );
     }
 }

@@ -27,7 +27,6 @@ namespace Mfr.App.Ui.Views.RenameList
         private readonly Rectangle _line;
         private readonly Path _arrow;
         private readonly double _headerHeight;
-        private DataGrid? _grid;
         private DataGridColumnHeadersPresenter? _presenter;
         private bool? _isAppendAtEnd;
 
@@ -70,7 +69,6 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             base.OnAttachedToVisualTree(e);
 
-            _grid = this.FindAncestorOfType<DataGrid>();
             _presenter = this.FindAncestorOfType<DataGridColumnHeadersPresenter>();
             if (_presenter is not null)
             {
@@ -84,7 +82,6 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             _presenter?.LayoutUpdated -= _OnPresenterLayoutUpdated;
             _presenter = null;
-            _grid = null;
             base.OnDetachedFromVisualTree(e);
         }
 
@@ -105,13 +102,13 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _UpdateArrowDirection()
         {
-            if (_grid is null || _presenter is null)
+            if (_presenter is null)
             {
                 return;
             }
 
             var dropOffset = this.TranslatePoint(new Point(), _presenter)?.X ?? Bounds.Left;
-            var isAppendAtEnd = RenameListColumnDropPosition.IsAppendAtEnd(_grid, _presenter, dropOffset);
+            var isAppendAtEnd = RenameListColumnDropPosition.IsAppendAtEnd(_presenter, dropOffset);
             if (_isAppendAtEnd == isAppendAtEnd)
             {
                 return;

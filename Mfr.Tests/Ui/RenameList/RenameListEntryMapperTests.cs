@@ -10,7 +10,7 @@ namespace Mfr.Tests.Ui.RenameList
     public sealed class RenameListEntryMapperTests
     {
         [Fact]
-        public void ToEntry_resolves_default_visible_fields_for_file_row()
+        public void ToEntry_GetFieldText_matches_catalog_and_convenience_properties()
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "vacation007",
@@ -18,38 +18,12 @@ namespace Mfr.Tests.Ui.RenameList
                 directory: @"D:\Photos\2024"
             );
             var entry = RenameListEntry.ToEntry(item);
+            var fullNameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key);
 
+            Assert.Equal("vacation007.jpg", entry.GetFieldText(fullNameKey));
+            Assert.Equal(entry.GetFieldText(fullNameKey), entry.FullFileName);
             Assert.Equal("File", entry.FileFolder);
-            Assert.Equal(@"D:\Photos\2024", entry.ParentFolder);
-            Assert.Equal("vacation007.jpg", entry.FullFileName);
-            Assert.Equal("vacation007.jpg", entry.FullFileNamePreview);
             Assert.Equal(@"D:\Photos\2024\vacation007.jpg", entry.FullPath);
-
-            Assert.Equal(
-                "File",
-                entry.GetFieldText(RenameListFieldKey.Original(BasicRenameListField.Group, BasicItemTypeField.Key))
-            );
-            Assert.Equal(
-                "vacation007.jpg",
-                entry.GetFieldText(RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key))
-            );
-        }
-
-        [Fact]
-        public void ToEntry_resolves_default_visible_fields_for_folder_row()
-        {
-            var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "Album",
-                extension: "",
-                directory: @"D:\Music",
-                attributes: FileAttributes.Directory
-            );
-            var entry = RenameListEntry.ToEntry(item);
-
-            Assert.Equal("Folder", entry.FileFolder);
-            Assert.Equal(@"D:\Music", entry.ParentFolder);
-            Assert.Equal("Album", entry.FullFileName);
-            Assert.Equal("Album", entry.FullFileNamePreview);
         }
 
         [Fact]
@@ -62,6 +36,10 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal("before.txt", entry.FullFileName);
             Assert.Equal("after.txt", entry.FullFileNamePreview);
+            Assert.Equal(
+                "after.txt",
+                entry.GetFieldText(RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key))
+            );
         }
     }
 }

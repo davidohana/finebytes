@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList;
@@ -83,13 +84,13 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             var key = visibleColumn.Key;
             var field = RenameListFieldCatalog.GetField(key);
-            var headerText = RenameListFieldDisplay.GetColumnHeaderText(field, key.IsPreview);
+            var headerText = field.DisplayName;
             var sortColumn = field.SortColumn;
             var canUserSort = !key.IsPreview && sortColumn is not null;
 
             var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 headerText,
-                reserveSortGlyph: !key.IsPreview,
+                reserveSortGlyph: canUserSort,
                 reservePreviewGlyph: key.IsPreview
             );
             var pixelWidth = _ResolveEffectivePixelWidth(visibleColumn, minHeaderWidth);
@@ -106,7 +107,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             column.HeaderTemplate = canUserSort
                 ? new FuncDataTemplate<object>(
-                    (_, _) => _BuildSortableHeader(_viewModel!, headerText, key.IsPreview, sortColumn!.Value, key)
+                    (_, _) => _BuildSortableHeader(_viewModel!, headerText, sortColumn!.Value, key)
                 )
                 : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key));
 
@@ -114,25 +115,10 @@ namespace Mfr.App.Ui.Views.RenameList
             return column;
         }
 
-        private static int _ResolveEffectivePixelWidth(
-            RenameListVisibleColumn visibleColumn,
-            int? minHeaderWidth = null
-        )
+        private static int _ResolveEffectivePixelWidth(RenameListVisibleColumn visibleColumn, int minHeaderWidth)
         {
-            var key = visibleColumn.Key;
-            var field = RenameListFieldCatalog.GetField(key);
-            var headerText = RenameListFieldDisplay.GetColumnHeaderText(field, key.IsPreview);
-            var resolvedMinHeaderWidth =
-                minHeaderWidth
-                ?? RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                    headerText,
-                    reserveSortGlyph: !key.IsPreview,
-                    reservePreviewGlyph: key.IsPreview
-                );
             var catalogWidth = visibleColumn.ResolveCatalogWidth();
-            return catalogWidth is int catalogPixelWidth
-                ? Math.Max(catalogPixelWidth, resolvedMinHeaderWidth)
-                : resolvedMinHeaderWidth;
+            return catalogWidth is int catalogPixelWidth ? Math.Max(catalogPixelWidth, minHeaderWidth) : minHeaderWidth;
         }
 
         private static Control _CreateHeaderContent(string headerText, RenameListFieldKey key)
@@ -145,7 +131,6 @@ namespace Mfr.App.Ui.Views.RenameList
         private static Grid _BuildSortableHeader(
             RenameListViewModel viewModel,
             string headerText,
-            bool isPreview,
             RenameListSortColumn sortColumn,
             RenameListFieldKey key
         )
@@ -153,16 +138,14 @@ namespace Mfr.App.Ui.Views.RenameList
             var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
             RenameListGridColumns.StampHeaderFieldKey(grid, key);
 
-            var titleHost = RenameListPreviewGlyph.CreateLabelRow(headerText, isPreview);
-            titleHost[Grid.ColumnProperty] = 0;
-            if (titleHost is TextBlock titleTextBlock)
+            var title = new TextBlock
             {
-                titleTextBlock.HorizontalAlignment = HorizontalAlignment.Left;
-            }
-            else if (titleHost is StackPanel titlePanel)
-            {
-                titlePanel.HorizontalAlignment = HorizontalAlignment.Left;
-            }
+                Text = headerText,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+            };
+            title[Grid.ColumnProperty] = 0;
 
             var glyph = new Border { [Grid.ColumnProperty] = 1, Classes = { "rename-list-sort-glyph" } };
 
@@ -175,7 +158,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 Children = { priority, direction },
             };
 
-            grid.Children.Add(titleHost);
+            grid.Children.Add(title);
             grid.Children.Add(glyph);
 
             _ApplySortGlyphState(glyph, priority, direction, viewModel, sortColumn);

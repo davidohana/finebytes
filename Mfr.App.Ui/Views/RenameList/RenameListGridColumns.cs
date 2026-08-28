@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
 using Mfr.Models.RenameList;
 
@@ -55,35 +54,22 @@ namespace Mfr.App.Ui.Views.RenameList
             return
             [
                 .. grid
-                    .Columns.Where(column => column.IsVisible && GetFieldKey(column) is not null)
-                    .OrderBy(column => column.DisplayIndex)
-                    .Select(column => GetFieldKey(column)!.Value),
+                    .Columns.Select(column => (column, key: GetFieldKey(column)))
+                    .Where(item => item.column.IsVisible && item.key is not null)
+                    .OrderBy(item => item.column.DisplayIndex)
+                    .Select(item => item.key!.Value),
             ];
         }
 
         /// <summary>
-        /// Resolves the catalog field key for a column header.
+        /// Resolves the catalog field key stamped on a column header.
         /// </summary>
-        /// <param name="grid">Owning grid.</param>
         /// <param name="header">Clicked or focused header.</param>
         /// <returns>Field key when resolved; otherwise <see langword="null"/>.</returns>
-        public static RenameListFieldKey? TryResolveFieldKey(DataGrid grid, DataGridColumnHeader header)
+        public static RenameListFieldKey? TryResolveFieldKey(DataGridColumnHeader header)
         {
-            ArgumentNullException.ThrowIfNull(grid);
             ArgumentNullException.ThrowIfNull(header);
 
-            var fromHeader = _TryGetFieldKeyFromHeader(header);
-            if (fromHeader is not null)
-            {
-                return fromHeader;
-            }
-
-            var column = _TryResolveColumn(grid, header);
-            return column is null ? null : GetFieldKey(column);
-        }
-
-        private static RenameListFieldKey? _TryGetFieldKeyFromHeader(DataGridColumnHeader header)
-        {
             if (header.Tag is RenameListFieldKey headerKey)
             {
                 return headerKey;
@@ -113,35 +99,6 @@ namespace Mfr.App.Ui.Views.RenameList
         private static RenameListFieldKey? _TryGetFieldKeyFromControl(Control control)
         {
             return control.Tag is RenameListFieldKey key ? key : null;
-        }
-
-        private static DataGridColumn? _TryResolveColumn(DataGrid grid, DataGridColumnHeader header)
-        {
-            var presenter = grid.GetVisualDescendants().OfType<DataGridColumnHeadersPresenter>().FirstOrDefault();
-            if (presenter is null)
-            {
-                return null;
-            }
-
-            var orderedHeaders = presenter
-                .GetVisualChildren()
-                .OfType<DataGridColumnHeader>()
-                .Where(columnHeader => columnHeader.IsVisible)
-                .OrderBy(columnHeader => columnHeader.Bounds.Left)
-                .ToList();
-
-            var orderedColumns = grid
-                .Columns.Where(column => column.IsVisible && GetFieldKey(column) is not null)
-                .OrderBy(column => column.DisplayIndex)
-                .ToList();
-
-            var index = orderedHeaders.IndexOf(header);
-            if (index < 0 || index >= orderedColumns.Count)
-            {
-                return null;
-            }
-
-            return orderedColumns[index];
         }
     }
 }

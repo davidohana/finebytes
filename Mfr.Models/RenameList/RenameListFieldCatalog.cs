@@ -29,6 +29,11 @@ namespace Mfr.Models.RenameList
         private static readonly Dictionary<(string GroupId, string PropertyKey), RenameListField> _fieldByKey =
             All.ToDictionary(field => (field.GroupId, field.PropertyKey));
 
+        private static readonly Dictionary<RenameListSortColumn, RenameListField> _fieldBySortColumn = All.Where(
+                field => field.SortColumn is not null
+            )
+            .ToDictionary(field => field.SortColumn!.Value);
+
         /// <summary>
         /// Default visible columns (MFR7 <c>RenameGrid</c>).
         /// </summary>
@@ -124,13 +129,8 @@ namespace Mfr.Models.RenameList
         /// <returns><see langword="true"/> when <paramref name="column"/> maps to a catalog field.</returns>
         public static bool TryMapSortColumn(RenameListSortColumn column, out RenameListFieldKey key)
         {
-            foreach (var field in All)
+            if (_fieldBySortColumn.TryGetValue(column, out var field))
             {
-                if (field.SortColumn != column)
-                {
-                    continue;
-                }
-
                 key = field.OriginalKey;
                 return true;
             }

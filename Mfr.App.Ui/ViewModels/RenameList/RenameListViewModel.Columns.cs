@@ -27,7 +27,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="columns">New columns in grid order; at least one required.</param>
         /// <exception cref="ArgumentNullException"><paramref name="columns"/> is null.</exception>
         /// <exception cref="ArgumentException">
-        /// <paramref name="columns"/> is empty or contains an unknown field key.
+        /// <paramref name="columns"/> is empty, duplicates a field key, or contains an unknown field key.
         /// </exception>
         public void SetVisibleColumns(IReadOnlyList<RenameListVisibleColumn> columns)
         {
@@ -37,12 +37,21 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 throw new ArgumentException("At least one visible column is required.", nameof(columns));
             }
 
+            var seenKeys = new HashSet<RenameListFieldKey>();
             foreach (var column in columns)
             {
                 if (!RenameListFieldCatalog.TryGetField(column.Key, out _))
                 {
                     throw new ArgumentException(
                         $"Unknown Rename List field '{column.Key.GroupId}/{column.Key.PropertyKey}'.",
+                        nameof(columns)
+                    );
+                }
+
+                if (!seenKeys.Add(column.Key))
+                {
+                    throw new ArgumentException(
+                        "Visible columns cannot contain duplicate field keys.",
                         nameof(columns)
                     );
                 }
@@ -68,10 +77,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 throw new ArgumentException("At least one visible column is required.", nameof(orderedKeys));
             }
 
-            if (orderedKeys.Count != _visibleColumns.Count)
+            var uniqueKeyCount = orderedKeys.ToHashSet().Count;
+            var hasWrongCountOrDuplicates =
+                orderedKeys.Count != _visibleColumns.Count || uniqueKeyCount != orderedKeys.Count;
+            if (hasWrongCountOrDuplicates)
             {
                 throw new ArgumentException(
-                    "Reordered keys must include every currently visible column.",
+                    "Reordered keys must include every currently visible column exactly once.",
                     nameof(orderedKeys)
                 );
             }
@@ -137,15 +149,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _RequestFieldShuttle(RenameListFieldShuttleTab.Sort);
         }
 
-        /// <summary>
-        /// Opens the unified field shuttle dialog on the requested tab.
-        /// </summary>
-        /// <param name="tab">Initial tab (Columns or Sort).</param>
-        public void OpenFieldShuttle(RenameListFieldShuttleTab tab)
-        {
-            _RequestFieldShuttle(tab);
-        }
-
         private void _RequestFieldShuttle(RenameListFieldShuttleTab tab)
         {
             FieldShuttleRequested?.Invoke(this, tab);
@@ -166,7 +169,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var validColumns = columns.Where(column => RenameListFieldCatalog.TryGetField(column.Key, out _)).ToList();
+            var seenKeys = new HashSet<RenameListFieldKey>();
+            var validColumns = new List<RenameListVisibleColumn>();
+            foreach (var column in columns)
+            {
+                if (!RenameListFieldCatalog.TryGetField(column.Key, out _) || !seenKeys.Add(column.Key))
+                {
+                    continue;
+                }
+
+                validColumns.Add(column);
+            }
+
             if (validColumns.Count == 0)
             {
                 _visibleColumns = [.. RenameListVisibleColumn.CreateDefaults()];
@@ -175,15 +189,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             SetVisibleColumns(validColumns);
-        }
-
-        /// <summary>
-        /// Captures the current visible columns for session save.
-        /// </summary>
-        /// <returns>Visible columns in grid order.</returns>
-        internal IReadOnlyList<RenameListVisibleColumn> CaptureVisibleColumns()
-        {
-            return [.. _visibleColumns];
         }
 
         /// <summary>

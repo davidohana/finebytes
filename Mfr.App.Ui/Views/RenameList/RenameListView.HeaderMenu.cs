@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Resources;
-using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -36,7 +35,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var fieldKey = RenameListGridColumns.TryResolveFieldKey(RenameGrid, header);
+            var fieldKey = RenameListGridColumns.TryResolveFieldKey(header);
             if (fieldKey is null)
             {
                 return;
@@ -54,7 +53,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var field = RenameListFieldCatalog.GetField(fieldKey);
-            var headerText = RenameListFieldDisplay.GetColumnHeaderText(field, fieldKey.IsPreview);
+            var headerText = field.DisplayName;
             var canHide = _viewModel.VisibleColumns.Count > 1;
 
             var menu = new ContextMenu { DataContext = _viewModel };

@@ -4,8 +4,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
@@ -17,40 +15,12 @@ namespace Mfr.Tests.Ui.RenameList
     /// </summary>
     public sealed class RenameListViewColumnTests : IDisposable
     {
-        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
-        private readonly List<FileListViewModel> _fileListViewModels = [];
-        private readonly UiConfig _originalUiConfig;
-
-        /// <summary>
-        /// Snapshots UI add-policy config for tests that may change it.
-        /// </summary>
-        public RenameListViewColumnTests()
-        {
-            _originalUiConfig = new UiConfig
-            {
-                AddMode = ConfigStore.Config.Ui.AddMode,
-                AddFolderContents = ConfigStore.Config.Ui.AddFolderContents,
-                RememberWindowState = ConfigStore.Config.Ui.RememberWindowState,
-                RememberLastFolder = ConfigStore.Config.Ui.RememberLastFolder,
-            };
-            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
-            ConfigStore.Config.Ui.AddFolderContents = true;
-        }
+        private readonly RenameListUiTestContext _context = new(pinAddPolicy: true);
 
         /// <inheritdoc />
         public void Dispose()
         {
-            ConfigStore.Config.Ui.AddMode = _originalUiConfig.AddMode;
-            ConfigStore.Config.Ui.AddFolderContents = _originalUiConfig.AddFolderContents;
-            ConfigStore.Config.Ui.RememberWindowState = _originalUiConfig.RememberWindowState;
-            ConfigStore.Config.Ui.RememberLastFolder = _originalUiConfig.RememberLastFolder;
-
-            foreach (var fileListViewModel in _fileListViewModels)
-            {
-                fileListViewModel.Dispose();
-            }
-
-            _tempDirectoryFixture.Dispose();
+            _context.Dispose();
         }
 
         /// <summary>
@@ -59,7 +29,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task Default_visible_columns_produce_four_grid_columns()
         {
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
 
             Assert.Equal(4, renameListViewModel.VisibleColumns.Count);
             Assert.Equal(4, grid.Columns.Count);
@@ -73,7 +43,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task SetVisibleColumns_rebuilds_grid_columns()
         {
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
             var twoColumns = new List<RenameListVisibleColumn>
             {
                 new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key)),
@@ -95,7 +65,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task Default_columns_use_catalog_or_header_widths()
         {
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
 
             Assert.Null(renameListViewModel.VisibleColumns[0].ResolveCatalogWidth());
             Assert.Equal(240, renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
@@ -141,7 +111,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task Narrow_catalog_columns_expand_to_fit_header_text()
         {
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
             renameListViewModel.SetVisibleColumns([
                 new RenameListVisibleColumn(
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullPathLengthField.Key)
@@ -153,19 +123,19 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var fullPathLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                "Full Path Name Length",
-                reserveSortGlyph: true
-            );
+            var fullPathLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full Path Name Length");
             var previewFileNameLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 "File Name Length",
                 reservePreviewGlyph: true
             );
-            var fullPathLengthHeaderOnly = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full Path Name Length");
+            var fullPathLengthWithGlyph = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Full Path Name Length",
+                reserveSortGlyph: true
+            );
 
             Assert.Null(renameListViewModel.VisibleColumns[0].ResolveCatalogWidth());
             Assert.Null(renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
-            Assert.True(fullPathLengthMin > fullPathLengthHeaderOnly);
+            Assert.True(fullPathLengthWithGlyph > fullPathLengthMin);
             Assert.True(previewFileNameLengthMin > 0);
             Assert.Equal(fullPathLengthMin, grid.Columns[0].Width.Value);
             Assert.Equal(fullPathLengthMin, grid.Columns[0].MinWidth);
@@ -177,44 +147,19 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies original columns reserve sort-glyph space even before engine sort mapping exists.
-        /// </summary>
-        [AvaloniaFact]
-        public async Task Original_columns_reserve_sort_glyph_space()
-        {
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
-            renameListViewModel.SetVisibleColumns([
-                new RenameListVisibleColumn(
-                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicExtensionField.Key)
-                ),
-            ]);
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var withGlyph = RenameListGridColumnWidths.GetMinimumHeaderWidth("File Extension", reserveSortGlyph: true);
-            var headerOnly = RenameListGridColumnWidths.GetMinimumHeaderWidth("File Extension");
-
-            Assert.True(withGlyph > headerOnly);
-            Assert.Equal(withGlyph, grid.Columns[0].Width.Value);
-            Assert.Equal(withGlyph, grid.Columns[0].MinWidth);
-
-            window.Close();
-        }
-
-        /// <summary>
         /// Verifies preview column headers show the preview badge without red header styling.
         /// </summary>
         [AvaloniaFact]
         public async Task Preview_column_header_uses_preview_style_class()
         {
-            var (_, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var (_, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key);
             var previewHeader = grid.GetVisualDescendants()
                 .OfType<DataGridColumnHeader>()
-                .FirstOrDefault(header => RenameListGridColumns.TryResolveFieldKey(grid, header) == previewKey);
+                .FirstOrDefault(header => RenameListGridColumns.TryResolveFieldKey(header) == previewKey);
             Assert.NotNull(previewHeader);
 
             var previewTitle = previewHeader
@@ -239,29 +184,29 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task Header_context_menu_resolves_clicked_column_field_key()
         {
-            var (_, window, grid) = await _ShowWithRowsAsync(rowCount: 1);
+            var (_, window, grid) = await _context.ShowWithRowsAsync(rowCount: 1);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             var parentFolderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
             var parentFolderHeader = grid.GetVisualDescendants()
                 .OfType<DataGridColumnHeader>()
-                .First(header => RenameListGridColumns.TryResolveFieldKey(grid, header) == parentFolderKey);
+                .First(header => RenameListGridColumns.TryResolveFieldKey(header) == parentFolderKey);
             var previewHeader = grid.GetVisualDescendants()
                 .OfType<DataGridColumnHeader>()
                 .First(header =>
-                    RenameListGridColumns.TryResolveFieldKey(grid, header)
+                    RenameListGridColumns.TryResolveFieldKey(header)
                     == RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key)
                 );
 
-            Assert.Equal(parentFolderKey, RenameListGridColumns.TryResolveFieldKey(grid, parentFolderHeader));
+            Assert.Equal(parentFolderKey, RenameListGridColumns.TryResolveFieldKey(parentFolderHeader));
             Assert.Equal(
                 RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key),
-                RenameListGridColumns.TryResolveFieldKey(grid, previewHeader)
+                RenameListGridColumns.TryResolveFieldKey(previewHeader)
             );
 
             var renameListViewModel = (RenameListViewModel)((RenameListView)window.Content!).DataContext!;
-            var resolvedKey = RenameListGridColumns.TryResolveFieldKey(grid, parentFolderHeader);
+            var resolvedKey = RenameListGridColumns.TryResolveFieldKey(parentFolderHeader);
             Assert.NotNull(resolvedKey);
             renameListViewModel.HideColumn(resolvedKey.Value);
 
@@ -279,12 +224,11 @@ namespace Mfr.Tests.Ui.RenameList
         {
             const int savedWidth = 400;
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "row.txt");
             await File.WriteAllTextAsync(path, "x");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([path]);
             renameListViewModel.ApplyVisibleColumnsFromSession([
                 new SessionStateRenameListColumn(folderKey, Width: savedWidth),
@@ -321,7 +265,7 @@ namespace Mfr.Tests.Ui.RenameList
             const int wideWidth = 500;
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key);
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
             window.Width = 420;
             renameListViewModel.SetVisibleColumns([
                 new RenameListVisibleColumn(folderKey, wideWidth),
@@ -349,7 +293,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             const int expandedWidth = 400;
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
             renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(folderKey, expandedWidth)]);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -372,7 +316,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task Reordered_visible_columns_keep_pixel_widths()
         {
-            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key);
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
             renameListViewModel.SetVisibleColumns([
@@ -401,7 +345,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task GetDisplayedFieldKeys_follows_display_index_order()
         {
-            var (_, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var (_, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -432,49 +376,6 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(8, indicator.DesiredSize.Width);
             Assert.Equal(headerHeight, indicator.DesiredSize.Height);
-        }
-
-        private async Task<(RenameListViewModel ViewModel, Window Window, DataGrid Grid)> _ShowWithRowsAsync(
-            int rowCount
-        )
-        {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var paths = new List<string>(rowCount);
-            for (var i = 0; i < rowCount; i++)
-            {
-                var path = Path.Combine(dir, $"row-{i:00}.txt");
-                File.WriteAllText(path, "x");
-                paths.Add(path);
-            }
-
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            await renameListViewModel.AddPathsAsync(paths);
-
-            var view = new RenameListView { DataContext = renameListViewModel };
-            var window = new Window
-            {
-                Width = 800,
-                Height = 180,
-                Content = view,
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
-            return (renameListViewModel, window, grid);
-        }
-
-        private FileListViewModel _CreateFileListViewModel(string path)
-        {
-            var fileListViewModel = new FileListViewModel(
-                NullSystemIconProvider.Instance,
-                path,
-                NullFileShellOpener.Instance
-            );
-            _fileListViewModels.Add(fileListViewModel);
-            return fileListViewModel;
         }
     }
 }

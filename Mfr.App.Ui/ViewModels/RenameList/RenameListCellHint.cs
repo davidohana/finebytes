@@ -12,11 +12,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         /// <param name="columnHeader">Grid column header text.</param>
         /// <param name="cellText">Cell display value.</param>
-        /// <param name="isPreviewColumn">Whether the column shows preview values.</param>
         /// <returns>Hint shown in the main window status bar.</returns>
-        public static StatusHintDisplay FormatParts(string columnHeader, string cellText, bool isPreviewColumn)
+        public static StatusHintDisplay FormatParts(string columnHeader, string cellText)
         {
-            _ = isPreviewColumn;
             return StatusHintDisplay.FromRuns(
                 new StatusHintRun(columnHeader) { FontWeight = FontWeight.Bold },
                 new StatusHintRun($": {cellText}")

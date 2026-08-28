@@ -14,17 +14,12 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void FormatParts_Uses_Bold_Column_Name()
         {
-            var plain = RenameListCellHint.FormatParts("Full File Name", "alpha.txt", isPreviewColumn: false);
-            Assert.Equal(2, plain.Runs.Count);
-            Assert.Equal("Full File Name", plain.Runs[0].Text);
-            Assert.Equal(FontWeight.Bold, plain.Runs[0].FontWeight);
-            Assert.Equal(": alpha.txt", plain.Runs[1].Text);
-            Assert.Equal("Full File Name: alpha.txt", plain.ToPlainText());
-
-            var preview = RenameListCellHint.FormatParts("Full File Name", "beta.txt", isPreviewColumn: true);
-            Assert.Equal("Full File Name", preview.Runs[0].Text);
-            Assert.Equal(": beta.txt", preview.Runs[1].Text);
-            Assert.Equal("Full File Name: beta.txt", preview.ToPlainText());
+            var hint = RenameListCellHint.FormatParts("Full File Name", "alpha.txt");
+            Assert.Equal(2, hint.Runs.Count);
+            Assert.Equal("Full File Name", hint.Runs[0].Text);
+            Assert.Equal(FontWeight.Bold, hint.Runs[0].FontWeight);
+            Assert.Equal(": alpha.txt", hint.Runs[1].Text);
+            Assert.Equal("Full File Name: alpha.txt", hint.ToPlainText());
         }
     }
 }

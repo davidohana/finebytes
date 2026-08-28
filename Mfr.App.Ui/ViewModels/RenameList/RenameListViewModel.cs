@@ -76,11 +76,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<RenameListSortKey> SortKeys => _sortKeys;
 
         /// <summary>
-        /// Gets whether another sort field can be added in the editor.
-        /// </summary>
-        public bool CanAddSortKey => _sortKeys.Count < RenameListSortDisplay.EditorColumns.Count;
-
-        /// <summary>
         /// Auto-Sort tooltip: active keys when on, or prompt to enable with default keys when off.
         /// </summary>
         public string SortSummaryText => RenameListSortDisplay.FormatSummary(_sortKeys);

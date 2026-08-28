@@ -26,6 +26,8 @@ namespace Mfr.Tests.Ui.RenameList
                     new RenameListSortKey(RenameListSortColumn.FullFileName, Descending: true),
                 ])
             );
+
+            Assert.Equal("Full File Path", RenameListSortDisplay.GetColumnLabel(RenameListSortColumn.FullPath));
         }
 
         /// <summary>
@@ -91,19 +93,6 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.False(states[RenameListSortColumn.ParentFolder].IsActive);
 
             Assert.False(states[RenameListSortColumn.FullFileName].IsActive);
-        }
-
-        /// <summary>
-        /// Verifies XAML-style string keys resolve the same as enum keys.
-        /// </summary>
-        [Fact]
-        public void ColumnSortStates_StringIndexer_Matches_Enum()
-        {
-            var states = RenameListSortDisplay.BuildColumnSortStates(RenameListSortKey.DefaultKeys);
-
-            Assert.Equal(states[RenameListSortColumn.FileFolder], states["FileFolder"]);
-
-            Assert.False(states["Unknown"].IsActive);
         }
     }
 }

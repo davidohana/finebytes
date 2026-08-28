@@ -3,59 +3,28 @@ using Mfr.Models.RenameList;
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// One selectable column in the sort editor dropdown.
-    /// </summary>
-    /// <param name="Column">Sort column.</param>
-    public sealed record RenameListSortColumnOption(RenameListSortColumn Column)
-    {
-        /// <summary>
-        /// Gets the user-visible column label.
-        /// </summary>
-        public string Label => RenameListSortDisplay.GetColumnLabel(Column);
-    }
-
-    /// <summary>
     /// Human-readable labels and tooltip text for Rename List Auto-Sort keys.
     /// </summary>
     public static class RenameListSortDisplay
     {
-        /// <summary>
-        /// Columns available in the sort editor dropdown (includes hidden Full Path).
-        /// </summary>
-        public static IReadOnlyList<RenameListSortColumn> EditorColumns { get; } =
-        [
-            RenameListSortColumn.FileFolder,
-            RenameListSortColumn.ParentFolder,
-            RenameListSortColumn.FullFileName,
-            RenameListSortColumn.FullPath,
-        ];
-
-        /// <summary>
-        /// Dropdown options for <see cref="EditorColumns"/>.
-        /// </summary>
-        public static IReadOnlyList<RenameListSortColumnOption> EditorColumnOptions { get; } =
-        [.. EditorColumns.Select(column => new RenameListSortColumnOption(column))];
-
         /// <summary>
         /// Tooltip when Auto-Sort is off.
         /// </summary>
         public const string AutoSortOffSummary = "Auto-Sort off. Push to activate.";
 
         /// <summary>
-        /// Gets the grid column label for a sort column.
+        /// Gets the catalog display name for a sort column.
         /// </summary>
         /// <param name="column">Sort column.</param>
-        /// <returns>User-visible column name.</returns>
+        /// <returns>User-visible field name, or the enum name when unmapped.</returns>
         public static string GetColumnLabel(RenameListSortColumn column)
         {
-            return column switch
+            if (!RenameListFieldCatalog.TryMapSortColumn(column, out var key))
             {
-                RenameListSortColumn.FileFolder => "File/Folder",
-                RenameListSortColumn.ParentFolder => "Parent Folder",
-                RenameListSortColumn.FullFileName => "Full File Name",
-                RenameListSortColumn.FullPath => "Full Path",
-                _ => column.ToString(),
-            };
+                return column.ToString();
+            }
+
+            return RenameListFieldCatalog.GetField(key).DisplayName;
         }
 
         /// <summary>
