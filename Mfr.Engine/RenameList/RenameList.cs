@@ -90,60 +90,81 @@ namespace Mfr.Engine.RenameList
             );
 
             var tracker = new AddProgressTracker(progress, cancellationToken);
-            var skippedSourceCount = 0;
-            var insertAt = insertAtIndex ?? _renameItems.Count;
+            var resolveOptions = new SourceResolveOptions(
+                IncludeFiles: includeFiles,
+                IncludeFolders: includeFolders,
+                IncludeSubdirs: includeSubdirs,
+                ExcludeMasks: excludeMasks
+            );
             var batch = new List<RenameItem>();
+            var skippedSourceCount = 0;
+            var inserted = false;
             try
             {
-                foreach (var source in sourceList)
+                skippedSourceCount = _FillBatch(sourceList, resolveOptions, tracker, batch);
+                if (!tracker.IsCanceled)
                 {
-                    if (tracker.IsCanceled)
-                    {
-                        break;
-                    }
-
-                    if (
-                        !_TryAddSource(
-                            source: source,
-                            includeFiles: includeFiles,
-                            includeFolders: includeFolders,
-                            includeSubdirs: includeSubdirs,
-                            excludeMasks: excludeMasks,
-                            tracker: tracker,
-                            batch: batch
-                        )
-                    )
-                    {
-                        skippedSourceCount++;
-                    }
+                    _EnsureMetadataLoaded(batch, metadataRequirement, tracker);
                 }
 
-                if (tracker.IsCanceled)
+                if (!tracker.IsCanceled)
+                {
+                    _InsertCollectedItems(batch, insertAtIndex ?? _renameItems.Count);
+                    inserted = true;
+                }
+            }
+            finally
+            {
+                if (!inserted)
                 {
                     _DiscardCollectedItems(batch);
                 }
-                else if (batch.Count > 0)
-                {
-                    _EnsureMetadataLoaded(batch, metadataRequirement, tracker);
-                    if (tracker.IsCanceled)
-                    {
-                        _DiscardCollectedItems(batch);
-                    }
-                    else
-                    {
-                        _renameItems.InsertRange(insertAt, batch);
-                        _ReindexItems();
-                    }
-                }
-            }
-            catch
-            {
-                _DiscardCollectedItems(batch);
-                throw;
             }
 
             tracker.ReportFinal();
             return new RenameListAddSummary(skippedSourceCount);
+        }
+
+        /// <summary>
+        /// Resolves each source into the staging <paramref name="batch"/> until canceled.
+        /// </summary>
+        /// <returns>How many sources were skipped (errors), not counting cancel.</returns>
+        private int _FillBatch(
+            List<string> sourceList,
+            SourceResolveOptions resolveOptions,
+            AddProgressTracker tracker,
+            List<RenameItem> batch
+        )
+        {
+            var skippedSourceCount = 0;
+            foreach (var source in sourceList)
+            {
+                if (tracker.IsCanceled)
+                {
+                    break;
+                }
+
+                if (!_TryAddSource(source, resolveOptions, tracker, batch))
+                {
+                    skippedSourceCount++;
+                }
+            }
+
+            return skippedSourceCount;
+        }
+
+        /// <summary>
+        /// Inserts a staging batch into <see cref="RenameItems"/> and reindexes.
+        /// </summary>
+        private void _InsertCollectedItems(List<RenameItem> batch, int insertAt)
+        {
+            if (batch.Count == 0)
+            {
+                return;
+            }
+
+            _renameItems.InsertRange(insertAt, batch);
+            _ReindexItems();
         }
 
         /// <summary>
@@ -152,33 +173,18 @@ namespace Mfr.Engine.RenameList
         /// <returns><see langword="false"/> when the source was skipped; otherwise <see langword="true"/>.</returns>
         private bool _TryAddSource(
             string source,
-            bool includeFiles,
-            bool includeFolders,
-            bool includeSubdirs,
-            IReadOnlyList<string>? excludeMasks,
+            SourceResolveOptions resolveOptions,
             AddProgressTracker tracker,
             List<RenameItem> batch
         )
         {
             try
             {
-                _AddSource(
-                    source: source,
-                    includeFiles: includeFiles,
-                    includeFolders: includeFolders,
-                    includeSubdirs: includeSubdirs,
-                    excludeMasks: excludeMasks,
-                    tracker: tracker,
-                    batch: batch
-                );
+                _AddSource(source, resolveOptions, tracker, batch);
                 return true;
             }
-            catch (UserException ex)
-            {
-                Log.Warning(ex, "Skipped rename source '{Source}'.", source);
-                return false;
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+            catch (Exception ex)
+                when (ex is UserException or IOException or UnauthorizedAccessException or ArgumentException)
             {
                 Log.Warning(ex, "Skipped rename source '{Source}'.", source);
                 return false;
@@ -190,10 +196,7 @@ namespace Mfr.Engine.RenameList
         /// </summary>
         private void _AddSource(
             string source,
-            bool includeFiles,
-            bool includeFolders,
-            bool includeSubdirs,
-            IReadOnlyList<string>? excludeMasks,
+            SourceResolveOptions resolveOptions,
             AddProgressTracker tracker,
             List<RenameItem> batch
         )
@@ -213,16 +216,16 @@ namespace Mfr.Engine.RenameList
 
             var resolvedPaths = AddedSourceResolver.ResolveToPaths(
                 source: trimmedSource,
-                includeFiles: includeFiles,
-                includeFolders: includeFolders,
-                includeSubdirs: includeSubdirs,
-                excludeMasks: excludeMasks,
+                includeFiles: resolveOptions.IncludeFiles,
+                includeFolders: resolveOptions.IncludeFolders,
+                includeSubdirs: resolveOptions.IncludeSubdirs,
+                excludeMasks: resolveOptions.ExcludeMasks,
                 cancellationToken: tracker.Token
             );
             var addedCount = _CollectResolvedItems(
                 resolvedPaths: resolvedPaths,
-                includeFiles: includeFiles,
-                includeFolders: includeFolders,
+                includeFiles: resolveOptions.IncludeFiles,
+                includeFolders: resolveOptions.IncludeFolders,
                 tracker: tracker,
                 batch: batch
             );
@@ -237,7 +240,7 @@ namespace Mfr.Engine.RenameList
         /// <summary>
         /// Drops a staging batch that was never inserted into <see cref="RenameItems"/>.
         /// </summary>
-        /// <param name="batch">Items reserved during the walk but not committed to the live list.</param>
+        /// <param name="batch">Items reserved during the walk but not inserted into the live list.</param>
         /// <remarks>
         /// <para>
         /// Only clears their paths from the dedupe set so a later add can accept them again. The batch
@@ -713,78 +716,125 @@ namespace Mfr.Engine.RenameList
 
                 tracker.OnScanned(fullPath);
 
-                var normalizedResolvedPath = _NormalizePathKey(fullPath);
-                if (!_includedResolvedPaths.Add(normalizedResolvedPath))
-                {
-                    continue;
-                }
-
-                var attrs = File.GetAttributes(fullPath);
-                if (!_includeHidden && (attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System)))
-                {
-                    continue;
-                }
-
-                var isDirectory = attrs.IsDirectory();
-                if (isDirectory && !includeFolders)
-                {
-                    continue;
-                }
-
-                if (!isDirectory && !includeFiles)
-                {
-                    continue;
-                }
-
-                if (isDirectory)
-                {
-                    var resolvedRoot = Path.GetPathRoot(fullPath) ?? string.Empty;
-                    var isResolvedRootPath = string.Equals(
-                        _NormalizePathKey(resolvedRoot),
-                        normalizedResolvedPath,
-                        StringComparison.Ordinal
-                    );
-                    if (isResolvedRootPath)
-                    {
-                        Log.Warning("Skipping root path '{Path}': root paths cannot be renamed.", fullPath);
-                        continue;
-                    }
-                }
-
-                string directoryPath;
-                string prefix;
-                string extension;
-
-                if (isDirectory)
-                {
-                    (directoryPath, prefix, extension) = _SplitRenamePathForDirectory(fullPath);
-                }
-                else
-                {
-                    (directoryPath, prefix, extension) = _SplitRenamePathForFile(fullPath);
-                }
-
-                // Indices are filled by _ReindexItems after the batch is committed to RenameItems.
-                var originalFileMeta = new FileMeta(
-                    renameListIndex: 0,
-                    inFolderIndex: 0,
-                    directoryPath: directoryPath,
-                    prefix: prefix,
-                    extension: extension,
-                    attributes: attrs,
-                    creationTime: File.GetCreationTime(fullPath),
-                    lastWriteTime: File.GetLastWriteTime(fullPath),
-                    lastAccessTime: File.GetLastAccessTime(fullPath),
-                    fileSize: isDirectory ? 0 : new FileInfo(fullPath).Length
+                var renameItem = _TryCreateResolvedItem(
+                    fullPath: fullPath,
+                    includeFiles: includeFiles,
+                    includeFolders: includeFolders
                 );
+                if (renameItem is null)
+                {
+                    continue;
+                }
 
-                var renameItem = new RenameItem(originalFileMeta);
                 batch.Add(renameItem);
                 tracker.OnAdded(fullPath);
                 addedCount++;
             }
 
             return addedCount;
+        }
+
+        /// <summary>
+        /// Builds a staging item when the path is new and passes include filters; otherwise returns null.
+        /// </summary>
+        private RenameItem? _TryCreateResolvedItem(string fullPath, bool includeFiles, bool includeFolders)
+        {
+            var normalizedResolvedPath = _NormalizePathKey(fullPath);
+            if (_includedResolvedPaths.Contains(normalizedResolvedPath))
+            {
+                return null;
+            }
+
+            var attrs = File.GetAttributes(fullPath);
+            if (
+                !_ShouldIncludeResolvedPath(
+                    fullPath: fullPath,
+                    normalizedResolvedPath: normalizedResolvedPath,
+                    attrs: attrs,
+                    includeFiles: includeFiles,
+                    includeFolders: includeFolders
+                )
+            )
+            {
+                return null;
+            }
+
+            _includedResolvedPaths.Add(normalizedResolvedPath);
+            return _CreateRenameItem(fullPath, attrs);
+        }
+
+        /// <summary>
+        /// Whether a resolved path should become a rename-list row.
+        /// </summary>
+        private bool _ShouldIncludeResolvedPath(
+            string fullPath,
+            string normalizedResolvedPath,
+            FileAttributes attrs,
+            bool includeFiles,
+            bool includeFolders
+        )
+        {
+            var isHiddenOrSystem = attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System);
+            if (!_includeHidden && isHiddenOrSystem)
+            {
+                return false;
+            }
+
+            var isDirectory = attrs.IsDirectory();
+            if (isDirectory && !includeFolders)
+            {
+                return false;
+            }
+
+            if (!isDirectory && !includeFiles)
+            {
+                return false;
+            }
+
+            if (!isDirectory)
+            {
+                return true;
+            }
+
+            var resolvedRoot = Path.GetPathRoot(fullPath) ?? string.Empty;
+            var isResolvedRootPath = string.Equals(
+                _NormalizePathKey(resolvedRoot),
+                normalizedResolvedPath,
+                StringComparison.Ordinal
+            );
+            if (!isResolvedRootPath)
+            {
+                return true;
+            }
+
+            Log.Warning("Skipping root path '{Path}': root paths cannot be renamed.", fullPath);
+            return false;
+        }
+
+        /// <summary>
+        /// Builds a rename item from a resolved filesystem path. Indices are filled after insert.
+        /// </summary>
+        private static RenameItem _CreateRenameItem(string fullPath, FileAttributes attrs)
+        {
+            var isDirectory = attrs.IsDirectory();
+            var (directoryPath, prefix, extension) = isDirectory
+                ? _SplitRenamePathForDirectory(fullPath)
+                : _SplitRenamePathForFile(fullPath);
+
+            var originalFileMeta = new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: directoryPath,
+                prefix: prefix,
+                extension: extension,
+                attributes: attrs,
+                creationTime: File.GetCreationTime(fullPath),
+                lastWriteTime: File.GetLastWriteTime(fullPath),
+                lastAccessTime: File.GetLastAccessTime(fullPath),
+                fileSize: isDirectory ? 0 : new FileInfo(fullPath).Length
+            );
+
+            return new RenameItem(originalFileMeta);
         }
 
         /// <summary>
@@ -857,5 +907,15 @@ namespace Mfr.Engine.RenameList
             var prefix = Path.GetFileName(trimmed);
             return (directoryPath, prefix, string.Empty);
         }
+
+        /// <summary>
+        /// Include flags and masks for one <see cref="AddSources"/> call.
+        /// </summary>
+        private readonly record struct SourceResolveOptions(
+            bool IncludeFiles,
+            bool IncludeFolders,
+            bool IncludeSubdirs,
+            IReadOnlyList<string>? ExcludeMasks
+        );
     }
 }

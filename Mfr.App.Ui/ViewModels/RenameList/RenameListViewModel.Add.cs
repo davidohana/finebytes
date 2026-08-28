@@ -57,7 +57,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Resolves sources into the engine, then mirrors a successful commit into <see cref="Entries"/>.
+        /// Resolves sources into the engine, then mirrors a successful insert into <see cref="Entries"/>.
         /// </summary>
         private async Task _AddSourcesAsync(IReadOnlyList<string> sources)
         {
@@ -197,13 +197,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Mirrors a committed engine add into <see cref="Entries"/>.
+        /// Mirrors an inserted engine add into <see cref="Entries"/>.
         /// </summary>
         /// <param name="insertAt">Index where the engine inserted the new items.</param>
         /// <param name="oldCount">Engine list size before this add; used to count new rows.</param>
         /// <remarks>
         /// <para>
-        /// Called only after a successful <c>AddSources</c> that committed its staging batch. Creates
+        /// Called only after a successful <c>AddSources</c> that inserted its staging batch. Creates
         /// UI rows for the newly inserted engine items at the same index.
         /// </para>
         /// </remarks>

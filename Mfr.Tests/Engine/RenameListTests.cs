@@ -734,6 +734,22 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies a path skipped by include flags is not reserved, so a later add with those flags on can accept it.
+        /// </summary>
+        public void AddSources_RejectedByIncludeFlags_CanBeAddedWhenIncluded()
+        {
+            var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources(sources: [filePath], includeFiles: false, includeFolders: true);
+            Assert.Empty(renameList.RenameItems);
+
+            renameList.AddSources(sources: [filePath], includeFiles: true, includeFolders: false);
+            Assert.Equal(filePath, Assert.Single(renameList.RenameItems).Original.FullPath);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that a folder whose name contains a dot is not split into pseudo prefix and extension like a file.
         /// </summary>
         public void AddSources_Folder_WithDotInName_UsesFullSegmentAsPrefix()
@@ -963,7 +979,7 @@ namespace Mfr.Tests.Engine
                 includeFiles: true,
                 includeFolders: false,
                 includeSubdirs: true,
-                progress: new Progress<RenameListAddProgress>(reports.Add)
+                progress: new SynchronousProgress<RenameListAddProgress>(reports.Add)
             );
 
             Assert.Equal(3, renameList.RenameItems.Count);
