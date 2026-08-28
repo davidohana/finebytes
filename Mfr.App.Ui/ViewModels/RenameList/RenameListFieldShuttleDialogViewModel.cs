@@ -8,10 +8,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// </summary>
     public sealed partial class RenameListFieldShuttleDialogViewModel : ViewModelBase
     {
-        private readonly List<RenameListVisibleColumn> _draftColumns;
-        private readonly List<RenameListSortKey> _draftSortKeys;
-        private readonly HashSet<RenameListFieldKey> _selectedColumnKeys;
-        private readonly HashSet<RenameListSortColumn> _selectedSortColumns;
+        private readonly OrderedDraft<RenameListFieldKey, RenameListVisibleColumn> _columns;
+        private readonly OrderedDraft<RenameListSortColumn, RenameListSortKey> _sortKeys;
 
         /// <summary>
         /// Initializes the shuttle from the Rename List's current column layout and sort keys.
@@ -28,10 +26,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ArgumentNullException.ThrowIfNull(visibleColumns);
             ArgumentNullException.ThrowIfNull(sortKeys);
 
-            _draftColumns = [.. visibleColumns];
-            _draftSortKeys = [.. sortKeys];
-            _selectedColumnKeys = [.. _draftColumns.Select(column => column.Key)];
-            _selectedSortColumns = [.. _draftSortKeys.Select(key => key.Column)];
+            _columns = new OrderedDraft<RenameListFieldKey, RenameListVisibleColumn>(
+                visibleColumns,
+                column => column.Key
+            );
+            _sortKeys = new OrderedDraft<RenameListSortColumn, RenameListSortKey>(sortKeys, key => key.Column);
 
             Groups = _BuildGroups();
             SelectedGroup = Groups.Count > 0 ? Groups[0] : null;
@@ -216,53 +215,53 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         public int SelectedColumnRowIndex
         {
-            get;
+            get => _columns.SelectedIndex;
             set
             {
-                if (field == value)
+                if (_columns.SelectedIndex == value)
                 {
                     return;
                 }
 
-                field = value;
+                _columns.SelectedIndex = value;
                 OnPropertyChanged();
                 _NotifyColumnSelectionCommands();
             }
-        } = -1;
+        }
 
         /// <summary>
         /// Gets or sets the selected row index in the selected-sort list.
         /// </summary>
         public int SelectedSortRowIndex
         {
-            get;
+            get => _sortKeys.SelectedIndex;
             set
             {
-                if (field == value)
+                if (_sortKeys.SelectedIndex == value)
                 {
                     return;
                 }
 
-                field = value;
+                _sortKeys.SelectedIndex = value;
                 OnPropertyChanged();
                 _NotifySortSelectionCommands();
             }
-        } = -1;
+        }
 
         /// <summary>
         /// Gets whether OK can apply the draft (at least one visible column required).
         /// </summary>
-        public bool CanConfirm => _draftColumns.Count > 0;
+        public bool CanConfirm => _columns.HasItems;
 
         /// <summary>
         /// Gets the draft visible columns to apply when OK is pressed.
         /// </summary>
-        public IReadOnlyList<RenameListVisibleColumn> ResultColumns => _draftColumns;
+        public IReadOnlyList<RenameListVisibleColumn> ResultColumns => _columns.Items;
 
         /// <summary>
         /// Gets the draft sort keys to apply when OK is pressed.
         /// </summary>
-        public IReadOnlyList<RenameListSortKey> ResultSortKeys => _draftSortKeys;
+        public IReadOnlyList<RenameListSortKey> ResultSortKeys => _sortKeys.Items;
 
         /// <summary>
         /// Adds the selected available original field to the visible-column list.
@@ -326,15 +325,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanRemoveSelectedColumn))]
         public void RemoveSelectedColumn()
         {
-            if (!_TryGetSelectedColumnIndex(out var index))
+            if (!_columns.TryRemoveSelected())
             {
                 return;
             }
 
-            var key = _draftColumns[index].Key;
-            _draftColumns.RemoveAt(index);
-            _selectedColumnKeys.Remove(key);
-            SelectedColumnRowIndex = _ClampSelectionIndex(index, _draftColumns.Count);
+            _NotifyColumnSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -344,13 +340,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedColumnUp))]
         public void MoveSelectedColumnUp()
         {
-            if (!_TryGetSelectedColumnIndex(out var index) || index <= 0)
+            if (!_columns.TryMoveSelected(-1))
             {
                 return;
             }
 
-            _SwapColumns(index, index - 1);
-            SelectedColumnRowIndex = index - 1;
+            _NotifyColumnSelectionIndexChanged();
+            _RefreshLists();
         }
 
         /// <summary>
@@ -359,13 +355,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedColumnDown))]
         public void MoveSelectedColumnDown()
         {
-            if (!_TryGetSelectedColumnIndex(out var index) || index >= _draftColumns.Count - 1)
+            if (!_columns.TryMoveSelected(1))
             {
                 return;
             }
 
-            _SwapColumns(index, index + 1);
-            SelectedColumnRowIndex = index + 1;
+            _NotifyColumnSelectionIndexChanged();
+            _RefreshLists();
         }
 
         /// <summary>
@@ -374,9 +370,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_HasSelectedColumns))]
         public void ClearSelectedColumns()
         {
-            _draftColumns.Clear();
-            _selectedColumnKeys.Clear();
-            SelectedColumnRowIndex = -1;
+            _columns.Clear();
+            _NotifyColumnSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -400,15 +395,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanRemoveSelectedSortKey))]
         public void RemoveSelectedSortKey()
         {
-            if (!_TryGetSelectedSortIndex(out var index))
+            if (!_sortKeys.TryRemoveSelected())
             {
                 return;
             }
 
-            var column = _draftSortKeys[index].Column;
-            _draftSortKeys.RemoveAt(index);
-            _selectedSortColumns.Remove(column);
-            SelectedSortRowIndex = _ClampSelectionIndex(index, _draftSortKeys.Count);
+            _NotifySortSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -418,13 +410,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedSortKeyUp))]
         public void MoveSelectedSortKeyUp()
         {
-            if (!_TryGetSelectedSortIndex(out var index) || index <= 0)
+            if (!_sortKeys.TryMoveSelected(-1))
             {
                 return;
             }
 
-            _SwapSortKeys(index, index - 1);
-            SelectedSortRowIndex = index - 1;
+            _NotifySortSelectionIndexChanged();
+            _RefreshLists();
         }
 
         /// <summary>
@@ -433,13 +425,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedSortKeyDown))]
         public void MoveSelectedSortKeyDown()
         {
-            if (!_TryGetSelectedSortIndex(out var index) || index >= _draftSortKeys.Count - 1)
+            if (!_sortKeys.TryMoveSelected(1))
             {
                 return;
             }
 
-            _SwapSortKeys(index, index + 1);
-            SelectedSortRowIndex = index + 1;
+            _NotifySortSelectionIndexChanged();
+            _RefreshLists();
         }
 
         /// <summary>
@@ -448,13 +440,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanToggleSelectedSortDirection))]
         public void ToggleSelectedSortDirection()
         {
-            if (!_TryGetSelectedSortIndex(out var index))
+            var index = _sortKeys.SelectedIndex;
+            if (index < 0 || index >= _sortKeys.Items.Count)
             {
                 return;
             }
 
-            var existing = _draftSortKeys[index];
-            _draftSortKeys[index] = existing with { Descending = !existing.Descending };
+            var existing = _sortKeys.Items[index];
+            _sortKeys.TrySetItem(index, existing with { Descending = !existing.Descending });
             _RefreshLists();
         }
 
@@ -464,9 +457,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_HasSelectedSortKeys))]
         public void ClearSelectedSortKeys()
         {
-            _draftSortKeys.Clear();
-            _selectedSortColumns.Clear();
-            SelectedSortRowIndex = -1;
+            _sortKeys.Clear();
+            _NotifySortSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -492,22 +484,22 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanRemoveSelectedColumn()
         {
-            return _TryGetSelectedColumnIndex(out _);
+            return _columns.CanRemove;
         }
 
         private bool _CanMoveSelectedColumnUp()
         {
-            return _TryGetSelectedColumnIndex(out var index) && index > 0;
+            return _columns.CanMoveUp;
         }
 
         private bool _CanMoveSelectedColumnDown()
         {
-            return _TryGetSelectedColumnIndex(out var index) && index < _draftColumns.Count - 1;
+            return _columns.CanMoveDown;
         }
 
         private bool _HasSelectedColumns()
         {
-            return _draftColumns.Count > 0;
+            return _columns.HasItems;
         }
 
         private bool _CanAddSelectedSortField()
@@ -517,38 +509,37 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanRemoveSelectedSortKey()
         {
-            return _TryGetSelectedSortIndex(out _);
+            return _sortKeys.CanRemove;
         }
 
         private bool _CanMoveSelectedSortKeyUp()
         {
-            return _TryGetSelectedSortIndex(out var index) && index > 0;
+            return _sortKeys.CanMoveUp;
         }
 
         private bool _CanMoveSelectedSortKeyDown()
         {
-            return _TryGetSelectedSortIndex(out var index) && index < _draftSortKeys.Count - 1;
+            return _sortKeys.CanMoveDown;
         }
 
         private bool _CanToggleSelectedSortDirection()
         {
-            return _TryGetSelectedSortIndex(out _);
+            return _sortKeys.CanRemove;
         }
 
         private bool _HasSelectedSortKeys()
         {
-            return _draftSortKeys.Count > 0;
+            return _sortKeys.HasItems;
         }
 
         private void _AddColumn(RenameListFieldKey key, bool refresh = true)
         {
-            if (!_selectedColumnKeys.Add(key))
+            if (!_columns.TryAdd(new RenameListVisibleColumn(key)))
             {
                 return;
             }
 
-            _draftColumns.Add(new RenameListVisibleColumn(key));
-            SelectedColumnRowIndex = _draftColumns.Count - 1;
+            _NotifyColumnSelectionIndexChanged();
 
             if (refresh)
             {
@@ -558,64 +549,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private void _AddSortKey(RenameListSortColumn sortColumn)
         {
-            if (!_selectedSortColumns.Add(sortColumn))
+            if (!_sortKeys.TryAdd(new RenameListSortKey(sortColumn)))
             {
                 return;
             }
 
-            _draftSortKeys.Add(new RenameListSortKey(sortColumn));
-            SelectedSortRowIndex = _draftSortKeys.Count - 1;
+            _NotifySortSelectionIndexChanged();
             _RefreshLists();
-        }
-
-        private void _SwapColumns(int firstIndex, int secondIndex)
-        {
-            (_draftColumns[firstIndex], _draftColumns[secondIndex]) = (
-                _draftColumns[secondIndex],
-                _draftColumns[firstIndex]
-            );
-            _RefreshLists();
-        }
-
-        private void _SwapSortKeys(int firstIndex, int secondIndex)
-        {
-            (_draftSortKeys[firstIndex], _draftSortKeys[secondIndex]) = (
-                _draftSortKeys[secondIndex],
-                _draftSortKeys[firstIndex]
-            );
-            _RefreshLists();
-        }
-
-        private bool _TryGetSelectedColumnIndex(out int index)
-        {
-            index = SelectedColumnRowIndex;
-            return index >= 0 && index < _draftColumns.Count;
-        }
-
-        private bool _TryGetSelectedSortIndex(out int index)
-        {
-            index = SelectedSortRowIndex;
-            return index >= 0 && index < _draftSortKeys.Count;
-        }
-
-        private static int _ClampSelectionIndex(int index, int count)
-        {
-            if (count == 0)
-            {
-                return -1;
-            }
-
-            if (index < 0)
-            {
-                return -1;
-            }
-
-            if (index >= count)
-            {
-                return count - 1;
-            }
-
-            return index;
         }
 
         private void _ClearAvailableSelections()
@@ -628,30 +568,24 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private void _RefreshLists()
         {
             var fieldsInGroup = _FieldsInSelectedGroup();
-            AvailableOriginalFields =
-            [
-                .. fieldsInGroup.Where(field => !_selectedColumnKeys.Contains(field.OriginalKey)),
-            ];
+            AvailableOriginalFields = [.. fieldsInGroup.Where(field => !_columns.Contains(field.OriginalKey))];
             AvailablePreviewFields =
             [
-                .. fieldsInGroup.Where(field =>
-                    field.SupportsPreview && !_selectedColumnKeys.Contains(field.PreviewKey)
-                ),
+                .. fieldsInGroup.Where(field => field.SupportsPreview && !_columns.Contains(field.PreviewKey)),
             ];
             AvailableSortFields =
             [
                 .. fieldsInGroup.Where(field =>
-                    field is { IsSortable: true, SortColumn: not null }
-                    && !_selectedSortColumns.Contains(field.SortColumn.Value)
+                    field is { IsSortable: true, SortColumn: not null } && !_sortKeys.Contains(field.SortColumn.Value)
                 ),
             ];
             SelectedColumnRows =
             [
-                .. _draftColumns.Select((column, index) => new RenameListFieldShuttleColumnRow(index, column)),
+                .. _columns.Items.Select((column, index) => new RenameListFieldShuttleColumnRow(index, column)),
             ];
             SelectedSortRows =
             [
-                .. _draftSortKeys.Select((key, index) => new RenameListFieldShuttleSortRow(index, key)),
+                .. _sortKeys.Items.Select((key, index) => new RenameListFieldShuttleSortRow(index, key)),
             ];
 
             OnPropertyChanged(nameof(AvailableOriginalFields));
@@ -675,6 +609,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedSortKeyDownCommand.NotifyCanExecuteChanged();
             ToggleSelectedSortDirectionCommand.NotifyCanExecuteChanged();
             ClearSelectedSortKeysCommand.NotifyCanExecuteChanged();
+        }
+
+        private void _NotifyColumnSelectionIndexChanged()
+        {
+            OnPropertyChanged(nameof(SelectedColumnRowIndex));
+            _NotifyColumnSelectionCommands();
+        }
+
+        private void _NotifySortSelectionIndexChanged()
+        {
+            OnPropertyChanged(nameof(SelectedSortRowIndex));
+            _NotifySortSelectionCommands();
         }
 
         private void _NotifyColumnSelectionCommands()
