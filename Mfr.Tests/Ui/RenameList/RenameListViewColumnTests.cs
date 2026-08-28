@@ -440,7 +440,7 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var header = grid.GetVisualDescendants()
+            var (Header, Title) = grid.GetVisualDescendants()
                 .OfType<DataGridColumnHeader>()
                 .Select(item =>
                     (
@@ -451,8 +451,8 @@ namespace Mfr.Tests.Ui.RenameList
                     )
                 )
                 .First(item => item.Title is not null);
-            var title = header.Title!;
-            Assert.True(header.Header.Bounds.Width > 0);
+            var title = Title!;
+            Assert.True(Header.Bounds.Width > 0);
             Assert.True(title.Bounds.Width > 0);
 
             var unconstrained = new TextBlock

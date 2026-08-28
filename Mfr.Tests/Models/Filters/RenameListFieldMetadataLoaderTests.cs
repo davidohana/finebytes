@@ -1,6 +1,8 @@
 using Mfr.Filters;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Media;
+using Mfr.Models.RenameList.Fields.Mpeg;
 
 namespace Mfr.Tests.Models.Filters
 {
@@ -15,12 +17,15 @@ namespace Mfr.Tests.Models.Filters
             var item = FilterTestHelpers.CreateRenameItem(attributes: FileAttributes.Directory);
             var audioKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
             var imageKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
+            var mediaKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType");
 
             RenameListFieldMetadataLoader.TryEnsureLoaded(item, audioKey);
             RenameListFieldMetadataLoader.TryEnsureLoaded(item, imageKey);
+            RenameListFieldMetadataLoader.TryEnsureLoaded(item, mediaKey);
 
             Assert.False(item.EmbeddedTagsLoadAttempted);
             Assert.False(item.ImagePropertiesLoadAttempted);
+            Assert.False(item.MediaPropertiesLoadAttempted);
         }
 
         [Fact]
@@ -29,14 +34,18 @@ namespace Mfr.Tests.Models.Filters
             var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
             var audioKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
             var imageKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
+            var mediaKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType");
 
             RenameListFieldMetadataLoader.TryEnsureLoaded(item, audioKey);
             RenameListFieldMetadataLoader.TryEnsureLoaded(item, imageKey);
+            RenameListFieldMetadataLoader.TryEnsureLoaded(item, mediaKey);
 
             Assert.True(item.EmbeddedTagsLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
+            Assert.True(item.MediaPropertiesLoadAttempted);
             Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, audioKey));
             Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, imageKey));
+            Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, mediaKey));
         }
 
         [Fact]
@@ -78,6 +87,36 @@ namespace Mfr.Tests.Models.Filters
 
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.Equal("Canon", RenameListFieldCatalog.Resolve(item, makeKey));
+        }
+
+        [Fact]
+        public void Loads_media_properties_from_disk_and_marks_tags_as_sibling()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tempDir);
+            try
+            {
+                var path = Path.Combine(tempDir, "sample.mp3");
+                File.Copy(
+                    Path.Combine(AppContext.BaseDirectory, "Fixtures", "l3-compl-cut.mp3"),
+                    path,
+                    overwrite: true
+                );
+                var item = _UnmarkedItem(path);
+                var layerKey = RenameListFieldKey.Original(MpegRenameListFields.Group, "Layer");
+
+                Assert.False(item.MediaPropertiesLoadAttempted);
+                Assert.False(item.EmbeddedTagsLoadAttempted);
+                RenameListFieldMetadataLoader.TryEnsureLoaded(item, layerKey);
+
+                Assert.True(item.MediaPropertiesLoadAttempted);
+                Assert.True(item.EmbeddedTagsLoadAttempted);
+                Assert.Equal("III", RenameListFieldCatalog.Resolve(item, layerKey));
+            }
+            finally
+            {
+                Directory.Delete(tempDir, recursive: true);
+            }
         }
 
         [Fact]

@@ -82,6 +82,51 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
+        /// Formats a duration as <c>h:mm:ss</c> with total hours unpadded.
+        /// </summary>
+        /// <param name="duration">Property value; <see cref="TimeSpan.Zero"/> means absent.</param>
+        /// <returns>Hours, minutes, and seconds, or empty when zero.</returns>
+        internal static string FormatDuration(TimeSpan duration)
+        {
+            if (duration == TimeSpan.Zero)
+            {
+                return string.Empty;
+            }
+
+            var totalHours = (int)duration.TotalHours;
+            return string.Create(
+                CultureInfo.InvariantCulture,
+                $"{totalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}"
+            );
+        }
+
+        /// <summary>
+        /// Formats a duration as whole seconds.
+        /// </summary>
+        /// <param name="duration">Property value; <see cref="TimeSpan.Zero"/> means absent.</param>
+        /// <returns>Floored total seconds as invariant digits, or empty when zero.</returns>
+        internal static string FormatDurationSec(TimeSpan duration)
+        {
+            if (duration == TimeSpan.Zero)
+            {
+                return string.Empty;
+            }
+
+            var seconds = (long)Math.Floor(duration.TotalSeconds);
+            return seconds.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Formats a boolean flag as <c>Yes</c> or <c>No</c>.
+        /// </summary>
+        /// <param name="value">Flag value; these properties are never treated as absent.</param>
+        /// <returns><c>Yes</c> when true; otherwise <c>No</c>.</returns>
+        internal static string FormatYesNo(bool value)
+        {
+            return value ? "Yes" : "No";
+        }
+
+        /// <summary>
         /// Formats horizontal or vertical DPI, or empty when unset.
         /// </summary>
         /// <param name="value">Dots per inch; zero or negative means absent.</param>

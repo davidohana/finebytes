@@ -4,6 +4,8 @@ using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Media;
+using Mfr.Models.RenameList.Fields.Mpeg;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -246,6 +248,8 @@ namespace Mfr.Tests.Ui.RenameList
                     BasicRenameListField.GroupLabel,
                     ExtendedRenameListFields.GroupLabel,
                     AudioTagRenameListFields.GroupLabel,
+                    MediaRenameListFields.GroupLabel,
+                    MpegRenameListFields.GroupLabel,
                     ImageRenameListFields.GroupLabel,
                     JpegRenameListFields.GroupLabel,
                 ],
@@ -283,7 +287,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dialogVm = _CreateDefaultDialog();
             dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == JpegRenameListFields.Group);
 
-            Assert.Equal(12, dialogVm.AvailableOriginalFields.Count);
+            Assert.Equal(17, dialogVm.AvailableOriginalFields.Count);
             Assert.Empty(dialogVm.AvailablePreviewFields);
         }
 

@@ -82,6 +82,36 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 JpegRenameListExifProperty.UserComment,
                 defaultWidth: 60
             ),
+            new JpegExifRenameListField(
+                "ExifDirectory*33434",
+                "Exposure Time",
+                JpegRenameListExifProperty.Exposure,
+                defaultWidth: 60
+            ),
+            new JpegExifRenameListField(
+                "ExifDirectory*33437",
+                "FNumber",
+                JpegRenameListExifProperty.FNumber,
+                defaultWidth: 40
+            ),
+            new JpegExifRenameListField(
+                "ExifDirectory*34855",
+                "ISO Speed Ratings",
+                JpegRenameListExifProperty.Iso,
+                defaultWidth: 60
+            ),
+            new JpegExifRenameListField(
+                "ExifDirectory*37386",
+                "Focal Length",
+                JpegRenameListExifProperty.FocalLength,
+                defaultWidth: 40
+            ),
+            new JpegExifRenameListField(
+                "ExifDirectory*41989",
+                "Focal Length In 35mm Film",
+                JpegRenameListExifProperty.FocalLength35mm,
+                defaultWidth: 80
+            ),
         ];
     }
 }

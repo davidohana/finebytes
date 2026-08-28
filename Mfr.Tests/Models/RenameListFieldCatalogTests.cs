@@ -3,6 +3,8 @@ using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Media;
+using Mfr.Models.RenameList.Fields.Mpeg;
 using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
 
@@ -16,12 +18,31 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Catalog_registers_all_phase7a_original_field_groups()
         {
-            Assert.Equal(66, RenameListFieldCatalog.All.Count);
+            Assert.Equal(97, RenameListFieldCatalog.All.Count);
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(BasicRenameListField.Group).Count);
             Assert.Equal(6, RenameListFieldCatalog.GetFieldsForGroup(ExtendedRenameListFields.Group).Count);
             Assert.Equal(32, RenameListFieldCatalog.GetFieldsForGroup(AudioTagRenameListFields.Group).Count);
+            Assert.Equal(15, RenameListFieldCatalog.GetFieldsForGroup(MediaRenameListFields.Group).Count);
+            Assert.Equal(11, RenameListFieldCatalog.GetFieldsForGroup(MpegRenameListFields.Group).Count);
             Assert.Equal(7, RenameListFieldCatalog.GetFieldsForGroup(ImageRenameListFields.Group).Count);
-            Assert.Equal(12, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
+            Assert.Equal(17, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
+        }
+
+        [Fact]
+        public void Catalog_group_order_matches_shuttle_dropdown()
+        {
+            Assert.Equal(
+                [
+                    BasicRenameListField.GroupLabel,
+                    ExtendedRenameListFields.GroupLabel,
+                    AudioTagRenameListFields.GroupLabel,
+                    MediaRenameListFields.GroupLabel,
+                    MpegRenameListFields.GroupLabel,
+                    ImageRenameListFields.GroupLabel,
+                    JpegRenameListFields.GroupLabel,
+                ],
+                RenameListFieldCatalog.All.Select(field => field.GroupDisplayName).Distinct()
+            );
         }
 
         [Fact]
@@ -407,12 +428,93 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
+        public void Media_mpeg_and_jpeg_camera_fields_resolve_cached_metadata()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: ".mp3",
+                configureOriginal: meta =>
+                {
+                    meta.Media = new MediaProperties
+                    {
+                        MimeType = "taglib/mp3",
+                        PossiblyCorrupt = false,
+                        Duration = TimeSpan.FromSeconds(225),
+                        MediaTypes = "Audio",
+                        Description = "MPEG Version 1 Audio, Layer 3",
+                        AudioBitrate = 128,
+                        AudioSampleRate = 44100,
+                        BitsPerSample = 16,
+                        AudioChannels = 2,
+                        PhotoWidth = 1920,
+                        PhotoHeight = 1080,
+                        PhotoQuality = 85,
+                        Mpeg = new MpegAudioProperties
+                        {
+                            Bitrate = 128,
+                            IsCopyrighted = true,
+                            Duration = TimeSpan.FromSeconds(225),
+                            IsVbr = false,
+                            SampleRate = 44100,
+                            Layer = 3,
+                            MpegVersion = "1",
+                            ChannelMode = "JointStereo",
+                            IsOriginal = false,
+                            IsProtected = true,
+                        },
+                    };
+                    meta.Exif = new ExifData
+                    {
+                        Exposure = "1/250 sec",
+                        FNumber = "f/5.6",
+                        Iso = "400",
+                        FocalLength = "50 mm",
+                        FocalLength35mm = "75 mm",
+                    };
+                }
+            );
+
+            _AssertField(item, MediaRenameListFields.Group, "MimeType", "taglib/mp3");
+            _AssertField(item, MediaRenameListFields.Group, "PossiblyCorrupt", "No");
+            _AssertField(item, MediaRenameListFields.Group, "Duration", "0:03:45");
+            _AssertField(item, MediaRenameListFields.Group, "DurationSeconds", "225");
+            _AssertField(item, MediaRenameListFields.Group, "MediaTypes", "Audio");
+            _AssertField(item, MediaRenameListFields.Group, "AudioBitrate", "128");
+            _AssertField(item, MediaRenameListFields.Group, "PhotoWidth", "1920");
+            _AssertField(item, MpegRenameListFields.Group, "Bitrate", "128");
+            _AssertField(item, MpegRenameListFields.Group, "Copyright", "Yes");
+            _AssertField(item, MpegRenameListFields.Group, "Duration", "0:03:45");
+            _AssertField(item, MpegRenameListFields.Group, "VBR", "CBR");
+            _AssertField(item, MpegRenameListFields.Group, "Layer", "III");
+            _AssertField(item, MpegRenameListFields.Group, "Mode", "JointStereo");
+            _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*33434", "1/250 sec");
+            _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*33437", "f/5.6");
+            _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*34855", "400");
+            _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*37386", "50 mm");
+            _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*41989", "75 mm");
+
+            Assert.Equal(
+                RenameListFieldMetadataLoad.MediaProperties,
+                RenameListFieldCatalog.GetMetadataLoad(
+                    RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType")
+                )
+            );
+            Assert.Equal(
+                RenameListFieldMetadataLoad.MediaProperties,
+                RenameListFieldCatalog.GetMetadataLoad(
+                    RenameListFieldKey.Original(MpegRenameListFields.Group, "Bitrate")
+                )
+            );
+        }
+
+        [Fact]
         public void Phase7a_original_groups_are_not_previewable_or_sortable()
         {
             string[] originalOnlyGroups =
             [
                 ExtendedRenameListFields.Group,
                 AudioTagRenameListFields.Group,
+                MediaRenameListFields.Group,
+                MpegRenameListFields.Group,
                 ImageRenameListFields.Group,
                 JpegRenameListFields.Group,
             ];
@@ -440,12 +542,17 @@ namespace Mfr.Tests.Models
             item.Original.AudioTagOverlay.ClearAllBlocks();
             item.Original.Image = null;
             item.Original.Exif = null;
+            item.Original.Media = null;
 
             _AssertField(item, ExtendedRenameListFields.Group, "CreationDate", "");
             _AssertField(item, AudioTagRenameListFields.Group, "Title", "");
             _AssertField(item, AudioTagRenameListFields.Group, "TagTypes", "");
+            _AssertField(item, MediaRenameListFields.Group, "MimeType", "");
+            _AssertField(item, MediaRenameListFields.Group, "Duration", "");
+            _AssertField(item, MpegRenameListFields.Group, "Bitrate", "");
             _AssertField(item, ImageRenameListFields.Group, "Width", "");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*271", "");
+            _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*33434", "");
         }
 
         [Fact]

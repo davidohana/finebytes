@@ -23,6 +23,11 @@ namespace Mfr.Filters
                 _TryEnsureEmbeddedTagsLoaded(item);
             }
 
+            if (metadataLoad.HasFlag(RenameListFieldMetadataLoad.MediaProperties))
+            {
+                _TryEnsureMediaPropertiesLoaded(item);
+            }
+
             if (metadataLoad.HasFlag(RenameListFieldMetadataLoad.ImageProperties))
             {
                 _TryEnsureImagePropertiesLoaded(item);
@@ -54,6 +59,23 @@ namespace Mfr.Filters
             catch (Exception ex) when (_IsMetadataReadFailure(ex))
             {
                 // Grid cells show empty when tags cannot be read (missing file, unsupported format).
+            }
+        }
+
+        private static void _TryEnsureMediaPropertiesLoaded(RenameItem item)
+        {
+            if (item.MediaPropertiesLoadAttempted || item.Original.Attributes.IsDirectory())
+            {
+                return;
+            }
+
+            try
+            {
+                item.EnsureMediaPropertiesLoaded();
+            }
+            catch (Exception ex) when (_IsMetadataReadFailure(ex))
+            {
+                // Grid cells show empty when media properties cannot be read.
             }
         }
 

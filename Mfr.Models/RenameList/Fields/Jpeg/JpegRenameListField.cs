@@ -85,6 +85,21 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
 
         /// <summary>SubIFD user comment.</summary>
         UserComment,
+
+        /// <summary>Exposure time.</summary>
+        Exposure,
+
+        /// <summary>F-number.</summary>
+        FNumber,
+
+        /// <summary>ISO speed ratings.</summary>
+        Iso,
+
+        /// <summary>Focal length.</summary>
+        FocalLength,
+
+        /// <summary>Focal length in 35mm film.</summary>
+        FocalLength35mm,
     }
 
     /// <summary>
@@ -123,6 +138,13 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                     tagId: 37393
                 ),
                 JpegRenameListExifProperty.UserComment => RenameListFieldDisplay.FormatOptionalText(exif.UserComment),
+                JpegRenameListExifProperty.Exposure => RenameListFieldDisplay.FormatOptionalText(exif.Exposure),
+                JpegRenameListExifProperty.FNumber => RenameListFieldDisplay.FormatOptionalText(exif.FNumber),
+                JpegRenameListExifProperty.Iso => RenameListFieldDisplay.FormatOptionalText(exif.Iso),
+                JpegRenameListExifProperty.FocalLength => RenameListFieldDisplay.FormatOptionalText(exif.FocalLength),
+                JpegRenameListExifProperty.FocalLength35mm => RenameListFieldDisplay.FormatOptionalText(
+                    exif.FocalLength35mm
+                ),
                 _ => string.Empty,
             };
         }

@@ -5,6 +5,8 @@ using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Media;
+using Mfr.Models.RenameList.Fields.Mpeg;
 using Mfr.Utils;
 
 namespace Mfr.Models.RenameList
@@ -22,6 +24,8 @@ namespace Mfr.Models.RenameList
                 .. BasicRenameListFields.All,
                 .. ExtendedRenameListFields.All,
                 .. AudioTagRenameListFields.All,
+                .. MediaRenameListFields.All,
+                .. MpegRenameListFields.All,
                 .. ImageRenameListFields.All,
                 .. JpegRenameListFields.All,
             ]);

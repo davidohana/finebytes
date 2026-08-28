@@ -17,6 +17,11 @@ namespace Mfr.Models.RenameList
         EmbeddedAudioTags,
 
         /// <summary>
+        /// Field reads TagLib media and MPEG stream properties from disk.
+        /// </summary>
+        MediaProperties,
+
+        /// <summary>
         /// Field reads MetadataExtractor image properties and/or EXIF from disk.
         /// </summary>
         ImageProperties,
