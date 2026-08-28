@@ -26,18 +26,5 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(": beta.txt", preview.Runs[1].Text);
             Assert.Equal("Full File Name: beta.txt", preview.ToPlainText());
         }
-
-        /// <summary>
-        /// Verifies templated sort columns resolve labels from sort member paths.
-        /// </summary>
-        [Fact]
-        public void GetColumnHeader_Resolves_SortMemberPath_When_Header_Is_Templated()
-        {
-            Assert.Equal(
-                "Full File Name",
-                RenameListCellHint.GetColumnHeader(nameof(RenameListEntry.FullFileName), null)
-            );
-            Assert.Equal("Full File Name", RenameListCellHint.GetColumnHeader(null, "Full File Name"));
-        }
     }
 }

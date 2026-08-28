@@ -105,6 +105,10 @@ namespace Mfr.Tests.Ui.RenameList
                 reserveSortGlyph: true
             );
             var fileFolderHeaderOnlyWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth("File/Folder");
+            var parentFolderMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Parent Folder",
+                reserveSortGlyph: true
+            );
             var fullFileNameMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 "Full File Name",
                 reserveSortGlyph: true
@@ -118,8 +122,8 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[2].Width.UnitType);
             Assert.True(grid.Columns[3].Width.IsStar);
             Assert.Equal(fileFolderMinWidth, grid.Columns[0].MinWidth);
-            Assert.Equal(240, grid.Columns[1].MinWidth);
-            Assert.Equal(Math.Max(180, fullFileNameMinWidth), grid.Columns[2].MinWidth);
+            Assert.Equal(parentFolderMinWidth, grid.Columns[1].MinWidth);
+            Assert.Equal(fullFileNameMinWidth, grid.Columns[2].MinWidth);
 
             window.Close();
         }
@@ -255,6 +259,31 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.DoesNotContain(renameListViewModel.VisibleColumns, column => column.Key == parentFolderKey);
             Assert.Equal(3, renameListViewModel.VisibleColumns.Count);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies user-expanded column widths do not raise MinWidth above the header-fit minimum.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task User_expanded_column_width_allows_shrink_below_saved_width()
+        {
+            const int expandedWidth = 400;
+            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
+            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(folderKey, expandedWidth)]);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var parentFolderMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Parent Folder",
+                reserveSortGlyph: true
+            );
+
+            Assert.Equal(expandedWidth, grid.Columns[0].Width.Value);
+            Assert.Equal(parentFolderMinWidth, grid.Columns[0].MinWidth);
+            Assert.True(parentFolderMinWidth < expandedWidth);
 
             window.Close();
         }

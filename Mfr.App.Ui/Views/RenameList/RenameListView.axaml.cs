@@ -666,10 +666,6 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 _viewModel.SortByFieldKey(fieldKey.Value, append);
             }
-            else
-            {
-                _viewModel.SortByColumn(e.Column.SortMemberPath, append);
-            }
 
             _ClearSortDescriptions();
         }

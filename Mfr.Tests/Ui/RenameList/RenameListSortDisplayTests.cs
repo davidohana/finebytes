@@ -105,24 +105,5 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.False(states["Unknown"].IsActive);
         }
-
-        /// <summary>
-        /// Verifies header SortMemberPath maps to visible columns only.
-        /// </summary>
-        [Fact]
-        public void TryMapMemberPath_Maps_Visible_Columns()
-        {
-            Assert.True(RenameListSortDisplay.TryMapMemberPath(nameof(RenameListEntry.FileFolder), out var fileFolder));
-            Assert.Equal(RenameListSortColumn.FileFolder, fileFolder);
-
-            Assert.True(RenameListSortDisplay.TryMapMemberPath(nameof(RenameListEntry.ParentFolder), out var parent));
-            Assert.Equal(RenameListSortColumn.ParentFolder, parent);
-
-            Assert.True(RenameListSortDisplay.TryMapMemberPath(nameof(RenameListEntry.FullFileName), out var name));
-            Assert.Equal(RenameListSortColumn.FullFileName, name);
-
-            Assert.False(RenameListSortDisplay.TryMapMemberPath(nameof(RenameListEntry.FullPath), out _));
-            Assert.False(RenameListSortDisplay.TryMapMemberPath(null, out _));
-        }
     }
 }

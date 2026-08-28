@@ -84,8 +84,8 @@ namespace Mfr.App.Ui.Views.RenameList
             var key = visibleColumn.Key;
             var field = RenameListFieldCatalog.GetField(key);
             var headerText = RenameListFieldDisplay.GetColumnHeaderText(field, key.IsPreview);
-            var sortMemberPath = _GetSortMemberPath(key);
-            var canUserSort = sortMemberPath is not null;
+            var sortColumn = field.SortColumn;
+            var canUserSort = !key.IsPreview && sortColumn is not null;
 
             var catalogWidth = visibleColumn.ResolveCatalogWidth();
             var reserveSortGlyph = !key.IsPreview;
@@ -102,20 +102,18 @@ namespace Mfr.App.Ui.Views.RenameList
             var column = new DataGridTextColumn
             {
                 Binding = new Binding { Converter = RenameListFieldTextConverter.Instance, ConverterParameter = key },
-                SortMemberPath = sortMemberPath ?? string.Empty,
                 CanUserSort = canUserSort,
                 Width = width,
-                MinWidth = effectiveWidth,
+                MinWidth = minHeaderWidth,
             };
 
             RenameListGridColumns.SetFieldKey(column, key);
 
-            column.HeaderTemplate =
-                canUserSort && field.SortColumn is { } sortColumn
-                    ? new FuncDataTemplate<object>(
-                        (_, _) => _BuildSortableHeader(_viewModel!, headerText, key.IsPreview, sortColumn, key)
-                    )
-                    : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key));
+            column.HeaderTemplate = canUserSort
+                ? new FuncDataTemplate<object>(
+                    (_, _) => _BuildSortableHeader(_viewModel!, headerText, key.IsPreview, sortColumn!.Value, key)
+                )
+                : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key));
 
             column.PropertyChanged += (_, args) => _OnGridColumnPropertyChanged(column, args);
             return column;
@@ -135,23 +133,6 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             return new DataGridLength(effectiveWidth, DataGridLengthUnitType.Pixel);
-        }
-
-        private static string? _GetSortMemberPath(RenameListFieldKey key)
-        {
-            if (key.IsPreview || !RenameListFieldCatalog.TryMapFieldKeyToSortColumn(key, out var sortColumn))
-            {
-                return null;
-            }
-
-            return sortColumn switch
-            {
-                RenameListSortColumn.FileFolder => nameof(RenameListEntry.FileFolder),
-                RenameListSortColumn.ParentFolder => nameof(RenameListEntry.ParentFolder),
-                RenameListSortColumn.FullFileName => nameof(RenameListEntry.FullFileName),
-                RenameListSortColumn.FullPath => null,
-                _ => null,
-            };
         }
 
         private static Control _CreateHeaderContent(string headerText, RenameListFieldKey key)

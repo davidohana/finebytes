@@ -198,25 +198,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Sets Auto-Sort from a column header click.
-        /// </summary>
-        /// <param name="memberPath">
-        /// <see cref="RenameListEntry"/> property name (<c>FileFolder</c>, <c>ParentFolder</c>, <c>FullFileName</c>).
-        /// </param>
-        /// <param name="append">
-        /// When <see langword="true"/> (Shift+click), append or adjust an existing key instead of replacing the list.
-        /// </param>
-        public void SortByColumn(string? memberPath, bool append = false)
-        {
-            if (!RenameListSortDisplay.TryMapMemberPath(memberPath, out var column))
-            {
-                return;
-            }
-
-            _SortByColumn(column, append);
-        }
-
-        /// <summary>
         /// Sets Auto-Sort from a visible grid column field key.
         /// </summary>
         /// <param name="key">Catalog field key for the clicked column.</param>
