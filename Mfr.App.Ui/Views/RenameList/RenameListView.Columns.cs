@@ -68,7 +68,6 @@ namespace Mfr.App.Ui.Views.RenameList
 
             var column = new DataGridTextColumn
             {
-                Header = headerText,
                 Binding = new Binding { Converter = RenameListFieldTextConverter.Instance, ConverterParameter = key },
                 SortMemberPath = sortMemberPath ?? string.Empty,
                 CanUserSort = canUserSort,
@@ -78,18 +77,11 @@ namespace Mfr.App.Ui.Views.RenameList
 
             RenameListGridColumns.SetFieldKey(column, key);
 
-            if (canUserSort && field.SortColumn is { } sortColumn)
-            {
-                column.HeaderTemplate = new FuncDataTemplate<object>(
-                    (_, _) => _BuildSortableHeader(_viewModel!, headerText, key.IsPreview, sortColumn)
-                );
-            }
-            else if (key.IsPreview)
-            {
-                column.HeaderTemplate = new FuncDataTemplate<object>(
-                    (_, _) => RenameListPreviewGlyph.CreateLabelRow(headerText, isPreview: true)
-                );
-            }
+            column.HeaderTemplate = canUserSort && field.SortColumn is { } sortColumn
+                ? new FuncDataTemplate<object>(
+                    (_, _) => _BuildSortableHeader(_viewModel!, headerText, key.IsPreview, sortColumn, key)
+                )
+                : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key));
 
             column.PropertyChanged += (_, args) => _OnGridColumnPropertyChanged(column, args);
             return column;
@@ -128,14 +120,23 @@ namespace Mfr.App.Ui.Views.RenameList
             };
         }
 
+        private static Control _CreateHeaderContent(string headerText, RenameListFieldKey key)
+        {
+            var root = RenameListPreviewGlyph.CreateLabelRow(headerText, key.IsPreview);
+            RenameListGridColumns.StampHeaderFieldKey(root, key);
+            return root;
+        }
+
         private static Grid _BuildSortableHeader(
             RenameListViewModel viewModel,
             string headerText,
             bool isPreview,
-            RenameListSortColumn sortColumn
+            RenameListSortColumn sortColumn,
+            RenameListFieldKey key
         )
         {
             var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+            RenameListGridColumns.StampHeaderFieldKey(grid, key);
 
             var titleHost = RenameListPreviewGlyph.CreateLabelRow(headerText, isPreview);
             titleHost[Grid.ColumnProperty] = 0;

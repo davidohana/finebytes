@@ -36,13 +36,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var column = _ResolveHeaderColumn(header);
-            if (column is null)
-            {
-                return;
-            }
-
-            var fieldKey = RenameListGridColumns.GetFieldKey(column);
+            var fieldKey = RenameListGridColumns.TryResolveFieldKey(RenameGrid, header);
             if (fieldKey is null)
             {
                 return;
@@ -50,18 +44,6 @@ namespace Mfr.App.Ui.Views.RenameList
 
             e.Handled = true;
             _ShowColumnHeaderContextMenu(header, fieldKey.Value);
-        }
-
-        private DataGridColumn? _ResolveHeaderColumn(DataGridColumnHeader header)
-        {
-            var headers = RenameGrid.GetVisualDescendants().OfType<DataGridColumnHeader>().ToList();
-            var index = headers.IndexOf(header);
-            if (index < 0 || index >= RenameGrid.Columns.Count)
-            {
-                return null;
-            }
-
-            return RenameGrid.Columns[index];
         }
 
         private void _ShowColumnHeaderContextMenu(DataGridColumnHeader header, RenameListFieldKey fieldKey)

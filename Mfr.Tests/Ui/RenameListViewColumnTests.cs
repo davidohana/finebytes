@@ -198,9 +198,10 @@ namespace Mfr.Tests.Ui
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key);
             var previewHeader = grid.GetVisualDescendants()
                 .OfType<DataGridColumnHeader>()
-                .LastOrDefault(header => header.Content is not null);
+                .FirstOrDefault(header => RenameListGridColumns.TryResolveFieldKey(grid, header) == previewKey);
             Assert.NotNull(previewHeader);
 
             var previewTitle = previewHeader
@@ -215,6 +216,44 @@ namespace Mfr.Tests.Ui
                 .OfType<Border>()
                 .FirstOrDefault(border => border.Classes.Contains("rename-list-preview-glyph"));
             Assert.NotNull(previewBadge);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies header context-menu resolution targets the clicked column, not a visual-tree index.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Header_context_menu_resolves_clicked_column_field_key()
+        {
+            var (_, window, grid) = await _ShowWithRowsAsync(rowCount: 1);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var parentFolderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
+            var parentFolderHeader = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeader>()
+                .First(header => RenameListGridColumns.TryResolveFieldKey(grid, header) == parentFolderKey);
+            var previewHeader = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeader>()
+                .First(header =>
+                    RenameListGridColumns.TryResolveFieldKey(grid, header)
+                    == RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key)
+                );
+
+            Assert.Equal(parentFolderKey, RenameListGridColumns.TryResolveFieldKey(grid, parentFolderHeader));
+            Assert.Equal(
+                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key),
+                RenameListGridColumns.TryResolveFieldKey(grid, previewHeader)
+            );
+
+            var renameListViewModel = (RenameListViewModel)((RenameListView)window.Content!).DataContext!;
+            var resolvedKey = RenameListGridColumns.TryResolveFieldKey(grid, parentFolderHeader);
+            Assert.NotNull(resolvedKey);
+            renameListViewModel.HideColumn(resolvedKey.Value);
+
+            Assert.DoesNotContain(renameListViewModel.VisibleColumns, column => column.Key == parentFolderKey);
+            Assert.Equal(3, renameListViewModel.VisibleColumns.Count);
 
             window.Close();
         }
