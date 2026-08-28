@@ -340,6 +340,7 @@
                 </Button>
               </StackPanel>
               <ListBox
+                x:Name="SelectedColumnsList"
                 Grid.Row="1"
                 Grid.Column="2"
                 Classes="field-shuttle-list"
@@ -441,6 +442,7 @@
                 </Button>
               </StackPanel>
               <ListBox
+                x:Name="SelectedSortList"
                 Grid.Row="1"
                 Grid.Column="2"
                 Classes="field-shuttle-list"

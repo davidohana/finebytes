@@ -60,6 +60,7 @@ namespace Mfr.Tests.Ui.RenameList
             dialogVm.SelectedColumnRowIndex = 0;
             dialogVm.MoveSelectedColumnDownCommand.Execute(null);
             Assert.Equal(BasicRenameListFields.Key.Folder, dialogVm.SelectedColumnRows[0].Column.Key.PropertyKey);
+            Assert.Equal(1, dialogVm.SelectedColumnRowIndex);
 
             dialogVm.SelectedAvailablePreviewField = RenameListFieldCatalog.GetField(
                 BasicRenameListField.Group,
@@ -131,6 +132,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             dialogVm.MoveSelectedSortKeyDownCommand.Execute(null);
             Assert.Equal(RenameListSortColumn.FileFolder, dialogVm.SelectedSortRows[1].Key.Column);
+            Assert.Equal(1, dialogVm.SelectedSortRowIndex);
 
             dialogVm.SelectedSortRowIndex = dialogVm.SelectedSortRows.Count - 1;
             dialogVm.RemoveSelectedSortKeyCommand.Execute(null);

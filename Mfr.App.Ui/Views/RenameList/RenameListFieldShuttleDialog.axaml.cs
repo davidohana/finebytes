@@ -1,5 +1,7 @@
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -25,10 +27,49 @@ namespace Mfr.App.Ui.Views.RenameList
             : this()
         {
             DataContext = viewModel;
+            viewModel.PropertyChanged += _OnViewModelPropertyChanged;
+            Closed += (_, _) => viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
         }
 
         private RenameListFieldShuttleDialogViewModel? _ViewModel =>
             DataContext as RenameListFieldShuttleDialogViewModel;
+
+        private void _OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (
+                e.PropertyName
+                is not (
+                    nameof(RenameListFieldShuttleDialogViewModel.SelectedColumnRows)
+                    or nameof(RenameListFieldShuttleDialogViewModel.SelectedSortRows)
+                )
+            )
+            {
+                return;
+            }
+
+            Dispatcher.UIThread.Post(_RestoreSelectedListIndexes, DispatcherPriority.Background);
+        }
+
+        private void _RestoreSelectedListIndexes()
+        {
+            if (_ViewModel is null)
+            {
+                return;
+            }
+
+            _RestoreListIndex(SelectedColumnsList, _ViewModel.SelectedColumnRowIndex);
+            _RestoreListIndex(SelectedSortList, _ViewModel.SelectedSortRowIndex);
+        }
+
+        private static void _RestoreListIndex(ListBox? list, int selectedIndex)
+        {
+            if (list is null || list.SelectedIndex == selectedIndex)
+            {
+                return;
+            }
+
+            list.SelectedIndex = selectedIndex;
+        }
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)
         {

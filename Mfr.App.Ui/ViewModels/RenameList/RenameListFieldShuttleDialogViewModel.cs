@@ -10,6 +10,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     {
         private readonly OrderedDraft<RenameListFieldKey, RenameListVisibleColumn> _columns;
         private readonly OrderedDraft<RenameListSortColumn, RenameListSortKey> _sortKeys;
+        private bool _suppressSelectionSync;
 
         /// <summary>
         /// Initializes the shuttle from the Rename List's current column layout and sort keys.
@@ -218,7 +219,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             get => _columns.SelectedIndex;
             set
             {
-                if (_columns.SelectedIndex == value)
+                if (_suppressSelectionSync || _columns.SelectedIndex == value)
+                {
+                    return;
+                }
+
+                // ListBox writes -1 when ItemsSource is rebuilt; keep the draft selection.
+                if (value < 0 && _columns.HasItems)
                 {
                     return;
                 }
@@ -237,7 +244,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             get => _sortKeys.SelectedIndex;
             set
             {
-                if (_sortKeys.SelectedIndex == value)
+                if (_suppressSelectionSync || _sortKeys.SelectedIndex == value)
+                {
+                    return;
+                }
+
+                // ListBox writes -1 when ItemsSource is rebuilt; keep the draft selection.
+                if (value < 0 && _sortKeys.HasItems)
                 {
                     return;
                 }
@@ -330,7 +343,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _NotifyColumnSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -345,7 +357,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _NotifyColumnSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -360,7 +371,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _NotifyColumnSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -371,7 +381,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public void ClearSelectedColumns()
         {
             _columns.Clear();
-            _NotifyColumnSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -400,7 +409,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _NotifySortSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -415,7 +423,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _NotifySortSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -430,7 +437,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _NotifySortSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -458,7 +464,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public void ClearSelectedSortKeys()
         {
             _sortKeys.Clear();
-            _NotifySortSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -539,8 +544,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _NotifyColumnSelectionIndexChanged();
-
             if (refresh)
             {
                 _RefreshLists();
@@ -554,7 +557,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _NotifySortSelectionIndexChanged();
             _RefreshLists();
         }
 
@@ -588,12 +590,23 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 .. _sortKeys.Items.Select((key, index) => new RenameListFieldShuttleSortRow(index, key)),
             ];
 
-            OnPropertyChanged(nameof(AvailableOriginalFields));
-            OnPropertyChanged(nameof(AvailablePreviewFields));
-            OnPropertyChanged(nameof(AvailableSortFields));
-            OnPropertyChanged(nameof(SelectedColumnRows));
-            OnPropertyChanged(nameof(SelectedSortRows));
-            OnPropertyChanged(nameof(CanConfirm));
+            _suppressSelectionSync = true;
+            try
+            {
+                OnPropertyChanged(nameof(AvailableOriginalFields));
+                OnPropertyChanged(nameof(AvailablePreviewFields));
+                OnPropertyChanged(nameof(AvailableSortFields));
+                OnPropertyChanged(nameof(SelectedColumnRows));
+                OnPropertyChanged(nameof(SelectedSortRows));
+                OnPropertyChanged(nameof(CanConfirm));
+            }
+            finally
+            {
+                _suppressSelectionSync = false;
+            }
+
+            _NotifyColumnSelectionIndexChanged();
+            _NotifySortSelectionIndexChanged();
 
             AddSelectedOriginalFieldCommand.NotifyCanExecuteChanged();
             AddSelectedPreviewFieldCommand.NotifyCanExecuteChanged();
