@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views.GridColumnSizing;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -13,7 +14,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <summary>
         /// Hit-test width at header edges; matches Avalonia <c>DataGridColumnHeader</c> resize regions.
         /// </summary>
-        internal const double HeaderResizeHitWidth = 5;
+        internal const double HeaderResizeHitWidth = DataGridColumnAutoFit.HeaderResizeHitWidth;
 
         /// <summary>
         /// Resolves the column to auto-fit when a header resize splitter is double-clicked.
@@ -30,57 +31,20 @@ namespace Mfr.App.Ui.Views.RenameList
             out RenameListFieldKey fieldKey
         )
         {
-            ArgumentNullException.ThrowIfNull(header);
-            ArgumentNullException.ThrowIfNull(grid);
-
             fieldKey = default;
-            if (!grid.CanUserResizeColumns)
+            var column = DataGridColumnAutoFit.TryResolveTargetColumn(header, grid, positionRelativeToHeader);
+            if (column is null)
             {
                 return false;
             }
 
-            var headerFieldKey = RenameListGridColumns.TryResolveFieldKey(header);
-            if (headerFieldKey is null)
+            var key = RenameListGridColumns.GetFieldKey(column);
+            if (key is null)
             {
                 return false;
             }
 
-            var headerColumn = _FindGridColumn(grid, headerFieldKey.Value);
-            if (headerColumn is null)
-            {
-                return false;
-            }
-
-            var headerWidth = header.Bounds.Width;
-            if (headerWidth <= 0)
-            {
-                return false;
-            }
-
-            var distanceFromLeft = positionRelativeToHeader.X;
-            var distanceFromRight = headerWidth - distanceFromLeft;
-            DataGridColumn? targetColumn = null;
-            if (distanceFromRight <= HeaderResizeHitWidth)
-            {
-                targetColumn = headerColumn;
-            }
-            else if (distanceFromLeft <= HeaderResizeHitWidth)
-            {
-                targetColumn = _GetPreviousVisibleColumn(grid, headerColumn);
-            }
-
-            if (targetColumn is null)
-            {
-                return false;
-            }
-
-            var targetFieldKey = RenameListGridColumns.GetFieldKey(targetColumn);
-            if (targetFieldKey is null)
-            {
-                return false;
-            }
-
-            fieldKey = targetFieldKey.Value;
+            fieldKey = key.Value;
             return true;
         }
 
@@ -103,38 +67,6 @@ namespace Mfr.App.Ui.Views.RenameList
             );
 
             return RenameListGridColumnWidths.GetAutoFitWidth(entries, fieldKey, minHeaderWidth);
-        }
-
-        private static DataGridColumn? _FindGridColumn(DataGrid grid, RenameListFieldKey fieldKey)
-        {
-            foreach (var column in grid.Columns)
-            {
-                if (RenameListGridColumns.GetFieldKey(column) == fieldKey)
-                {
-                    return column;
-                }
-            }
-
-            return null;
-        }
-
-        private static DataGridColumn? _GetPreviousVisibleColumn(DataGrid grid, DataGridColumn column)
-        {
-            var targetDisplayIndex = column.DisplayIndex - 1;
-            if (targetDisplayIndex < 0)
-            {
-                return null;
-            }
-
-            foreach (var candidate in grid.Columns)
-            {
-                if (candidate.IsVisible && candidate.DisplayIndex == targetDisplayIndex)
-                {
-                    return candidate;
-                }
-            }
-
-            return null;
         }
     }
 }

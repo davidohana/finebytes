@@ -11,6 +11,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.App.Ui.Views.GridColumnSizing;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.Views.FileList
@@ -77,6 +78,7 @@ namespace Mfr.App.Ui.Views.FileList
                 RoutingStrategies.Tunnel
             );
             ReportGrid.CellPointerPressed += _OnReportCellPointerPressed;
+            DataGridColumnAutoFit.Attach(ReportGrid, _ResolveReportAutoFitWidth);
             _WireListingDrag(ReportGrid);
             _WireListBoxDrag(ListViewList);
             _WireListBoxDrag(SmallIconsList);
@@ -872,6 +874,16 @@ namespace Mfr.App.Ui.Views.FileList
             }
 
             return false;
+        }
+
+        private int? _ResolveReportAutoFitWidth(DataGridColumn column)
+        {
+            if (DataContext is not FileListViewModel viewModel)
+            {
+                return null;
+            }
+
+            return FileListReportColumnAutoFit.ResolveFitWidth(viewModel.Entries, column);
         }
 
         private void _OnReportGridLoaded(object? sender, RoutedEventArgs e)

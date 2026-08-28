@@ -425,7 +425,10 @@ namespace Mfr.Tests.Ui.RenameList
             );
 
             var parentMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Parent Folder", reserveSortGlyph: true);
-            var fullPathMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full File Path", reserveSortGlyph: true);
+            var fullPathMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Full File Path",
+                reserveSortGlyph: true
+            );
             var parentFit = RenameListGridColumnWidths.GetAutoFitWidth([parentEntry], parentFolderKey, parentMin);
             var fullPathFit = RenameListGridColumnWidths.GetAutoFitWidth([fullPathEntry], fullPathKey, fullPathMin);
 
@@ -447,8 +450,7 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var headers = grid
-                .GetVisualDescendants()
+            var headers = grid.GetVisualDescendants()
                 .OfType<DataGridColumnHeader>()
                 .Select(header => (header, key: RenameListGridColumns.TryResolveFieldKey(header)))
                 .Where(item => item.key is not null)

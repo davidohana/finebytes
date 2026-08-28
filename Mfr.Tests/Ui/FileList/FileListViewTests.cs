@@ -11,6 +11,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.Views.FileList;
+using Mfr.App.Ui.Views.GridColumnSizing;
 
 namespace Mfr.Tests.Ui.FileList
 {
@@ -382,6 +383,74 @@ namespace Mfr.Tests.Ui.FileList
             Assert.Equal("beta.md", viewModel.SelectedEntry!.Name);
             Assert.Single(grid.SelectedItems!.Cast<FileListEntry>());
             Assert.Equal("beta.md", grid.SelectedItems.Cast<FileListEntry>().Single().Name);
+        }
+
+        /// <summary>
+        /// Verifies report-view auto-fit widths grow to long file names and stay within the shared cap.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_auto_fit_widens_name_column_to_fit_long_file_name()
+        {
+            const string longName = "a-very-long-sample-file-name-for-report-autofit.txt";
+            var column = new DataGridTemplateColumn { Header = "Name", SortMemberPath = "Name" };
+            var entries = new[]
+            {
+                new FileListEntry
+                {
+                    Name = longName,
+                    FullPath = @"C:\folder\" + longName,
+                    IsDirectory = false,
+                },
+            };
+
+            var fitWidth = FileListReportColumnAutoFit.ResolveFitWidth(entries, column);
+            var minHeaderWidth = GridColumnTextWidths.GetMinimumHeaderWidth("Name");
+
+            Assert.True(fitWidth > minHeaderWidth);
+            Assert.True(fitWidth <= GridColumnTextWidths.MaxAutoFitWidth);
+        }
+
+        /// <summary>
+        /// Verifies report-view header splitter hit-testing targets the column to the left.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_header_splitter_hit_test_targets_column_to_the_left()
+        {
+            var (_, grid, window) = _ShowReportGrid();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var headers = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeader>()
+                .Where(header => header.IsVisible && header.Bounds.Width > 0)
+                .OrderBy(header => header.Bounds.Left)
+                .ToList();
+            Assert.True(headers.Count >= 2);
+
+            var firstHeader = headers[0];
+            var secondHeader = headers[1];
+            Assert.True(firstHeader.Bounds.Width > DataGridColumnAutoFit.HeaderResizeHitWidth);
+            Assert.True(secondHeader.Bounds.Width > DataGridColumnAutoFit.HeaderResizeHitWidth);
+
+            var rightEdgeColumn = DataGridColumnAutoFit.TryResolveTargetColumn(
+                firstHeader,
+                grid,
+                new Point(firstHeader.Bounds.Width - 1, 11)
+            );
+            var leftEdgeColumn = DataGridColumnAutoFit.TryResolveTargetColumn(secondHeader, grid, new Point(1, 11));
+            var centerColumn = DataGridColumnAutoFit.TryResolveTargetColumn(
+                firstHeader,
+                grid,
+                new Point(firstHeader.Bounds.Width / 2, 11)
+            );
+
+            Assert.NotNull(rightEdgeColumn);
+            Assert.Equal("Name", rightEdgeColumn.Header);
+            Assert.NotNull(leftEdgeColumn);
+            Assert.Equal("Name", leftEdgeColumn.Header);
+            Assert.Null(centerColumn);
+
+            window.Close();
         }
 
         /// <summary>

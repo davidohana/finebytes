@@ -185,7 +185,7 @@ namespace Mfr.Tests.Ui.RenameList
                 SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
                     BasicRenameListField.Group,
                     BasicNameField.Key
-                )
+                ),
             };
             dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
             var count = dialogVm.SelectedColumnRows.Count;
