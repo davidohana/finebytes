@@ -319,6 +319,13 @@
                 </Button>
                 <Button
                   Classes="field-shuttle-action"
+                  ToolTip.Tip="Remove all"
+                  Command="{Binding ClearSelectedColumnsCommand}"
+                >
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/Clear.png" />
+                </Button>
+                <Button
+                  Classes="field-shuttle-action"
                   ToolTip.Tip="Move up"
                   Command="{Binding MoveSelectedColumnUpCommand}"
                 >
@@ -410,6 +417,13 @@
                   Command="{Binding RemoveSelectedSortKeyCommand}"
                 >
                   <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/RemoveSelected.png" />
+                </Button>
+                <Button
+                  Classes="field-shuttle-action"
+                  ToolTip.Tip="Remove all"
+                  Command="{Binding ClearSelectedSortKeysCommand}"
+                >
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/Clear.png" />
                 </Button>
                 <Button
                   Classes="field-shuttle-action"

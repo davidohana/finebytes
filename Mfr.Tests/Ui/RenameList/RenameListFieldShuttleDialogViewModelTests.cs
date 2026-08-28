@@ -75,9 +75,11 @@ namespace Mfr.Tests.Ui.RenameList
             dialogVm.RemoveSelectedColumnCommand.Execute(null);
             Assert.DoesNotContain(dialogVm.SelectedColumnRows, row => row.Column.Key == previewKey);
 
+            Assert.True(dialogVm.ClearSelectedColumnsCommand.CanExecute(null));
             dialogVm.ClearSelectedColumnsCommand.Execute(null);
             Assert.Empty(dialogVm.SelectedColumnRows);
             Assert.False(dialogVm.CanConfirm);
+            Assert.False(dialogVm.ClearSelectedColumnsCommand.CanExecute(null));
         }
 
         [Fact]
@@ -134,9 +136,11 @@ namespace Mfr.Tests.Ui.RenameList
             dialogVm.RemoveSelectedSortKeyCommand.Execute(null);
             Assert.Equal(3, dialogVm.SelectedSortRows.Count);
 
+            Assert.True(dialogVm.ClearSelectedSortKeysCommand.CanExecute(null));
             dialogVm.ClearSelectedSortKeysCommand.Execute(null);
             Assert.Empty(dialogVm.SelectedSortRows);
             Assert.True(dialogVm.CanConfirm);
+            Assert.False(dialogVm.ClearSelectedSortKeysCommand.CanExecute(null));
         }
 
         [Fact]
