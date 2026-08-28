@@ -87,8 +87,7 @@ namespace Mfr.App.Ui.Views.RenameList
             else if (key.IsPreview)
             {
                 column.HeaderTemplate = new FuncDataTemplate<object>(
-                    (_, _) =>
-                        RenameListPreviewGlyph.CreateLabelRow(headerText, isPreview: true, usePreviewHeaderStyle: true)
+                    (_, _) => RenameListPreviewGlyph.CreateLabelRow(headerText, isPreview: true)
                 );
             }
 
@@ -138,11 +137,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
 
-            var titleHost = RenameListPreviewGlyph.CreateLabelRow(
-                headerText,
-                isPreview,
-                usePreviewHeaderStyle: isPreview
-            );
+            var titleHost = RenameListPreviewGlyph.CreateLabelRow(headerText, isPreview);
             titleHost[Grid.ColumnProperty] = 0;
             if (titleHost is TextBlock titleTextBlock)
             {

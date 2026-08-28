@@ -189,7 +189,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies preview column headers use the MFR7 red preview style class and preview badge.
+        /// Verifies preview column headers show the preview badge without red header styling.
         /// </summary>
         [AvaloniaFact]
         public async Task Preview_column_header_uses_preview_style_class()
@@ -206,9 +206,9 @@ namespace Mfr.Tests.Ui
             var previewTitle = previewHeader
                 .GetVisualDescendants()
                 .OfType<TextBlock>()
-                .FirstOrDefault(textBlock => textBlock.Classes.Contains("rename-list-preview-header"));
+                .FirstOrDefault(textBlock => textBlock.Text == "Full File Name");
             Assert.NotNull(previewTitle);
-            Assert.Equal("Full File Name", previewTitle.Text);
+            Assert.DoesNotContain("rename-list-preview-header", previewTitle.Classes);
 
             var previewBadge = previewHeader
                 .GetVisualDescendants()

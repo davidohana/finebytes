@@ -91,9 +91,6 @@
       <Setter Property="SeparatorBrush" Value="{DynamicResource FileListSeparatorBrush}" />
       <Setter Property="AreSeparatorsVisible" Value="True" />
     </Style>
-    <Style Selector="TextBlock.rename-list-preview-header">
-      <Setter Property="Foreground" Value="Red" />
-    </Style>
     <Style Selector="Border.rename-list-preview-glyph">
       <Setter Property="Background" Value="{DynamicResource FileListPreviewGlyphBackgroundBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource FileListPreviewGlyphBorderBrush}" />

@@ -42,9 +42,8 @@ namespace Mfr.App.Ui.Views.RenameList
         /// </summary>
         /// <param name="label">Field display name.</param>
         /// <param name="isPreview">When <see langword="true"/>, appends the preview badge.</param>
-        /// <param name="usePreviewHeaderStyle">When <see langword="true"/>, styles the label with the red preview header class.</param>
         /// <returns>Header or list row content.</returns>
-        public static Control CreateLabelRow(string label, bool isPreview, bool usePreviewHeaderStyle = false)
+        public static Control CreateLabelRow(string label, bool isPreview)
         {
             var title = new TextBlock
             {
@@ -52,11 +51,6 @@ namespace Mfr.App.Ui.Views.RenameList
                 VerticalAlignment = VerticalAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis,
             };
-
-            if (usePreviewHeaderStyle)
-            {
-                title.Classes.Add("rename-list-preview-header");
-            }
 
             if (!isPreview)
             {

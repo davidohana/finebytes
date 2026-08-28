@@ -314,22 +314,25 @@
                 </Button>
                 <Button
                   Classes="field-shuttle-action"
-                  Content="X"
                   ToolTip.Tip="Remove selected"
                   Command="{Binding RemoveSelectedColumnCommand}"
-                />
+                >
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/RemoveSelected.png" />
+                </Button>
                 <Button
                   Classes="field-shuttle-action"
-                  Content="↑"
                   ToolTip.Tip="Move up"
                   Command="{Binding MoveSelectedColumnUpCommand}"
-                />
+                >
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/MoveUp.png" />
+                </Button>
                 <Button
                   Classes="field-shuttle-action"
-                  Content="↓"
                   ToolTip.Tip="Move down"
                   Command="{Binding MoveSelectedColumnDownCommand}"
-                />
+                >
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
+                </Button>
               </StackPanel>
               <ListBox
                 Grid.Row="1"
@@ -405,22 +408,25 @@
                 </Button>
                 <Button
                   Classes="field-shuttle-action"
-                  Content="X"
                   ToolTip.Tip="Remove selected"
                   Command="{Binding RemoveSelectedSortKeyCommand}"
-                />
+                >
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/RemoveSelected.png" />
+                </Button>
                 <Button
                   Classes="field-shuttle-action"
-                  Content="↑"
                   ToolTip.Tip="Move up"
                   Command="{Binding MoveSelectedSortKeyUpCommand}"
-                />
+                >
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/MoveUp.png" />
+                </Button>
                 <Button
                   Classes="field-shuttle-action"
-                  Content="↓"
                   ToolTip.Tip="Move down"
                   Command="{Binding MoveSelectedSortKeyDownCommand}"
-                />
+                >
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
+                </Button>
               </StackPanel>
               <ListBox
                 Grid.Row="1"
