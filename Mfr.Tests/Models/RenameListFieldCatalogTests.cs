@@ -534,16 +534,19 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void CompareForSort_orders_field_load_errors_as_display_text()
+        public void CompareForSort_orders_field_load_errors_after_non_error_values()
         {
             var errored = FilterTestHelpers.CreateRenameItem(prefix: "bad", extension: ".mp3");
             errored.SetTagLibMetadataLoadError(new IOException("missing file"));
-            var ok = _ItemWithSemantic(SemanticAudioField.Title, "Alpha");
+            var alphaTitle = _ItemWithSemantic(SemanticAudioField.Title, "Alpha");
+            var zebraTitle = _ItemWithSemantic(SemanticAudioField.Title, "Zebra");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
             Assert.Equal(RenameListMetadataLoadErrors.DisplayText, RenameListFieldCatalog.Resolve(errored, titleKey));
-            Assert.True(RenameListFieldCatalog.CompareForSort(errored, titleKey, ok) > 0);
-            Assert.True(RenameListFieldCatalog.CompareForSort(ok, titleKey, errored) < 0);
+            Assert.True(RenameListFieldCatalog.CompareForSort(errored, titleKey, alphaTitle) > 0);
+            Assert.True(RenameListFieldCatalog.CompareForSort(alphaTitle, titleKey, errored) < 0);
+            Assert.True(RenameListFieldCatalog.CompareForSort(errored, titleKey, zebraTitle) > 0);
+            Assert.True(RenameListFieldCatalog.CompareForSort(zebraTitle, titleKey, errored) < 0);
         }
 
         [Fact]

@@ -580,13 +580,30 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             foreach (var textBlock in row.GetVisualDescendants().OfType<TextBlock>())
             {
-                if (!string.Equals(textBlock.Text, RenameListFieldCatalog.FieldLoadErrorText, StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
-                textBlock.Foreground = RenameListFieldForegroundConverter.ErrorBrush;
+                _WireErrorForeground(textBlock);
+                RenameListFieldForegroundConverter.ApplyFromCellText(textBlock);
             }
+        }
+
+        private void _WireErrorForeground(TextBlock textBlock)
+        {
+            if (textBlock.Classes.Contains("mfr-error-fg"))
+            {
+                return;
+            }
+
+            textBlock.Classes.Add("mfr-error-fg");
+            textBlock.PropertyChanged += _OnCellTextForegroundPropertyChanged;
+        }
+
+        private void _OnCellTextForegroundPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property != TextBlock.TextProperty || sender is not TextBlock textBlock)
+            {
+                return;
+            }
+
+            RenameListFieldForegroundConverter.ApplyFromCellText(textBlock);
         }
 
         private void _ApplyDropMarkVisuals()

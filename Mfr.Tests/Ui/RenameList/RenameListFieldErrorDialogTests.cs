@@ -64,5 +64,20 @@ namespace Mfr.Tests.Ui.RenameList
                 RenameListFieldForegroundConverter.Instance.Convert(null, typeof(Avalonia.Media.IBrush), null, null!)
             );
         }
+
+        /// <summary>
+        /// Verifies recycled cells drop gray when they no longer show Error.
+        /// </summary>
+        [AvaloniaFact]
+        public void ApplyFromCellText_clears_gray_when_text_is_not_Error()
+        {
+            var textBlock = new TextBlock { Text = RenameListFieldCatalog.FieldLoadErrorText };
+            RenameListFieldForegroundConverter.ApplyFromCellText(textBlock);
+            Assert.Same(RenameListFieldForegroundConverter.ErrorBrush, textBlock.Foreground);
+
+            textBlock.Text = "Zero 7";
+            RenameListFieldForegroundConverter.ApplyFromCellText(textBlock);
+            Assert.NotSame(RenameListFieldForegroundConverter.ErrorBrush, textBlock.Foreground);
+        }
     }
 }

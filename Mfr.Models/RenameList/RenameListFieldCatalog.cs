@@ -154,11 +154,17 @@ namespace Mfr.Models.RenameList
                 throw new ArgumentException($"Field '{key.GroupId}/{key.PropertyKey}' is not sortable.", nameof(key));
             }
 
-            var leftText = Resolve(left, key);
-            var rightText = Resolve(right, key);
-            if (RenameListMetadataLoadErrors.HasLoadError(left, key) || RenameListMetadataLoadErrors.HasLoadError(right, key))
+            var leftIsError = RenameListMetadataLoadErrors.HasLoadError(left, key);
+            var rightIsError = RenameListMetadataLoadErrors.HasLoadError(right, key);
+            var errorOrder = RenameListFieldSortCompare.ErrorsLast(leftIsError, rightIsError);
+            if (errorOrder != 0)
             {
-                return RenameListFieldSortCompare.String(leftText, rightText);
+                return errorOrder;
+            }
+
+            if (leftIsError)
+            {
+                return 0;
             }
 
             return GetField(key).CompareForSort(left.Original, right.Original);

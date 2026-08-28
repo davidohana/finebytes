@@ -9,6 +9,22 @@ namespace Mfr.Models.RenameList
     internal static class RenameListFieldSortCompare
     {
         /// <summary>
+        /// Orders load-error cells after non-error cells (ascending). Both errors compare equal.
+        /// </summary>
+        /// <param name="leftIsError">Whether the left cell is a metadata load failure.</param>
+        /// <param name="rightIsError">Whether the right cell is a metadata load failure.</param>
+        /// <returns>Comparison sign, or zero when both are errors or both are not.</returns>
+        internal static int ErrorsLast(bool leftIsError, bool rightIsError)
+        {
+            if (leftIsError == rightIsError)
+            {
+                return 0;
+            }
+
+            return leftIsError ? 1 : -1;
+        }
+
+        /// <summary>
         /// Compares display strings with ordinal case-insensitive ordering.
         /// </summary>
         /// <param name="left">Left value.</param>
