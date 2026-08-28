@@ -65,6 +65,11 @@ namespace Mfr.Models.RenameList
         public RenameListSortColumn? SortColumn { get; } = sortColumn;
 
         /// <summary>
+        /// Gets whether resolving this field may require lazy metadata loaded from disk.
+        /// </summary>
+        public virtual RenameListFieldMetadataLoad MetadataLoad => RenameListFieldMetadataLoad.None;
+
+        /// <summary>
         /// Gets the original (non-preview) field key for this field.
         /// </summary>
         public RenameListFieldKey OriginalKey => RenameListFieldKey.Original(GroupId, PropertyKey);

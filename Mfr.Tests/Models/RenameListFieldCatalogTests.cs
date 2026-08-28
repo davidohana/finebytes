@@ -1,4 +1,9 @@
+using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Image;
+using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Models
@@ -9,9 +14,19 @@ namespace Mfr.Tests.Models
     public sealed class RenameListFieldCatalogTests
     {
         [Fact]
+        public void Catalog_registers_all_phase7a_original_field_groups()
+        {
+            Assert.Equal(66, RenameListFieldCatalog.All.Count);
+            Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(BasicRenameListField.Group).Count);
+            Assert.Equal(6, RenameListFieldCatalog.GetFieldsForGroup(ExtendedRenameListField.Group).Count);
+            Assert.Equal(32, RenameListFieldCatalog.GetFieldsForGroup(AudioTagRenameListField.Group).Count);
+            Assert.Equal(7, RenameListFieldCatalog.GetFieldsForGroup(ImageRenameListField.Group).Count);
+            Assert.Equal(12, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListField.Group).Count);
+        }
+
+        [Fact]
         public void Basic_group_registers_nine_fields_in_catalog_order()
         {
-            Assert.Equal(9, RenameListFieldCatalog.All.Count);
             Assert.Equal(
                 [
                     BasicItemTypeField.Key,
@@ -24,11 +39,15 @@ namespace Mfr.Tests.Models
                     BasicFileNameLengthField.Key,
                     BasicFullPathLengthField.Key,
                 ],
-                [.. RenameListFieldCatalog.All.Select(field => field.PropertyKey)]
+                [
+                    .. RenameListFieldCatalog
+                        .GetFieldsForGroup(BasicRenameListField.Group)
+                        .Select(field => field.PropertyKey),
+                ]
             );
             Assert.Equal(
                 RenameListFieldCatalog.GetFieldsForGroup(BasicRenameListField.Group),
-                RenameListFieldCatalog.All
+                [.. RenameListFieldCatalog.All.Where(field => field.GroupId == BasicRenameListField.Group)]
             );
             Assert.Empty(RenameListFieldCatalog.GetFieldsForGroup("Unknown"));
         }
@@ -227,10 +246,143 @@ namespace Mfr.Tests.Models
             Assert.Equal(expected, RenameListFieldCatalog.Resolve(item, key));
         }
 
+        [Fact]
+        public void Extended_fields_resolve_from_scan_metadata()
+        {
+            var created = new DateTime(2023, 1, 2, 15, 4, 5, DateTimeKind.Unspecified);
+            var item = FilterTestHelpers.CreateRenameItem(
+                creationTime: created,
+                lastWriteTime: created.AddDays(1),
+                lastAccessTime: created.AddDays(2),
+                fileSize: 2048,
+                attributes: FileAttributes.ReadOnly | FileAttributes.Archive
+            );
+
+            _AssertField(item, ExtendedRenameListField.Group, "CreationDate", created.ToString("g"));
+            _AssertField(item, ExtendedRenameListField.Group, "LastWriteDate", created.AddDays(1).ToString("g"));
+            _AssertField(item, ExtendedRenameListField.Group, "LastAccessDate", created.AddDays(2).ToString("g"));
+            _AssertField(item, ExtendedRenameListField.Group, "Size", "2048");
+            _AssertField(item, ExtendedRenameListField.Group, "Attrs", "RA--");
+        }
+
+        [Fact]
+        public void Audio_tag_fields_resolve_semantic_overlay_without_preview()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(configureOriginal: meta =>
+            {
+                meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Mpeg;
+                meta.AudioTagOverlay.ClearAllBlocks();
+                meta.AudioTagOverlay.MergeSemantic(
+                    new SemanticAudioTag(
+                        Title: "Song",
+                        Album: "Album",
+                        Performers: "Alice;Bob",
+                        AlbumArtists: "Band;Guest",
+                        Composers: "Composer A;Composer B",
+                        Genre: "Rock",
+                        Comment: null,
+                        Lyrics: null,
+                        Copyright: null,
+                        Grouping: null,
+                        Year: 2020,
+                        Track: 3,
+                        TrackCount: 10,
+                        Disc: 1,
+                        DiscCount: 2,
+                        BeatsPerMinute: null,
+                        Conductor: null,
+                        MusicBrainzArtistId: null,
+                        MusicBrainzReleaseId: null,
+                        MusicBrainzReleaseArtistId: null,
+                        MusicBrainzTrackId: null,
+                        MusicBrainzDiscId: null,
+                        MusicBrainzReleaseStatus: null,
+                        MusicBrainzReleaseType: null,
+                        MusicBrainzReleaseCountry: null,
+                        MusicIpId: null,
+                        AmazonId: null
+                    )
+                );
+            });
+
+            _AssertField(item, AudioTagRenameListField.Group, "Title", "Song");
+            _AssertField(item, AudioTagRenameListField.Group, "Album", "Album");
+            _AssertField(item, AudioTagRenameListField.Group, "Performers", "Alice; Bob");
+            _AssertField(item, AudioTagRenameListField.Group, "FirstPerformer", "Alice");
+            _AssertField(item, AudioTagRenameListField.Group, "FirstAlbumArtist", "Band");
+            _AssertField(item, AudioTagRenameListField.Group, "Year", "2020");
+            Assert.Contains(
+                "Id3v2",
+                RenameListFieldCatalog.Resolve(
+                    item,
+                    RenameListFieldKey.Original(AudioTagRenameListField.Group, "TagTypes")
+                )
+            );
+
+            Assert.False(RenameListFieldCatalog.GetField(AudioTagRenameListField.Group, "Title").SupportsPreview);
+            Assert.Equal(
+                RenameListFieldMetadataLoad.EmbeddedAudioTags,
+                RenameListFieldCatalog.GetMetadataLoad(RenameListFieldKey.Original(AudioTagRenameListField.Group, "Title"))
+            );
+        }
+
+        [Fact]
+        public void Image_and_jpeg_fields_resolve_cached_metadata()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: ".jpg",
+                configureOriginal: meta =>
+                {
+                    meta.Image = new ImageProperties
+                    {
+                        Format = "JPEG",
+                        Width = 1920,
+                        Height = 1080,
+                        BitDepth = 24,
+                        HorizontalResolutionDpi = 72,
+                        VerticalResolutionDpi = 72,
+                        FrameCount = 1,
+                    };
+                    meta.Exif = new ExifData
+                    {
+                        Make = "Canon",
+                        Model = "EOS",
+                        Title = "Vacation",
+                        DateTaken = new DateTime(2024, 7, 4, 9, 30, 0, DateTimeKind.Unspecified),
+                    };
+                }
+            );
+
+            _AssertField(item, ImageRenameListField.Group, "Format", "JPEG");
+            _AssertField(item, ImageRenameListField.Group, "Width", "1920");
+            _AssertField(item, JpegRenameListField.Group, "ExifDirectory*271", "Canon");
+            _AssertField(item, JpegRenameListField.Group, "ExifDirectory*40091", "Vacation");
+            _AssertField(
+                item,
+                JpegRenameListField.Group,
+                "ExifDirectory*36867",
+                new DateTime(2024, 7, 4, 9, 30, 0, DateTimeKind.Unspecified).ToString("g")
+            );
+
+            Assert.False(RenameListFieldCatalog.GetField(ImageRenameListField.Group, "Width").SupportsPreview);
+            Assert.Equal(
+                RenameListFieldMetadataLoad.ImageProperties,
+                RenameListFieldCatalog.GetCombinedMetadataLoad([
+                    RenameListFieldKey.Original(ImageRenameListField.Group, "Width"),
+                    RenameListFieldKey.Original(JpegRenameListField.Group, "ExifDirectory*271"),
+                ])
+            );
+        }
+
+        private static void _AssertField(RenameItem item, string groupId, string propertyKey, string expected)
+        {
+            var key = RenameListFieldKey.Original(groupId, propertyKey);
+            Assert.Equal(expected, RenameListFieldCatalog.Resolve(item, key));
+        }
+
         private static void _AssertField(RenameItem item, string propertyKey, string expected)
         {
-            var key = RenameListFieldKey.Original(BasicRenameListField.Group, propertyKey);
-            Assert.Equal(expected, RenameListFieldCatalog.Resolve(item, key));
+            _AssertField(item, BasicRenameListField.Group, propertyKey, expected);
         }
     }
 }
