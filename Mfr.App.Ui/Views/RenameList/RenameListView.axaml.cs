@@ -54,6 +54,7 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameGrid.LoadingRow += _OnLoadingRow;
             RenameGrid.AddHandler(KeyDownEvent, _OnGridKeyDown, RoutingStrategies.Tunnel);
             _WireHeaderContextMenu();
+            _WireColumnReorder();
             RenameGrid.AddHandler(PointerMovedEvent, _OnGridPointerMoved, RoutingStrategies.Tunnel);
             RenameGrid.AddHandler(PointerReleasedEvent, _OnGridPointerReleased, RoutingStrategies.Tunnel);
             RenameGrid.AddHandler(PointerCaptureLostEvent, _OnGridPointerCaptureLost, RoutingStrategies.Tunnel);

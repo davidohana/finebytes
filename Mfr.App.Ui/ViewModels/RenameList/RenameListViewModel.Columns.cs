@@ -53,6 +53,48 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Reorders visible columns to match a new left-to-right key sequence.
+        /// </summary>
+        /// <param name="orderedKeys">Field keys in grid order; must match the current visible set.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="orderedKeys"/> is null.</exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="orderedKeys"/> is empty, duplicates a key, or does not match the current visible columns.
+        /// </exception>
+        public void ReorderVisibleColumns(IReadOnlyList<RenameListFieldKey> orderedKeys)
+        {
+            ArgumentNullException.ThrowIfNull(orderedKeys);
+            if (orderedKeys.Count == 0)
+            {
+                throw new ArgumentException("At least one visible column is required.", nameof(orderedKeys));
+            }
+
+            if (orderedKeys.Count != _visibleColumns.Count)
+            {
+                throw new ArgumentException(
+                    "Reordered keys must include every currently visible column.",
+                    nameof(orderedKeys)
+                );
+            }
+
+            var keyToColumn = _visibleColumns.ToDictionary(column => column.Key);
+            if (orderedKeys.Any(key => !keyToColumn.ContainsKey(key)))
+            {
+                throw new ArgumentException(
+                    "Reordered keys must match the currently visible columns.",
+                    nameof(orderedKeys)
+                );
+            }
+
+            if (orderedKeys.SequenceEqual(_visibleColumns.Select(column => column.Key)))
+            {
+                return;
+            }
+
+            _visibleColumns = [.. orderedKeys.Select(key => keyToColumn[key])];
+            OnPropertyChanged(nameof(VisibleColumns));
+        }
+
+        /// <summary>
         /// Removes one visible column by field key.
         /// </summary>
         /// <param name="key">Field key to hide.</param>

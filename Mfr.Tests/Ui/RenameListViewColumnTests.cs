@@ -258,6 +258,60 @@ namespace Mfr.Tests.Ui
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies reordering visible columns moves the star preview width to the new last column.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Reordered_visible_columns_move_star_preview_width()
+        {
+            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key);
+            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(previewKey),
+                new RenameListVisibleColumn(folderKey),
+            ]);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
+            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
+
+            renameListViewModel.ReorderVisibleColumns([folderKey, previewKey]);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
+            Assert.True(grid.Columns[1].Width.IsStar);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies displayed field keys follow grid display index order after reorder.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task GetDisplayedFieldKeys_follows_display_index_order()
+        {
+            var (_, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var firstColumn = grid.Columns[0];
+            var secondColumn = grid.Columns[1];
+            firstColumn.DisplayIndex = 1;
+            secondColumn.DisplayIndex = 0;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var orderedKeys = RenameListGridColumns.GetDisplayedFieldKeys(grid);
+
+            Assert.Equal(RenameListGridColumns.GetFieldKey(secondColumn), orderedKeys[0]);
+            Assert.Equal(RenameListGridColumns.GetFieldKey(firstColumn), orderedKeys[1]);
+
+            window.Close();
+        }
+
         private async Task<(RenameListViewModel ViewModel, Window Window, DataGrid Grid)> _ShowWithRowsAsync(
             int rowCount
         )

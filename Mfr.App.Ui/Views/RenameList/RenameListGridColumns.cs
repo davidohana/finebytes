@@ -44,6 +44,24 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
+        /// Gets visible grid columns' field keys in left-to-right display order.
+        /// </summary>
+        /// <param name="grid">Owning grid.</param>
+        /// <returns>Field keys for columns with a stored key, ordered by display index.</returns>
+        public static IReadOnlyList<RenameListFieldKey> GetDisplayedFieldKeys(DataGrid grid)
+        {
+            ArgumentNullException.ThrowIfNull(grid);
+
+            return
+            [
+                .. grid
+                    .Columns.Where(column => column.IsVisible && GetFieldKey(column) is not null)
+                    .OrderBy(column => column.DisplayIndex)
+                    .Select(column => GetFieldKey(column)!.Value),
+            ];
+        }
+
+        /// <summary>
         /// Resolves the catalog field key for a column header.
         /// </summary>
         /// <param name="grid">Owning grid.</param>

@@ -18,6 +18,27 @@ namespace Mfr.App.Ui.Views.RenameList
         private bool _isRebuildingColumns;
         private bool _columnWidthSyncEnabled;
 
+        private void _WireColumnReorder()
+        {
+            RenameGrid.ColumnReordered += _OnColumnReordered;
+        }
+
+        private void _OnColumnReordered(object? sender, DataGridColumnEventArgs e)
+        {
+            if (_isRebuildingColumns || _viewModel is null)
+            {
+                return;
+            }
+
+            var orderedKeys = RenameListGridColumns.GetDisplayedFieldKeys(RenameGrid);
+            if (orderedKeys.Count == 0)
+            {
+                return;
+            }
+
+            _viewModel.ReorderVisibleColumns(orderedKeys);
+        }
+
         private void _RebuildColumns()
         {
             if (_viewModel is null)
@@ -77,11 +98,12 @@ namespace Mfr.App.Ui.Views.RenameList
 
             RenameListGridColumns.SetFieldKey(column, key);
 
-            column.HeaderTemplate = canUserSort && field.SortColumn is { } sortColumn
-                ? new FuncDataTemplate<object>(
-                    (_, _) => _BuildSortableHeader(_viewModel!, headerText, key.IsPreview, sortColumn, key)
-                )
-                : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key));
+            column.HeaderTemplate =
+                canUserSort && field.SortColumn is { } sortColumn
+                    ? new FuncDataTemplate<object>(
+                        (_, _) => _BuildSortableHeader(_viewModel!, headerText, key.IsPreview, sortColumn, key)
+                    )
+                    : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key));
 
             column.PropertyChanged += (_, args) => _OnGridColumnPropertyChanged(column, args);
             return column;

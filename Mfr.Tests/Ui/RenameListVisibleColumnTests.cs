@@ -125,6 +125,58 @@ namespace Mfr.Tests.Ui
         }
 
         [Fact]
+        public void ReorderVisibleColumns_reorders_keys_and_preserves_widths()
+        {
+            var renameListViewModel = _CreateRenameListViewModel();
+            var firstKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicNameField.Key);
+            var secondKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicExtensionField.Key);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(firstKey, Width: 150),
+                new RenameListVisibleColumn(secondKey, Width: 120),
+            ]);
+
+            renameListViewModel.ReorderVisibleColumns([secondKey, firstKey]);
+
+            Assert.Equal(secondKey, renameListViewModel.VisibleColumns[0].Key);
+            Assert.Equal(120, renameListViewModel.VisibleColumns[0].Width);
+            Assert.Equal(firstKey, renameListViewModel.VisibleColumns[1].Key);
+            Assert.Equal(150, renameListViewModel.VisibleColumns[1].Width);
+        }
+
+        [Fact]
+        public void ReorderVisibleColumns_no_ops_when_order_unchanged()
+        {
+            var renameListViewModel = _CreateRenameListViewModel();
+            var before = renameListViewModel.CaptureVisibleColumns();
+            var propertyChanged = false;
+            renameListViewModel.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName is nameof(RenameListViewModel.VisibleColumns))
+                {
+                    propertyChanged = true;
+                }
+            };
+
+            renameListViewModel.ReorderVisibleColumns([.. before.Select(column => column.Key)]);
+
+            Assert.False(propertyChanged);
+            Assert.Equal(before, renameListViewModel.VisibleColumns);
+        }
+
+        [Fact]
+        public void ReorderVisibleColumns_rejects_unknown_or_mismatched_keys()
+        {
+            var renameListViewModel = _CreateRenameListViewModel();
+            var knownKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicNameField.Key);
+            var unknownKey = RenameListFieldKey.Original("Unknown", "Missing");
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(knownKey)]);
+
+            Assert.Throws<ArgumentException>(() => renameListViewModel.ReorderVisibleColumns([]));
+            Assert.Throws<ArgumentException>(() => renameListViewModel.ReorderVisibleColumns([knownKey, knownKey]));
+            Assert.Throws<ArgumentException>(() => renameListViewModel.ReorderVisibleColumns([unknownKey]));
+        }
+
+        [Fact]
         public void ApplyVisibleColumnsFromSession_null_restores_defaults()
         {
             var renameListViewModel = _CreateRenameListViewModel();
