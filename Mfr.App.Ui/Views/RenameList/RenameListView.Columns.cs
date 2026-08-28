@@ -57,7 +57,8 @@ namespace Mfr.App.Ui.Views.RenameList
             var canUserSort = sortMemberPath is not null;
 
             var catalogWidth = visibleColumn.ResolveCatalogWidth();
-            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(headerText, canUserSort);
+            var reserveSortGlyph = !key.IsPreview;
+            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(headerText, reserveSortGlyph);
             var effectiveWidth =
                 catalogWidth is int catalogPixelWidth ? Math.Max(catalogPixelWidth, minHeaderWidth) : minHeaderWidth;
             var width = _ResolveColumnWidth(visibleColumn, index, columnCount, effectiveWidth);

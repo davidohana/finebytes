@@ -138,19 +138,48 @@ namespace Mfr.Tests.Ui
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var fullPathLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full Path Name Length");
+            var fullPathLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Full Path Name Length",
+                reserveSortGlyph: true
+            );
             var previewFileNameLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 "File Name Length (Preview)"
             );
+            var fullPathLengthHeaderOnly = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full Path Name Length");
 
             Assert.Null(renameListViewModel.VisibleColumns[0].ResolveCatalogWidth());
             Assert.Null(renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
-            Assert.True(fullPathLengthMin > 0);
+            Assert.True(fullPathLengthMin > fullPathLengthHeaderOnly);
             Assert.True(previewFileNameLengthMin > 0);
             Assert.Equal(fullPathLengthMin, grid.Columns[0].Width.Value);
             Assert.Equal(fullPathLengthMin, grid.Columns[0].MinWidth);
             Assert.True(grid.Columns[1].Width.IsStar);
             Assert.Equal(previewFileNameLengthMin, grid.Columns[1].MinWidth);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies original columns reserve sort-glyph space even before engine sort mapping exists.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Original_columns_reserve_sort_glyph_space()
+        {
+            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicExtensionField.Key)
+                ),
+            ]);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var withGlyph = RenameListGridColumnWidths.GetMinimumHeaderWidth("File Extension", reserveSortGlyph: true);
+            var headerOnly = RenameListGridColumnWidths.GetMinimumHeaderWidth("File Extension");
+
+            Assert.True(withGlyph > headerOnly);
+            Assert.Equal(withGlyph, grid.Columns[0].Width.Value);
+            Assert.Equal(withGlyph, grid.Columns[0].MinWidth);
 
             window.Close();
         }

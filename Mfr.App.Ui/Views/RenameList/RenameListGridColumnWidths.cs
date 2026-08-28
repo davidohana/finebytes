@@ -23,7 +23,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// </summary>
         /// <param name="headerText">Grid column header text.</param>
         /// <param name="reserveSortGlyph">
-        /// When <see langword="true"/>, reserves space for the Auto-Sort priority/direction glyph.
+        /// When <see langword="true"/>, reserves space for the Auto-Sort priority/direction glyph on original columns.
         /// </param>
         /// <returns>Minimum column width in pixels.</returns>
         public static int GetMinimumHeaderWidth(string headerText, bool reserveSortGlyph = false)
