@@ -125,5 +125,147 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(2, viewModel.AddedCount);
             Assert.Equal(lastPath, viewModel.LastPath);
         }
+
+        /// <summary>
+        /// Verifies metadata hydrate operations expose total counts and dialog title.
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_MetadataHydrate_Uses_Hydrate_Copy()
+        {
+            var viewModel = new RenameListAddProgressViewModel();
+
+            var completed = await viewModel
+                .RunAsync(
+                    RenameListProgressOperation.MetadataHydrate,
+                    (_, progress) =>
+                        progress.Report(
+                            new RenameListAddProgress(
+                                ScannedCount: 0,
+                                AddedCount: 0,
+                                LastPath: "C:\\a.mp3",
+                                MetadataTotalCount: 10,
+                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                MetadataProcessedCount: 3
+                            )
+                        )
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(completed);
+            Assert.Equal("Reading file metadata", viewModel.DialogTitle);
+            Assert.Equal("Reading metadata: 3 of 10 files", viewModel.MetadataProgressText);
+            Assert.True(viewModel.ShowMetadataProgress);
+            Assert.False(viewModel.ShowResolveProgress);
+        }
+
+        /// <summary>
+        /// Verifies add switches to a metadata stage instead of continuing the scanned counter.
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_Add_Metadata_Phase_Switches_Progress_Copy()
+        {
+            var viewModel = new RenameListAddProgressViewModel();
+
+            var completed = await viewModel
+                .RunAsync(
+                    (_, progress) =>
+                    {
+                        progress.Report(new RenameListAddProgress(100, 50, "C:\\done.mp3"));
+                        progress.Report(
+                            new RenameListAddProgress(
+                                ScannedCount: 100,
+                                AddedCount: 50,
+                                LastPath: "C:\\a.mp3",
+                                MetadataTotalCount: 50,
+                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                MetadataProcessedCount: 1
+                            )
+                        );
+                    }
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(completed);
+            Assert.Equal(RenameListAddProgressPhase.LoadMetadata, viewModel.Phase);
+            Assert.Equal("Reading file metadata", viewModel.DialogTitle);
+            Assert.Equal("Scanned 100 files", viewModel.PrimaryProgressText);
+            Assert.Equal("Reading metadata: 1 of 50 files", viewModel.MetadataProgressText);
+            Assert.Equal(50, viewModel.AddedCount);
+            Assert.True(viewModel.ShowResolveProgress);
+            Assert.True(viewModel.ShowMetadataProgress);
+            Assert.Equal("Added 50 files", viewModel.SecondaryProgressText);
+        }
+
+        /// <summary>
+        /// Verifies resolve totals on the first metadata report apply when resolve finished without UI updates.
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_Add_Metadata_Phase_Applies_Resolve_Totals_Without_Prior_Resolve_Report()
+        {
+            var viewModel = new RenameListAddProgressViewModel();
+
+            var completed = await viewModel
+                .RunAsync(
+                    (_, progress) =>
+                        progress.Report(
+                            new RenameListAddProgress(
+                                ScannedCount: 100,
+                                AddedCount: 50,
+                                LastPath: "C:\\a.mp3",
+                                MetadataTotalCount: 50,
+                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                MetadataProcessedCount: 1
+                            )
+                        )
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(completed);
+            Assert.Equal(RenameListAddProgressPhase.LoadMetadata, viewModel.Phase);
+            Assert.Equal("Scanned 100 files", viewModel.PrimaryProgressText);
+            Assert.Equal("Added 50 files", viewModel.SecondaryProgressText);
+            Assert.Equal("Reading metadata: 1 of 50 files", viewModel.MetadataProgressText);
+        }
+
+        /// <summary>
+        /// Verifies metadata processed count updates refresh the metadata progress line.
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_Metadata_Progress_Updates_MetadataProgressText()
+        {
+            var viewModel = new RenameListAddProgressViewModel();
+
+            var completed = await viewModel
+                .RunAsync(
+                    RenameListProgressOperation.MetadataHydrate,
+                    (_, progress) =>
+                    {
+                        progress.Report(
+                            new RenameListAddProgress(
+                                ScannedCount: 0,
+                                AddedCount: 0,
+                                LastPath: "C:\\a.mp3",
+                                MetadataTotalCount: 10,
+                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                MetadataProcessedCount: 1
+                            )
+                        );
+                        progress.Report(
+                            new RenameListAddProgress(
+                                ScannedCount: 0,
+                                AddedCount: 0,
+                                LastPath: "C:\\e.mp3",
+                                MetadataTotalCount: 10,
+                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                MetadataProcessedCount: 5
+                            )
+                        );
+                    }
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(completed);
+            Assert.Equal("Reading metadata: 5 of 10 files", viewModel.MetadataProgressText);
+        }
     }
 }

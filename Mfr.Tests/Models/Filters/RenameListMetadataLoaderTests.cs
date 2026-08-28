@@ -7,9 +7,9 @@ using Mfr.Models.RenameList.Fields.Mpeg;
 namespace Mfr.Tests.Models.Filters
 {
     /// <summary>
-    /// Tests for <see cref="RenameListLazyMetadataLoader"/>.
+    /// Tests for <see cref="RenameListMetadataLoader"/>.
     /// </summary>
-    public sealed class RenameListLazyMetadataLoaderTests
+    public sealed class RenameListMetadataLoaderTests
     {
         [Fact]
         public void Directory_rows_skip_disk_loads()
@@ -19,9 +19,9 @@ namespace Mfr.Tests.Models.Filters
             var imageKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
             var mediaKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType");
 
-            RenameListLazyMetadataLoader.TryEnsureLoaded(item, audioKey);
-            RenameListLazyMetadataLoader.TryEnsureLoaded(item, imageKey);
-            RenameListLazyMetadataLoader.TryEnsureLoaded(item, mediaKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, audioKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, imageKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, mediaKey);
 
             Assert.False(item.EmbeddedTagsLoadAttempted);
             Assert.False(item.ImagePropertiesLoadAttempted);
@@ -36,9 +36,9 @@ namespace Mfr.Tests.Models.Filters
             var imageKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
             var mediaKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType");
 
-            RenameListLazyMetadataLoader.TryEnsureLoaded(item, audioKey);
-            RenameListLazyMetadataLoader.TryEnsureLoaded(item, imageKey);
-            RenameListLazyMetadataLoader.TryEnsureLoaded(item, mediaKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, audioKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, imageKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, mediaKey);
 
             Assert.True(item.EmbeddedTagsLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
@@ -61,13 +61,13 @@ namespace Mfr.Tests.Models.Filters
                 var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
                 Assert.False(item.EmbeddedTagsLoadAttempted);
-                RenameListLazyMetadataLoader.TryEnsureLoaded(item, titleKey);
+                RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
 
                 Assert.True(item.EmbeddedTagsLoadAttempted);
                 Assert.Equal("DiskTitle", RenameListFieldCatalog.Resolve(item, titleKey));
 
                 item.Original.AudioTagOverlay.ClearAllBlocks();
-                RenameListLazyMetadataLoader.TryEnsureLoaded(item, titleKey);
+                RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
                 Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, titleKey));
             }
             finally
@@ -83,7 +83,7 @@ namespace Mfr.Tests.Models.Filters
             var makeKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
 
             Assert.False(item.ImagePropertiesLoadAttempted);
-            RenameListLazyMetadataLoader.TryEnsureLoaded(item, makeKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, makeKey);
 
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.Equal("Canon", RenameListFieldCatalog.Resolve(item, makeKey));
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Models.Filters
 
                 Assert.False(item.MediaPropertiesLoadAttempted);
                 Assert.False(item.EmbeddedTagsLoadAttempted);
-                RenameListLazyMetadataLoader.TryEnsureLoaded(item, layerKey);
+                RenameListMetadataLoader.TryEnsureLoaded(item, layerKey);
 
                 Assert.True(item.MediaPropertiesLoadAttempted);
                 Assert.True(item.EmbeddedTagsLoadAttempted);
@@ -125,10 +125,48 @@ namespace Mfr.Tests.Models.Filters
             var item = _UnmarkedFixtureItem("tiny.jpeg");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
-            RenameListLazyMetadataLoader.TryEnsureLoaded(item, titleKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
 
             Assert.True(item.EmbeddedTagsLoadAttempted);
             Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, titleKey));
+        }
+
+        [Fact]
+        public void IsRequirementSatisfied_false_until_load_attempted()
+        {
+            var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
+            var requirement = RenameListMetadataRequirement.EmbeddedAudioTags;
+
+            Assert.False(RenameListMetadataLoader.IsRequirementSatisfied(item, requirement));
+
+            RenameListMetadataLoader.TryEnsureLoaded(item, requirement);
+
+            Assert.True(RenameListMetadataLoader.IsRequirementSatisfied(item, requirement));
+        }
+
+        [Fact]
+        public void AnyItemNeedsLoad_false_when_all_rows_satisfied()
+        {
+            var item = FilterTestHelpers.CreateRenameItem();
+            item.MarkEmbeddedTagsLoadAttempted();
+            var requirement = RenameListMetadataRequirement.EmbeddedAudioTags;
+
+            Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
+        }
+
+        [Fact]
+        public void Combined_requirement_loads_each_flagged_bucket()
+        {
+            var item = _UnmarkedFixtureItem("tiny-exif.jpeg");
+            var requirement =
+                RenameListMetadataRequirement.EmbeddedAudioTags | RenameListMetadataRequirement.ImageProperties;
+
+            Assert.True(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
+            RenameListMetadataLoader.TryEnsureLoaded(item, requirement);
+
+            Assert.True(item.EmbeddedTagsLoadAttempted);
+            Assert.True(item.ImagePropertiesLoadAttempted);
+            Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
         }
 
         private static RenameItem _UnmarkedFixtureItem(string fileName)

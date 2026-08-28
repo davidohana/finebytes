@@ -104,8 +104,9 @@ namespace Mfr.App.Ui.Views.RenameList
                     return;
                 }
 
-                _viewModel.SetVisibleColumns(dialogVm.ResultColumns);
-                _viewModel.SetSortKeys(dialogVm.ResultSortKeys);
+                await _viewModel
+                    .ApplyFieldShuttleAsync(dialogVm.ResultColumns, dialogVm.ResultSortKeys)
+                    .ConfigureAwait(true);
             }
             finally
             {

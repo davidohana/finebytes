@@ -4,12 +4,17 @@ using Mfr.Utils;
 namespace Mfr.Filters
 {
     /// <summary>
-    /// Lazy-loads rename-row metadata for Rename List grid columns (original-only Phase 7a fields).
+    /// Loads rename-row metadata buckets for the Rename List grid and Auto-Sort.
     /// </summary>
-    public static class RenameListLazyMetadataLoader
+    /// <remarks>
+    /// <para>
+    /// Grid and Auto-Sort hydrate via <c>RenameList.EnsureMetadataLoaded</c>. Filters still call per-field ensure on preview.
+    /// </para>
+    /// </remarks>
+    public static class RenameListMetadataLoader
     {
         /// <summary>
-        /// Ensures lazy rename-row metadata is loaded for each requirement in <paramref name="metadataRequirement"/>.
+        /// Ensures rename-row metadata is loaded for each requirement in <paramref name="metadataRequirement"/>.
         /// </summary>
         /// <param name="item">Rename row to load.</param>
         /// <param name="metadataRequirement">Combined metadata requirements for visible columns.</param>
@@ -34,14 +39,64 @@ namespace Mfr.Filters
         }
 
         /// <summary>
-        /// Ensures embedded audio tags are loaded for one field key.
+        /// Ensures metadata is loaded for one field key.
         /// </summary>
-        /// <param name="item">Rename row to hydrate.</param>
+        /// <param name="item">Rename row to load.</param>
         /// <param name="key">Catalog field key being resolved.</param>
         public static void TryEnsureLoaded(RenameItem item, RenameListFieldKey key)
         {
             ArgumentNullException.ThrowIfNull(item);
             TryEnsureLoaded(item, RenameListFieldCatalog.GetMetadataRequirement(key));
+        }
+
+        /// <summary>
+        /// Returns whether <paramref name="item"/> already attempted every load required by <paramref name="requirement"/>.
+        /// </summary>
+        /// <param name="item">Rename row to inspect.</param>
+        /// <param name="requirement">Combined metadata requirement flags.</param>
+        /// <returns><see langword="true"/> when no further disk reads are needed for the requirement.</returns>
+        public static bool IsRequirementSatisfied(RenameItem item, RenameListMetadataRequirement requirement)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            if (requirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags) && !item.EmbeddedTagsLoadAttempted)
+            {
+                return false;
+            }
+
+            if (
+                requirement.HasFlag(RenameListMetadataRequirement.MediaProperties) && !item.MediaPropertiesLoadAttempted
+            )
+            {
+                return false;
+            }
+
+            if (
+                requirement.HasFlag(RenameListMetadataRequirement.ImageProperties) && !item.ImagePropertiesLoadAttempted
+            )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns whether any row still needs disk reads for <paramref name="requirement"/>.
+        /// </summary>
+        /// <param name="items">Rename rows to inspect.</param>
+        /// <param name="requirement">Combined metadata requirement flags.</param>
+        /// <returns><see langword="true"/> when at least one row still needs loading.</returns>
+        public static bool AnyItemNeedsLoad(IEnumerable<RenameItem> items, RenameListMetadataRequirement requirement)
+        {
+            ArgumentNullException.ThrowIfNull(items);
+
+            if (requirement == RenameListMetadataRequirement.None)
+            {
+                return false;
+            }
+
+            return items.Any(item => !IsRequirementSatisfied(item, requirement));
         }
 
         private static void _TryEnsureEmbeddedTagsLoaded(RenameItem item)

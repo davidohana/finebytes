@@ -75,6 +75,10 @@ cache is filled only when that load flag is not already set, so seeded unit-test
 overwritten. Commit Apply / strip still opens again to write. Filters do not reopen the file
 mid-chain.
 
+The Rename List grid **eager-loads** metadata buckets for the union of visible columns and
+Auto-Sort keys (background hydrate on shuttle apply, header sort, and add). Formatter preview
+tokens still lazy-load on first use in the filter chain.
+
 Each block type owns one `*TagFields` class under `Mfr.Metadata/TagFields/` exposing `Read(file)` and
 `Apply(file, original, preview)`, so its modeled keys, read rules, and patch rules sit together.
 `AudioTagPersistence` only decides which blocks to visit; `TagFieldDiff` holds the shared key-diff loop.

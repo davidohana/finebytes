@@ -76,6 +76,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var ui = ConfigStore.Config.Ui;
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
+            var metadataRequirement = _CurrentMetadataRequirement();
             var addSummary = new RenameListAddSummary(0);
             var completed = false;
             try
@@ -91,7 +92,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                                 excludeMasks: excludeMasks,
                                 cancellationToken: token,
                                 progress: progress,
-                                insertAtIndex: insertAt
+                                insertAtIndex: insertAt,
+                                metadataRequirement: metadataRequirement
                             )
                     )
                     .ConfigureAwait(true);

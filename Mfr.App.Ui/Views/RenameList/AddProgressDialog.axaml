@@ -4,12 +4,12 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
   x:Class="Mfr.App.Ui.Views.RenameList.AddProgressDialog"
   x:DataType="vm:RenameListAddProgressViewModel"
-  Title="Adding to Rename List"
+  Title="{Binding DialogTitle}"
   Icon="/Assets/mfr.ico"
   Width="560"
-  Height="210"
+  Height="230"
   MinWidth="520"
-  MinHeight="190"
+  MinHeight="210"
   WindowStartupLocation="CenterOwner"
   CanResize="False"
   ShowInTaskbar="False"
@@ -28,8 +28,21 @@
     />
 
     <StackPanel Spacing="12" VerticalAlignment="Center">
-      <TextBlock HorizontalAlignment="Center" Text="{Binding ScannedCount, StringFormat=Scanned {0} files}" />
-      <TextBlock HorizontalAlignment="Center" Text="{Binding AddedCount, StringFormat=Added {0} files}" />
+      <TextBlock
+        HorizontalAlignment="Center"
+        IsVisible="{Binding ShowResolveProgress}"
+        Text="{Binding PrimaryProgressText}"
+      />
+      <TextBlock
+        HorizontalAlignment="Center"
+        IsVisible="{Binding ShowResolveProgress}"
+        Text="{Binding SecondaryProgressText}"
+      />
+      <TextBlock
+        HorizontalAlignment="Center"
+        IsVisible="{Binding ShowMetadataProgress}"
+        Text="{Binding MetadataProgressText}"
+      />
       <TextBlock
         HorizontalAlignment="Stretch"
         TextWrapping="Wrap"

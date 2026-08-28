@@ -172,7 +172,7 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Returns the lazy metadata requirement for one field key.
+        /// Returns the disk metadata requirement for one field key.
         /// </summary>
         /// <param name="key">Field key.</param>
         /// <returns>Metadata requirement for the registered field, or <see cref="RenameListMetadataRequirement.None"/>.</returns>
@@ -182,7 +182,7 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Combines lazy metadata requirements for a set of field keys.
+        /// Combines disk metadata requirements for a set of field keys.
         /// </summary>
         /// <param name="keys">Field keys.</param>
         /// <returns>Combined requirement flags.</returns>

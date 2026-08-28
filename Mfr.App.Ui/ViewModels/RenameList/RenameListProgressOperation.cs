@@ -1,0 +1,18 @@
+namespace Mfr.App.Ui.ViewModels.RenameList
+{
+    /// <summary>
+    /// Background Rename List operation shown in the progress dialog.
+    /// </summary>
+    public enum RenameListProgressOperation
+    {
+        /// <summary>
+        /// Resolving and appending rename sources.
+        /// </summary>
+        Add,
+
+        /// <summary>
+        /// Reading metadata for visible columns or Auto-Sort keys.
+        /// </summary>
+        MetadataHydrate,
+    }
+}

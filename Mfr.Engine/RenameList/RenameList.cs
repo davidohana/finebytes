@@ -49,9 +49,12 @@ namespace Mfr.Engine.RenameList
         /// <param name="includeSubdirs">Whether directory expansion should recurse into subdirectories.</param>
         /// <param name="excludeMasks">Exclusive file-name masks for discovered directory entries.</param>
         /// <param name="cancellationToken">When canceled, stops resolution and returns without throwing.</param>
-        /// <param name="progress">Optional progress sink (scanned / added / last path).</param>
+        /// <param name="progress">Optional progress sink (resolve counts, metadata counts, last path).</param>
         /// <param name="insertAtIndex">
         /// 0-based index to insert new items; <see langword="null"/> appends at the end.
+        /// </param>
+        /// <param name="metadataRequirement">
+        /// Metadata buckets to hydrate on the staging batch before insert; default is none (CLI / filter preview stay lazy).
         /// </param>
         /// <returns>Summary of sources that were skipped during resolution.</returns>
         /// <remarks>
@@ -71,7 +74,8 @@ namespace Mfr.Engine.RenameList
             IReadOnlyList<string>? excludeMasks = null,
             CancellationToken cancellationToken = default,
             IProgress<RenameListAddProgress>? progress = null,
-            int? insertAtIndex = null
+            int? insertAtIndex = null,
+            RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None
         )
         {
             var sourceList = sources.ToList();
@@ -120,8 +124,16 @@ namespace Mfr.Engine.RenameList
                 }
                 else if (batch.Count > 0)
                 {
-                    _renameItems.InsertRange(insertAt, batch);
-                    _ReindexItems();
+                    _EnsureMetadataLoaded(batch, metadataRequirement, tracker);
+                    if (tracker.IsCanceled)
+                    {
+                        _DiscardCollectedItems(batch);
+                    }
+                    else
+                    {
+                        _renameItems.InsertRange(insertAt, batch);
+                        _ReindexItems();
+                    }
                 }
             }
             catch
@@ -237,6 +249,33 @@ namespace Mfr.Engine.RenameList
             foreach (var item in batch)
             {
                 _includedResolvedPaths.Remove(_NormalizePathKey(item.Original.FullPath));
+            }
+        }
+
+        /// <summary>
+        /// Hydrates metadata on a staging or live item list before grid display or sort.
+        /// </summary>
+        private static void _EnsureMetadataLoaded(
+            List<RenameItem> items,
+            RenameListMetadataRequirement requirement,
+            AddProgressTracker tracker
+        )
+        {
+            if (requirement == RenameListMetadataRequirement.None || items.Count == 0)
+            {
+                return;
+            }
+
+            tracker.BeginMetadataPhase(items.Count);
+            foreach (var item in items)
+            {
+                if (tracker.IsCanceled)
+                {
+                    break;
+                }
+
+                RenameListMetadataLoader.TryEnsureLoaded(item, requirement);
+                tracker.OnMetadataProcessed(item.Original.FullPath);
             }
         }
 
@@ -432,6 +471,28 @@ namespace Mfr.Engine.RenameList
             return true;
         }
 
+        /// <summary>
+        /// Ensures rename-row metadata buckets are loaded for every item in the list.
+        /// </summary>
+        /// <param name="requirement">Combined metadata requirement flags; <see cref="RenameListMetadataRequirement.None"/> is a no-op.</param>
+        /// <param name="cancellationToken">When canceled, stops without throwing.</param>
+        /// <param name="progress">Optional progress sink (metadata processed count, total, last path).</param>
+        public void EnsureMetadataLoaded(
+            RenameListMetadataRequirement requirement,
+            CancellationToken cancellationToken = default,
+            IProgress<RenameListAddProgress>? progress = null
+        )
+        {
+            if (requirement == RenameListMetadataRequirement.None || _renameItems.Count == 0)
+            {
+                return;
+            }
+
+            var tracker = new AddProgressTracker(progress, cancellationToken);
+            _EnsureMetadataLoaded(_renameItems, requirement, tracker);
+            tracker.ReportFinal();
+        }
+
         private static int _CompareItems(RenameItem left, RenameItem right, IReadOnlyList<RenameListSortKey> keys)
         {
             foreach (var key in keys)
@@ -440,9 +501,6 @@ namespace Mfr.Engine.RenameList
                 {
                     continue;
                 }
-
-                RenameListLazyMetadataLoader.TryEnsureLoaded(left, key.FieldKey);
-                RenameListLazyMetadataLoader.TryEnsureLoaded(right, key.FieldKey);
 
                 var cmp = RenameListFieldCatalog.CompareForSort(left, key.FieldKey, right);
                 if (key.Descending)

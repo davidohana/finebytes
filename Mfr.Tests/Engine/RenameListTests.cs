@@ -1,5 +1,6 @@
 using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
+using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.Tags;
@@ -970,6 +971,8 @@ namespace Mfr.Tests.Engine
             var last = reports[^1];
             Assert.True(last.ScannedCount >= 3);
             Assert.Equal(3, last.AddedCount);
+            Assert.Equal(RenameListAddProgressPhase.ResolveSources, last.Phase);
+            Assert.Equal(0, last.MetadataProcessedCount);
             Assert.False(string.IsNullOrWhiteSpace(last.LastPath));
         }
 
@@ -1272,6 +1275,173 @@ namespace Mfr.Tests.Engine
             {
                 _AllowDirectoryTraverse(deniedFolder);
             }
+        }
+
+        /// <summary>
+        /// Verifies EnsureMetadataLoaded reads embedded tags for grid display.
+        /// </summary>
+        [Fact]
+        public void EnsureMetadataLoaded_Loads_Embedded_Audio_Tags()
+        {
+            var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "HydrateTitle", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+            var item = Assert.Single(renameList.RenameItems);
+            Assert.False(item.EmbeddedTagsLoadAttempted);
+
+            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.EmbeddedAudioTags);
+
+            Assert.True(item.EmbeddedTagsLoadAttempted);
+            Assert.Equal("HydrateTitle", item.Original.AudioTagOverlay.Semantic().Title);
+        }
+
+        /// <summary>
+        /// Verifies EnsureMetadataLoaded with no requirement does not open files.
+        /// </summary>
+        [Fact]
+        public void EnsureMetadataLoaded_None_Does_Not_Load()
+        {
+            var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "SkipTitle", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.None);
+
+            var item = Assert.Single(renameList.RenameItems);
+            Assert.False(item.EmbeddedTagsLoadAttempted);
+        }
+
+        /// <summary>
+        /// Verifies hydrate then sort orders rows by embedded title without the comparer opening files.
+        /// </summary>
+        [Fact]
+        public void EnsureMetadataLoaded_Then_Sort_By_Title_Orders_Items()
+        {
+            var betaPath = Path.Combine(_tempRoot, $"beta_{Guid.NewGuid():N}.wav");
+            var alphaPath = Path.Combine(_tempRoot, $"alpha_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(betaPath, title: "Beta", album: null);
+            TaggedMinimalWav.WriteTagged(alphaPath, title: "Alpha", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([betaPath, alphaPath]);
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.EmbeddedAudioTags);
+
+            Assert.True(renameList.Sort([new RenameListSortKey(titleKey)]));
+            Assert.Equal(alphaPath, renameList.RenameItems[0].Original.FullPath);
+            Assert.Equal(betaPath, renameList.RenameItems[1].Original.FullPath);
+        }
+
+        /// <summary>
+        /// Verifies add with a metadata requirement reports a distinct hydrate phase that keeps resolve counts.
+        /// </summary>
+        [Fact]
+        public void AddSources_With_MetadataRequirement_Reports_LoadMetadata_Phase()
+        {
+            var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "ProgressTitle", album: null);
+
+            var reports = new List<RenameListAddProgress>();
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources(
+                [path],
+                metadataRequirement: RenameListMetadataRequirement.EmbeddedAudioTags,
+                progress: new SynchronousProgress<RenameListAddProgress>(reports.Add)
+            );
+
+            Assert.NotEmpty(reports);
+            var last = reports[^1];
+            Assert.Equal(RenameListAddProgressPhase.LoadMetadata, last.Phase);
+            Assert.Equal(1, last.AddedCount);
+            Assert.True(last.ScannedCount >= 1);
+            Assert.Equal(1, last.MetadataProcessedCount);
+            Assert.Equal(1, last.MetadataTotalCount);
+        }
+
+        /// <summary>
+        /// Verifies canceling during metadata hydrate discards the staging batch.
+        /// </summary>
+        [Fact]
+        public void AddSources_Cancel_During_Metadata_Discards_Batch()
+        {
+            var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "CancelTitle", album: null);
+
+            using var cts = new CancellationTokenSource();
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources(
+                [path],
+                metadataRequirement: RenameListMetadataRequirement.EmbeddedAudioTags,
+                cancellationToken: cts.Token,
+                progress: new SynchronousProgress<RenameListAddProgress>(report =>
+                {
+                    if (report.Phase == RenameListAddProgressPhase.LoadMetadata)
+                    {
+                        cts.Cancel();
+                    }
+                })
+            );
+
+            Assert.Empty(renameList.RenameItems);
+        }
+
+        /// <summary>
+        /// Verifies Sort does not open files; metadata must be hydrated first.
+        /// </summary>
+        [Fact]
+        public void Sort_By_Title_Does_Not_Load_Embedded_Tags()
+        {
+            var alphaPath = Path.Combine(_tempRoot, $"alpha_{Guid.NewGuid():N}.wav");
+            var betaPath = Path.Combine(_tempRoot, $"beta_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(alphaPath, title: "Beta", album: null);
+            TaggedMinimalWav.WriteTagged(betaPath, title: "Alpha", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath]);
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+
+            renameList.Sort([new RenameListSortKey(titleKey)]);
+
+            Assert.All(renameList.RenameItems, item => Assert.False(item.EmbeddedTagsLoadAttempted));
+        }
+
+        /// <summary>
+        /// Verifies AddSources hydrates a staging batch when a metadata requirement is supplied.
+        /// </summary>
+        [Fact]
+        public void AddSources_With_MetadataRequirement_Hydrates_Batch_Before_Insert()
+        {
+            var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "BatchTitle", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path], metadataRequirement: RenameListMetadataRequirement.EmbeddedAudioTags);
+
+            var item = Assert.Single(renameList.RenameItems);
+            Assert.True(item.EmbeddedTagsLoadAttempted);
+            Assert.Equal("BatchTitle", item.Original.AudioTagOverlay.Semantic().Title);
+        }
+
+        /// <summary>
+        /// Verifies EnsureMetadataLoaded honors cancel without throwing or loading.
+        /// </summary>
+        [Fact]
+        public void EnsureMetadataLoaded_Cancel_Stops_Without_Throwing()
+        {
+            var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "CancelTitle", album: null);
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.EmbeddedAudioTags, cts.Token);
+
+            Assert.False(Assert.Single(renameList.RenameItems).EmbeddedTagsLoadAttempted);
         }
 
         [System.Runtime.Versioning.SupportedOSPlatform("windows")]

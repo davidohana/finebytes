@@ -1,7 +1,7 @@
 namespace Mfr.Models.RenameList
 {
     /// <summary>
-    /// Lazy metadata requirements before resolving some Rename List catalog fields.
+    /// Disk metadata buckets required before resolving some Rename List catalog fields.
     /// </summary>
     [Flags]
     public enum RenameListMetadataRequirement
