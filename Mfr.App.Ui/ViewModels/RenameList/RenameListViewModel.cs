@@ -76,12 +76,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<RenameListSortKey> SortKeys => _sortKeys;
 
         /// <summary>
-        /// Gets indexed rows for the sort editor flyout.
-        /// </summary>
-        public IReadOnlyList<RenameListSortEditorRow> SortEditorRows =>
-            [.. _sortKeys.Select((key, index) => new RenameListSortEditorRow(index, key))];
-
-        /// <summary>
         /// Gets whether another sort field can be added in the editor.
         /// </summary>
         public bool CanAddSortKey => _sortKeys.Count < RenameListSortDisplay.EditorColumns.Count;

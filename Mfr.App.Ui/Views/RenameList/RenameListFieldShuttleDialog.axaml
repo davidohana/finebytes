@@ -1,0 +1,447 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
+  xmlns:models="using:Mfr.Models.RenameList"
+  mc:Ignorable="d"
+  d:DesignWidth="560"
+  d:DesignHeight="440"
+  x:Class="Mfr.App.Ui.Views.RenameList.RenameListFieldShuttleDialog"
+  x:DataType="vm:RenameListFieldShuttleDialogViewModel"
+  Title="Rename List Fields"
+  Icon="/Assets/mfr.ico"
+  Width="560"
+  Height="440"
+  MinWidth="520"
+  MinHeight="400"
+  WindowStartupLocation="CenterOwner"
+  CanResize="True"
+  ShowInTaskbar="False"
+>
+  <Window.Styles>
+    <Style Selector="Border.field-shuttle-panel">
+      <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding" Value="12" />
+    </Style>
+    <Style Selector="TextBlock.field-shuttle-label">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+    <Style Selector="TextBlock.field-shuttle-hint">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Margin" Value="0,0,0,10" />
+    </Style>
+    <Style Selector="ComboBox.field-shuttle-group">
+      <Setter Property="MinHeight" Value="26" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Margin" Value="0,0,0,10" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="TabControl.field-shuttle-tabs">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+    </Style>
+    <Style Selector="RadioButton.field-shuttle-subtab">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Padding" Value="4,0,0,0" />
+      <Setter Property="Margin" Value="0,0,12,0" />
+      <Setter Property="MinHeight" Value="18" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="RadioButton.field-shuttle-subtab /template/ Ellipse#OuterEllipse">
+      <Setter Property="Width" Value="12" />
+      <Setter Property="Height" Value="12" />
+    </Style>
+    <Style Selector="RadioButton.field-shuttle-subtab /template/ Ellipse#CheckOuterEllipse">
+      <Setter Property="Width" Value="12" />
+      <Setter Property="Height" Value="12" />
+    </Style>
+    <Style Selector="RadioButton.field-shuttle-subtab /template/ Ellipse#CheckGlyph">
+      <Setter Property="Width" Value="5" />
+      <Setter Property="Height" Value="5" />
+    </Style>
+    <Style Selector="RadioButton.field-shuttle-subtab /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Margin" Value="4,0,0,0" />
+    </Style>
+    <Style Selector="ListBox.field-shuttle-list">
+      <Setter Property="MinHeight" Value="180" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="ListBox.field-shuttle-list ListBoxItem">
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="MinHeight" Value="22" />
+    </Style>
+    <Style Selector="Button.field-shuttle-action">
+      <Setter Property="Width" Value="36" />
+      <Setter Property="Height" Value="26" />
+      <Setter Property="MinWidth" Value="36" />
+      <Setter Property="MinHeight" Value="26" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.field-shuttle-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.field-shuttle-action:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+    <Style Selector="Button.field-shuttle-footer">
+      <Setter Property="MinHeight" Value="28" />
+      <Setter Property="MinWidth" Value="88" />
+      <Setter Property="Padding" Value="12,4" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.field-shuttle-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.field-shuttle-footer:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+    <Style Selector="Button.field-shuttle-footer-primary">
+      <Setter Property="MinHeight" Value="28" />
+      <Setter Property="MinWidth" Value="88" />
+      <Setter Property="Padding" Value="12,4" />
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.field-shuttle-footer-primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="Button.field-shuttle-footer-primary:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+    <Style Selector="Border.field-shuttle-priority">
+      <Setter Property="Background" Value="{DynamicResource FileListSortGlyphBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSortGlyphBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="MinWidth" Value="22" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.field-shuttle-priority TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListSortGlyphForegroundBrush}" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.field-shuttle-direction">
+      <Setter Property="MinWidth" Value="28" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="6,0" />
+      <Setter Property="Margin" Value="4,0,0,0" />
+      <Setter Property="Background" Value="{DynamicResource FileListSortGlyphBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSortGlyphBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListSortGlyphForegroundBrush}" />
+    </Style>
+    <Style Selector="Button.field-shuttle-direction:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+  </Window.Styles>
+  <DockPanel Margin="12">
+    <Grid DockPanel.Dock="Bottom" Margin="0,14,0,0" ColumnDefinitions="*,Auto,*">
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+        <Button
+          Classes="field-shuttle-footer-primary"
+          Content="OK"
+          IsDefault="True"
+          IsEnabled="{Binding CanConfirm}"
+          Click="_OnOkClick"
+        />
+        <Button Classes="field-shuttle-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
+      </StackPanel>
+    </Grid>
+
+    <TabControl Classes="field-shuttle-tabs" SelectedIndex="{Binding SelectedTabIndex}">
+      <TabItem Header="Columns">
+        <Border Classes="field-shuttle-panel" Margin="0,8,0,0">
+          <Grid RowDefinitions="Auto,Auto,*">
+            <TextBlock
+              Grid.Row="0"
+              Classes="field-shuttle-hint"
+              Text="Select which fields to show as Rename List columns."
+            />
+            <ComboBox
+              Grid.Row="1"
+              Classes="field-shuttle-group"
+              ItemsSource="{Binding Groups}"
+              SelectedItem="{Binding SelectedGroup}"
+            >
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:RenameListFieldGroupOption">
+                  <TextBlock Text="{Binding DisplayName}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto,*" RowDefinitions="Auto,*">
+              <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-shuttle-label" Text="Available fields in group:" />
+              <TextBlock Grid.Row="0" Grid.Column="2" Classes="field-shuttle-label" Text="Selected fields:" />
+              <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="Auto,*">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4" Spacing="0">
+                  <RadioButton
+                    Classes="field-shuttle-subtab"
+                    GroupName="ColumnAvailableFields"
+                    Content="Original Fields"
+                    IsChecked="{Binding IsOriginalColumnsTab}"
+                    Command="{Binding SelectOriginalColumnsTabCommand}"
+                  />
+                  <RadioButton
+                    Classes="field-shuttle-subtab"
+                    GroupName="ColumnAvailableFields"
+                    Content="Preview Fields"
+                    IsChecked="{Binding IsPreviewColumnsTab}"
+                    Command="{Binding SelectPreviewColumnsTabCommand}"
+                  />
+                </StackPanel>
+                <ListBox
+                  Grid.Row="1"
+                  Classes="field-shuttle-list"
+                  IsVisible="{Binding IsOriginalColumnsTab}"
+                  ItemsSource="{Binding AvailableOriginalFields}"
+                  SelectedItem="{Binding SelectedAvailableOriginalField}"
+                  DoubleTapped="_OnAddOriginalDoubleTapped"
+                >
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:RenameListField">
+                      <TextBlock Text="{Binding DisplayName}" />
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+                <ListBox
+                  Grid.Row="1"
+                  Classes="field-shuttle-list"
+                  IsVisible="{Binding IsPreviewColumnsTab}"
+                  ItemsSource="{Binding AvailablePreviewFields}"
+                  SelectedItem="{Binding SelectedAvailablePreviewField}"
+                  DoubleTapped="_OnAddPreviewDoubleTapped"
+                >
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:RenameListField">
+                      <TextBlock Text="{Binding DisplayName}" />
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </Grid>
+              <StackPanel
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="12,0"
+                Spacing="4"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+              >
+                <Button
+                  Classes="field-shuttle-action"
+                  Content="&gt;"
+                  ToolTip.Tip="Add selected"
+                  Click="_OnAddSelectedClick"
+                />
+                <Button
+                  Classes="field-shuttle-action"
+                  Content="&gt;&gt;"
+                  ToolTip.Tip="Add all in tab"
+                  Click="_OnAddAllClick"
+                />
+                <Button
+                  Classes="field-shuttle-action"
+                  Content="X"
+                  ToolTip.Tip="Remove selected"
+                  Command="{Binding RemoveSelectedColumnCommand}"
+                />
+                <Button
+                  Classes="field-shuttle-action"
+                  Content="↑"
+                  ToolTip.Tip="Move up"
+                  Command="{Binding MoveSelectedColumnUpCommand}"
+                />
+                <Button
+                  Classes="field-shuttle-action"
+                  Content="↓"
+                  ToolTip.Tip="Move down"
+                  Command="{Binding MoveSelectedColumnDownCommand}"
+                />
+              </StackPanel>
+              <ListBox
+                Grid.Row="1"
+                Grid.Column="2"
+                Classes="field-shuttle-list"
+                ItemsSource="{Binding SelectedColumnRows}"
+                SelectedIndex="{Binding SelectedColumnRowIndex}"
+                DoubleTapped="_OnRemoveColumnDoubleTapped"
+              >
+                <ListBox.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="Clear" Command="{Binding ClearSelectedColumnsCommand}" />
+                  </ContextMenu>
+                </ListBox.ContextMenu>
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:RenameListFieldShuttleColumnRow">
+                    <TextBlock Text="{Binding Label}" />
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Grid>
+          </Grid>
+        </Border>
+      </TabItem>
+      <TabItem Header="Sort">
+        <Border Classes="field-shuttle-panel" Margin="0,8,0,0">
+          <Grid RowDefinitions="Auto,Auto,*">
+            <TextBlock Grid.Row="0" Classes="field-shuttle-hint" Text="Select fields to sort Rename List by." />
+            <ComboBox
+              Grid.Row="1"
+              Classes="field-shuttle-group"
+              ItemsSource="{Binding Groups}"
+              SelectedItem="{Binding SelectedGroup}"
+            >
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:RenameListFieldGroupOption">
+                  <TextBlock Text="{Binding DisplayName}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto,*" RowDefinitions="Auto,*">
+              <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-shuttle-label" Text="Available fields in group:" />
+              <TextBlock Grid.Row="0" Grid.Column="2" Classes="field-shuttle-label" Text="Selected fields:" />
+              <ListBox
+                Grid.Row="1"
+                Grid.Column="0"
+                Classes="field-shuttle-list"
+                ItemsSource="{Binding AvailableSortFields}"
+                SelectedItem="{Binding SelectedAvailableSortField}"
+                DoubleTapped="_OnAddSortDoubleTapped"
+              >
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="models:RenameListField">
+                    <TextBlock Text="{Binding DisplayName}" />
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+              <StackPanel
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="12,0"
+                Spacing="4"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+              >
+                <Button
+                  Classes="field-shuttle-action"
+                  Content="&gt;"
+                  ToolTip.Tip="Add selected"
+                  Click="_OnAddSortClick"
+                />
+                <Button
+                  Classes="field-shuttle-action"
+                  Content="X"
+                  ToolTip.Tip="Remove selected"
+                  Command="{Binding RemoveSelectedSortKeyCommand}"
+                />
+                <Button
+                  Classes="field-shuttle-action"
+                  Content="↑"
+                  ToolTip.Tip="Move up"
+                  Command="{Binding MoveSelectedSortKeyUpCommand}"
+                />
+                <Button
+                  Classes="field-shuttle-action"
+                  Content="↓"
+                  ToolTip.Tip="Move down"
+                  Command="{Binding MoveSelectedSortKeyDownCommand}"
+                />
+              </StackPanel>
+              <ListBox
+                Grid.Row="1"
+                Grid.Column="2"
+                Classes="field-shuttle-list"
+                ItemsSource="{Binding SelectedSortRows}"
+                SelectedIndex="{Binding SelectedSortRowIndex}"
+                DoubleTapped="_OnRemoveSortDoubleTapped"
+              >
+                <ListBox.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="Clear" Command="{Binding ClearSelectedSortKeysCommand}" />
+                  </ContextMenu>
+                </ListBox.ContextMenu>
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:RenameListFieldShuttleSortRow">
+                    <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                      <Border Grid.Column="0" Classes="field-shuttle-priority">
+                        <TextBlock Text="{Binding Priority}" />
+                      </Border>
+                      <TextBlock Grid.Column="1" Margin="6,0,0,0" Text="{Binding Label}" VerticalAlignment="Center" />
+                      <Button
+                        Grid.Column="2"
+                        Classes="field-shuttle-direction"
+                        Content="{Binding DirectionGlyph}"
+                        ToolTip.Tip="Toggle ascending / descending"
+                        Click="_OnToggleSortDirectionClick"
+                      />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Grid>
+          </Grid>
+        </Border>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</Window>

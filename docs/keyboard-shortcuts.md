@@ -64,7 +64,7 @@ Selecting or focusing a Rename List cell shows the full cell value in the status
 
 Shift+click a column header to append a sort key, toggle its direction, or remove it from the sort list. A plain header click replaces the sort list with that column only.
 
-Right-click the Rename List grid and choose **Edit Sort Fields...** to open the multi-field sort editor (column list, direction, reorder, Full Path).
+Right-click the Rename List grid and choose **Select Fields...** to open the field shuttle (visible columns and Auto-Sort tabs).
 
 ## Shown in menus, not implemented yet
 

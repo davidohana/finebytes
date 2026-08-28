@@ -101,20 +101,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Raised when the view should open the sort editor flyout.
-        /// </summary>
-        public event EventHandler? SortEditorRequested;
-
-        /// <summary>
-        /// Requests the sort editor flyout (Rename List context menu).
-        /// </summary>
-        [RelayCommand]
-        public void OpenSortEditor()
-        {
-            SortEditorRequested?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
         /// Appends a sort key for the first unused editor column.
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanAddSortKey))]
@@ -315,7 +301,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ColumnSortStates = RenameListSortDisplay.BuildColumnSortStates(_sortKeys);
             OnPropertyChanged(nameof(IsAutoSort));
             OnPropertyChanged(nameof(SortKeys));
-            OnPropertyChanged(nameof(SortEditorRows));
             OnPropertyChanged(nameof(CanAddSortKey));
             OnPropertyChanged(nameof(SortSummaryText));
             OnPropertyChanged(nameof(ColumnSortStates));

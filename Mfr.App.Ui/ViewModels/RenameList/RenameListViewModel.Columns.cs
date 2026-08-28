@@ -77,11 +77,24 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Opens the unified field shuttle dialog on the Columns tab (context menu and toolbar).
+        /// </summary>
+        [RelayCommand]
+        public void OpenFieldShuttle()
+        {
+            _RequestFieldShuttle(RenameListFieldShuttleTab.Columns);
+        }
+
+        /// <summary>
         /// Opens the unified field shuttle dialog on the requested tab.
         /// </summary>
         /// <param name="tab">Initial tab (Columns or Sort).</param>
-        [RelayCommand]
-        public void OpenFieldShuttle(RenameListFieldShuttleTab tab = RenameListFieldShuttleTab.Columns)
+        public void OpenFieldShuttle(RenameListFieldShuttleTab tab)
+        {
+            _RequestFieldShuttle(tab);
+        }
+
+        private void _RequestFieldShuttle(RenameListFieldShuttleTab tab)
         {
             FieldShuttleRequested?.Invoke(this, tab);
         }

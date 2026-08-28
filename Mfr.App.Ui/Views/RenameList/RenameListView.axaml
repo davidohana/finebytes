@@ -6,7 +6,6 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
   xmlns:input="using:Mfr.App.Ui.Input"
   xmlns:resources="using:Mfr.App.Ui.Resources"
-  xmlns:renameviews="using:Mfr.App.Ui.Views.RenameList"
   mc:Ignorable="d"
   d:DesignWidth="800"
   d:DesignHeight="240"
@@ -40,9 +39,9 @@
         />
         <Separator />
         <MenuItem
-          Header="Edit Sort Fields..."
-          Command="{Binding OpenSortEditorCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.EditSortFields}"
+          Header="Select Fields..."
+          Command="{Binding OpenFieldShuttleCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
         />
         <Separator />
         <MenuItem
@@ -304,11 +303,6 @@
         Sorting="_OnEntriesSorting"
         ContextMenu="{StaticResource RenameListRowContextMenu}"
       >
-        <FlyoutBase.AttachedFlyout>
-          <Flyout Placement="Pointer" ShowMode="Transient">
-            <renameviews:RenameListSortEditorView DataContext="{Binding #RenameGrid.DataContext}" />
-          </Flyout>
-        </FlyoutBase.AttachedFlyout>
         <DataGrid.Columns />
       </DataGrid>
     </Grid>

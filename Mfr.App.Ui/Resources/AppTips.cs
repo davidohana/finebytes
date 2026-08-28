@@ -47,8 +47,9 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List Move Selected Down button and menu tip.</summary>
         public const string MoveSelectedDown = "Move selected down (Ctrl+Down)";
 
-        /// <summary>Rename List sort editor flyout (Rename List grid context menu).</summary>
-        public const string EditSortFields = "Edit sort fields (Rename List right-click menu)";
+        /// <summary>Rename List field shuttle: visible columns and Auto-Sort (grid context menu).</summary>
+        public const string SelectRenameListFields =
+            "Choose visible columns and sort fields (Rename List right-click menu)";
 
         /// <summary>File List refresh button tip.</summary>
         public const string Refresh = "Refresh (F5)";

@@ -631,9 +631,6 @@ namespace Mfr.Tests.Ui
             Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].Priority);
             Assert.True(renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].IsDescending);
             Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
-            Assert.Equal(2, renameListViewModel.SortEditorRows.Count);
-            Assert.Equal(0, renameListViewModel.SortEditorRows[0].Index);
-            Assert.Equal(RenameListSortColumn.FullPath, renameListViewModel.SortEditorRows[0].Key.Column);
         }
 
         /// <summary>
@@ -713,20 +710,21 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies OpenSortEditor raises <see cref="RenameListViewModel.SortEditorRequested"/>.
+        /// Verifies OpenFieldShuttle opens the unified field shuttle on the Columns tab by default.
         /// </summary>
         [Fact]
-        public void OpenSortEditor_Raises_SortEditorRequested()
+        public void OpenFieldShuttle_Raises_FieldShuttleRequested_With_Columns_Tab()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            var raised = false;
-            renameListViewModel.SortEditorRequested += (_, _) => raised = true;
+            RenameListFieldShuttleTab? tab = null;
+            renameListViewModel.FieldShuttleRequested += (_, requestedTab) => tab = requestedTab;
 
-            renameListViewModel.OpenSortEditorCommand.Execute(null);
+            renameListViewModel.OpenFieldShuttleCommand.Execute(null);
 
-            Assert.True(raised);
+            Assert.True(renameListViewModel.OpenFieldShuttleCommand.CanExecute(null));
+            Assert.Equal(RenameListFieldShuttleTab.Columns, tab);
         }
 
         /// <summary>

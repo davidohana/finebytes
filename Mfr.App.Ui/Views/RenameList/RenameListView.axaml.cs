@@ -2,7 +2,6 @@ using System.Collections;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -35,6 +34,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private bool _selectionChangeFromView;
         private DataGridColumn? _lastHintColumn;
         private AddProgressDialog? _addProgressDialog;
+        private RenameListFieldShuttleDialog? _fieldShuttleDialog;
         private Point? _dragStartPoint;
         private PointerEventArgs? _dragStartArgs;
         private RenameListEntry? _dragHitEntry;
@@ -63,27 +63,61 @@ namespace Mfr.App.Ui.Views.RenameList
             AddHandler(DragDrop.DropEvent, _OnDrop);
         }
 
-        private void _OnSortEditorRequested(object? sender, EventArgs e)
+        private void _OnFieldShuttleRequested(object? sender, RenameListFieldShuttleTab tab)
         {
-            // Defer until the context menu closes so pointer placement and focus work.
-            Dispatcher.UIThread.Post(_ShowSortEditorFlyout);
+            // Defer until any context menu closes so the modal centers on the owner window.
+            Dispatcher.UIThread.Post(() => _ = _ShowFieldShuttleDialogAsync(tab));
         }
 
-        private void _ShowSortEditorFlyout()
+        private async Task _ShowFieldShuttleDialogAsync(RenameListFieldShuttleTab tab)
         {
-            if (FlyoutBase.GetAttachedFlyout(RenameGrid) is null)
+            if (_viewModel is null)
             {
                 return;
             }
 
-            FlyoutBase.ShowAttachedFlyout(RenameGrid);
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            if (_fieldShuttleDialog is not null)
+            {
+                return;
+            }
+
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                _viewModel.VisibleColumns,
+                _viewModel.SortKeys,
+                tab
+            );
+            var dialog = new RenameListFieldShuttleDialog(dialogVm);
+            _fieldShuttleDialog = dialog;
+            try
+            {
+                var accepted = await dialog.ShowDialog<bool?>(owner);
+                if (accepted != true)
+                {
+                    return;
+                }
+
+                _viewModel.SetVisibleColumns(dialogVm.ResultColumns);
+                _viewModel.SetSortKeys(dialogVm.ResultSortKeys);
+            }
+            finally
+            {
+                if (ReferenceEquals(_fieldShuttleDialog, dialog))
+                {
+                    _fieldShuttleDialog = null;
+                }
+            }
         }
 
         private void _OnDataContextChanged(object? sender, EventArgs e)
         {
             if (_viewModel is not null)
             {
-                _viewModel.SortEditorRequested -= _OnSortEditorRequested;
+                _viewModel.FieldShuttleRequested -= _OnFieldShuttleRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.AddProgress.PropertyChanged -= _OnAddProgressPropertyChanged;
             }
@@ -94,7 +128,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            _viewModel.SortEditorRequested += _OnSortEditorRequested;
+            _viewModel.FieldShuttleRequested += _OnFieldShuttleRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
             _RebuildColumns();
