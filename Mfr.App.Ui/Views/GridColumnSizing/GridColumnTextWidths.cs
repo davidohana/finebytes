@@ -19,6 +19,11 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         internal const double HeaderHorizontalPadding = 10;
 
         /// <summary>
+        /// Width of the Fluent <c>DataGridColumnHeader</c> vertical separator.
+        /// </summary>
+        internal const double HeaderSeparatorWidth = 1;
+
+        /// <summary>
         /// Horizontal cell padding matching <c>Padding="4,0"</c> on File List / Rename List cells.
         /// </summary>
         internal const double CellPaddingHorizontal = 8;
@@ -58,7 +63,9 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         internal static int GetMinimumHeaderWidth(string headerText)
         {
             ArgumentException.ThrowIfNullOrEmpty(headerText);
-            return (int)Math.Ceiling(MeasureText(headerText) + HeaderHorizontalPadding);
+            var textWidth = Math.Ceiling(MeasureText(headerText) * _TextWidthSlack);
+            return (int)
+                Math.Ceiling(textWidth + HeaderHorizontalPadding + HeaderSeparatorWidth + _MeasurementSafetyBuffer);
         }
 
         /// <summary>

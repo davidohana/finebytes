@@ -45,20 +45,18 @@ namespace Mfr.App.Ui.Views.RenameList
             bool reservePreviewGlyph = false
         )
         {
-            ArgumentException.ThrowIfNullOrEmpty(headerText);
-
-            var extra = GridColumnTextWidths.HeaderHorizontalPadding;
+            var width = GridColumnTextWidths.GetMinimumHeaderWidth(headerText);
             if (reserveSortGlyph)
             {
-                extra += _MeasureSortGlyphReserve();
+                width += (int)Math.Ceiling(_MeasureSortGlyphReserve());
             }
 
             if (reservePreviewGlyph)
             {
-                extra += _MeasurePreviewGlyphReserve();
+                width += (int)Math.Ceiling(_MeasurePreviewGlyphReserve());
             }
 
-            return (int)Math.Ceiling(GridColumnTextWidths.MeasureText(headerText) + extra);
+            return width;
         }
 
         /// <summary>

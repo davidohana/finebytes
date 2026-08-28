@@ -6,6 +6,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
+using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Models.Filters;
 
@@ -406,6 +407,68 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(shortFit >= minHeaderWidth);
             Assert.Equal(RenameListGridColumnWidths.MaxAutoFitWidth, longFit);
             Assert.True(longFit > shortFit);
+        }
+
+        /// <summary>
+        /// Verifies auto-fit of an empty short header (Disc) still leaves room for the full label.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Auto_fit_empty_disc_column_does_not_truncate_header()
+        {
+            var discKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Disc");
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
+            Assert.All(renameListViewModel.Entries, entry => Assert.Equal(string.Empty, entry.GetFieldText(discKey)));
+
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(discKey),
+                new RenameListVisibleColumn(fullNameKey, 400),
+            ]);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth("Disc");
+            var fitWidth = RenameListColumnAutoFit.ResolveAutoFitWidth(renameListViewModel.Entries, discKey);
+            Assert.Equal(minHeaderWidth, fitWidth);
+
+            grid.Columns[0].Width = new DataGridLength(fitWidth, DataGridLengthUnitType.Pixel);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var header = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeader>()
+                .Select(item =>
+                    (
+                        Header: item,
+                        Title: item.GetVisualDescendants()
+                            .OfType<TextBlock>()
+                            .FirstOrDefault(text => text.Text == "Disc")
+                    )
+                )
+                .First(item => item.Title is not null);
+            var title = header.Title!;
+            Assert.True(header.Header.Bounds.Width > 0);
+            Assert.True(title.Bounds.Width > 0);
+
+            var unconstrained = new TextBlock
+            {
+                Text = "Disc",
+                FontFamily = title.FontFamily,
+                FontSize = title.FontSize,
+                FontWeight = title.FontWeight,
+            };
+            unconstrained.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Assert.True(
+                title.Bounds.Width + 0.5 >= unconstrained.DesiredSize.Width,
+                $"Disc header truncated: available={title.Bounds.Width}, needed={unconstrained.DesiredSize.Width}, column={fitWidth}"
+            );
+
+            window.Close();
         }
 
         /// <summary>
