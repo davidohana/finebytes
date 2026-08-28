@@ -84,6 +84,45 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
+        /// Looks up a catalog field by group and property key.
+        /// </summary>
+        /// <param name="groupId">Property group id.</param>
+        /// <param name="propertyKey">Property key within the group.</param>
+        /// <returns>The registered field.</returns>
+        /// <exception cref="ArgumentException">The field is not registered in the catalog.</exception>
+        public static RenameListField GetField(string groupId, string propertyKey)
+        {
+            if (TryGetField(groupId, propertyKey, out var field))
+            {
+                return field;
+            }
+
+            throw new ArgumentException(
+                $"Unknown Rename List field '{groupId}/{propertyKey}'.",
+                nameof(propertyKey)
+            );
+        }
+
+        /// <summary>
+        /// Looks up a catalog field for <paramref name="key"/> (ignores preview flag).
+        /// </summary>
+        /// <param name="key">Field key.</param>
+        /// <returns>The registered field.</returns>
+        /// <exception cref="ArgumentException">The field is not registered in the catalog.</exception>
+        public static RenameListField GetField(RenameListFieldKey key)
+        {
+            if (TryGetField(key, out var field))
+            {
+                return field;
+            }
+
+            throw new ArgumentException(
+                $"Unknown Rename List field '{key.GroupId}/{key.PropertyKey}'.",
+                nameof(key)
+            );
+        }
+
+        /// <summary>
         /// Maps an engine Auto-Sort column to the corresponding original field key.
         /// </summary>
         /// <param name="column">Engine sort column.</param>
@@ -143,16 +182,7 @@ namespace Mfr.Models.RenameList
         public static string Resolve(RenameItem item, RenameListFieldKey key)
         {
             ArgumentNullException.ThrowIfNull(item);
-            if (!TryGetField(key, out var field))
-            {
-                throw new ArgumentException(
-                    $"Unknown Rename List field '{key.GroupId}/{key.PropertyKey}'.",
-                    nameof(key)
-                );
-            }
-
-            var meta = key.IsPreview ? item.Preview : item.Original;
-            return field.Resolve(meta);
+            return GetField(key).Resolve(item, key.IsPreview);
         }
 
         private static List<RenameListField> _Register(List<RenameListField> fields)

@@ -155,6 +155,40 @@ namespace Mfr.Tests.Models
 
             Assert.Equal("before.txt", RenameListFieldCatalog.Resolve(item, originalKey));
             Assert.Equal("after.txt", RenameListFieldCatalog.Resolve(item, previewKey));
+
+            Assert.True(RenameListFieldCatalog.TryGetField(originalKey, out var field));
+            Assert.Equal("before.txt", field.Resolve(item, isPreview: false));
+            Assert.Equal("after.txt", field.Resolve(item, isPreview: true));
+        }
+
+        [Fact]
+        public void GetField_returns_registered_field()
+        {
+            var expected = RenameListFieldCatalog.All.Single(field =>
+                field.PropertyKey == BasicItemTypeField.Key
+            );
+
+            Assert.Same(
+                expected,
+                RenameListFieldCatalog.GetField(BasicRenameListField.Group, BasicItemTypeField.Key)
+            );
+            Assert.Same(
+                expected,
+                RenameListFieldCatalog.GetField(
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicItemTypeField.Key)
+                )
+            );
+        }
+
+        [Fact]
+        public void GetField_unknown_field_throws()
+        {
+            var key = RenameListFieldKey.Original("Unknown", "Missing");
+
+            Assert.Throws<ArgumentException>(() =>
+                RenameListFieldCatalog.GetField("Unknown", "Missing")
+            );
+            Assert.Throws<ArgumentException>(() => RenameListFieldCatalog.GetField(key));
         }
 
         [Fact]

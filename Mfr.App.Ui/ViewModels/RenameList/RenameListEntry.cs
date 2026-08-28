@@ -27,27 +27,27 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the file-or-folder label shown in the File/Folder column.
         /// </summary>
-        public string FileFolder => GetFieldText(_ItemTypeKey);
+        public string FileFolder => _ItemTypeField.Resolve(EngineItem, isPreview: false);
 
         /// <summary>
         /// Gets the parent folder path shown in the Parent Folder column.
         /// </summary>
-        public string ParentFolder => GetFieldText(_FolderKey);
+        public string ParentFolder => _FolderField.Resolve(EngineItem, isPreview: false);
 
         /// <summary>
         /// Gets the original full file name shown in the Full File Name column.
         /// </summary>
-        public string FullFileName => GetFieldText(_FullNameOriginalKey);
+        public string FullFileName => _FullNameField.Resolve(EngineItem, isPreview: false);
 
         /// <summary>
         /// Gets the absolute path used for Auto-Sort (and as a CollectionView sort member).
         /// </summary>
-        public string FullPath => GetFieldText(_FullPathKey);
+        public string FullPath => _FullPathField.Resolve(EngineItem, isPreview: false);
 
         /// <summary>
         /// Gets the preview full file name shown in the Full File Name (Preview) column.
         /// </summary>
-        public string FullFileNamePreview => GetFieldText(_FullNamePreviewKey);
+        public string FullFileNamePreview => _FullNameField.Resolve(EngineItem, isPreview: true);
 
         /// <summary>
         /// Builds a grid row from a rename item (identity preview until filter preview exists).
@@ -61,29 +61,24 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return new RenameListEntry { EngineItem = item };
         }
 
-        private static readonly RenameListFieldKey _ItemTypeKey = RenameListFieldKey.Original(
-            BasicRenameListField.Group,
-            BasicItemTypeField.Key
+        private static readonly RenameListField _ItemTypeField = RenameListFieldCatalog.GetField(
+            groupId: BasicRenameListField.Group,
+            propertyKey: BasicItemTypeField.Key
         );
 
-        private static readonly RenameListFieldKey _FolderKey = RenameListFieldKey.Original(
-            BasicRenameListField.Group,
-            BasicFolderField.Key
+        private static readonly RenameListField _FolderField = RenameListFieldCatalog.GetField(
+            groupId: BasicRenameListField.Group,
+            propertyKey: BasicFolderField.Key
         );
 
-        private static readonly RenameListFieldKey _FullNameOriginalKey = RenameListFieldKey.Original(
-            BasicRenameListField.Group,
-            BasicFullNameField.Key
+        private static readonly RenameListField _FullNameField = RenameListFieldCatalog.GetField(
+            groupId: BasicRenameListField.Group,
+            propertyKey: BasicFullNameField.Key
         );
 
-        private static readonly RenameListFieldKey _FullNamePreviewKey = RenameListFieldKey.Preview(
-            BasicRenameListField.Group,
-            BasicFullNameField.Key
-        );
-
-        private static readonly RenameListFieldKey _FullPathKey = RenameListFieldKey.Original(
-            BasicRenameListField.Group,
-            BasicFullPathField.Key
+        private static readonly RenameListField _FullPathField = RenameListFieldCatalog.GetField(
+            groupId: BasicRenameListField.Group,
+            propertyKey: BasicFullPathField.Key
         );
     }
 }

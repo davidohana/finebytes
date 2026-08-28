@@ -78,5 +78,19 @@ namespace Mfr.Models.RenameList
         /// <param name="meta">Original or preview metadata.</param>
         /// <returns>Display string for the grid or sort shuttle.</returns>
         public abstract string Resolve(FileMeta meta);
+
+        /// <summary>
+        /// Returns the display text for this field on a rename item.
+        /// </summary>
+        /// <param name="item">Engine rename item.</param>
+        /// <param name="isPreview">When <see langword="true"/>, values come from the preview snapshot.</param>
+        /// <returns>Display string for the grid or sort shuttle.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="item"/> is null.</exception>
+        public string Resolve(RenameItem item, bool isPreview)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            var meta = isPreview ? item.Preview : item.Original;
+            return Resolve(meta);
+        }
     }
 }
