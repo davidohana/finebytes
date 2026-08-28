@@ -5,8 +5,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// <summary>
     /// File extension without a leading dot (MFR7 BasicPG).
     /// </summary>
-    public sealed class BasicExtensionField()
-        : BasicRenameListField(propertyKey: Key, displayName: "File Extension")
+    public sealed class BasicExtensionField() : BasicRenameListField(propertyKey: Key, displayName: "File Extension")
     {
         /// <summary>
         /// MFR7 property key.

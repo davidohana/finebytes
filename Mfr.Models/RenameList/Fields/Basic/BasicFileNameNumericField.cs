@@ -6,11 +6,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// First 1–10 digit run in the full file name (MFR7 BasicPG).
     /// </summary>
     public sealed class BasicFileNameNumericField()
-        : BasicRenameListField(
-            propertyKey: Key,
-            displayName: "File Name Numeric Value",
-            supportsPreview: false
-        )
+        : BasicRenameListField(propertyKey: Key, displayName: "File Name Numeric Value", supportsPreview: false)
     {
         /// <summary>
         /// MFR7 property key.

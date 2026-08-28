@@ -25,7 +25,7 @@ namespace Mfr.Tests.Ui
             Assert.Equal(sortKeys, dialogVm.ResultSortKeys);
             Assert.Single(dialogVm.SelectedColumnRows);
             Assert.Single(dialogVm.SelectedSortRows);
-            Assert.Equal("File Name", dialogVm.SelectedColumnRows[0].Label);
+            Assert.Equal("File Name", dialogVm.SelectedColumnRows[0].DisplayName);
             Assert.Equal("Full Path", dialogVm.SelectedSortRows[0].Label);
         }
 

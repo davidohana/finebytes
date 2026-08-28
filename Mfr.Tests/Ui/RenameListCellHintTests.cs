@@ -9,10 +9,10 @@ namespace Mfr.Tests.Ui
     public sealed class RenameListCellHintTests
     {
         /// <summary>
-        /// Verifies hints use bold column name, colon, then value, including preview suffix stripping.
+        /// Verifies hints use bold column name, colon, then value.
         /// </summary>
         [Fact]
-        public void FormatParts_Uses_Bold_Column_Name_And_Strips_Preview_Suffix()
+        public void FormatParts_Uses_Bold_Column_Name()
         {
             var plain = RenameListCellHint.FormatParts("Full File Name", "alpha.txt", isPreviewColumn: false);
             Assert.Equal(2, plain.Runs.Count);
@@ -21,20 +21,10 @@ namespace Mfr.Tests.Ui
             Assert.Equal(": alpha.txt", plain.Runs[1].Text);
             Assert.Equal("Full File Name: alpha.txt", plain.ToPlainText());
 
-            var preview = RenameListCellHint.FormatParts("Full File Name (Preview)", "beta.txt", isPreviewColumn: true);
+            var preview = RenameListCellHint.FormatParts("Full File Name", "beta.txt", isPreviewColumn: true);
             Assert.Equal("Full File Name", preview.Runs[0].Text);
             Assert.Equal(": beta.txt", preview.Runs[1].Text);
             Assert.Equal("Full File Name: beta.txt", preview.ToPlainText());
-        }
-
-        /// <summary>
-        /// Verifies preview columns are detected by header text.
-        /// </summary>
-        [Fact]
-        public void IsPreviewColumn_Recognizes_Preview_Header()
-        {
-            Assert.True(RenameListCellHint.IsPreviewColumn("Full File Name (Preview)"));
-            Assert.False(RenameListCellHint.IsPreviewColumn("Full File Name"));
         }
 
         /// <summary>
@@ -47,10 +37,7 @@ namespace Mfr.Tests.Ui
                 "Full File Name",
                 RenameListCellHint.GetColumnHeader(nameof(RenameListEntry.FullFileName), null)
             );
-            Assert.Equal(
-                "Full File Name (Preview)",
-                RenameListCellHint.GetColumnHeader(null, "Full File Name (Preview)")
-            );
+            Assert.Equal("Full File Name", RenameListCellHint.GetColumnHeader(null, "Full File Name"));
         }
     }
 }

@@ -194,6 +194,20 @@
     <Style Selector="Button.field-shuttle-direction:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
     </Style>
+    <Style Selector="Border.rename-list-preview-glyph">
+      <Setter Property="Background" Value="{DynamicResource FileListPreviewGlyphBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListPreviewGlyphBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.rename-list-preview-glyph TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListPreviewGlyphForegroundBrush}" />
+    </Style>
   </Window.Styles>
   <DockPanel Margin="12">
     <Grid DockPanel.Dock="Bottom" Margin="0,14,0,0" ColumnDefinitions="*,Auto,*">
@@ -274,7 +288,12 @@
                 >
                   <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="models:RenameListField">
-                      <TextBlock Text="{Binding DisplayName}" />
+                      <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                        <Border Classes="rename-list-preview-glyph">
+                          <TextBlock Text="P" />
+                        </Border>
+                      </StackPanel>
                     </DataTemplate>
                   </ListBox.ItemTemplate>
                 </ListBox>
@@ -287,18 +306,12 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
               >
-                <Button
-                  Classes="field-shuttle-action"
-                  Content="&gt;"
-                  ToolTip.Tip="Add selected"
-                  Click="_OnAddSelectedClick"
-                />
-                <Button
-                  Classes="field-shuttle-action"
-                  Content="&gt;&gt;"
-                  ToolTip.Tip="Add all in tab"
-                  Click="_OnAddAllClick"
-                />
+                <Button Classes="field-shuttle-action" ToolTip.Tip="Add selected" Click="_OnAddSelectedClick">
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
+                </Button>
+                <Button Classes="field-shuttle-action" ToolTip.Tip="Add all in tab" Click="_OnAddAllClick">
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/AddAll.png" />
+                </Button>
                 <Button
                   Classes="field-shuttle-action"
                   Content="X"
@@ -333,7 +346,12 @@
                 </ListBox.ContextMenu>
                 <ListBox.ItemTemplate>
                   <DataTemplate x:DataType="vm:RenameListFieldShuttleColumnRow">
-                    <TextBlock Text="{Binding Label}" />
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                      <Border Classes="rename-list-preview-glyph" IsVisible="{Binding IsPreview}">
+                        <TextBlock Text="P" />
+                      </Border>
+                    </StackPanel>
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
@@ -382,12 +400,9 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
               >
-                <Button
-                  Classes="field-shuttle-action"
-                  Content="&gt;"
-                  ToolTip.Tip="Add selected"
-                  Click="_OnAddSortClick"
-                />
+                <Button Classes="field-shuttle-action" ToolTip.Tip="Add selected" Click="_OnAddSortClick">
+                  <Image Width="20" Height="20" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
+                </Button>
                 <Button
                   Classes="field-shuttle-action"
                   Content="X"

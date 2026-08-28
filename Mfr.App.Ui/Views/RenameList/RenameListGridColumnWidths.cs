@@ -25,8 +25,15 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <param name="reserveSortGlyph">
         /// When <see langword="true"/>, reserves space for the Auto-Sort priority/direction glyph on original columns.
         /// </param>
+        /// <param name="reservePreviewGlyph">
+        /// When <see langword="true"/>, reserves space for the preview badge on preview columns.
+        /// </param>
         /// <returns>Minimum column width in pixels.</returns>
-        public static int GetMinimumHeaderWidth(string headerText, bool reserveSortGlyph = false)
+        public static int GetMinimumHeaderWidth(
+            string headerText,
+            bool reserveSortGlyph = false,
+            bool reservePreviewGlyph = false
+        )
         {
             ArgumentException.ThrowIfNullOrEmpty(headerText);
 
@@ -39,7 +46,17 @@ namespace Mfr.App.Ui.Views.RenameList
                 maxWidth: double.PositiveInfinity
             );
 
-            var extra = _HeaderHorizontalPadding + (reserveSortGlyph ? _MeasureSortGlyphReserve() : 0);
+            var extra = _HeaderHorizontalPadding;
+            if (reserveSortGlyph)
+            {
+                extra += _MeasureSortGlyphReserve();
+            }
+
+            if (reservePreviewGlyph)
+            {
+                extra += _MeasurePreviewGlyphReserve();
+            }
+
             return (int)Math.Ceiling(layout.Width + extra);
         }
 
@@ -63,6 +80,31 @@ namespace Mfr.App.Ui.Views.RenameList
 
             var contentWidth = priorityLayout.Width + _SortGlyphStackSpacing + directionLayout.Width;
             return _SortGlyphMarginLeft + _SortGlyphBorderHorizontal + _SortGlyphPaddingHorizontal + contentWidth;
+        }
+
+        private const double _PreviewGlyphFontSize = 11;
+        private const double _PreviewGlyphSpacing = 4;
+        private const double _PreviewGlyphMarginLeft = 0;
+        private const double _PreviewGlyphBorderHorizontal = 2;
+        private const double _PreviewGlyphPaddingHorizontal = 8;
+
+        private static double _MeasurePreviewGlyphReserve()
+        {
+            var typeface = new Typeface(_HeaderFontFamily, FontStyle.Normal, FontWeight.Normal);
+            using var badgeLayout = new TextLayout(
+                RenameListPreviewGlyph.Text,
+                typeface,
+                _PreviewGlyphFontSize,
+                null,
+                maxWidth: double.PositiveInfinity
+            );
+
+            var contentWidth = badgeLayout.Width;
+            return _PreviewGlyphSpacing
+                + _PreviewGlyphMarginLeft
+                + _PreviewGlyphBorderHorizontal
+                + _PreviewGlyphPaddingHorizontal
+                + contentWidth;
         }
     }
 }

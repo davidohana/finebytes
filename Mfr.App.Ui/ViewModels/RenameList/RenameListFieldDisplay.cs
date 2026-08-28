@@ -11,17 +11,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets the grid column header text for a catalog field.
         /// </summary>
         /// <param name="field">Catalog field.</param>
-        /// <param name="isPreview">When <see langword="true"/>, appends the MFR7 preview suffix.</param>
+        /// <param name="isPreview">Ignored; preview columns use a badge glyph in the header template.</param>
         /// <returns>Header text shown in the grid.</returns>
         public static string GetColumnHeaderText(RenameListField field, bool isPreview)
         {
             ArgumentNullException.ThrowIfNull(field);
-            if (!isPreview)
-            {
-                return field.DisplayName;
-            }
-
-            return $"{field.DisplayName} (Preview)";
+            _ = isPreview;
+            return field.DisplayName;
         }
     }
 }

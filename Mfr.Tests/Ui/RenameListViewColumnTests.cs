@@ -99,7 +99,10 @@ namespace Mfr.Tests.Ui
             Assert.Equal(240, renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
             Assert.Equal(180, renameListViewModel.VisibleColumns[2].ResolveCatalogWidth());
 
-            var fileFolderMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth("File/Folder", reserveSortGlyph: true);
+            var fileFolderMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "File/Folder",
+                reserveSortGlyph: true
+            );
             var fileFolderHeaderOnlyWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth("File/Folder");
             var fullFileNameMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 "Full File Name",
@@ -143,7 +146,8 @@ namespace Mfr.Tests.Ui
                 reserveSortGlyph: true
             );
             var previewFileNameLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                "File Name Length (Preview)"
+                "File Name Length",
+                reservePreviewGlyph: true
             );
             var fullPathLengthHeaderOnly = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full Path Name Length");
 
@@ -185,7 +189,7 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies preview column headers use the MFR7 red preview style class.
+        /// Verifies preview column headers use the MFR7 red preview style class and preview badge.
         /// </summary>
         [AvaloniaFact]
         public async Task Preview_column_header_uses_preview_style_class()
@@ -204,7 +208,13 @@ namespace Mfr.Tests.Ui
                 .OfType<TextBlock>()
                 .FirstOrDefault(textBlock => textBlock.Classes.Contains("rename-list-preview-header"));
             Assert.NotNull(previewTitle);
-            Assert.Equal("Full File Name (Preview)", previewTitle.Text);
+            Assert.Equal("Full File Name", previewTitle.Text);
+
+            var previewBadge = previewHeader
+                .GetVisualDescendants()
+                .OfType<Border>()
+                .FirstOrDefault(border => border.Classes.Contains("rename-list-preview-glyph"));
+            Assert.NotNull(previewBadge);
 
             window.Close();
         }

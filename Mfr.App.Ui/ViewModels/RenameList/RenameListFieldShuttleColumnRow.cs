@@ -10,15 +10,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed record RenameListFieldShuttleColumnRow(int Index, RenameListVisibleColumn Column)
     {
         /// <summary>
-        /// Gets the user-visible label, including the preview suffix when applicable.
+        /// Gets the catalog field display name without preview decoration.
         /// </summary>
-        public string Label
-        {
-            get
-            {
-                var catalogField = RenameListFieldCatalog.GetField(Column.Key);
-                return RenameListFieldDisplay.GetColumnHeaderText(catalogField, Column.Key.IsPreview);
-            }
-        }
+        public string DisplayName => RenameListFieldCatalog.GetField(Column.Key).DisplayName;
+
+        /// <summary>
+        /// Gets whether the selected column shows preview values.
+        /// </summary>
+        public bool IsPreview => Column.Key.IsPreview;
     }
 }
