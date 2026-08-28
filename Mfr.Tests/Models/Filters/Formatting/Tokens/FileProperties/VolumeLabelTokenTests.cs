@@ -3,9 +3,9 @@ using Mfr.Filters.Formatting.Tokens.FileProperties;
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
 {
     /// <summary>
-    /// Tests for <see cref="LabelToken"/>.
+    /// Tests for <see cref="VolumeLabelToken"/>.
     /// </summary>
-    public sealed class LabelTokenTests
+    public sealed class VolumeLabelTokenTests
     {
         /// <summary>
         /// Verifies a path with no resolvable root returns an empty string.
@@ -13,7 +13,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
         [Fact]
         public void Resolve_NoRoot_ReturnsEmpty()
         {
-            var token = new LabelToken();
+            var token = new VolumeLabelToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: "");
 
             Assert.Equal(string.Empty, token.Compile(tokenArgs: "")(item));
@@ -25,7 +25,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
         [Fact]
         public void Resolve_UncPath_ReturnsEmpty()
         {
-            var token = new LabelToken();
+            var token = new VolumeLabelToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"\\server\share\docs");
 
             Assert.Equal(string.Empty, token.Compile(tokenArgs: "")(item));
@@ -50,7 +50,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
                 return;
             }
 
-            var token = new LabelToken();
+            var token = new VolumeLabelToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: localDrive.RootDirectory.FullName);
 
             Assert.Equal(localDrive.VolumeLabel, token.Compile(tokenArgs: "")(item));

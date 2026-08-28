@@ -3,7 +3,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// <summary>
     /// Resolves the <c>&lt;label&gt;</c> token to the volume label of the drive holding the file.
     /// </summary>
-    internal sealed class LabelToken : IFormatToken
+    internal sealed class VolumeLabelToken : IFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["label"];

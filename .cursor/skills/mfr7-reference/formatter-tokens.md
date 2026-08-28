@@ -24,7 +24,7 @@ finebytes implements tokens under `Mfr.Filters/Formatting/Tokens/` as `IFormatTo
 | `FullNameFormattingParameter` | `filenamefp.html` | `FullNameToken` |
 | `FolderFormattingParameter` | `filepropsfp.html` | `ParentFolderToken` |
 | `DriveFormattingParameter` | `filepropsfp.html` | `DriveLetterToken` |
-| `VolumeLabelFormattingParameter` | `filepropsfp.html` | `LabelToken` |
+| `VolumeLabelFormattingParameter` | `filepropsfp.html` | `VolumeLabelToken` |
 | `SizeFormattingParameter` | `filepropsfp.html` | `FileSizeToken` |
 | `DateFormattingParameter` | `filepropsfp.html` | `FileDateToken` |
 | `FileCountFormattingParameter` | `filepropsfp.html` | `FileCountToken` |
