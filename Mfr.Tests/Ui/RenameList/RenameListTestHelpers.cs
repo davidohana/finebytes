@@ -14,7 +14,7 @@ namespace Mfr.Tests.Ui.RenameList
     internal static class RenameListTestHelpers
     {
         /// <summary>
-        /// Builds a one-field session sort list for <see cref="App.Ui.ViewModels.RenameList.RenameListViewModel.ApplySession"/>.
+        /// Builds a one-field session sort list for <see cref="RenameListViewModel.ApplySession"/>.
         /// </summary>
         /// <param name="column">Sort column.</param>
         /// <param name="descending">When <see langword="true"/>, sort descending.</param>

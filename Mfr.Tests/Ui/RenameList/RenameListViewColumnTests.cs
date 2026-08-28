@@ -7,6 +7,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -376,6 +377,171 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(8, indicator.DesiredSize.Width);
             Assert.Equal(headerHeight, indicator.DesiredSize.Height);
+        }
+
+        /// <summary>
+        /// Verifies auto-fit width respects header minimum and caps at the configured maximum.
+        /// </summary>
+        [AvaloniaFact]
+        public void GetAutoFitWidth_clamps_to_max_and_respects_header_minimum()
+        {
+            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Full File Name",
+                reserveSortGlyph: true
+            );
+            var key = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key);
+            var shortEntry = RenameListEntry.ToEntry(
+                FilterTestHelpers.CreateRenameItem(prefix: "short", directory: @"C:\folder")
+            );
+            var longEntry = RenameListEntry.ToEntry(
+                FilterTestHelpers.CreateRenameItem(prefix: new string('x', 500), directory: @"C:\folder")
+            );
+
+            var shortFit = RenameListGridColumnWidths.GetAutoFitWidth([shortEntry], key, minHeaderWidth);
+            var longFit = RenameListGridColumnWidths.GetAutoFitWidth([longEntry], key, minHeaderWidth);
+
+            Assert.True(shortFit >= minHeaderWidth);
+            Assert.Equal(RenameListGridColumnWidths.MaxAutoFitWidth, longFit);
+            Assert.True(longFit > shortFit);
+        }
+
+        /// <summary>
+        /// Verifies auto-fit widths for typical music-library paths exceed catalog defaults.
+        /// </summary>
+        [AvaloniaFact]
+        public void GetAutoFitWidth_fits_typical_music_library_paths()
+        {
+            const string parentFolder = @"D:\Music\General\QRS\Supergrass - 2005 - Road To Rouen";
+            const string fullPath =
+                @"D:\Music\General\QRS\Supergrass - 2005 - Road To Rouen\01 - Tales of Endurance (Part 1).mp3";
+
+            var parentFolderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key);
+            var fullPathKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullPathField.Key);
+            var parentEntry = RenameListEntry.ToEntry(
+                FilterTestHelpers.CreateRenameItem(prefix: "01 - Tales of Endurance (Part 1)", directory: parentFolder)
+            );
+            var fullPathEntry = RenameListEntry.ToEntry(
+                FilterTestHelpers.CreateRenameItem(prefix: "01 - Tales of Endurance (Part 1)", directory: parentFolder)
+            );
+
+            var parentMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Parent Folder", reserveSortGlyph: true);
+            var fullPathMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full File Path", reserveSortGlyph: true);
+            var parentFit = RenameListGridColumnWidths.GetAutoFitWidth([parentEntry], parentFolderKey, parentMin);
+            var fullPathFit = RenameListGridColumnWidths.GetAutoFitWidth([fullPathEntry], fullPathKey, fullPathMin);
+
+            Assert.True(parentFit > 240);
+            Assert.True(parentFit < RenameListGridColumnWidths.MaxAutoFitWidth);
+            Assert.True(fullPathFit > parentFit);
+            Assert.True(fullPathFit <= RenameListGridColumnWidths.MaxAutoFitWidth);
+            Assert.Equal(parentFolder, parentEntry.GetFieldText(parentFolderKey));
+            Assert.Equal(fullPath, fullPathEntry.GetFieldText(fullPathKey));
+        }
+
+        /// <summary>
+        /// Verifies header splitter hit-testing matches Avalonia resize regions.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Header_splitter_hit_test_matches_resize_regions()
+        {
+            var (_, window, grid) = await _context.ShowWithRowsAsync(rowCount: 1);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var headers = grid
+                .GetVisualDescendants()
+                .OfType<DataGridColumnHeader>()
+                .Select(header => (header, key: RenameListGridColumns.TryResolveFieldKey(header)))
+                .Where(item => item.key is not null)
+                .ToList();
+            Assert.True(headers.Count >= 2);
+
+            var firstHeader = headers[0].header;
+            var secondHeader = headers[1].header;
+            var firstKey = headers[0].key!.Value;
+            var secondKey = headers[1].key!.Value;
+            Assert.NotEqual(firstKey, secondKey);
+
+            Assert.True(firstHeader.Bounds.Width > RenameListColumnAutoFit.HeaderResizeHitWidth);
+            Assert.True(secondHeader.Bounds.Width > RenameListColumnAutoFit.HeaderResizeHitWidth);
+
+            Assert.True(
+                RenameListColumnAutoFit.TryResolveAutoFitFieldKey(
+                    firstHeader,
+                    grid,
+                    new Point(firstHeader.Bounds.Width - 1, 11),
+                    out var rightEdgeKey
+                )
+            );
+            Assert.Equal(firstKey, rightEdgeKey);
+
+            Assert.True(
+                RenameListColumnAutoFit.TryResolveAutoFitFieldKey(
+                    secondHeader,
+                    grid,
+                    new Point(1, 11),
+                    out var leftEdgeKey
+                )
+            );
+            Assert.Equal(firstKey, leftEdgeKey);
+
+            Assert.False(
+                RenameListColumnAutoFit.TryResolveAutoFitFieldKey(
+                    firstHeader,
+                    grid,
+                    new Point(firstHeader.Bounds.Width / 2, 11),
+                    out _
+                )
+            );
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies auto-fit width is applied to the grid column and synced to the view model.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Auto_fit_width_updates_grid_column_and_view_model()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "a-very-long-sample-file-name-for-autofit.txt");
+            await File.WriteAllTextAsync(path, "x");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]);
+            var fullNameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key);
+            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Full File Name",
+                reserveSortGlyph: true
+            );
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(fullNameKey, minHeaderWidth)]);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 800,
+                Height = 180,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            var expectedWidth = RenameListColumnAutoFit.ResolveAutoFitWidth(renameListViewModel.Entries, fullNameKey);
+
+            Assert.Equal(minHeaderWidth, grid.Columns[0].Width.Value);
+            Assert.True(expectedWidth > minHeaderWidth);
+
+            grid.Columns[0].Width = new DataGridLength(expectedWidth, DataGridLengthUnitType.Pixel);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(expectedWidth, grid.Columns[0].Width.Value);
+            Assert.Equal(expectedWidth, renameListViewModel.VisibleColumns[0].Width);
+
+            window.Close();
         }
     }
 }

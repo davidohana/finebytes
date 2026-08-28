@@ -180,12 +180,13 @@ namespace Mfr.Tests.Ui.RenameList
                     ),
                 ],
                 []
-            );
-
-            dialogVm.SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
-                BasicRenameListField.Group,
-                BasicNameField.Key
-            );
+            )
+            {
+                SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
+                    BasicRenameListField.Group,
+                    BasicNameField.Key
+                )
+            };
             dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
             var count = dialogVm.SelectedColumnRows.Count;
             dialogVm.AddSelectedOriginalFieldCommand.Execute(null);

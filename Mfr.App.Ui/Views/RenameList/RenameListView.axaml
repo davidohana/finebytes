@@ -148,6 +148,9 @@
       <Setter Property="Padding" Value="4,0" />
       <Setter Property="MinHeight" Value="0" />
     </Style>
+    <Style Selector="DataGrid.rename-list DataGridCell TextBlock">
+      <Setter Property="Margin" Value="{StaticResource DataGridTextColumnCellTextBlockMargin}" />
+    </Style>
     <Style Selector="DataGrid.rename-list DataGridCell:focus /template/ Grid#FocusVisual">
       <Setter Property="IsVisible" Value="False" />
     </Style>
