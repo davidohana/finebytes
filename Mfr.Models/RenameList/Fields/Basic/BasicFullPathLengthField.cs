@@ -6,7 +6,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// Length of the absolute full path.
     /// </summary>
     public sealed class BasicFullPathLengthField()
-        : BasicRenameListField(propertyKey: Key, displayName: "Full Path Name Length", defaultWidth: 40)
+        : BasicRenameListField(propertyKey: Key, displayName: "Full Path Name Length")
     {
         /// <summary>
         /// MFR7 property key.

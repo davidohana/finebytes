@@ -5,14 +5,16 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// </summary>
     /// <param name="propertyKey">Property key within the Basic group.</param>
     /// <param name="displayName">User-visible column label.</param>
-    /// <param name="defaultWidth">Default grid column width in pixels (MFR7).</param>
+    /// <param name="defaultWidth">
+    /// Optional grid column width override in pixels for fields whose data is typically wider than the header.
+    /// </param>
     /// <param name="isSortable">When <see langword="true"/>, the field may appear in Auto-Sort keys.</param>
     /// <param name="supportsPreview">When <see langword="true"/>, a preview column variant may be added.</param>
     /// <param name="sortColumn">Engine Auto-Sort column when this field maps to one.</param>
     public abstract class BasicRenameListField(
         string propertyKey,
         string displayName,
-        int defaultWidth = 180,
+        int? defaultWidth = null,
         bool isSortable = true,
         bool supportsPreview = true,
         RenameListSortColumn? sortColumn = null

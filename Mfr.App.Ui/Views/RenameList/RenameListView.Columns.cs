@@ -56,7 +56,11 @@ namespace Mfr.App.Ui.Views.RenameList
             var sortMemberPath = _GetSortMemberPath(key);
             var canUserSort = sortMemberPath is not null;
 
-            var width = _ResolveColumnWidth(visibleColumn, index, columnCount);
+            var catalogWidth = visibleColumn.ResolveCatalogWidth();
+            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(headerText, canUserSort);
+            var effectiveWidth =
+                catalogWidth is int catalogPixelWidth ? Math.Max(catalogPixelWidth, minHeaderWidth) : minHeaderWidth;
+            var width = _ResolveColumnWidth(visibleColumn, index, columnCount, effectiveWidth);
 
             var column = new DataGridTextColumn
             {
@@ -65,13 +69,8 @@ namespace Mfr.App.Ui.Views.RenameList
                 SortMemberPath = sortMemberPath ?? string.Empty,
                 CanUserSort = canUserSort,
                 Width = width,
+                MinWidth = effectiveWidth,
             };
-
-            if (!width.IsStar)
-            {
-                var pixelWidth = visibleColumn.ResolveWidth();
-                column.MinWidth = pixelWidth;
-            }
 
             RenameListGridColumns.SetFieldKey(column, key);
 
@@ -93,7 +92,8 @@ namespace Mfr.App.Ui.Views.RenameList
         private static DataGridLength _ResolveColumnWidth(
             RenameListVisibleColumn visibleColumn,
             int index,
-            int columnCount
+            int columnCount,
+            int effectiveWidth
         )
         {
             var isLastColumn = index == columnCount - 1;
@@ -102,7 +102,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return new DataGridLength(1, DataGridLengthUnitType.Star);
             }
 
-            return new DataGridLength(visibleColumn.ResolveWidth(), DataGridLengthUnitType.Pixel);
+            return new DataGridLength(effectiveWidth, DataGridLengthUnitType.Pixel);
         }
 
         private static string? _GetSortMemberPath(RenameListFieldKey key)

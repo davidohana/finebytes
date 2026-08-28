@@ -9,6 +9,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: Key,
             displayName: "Full File Name",
+            defaultWidth: 180,
             sortColumn: RenameListSortColumn.FullFileName
         )
     {

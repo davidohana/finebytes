@@ -88,27 +88,69 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
-        /// Verifies default grid columns use catalog pixel widths and a star preview column.
+        /// Verifies default grid columns use at least catalog or header-fit widths, and a star preview column.
         /// </summary>
         [AvaloniaFact]
-        public async Task Default_columns_use_catalog_widths()
+        public async Task Default_columns_use_catalog_or_header_widths()
         {
             var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
 
-            Assert.Equal(100, renameListViewModel.VisibleColumns[0].ResolveWidth());
-            Assert.Equal(240, renameListViewModel.VisibleColumns[1].ResolveWidth());
-            Assert.Equal(180, renameListViewModel.VisibleColumns[2].ResolveWidth());
+            Assert.Null(renameListViewModel.VisibleColumns[0].ResolveCatalogWidth());
+            Assert.Equal(240, renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
+            Assert.Equal(180, renameListViewModel.VisibleColumns[2].ResolveCatalogWidth());
 
-            Assert.Equal(100, grid.Columns[0].Width.Value);
+            var fileFolderMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth("File/Folder", reserveSortGlyph: true);
+            var fileFolderHeaderOnlyWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth("File/Folder");
+            var fullFileNameMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Full File Name",
+                reserveSortGlyph: true
+            );
+            Assert.True(fileFolderMinWidth > fileFolderHeaderOnlyWidth);
+            Assert.Equal(fileFolderMinWidth, grid.Columns[0].Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
             Assert.Equal(240, grid.Columns[1].Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
-            Assert.Equal(180, grid.Columns[2].Width.Value);
+            Assert.Equal(Math.Max(180, fullFileNameMinWidth), grid.Columns[2].Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[2].Width.UnitType);
             Assert.True(grid.Columns[3].Width.IsStar);
-            Assert.Equal(100, grid.Columns[0].MinWidth);
+            Assert.Equal(fileFolderMinWidth, grid.Columns[0].MinWidth);
             Assert.Equal(240, grid.Columns[1].MinWidth);
-            Assert.Equal(180, grid.Columns[2].MinWidth);
+            Assert.Equal(Math.Max(180, fullFileNameMinWidth), grid.Columns[2].MinWidth);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies narrow catalog defaults expand so long header labels are not truncated.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Narrow_catalog_columns_expand_to_fit_header_text()
+        {
+            var (renameListViewModel, window, grid) = await _ShowWithRowsAsync(rowCount: 2);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullPathLengthField.Key)
+                ),
+                new RenameListVisibleColumn(
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFileNameLengthField.Key)
+                ),
+            ]);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var fullPathLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full Path Name Length");
+            var previewFileNameLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "File Name Length (Preview)"
+            );
+
+            Assert.Null(renameListViewModel.VisibleColumns[0].ResolveCatalogWidth());
+            Assert.Null(renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
+            Assert.True(fullPathLengthMin > 0);
+            Assert.True(previewFileNameLengthMin > 0);
+            Assert.Equal(fullPathLengthMin, grid.Columns[0].Width.Value);
+            Assert.Equal(fullPathLengthMin, grid.Columns[0].MinWidth);
+            Assert.True(grid.Columns[1].Width.IsStar);
+            Assert.Equal(previewFileNameLengthMin, grid.Columns[1].MinWidth);
 
             window.Close();
         }

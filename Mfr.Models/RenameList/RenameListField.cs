@@ -7,7 +7,9 @@ namespace Mfr.Models.RenameList
     /// </summary>
     /// <param name="propertyKey">Property key within the group (e.g. <c>FullName</c>).</param>
     /// <param name="displayName">User-visible column label.</param>
-    /// <param name="defaultWidth">Default grid column width in pixels (MFR7).</param>
+    /// <param name="defaultWidth">
+    /// Optional grid column width override in pixels for fields whose data is typically wider than the header.
+    /// </param>
     /// <param name="isSortable">When <see langword="true"/>, the field may appear in Auto-Sort keys.</param>
     /// <param name="supportsPreview">
     /// When <see langword="true"/>, a preview column variant may be added (MFR7 non-<c>ReadOnly</c> fields).
@@ -16,7 +18,7 @@ namespace Mfr.Models.RenameList
     public abstract class RenameListField(
         string propertyKey,
         string displayName,
-        int defaultWidth = 180,
+        int? defaultWidth = null,
         bool isSortable = true,
         bool supportsPreview = true,
         RenameListSortColumn? sortColumn = null
@@ -43,9 +45,9 @@ namespace Mfr.Models.RenameList
         public string DisplayName { get; } = displayName;
 
         /// <summary>
-        /// Gets default grid column width in pixels (MFR7).
+        /// Gets optional default grid column width in pixels when data needs more space than the header.
         /// </summary>
-        public int DefaultWidth { get; } = defaultWidth;
+        public int? DefaultWidth { get; } = defaultWidth;
 
         /// <summary>
         /// Gets whether the field may appear in Auto-Sort keys.

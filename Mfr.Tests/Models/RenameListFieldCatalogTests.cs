@@ -82,10 +82,10 @@ namespace Mfr.Tests.Models
 
         [Theory]
         [InlineData(BasicNameField.Key, "File Name", 150, true, true)]
-        [InlineData(BasicItemTypeField.Key, "File/Folder", 100, true, false)]
         [InlineData(BasicFolderField.Key, "Parent Folder", 240, true, true)]
-        [InlineData(BasicFileNameNumericField.Key, "File Name Numeric Value", 50, true, false)]
-        public void Field_definitions_carry_mfr7_labels_and_flags(
+        [InlineData(BasicFullNameField.Key, "Full File Name", 180, true, true)]
+        [InlineData(BasicFullPathField.Key, "Full File Path", 180, true, true)]
+        public void Field_definitions_with_width_overrides_carry_mfr7_labels_and_flags(
             string propertyKey,
             string displayName,
             int defaultWidth,
@@ -101,6 +101,24 @@ namespace Mfr.Tests.Models
             Assert.Equal(supportsPreview, field.SupportsPreview);
             Assert.False(field.OriginalKey.IsPreview);
             Assert.True(field.PreviewKey.IsPreview);
+        }
+
+        [Theory]
+        [InlineData(BasicItemTypeField.Key, "File/Folder", false)]
+        [InlineData(BasicExtensionField.Key, "File Extension", true)]
+        [InlineData(BasicFileNameNumericField.Key, "File Name Numeric Value", false)]
+        [InlineData(BasicFileNameLengthField.Key, "File Name Length", true)]
+        [InlineData(BasicFullPathLengthField.Key, "Full Path Name Length", true)]
+        public void Field_definitions_without_width_overrides_use_header_fit_default(
+            string propertyKey,
+            string displayName,
+            bool supportsPreview
+        )
+        {
+            Assert.True(RenameListFieldCatalog.TryGetField(BasicRenameListField.Group, propertyKey, out var field));
+            Assert.Equal(displayName, field.DisplayName);
+            Assert.Null(field.DefaultWidth);
+            Assert.Equal(supportsPreview, field.SupportsPreview);
         }
 
         [Fact]

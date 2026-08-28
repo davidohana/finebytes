@@ -7,12 +7,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// </summary>
     /// <param name="Key">Field key (original or preview).</param>
     /// <param name="Width">
-    /// Column width in pixels, or <see cref="UseCatalogDefaultWidth"/> to use the catalog default.
+    /// Column width in pixels, or <see cref="UseCatalogDefaultWidth"/> to use the catalog override when set.
     /// </param>
     public sealed record RenameListVisibleColumn(RenameListFieldKey Key, int Width = -1)
     {
         /// <summary>
-        /// Sentinel width: use <see cref="RenameListField.DefaultWidth"/> from the catalog.
+        /// Sentinel width: use the catalog override when declared; otherwise fit the header text.
         /// </summary>
         public const int UseCatalogDefaultWidth = -1;
 
@@ -26,10 +26,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Resolves the grid width for this column.
+        /// Resolves an optional catalog width override for this column.
         /// </summary>
-        /// <returns>Explicit width when set; otherwise the catalog default for <see cref="Key"/>.</returns>
-        public int ResolveWidth()
+        /// <returns>
+        /// User/session pixel width when set; otherwise the catalog override when declared; otherwise <see langword="null"/>.
+        /// </returns>
+        public int? ResolveCatalogWidth()
         {
             if (Width != UseCatalogDefaultWidth)
             {
@@ -38,7 +40,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             if (!RenameListFieldCatalog.TryGetField(Key, out var field))
             {
-                return 180;
+                return null;
             }
 
             return field.DefaultWidth;

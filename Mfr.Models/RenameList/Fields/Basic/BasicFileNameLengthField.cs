@@ -6,7 +6,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// Length of the full file name including extension.
     /// </summary>
     public sealed class BasicFileNameLengthField()
-        : BasicRenameListField(propertyKey: Key, displayName: "File Name Length", defaultWidth: 40)
+        : BasicRenameListField(propertyKey: Key, displayName: "File Name Length")
     {
         /// <summary>
         /// MFR7 property key.
