@@ -39,12 +39,12 @@
         />
         <Separator />
         <MenuItem
-          Header="Select Fields..."
+          Header="Select Visible Fields..."
           Command="{Binding OpenFieldShuttleCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
         />
         <MenuItem
-          Header="Edit Sort Fields..."
+          Header="Select Sort Fields..."
           Command="{Binding OpenEditSortFieldsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"
         />

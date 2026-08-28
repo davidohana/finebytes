@@ -61,11 +61,19 @@ namespace Mfr.App.Ui.Views.RenameList
             menu.Items.Add(new Separator());
             var selectFields = new MenuItem
             {
-                Header = "Select Fields...",
+                Header = "Select Visible Fields...",
                 Command = _viewModel.OpenFieldShuttleCommand,
             };
             ToolTip.SetTip(selectFields, AppTips.SelectRenameListFields);
             menu.Items.Add(selectFields);
+
+            var selectSortFields = new MenuItem
+            {
+                Header = "Select Sort Fields...",
+                Command = _viewModel.OpenEditSortFieldsCommand,
+            };
+            ToolTip.SetTip(selectSortFields, AppTips.EditRenameListSortFields);
+            menu.Items.Add(selectSortFields);
 
             var hideField = new MenuItem { Header = "Hide Field", IsEnabled = canHide };
             hideField.Click += (_, _) => _viewModel.HideColumn(fieldKey);

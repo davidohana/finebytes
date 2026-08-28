@@ -64,7 +64,7 @@ Selecting or focusing a Rename List cell shows the full cell value in the status
 
 Shift+click a column header to append a sort key, toggle its direction, or remove it from the sort list. A plain header click replaces the sort list with that column only.
 
-Click the **Select Fields** toolbar button on the Rename List, choose **Select Visible Fields...** or **Select Sort Fields...** from the **Rename List** menu, right-click the grid and choose **Select Fields...** or **Edit Sort Fields...**, or right-click a column header and choose **Select Fields...** or **Hide Field**, to open the field shuttle (visible columns and Auto-Sort tabs).
+Click the **Select Fields** toolbar button on the Rename List, or choose **Select Visible Fields...** or **Select Sort Fields...** from the **Rename List** menu, the grid right-click menu, or a column-header right-click menu, to open the field shuttle (visible columns and Auto-Sort tabs). Right-click a column header and choose **Hide Field** to hide that column.
 
 ## Shown in menus, not implemented yet
 
