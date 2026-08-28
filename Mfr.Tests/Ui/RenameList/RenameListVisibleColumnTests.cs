@@ -142,7 +142,10 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var renameListViewModel = _context.CreateRenameListViewModel();
             var firstKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
-            var secondKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Extension);
+            var secondKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Extension
+            );
             renameListViewModel.SetVisibleColumns([
                 new RenameListVisibleColumn(firstKey, Width: 150),
                 new RenameListVisibleColumn(secondKey, Width: 120),
@@ -181,7 +184,10 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var renameListViewModel = _context.CreateRenameListViewModel();
             var firstKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
-            var secondKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Extension);
+            var secondKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Extension
+            );
             var unknownKey = RenameListFieldKey.Original("Unknown", "Missing");
             renameListViewModel.SetVisibleColumns([
                 new RenameListVisibleColumn(firstKey),

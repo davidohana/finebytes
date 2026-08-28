@@ -1,5 +1,9 @@
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Image;
+using Mfr.Models.RenameList.Fields.Jpeg;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -48,7 +52,10 @@ namespace Mfr.Tests.Ui.RenameList
             );
             dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
             Assert.Equal(4, dialogVm.SelectedColumnRows.Count);
-            Assert.DoesNotContain(dialogVm.AvailableOriginalFields, field => field.PropertyKey == BasicRenameListFields.Key.Name);
+            Assert.DoesNotContain(
+                dialogVm.AvailableOriginalFields,
+                field => field.PropertyKey == BasicRenameListFields.Key.Name
+            );
 
             dialogVm.SelectedColumnRowIndex = 0;
             dialogVm.MoveSelectedColumnDownCommand.Execute(null);
@@ -221,6 +228,57 @@ namespace Mfr.Tests.Ui.RenameList
             dialogVm.IsOriginalColumnsTab = true;
             Assert.False(dialogVm.IsPreviewColumnsTab);
             Assert.True(dialogVm.IsOriginalColumnsTab);
+        }
+
+        [Fact]
+        public void Constructor_exposes_phase7a_original_groups()
+        {
+            var dialogVm = _CreateDefaultDialog();
+
+            Assert.Equal(
+                [
+                    BasicRenameListField.GroupLabel,
+                    ExtendedRenameListFields.GroupLabel,
+                    AudioTagRenameListFields.GroupLabel,
+                    ImageRenameListFields.GroupLabel,
+                    JpegRenameListFields.GroupLabel,
+                ],
+                dialogVm.Groups.Select(group => group.DisplayName)
+            );
+        }
+
+        [Fact]
+        public void Original_only_group_has_no_preview_fields_and_add_all_adds_originals()
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
+                    ),
+                ],
+                []
+            );
+            dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == ExtendedRenameListFields.Group);
+
+            Assert.Equal(6, dialogVm.AvailableOriginalFields.Count);
+            Assert.Empty(dialogVm.AvailablePreviewFields);
+            Assert.Empty(dialogVm.AvailableSortFields);
+
+            dialogVm.AddAllOriginalFieldsCommand.Execute(null);
+
+            Assert.Equal(7, dialogVm.SelectedColumnRows.Count);
+            Assert.Empty(dialogVm.AvailableOriginalFields);
+            Assert.DoesNotContain(dialogVm.SelectedColumnRows, row => row.Column.Key.IsPreview);
+        }
+
+        [Fact]
+        public void Jpeg_tag_group_has_no_preview_fields()
+        {
+            var dialogVm = _CreateDefaultDialog();
+            dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == JpegRenameListFields.Group);
+
+            Assert.Equal(12, dialogVm.AvailableOriginalFields.Count);
+            Assert.Empty(dialogVm.AvailablePreviewFields);
         }
 
         private static RenameListFieldShuttleDialogViewModel _CreateDefaultDialog()

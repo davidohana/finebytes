@@ -18,7 +18,17 @@ namespace Mfr.Models.RenameList.Fields.Basic
         bool isSortable = true,
         bool supportsPreview = true,
         RenameListSortColumn? sortColumn = null
-    ) : RenameListField(propertyKey, displayName, defaultWidth, isSortable, supportsPreview, sortColumn)
+    )
+        : RenameListField(
+            Group,
+            GroupLabel,
+            propertyKey,
+            displayName,
+            defaultWidth,
+            isSortable,
+            supportsPreview,
+            sortColumn
+        )
     {
         /// <summary>
         /// MFR7 Basic property group id.
@@ -29,11 +39,5 @@ namespace Mfr.Models.RenameList.Fields.Basic
         /// User-visible group label in the field shuttle dropdown.
         /// </summary>
         public const string GroupLabel = "File Name";
-
-        /// <inheritdoc />
-        public sealed override string GroupId => Group;
-
-        /// <inheritdoc />
-        public sealed override string GroupDisplayName => GroupLabel;
     }
 }

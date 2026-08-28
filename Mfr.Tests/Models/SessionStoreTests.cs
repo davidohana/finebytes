@@ -77,11 +77,17 @@ namespace Mfr.Tests.Models
                         VisibleColumns =
                         [
                             new SessionStateRenameListColumn(
-                                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath),
+                                RenameListFieldKey.Original(
+                                    BasicRenameListField.Group,
+                                    BasicRenameListFields.Key.FullPath
+                                ),
                                 Width: 220
                             ),
                             new SessionStateRenameListColumn(
-                                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                                RenameListFieldKey.Preview(
+                                    BasicRenameListField.Group,
+                                    BasicRenameListFields.Key.FullName
+                                )
                             ),
                         ],
                     },

@@ -189,7 +189,10 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var parentFolderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            var parentFolderKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Folder
+            );
             var parentFolderHeader = grid.GetVisualDescendants()
                 .OfType<DataGridColumnHeader>()
                 .First(header => RenameListGridColumns.TryResolveFieldKey(header) == parentFolderKey);
@@ -415,8 +418,14 @@ namespace Mfr.Tests.Ui.RenameList
             const string fullPath =
                 @"D:\Music\General\QRS\Supergrass - 2005 - Road To Rouen\01 - Tales of Endurance (Part 1).mp3";
 
-            var parentFolderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
-            var fullPathKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath);
+            var parentFolderKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Folder
+            );
+            var fullPathKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullPath
+            );
             var parentEntry = RenameListEntry.ToEntry(
                 FilterTestHelpers.CreateRenameItem(prefix: "01 - Tales of Endurance (Part 1)", directory: parentFolder)
             );
@@ -510,7 +519,10 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([path]);
-            var fullNameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
             var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 "Full File Name",
                 reserveSortGlyph: true

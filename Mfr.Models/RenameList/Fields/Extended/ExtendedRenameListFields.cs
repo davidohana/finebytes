@@ -1,4 +1,3 @@
-using System.Globalization;
 using Mfr.Models.Rename;
 
 namespace Mfr.Models.RenameList.Fields.Extended
@@ -8,6 +7,16 @@ namespace Mfr.Models.RenameList.Fields.Extended
     /// </summary>
     public static class ExtendedRenameListFields
     {
+        /// <summary>
+        /// MFR7 Extended property group id.
+        /// </summary>
+        public const string Group = "Extended";
+
+        /// <summary>
+        /// User-visible group label in the field shuttle dropdown.
+        /// </summary>
+        public const string GroupLabel = "File Properties";
+
         /// <summary>
         /// Extended group fields in catalog order.
         /// </summary>
@@ -21,6 +30,15 @@ namespace Mfr.Models.RenameList.Fields.Extended
             new ExtendedFileCountField(),
         ];
     }
+
+    internal abstract class ExtendedRenameListField(string propertyKey, string displayName, int? defaultWidth = null)
+        : OriginalOnlyRenameListField(
+            ExtendedRenameListFields.Group,
+            ExtendedRenameListFields.GroupLabel,
+            propertyKey,
+            displayName,
+            defaultWidth
+        );
 
     internal sealed class ExtendedCreationDateField()
         : ExtendedRenameListField(CreationDateKey, "Creation Date", defaultWidth: 110)
@@ -83,14 +101,7 @@ namespace Mfr.Models.RenameList.Fields.Extended
 
         public override string Resolve(FileMeta meta)
         {
-            var directoryPath = meta.Attributes.HasFlag(FileAttributes.Directory) ? meta.FullPath : meta.DirectoryPath;
-
-            if (!Directory.Exists(directoryPath))
-            {
-                return string.Empty;
-            }
-
-            return Directory.GetFiles(directoryPath).Length.ToString(CultureInfo.InvariantCulture);
+            return RenameListFieldDisplay.FormatFolderFileCount(meta);
         }
     }
 }

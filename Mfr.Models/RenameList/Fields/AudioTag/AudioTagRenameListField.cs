@@ -9,29 +9,15 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// <param name="propertyKey">Property key within the Audio Tag group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    public abstract class AudioTagRenameListField(string propertyKey, string displayName, int? defaultWidth = 100)
-        : RenameListField(propertyKey, displayName, defaultWidth, isSortable: false, supportsPreview: false)
-    {
-        /// <summary>
-        /// MFR7 Audio Tag property group id.
-        /// </summary>
-        public const string Group = "MediaTag";
-
-        /// <summary>
-        /// User-visible group label in the field shuttle dropdown.
-        /// </summary>
-        public const string GroupLabel = "Audio Tag";
-
-        /// <inheritdoc />
-        public sealed override string GroupId => Group;
-
-        /// <inheritdoc />
-        public sealed override string GroupDisplayName => GroupLabel;
-
-        /// <inheritdoc />
-        public sealed override RenameListFieldMetadataLoad MetadataLoad =>
-            RenameListFieldMetadataLoad.EmbeddedAudioTags;
-    }
+    internal abstract class AudioTagRenameListField(string propertyKey, string displayName, int? defaultWidth = 100)
+        : OriginalOnlyRenameListField(
+            AudioTagRenameListFields.Group,
+            AudioTagRenameListFields.GroupLabel,
+            propertyKey,
+            displayName,
+            defaultWidth,
+            RenameListFieldMetadataLoad.EmbeddedAudioTags
+        );
 
     /// <summary>
     /// One semantic audio-tag column backed by <see cref="SemanticFields"/>.
@@ -40,7 +26,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="field">Semantic field to format.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    public sealed class AudioTagSemanticRenameListField(
+    internal sealed class AudioTagSemanticRenameListField(
         string propertyKey,
         string displayName,
         SemanticAudioField field,
@@ -56,6 +42,26 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         public override string Resolve(FileMeta meta)
         {
             return SemanticFields.GetSemanticField(meta.AudioTagOverlay, Field);
+        }
+    }
+
+    /// <summary>
+    /// First semicolon-delimited segment of a multi-value semantic audio field.
+    /// </summary>
+    /// <param name="propertyKey">Property key within the Audio Tag group.</param>
+    /// <param name="displayName">User-visible column label.</param>
+    /// <param name="field">Semantic field whose first segment is shown.</param>
+    internal sealed class AudioTagFirstSegmentRenameListField(
+        string propertyKey,
+        string displayName,
+        SemanticAudioField field
+    ) : AudioTagRenameListField(propertyKey, displayName)
+    {
+        /// <inheritdoc />
+        public override string Resolve(FileMeta meta)
+        {
+            var joined = SemanticFields.GetSemanticField(meta.AudioTagOverlay, field);
+            return RenameListFieldDisplay.FirstDelimitedSegment(joined);
         }
     }
 }

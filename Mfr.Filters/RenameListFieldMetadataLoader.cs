@@ -51,9 +51,9 @@ namespace Mfr.Filters
             {
                 item.EnsureEmbeddedTagsLoaded();
             }
-            catch (Exception ex) when (ex is InvalidOperationException or IOException)
+            catch (Exception ex) when (_IsMetadataReadFailure(ex))
             {
-                // Grid cells show empty when tags cannot be read (folder row, missing file, unsupported format).
+                // Grid cells show empty when tags cannot be read (missing file, unsupported format).
             }
         }
 
@@ -68,10 +68,22 @@ namespace Mfr.Filters
             {
                 item.EnsureImagePropertiesLoaded();
             }
-            catch (Exception ex) when (ex is InvalidOperationException or IOException or ArgumentException)
+            catch (Exception ex) when (_IsMetadataReadFailure(ex))
             {
                 // Grid cells show empty when image metadata cannot be read.
             }
+        }
+
+        private static bool _IsMetadataReadFailure(Exception ex)
+        {
+            if (ex is InvalidOperationException or IOException or ArgumentException or UnauthorizedAccessException)
+            {
+                return true;
+            }
+
+            // TagLib / MetadataExtractor exceptions without taking a Filters package reference on those libraries.
+            var typeName = ex.GetType().Name;
+            return typeName is "UnsupportedFormatException" or "CorruptFileException" or "ImageProcessingException";
         }
     }
 }

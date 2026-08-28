@@ -9,6 +9,16 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     public static class AudioTagRenameListFields
     {
         /// <summary>
+        /// MFR7 Audio Tag property group id.
+        /// </summary>
+        public const string Group = "MediaTag";
+
+        /// <summary>
+        /// User-visible group label in the field shuttle dropdown.
+        /// </summary>
+        public const string GroupLabel = "Audio Tag";
+
+        /// <summary>
         /// Audio Tag group fields in MFR7 alphabetical display-name order.
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
@@ -27,10 +37,14 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
             new AudioTagSemanticRenameListField("Copyright", "Copyright", SemanticAudioField.Copyright),
             new AudioTagSemanticRenameListField("DiscCount", "Disc Count", SemanticAudioField.DiscCount),
             new AudioTagSemanticRenameListField("Disc", "Disc", SemanticAudioField.Disc),
-            new AudioTagFirstAlbumArtistField(),
-            new AudioTagFirstComposerField(),
-            new AudioTagFirstGenreField(),
-            new AudioTagFirstPerformerField(),
+            new AudioTagFirstSegmentRenameListField(
+                "FirstAlbumArtist",
+                "First AlbumArtist",
+                SemanticAudioField.AlbumArtists
+            ),
+            new AudioTagFirstSegmentRenameListField("FirstComposer", "First Composer", SemanticAudioField.Composers),
+            new AudioTagFirstSegmentRenameListField("FirstGenre", "First Genre", SemanticAudioField.Genre),
+            new AudioTagFirstSegmentRenameListField("FirstPerformer", "First Performer", SemanticAudioField.Performers),
             new AudioTagSemanticRenameListField("Genres", "Genres", SemanticAudioField.Genre),
             new AudioTagSemanticRenameListField("Grouping", "Grouping", SemanticAudioField.Grouping),
             new AudioTagSemanticRenameListField("Lyrics", "Lyrics", SemanticAudioField.Lyrics),
@@ -82,42 +96,6 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
             new AudioTagSemanticRenameListField("Track", "Track", SemanticAudioField.Track, defaultWidth: 40),
             new AudioTagSemanticRenameListField("Year", "Year", SemanticAudioField.Year, defaultWidth: 60),
         ];
-    }
-
-    internal sealed class AudioTagFirstPerformerField() : AudioTagRenameListField("FirstPerformer", "First Performer")
-    {
-        public override string Resolve(FileMeta meta)
-        {
-            var performers = SemanticFields.GetSemanticField(meta.AudioTagOverlay, SemanticAudioField.Performers);
-            return RenameListFieldDisplay.FirstDelimitedSegment(performers);
-        }
-    }
-
-    internal sealed class AudioTagFirstAlbumArtistField()
-        : AudioTagRenameListField("FirstAlbumArtist", "First AlbumArtist")
-    {
-        public override string Resolve(FileMeta meta)
-        {
-            var albumArtists = SemanticFields.GetSemanticField(meta.AudioTagOverlay, SemanticAudioField.AlbumArtists);
-            return RenameListFieldDisplay.FirstDelimitedSegment(albumArtists);
-        }
-    }
-
-    internal sealed class AudioTagFirstComposerField() : AudioTagRenameListField("FirstComposer", "First Composer")
-    {
-        public override string Resolve(FileMeta meta)
-        {
-            var composers = SemanticFields.GetSemanticField(meta.AudioTagOverlay, SemanticAudioField.Composers);
-            return RenameListFieldDisplay.FirstDelimitedSegment(composers);
-        }
-    }
-
-    internal sealed class AudioTagFirstGenreField() : AudioTagRenameListField("FirstGenre", "First Genre")
-    {
-        public override string Resolve(FileMeta meta)
-        {
-            return SemanticFields.GetSemanticField(meta.AudioTagOverlay, SemanticAudioField.Genre);
-        }
     }
 
     internal sealed class AudioTagTagTypesField() : AudioTagRenameListField("TagTypes", "Tag Types")

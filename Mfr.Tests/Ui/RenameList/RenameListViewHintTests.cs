@@ -141,7 +141,10 @@ namespace Mfr.Tests.Ui.RenameList
                 .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
             Assert.NotNull(row);
 
-            var fullNameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
             var x = 0.0;
             var found = false;
             foreach (var column in grid.Columns.OrderBy(column => column.DisplayIndex))

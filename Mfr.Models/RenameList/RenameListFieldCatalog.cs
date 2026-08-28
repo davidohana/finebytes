@@ -180,29 +180,6 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Returns the combined lazy-load requirements for <paramref name="keys"/>.
-        /// </summary>
-        /// <param name="keys">Visible or requested field keys.</param>
-        /// <returns>Union of metadata-load flags for the registered fields.</returns>
-        public static RenameListFieldMetadataLoad GetCombinedMetadataLoad(IEnumerable<RenameListFieldKey> keys)
-        {
-            ArgumentNullException.ThrowIfNull(keys);
-
-            var metadataLoad = RenameListFieldMetadataLoad.None;
-            foreach (var key in keys)
-            {
-                if (!TryGetField(key, out var field))
-                {
-                    continue;
-                }
-
-                metadataLoad |= field.MetadataLoad;
-            }
-
-            return metadataLoad;
-        }
-
-        /// <summary>
         /// Returns the lazy metadata-load requirement for one field key.
         /// </summary>
         /// <param name="key">Field key.</param>

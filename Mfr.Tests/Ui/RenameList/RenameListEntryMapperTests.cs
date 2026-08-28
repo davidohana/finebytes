@@ -18,7 +18,10 @@ namespace Mfr.Tests.Ui.RenameList
                 directory: @"D:\Photos\2024"
             );
             var entry = RenameListEntry.ToEntry(item);
-            var fullNameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
 
             Assert.Equal("vacation007.jpg", entry.GetFieldText(fullNameKey));
             Assert.Equal(entry.GetFieldText(fullNameKey), entry.FullFileName);
@@ -38,7 +41,9 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("after.txt", entry.FullFileNamePreview);
             Assert.Equal(
                 "after.txt",
-                entry.GetFieldText(RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName))
+                entry.GetFieldText(
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                )
             );
         }
     }

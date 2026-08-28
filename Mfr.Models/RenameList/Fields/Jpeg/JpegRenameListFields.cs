@@ -6,6 +6,16 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
     public static class JpegRenameListFields
     {
         /// <summary>
+        /// MFR7 Jpeg property group id.
+        /// </summary>
+        public const string Group = "Jpeg";
+
+        /// <summary>
+        /// User-visible group label in the field shuttle dropdown.
+        /// </summary>
+        public const string GroupLabel = "Jpeg Tag";
+
+        /// <summary>
         /// Jpeg Tag group fields in catalog order.
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =

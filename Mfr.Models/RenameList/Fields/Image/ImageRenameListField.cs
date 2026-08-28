@@ -9,29 +9,15 @@ namespace Mfr.Models.RenameList.Fields.Image
     /// <param name="propertyKey">Property key within the Image group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    public abstract class ImageRenameListField(string propertyKey, string displayName, int? defaultWidth = 40)
-        : RenameListField(propertyKey, displayName, defaultWidth, isSortable: false, supportsPreview: false)
-    {
-        /// <summary>
-        /// MFR7 Image property group id.
-        /// </summary>
-        public const string Group = "Image";
-
-        /// <summary>
-        /// User-visible group label in the field shuttle dropdown.
-        /// </summary>
-        public const string GroupLabel = "Image";
-
-        /// <inheritdoc />
-        public sealed override string GroupId => Group;
-
-        /// <inheritdoc />
-        public sealed override string GroupDisplayName => GroupLabel;
-
-        /// <inheritdoc />
-        public sealed override RenameListFieldMetadataLoad MetadataLoad =>
-            RenameListFieldMetadataLoad.ImageProperties;
-    }
+    internal abstract class ImageRenameListField(string propertyKey, string displayName, int? defaultWidth = 40)
+        : OriginalOnlyRenameListField(
+            ImageRenameListFields.Group,
+            ImageRenameListFields.GroupLabel,
+            propertyKey,
+            displayName,
+            defaultWidth,
+            RenameListFieldMetadataLoad.ImageProperties
+        );
 
     /// <summary>
     /// One read-only image property column backed by <see cref="ImageProperties"/>.
@@ -40,7 +26,7 @@ namespace Mfr.Models.RenameList.Fields.Image
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="field">Image property to format.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    public sealed class ImagePropertyRenameListField(
+    internal sealed class ImagePropertyRenameListField(
         string propertyKey,
         string displayName,
         ImageRenameListProperty field,
@@ -62,7 +48,7 @@ namespace Mfr.Models.RenameList.Fields.Image
     /// <summary>
     /// Image properties exposed as Rename List columns.
     /// </summary>
-    public enum ImageRenameListProperty
+    internal enum ImageRenameListProperty
     {
         /// <summary>Raster format short name.</summary>
         Format,

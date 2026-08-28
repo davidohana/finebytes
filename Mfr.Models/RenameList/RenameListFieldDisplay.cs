@@ -1,5 +1,6 @@
 using System.Globalization;
 using Mfr.Models.Media;
+using Mfr.Models.Rename;
 using Mfr.Utils;
 
 namespace Mfr.Models.RenameList
@@ -32,6 +33,22 @@ namespace Mfr.Models.RenameList
         internal static string FormatFileSizeBytes(long bytes)
         {
             return bytes.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Formats the non-recursive file count for a folder item or its parent (MFR7 <c>FileCount</c>).
+        /// </summary>
+        /// <param name="meta">Scan metadata for the row.</param>
+        /// <returns>Invariant digit string, or empty when the directory does not exist.</returns>
+        internal static string FormatFolderFileCount(FileMeta meta)
+        {
+            var directoryPath = meta.Attributes.IsDirectory() ? meta.FullPath : meta.DirectoryPath;
+            if (!Directory.Exists(directoryPath))
+            {
+                return string.Empty;
+            }
+
+            return Directory.GetFiles(directoryPath).Length.ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -102,12 +119,7 @@ namespace Mfr.Models.RenameList
         /// <returns>Formatted date/time, or empty when absent.</returns>
         internal static string FormatExifDateTaken(ExifData? exif)
         {
-            if (exif?.DateTaken is not { } dateTaken)
-            {
-                return string.Empty;
-            }
-
-            return dateTaken.ToString("g", CultureInfo.CurrentCulture);
+            return exif?.DateTaken is { } dateTaken ? FormatFileDate(dateTaken) : string.Empty;
         }
 
         /// <summary>

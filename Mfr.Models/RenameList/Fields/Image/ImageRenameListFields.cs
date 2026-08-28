@@ -6,6 +6,16 @@ namespace Mfr.Models.RenameList.Fields.Image
     public static class ImageRenameListFields
     {
         /// <summary>
+        /// MFR7 Image property group id.
+        /// </summary>
+        public const string Group = "Image";
+
+        /// <summary>
+        /// User-visible group label in the field shuttle dropdown.
+        /// </summary>
+        public const string GroupLabel = "Image";
+
+        /// <summary>
         /// Image group fields in catalog order.
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =

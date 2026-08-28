@@ -5,6 +5,8 @@ namespace Mfr.Models.RenameList
     /// <summary>
     /// One Rename List catalog field: metadata plus value resolution for original/preview snapshots.
     /// </summary>
+    /// <param name="groupId">MFR7 property group id (e.g. <c>Basic</c>).</param>
+    /// <param name="groupDisplayName">User-visible group label in the field shuttle dropdown.</param>
     /// <param name="propertyKey">Property key within the group (e.g. <c>FullName</c>).</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">
@@ -15,24 +17,28 @@ namespace Mfr.Models.RenameList
     /// When <see langword="true"/>, a preview column variant may be added (MFR7 non-<c>ReadOnly</c> fields).
     /// </param>
     /// <param name="sortColumn">Engine Auto-Sort column when this field maps to one.</param>
+    /// <param name="metadataLoad">Lazy disk metadata required before resolving this field.</param>
     public abstract class RenameListField(
+        string groupId,
+        string groupDisplayName,
         string propertyKey,
         string displayName,
         int? defaultWidth = null,
         bool isSortable = true,
         bool supportsPreview = true,
-        RenameListSortColumn? sortColumn = null
+        RenameListSortColumn? sortColumn = null,
+        RenameListFieldMetadataLoad metadataLoad = RenameListFieldMetadataLoad.None
     )
     {
         /// <summary>
         /// Gets the MFR7 property group id.
         /// </summary>
-        public abstract string GroupId { get; }
+        public string GroupId { get; } = groupId;
 
         /// <summary>
         /// Gets the user-visible group label in the field shuttle dropdown.
         /// </summary>
-        public abstract string GroupDisplayName { get; }
+        public string GroupDisplayName { get; } = groupDisplayName;
 
         /// <summary>
         /// Gets the property key within <see cref="GroupId"/>.
@@ -67,7 +73,7 @@ namespace Mfr.Models.RenameList
         /// <summary>
         /// Gets whether resolving this field may require lazy metadata loaded from disk.
         /// </summary>
-        public virtual RenameListFieldMetadataLoad MetadataLoad => RenameListFieldMetadataLoad.None;
+        public RenameListFieldMetadataLoad MetadataLoad { get; } = metadataLoad;
 
         /// <summary>
         /// Gets the original (non-preview) field key for this field.

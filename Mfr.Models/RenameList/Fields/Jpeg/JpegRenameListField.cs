@@ -9,29 +9,15 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
     /// <param name="propertyKey">Property key within the Jpeg group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    public abstract class JpegRenameListField(string propertyKey, string displayName, int? defaultWidth = 80)
-        : RenameListField(propertyKey, displayName, defaultWidth, isSortable: false, supportsPreview: false)
-    {
-        /// <summary>
-        /// MFR7 Jpeg property group id.
-        /// </summary>
-        public const string Group = "Jpeg";
-
-        /// <summary>
-        /// User-visible group label in the field shuttle dropdown.
-        /// </summary>
-        public const string GroupLabel = "Jpeg Tag";
-
-        /// <inheritdoc />
-        public sealed override string GroupId => Group;
-
-        /// <inheritdoc />
-        public sealed override string GroupDisplayName => GroupLabel;
-
-        /// <inheritdoc />
-        public sealed override RenameListFieldMetadataLoad MetadataLoad =>
-            RenameListFieldMetadataLoad.ImageProperties;
-    }
+    internal abstract class JpegRenameListField(string propertyKey, string displayName, int? defaultWidth = 80)
+        : OriginalOnlyRenameListField(
+            JpegRenameListFields.Group,
+            JpegRenameListFields.GroupLabel,
+            propertyKey,
+            displayName,
+            defaultWidth,
+            RenameListFieldMetadataLoad.ImageProperties
+        );
 
     /// <summary>
     /// One read-only EXIF column backed by <see cref="ExifData"/>.
@@ -40,7 +26,7 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="field">EXIF property to format.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    public sealed class JpegExifRenameListField(
+    internal sealed class JpegExifRenameListField(
         string propertyKey,
         string displayName,
         JpegRenameListExifProperty field,
@@ -62,7 +48,7 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
     /// <summary>
     /// EXIF properties exposed as MFR7 Jpeg Tag Rename List columns.
     /// </summary>
-    public enum JpegRenameListExifProperty
+    internal enum JpegRenameListExifProperty
     {
         /// <summary>Windows XP Title.</summary>
         Title,

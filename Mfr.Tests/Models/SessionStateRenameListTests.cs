@@ -35,7 +35,10 @@ namespace Mfr.Tests.Models
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
             var sessionColumns = new List<SessionStateRenameListColumn>
             {
-                new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath), Width: 220),
+                new(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath),
+                    Width: 220
+                ),
                 new(previewKey),
             };
 

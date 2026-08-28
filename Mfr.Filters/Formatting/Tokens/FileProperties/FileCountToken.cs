@@ -1,5 +1,4 @@
-using System.Globalization;
-using Mfr.Utils;
+using Mfr.Models.RenameList;
 
 namespace Mfr.Filters.Formatting.Tokens.FileProperties
 {
@@ -22,16 +21,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         public Formatter Compile(string tokenArgs)
         {
             FormatOptionsParsing.RequireNoArgument(tokenArgs, FormatOptionsParsing.TokenDisplayName(this));
-            return item =>
-            {
-                var dir = item.Original.Attributes.IsDirectory() ? item.Original.FullPath : item.Original.DirectoryPath;
-                if (!Directory.Exists(dir))
-                {
-                    return string.Empty;
-                }
-
-                return Directory.GetFiles(dir).Length.ToString(CultureInfo.InvariantCulture);
-            };
+            return item => RenameListFieldDisplay.FormatFolderFileCount(item.Original);
         }
     }
 }
