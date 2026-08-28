@@ -217,7 +217,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var newEntries = new List<RenameListEntry>(addedCount);
             for (var i = insertAt; i < insertAt + addedCount; i++)
             {
-                newEntries.Add(RenameListEntryMapper.ToEntry(renameItems[i]));
+                newEntries.Add(RenameListEntry.ToEntry(renameItems[i]));
             }
 
             Entries.InsertRange(insertAt, newEntries);
