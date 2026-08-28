@@ -20,7 +20,19 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _WireColumnReorder()
         {
+            RenameGrid.ColumnReordering += _OnColumnReordering;
             RenameGrid.ColumnReordered += _OnColumnReordered;
+        }
+
+        private void _OnColumnReordering(object? sender, DataGridColumnReorderingEventArgs e)
+        {
+            var headerHeight = RenameGrid.ColumnHeaderHeight;
+            if (double.IsNaN(headerHeight) || headerHeight <= 0)
+            {
+                headerHeight = 22;
+            }
+
+            e.DropLocationIndicator = new RenameListColumnDropIndicator(headerHeight);
         }
 
         private void _OnColumnReordered(object? sender, DataGridColumnEventArgs e)

@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
@@ -310,6 +311,20 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(RenameListGridColumns.GetFieldKey(firstColumn), orderedKeys[1]);
 
             window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the column drop marker reports a non-zero size for the header height.
+        /// </summary>
+        [AvaloniaFact]
+        public void Column_drop_indicator_has_header_height()
+        {
+            const double headerHeight = 22;
+            var indicator = new RenameListColumnDropIndicator(headerHeight);
+            indicator.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
+            Assert.Equal(8, indicator.DesiredSize.Width);
+            Assert.Equal(headerHeight, indicator.DesiredSize.Height);
         }
 
         private async Task<(RenameListViewModel ViewModel, Window Window, DataGrid Grid)> _ShowWithRowsAsync(
