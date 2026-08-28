@@ -43,6 +43,24 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
         {
             return JpegRenameListFieldDisplay.Format(meta.Exif, Field);
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            if (Field == JpegRenameListExifProperty.DateTaken)
+            {
+                var leftDate = left.Exif?.DateTaken ?? default;
+                var rightDate = right.Exif?.DateTaken ?? default;
+                return RenameListFieldSortCompare.DateTime(leftDate, rightDate);
+            }
+
+            if (Field == JpegRenameListExifProperty.ImageNumber)
+            {
+                return RenameListFieldSortCompare.ParsedInt64(Resolve(left), Resolve(right));
+            }
+
+            return base.CompareForSort(left, right);
+        }
     }
 
     /// <summary>

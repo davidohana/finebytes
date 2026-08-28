@@ -1,4 +1,5 @@
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Models
 {
@@ -12,18 +13,18 @@ namespace Mfr.Tests.Models
         {
             var descending = new List<SessionStateRenameListSortField>
             {
-                new(RenameListSortColumn.ParentFolder, Descending: true),
+                new(RenameListTestHelpers.ParentFolderKey, Descending: true),
             };
             Assert.Equal(
-                [new RenameListSortKey(RenameListSortColumn.ParentFolder, Descending: true)],
+                [new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true)],
                 SessionStateRenameList.ToSortKeys(descending)
             );
             Assert.Empty(SessionStateRenameList.ToSortKeys([]));
             Assert.Equal(
                 [
-                    new SessionStateRenameListSortField(RenameListSortColumn.FileFolder),
-                    new SessionStateRenameListSortField(RenameListSortColumn.ParentFolder),
-                    new SessionStateRenameListSortField(RenameListSortColumn.FullFileName),
+                    new SessionStateRenameListSortField(RenameListTestHelpers.FileFolderKey),
+                    new SessionStateRenameListSortField(RenameListTestHelpers.ParentFolderKey),
+                    new SessionStateRenameListSortField(RenameListTestHelpers.FullFileNameKey),
                 ],
                 SessionStateRenameList.FromSortKeys(RenameListSortKey.DefaultKeys)
             );

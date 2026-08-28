@@ -13,37 +13,32 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public const string AutoSortOffSummary = "Auto-Sort off. Push to activate.";
 
         /// <summary>
-        /// Gets the catalog display name for a sort column.
+        /// Gets the catalog display name for a sort field key.
         /// </summary>
-        /// <param name="column">Sort column.</param>
-        /// <returns>User-visible field name, or the enum name when unmapped.</returns>
-        public static string GetColumnLabel(RenameListSortColumn column)
+        /// <param name="fieldKey">Original field key.</param>
+        /// <returns>User-visible field name.</returns>
+        public static string GetFieldLabel(RenameListFieldKey fieldKey)
         {
-            if (!RenameListFieldCatalog.TryMapSortColumn(column, out var key))
-            {
-                return column.ToString();
-            }
-
-            return RenameListFieldCatalog.GetField(key).DisplayName;
+            return RenameListFieldCatalog.GetField(fieldKey).DisplayName;
         }
 
         /// <summary>
-        /// Builds header glyph state from active sort keys, keyed by column.
+        /// Builds header glyph state from active sort keys, keyed by original field key.
         /// </summary>
         /// <param name="keys">Active sort keys in priority order.</param>
-        /// <returns>Lookup of priority and direction for each key's column.</returns>
+        /// <returns>Lookup of priority and direction for each key's field.</returns>
         public static RenameListColumnSortStates BuildColumnSortStates(IReadOnlyList<RenameListSortKey> keys)
         {
             ArgumentNullException.ThrowIfNull(keys);
 
-            var columnToState = new Dictionary<RenameListSortColumn, RenameListColumnSortState>(keys.Count);
+            var fieldKeyToState = new Dictionary<RenameListFieldKey, RenameListColumnSortState>(keys.Count);
             for (var i = 0; i < keys.Count; i++)
             {
                 var key = keys[i];
-                columnToState.TryAdd(key.Column, new RenameListColumnSortState(i + 1, key.Descending));
+                fieldKeyToState.TryAdd(key.FieldKey, new RenameListColumnSortState(i + 1, key.Descending));
             }
 
-            return new RenameListColumnSortStates(columnToState);
+            return new RenameListColumnSortStates(fieldKeyToState);
         }
 
         /// <summary>
@@ -64,7 +59,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 var key = keys[i];
                 var arrow = key.Descending ? "↓" : "↑";
-                lines[i] = $"{i + 1}. {GetColumnLabel(key.Column)} {arrow}";
+                lines[i] = $"{i + 1}. {GetFieldLabel(key.FieldKey)} {arrow}";
             }
 
             return string.Join('\n', lines);

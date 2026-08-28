@@ -85,8 +85,7 @@ namespace Mfr.App.Ui.Views.RenameList
             var key = visibleColumn.Key;
             var field = RenameListFieldCatalog.GetField(key);
             var headerText = field.DisplayName;
-            var sortColumn = field.SortColumn;
-            var canUserSort = !key.IsPreview && sortColumn is not null;
+            var canUserSort = RenameListFieldCatalog.IsSortableKey(key);
 
             var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 headerText,
@@ -106,9 +105,7 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameListGridColumns.SetFieldKey(column, key);
 
             column.HeaderTemplate = canUserSort
-                ? new FuncDataTemplate<object>(
-                    (_, _) => _BuildSortableHeader(_viewModel!, headerText, sortColumn!.Value, key)
-                )
+                ? new FuncDataTemplate<object>((_, _) => _BuildSortableHeader(_viewModel!, headerText, key))
                 : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key));
 
             column.PropertyChanged += (_, args) => _OnGridColumnPropertyChanged(column, args);
@@ -131,12 +128,11 @@ namespace Mfr.App.Ui.Views.RenameList
         private static Grid _BuildSortableHeader(
             RenameListViewModel viewModel,
             string headerText,
-            RenameListSortColumn sortColumn,
-            RenameListFieldKey key
+            RenameListFieldKey fieldKey
         )
         {
             var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
-            RenameListGridColumns.StampHeaderFieldKey(grid, key);
+            RenameListGridColumns.StampHeaderFieldKey(grid, fieldKey);
 
             var title = new TextBlock
             {
@@ -161,8 +157,8 @@ namespace Mfr.App.Ui.Views.RenameList
             grid.Children.Add(title);
             grid.Children.Add(glyph);
 
-            _ApplySortGlyphState(glyph, priority, direction, viewModel, sortColumn);
-            _WireSortGlyphUpdates(grid, glyph, priority, direction, viewModel, sortColumn);
+            _ApplySortGlyphState(glyph, priority, direction, viewModel, fieldKey);
+            _WireSortGlyphUpdates(grid, glyph, priority, direction, viewModel, fieldKey);
 
             return grid;
         }
@@ -173,14 +169,14 @@ namespace Mfr.App.Ui.Views.RenameList
             TextBlock priority,
             TextBlock direction,
             RenameListViewModel viewModel,
-            RenameListSortColumn sortColumn
+            RenameListFieldKey fieldKey
         )
         {
             void _OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs args)
             {
                 if (args.PropertyName is nameof(RenameListViewModel.ColumnSortStates))
                 {
-                    _ApplySortGlyphState(glyph, priority, direction, viewModel, sortColumn);
+                    _ApplySortGlyphState(glyph, priority, direction, viewModel, fieldKey);
                 }
             }
 
@@ -196,10 +192,10 @@ namespace Mfr.App.Ui.Views.RenameList
             TextBlock priority,
             TextBlock direction,
             RenameListViewModel viewModel,
-            RenameListSortColumn sortColumn
+            RenameListFieldKey fieldKey
         )
         {
-            var state = viewModel.ColumnSortStates[sortColumn];
+            var state = viewModel.ColumnSortStates[fieldKey];
             glyph.IsVisible = state.IsActive;
             priority.Text = state.Priority?.ToString() ?? string.Empty;
             direction.Text = state.IsActive ? state.DirectionGlyph : string.Empty;

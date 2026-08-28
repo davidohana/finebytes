@@ -10,25 +10,13 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// </param>
     /// <param name="isSortable">When <see langword="true"/>, the field may appear in Auto-Sort keys.</param>
     /// <param name="supportsPreview">When <see langword="true"/>, a preview column variant may be added.</param>
-    /// <param name="sortColumn">Engine Auto-Sort column when this field maps to one.</param>
     public abstract class BasicRenameListField(
         string propertyKey,
         string displayName,
         int? defaultWidth = null,
         bool isSortable = true,
-        bool supportsPreview = true,
-        RenameListSortColumn? sortColumn = null
-    )
-        : RenameListField(
-            Group,
-            GroupLabel,
-            propertyKey,
-            displayName,
-            defaultWidth,
-            isSortable,
-            supportsPreview,
-            sortColumn
-        )
+        bool supportsPreview = true
+    ) : RenameListField(Group, GroupLabel, propertyKey, displayName, defaultWidth, isSortable, supportsPreview)
     {
         /// <summary>
         /// MFR7 Basic property group id.

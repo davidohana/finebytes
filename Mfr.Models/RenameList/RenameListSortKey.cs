@@ -1,46 +1,22 @@
+using Mfr.Models.RenameList.Fields.Basic;
+
 namespace Mfr.Models.RenameList
 {
     /// <summary>
-    /// Rename List columns that can participate in Auto-Sort (original fields only).
+    /// One Auto-Sort key: original catalog field plus ascending/descending.
     /// </summary>
-    public enum RenameListSortColumn
-    {
-        /// <summary>
-        /// File vs Folder (<c>File</c> / <c>Folder</c>).
-        /// </summary>
-        FileFolder = 0,
-
-        /// <summary>
-        /// Parent directory path.
-        /// </summary>
-        ParentFolder = 1,
-
-        /// <summary>
-        /// File name including extension.
-        /// </summary>
-        FullFileName = 2,
-
-        /// <summary>
-        /// Absolute full path (not a visible grid column).
-        /// </summary>
-        FullPath = 3,
-    }
-
-    /// <summary>
-    /// One Auto-Sort key: column plus ascending/descending.
-    /// </summary>
-    /// <param name="Column">Column to compare.</param>
-    /// <param name="Descending">When <see langword="true"/>, reverse that column's order.</param>
-    public readonly record struct RenameListSortKey(RenameListSortColumn Column, bool Descending = false)
+    /// <param name="FieldKey">Original field key to compare.</param>
+    /// <param name="Descending">When <see langword="true"/>, reverse that field's order.</param>
+    public readonly record struct RenameListSortKey(RenameListFieldKey FieldKey, bool Descending = false)
     {
         /// <summary>
         /// Default Auto-Sort keys: File/Folder, Parent Folder, then Full File Name. Empty session value disables Auto-Sort.
         /// </summary>
         public static IReadOnlyList<RenameListSortKey> DefaultKeys { get; } =
         [
-            new RenameListSortKey(RenameListSortColumn.FileFolder),
-            new RenameListSortKey(RenameListSortColumn.ParentFolder),
-            new RenameListSortKey(RenameListSortColumn.FullFileName),
+            new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)),
+            new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder)),
+            new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)),
         ];
     }
 }

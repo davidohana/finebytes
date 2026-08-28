@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.RenameList
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
                 ),
             };
-            var sortKeys = new[] { new RenameListSortKey(RenameListSortColumn.FullPath) };
+            var sortKeys = new[] { new RenameListSortKey(RenameListTestHelpers.FullPathKey) };
 
             var dialogVm = new RenameListFieldShuttleDialogViewModel(columns, sortKeys);
 
@@ -126,14 +126,14 @@ namespace Mfr.Tests.Ui.RenameList
             );
             dialogVm.AddSelectedSortFieldCommand.Execute(null);
             Assert.Equal(4, dialogVm.SelectedSortRows.Count);
-            Assert.Equal(RenameListSortColumn.FullPath, dialogVm.SelectedSortRows[^1].Key.Column);
+            Assert.Equal(RenameListTestHelpers.FullPathKey, dialogVm.SelectedSortRows[^1].Key.FieldKey);
 
             dialogVm.SelectedSortRowIndex = 0;
             dialogVm.ToggleSelectedSortDirectionCommand.Execute(null);
             Assert.True(dialogVm.SelectedSortRows[0].Key.Descending);
 
             dialogVm.MoveSelectedSortKeyDownCommand.Execute(null);
-            Assert.Equal(RenameListSortColumn.FileFolder, dialogVm.SelectedSortRows[1].Key.Column);
+            Assert.Equal(RenameListTestHelpers.FileFolderKey, dialogVm.SelectedSortRows[1].Key.FieldKey);
             Assert.Equal(1, dialogVm.SelectedSortRowIndex);
 
             dialogVm.SelectedSortRowIndex = dialogVm.SelectedSortRows.Count - 1;
@@ -170,7 +170,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Single(dialogVm.SelectedColumnRows);
             Assert.Single(dialogVm.SelectedSortRows);
             Assert.Equal(BasicRenameListFields.Key.Name, dialogVm.SelectedColumnRows[0].Column.Key.PropertyKey);
-            Assert.Equal(RenameListSortColumn.FullPath, dialogVm.SelectedSortRows[0].Key.Column);
+            Assert.Equal(RenameListTestHelpers.FullPathKey, dialogVm.SelectedSortRows[0].Key.FieldKey);
         }
 
         [Fact]
@@ -272,7 +272,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(6, dialogVm.AvailableOriginalFields.Count);
             Assert.Empty(dialogVm.AvailablePreviewFields);
-            Assert.Empty(dialogVm.AvailableSortFields);
+            Assert.Equal(6, dialogVm.AvailableSortFields.Count);
 
             dialogVm.AddAllOriginalFieldsCommand.Execute(null);
 

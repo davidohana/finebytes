@@ -37,11 +37,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
             new AudioTagSemanticRenameListField("Copyright", "Copyright", SemanticAudioField.Copyright),
             new AudioTagSemanticRenameListField("DiscCount", "Disc Count", SemanticAudioField.DiscCount),
             new AudioTagSemanticRenameListField("Disc", "Disc", SemanticAudioField.Disc),
-            new AudioTagFirstSegmentRenameListField(
-                "FirstAlbumArtist",
-                "AlbumArtist",
-                SemanticAudioField.AlbumArtists
-            ),
+            new AudioTagFirstSegmentRenameListField("FirstAlbumArtist", "AlbumArtist", SemanticAudioField.AlbumArtists),
             new AudioTagFirstSegmentRenameListField("FirstComposer", "Composer", SemanticAudioField.Composers),
             new AudioTagFirstSegmentRenameListField("FirstGenre", "Genre", SemanticAudioField.Genre),
             new AudioTagFirstSegmentRenameListField("FirstPerformer", "Performer", SemanticAudioField.Performers),

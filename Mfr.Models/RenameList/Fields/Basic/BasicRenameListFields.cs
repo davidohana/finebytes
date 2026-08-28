@@ -62,13 +62,18 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.ItemType,
             displayName: "File/Folder",
-            supportsPreview: false,
-            sortColumn: RenameListSortColumn.FileFolder
+            supportsPreview: false
         )
     {
         public override string Resolve(FileMeta meta)
         {
             return meta.Attributes.IsDirectory() ? "Folder" : "File";
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return left.Attributes.IsDirectory().CompareTo(right.Attributes.IsDirectory());
         }
     }
 
@@ -76,13 +81,18 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.Folder,
             displayName: "Parent Folder",
-            defaultWidth: 240,
-            sortColumn: RenameListSortColumn.ParentFolder
+            defaultWidth: 240
         )
     {
         public override string Resolve(FileMeta meta)
         {
             return meta.DirectoryPath;
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.Path(left.DirectoryPath, right.DirectoryPath);
         }
     }
 
@@ -90,13 +100,18 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FullName,
             displayName: "Full File Name",
-            defaultWidth: 180,
-            sortColumn: RenameListSortColumn.FullFileName
+            defaultWidth: 180
         )
     {
         public override string Resolve(FileMeta meta)
         {
             return meta.Prefix + meta.Extension;
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.Path(left.Prefix + left.Extension, right.Prefix + right.Extension);
         }
     }
 
@@ -104,13 +119,18 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FullPath,
             displayName: "Full File Path",
-            defaultWidth: 180,
-            sortColumn: RenameListSortColumn.FullPath
+            defaultWidth: 180
         )
     {
         public override string Resolve(FileMeta meta)
         {
             return meta.FullPath;
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.Path(left.FullPath, right.FullPath);
         }
     }
 
@@ -120,6 +140,12 @@ namespace Mfr.Models.RenameList.Fields.Basic
         public override string Resolve(FileMeta meta)
         {
             return meta.Prefix;
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.Path(left.Prefix, right.Prefix);
         }
     }
 
@@ -136,6 +162,12 @@ namespace Mfr.Models.RenameList.Fields.Basic
 
             return extension.StartsWith('.') ? extension[1..] : extension;
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.Path(Resolve(left), Resolve(right));
+        }
     }
 
     internal sealed class BasicFileNameNumericField()
@@ -148,6 +180,12 @@ namespace Mfr.Models.RenameList.Fields.Basic
         public override string Resolve(FileMeta meta)
         {
             return _FirstDigitRun(meta.Prefix + meta.Extension);
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.ParsedInt64(Resolve(left), Resolve(right));
         }
 
         private static string _FirstDigitRun(string fullFileName)
@@ -179,6 +217,15 @@ namespace Mfr.Models.RenameList.Fields.Basic
         {
             return (meta.Prefix + meta.Extension).Length.ToString();
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.Int32(
+                (left.Prefix + left.Extension).Length,
+                (right.Prefix + right.Extension).Length
+            );
+        }
     }
 
     internal sealed class BasicFullPathLengthField()
@@ -190,6 +237,12 @@ namespace Mfr.Models.RenameList.Fields.Basic
         public override string Resolve(FileMeta meta)
         {
             return meta.FullPath.Length.ToString();
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.Int32(left.FullPath.Length, right.FullPath.Length);
         }
     }
 }

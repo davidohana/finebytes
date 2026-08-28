@@ -537,13 +537,13 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(
                 [
-                    new RenameListSortKey(RenameListSortColumn.FileFolder),
-                    new RenameListSortKey(RenameListSortColumn.ParentFolder),
+                    new RenameListSortKey(RenameListTestHelpers.FileFolderKey),
+                    new RenameListSortKey(RenameListTestHelpers.ParentFolderKey),
                 ],
                 renameListViewModel.SortKeys
             );
-            Assert.Equal(1, renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].Priority);
-            Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].Priority);
+            Assert.Equal(1, renameListViewModel.ColumnSortStates[RenameListTestHelpers.FileFolderKey].Priority);
+            Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListTestHelpers.ParentFolderKey].Priority);
 
             renameListViewModel.SortByFieldKey(
                 RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
@@ -551,19 +551,19 @@ namespace Mfr.Tests.Ui.RenameList
             );
             Assert.Equal(
                 [
-                    new RenameListSortKey(RenameListSortColumn.FileFolder),
-                    new RenameListSortKey(RenameListSortColumn.ParentFolder, Descending: true),
+                    new RenameListSortKey(RenameListTestHelpers.FileFolderKey),
+                    new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true),
                 ],
                 renameListViewModel.SortKeys
             );
-            Assert.True(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsDescending);
+            Assert.True(renameListViewModel.ColumnSortStates[RenameListTestHelpers.ParentFolderKey].IsDescending);
 
             renameListViewModel.SortByFieldKey(
                 RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
                 append: true
             );
-            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FileFolder)], renameListViewModel.SortKeys);
-            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
+            Assert.Equal([new RenameListSortKey(RenameListTestHelpers.FileFolderKey)], renameListViewModel.SortKeys);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListTestHelpers.ParentFolderKey].IsActive);
 
             renameListViewModel.SortByFieldKey(
                 RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder)
@@ -573,7 +573,7 @@ namespace Mfr.Tests.Ui.RenameList
                 append: true
             );
             Assert.Equal(
-                [new RenameListSortKey(RenameListSortColumn.ParentFolder, Descending: true)],
+                [new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true)],
                 renameListViewModel.SortKeys
             );
         }
@@ -630,8 +630,8 @@ namespace Mfr.Tests.Ui.RenameList
                 RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
             );
 
-            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FullFileName)], renameListViewModel.SortKeys);
-            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
+            Assert.Equal([new RenameListSortKey(RenameListTestHelpers.FullFileNameKey)], renameListViewModel.SortKeys);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListTestHelpers.ParentFolderKey].IsActive);
         }
 
         /// <summary>
@@ -645,21 +645,21 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             renameListViewModel.SetSortKeys([
-                new RenameListSortKey(RenameListSortColumn.FullPath),
-                new RenameListSortKey(RenameListSortColumn.FileFolder, Descending: true),
+                new RenameListSortKey(RenameListTestHelpers.FullPathKey),
+                new RenameListSortKey(RenameListTestHelpers.FileFolderKey, Descending: true),
             ]);
 
             Assert.Equal(
                 [
-                    new RenameListSortKey(RenameListSortColumn.FullPath),
-                    new RenameListSortKey(RenameListSortColumn.FileFolder, Descending: true),
+                    new RenameListSortKey(RenameListTestHelpers.FullPathKey),
+                    new RenameListSortKey(RenameListTestHelpers.FileFolderKey, Descending: true),
                 ],
                 renameListViewModel.SortKeys
             );
             Assert.Equal("1. Full File Path ↑\n2. File/Folder ↓", renameListViewModel.SortSummaryText);
-            Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].Priority);
-            Assert.True(renameListViewModel.ColumnSortStates[RenameListSortColumn.FileFolder].IsDescending);
-            Assert.False(renameListViewModel.ColumnSortStates[RenameListSortColumn.ParentFolder].IsActive);
+            Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListTestHelpers.FileFolderKey].Priority);
+            Assert.True(renameListViewModel.ColumnSortStates[RenameListTestHelpers.FileFolderKey].IsDescending);
+            Assert.False(renameListViewModel.ColumnSortStates[RenameListTestHelpers.ParentFolderKey].IsActive);
         }
 
         /// <summary>
@@ -707,16 +707,14 @@ namespace Mfr.Tests.Ui.RenameList
             var dir = _CreateSampleFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.SetSortKeys([new RenameListSortKey(RenameListSortColumn.FullFileName)]);
+            renameListViewModel.SetSortKeys([new RenameListSortKey(RenameListTestHelpers.FullFileNameKey)]);
 
             renameListViewModel.SortByFieldKey(
                 RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
             );
-            renameListViewModel.SortByFieldKey(
-                RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Extension)
-            );
+            renameListViewModel.SortByFieldKey(RenameListFieldKey.Original("Unknown", "Missing"));
 
-            Assert.Equal([new RenameListSortKey(RenameListSortColumn.FullFileName)], renameListViewModel.SortKeys);
+            Assert.Equal([new RenameListSortKey(RenameListTestHelpers.FullFileNameKey)], renameListViewModel.SortKeys);
         }
 
         /// <summary>
@@ -728,7 +726,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListSortColumn.FullFileName));
+            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
             Assert.True(renameListViewModel.IsAutoSort);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "gamma.log"), _FileEntry(dir, "alpha.txt")]);
@@ -751,7 +749,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListSortColumn.FullFileName));
+            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
 
             fileListViewModel.SetSelectedEntries([
                 _FileEntry(dir, "alpha.txt"),
@@ -820,7 +818,7 @@ namespace Mfr.Tests.Ui.RenameList
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             renameListViewModel.ApplySession(
-                RenameListTestHelpers.SortSession(RenameListSortColumn.FullFileName, descending: true)
+                RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey, descending: true)
             );
 
             renameListViewModel.ApplySession([]);
@@ -842,7 +840,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListSortColumn.FullFileName));
+            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "beta.md")]);
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
@@ -860,7 +858,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dir = _CreateThreeFileFolder();
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListSortColumn.FullFileName));
+            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
 
             fileListViewModel.SetSelectedEntries([
                 _FileEntry(dir, "alpha.txt"),

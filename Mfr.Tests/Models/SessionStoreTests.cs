@@ -1,4 +1,5 @@
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Models
 {
@@ -72,7 +73,10 @@ namespace Mfr.Tests.Models
                     {
                         SortFields =
                         [
-                            new SessionStateRenameListSortField(RenameListSortColumn.FullFileName, Descending: true),
+                            new SessionStateRenameListSortField(
+                                RenameListTestHelpers.FullFileNameKey,
+                                Descending: true
+                            ),
                         ],
                         VisibleColumns =
                         [
@@ -119,7 +123,7 @@ namespace Mfr.Tests.Models
                 Assert.NotNull(loaded.RenameList);
                 Assert.NotNull(loaded.RenameList.SortFields);
                 Assert.Single(loaded.RenameList.SortFields);
-                Assert.Equal(RenameListSortColumn.FullFileName, loaded.RenameList.SortFields[0].Column);
+                Assert.Equal(RenameListTestHelpers.FullFileNameKey, loaded.RenameList.SortFields[0].Key);
                 Assert.True(loaded.RenameList.SortFields[0].Descending);
                 Assert.NotNull(loaded.RenameList.VisibleColumns);
                 Assert.Equal(2, loaded.RenameList.VisibleColumns.Count);

@@ -56,12 +56,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </param>
         public void SortByFieldKey(RenameListFieldKey key, bool append = false)
         {
-            if (key.IsPreview || !RenameListFieldCatalog.TryMapFieldKeyToSortColumn(key, out var column))
+            if (key.IsPreview || !RenameListFieldCatalog.IsSortableKey(key))
             {
                 return;
             }
 
-            _SortByColumn(column, append);
+            _SortByFieldKey(key, append);
         }
 
         /// <summary>
@@ -87,28 +87,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return SessionStateRenameList.FromSortKeys(_sortKeys);
         }
 
-        private void _SortByColumn(RenameListSortColumn column, bool append)
+        private void _SortByFieldKey(RenameListFieldKey fieldKey, bool append)
         {
             if (append)
             {
-                _SortByColumnAppend(column);
+                _SortByFieldKeyAppend(fieldKey);
                 return;
             }
 
             // MFR7 RenameGridCells.SetSortMode: desc = GetSortMode() == Ascending (None → ascending).
-            var descending = _sortKeys.Any(key => key.Column == column && !key.Descending);
-            _SetSortKeys([new RenameListSortKey(column, descending)], resort: true);
+            var descending = _sortKeys.Any(key => key.FieldKey == fieldKey && !key.Descending);
+            _SetSortKeys([new RenameListSortKey(fieldKey, descending)], resort: true);
         }
 
         /// <summary>
         /// Appends a sort key, toggles direction on an existing key, or removes a descending key (Shift+click).
         /// </summary>
-        private void _SortByColumnAppend(RenameListSortColumn column)
+        private void _SortByFieldKeyAppend(RenameListFieldKey fieldKey)
         {
-            var index = _sortKeys.FindIndex(key => key.Column == column);
+            var index = _sortKeys.FindIndex(key => key.FieldKey == fieldKey);
             if (index < 0)
             {
-                var keys = new List<RenameListSortKey>(_sortKeys) { new(column) };
+                var keys = new List<RenameListSortKey>(_sortKeys) { new(fieldKey) };
                 _SetSortKeys(keys, resort: true);
                 return;
             }
@@ -122,8 +122,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var withoutColumn = _sortKeys.Where((_, i) => i != index).ToList();
-            _SetSortKeys(withoutColumn, resort: withoutColumn.Count > 0);
+            var withoutField = _sortKeys.Where((_, i) => i != index).ToList();
+            _SetSortKeys(withoutField, resort: withoutField.Count > 0);
         }
 
         private void _SetSortKeys(IReadOnlyList<RenameListSortKey> keys, bool resort)

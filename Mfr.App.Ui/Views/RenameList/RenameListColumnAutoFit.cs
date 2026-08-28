@@ -59,7 +59,7 @@ namespace Mfr.App.Ui.Views.RenameList
             ArgumentNullException.ThrowIfNull(entries);
 
             var field = RenameListFieldCatalog.GetField(fieldKey);
-            var canUserSort = !fieldKey.IsPreview && field.SortColumn is not null;
+            var canUserSort = RenameListFieldCatalog.IsSortableKey(fieldKey);
             var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 field.DisplayName,
                 reserveSortGlyph: canUserSort,

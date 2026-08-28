@@ -5,6 +5,7 @@ using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
+using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -14,17 +15,41 @@ namespace Mfr.Tests.Ui.RenameList
     internal static class RenameListTestHelpers
     {
         /// <summary>
+        /// Original field key for File/Folder.
+        /// </summary>
+        internal static RenameListFieldKey FileFolderKey =>
+            RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType);
+
+        /// <summary>
+        /// Original field key for Parent Folder.
+        /// </summary>
+        internal static RenameListFieldKey ParentFolderKey =>
+            RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+
+        /// <summary>
+        /// Original field key for Full File Name.
+        /// </summary>
+        internal static RenameListFieldKey FullFileNameKey =>
+            RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+        /// <summary>
+        /// Original field key for Full File Path.
+        /// </summary>
+        internal static RenameListFieldKey FullPathKey =>
+            RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath);
+
+        /// <summary>
         /// Builds a one-field session sort list for <see cref="RenameListViewModel.ApplySession"/>.
         /// </summary>
-        /// <param name="column">Sort column.</param>
+        /// <param name="fieldKey">Sort field key.</param>
         /// <param name="descending">When <see langword="true"/>, sort descending.</param>
         /// <returns>Single-element session field list.</returns>
         internal static List<SessionStateRenameListSortField> SortSession(
-            RenameListSortColumn column,
+            RenameListFieldKey fieldKey,
             bool descending = false
         )
         {
-            return [new SessionStateRenameListSortField(column, descending)];
+            return [new SessionStateRenameListSortField(fieldKey, descending)];
         }
     }
 

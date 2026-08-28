@@ -17,7 +17,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the user-visible field label.
         /// </summary>
-        public string Label => RenameListSortDisplay.GetColumnLabel(Key.Column);
+        public string Label => RenameListSortDisplay.GetFieldLabel(Key.FieldKey);
 
         /// <summary>
         /// Gets the direction glyph for the row toggle.

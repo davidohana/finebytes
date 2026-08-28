@@ -140,25 +140,9 @@ factory; after the style move, either keep the class name on a `Border` or call
 `RenameListPreviewGlyph.Create()` from a template converter. Do this when a third surface
 needs the badge (Phase 7 field pickers) or when the badge look changes.
 
-## 3. `IsSortable` vs `SortColumn`
+## 3. ~~`IsSortable` vs `SortColumn`~~ (done in Phase 7d)
 
-`RenameListField` has both `IsSortable` (may appear in Auto-Sort) and `SortColumn`
-(engine key). The Sort tab requires **both**. Several Basic fields default
-`isSortable: true` with no `sortColumn`, so they never appear on the Sort tab:
-
-- File Name, File Extension, File Name Numeric Value, File Name Length, Full Path Name Length
-
-MFR7 can sort those properties; the engine enum currently has only File/Folder, Parent
-Folder, Full File Name, and Full Path.
-
-When Phase 7 (or a sort-column expansion) happens, pick one:
-
-- Map the field to a new `RenameListSortColumn` and keep `IsSortable: true`, or
-- Set `isSortable: false` until the engine can sort it.
-
-Do not leave “sortable in metadata, invisible in the shuttle” as the long-term state.
-Header click already uses `SortColumn is not null` (`canUserSort`); keep that aligned with
-the shuttle filter.
+Resolved in Phase 7d: Auto-Sort keys are original `RenameListFieldKey` values; `IsSortable` is the sole gate (preview columns never sort). The fixed `RenameListSortColumn` enum and per-field `SortColumn` mapping were removed.
 
 ## 4. `RenameListEntry` convenience properties
 
@@ -190,8 +174,8 @@ the context with an optional window size rather than a second `_Show`.
 
 ## Suggested order
 
+1. `IsSortable` / `SortColumn` — done in Phase 7d (field-key Auto-Sort).
 1. `OrderedDraft` when adding Phase 7 groups or otherwise editing the shuttle VM.
-1. `IsSortable` / `SortColumn` when adding engine sort columns or new catalog fields.
 1. Preview glyph resources when a third UI needs the badge or the look changes.
 1. Test fixture when touching drop or view-model test setup.
 1. Entry convenience properties last (call-site grind, no behavior change).

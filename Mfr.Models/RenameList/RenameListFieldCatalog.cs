@@ -33,11 +33,6 @@ namespace Mfr.Models.RenameList
         private static readonly Dictionary<(string GroupId, string PropertyKey), RenameListField> _fieldByKey =
             All.ToDictionary(field => (field.GroupId, field.PropertyKey));
 
-        private static readonly Dictionary<RenameListSortColumn, RenameListField> _fieldBySortColumn = All.Where(
-                field => field.SortColumn is not null
-            )
-            .ToDictionary(field => field.SortColumn!.Value);
-
         /// <summary>
         /// Default visible columns (MFR7 <c>RenameGrid</c>).
         /// </summary>
@@ -126,47 +121,40 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Maps an engine Auto-Sort column to the corresponding original field key.
-        /// </summary>
-        /// <param name="column">Engine sort column.</param>
-        /// <param name="key">Mapped original field key when supported.</param>
-        /// <returns><see langword="true"/> when <paramref name="column"/> maps to a catalog field.</returns>
-        public static bool TryMapSortColumn(RenameListSortColumn column, out RenameListFieldKey key)
-        {
-            if (_fieldBySortColumn.TryGetValue(column, out var field))
-            {
-                key = field.OriginalKey;
-                return true;
-            }
-
-            key = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Maps an original (non-preview) field key to an engine Auto-Sort column.
+        /// Returns whether an original field key may participate in Auto-Sort.
         /// </summary>
         /// <param name="key">Field key.</param>
-        /// <param name="column">Mapped sort column when supported.</param>
-        /// <returns>
-        /// <see langword="true"/> when <paramref name="key"/> is a known original field with engine sort support.
-        /// </returns>
-        public static bool TryMapFieldKeyToSortColumn(RenameListFieldKey key, out RenameListSortColumn column)
+        /// <returns><see langword="true"/> when the key is a sortable original field.</returns>
+        public static bool IsSortableKey(RenameListFieldKey key)
         {
             if (key.IsPreview)
             {
-                column = default;
                 return false;
             }
 
-            if (!TryGetField(key, out var field) || field.SortColumn is not { } sortColumn)
+            return TryGetField(key, out var field) && field.IsSortable;
+        }
+
+        /// <summary>
+        /// Compares two rename items for Auto-Sort on one original field key.
+        /// </summary>
+        /// <param name="left">Left item.</param>
+        /// <param name="key">Original field key.</param>
+        /// <param name="right">Right item.</param>
+        /// <returns>Comparison sign for sort.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="left"/> or <paramref name="right"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="key"/> is not a sortable original field.</exception>
+        public static int CompareForSort(RenameItem left, RenameListFieldKey key, RenameItem right)
+        {
+            ArgumentNullException.ThrowIfNull(left);
+            ArgumentNullException.ThrowIfNull(right);
+
+            if (!IsSortableKey(key))
             {
-                column = default;
-                return false;
+                throw new ArgumentException($"Field '{key.GroupId}/{key.PropertyKey}' is not sortable.", nameof(key));
             }
 
-            column = sortColumn;
-            return true;
+            return GetField(key).CompareForSort(left.Original, right.Original);
         }
 
         /// <summary>
@@ -193,10 +181,27 @@ namespace Mfr.Models.RenameList
             return TryGetField(key, out var field) ? field.MetadataRequirement : RenameListMetadataRequirement.None;
         }
 
+        /// <summary>
+        /// Combines lazy metadata requirements for a set of field keys.
+        /// </summary>
+        /// <param name="keys">Field keys.</param>
+        /// <returns>Combined requirement flags.</returns>
+        public static RenameListMetadataRequirement GetCombinedMetadataRequirement(IEnumerable<RenameListFieldKey> keys)
+        {
+            ArgumentNullException.ThrowIfNull(keys);
+
+            var combined = RenameListMetadataRequirement.None;
+            foreach (var key in keys)
+            {
+                combined |= GetMetadataRequirement(key);
+            }
+
+            return combined;
+        }
+
         private static List<RenameListField> _Register(List<RenameListField> fields)
         {
             var seenKeys = new HashSet<(string GroupId, string PropertyKey)>();
-            var seenSortColumns = new HashSet<RenameListSortColumn>();
             foreach (var field in fields)
             {
                 Check.That(
@@ -214,16 +219,6 @@ namespace Mfr.Models.RenameList
                 Check.That(
                     seenKeys.Add((field.GroupId, field.PropertyKey)),
                     $"Duplicate Rename List field '{field.GroupId}/{field.PropertyKey}'."
-                );
-
-                if (field.SortColumn is not { } sortColumn)
-                {
-                    continue;
-                }
-
-                Check.That(
-                    seenSortColumns.Add(sortColumn),
-                    $"Duplicate Rename List sort column mapping for '{sortColumn}'."
                 );
             }
 

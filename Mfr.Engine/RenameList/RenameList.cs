@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Utils;
 using Serilog;
 
@@ -428,7 +429,10 @@ namespace Mfr.Engine.RenameList
         {
             foreach (var key in keys)
             {
-                var cmp = _CompareColumn(left.Original, right.Original, key.Column);
+                RenameListLazyMetadataLoader.TryEnsureLoaded(left, key.FieldKey);
+                RenameListLazyMetadataLoader.TryEnsureLoaded(right, key.FieldKey);
+
+                var cmp = RenameListFieldCatalog.CompareForSort(left, key.FieldKey, right);
                 if (key.Descending)
                 {
                     cmp = -cmp;
@@ -441,23 +445,6 @@ namespace Mfr.Engine.RenameList
             }
 
             return 0;
-        }
-
-        private static int _CompareColumn(FileMeta left, FileMeta right, RenameListSortColumn column)
-        {
-            return column switch
-            {
-                RenameListSortColumn.FileFolder => left
-                    .Attributes.IsDirectory()
-                    .CompareTo(right.Attributes.IsDirectory()),
-                RenameListSortColumn.ParentFolder => PathComparers.Os.Compare(left.DirectoryPath, right.DirectoryPath),
-                RenameListSortColumn.FullFileName => PathComparers.Os.Compare(
-                    left.Prefix + left.Extension,
-                    right.Prefix + right.Extension
-                ),
-                RenameListSortColumn.FullPath => PathComparers.Os.Compare(left.FullPath, right.FullPath),
-                _ => 0,
-            };
         }
 
         /// <summary>

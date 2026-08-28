@@ -11,7 +11,7 @@ namespace Mfr.Tests.Ui.RenameList
         /// Verifies Auto-Sort summary text for off, default keys, and single-column sort.
         /// </summary>
         [Fact]
-        public void FormatSummary_Reflects_Key_State()
+        public void FormatSummary_off_default_and_single_column()
         {
             Assert.Equal(RenameListSortDisplay.AutoSortOffSummary, RenameListSortDisplay.FormatSummary([]));
 
@@ -23,76 +23,67 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(
                 "1. Full File Name ↓",
                 RenameListSortDisplay.FormatSummary([
-                    new RenameListSortKey(RenameListSortColumn.FullFileName, Descending: true),
+                    new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true),
                 ])
             );
 
-            Assert.Equal("Full File Path", RenameListSortDisplay.GetColumnLabel(RenameListSortColumn.FullPath));
+            Assert.Equal("Full File Path", RenameListSortDisplay.GetFieldLabel(RenameListTestHelpers.FullPathKey));
         }
 
-        /// <summary>
-        /// Verifies default keys assign priorities 1–3 by column.
-        /// </summary>
         [Fact]
         public void BuildColumnSortStates_DefaultKeys_Assigns_Priorities_1_2_3()
         {
             var states = RenameListSortDisplay.BuildColumnSortStates(RenameListSortKey.DefaultKeys);
 
-            Assert.Equal(1, states[RenameListSortColumn.FileFolder].Priority);
+            Assert.Equal(1, states[RenameListTestHelpers.FileFolderKey].Priority);
 
-            Assert.Equal(2, states[RenameListSortColumn.ParentFolder].Priority);
+            Assert.Equal(2, states[RenameListTestHelpers.ParentFolderKey].Priority);
 
-            Assert.Equal(3, states[RenameListSortColumn.FullFileName].Priority);
+            Assert.Equal(3, states[RenameListTestHelpers.FullFileNameKey].Priority);
 
-            Assert.False(states[RenameListSortColumn.FileFolder].IsDescending);
+            Assert.False(states[RenameListTestHelpers.FileFolderKey].IsDescending);
 
-            Assert.False(states[RenameListSortColumn.ParentFolder].IsDescending);
+            Assert.False(states[RenameListTestHelpers.ParentFolderKey].IsDescending);
 
-            Assert.False(states[RenameListSortColumn.FullFileName].IsDescending);
+            Assert.False(states[RenameListTestHelpers.FullFileNameKey].IsDescending);
         }
 
-        /// <summary>
-        /// Verifies a single-column sort shows priority 1 on that column only.
-        /// </summary>
         [Fact]
         public void BuildColumnSortStates_SingleColumn_Only_One_Active()
         {
             var states = RenameListSortDisplay.BuildColumnSortStates([
-                new RenameListSortKey(RenameListSortColumn.FullFileName, Descending: true),
+                new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true),
             ]);
 
-            Assert.False(states[RenameListSortColumn.FileFolder].IsActive);
+            Assert.False(states[RenameListTestHelpers.FileFolderKey].IsActive);
 
-            Assert.False(states[RenameListSortColumn.ParentFolder].IsActive);
+            Assert.False(states[RenameListTestHelpers.ParentFolderKey].IsActive);
 
-            Assert.True(states[RenameListSortColumn.FullFileName].IsActive);
+            Assert.True(states[RenameListTestHelpers.FullFileNameKey].IsActive);
 
-            Assert.Equal(1, states[RenameListSortColumn.FullFileName].Priority);
+            Assert.Equal(1, states[RenameListTestHelpers.FullFileNameKey].Priority);
 
-            Assert.True(states[RenameListSortColumn.FullFileName].IsDescending);
+            Assert.True(states[RenameListTestHelpers.FullFileNameKey].IsDescending);
 
-            Assert.Equal("↓", states[RenameListSortColumn.FullFileName].DirectionGlyph);
+            Assert.Equal("↓", states[RenameListTestHelpers.FullFileNameKey].DirectionGlyph);
         }
 
-        /// <summary>
-        /// Verifies a Full Path key is stored and does not mark other columns active.
-        /// </summary>
         [Fact]
         public void BuildColumnSortStates_FullPathKey_Does_Not_Activate_Other_Columns()
         {
             var states = RenameListSortDisplay.BuildColumnSortStates([
-                new RenameListSortKey(RenameListSortColumn.FullPath),
+                new RenameListSortKey(RenameListTestHelpers.FullPathKey),
             ]);
 
-            Assert.True(states[RenameListSortColumn.FullPath].IsActive);
+            Assert.True(states[RenameListTestHelpers.FullPathKey].IsActive);
 
-            Assert.Equal(1, states[RenameListSortColumn.FullPath].Priority);
+            Assert.Equal(1, states[RenameListTestHelpers.FullPathKey].Priority);
 
-            Assert.False(states[RenameListSortColumn.FileFolder].IsActive);
+            Assert.False(states[RenameListTestHelpers.FileFolderKey].IsActive);
 
-            Assert.False(states[RenameListSortColumn.ParentFolder].IsActive);
+            Assert.False(states[RenameListTestHelpers.ParentFolderKey].IsActive);
 
-            Assert.False(states[RenameListSortColumn.FullFileName].IsActive);
+            Assert.False(states[RenameListTestHelpers.FullFileNameKey].IsActive);
         }
     }
 }

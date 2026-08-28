@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListFieldShuttleDialogViewModel : ViewModelBase
     {
         private readonly OrderedDraft<RenameListFieldKey, RenameListVisibleColumn> _columns;
-        private readonly OrderedDraft<RenameListSortColumn, RenameListSortKey> _sortKeys;
+        private readonly OrderedDraft<RenameListFieldKey, RenameListSortKey> _sortKeys;
         private bool _suppressSelectionSync;
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 visibleColumns,
                 column => column.Key
             );
-            _sortKeys = new OrderedDraft<RenameListSortColumn, RenameListSortKey>(sortKeys, key => key.Column);
+            _sortKeys = new OrderedDraft<RenameListFieldKey, RenameListSortKey>(sortKeys, key => key.FieldKey);
 
             Groups = _BuildGroups();
             SelectedGroup = Groups.Count > 0 ? Groups[0] : null;
@@ -390,12 +390,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelectedSortField))]
         public void AddSelectedSortField()
         {
-            if (SelectedAvailableSortField?.SortColumn is not { } sortColumn)
+            if (SelectedAvailableSortField is not { IsSortable: true } field)
             {
                 return;
             }
 
-            _AddSortKey(sortColumn);
+            _AddSortKey(field.OriginalKey);
         }
 
         /// <summary>
@@ -509,7 +509,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelectedSortField()
         {
-            return SelectedAvailableSortField is { SortColumn: not null };
+            return SelectedAvailableSortField is { IsSortable: true };
         }
 
         private bool _CanRemoveSelectedSortKey()
@@ -550,9 +550,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
         }
 
-        private void _AddSortKey(RenameListSortColumn sortColumn)
+        private void _AddSortKey(RenameListFieldKey fieldKey)
         {
-            if (!_sortKeys.TryAdd(new RenameListSortKey(sortColumn)))
+            if (!_sortKeys.TryAdd(new RenameListSortKey(fieldKey)))
             {
                 return;
             }
@@ -577,9 +577,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ];
             AvailableSortFields =
             [
-                .. fieldsInGroup.Where(field =>
-                    field is { IsSortable: true, SortColumn: not null } && !_sortKeys.Contains(field.SortColumn.Value)
-                ),
+                .. fieldsInGroup.Where(field => field.IsSortable && !_sortKeys.Contains(field.OriginalKey)),
             ];
             SelectedColumnRows =
             [

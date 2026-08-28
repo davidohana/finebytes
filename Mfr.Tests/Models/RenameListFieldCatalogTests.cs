@@ -89,35 +89,22 @@ namespace Mfr.Tests.Models
         }
 
         [Theory]
-        [InlineData(RenameListSortColumn.FileFolder, BasicRenameListFields.Key.ItemType)]
-        [InlineData(RenameListSortColumn.ParentFolder, BasicRenameListFields.Key.Folder)]
-        [InlineData(RenameListSortColumn.FullFileName, BasicRenameListFields.Key.FullName)]
-        [InlineData(RenameListSortColumn.FullPath, BasicRenameListFields.Key.FullPath)]
-        public void Sort_column_maps_to_original_field_key(RenameListSortColumn column, string propertyKey)
+        [InlineData(BasicRenameListFields.Key.ItemType)]
+        [InlineData(BasicRenameListFields.Key.Folder)]
+        [InlineData(BasicRenameListFields.Key.FullName)]
+        [InlineData(BasicRenameListFields.Key.FullPath)]
+        public void Original_basic_field_keys_are_sortable(string propertyKey)
         {
-            Assert.True(RenameListFieldCatalog.TryMapSortColumn(column, out var key));
-            Assert.Equal(BasicRenameListField.Group, key.GroupId);
-            Assert.Equal(propertyKey, key.PropertyKey);
-            Assert.False(key.IsPreview);
+            var key = RenameListFieldKey.Original(BasicRenameListField.Group, propertyKey);
+            Assert.True(RenameListFieldCatalog.IsSortableKey(key));
         }
 
         [Fact]
-        public void Sort_column_mapping_round_trips_for_engine_columns()
-        {
-            foreach (var column in Enum.GetValues<RenameListSortColumn>())
-            {
-                Assert.True(RenameListFieldCatalog.TryMapSortColumn(column, out var key));
-                Assert.True(RenameListFieldCatalog.TryMapFieldKeyToSortColumn(key, out var roundTrip));
-                Assert.Equal(column, roundTrip);
-            }
-        }
-
-        [Fact]
-        public void Preview_field_keys_do_not_map_to_sort_columns()
+        public void Preview_field_keys_are_not_sortable()
         {
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
-            Assert.False(RenameListFieldCatalog.TryMapFieldKeyToSortColumn(previewKey, out _));
+            Assert.False(RenameListFieldCatalog.IsSortableKey(previewKey));
         }
 
         [Theory]
@@ -507,7 +494,7 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void Phase7a_original_groups_are_not_previewable_or_sortable()
+        public void Phase7a_original_groups_are_sortable_without_preview()
         {
             string[] originalOnlyGroups =
             [
@@ -526,8 +513,8 @@ namespace Mfr.Tests.Models
             )
             {
                 Assert.False(field.SupportsPreview, field.PropertyKey);
-                Assert.False(field.IsSortable, field.PropertyKey);
-                Assert.Null(field.SortColumn);
+                Assert.True(field.IsSortable, field.PropertyKey);
+                Assert.True(RenameListFieldCatalog.IsSortableKey(field.OriginalKey), field.PropertyKey);
             }
         }
 
@@ -553,6 +540,107 @@ namespace Mfr.Tests.Models
             _AssertField(item, ImageRenameListFields.Group, "Width", "");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*271", "");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*33434", "");
+        }
+
+        [Fact]
+        public void CompareForSort_orders_audio_title_string_and_jpeg_image_number_numeric()
+        {
+            static SemanticAudioTag _TitleTag(string title)
+            {
+                return new(
+                    Title: title,
+                    Album: null,
+                    Performers: null,
+                    AlbumArtists: null,
+                    Composers: null,
+                    Genre: null,
+                    Comment: null,
+                    Lyrics: null,
+                    Copyright: null,
+                    Grouping: null,
+                    Year: null,
+                    Track: null,
+                    TrackCount: null,
+                    Disc: null,
+                    DiscCount: null,
+                    BeatsPerMinute: null,
+                    Conductor: null,
+                    MusicBrainzArtistId: null,
+                    MusicBrainzReleaseId: null,
+                    MusicBrainzReleaseArtistId: null,
+                    MusicBrainzTrackId: null,
+                    MusicBrainzDiscId: null,
+                    MusicBrainzReleaseStatus: null,
+                    MusicBrainzReleaseType: null,
+                    MusicBrainzReleaseCountry: null,
+                    MusicIpId: null,
+                    AmazonId: null
+                );
+            }
+
+            var alphaItem = FilterTestHelpers.CreateRenameItem(
+                prefix: "alpha",
+                extension: ".mp3",
+                configureOriginal: meta =>
+                {
+                    meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Mpeg;
+                    meta.AudioTagOverlay.ClearAllBlocks();
+                    meta.AudioTagOverlay.MergeSemantic(_TitleTag("Beta"));
+                }
+            );
+            var betaItem = FilterTestHelpers.CreateRenameItem(
+                prefix: "beta",
+                extension: ".mp3",
+                configureOriginal: meta =>
+                {
+                    meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Mpeg;
+                    meta.AudioTagOverlay.ClearAllBlocks();
+                    meta.AudioTagOverlay.MergeSemantic(_TitleTag("Alpha"));
+                }
+            );
+
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+            Assert.Equal("Beta", RenameListFieldCatalog.Resolve(alphaItem, titleKey));
+            Assert.Equal("Alpha", RenameListFieldCatalog.Resolve(betaItem, titleKey));
+            Assert.True(
+                RenameListFieldCatalog.CompareForSort(alphaItem, titleKey, betaItem) > 0,
+                "Beta should sort after Alpha."
+            );
+
+            var lowImageItem = FilterTestHelpers.CreateRenameItem(
+                prefix: "low",
+                extension: ".jpg",
+                configureOriginal: meta =>
+                {
+                    meta.Exif = new ExifData
+                    {
+                        TagToDescription = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            ["ExifSub/37393"] = "10",
+                        },
+                    };
+                }
+            );
+            var highImageItem = FilterTestHelpers.CreateRenameItem(
+                prefix: "high",
+                extension: ".jpg",
+                configureOriginal: meta =>
+                {
+                    meta.Exif = new ExifData
+                    {
+                        TagToDescription = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            ["ExifSub/37393"] = "2",
+                        },
+                    };
+                }
+            );
+
+            var imageNumberKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*37393");
+            Assert.True(
+                RenameListFieldCatalog.CompareForSort(highImageItem, imageNumberKey, lowImageItem) < 0,
+                "Image number 2 should sort before 10."
+            );
         }
 
         [Fact]

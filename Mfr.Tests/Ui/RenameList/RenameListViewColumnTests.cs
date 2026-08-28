@@ -139,8 +139,8 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Null(renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
             Assert.True(fullPathLengthWithGlyph > fullPathLengthMin);
             Assert.True(previewFileNameLengthMin > 0);
-            Assert.Equal(fullPathLengthMin, grid.Columns[0].Width.Value);
-            Assert.Equal(fullPathLengthMin, grid.Columns[0].MinWidth);
+            Assert.Equal(fullPathLengthWithGlyph, grid.Columns[0].Width.Value);
+            Assert.Equal(fullPathLengthWithGlyph, grid.Columns[0].MinWidth);
             Assert.Equal(previewFileNameLengthMin, grid.Columns[1].Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
             Assert.Equal(previewFileNameLengthMin, grid.Columns[1].MinWidth);
@@ -432,7 +432,7 @@ namespace Mfr.Tests.Ui.RenameList
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
             Dispatcher.UIThread.RunJobs();
 
-            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth("Disc");
+            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth("Disc", reserveSortGlyph: true);
             var fitWidth = RenameListColumnAutoFit.ResolveAutoFitWidth(renameListViewModel.Entries, discKey);
             Assert.Equal(minHeaderWidth, fitWidth);
 

@@ -1,6 +1,9 @@
 using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
+using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.Tags;
+using Mfr.Tests.Ui.RenameList;
 using Mfr.Utils;
 using FormatterFilter = Mfr.Filters.Formatting.FormatterFilter;
 
@@ -359,8 +362,8 @@ namespace Mfr.Tests.Engine
 
             Assert.True(
                 renameList.Sort([
-                    new RenameListSortKey(RenameListSortColumn.FileFolder),
-                    new RenameListSortKey(RenameListSortColumn.FullPath),
+                    new RenameListSortKey(RenameListTestHelpers.FileFolderKey),
+                    new RenameListSortKey(RenameListTestHelpers.FullPathKey),
                 ])
             );
 
@@ -386,12 +389,62 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([alphaPath, betaPath, gammaPath]);
 
-            Assert.True(renameList.Sort([new RenameListSortKey(RenameListSortColumn.FullFileName, Descending: true)]));
+            Assert.True(
+                renameList.Sort([new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true)])
+            );
 
             Assert.Equal(
                 [gammaPath, betaPath, alphaPath],
                 renameList.RenameItems.Select(item => item.Original.FullPath)
             );
+        }
+
+        /// <summary>
+        /// Verifies Sort by File Name orders alphabetically by prefix.
+        /// </summary>
+        [Fact]
+        public void Sort_BasicName_Orders_By_Prefix()
+        {
+            var (alphaPath, betaPath, gammaPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "alpha.txt",
+                "beta.log",
+                "gamma.txt"
+            );
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([gammaPath, betaPath, alphaPath]);
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            Assert.True(renameList.Sort([new RenameListSortKey(nameKey)]));
+
+            Assert.Equal(
+                [alphaPath, betaPath, gammaPath],
+                renameList.RenameItems.Select(item => item.Original.FullPath)
+            );
+        }
+
+        /// <summary>
+        /// Verifies Sort by Creation Date orders chronologically.
+        /// </summary>
+        [Fact]
+        public void Sort_ExtendedCreationDate_Orders_Chronologically()
+        {
+            var earlyPath = TestHelpers.CreateFile(_tempRoot, "early.txt");
+            var latePath = TestHelpers.CreateFile(_tempRoot, "late.txt");
+            File.SetCreationTime(earlyPath, new DateTime(2020, 1, 1, 12, 0, 0));
+            File.SetCreationTime(latePath, new DateTime(2024, 6, 1, 12, 0, 0));
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([latePath, earlyPath]);
+
+            var creationDateKey = RenameListFieldKey.Original(
+                ExtendedRenameListFields.Group,
+                ExtendedCreationDateField.CreationDateKey
+            );
+            Assert.True(renameList.Sort([new RenameListSortKey(creationDateKey)]));
+
+            Assert.Equal([earlyPath, latePath], renameList.RenameItems.Select(item => item.Original.FullPath));
         }
 
         [Fact]

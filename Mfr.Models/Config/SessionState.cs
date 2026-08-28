@@ -147,7 +147,7 @@ namespace Mfr.Models.Config
                 return [];
             }
 
-            return [.. fields.Select(field => new RenameListSortKey(field.Column, field.Descending))];
+            return [.. fields.Select(field => new RenameListSortKey(field.Key, field.Descending))];
         }
 
         /// <summary>
@@ -158,17 +158,17 @@ namespace Mfr.Models.Config
         public static List<SessionStateRenameListSortField> FromSortKeys(IReadOnlyList<RenameListSortKey> keys)
         {
             ArgumentNullException.ThrowIfNull(keys);
-            return [.. keys.Select(key => new SessionStateRenameListSortField(key.Column, key.Descending))];
+            return [.. keys.Select(key => new SessionStateRenameListSortField(key.FieldKey, key.Descending))];
         }
     }
 
     /// <summary>
-    /// One persisted Rename List Auto-Sort key: column plus sort direction.
+    /// One persisted Rename List Auto-Sort key: field plus sort direction.
     /// </summary>
-    /// <param name="Column">Column to compare.</param>
-    /// <param name="Descending">When <see langword="true"/>, sort that column descending.</param>
+    /// <param name="Key">Original field key to compare.</param>
+    /// <param name="Descending">When <see langword="true"/>, sort that field descending.</param>
     public sealed record SessionStateRenameListSortField(
-        [property: JsonPropertyName("column")] RenameListSortColumn Column,
+        [property: JsonPropertyName("key")] RenameListFieldKey Key,
         [property: JsonPropertyName("descending")] bool Descending = false
     );
 

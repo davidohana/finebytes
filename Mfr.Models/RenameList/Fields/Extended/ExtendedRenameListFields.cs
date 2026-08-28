@@ -49,6 +49,12 @@ namespace Mfr.Models.RenameList.Fields.Extended
         {
             return RenameListFieldDisplay.FormatFileDate(meta.CreationTime);
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.DateTime(left.CreationTime, right.CreationTime);
+        }
     }
 
     internal sealed class ExtendedLastWriteDateField()
@@ -59,6 +65,12 @@ namespace Mfr.Models.RenameList.Fields.Extended
         public override string Resolve(FileMeta meta)
         {
             return RenameListFieldDisplay.FormatFileDate(meta.LastWriteTime);
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.DateTime(left.LastWriteTime, right.LastWriteTime);
         }
     }
 
@@ -71,6 +83,12 @@ namespace Mfr.Models.RenameList.Fields.Extended
         {
             return RenameListFieldDisplay.FormatFileDate(meta.LastAccessTime);
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.DateTime(left.LastAccessTime, right.LastAccessTime);
+        }
     }
 
     internal sealed class ExtendedSizeField() : ExtendedRenameListField(SizeKey, "Size", defaultWidth: 75)
@@ -80,6 +98,12 @@ namespace Mfr.Models.RenameList.Fields.Extended
         public override string Resolve(FileMeta meta)
         {
             return RenameListFieldDisplay.FormatFileSizeBytes(meta.FileSize);
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.Int64(left.FileSize, right.FileSize);
         }
     }
 
@@ -102,6 +126,12 @@ namespace Mfr.Models.RenameList.Fields.Extended
         public override string Resolve(FileMeta meta)
         {
             return RenameListFieldDisplay.FormatFolderFileCount(meta);
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.ParsedInt64(Resolve(left), Resolve(right));
         }
     }
 }

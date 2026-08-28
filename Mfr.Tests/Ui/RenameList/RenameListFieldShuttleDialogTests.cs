@@ -50,7 +50,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void Moving_a_sort_key_keeps_the_moved_row_selected()
         {
             var (dialog, dialogVm, list) = _ShowSortList();
-            var movedColumn = dialogVm.SelectedSortRows[0].Key.Column;
+            var movedFieldKey = dialogVm.SelectedSortRows[0].Key.FieldKey;
 
             list.SelectedIndex = 0;
             Dispatcher.UIThread.RunJobs();
@@ -60,7 +60,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(1, list.SelectedIndex);
             Assert.Equal(1, dialogVm.SelectedSortRowIndex);
-            Assert.Equal(movedColumn, dialogVm.SelectedSortRows[1].Key.Column);
+            Assert.Equal(movedFieldKey, dialogVm.SelectedSortRows[1].Key.FieldKey);
             Assert.True(dialogVm.MoveSelectedSortKeyUpCommand.CanExecute(null));
             Assert.True(dialogVm.MoveSelectedSortKeyDownCommand.CanExecute(null));
 

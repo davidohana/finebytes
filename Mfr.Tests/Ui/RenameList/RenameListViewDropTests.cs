@@ -286,7 +286,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var fileListViewModel = _CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListSortColumn.FullFileName));
+            renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
             Assert.True(renameListViewModel.IsAutoSort);
 

@@ -1,7 +1,7 @@
 namespace Mfr.Models.RenameList
 {
     /// <summary>
-    /// Catalog field that is original-only: no Auto-Sort mapping and no preview column.
+    /// Catalog field that is original-only: sortable but no preview column.
     /// </summary>
     /// <param name="groupId">MFR7 property group id.</param>
     /// <param name="groupDisplayName">User-visible group label in the field shuttle dropdown.</param>
@@ -23,9 +23,8 @@ namespace Mfr.Models.RenameList
             propertyKey,
             displayName,
             defaultWidth,
-            isSortable: false,
+            isSortable: true,
             supportsPreview: false,
-            sortColumn: null,
             metadataRequirement
         );
 }

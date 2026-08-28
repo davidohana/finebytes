@@ -16,7 +16,6 @@ namespace Mfr.Models.RenameList
     /// <param name="supportsPreview">
     /// When <see langword="true"/>, a preview column variant may be added (MFR7 non-<c>ReadOnly</c> fields).
     /// </param>
-    /// <param name="sortColumn">Engine Auto-Sort column when this field maps to one.</param>
     /// <param name="metadataRequirement">Lazy disk metadata required before resolving this field.</param>
     public abstract class RenameListField(
         string groupId,
@@ -26,7 +25,6 @@ namespace Mfr.Models.RenameList
         int? defaultWidth = null,
         bool isSortable = true,
         bool supportsPreview = true,
-        RenameListSortColumn? sortColumn = null,
         RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None
     )
     {
@@ -66,11 +64,6 @@ namespace Mfr.Models.RenameList
         public bool SupportsPreview { get; } = supportsPreview;
 
         /// <summary>
-        /// Gets the engine Auto-Sort column when this field maps to one.
-        /// </summary>
-        public RenameListSortColumn? SortColumn { get; } = sortColumn;
-
-        /// <summary>
         /// Gets lazy disk metadata that must be loaded before resolving this field.
         /// </summary>
         public RenameListMetadataRequirement MetadataRequirement { get; } = metadataRequirement;
@@ -91,6 +84,17 @@ namespace Mfr.Models.RenameList
         /// <param name="meta">Original or preview metadata.</param>
         /// <returns>Display string for the grid or sort shuttle.</returns>
         public abstract string Resolve(FileMeta meta);
+
+        /// <summary>
+        /// Compares two metadata snapshots for Auto-Sort on this field.
+        /// </summary>
+        /// <param name="left">Left snapshot.</param>
+        /// <param name="right">Right snapshot.</param>
+        /// <returns>Comparison sign for sort.</returns>
+        public virtual int CompareForSort(FileMeta left, FileMeta right)
+        {
+            return RenameListFieldSortCompare.String(Resolve(left), Resolve(right));
+        }
 
         /// <summary>
         /// Returns the display text for this field on a rename item.
