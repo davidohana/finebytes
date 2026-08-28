@@ -280,8 +280,20 @@
         />
         <Separator />
         <MenuItem
+          Header="Select Visible Fields..."
+          Command="{Binding RenameListViewModel.OpenFieldShuttleCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
+        />
+        <MenuItem
+          Header="Select Sort Fields..."
+          Command="{Binding RenameListViewModel.OpenEditSortFieldsCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"
+        />
+        <Separator />
+        <MenuItem
           Header="Auto-Sort"
           Command="{Binding RenameListViewModel.ToggleAutoSortCommand}"
+          ToggleType="CheckBox"
           IsChecked="{Binding RenameListViewModel.IsAutoSort, Mode=OneWay}"
           ToolTip.Tip="{Binding RenameListViewModel.SortSummaryText}"
         />

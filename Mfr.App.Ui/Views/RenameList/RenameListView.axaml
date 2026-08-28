@@ -43,6 +43,11 @@
           Command="{Binding OpenFieldShuttleCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
         />
+        <MenuItem
+          Header="Edit Sort Fields..."
+          Command="{Binding OpenEditSortFieldsCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"
+        />
         <Separator />
         <MenuItem
           Header="Remove Selected Item(s)"

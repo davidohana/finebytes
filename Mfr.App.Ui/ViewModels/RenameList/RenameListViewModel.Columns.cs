@@ -86,6 +86,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Opens the unified field shuttle dialog on the Sort tab (context and main menus).
+        /// </summary>
+        [RelayCommand]
+        public void OpenEditSortFields()
+        {
+            _RequestFieldShuttle(RenameListFieldShuttleTab.Sort);
+        }
+
+        /// <summary>
         /// Opens the unified field shuttle dialog on the requested tab.
         /// </summary>
         /// <param name="tab">Initial tab (Columns or Sort).</param>

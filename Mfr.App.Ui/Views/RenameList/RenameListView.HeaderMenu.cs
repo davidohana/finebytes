@@ -1,0 +1,97 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
+using Mfr.App.Ui.Resources;
+using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Models.RenameList;
+
+namespace Mfr.App.Ui.Views.RenameList
+{
+    /// <summary>
+    /// Column header context menu for <see cref="RenameListView"/>.
+    /// </summary>
+    public partial class RenameListView
+    {
+        private void _WireHeaderContextMenu()
+        {
+            RenameGrid.AddHandler(ContextRequestedEvent, _OnGridContextRequested, RoutingStrategies.Tunnel);
+        }
+
+        private void _OnGridContextRequested(object? sender, ContextRequestedEventArgs e)
+        {
+            if (_viewModel is null || e.Handled)
+            {
+                return;
+            }
+
+            if (e.Source is not Visual source)
+            {
+                return;
+            }
+
+            var header = source.FindAncestorOfType<DataGridColumnHeader>() ?? source as DataGridColumnHeader;
+            if (header is null)
+            {
+                return;
+            }
+
+            var column = _ResolveHeaderColumn(header);
+            if (column is null)
+            {
+                return;
+            }
+
+            var fieldKey = RenameListGridColumns.GetFieldKey(column);
+            if (fieldKey is null)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            _ShowColumnHeaderContextMenu(header, fieldKey.Value);
+        }
+
+        private DataGridColumn? _ResolveHeaderColumn(DataGridColumnHeader header)
+        {
+            var headers = RenameGrid.GetVisualDescendants().OfType<DataGridColumnHeader>().ToList();
+            var index = headers.IndexOf(header);
+            if (index < 0 || index >= RenameGrid.Columns.Count)
+            {
+                return null;
+            }
+
+            return RenameGrid.Columns[index];
+        }
+
+        private void _ShowColumnHeaderContextMenu(DataGridColumnHeader header, RenameListFieldKey fieldKey)
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            var field = RenameListFieldCatalog.GetField(fieldKey);
+            var headerText = RenameListFieldDisplay.GetColumnHeaderText(field, fieldKey.IsPreview);
+            var canHide = _viewModel.VisibleColumns.Count > 1;
+
+            var menu = new ContextMenu { DataContext = _viewModel };
+            menu.Items.Add(new MenuItem { Header = $"({headerText})", IsEnabled = false });
+            menu.Items.Add(new Separator());
+            var selectFields = new MenuItem
+            {
+                Header = "Select Fields...",
+                Command = _viewModel.OpenFieldShuttleCommand,
+            };
+            ToolTip.SetTip(selectFields, AppTips.SelectRenameListFields);
+            menu.Items.Add(selectFields);
+
+            var hideField = new MenuItem { Header = "Hide Field", IsEnabled = canHide };
+            hideField.Click += (_, _) => _viewModel.HideColumn(fieldKey);
+            menu.Items.Add(hideField);
+
+            menu.PlacementTarget = header;
+            menu.Open(header);
+        }
+    }
+}

@@ -728,6 +728,24 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies OpenEditSortFields opens the unified field shuttle on the Sort tab.
+        /// </summary>
+        [Fact]
+        public void OpenEditSortFields_Raises_FieldShuttleRequested_With_Sort_Tab()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            RenameListFieldShuttleTab? tab = null;
+            renameListViewModel.FieldShuttleRequested += (_, requestedTab) => tab = requestedTab;
+
+            renameListViewModel.OpenEditSortFieldsCommand.Execute(null);
+
+            Assert.True(renameListViewModel.OpenEditSortFieldsCommand.CanExecute(null));
+            Assert.Equal(RenameListFieldShuttleTab.Sort, tab);
+        }
+
+        /// <summary>
         /// Verifies Auto-Sort adds append then resort, ignoring selection insert.
         /// </summary>
         [Fact]
