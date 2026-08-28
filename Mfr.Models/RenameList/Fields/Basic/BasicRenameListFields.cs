@@ -1,3 +1,4 @@
+using System.Globalization;
 using Mfr.Models.Rename;
 using Mfr.Utils;
 
@@ -203,7 +204,8 @@ namespace Mfr.Models.RenameList.Fields.Basic
                     end++;
                 }
 
-                return long.Parse(fullFileName.AsSpan(i, end - i)).ToString();
+                return long.Parse(fullFileName.AsSpan(i, end - i), CultureInfo.InvariantCulture)
+                    .ToString(CultureInfo.InvariantCulture);
             }
 
             return "0";

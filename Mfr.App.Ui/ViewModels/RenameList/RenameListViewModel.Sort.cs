@@ -56,7 +56,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </param>
         public void SortByFieldKey(RenameListFieldKey key, bool append = false)
         {
-            if (key.IsPreview || !RenameListFieldCatalog.IsSortableKey(key))
+            if (!RenameListFieldCatalog.IsSortableKey(key))
             {
                 return;
             }
@@ -128,7 +128,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private void _SetSortKeys(IReadOnlyList<RenameListSortKey> keys, bool resort)
         {
-            _sortKeys = [.. keys];
+            _sortKeys = _SanitizeSortKeys(keys);
             ColumnSortStates = RenameListSortDisplay.BuildColumnSortStates(_sortKeys);
             OnPropertyChanged(nameof(IsAutoSort));
             OnPropertyChanged(nameof(SortKeys));
@@ -141,6 +141,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 _renameList.Sort(_sortKeys);
                 _SyncEntriesToEngineOrder();
             }
+        }
+
+        private static List<RenameListSortKey> _SanitizeSortKeys(IReadOnlyList<RenameListSortKey> keys)
+        {
+            var seenFieldKeys = new HashSet<RenameListFieldKey>();
+            var sanitized = new List<RenameListSortKey>(keys.Count);
+            foreach (var key in keys)
+            {
+                if (!RenameListFieldCatalog.IsSortableKey(key.FieldKey))
+                {
+                    continue;
+                }
+
+                if (!seenFieldKeys.Add(key.FieldKey))
+                {
+                    continue;
+                }
+
+                sanitized.Add(key);
+            }
+
+            return sanitized;
         }
     }
 }

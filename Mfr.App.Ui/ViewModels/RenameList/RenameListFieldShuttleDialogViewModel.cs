@@ -390,7 +390,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelectedSortField))]
         public void AddSelectedSortField()
         {
-            if (SelectedAvailableSortField is not { IsSortable: true } field)
+            if (SelectedAvailableSortField is not { } field)
             {
                 return;
             }
@@ -509,7 +509,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelectedSortField()
         {
-            return SelectedAvailableSortField is { IsSortable: true };
+            return SelectedAvailableSortField is not null;
         }
 
         private bool _CanRemoveSelectedSortKey()

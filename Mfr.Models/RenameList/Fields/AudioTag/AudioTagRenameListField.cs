@@ -43,6 +43,28 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         {
             return SemanticFields.GetSemanticField(meta.AudioTagOverlay, Field);
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            if (_IsNumericField(Field))
+            {
+                return RenameListFieldSortCompare.ParsedInt64(Resolve(left), Resolve(right));
+            }
+
+            return base.CompareForSort(left, right);
+        }
+
+        private static bool _IsNumericField(SemanticAudioField field)
+        {
+            return field
+                is SemanticAudioField.Year
+                    or SemanticAudioField.Track
+                    or SemanticAudioField.TrackCount
+                    or SemanticAudioField.Disc
+                    or SemanticAudioField.DiscCount
+                    or SemanticAudioField.BeatsPerMinute;
+        }
     }
 
     /// <summary>

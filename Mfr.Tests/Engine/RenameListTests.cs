@@ -447,6 +447,101 @@ namespace Mfr.Tests.Engine
             Assert.Equal([earlyPath, latePath], renameList.RenameItems.Select(item => item.Original.FullPath));
         }
 
+        /// <summary>
+        /// Verifies Sort is a no-op for empty keys or a single-item list.
+        /// </summary>
+        [Fact]
+        public void Sort_Empty_Keys_Or_Single_Item_Is_NoOp()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+
+            Assert.False(renameList.Sort([]));
+            Assert.False(renameList.Sort(RenameListSortKey.DefaultKeys));
+
+            var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "z.txt", "a.txt");
+            renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([alphaPath, betaPath]);
+            Assert.False(renameList.Sort([]));
+            Assert.Equal([alphaPath, betaPath], renameList.RenameItems.Select(item => item.Original.FullPath));
+        }
+
+        /// <summary>
+        /// Verifies Sort by File Name Numeric Value orders 2 before 10.
+        /// </summary>
+        [Fact]
+        public void Sort_FileNameNumeric_Orders_2_Before_10()
+        {
+            var tenPath = TestHelpers.CreateFile(_tempRoot, "file10.txt");
+            var twoPath = TestHelpers.CreateFile(_tempRoot, "file2.txt");
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([tenPath, twoPath]);
+
+            var numericKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FileNameNumeric
+            );
+            Assert.True(renameList.Sort([new RenameListSortKey(numericKey)]));
+            Assert.Equal([twoPath, tenPath], renameList.RenameItems.Select(item => item.Original.FullPath));
+        }
+
+        /// <summary>
+        /// Verifies Sort by Size orders smaller files first.
+        /// </summary>
+        [Fact]
+        public void Sort_Size_Orders_Smaller_First()
+        {
+            var largePath = TestHelpers.CreateFile(_tempRoot, "large.txt");
+            var smallPath = TestHelpers.CreateFile(_tempRoot, "small.txt");
+            File.WriteAllText(largePath, new string('x', 50));
+            File.WriteAllText(smallPath, "x");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([largePath, smallPath]);
+
+            var sizeKey = RenameListFieldKey.Original(ExtendedRenameListFields.Group, ExtendedSizeField.SizeKey);
+            Assert.True(renameList.Sort([new RenameListSortKey(sizeKey)]));
+            Assert.Equal([smallPath, largePath], renameList.RenameItems.Select(item => item.Original.FullPath));
+        }
+
+        /// <summary>
+        /// Verifies equal sort keys keep add order across repeated Sort calls.
+        /// </summary>
+        [Fact]
+        public void Sort_Tied_Keys_Keep_Add_Order()
+        {
+            var betaPath = TestHelpers.CreateFile(_tempRoot, "beta.txt");
+            var alphaPath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([betaPath, alphaPath]);
+
+            var extensionKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Extension
+            );
+            Assert.True(renameList.Sort([new RenameListSortKey(extensionKey)]));
+            Assert.Equal([betaPath, alphaPath], renameList.RenameItems.Select(item => item.Original.FullPath));
+
+            Assert.True(renameList.Sort([new RenameListSortKey(extensionKey)]));
+            Assert.Equal([betaPath, alphaPath], renameList.RenameItems.Select(item => item.Original.FullPath));
+        }
+
+        /// <summary>
+        /// Verifies a preview sort key is ignored and does not throw.
+        /// </summary>
+        [Fact]
+        public void Sort_Preview_Key_Does_Not_Throw_And_Keeps_Order()
+        {
+            var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "alpha.txt", "beta.txt");
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([betaPath, alphaPath]);
+
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            Assert.False(renameList.Sort([new RenameListSortKey(previewKey)]));
+            Assert.Equal([betaPath, alphaPath], renameList.RenameItems.Select(item => item.Original.FullPath));
+        }
+
         [Fact]
         /// <summary>
         /// Verifies that removing by item reference drops the item from the list.

@@ -64,6 +64,28 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
+        /// Compares durations.
+        /// </summary>
+        /// <param name="left">Left duration.</param>
+        /// <param name="right">Right duration.</param>
+        /// <returns>Comparison sign for sort.</returns>
+        internal static int TimeSpan(TimeSpan left, TimeSpan right)
+        {
+            return left.CompareTo(right);
+        }
+
+        /// <summary>
+        /// Compares floating-point values.
+        /// </summary>
+        /// <param name="left">Left value.</param>
+        /// <param name="right">Right value.</param>
+        /// <returns>Comparison sign for sort.</returns>
+        internal static int Double(double left, double right)
+        {
+            return left.CompareTo(right);
+        }
+
+        /// <summary>
         /// Compares invariant integer strings; non-numeric values sort as zero.
         /// </summary>
         /// <param name="left">Left formatted value.</param>

@@ -4,7 +4,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Models.RenameList.Fields.AudioTag
 {
     /// <summary>
-    /// All MFR7 Audio Tag Rename List fields (original columns only; preview deferred to Phase 7b).
+    /// All MFR7 Audio Tag Rename List fields (original columns only; preview deferred to Phase 9).
     /// </summary>
     public static class AudioTagRenameListFields
     {

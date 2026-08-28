@@ -43,6 +43,62 @@ namespace Mfr.Models.RenameList.Fields.Media
         {
             return MediaRenameListFieldDisplay.Format(meta.Media, Field);
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            var leftMedia = left.Media;
+            var rightMedia = right.Media;
+            return Field switch
+            {
+                MediaRenameListProperty.Duration or MediaRenameListProperty.DurationSeconds =>
+                    RenameListFieldSortCompare.TimeSpan(
+                        leftMedia?.Duration ?? TimeSpan.Zero,
+                        rightMedia?.Duration ?? TimeSpan.Zero
+                    ),
+                MediaRenameListProperty.AudioBitrate => RenameListFieldSortCompare.Int32(
+                    leftMedia?.AudioBitrate ?? 0,
+                    rightMedia?.AudioBitrate ?? 0
+                ),
+                MediaRenameListProperty.AudioChannels => RenameListFieldSortCompare.Int32(
+                    leftMedia?.AudioChannels ?? 0,
+                    rightMedia?.AudioChannels ?? 0
+                ),
+                MediaRenameListProperty.AudioSampleRate => RenameListFieldSortCompare.Int32(
+                    leftMedia?.AudioSampleRate ?? 0,
+                    rightMedia?.AudioSampleRate ?? 0
+                ),
+                MediaRenameListProperty.BitsPerSample => RenameListFieldSortCompare.Int32(
+                    leftMedia?.BitsPerSample ?? 0,
+                    rightMedia?.BitsPerSample ?? 0
+                ),
+                MediaRenameListProperty.VideoWidth => RenameListFieldSortCompare.Int32(
+                    leftMedia?.VideoWidth ?? 0,
+                    rightMedia?.VideoWidth ?? 0
+                ),
+                MediaRenameListProperty.VideoHeight => RenameListFieldSortCompare.Int32(
+                    leftMedia?.VideoHeight ?? 0,
+                    rightMedia?.VideoHeight ?? 0
+                ),
+                MediaRenameListProperty.PhotoWidth => RenameListFieldSortCompare.Int32(
+                    leftMedia?.PhotoWidth ?? 0,
+                    rightMedia?.PhotoWidth ?? 0
+                ),
+                MediaRenameListProperty.PhotoHeight => RenameListFieldSortCompare.Int32(
+                    leftMedia?.PhotoHeight ?? 0,
+                    rightMedia?.PhotoHeight ?? 0
+                ),
+                MediaRenameListProperty.PhotoQuality => RenameListFieldSortCompare.Int32(
+                    leftMedia?.PhotoQuality ?? 0,
+                    rightMedia?.PhotoQuality ?? 0
+                ),
+                MediaRenameListProperty.MimeType
+                or MediaRenameListProperty.PossiblyCorrupt
+                or MediaRenameListProperty.MediaTypes
+                or MediaRenameListProperty.Description => base.CompareForSort(left, right),
+                _ => base.CompareForSort(left, right),
+            };
+        }
     }
 
     /// <summary>

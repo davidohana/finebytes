@@ -409,13 +409,20 @@ namespace Mfr.Engine.RenameList
         /// <summary>
         /// Sorts the list by <paramref name="keys"/> and reindexes.
         /// </summary>
-        /// <param name="keys">Sort keys in priority order. Empty is a no-op.</param>
+        /// <param name="keys">
+        /// Sort keys in priority order. Empty or only non-sortable keys is a no-op.
+        /// </param>
         /// <returns><see langword="true"/> when the list order may have changed.</returns>
         public bool Sort(IReadOnlyList<RenameListSortKey> keys)
         {
             ArgumentNullException.ThrowIfNull(keys);
 
             if (keys.Count == 0 || _renameItems.Count <= 1)
+            {
+                return false;
+            }
+
+            if (!keys.Any(key => RenameListFieldCatalog.IsSortableKey(key.FieldKey)))
             {
                 return false;
             }
@@ -429,6 +436,11 @@ namespace Mfr.Engine.RenameList
         {
             foreach (var key in keys)
             {
+                if (!RenameListFieldCatalog.IsSortableKey(key.FieldKey))
+                {
+                    continue;
+                }
+
                 RenameListLazyMetadataLoader.TryEnsureLoaded(left, key.FieldKey);
                 RenameListLazyMetadataLoader.TryEnsureLoaded(right, key.FieldKey);
 
@@ -444,7 +456,8 @@ namespace Mfr.Engine.RenameList
                 }
             }
 
-            return 0;
+            // MFR7 RenameItemComparer: equal keys keep add order so a second Sort does not reshuffle ties.
+            return left.Original.RenameListIndex.CompareTo(right.Original.RenameListIndex);
         }
 
         /// <summary>

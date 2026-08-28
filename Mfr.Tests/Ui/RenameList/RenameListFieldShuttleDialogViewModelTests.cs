@@ -282,6 +282,21 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void Sort_tab_can_add_image_width_field()
+        {
+            var dialogVm = _CreateDefaultDialog();
+            dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == ImageRenameListFields.Group);
+
+            Assert.Contains(dialogVm.AvailableSortFields, field => field.PropertyKey == "Width");
+
+            dialogVm.SelectedAvailableSortField = RenameListFieldCatalog.GetField(ImageRenameListFields.Group, "Width");
+            dialogVm.AddSelectedSortFieldCommand.Execute(null);
+
+            Assert.Equal("Width", dialogVm.SelectedSortRows[^1].Key.FieldKey.PropertyKey);
+            Assert.Equal("Width", dialogVm.SelectedSortRows[^1].Label);
+        }
+
+        [Fact]
         public void Jpeg_tag_group_has_no_preview_fields()
         {
             var dialogVm = _CreateDefaultDialog();

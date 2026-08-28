@@ -88,23 +88,14 @@ namespace Mfr.Tests.Models
             Assert.True(keys[3].IsPreview);
         }
 
-        [Theory]
-        [InlineData(BasicRenameListFields.Key.ItemType)]
-        [InlineData(BasicRenameListFields.Key.Folder)]
-        [InlineData(BasicRenameListFields.Key.FullName)]
-        [InlineData(BasicRenameListFields.Key.FullPath)]
-        public void Original_basic_field_keys_are_sortable(string propertyKey)
-        {
-            var key = RenameListFieldKey.Original(BasicRenameListField.Group, propertyKey);
-            Assert.True(RenameListFieldCatalog.IsSortableKey(key));
-        }
-
         [Fact]
-        public void Preview_field_keys_are_not_sortable()
+        public void Every_original_field_is_sortable_and_preview_keys_are_not()
         {
-            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
-
-            Assert.False(RenameListFieldCatalog.IsSortableKey(previewKey));
+            foreach (var field in RenameListFieldCatalog.All)
+            {
+                Assert.True(RenameListFieldCatalog.IsSortableKey(field.OriginalKey), field.PropertyKey);
+                Assert.False(RenameListFieldCatalog.IsSortableKey(field.PreviewKey), field.PropertyKey);
+            }
         }
 
         [Theory]
@@ -543,70 +534,65 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void CompareForSort_orders_audio_title_string_and_jpeg_image_number_numeric()
+        public void CompareForSort_orders_audio_title_string()
         {
-            static SemanticAudioTag _TitleTag(string title)
-            {
-                return new(
-                    Title: title,
-                    Album: null,
-                    Performers: null,
-                    AlbumArtists: null,
-                    Composers: null,
-                    Genre: null,
-                    Comment: null,
-                    Lyrics: null,
-                    Copyright: null,
-                    Grouping: null,
-                    Year: null,
-                    Track: null,
-                    TrackCount: null,
-                    Disc: null,
-                    DiscCount: null,
-                    BeatsPerMinute: null,
-                    Conductor: null,
-                    MusicBrainzArtistId: null,
-                    MusicBrainzReleaseId: null,
-                    MusicBrainzReleaseArtistId: null,
-                    MusicBrainzTrackId: null,
-                    MusicBrainzDiscId: null,
-                    MusicBrainzReleaseStatus: null,
-                    MusicBrainzReleaseType: null,
-                    MusicBrainzReleaseCountry: null,
-                    MusicIpId: null,
-                    AmazonId: null
-                );
-            }
-
-            var alphaItem = FilterTestHelpers.CreateRenameItem(
-                prefix: "alpha",
-                extension: ".mp3",
-                configureOriginal: meta =>
-                {
-                    meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Mpeg;
-                    meta.AudioTagOverlay.ClearAllBlocks();
-                    meta.AudioTagOverlay.MergeSemantic(_TitleTag("Beta"));
-                }
-            );
-            var betaItem = FilterTestHelpers.CreateRenameItem(
-                prefix: "beta",
-                extension: ".mp3",
-                configureOriginal: meta =>
-                {
-                    meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Mpeg;
-                    meta.AudioTagOverlay.ClearAllBlocks();
-                    meta.AudioTagOverlay.MergeSemantic(_TitleTag("Alpha"));
-                }
-            );
-
+            var betaTitle = _ItemWithSemantic(SemanticAudioField.Title, "Beta");
+            var alphaTitle = _ItemWithSemantic(SemanticAudioField.Title, "Alpha");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
-            Assert.Equal("Beta", RenameListFieldCatalog.Resolve(alphaItem, titleKey));
-            Assert.Equal("Alpha", RenameListFieldCatalog.Resolve(betaItem, titleKey));
-            Assert.True(
-                RenameListFieldCatalog.CompareForSort(alphaItem, titleKey, betaItem) > 0,
-                "Beta should sort after Alpha."
-            );
 
+            Assert.True(RenameListFieldCatalog.CompareForSort(betaTitle, titleKey, alphaTitle) > 0);
+        }
+
+        [Fact]
+        public void CompareForSort_orders_audio_track_and_image_width_numeric()
+        {
+            var trackTen = _ItemWithSemantic(SemanticAudioField.Track, "10");
+            var trackTwo = _ItemWithSemantic(SemanticAudioField.Track, "2");
+            var trackKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Track");
+            Assert.True(RenameListFieldCatalog.CompareForSort(trackTwo, trackKey, trackTen) < 0);
+
+            var widthTen = FilterTestHelpers.CreateRenameItem(
+                prefix: "wide",
+                extension: ".jpg",
+                configureOriginal: meta => meta.Image = new ImageProperties { Width = 10 }
+            );
+            var widthTwo = FilterTestHelpers.CreateRenameItem(
+                prefix: "narrow",
+                extension: ".jpg",
+                configureOriginal: meta => meta.Image = new ImageProperties { Width = 2 }
+            );
+            var widthKey = RenameListFieldKey.Original(ImageRenameListFields.Group, "Width");
+            Assert.True(RenameListFieldCatalog.CompareForSort(widthTwo, widthKey, widthTen) < 0);
+        }
+
+        [Fact]
+        public void CompareForSort_orders_media_duration_and_file_name_numeric()
+        {
+            var tenHours = FilterTestHelpers.CreateRenameItem(
+                prefix: "long",
+                extension: ".mp3",
+                configureOriginal: meta => meta.Media = new MediaProperties { Duration = TimeSpan.FromHours(10) }
+            );
+            var oneHour = FilterTestHelpers.CreateRenameItem(
+                prefix: "short",
+                extension: ".mp3",
+                configureOriginal: meta => meta.Media = new MediaProperties { Duration = TimeSpan.FromHours(1) }
+            );
+            var durationKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "Duration");
+            Assert.True(RenameListFieldCatalog.CompareForSort(oneHour, durationKey, tenHours) < 0);
+
+            var fileTen = FilterTestHelpers.CreateRenameItem(prefix: "file10", extension: ".txt");
+            var fileTwo = FilterTestHelpers.CreateRenameItem(prefix: "file2", extension: ".txt");
+            var numericKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FileNameNumeric
+            );
+            Assert.True(RenameListFieldCatalog.CompareForSort(fileTwo, numericKey, fileTen) < 0);
+        }
+
+        [Fact]
+        public void CompareForSort_orders_jpeg_image_number_numeric()
+        {
             var lowImageItem = FilterTestHelpers.CreateRenameItem(
                 prefix: "low",
                 extension: ".jpg",
@@ -637,10 +623,17 @@ namespace Mfr.Tests.Models
             );
 
             var imageNumberKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*37393");
-            Assert.True(
-                RenameListFieldCatalog.CompareForSort(highImageItem, imageNumberKey, lowImageItem) < 0,
-                "Image number 2 should sort before 10."
-            );
+            Assert.True(RenameListFieldCatalog.CompareForSort(highImageItem, imageNumberKey, lowImageItem) < 0);
+        }
+
+        [Fact]
+        public void CompareForSort_throws_for_preview_key()
+        {
+            var left = FilterTestHelpers.CreateRenameItem(prefix: "alpha");
+            var right = FilterTestHelpers.CreateRenameItem(prefix: "beta");
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+            Assert.Throws<ArgumentException>(() => RenameListFieldCatalog.CompareForSort(left, previewKey, right));
         }
 
         [Fact]
@@ -685,6 +678,20 @@ namespace Mfr.Tests.Models
         private static void _AssertField(RenameItem item, string propertyKey, string expected)
         {
             _AssertField(item, BasicRenameListField.Group, propertyKey, expected);
+        }
+
+        private static RenameItem _ItemWithSemantic(SemanticAudioField field, string value)
+        {
+            return FilterTestHelpers.CreateRenameItem(
+                prefix: "track",
+                extension: ".mp3",
+                configureOriginal: meta =>
+                {
+                    meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Mpeg;
+                    meta.AudioTagOverlay.ClearAllBlocks();
+                    SemanticFields.SetSemanticField(meta.AudioTagOverlay, field, value);
+                }
+            );
         }
     }
 }

@@ -44,6 +44,40 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
         {
             return MpegRenameListFieldDisplay.Format(meta.Media?.Mpeg, Field);
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            var leftMpeg = left.Media?.Mpeg;
+            var rightMpeg = right.Media?.Mpeg;
+            return Field switch
+            {
+                MpegRenameListProperty.Bitrate => RenameListFieldSortCompare.Int32(
+                    leftMpeg?.Bitrate ?? 0,
+                    rightMpeg?.Bitrate ?? 0
+                ),
+                MpegRenameListProperty.Duration or MpegRenameListProperty.DurationSecs =>
+                    RenameListFieldSortCompare.TimeSpan(
+                        leftMpeg?.Duration ?? TimeSpan.Zero,
+                        rightMpeg?.Duration ?? TimeSpan.Zero
+                    ),
+                MpegRenameListProperty.Frequency => RenameListFieldSortCompare.Int32(
+                    leftMpeg?.SampleRate ?? 0,
+                    rightMpeg?.SampleRate ?? 0
+                ),
+                MpegRenameListProperty.Layer => RenameListFieldSortCompare.Int32(
+                    leftMpeg?.Layer ?? 0,
+                    rightMpeg?.Layer ?? 0
+                ),
+                MpegRenameListProperty.Copyright
+                or MpegRenameListProperty.Vbr
+                or MpegRenameListProperty.Level
+                or MpegRenameListProperty.Mode
+                or MpegRenameListProperty.Original
+                or MpegRenameListProperty.Protection => base.CompareForSort(left, right),
+                _ => base.CompareForSort(left, right),
+            };
+        }
     }
 
     /// <summary>

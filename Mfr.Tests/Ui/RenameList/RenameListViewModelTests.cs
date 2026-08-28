@@ -718,6 +718,50 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies SetSortKeys drops preview, unknown, and duplicate field keys.
+        /// </summary>
+        [Fact]
+        public void SetSortKeys_Drops_Preview_Unknown_And_Duplicate_Keys()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var unknownKey = RenameListFieldKey.Original("Unknown", "Missing");
+
+            renameListViewModel.SetSortKeys([
+                new RenameListSortKey(previewKey),
+                new RenameListSortKey(RenameListTestHelpers.FullFileNameKey),
+                new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true),
+                new RenameListSortKey(unknownKey),
+            ]);
+
+            Assert.Equal([new RenameListSortKey(RenameListTestHelpers.FullFileNameKey)], renameListViewModel.SortKeys);
+        }
+
+        /// <summary>
+        /// Verifies ApplySession drops unsortable keys and keeps the rest.
+        /// </summary>
+        [Fact]
+        public void ApplySession_Drops_Unsortable_Keys()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+            renameListViewModel.ApplySession([
+                new SessionStateRenameListSortField(previewKey),
+                new SessionStateRenameListSortField(RenameListTestHelpers.ParentFolderKey, Descending: true),
+            ]);
+
+            Assert.Equal(
+                [new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true)],
+                renameListViewModel.SortKeys
+            );
+        }
+
+        /// <summary>
         /// Verifies Auto-Sort adds append then resort, ignoring selection insert.
         /// </summary>
         [Fact]

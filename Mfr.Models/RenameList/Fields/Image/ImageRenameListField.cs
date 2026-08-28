@@ -43,6 +43,42 @@ namespace Mfr.Models.RenameList.Fields.Image
         {
             return ImageRenameListFieldDisplay.Format(meta.Image, Field);
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            var leftImage = left.Image;
+            var rightImage = right.Image;
+            return Field switch
+            {
+                ImageRenameListProperty.Width => RenameListFieldSortCompare.Int32(
+                    leftImage?.Width ?? 0,
+                    rightImage?.Width ?? 0
+                ),
+                ImageRenameListProperty.Height => RenameListFieldSortCompare.Int32(
+                    leftImage?.Height ?? 0,
+                    rightImage?.Height ?? 0
+                ),
+                ImageRenameListProperty.BitDepth => RenameListFieldSortCompare.Int32(
+                    leftImage?.BitDepth ?? 0,
+                    rightImage?.BitDepth ?? 0
+                ),
+                ImageRenameListProperty.HorizontalResolutionDpi => RenameListFieldSortCompare.Double(
+                    leftImage?.HorizontalResolutionDpi ?? 0,
+                    rightImage?.HorizontalResolutionDpi ?? 0
+                ),
+                ImageRenameListProperty.VerticalResolutionDpi => RenameListFieldSortCompare.Double(
+                    leftImage?.VerticalResolutionDpi ?? 0,
+                    rightImage?.VerticalResolutionDpi ?? 0
+                ),
+                ImageRenameListProperty.FrameCount => RenameListFieldSortCompare.Int32(
+                    leftImage?.FrameCount ?? 0,
+                    rightImage?.FrameCount ?? 0
+                ),
+                ImageRenameListProperty.Format => base.CompareForSort(left, right),
+                _ => base.CompareForSort(left, right),
+            };
+        }
     }
 
     /// <summary>
