@@ -6,7 +6,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// File name without extension.
     /// </summary>
     public sealed class BasicNameField()
-        : BasicRenameListField(propertyKey: Key, displayName: "File Name", order: 4, defaultWidth: 150)
+        : BasicRenameListField(propertyKey: Key, displayName: "File Name", defaultWidth: 150)
     {
         /// <summary>
         /// MFR7 property key.

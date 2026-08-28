@@ -9,7 +9,6 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: Key,
             displayName: "File Name Numeric Value",
-            order: 6,
             defaultWidth: 50,
             supportsPreview: false
         )

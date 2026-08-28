@@ -7,25 +7,19 @@ namespace Mfr.Models.RenameList
     /// </summary>
     /// <param name="propertyKey">Property key within the group (e.g. <c>FullName</c>).</param>
     /// <param name="displayName">User-visible column label.</param>
-    /// <param name="order">Field order within the group (lower first).</param>
     /// <param name="defaultWidth">Default grid column width in pixels (MFR7).</param>
     /// <param name="isSortable">When <see langword="true"/>, the field may appear in Auto-Sort keys.</param>
     /// <param name="supportsPreview">
     /// When <see langword="true"/>, a preview column variant may be added (MFR7 non-<c>ReadOnly</c> fields).
     /// </param>
     /// <param name="sortColumn">Engine Auto-Sort column when this field maps to one.</param>
-    /// <param name="isDefaultVisible">When <see langword="true"/>, included in default visible original columns.</param>
-    /// <param name="isDefaultVisiblePreview">When <see langword="true"/>, included in default visible preview columns.</param>
     public abstract class RenameListField(
         string propertyKey,
         string displayName,
-        int order,
         int defaultWidth = 180,
         bool isSortable = true,
         bool supportsPreview = true,
-        RenameListSortColumn? sortColumn = null,
-        bool isDefaultVisible = false,
-        bool isDefaultVisiblePreview = false
+        RenameListSortColumn? sortColumn = null
     )
     {
         /// <summary>
@@ -49,16 +43,6 @@ namespace Mfr.Models.RenameList
         public string DisplayName { get; } = displayName;
 
         /// <summary>
-        /// Gets shuttle group sort order (lower first).
-        /// </summary>
-        public virtual int GroupOrder => 0;
-
-        /// <summary>
-        /// Gets field order within the group (lower first).
-        /// </summary>
-        public int Order { get; } = order;
-
-        /// <summary>
         /// Gets default grid column width in pixels (MFR7).
         /// </summary>
         public int DefaultWidth { get; } = defaultWidth;
@@ -77,16 +61,6 @@ namespace Mfr.Models.RenameList
         /// Gets the engine Auto-Sort column when this field maps to one.
         /// </summary>
         public RenameListSortColumn? SortColumn { get; } = sortColumn;
-
-        /// <summary>
-        /// Gets whether this field is a default visible original column.
-        /// </summary>
-        public bool IsDefaultVisible { get; } = isDefaultVisible;
-
-        /// <summary>
-        /// Gets whether this field is a default visible preview column.
-        /// </summary>
-        public bool IsDefaultVisiblePreview { get; } = isDefaultVisiblePreview;
 
         /// <summary>
         /// Gets the original (non-preview) field key for this field.

@@ -1,22 +1,30 @@
 using System.Diagnostics.CodeAnalysis;
 using Mfr.Models.Rename;
+using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Utils;
 
 namespace Mfr.Models.RenameList
 {
     /// <summary>
     /// Product catalog of Rename List grid/sort fields.
-    /// <para>
-    /// Built by reflecting concrete <see cref="RenameListField"/> subclasses, like
-    /// <c>FilterCatalog</c> does for filters.
-    /// </para>
     /// </summary>
     public static class RenameListFieldCatalog
     {
         /// <summary>
-        /// All registered fields in group order, then field order.
+        /// All registered fields in catalog order (group, then field).
         /// </summary>
-        public static IReadOnlyList<RenameListField> All { get; } = _DiscoverFields();
+        public static IReadOnlyList<RenameListField> All { get; } =
+            _Register([
+                new BasicItemTypeField(),
+                new BasicFolderField(),
+                new BasicFullNameField(),
+                new BasicFullPathField(),
+                new BasicNameField(),
+                new BasicExtensionField(),
+                new BasicFileNameNumericField(),
+                new BasicFileNameLengthField(),
+                new BasicFullPathLengthField(),
+            ]);
 
         private static readonly Dictionary<(string GroupId, string PropertyKey), RenameListField> _fieldByKey =
             All.ToDictionary(field => (field.GroupId, field.PropertyKey));
@@ -24,7 +32,13 @@ namespace Mfr.Models.RenameList
         /// <summary>
         /// Default visible columns (MFR7 <c>RenameGrid</c>).
         /// </summary>
-        public static IReadOnlyList<RenameListFieldKey> DefaultVisibleColumns { get; } = _DefaultVisibleColumns(All);
+        public static IReadOnlyList<RenameListFieldKey> DefaultVisibleColumns { get; } =
+            _RegisterDefaultVisibleColumns([
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicItemTypeField.Key),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFolderField.Key),
+                RenameListFieldKey.Original(BasicRenameListField.Group, BasicFullNameField.Key),
+                RenameListFieldKey.Preview(BasicRenameListField.Group, BasicFullNameField.Key),
+            ]);
 
         /// <summary>
         /// Returns fields for one property group.
@@ -141,54 +155,28 @@ namespace Mfr.Models.RenameList
             return field.Resolve(meta);
         }
 
-        private static List<RenameListFieldKey> _DefaultVisibleColumns(IReadOnlyList<RenameListField> fields)
+        private static List<RenameListField> _Register(List<RenameListField> fields)
         {
-            var keys = new List<RenameListFieldKey>();
-            foreach (var field in fields)
-            {
-                if (field.IsDefaultVisible)
-                {
-                    keys.Add(field.OriginalKey);
-                }
-
-                if (field.IsDefaultVisiblePreview)
-                {
-                    keys.Add(field.PreviewKey);
-                }
-            }
-
-            return keys;
-        }
-
-        private static List<RenameListField> _DiscoverFields()
-        {
-            var fields = typeof(RenameListFieldCatalog)
-                .Assembly.GetExportedTypes()
-                .Where(type =>
-                    type is { IsClass: true, IsAbstract: false } && typeof(RenameListField).IsAssignableFrom(type)
-                )
-                .Select(_CreateField)
-                .OrderBy(field => field.GroupOrder)
-                .ThenBy(field => field.Order)
-                .ThenBy(field => field.PropertyKey, StringComparer.Ordinal)
-                .ToList();
-
             var seenKeys = new HashSet<(string GroupId, string PropertyKey)>();
             var seenSortColumns = new HashSet<RenameListSortColumn>();
             foreach (var field in fields)
             {
                 Check.That(
+                    !string.IsNullOrWhiteSpace(field.GroupId),
+                    $"Rename List field '{field.GetType().FullName}' must declare a non-empty group id."
+                );
+                Check.That(
+                    !string.IsNullOrWhiteSpace(field.PropertyKey),
+                    $"Rename List field '{field.GetType().FullName}' must declare a non-empty property key."
+                );
+                Check.That(
+                    !string.IsNullOrWhiteSpace(field.DisplayName),
+                    $"Rename List field '{field.GetType().FullName}' must declare a non-empty display name."
+                );
+                Check.That(
                     seenKeys.Add((field.GroupId, field.PropertyKey)),
                     $"Duplicate Rename List field '{field.GroupId}/{field.PropertyKey}'."
                 );
-
-                if (field.IsDefaultVisiblePreview)
-                {
-                    Check.That(
-                        field.SupportsPreview,
-                        $"Preview default column '{field.GroupId}/{field.PropertyKey}' must support preview."
-                    );
-                }
 
                 if (field.SortColumn is not { } sortColumn)
                 {
@@ -204,26 +192,26 @@ namespace Mfr.Models.RenameList
             return fields;
         }
 
-        private static RenameListField _CreateField(Type fieldType)
+        private static List<RenameListFieldKey> _RegisterDefaultVisibleColumns(List<RenameListFieldKey> keys)
         {
-            var field = (RenameListField)
-                Check.NotNull(
-                    Activator.CreateInstance(fieldType),
-                    $"Rename List field '{fieldType.FullName}' could not be constructed."
+            foreach (var key in keys)
+            {
+                Check.That(
+                    TryGetField(key, out var field),
+                    $"Default visible column '{key.GroupId}/{key.PropertyKey}' is not a registered field."
                 );
-            Check.That(
-                !string.IsNullOrWhiteSpace(field.GroupId),
-                $"Rename List field '{fieldType.FullName}' must declare a non-empty group id."
-            );
-            Check.That(
-                !string.IsNullOrWhiteSpace(field.PropertyKey),
-                $"Rename List field '{fieldType.FullName}' must declare a non-empty property key."
-            );
-            Check.That(
-                !string.IsNullOrWhiteSpace(field.DisplayName),
-                $"Rename List field '{fieldType.FullName}' must declare a non-empty display name."
-            );
-            return field;
+                if (!key.IsPreview)
+                {
+                    continue;
+                }
+
+                Check.That(
+                    field is { SupportsPreview: true },
+                    $"Preview default column '{key.GroupId}/{key.PropertyKey}' must support preview."
+                );
+            }
+
+            return keys;
         }
     }
 }

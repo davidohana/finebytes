@@ -10,11 +10,9 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: Key,
             displayName: "File/Folder",
-            order: 0,
             defaultWidth: 50,
             supportsPreview: false,
-            sortColumn: RenameListSortColumn.FileFolder,
-            isDefaultVisible: true
+            sortColumn: RenameListSortColumn.FileFolder
         )
     {
         /// <summary>

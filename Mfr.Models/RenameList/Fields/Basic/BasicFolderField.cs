@@ -9,9 +9,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: Key,
             displayName: "Parent Folder",
-            order: 1,
-            sortColumn: RenameListSortColumn.ParentFolder,
-            isDefaultVisible: true
+            sortColumn: RenameListSortColumn.ParentFolder
         )
     {
         /// <summary>
