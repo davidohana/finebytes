@@ -4,8 +4,8 @@ Optional fixed-width font for the Rename List grid, persisted in `session.json` 
 
 ## Goal
 
-- **Default:** proportional **Segoe UI** via existing `FileListFont` — no behavior change for existing users.
-- **Optional:** user enables **fixed-width** (`Cascadia Mono, Consolas, monospace` at 12pt) for the **whole Rename List grid**.
+- **Default:** **fixed-width** (`Cascadia Mono, Consolas, monospace` at 12pt) for the **whole Rename List grid**.
+- **Optional:** user can disable fixed-width to use proportional **Segoe UI** via existing `FileListFont`.
 - **Immediate:** checkbox toggles in the Rename List context menu and **Rename List** main menu apply at once.
 - **Persistent:** choice is stored in **`session.json`** (`renameList.useFixedWidthFont`) on close, with the rest of the Rename List section.
 
@@ -22,7 +22,7 @@ Add-policy (`addMode`, `addFolderContents`) lives on the same `renameList` objec
 ```json
 {
   "renameList": {
-    "useFixedWidthFont": false,
+    "useFixedWidthFont": true,
     "addMode": "files"
   }
 }
@@ -30,7 +30,7 @@ Add-policy (`addMode`, `addFolderContents`) lives on the same `renameList` objec
 
 | Field               | CLR                 | Type | Default   |
 | ------------------- | ------------------- | ---- | --------- |
-| `useFixedWidthFont` | `UseFixedWidthFont` | bool | **false** |
+| `useFixedWidthFont` | `UseFixedWidthFont` | bool | **true** |
 
 Omitted keys use property initializer defaults. No legacy migration from `config.json` or a `ui` session object.
 

@@ -156,6 +156,11 @@
       <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
       <Setter Property="Foreground" Value="{DynamicResource FileListSortGlyphForegroundBrush}" />
     </Style>
+    <Style Selector="DataGrid.rename-list DataGridCell Path.rename-list-row-error-glyph">
+      <Setter Property="Fill" Value="{DynamicResource RenameListRowErrorGlyphForegroundBrush}" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
     <Style Selector="DataGrid.rename-list DataGridRow">
       <Setter Property="MinHeight" Value="20" />
       <Setter Property="Height" Value="20" />

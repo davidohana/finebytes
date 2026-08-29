@@ -49,6 +49,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _viewModel.ReorderVisibleColumns(orderedKeys);
+            _EnsureRowStatusColumnFirst();
         }
 
         private void _RebuildColumns()
@@ -64,6 +65,7 @@ namespace Mfr.App.Ui.Views.RenameList
             try
             {
                 RenameGrid.Columns.Clear();
+                RenameGrid.Columns.Add(_CreateRowStatusColumn());
                 var visibleColumns = _viewModel.VisibleColumns;
                 foreach (var visibleColumn in visibleColumns)
                 {
@@ -76,7 +78,65 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             // Ignore layout-driven width changes until the first pass completes.
-            Dispatcher.UIThread.Post(() => _columnWidthSyncEnabled = true, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.Post(
+                () =>
+                {
+                    _columnWidthSyncEnabled = true;
+                    _EnsureRowStatusColumnFirst();
+                },
+                DispatcherPriority.Loaded
+            );
+        }
+
+        private DataGridTemplateColumn _CreateRowStatusColumn()
+        {
+            const int width = 20;
+            var column = new DataGridTemplateColumn
+            {
+                CanUserSort = false,
+                Width = new DataGridLength(width, DataGridLengthUnitType.Pixel),
+                MinWidth = width,
+                MaxWidth = width,
+                Header = string.Empty,
+                CellTemplate = new FuncDataTemplate<RenameListEntry>((entry, _) => _CreateRowStatusCell(entry)),
+            };
+            RenameListGridColumns.MarkAsRowStatusColumn(column);
+            return column;
+        }
+
+        /// <summary>
+        /// Builds the fixed status cell and re-applies the error mark when rows are recycled.
+        /// </summary>
+        private static Grid _CreateRowStatusCell(RenameListEntry? entry)
+        {
+            var mark = RenameListRowErrorGlyph.Create();
+            var grid = new Grid
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Children = { mark },
+            };
+
+            void _SyncMark()
+            {
+                var current = grid.DataContext as RenameListEntry ?? entry;
+                RenameListRowErrorGlyph.Apply(mark, current);
+            }
+
+            _SyncMark();
+            grid.DataContextChanged += (_, _) => _SyncMark();
+            return grid;
+        }
+
+        private void _EnsureRowStatusColumnFirst()
+        {
+            var statusColumn = RenameGrid.Columns.FirstOrDefault(RenameListGridColumns.IsRowStatusColumn);
+            if (statusColumn is null || statusColumn.DisplayIndex == 0)
+            {
+                return;
+            }
+
+            statusColumn.DisplayIndex = 0;
         }
 
         private DataGridTemplateColumn _CreateGridColumn(RenameListVisibleColumn visibleColumn)

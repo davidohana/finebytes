@@ -30,6 +30,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;
             AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
+            _ApplySessionScalarDefaults();
+        }
+
+        private void _ApplySessionScalarDefaults()
+        {
+            var section = new SessionStateRenameList();
+            AddMode = section.AddMode;
+            AddFolderContents = section.AddFolderContents;
+            UseFixedWidthFont = section.UseFixedWidthFont;
         }
 
         /// <summary>
@@ -40,11 +49,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </param>
         internal void ApplySessionSection(SessionStateRenameList? renameList)
         {
+            var section = renameList ?? new SessionStateRenameList();
             ApplySession(renameList?.SortFields);
             ApplyVisibleColumnsFromSession(renameList?.VisibleColumns);
-            AddMode = renameList?.AddMode ?? RenameListAddMode.Files;
-            AddFolderContents = renameList?.AddFolderContents ?? true;
-            UseFixedWidthFont = renameList?.UseFixedWidthFont ?? false;
+            AddMode = section.AddMode;
+            AddFolderContents = section.AddFolderContents;
+            UseFixedWidthFont = section.UseFixedWidthFont;
         }
 
         /// <summary>

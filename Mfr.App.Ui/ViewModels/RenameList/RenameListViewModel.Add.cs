@@ -18,14 +18,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Which path kinds become Rename List rows when adding from the File List.
         /// </summary>
         [ObservableProperty]
-        private RenameListAddMode _addMode = RenameListAddMode.Files;
+        private RenameListAddMode _addMode;
 
         /// <summary>
         /// When true, folder sources recurse: matching files in subfolders, and descendant folder rows when
         /// <see cref="AddMode"/> includes folders.
         /// </summary>
         [ObservableProperty]
-        private bool _addFolderContents = true;
+        private bool _addFolderContents;
 
         /// <summary>
         /// Adds the File List selection to the Rename List.

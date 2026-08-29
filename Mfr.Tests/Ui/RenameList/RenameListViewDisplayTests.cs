@@ -25,12 +25,6 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 1);
 
-            Assert.DoesNotContain("fixed-width-font", grid.Classes);
-
-            renameListViewModel.ToggleUseFixedWidthFontCommand.Execute(null);
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
             Assert.Contains("fixed-width-font", grid.Classes);
 
             renameListViewModel.ToggleUseFixedWidthFontCommand.Execute(null);
@@ -38,6 +32,12 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             Assert.DoesNotContain("fixed-width-font", grid.Classes);
+
+            renameListViewModel.ToggleUseFixedWidthFontCommand.Execute(null);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains("fixed-width-font", grid.Classes);
 
             window.Close();
         }

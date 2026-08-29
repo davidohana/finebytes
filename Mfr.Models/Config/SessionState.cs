@@ -190,7 +190,7 @@ namespace Mfr.Models.Config
         /// When true, the Rename List grid uses a fixed-width font instead of the proportional File List font.
         /// </summary>
         [JsonPropertyName("useFixedWidthFont")]
-        public bool UseFixedWidthFont { get; set; }
+        public bool UseFixedWidthFont { get; set; } = true;
 
         /// <summary>
         /// Converts persisted session fields into sort keys.

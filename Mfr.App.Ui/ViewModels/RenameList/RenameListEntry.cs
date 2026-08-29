@@ -50,6 +50,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Returns whether Show Error Details should list issues for this row.
+        /// </summary>
+        public bool HasRowError => RenameListFieldCatalog.HasAnyLoadError(EngineItem);
+
+        /// <summary>
         /// Returns whether this row path is missing from disk (whole-row gray; not a metadata load error).
         /// </summary>
         public bool IsMissingFromDisk => RenameListDiskPaths.IsMissingFromDisk(EngineItem);

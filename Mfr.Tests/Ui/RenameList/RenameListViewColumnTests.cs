@@ -26,7 +26,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies the default visible column list produces four grid columns.
+        /// Verifies the default visible column list produces four data columns plus the status column.
         /// </summary>
         [AvaloniaFact]
         public async Task Default_visible_columns_produce_four_grid_columns()
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Ui.RenameList
             var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
 
             Assert.Equal(4, renameListViewModel.VisibleColumns.Count);
-            Assert.Equal(4, grid.Columns.Count);
+            Assert.Equal(5, grid.Columns.Count);
 
             window.Close();
         }
@@ -56,7 +56,7 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Equal(2, grid.Columns.Count);
+            Assert.Equal(3, grid.Columns.Count);
 
             window.Close();
         }
@@ -91,18 +91,18 @@ namespace Mfr.Tests.Ui.RenameList
                 reservePreviewGlyph: true
             );
             Assert.True(fileFolderMinWidth > fileFolderHeaderOnlyWidth);
-            Assert.Equal(fileFolderMinWidth, grid.Columns[0].Width.Value);
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
-            Assert.Equal(240, grid.Columns[1].Width.Value);
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
-            Assert.Equal(Math.Max(180, fullFileNameMinWidth), grid.Columns[2].Width.Value);
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[2].Width.UnitType);
-            Assert.Equal(Math.Max(180, previewFullFileNameMinWidth), grid.Columns[3].Width.Value);
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[3].Width.UnitType);
-            Assert.Equal(fileFolderMinWidth, grid.Columns[0].MinWidth);
-            Assert.Equal(parentFolderMinWidth, grid.Columns[1].MinWidth);
-            Assert.Equal(fullFileNameMinWidth, grid.Columns[2].MinWidth);
-            Assert.Equal(previewFullFileNameMinWidth, grid.Columns[3].MinWidth);
+            Assert.Equal(fileFolderMinWidth, _DataColumn(grid, 0).Width.Value);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 0).Width.UnitType);
+            Assert.Equal(240, _DataColumn(grid, 1).Width.Value);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 1).Width.UnitType);
+            Assert.Equal(Math.Max(180, fullFileNameMinWidth), _DataColumn(grid, 2).Width.Value);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 2).Width.UnitType);
+            Assert.Equal(Math.Max(180, previewFullFileNameMinWidth), _DataColumn(grid, 3).Width.Value);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 3).Width.UnitType);
+            Assert.Equal(fileFolderMinWidth, _DataColumn(grid, 0).MinWidth);
+            Assert.Equal(parentFolderMinWidth, _DataColumn(grid, 1).MinWidth);
+            Assert.Equal(fullFileNameMinWidth, _DataColumn(grid, 2).MinWidth);
+            Assert.Equal(previewFullFileNameMinWidth, _DataColumn(grid, 3).MinWidth);
 
             window.Close();
         }
@@ -139,11 +139,11 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Null(renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
             Assert.True(fullPathLengthWithGlyph > fullPathLengthMin);
             Assert.True(previewFileNameLengthMin > 0);
-            Assert.Equal(fullPathLengthWithGlyph, grid.Columns[0].Width.Value);
-            Assert.Equal(fullPathLengthWithGlyph, grid.Columns[0].MinWidth);
-            Assert.Equal(previewFileNameLengthMin, grid.Columns[1].Width.Value);
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
-            Assert.Equal(previewFileNameLengthMin, grid.Columns[1].MinWidth);
+            Assert.Equal(fullPathLengthWithGlyph, _DataColumn(grid, 0).Width.Value);
+            Assert.Equal(fullPathLengthWithGlyph, _DataColumn(grid, 0).MinWidth);
+            Assert.Equal(previewFileNameLengthMin, _DataColumn(grid, 1).Width.Value);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 1).Width.UnitType);
+            Assert.Equal(previewFileNameLengthMin, _DataColumn(grid, 1).MinWidth);
 
             window.Close();
         }
@@ -256,7 +256,7 @@ namespace Mfr.Tests.Ui.RenameList
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
 
             Assert.Equal(savedWidth, renameListViewModel.VisibleColumns[0].Width);
-            Assert.Equal(savedWidth, grid.Columns[0].Width.Value);
+            Assert.Equal(savedWidth, _DataColumn(grid, 0).Width.Value);
 
             window.Close();
         }
@@ -281,10 +281,10 @@ namespace Mfr.Tests.Ui.RenameList
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Equal(wideWidth, grid.Columns[0].Width.Value);
-            Assert.Equal(wideWidth, grid.Columns[1].Width.Value);
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
+            Assert.Equal(wideWidth, _DataColumn(grid, 0).Width.Value);
+            Assert.Equal(wideWidth, _DataColumn(grid, 1).Width.Value);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 0).Width.UnitType);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 1).Width.UnitType);
             Assert.Equal(ScrollBarVisibility.Auto, grid.HorizontalScrollBarVisibility);
 
             window.Close();
@@ -308,8 +308,8 @@ namespace Mfr.Tests.Ui.RenameList
                 reserveSortGlyph: true
             );
 
-            Assert.Equal(expandedWidth, grid.Columns[0].Width.Value);
-            Assert.Equal(parentFolderMinWidth, grid.Columns[0].MinWidth);
+            Assert.Equal(expandedWidth, _DataColumn(grid, 0).Width.Value);
+            Assert.Equal(parentFolderMinWidth, _DataColumn(grid, 0).MinWidth);
             Assert.True(parentFolderMinWidth < expandedWidth);
 
             window.Close();
@@ -331,15 +331,15 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 0).Width.UnitType);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 1).Width.UnitType);
 
             renameListViewModel.ReorderVisibleColumns([folderKey, previewKey]);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[0].Width.UnitType);
-            Assert.Equal(DataGridLengthUnitType.Pixel, grid.Columns[1].Width.UnitType);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 0).Width.UnitType);
+            Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 1).Width.UnitType);
 
             window.Close();
         }
@@ -354,8 +354,12 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var firstColumn = grid.Columns[0];
-            var secondColumn = grid.Columns[1];
+            var dataColumns = grid
+                .Columns.Where(column => !RenameListGridColumns.IsRowStatusColumn(column))
+                .OrderBy(column => column.DisplayIndex)
+                .ToList();
+            var firstColumn = dataColumns[0];
+            var secondColumn = dataColumns[1];
             firstColumn.DisplayIndex = 1;
             secondColumn.DisplayIndex = 0;
             window.UpdateLayout();
@@ -436,7 +440,7 @@ namespace Mfr.Tests.Ui.RenameList
             var fitWidth = RenameListColumnAutoFit.ResolveAutoFitWidth(renameListViewModel.Entries, discKey);
             Assert.Equal(minHeaderWidth, fitWidth);
 
-            grid.Columns[0].Width = new DataGridLength(fitWidth, DataGridLengthUnitType.Pixel);
+            _DataColumn(grid, 0).Width = new DataGridLength(fitWidth, DataGridLengthUnitType.Pixel);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -608,14 +612,14 @@ namespace Mfr.Tests.Ui.RenameList
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
             var expectedWidth = RenameListColumnAutoFit.ResolveAutoFitWidth(renameListViewModel.Entries, fullNameKey);
 
-            Assert.Equal(minHeaderWidth, grid.Columns[0].Width.Value);
+            Assert.Equal(minHeaderWidth, _DataColumn(grid, 0).Width.Value);
             Assert.True(expectedWidth > minHeaderWidth);
 
-            grid.Columns[0].Width = new DataGridLength(expectedWidth, DataGridLengthUnitType.Pixel);
+            _DataColumn(grid, 0).Width = new DataGridLength(expectedWidth, DataGridLengthUnitType.Pixel);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Equal(expectedWidth, grid.Columns[0].Width.Value);
+            Assert.Equal(expectedWidth, _DataColumn(grid, 0).Width.Value);
             Assert.Equal(expectedWidth, renameListViewModel.VisibleColumns[0].Width);
 
             window.Close();
@@ -807,13 +811,168 @@ namespace Mfr.Tests.Ui.RenameList
             var row = Assert.Single(view.GetVisualDescendants().OfType<DataGridRow>());
             var textBlocks = row.GetVisualDescendants()
                 .OfType<TextBlock>()
-                .Where(text => !string.IsNullOrEmpty(text.Text))
+                .Where(textBlock => !string.IsNullOrEmpty(textBlock.Text))
                 .ToList();
             Assert.NotEmpty(textBlocks);
             Assert.All(textBlocks, textBlock => Assert.Contains("rename-list-missing-on-disk", textBlock.Classes));
             Assert.DoesNotContain(textBlocks, textBlock => textBlock.Classes.Contains("rename-list-load-error"));
+            _AssertRowErrorGlyphVisible(row, shouldBeVisible: true);
 
             window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the error mark appears after refresh while the grid is already visible.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Grid_shows_row_error_mark_after_refresh_while_visible()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "vanish.txt");
+            File.WriteAllText(path, "x");
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(fullNameKey)]);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 900,
+                Height = 200,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var row = Assert.Single(window.GetVisualDescendants().OfType<DataGridRow>());
+            _AssertRowErrorGlyphVisible(row, shouldBeVisible: false);
+
+            File.Delete(path);
+            await renameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            row = Assert.Single(window.GetVisualDescendants().OfType<DataGridRow>());
+            Assert.True(Assert.Single(renameListViewModel.Entries).IsMissingFromDisk);
+            _AssertRowErrorGlyphVisible(row, shouldBeVisible: true);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the status column shows an error glyph for metadata load failures.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Grid_shows_row_error_glyph_for_metadata_load_failure()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "info.htm");
+            await File.WriteAllTextAsync(path, "<html></html>");
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(fullNameKey),
+                new RenameListVisibleColumn(titleKey),
+            ]);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 900,
+                Height = 200,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.True(entry.HasRowError);
+
+            var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
+            _AssertRowErrorGlyphVisible(row, shouldBeVisible: true);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies healthy rows keep the status column but hide the error glyph.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Grid_hides_row_error_glyph_for_healthy_row()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "ok.txt");
+            File.WriteAllText(path, "x");
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(fullNameKey)]);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 900,
+                Height = 200,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            Assert.Equal(2, grid.Columns.Count);
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.False(entry.HasRowError);
+
+            var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
+            _AssertRowErrorGlyphVisible(row, shouldBeVisible: false);
+
+            window.Close();
+        }
+
+        private static DataGridColumn _DataColumn(DataGrid grid, int visibleColumnIndex)
+        {
+            var column = grid.Columns[visibleColumnIndex + 1];
+            Assert.False(RenameListGridColumns.IsRowStatusColumn(column));
+            return column;
+        }
+
+        private static void _AssertRowErrorGlyphVisible(DataGridRow row, bool shouldBeVisible)
+        {
+            var mark = row.GetVisualDescendants()
+                .OfType<Avalonia.Controls.Shapes.Path>()
+                .Single(path => path.Classes.Contains(RenameListRowErrorGlyph.ClassName));
+            Assert.Equal(shouldBeVisible, mark.IsVisible);
+            if (shouldBeVisible)
+            {
+                Assert.NotNull(mark.Data);
+            }
         }
     }
 }

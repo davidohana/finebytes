@@ -10,6 +10,32 @@ namespace Mfr.App.Ui.Views.RenameList
     internal static class RenameListGridColumns
     {
         /// <summary>
+        /// Marker tag for the fixed row-status column (no catalog field key).
+        /// </summary>
+        internal static readonly object RowStatusColumnMarker = new();
+
+        /// <summary>
+        /// Gets whether a grid column is the fixed row-status indicator column.
+        /// </summary>
+        /// <param name="column">Grid column.</param>
+        /// <returns><see langword="true"/> for the leading error-glyph column.</returns>
+        public static bool IsRowStatusColumn(DataGridColumn column)
+        {
+            ArgumentNullException.ThrowIfNull(column);
+            return ReferenceEquals(column.Tag, RowStatusColumnMarker);
+        }
+
+        /// <summary>
+        /// Marks a grid column as the fixed row-status indicator column.
+        /// </summary>
+        /// <param name="column">Grid column.</param>
+        public static void MarkAsRowStatusColumn(DataGridColumn column)
+        {
+            ArgumentNullException.ThrowIfNull(column);
+            column.Tag = RowStatusColumnMarker;
+        }
+
+        /// <summary>
         /// Gets the catalog field key stored on a grid column.
         /// </summary>
         /// <param name="column">Grid column.</param>
