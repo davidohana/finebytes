@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using Mfr.Utils.Config;
 
 namespace Mfr.Tests.Utils.Config
@@ -21,6 +20,12 @@ namespace Mfr.Tests.Utils.Config
             public SampleLeafMode Mode = SampleLeafMode.Files;
         }
 
+        private sealed class SampleSectionRoot
+        {
+            [ConfigSection]
+            public SampleOptions Inner = new();
+        }
+
         private enum SampleLeafMode
         {
             Files = 0,
@@ -28,9 +33,8 @@ namespace Mfr.Tests.Utils.Config
         }
 
         [Fact]
-        public void MergeInto_writes_string_leaf_values()
+        public void Write_writes_string_leaf_values()
         {
-            var root = new JsonObject();
             var options = new SampleOptions
             {
                 Port = 42,
@@ -39,7 +43,7 @@ namespace Mfr.Tests.Utils.Config
                 Name = "ok",
             };
 
-            ConfigJsonWriter.MergeInto(root, options);
+            var root = ConfigJsonWriter.Write(options);
 
             Assert.Equal("42", root["port"]?.GetValue<string>());
             Assert.Equal("false", root["enabled"]?.GetValue<string>());
@@ -48,22 +52,21 @@ namespace Mfr.Tests.Utils.Config
         }
 
         [Fact]
-        public void MergeInto_writes_empty_string_leaves()
+        public void Write_writes_empty_string_leaves()
         {
-            var root = new JsonObject();
-            ConfigJsonWriter.MergeInto(root, new SampleOptions());
+            var root = ConfigJsonWriter.Write(new SampleOptions());
 
             Assert.Equal(string.Empty, root["name"]?.GetValue<string>());
         }
 
         [Fact]
-        public void MergeInto_preserves_unrelated_keys_in_same_section()
+        public void Write_writes_nested_sections()
         {
-            var section = new JsonObject { ["custom"] = "keep" };
-            ConfigJsonWriter.MergeInto(section, new SampleOptions { Port = 7 });
+            var root = ConfigJsonWriter.Write(new SampleSectionRoot { Inner = { Port = 7 } });
 
-            Assert.Equal("keep", section["custom"]?.GetValue<string>());
-            Assert.Equal("7", section["port"]?.GetValue<string>());
+            var inner = root["inner"]?.AsObject();
+            Assert.NotNull(inner);
+            Assert.Equal("7", inner["port"]?.GetValue<string>());
         }
     }
 }

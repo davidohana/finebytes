@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Mfr.Utils;
 using Mfr.Utils.Config;
 
@@ -117,9 +116,9 @@ namespace Mfr.Models.Config
                     Directory.CreateDirectory(directory);
                 }
 
-                JsonObject root = [];
-                ConfigJsonWriter.MergeInto(root, Config);
-                var json = root.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+                var json = ConfigJsonWriter
+                    .Write(Config)
+                    .ToJsonString(new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(path, json);
             }
             catch

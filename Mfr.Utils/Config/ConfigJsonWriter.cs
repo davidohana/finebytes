@@ -6,7 +6,7 @@ using System.Text.Json.Nodes;
 namespace Mfr.Utils.Config
 {
     /// <summary>
-    /// Writes annotated config fields into a JSON object using the same string-leaf schema as
+    /// Writes annotated config fields into a new JSON object using the same string-leaf schema as
     /// <see cref="ConfigJsonApplier"/>.
     /// </summary>
     public static class ConfigJsonWriter
@@ -14,46 +14,51 @@ namespace Mfr.Utils.Config
         private static readonly JsonNamingPolicy s_DefaultNaming = JsonNamingPolicy.CamelCase;
 
         /// <summary>
-        /// Merges <paramref name="configObject"/> into <paramref name="root"/>, updating known section and leaf
-        /// properties while preserving unrelated keys already present in <paramref name="root"/>.
+        /// Serializes <paramref name="configObject"/> to a new JSON object.
         /// </summary>
-        /// <param name="root">Existing config document root or a new object.</param>
         /// <param name="configObject">Annotated config instance to serialize.</param>
         /// <param name="jsonPropertyNamingPolicy">
         /// Converts CLR field names to JSON property names. When <c>null</c>, <see cref="JsonNamingPolicy.CamelCase"/> is used.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="root"/> or <paramref name="configObject"/> is null.
-        /// </exception>
+        /// <returns>A JSON object with nested sections and string-leaf values.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="configObject"/> is null.</exception>
         /// <exception cref="InvalidOperationException">
         /// A field has incompatible attributes or types, or more than one leaf attribute.
         /// </exception>
-        public static void MergeInto(
-            JsonObject root,
-            object configObject,
-            JsonNamingPolicy? jsonPropertyNamingPolicy = null
-        )
+        public static JsonObject Write(object configObject, JsonNamingPolicy? jsonPropertyNamingPolicy = null)
         {
-            ArgumentNullException.ThrowIfNull(root);
             ArgumentNullException.ThrowIfNull(configObject);
 
+            JsonObject root = [];
+            _WriteInto(root, configObject, jsonPropertyNamingPolicy);
+            return root;
+        }
+
+        /// <summary>
+        /// Writes annotated public instance fields of <paramref name="configObject"/> into <paramref name="root"/>.
+        /// </summary>
+        /// <param name="root">JSON object receiving the fields.</param>
+        /// <param name="configObject">Instance whose fields are written.</param>
+        /// <param name="jsonPropertyNamingPolicy">Optional naming policy forwarded to nested sections.</param>
+        private static void _WriteInto(JsonObject root, object configObject, JsonNamingPolicy? jsonPropertyNamingPolicy)
+        {
             var naming = jsonPropertyNamingPolicy ?? s_DefaultNaming;
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             foreach (var field in configObject.GetType().GetFields(flags))
             {
-                _MergeField(root, configObject, field, naming, jsonPropertyNamingPolicy);
+                _WriteField(root, configObject, field, naming, jsonPropertyNamingPolicy);
             }
         }
 
         /// <summary>
-        /// Classifies <paramref name="field"/> and merges a matching section or leaf value.
+        /// Classifies <paramref name="field"/> and writes a matching section or leaf value.
         /// </summary>
         /// <param name="root">JSON object receiving the field.</param>
         /// <param name="configObject">Instance that owns <paramref name="field"/>.</param>
-        /// <param name="field">Public instance field to merge.</param>
+        /// <param name="field">Public instance field to write.</param>
         /// <param name="naming">JSON property naming policy.</param>
         /// <param name="jsonPropertyNamingPolicy">Optional naming policy forwarded to nested sections.</param>
-        private static void _MergeField(
+        private static void _WriteField(
             JsonObject root,
             object configObject,
             FieldInfo field,
@@ -74,7 +79,7 @@ namespace Mfr.Utils.Config
                     );
                 }
 
-                _MergeSection(root, configObject, field, sectionAttr, naming, jsonPropertyNamingPolicy);
+                _WriteSection(root, configObject, field, sectionAttr, naming, jsonPropertyNamingPolicy);
                 return;
             }
 
@@ -89,32 +94,32 @@ namespace Mfr.Utils.Config
 
             if (intRange is not null)
             {
-                _MergeIntLeaf(root, configObject, field, jsonName, intRange);
+                _WriteIntLeaf(root, configObject, field, jsonName, intRange);
                 return;
             }
 
             if (strMax is not null)
             {
-                _MergeStringLeaf(root, configObject, field, jsonName);
+                _WriteStringLeaf(root, configObject, field, jsonName);
                 return;
             }
 
             if (field.FieldType == typeof(bool))
             {
-                _MergeBoolLeaf(root, configObject, field, jsonName);
+                _WriteBoolLeaf(root, configObject, field, jsonName);
                 return;
             }
 
             if (field.FieldType.IsEnum)
             {
-                _MergeEnumLeaf(root, configObject, field, jsonName, naming);
+                _WriteEnumLeaf(root, configObject, field, jsonName, naming);
             }
         }
 
         /// <summary>
-        /// Recurses into a nested JSON object for a <see cref="ConfigSectionAttribute"/> field.
+        /// Writes a nested JSON object for a <see cref="ConfigSectionAttribute"/> field.
         /// </summary>
-        private static void _MergeSection(
+        private static void _WriteSection(
             JsonObject root,
             object configObject,
             FieldInfo field,
@@ -142,24 +147,15 @@ namespace Mfr.Utils.Config
                 sectionKey = naming.ConvertName(field.Name);
             }
 
-            JsonObject sectionObject;
-            if (root[sectionKey] is JsonObject existingSection)
-            {
-                sectionObject = existingSection;
-            }
-            else
-            {
-                sectionObject = [];
-                root[sectionKey] = sectionObject;
-            }
-
-            MergeInto(sectionObject, nested, jsonPropertyNamingPolicy);
+            JsonObject sectionObject = [];
+            root[sectionKey] = sectionObject;
+            _WriteInto(sectionObject, nested, jsonPropertyNamingPolicy);
         }
 
         /// <summary>
         /// Writes an integer leaf as a JSON string.
         /// </summary>
-        private static void _MergeIntLeaf(
+        private static void _WriteIntLeaf(
             JsonObject root,
             object configObject,
             FieldInfo field,
@@ -188,7 +184,7 @@ namespace Mfr.Utils.Config
         /// <summary>
         /// Writes a string leaf as a JSON string (including empty).
         /// </summary>
-        private static void _MergeStringLeaf(JsonObject root, object configObject, FieldInfo field, string jsonName)
+        private static void _WriteStringLeaf(JsonObject root, object configObject, FieldInfo field, string jsonName)
         {
             if (field.FieldType != typeof(string))
             {
@@ -204,7 +200,7 @@ namespace Mfr.Utils.Config
         /// <summary>
         /// Writes an unannotated <c>bool</c> leaf as a JSON string.
         /// </summary>
-        private static void _MergeBoolLeaf(JsonObject root, object configObject, FieldInfo field, string jsonName)
+        private static void _WriteBoolLeaf(JsonObject root, object configObject, FieldInfo field, string jsonName)
         {
             var value = (bool)field.GetValue(configObject)!;
             root[jsonName] = value ? "true" : "false";
@@ -213,7 +209,7 @@ namespace Mfr.Utils.Config
         /// <summary>
         /// Writes an unannotated enum leaf as a JSON string.
         /// </summary>
-        private static void _MergeEnumLeaf(
+        private static void _WriteEnumLeaf(
             JsonObject root,
             object configObject,
             FieldInfo field,
