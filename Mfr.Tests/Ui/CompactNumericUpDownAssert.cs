@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.Views;
+using Mfr.App.Ui.Views.Controls;
 
 namespace Mfr.Tests.Ui
 {

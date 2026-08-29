@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
-using Mfr.App.Ui.Views;
+using Mfr.App.Ui.Views.Controls;
 
 namespace Mfr.Tests.Ui
 {

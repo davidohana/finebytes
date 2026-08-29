@@ -6,6 +6,7 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels"
   xmlns:filelist="using:Mfr.App.Ui.ViewModels.FileList"
   xmlns:views="using:Mfr.App.Ui.Views"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:filelistviews="using:Mfr.App.Ui.Views.FileList"
   xmlns:filterpaletteviews="using:Mfr.App.Ui.Views.FilterPalette"
   xmlns:appliedfiltersviews="using:Mfr.App.Ui.Views.AppliedFilters"
@@ -420,7 +421,7 @@
           AddAllCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).RenameListViewModel.AddAllCommand}"
           RemoveSelectedFromRenameListCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).RenameListViewModel.RemoveSelectedCommand}"
         />
-        <views:PaneSplitter
+        <controls:PaneSplitter
           x:Name="FileListSplitter"
           Grid.Column="1"
           ResizeDirection="Columns"
@@ -446,7 +447,7 @@
               AddSelectedToAppliedCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AddSelectedFilterFromPaletteCommand}"
               RemoveAppliedStepsCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel.RemoveStepsAtIndicesCommand}"
             />
-            <views:PaneSplitter
+            <controls:PaneSplitter
               x:Name="AvailableAppliedSplitter"
               Grid.Column="1"
               ResizeDirection="Columns"
@@ -461,7 +462,7 @@
               AddFromPaletteCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AddSelectedFilterFromPaletteCommand}"
             />
           </Grid>
-          <views:PaneSplitter
+          <controls:PaneSplitter
             x:Name="FilterEditorSplitter"
             Grid.Row="1"
             ResizeDirection="Rows"
@@ -472,7 +473,7 @@
           <views:FilterEditorView Grid.Row="2" DataContext="{Binding FilterEditorViewModel}" />
         </Grid>
       </Grid>
-      <views:PaneSplitter
+      <controls:PaneSplitter
         x:Name="RenameListSplitter"
         Grid.Row="1"
         ResizeDirection="Rows"

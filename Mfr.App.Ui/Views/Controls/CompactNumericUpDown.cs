@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Layout;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.Controls
 {
     /// <summary>
     /// Numeric stepper with a compact stacked up/down spinner.

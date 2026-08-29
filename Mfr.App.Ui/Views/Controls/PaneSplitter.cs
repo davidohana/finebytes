@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.Controls
 {
     /// <summary>
     /// Main-window pane splitter that keeps the drag after the pointer leaves the bar.

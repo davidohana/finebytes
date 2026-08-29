@@ -2,7 +2,7 @@
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.AppliedFilters"
-  xmlns:views="using:Mfr.App.Ui.Views"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   x:Class="Mfr.App.Ui.Views.AppliedFilters.FilterOptionsDialog"
   x:DataType="vm:FilterOptionsDialogViewModel"
   Title="Filter Options"
@@ -196,7 +196,7 @@
             <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
           <TextBlock Classes="filter-options-label" Text="Level:" />
-          <views:CompactNumericUpDown
+          <controls:CompactNumericUpDown
             x:Name="AncestorFolderLevelSpinner"
             Grid.Column="1"
             Minimum="1"
@@ -251,7 +251,7 @@
                 <RowDefinition Height="Auto" />
               </Grid.RowDefinitions>
               <TextBlock Classes="filter-options-label" Text="Start at position" />
-              <views:CompactNumericUpDown
+              <controls:CompactNumericUpDown
                 x:Name="SubstringStartSpinner"
                 Grid.Column="1"
                 Minimum="1"
@@ -275,7 +275,7 @@
               <TextBlock Grid.Column="4" Classes="filter-options-suffix" Text="side (incl.)" />
 
               <TextBlock Grid.Row="2" Classes="filter-options-label" Text="End at position" />
-              <views:CompactNumericUpDown
+              <controls:CompactNumericUpDown
                 x:Name="SubstringEndSpinner"
                 Grid.Row="2"
                 Grid.Column="1"
@@ -320,7 +320,7 @@
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
               <TextBlock Classes="filter-options-label" Text="Token number:" />
-              <views:CompactNumericUpDown
+              <controls:CompactNumericUpDown
                 x:Name="TokenNumberSpinner"
                 Grid.Column="1"
                 Minimum="1"

@@ -3,8 +3,8 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
-using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.Controls;
 using Mfr.Filters.Space;
 using Mfr.Tests.Ui;
 
