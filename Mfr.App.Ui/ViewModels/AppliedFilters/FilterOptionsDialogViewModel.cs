@@ -113,25 +113,13 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Gets or sets the substring start position (1-based inclusive).
         /// </summary>
         [ObservableProperty]
-        private int _substringStartPosition = 1;
-
-        /// <summary>
-        /// Gets or sets the substring start anchor.
-        /// </summary>
-        [ObservableProperty]
-        private StringScopeAnchor _substringStartAnchor = StringScopeAnchor.Left;
+        private decimal _substringStartPosition = 1;
 
         /// <summary>
         /// Gets or sets the substring end position (1-based inclusive).
         /// </summary>
         [ObservableProperty]
-        private int _substringEndPosition = 5;
-
-        /// <summary>
-        /// Gets or sets the substring end anchor.
-        /// </summary>
-        [ObservableProperty]
-        private StringScopeAnchor _substringEndAnchor = StringScopeAnchor.Left;
+        private decimal _substringEndPosition = 5;
 
         /// <summary>
         /// Gets or sets the token separator string.
@@ -143,7 +131,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Gets or sets the 1-based token index.
         /// </summary>
         [ObservableProperty]
-        private int _tokenNumber = 1;
+        private decimal _tokenNumber = 1;
 
         /// <summary>
         /// Builds the Apply-To target from the current draft fields.
@@ -156,7 +144,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 return null;
             }
 
-            return SelectedTargetOption.BuildTarget(AncestorFolderLevel);
+            return SelectedTargetOption.BuildTarget((int)AncestorFolderLevel);
         }
 
         /// <summary>
@@ -170,15 +158,15 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 FilterApplyScopeMode.Whole => null,
                 FilterApplyScopeMode.Substring
                     => new SubstringApplyScope(
-                        StartPosition: Math.Max(1, SubstringStartPosition),
-                        StartAnchor: SubstringStartAnchor,
-                        EndPosition: Math.Max(1, SubstringEndPosition),
-                        EndAnchor: SubstringEndAnchor
+                        StartPosition: Math.Max(1, (int)SubstringStartPosition),
+                        StartAnchor: SubstringStartAnchorOption.Anchor,
+                        EndPosition: Math.Max(1, (int)SubstringEndPosition),
+                        EndAnchor: SubstringEndAnchorOption.Anchor
                     ),
                 FilterApplyScopeMode.Token
                     => new TokenApplyScope(
                         Separator: TokenSeparator,
-                        TokenNumber: Math.Max(1, TokenNumber)
+                        TokenNumber: Math.Max(1, (int)TokenNumber)
                     ),
                 _ => null,
             };
@@ -275,9 +263,9 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 case SubstringApplyScope substring:
                     ScopeMode = FilterApplyScopeMode.Substring;
                     SubstringStartPosition = substring.StartPosition;
-                    SubstringStartAnchor = substring.StartAnchor;
+                    SubstringStartAnchorOption = StringScopeAnchorOption.FromAnchor(substring.StartAnchor);
                     SubstringEndPosition = substring.EndPosition;
-                    SubstringEndAnchor = substring.EndAnchor;
+                    SubstringEndAnchorOption = StringScopeAnchorOption.FromAnchor(substring.EndAnchor);
                     break;
                 case TokenApplyScope token:
                     ScopeMode = FilterApplyScopeMode.Token;

@@ -112,9 +112,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
             {
                 ScopeMode = FilterApplyScopeMode.Substring,
                 SubstringStartPosition = 2,
-                SubstringStartAnchor = StringScopeAnchor.Right,
+                SubstringStartAnchorOption = StringScopeAnchorOption.FromAnchor(StringScopeAnchor.Right),
                 SubstringEndPosition = 4,
-                SubstringEndAnchor = StringScopeAnchor.Left,
+                SubstringEndAnchorOption = StringScopeAnchorOption.FromAnchor(StringScopeAnchor.Left),
             };
 
             applied.ApplyFilterOptions(dialog);
