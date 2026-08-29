@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Views.Controls;
 
@@ -42,11 +41,11 @@ namespace Mfr.Tests.Ui
             foreach (var button in buttons)
             {
                 Assert.True(
-                    button.Bounds.Width >= 10 && button.Bounds.Width <= 20,
+                    button.Bounds.Width is >= 10 and <= 20,
                     $"Spinner button width {button.Bounds.Width} should be a compact column."
                 );
                 Assert.True(
-                    button.Bounds.Height >= 8 && button.Bounds.Height <= 16,
+                    button.Bounds.Height is >= 8 and <= 16,
                     $"Spinner button height {button.Bounds.Height} should be a stacked half of the field."
                 );
             }

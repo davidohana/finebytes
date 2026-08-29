@@ -8,7 +8,6 @@ using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.Filters.Space;
-using Mfr.Tests.Ui;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {

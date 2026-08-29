@@ -48,7 +48,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
             {
                 SelectedTargetGroup = FilterTargetCatalog.Groups[0],
-                SelectedTargetOption = FilterTargetCatalog.Groups[0].Targets[1]
+                SelectedTargetOption = FilterTargetCatalog.Groups[0].Targets[1],
             };
 
             applied.ApplyFilterOptions(dialog);

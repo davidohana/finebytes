@@ -4,7 +4,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:editorVm="using:Mfr.App.Ui.ViewModels.FilterEditors"
-  xmlns:editorViews="using:Mfr.App.Ui.Views.FilterEditors"
+  xmlns:filterEditors="using:Mfr.App.Ui.Views.FilterEditors"
   mc:Ignorable="d"
   d:DesignWidth="480"
   d:DesignHeight="280"
@@ -28,14 +28,9 @@
         <StackPanel Margin="8,0,8,8" IsVisible="{Binding HasSelectedStep}" Spacing="8">
           <TextBlock x:Name="AppliedFilterTitle" Text="{Binding TitleText}" />
           <ContentControl x:Name="OptionsEditorSlot" Content="{Binding OptionsEditor}">
-            <ContentControl.DataTemplates>
-              <DataTemplate DataType="editorVm:SpaceCharacterFilterEditorViewModel">
-                <editorViews:SpaceCharacterFilterEditorView />
-              </DataTemplate>
-              <DataTemplate DataType="editorVm:LettersCaseFilterEditorViewModel">
-                <editorViews:LettersCaseFilterEditorView />
-              </DataTemplate>
-            </ContentControl.DataTemplates>
+            <ContentControl.ContentTemplate>
+              <filterEditors:FilterEditorViewLocator />
+            </ContentControl.ContentTemplate>
           </ContentControl>
         </StackPanel>
       </ScrollViewer>

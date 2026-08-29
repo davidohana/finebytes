@@ -13,10 +13,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Gets substring endpoint anchor choices.
         /// </summary>
         public static IReadOnlyList<StringScopeAnchorOption> All { get; } =
-        [
-            new("left", StringScopeAnchor.Left),
-            new("right", StringScopeAnchor.Right),
-        ];
+        [new("left", StringScopeAnchor.Left), new("right", StringScopeAnchor.Right)];
 
         /// <summary>
         /// Maps an anchor to its combo entry.
