@@ -127,7 +127,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
-            _NotifyShowFieldErrorChanged();
+            _NotifyShowLoadErrorsChanged();
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
-            _NotifyShowFieldErrorChanged();
+            _NotifyShowLoadErrorsChanged();
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

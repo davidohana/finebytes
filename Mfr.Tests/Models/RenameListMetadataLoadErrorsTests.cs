@@ -13,13 +13,13 @@ namespace Mfr.Tests.Models
         /// Verifies audio/media load failures use a generic explanation, not format-specific copy.
         /// </summary>
         [Fact]
-        public void DescribeFieldLoadError_uses_audio_bucket_message()
+        public void DescribeLoadError_uses_audio_bucket_message()
         {
             var item = _UnmarkedItem(@"D:\Music\PLAYLIST.M3U");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
             item.SetTagLibMetadataLoadError(new InvalidOperationException(@"D:\Music\PLAYLIST.M3U (taglib/m3u)"));
 
-            var explanation = RenameListFieldCatalog.DescribeFieldLoadError(item, titleKey);
+            var explanation = RenameListFieldCatalog.DescribeLoadError(item, titleKey);
 
             Assert.Equal("This file could not be read as audio or media metadata.", explanation);
         }
@@ -28,13 +28,13 @@ namespace Mfr.Tests.Models
         /// Verifies I/O failures use a generic missing-file explanation.
         /// </summary>
         [Fact]
-        public void DescribeFieldLoadError_uses_io_message_for_missing_files()
+        public void DescribeLoadError_uses_io_message_for_missing_files()
         {
             var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
             item.SetTagLibMetadataLoadError(new FileNotFoundException("missing"));
 
-            var explanation = RenameListFieldCatalog.DescribeFieldLoadError(item, titleKey);
+            var explanation = RenameListFieldCatalog.DescribeLoadError(item, titleKey);
 
             Assert.Equal("The file is missing or could not be opened.", explanation);
         }
@@ -43,13 +43,13 @@ namespace Mfr.Tests.Models
         /// Verifies image load failures use the image-bucket explanation.
         /// </summary>
         [Fact]
-        public void DescribeFieldLoadError_uses_image_bucket_message()
+        public void DescribeLoadError_uses_image_bucket_message()
         {
             var item = _UnmarkedItem(@"D:\Music\notes.txt");
             var makeKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
             item.SetImagePropertiesLoadError(new InvalidOperationException("Cannot read image properties"));
 
-            var explanation = RenameListFieldCatalog.DescribeFieldLoadError(item, makeKey);
+            var explanation = RenameListFieldCatalog.DescribeLoadError(item, makeKey);
 
             Assert.Equal("This file could not be read as image or EXIF metadata.", explanation);
         }
@@ -58,14 +58,14 @@ namespace Mfr.Tests.Models
         /// Verifies listing returns both TagLib and image failures for one row.
         /// </summary>
         [Fact]
-        public void ListFieldLoadErrors_returns_taglib_and_image_failures()
+        public void ListLoadErrors_returns_taglib_and_image_failures()
         {
             var item = _UnmarkedItem(@"D:\Music\PLAYLIST.M3U");
             item.SetTagLibMetadataLoadError(new InvalidOperationException(@"D:\Music\PLAYLIST.M3U (taglib/m3u)"));
             item.SetImagePropertiesLoadError(new InvalidOperationException("Cannot read image properties"));
 
-            Assert.True(RenameListFieldCatalog.HasAnyFieldLoadError(item));
-            var errors = RenameListFieldCatalog.ListFieldLoadErrors(item);
+            Assert.True(RenameListFieldCatalog.HasAnyLoadError(item));
+            var errors = RenameListFieldCatalog.ListLoadErrors(item);
             Assert.Equal(2, errors.Count);
             Assert.Equal("This file could not be read as audio or media metadata.", errors[0].UserExplanation);
             Assert.Contains("taglib/m3u", errors[0].TechnicalDetails, StringComparison.Ordinal);
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Models
                 var error = item.TagLibMetadataLoadError;
                 Assert.Contains("taglib", error.Message, StringComparison.OrdinalIgnoreCase);
 
-                var explanation = RenameListFieldCatalog.DescribeFieldLoadError(item, titleKey);
+                var explanation = RenameListFieldCatalog.DescribeLoadError(item, titleKey);
                 Assert.Equal("This file could not be read as audio or media metadata.", explanation);
             }
             finally

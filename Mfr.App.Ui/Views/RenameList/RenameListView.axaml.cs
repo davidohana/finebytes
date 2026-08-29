@@ -117,19 +117,19 @@ namespace Mfr.App.Ui.Views.RenameList
             }
         }
 
-        private void _OnFieldErrorDialogRequested(object? sender, RenameListFieldErrorDialogContent content)
+        private void _OnLoadErrorsDialogRequested(object? sender, RenameListLoadErrorsDialogContent content)
         {
-            Dispatcher.UIThread.Post(() => _ = _ShowFieldErrorDialogAsync(content));
+            Dispatcher.UIThread.Post(() => _ = _ShowLoadErrorsDialogAsync(content));
         }
 
-        private async Task _ShowFieldErrorDialogAsync(RenameListFieldErrorDialogContent content)
+        private async Task _ShowLoadErrorsDialogAsync(RenameListLoadErrorsDialogContent content)
         {
             if (TopLevel.GetTopLevel(this) is not Window owner)
             {
                 return;
             }
 
-            var dialog = new RenameListFieldErrorDialog(content);
+            var dialog = new RenameListLoadErrorsDialog(content);
             await dialog.ShowDialog(owner);
         }
 
@@ -138,7 +138,7 @@ namespace Mfr.App.Ui.Views.RenameList
             if (_viewModel is not null)
             {
                 _viewModel.FieldShuttleRequested -= _OnFieldShuttleRequested;
-                _viewModel.FieldErrorDialogRequested -= _OnFieldErrorDialogRequested;
+                _viewModel.LoadErrorsDialogRequested -= _OnLoadErrorsDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.AddProgress.PropertyChanged -= _OnAddProgressPropertyChanged;
             }
@@ -150,7 +150,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _viewModel.FieldShuttleRequested += _OnFieldShuttleRequested;
-            _viewModel.FieldErrorDialogRequested += _OnFieldErrorDialogRequested;
+            _viewModel.LoadErrorsDialogRequested += _OnLoadErrorsDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
             _RebuildColumns();
@@ -420,8 +420,8 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (entry.IsFieldLoadError(fieldKey.Value))
             {
-                var userExplanation = RenameListFieldCatalog.DescribeFieldLoadError(entry.EngineItem, fieldKey.Value);
-                _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatFieldError(
+                var userExplanation = RenameListFieldCatalog.DescribeLoadError(entry.EngineItem, fieldKey.Value);
+                _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatLoadError(
                     field.DisplayName,
                     userExplanation
                 );

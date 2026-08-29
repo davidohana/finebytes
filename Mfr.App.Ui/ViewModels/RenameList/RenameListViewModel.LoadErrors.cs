@@ -11,12 +11,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Raised when the user requests the Show Load Errors dialog.
         /// </summary>
-        public event EventHandler<RenameListFieldErrorDialogContent>? FieldErrorDialogRequested;
+        public event EventHandler<RenameListLoadErrorsDialogContent>? LoadErrorsDialogRequested;
 
         /// <summary>
         /// Gets whether Show Load Errors should appear on the row context menu.
         /// </summary>
-        public bool CanShowFieldError => _CanShowFieldError();
+        public bool CanShowLoadErrors => _CanShowLoadErrors();
 
         /// <summary>
         /// Gets the focused Rename List column for status hints.
@@ -41,8 +41,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Shows stored metadata load failures for the selected row.
         /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanShowFieldError))]
-        public void ShowFieldError()
+        [RelayCommand(CanExecute = nameof(_CanShowLoadErrors))]
+        public void ShowLoadErrors()
         {
             if (_selectedEntries.Count != 1)
             {
@@ -50,29 +50,29 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var entry = _selectedEntries[0];
-            var errors = RenameListFieldCatalog.ListFieldLoadErrors(entry.EngineItem);
+            var errors = RenameListFieldCatalog.ListLoadErrors(entry.EngineItem);
             if (errors.Count == 0)
             {
                 return;
             }
 
-            FieldErrorDialogRequested?.Invoke(this, new RenameListFieldErrorDialogContent(entry.FullPath, errors));
+            LoadErrorsDialogRequested?.Invoke(this, new RenameListLoadErrorsDialogContent(entry.FullPath, errors));
         }
 
-        private bool _CanShowFieldError()
+        private bool _CanShowLoadErrors()
         {
             if (IsAdding || _selectedEntries.Count != 1)
             {
                 return false;
             }
 
-            return RenameListFieldCatalog.HasAnyFieldLoadError(_selectedEntries[0].EngineItem);
+            return RenameListFieldCatalog.HasAnyLoadError(_selectedEntries[0].EngineItem);
         }
 
-        private void _NotifyShowFieldErrorChanged()
+        private void _NotifyShowLoadErrorsChanged()
         {
-            OnPropertyChanged(nameof(CanShowFieldError));
-            ShowFieldErrorCommand.NotifyCanExecuteChanged();
+            OnPropertyChanged(nameof(CanShowLoadErrors));
+            ShowLoadErrorsCommand.NotifyCanExecuteChanged();
         }
     }
 }

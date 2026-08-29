@@ -1,6 +1,6 @@
 ---
 title: Rename List Phase 6b follow-ups
-description: Leftovers after original field-load errors. Do 6c–6e before Phase 8a Refresh.
+description: Leftovers after original field-load errors. 6c–6e shipped; next is Phase 8a Refresh.
 ---
 
 # Rename List Phase 6b follow-ups
@@ -9,8 +9,8 @@ Handover from the Phase 6b review. **6b is shipped:** row-level TagLib + image e
 gray `"Error"` cells, Show Load Errors dialog, status-bar `[Field value error]` hint,
 `ErrorsLast` sort.
 
-These phases are **6b leftovers**, not preview work. **6d is shipped** (structured cell gray).
-**8a Refresh** should wait until **6e** so Refresh does not inherit Field Error type names.
+These phases are **6b leftovers**, not preview work. **6c–6e are shipped.** **8a Refresh**
+can start (Load Errors type names are in place).
 
 Do **not** go back to per-field stored exceptions or format-specific user-message parsers.
 Keep two slots on `RenameItem` (`TagLibMetadataLoadError`, `ImagePropertiesLoadError`).
@@ -19,7 +19,7 @@ Keep two slots on `RenameItem` (`TagLibMetadataLoadError`, `ImagePropertiesLoadE
 
 1. ~~**6c** TagLib sibling load flags (loader only).~~
 1. ~~**6d** Structured gray (grid paint; no `"Error"` text compare).~~
-1. **6e** Rename `FieldError` → `LoadErrors` (names match the menu).
+1. ~~**6e** Rename `FieldError` → `LoadErrors` (names match the menu).~~
 1. Then **8a** Original Refresh.
 
 ## 6c — TagLib sibling attempted flags
@@ -53,26 +53,10 @@ not gray.
 
 ## 6e — `FieldError` → `LoadErrors` names
 
-Menu is already **Show Load Errors**. Types and commands still say Field Error. Mechanical
-rename after 6d so grid paint types are not renamed twice.
-
-| Current                                                                                                 | Target                                                                      |
-| ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `ShowFieldError` / `CanShowFieldError` / `ShowFieldErrorCommand`                                        | `ShowLoadErrors` / `CanShowLoadErrors` / `ShowLoadErrorsCommand`            |
-| `FieldErrorDialogRequested`                                                                             | `LoadErrorsDialogRequested`                                                 |
-| `RenameListViewModel.FieldError.cs`                                                                     | `RenameListViewModel.LoadErrors.cs`                                         |
-| `RenameListFieldErrorDialog` + `.axaml`                                                                 | `RenameListLoadErrorsDialog`                                                |
-| `RenameListFieldErrorDialogContent`                                                                     | `RenameListLoadErrorsDialogContent`                                         |
-| `RenameListFieldErrorDisplay`                                                                           | `RenameListLoadErrorDisplay`                                                |
-| Catalog `HasFieldLoadError` / `HasAnyFieldLoadError` / `ListFieldLoadErrors` / `DescribeFieldLoadError` | `HasLoadError` / `HasAnyLoadError` / `ListLoadErrors` / `DescribeLoadError` |
-| `RenameListCellHint.FormatFieldError`                                                                   | `FormatLoadError`                                                           |
-| Matching test class/file names                                                                          | same stems                                                                  |
-
-Keep `FieldLoadErrorText = "Error"` (that is the **cell word**, not the command).
-
-Keep `_NotifyShowFieldErrorChanged` inlined under the new command name.
-
-No behavior change. Catalog wrappers stay public (UI has no `InternalsVisibleTo` on Models).
+**Shipped.** Menu, commands, and types say Load Errors. Cell word stays
+`FieldLoadErrorText = "Error"`. Catalog wrappers stay public (UI has no `InternalsVisibleTo` on
+Models): `HasLoadError` / `HasAnyLoadError` / `ListLoadErrors` / `DescribeLoadError`.
+`_NotifyShowLoadErrorsChanged` stays inlined next to `ShowLoadErrors`.
 
 ## What not to do
 
@@ -80,4 +64,3 @@ No behavior change. Catalog wrappers stay public (UI has no `InternalsVisibleTo`
 - Format-specific `DescribeUserMessage` branches (playlist vs jpeg vs …)
 - Preview-error UI (**8c**) or missing-on-disk gray (**Phase 10**) — Phase 10 should reuse
   6d’s structured cell foreground, not a second text sentinel
-- Starting **8a** before **6e** (Refresh would inherit Field Error type names)

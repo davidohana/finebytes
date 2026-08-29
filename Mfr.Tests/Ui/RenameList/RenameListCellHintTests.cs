@@ -10,7 +10,7 @@ namespace Mfr.Tests.Ui.RenameList
     public sealed class RenameListCellHintTests
     {
         [Fact]
-        public void FormatFieldError_Uses_Plain_Language_Explanation()
+        public void FormatLoadError_Uses_Plain_Language_Explanation()
         {
             var dir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(dir);
@@ -30,9 +30,9 @@ namespace Mfr.Tests.Ui.RenameList
                 );
                 item.SetTagLibMetadataLoadError(new InvalidOperationException($"{path} (taglib/m3u)"));
                 var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
-                var explanation = RenameListFieldCatalog.DescribeFieldLoadError(item, titleKey);
+                var explanation = RenameListFieldCatalog.DescribeLoadError(item, titleKey);
 
-                var hint = RenameListCellHint.FormatFieldError("Album Artists", explanation);
+                var hint = RenameListCellHint.FormatLoadError("Album Artists", explanation);
                 Assert.Equal(2, hint.Runs.Count);
                 Assert.Equal("Album Artists", hint.Runs[0].Text);
                 Assert.Contains("[Field value error]", hint.Runs[1].Text, StringComparison.Ordinal);

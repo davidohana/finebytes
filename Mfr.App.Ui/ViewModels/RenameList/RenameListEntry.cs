@@ -56,7 +56,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns><see langword="true"/> when the cell should show <c>Error</c>.</returns>
         public bool IsFieldLoadError(RenameListFieldKey key)
         {
-            return RenameListFieldCatalog.HasFieldLoadError(EngineItem, key);
+            return RenameListFieldCatalog.HasLoadError(EngineItem, key);
         }
 
         /// <summary>

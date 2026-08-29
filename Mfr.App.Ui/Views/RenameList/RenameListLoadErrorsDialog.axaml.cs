@@ -7,7 +7,7 @@ namespace Mfr.App.Ui.Views.RenameList
     /// <summary>
     /// Modal dialog for Rename List original metadata load errors (Show Load Errors).
     /// </summary>
-    public partial class RenameListFieldErrorDialog : Window
+    public partial class RenameListLoadErrorsDialog : Window
     {
         private readonly string _copyText;
 
@@ -15,19 +15,19 @@ namespace Mfr.App.Ui.Views.RenameList
         /// Initializes the dialog with all reader failures on the selected row.
         /// </summary>
         /// <param name="content">File path and stored load errors.</param>
-        public RenameListFieldErrorDialog(RenameListFieldErrorDialogContent content)
+        public RenameListLoadErrorsDialog(RenameListLoadErrorsDialogContent content)
         {
             ArgumentNullException.ThrowIfNull(content);
 
             InitializeComponent();
-            SummaryText.Text = RenameListFieldErrorDisplay.Summary;
+            SummaryText.Text = RenameListLoadErrorDisplay.Summary;
             FilePathText.Text = content.FilePath;
-            DetailsText.Text = RenameListFieldErrorDisplay.FormatDetailsText(content);
-            _copyText = RenameListFieldErrorDisplay.FormatCopyText(content);
+            DetailsText.Text = RenameListLoadErrorDisplay.FormatDetailsText(content);
+            _copyText = RenameListLoadErrorDisplay.FormatCopyText(content);
         }
 
         /// <inheritdoc />
-        public RenameListFieldErrorDialog()
+        public RenameListLoadErrorsDialog()
         {
             InitializeComponent();
             _copyText = string.Empty;

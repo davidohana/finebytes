@@ -3,9 +3,9 @@ using Mfr.App.Ui.ViewModels.RenameList;
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Tests for Rename List field-load error user-facing copy.
+    /// Tests for Rename List metadata load-error user-facing copy.
     /// </summary>
-    public sealed class RenameListFieldErrorDisplayTests
+    public sealed class RenameListLoadErrorDisplayTests
     {
         /// <summary>
         /// Verifies copy text includes summary, path, and folded friendly plus technical lines.
@@ -18,11 +18,11 @@ namespace Mfr.Tests.Ui.RenameList
                 "This file could not be read as audio or media metadata.",
                 technicalDetails
             );
-            var content = new RenameListFieldErrorDialogContent(@"D:\Music\PLAYLIST.M3U", [error]);
+            var content = new RenameListLoadErrorsDialogContent(@"D:\Music\PLAYLIST.M3U", [error]);
 
-            var copyText = RenameListFieldErrorDisplay.FormatCopyText(content);
+            var copyText = RenameListLoadErrorDisplay.FormatCopyText(content);
 
-            Assert.Contains(RenameListFieldErrorDisplay.Summary, copyText, StringComparison.Ordinal);
+            Assert.Contains(RenameListLoadErrorDisplay.Summary, copyText, StringComparison.Ordinal);
             Assert.Contains(@"D:\Music\PLAYLIST.M3U", copyText, StringComparison.Ordinal);
             Assert.Contains(error.UserExplanation, copyText, StringComparison.Ordinal);
             Assert.Contains(technicalDetails, copyText, StringComparison.Ordinal);
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void FormatDetailsText_folds_friendly_and_technical()
         {
-            var content = new RenameListFieldErrorDialogContent(
+            var content = new RenameListLoadErrorsDialogContent(
                 @"D:\Music\info.htm",
                 [
                     new RenameListLoadError("Could not read audio metadata.", "taglib/htm"),
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ]
             );
 
-            var details = RenameListFieldErrorDisplay.FormatDetailsText(content);
+            var details = RenameListLoadErrorDisplay.FormatDetailsText(content);
             var expected = string.Join(
                 $"{Environment.NewLine}{Environment.NewLine}",
                 $"Could not read audio metadata.{Environment.NewLine}taglib/htm",

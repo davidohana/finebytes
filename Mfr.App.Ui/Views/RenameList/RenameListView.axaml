@@ -23,10 +23,10 @@
       <ContextMenu x:Key="RenameListRowContextMenu" x:Shared="False">
         <MenuItem
           Header="Show Load Errors"
-          Command="{Binding ShowFieldErrorCommand}"
-          IsVisible="{Binding CanShowFieldError}"
+          Command="{Binding ShowLoadErrorsCommand}"
+          IsVisible="{Binding CanShowLoadErrors}"
         />
-        <Separator IsVisible="{Binding CanShowFieldError}" />
+        <Separator IsVisible="{Binding CanShowLoadErrors}" />
         <MenuItem
           Header="Locate in File List"
           Command="{Binding LocateInFileListCommand}"

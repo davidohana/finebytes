@@ -7,7 +7,7 @@ namespace Mfr.Tests.Ui.RenameList
     /// <summary>
     /// Tests for Rename List Show Load Errors command state.
     /// </summary>
-    public sealed class RenameListViewModelFieldErrorTests : IDisposable
+    public sealed class RenameListViewModelLoadErrorsTests : IDisposable
     {
         private readonly RenameListUiTestContext _context = new(pinAddPolicy: true);
 
@@ -18,10 +18,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies Show Field Error is available for a single selected row with any load error.
+        /// Verifies Show Load Errors is available for a single selected row with any load error.
         /// </summary>
         [Fact]
-        public async Task ShowFieldError_available_for_row_with_load_error()
+        public async Task ShowLoadErrors_available_for_row_with_load_error()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "info.htm");
@@ -45,11 +45,11 @@ namespace Mfr.Tests.Ui.RenameList
 
             renameListViewModel.SetSelectedEntries([entry]);
             renameListViewModel.SetFocusedFieldKey(fullNameKey);
-            Assert.True(renameListViewModel.CanShowFieldError);
+            Assert.True(renameListViewModel.CanShowLoadErrors);
 
-            RenameListFieldErrorDialogContent? content = null;
-            renameListViewModel.FieldErrorDialogRequested += (_, value) => content = value;
-            renameListViewModel.ShowFieldErrorCommand.Execute(null);
+            RenameListLoadErrorsDialogContent? content = null;
+            renameListViewModel.LoadErrorsDialogRequested += (_, value) => content = value;
+            renameListViewModel.ShowLoadErrorsCommand.Execute(null);
 
             Assert.NotNull(content);
             Assert.Equal(path, content.FilePath);
@@ -59,10 +59,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies Show Field Error remains available when the focused column is a preview field.
+        /// Verifies Show Load Errors remains available when the focused column is a preview field.
         /// </summary>
         [Fact]
-        public async Task ShowFieldError_available_when_preview_column_is_focused()
+        public async Task ShowLoadErrors_available_when_preview_column_is_focused()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "info.htm");
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([entry]);
             renameListViewModel.SetFocusedFieldKey(previewFullNameKey);
 
-            Assert.True(renameListViewModel.CanShowFieldError);
+            Assert.True(renameListViewModel.CanShowLoadErrors);
         }
     }
 }

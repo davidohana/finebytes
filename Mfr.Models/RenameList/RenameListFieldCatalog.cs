@@ -189,7 +189,7 @@ namespace Mfr.Models.RenameList
         /// <param name="item">Engine rename item.</param>
         /// <param name="key">Field key (original or preview).</param>
         /// <returns><see langword="true"/> when the cell should show <c>Error</c>.</returns>
-        public static bool HasFieldLoadError(RenameItem item, RenameListFieldKey key)
+        public static bool HasLoadError(RenameItem item, RenameListFieldKey key)
         {
             return RenameListMetadataLoadErrors.HasLoadError(item, key);
         }
@@ -199,7 +199,7 @@ namespace Mfr.Models.RenameList
         /// </summary>
         /// <param name="item">Engine rename item.</param>
         /// <returns><see langword="true"/> when TagLib or image metadata failed to load.</returns>
-        public static bool HasAnyFieldLoadError(RenameItem item)
+        public static bool HasAnyLoadError(RenameItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
             return RenameListMetadataLoadErrors.HasAny(item);
@@ -210,19 +210,19 @@ namespace Mfr.Models.RenameList
         /// </summary>
         /// <param name="item">Engine rename item.</param>
         /// <returns>At most one TagLib and one image failure, in that order.</returns>
-        public static IReadOnlyList<RenameListLoadError> ListFieldLoadErrors(RenameItem item)
+        public static IReadOnlyList<RenameListLoadError> ListLoadErrors(RenameItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
             return RenameListMetadataLoadErrors.List(item);
         }
 
         /// <summary>
-        /// Returns a plain-language explanation for a field-load failure on one original column.
+        /// Returns a plain-language explanation for a metadata load failure on one original column.
         /// </summary>
         /// <param name="item">Engine rename item.</param>
         /// <param name="key">Original field key with a load error.</param>
         /// <returns>User-facing explanation, or an empty string when no error is stored.</returns>
-        public static string DescribeFieldLoadError(RenameItem item, RenameListFieldKey key)
+        public static string DescribeLoadError(RenameItem item, RenameListFieldKey key)
         {
             ArgumentNullException.ThrowIfNull(item);
 

@@ -1,9 +1,9 @@
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// User-facing copy for Rename List original field-load errors.
+    /// User-facing copy for Rename List original metadata load errors.
     /// </summary>
-    internal static class RenameListFieldErrorDisplay
+    internal static class RenameListLoadErrorDisplay
     {
         /// <summary>
         /// Short summary shown at the top of the error dialog.
@@ -15,7 +15,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         /// <param name="content">Dialog content.</param>
         /// <returns>Folded error text for the single details box.</returns>
-        internal static string FormatDetailsText(RenameListFieldErrorDialogContent content)
+        internal static string FormatDetailsText(RenameListLoadErrorsDialogContent content)
         {
             var blocks = content.Errors.Select(error =>
                 $"{error.UserExplanation}{Environment.NewLine}{error.TechnicalDetails}"
@@ -28,7 +28,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         /// <param name="content">Dialog content.</param>
         /// <returns>Multi-line text suitable for copy/paste.</returns>
-        internal static string FormatCopyText(RenameListFieldErrorDialogContent content)
+        internal static string FormatCopyText(RenameListLoadErrorsDialogContent content)
         {
             return string.Join(
                 Environment.NewLine,

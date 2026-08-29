@@ -8,7 +8,7 @@ namespace Mfr.Tests.Ui.RenameList
     /// <summary>
     /// Headless tests for the Rename List Show Load Errors dialog.
     /// </summary>
-    public sealed class RenameListFieldErrorDialogTests
+    public sealed class RenameListLoadErrorsDialogTests
     {
         /// <summary>
         /// Verifies the dialog shows a single copyable box with folded friendly and technical text.
@@ -18,14 +18,14 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var tagLibMessage = @"D:\Music\PLAYLIST.M3U (taglib/m3u)";
             var imageMessage = "Cannot read image properties";
-            var content = new RenameListFieldErrorDialogContent(
+            var content = new RenameListLoadErrorsDialogContent(
                 @"D:\Music\PLAYLIST.M3U",
                 [
                     new RenameListLoadError("This file could not be read as audio or media metadata.", tagLibMessage),
                     new RenameListLoadError("This file could not be read as image or EXIF metadata.", imageMessage),
                 ]
             );
-            var dialog = new RenameListFieldErrorDialog(content);
+            var dialog = new RenameListLoadErrorsDialog(content);
             dialog.Show();
             dialog.UpdateLayout();
 
@@ -37,7 +37,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(detailsText);
 
             Assert.Equal("Error", dialog.Title);
-            Assert.Equal(RenameListFieldErrorDisplay.Summary, summaryText.Text);
+            Assert.Equal(RenameListLoadErrorDisplay.Summary, summaryText.Text);
             Assert.Equal(@"D:\Music\PLAYLIST.M3U", filePathText.Text);
             Assert.Contains(tagLibMessage, detailsText.Text, StringComparison.Ordinal);
             Assert.Contains(imageMessage, detailsText.Text, StringComparison.Ordinal);
