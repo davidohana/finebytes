@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Input;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.DragAndDrop
 {
     /// <summary>
     /// Pointer-press state for a ListBox drag that may preserve a multi-selection.

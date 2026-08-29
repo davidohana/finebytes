@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.Views.DragAndDrop;
 
 namespace Mfr.App.Ui.Views.AppliedFilters
 {

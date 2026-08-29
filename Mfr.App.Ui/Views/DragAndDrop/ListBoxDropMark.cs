@@ -4,7 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.DragAndDrop
 {
     /// <summary>
     /// Salmon insert marker for ListBox drag-and-drop: row class, or a line after the last item.

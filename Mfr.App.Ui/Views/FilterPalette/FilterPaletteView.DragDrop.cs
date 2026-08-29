@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.Filters;
 
 namespace Mfr.App.Ui.Views.FilterPalette

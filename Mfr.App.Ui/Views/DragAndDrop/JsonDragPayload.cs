@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Avalonia.Input;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.DragAndDrop
 {
     /// <summary>
     /// JSON serialize/deserialize helpers for in-process Avalonia drag payloads.

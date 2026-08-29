@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.DragAndDrop
 {
     /// <summary>
     /// Transfer and effect for a ListBox drag that exceeds the movement threshold.

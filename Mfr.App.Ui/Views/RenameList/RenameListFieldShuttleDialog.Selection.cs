@@ -2,6 +2,7 @@ using System.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList

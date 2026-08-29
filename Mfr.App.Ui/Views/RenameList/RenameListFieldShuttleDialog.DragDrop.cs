@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList

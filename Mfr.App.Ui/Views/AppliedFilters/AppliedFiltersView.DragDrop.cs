@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.App.Ui.Views.FilterPalette;
 using Mfr.Filters;
 

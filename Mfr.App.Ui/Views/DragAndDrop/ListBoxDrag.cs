@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.DragAndDrop
 {
     /// <summary>
     /// Shared ListBox drag-and-drop geometry, press capture, and selection restore.
