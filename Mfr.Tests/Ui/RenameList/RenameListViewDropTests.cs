@@ -19,22 +19,23 @@ namespace Mfr.Tests.Ui.RenameList
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
         private readonly List<FileListViewModel> _fileListViewModels = [];
-        private readonly SessionStateUi _originalUi;
+        private readonly SessionPrefSnapshot _originalPrefs;
 
         /// <summary>
-        /// Snapshots UI add-policy session prefs for tests that may change them.
+        /// Snapshots add-policy session prefs for tests that may change them.
         /// </summary>
         public RenameListViewDropTests()
         {
-            _originalUi = RenameListTestHelpers.SnapshotSessionUi();
-            SessionStore.Current.Ui.AddMode = RenameListAddMode.Files;
-            SessionStore.Current.Ui.AddFolderContents = true;
+            _originalPrefs = RenameListTestHelpers.SnapshotSessionPrefs();
+            var renameList = SessionStore.Current.EnsureRenameList();
+            renameList.AddMode = RenameListAddMode.Files;
+            renameList.AddFolderContents = true;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            RenameListTestHelpers.RestoreSessionUi(_originalUi);
+            RenameListTestHelpers.RestoreSessionPrefs(_originalPrefs);
 
             foreach (var fileListViewModel in _fileListViewModels)
             {

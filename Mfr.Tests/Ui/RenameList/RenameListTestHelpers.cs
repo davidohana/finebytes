@@ -53,24 +53,54 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Snapshots the process <see cref="SessionStore.Current"/> UI preferences.
+        /// Snapshots add-policy, remember, and display flags from <see cref="SessionStore.Current"/>.
         /// </summary>
-        /// <returns>A copy of the current UI session preferences.</returns>
-        internal static SessionStateUi SnapshotSessionUi()
+        /// <returns>Preference values to restore after a test.</returns>
+        internal static SessionPrefSnapshot SnapshotSessionPrefs()
         {
-            return SessionStore.Current.Ui.Clone();
+            var session = SessionStore.Current;
+            return new SessionPrefSnapshot(
+                AddMode: session.RenameList?.AddMode ?? RenameListAddMode.Files,
+                AddFolderContents: session.RenameList?.AddFolderContents ?? true,
+                UseFixedWidthFont: session.RenameList?.UseFixedWidthFont ?? false,
+                RememberWindowState: session.MainWindow?.RememberWindowState ?? true,
+                RememberLastFolder: session.FileList?.RememberLastFolder ?? true
+            );
         }
 
         /// <summary>
-        /// Restores <see cref="SessionStore.Current"/> UI preferences from <paramref name="snapshot"/>.
+        /// Restores add-policy, remember, and display flags onto <see cref="SessionStore.Current"/>.
         /// </summary>
         /// <param name="snapshot">Previously captured preferences.</param>
-        internal static void RestoreSessionUi(SessionStateUi snapshot)
+        internal static void RestoreSessionPrefs(SessionPrefSnapshot snapshot)
         {
             ArgumentNullException.ThrowIfNull(snapshot);
-            SessionStore.Current.Ui = snapshot;
+
+            var session = SessionStore.Current;
+            var renameList = session.EnsureRenameList();
+            renameList.AddMode = snapshot.AddMode;
+            renameList.AddFolderContents = snapshot.AddFolderContents;
+            renameList.UseFixedWidthFont = snapshot.UseFixedWidthFont;
+            session.EnsureMainWindow().RememberWindowState = snapshot.RememberWindowState;
+            session.EnsureFileList().RememberLastFolder = snapshot.RememberLastFolder;
         }
     }
+
+    /// <summary>
+    /// Add-policy, remember, and display flags copied from <see cref="SessionStore.Current"/>.
+    /// </summary>
+    /// <param name="AddMode">Rename List add mode.</param>
+    /// <param name="AddFolderContents">Whether folder sources recurse.</param>
+    /// <param name="UseFixedWidthFont">Rename List fixed-width font flag.</param>
+    /// <param name="RememberWindowState">Whether window geometry is remembered.</param>
+    /// <param name="RememberLastFolder">Whether the last File List folder is remembered.</param>
+    internal sealed record SessionPrefSnapshot(
+        RenameListAddMode AddMode,
+        bool AddFolderContents,
+        bool UseFixedWidthFont,
+        bool RememberWindowState,
+        bool RememberLastFolder
+    );
 
     /// <summary>
     /// Temp folders, File List hosts, and optional UI add-policy pinning for Rename List tests.
@@ -79,7 +109,7 @@ namespace Mfr.Tests.Ui.RenameList
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
         private readonly List<FileListViewModel> _fileListViewModels = [];
-        private readonly SessionStateUi? _originalUi;
+        private readonly SessionPrefSnapshot? _originalPrefs;
 
         /// <summary>
         /// Creates a test context and optionally pins File List add-policy flags.
@@ -94,17 +124,18 @@ namespace Mfr.Tests.Ui.RenameList
                 return;
             }
 
-            _originalUi = RenameListTestHelpers.SnapshotSessionUi();
-            SessionStore.Current.Ui.AddMode = RenameListAddMode.Files;
-            SessionStore.Current.Ui.AddFolderContents = true;
+            _originalPrefs = RenameListTestHelpers.SnapshotSessionPrefs();
+            var renameList = SessionStore.Current.EnsureRenameList();
+            renameList.AddMode = RenameListAddMode.Files;
+            renameList.AddFolderContents = true;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (_originalUi is not null)
+            if (_originalPrefs is not null)
             {
-                RenameListTestHelpers.RestoreSessionUi(_originalUi);
+                RenameListTestHelpers.RestoreSessionPrefs(_originalPrefs);
             }
 
             foreach (var fileListViewModel in _fileListViewModels)

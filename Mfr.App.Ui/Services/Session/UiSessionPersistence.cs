@@ -28,7 +28,7 @@ namespace Mfr.App.Ui.Services.Session
 
             var windowRestored = false;
 
-            if (session.Ui.RememberWindowState)
+            if (session.MainWindow?.RememberWindowState ?? true)
             {
                 windowRestored = WindowSession.TryRestore(window, session.MainWindow);
 
@@ -66,22 +66,23 @@ namespace Mfr.App.Ui.Services.Session
             try
             {
                 var session = SessionStore.Current;
-                var ui = session.Ui;
+                var rememberWindow = session.MainWindow?.RememberWindowState ?? true;
+                var rememberLastFolder = session.FileList?.RememberLastFolder ?? true;
 
-                if (ui.RememberWindowState)
+                if (rememberWindow)
                 {
-                    session.MainWindow = WindowSession.Capture(window);
-
-                    session.MainWindow.Splitters = SplitterSession.Capture(window);
+                    var captured = WindowSession.Capture(window);
+                    captured.RememberWindowState = rememberWindow;
+                    captured.Splitters = SplitterSession.Capture(window);
+                    session.MainWindow = captured;
                 }
 
                 if (fileListSnapshot is not null)
                 {
-                    session.FileList ??= new SessionStateFileList();
+                    var fileList = session.EnsureFileList();
+                    fileList.RememberLastFolder = rememberLastFolder;
 
-                    var fileList = session.FileList;
-
-                    if (ui.RememberLastFolder && _IsPersistableFolder(fileListSnapshot.LastOpenedDirectory))
+                    if (rememberLastFolder && _IsPersistableFolder(fileListSnapshot.LastOpenedDirectory))
                     {
                         fileList.LastOpenedDirectory = fileListSnapshot.LastOpenedDirectory;
                     }
@@ -101,16 +102,16 @@ namespace Mfr.App.Ui.Services.Session
 
                 if (renameListSortFields is not null || renameListVisibleColumns is not null)
                 {
-                    session.RenameList ??= new SessionStateRenameList();
+                    var renameList = session.EnsureRenameList();
 
                     if (renameListSortFields is not null)
                     {
-                        session.RenameList.SortFields = [.. renameListSortFields];
+                        renameList.SortFields = [.. renameListSortFields];
                     }
 
                     if (renameListVisibleColumns is not null)
                     {
-                        session.RenameList.VisibleColumns = [.. renameListVisibleColumns];
+                        renameList.VisibleColumns = [.. renameListVisibleColumns];
                     }
                 }
 

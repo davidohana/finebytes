@@ -76,31 +76,57 @@ namespace Mfr.Models.Config
                 state.Version = 1;
             }
 
-            state.Ui ??= new SessionStateUi();
-
             var json = JsonSerializer.Serialize(state, s_JsonOptions);
             File.WriteAllText(path, json);
         }
 
         /// <summary>
-        /// Writes <see cref="Current"/>.Ui into the session file, preserving other sections already on disk.
-        /// <para>Failures are swallowed so UI preference saves do not crash the app.</para>
+        /// Writes live preference fields from <see cref="Current"/> into the session file, preserving last-used
+        /// layout already on disk (geometry, masks, sort, columns).
+        /// <para>Failures are swallowed so preference saves do not crash the app.</para>
         /// </summary>
         /// <param name="sessionFilePath">
         /// Path to JSON. When <c>null</c> or whitespace, <see cref="DefaultSessionFilePath"/> is used.
         /// </param>
-        public static void SaveCurrentUi(string? sessionFilePath = null)
+        public static void SaveCurrentPreferences(string? sessionFilePath = null)
         {
             try
             {
                 var path = _ResolvePath(sessionFilePath);
                 var session = File.Exists(path) ? _Read(path) : new SessionState();
-                session.Ui = Current.Ui;
+                _CopyPreferences(Current, session);
                 Save(session, path);
             }
             catch
             {
                 // Preference save must not block the UI or surface to the user.
+            }
+        }
+
+        /// <summary>
+        /// Copies add-policy, remember, and display flags from <paramref name="source"/> onto
+        /// <paramref name="target"/> without replacing last-used layout fields.
+        /// </summary>
+        /// <param name="source">Live in-memory session.</param>
+        /// <param name="target">Session document being written.</param>
+        private static void _CopyPreferences(SessionState source, SessionState target)
+        {
+            if (source.MainWindow is not null)
+            {
+                target.EnsureMainWindow().RememberWindowState = source.MainWindow.RememberWindowState;
+            }
+
+            if (source.FileList is not null)
+            {
+                target.EnsureFileList().RememberLastFolder = source.FileList.RememberLastFolder;
+            }
+
+            if (source.RenameList is not null)
+            {
+                var targetRenameList = target.EnsureRenameList();
+                targetRenameList.AddMode = source.RenameList.AddMode;
+                targetRenameList.AddFolderContents = source.RenameList.AddFolderContents;
+                targetRenameList.UseFixedWidthFont = source.RenameList.UseFixedWidthFont;
             }
         }
 
@@ -130,7 +156,6 @@ namespace Mfr.Models.Config
             {
                 var json = File.ReadAllText(path);
                 var state = JsonSerializer.Deserialize<SessionState>(json, s_JsonOptions) ?? new SessionState();
-                state.Ui ??= new SessionStateUi();
                 return state;
             }
             catch

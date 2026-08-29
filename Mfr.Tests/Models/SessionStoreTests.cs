@@ -14,7 +14,6 @@ namespace Mfr.Tests.Models
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-missing-" + Guid.NewGuid() + ".json");
             var session = SessionStore.Load(path);
             Assert.Equal(1, session.Version);
-            Assert.Equal(RenameListAddMode.Files, session.Ui.AddMode);
             Assert.Null(session.MainWindow);
             Assert.Null(session.FileList);
             Assert.Null(session.RenameList);
@@ -28,7 +27,6 @@ namespace Mfr.Tests.Models
             {
                 File.WriteAllText(path, "{ not-json");
                 var session = SessionStore.Load(path);
-                Assert.Equal(RenameListAddMode.Files, session.Ui.AddMode);
                 Assert.Null(session.MainWindow);
                 Assert.Null(session.FileList);
                 Assert.Null(session.RenameList);

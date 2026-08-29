@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets whether the Rename List grid uses a fixed-width font.
         /// </summary>
         [ObservableProperty]
-        private bool _useFixedWidthFont = SessionStore.Current.Ui.RenameListUseFixedWidthFont;
+        private bool _useFixedWidthFont = SessionStore.Current.RenameList?.UseFixedWidthFont ?? false;
 
         /// <summary>
         /// Updates the fixed-width font flag and persists it to <c>session.json</c>.
@@ -27,8 +27,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             UseFixedWidthFont = value;
-            SessionStore.Current.Ui.RenameListUseFixedWidthFont = value;
-            SessionStore.SaveCurrentUi();
+            SessionStore.Current.EnsureRenameList().UseFixedWidthFont = value;
+            SessionStore.SaveCurrentPreferences();
         }
 
         /// <summary>

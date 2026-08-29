@@ -12,22 +12,23 @@ namespace Mfr.Tests.Ui.RenameList
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
         private readonly List<FileListViewModel> _fileListViewModels = [];
-        private readonly SessionStateUi _originalUi;
+        private readonly SessionPrefSnapshot _originalPrefs;
 
         /// <summary>
-        /// Initializes session UI snapshot for tests that override add-policy flags.
+        /// Initializes session preference snapshot for tests that override add-policy flags.
         /// </summary>
         public RenameListViewModelTests()
         {
-            _originalUi = RenameListTestHelpers.SnapshotSessionUi();
-            SessionStore.Current.Ui.AddMode = RenameListAddMode.Files;
-            SessionStore.Current.Ui.AddFolderContents = true;
+            _originalPrefs = RenameListTestHelpers.SnapshotSessionPrefs();
+            var renameList = SessionStore.Current.EnsureRenameList();
+            renameList.AddMode = RenameListAddMode.Files;
+            renameList.AddFolderContents = true;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            RenameListTestHelpers.RestoreSessionUi(_originalUi);
+            RenameListTestHelpers.RestoreSessionPrefs(_originalPrefs);
 
             foreach (var fileListViewModel in _fileListViewModels)
             {
@@ -88,8 +89,8 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddPaths_FoldersOnly_Skips_Files()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            SessionStore.Current.Ui.AddMode = RenameListAddMode.Folders;
-            SessionStore.Current.Ui.AddFolderContents = false;
+            SessionStore.Current.EnsureRenameList().AddMode = RenameListAddMode.Folders;
+            SessionStore.Current.EnsureRenameList().AddFolderContents = false;
             var fileListViewModel = _CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
@@ -236,7 +237,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Folder_AddFoldersAndContents_AddsNestedFolderRows()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            SessionStore.Current.Ui.AddMode = RenameListAddMode.FilesAndFolders;
+            SessionStore.Current.EnsureRenameList().AddMode = RenameListAddMode.FilesAndFolders;
             var fileListViewModel = _CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
@@ -257,8 +258,8 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Folder_ContentsOff_AddsFolderAndTopLevelFiles()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            SessionStore.Current.Ui.AddMode = RenameListAddMode.FilesAndFolders;
-            SessionStore.Current.Ui.AddFolderContents = false;
+            SessionStore.Current.EnsureRenameList().AddMode = RenameListAddMode.FilesAndFolders;
+            SessionStore.Current.EnsureRenameList().AddFolderContents = false;
             var fileListViewModel = _CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
@@ -322,7 +323,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Folder_FilesOffFoldersOn_AddsFolderAndDescendants()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            SessionStore.Current.Ui.AddMode = RenameListAddMode.Folders;
+            SessionStore.Current.EnsureRenameList().AddMode = RenameListAddMode.Folders;
             var fileListViewModel = _CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
@@ -351,13 +352,13 @@ namespace Mfr.Tests.Ui.RenameList
             fileListViewModel.SetSelectedEntries([folderEntry]);
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
-            SessionStore.Current.Ui.AddMode = RenameListAddMode.Folders;
+            SessionStore.Current.EnsureRenameList().AddMode = RenameListAddMode.Folders;
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
             fileListViewModel.SetSelectedEntries([fileEntry]);
             Assert.False(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
-            SessionStore.Current.Ui.AddMode = RenameListAddMode.Files;
+            SessionStore.Current.EnsureRenameList().AddMode = RenameListAddMode.Files;
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
         }
 

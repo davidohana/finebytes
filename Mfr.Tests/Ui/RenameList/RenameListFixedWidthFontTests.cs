@@ -12,8 +12,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void SetUseFixedWidthFont_updates_vm_and_in_memory_session()
         {
-            var originalUi = RenameListTestHelpers.SnapshotSessionUi();
-            SessionStore.Current.Ui.RenameListUseFixedWidthFont = false;
+            var originalPrefs = RenameListTestHelpers.SnapshotSessionPrefs();
+            SessionStore.Current.EnsureRenameList().UseFixedWidthFont = false;
 
             var fileListViewModel = new FileListViewModel(
                 NullSystemIconProvider.Instance,
@@ -28,20 +28,20 @@ namespace Mfr.Tests.Ui.RenameList
                 renameListViewModel.SetUseFixedWidthFont(true);
 
                 Assert.True(renameListViewModel.UseFixedWidthFont);
-                Assert.True(SessionStore.Current.Ui.RenameListUseFixedWidthFont);
+                Assert.True(SessionStore.Current.RenameList?.UseFixedWidthFont);
             }
             finally
             {
                 fileListViewModel.Dispose();
-                RenameListTestHelpers.RestoreSessionUi(originalUi);
+                RenameListTestHelpers.RestoreSessionPrefs(originalPrefs);
             }
         }
 
         [Fact]
         public void ToggleUseFixedWidthFont_flips_value()
         {
-            var originalUi = RenameListTestHelpers.SnapshotSessionUi();
-            SessionStore.Current.Ui.RenameListUseFixedWidthFont = false;
+            var originalPrefs = RenameListTestHelpers.SnapshotSessionPrefs();
+            SessionStore.Current.EnsureRenameList().UseFixedWidthFont = false;
 
             var fileListViewModel = new FileListViewModel(
                 NullSystemIconProvider.Instance,
@@ -56,17 +56,17 @@ namespace Mfr.Tests.Ui.RenameList
                 renameListViewModel.ToggleUseFixedWidthFontCommand.Execute(null);
 
                 Assert.True(renameListViewModel.UseFixedWidthFont);
-                Assert.True(SessionStore.Current.Ui.RenameListUseFixedWidthFont);
+                Assert.True(SessionStore.Current.RenameList?.UseFixedWidthFont);
 
                 renameListViewModel.ToggleUseFixedWidthFontCommand.Execute(null);
 
                 Assert.False(renameListViewModel.UseFixedWidthFont);
-                Assert.False(SessionStore.Current.Ui.RenameListUseFixedWidthFont);
+                Assert.False(SessionStore.Current.RenameList?.UseFixedWidthFont);
             }
             finally
             {
                 fileListViewModel.Dispose();
-                RenameListTestHelpers.RestoreSessionUi(originalUi);
+                RenameListTestHelpers.RestoreSessionPrefs(originalPrefs);
             }
         }
     }
