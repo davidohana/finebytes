@@ -189,9 +189,10 @@ namespace Mfr.Tests.Ui.RenameList
                     ),
                 ],
                 []
-            );
-
-            dialogVm.SelectedColumnRowIndex = 0;
+            )
+            {
+                SelectedColumnRowIndex = 0
+            };
             var firstAvailable = dialogVm.AvailableOriginalFields[0];
             dialogVm.AddAllOriginalFieldsCommand.Execute(null);
 

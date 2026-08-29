@@ -41,11 +41,7 @@ namespace Mfr.App.Ui.Views.RenameList
             };
             mark.Bind(
                 Visual.IsVisibleProperty,
-                new Binding(nameof(RenameListEntry.HasRowError))
-                {
-                    FallbackValue = false,
-                    TargetNullValue = false,
-                }
+                new Binding(nameof(RenameListEntry.HasRowError)) { FallbackValue = false, TargetNullValue = false }
             );
             ToolTip.SetTip(
                 mark,

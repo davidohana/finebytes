@@ -93,8 +93,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<RenameListEntry> SelectedEntries => _selectedEntries;
 
         /// <summary>
-        /// Gets the row index under a file or internal drag (insert-before target), or null when unset.
+        /// Gets the insert index under a file or internal drag (insert-before target), or null when unset.
         /// </summary>
+        /// <para>
+        /// When equal to <see cref="Entries"/>.Count, the mark means append after the last row.
+        /// </para>
         public int? DropMarkIndex { get; private set; }
 
         /// <summary>
@@ -173,9 +176,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Sets or clears the drag insert marker (row index to insert before).
+        /// Sets or clears the drag insert marker (index to insert before, or append at end).
         /// </summary>
-        /// <param name="index">Zero-based row index under the pointer, or null to clear.</param>
+        /// <param name="index">
+        /// Zero-based insert index under the pointer (<see cref="Entries"/>.Count = append), or null to clear.
+        /// </param>
         /// <remarks>
         /// <para>
         /// Ignored while Auto-Sort is on (MFR7: external drops append and resort; no mark).
@@ -188,7 +193,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 index = null;
             }
 
-            if (index is { } i && (i < 0 || i >= Entries.Count))
+            if (index is { } i && (i < 0 || i > Entries.Count))
             {
                 index = null;
             }

@@ -28,8 +28,8 @@ Add-policy (`addMode`, `addFolderContents`) lives on the same `renameList` objec
 }
 ```
 
-| Field               | CLR                 | Type | Default   |
-| ------------------- | ------------------- | ---- | --------- |
+| Field               | CLR                 | Type | Default  |
+| ------------------- | ------------------- | ---- | -------- |
 | `useFixedWidthFont` | `UseFixedWidthFont` | bool | **true** |
 
 Omitted keys use property initializer defaults. No legacy migration from `config.json` or a `ui` session object.

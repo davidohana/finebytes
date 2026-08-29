@@ -60,15 +60,13 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var isOnlySelected =
-                _viewModel.SelectedEntries.Count == 1 && _viewModel.SelectedEntries[0] == hit;
+            var isOnlySelected = _viewModel.SelectedEntries.Count == 1 && _viewModel.SelectedEntries[0] == hit;
             if (isOnlySelected)
             {
                 return;
             }
 
-            var keepMultiSelection =
-                _viewModel.SelectedEntries.Count > 1 && _viewModel.SelectedEntries.Contains(hit);
+            var keepMultiSelection = _viewModel.SelectedEntries.Count > 1 && _viewModel.SelectedEntries.Contains(hit);
             if (keepMultiSelection)
             {
                 return;

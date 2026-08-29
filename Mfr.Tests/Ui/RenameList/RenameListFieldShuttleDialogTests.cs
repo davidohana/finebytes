@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
@@ -21,7 +20,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public void Moving_a_column_keeps_the_moved_row_selected()
         {
-            var (dialog, dialogVm, list) = _ShowColumnsList();
+            var (dialog, dialogVm, _) = _ShowColumnsList();
             var movedKey = dialogVm.SelectedColumnRows[0].Column.Key;
 
             dialogVm.SetSelectedColumnRows([0], 0);
@@ -92,7 +91,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public void Moving_a_sort_key_keeps_the_moved_row_selected()
         {
-            var (dialog, dialogVm, list) = _ShowSortList();
+            var (dialog, dialogVm, _) = _ShowSortList();
             var movedFieldKey = dialogVm.SelectedSortRows[0].Key.FieldKey;
 
             dialogVm.SetSelectedSortRows([0], 0);

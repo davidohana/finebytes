@@ -168,7 +168,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 }
 
                 field = value;
-                _selectedAvailableOriginalFields = _AvailableListForAnchor(_selectedAvailableOriginalFields, value);
+                SelectedAvailableOriginalFields = _AvailableListForAnchor(SelectedAvailableOriginalFields, value);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedAvailableOriginalFields));
                 AddSelectedOriginalFieldCommand.NotifyCanExecuteChanged();
@@ -189,7 +189,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 }
 
                 field = value;
-                _selectedAvailablePreviewFields = _AvailableListForAnchor(_selectedAvailablePreviewFields, value);
+                SelectedAvailablePreviewFields = _AvailableListForAnchor(SelectedAvailablePreviewFields, value);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedAvailablePreviewFields));
                 AddSelectedPreviewFieldCommand.NotifyCanExecuteChanged();
@@ -210,7 +210,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 }
 
                 field = value;
-                _selectedAvailableSortFields = _AvailableListForAnchor(_selectedAvailableSortFields, value);
+                SelectedAvailableSortFields = _AvailableListForAnchor(SelectedAvailableSortFields, value);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedAvailableSortFields));
                 AddSelectedSortFieldCommand.NotifyCanExecuteChanged();
@@ -278,7 +278,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelectedOriginalField))]
         public void AddSelectedOriginalField()
         {
-            _AddColumns(_selectedAvailableOriginalFields.Select(field => field.OriginalKey));
+            _AddColumns(SelectedAvailableOriginalFields.Select(field => field.OriginalKey));
         }
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelectedPreviewField))]
         public void AddSelectedPreviewField()
         {
-            _AddColumns(_selectedAvailablePreviewFields.Select(field => field.PreviewKey));
+            _AddColumns(SelectedAvailablePreviewFields.Select(field => field.PreviewKey));
         }
 
         /// <summary>
@@ -368,7 +368,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelectedSortField))]
         public void AddSelectedSortField()
         {
-            _AddSortKeys(_selectedAvailableSortFields.Select(field => field.OriginalKey));
+            _AddSortKeys(SelectedAvailableSortFields.Select(field => field.OriginalKey));
         }
 
         /// <summary>
@@ -450,12 +450,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelectedOriginalField()
         {
-            return _selectedAvailableOriginalFields.Count > 0;
+            return SelectedAvailableOriginalFields.Count > 0;
         }
 
         private bool _CanAddSelectedPreviewField()
         {
-            return _selectedAvailablePreviewFields.Count > 0;
+            return SelectedAvailablePreviewFields.Count > 0;
         }
 
         private bool _HasAvailableOriginalFields()
@@ -490,7 +490,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelectedSortField()
         {
-            return _selectedAvailableSortFields.Count > 0;
+            return SelectedAvailableSortFields.Count > 0;
         }
 
         private bool _CanRemoveSelectedSortKey()
@@ -564,23 +564,23 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         private void _PruneAvailableSelections()
         {
-            _selectedAvailableOriginalFields = _PruneFields(_selectedAvailableOriginalFields, AvailableOriginalFields);
-            _selectedAvailablePreviewFields = _PruneFields(_selectedAvailablePreviewFields, AvailablePreviewFields);
-            _selectedAvailableSortFields = _PruneFields(_selectedAvailableSortFields, AvailableSortFields);
+            SelectedAvailableOriginalFields = _PruneFields(SelectedAvailableOriginalFields, AvailableOriginalFields);
+            SelectedAvailablePreviewFields = _PruneFields(SelectedAvailablePreviewFields, AvailablePreviewFields);
+            SelectedAvailableSortFields = _PruneFields(SelectedAvailableSortFields, AvailableSortFields);
 
             if (SelectedAvailableOriginalField is { } original && !AvailableOriginalFields.Contains(original))
             {
-                SelectedAvailableOriginalField = _LastOrNull(_selectedAvailableOriginalFields);
+                SelectedAvailableOriginalField = _LastOrNull(SelectedAvailableOriginalFields);
             }
 
             if (SelectedAvailablePreviewField is { } preview && !AvailablePreviewFields.Contains(preview))
             {
-                SelectedAvailablePreviewField = _LastOrNull(_selectedAvailablePreviewFields);
+                SelectedAvailablePreviewField = _LastOrNull(SelectedAvailablePreviewFields);
             }
 
             if (SelectedAvailableSortField is { } sort && !AvailableSortFields.Contains(sort))
             {
-                SelectedAvailableSortField = _LastOrNull(_selectedAvailableSortFields);
+                SelectedAvailableSortField = _LastOrNull(SelectedAvailableSortFields);
             }
         }
 

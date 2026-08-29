@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
-using Mfr.Models.RenameList;
 
 namespace Mfr.Tests.Ui.RenameList
 {

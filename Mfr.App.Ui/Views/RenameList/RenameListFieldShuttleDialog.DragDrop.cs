@@ -38,11 +38,11 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _WireListDragDrop(ListBox listBox, ShuttleDragKind kind)
         {
             DragDrop.SetAllowDrop(listBox, true);
-            listBox.AddHandler(InputElement.PointerPressedEvent, _OnListPointerPressed, RoutingStrategies.Tunnel);
-            listBox.AddHandler(InputElement.PointerMovedEvent, _OnListPointerMoved, RoutingStrategies.Tunnel);
-            listBox.AddHandler(InputElement.PointerReleasedEvent, _OnListPointerReleased, RoutingStrategies.Tunnel);
+            listBox.AddHandler(PointerPressedEvent, _OnListPointerPressed, RoutingStrategies.Tunnel);
+            listBox.AddHandler(PointerMovedEvent, _OnListPointerMoved, RoutingStrategies.Tunnel);
+            listBox.AddHandler(PointerReleasedEvent, _OnListPointerReleased, RoutingStrategies.Tunnel);
             listBox.AddHandler(
-                InputElement.PointerCaptureLostEvent,
+                PointerCaptureLostEvent,
                 _OnListPointerCaptureLost,
                 RoutingStrategies.Tunnel
             );
@@ -316,7 +316,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 var rows = _ReadSelectedColumnRows();
                 return new ShuttleDragPayload(
                     ShuttleDragKind.SelectedColumn,
-                    rows.Select(row => ShuttleFieldKeyCodec.Encode(row.Column.Key)).ToList()
+                    [.. rows.Select(row => ShuttleFieldKeyCodec.Encode(row.Column.Key))]
                 );
             }
 
@@ -325,7 +325,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 var rows = _ReadSelectedSortRows();
                 return new ShuttleDragPayload(
                     ShuttleDragKind.SelectedSort,
-                    rows.Select(row => ShuttleFieldKeyCodec.Encode(row.Key.FieldKey)).ToList()
+                    [.. rows.Select(row => ShuttleFieldKeyCodec.Encode(row.Key.FieldKey))]
                 );
             }
 
@@ -389,11 +389,10 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var keySet = keys.ToHashSet();
-            return _ViewModel
+            return [.. _ViewModel
                 .SelectedColumnRows.Where(row => keySet.Contains(row.Column.Key))
                 .Select(row => row.Index)
-                .OrderBy(index => index)
-                .ToList();
+                .OrderBy(index => index)];
         }
 
         private IReadOnlyList<int> _IndicesForSortKeys(IReadOnlyList<RenameListFieldKey> keys)
@@ -404,11 +403,10 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var keySet = keys.ToHashSet();
-            return _ViewModel
+            return [.. _ViewModel
                 .SelectedSortRows.Where(row => keySet.Contains(row.Key.FieldKey))
                 .Select(row => row.Index)
-                .OrderBy(index => index)
-                .ToList();
+                .OrderBy(index => index)];
         }
 
         private static int _GetDropIndex(ListBox listBox, Point position)
@@ -431,7 +429,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return itemIndex;
             }
 
-            var midpoint = itemOrigin.Value.Y + item.Bounds.Height / 2;
+            var midpoint = itemOrigin.Value.Y + (item.Bounds.Height / 2);
             return position.Y >= midpoint ? itemIndex + 1 : itemIndex;
         }
 

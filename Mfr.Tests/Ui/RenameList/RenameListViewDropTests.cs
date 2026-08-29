@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
@@ -315,6 +316,80 @@ namespace Mfr.Tests.Ui.RenameList
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies DragOver on the last row lower half sets append mark and shows the salmon line.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragOver_Last_Row_Lower_Half_Sets_Append_Mark()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            var dragPath = Path.Combine(dir, "drag.txt");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(betaPath, "b");
+            File.WriteAllText(dragPath, "d");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+
+            var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1], rowFractionY: 0.75);
+            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(2, renameListViewModel.DropMarkIndex);
+            var lastRow = grid.GetVisualDescendants().OfType<DataGridRow>().First(row => row.Index == 1);
+            Assert.DoesNotContain("drop-mark", lastRow.Classes);
+            Assert.NotNull(AdornerLayer.GetAdorner(grid));
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies DragOver below the last row sets append mark and shows the salmon line.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragOver_Below_Last_Row_Sets_Append_Mark()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.md");
+            var dragPath = Path.Combine(dir, "drag.txt");
+            File.WriteAllText(alphaPath, "a");
+            File.WriteAllText(betaPath, "b");
+            File.WriteAllText(dragPath, "d");
+
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+
+            var (view, window) = _Show(renameListViewModel);
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+            Dispatcher.UIThread.RunJobs();
+
+            var pointOnView = _PointBelowLastEntry(view, grid, renameListViewModel.Entries[1]);
+            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            view.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
+            );
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(2, renameListViewModel.DropMarkIndex);
+            Assert.NotNull(AdornerLayer.GetAdorner(grid));
+
+            window.Close();
+        }
+
         private FileListViewModel _CreateFileListViewModel(string path)
         {
             var fileListViewModel = new FileListViewModel(
@@ -340,14 +415,33 @@ namespace Mfr.Tests.Ui.RenameList
             return (view, window);
         }
 
-        private static Point _PointOverEntry(RenameListView view, DataGrid grid, RenameListEntry entry)
+        private static Point _PointOverEntry(
+            RenameListView view,
+            DataGrid grid,
+            RenameListEntry entry,
+            double rowFractionY = 0.25
+        )
         {
             var row = grid.GetVisualDescendants()
                 .OfType<DataGridRow>()
                 .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
             Assert.NotNull(row);
 
-            var local = new Point(Math.Max(8, row.Bounds.Width / 2), Math.Max(4, row.Bounds.Height / 2));
+            var localY = Math.Max(4, row.Bounds.Height * rowFractionY);
+            var local = new Point(Math.Max(8, row.Bounds.Width / 2), localY);
+            var pointOnView = row.TranslatePoint(local, view);
+            Assert.True(pointOnView.HasValue);
+            return pointOnView.Value;
+        }
+
+        private static Point _PointBelowLastEntry(RenameListView view, DataGrid grid, RenameListEntry entry)
+        {
+            var row = grid.GetVisualDescendants()
+                .OfType<DataGridRow>()
+                .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
+            Assert.NotNull(row);
+
+            var local = new Point(Math.Max(8, row.Bounds.Width / 2), row.Bounds.Height + 4);
             var pointOnView = row.TranslatePoint(local, view);
             Assert.True(pointOnView.HasValue);
             return pointOnView.Value;

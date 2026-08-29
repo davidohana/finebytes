@@ -435,7 +435,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies SetDropMarkIndex ignores out-of-range indices.
+        /// Verifies SetDropMarkIndex allows append at Count and clears indices beyond that.
         /// </summary>
         [Fact]
         public async Task SetDropMarkIndex_Out_Of_Range_Clears()
@@ -450,7 +450,35 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetDropMarkIndex(0);
             Assert.Equal(0, renameListViewModel.DropMarkIndex);
 
+            renameListViewModel.SetDropMarkIndex(1);
+            Assert.Equal(1, renameListViewModel.DropMarkIndex);
+
             renameListViewModel.SetDropMarkIndex(5);
+            Assert.Null(renameListViewModel.DropMarkIndex);
+        }
+
+        /// <summary>
+        /// Verifies ReorderSelectedToDropMark appends when the drop mark is at Count.
+        /// </summary>
+        [Fact]
+        public async Task ReorderSelectedToDropMark_Append_Mark_Moves_Selection_To_End()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+            renameListViewModel.SetDropMarkIndex(renameListViewModel.Entries.Count);
+
+            Assert.True(renameListViewModel.ReorderSelectedToDropMark());
+            Assert.Equal(["beta.md", "gamma.log", "alpha.txt"], _PreviewNames(renameListViewModel));
             Assert.Null(renameListViewModel.DropMarkIndex);
         }
 

@@ -1,5 +1,4 @@
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 
 namespace Mfr.Tests.Ui.RenameList

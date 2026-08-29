@@ -4,9 +4,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 {
     public sealed partial class RenameListFieldShuttleDialogViewModel
     {
-        private IReadOnlyList<RenameListField> _selectedAvailableOriginalFields = [];
-        private IReadOnlyList<RenameListField> _selectedAvailablePreviewFields = [];
-        private IReadOnlyList<RenameListField> _selectedAvailableSortFields = [];
 
         /// <summary>
         /// Gets selected row indices in the selected-columns list.
@@ -73,7 +70,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _selectedAvailableOriginalFields = [.. fields];
+            SelectedAvailableOriginalFields = [.. fields];
             SelectedAvailableOriginalField = anchorField ?? _LastOrNull(fields);
             OnPropertyChanged(nameof(SelectedAvailableOriginalFields));
             AddSelectedOriginalFieldCommand.NotifyCanExecuteChanged();
@@ -96,7 +93,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _selectedAvailablePreviewFields = [.. fields];
+            SelectedAvailablePreviewFields = [.. fields];
             SelectedAvailablePreviewField = anchorField ?? _LastOrNull(fields);
             OnPropertyChanged(nameof(SelectedAvailablePreviewFields));
             AddSelectedPreviewFieldCommand.NotifyCanExecuteChanged();
@@ -116,7 +113,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _selectedAvailableSortFields = [.. fields];
+            SelectedAvailableSortFields = [.. fields];
             SelectedAvailableSortField = anchorField ?? _LastOrNull(fields);
             OnPropertyChanged(nameof(SelectedAvailableSortFields));
             AddSelectedSortFieldCommand.NotifyCanExecuteChanged();
@@ -125,17 +122,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets selected available original fields on the Columns tab.
         /// </summary>
-        public IReadOnlyList<RenameListField> SelectedAvailableOriginalFields => _selectedAvailableOriginalFields;
+        public IReadOnlyList<RenameListField> SelectedAvailableOriginalFields { get; private set; } = [];
 
         /// <summary>
         /// Gets selected available preview fields on the Columns tab.
         /// </summary>
-        public IReadOnlyList<RenameListField> SelectedAvailablePreviewFields => _selectedAvailablePreviewFields;
+        public IReadOnlyList<RenameListField> SelectedAvailablePreviewFields { get; private set; } = [];
 
         /// <summary>
         /// Gets selected available sort fields on the Sort tab.
         /// </summary>
-        public IReadOnlyList<RenameListField> SelectedAvailableSortFields => _selectedAvailableSortFields;
+        public IReadOnlyList<RenameListField> SelectedAvailableSortFields { get; private set; } = [];
 
         private bool _IsSingleColumnSelection(int index)
         {

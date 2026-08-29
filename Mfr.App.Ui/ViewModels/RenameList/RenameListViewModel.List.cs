@@ -148,7 +148,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     return false;
                 }
 
-                var beforeItem = DropMarkIndex is { } markIndex ? Entries[markIndex].EngineItem : null;
+                var beforeItem =
+                    DropMarkIndex is { } markIndex && markIndex < Entries.Count ? Entries[markIndex].EngineItem : null;
                 var engineItems = _selectedEntries.Select(entry => entry.EngineItem);
                 if (!_renameList.MoveSelectedBefore(engineItems, beforeItem: beforeItem))
                 {

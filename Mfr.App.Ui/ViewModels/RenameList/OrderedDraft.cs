@@ -11,7 +11,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private readonly List<TItem> _items;
         private readonly HashSet<TKey> _keys;
         private readonly Func<TItem, TKey> _keyOf;
-        private IReadOnlyList<int> _selectedIndices = [];
         private int _selectedIndex = -1;
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets selected item indices in list order.
         /// </summary>
-        public IReadOnlyList<int> SelectedIndices => _selectedIndices;
+        public IReadOnlyList<int> SelectedIndices { get; private set; } = [];
 
         /// <summary>
         /// Gets or sets the selected-item anchor, or <c>-1</c> when nothing is selected.
@@ -63,8 +62,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             ArgumentNullException.ThrowIfNull(indices);
 
-            _selectedIndices = _NormalizeIndices(indices);
-            _selectedIndex = _ResolveAnchor(_selectedIndices, anchorIndex);
+            SelectedIndices = _NormalizeIndices(indices);
+            _selectedIndex = _ResolveAnchor(SelectedIndices, anchorIndex);
         }
 
         /// <summary>
@@ -85,7 +84,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets whether the current selection can be removed.
         /// </summary>
-        public bool CanRemove => _selectedIndices.Count > 0;
+        public bool CanRemove => SelectedIndices.Count > 0;
 
         /// <summary>
         /// Gets whether any selected item can move one step toward <paramref name="offset"/>.
@@ -96,7 +95,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </returns>
         public bool CanMoveBlock(int offset)
         {
-            return CanMoveBlock(_selectedIndices, offset);
+            return CanMoveBlock(SelectedIndices, offset);
         }
 
         /// <summary>
@@ -139,7 +138,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns>Index in <c>[0, Count]</c>; when nothing is selected, returns <see cref="IReadOnlyCollection{T}.Count"/>.</returns>
         public int GetInsertIndexBelow()
         {
-            return GetInsertIndexBelow(_selectedIndices);
+            return GetInsertIndexBelow(SelectedIndices);
         }
 
         /// <summary>
@@ -271,7 +270,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns><see langword="false"/> when nothing could move.</returns>
         public bool TryMoveBlock(int offset)
         {
-            return TryMoveBlock(_selectedIndices, offset, out _);
+            return TryMoveBlock(SelectedIndices, offset, out _);
         }
 
         /// <summary>

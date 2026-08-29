@@ -2,8 +2,11 @@ using System.Collections;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -41,6 +44,8 @@ namespace Mfr.App.Ui.Views.RenameList
         private RenameListEntry? _dragHitEntry;
         private IReadOnlyList<RenameListEntry>? _dragSelectionSnapshot;
         private KeyModifiers _lastSortClickModifiers = KeyModifiers.None;
+        private Canvas? _appendMarkHost;
+        private Rectangle? _appendMarkLine;
 
         /// <summary>
         /// Initializes the Rename List pane.
@@ -551,26 +556,89 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var row = _HitTestDataGridRow(e);
-            if (row is null)
-            {
-                // Keep the last mark when the pointer is briefly between cells / over gaps so the
-                // salmon highlight does not flicker during DragOver.
-                return;
-            }
-
-            var index = row.Index;
-            if (index < 0 || index >= _viewModel.Entries.Count)
+            if (!_TryGetDropIndex(e, out var insertIndex))
             {
                 return;
             }
 
-            _viewModel.SetDropMarkIndex(index);
+            _viewModel.SetDropMarkIndex(insertIndex);
         }
 
-        private DataGridRow? _HitTestDataGridRow(DragEventArgs e)
+        /// <summary>
+        /// Resolves the insert index from the drag pointer: row midpoint, append after last row, or no change.
+        /// </summary>
+        private bool _TryGetDropIndex(DragEventArgs e, out int insertIndex)
         {
+            insertIndex = 0;
+            if (_viewModel is null)
+            {
+                return false;
+            }
+
             var position = e.GetPosition(RenameGrid);
+            var row = _HitTestDataGridRowAt(position);
+            if (row is not null)
+            {
+                var rowIndex = row.Index;
+                if (rowIndex < 0 || rowIndex >= _viewModel.Entries.Count)
+                {
+                    return false;
+                }
+
+                var origin = row.TranslatePoint(default, RenameGrid);
+                if (origin is null)
+                {
+                    insertIndex = rowIndex;
+                    return true;
+                }
+
+                var midpoint = origin.Value.Y + (row.Bounds.Height / 2);
+                insertIndex = position.Y >= midpoint ? rowIndex + 1 : rowIndex;
+                return true;
+            }
+
+            if (_IsPointerPastLastRow(position))
+            {
+                insertIndex = _viewModel.Entries.Count;
+                return true;
+            }
+
+            // Keep the last mark when the pointer is briefly between cells / over gaps.
+            return false;
+        }
+
+        private bool _IsPointerPastLastRow(Point position)
+        {
+            if (_viewModel is null)
+            {
+                return false;
+            }
+
+            if (_viewModel.Entries.Count == 0)
+            {
+                return true;
+            }
+
+            var lastRow = RenameGrid
+                .GetVisualDescendants()
+                .OfType<DataGridRow>()
+                .FirstOrDefault(item => item.Index == _viewModel.Entries.Count - 1);
+            if (lastRow is null)
+            {
+                return false;
+            }
+
+            var origin = lastRow.TranslatePoint(default, RenameGrid);
+            if (origin is null)
+            {
+                return false;
+            }
+
+            return position.Y >= origin.Value.Y + lastRow.Bounds.Height;
+        }
+
+        private DataGridRow? _HitTestDataGridRowAt(Point position)
+        {
             foreach (var row in RenameGrid.GetVisualDescendants().OfType<DataGridRow>())
             {
                 var origin = row.TranslatePoint(default, RenameGrid);
@@ -591,6 +659,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _ClearDropMark()
         {
             _viewModel?.SetDropMarkIndex(null);
+            _ClearAppendMark();
         }
 
         private void _OnLoadingRow(object? sender, DataGridRowEventArgs e)
@@ -600,16 +669,86 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _ApplyDropMarkVisuals()
         {
+            var entryCount = _viewModel?.Entries.Count ?? 0;
+            var markIndex = _viewModel?.DropMarkIndex;
+
             foreach (var row in RenameGrid.GetVisualDescendants().OfType<DataGridRow>())
             {
                 _ApplyDropMarkClass(row);
+            }
+
+            if (markIndex == entryCount)
+            {
+                _ShowAppendMark();
+            }
+            else
+            {
+                _ClearAppendMark();
             }
         }
 
         private void _ApplyDropMarkClass(DataGridRow row)
         {
-            var isMarked = _viewModel?.DropMarkIndex is { } markIndex && row.Index == markIndex;
+            var entryCount = _viewModel?.Entries.Count ?? 0;
+            var isMarked =
+                _viewModel?.DropMarkIndex is { } markIndex && markIndex < entryCount && row.Index == markIndex;
             row.Classes.Set(DropMarkClass, isMarked);
+        }
+
+        /// <summary>
+        /// Shows the salmon horizontal line after the last row (append insert target).
+        /// </summary>
+        private void _ShowAppendMark()
+        {
+            var y = 2.0;
+            if (
+                _viewModel?.Entries.Count > 0
+                && RenameGrid
+                    .GetVisualDescendants()
+                    .OfType<DataGridRow>()
+                    .FirstOrDefault(row => row.Index == _viewModel.Entries.Count - 1)
+                    is Control lastRow
+                && lastRow.TranslatePoint(default, RenameGrid) is { } origin
+            )
+            {
+                y = origin.Y + lastRow.Bounds.Height;
+            }
+
+            _appendMarkHost ??= new Canvas { IsHitTestVisible = false };
+            _appendMarkLine ??= new Rectangle
+            {
+                Height = 3,
+                IsHitTestVisible = false,
+                Fill = _DropMarkBrush(),
+            };
+
+            if (_appendMarkLine.Parent is null)
+            {
+                _appendMarkHost.Children.Add(_appendMarkLine);
+            }
+
+            _appendMarkLine.Width = Math.Max(0, RenameGrid.Bounds.Width - 4);
+            Canvas.SetLeft(_appendMarkLine, 2);
+            Canvas.SetTop(_appendMarkLine, Math.Clamp(y - 1.5, 0, Math.Max(0, RenameGrid.Bounds.Height - 3)));
+            AdornerLayer.SetAdorner(RenameGrid, _appendMarkHost);
+        }
+
+        private IBrush _DropMarkBrush()
+        {
+            if (
+                TryGetResource("RenameListDropIndicatorBrush", ActualThemeVariant, out var resource)
+                && resource is IBrush brush
+            )
+            {
+                return brush;
+            }
+
+            return new SolidColorBrush(Color.Parse("#FA8072"));
+        }
+
+        private void _ClearAppendMark()
+        {
+            AdornerLayer.SetAdorner(RenameGrid, null);
         }
 
         private static bool _CanAcceptFileDrop(DragEventArgs e)
