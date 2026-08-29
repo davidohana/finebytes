@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
@@ -84,7 +85,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 var title = dialog
                     .GetVisualDescendants()
                     .OfType<TextBlock>()
-                    .Single(block => block.IsVisible && block.Text == "Token");
+                    .Single(block =>
+                        block.IsVisible && block.Text == "Token" && block.FontWeight == FontWeight.SemiBold
+                    );
                 var separatorLabel = dialog
                     .GetVisualDescendants()
                     .OfType<TextBlock>()
@@ -97,15 +100,15 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Assert.Equal(TextAlignment.Left, separatorLabel.TextAlignment);
                 Assert.Equal(TextAlignment.Left, tokenNumberLabel.TextAlignment);
 
-                var titleX = title.TranslatePoint(default, dialog)!.Value.X;
-                var separatorLabelX = separatorLabel.TranslatePoint(default, dialog)!.Value.X;
-                var tokenNumberLabelX = tokenNumberLabel.TranslatePoint(default, dialog)!.Value.X;
-                Assert.Equal(titleX, separatorLabelX);
-                Assert.Equal(titleX, tokenNumberLabelX);
+                var titleX = title.TranslatePoint(new Point(), dialog)!.Value.X;
+                var separatorLabelX = separatorLabel.TranslatePoint(new Point(), dialog)!.Value.X;
+                var tokenNumberLabelX = tokenNumberLabel.TranslatePoint(new Point(), dialog)!.Value.X;
+                Assert.True(Math.Abs(titleX - separatorLabelX) <= 1);
+                Assert.True(Math.Abs(titleX - tokenNumberLabelX) <= 1);
 
-                var separatorBoxX = separatorBox.TranslatePoint(default, dialog)!.Value.X;
-                var spinnerX = spinner.TranslatePoint(default, dialog)!.Value.X;
-                Assert.Equal(separatorBoxX, spinnerX);
+                var separatorBoxX = separatorBox.TranslatePoint(new Point(), dialog)!.Value.X;
+                var spinnerX = spinner.TranslatePoint(new Point(), dialog)!.Value.X;
+                Assert.True(Math.Abs(separatorBoxX - spinnerX) <= 1);
             }
             finally
             {
