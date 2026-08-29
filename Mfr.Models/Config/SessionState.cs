@@ -16,6 +16,12 @@ namespace Mfr.Models.Config
         public int Version { get; set; } = 1;
 
         /// <summary>
+        /// UI preferences (add policy, restore toggles, display options).
+        /// </summary>
+        [JsonPropertyName("ui")]
+        public SessionStateUi Ui { get; set; } = new();
+
+        /// <summary>
         /// Last main-window geometry and pane splitters, when remembered.
         /// </summary>
         [JsonPropertyName("mainWindow")]
@@ -32,6 +38,59 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("renameList")]
         public SessionStateRenameList? RenameList { get; set; }
+    }
+
+    /// <summary>
+    /// UI preferences persisted in <c>session.json</c> (UI-only; not read by the CLI).
+    /// </summary>
+    public sealed class SessionStateUi
+    {
+        /// <summary>
+        /// Which path kinds become Rename List rows when adding from the File List.
+        /// </summary>
+        [JsonPropertyName("addMode")]
+        public RenameListAddMode AddMode { get; set; } = RenameListAddMode.Files;
+
+        /// <summary>
+        /// When true, folder sources recurse: matching files in subfolders, and descendant folder rows when
+        /// <see cref="AddMode"/> includes folders.
+        /// </summary>
+        [JsonPropertyName("addFolderContents")]
+        public bool AddFolderContents { get; set; } = true;
+
+        /// <summary>
+        /// When true, restore and save main-window size, position, maximized state, and pane splitters across launches.
+        /// </summary>
+        [JsonPropertyName("rememberWindowState")]
+        public bool RememberWindowState { get; set; } = true;
+
+        /// <summary>
+        /// When true, restore and save the last File List folder across launches.
+        /// </summary>
+        [JsonPropertyName("rememberLastFolder")]
+        public bool RememberLastFolder { get; set; } = true;
+
+        /// <summary>
+        /// When true, the Rename List grid uses a fixed-width font instead of the proportional File List font.
+        /// </summary>
+        [JsonPropertyName("renameListUseFixedWidthFont")]
+        public bool RenameListUseFixedWidthFont { get; set; }
+
+        /// <summary>
+        /// Returns a copy of these preferences.
+        /// </summary>
+        /// <returns>A new instance with the same field values.</returns>
+        public SessionStateUi Clone()
+        {
+            return new SessionStateUi
+            {
+                AddMode = AddMode,
+                AddFolderContents = AddFolderContents,
+                RememberWindowState = RememberWindowState,
+                RememberLastFolder = RememberLastFolder,
+                RenameListUseFixedWidthFont = RenameListUseFixedWidthFont,
+            };
+        }
     }
 
     /// <summary>

@@ -19,31 +19,22 @@ namespace Mfr.Tests.Ui.RenameList
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
         private readonly List<FileListViewModel> _fileListViewModels = [];
-        private readonly UiConfig _originalUiConfig;
+        private readonly SessionStateUi _originalUi;
 
         /// <summary>
-        /// Snapshots UI add-policy config for tests that may change it.
+        /// Snapshots UI add-policy session prefs for tests that may change them.
         /// </summary>
         public RenameListViewDropTests()
         {
-            _originalUiConfig = new UiConfig
-            {
-                AddMode = ConfigStore.Config.Ui.AddMode,
-                AddFolderContents = ConfigStore.Config.Ui.AddFolderContents,
-                RememberWindowState = ConfigStore.Config.Ui.RememberWindowState,
-                RememberLastFolder = ConfigStore.Config.Ui.RememberLastFolder,
-            };
-            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
-            ConfigStore.Config.Ui.AddFolderContents = true;
+            _originalUi = RenameListTestHelpers.SnapshotSessionUi();
+            SessionStore.Current.Ui.AddMode = RenameListAddMode.Files;
+            SessionStore.Current.Ui.AddFolderContents = true;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            ConfigStore.Config.Ui.AddMode = _originalUiConfig.AddMode;
-            ConfigStore.Config.Ui.AddFolderContents = _originalUiConfig.AddFolderContents;
-            ConfigStore.Config.Ui.RememberWindowState = _originalUiConfig.RememberWindowState;
-            ConfigStore.Config.Ui.RememberLastFolder = _originalUiConfig.RememberLastFolder;
+            RenameListTestHelpers.RestoreSessionUi(_originalUi);
 
             foreach (var fileListViewModel in _fileListViewModels)
             {

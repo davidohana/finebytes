@@ -19,7 +19,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelected))]
         public async Task AddSelectedAsync()
         {
-            var addMode = ConfigStore.Config.Ui.AddMode;
+            var addMode = SessionStore.Current.Ui.AddMode;
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 _ToSourceItems(_fileListViewModel.SelectedEntries),
                 _fileListViewModel.Mask,
@@ -34,7 +34,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddAll))]
         public async Task AddAllAsync()
         {
-            var addMode = ConfigStore.Config.Ui.AddMode;
+            var addMode = SessionStore.Current.Ui.AddMode;
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 _ToSourceItems(_fileListViewModel.Entries),
                 _fileListViewModel.Mask,
@@ -51,7 +51,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             ArgumentNullException.ThrowIfNull(paths);
 
-            var addMode = ConfigStore.Config.Ui.AddMode;
+            var addMode = SessionStore.Current.Ui.AddMode;
             var sources = RenameListAddSourceResolver.ResolveSourcesFromPaths(paths, _fileListViewModel.Mask, addMode);
             await _AddSourcesAsync(sources).ConfigureAwait(true);
         }
@@ -74,7 +74,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var oldCount = _renameList.RenameItems.Count;
             LastAddError = string.Empty;
 
-            var ui = ConfigStore.Config.Ui;
+            var ui = SessionStore.Current.Ui;
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             var metadataRequirement = _CurrentMetadataRequirement();
             var addSummary = new RenameListAddSummary(0);
@@ -258,7 +258,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return RenameListAddSourceResolver.CanResolveFromSelection(
                 _ToSourceItems(_fileListViewModel.SelectedEntries),
                 _fileListViewModel.Mask,
-                ConfigStore.Config.Ui.AddMode
+                SessionStore.Current.Ui.AddMode
             );
         }
 
@@ -279,7 +279,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return RenameListAddSourceResolver.CanResolveFromSelection(
                 _ToSourceItems(_fileListViewModel.Entries),
                 _fileListViewModel.Mask,
-                ConfigStore.Config.Ui.AddMode
+                SessionStore.Current.Ui.AddMode
             );
         }
 

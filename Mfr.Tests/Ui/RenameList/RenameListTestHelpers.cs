@@ -51,6 +51,25 @@ namespace Mfr.Tests.Ui.RenameList
         {
             return [new SessionStateRenameListSortField(fieldKey, descending)];
         }
+
+        /// <summary>
+        /// Snapshots the process <see cref="SessionStore.Current"/> UI preferences.
+        /// </summary>
+        /// <returns>A copy of the current UI session preferences.</returns>
+        internal static SessionStateUi SnapshotSessionUi()
+        {
+            return SessionStore.Current.Ui.Clone();
+        }
+
+        /// <summary>
+        /// Restores <see cref="SessionStore.Current"/> UI preferences from <paramref name="snapshot"/>.
+        /// </summary>
+        /// <param name="snapshot">Previously captured preferences.</param>
+        internal static void RestoreSessionUi(SessionStateUi snapshot)
+        {
+            ArgumentNullException.ThrowIfNull(snapshot);
+            SessionStore.Current.Ui = snapshot;
+        }
     }
 
     /// <summary>
@@ -60,7 +79,7 @@ namespace Mfr.Tests.Ui.RenameList
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
         private readonly List<FileListViewModel> _fileListViewModels = [];
-        private readonly UiConfig? _originalUiConfig;
+        private readonly SessionStateUi? _originalUi;
 
         /// <summary>
         /// Creates a test context and optionally pins File List add-policy flags.
@@ -75,28 +94,17 @@ namespace Mfr.Tests.Ui.RenameList
                 return;
             }
 
-            _originalUiConfig = new UiConfig
-            {
-                AddMode = ConfigStore.Config.Ui.AddMode,
-                AddFolderContents = ConfigStore.Config.Ui.AddFolderContents,
-                RememberWindowState = ConfigStore.Config.Ui.RememberWindowState,
-                RememberLastFolder = ConfigStore.Config.Ui.RememberLastFolder,
-                RenameListUseFixedWidthFont = ConfigStore.Config.Ui.RenameListUseFixedWidthFont,
-            };
-            ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
-            ConfigStore.Config.Ui.AddFolderContents = true;
+            _originalUi = RenameListTestHelpers.SnapshotSessionUi();
+            SessionStore.Current.Ui.AddMode = RenameListAddMode.Files;
+            SessionStore.Current.Ui.AddFolderContents = true;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (_originalUiConfig is not null)
+            if (_originalUi is not null)
             {
-                ConfigStore.Config.Ui.AddMode = _originalUiConfig.AddMode;
-                ConfigStore.Config.Ui.AddFolderContents = _originalUiConfig.AddFolderContents;
-                ConfigStore.Config.Ui.RememberWindowState = _originalUiConfig.RememberWindowState;
-                ConfigStore.Config.Ui.RememberLastFolder = _originalUiConfig.RememberLastFolder;
-                ConfigStore.Config.Ui.RenameListUseFixedWidthFont = _originalUiConfig.RenameListUseFixedWidthFont;
+                RenameListTestHelpers.RestoreSessionUi(_originalUi);
             }
 
             foreach (var fileListViewModel in _fileListViewModels)

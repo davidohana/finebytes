@@ -56,7 +56,7 @@ duplicated:
 - [`RenameListViewDropTests`](../Mfr.Tests/Ui/RenameList/RenameListViewDropTests.cs) —
   same config snapshot + File List factory; window size differs (`_Show` is 600×300).
 - [`RenameListViewModelTests`](../Mfr.Tests/Ui/RenameList/RenameListViewModelTests.cs) —
-  same snapshot via `_CloneUiConfig`; many private folder/file helpers stay local.
+  same snapshot via `RenameListTestHelpers.SnapshotSessionUi`; many private folder/file helpers stay local.
 
 When those files are next edited, construct `new RenameListUiTestContext(pinAddPolicy: true)`
 and keep scenario helpers (`_CreateSampleFolder`, `_FileEntry`) on the test class. Extend

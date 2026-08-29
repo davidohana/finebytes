@@ -62,38 +62,6 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// UI-related preferences loaded from the <c>ui</c> section of the config file.
-    /// <para>Options dialog will expose these later; until then edit <c>config.json</c> or use CLI <c>--set</c>.</para>
-    /// </summary>
-    public sealed class UiConfig
-    {
-        /// <summary>
-        /// Which path kinds become Rename List rows when adding from the File List.
-        /// </summary>
-        public RenameListAddMode AddMode = RenameListAddMode.Files;
-
-        /// <summary>
-        /// When true, folder sources recurse: matching files in subfolders, and descendant folder rows when <see cref="AddMode"/> includes folders.
-        /// </summary>
-        public bool AddFolderContents = true;
-
-        /// <summary>
-        /// When true, restore and save main-window size, position, maximized state, and pane splitters across launches.
-        /// </summary>
-        public bool RememberWindowState = true;
-
-        /// <summary>
-        /// When true, restore and save the last File List folder across launches.
-        /// </summary>
-        public bool RememberLastFolder = true;
-
-        /// <summary>
-        /// When true, the Rename List grid uses a fixed-width font instead of the proportional File List font.
-        /// </summary>
-        public bool RenameListUseFixedWidthFont;
-    }
-
-    /// <summary>
     /// Resolved config for the current process (see <see cref="ConfigStore.Config"/>).
     /// </summary>
     public sealed class MfrConfig
@@ -109,11 +77,5 @@ namespace Mfr.Models.Config
         /// </summary>
         [ConfigSection]
         public LogConfig Log = new();
-
-        /// <summary>
-        /// UI preferences (add policy, window/folder restore toggles, and future Options settings).
-        /// </summary>
-        [ConfigSection]
-        public UiConfig Ui = new();
     }
 }

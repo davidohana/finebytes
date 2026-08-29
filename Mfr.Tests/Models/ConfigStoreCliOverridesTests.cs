@@ -96,18 +96,12 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void ApplyCliOverrides_Sets_Ui_RememberLastFolder()
+        public void ApplyCliOverrides_Rejects_Ui_Section()
         {
-            ConfigStore.ApplyCliOverrides(["ui.rememberLastFolder=false"]);
-            Assert.False(ConfigStore.Config.Ui.RememberLastFolder);
-            Assert.True(ConfigStore.Config.Ui.RememberWindowState);
-        }
-
-        [Fact]
-        public void ApplyCliOverrides_Sets_Ui_RememberWindowState()
-        {
-            ConfigStore.ApplyCliOverrides(["ui.rememberWindowState=false"]);
-            Assert.False(ConfigStore.Config.Ui.RememberWindowState);
+            var ex = Assert.Throws<InvalidDataException>(() =>
+                ConfigStore.ApplyCliOverrides(["ui.rememberLastFolder=false"])
+            );
+            Assert.Contains("Unknown config section 'ui'", ex.Message, StringComparison.Ordinal);
         }
     }
 }

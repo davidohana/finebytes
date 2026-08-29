@@ -12,7 +12,6 @@ namespace Mfr.Tests.Models
         [InlineData(typeof(MfrConfig))]
         [InlineData(typeof(FilterConfig))]
         [InlineData(typeof(LogConfig))]
-        [InlineData(typeof(UiConfig))]
         public void Every_public_instance_field_participates_in_config_binding(Type configType)
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;

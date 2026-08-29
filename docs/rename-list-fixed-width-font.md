@@ -1,59 +1,52 @@
 # Rename List fixed-width font
 
-Optional fixed-width font for the Rename List grid, persisted in `config.json` as a user preference.
+Optional fixed-width font for the Rename List grid, persisted in `session.json` as a UI preference.
 
 ## Goal
 
 - **Default:** proportional **Segoe UI** via existing `FileListFont` — no behavior change for existing users.
 - **Optional:** user enables **fixed-width** (`Cascadia Mono, Consolas, monospace` at 12pt) for the **whole Rename List grid**.
 - **Immediate:** checkbox toggles in the Rename List context menu and **Rename List** main menu apply and save instantly.
-- **Persistent:** choice survives restarts via **`config.json`** (`UiConfig`), alongside `RememberWindowState` and add-policy prefs.
+- **Persistent:** choice survives restarts via **`session.json`** (`SessionStateUi`), alongside add-policy prefs and restore toggles.
 
 File List stays on `FileListFont`. The field shuttle dialog stays proportional (field picker, not the grid).
 
-## Why config, not session
+## Why session, not config
 
-This is a **user preference** (like `RememberWindowState`, `AddMode`), not transient Rename List layout state. Session holds per-workspace grid state (sort keys, column order/widths); font choice should follow the user across sessions and machines (when config is shared).
+The `ui` object is UI-only. The CLI has its own `--files` / `--folders` / recurse switches and does not read add-policy, remember flags, or this font. `config.json` stays process-wide (`filters`, `log`).
 
-`UiConfig` documents that Options will expose these settings later; this toggle is the first UI-driven write to config.
+Last-used layout (window, columns, sort) lives in the same `session.json` document under other keys.
 
 ## Persistence schema
 
 ```json
 {
   "ui": {
-    "renameListUseFixedWidthFont": "false",
+    "renameListUseFixedWidthFont": false,
     "addMode": "files"
   }
 }
 ```
 
-| Field                         | CLR                           | Type         | Default   |
-| ----------------------------- | ----------------------------- | ------------ | --------- |
-| `renameListUseFixedWidthFont` | `RenameListUseFixedWidthFont` | `bool` field | **false** |
+| Field                         | CLR                           | Type | Default   |
+| ----------------------------- | ----------------------------- | ---- | --------- |
+| `renameListUseFixedWidthFont` | `RenameListUseFixedWidthFont` | bool | **false** |
 
-Leaf values are JSON **strings** (`"true"` / `"false"`). Omitted keys use field initializer defaults. No legacy migration.
+Omitted keys use property initializer defaults. No legacy migration from `config.json`.
 
-CLI override: `ui.renameListUseFixedWidthFont=true`.
+## SessionStore.SaveCurrentUi
 
-## ConfigStore.Save
+`SessionStore.SaveCurrentUi()` writes `SessionStore.Current.Ui` into `session.json` and keeps other sections already on disk (`mainWindow`, `fileList`, `renameList`). Save failures are swallowed.
 
-`ConfigStore.Save()` merge-writes the in-memory `ConfigStore.Config` to `config.json`:
-
-- Default path: `AppDataPaths.RoamingRoot()/config.json`.
-- Preserves unrelated sections and keys (`filters`, `log`, custom `ui` keys).
-- Serializes via `ConfigJsonWriter` (mirrors `ConfigJsonApplier` field walk).
-- Save failures are swallowed (same spirit as session save).
-
-Toggle → update `ConfigStore.Config.Ui.RenameListUseFixedWidthFont` → `ConfigStore.Save()`.
+Toggle → update `SessionStore.Current.Ui.RenameListUseFixedWidthFont` → `SessionStore.SaveCurrentUi()`.
 
 ## UI
 
-| Piece  | Detail                                                                |
-| ------ | --------------------------------------------------------------------- |
-| Entry  | Rename List context menu → **Use Fixed-Width Font** (checkbox)        |
-| Entry  | Main menu **Rename List** → **Use Fixed-Width Font** (checkbox)       |
-| Toggle | `ToggleUseFixedWidthFontCommand` → VM + config + `ConfigStore.Save()` |
+| Piece  | Detail                                                                           |
+| ------ | -------------------------------------------------------------------------------- |
+| Entry  | Rename List context menu → **Use Fixed-Width Font** (checkbox)                   |
+| Entry  | Main menu **Rename List** → **Use Fixed-Width Font** (checkbox)                  |
+| Toggle | `ToggleUseFixedWidthFontCommand` → VM + session + `SessionStore.SaveCurrentUi()` |
 
 Same pattern as **Auto-Sort**: `ToggleType="CheckBox"`, `IsChecked` one-way from `UseFixedWidthFont`.
 

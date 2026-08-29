@@ -28,7 +28,7 @@ namespace Mfr.App.Ui.Services.Session
 
             var windowRestored = false;
 
-            if (ConfigStore.Config.Ui.RememberWindowState)
+            if (session.Ui.RememberWindowState)
             {
                 windowRestored = WindowSession.TryRestore(window, session.MainWindow);
 
@@ -65,9 +65,8 @@ namespace Mfr.App.Ui.Services.Session
 
             try
             {
-                var session = SessionStore.Load();
-
-                var ui = ConfigStore.Config.Ui;
+                var session = SessionStore.Current;
+                var ui = session.Ui;
 
                 if (ui.RememberWindowState)
                 {
