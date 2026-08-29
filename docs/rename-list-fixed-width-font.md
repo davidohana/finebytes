@@ -52,7 +52,7 @@ Same pattern as **Auto-Sort**: `ToggleType="CheckBox"`, `IsChecked` one-way from
 
 ## Grid styling
 
-`RenameListView` toggles the `fixed-width-font` class on the DataGrid when `UseFixedWidthFont` changes. Parallel style selectors apply `RenameListFixedWidthFont` to the grid, headers, cells, and glyph TextBlocks.
+`RenameListView` toggles the `fixed-width-font` class on the DataGrid when `UseFixedWidthFont` changes. Parallel style selectors apply `RenameListFixedWidthFont` to the grid, headers, and cells. Sort and preview glyphs stay on `FileListFont` (same as header glyph-reserve measurement).
 
 Column minimum widths are recomputed on toggle; user-resized widths above the new minimum are preserved.
 

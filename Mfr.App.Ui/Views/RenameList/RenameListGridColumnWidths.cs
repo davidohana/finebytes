@@ -38,7 +38,10 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <param name="reservePreviewGlyph">
         /// When <see langword="true"/>, reserves space for the preview badge on preview columns.
         /// </param>
-        /// <param name="useFixedWidthFont"></param>
+        /// <param name="useFixedWidthFont">
+        /// When <see langword="true"/>, measure header text in the Rename List fixed-width font.
+        /// Glyph reserves stay on the proportional glyph font.
+        /// </param>
         /// <returns>Minimum column width in pixels.</returns>
         public static int GetMinimumHeaderWidth(
             string headerText,
@@ -63,12 +66,33 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
+        /// Gets the minimum pixel width for a catalog field header, including sort/preview glyph reserves.
+        /// </summary>
+        /// <param name="fieldKey">Column field key.</param>
+        /// <param name="useFixedWidthFont">
+        /// When <see langword="true"/>, measure header text in the Rename List fixed-width font.
+        /// </param>
+        /// <returns>Minimum column width in pixels.</returns>
+        public static int GetMinimumHeaderWidth(RenameListFieldKey fieldKey, bool useFixedWidthFont = false)
+        {
+            var field = RenameListFieldCatalog.GetField(fieldKey);
+            return GetMinimumHeaderWidth(
+                field.DisplayName,
+                reserveSortGlyph: RenameListFieldCatalog.IsSortableKey(fieldKey),
+                reservePreviewGlyph: fieldKey.IsPreview,
+                useFixedWidthFont: useFixedWidthFont
+            );
+        }
+
+        /// <summary>
         /// Gets the pixel width to fit visible cell values for one column, clamped to <see cref="MaxAutoFitWidth"/>.
         /// </summary>
         /// <param name="entries">Grid rows.</param>
         /// <param name="fieldKey">Column field key.</param>
         /// <param name="minHeaderWidth">Minimum width from the header label.</param>
-        /// <param name="useFixedWidthFont"></param>
+        /// <param name="useFixedWidthFont">
+        /// When <see langword="true"/>, measure cell text in the Rename List fixed-width font.
+        /// </param>
         /// <returns>Auto-fit width in pixels.</returns>
         public static int GetAutoFitWidth(
             IEnumerable<RenameListEntry> entries,

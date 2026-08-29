@@ -53,7 +53,9 @@ namespace Mfr.App.Ui.Views.RenameList
         /// </summary>
         /// <param name="entries">Grid rows.</param>
         /// <param name="fieldKey">Column field key.</param>
-        /// <param name="useFixedWidthFont"></param>
+        /// <param name="useFixedWidthFont">
+        /// When <see langword="true"/>, measure header and cell text in the Rename List fixed-width font.
+        /// </param>
         /// <returns>Clamped fit width in pixels.</returns>
         internal static int ResolveAutoFitWidth(
             IEnumerable<RenameListEntry> entries,
@@ -63,15 +65,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             ArgumentNullException.ThrowIfNull(entries);
 
-            var field = RenameListFieldCatalog.GetField(fieldKey);
-            var canUserSort = RenameListFieldCatalog.IsSortableKey(fieldKey);
-            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                field.DisplayName,
-                reserveSortGlyph: canUserSort,
-                reservePreviewGlyph: fieldKey.IsPreview,
-                useFixedWidthFont: useFixedWidthFont
-            );
-
+            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(fieldKey, useFixedWidthFont);
             return RenameListGridColumnWidths.GetAutoFitWidth(
                 entries,
                 fieldKey,
