@@ -1,0 +1,123 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.AppliedFilters"
+  mc:Ignorable="d"
+  d:DesignWidth="240"
+  d:DesignHeight="200"
+  x:Class="Mfr.App.Ui.Views.AppliedFilters.AppliedFiltersView"
+  x:Name="AppliedFiltersRoot"
+  x:DataType="vm:AppliedFiltersViewModel"
+>
+  <UserControl.Styles>
+    <Style Selector="Button.applied-filter-toolbar">
+      <Setter Property="Width" Value="22" />
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinWidth" Value="22" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ListBox.applied-filters">
+      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+      <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+    <Style Selector="ListBox.applied-filters ListBoxItem">
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="4,2" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="ListBox.applied-filters ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="ListBox.applied-filters ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="ListBox.applied-filters ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="ListBox.applied-filters ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.applied-filter-apply-to">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+    <Style Selector="CheckBox.applied-filter-enabled">
+      <Setter Property="Margin" Value="0,0,6,0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="MinHeight" Value="0" />
+    </Style>
+  </UserControl.Styles>
+  <Border Classes="pane">
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Top" Classes="pane-header" Text="Applied Filters" />
+      <Grid ColumnDefinitions="28,*">
+        <StackPanel Grid.Column="0" Margin="2,4,0,4" VerticalAlignment="Top">
+          <Button Classes="applied-filter-toolbar" ToolTip.Tip="Add selected filter" IsEnabled="False">
+            <Image Width="16" Height="16" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
+          </Button>
+          <Button Classes="applied-filter-toolbar" ToolTip.Tip="Remove selected filter" IsEnabled="False">
+            <Image Width="16" Height="16" Stretch="None" Source="/Assets/RenameList/RemoveSelected.png" />
+          </Button>
+          <Button Classes="applied-filter-toolbar" ToolTip.Tip="Remove all filters" IsEnabled="False">
+            <Image Width="16" Height="16" Stretch="None" Source="/Assets/RenameList/Clear.png" />
+          </Button>
+          <Button Classes="applied-filter-toolbar" ToolTip.Tip="Move selected up" IsEnabled="False">
+            <Image Width="16" Height="16" Stretch="None" Source="/Assets/RenameList/MoveUp.png" />
+          </Button>
+          <Button Classes="applied-filter-toolbar" ToolTip.Tip="Move selected down" IsEnabled="False">
+            <Image Width="16" Height="16" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
+          </Button>
+        </StackPanel>
+        <ListBox
+          x:Name="AppliedFiltersList"
+          Grid.Column="1"
+          Classes="applied-filters"
+          ItemsSource="{Binding Steps}"
+          SelectionMode="Multiple"
+        >
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:AppliedFilterStepViewModel">
+              <Grid ColumnDefinitions="Auto,*">
+                <CheckBox Grid.Column="0" Classes="applied-filter-enabled" IsChecked="{Binding Enabled, Mode=TwoWay}" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock
+                    Classes="applied-filter-apply-to"
+                    Text="{Binding ApplyToLabel}"
+                    IsVisible="{Binding ApplyToLabel, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                  />
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </DockPanel>
+  </Border>
+</UserControl>

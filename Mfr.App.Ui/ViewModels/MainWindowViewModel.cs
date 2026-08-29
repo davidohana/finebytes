@@ -5,6 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.Session;
+using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -45,7 +46,9 @@ namespace Mfr.App.Ui.ViewModels
             }
 
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
+            AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
             ItemCount = RenameListViewModel.ItemCount;
+            FilterCount = AppliedFiltersViewModel.Count;
             WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
         }
 
@@ -196,6 +199,14 @@ namespace Mfr.App.Ui.ViewModels
             {
                 _paneStatusHintDisplay = RenameListViewModel.CellStatusHintDisplay;
                 _UpdateStatusHintDisplay();
+            }
+        }
+
+        private void _OnAppliedFiltersPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(AppliedFiltersViewModel.Count))
+            {
+                FilterCount = AppliedFiltersViewModel.Count;
             }
         }
 

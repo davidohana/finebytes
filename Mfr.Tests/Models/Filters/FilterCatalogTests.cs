@@ -59,7 +59,7 @@ namespace Mfr.Tests.Models.Filters
         {
             foreach (var entry in FilterCatalog.Entries)
             {
-                var instance = (BaseFilter)Activator.CreateInstance(entry.FilterType)!;
+                var instance = FilterCatalog.CreateDefault(entry);
                 Assert.Equal(entry.Type, instance.Type);
             }
         }

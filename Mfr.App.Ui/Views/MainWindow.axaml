@@ -8,6 +8,7 @@
   xmlns:views="using:Mfr.App.Ui.Views"
   xmlns:filelistviews="using:Mfr.App.Ui.Views.FileList"
   xmlns:filterpaletteviews="using:Mfr.App.Ui.Views.FilterPalette"
+  xmlns:appliedfiltersviews="using:Mfr.App.Ui.Views.AppliedFilters"
   xmlns:renamelistviews="using:Mfr.App.Ui.Views.RenameList"
   xmlns:input="using:Mfr.App.Ui.Input"
   xmlns:resources="using:Mfr.App.Ui.Resources"
@@ -424,7 +425,7 @@
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
             />
-            <views:AppliedFiltersView Grid.Column="2" DataContext="{Binding AppliedFiltersViewModel}" />
+            <appliedfiltersviews:AppliedFiltersView Grid.Column="2" DataContext="{Binding AppliedFiltersViewModel}" />
           </Grid>
           <views:PaneSplitter
             x:Name="FilterEditorSplitter"

@@ -66,5 +66,16 @@ namespace Mfr.Filters
             );
             return typeName;
         }
+
+        /// <summary>
+        /// Creates a new filter instance using the catalog entry's parameterless constructor.
+        /// </summary>
+        /// <param name="entry">Catalog row whose <see cref="FilterCatalogEntry.FilterType"/> to construct.</param>
+        /// <returns>A new filter with palette add defaults.</returns>
+        public static BaseFilter CreateDefault(FilterCatalogEntry entry)
+        {
+            ArgumentNullException.ThrowIfNull(entry);
+            return (BaseFilter)Activator.CreateInstance(entry.FilterType)!;
+        }
     }
 }

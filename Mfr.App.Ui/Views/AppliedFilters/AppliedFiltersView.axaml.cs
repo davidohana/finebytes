@@ -1,6 +1,7 @@
 using Avalonia.Controls;
+using Mfr.App.Ui.ViewModels.AppliedFilters;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.AppliedFilters
 {
     /// <summary>
     /// Applied Filters pane host.
@@ -13,6 +14,14 @@ namespace Mfr.App.Ui.Views
         public AppliedFiltersView()
         {
             InitializeComponent();
+            _WireSelectionHandlers();
+            DataContextChanged += (_, _) =>
+            {
+                if (DataContext is AppliedFiltersViewModel viewModel)
+                {
+                    _OnDataContextAttached(viewModel);
+                }
+            };
         }
     }
 }
