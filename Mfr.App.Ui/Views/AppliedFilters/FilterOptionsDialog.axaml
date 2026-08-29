@@ -6,13 +6,25 @@
   x:DataType="vm:FilterOptionsDialogViewModel"
   Title="Filter Options"
   Icon="/Assets/mfr.ico"
-  Width="400"
+  Width="420"
   SizeToContent="Height"
-  MinWidth="360"
+  MinWidth="400"
+  MaxHeight="640"
   WindowStartupLocation="CenterOwner"
-  CanResize="False"
+  CanResize="True"
   ShowInTaskbar="False"
 >
+  <Window.Styles>
+    <Style Selector="Border.filter-options-group">
+      <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="8" />
+    </Style>
+    <Style Selector="TextBlock.filter-options-group-title">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+  </Window.Styles>
   <DockPanel Margin="12">
     <StackPanel
       DockPanel.Dock="Bottom"
@@ -40,28 +52,111 @@
       />
     </StackPanel>
 
-    <StackPanel Spacing="8">
-      <Grid ColumnDefinitions="Auto,*">
-        <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Name:" />
-        <TextBox Grid.Column="1" Text="{Binding Name}" />
-      </Grid>
-      <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding HasApplyTo}">
-        <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Apply To:" />
-        <ComboBox
-          x:Name="ApplyToCombo"
-          Grid.Column="1"
-          MinWidth="160"
-          HorizontalAlignment="Left"
-          ItemsSource="{Binding ApplyToOptions}"
-          SelectedItem="{Binding SelectedApplyTo}"
-        >
-          <ComboBox.ItemTemplate>
-            <DataTemplate x:DataType="vm:FilterTargetOption">
-              <TextBlock Text="{Binding Label}" />
-            </DataTemplate>
-          </ComboBox.ItemTemplate>
-        </ComboBox>
-      </Grid>
-    </StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="8">
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Name:" />
+          <TextBox Grid.Column="1" Text="{Binding Name}" />
+        </Grid>
+
+        <StackPanel Spacing="8" IsVisible="{Binding HasApplyTo}">
+          <Grid ColumnDefinitions="Auto,*,Auto,*">
+            <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Apply To:" />
+            <ComboBox
+              Grid.Column="1"
+              Margin="0,0,8,0"
+              ItemsSource="{Binding TargetGroups}"
+              SelectedItem="{Binding SelectedTargetGroup}"
+            >
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:FilterTargetGroupOption">
+                  <TextBlock Text="{Binding Label}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox
+              Grid.Column="3"
+              ItemsSource="{Binding TargetOptions}"
+              SelectedItem="{Binding SelectedTargetOption}"
+            >
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:FilterTargetOption">
+                  <TextBlock Text="{Binding Label}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </Grid>
+
+          <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding HasAncestorFolderLevel}">
+            <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Level:" />
+            <NumericUpDown
+              Grid.Column="1"
+              Minimum="1"
+              Maximum="99"
+              HorizontalAlignment="Left"
+              Width="80"
+              Value="{Binding AncestorFolderLevel}"
+            />
+          </Grid>
+
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <RadioButton GroupName="ApplyScope" Content="Whole" IsChecked="{Binding IsWholeScope, Mode=TwoWay}" />
+            <RadioButton
+              GroupName="ApplyScope"
+              Content="Substring"
+              IsChecked="{Binding IsSubstringScopeMode, Mode=TwoWay}"
+            />
+            <RadioButton GroupName="ApplyScope" Content="Token" IsChecked="{Binding IsTokenScopeMode, Mode=TwoWay}" />
+          </StackPanel>
+
+          <Border Classes="filter-options-group" IsVisible="{Binding IsSubstringScope}">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="filter-options-group-title" Text="Substring" />
+              <Grid ColumnDefinitions="Auto,80,Auto,88,Auto">
+                <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Start at position" />
+                <NumericUpDown
+                  Grid.Column="1"
+                  Minimum="1"
+                  Maximum="9999"
+                  Value="{Binding SubstringStartPosition}"
+                />
+                <ComboBox
+                  Grid.Column="2"
+                  Margin="8,0"
+                  ItemsSource="{Binding ScopeAnchors}"
+                  SelectedItem="{Binding SubstringStartAnchor}"
+                />
+                <TextBlock Grid.Column="3" VerticalAlignment="Center" Text="side (incl.)" />
+              </Grid>
+              <Grid ColumnDefinitions="Auto,80,Auto,88,Auto">
+                <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="End at position" />
+                <NumericUpDown Grid.Column="1" Minimum="1" Maximum="9999" Value="{Binding SubstringEndPosition}" />
+                <ComboBox
+                  Grid.Column="2"
+                  Margin="8,0"
+                  ItemsSource="{Binding ScopeAnchors}"
+                  SelectedItem="{Binding SubstringEndAnchor}"
+                />
+                <TextBlock Grid.Column="3" VerticalAlignment="Center" Text="side (incl.)" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <Border Classes="filter-options-group" IsVisible="{Binding IsTokenScope}">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="filter-options-group-title" Text="Token" />
+              <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Separator:" />
+                <TextBox Grid.Column="1" Text="{Binding TokenSeparator}" />
+              </Grid>
+              <Grid ColumnDefinitions="Auto,80">
+                <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Token number:" />
+                <NumericUpDown Grid.Column="1" Minimum="1" Maximum="9999" Value="{Binding TokenNumber}" />
+              </Grid>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
   </DockPanel>
 </Window>

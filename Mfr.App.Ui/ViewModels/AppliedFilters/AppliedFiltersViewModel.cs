@@ -135,6 +135,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         public bool CanShowFilterOptions => _selectedSteps.Count == 1;
 
         /// <summary>
+        /// Raised after Filter Options are accepted so hosts can refresh dependent panes.
+        /// </summary>
+        public event EventHandler? FilterOptionsApplied;
+
+        /// <summary>
         /// Applies Filter Options dialog edits to the selected step.
         /// </summary>
         /// <param name="draft">Accepted dialog state.</param>
@@ -153,18 +158,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 step.SetDisplayName(draft.Name.Trim());
             }
 
-            if (
-                draft.HasApplyTo
-                && draft.SelectedApplyTo is not null
-                && step.Filter is StringTargetFilter stringFilter
-            )
+            if (step.Filter is StringTargetFilter stringFilter)
             {
-                var currentApplyTo = FilterTargetOption.FromTarget(stringFilter.Target);
-                if (currentApplyTo != draft.SelectedApplyTo)
+                var newTarget = draft.BuildTarget();
+                if (newTarget is not null)
                 {
-                    step.SetFilter(stringFilter with { Target = draft.SelectedApplyTo.Target });
+                    step.SetFilter(stringFilter with { Target = newTarget, ApplyScope = draft.BuildApplyScope() });
                 }
             }
+
+            FilterOptionsApplied?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

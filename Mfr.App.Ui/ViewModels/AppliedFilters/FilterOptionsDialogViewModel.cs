@@ -1,13 +1,16 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.Filters;
+using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.ViewModels.AppliedFilters
 {
     /// <summary>
-    /// Draft state for the Filter Options dialog (name and basic Apply-To targets).
+    /// Draft state for the Filter Options dialog (name, Apply-To targets, and apply scope).
     /// </summary>
     public sealed partial class FilterOptionsDialogViewModel : ViewModelBase
     {
+        private bool _isSyncingTarget;
+
         /// <summary>
         /// Initializes draft fields from the selected applied-filter step.
         /// </summary>
@@ -18,16 +21,39 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             Name = step.DisplayName;
             HasApplyTo = step.Filter is StringTargetFilter;
-            SelectedApplyTo =
-                step.Filter is StringTargetFilter stringFilter
-                    ? FilterTargetOption.FromTarget(stringFilter.Target)
-                    : null;
+            if (step.Filter is StringTargetFilter stringFilter)
+            {
+                _LoadFromStringFilter(stringFilter);
+            }
         }
 
         /// <summary>
-        /// Gets the Apply-To choices for string-target filters.
+        /// Gets Apply-To groups shown in Filter Options.
         /// </summary>
-        public IReadOnlyList<FilterTargetOption> ApplyToOptions => FilterTargetOption.All;
+        public IReadOnlyList<FilterTargetGroupOption> TargetGroups => FilterTargetCatalog.Groups;
+
+        /// <summary>
+        /// Gets anchor choices for substring scope endpoints.
+        /// </summary>
+        public IReadOnlyList<StringScopeAnchorOption> ScopeAnchorOptions => StringScopeAnchorOption.All;
+
+        /// <summary>
+        /// Gets or sets the substring start anchor choice.
+        /// </summary>
+        [ObservableProperty]
+        private StringScopeAnchorOption _substringStartAnchorOption = StringScopeAnchorOption.All[0];
+
+        /// <summary>
+        /// Gets or sets the substring end anchor choice.
+        /// </summary>
+        [ObservableProperty]
+        private StringScopeAnchorOption _substringEndAnchorOption = StringScopeAnchorOption.All[0];
+
+        /// <summary>
+        /// Gets or sets the ancestor-folder level (1 = parent folder).
+        /// </summary>
+        [ObservableProperty]
+        private decimal _ancestorFolderLevel = 1;
 
         /// <summary>
         /// Gets or sets the filter instance name shown in the Applied list.
@@ -42,9 +68,237 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private bool _hasApplyTo;
 
         /// <summary>
-        /// Gets or sets the selected Apply-To target for string-target filters.
+        /// Gets or sets the selected Apply-To group.
         /// </summary>
         [ObservableProperty]
-        private FilterTargetOption? _selectedApplyTo;
+        private FilterTargetGroupOption? _selectedTargetGroup;
+
+        /// <summary>
+        /// Gets targets for <see cref="SelectedTargetGroup"/>.
+        /// </summary>
+        [ObservableProperty]
+        private IReadOnlyList<FilterTargetOption> _targetOptions = [];
+
+        /// <summary>
+        /// Gets or sets the selected Apply-To target.
+        /// </summary>
+        [ObservableProperty]
+        private FilterTargetOption? _selectedTargetOption;
+
+        /// <summary>
+        /// Gets whether <see cref="AncestorFolderLevel"/> is shown.
+        /// </summary>
+        [ObservableProperty]
+        private bool _hasAncestorFolderLevel;
+
+        /// <summary>
+        /// Gets or sets the apply-scope mode.
+        /// </summary>
+        [ObservableProperty]
+        private FilterApplyScopeMode _scopeMode = FilterApplyScopeMode.Whole;
+
+        /// <summary>
+        /// Gets whether substring scope controls are visible.
+        /// </summary>
+        [ObservableProperty]
+        private bool _isSubstringScope;
+
+        /// <summary>
+        /// Gets whether token scope controls are visible.
+        /// </summary>
+        [ObservableProperty]
+        private bool _isTokenScope;
+
+        /// <summary>
+        /// Gets or sets the substring start position (1-based inclusive).
+        /// </summary>
+        [ObservableProperty]
+        private int _substringStartPosition = 1;
+
+        /// <summary>
+        /// Gets or sets the substring start anchor.
+        /// </summary>
+        [ObservableProperty]
+        private StringScopeAnchor _substringStartAnchor = StringScopeAnchor.Left;
+
+        /// <summary>
+        /// Gets or sets the substring end position (1-based inclusive).
+        /// </summary>
+        [ObservableProperty]
+        private int _substringEndPosition = 5;
+
+        /// <summary>
+        /// Gets or sets the substring end anchor.
+        /// </summary>
+        [ObservableProperty]
+        private StringScopeAnchor _substringEndAnchor = StringScopeAnchor.Left;
+
+        /// <summary>
+        /// Gets or sets the token separator string.
+        /// </summary>
+        [ObservableProperty]
+        private string _tokenSeparator = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the 1-based token index.
+        /// </summary>
+        [ObservableProperty]
+        private int _tokenNumber = 1;
+
+        /// <summary>
+        /// Builds the Apply-To target from the current draft fields.
+        /// </summary>
+        /// <returns>Target instance, or <see langword="null"/> when Apply-To is unavailable.</returns>
+        public FilterTarget? BuildTarget()
+        {
+            if (!HasApplyTo || SelectedTargetOption is null)
+            {
+                return null;
+            }
+
+            return SelectedTargetOption.BuildTarget(AncestorFolderLevel);
+        }
+
+        /// <summary>
+        /// Builds the apply scope from the current draft fields.
+        /// </summary>
+        /// <returns><see langword="null"/> for whole-field scope.</returns>
+        public StringApplyScope? BuildApplyScope()
+        {
+            return ScopeMode switch
+            {
+                FilterApplyScopeMode.Whole => null,
+                FilterApplyScopeMode.Substring
+                    => new SubstringApplyScope(
+                        StartPosition: Math.Max(1, SubstringStartPosition),
+                        StartAnchor: SubstringStartAnchor,
+                        EndPosition: Math.Max(1, SubstringEndPosition),
+                        EndAnchor: SubstringEndAnchor
+                    ),
+                FilterApplyScopeMode.Token
+                    => new TokenApplyScope(
+                        Separator: TokenSeparator,
+                        TokenNumber: Math.Max(1, TokenNumber)
+                    ),
+                _ => null,
+            };
+        }
+
+        partial void OnSelectedTargetGroupChanged(FilterTargetGroupOption? value)
+        {
+            if (_isSyncingTarget)
+            {
+                return;
+            }
+
+            TargetOptions = value?.Targets ?? [];
+            SelectedTargetOption = TargetOptions.Count > 0 ? TargetOptions[0] : null;
+        }
+
+        partial void OnSelectedTargetOptionChanged(FilterTargetOption? value)
+        {
+            HasAncestorFolderLevel = value?.Kind == FilterTargetKind.AncestorFolder;
+        }
+
+        partial void OnScopeModeChanged(FilterApplyScopeMode value)
+        {
+            _UpdateScopeVisibility(value);
+            OnPropertyChanged(nameof(IsWholeScope));
+            OnPropertyChanged(nameof(IsSubstringScopeMode));
+            OnPropertyChanged(nameof(IsTokenScopeMode));
+        }
+
+        /// <summary>
+        /// Gets or sets whether whole-field scope is selected.
+        /// </summary>
+        public bool IsWholeScope
+        {
+            get => ScopeMode == FilterApplyScopeMode.Whole;
+            set
+            {
+                if (value)
+                {
+                    ScopeMode = FilterApplyScopeMode.Whole;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether substring scope is selected.
+        /// </summary>
+        public bool IsSubstringScopeMode
+        {
+            get => ScopeMode == FilterApplyScopeMode.Substring;
+            set
+            {
+                if (value)
+                {
+                    ScopeMode = FilterApplyScopeMode.Substring;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether token scope is selected.
+        /// </summary>
+        public bool IsTokenScopeMode
+        {
+            get => ScopeMode == FilterApplyScopeMode.Token;
+            set
+            {
+                if (value)
+                {
+                    ScopeMode = FilterApplyScopeMode.Token;
+                }
+            }
+        }
+
+        private void _LoadFromStringFilter(StringTargetFilter stringFilter)
+        {
+            var (group, option, ancestorLevel) = FilterTargetCatalog.Resolve(stringFilter.Target);
+            _isSyncingTarget = true;
+            try
+            {
+                SelectedTargetGroup = group;
+                TargetOptions = group.Targets;
+                SelectedTargetOption = option;
+                AncestorFolderLevel = ancestorLevel;
+                HasAncestorFolderLevel = option.Kind == FilterTargetKind.AncestorFolder;
+            }
+            finally
+            {
+                _isSyncingTarget = false;
+            }
+
+            switch (stringFilter.ApplyScope)
+            {
+                case SubstringApplyScope substring:
+                    ScopeMode = FilterApplyScopeMode.Substring;
+                    SubstringStartPosition = substring.StartPosition;
+                    SubstringStartAnchor = substring.StartAnchor;
+                    SubstringEndPosition = substring.EndPosition;
+                    SubstringEndAnchor = substring.EndAnchor;
+                    break;
+                case TokenApplyScope token:
+                    ScopeMode = FilterApplyScopeMode.Token;
+                    TokenSeparator = token.Separator;
+                    TokenNumber = token.TokenNumber;
+                    break;
+                default:
+                    ScopeMode = FilterApplyScopeMode.Whole;
+                    break;
+            }
+
+            _UpdateScopeVisibility(ScopeMode);
+            OnPropertyChanged(nameof(IsWholeScope));
+            OnPropertyChanged(nameof(IsSubstringScopeMode));
+            OnPropertyChanged(nameof(IsTokenScopeMode));
+        }
+
+        private void _UpdateScopeVisibility(FilterApplyScopeMode mode)
+        {
+            IsSubstringScope = mode == FilterApplyScopeMode.Substring;
+            IsTokenScope = mode == FilterApplyScopeMode.Token;
+        }
     }
 }

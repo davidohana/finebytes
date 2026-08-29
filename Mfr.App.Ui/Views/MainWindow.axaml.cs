@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels;
 
@@ -37,6 +38,11 @@ namespace Mfr.App.Ui.Views
                 viewModel.FileListViewModel.CaptureSession(),
                 viewModel.RenameListViewModel.CaptureSession()
             );
+        }
+
+        private async void _OnFilterOptionsMenuClick(object? sender, RoutedEventArgs e)
+        {
+            await AppliedFiltersPane.ShowFilterOptionsAsync();
         }
     }
 }

@@ -333,7 +333,11 @@
         <Separator />
         <MenuItem Header="Presets" IsEnabled="False" />
         <MenuItem Header="Save Preset" IsEnabled="False" />
-        <MenuItem Header="Filter Options" IsEnabled="False" />
+        <MenuItem
+          Header="Filter Options"
+          Click="_OnFilterOptionsMenuClick"
+          IsEnabled="{Binding AppliedFiltersViewModel.CanShowFilterOptions}"
+        />
       </MenuItem>
       <MenuItem Header="_Help">
         <MenuItem Header="About" IsEnabled="False" />
@@ -451,6 +455,7 @@
               VerticalAlignment="Stretch"
             />
             <appliedfiltersviews:AppliedFiltersView
+              x:Name="AppliedFiltersPane"
               Grid.Column="2"
               DataContext="{Binding AppliedFiltersViewModel}"
               AddFromPaletteCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AddSelectedFilterFromPaletteCommand}"

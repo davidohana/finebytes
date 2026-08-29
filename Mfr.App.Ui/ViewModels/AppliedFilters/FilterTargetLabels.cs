@@ -22,12 +22,17 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 return string.Empty;
             }
 
-            return stringFilter.Target switch
+            var label = FilterTargetCatalog.GetLabel(stringFilter.Target);
+            if (string.IsNullOrEmpty(label))
             {
-                FilePrefixTarget => "File Prefix",
-                FileExtensionTarget => "Extension",
-                FileFullNameTarget => "Full File Name",
-                _ => string.Empty,
+                return string.Empty;
+            }
+
+            return stringFilter.ApplyScope switch
+            {
+                SubstringApplyScope => $"{label} (Substring)",
+                TokenApplyScope => $"{label} (Token)",
+                _ => label,
             };
         }
     }

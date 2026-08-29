@@ -48,6 +48,7 @@ namespace Mfr.App.Ui.ViewModels
 
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
             AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
+            AppliedFiltersViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
             FilterPaletteViewModel.PropertyChanged += _OnFilterPalettePropertyChanged;
             ItemCount = RenameListViewModel.ItemCount;
             FilterCount = AppliedFiltersViewModel.Count;
@@ -230,6 +231,11 @@ namespace Mfr.App.Ui.ViewModels
             {
                 FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
             }
+        }
+
+        private void _OnFilterOptionsApplied(object? sender, EventArgs e)
+        {
+            FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
         }
 
         private void _OnFilterPalettePropertyChanged(object? sender, PropertyChangedEventArgs e)

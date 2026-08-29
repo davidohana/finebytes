@@ -15,15 +15,19 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
         private async void _OnFilterOptionsClick(object? sender, RoutedEventArgs e)
         {
-            await _ShowFilterOptionsAsync();
+            await ShowFilterOptionsAsync();
         }
 
         private async void _OnListDoubleTapped(object? sender, TappedEventArgs e)
         {
-            await _ShowFilterOptionsAsync();
+            await ShowFilterOptionsAsync();
         }
 
-        private async Task _ShowFilterOptionsAsync()
+        /// <summary>
+        /// Opens Filter Options for the single selected applied-filter row.
+        /// </summary>
+        /// <returns>A task that completes when the dialog closes.</returns>
+        public async Task ShowFilterOptionsAsync()
         {
             if (_viewModel is null || !_viewModel.CanShowFilterOptions)
             {

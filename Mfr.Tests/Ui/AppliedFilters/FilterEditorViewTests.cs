@@ -95,10 +95,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var list = _AppliedList(window);
             Assert.Equal("File Prefix", _RowApplyToLabel(list, 0));
 
-            var dialogVm = new FilterOptionsDialogViewModel(mainViewModel.AppliedFiltersViewModel.Steps[0])
-            {
-                SelectedApplyTo = FilterTargetOption.All[2],
-            };
+            var dialogVm = new FilterOptionsDialogViewModel(mainViewModel.AppliedFiltersViewModel.Steps[0]);
+            dialogVm.SelectedTargetGroup = FilterTargetCatalog.Groups[0];
+            dialogVm.SelectedTargetOption = FilterTargetCatalog.Groups[0].Targets[2];
             var dialog = new FilterOptionsDialog(dialogVm);
             dialog.Show();
             window.UpdateLayout();

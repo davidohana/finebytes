@@ -2,6 +2,7 @@ using System.Text.Json;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Space;
 using Mfr.Models.Filters;
+using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -21,7 +22,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal("Shrink Spaces", dialog.Name);
             Assert.True(dialog.HasApplyTo);
-            Assert.Equal(FilterTargetOption.All[0], dialog.SelectedApplyTo);
+            Assert.Equal(FilterTargetKind.FilePrefix, dialog.SelectedTargetOption?.Kind);
         }
 
         /// <summary>
@@ -37,7 +38,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var dialog = new FilterOptionsDialogViewModel(step);
 
             Assert.False(dialog.HasApplyTo);
-            Assert.Null(dialog.SelectedApplyTo);
+            Assert.Null(dialog.SelectedTargetOption);
         }
 
         /// <summary>
@@ -48,7 +49,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new AppliedFiltersViewModel();
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
-            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]) { SelectedApplyTo = FilterTargetOption.All[1] };
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
+            dialog.SelectedTargetGroup = FilterTargetCatalog.Groups[0];
+            dialog.SelectedTargetOption = FilterTargetCatalog.Groups[0].Targets[1];
 
             applied.ApplyFilterOptions(dialog);
 
@@ -73,6 +76,56 @@ namespace Mfr.Tests.Ui.AppliedFilters
             applied.ApplyFilterOptions(dialog);
 
             Assert.Equal("Cleaner", applied.Steps[0].DisplayName);
+        }
+
+        /// <summary>
+        /// Verifies semantic audio targets round-trip through Filter Options.
+        /// </summary>
+        [Fact]
+        public void ApplyFilterOptions_updates_semantic_audio_target()
+        {
+            var applied = new AppliedFiltersViewModel();
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
+            var audioGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Audio Tag");
+            var albumOption = audioGroup.Targets.First(option => option.AudioField == SemanticAudioField.Album);
+            dialog.SelectedTargetGroup = audioGroup;
+            dialog.SelectedTargetOption = albumOption;
+
+            applied.ApplyFilterOptions(dialog);
+
+            Assert.Equal("Album", applied.Steps[0].ApplyToLabel);
+            var filter = (ShrinkSpacesFilter)applied.ToChain().Steps[0].Filter;
+            var target = Assert.IsType<SemanticAudioFieldTarget>(filter.Target);
+            Assert.Equal(SemanticAudioField.Album, target.Field);
+        }
+
+        /// <summary>
+        /// Verifies substring apply scope round-trips through Filter Options.
+        /// </summary>
+        [Fact]
+        public void ApplyFilterOptions_updates_substring_apply_scope()
+        {
+            var applied = new AppliedFiltersViewModel();
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
+            {
+                ScopeMode = FilterApplyScopeMode.Substring,
+                SubstringStartPosition = 2,
+                SubstringStartAnchor = StringScopeAnchor.Right,
+                SubstringEndPosition = 4,
+                SubstringEndAnchor = StringScopeAnchor.Left,
+            };
+
+            applied.ApplyFilterOptions(dialog);
+
+            Assert.Equal("File Prefix (Substring)", applied.Steps[0].ApplyToLabel);
+            var filter = (ShrinkSpacesFilter)applied.ToChain().Steps[0].Filter;
+            var scope = Assert.IsType<SubstringApplyScope>(filter.ApplyScope);
+            Assert.Equal(2, scope.StartPosition);
+            Assert.Equal(StringScopeAnchor.Right, scope.StartAnchor);
+            Assert.Equal(4, scope.EndPosition);
+            Assert.Equal(StringScopeAnchor.Left, scope.EndAnchor);
         }
     }
 }
