@@ -9,11 +9,7 @@ namespace Mfr.App.Ui.Views.RenameList
 {
     public partial class RenameListFieldShuttleDialog
     {
-        private ListBox? _dragSourceList;
-        private Point? _dragStartPoint;
-        private PointerEventArgs? _dragStartArgs;
-        private IReadOnlyList<int>? _dragSelectionSnapshot;
-        private int? _dragHitIndex;
+        private readonly ListBoxDragSession _dragSession = new();
         private readonly ListBoxDropMark _dropMark = new();
 
         private void _WireDragDropHandlers()
@@ -40,81 +36,60 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnListPointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            _ClearDragState();
+            _dragSession.Clear();
 
             if (sender is not ListBox listBox || _ViewModel is null)
             {
                 return;
             }
 
-            if (!ListBoxDrag.TryCapturePress(listBox, e, out var press))
-            {
-                return;
-            }
-
-            _dragSelectionSnapshot = press.SelectionSnapshot;
-            _dragHitIndex = press.HitIndex;
-            _dragSourceList = listBox;
-            _dragStartPoint = press.StartPoint;
-            _dragStartArgs = press.StartArgs;
+            _dragSession.Capture(listBox, e);
         }
 
         private async void _OnListPointerMoved(object? sender, PointerEventArgs e)
         {
-            if (_dragStartArgs is null || _dragStartPoint is null || _dragSourceList is null || _ViewModel is null)
+            if (_ViewModel is null || _dragSession.SourceList is not ListBox sourceList)
             {
                 return;
             }
 
-            if (!e.GetCurrentPoint(_dragSourceList).Properties.IsLeftButtonPressed)
+            await _dragSession
+                .TryBeginDragAsync(sourceList, e, _BuildShuttleDrag, _dropMark.Clear)
+                .ConfigureAwait(true);
+        }
+
+        private ListBoxDragStart? _BuildShuttleDrag()
+        {
+            if (_dragSession.SourceList is not ListBox sourceList)
             {
-                _ClearDragState();
-                return;
+                return null;
             }
 
-            if (ListBoxDrag.IsBelowThreshold(_dragStartPoint.Value, e.GetPosition(_dragSourceList)))
-            {
-                return;
-            }
-
-            var payload = _BuildDragPayload(_dragSourceList);
+            var payload = _BuildDragPayload(sourceList);
             if (payload is null)
             {
-                _ClearDragState();
-                return;
+                return null;
             }
-
-            var dragArgs = _dragStartArgs;
-            _ClearDragState();
-
-            var dataTransfer = JsonDragPayload.CreateTransfer(ShuttleDragPayload.Format, payload);
 
             var effect = payload.Kind == ShuttleDragKind.AvailableField ? DragDropEffects.Copy : DragDropEffects.Move;
-            try
-            {
-                await DragDrop.DoDragDropAsync(dragArgs, dataTransfer, effect).ConfigureAwait(true);
-            }
-            finally
-            {
-                _dropMark.Clear();
-            }
+            return new ListBoxDragStart(JsonDragPayload.CreateTransfer(ShuttleDragPayload.Format, payload), effect);
         }
 
         private void _OnListPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
             // Explorer: press on a multi-selected row without dragging collapses to that row on release.
-            if (_dragSourceList is not null && _dragSelectionSnapshot is { Count: > 0 } && _dragHitIndex is int hit)
-            {
-                _RestoreListSelection(_dragSourceList, [hit], hit);
-                _SyncViewModelFromListBox(_dragSourceList);
-            }
-
-            _ClearDragState();
+            _dragSession.OnReleased(
+                (listBox, _, hit) =>
+                {
+                    _RestoreListSelection(listBox, [hit], hit);
+                    _SyncViewModelFromListBox(listBox);
+                }
+            );
         }
 
         private void _OnListPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
         {
-            _ClearDragState();
+            _dragSession.Clear();
         }
 
         private void _OnListDragOver(object? sender, DragEventArgs e)
@@ -406,15 +381,6 @@ namespace Mfr.App.Ui.Views.RenameList
                 ShuttleDragKind.SelectedSort when ReferenceEquals(targetList, SelectedSortList) => DragDropEffects.Move,
                 _ => DragDropEffects.None,
             };
-        }
-
-        private void _ClearDragState()
-        {
-            _dragSourceList = null;
-            _dragStartPoint = null;
-            _dragStartArgs = null;
-            _dragSelectionSnapshot = null;
-            _dragHitIndex = null;
         }
     }
 }

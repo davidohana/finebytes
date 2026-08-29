@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -10,8 +9,7 @@ namespace Mfr.App.Ui.Views.FilterPalette
 {
     public partial class FilterPaletteView
     {
-        private Point? _dragStartPoint;
-        private PointerEventArgs? _dragStartArgs;
+        private readonly ListBoxDragSession _dragSession = new();
 
         private void _WireDragDropHandlers()
         {
@@ -26,62 +24,48 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _OnListPointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            _ClearDragState();
+            _dragSession.Clear();
 
             if (DataContext is not FilterPaletteViewModel || sender is not ListBox listBox)
             {
                 return;
             }
 
-            if (!ListBoxDrag.TryCapturePress(listBox, e, out var press))
-            {
-                return;
-            }
-
-            _dragStartPoint = press.StartPoint;
-            _dragStartArgs = press.StartArgs;
+            _dragSession.Capture(listBox, e);
         }
 
         private async void _OnListPointerMoved(object? sender, PointerEventArgs e)
         {
-            if (_dragStartArgs is null || _dragStartPoint is null || DataContext is not FilterPaletteViewModel)
+            if (DataContext is not FilterPaletteViewModel)
             {
                 return;
             }
 
-            if (!e.GetCurrentPoint(FilterList).Properties.IsLeftButtonPressed)
-            {
-                _ClearDragState();
-                return;
-            }
+            await _dragSession.TryBeginDragAsync(FilterList, e, _BuildPaletteDrag).ConfigureAwait(true);
+        }
 
-            if (ListBoxDrag.IsBelowThreshold(_dragStartPoint.Value, e.GetPosition(FilterList)))
-            {
-                return;
-            }
-
+        private ListBoxDragStart? _BuildPaletteDrag()
+        {
             var payload = _BuildDragPayload(FilterList);
             if (payload is null)
             {
-                _ClearDragState();
-                return;
+                return null;
             }
 
-            var dragArgs = _dragStartArgs;
-            _ClearDragState();
-
-            var dataTransfer = JsonDragPayload.CreateTransfer(FilterPaletteDragPayload.Format, payload);
-            await DragDrop.DoDragDropAsync(dragArgs, dataTransfer, DragDropEffects.Copy).ConfigureAwait(true);
+            return new ListBoxDragStart(
+                JsonDragPayload.CreateTransfer(FilterPaletteDragPayload.Format, payload),
+                DragDropEffects.Copy
+            );
         }
 
         private void _OnListPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
-            _ClearDragState();
+            _dragSession.OnReleased();
         }
 
         private void _OnListPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
         {
-            _ClearDragState();
+            _dragSession.Clear();
         }
 
         private void _OnListDragOver(object? sender, DragEventArgs e)
@@ -121,12 +105,6 @@ namespace Mfr.App.Ui.Views.FilterPalette
                 .ToList();
 
             return types.Count == 0 ? null : new FilterPaletteDragPayload(types);
-        }
-
-        private void _ClearDragState()
-        {
-            _dragStartPoint = null;
-            _dragStartArgs = null;
         }
     }
 }

@@ -126,12 +126,15 @@ namespace Mfr.App.Ui.Views.RenameList
         /// </summary>
         private bool _TryKeepMultiSelectionForDrag(ListBox listBox)
         {
-            if (!ReferenceEquals(listBox, _dragSourceList) || _dragSelectionSnapshot is not { Count: > 0 } snapshot)
+            if (
+                !ReferenceEquals(listBox, _dragSession.SourceList)
+                || _dragSession.SelectionSnapshot is not { Count: > 0 } snapshot
+            )
             {
                 return false;
             }
 
-            var anchor = _dragHitIndex is int hit && snapshot.Contains(hit) ? hit : snapshot[^1];
+            var anchor = _dragSession.HitIndex is int hit && snapshot.Contains(hit) ? hit : snapshot[^1];
             _RestoreListSelection(listBox, snapshot, anchor);
             return true;
         }

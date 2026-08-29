@@ -9,10 +9,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 {
     public partial class AppliedFiltersView
     {
-        private Point? _dragStartPoint;
-        private PointerEventArgs? _dragStartArgs;
-        private IReadOnlyList<int>? _dragSelectionSnapshot;
-        private int? _dragHitIndex;
+        private readonly ListBoxDragSession _dragSession = new();
         private readonly ListBoxDropMark _dropMark = new();
 
         private void _WireDragDropHandlers()
@@ -29,79 +26,57 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
         private void _OnListPointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            _ClearDragState();
+            _dragSession.Clear();
 
             if (_viewModel is null || sender is not ListBox listBox)
             {
                 return;
             }
 
-            if (!ListBoxDrag.TryCapturePress(listBox, e, out var press))
-            {
-                return;
-            }
-
-            _dragSelectionSnapshot = press.SelectionSnapshot;
-            _dragHitIndex = press.HitIndex;
-            _dragStartPoint = press.StartPoint;
-            _dragStartArgs = press.StartArgs;
+            _dragSession.Capture(listBox, e);
         }
 
         private async void _OnListPointerMoved(object? sender, PointerEventArgs e)
         {
-            if (_dragStartArgs is null || _dragStartPoint is null || _viewModel is null)
+            if (_viewModel is null)
             {
                 return;
             }
 
-            if (!e.GetCurrentPoint(AppliedFiltersList).Properties.IsLeftButtonPressed)
-            {
-                _ClearDragState();
-                return;
-            }
+            await _dragSession
+                .TryBeginDragAsync(AppliedFiltersList, e, _BuildAppliedFilterDrag, _dropMark.Clear)
+                .ConfigureAwait(true);
+        }
 
-            if (ListBoxDrag.IsBelowThreshold(_dragStartPoint.Value, e.GetPosition(AppliedFiltersList)))
-            {
-                return;
-            }
-
+        private ListBoxDragStart? _BuildAppliedFilterDrag()
+        {
             var indices = ListBoxDrag.ReadSelectedIndices(AppliedFiltersList);
             if (indices.Count == 0)
             {
-                _ClearDragState();
-                return;
+                return null;
             }
 
             var payload = new AppliedFilterDragPayload(indices);
-            var dragArgs = _dragStartArgs;
-            _ClearDragState();
-
-            var dataTransfer = JsonDragPayload.CreateTransfer(AppliedFilterDragPayload.Format, payload);
-
-            try
-            {
-                await DragDrop.DoDragDropAsync(dragArgs, dataTransfer, DragDropEffects.Move).ConfigureAwait(true);
-            }
-            finally
-            {
-                _dropMark.Clear();
-            }
+            return new ListBoxDragStart(
+                JsonDragPayload.CreateTransfer(AppliedFilterDragPayload.Format, payload),
+                DragDropEffects.Move
+            );
         }
 
         private void _OnListPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
-            if (_dragSelectionSnapshot is { Count: > 0 } && _dragHitIndex is int hit)
-            {
-                _RestoreListSelection(AppliedFiltersList, _dragSelectionSnapshot, hit);
-                _viewModel?.SetSelectedSteps(_ReadSelectedSteps(AppliedFiltersList));
-            }
-
-            _ClearDragState();
+            _dragSession.OnReleased(
+                (listBox, snapshot, hit) =>
+                {
+                    _RestoreListSelection(listBox, snapshot, hit);
+                    _viewModel?.SetSelectedSteps(_ReadSelectedSteps(listBox));
+                }
+            );
         }
 
         private void _OnListPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
         {
-            _ClearDragState();
+            _dragSession.Clear();
         }
 
         private void _OnListDragOver(object? sender, DragEventArgs e)
@@ -191,14 +166,6 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             }
 
             return resolved;
-        }
-
-        private void _ClearDragState()
-        {
-            _dragStartPoint = null;
-            _dragStartArgs = null;
-            _dragSelectionSnapshot = null;
-            _dragHitIndex = null;
         }
     }
 }

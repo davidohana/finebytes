@@ -64,12 +64,12 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
         private bool _TryKeepMultiSelectionForDrag()
         {
-            if (_dragSelectionSnapshot is not { Count: > 0 } snapshot)
+            if (_dragSession.SelectionSnapshot is not { Count: > 0 } snapshot)
             {
                 return false;
             }
 
-            var anchor = _dragHitIndex is int hit && snapshot.Contains(hit) ? hit : snapshot[^1];
+            var anchor = _dragSession.HitIndex is int hit && snapshot.Contains(hit) ? hit : snapshot[^1];
             _RestoreListSelection(AppliedFiltersList, snapshot, anchor);
             return true;
         }
