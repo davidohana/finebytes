@@ -1,7 +1,10 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.AppliedFilters;
 
@@ -22,7 +25,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.False(mainViewModel.FilterEditorViewModel.HasSelectedStep);
             Assert.Equal(string.Empty, _TitleText(editorView));
-            Assert.False(_TitleBlock(editorView)!.IsVisible);
 
             window.Close();
         }
@@ -70,7 +72,33 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal("Applied Filter: Audio Tag Remover", mainViewModel.FilterEditorViewModel.TitleText);
             Assert.Equal("Applied Filter: Audio Tag Remover", _TitleText(editorView));
-            Assert.True(_TitleBlock(editorView)!.IsVisible);
+            Assert.False(mainViewModel.FilterEditorViewModel.HasApplyTo);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies changing the Apply-To combo updates the Applied list subtitle.
+        /// </summary>
+        [AvaloniaFact]
+        public void Apply_to_combo_updates_applied_list_subtitle()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var list = _AppliedList(window);
+            Assert.Equal("File Prefix", _RowApplyToLabel(list, 0));
+
+            var combo = _ApplyToCombo(editorView);
+            Assert.NotNull(combo);
+            combo.SelectedItem = FilterApplyToOption.All[2];
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("Full File Name", mainViewModel.AppliedFiltersViewModel.Steps[0].ApplyToLabel);
+            Assert.Equal("Full File Name", _RowApplyToLabel(list, 0));
 
             window.Close();
         }
@@ -125,6 +153,23 @@ namespace Mfr.Tests.Ui.AppliedFilters
         private static TextBlock? _TitleBlock(FilterEditorView editorView)
         {
             return editorView.FindControl<TextBlock>("AppliedFilterTitle");
+        }
+
+        private static ComboBox _ApplyToCombo(FilterEditorView editorView)
+        {
+            var combo = editorView.FindControl<ComboBox>("ApplyToCombo");
+            Assert.NotNull(combo);
+            return combo;
+        }
+
+        private static string _RowApplyToLabel(ListBox list, int rowIndex)
+        {
+            var container = list.ContainerFromIndex(rowIndex) as Visual;
+            Assert.NotNull(container);
+
+            var textBlocks = container.GetVisualDescendants().OfType<TextBlock>().ToList();
+            Assert.True(textBlocks.Count > 1);
+            return textBlocks[1].Text ?? string.Empty;
         }
     }
 }

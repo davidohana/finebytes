@@ -4,6 +4,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels"
+  xmlns:appliedVm="using:Mfr.App.Ui.ViewModels.AppliedFilters"
   mc:Ignorable="d"
   d:DesignWidth="480"
   d:DesignHeight="160"
@@ -13,12 +14,26 @@
   <Border Classes="pane">
     <DockPanel>
       <TextBlock DockPanel.Dock="Top" Classes="pane-header" Text="Filter Configuration" />
-      <TextBlock
-        x:Name="AppliedFilterTitle"
-        Margin="8,0,8,8"
-        IsVisible="{Binding HasSelectedStep}"
-        Text="{Binding TitleText}"
-      />
+      <StackPanel Margin="8,0,8,8" IsVisible="{Binding HasSelectedStep}" Spacing="8">
+        <TextBlock x:Name="AppliedFilterTitle" Text="{Binding TitleText}" />
+        <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding HasApplyTo}">
+          <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Apply To:" />
+          <ComboBox
+            x:Name="ApplyToCombo"
+            Grid.Column="1"
+            MinWidth="160"
+            HorizontalAlignment="Left"
+            ItemsSource="{Binding ApplyToOptions}"
+            SelectedItem="{Binding SelectedApplyTo}"
+          >
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="appliedVm:FilterApplyToOption">
+                <TextBlock Text="{Binding Label}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </Grid>
+      </StackPanel>
     </DockPanel>
   </Border>
 </UserControl>
