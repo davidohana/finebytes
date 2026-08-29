@@ -5,7 +5,7 @@ description: >-
   APIs, layering, leftover flags, fragile heuristics, dedup/reuse (local and
   cross-file), and test coverage; applies high-confidence cleanup and adds
   worthwhile tests; surfaces deeper refactor/dedup options clearly even when not
-  auto-applied. Use when the user asks for a code review, deep review,
+  auto-applied; may delegate to explore/bugbot/security-review when triggers match. Use when the user asks for a code review, deep review,
   KISS/YAGNI pass, simplify/minimize/cleanup/dedup, to review a plan phase or
   prior transcript, or says auto-correct things you are sure about.
 ---
@@ -67,7 +67,37 @@ Do not treat “deeper refactor” as optional silence — if duplication exists
 If leftover work is real after a named plan phase, list it in the report. Write a follow-up
 doc only when the user asks to handover, or when that phase already has one.
 
-Do not launch Bugbot / security-review subagents unless the user asked for those.
+## Optional subagents
+
+**Default: one reviewer, one synthesized report.** Most reviews stay in-process — correctness,
+KISS, dedup, layering, naming, and tests overlap and the parent often applies fixes in the
+same pass.
+
+Delegate only for **discovery** or **specialized audits**. Subagent output is input; the parent
+merges, dedupes, prioritizes, and writes the final report. Subagents do **not** apply fixes.
+
+| Subagent | Launch when | Skip when |
+|----------|-------------|-----------|
+| **`explore`** | Hunting **cross-file dedup/reuse** — parallel views, payloads, DnD handlers, label maps, twin resolvers; scope is path/type and copies may live outside the diff | Diff is small, self-contained, or parallel sites are already obvious from open files |
+| **`bugbot`** | User asked; or diff is **large/risky** (rename engine, batch apply, cancel/progress, persistence, concurrency) | Typical UI/VM refactors; small feature-area reviews — overlaps the Correctness lens |
+| **`security-review`** | Diff touches **security-sensitive** surfaces: path traversal, deserializing untrusted input, shell/process spawn, network | Routine desktop UI, filters, session layout, internal models |
+
+**Do not** spin up a subagent per report section (Correctness agent, Dedup agent, etc.) — weak
+synthesis, heavy overlap.
+
+**`explore` prompt shape** — name the pattern, not just the changed file:
+
+```text
+Find parallel implementations of <pattern> across the repo (e.g. drag payloads, palette→list
+drop, FilterTargetLabels-style maps). Return: file paths, what each does, and which pairs look
+mergeable into one owner.
+```
+
+**`bugbot` / `security-review`** — follow `.cursor/skills-cursor/review-bugbot/SKILL.md` and
+`review-security/SKILL.md` prompt shapes; default `Diff: branch changes`.
+
+Fold subagent findings into **Dedup / reuse**, **Correctness**, or **Deeper refactors**;
+note in the verdict when a subagent was used.
 
 ## Review lenses
 

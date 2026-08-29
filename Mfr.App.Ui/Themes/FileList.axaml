@@ -3,9 +3,9 @@
     <ResourceDictionary x:Key="Light">
       <SolidColorBrush x:Key="FileListRowBrush" Color="#FFFFFF" />
       <SolidColorBrush x:Key="FileListAltRowBrush" Color="#F6F6F6" />
-      <SolidColorBrush x:Key="FileListSelectionBrush" Color="#CCE8FF" />
-      <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#99D1FF" />
-      <SolidColorBrush x:Key="FileListHoverBrush" Color="#E5F3FF" />
+      <SolidColorBrush x:Key="FileListSelectionBrush" Color="#B8DCFF" />
+      <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#7ABFFF" />
+      <SolidColorBrush x:Key="FileListHoverBrush" Color="#E8E8E8" />
       <SolidColorBrush x:Key="FileListHeaderBrush" Color="#F5F5F5" />
       <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#1A1A1A" />
       <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#E0E0E0" />
@@ -28,7 +28,7 @@
       <SolidColorBrush x:Key="FileListAltRowBrush" Color="#2A2A2A" />
       <SolidColorBrush x:Key="FileListSelectionBrush" Color="#264F78" />
       <SolidColorBrush x:Key="FileListSelectionBorderBrush" Color="#3A6A9A" />
-      <SolidColorBrush x:Key="FileListHoverBrush" Color="#2A3F55" />
+      <SolidColorBrush x:Key="FileListHoverBrush" Color="#3A3A3A" />
       <SolidColorBrush x:Key="FileListHeaderBrush" Color="#2B2B2B" />
       <SolidColorBrush x:Key="FileListHeaderForegroundBrush" Color="#F0F0F0" />
       <SolidColorBrush x:Key="FileListSeparatorBrush" Color="#3F3F3F" />
