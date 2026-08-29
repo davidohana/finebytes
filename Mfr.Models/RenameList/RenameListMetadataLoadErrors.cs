@@ -51,10 +51,7 @@ namespace Mfr.Models.RenameList
                 return false;
             }
 
-            if (
-                requirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags)
-                || requirement.HasFlag(RenameListMetadataRequirement.MediaProperties)
-            )
+            if (requirement.HasFlag(RenameListMetadataRequirement.TagLib))
             {
                 error = item.TagLibMetadataLoadError;
                 if (error is not null)
@@ -112,11 +109,7 @@ namespace Mfr.Models.RenameList
             {
                 errors.Add(
                     new RenameListLoadError(
-                        DescribeUserMessage(
-                            tagLibError,
-                            RenameListMetadataRequirement.EmbeddedAudioTags
-                                | RenameListMetadataRequirement.MediaProperties
-                        ),
+                        DescribeUserMessage(tagLibError, RenameListMetadataRequirement.TagLib),
                         tagLibError.Message
                     )
                 );
@@ -150,10 +143,7 @@ namespace Mfr.Models.RenameList
                 return "The file is missing or could not be opened.";
             }
 
-            if (
-                requirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags)
-                || requirement.HasFlag(RenameListMetadataRequirement.MediaProperties)
-            )
+            if (requirement.HasFlag(RenameListMetadataRequirement.TagLib))
             {
                 return "This file could not be read as audio or media metadata.";
             }

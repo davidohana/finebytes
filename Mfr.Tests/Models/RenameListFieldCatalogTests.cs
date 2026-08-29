@@ -334,7 +334,7 @@ namespace Mfr.Tests.Models
 
             Assert.False(RenameListFieldCatalog.GetField(AudioTagRenameListFields.Group, "Title").SupportsPreview);
             Assert.Equal(
-                RenameListMetadataRequirement.EmbeddedAudioTags,
+                RenameListMetadataRequirement.TagLib,
                 RenameListFieldCatalog.GetMetadataRequirement(
                     RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title")
                 )
@@ -471,13 +471,13 @@ namespace Mfr.Tests.Models
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*41989", "75 mm");
 
             Assert.Equal(
-                RenameListMetadataRequirement.MediaProperties,
+                RenameListMetadataRequirement.TagLib,
                 RenameListFieldCatalog.GetMetadataRequirement(
                     RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType")
                 )
             );
             Assert.Equal(
-                RenameListMetadataRequirement.MediaProperties,
+                RenameListMetadataRequirement.TagLib,
                 RenameListFieldCatalog.GetMetadataRequirement(
                     RenameListFieldKey.Original(MpegRenameListFields.Group, "Bitrate")
                 )

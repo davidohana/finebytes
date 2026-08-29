@@ -16,7 +16,7 @@ namespace Mfr.Models.RenameList.Fields.Media
             propertyKey,
             displayName,
             defaultWidth,
-            RenameListMetadataRequirement.MediaProperties
+            RenameListMetadataRequirement.TagLib
         );
 
     /// <summary>

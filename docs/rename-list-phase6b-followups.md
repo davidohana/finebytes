@@ -36,9 +36,8 @@ true and the media requirement is satisfied (media key need not be requested).
 `RenameListMetadataLoadErrorsTests.ImageProperties_flag_does_not_include_audio_or_media`
 (asserts enum bit values only).
 
-**Out of scope:** image catch (no TagLib sibling). Keep
-`RenameListMetadataRequirement.EmbeddedAudioTags` vs `MediaProperties` (column needs, not load
-attempted).
+**Out of scope:** image catch (no TagLib sibling). Audio, media, and MPEG columns share
+`RenameListMetadataRequirement.TagLib`; image/EXIF stays `ImageProperties`.
 
 ## 6d — Structured gray (no display-text sentinel)
 

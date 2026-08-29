@@ -38,7 +38,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(item.TagLibLoadAttempted);
             Assert.NotNull(item.TagLibMetadataLoadError);
             Assert.True(
-                RenameListMetadataLoader.IsRequirementSatisfied(item, RenameListMetadataRequirement.MediaProperties)
+                RenameListMetadataLoader.IsRequirementSatisfied(item, RenameListMetadataRequirement.TagLib)
             );
         }
 
@@ -163,7 +163,7 @@ namespace Mfr.Tests.Models.Filters
         public void IsRequirementSatisfied_false_until_load_attempted()
         {
             var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
-            var requirement = RenameListMetadataRequirement.EmbeddedAudioTags;
+            var requirement = RenameListMetadataRequirement.TagLib;
 
             Assert.False(RenameListMetadataLoader.IsRequirementSatisfied(item, requirement));
 
@@ -177,7 +177,7 @@ namespace Mfr.Tests.Models.Filters
         {
             var item = FilterTestHelpers.CreateRenameItem();
             item.MarkTagLibLoadAttempted();
-            var requirement = RenameListMetadataRequirement.EmbeddedAudioTags;
+            var requirement = RenameListMetadataRequirement.TagLib;
 
             Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
         }
@@ -187,7 +187,7 @@ namespace Mfr.Tests.Models.Filters
         {
             var item = _UnmarkedFixtureItem("tiny-exif.jpeg");
             var requirement =
-                RenameListMetadataRequirement.EmbeddedAudioTags | RenameListMetadataRequirement.ImageProperties;
+                RenameListMetadataRequirement.TagLib | RenameListMetadataRequirement.ImageProperties;
 
             Assert.True(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
             RenameListMetadataLoader.TryEnsureLoaded(item, requirement);

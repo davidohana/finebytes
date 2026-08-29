@@ -1307,7 +1307,7 @@ namespace Mfr.Tests.Engine
             var item = Assert.Single(renameList.RenameItems);
             Assert.False(item.TagLibLoadAttempted);
 
-            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.EmbeddedAudioTags);
+            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.TagLib);
 
             Assert.True(item.TagLibLoadAttempted);
             Assert.Equal("HydrateTitle", item.Original.AudioTagOverlay.Semantic().Title);
@@ -1344,7 +1344,7 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([betaPath, alphaPath]);
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
-            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.EmbeddedAudioTags);
+            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.TagLib);
 
             Assert.True(renameList.Sort([new RenameListSortKey(titleKey)]));
             Assert.Equal(alphaPath, renameList.RenameItems[0].Original.FullPath);
@@ -1364,7 +1364,7 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources(
                 [path],
-                metadataRequirement: RenameListMetadataRequirement.EmbeddedAudioTags,
+                metadataRequirement: RenameListMetadataRequirement.TagLib,
                 progress: new SynchronousProgress<RenameListAddProgress>(reports.Add)
             );
 
@@ -1390,7 +1390,7 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources(
                 [path],
-                metadataRequirement: RenameListMetadataRequirement.EmbeddedAudioTags,
+                metadataRequirement: RenameListMetadataRequirement.TagLib,
                 cancellationToken: cts.Token,
                 progress: new SynchronousProgress<RenameListAddProgress>(report =>
                 {
@@ -1434,7 +1434,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(path, title: "BatchTitle", album: null);
 
             var renameList = new RenameList(includeHidden: true);
-            renameList.AddSources([path], metadataRequirement: RenameListMetadataRequirement.EmbeddedAudioTags);
+            renameList.AddSources([path], metadataRequirement: RenameListMetadataRequirement.TagLib);
 
             var item = Assert.Single(renameList.RenameItems);
             Assert.True(item.TagLibLoadAttempted);
@@ -1455,7 +1455,7 @@ namespace Mfr.Tests.Engine
 
             using var cts = new CancellationTokenSource();
             cts.Cancel();
-            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.EmbeddedAudioTags, cts.Token);
+            renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.TagLib, cts.Token);
 
             Assert.False(Assert.Single(renameList.RenameItems).TagLibLoadAttempted);
         }

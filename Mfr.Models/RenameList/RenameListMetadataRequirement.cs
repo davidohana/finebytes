@@ -12,18 +12,13 @@ namespace Mfr.Models.RenameList
         None = 0,
 
         /// <summary>
-        /// Field reads embedded audio tags from disk via TagLib.
+        /// Field reads TagLib embedded tags and/or media properties from disk.
         /// </summary>
-        EmbeddedAudioTags = 1,
-
-        /// <summary>
-        /// Field reads TagLib media and MPEG stream properties from disk.
-        /// </summary>
-        MediaProperties = 2,
+        TagLib = 1,
 
         /// <summary>
         /// Field reads MetadataExtractor image properties and/or EXIF from disk.
         /// </summary>
-        ImageProperties = 4,
+        ImageProperties = 2,
     }
 }

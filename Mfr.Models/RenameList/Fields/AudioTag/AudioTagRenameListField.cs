@@ -16,7 +16,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
             propertyKey,
             displayName,
             defaultWidth,
-            RenameListMetadataRequirement.EmbeddedAudioTags
+            RenameListMetadataRequirement.TagLib
         );
 
     /// <summary>

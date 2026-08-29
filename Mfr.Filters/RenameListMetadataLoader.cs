@@ -22,7 +22,7 @@ namespace Mfr.Filters
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (_NeedsTagLib(metadataRequirement))
+            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.TagLib))
             {
                 _TryEnsureTagLibLoaded(item);
             }
@@ -54,7 +54,7 @@ namespace Mfr.Filters
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (_NeedsTagLib(requirement) && !item.TagLibLoadAttempted)
+            if (requirement.HasFlag(RenameListMetadataRequirement.TagLib) && !item.TagLibLoadAttempted)
             {
                 return false;
             }
@@ -85,12 +85,6 @@ namespace Mfr.Filters
             }
 
             return items.Any(item => !IsRequirementSatisfied(item, requirement));
-        }
-
-        private static bool _NeedsTagLib(RenameListMetadataRequirement requirement)
-        {
-            return requirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags)
-                || requirement.HasFlag(RenameListMetadataRequirement.MediaProperties);
         }
 
         private static void _TryEnsureTagLibLoaded(RenameItem item)
