@@ -375,27 +375,7 @@ namespace Mfr.Engine.RenameList
             }
 
             var selected = items.ToHashSet();
-            if (selected.Count == 0 || _renameItems.Count == 0)
-            {
-                return false;
-            }
-
-            var moved = false;
-            var walkStep = -offset;
-            var startIndex = walkStep > 0 ? 0 : _renameItems.Count - 1;
-            for (var i = startIndex; i >= 0 && i < _renameItems.Count; i += walkStep)
-            {
-                if (!_CanSwapTowardNeighbor(selected, i, offset))
-                {
-                    continue;
-                }
-
-                var neighborIndex = i + offset;
-                (_renameItems[i], _renameItems[neighborIndex]) = (_renameItems[neighborIndex], _renameItems[i]);
-                moved = true;
-            }
-
-            if (!moved)
+            if (!ListReorder.TryMoveSelectedTowardNeighbor(_renameItems, selected, offset))
             {
                 return false;
             }
@@ -556,25 +536,6 @@ namespace Mfr.Engine.RenameList
 
             // MFR7 RenameItemComparer: equal keys keep add order so a second Sort does not reshuffle ties.
             return left.Original.RenameListIndex.CompareTo(right.Original.RenameListIndex);
-        }
-
-        /// <summary>
-        /// Whether the item at <paramref name="index"/> is selected and can swap with the neighbor.
-        /// </summary>
-        private bool _CanSwapTowardNeighbor(HashSet<RenameItem> selected, int index, int offset)
-        {
-            if (!selected.Contains(_renameItems[index]))
-            {
-                return false;
-            }
-
-            var neighborIndex = index + offset;
-            if (neighborIndex < 0 || neighborIndex >= _renameItems.Count)
-            {
-                return false;
-            }
-
-            return !selected.Contains(_renameItems[neighborIndex]);
         }
 
         /// <summary>

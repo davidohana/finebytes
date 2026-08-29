@@ -1,3 +1,5 @@
+using Mfr.Utils;
+
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
@@ -115,21 +117,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            var selectedKeys = _KeysAt(sourceIndices);
-            if (selectedKeys.Count == 0)
-            {
-                return false;
-            }
-
-            for (var index = 0; index < _items.Count; index++)
-            {
-                if (_CanSwapTowardNeighbor(selectedKeys, index, offset))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            var selectedItems = _ItemsAt(sourceIndices);
+            return ListReorder.CanMoveSelectedTowardNeighbor(_items, selectedItems, offset);
         }
 
         /// <summary>
@@ -307,34 +296,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            var selectedKeys = _KeysAt(sourceIndices);
+            var selectedItems = _ItemsAt(sourceIndices);
             var hasAnchor = _selectedIndex >= 0 && _selectedIndex < _items.Count;
             var trackedAnchor = hasAnchor ? _keyOf(_items[_selectedIndex]) : default;
 
-            var moved = false;
-            var walkStep = -offset;
-            var startIndex = walkStep > 0 ? 0 : _items.Count - 1;
-            for (var index = startIndex; index >= 0 && index < _items.Count; index += walkStep)
-            {
-                if (!_CanSwapTowardNeighbor(selectedKeys, index, offset))
-                {
-                    continue;
-                }
-
-                var neighborIndex = index + offset;
-                (_items[index], _items[neighborIndex]) = (_items[neighborIndex], _items[index]);
-                moved = true;
-            }
-
-            if (!moved)
+            if (!ListReorder.TryMoveSelectedTowardNeighbor(_items, selectedItems, offset))
             {
                 return false;
             }
 
-            newIndices =
-            [
-                .. Enumerable.Range(0, _items.Count).Where(index => selectedKeys.Contains(_keyOf(_items[index]))),
-            ];
+            newIndices = [.. Enumerable.Range(0, _items.Count).Where(index => selectedItems.Contains(_items[index]))];
             var newAnchor = hasAnchor
                 ? _items.FindIndex(item => EqualityComparer<TKey>.Default.Equals(_keyOf(item), trackedAnchor))
                 : -1;
@@ -449,40 +420,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Keys of items at valid indices in <paramref name="indices"/>.
+        /// Items at valid indices in <paramref name="indices"/>.
         /// </summary>
         /// <param name="indices">Candidate item indices.</param>
-        /// <returns>Unique keys for in-range indices.</returns>
-        private HashSet<TKey> _KeysAt(IReadOnlyList<int> indices)
+        /// <returns>Unique items for in-range indices.</returns>
+        private HashSet<TItem> _ItemsAt(IReadOnlyList<int> indices)
         {
-            return
-            [
-                .. indices.Where(index => index >= 0 && index < _items.Count).Select(index => _keyOf(_items[index])),
-            ];
-        }
-
-        /// <summary>
-        /// Gets whether the item at <paramref name="index"/> is selected and can swap with the neighbor toward
-        /// <paramref name="offset"/>.
-        /// </summary>
-        /// <param name="selectedKeys">Keys of the items being moved.</param>
-        /// <param name="index">Candidate item index.</param>
-        /// <param name="offset">Direction to move (-1 up, +1 down).</param>
-        /// <returns><see langword="true"/> when this item should swap with its neighbor.</returns>
-        private bool _CanSwapTowardNeighbor(HashSet<TKey> selectedKeys, int index, int offset)
-        {
-            if (!selectedKeys.Contains(_keyOf(_items[index])))
-            {
-                return false;
-            }
-
-            var neighborIndex = index + offset;
-            if (neighborIndex < 0 || neighborIndex >= _items.Count)
-            {
-                return false;
-            }
-
-            return !selectedKeys.Contains(_keyOf(_items[neighborIndex]));
+            return [.. indices.Where(index => index >= 0 && index < _items.Count).Select(index => _items[index])];
         }
 
         private IReadOnlyList<int> _NormalizeIndices(IReadOnlyList<int> indices)
