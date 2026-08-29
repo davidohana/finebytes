@@ -105,12 +105,6 @@
     <Style Selector="DataGrid.rename-list.fixed-width-font">
       <Setter Property="FontFamily" Value="{StaticResource RenameListFixedWidthFont}" />
     </Style>
-    <Style Selector="DataGrid.rename-list /template/ ScrollBar#PART_VerticalScrollbar">
-      <Setter Property="AllowAutoHide" Value="False" />
-    </Style>
-    <Style Selector="DataGrid.rename-list /template/ ScrollBar#PART_HorizontalScrollbar">
-      <Setter Property="AllowAutoHide" Value="False" />
-    </Style>
     <Style Selector="DataGrid.rename-list DataGridColumnHeader">
       <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
       <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />

@@ -56,7 +56,6 @@
       <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
       <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
       <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
       <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
       <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     </Style>
