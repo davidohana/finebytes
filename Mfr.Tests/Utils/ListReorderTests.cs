@@ -76,5 +76,18 @@ namespace Mfr.Tests.Utils
             Assert.True(ListReorder.TryMoveSelectedTowardNeighbor(items, selected, offset: -1));
             Assert.Equal(["a", "c", "b"], items);
         }
+
+        /// <summary>
+        /// Verifies block move to a target insert index.
+        /// </summary>
+        [Fact]
+        public void TryMoveIndicesTo_reorders_block_to_target()
+        {
+            var items = new List<string> { "a", "b", "c", "d" };
+
+            Assert.True(ListReorder.TryMoveIndicesTo(items, [1, 2], targetIndex: 4, out var newIndices));
+            Assert.Equal(["a", "d", "b", "c"], items);
+            Assert.Equal([2, 3], newIndices);
+        }
     }
 }

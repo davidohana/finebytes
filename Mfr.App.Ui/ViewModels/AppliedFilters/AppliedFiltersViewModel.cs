@@ -252,6 +252,24 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 && ListReorder.CanMoveSelectedTowardNeighbor(Steps, _selectedSteps.ToHashSet(), offset: 1);
         }
 
+        /// <summary>
+        /// Moves selected steps to <paramref name="targetIndex"/> (drag-drop insert index).
+        /// </summary>
+        /// <param name="sourceIndices">Indices of rows to move.</param>
+        /// <param name="targetIndex">Destination index in <c>[0, Count]</c> before the move.</param>
+        public void MoveStepsTo(IReadOnlyList<int> sourceIndices, int targetIndex)
+        {
+            ArgumentNullException.ThrowIfNull(sourceIndices);
+
+            if (!ListReorder.TryMoveIndicesTo(Steps, sourceIndices, targetIndex, out var newIndices))
+            {
+                return;
+            }
+
+            var moved = newIndices.Select(index => Steps[index]).ToList();
+            SetSelectedSteps(moved);
+        }
+
         private void _NotifySelectionCommandsChanged()
         {
             RemoveSelectedCommand.NotifyCanExecuteChanged();

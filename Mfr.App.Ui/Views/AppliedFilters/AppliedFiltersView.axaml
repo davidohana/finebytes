@@ -84,6 +84,15 @@
       <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
       <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
     </Style>
+    <Style Selector="ListBox.applied-filters ListBoxItem.drop-mark">
+      <Setter Property="Background" Value="{DynamicResource RenameListDropIndicatorBrush}" />
+    </Style>
+    <Style Selector="ListBox.applied-filters ListBoxItem.drop-mark:selected">
+      <Setter Property="Background" Value="{DynamicResource RenameListDropIndicatorBrush}" />
+    </Style>
+    <Style Selector="ListBox.applied-filters ListBoxItem.drop-mark:pointerover">
+      <Setter Property="Background" Value="{DynamicResource RenameListDropIndicatorBrush}" />
+    </Style>
     <Style Selector="TextBlock.applied-filter-apply-to">
       <Setter Property="FontSize" Value="11" />
       <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />

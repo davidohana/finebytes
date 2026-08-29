@@ -81,6 +81,62 @@ namespace Mfr.Utils
         }
 
         /// <summary>
+        /// Moves items at <paramref name="sourceIndices"/> to <paramref name="targetIndex"/>, preserving their order.
+        /// </summary>
+        /// <typeparam name="T">List element type.</typeparam>
+        /// <param name="items">Ordered list to mutate in place.</param>
+        /// <param name="sourceIndices">Indices of items to move.</param>
+        /// <param name="targetIndex">Destination index in the list before the move.</param>
+        /// <param name="newIndices">Indices of the moved items after a successful move.</param>
+        /// <returns><see langword="false"/> when the move is not allowed or is a no-op.</returns>
+        public static bool TryMoveIndicesTo<T>(
+            IList<T> items,
+            IReadOnlyList<int> sourceIndices,
+            int targetIndex,
+            out IReadOnlyList<int> newIndices
+        )
+        {
+            ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(sourceIndices);
+
+            newIndices = [];
+            var sortedSources = sourceIndices.Distinct().OrderBy(index => index).ToList();
+            if (sortedSources.Count == 0)
+            {
+                return false;
+            }
+
+            if (sortedSources.Any(index => index < 0 || index >= items.Count))
+            {
+                return false;
+            }
+
+            var before = items.ToList();
+            targetIndex = Math.Clamp(targetIndex, 0, items.Count);
+            var movingItems = sortedSources.Select(index => items[index]).ToList();
+
+            foreach (var index in sortedSources.OrderByDescending(index => index))
+            {
+                items.RemoveAt(index);
+            }
+
+            var insertIndex = targetIndex - sortedSources.Count(index => index < targetIndex);
+            insertIndex = Math.Clamp(insertIndex, 0, items.Count);
+            for (var offset = 0; offset < movingItems.Count; offset++)
+            {
+                items.Insert(insertIndex + offset, movingItems[offset]);
+            }
+
+            if (before.SequenceEqual(items))
+            {
+                return false;
+            }
+
+            newIndices = [.. Enumerable.Range(insertIndex, movingItems.Count)];
+            return true;
+        }
+
+        /// <summary>
         /// Whether the item at <paramref name="index"/> is selected and can swap with the neighbor toward
         /// <paramref name="offset"/>.
         /// </summary>

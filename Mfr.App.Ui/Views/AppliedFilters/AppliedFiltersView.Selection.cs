@@ -54,7 +54,24 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
+            if (_TryKeepMultiSelectionForDrag())
+            {
+                return;
+            }
+
             _viewModel.SetSelectedSteps(_ReadSelectedSteps(AppliedFiltersList));
+        }
+
+        private bool _TryKeepMultiSelectionForDrag()
+        {
+            if (_dragSelectionSnapshot is not { Count: > 0 } snapshot)
+            {
+                return false;
+            }
+
+            var anchor = _dragHitIndex is int hit && snapshot.Contains(hit) ? hit : snapshot[^1];
+            _RestoreListSelection(AppliedFiltersList, snapshot, anchor);
+            return true;
         }
 
         private void _RestoreSelectionFromViewModel()

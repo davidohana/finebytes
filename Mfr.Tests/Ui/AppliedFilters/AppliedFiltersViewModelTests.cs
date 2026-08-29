@@ -181,6 +181,29 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
         }
 
+        /// <summary>
+        /// Verifies drag-drop insert moves selected steps and keeps them selected.
+        /// </summary>
+        [Fact]
+        public void MoveStepsTo_reorders_selected_block()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(_Entry("LettersCase"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(_Entry("TagRemover"));
+            viewModel.SetSelectedSteps([viewModel.Steps[1]]);
+
+            viewModel.MoveStepsTo([1], targetIndex: 0);
+
+            Assert.Equal(
+                ["Letters Case", "Shrink Spaces", "Audio Tag Remover"],
+                viewModel.Steps.Select(step => step.DisplayName)
+            );
+            Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
+        }
+
         private static FilterCatalogEntry _Entry(string type)
         {
             return FilterCatalog.Entries.Single(entry => entry.Type == type);
