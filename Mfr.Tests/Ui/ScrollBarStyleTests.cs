@@ -44,7 +44,7 @@ namespace Mfr.Tests.Ui
         [AvaloniaFact]
         public void FileListReport_uses_expanded_vertical_scrollbar()
         {
-            var (window, grid, scrollBar) = _ShowOverflowReportGrid();
+            var (window, _, scrollBar) = _ShowOverflowReportGrid();
             _AssertExpandedVerticalScrollBar(scrollBar);
             window.Close();
         }

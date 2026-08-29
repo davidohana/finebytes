@@ -13,7 +13,12 @@
   <Border Classes="pane">
     <DockPanel>
       <TextBlock DockPanel.Dock="Top" Classes="pane-header" Text="Filter Configuration" />
-      <Border />
+      <TextBlock
+        x:Name="AppliedFilterTitle"
+        Margin="8,0,8,8"
+        IsVisible="{Binding HasSelectedStep}"
+        Text="{Binding TitleText}"
+      />
     </DockPanel>
   </Border>
 </UserControl>

@@ -1,6 +1,8 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.Filters;
@@ -74,6 +76,71 @@ namespace Mfr.Tests.Ui.AppliedFilters
                     Key = key,
                     KeyModifiers = modifiers,
                     Source = control,
+                }
+            );
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        /// <summary>
+        /// Clicks an Applied Filters list row (not the checkbox).
+        /// </summary>
+        /// <param name="window">Host window for pointer routing.</param>
+        /// <param name="list">Applied Filters list.</param>
+        /// <param name="rowIndex">Zero-based row index.</param>
+        public static void ClickRow(Window window, ListBox list, int rowIndex)
+        {
+            _ = window;
+            var item = list.ContainerFromIndex(rowIndex) as ListBoxItem;
+            Assert.NotNull(item);
+
+            var labelText = item.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .FirstOrDefault(text => !string.IsNullOrEmpty(text.Text));
+            var target = (Visual?)labelText ?? item;
+            var point =
+                target.TranslatePoint(
+                    new Point(Math.Max(2, target.Bounds.Width / 2), Math.Max(2, target.Bounds.Height / 2)),
+                    item
+                ) ?? new Point(8, 4);
+
+            var pointer = new Pointer(1, PointerType.Mouse, true);
+            var pressedProps = new PointerPointProperties(
+                RawInputModifiers.LeftMouseButton,
+                PointerUpdateKind.LeftButtonPressed
+            );
+            item.RaiseEvent(
+                new PointerPressedEventArgs(
+                    item,
+                    pointer,
+                    list,
+                    point,
+                    0,
+                    pressedProps,
+                    KeyModifiers.None,
+                    clickCount: 1
+                )
+                {
+                    RoutedEvent = InputElement.PointerPressedEvent,
+                }
+            );
+
+            var releasedProps = new PointerPointProperties(
+                RawInputModifiers.None,
+                PointerUpdateKind.LeftButtonReleased
+            );
+            item.RaiseEvent(
+                new PointerReleasedEventArgs(
+                    item,
+                    pointer,
+                    list,
+                    point,
+                    0,
+                    releasedProps,
+                    KeyModifiers.None,
+                    MouseButton.Left
+                )
+                {
+                    RoutedEvent = InputElement.PointerReleasedEvent,
                 }
             );
             Dispatcher.UIThread.RunJobs();

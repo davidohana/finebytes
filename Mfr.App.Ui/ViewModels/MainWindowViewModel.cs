@@ -224,6 +224,11 @@ namespace Mfr.App.Ui.ViewModels
             {
                 FilterCount = AppliedFiltersViewModel.Count;
             }
+
+            if (e.PropertyName is nameof(AppliedFiltersViewModel.SelectedSteps))
+            {
+                FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
+            }
         }
 
         private void _OnFilterPalettePropertyChanged(object? sender, PropertyChangedEventArgs e)
