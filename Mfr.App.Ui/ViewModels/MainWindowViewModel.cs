@@ -178,25 +178,6 @@ namespace Mfr.App.Ui.ViewModels
                 _paneStatusHintDisplay = RenameListViewModel.CellStatusHintDisplay;
                 _UpdateStatusHintDisplay();
             }
-
-            if (e.PropertyName is nameof(RenameListViewModel.UseFixedWidthFont))
-            {
-                _TrySaveRenameListFont();
-            }
-        }
-
-        /// <summary>
-        /// Writes the live font flag onto the loaded session and persists it.
-        /// </summary>
-        private void _TrySaveRenameListFont()
-        {
-            if (Session is null)
-            {
-                return;
-            }
-
-            Session.EnsureRenameList().UseFixedWidthFont = RenameListViewModel.UseFixedWidthFont;
-            SessionStore.TrySave(Session);
         }
 
         /// <summary>
