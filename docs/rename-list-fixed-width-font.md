@@ -34,19 +34,19 @@ Add-policy (`addMode`, `addFolderContents`) lives on the same `renameList` objec
 
 Omitted keys use property initializer defaults. No legacy migration from `config.json` or a `ui` session object.
 
-## SessionStore.TrySaveCurrent
+## Persistence
 
-`SessionStore.TrySaveCurrent()` writes `SessionStore.Current` to `session.json`. Save failures are swallowed. When no path is passed, it writes only after a default-path `SessionStore.Load()`.
+Font toggle updates `RenameListViewModel.UseFixedWidthFont`. When the main window was constructed with a loaded session, that change is copied onto `session.renameList.useFixedWidthFont` and `SessionStore.TrySave` writes `session.json`. Save-on-close captures the same flag with the rest of the Rename List section.
 
-Toggle → update `SessionStore.Current.EnsureRenameList().UseFixedWidthFont` → `SessionStore.TrySaveCurrent()`.
+Toggle → view-model property → loaded `SessionState` → `SessionStore.TrySave(session)`.
 
 ## UI
 
-| Piece  | Detail                                                                            |
-| ------ | --------------------------------------------------------------------------------- |
-| Entry  | Rename List context menu → **Use Fixed-Width Font** (checkbox)                    |
-| Entry  | Main menu **Rename List** → **Use Fixed-Width Font** (checkbox)                   |
-| Toggle | `ToggleUseFixedWidthFontCommand` → VM + session + `SessionStore.TrySaveCurrent()` |
+| Piece  | Detail                                                                                                       |
+| ------ | ------------------------------------------------------------------------------------------------------------ |
+| Entry  | Rename List context menu → **Use Fixed-Width Font** (checkbox)                                               |
+| Entry  | Main menu **Rename List** → **Use Fixed-Width Font** (checkbox)                                              |
+| Toggle | `ToggleUseFixedWidthFontCommand` → VM; main window copies onto the loaded session and `SessionStore.TrySave` |
 
 Same pattern as **Auto-Sort**: `ToggleType="CheckBox"`, `IsChecked` one-way from `UseFixedWidthFont`.
 

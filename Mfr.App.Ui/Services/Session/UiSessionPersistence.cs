@@ -6,7 +6,7 @@ using Mfr.Utils;
 namespace Mfr.App.Ui.Services.Session
 {
     /// <summary>
-    /// Merges UI preferences with in-memory window/folder state into <see cref="SessionStore"/>.
+    /// Merges UI preferences with in-memory window/folder state into a <see cref="SessionState"/>.
     /// </summary>
     internal static class UiSessionPersistence
     {
@@ -17,8 +17,7 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="session">Loaded session document.</param>
         /// <remarks>
         /// File List mask fields and Rename List session fields are restored separately via
-        /// <see cref="FileListSessionSnapshot.FromSessionState"/> / <c>ApplySession</c> /
-        /// <c>ApplyVisibleColumnsFromSession</c>.
+        /// <see cref="FileListSessionSnapshot.FromSessionState"/> and pane apply/capture methods.
         /// </remarks>
         public static void TryRestore(MainWindow window, SessionState session)
         {
@@ -42,30 +41,28 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Updates <c>session.json</c>: window/folder when their remember flags are on; masks and Auto-Sort always.
+        /// Updates <c>session.json</c>: window/folder when their remember flags are on; masks and Rename List always.
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
+        /// <param name="session">Live session document to merge into and write.</param>
         /// <param name="fileListSnapshot">
         /// File List mask and folder fields to persist, or <see langword="null"/> when unavailable.
         /// </param>
-        /// <param name="renameListSortFields">
-        /// Rename List Auto-Sort session fields, or <see langword="null"/> to leave the saved value unchanged.
-        /// </param>
-        /// <param name="renameListVisibleColumns">
-        /// Rename List visible column session fields, or <see langword="null"/> to leave the saved value unchanged.
+        /// <param name="renameList">
+        /// Rename List session fields, or <see langword="null"/> to leave the saved section unchanged.
         /// </param>
         public static void SaveOnClose(
             MainWindow window,
+            SessionState session,
             FileListSessionSnapshot? fileListSnapshot,
-            IReadOnlyList<SessionStateRenameListSortField>? renameListSortFields = null,
-            IReadOnlyList<SessionStateRenameListColumn>? renameListVisibleColumns = null
+            SessionStateRenameList? renameList = null
         )
         {
             ArgumentNullException.ThrowIfNull(window);
+            ArgumentNullException.ThrowIfNull(session);
 
             try
             {
-                var session = SessionStore.Current;
                 var rememberWindow = session.MainWindow?.RememberWindowState ?? true;
                 var rememberLastFolder = session.FileList?.RememberLastFolder ?? true;
 
@@ -100,19 +97,9 @@ namespace Mfr.App.Ui.Services.Session
                         : [.. fileListSnapshot.MaskSuggestions];
                 }
 
-                if (renameListSortFields is not null || renameListVisibleColumns is not null)
+                if (renameList is not null)
                 {
-                    var renameList = session.EnsureRenameList();
-
-                    if (renameListSortFields is not null)
-                    {
-                        renameList.SortFields = [.. renameListSortFields];
-                    }
-
-                    if (renameListVisibleColumns is not null)
-                    {
-                        renameList.VisibleColumns = [.. renameListVisibleColumns];
-                    }
+                    session.RenameList = renameList;
                 }
 
                 SessionStore.Save(session);

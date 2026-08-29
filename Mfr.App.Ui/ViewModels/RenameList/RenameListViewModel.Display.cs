@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -13,10 +12,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets whether the Rename List grid uses a fixed-width font.
         /// </summary>
         [ObservableProperty]
-        private bool _useFixedWidthFont = SessionStore.Current.RenameList?.UseFixedWidthFont ?? false;
+        private bool _useFixedWidthFont;
 
         /// <summary>
-        /// Updates the fixed-width font flag and persists it to <c>session.json</c>.
+        /// Updates the fixed-width font flag.
         /// </summary>
         /// <param name="value">New value.</param>
         public void SetUseFixedWidthFont(bool value)
@@ -27,8 +26,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             UseFixedWidthFont = value;
-            SessionStore.Current.EnsureRenameList().UseFixedWidthFont = value;
-            SessionStore.TrySaveCurrent();
         }
 
         /// <summary>

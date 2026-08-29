@@ -20,11 +20,23 @@ namespace Mfr.App.Ui.Views
 
         private void _OnClosing(object? sender, WindowClosingEventArgs e)
         {
-            var viewModel = DataContext as MainWindowViewModel;
-            var fileListSnapshot = viewModel?.FileListViewModel.CaptureSession();
-            var renameListSortFields = viewModel?.RenameListViewModel.CaptureSortFields();
-            var renameListVisibleColumns = viewModel?.RenameListViewModel.CaptureVisibleColumnsForSession();
-            UiSessionPersistence.SaveOnClose(this, fileListSnapshot, renameListSortFields, renameListVisibleColumns);
+            if (DataContext is not MainWindowViewModel viewModel)
+            {
+                return;
+            }
+
+            var session = viewModel.Session;
+            if (session is null)
+            {
+                return;
+            }
+
+            UiSessionPersistence.SaveOnClose(
+                this,
+                session,
+                viewModel.FileListViewModel.CaptureSession(),
+                viewModel.RenameListViewModel.CaptureSession()
+            );
         }
     }
 }

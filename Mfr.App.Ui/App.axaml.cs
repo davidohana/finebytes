@@ -30,16 +30,10 @@ namespace Mfr.App.Ui
 
                 var mainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(initialFileListPath: initialFolder),
+                    DataContext = new MainWindowViewModel(initialFileListPath: initialFolder, session: session),
                 };
 
                 UiSessionPersistence.TryRestore(mainWindow, session);
-                if (mainWindow.DataContext is MainWindowViewModel viewModel)
-                {
-                    viewModel.FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
-                    viewModel.RenameListViewModel.ApplySession(session.RenameList?.SortFields);
-                    viewModel.RenameListViewModel.ApplyVisibleColumnsFromSession(session.RenameList?.VisibleColumns);
-                }
 
                 desktop.MainWindow = mainWindow;
 #if DEBUG

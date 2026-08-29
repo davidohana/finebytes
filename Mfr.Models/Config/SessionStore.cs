@@ -18,16 +18,6 @@ namespace Mfr.Models.Config
         };
 
         /// <summary>
-        /// Gets the in-memory session for this process, set by <see cref="Load"/> when using the default path.
-        /// </summary>
-        public static SessionState Current { get; private set; } = new();
-
-        /// <summary>
-        /// Default session path last bound to <see cref="Current"/> by <see cref="Load"/>.
-        /// </summary>
-        private static string? s_CurrentDefaultPath;
-
-        /// <summary>
         /// Default session file path (<see cref="AppDataPaths.RoamingRoot"/> + <c>session.json</c>).
         /// </summary>
         /// <returns>Absolute path to the default session JSON file.</returns>
@@ -38,7 +28,6 @@ namespace Mfr.Models.Config
 
         /// <summary>
         /// Loads session state from <paramref name="sessionFilePath"/> when present and valid.
-        /// <para>When <paramref name="sessionFilePath"/> is omitted, also assigns <see cref="Current"/>.</para>
         /// </summary>
         /// <param name="sessionFilePath">
         /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultSessionFilePath"/> is used.
@@ -46,16 +35,7 @@ namespace Mfr.Models.Config
         /// <returns>Deserialized state, or a new empty <see cref="SessionState"/> when missing or unreadable.</returns>
         public static SessionState Load(string? sessionFilePath = null)
         {
-            var useDefaultPath = sessionFilePath.IsBlank();
-            var path = _ResolvePath(sessionFilePath);
-            var state = _Read(path);
-            if (useDefaultPath)
-            {
-                Current = state;
-                s_CurrentDefaultPath = path;
-            }
-
-            return state;
+            return _Read(_ResolvePath(sessionFilePath));
         }
 
         /// <summary>
@@ -88,26 +68,18 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Writes <see cref="Current"/> to the session file.
-        /// <para>
-        /// When <paramref name="sessionFilePath"/> is omitted, writes only if <see cref="Load"/> was called
-        /// for the default path. Failures are swallowed so preference saves do not crash the app.
-        /// </para>
+        /// Writes <paramref name="state"/> to the session file.
+        /// <para>Failures are swallowed so preference saves do not crash the app.</para>
         /// </summary>
+        /// <param name="state">Session values to persist.</param>
         /// <param name="sessionFilePath">
-        /// Path to JSON. When <c>null</c> or whitespace, the default-path <see cref="Load"/> target is used.
+        /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultSessionFilePath"/> is used.
         /// </param>
-        public static void TrySaveCurrent(string? sessionFilePath = null)
+        public static void TrySave(SessionState state, string? sessionFilePath = null)
         {
             try
             {
-                var path = sessionFilePath.IsBlank() ? s_CurrentDefaultPath : sessionFilePath.Trim();
-                if (path is null)
-                {
-                    return;
-                }
-
-                Save(Current, path);
+                Save(state, sessionFilePath);
             }
             catch
             {

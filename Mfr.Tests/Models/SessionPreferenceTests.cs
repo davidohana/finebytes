@@ -1,5 +1,3 @@
-using Mfr.Tests.Ui.RenameList;
-
 namespace Mfr.Tests.Models
 {
     /// <summary>
@@ -72,15 +70,15 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void TrySaveCurrent_writes_current_session()
+        public void TrySave_writes_session()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-test-pref-session-" + Guid.NewGuid() + ".json");
-            var originalPrefs = RenameListTestHelpers.SnapshotSessionPrefs();
             try
             {
-                SessionStore.Current.EnsureRenameList().AddMode = RenameListAddMode.Folders;
-                SessionStore.Current.EnsureRenameList().UseFixedWidthFont = true;
-                SessionStore.TrySaveCurrent(path);
+                var original = new SessionState();
+                original.EnsureRenameList().AddMode = RenameListAddMode.Folders;
+                original.EnsureRenameList().UseFixedWidthFont = true;
+                SessionStore.TrySave(original, path);
 
                 var loaded = SessionStore.Load(path);
                 Assert.Equal(RenameListAddMode.Folders, loaded.RenameList?.AddMode);
@@ -88,7 +86,6 @@ namespace Mfr.Tests.Models
             }
             finally
             {
-                RenameListTestHelpers.RestoreSessionPrefs(originalPrefs);
                 File.Delete(path);
             }
         }

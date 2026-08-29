@@ -50,15 +50,15 @@ hint tests no longer use `entry.FullFileName` as the row identity.
 ## 5. Headless test fixture for remaining Rename List suites
 
 [`RenameListUiTestContext`](../Mfr.Tests/Ui/RenameList/RenameListTestHelpers.cs) already
-owns temp dirs, File List hosts, add-policy pinning, and `ShowWithRowsAsync`. Still
+owns temp dirs, File List hosts, and `ShowWithRowsAsync`. Still
 duplicated:
 
 - [`RenameListViewDropTests`](../Mfr.Tests/Ui/RenameList/RenameListViewDropTests.cs) —
-  same config snapshot + File List factory; window size differs (`_Show` is 600×300).
+  same File List factory; window size differs (`_Show` is 600×300).
 - [`RenameListViewModelTests`](../Mfr.Tests/Ui/RenameList/RenameListViewModelTests.cs) —
-  same snapshot via `RenameListTestHelpers.SnapshotSessionPrefs`; many private folder/file helpers stay local.
+  same temp-dir / File List factory; many private folder/file helpers stay local.
 
-When those files are next edited, construct `new RenameListUiTestContext(pinAddPolicy: true)`
+When those files are next edited, construct `new RenameListUiTestContext()`
 and keep scenario helpers (`_CreateSampleFolder`, `_FileEntry`) on the test class. Extend
 the context with an optional window size rather than a second `_Show`.
 

@@ -4,9 +4,11 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.ViewModels
 {
@@ -27,14 +29,30 @@ namespace Mfr.App.Ui.ViewModels
         /// <param name="initialFileListPath">
         /// Optional File List start path (e.g. remembered last folder). When null, the File List uses its default.
         /// </param>
-        public MainWindowViewModel(string? initialFileListPath = null)
+        /// <param name="session">
+        /// Loaded session to restore onto child panes and persist from this window. When null, panes keep
+        /// first-launch defaults and this window does not write <c>session.json</c>.
+        /// </param>
+        public MainWindowViewModel(string? initialFileListPath = null, SessionState? session = null)
         {
+            Session = session;
             FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
             RenameListViewModel = new RenameListViewModel(FileListViewModel);
+            if (session is not null)
+            {
+                FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
+                RenameListViewModel.ApplySessionSection(session.RenameList);
+            }
+
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
             ItemCount = RenameListViewModel.ItemCount;
             WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
         }
+
+        /// <summary>
+        /// Loaded session document for this window, or <see langword="null"/> when the window was created without one.
+        /// </summary>
+        internal SessionState? Session { get; }
 
         /// <summary>
         /// Gets the main window title, including the product version.
@@ -160,6 +178,25 @@ namespace Mfr.App.Ui.ViewModels
                 _paneStatusHintDisplay = RenameListViewModel.CellStatusHintDisplay;
                 _UpdateStatusHintDisplay();
             }
+
+            if (e.PropertyName is nameof(RenameListViewModel.UseFixedWidthFont))
+            {
+                _TrySaveRenameListFont();
+            }
+        }
+
+        /// <summary>
+        /// Writes the live font flag onto the loaded session and persists it.
+        /// </summary>
+        private void _TrySaveRenameListFont()
+        {
+            if (Session is null)
+            {
+                return;
+            }
+
+            Session.EnsureRenameList().UseFixedWidthFont = RenameListViewModel.UseFixedWidthFont;
+            SessionStore.TrySave(Session);
         }
 
         /// <summary>

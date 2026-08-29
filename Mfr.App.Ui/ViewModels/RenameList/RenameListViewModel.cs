@@ -3,6 +3,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.Collections;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.Models.Config;
 using Mfr.Models.RenameList;
 using EngineRenameList = Mfr.Engine.RenameList.RenameList;
 
@@ -29,6 +30,37 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;
             AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
+        }
+
+        /// <summary>
+        /// Restores sort, columns, add-policy, and display prefs from a session section.
+        /// </summary>
+        /// <param name="renameList">
+        /// Saved Rename List section, or <see langword="null"/> for first-launch defaults.
+        /// </param>
+        internal void ApplySessionSection(SessionStateRenameList? renameList)
+        {
+            ApplySession(renameList?.SortFields);
+            ApplyVisibleColumnsFromSession(renameList?.VisibleColumns);
+            AddMode = renameList?.AddMode ?? RenameListAddMode.Files;
+            AddFolderContents = renameList?.AddFolderContents ?? true;
+            UseFixedWidthFont = renameList?.UseFixedWidthFont ?? false;
+        }
+
+        /// <summary>
+        /// Captures sort, columns, add-policy, and display prefs for session save.
+        /// </summary>
+        /// <returns>Rename List session section matching the current view model.</returns>
+        internal SessionStateRenameList CaptureSession()
+        {
+            return new SessionStateRenameList
+            {
+                SortFields = [.. CaptureSortFields()],
+                VisibleColumns = [.. CaptureVisibleColumnsForSession()],
+                AddMode = AddMode,
+                AddFolderContents = AddFolderContents,
+                UseFixedWidthFont = UseFixedWidthFont,
+            };
         }
 
         /// <summary>

@@ -51,93 +51,19 @@ namespace Mfr.Tests.Ui.RenameList
         {
             return [new SessionStateRenameListSortField(fieldKey, descending)];
         }
-
-        /// <summary>
-        /// Snapshots add-policy, remember, and display flags from <see cref="SessionStore.Current"/>.
-        /// </summary>
-        /// <returns>Preference values to restore after a test.</returns>
-        internal static SessionPrefSnapshot SnapshotSessionPrefs()
-        {
-            var session = SessionStore.Current;
-            return new SessionPrefSnapshot(
-                AddMode: session.RenameList?.AddMode ?? RenameListAddMode.Files,
-                AddFolderContents: session.RenameList?.AddFolderContents ?? true,
-                UseFixedWidthFont: session.RenameList?.UseFixedWidthFont ?? false,
-                RememberWindowState: session.MainWindow?.RememberWindowState ?? true,
-                RememberLastFolder: session.FileList?.RememberLastFolder ?? true
-            );
-        }
-
-        /// <summary>
-        /// Restores add-policy, remember, and display flags onto <see cref="SessionStore.Current"/>.
-        /// </summary>
-        /// <param name="snapshot">Previously captured preferences.</param>
-        internal static void RestoreSessionPrefs(SessionPrefSnapshot snapshot)
-        {
-            ArgumentNullException.ThrowIfNull(snapshot);
-
-            var session = SessionStore.Current;
-            var renameList = session.EnsureRenameList();
-            renameList.AddMode = snapshot.AddMode;
-            renameList.AddFolderContents = snapshot.AddFolderContents;
-            renameList.UseFixedWidthFont = snapshot.UseFixedWidthFont;
-            session.EnsureMainWindow().RememberWindowState = snapshot.RememberWindowState;
-            session.EnsureFileList().RememberLastFolder = snapshot.RememberLastFolder;
-        }
     }
 
     /// <summary>
-    /// Add-policy, remember, and display flags copied from <see cref="SessionStore.Current"/>.
-    /// </summary>
-    /// <param name="AddMode">Rename List add mode.</param>
-    /// <param name="AddFolderContents">Whether folder sources recurse.</param>
-    /// <param name="UseFixedWidthFont">Rename List fixed-width font flag.</param>
-    /// <param name="RememberWindowState">Whether window geometry is remembered.</param>
-    /// <param name="RememberLastFolder">Whether the last File List folder is remembered.</param>
-    internal sealed record SessionPrefSnapshot(
-        RenameListAddMode AddMode,
-        bool AddFolderContents,
-        bool UseFixedWidthFont,
-        bool RememberWindowState,
-        bool RememberLastFolder
-    );
-
-    /// <summary>
-    /// Temp folders, File List hosts, and optional UI add-policy pinning for Rename List tests.
+    /// Temp folders and File List hosts for Rename List tests.
     /// </summary>
     internal sealed class RenameListUiTestContext : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
         private readonly List<FileListViewModel> _fileListViewModels = [];
-        private readonly SessionPrefSnapshot? _originalPrefs;
-
-        /// <summary>
-        /// Creates a test context and optionally pins File List add-policy flags.
-        /// </summary>
-        /// <param name="pinAddPolicy">
-        /// When <see langword="true"/>, snapshots and sets Files/add-folder-contents for headless add tests.
-        /// </param>
-        public RenameListUiTestContext(bool pinAddPolicy = false)
-        {
-            if (!pinAddPolicy)
-            {
-                return;
-            }
-
-            _originalPrefs = RenameListTestHelpers.SnapshotSessionPrefs();
-            var renameList = SessionStore.Current.EnsureRenameList();
-            renameList.AddMode = RenameListAddMode.Files;
-            renameList.AddFolderContents = true;
-        }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (_originalPrefs is not null)
-            {
-                RenameListTestHelpers.RestoreSessionPrefs(_originalPrefs);
-            }
-
             foreach (var fileListViewModel in _fileListViewModels)
             {
                 fileListViewModel.Dispose();

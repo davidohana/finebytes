@@ -16,7 +16,7 @@ namespace Mfr.Tests.Ui.RenameList
     /// </summary>
     public sealed class RenameListViewHintTests : IDisposable
     {
-        private readonly RenameListUiTestContext _context = new(pinAddPolicy: true);
+        private readonly RenameListUiTestContext _context = new();
 
         /// <inheritdoc />
         public void Dispose()

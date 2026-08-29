@@ -9,7 +9,7 @@ namespace Mfr.Tests.Ui.RenameList
     /// </summary>
     public sealed class RenameListViewDisplayTests : IDisposable
     {
-        private readonly RenameListUiTestContext _context = new(pinAddPolicy: true);
+        private readonly RenameListUiTestContext _context = new();
 
         /// <inheritdoc />
         public void Dispose()
@@ -23,8 +23,6 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task UseFixedWidthFont_toggles_grid_style_class()
         {
-            SessionStore.Current.EnsureRenameList().UseFixedWidthFont = false;
-
             var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 1);
 
             Assert.DoesNotContain("fixed-width-font", grid.Classes);
