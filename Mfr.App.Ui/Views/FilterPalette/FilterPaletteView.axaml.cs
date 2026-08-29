@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 
 namespace Mfr.App.Ui.Views.FilterPalette
@@ -29,18 +28,20 @@ namespace Mfr.App.Ui.Views.FilterPalette
         }
 
         /// <summary>
-        /// Applied Filters view model, set by the main window shell for drag-back removal.
+        /// Applied Filters remove-by-index command, set by the main window shell.
         /// </summary>
-        public static readonly StyledProperty<AppliedFiltersViewModel?> AppliedFiltersViewModelProperty =
-            AvaloniaProperty.Register<FilterPaletteView, AppliedFiltersViewModel?>(nameof(AppliedFiltersViewModel));
+        public static readonly StyledProperty<ICommand?> RemoveAppliedStepsCommandProperty = AvaloniaProperty.Register<
+            FilterPaletteView,
+            ICommand?
+        >(nameof(RemoveAppliedStepsCommand));
 
         /// <summary>
-        /// Gets or sets the Applied Filters view model used when rows are dragged back to Available.
+        /// Gets or sets the command that removes applied steps dragged back to Available Filters.
         /// </summary>
-        public AppliedFiltersViewModel? AppliedFiltersViewModel
+        public ICommand? RemoveAppliedStepsCommand
         {
-            get => GetValue(AppliedFiltersViewModelProperty);
-            set => SetValue(AppliedFiltersViewModelProperty, value);
+            get => GetValue(RemoveAppliedStepsCommandProperty);
+            set => SetValue(RemoveAppliedStepsCommandProperty, value);
         }
 
         /// <summary>

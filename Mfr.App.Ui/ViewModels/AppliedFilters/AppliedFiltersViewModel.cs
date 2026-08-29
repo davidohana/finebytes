@@ -145,6 +145,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             OnPropertyChanged(nameof(Count));
             ClearCommand.NotifyCanExecuteChanged();
+            RemoveStepsAtIndicesCommand.NotifyCanExecuteChanged();
             _NotifySelectionCommandsChanged();
         }
 
@@ -256,6 +257,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             return Steps.Count > 0;
         }
 
+        private bool _CanRemoveStepsAtIndices(IReadOnlyList<int> indices)
+        {
+            if (indices is null || indices.Count == 0)
+            {
+                return false;
+            }
+
+            return indices.Any(index => index >= 0 && index < Steps.Count);
+        }
+
         private bool _CanMoveSelectedUp()
         {
             return _selectedSteps.Count > 0
@@ -290,6 +301,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Removes applied steps by list index (drag-back to Available Filters).
         /// </summary>
         /// <param name="indices">Row indices to remove.</param>
+        [RelayCommand(CanExecute = nameof(_CanRemoveStepsAtIndices))]
         public void RemoveStepsAtIndices(IReadOnlyList<int> indices)
         {
             ArgumentNullException.ThrowIfNull(indices);
@@ -320,6 +332,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private void _NotifySelectionCommandsChanged()
         {
             RemoveSelectedCommand.NotifyCanExecuteChanged();
+            RemoveStepsAtIndicesCommand.NotifyCanExecuteChanged();
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
         }

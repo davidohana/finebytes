@@ -70,7 +70,7 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _OnListDragOver(object? sender, DragEventArgs e)
         {
-            if (AppliedFiltersViewModel is null || AppliedFilterDragPayload.TryRead(e.DataTransfer) is null)
+            if (RemoveAppliedStepsCommand is null || AppliedFilterDragPayload.TryRead(e.DataTransfer) is null)
             {
                 e.DragEffects = DragDropEffects.None;
                 return;
@@ -82,18 +82,17 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _OnListDrop(object? sender, DragEventArgs e)
         {
-            if (AppliedFiltersViewModel is null)
-            {
-                return;
-            }
-
-            if (AppliedFilterDragPayload.TryRead(e.DataTransfer) is not { } payload)
+            var command = RemoveAppliedStepsCommand;
+            if (command is null || AppliedFilterDragPayload.TryRead(e.DataTransfer) is not { } payload)
             {
                 return;
             }
 
             e.Handled = true;
-            AppliedFiltersViewModel.RemoveStepsAtIndices(payload.SourceIndices);
+            if (command.CanExecute(payload.SourceIndices))
+            {
+                command.Execute(payload.SourceIndices);
+            }
         }
 
         private static FilterPaletteDragPayload? _BuildDragPayload(ListBox listBox)

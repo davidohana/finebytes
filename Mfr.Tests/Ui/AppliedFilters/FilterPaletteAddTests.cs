@@ -149,7 +149,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             {
                 DataContext = mainViewModel.FilterPaletteViewModel,
                 AddSelectedToAppliedCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
-                AppliedFiltersViewModel = mainViewModel.AppliedFiltersViewModel,
+                RemoveAppliedStepsCommand = mainViewModel.AppliedFiltersViewModel.RemoveStepsAtIndicesCommand,
             };
             var appliedView = new AppliedFiltersView
             {

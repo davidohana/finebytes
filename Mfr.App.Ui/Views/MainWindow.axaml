@@ -439,7 +439,7 @@
               Grid.Column="0"
               DataContext="{Binding FilterPaletteViewModel}"
               AddSelectedToAppliedCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AddSelectedFilterFromPaletteCommand}"
-              AppliedFiltersViewModel="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel}"
+              RemoveAppliedStepsCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel.RemoveStepsAtIndicesCommand}"
             />
             <views:PaneSplitter
               x:Name="AvailableAppliedSplitter"
