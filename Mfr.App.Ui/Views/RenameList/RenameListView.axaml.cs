@@ -450,6 +450,15 @@ namespace Mfr.App.Ui.Views.RenameList
 
             _lastHintColumn = column;
 
+            if (entry.IsMissingFromDisk)
+            {
+                _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatLoadError(
+                    field.DisplayName,
+                    RenameListDiskPaths.MissingUserExplanation
+                );
+                return;
+            }
+
             if (entry.IsLoadError(fieldKey.Value))
             {
                 var userExplanation = RenameListFieldCatalog.DescribeLoadError(entry.EngineItem, fieldKey.Value);

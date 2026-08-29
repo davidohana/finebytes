@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Models.RenameList;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -22,10 +23,26 @@ namespace Mfr.Tests.Ui.RenameList
 
             var copyText = RenameListLoadErrorDisplay.FormatCopyText(content);
 
-            Assert.Contains(RenameListLoadErrorDisplay.Summary, copyText, StringComparison.Ordinal);
+            Assert.Contains(RenameListLoadErrorDisplay.MetadataSummary, copyText, StringComparison.Ordinal);
             Assert.Contains(@"D:\Music\PLAYLIST.M3U", copyText, StringComparison.Ordinal);
             Assert.Contains(error.UserExplanation, copyText, StringComparison.Ordinal);
             Assert.Contains(technicalDetails, copyText, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies missing rows use a missing-path headline and omit the redundant path in details.
+        /// </summary>
+        [Fact]
+        public void FormatSummary_and_details_for_missing_file()
+        {
+            const string path = @"D:\Music\1\Working on the Highway.mp3";
+            var content = new RenameListLoadErrorsDialogContent(
+                path,
+                [new RenameListLoadError(RenameListDiskPaths.MissingUserExplanation, path)]
+            );
+
+            Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, RenameListLoadErrorDisplay.FormatSummary(content));
+            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, RenameListLoadErrorDisplay.FormatDetailsText(content));
         }
 
         /// <summary>

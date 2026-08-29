@@ -130,12 +130,14 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
-        /// Sets catalog text and load-error styling when that field has a stored load exception.
+        /// Sets catalog text; missing rows use whole-row gray, load failures use per-cell styling.
         /// </summary>
         private static void _ApplyFieldCell(TextBlock textBlock, RenameListEntry? entry, RenameListFieldKey key)
         {
             textBlock.Text = entry?.GetFieldText(key) ?? string.Empty;
-            var isLoadError = entry?.IsLoadError(key) == true;
+            var isMissing = entry?.IsMissingFromDisk == true;
+            var isLoadError = !isMissing && entry?.IsLoadError(key) == true;
+            textBlock.Classes.Set("rename-list-missing-on-disk", isMissing);
             textBlock.Classes.Set("rename-list-load-error", isLoadError);
             textBlock.ClearValue(TextBlock.ForegroundProperty);
             textBlock.ClearValue(TextBlock.FontStyleProperty);

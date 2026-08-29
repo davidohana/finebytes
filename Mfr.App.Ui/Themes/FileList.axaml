@@ -20,6 +20,7 @@
       <SolidColorBrush x:Key="FileListPreviewGlyphBackgroundBrush" Color="#FFE8E8" />
       <SolidColorBrush x:Key="FileListPreviewGlyphBorderBrush" Color="#F0A0A0" />
       <SolidColorBrush x:Key="RenameListDropIndicatorBrush" Color="#FA8072" />
+      <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#808080" />
     </ResourceDictionary>
     <ResourceDictionary x:Key="Dark">
       <SolidColorBrush x:Key="FileListRowBrush" Color="#202020" />
@@ -41,6 +42,7 @@
       <SolidColorBrush x:Key="FileListPreviewGlyphBackgroundBrush" Color="#4A2828" />
       <SolidColorBrush x:Key="FileListPreviewGlyphBorderBrush" Color="#804040" />
       <SolidColorBrush x:Key="RenameListDropIndicatorBrush" Color="#FA8072" />
+      <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#909090" />
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

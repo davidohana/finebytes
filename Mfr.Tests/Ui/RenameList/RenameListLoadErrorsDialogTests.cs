@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
+using Mfr.Models.RenameList;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -37,7 +38,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(detailsText);
 
             Assert.Equal("Error", dialog.Title);
-            Assert.Equal(RenameListLoadErrorDisplay.Summary, summaryText.Text);
+            Assert.Equal(RenameListLoadErrorDisplay.MetadataSummary, summaryText.Text);
             Assert.Equal(@"D:\Music\PLAYLIST.M3U", filePathText.Text);
             Assert.Contains(tagLibMessage, detailsText.Text, StringComparison.Ordinal);
             Assert.Contains(imageMessage, detailsText.Text, StringComparison.Ordinal);
@@ -45,6 +46,30 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Contains("image or EXIF metadata", detailsText.Text, StringComparison.Ordinal);
             Assert.True(detailsText.IsReadOnly);
             Assert.NotNull(dialog.FindControl<Button>("CopyButton"));
+        }
+
+        /// <summary>
+        /// Verifies missing rows show a missing-path headline instead of the metadata summary.
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_shows_missing_summary_for_absent_path()
+        {
+            const string path = @"D:\Music\1\Working on the Highway.mp3";
+            var content = new RenameListLoadErrorsDialogContent(
+                path,
+                [new RenameListLoadError(RenameListDiskPaths.MissingUserExplanation, path)]
+            );
+            var dialog = new RenameListLoadErrorsDialog(content);
+            dialog.Show();
+            dialog.UpdateLayout();
+
+            var summaryText = dialog.FindControl<TextBlock>("SummaryText");
+            var detailsText = dialog.FindControl<TextBox>("DetailsText");
+            Assert.NotNull(summaryText);
+            Assert.NotNull(detailsText);
+
+            Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, summaryText.Text);
+            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, detailsText.Text);
         }
     }
 }

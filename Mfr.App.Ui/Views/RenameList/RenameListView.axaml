@@ -22,7 +22,7 @@
       <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
       <ContextMenu x:Key="RenameListRowContextMenu" x:Shared="False">
         <MenuItem
-          Header="Show Load Errors"
+          Header="Show Error Details"
           Command="{Binding ShowLoadErrorsCommand}"
           IsVisible="{Binding CanShowLoadErrors}"
         />
@@ -181,6 +181,12 @@
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-load-error">
       <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
       <Setter Property="FontStyle" Value="Italic" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-missing-on-disk">
+      <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-missing-on-disk">
+      <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell:focus /template/ Grid#FocusVisual">
       <Setter Property="IsVisible" Value="False" />

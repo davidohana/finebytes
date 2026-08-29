@@ -191,28 +191,38 @@ namespace Mfr.Models.RenameList
         /// <returns><see langword="true"/> when the cell should show <see cref="LoadErrorText"/>.</returns>
         public static bool HasLoadError(RenameItem item, RenameListFieldKey key)
         {
+            if (RenameListDiskPaths.IsMissingFromDisk(item))
+            {
+                return false;
+            }
+
             return RenameListMetadataLoadErrors.HasLoadError(item, key);
         }
 
         /// <summary>
-        /// Returns whether the row has any original metadata load failure.
+        /// Returns whether the row has any issue for Show Load Errors (missing on disk or metadata load failure).
         /// </summary>
         /// <param name="item">Engine rename item.</param>
-        /// <returns><see langword="true"/> when TagLib or image metadata failed to load.</returns>
+        /// <returns><see langword="true"/> when the path is missing or TagLib/image metadata failed to load.</returns>
         public static bool HasAnyLoadError(RenameItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
-            return RenameListMetadataLoadErrors.HasAny(item);
+            return RenameListDiskPaths.IsMissingFromDisk(item) || RenameListMetadataLoadErrors.HasAny(item);
         }
 
         /// <summary>
-        /// Lists distinct original metadata-reader failures on the row.
+        /// Lists Show Load Errors entries for the row (missing path or metadata-reader failures).
         /// </summary>
         /// <param name="item">Engine rename item.</param>
-        /// <returns>At most one TagLib and one image failure, in that order.</returns>
+        /// <returns>Missing-path only, or at most one TagLib and one image failure.</returns>
         public static IReadOnlyList<RenameListLoadError> ListLoadErrors(RenameItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
+            if (RenameListDiskPaths.IsMissingFromDisk(item))
+            {
+                return [RenameListDiskPaths.MissingLoadError(item)];
+            }
+
             return RenameListMetadataLoadErrors.List(item);
         }
 
@@ -233,6 +243,11 @@ namespace Mfr.Models.RenameList
 
             if (!RenameListMetadataLoadErrors.TryGetLoadError(item, key, out var error) || error is null)
             {
+                if (RenameListDiskPaths.IsMissingFromDisk(item))
+                {
+                    return RenameListDiskPaths.MissingUserExplanation;
+                }
+
                 return string.Empty;
             }
 

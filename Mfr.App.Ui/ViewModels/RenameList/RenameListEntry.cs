@@ -50,6 +50,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Returns whether this row path is missing from disk (whole-row gray; not a metadata load error).
+        /// </summary>
+        public bool IsMissingFromDisk => RenameListDiskPaths.IsMissingFromDisk(EngineItem);
+
+        /// <summary>
         /// Returns whether this original cell failed to load metadata from disk.
         /// </summary>
         /// <param name="key">Field key (original or preview).</param>

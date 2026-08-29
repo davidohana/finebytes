@@ -760,5 +760,60 @@ namespace Mfr.Tests.Ui.RenameList
 
             window.Close();
         }
+
+        /// <summary>
+        /// Verifies a row grays all cells when its path no longer exists on disk.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Grid_grays_whole_row_when_file_missing_from_disk()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "vanish.txt");
+            File.WriteAllText(path, "x");
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(fullNameKey),
+                new RenameListVisibleColumn(titleKey),
+            ]);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            File.Delete(path);
+            await renameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 900,
+                Height = 200,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.True(entry.IsMissingFromDisk);
+            Assert.Equal("vanish.txt", entry.GetFieldText(fullNameKey));
+            Assert.False(entry.IsLoadError(titleKey));
+
+            var row = Assert.Single(view.GetVisualDescendants().OfType<DataGridRow>());
+            var textBlocks = row.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .Where(text => !string.IsNullOrEmpty(text.Text))
+                .ToList();
+            Assert.NotEmpty(textBlocks);
+            Assert.All(textBlocks, textBlock => Assert.Contains("rename-list-missing-on-disk", textBlock.Classes));
+            Assert.DoesNotContain(textBlocks, textBlock => textBlock.Classes.Contains("rename-list-load-error"));
+
+            window.Close();
+        }
     }
 }

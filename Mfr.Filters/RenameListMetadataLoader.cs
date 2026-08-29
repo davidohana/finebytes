@@ -89,7 +89,11 @@ namespace Mfr.Filters
 
         private static void _TryEnsureTagLibLoaded(RenameItem item)
         {
-            if (item.TagLibLoadAttempted || item.Original.Attributes.IsDirectory())
+            if (
+                item.TagLibLoadAttempted
+                || item.Original.Attributes.IsDirectory()
+                || RenameListDiskPaths.IsMissingFromDisk(item)
+            )
             {
                 return;
             }
@@ -106,7 +110,11 @@ namespace Mfr.Filters
 
         private static void _TryEnsureImagePropertiesLoaded(RenameItem item)
         {
-            if (item.ImagePropertiesLoadAttempted || item.Original.Attributes.IsDirectory())
+            if (
+                item.ImagePropertiesLoadAttempted
+                || item.Original.Attributes.IsDirectory()
+                || RenameListDiskPaths.IsMissingFromDisk(item)
+            )
             {
                 return;
             }

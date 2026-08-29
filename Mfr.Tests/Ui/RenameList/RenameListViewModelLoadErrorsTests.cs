@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 
 namespace Mfr.Tests.Ui.RenameList
@@ -90,6 +91,35 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.False(entry.IsLoadError(RenameListTestHelpers.FullFileNameKey));
             Assert.False(renameListViewModel.CanShowLoadErrors);
             Assert.False(_TryShowLoadErrors(renameListViewModel));
+        }
+
+        /// <summary>
+        /// Verifies Show Load Errors is available when the selected row is missing from disk.
+        /// </summary>
+        [Fact]
+        public async Task ShowLoadErrors_available_for_missing_file()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "vanished.txt");
+            await File.WriteAllTextAsync(path, "x");
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            File.Delete(path);
+            await renameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.True(entry.IsMissingFromDisk);
+            renameListViewModel.SetSelectedEntries([entry]);
+            Assert.True(renameListViewModel.CanShowLoadErrors);
+
+            RenameListLoadErrorsDialogContent? content = null;
+            renameListViewModel.LoadErrorsDialogRequested += (_, value) => content = value;
+            renameListViewModel.ShowLoadErrorsCommand.Execute(null);
+
+            Assert.NotNull(content);
+            Assert.Equal(path, content.FilePath);
+            var error = Assert.Single(content.Errors);
+            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, error.UserExplanation);
         }
 
         private async Task<(RenameListViewModel ViewModel, string Path, RenameListEntry Entry)> _AddHtmWithTitleAsync()

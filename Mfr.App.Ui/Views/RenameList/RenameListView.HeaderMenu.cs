@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Resources;
+using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -30,19 +31,68 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var header = source.FindAncestorOfType<DataGridColumnHeader>() ?? source as DataGridColumnHeader;
-            if (header is null)
+            if (header is not null)
+            {
+                var fieldKey = RenameListGridColumns.TryResolveFieldKey(header);
+                if (fieldKey is null)
+                {
+                    return;
+                }
+
+                e.Handled = true;
+                _ShowColumnHeaderContextMenu(header, fieldKey.Value);
+                return;
+            }
+
+            var row = source.FindAncestorOfType<DataGridRow>();
+            if (row?.DataContext is not RenameListEntry hit)
             {
                 return;
             }
 
-            var fieldKey = RenameListGridColumns.TryResolveFieldKey(header);
-            if (fieldKey is null)
+            _SelectRowForContextMenu(hit);
+        }
+
+        private void _SelectRowForContextMenu(RenameListEntry hit)
+        {
+            if (_viewModel is null)
             {
                 return;
             }
 
-            e.Handled = true;
-            _ShowColumnHeaderContextMenu(header, fieldKey.Value);
+            var isOnlySelected =
+                _viewModel.SelectedEntries.Count == 1 && _viewModel.SelectedEntries[0] == hit;
+            if (isOnlySelected)
+            {
+                return;
+            }
+
+            var keepMultiSelection =
+                _viewModel.SelectedEntries.Count > 1 && _viewModel.SelectedEntries.Contains(hit);
+            if (keepMultiSelection)
+            {
+                return;
+            }
+
+            _selectionChangeFromView = true;
+            try
+            {
+                _viewModel.SetSelectedEntries([hit]);
+            }
+            finally
+            {
+                _selectionChangeFromView = false;
+            }
+
+            _isSyncingSelection = true;
+            try
+            {
+                _SyncSelectionToGrid();
+            }
+            finally
+            {
+                _isSyncingSelection = false;
+            }
         }
 
         private void _ShowColumnHeaderContextMenu(DataGridColumnHeader header, RenameListFieldKey fieldKey)
