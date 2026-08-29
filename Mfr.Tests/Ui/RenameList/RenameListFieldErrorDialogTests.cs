@@ -46,24 +46,5 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(detailsText.IsReadOnly);
             Assert.NotNull(dialog.FindControl<Button>("CopyButton"));
         }
-
-        /// <summary>
-        /// Verifies recycled cells drop gray when they no longer show Error.
-        /// </summary>
-        [AvaloniaFact]
-        public void ApplyFromCellText_clears_gray_when_text_is_not_Error()
-        {
-            var textBlock = new TextBlock { Text = RenameListFieldCatalog.FieldLoadErrorText };
-            RenameListFieldForegroundConverter.ApplyFromCellText(textBlock);
-            var errorBrush = Assert.IsType<Avalonia.Media.SolidColorBrush>(
-                RenameListFieldForegroundConverter.ErrorBrush
-            );
-            Assert.Equal(Avalonia.Media.Color.Parse("#808080"), errorBrush.Color);
-            Assert.Same(RenameListFieldForegroundConverter.ErrorBrush, textBlock.Foreground);
-
-            textBlock.Text = "Zero 7";
-            RenameListFieldForegroundConverter.ApplyFromCellText(textBlock);
-            Assert.NotSame(RenameListFieldForegroundConverter.ErrorBrush, textBlock.Foreground);
-        }
     }
 }

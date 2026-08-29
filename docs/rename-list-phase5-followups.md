@@ -39,9 +39,8 @@ Resolved in Phase 7d: Auto-Sort keys are original `RenameListFieldKey` values; `
 
 [`RenameListEntry`](../Mfr.App.Ui/ViewModels/RenameList/RenameListEntry.cs) still exposes
 `FileFolder`, `ParentFolder`, `FullFileName`, `FullPath`, and `FullFileNamePreview`. Those
-are `GetFieldText` over fixed keys. The grid binds through
-`RenameListFieldTextConverter` + catalog keys; the named properties exist for tests and a
-few call sites.
+are `GetFieldText` over fixed keys. The grid paints cells from `GetFieldText` (and
+`IsFieldLoadError` for gray); the named properties exist for tests and a few call sites.
 
 After Phase 6 preview coloring, prefer `GetFieldText(key)` (or engine item snapshots) in
 new code. Delete the named properties when

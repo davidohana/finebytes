@@ -2,7 +2,6 @@ using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -80,7 +79,7 @@ namespace Mfr.App.Ui.Views.RenameList
             Dispatcher.UIThread.Post(() => _columnWidthSyncEnabled = true, DispatcherPriority.Loaded);
         }
 
-        private DataGridTextColumn _CreateGridColumn(RenameListVisibleColumn visibleColumn)
+        private DataGridTemplateColumn _CreateGridColumn(RenameListVisibleColumn visibleColumn)
         {
             var key = visibleColumn.Key;
             var field = RenameListFieldCatalog.GetField(key);
@@ -94,12 +93,12 @@ namespace Mfr.App.Ui.Views.RenameList
             );
             var pixelWidth = _ResolveEffectivePixelWidth(visibleColumn, minHeaderWidth);
 
-            var column = new DataGridTextColumn
+            var column = new DataGridTemplateColumn
             {
-                Binding = new Binding { Converter = RenameListFieldTextConverter.Instance, ConverterParameter = key },
                 CanUserSort = canUserSort,
                 Width = new DataGridLength(pixelWidth, DataGridLengthUnitType.Pixel),
                 MinWidth = minHeaderWidth,
+                CellTemplate = new FuncDataTemplate<RenameListEntry>((entry, _) => _CreateFieldCell(entry, key)),
             };
 
             RenameListGridColumns.SetFieldKey(column, key);
@@ -110,6 +109,40 @@ namespace Mfr.App.Ui.Views.RenameList
 
             column.PropertyChanged += (_, args) => _OnGridColumnPropertyChanged(column, args);
             return column;
+        }
+
+        /// <summary>
+        /// Builds one field cell and re-applies text and foreground when DataGrid recycles the row.
+        /// </summary>
+        private static TextBlock _CreateFieldCell(RenameListEntry? entry, RenameListFieldKey key)
+        {
+            var textBlock = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
+            _ApplyFieldCell(textBlock, entry, key);
+            textBlock.DataContextChanged += (_, _) =>
+            {
+                if (textBlock.DataContext is not RenameListEntry current)
+                {
+                    return;
+                }
+
+                _ApplyFieldCell(textBlock, current, key);
+            };
+            return textBlock;
+        }
+
+        /// <summary>
+        /// Sets catalog text and grays only when that field has a stored load error.
+        /// </summary>
+        private static void _ApplyFieldCell(TextBlock textBlock, RenameListEntry? entry, RenameListFieldKey key)
+        {
+            textBlock.Text = entry?.GetFieldText(key) ?? string.Empty;
+            if (entry?.IsFieldLoadError(key) == true)
+            {
+                textBlock.Foreground = RenameListLoadErrorForeground.Brush;
+                return;
+            }
+
+            textBlock.ClearValue(TextBlock.ForegroundProperty);
         }
 
         private static int _ResolveEffectivePixelWidth(RenameListVisibleColumn visibleColumn, int minHeaderWidth)

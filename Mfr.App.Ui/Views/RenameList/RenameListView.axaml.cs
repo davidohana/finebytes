@@ -565,42 +565,6 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _OnLoadingRow(object? sender, DataGridRowEventArgs e)
         {
             _ApplyDropMarkClass(e.Row);
-            _ApplyFieldLoadErrorForeground(e.Row);
-        }
-
-        private void _ApplyFieldLoadErrorForeground(DataGridRow row)
-        {
-            Dispatcher.UIThread.Post(() => _ApplyFieldLoadErrorForegroundCore(row), DispatcherPriority.Loaded);
-        }
-
-        private void _ApplyFieldLoadErrorForegroundCore(DataGridRow row)
-        {
-            foreach (var textBlock in row.GetVisualDescendants().OfType<TextBlock>())
-            {
-                _WireErrorForeground(textBlock);
-                RenameListFieldForegroundConverter.ApplyFromCellText(textBlock);
-            }
-        }
-
-        private void _WireErrorForeground(TextBlock textBlock)
-        {
-            if (textBlock.Classes.Contains("mfr-error-fg"))
-            {
-                return;
-            }
-
-            textBlock.Classes.Add("mfr-error-fg");
-            textBlock.PropertyChanged += _OnCellTextForegroundPropertyChanged;
-        }
-
-        private void _OnCellTextForegroundPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-        {
-            if (e.Property != TextBlock.TextProperty || sender is not TextBlock textBlock)
-            {
-                return;
-            }
-
-            RenameListFieldForegroundConverter.ApplyFromCellText(textBlock);
         }
 
         private void _ApplyDropMarkVisuals()

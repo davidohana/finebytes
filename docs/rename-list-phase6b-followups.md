@@ -9,16 +9,16 @@ Handover from the Phase 6b review. **6b is shipped:** row-level TagLib + image e
 gray `"Error"` cells, Show Load Errors dialog, status-bar `[Field value error]` hint,
 `ErrorsLast` sort.
 
-These phases are **6b leftovers**, not preview work. **8a Refresh** should wait until **6d**
-so Refresh does not inherit the text-sentinel gray path.
+These phases are **6b leftovers**, not preview work. **6d is shipped** (structured cell gray).
+**8a Refresh** should wait until **6e** so Refresh does not inherit Field Error type names.
 
 Do **not** go back to per-field stored exceptions or format-specific user-message parsers.
 Keep two slots on `RenameItem` (`TagLibMetadataLoadError`, `ImagePropertiesLoadError`).
 
 ## Suggested order
 
-1. **6c** TagLib sibling load flags (loader only).
-1. **6d** Structured gray (grid paint; no `"Error"` text compare).
+1. ~~**6c** TagLib sibling load flags (loader only).~~
+1. ~~**6d** Structured gray (grid paint; no `"Error"` text compare).~~
 1. **6e** Rename `FieldError` → `LoadErrors` (names match the menu).
 1. Then **8a** Original Refresh.
 
@@ -41,49 +41,15 @@ true and the media requirement is satisfied (media key need not be requested).
 
 ## 6d — Structured gray (no display-text sentinel)
 
-[`ApplyFromCellText`](../Mfr.App.Ui/ViewModels/RenameList/RenameListFieldForegroundConverter.cs)
-grays any `TextBlock` whose text is `"Error"`. Sort already uses
-`RenameListMetadataLoadErrors.HasLoadError`; a real Title of `"Error"` would still paint gray.
-`LoadingRow` + `TextProperty` listeners exist because Avalonia `DataGridCell` has no `Column`.
+**Shipped.** Cells are **`DataGridTemplateColumn`** + `FuncDataTemplate<RenameListEntry>`.
+Text comes from `GetFieldText`; gray from `IsFieldLoadError` (not `"Error"` text).
+`DataContextChanged` re-applies both when DataGrid recycles the row. Unused
+`RenameListFieldTextConverter` and the `LoadingRow` text-sentinel listeners are gone.
+Brush helper is [`RenameListLoadErrorForeground`](../Mfr.App.Ui/ViewModels/RenameList/RenameListLoadErrorForeground.cs).
 
-### Approach
-
-Use **`DataGridTemplateColumn`** with `FuncDataTemplate<RenameListEntry>` and the **`entry`
-argument** (not an empty `{Binding}` — that was the blank-cell bug).
-
-For each cell:
-
-- `Text = entry?.GetFieldText(key) ?? ""`
-- If `entry?.IsFieldLoadError(key) == true`, set `Foreground` to the gray brush
-- Otherwise **do not set `Foreground`** (do **not** use `Brushes.Transparent` — that made
-  basic columns invisible)
-
-Keep header templates, widths, `CanUserSort`, and `RenameListGridColumns.SetFieldKey` as
-today.
-
-### Delete after paint works
-
-- `_ApplyFieldLoadErrorForeground` / `_WireErrorForeground` /
-  `_OnCellTextForegroundPropertyChanged` in
-  [`RenameListView.axaml.cs`](../Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs)
-- `ApplyFromCellText` and the `"mfr-error-fg"` once-flag
-- Tests that only exist to lock in text-sentinel paint
-  (`ApplyFromCellText_clears_gray_when_text_is_not_Error`)
-
-### Tests that must keep passing
-
-- [`Grid_cells_show_basic_field_text`](../Mfr.Tests/Ui/RenameList/RenameListViewColumnTests.cs)
-- `Grid_shows_basic_text_and_Error_for_metadata_failure_on_same_row` — gray on the **Title**
-  cell, not Full File Name; Full File Name not gray
-
-**Add:** a Title value of `"Error"` without a stored load exception is **not** gray (same
-fixture idea as `CompareForSort_does_not_treat_literal_Error_tag_value_as_load_failure`).
-
-**If templates still break autofit/sort:** stop and fix the template; do not restore
-text-sentinel paint.
-
-Name any remaining brush helper for **load-error foreground**, not `*Converter` (it is not
-an `IValueConverter`).
+**Tests:** `Grid_cells_show_basic_field_text`; gray Title + not-gray Full File Name on the
+same failed-metadata row; a literal Title of `"Error"` without a stored load exception is
+not gray.
 
 ## 6e — `FieldError` → `LoadErrors` names
 
@@ -114,4 +80,4 @@ No behavior change. Catalog wrappers stay public (UI has no `InternalsVisibleTo`
 - Format-specific `DescribeUserMessage` branches (playlist vs jpeg vs …)
 - Preview-error UI (**8c**) or missing-on-disk gray (**Phase 10**) — Phase 10 should reuse
   6d’s structured cell foreground, not a second text sentinel
-- Starting **8a** while gray still compares cell text to `"Error"`
+- Starting **8a** before **6e** (Refresh would inherit Field Error type names)

@@ -701,13 +701,64 @@ namespace Mfr.Tests.Ui.RenameList
             var errorTextBlock = row.GetVisualDescendants()
                 .OfType<TextBlock>()
                 .First(textBlock => textBlock.Text == RenameListFieldCatalog.FieldLoadErrorText);
+            Assert.Same(RenameListLoadErrorForeground.Brush, errorTextBlock.Foreground);
             var errorBrush = Assert.IsType<SolidColorBrush>(errorTextBlock.Foreground);
             Assert.Equal(Color.Parse("#808080"), errorBrush.Color);
 
             var fullNameTextBlock = row.GetVisualDescendants()
                 .OfType<TextBlock>()
                 .First(textBlock => textBlock.Text == "info.htm");
-            Assert.NotSame(RenameListFieldForegroundConverter.ErrorBrush, fullNameTextBlock.Foreground);
+            Assert.NotSame(RenameListLoadErrorForeground.Brush, fullNameTextBlock.Foreground);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies a Title of <c>Error</c> is not gray unless that field stored a load exception.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Grid_does_not_gray_literal_Error_title_without_load_failure()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "tagged.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "Error");
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(fullNameKey),
+                new RenameListVisibleColumn(titleKey),
+            ]);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 900,
+                Height = 200,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.Equal("tagged.wav", entry.GetFieldText(fullNameKey));
+            Assert.Equal("Error", entry.GetFieldText(titleKey));
+            Assert.False(entry.IsFieldLoadError(titleKey));
+
+            var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
+            var titleTextBlock = row.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .First(textBlock => textBlock.Text == "Error");
+            Assert.NotSame(RenameListLoadErrorForeground.Brush, titleTextBlock.Foreground);
 
             window.Close();
         }
