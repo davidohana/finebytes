@@ -19,16 +19,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var items = keys.Select(key => new RenameListVisibleColumn(key));
-            var insertedCount = _columns.TryInsertMany(index, items);
-            if (insertedCount == 0)
+            if (_columns.TryInsertMany(index, items) == 0)
             {
                 return;
             }
 
-            _AssignColumnSelection(
-                _BuildInsertedSelectionIndices(index, insertedCount, _columns.Items.Count),
-                _columns.SelectedIndex
-            );
             _RefreshLists();
         }
 
@@ -45,7 +40,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _AssignColumnSelection([], -1);
+            _columns.SetSelection([], -1);
             _RefreshLists();
         }
 
@@ -58,12 +53,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             ArgumentNullException.ThrowIfNull(sourceIndices);
 
-            if (!_columns.TryMoveIndicesTo(sourceIndices, targetIndex, out var newIndices))
+            if (!_columns.TryMoveIndicesTo(sourceIndices, targetIndex))
             {
                 return;
             }
 
-            _AssignColumnSelection(newIndices, _columns.SelectedIndex);
             _RefreshLists();
         }
 
@@ -82,16 +76,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var items = fieldKeys.Select(fieldKey => new RenameListSortKey(fieldKey));
-            var insertedCount = _sortKeys.TryInsertMany(index, items);
-            if (insertedCount == 0)
+            if (_sortKeys.TryInsertMany(index, items) == 0)
             {
                 return;
             }
 
-            _AssignSortSelection(
-                _BuildInsertedSelectionIndices(index, insertedCount, _sortKeys.Items.Count),
-                _sortKeys.SelectedIndex
-            );
             _RefreshLists();
         }
 
@@ -108,7 +97,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _AssignSortSelection([], -1);
+            _sortKeys.SetSelection([], -1);
             _RefreshLists();
         }
 
@@ -121,12 +110,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             ArgumentNullException.ThrowIfNull(sourceIndices);
 
-            if (!_sortKeys.TryMoveIndicesTo(sourceIndices, targetIndex, out var newIndices))
+            if (!_sortKeys.TryMoveIndicesTo(sourceIndices, targetIndex))
             {
                 return;
             }
 
-            _AssignSortSelection(newIndices, _sortKeys.SelectedIndex);
             _RefreshLists();
         }
 
@@ -158,21 +146,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             RemoveSortKeysAtIndices([index]);
-        }
-
-        private static IReadOnlyList<int> _BuildInsertedSelectionIndices(
-            int insertIndex,
-            int insertedCount,
-            int totalCount
-        )
-        {
-            if (insertedCount == 0 || totalCount == 0)
-            {
-                return [];
-            }
-
-            var start = Math.Clamp(insertIndex, 0, totalCount - insertedCount);
-            return [.. Enumerable.Range(start, insertedCount)];
         }
     }
 }

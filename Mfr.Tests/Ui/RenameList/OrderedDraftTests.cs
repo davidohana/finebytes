@@ -133,6 +133,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(2, insertedCount);
             Assert.Equal(["a", "b", "c"], draft.Items);
             Assert.Equal(2, draft.SelectedIndex);
+            Assert.Equal([1, 2], draft.SelectedIndices);
         }
 
         [Fact]
@@ -169,6 +170,22 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(["a", "c", "b"], draft.Items);
             Assert.Equal([0, 1], newIndices);
+            Assert.Equal(1, draft.SelectedIndex);
+            Assert.Equal([0, 1], draft.SelectedIndices);
+        }
+
+        [Fact]
+        public void SetSelection_keeps_anchor_inside_indices()
+        {
+            var draft = new OrderedDraft<string, string>(["a", "b", "c"], item => item);
+
+            draft.SetSelection([0, 2], 2);
+
+            Assert.Equal([0, 2], draft.SelectedIndices);
+            Assert.Equal(2, draft.SelectedIndex);
+
+            draft.SelectedIndex = 1;
+            Assert.Equal([1], draft.SelectedIndices);
             Assert.Equal(1, draft.SelectedIndex);
         }
 

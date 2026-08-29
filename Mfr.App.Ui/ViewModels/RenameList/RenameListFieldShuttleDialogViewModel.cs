@@ -100,15 +100,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 OnPropertyChanged(nameof(IsOriginalColumnsTab));
                 if (value)
                 {
-                    _selectedAvailableOriginalFields = [];
                     SelectedAvailableOriginalField = null;
-                    OnPropertyChanged(nameof(SelectedAvailableOriginalFields));
                 }
                 else
                 {
-                    _selectedAvailablePreviewFields = [];
                     SelectedAvailablePreviewField = null;
-                    OnPropertyChanged(nameof(SelectedAvailablePreviewFields));
                 }
 
                 AddSelectedOriginalFieldCommand.NotifyCanExecuteChanged();
@@ -172,7 +168,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 }
 
                 field = value;
+                _selectedAvailableOriginalFields = _AvailableListForAnchor(_selectedAvailableOriginalFields, value);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(SelectedAvailableOriginalFields));
                 AddSelectedOriginalFieldCommand.NotifyCanExecuteChanged();
             }
         }
@@ -191,7 +189,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 }
 
                 field = value;
+                _selectedAvailablePreviewFields = _AvailableListForAnchor(_selectedAvailablePreviewFields, value);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(SelectedAvailablePreviewFields));
                 AddSelectedPreviewFieldCommand.NotifyCanExecuteChanged();
             }
         }
@@ -210,7 +210,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 }
 
                 field = value;
+                _selectedAvailableSortFields = _AvailableListForAnchor(_selectedAvailableSortFields, value);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(SelectedAvailableSortFields));
                 AddSelectedSortFieldCommand.NotifyCanExecuteChanged();
             }
         }
@@ -228,7 +230,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     return;
                 }
 
-                _AssignColumnSelection(value >= 0 ? [value] : [], value);
+                _columns.SetSelection(value >= 0 ? [value] : [], value);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedColumnRowIndices));
                 _NotifyColumnSelectionCommands();
@@ -248,7 +250,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     return;
                 }
 
-                _AssignSortSelection(value >= 0 ? [value] : [], value);
+                _sortKeys.SetSelection(value >= 0 ? [value] : [], value);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedSortRowIndices));
                 _NotifySortSelectionCommands();
@@ -276,12 +278,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelectedOriginalField))]
         public void AddSelectedOriginalField()
         {
-            var fields =
-                _selectedAvailableOriginalFields.Count > 0 ? _selectedAvailableOriginalFields
-                : SelectedAvailableOriginalField is { } single ? [single]
-                : Array.Empty<RenameListField>();
-
-            _AddColumns(fields.Select(field => field.OriginalKey));
+            _AddColumns(_selectedAvailableOriginalFields.Select(field => field.OriginalKey));
         }
 
         /// <summary>
@@ -290,12 +287,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelectedPreviewField))]
         public void AddSelectedPreviewField()
         {
-            var fields =
-                _selectedAvailablePreviewFields.Count > 0 ? _selectedAvailablePreviewFields
-                : SelectedAvailablePreviewField is { } single ? [single]
-                : Array.Empty<RenameListField>();
-
-            _AddColumns(fields.Select(field => field.PreviewKey));
+            _AddColumns(_selectedAvailablePreviewFields.Select(field => field.PreviewKey));
         }
 
         /// <summary>
@@ -324,12 +316,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanRemoveSelectedColumn))]
         public void RemoveSelectedColumn()
         {
-            if (_columns.TryRemoveAtIndices(_selectedColumnRowIndices) == 0)
+            if (_columns.TryRemoveAtIndices(_columns.SelectedIndices) == 0)
             {
                 return;
             }
 
-            _AssignColumnSelection(_columns.SelectedIndex >= 0 ? [_columns.SelectedIndex] : [], _columns.SelectedIndex);
             _RefreshLists();
         }
 
@@ -339,12 +330,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedColumnUp))]
         public void MoveSelectedColumnUp()
         {
-            if (!_columns.TryMoveBlock(_selectedColumnRowIndices, -1, out var newIndices))
+            if (!_columns.TryMoveBlock(-1))
             {
                 return;
             }
 
-            _AssignColumnSelection(newIndices, _columns.SelectedIndex);
             _RefreshLists();
         }
 
@@ -354,12 +344,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedColumnDown))]
         public void MoveSelectedColumnDown()
         {
-            if (!_columns.TryMoveBlock(_selectedColumnRowIndices, 1, out var newIndices))
+            if (!_columns.TryMoveBlock(1))
             {
                 return;
             }
 
-            _AssignColumnSelection(newIndices, _columns.SelectedIndex);
             _RefreshLists();
         }
 
@@ -370,7 +359,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public void ClearSelectedColumns()
         {
             _columns.Clear();
-            _AssignColumnSelection([], -1);
             _RefreshLists();
         }
 
@@ -380,12 +368,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelectedSortField))]
         public void AddSelectedSortField()
         {
-            var fields =
-                _selectedAvailableSortFields.Count > 0 ? _selectedAvailableSortFields
-                : SelectedAvailableSortField is { } single ? [single]
-                : Array.Empty<RenameListField>();
-
-            _AddSortKeys(fields.Select(field => field.OriginalKey));
+            _AddSortKeys(_selectedAvailableSortFields.Select(field => field.OriginalKey));
         }
 
         /// <summary>
@@ -394,15 +377,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanRemoveSelectedSortKey))]
         public void RemoveSelectedSortKey()
         {
-            if (_sortKeys.TryRemoveAtIndices(_selectedSortRowIndices) == 0)
+            if (_sortKeys.TryRemoveAtIndices(_sortKeys.SelectedIndices) == 0)
             {
                 return;
             }
 
-            _AssignSortSelection(
-                _sortKeys.SelectedIndex >= 0 ? [_sortKeys.SelectedIndex] : [],
-                _sortKeys.SelectedIndex
-            );
             _RefreshLists();
         }
 
@@ -412,12 +391,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedSortKeyUp))]
         public void MoveSelectedSortKeyUp()
         {
-            if (!_sortKeys.TryMoveBlock(_selectedSortRowIndices, -1, out var newIndices))
+            if (!_sortKeys.TryMoveBlock(-1))
             {
                 return;
             }
 
-            _AssignSortSelection(newIndices, _sortKeys.SelectedIndex);
             _RefreshLists();
         }
 
@@ -427,12 +405,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedSortKeyDown))]
         public void MoveSelectedSortKeyDown()
         {
-            if (!_sortKeys.TryMoveBlock(_selectedSortRowIndices, 1, out var newIndices))
+            if (!_sortKeys.TryMoveBlock(1))
             {
                 return;
             }
 
-            _AssignSortSelection(newIndices, _sortKeys.SelectedIndex);
             _RefreshLists();
         }
 
@@ -468,18 +445,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public void ClearSelectedSortKeys()
         {
             _sortKeys.Clear();
-            _AssignSortSelection([], -1);
             _RefreshLists();
         }
 
         private bool _CanAddSelectedOriginalField()
         {
-            return _selectedAvailableOriginalFields.Count > 0 || SelectedAvailableOriginalField is not null;
+            return _selectedAvailableOriginalFields.Count > 0;
         }
 
         private bool _CanAddSelectedPreviewField()
         {
-            return _selectedAvailablePreviewFields.Count > 0 || SelectedAvailablePreviewField is not null;
+            return _selectedAvailablePreviewFields.Count > 0;
         }
 
         private bool _HasAvailableOriginalFields()
@@ -494,17 +470,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanRemoveSelectedColumn()
         {
-            return _selectedColumnRowIndices.Count > 0;
+            return _columns.SelectedIndices.Count > 0;
         }
 
         private bool _CanMoveSelectedColumnUp()
         {
-            return _columns.CanMoveBlock(_selectedColumnRowIndices, offset: -1);
+            return _columns.CanMoveBlock(offset: -1);
         }
 
         private bool _CanMoveSelectedColumnDown()
         {
-            return _columns.CanMoveBlock(_selectedColumnRowIndices, offset: 1);
+            return _columns.CanMoveBlock(offset: 1);
         }
 
         private bool _HasSelectedColumns()
@@ -514,22 +490,22 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelectedSortField()
         {
-            return _selectedAvailableSortFields.Count > 0 || SelectedAvailableSortField is not null;
+            return _selectedAvailableSortFields.Count > 0;
         }
 
         private bool _CanRemoveSelectedSortKey()
         {
-            return _selectedSortRowIndices.Count > 0;
+            return _sortKeys.SelectedIndices.Count > 0;
         }
 
         private bool _CanMoveSelectedSortKeyUp()
         {
-            return _sortKeys.CanMoveBlock(_selectedSortRowIndices, offset: -1);
+            return _sortKeys.CanMoveBlock(offset: -1);
         }
 
         private bool _CanMoveSelectedSortKeyDown()
         {
-            return _sortKeys.CanMoveBlock(_selectedSortRowIndices, offset: 1);
+            return _sortKeys.CanMoveBlock(offset: 1);
         }
 
         private bool _CanToggleSelectedSortDirection()
@@ -544,45 +520,35 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private void _AddColumns(IEnumerable<RenameListFieldKey> keys)
         {
-            var insertIndex = _columns.GetInsertIndexBelow(_selectedColumnRowIndices);
+            var insertIndex = _columns.GetInsertIndexBelow();
             var items = keys.Select(key => new RenameListVisibleColumn(key)).ToList();
             if (items.Count == 0)
             {
                 return;
             }
 
-            var insertedCount = _columns.TryInsertMany(insertIndex, items);
-            if (insertedCount == 0)
+            if (_columns.TryInsertMany(insertIndex, items) == 0)
             {
                 return;
             }
 
-            _AssignColumnSelection(
-                _BuildInsertedSelectionIndices(insertIndex, insertedCount, _columns.Items.Count),
-                _columns.SelectedIndex
-            );
             _RefreshLists();
         }
 
         private void _AddSortKeys(IEnumerable<RenameListFieldKey> fieldKeys)
         {
-            var insertIndex = _sortKeys.GetInsertIndexBelow(_selectedSortRowIndices);
+            var insertIndex = _sortKeys.GetInsertIndexBelow();
             var items = fieldKeys.Select(fieldKey => new RenameListSortKey(fieldKey)).ToList();
             if (items.Count == 0)
             {
                 return;
             }
 
-            var insertedCount = _sortKeys.TryInsertMany(insertIndex, items);
-            if (insertedCount == 0)
+            if (_sortKeys.TryInsertMany(insertIndex, items) == 0)
             {
                 return;
             }
 
-            _AssignSortSelection(
-                _BuildInsertedSelectionIndices(insertIndex, insertedCount, _sortKeys.Items.Count),
-                _sortKeys.SelectedIndex
-            );
             _RefreshLists();
         }
 
@@ -591,12 +557,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             SelectedAvailableOriginalField = null;
             SelectedAvailablePreviewField = null;
             SelectedAvailableSortField = null;
-            _selectedAvailableOriginalFields = [];
-            _selectedAvailablePreviewFields = [];
-            _selectedAvailableSortFields = [];
-            OnPropertyChanged(nameof(SelectedAvailableOriginalFields));
-            OnPropertyChanged(nameof(SelectedAvailablePreviewFields));
-            OnPropertyChanged(nameof(SelectedAvailableSortFields));
         }
 
         /// <summary>

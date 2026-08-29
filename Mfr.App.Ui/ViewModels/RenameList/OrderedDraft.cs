@@ -1,7 +1,7 @@
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Ordered draft list with unique keys, selection index, and shuttle-style add/remove/move/clear.
+    /// Ordered draft list with unique keys, multi-selection, and shuttle-style add/remove/move/clear.
     /// </summary>
     /// <typeparam name="TKey">Unique key for duplicate detection.</typeparam>
     /// <typeparam name="TItem">Draft item stored in list order.</typeparam>
@@ -11,6 +11,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private readonly List<TItem> _items;
         private readonly HashSet<TKey> _keys;
         private readonly Func<TItem, TKey> _keyOf;
+        private IReadOnlyList<int> _selectedIndices = [];
+        private int _selectedIndex = -1;
 
         /// <summary>
         /// Initializes a draft from existing items.
@@ -33,9 +35,37 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<TItem> Items => _items;
 
         /// <summary>
-        /// Gets or sets the selected item index, or <c>-1</c> when empty or nothing selected.
+        /// Gets selected item indices in list order.
         /// </summary>
-        public int SelectedIndex { get; set; } = -1;
+        public IReadOnlyList<int> SelectedIndices => _selectedIndices;
+
+        /// <summary>
+        /// Gets or sets the selected-item anchor, or <c>-1</c> when nothing is selected.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Setting this value replaces multi-selection with that single index (or clears it when
+        /// <c>-1</c>). Use <see cref="SetSelection"/> to keep a multi-selection.
+        /// </para>
+        /// </remarks>
+        public int SelectedIndex
+        {
+            get => _selectedIndex;
+            set => SetSelection(value >= 0 ? [value] : [], value);
+        }
+
+        /// <summary>
+        /// Sets multi-selection and keeps the anchor on a selected row.
+        /// </summary>
+        /// <param name="indices">Selected row indices in list order.</param>
+        /// <param name="anchorIndex">Primary selected row used for insert-below and direction toggles.</param>
+        public void SetSelection(IReadOnlyList<int> indices, int anchorIndex)
+        {
+            ArgumentNullException.ThrowIfNull(indices);
+
+            _selectedIndices = _NormalizeIndices(indices);
+            _selectedIndex = _ResolveAnchor(_selectedIndices, anchorIndex);
+        }
 
         /// <summary>
         /// Gets whether the draft contains an item with <paramref name="key"/>.
@@ -55,7 +85,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets whether the current selection can be removed.
         /// </summary>
-        public bool CanRemove => _TryGetSelectedIndex(out _);
+        public bool CanRemove => _selectedIndices.Count > 0;
+
+        /// <summary>
+        /// Gets whether any selected item can move one step toward <paramref name="offset"/>.
+        /// </summary>
+        /// <param name="offset">Direction to move (-1 up, +1 down).</param>
+        /// <returns>
+        /// <see langword="true"/> when at least one selected item has an unselected neighbor in that direction.
+        /// </returns>
+        public bool CanMoveBlock(int offset)
+        {
+            return CanMoveBlock(_selectedIndices, offset);
+        }
 
         /// <summary>
         /// Gets whether any item at <paramref name="sourceIndices"/> can move one step toward <paramref name="offset"/>.
@@ -89,6 +131,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Gets the index where a new item should be inserted below the last selected row.
+        /// </summary>
+        /// <returns>Index in <c>[0, Count]</c>; when nothing is selected, returns <see cref="IReadOnlyCollection{T}.Count"/>.</returns>
+        public int GetInsertIndexBelow()
+        {
+            return GetInsertIndexBelow(_selectedIndices);
         }
 
         /// <summary>
@@ -130,20 +181,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns><see langword="false"/> when the key already exists; otherwise <see langword="true"/>.</returns>
         public bool TryInsertAt(int index, TItem item)
         {
-            var key = _keyOf(item);
-            if (!_keys.Add(key))
+            if (!_TryInsertItem(index, item, out var insertedIndex))
             {
                 return false;
             }
 
-            index = Math.Clamp(index, 0, _items.Count);
-            _items.Insert(index, item);
-            SelectedIndex = index;
+            SetSelection([insertedIndex], insertedIndex);
             return true;
         }
 
         /// <summary>
-        /// Inserts items at <paramref name="index"/> in order, skipping duplicate keys, and selects the last inserted row.
+        /// Inserts items at <paramref name="index"/> in order, skipping duplicate keys, and selects the inserted rows.
         /// </summary>
         /// <param name="index">Starting insertion index in <c>[0, Count]</c>.</param>
         /// <param name="items">Items to insert.</param>
@@ -158,26 +206,27 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             foreach (var item in items)
             {
-                if (!TryInsertAt(index, item))
+                if (!_TryInsertItem(index, item, out var insertedIndex))
                 {
                     continue;
                 }
 
                 insertedCount++;
-                lastInsertedIndex = index;
-                index++;
+                lastInsertedIndex = insertedIndex;
+                index = insertedIndex + 1;
             }
 
-            if (lastInsertedIndex >= 0)
+            if (insertedCount > 0)
             {
-                SelectedIndex = lastInsertedIndex;
+                var start = lastInsertedIndex - insertedCount + 1;
+                SetSelection([.. Enumerable.Range(start, insertedCount)], lastInsertedIndex);
             }
 
             return insertedCount;
         }
 
         /// <summary>
-        /// Removes items at <paramref name="indices"/> and clamps <see cref="SelectedIndex"/>.
+        /// Removes items at <paramref name="indices"/> and clamps selection to a remaining row.
         /// </summary>
         /// <param name="indices">Item indices to remove.</param>
         /// <returns>Number of items removed.</returns>
@@ -190,7 +239,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return 0;
             }
 
-            var anchorIndex = SelectedIndex;
+            var anchorIndex = _selectedIndex;
             var removedCount = 0;
 
             foreach (var index in indices.Distinct().OrderByDescending(i => i))
@@ -210,8 +259,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return 0;
             }
 
-            SelectedIndex = _ClampSelectionIndex(anchorIndex, _items.Count);
+            var newAnchor = _ClampSelectionIndex(anchorIndex, _items.Count);
+            SetSelection(newAnchor >= 0 ? [newAnchor] : [], newAnchor);
             return removedCount;
+        }
+
+        /// <summary>
+        /// Moves the current selection one position toward <paramref name="offset"/>, independently.
+        /// </summary>
+        /// <param name="offset">Direction to move (-1 up, +1 down).</param>
+        /// <returns><see langword="false"/> when nothing could move.</returns>
+        public bool TryMoveBlock(int offset)
+        {
+            return TryMoveBlock(_selectedIndices, offset, out _);
         }
 
         /// <summary>
@@ -249,8 +309,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var selectedKeys = _KeysAt(sourceIndices);
-            var hasAnchor = _TryGetSelectedIndex(out var anchorIndex);
-            var trackedAnchor = hasAnchor ? _keyOf(_items[anchorIndex]) : default;
+            var hasAnchor = _selectedIndex >= 0 && _selectedIndex < _items.Count;
+            var trackedAnchor = hasAnchor ? _keyOf(_items[_selectedIndex]) : default;
 
             var moved = false;
             var walkStep = -offset;
@@ -276,13 +336,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             [
                 .. Enumerable.Range(0, _items.Count).Where(index => selectedKeys.Contains(_keyOf(_items[index]))),
             ];
-            if (hasAnchor)
-            {
-                SelectedIndex = _items.FindIndex(item =>
-                    EqualityComparer<TKey>.Default.Equals(_keyOf(item), trackedAnchor)
-                );
-            }
-
+            var newAnchor = hasAnchor
+                ? _items.FindIndex(item => EqualityComparer<TKey>.Default.Equals(_keyOf(item), trackedAnchor))
+                : -1;
+            SetSelection(newIndices, newAnchor);
             return true;
         }
 
@@ -326,8 +383,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             targetIndex = Math.Clamp(targetIndex, 0, _items.Count);
             var movingItems = sortedSources.Select(index => _items[index]).ToList();
-            var hasAnchor = _TryGetSelectedIndex(out var anchorIndex);
-            var trackedAnchor = hasAnchor ? _keyOf(_items[anchorIndex]) : default;
+            var hasAnchor = _selectedIndex >= 0 && _selectedIndex < _items.Count;
+            var trackedAnchor = hasAnchor ? _keyOf(_items[_selectedIndex]) : default;
 
             foreach (var index in sortedSources.OrderByDescending(i => i))
             {
@@ -339,13 +396,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _items.InsertRange(insertIndex, movingItems);
 
             newIndices = [.. Enumerable.Range(insertIndex, movingItems.Count)];
-            if (hasAnchor)
-            {
-                SelectedIndex = _items.FindIndex(item =>
-                    EqualityComparer<TKey>.Default.Equals(_keyOf(item), trackedAnchor)
-                );
-            }
-
+            var newAnchor = hasAnchor
+                ? _items.FindIndex(item => EqualityComparer<TKey>.Default.Equals(_keyOf(item), trackedAnchor))
+                : -1;
+            SetSelection(newIndices, newAnchor);
             return true;
         }
 
@@ -356,7 +410,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             _items.Clear();
             _keys.Clear();
-            SelectedIndex = -1;
+            SetSelection([], -1);
         }
 
         /// <summary>
@@ -378,6 +432,20 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _items[index] = item;
+            return true;
+        }
+
+        private bool _TryInsertItem(int index, TItem item, out int insertedIndex)
+        {
+            var key = _keyOf(item);
+            if (!_keys.Add(key))
+            {
+                insertedIndex = -1;
+                return false;
+            }
+
+            insertedIndex = Math.Clamp(index, 0, _items.Count);
+            _items.Insert(insertedIndex, item);
             return true;
         }
 
@@ -418,10 +486,24 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return !selectedKeys.Contains(_keyOf(_items[neighborIndex]));
         }
 
-        private bool _TryGetSelectedIndex(out int index)
+        private IReadOnlyList<int> _NormalizeIndices(IReadOnlyList<int> indices)
         {
-            index = SelectedIndex;
-            return index >= 0 && index < _items.Count;
+            return [.. indices.Where(index => index >= 0 && index < _items.Count).Distinct().OrderBy(index => index)];
+        }
+
+        private static int _ResolveAnchor(IReadOnlyList<int> indices, int anchorIndex)
+        {
+            if (indices.Count == 0)
+            {
+                return -1;
+            }
+
+            if (indices.Contains(anchorIndex))
+            {
+                return anchorIndex;
+            }
+
+            return indices[^1];
         }
 
         private static int _ClampSelectionIndex(int index, int count)

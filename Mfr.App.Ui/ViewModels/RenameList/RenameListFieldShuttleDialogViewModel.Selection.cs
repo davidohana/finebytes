@@ -4,8 +4,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 {
     public sealed partial class RenameListFieldShuttleDialogViewModel
     {
-        private IReadOnlyList<int> _selectedColumnRowIndices = [];
-        private IReadOnlyList<int> _selectedSortRowIndices = [];
         private IReadOnlyList<RenameListField> _selectedAvailableOriginalFields = [];
         private IReadOnlyList<RenameListField> _selectedAvailablePreviewFields = [];
         private IReadOnlyList<RenameListField> _selectedAvailableSortFields = [];
@@ -13,12 +11,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets selected row indices in the selected-columns list.
         /// </summary>
-        public IReadOnlyList<int> SelectedColumnRowIndices => _selectedColumnRowIndices;
+        public IReadOnlyList<int> SelectedColumnRowIndices => _columns.SelectedIndices;
 
         /// <summary>
         /// Gets selected row indices in the selected-sort list.
         /// </summary>
-        public IReadOnlyList<int> SelectedSortRowIndices => _selectedSortRowIndices;
+        public IReadOnlyList<int> SelectedSortRowIndices => _sortKeys.SelectedIndices;
 
         /// <summary>
         /// Sets multi-selection for the selected-columns list.
@@ -34,7 +32,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _AssignColumnSelection(indices, anchorIndex);
+            _columns.SetSelection(indices, anchorIndex);
             OnPropertyChanged(nameof(SelectedColumnRowIndices));
             _NotifyColumnSelectionIndexChanged();
         }
@@ -53,7 +51,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _AssignSortSelection(indices, anchorIndex);
+            _sortKeys.SetSelection(indices, anchorIndex);
             OnPropertyChanged(nameof(SelectedSortRowIndices));
             _NotifySortSelectionIndexChanged();
         }
@@ -139,32 +137,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         public IReadOnlyList<RenameListField> SelectedAvailableSortFields => _selectedAvailableSortFields;
 
-        /// <summary>
-        /// Stores column multi-selection and keeps the draft anchor on a selected row.
-        /// </summary>
-        private void _AssignColumnSelection(IReadOnlyList<int> indices, int anchorIndex)
-        {
-            _selectedColumnRowIndices = _NormalizeIndices(indices, _columns.Items.Count);
-            _columns.SelectedIndex = _ResolveAnchor(_selectedColumnRowIndices, anchorIndex);
-        }
-
-        /// <summary>
-        /// Stores sort multi-selection and keeps the draft anchor on a selected row.
-        /// </summary>
-        private void _AssignSortSelection(IReadOnlyList<int> indices, int anchorIndex)
-        {
-            _selectedSortRowIndices = _NormalizeIndices(indices, _sortKeys.Items.Count);
-            _sortKeys.SelectedIndex = _ResolveAnchor(_selectedSortRowIndices, anchorIndex);
-        }
-
         private bool _IsSingleColumnSelection(int index)
         {
-            return _columns.SelectedIndex == index && _IsSingleIndexSelection(_selectedColumnRowIndices, index);
+            return _columns.SelectedIndex == index && _IsSingleIndexSelection(_columns.SelectedIndices, index);
         }
 
         private bool _IsSingleSortSelection(int index)
         {
-            return _sortKeys.SelectedIndex == index && _IsSingleIndexSelection(_selectedSortRowIndices, index);
+            return _sortKeys.SelectedIndex == index && _IsSingleIndexSelection(_sortKeys.SelectedIndices, index);
         }
 
         private static bool _IsSingleIndexSelection(IReadOnlyList<int> indices, int index)
@@ -177,24 +157,29 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return indices.Count == 1 && indices[0] == index;
         }
 
-        private static IReadOnlyList<int> _NormalizeIndices(IReadOnlyList<int> indices, int itemCount)
+        /// <summary>
+        /// Aligns an available-field list with a newly assigned anchor: empty when cleared, otherwise
+        /// keep the current multi-selection when the anchor is already in it.
+        /// </summary>
+        /// <param name="current">Current available-field multi-selection.</param>
+        /// <param name="anchor">New primary selected field, or <see langword="null"/> to clear.</param>
+        /// <returns>The existing list when it already contains <paramref name="anchor"/>; otherwise a one-item list.</returns>
+        private static IReadOnlyList<RenameListField> _AvailableListForAnchor(
+            IReadOnlyList<RenameListField> current,
+            RenameListField? anchor
+        )
         {
-            return [.. indices.Where(index => index >= 0 && index < itemCount).Distinct().OrderBy(index => index)];
-        }
-
-        private static int _ResolveAnchor(IReadOnlyList<int> indices, int anchorIndex)
-        {
-            if (indices.Count == 0)
+            if (anchor is null)
             {
-                return -1;
+                return [];
             }
 
-            if (indices.Contains(anchorIndex))
+            if (current.Contains(anchor))
             {
-                return anchorIndex;
+                return current;
             }
 
-            return indices[^1];
+            return [anchor];
         }
 
         private static RenameListField? _LastOrNull(IReadOnlyList<RenameListField> fields)
