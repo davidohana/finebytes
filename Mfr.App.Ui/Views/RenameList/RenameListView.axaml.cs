@@ -232,6 +232,17 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
             }
 
+            if (e.Key is Key.Home or Key.End && e.KeyModifiers == KeyModifiers.None)
+            {
+                if (_viewModel.TryJumpSelection(toLast: e.Key == Key.End))
+                {
+                    var entry = _viewModel.SelectedEntries[0];
+                    RenameGrid.ScrollIntoView(entry, RenameGrid.CurrentColumn);
+                    e.Handled = true;
+                    return true;
+                }
+            }
+
             return false;
         }
 

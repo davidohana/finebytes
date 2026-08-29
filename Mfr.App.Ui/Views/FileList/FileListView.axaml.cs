@@ -85,6 +85,22 @@ namespace Mfr.App.Ui.Views.FileList
             _WireListBoxDrag(LargeIconsList);
             _WireListBoxDrag(TilesList);
             _WireListBoxDrag(ThumbnailsList);
+            _WireListingHomeEndKeyDown(ReportGrid);
+            _WireListingHomeEndKeyDown(ListViewList);
+            _WireListingHomeEndKeyDown(SmallIconsList);
+            _WireListingHomeEndKeyDown(LargeIconsList);
+            _WireListingHomeEndKeyDown(TilesList);
+            _WireListingHomeEndKeyDown(ThumbnailsList);
+        }
+
+        private void _WireListingHomeEndKeyDown(Control host)
+        {
+            host.AddHandler(KeyDownEvent, _OnListingHomeEndKeyDown, RoutingStrategies.Tunnel);
+        }
+
+        private void _OnListingHomeEndKeyDown(object? sender, KeyEventArgs e)
+        {
+            _ = _TryHandleHomeEndNavigation(sender, e);
         }
 
         private void _WireListBoxDrag(ListBox listBox)
@@ -787,6 +803,48 @@ namespace Mfr.App.Ui.Views.FileList
             {
                 e.Handled = true;
                 return true;
+            }
+
+            _isSyncingSelection = true;
+            try
+            {
+                _ApplySelectionToSender(sender, force: true);
+            }
+            finally
+            {
+                _isSyncingSelection = false;
+            }
+
+            _ScrollSelectedIntoView(sender);
+            e.Handled = true;
+            return true;
+        }
+
+        private bool _TryHandleHomeEndNavigation(object? sender, KeyEventArgs e)
+        {
+            if (_viewModel is null || e.Key is not (Key.Home or Key.End))
+            {
+                return false;
+            }
+
+            if (e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+            {
+                return false;
+            }
+
+            if (e.KeyModifiers is not KeyModifiers.None)
+            {
+                return false;
+            }
+
+            if (!_IsActiveListingSender(sender))
+            {
+                return false;
+            }
+
+            if (!_viewModel.TryJumpSelection(toLast: e.Key == Key.End))
+            {
+                return false;
             }
 
             _isSyncingSelection = true;

@@ -38,6 +38,8 @@ Ctrl+L is the address bar (Explorer / Chrome). Log is Ctrl+Shift+L so the two do
 | Zoom thumbnails in   | Ctrl++, Ctrl+Shift+=, Ctrl+numpad +, Ctrl+wheel up | Thumbnails view, not while typing      |
 | Zoom thumbnails out  | Ctrl+-, Ctrl+numpad -, Ctrl+wheel down             | Thumbnails view, not while typing      |
 | Reset thumbnail size | Ctrl+0, Ctrl+numpad 0                              | Thumbnails view, not while typing      |
+| First item           | Home                                               | File listing focused, not while typing |
+| Last item            | End                                                | File listing focused, not while typing |
 | Commit typed path    | Enter                                              | Address bar edit                       |
 | Cancel typed path    | Esc                                                | Address bar edit                       |
 
@@ -59,6 +61,8 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 | Refresh                 | F5           | Rename List grid focused  |
 | Move selected up        | Ctrl+↑       | Rename List grid focused  |
 | Move selected down      | Ctrl+↓       | Rename List grid focused  |
+| First item              | Home         | Rename List grid focused  |
+| Last item               | End          | Rename List grid focused  |
 | Add/toggle sort level   | Shift+click  | Rename List column header |
 
 Selecting or focusing a Rename List cell shows the full cell value in the status bar.
@@ -66,6 +70,13 @@ Selecting or focusing a Rename List cell shows the full cell value in the status
 Shift+click a column header to append a sort key, toggle its direction, or remove it from the sort list. A plain header click replaces the sort list with that column only. Any **original** (non-preview) catalog column supports header sort; preview columns do not.
 
 Click the **Select Fields** toolbar button on the Rename List, or choose **Select Visible Fields...** or **Select Sort Fields...** from the **Rename List** menu, the grid right-click menu, or a column-header right-click menu, to open the field shuttle (visible columns and Auto-Sort tabs). Right-click a column header and choose **Hide Field** to hide that column.
+
+### Field shuttle (Select Fields dialog)
+
+| Action     | Shortcut | Where it works       |
+| ---------- | -------- | -------------------- |
+| First item | Home     | Focused shuttle list |
+| Last item  | End      | Focused shuttle list |
 
 ## Shown in menus, not implemented yet
 

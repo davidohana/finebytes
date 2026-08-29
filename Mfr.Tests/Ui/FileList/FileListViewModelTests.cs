@@ -825,6 +825,38 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
+        /// Verifies TryJumpSelection replaces multi-select with the first row.
+        /// </summary>
+        [Fact]
+        public void TryJumpSelection_Replaces_Multi_Select_With_First_Row()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            var first = viewModel.Entries[0];
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([first, beta], focusedEntry: beta);
+
+            Assert.True(viewModel.TryJumpSelection(toLast: false));
+
+            Assert.Single(viewModel.SelectedEntries);
+            Assert.Same(first, viewModel.SelectedEntry);
+        }
+
+        /// <summary>
+        /// Verifies TryJumpSelection jumps to the last row.
+        /// </summary>
+        [Fact]
+        public void TryJumpSelection_Jumps_To_Last_Row()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.SelectedEntry = viewModel.Entries[0];
+
+            Assert.True(viewModel.TryJumpSelection(toLast: true));
+
+            Assert.Single(viewModel.SelectedEntries);
+            Assert.Same(viewModel.Entries[^1], viewModel.SelectedEntry);
+        }
+
+        /// <summary>
         /// Verifies Thumbnails requests jumbo shell icons so glyphs are not upscaled from 32×32.
         /// </summary>
         [Fact]

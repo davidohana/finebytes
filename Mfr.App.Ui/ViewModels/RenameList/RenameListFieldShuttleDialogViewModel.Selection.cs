@@ -4,7 +4,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 {
     public sealed partial class RenameListFieldShuttleDialogViewModel
     {
-
         /// <summary>
         /// Gets selected row indices in the selected-columns list.
         /// </summary>

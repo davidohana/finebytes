@@ -1,5 +1,6 @@
 using System.Collections;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Threading;
 using Mfr.Models.RenameList;
 
@@ -17,6 +18,42 @@ namespace Mfr.App.Ui.Views.RenameList
             AvailableSortFieldsList.SelectionChanged += (_, _) => _OnAvailableSortSelectionChanged();
             SelectedColumnsList.SelectionChanged += (_, _) => _OnSelectedColumnsSelectionChanged();
             SelectedSortList.SelectionChanged += (_, _) => _OnSelectedSortSelectionChanged();
+            _WireShuttleListKeyDown(AvailableOriginalFieldsList);
+            _WireShuttleListKeyDown(AvailablePreviewFieldsList);
+            _WireShuttleListKeyDown(AvailableSortFieldsList);
+            _WireShuttleListKeyDown(SelectedColumnsList);
+            _WireShuttleListKeyDown(SelectedSortList);
+        }
+
+        private static void _WireShuttleListKeyDown(ListBox listBox)
+        {
+            listBox.KeyDown += _OnShuttleListKeyDown;
+        }
+
+        private static void _OnShuttleListKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (sender is not ListBox listBox || e.Key is not (Key.Home or Key.End))
+            {
+                return;
+            }
+
+            if (e.KeyModifiers is not KeyModifiers.None)
+            {
+                return;
+            }
+
+            var itemCount = listBox.ItemCount;
+            if (itemCount == 0)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            var index = e.Key == Key.Home ? 0 : itemCount - 1;
+            listBox.Selection.Clear();
+            listBox.Selection.Select(index);
+            listBox.ScrollIntoView(index);
+            e.Handled = true;
         }
 
         private void _OnAvailableOriginalSelectionChanged()

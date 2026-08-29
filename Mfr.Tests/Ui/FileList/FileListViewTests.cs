@@ -386,6 +386,48 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
+        /// Verifies Home on the Report grid replaces multi-select with the first row.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_Grid_Home_Replaces_Multi_Select_With_First_Row()
+        {
+            var (viewModel, grid, window) = _ShowReportGrid();
+            var first = viewModel.Entries[0];
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([first, beta], first);
+            window.UpdateLayout();
+
+            _RaiseKeyDown(grid, Key.Home);
+            window.UpdateLayout();
+
+            Assert.Single(viewModel.SelectedEntries);
+            Assert.Same(first, viewModel.SelectedEntry);
+            Assert.Single(grid.SelectedItems.Cast<FileListEntry>());
+            Assert.Same(first, grid.SelectedItems.Cast<FileListEntry>().Single());
+        }
+
+        /// <summary>
+        /// Verifies End on the Report grid replaces multi-select with the last row.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_Grid_End_Replaces_Multi_Select_With_Last_Row()
+        {
+            var (viewModel, grid, window) = _ShowReportGrid();
+            var first = viewModel.Entries[0];
+            var last = viewModel.Entries[^1];
+            viewModel.SetSelectedEntries([first, last], first);
+            window.UpdateLayout();
+
+            _RaiseKeyDown(grid, Key.End);
+            window.UpdateLayout();
+
+            Assert.Single(viewModel.SelectedEntries);
+            Assert.Same(last, viewModel.SelectedEntry);
+            Assert.Single(grid.SelectedItems.Cast<FileListEntry>());
+            Assert.Same(last, grid.SelectedItems.Cast<FileListEntry>().Single());
+        }
+
+        /// <summary>
         /// Verifies report-view auto-fit widths grow to long file names and stay within the shared cap.
         /// </summary>
         [AvaloniaFact]

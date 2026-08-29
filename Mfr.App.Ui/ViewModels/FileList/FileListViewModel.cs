@@ -438,6 +438,23 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
+        /// Jumps to the first or last row. Replaces the current selection with that row.
+        /// </summary>
+        /// <param name="toLast"><see langword="true"/> for the last row; otherwise the first.</param>
+        /// <returns><see langword="true"/> when the list has at least one row.</returns>
+        public bool TryJumpSelection(bool toLast)
+        {
+            if (Entries.Count == 0)
+            {
+                return false;
+            }
+
+            var target = Entries[toLast ? Entries.Count - 1 : 0];
+            SetSelectedEntries([target], target);
+            return true;
+        }
+
+        /// <summary>
         /// Opens the focused row: folders navigate in-app; files open with the OS default app.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanOpenSelected))]

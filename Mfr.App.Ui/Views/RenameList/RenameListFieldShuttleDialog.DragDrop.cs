@@ -41,11 +41,7 @@ namespace Mfr.App.Ui.Views.RenameList
             listBox.AddHandler(PointerPressedEvent, _OnListPointerPressed, RoutingStrategies.Tunnel);
             listBox.AddHandler(PointerMovedEvent, _OnListPointerMoved, RoutingStrategies.Tunnel);
             listBox.AddHandler(PointerReleasedEvent, _OnListPointerReleased, RoutingStrategies.Tunnel);
-            listBox.AddHandler(
-                PointerCaptureLostEvent,
-                _OnListPointerCaptureLost,
-                RoutingStrategies.Tunnel
-            );
+            listBox.AddHandler(PointerCaptureLostEvent, _OnListPointerCaptureLost, RoutingStrategies.Tunnel);
             listBox.AddHandler(DragDrop.DragOverEvent, _OnListDragOver);
             listBox.AddHandler(DragDrop.DragLeaveEvent, _OnListDragLeave);
             listBox.AddHandler(DragDrop.DropEvent, _OnListDrop);
@@ -389,10 +385,13 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var keySet = keys.ToHashSet();
-            return [.. _ViewModel
-                .SelectedColumnRows.Where(row => keySet.Contains(row.Column.Key))
-                .Select(row => row.Index)
-                .OrderBy(index => index)];
+            return
+            [
+                .. _ViewModel
+                    .SelectedColumnRows.Where(row => keySet.Contains(row.Column.Key))
+                    .Select(row => row.Index)
+                    .OrderBy(index => index),
+            ];
         }
 
         private IReadOnlyList<int> _IndicesForSortKeys(IReadOnlyList<RenameListFieldKey> keys)
@@ -403,10 +402,13 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var keySet = keys.ToHashSet();
-            return [.. _ViewModel
-                .SelectedSortRows.Where(row => keySet.Contains(row.Key.FieldKey))
-                .Select(row => row.Index)
-                .OrderBy(index => index)];
+            return
+            [
+                .. _ViewModel
+                    .SelectedSortRows.Where(row => keySet.Contains(row.Key.FieldKey))
+                    .Select(row => row.Index)
+                    .OrderBy(index => index),
+            ];
         }
 
         private static int _GetDropIndex(ListBox listBox, Point position)

@@ -388,6 +388,54 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies TryJumpSelection replaces multi-select with the first row.
+        /// </summary>
+        [Fact]
+        public async Task TryJumpSelection_Replaces_Multi_Select_With_First_Row()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0], renameListViewModel.Entries[2]]);
+
+            Assert.True(renameListViewModel.TryJumpSelection(toLast: false));
+
+            Assert.Single(renameListViewModel.SelectedEntries);
+            Assert.Same(renameListViewModel.Entries[0], renameListViewModel.SelectedEntries[0]);
+        }
+
+        /// <summary>
+        /// Verifies TryJumpSelection jumps to the last row.
+        /// </summary>
+        [Fact]
+        public async Task TryJumpSelection_Jumps_To_Last_Row()
+        {
+            var dir = _CreateThreeFileFolder();
+            var fileListViewModel = _CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            fileListViewModel.SetSelectedEntries([
+                _FileEntry(dir, "alpha.txt"),
+                _FileEntry(dir, "beta.md"),
+                _FileEntry(dir, "gamma.log"),
+            ]);
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            Assert.True(renameListViewModel.TryJumpSelection(toLast: true));
+
+            Assert.Single(renameListViewModel.SelectedEntries);
+            Assert.Same(renameListViewModel.Entries[^1], renameListViewModel.SelectedEntries[0]);
+        }
+
+        /// <summary>
         /// Verifies Add with a Rename List selection inserts after the first selected row (MFR7 help).
         /// </summary>
         [Fact]
