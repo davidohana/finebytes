@@ -227,16 +227,6 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
             }
 
-            if (_MatchesGesture(e, AppShortcuts.Refresh))
-            {
-                if (_viewModel.RefreshCommand.CanExecute(null))
-                {
-                    _ = _viewModel.RefreshCommand.ExecuteAsync(null);
-                    e.Handled = true;
-                    return true;
-                }
-            }
-
             return false;
         }
 
