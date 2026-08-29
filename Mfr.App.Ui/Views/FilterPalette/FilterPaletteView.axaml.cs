@@ -33,6 +33,7 @@ namespace Mfr.App.Ui.Views.FilterPalette
         public FilterPaletteView()
         {
             InitializeComponent();
+            _WireDragDropHandlers();
         }
 
         private void _OnSearchKeyDown(object? sender, KeyEventArgs e)

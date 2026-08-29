@@ -158,14 +158,45 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             _NotifySelectionCommandsChanged();
         }
 
+        /// <summary>
+        /// Inserts catalog filters at <paramref name="insertIndex"/> (drag-drop from Available Filters).
+        /// </summary>
+        /// <param name="entries">Catalog rows to insert in order.</param>
+        /// <param name="insertIndex">Destination index in <c>[0, Count]</c>.</param>
+        public void InsertFromCatalogAt(IReadOnlyList<FilterCatalogEntry> entries, int insertIndex)
+        {
+            ArgumentNullException.ThrowIfNull(entries);
+
+            if (entries.Count == 0)
+            {
+                return;
+            }
+
+            insertIndex = Math.Clamp(insertIndex, 0, Steps.Count);
+            var inserted = new List<AppliedFilterStepViewModel>();
+            for (var offset = 0; offset < entries.Count; offset++)
+            {
+                var step = _CreateStep(entries[offset]);
+                Steps.Insert(insertIndex + offset, step);
+                inserted.Add(step);
+            }
+
+            SetSelectedSteps(inserted);
+        }
+
         private void _InsertStep(FilterCatalogEntry entry, int insertIndex)
         {
-            var filter = FilterCatalog.CreateDefault(entry);
-            var displayName = _GenerateDisplayName(entry);
-            var step = new AppliedFilterStepViewModel(displayName, filter);
+            var step = _CreateStep(entry);
             insertIndex = Math.Clamp(insertIndex, 0, Steps.Count);
             Steps.Insert(insertIndex, step);
             SetSelectedSteps([step]);
+        }
+
+        private AppliedFilterStepViewModel _CreateStep(FilterCatalogEntry entry)
+        {
+            var filter = FilterCatalog.CreateDefault(entry);
+            var displayName = _GenerateDisplayName(entry);
+            return new AppliedFilterStepViewModel(displayName, filter);
         }
 
         private int _GetInsertIndex()

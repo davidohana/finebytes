@@ -204,6 +204,27 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
         }
 
+        /// <summary>
+        /// Verifies inserting catalog rows at an index preserves order and selects the new steps.
+        /// </summary>
+        [Fact]
+        public void InsertFromCatalogAt_inserts_at_index_and_selects_new_steps()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+
+            viewModel.InsertFromCatalogAt([_Entry("LettersCase"), _Entry("TagRemover")], insertIndex: 0);
+
+            Assert.Equal(
+                ["Letters Case", "Audio Tag Remover", "Shrink Spaces"],
+                viewModel.Steps.Select(step => step.DisplayName)
+            );
+            Assert.Equal(2, viewModel.SelectedSteps.Count);
+            Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
+            Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[1]);
+        }
+
         private static FilterCatalogEntry _Entry(string type)
         {
             return FilterCatalog.Entries.Single(entry => entry.Type == type);

@@ -6,6 +6,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.Views.FilterPalette;
+using Mfr.Filters;
 
 namespace Mfr.App.Ui.Views.AppliedFilters
 {
@@ -140,7 +142,9 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            if (_ReadDragPayload(e) is null)
+            var isFromPalette = _ReadPalettePayload(e) is not null;
+            var isReorder = !isFromPalette && _ReadReorderPayload(e) is not null;
+            if (!isReorder && !isFromPalette)
             {
                 e.DragEffects = DragDropEffects.None;
                 _ClearDropMark();
@@ -148,7 +152,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             }
 
             e.Handled = true;
-            e.DragEffects = DragDropEffects.Move;
+            e.DragEffects = isFromPalette ? DragDropEffects.Copy : DragDropEffects.Move;
             _UpdateDropMark(targetList, e.GetPosition(targetList));
         }
 
@@ -176,20 +180,34 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            var payload = _ReadDragPayload(e);
-            if (payload is null)
+            var position = e.GetPosition(targetList);
+            var insertIndex = _GetDropIndex(targetList, position);
+
+            if (_ReadPalettePayload(e) is { } palettePayload)
             {
+                var entries = _ResolveCatalogEntries(palettePayload);
+                if (entries.Count == 0)
+                {
+                    return;
+                }
+
+                e.Handled = true;
+                _ClearDropMark();
+                _viewModel.InsertFromCatalogAt(entries, insertIndex);
+                _QueueRestoreSelectionFromViewModel();
                 return;
             }
 
-            e.Handled = true;
-            var position = e.GetPosition(targetList);
-            _ClearDropMark();
-            _viewModel.MoveStepsTo(payload.SourceIndices, _GetDropIndex(targetList, position));
-            _QueueRestoreSelectionFromViewModel();
+            if (_ReadReorderPayload(e) is { } reorderPayload)
+            {
+                e.Handled = true;
+                _ClearDropMark();
+                _viewModel.MoveStepsTo(reorderPayload.SourceIndices, insertIndex);
+                _QueueRestoreSelectionFromViewModel();
+            }
         }
 
-        private static AppliedFilterDragPayload? _ReadDragPayload(DragEventArgs e)
+        private static AppliedFilterDragPayload? _ReadReorderPayload(DragEventArgs e)
         {
             if (e.DataTransfer is null)
             {
@@ -200,11 +218,46 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             {
                 if (item.TryGetRaw(AppliedFilterDragPayload.Format) is string json)
                 {
-                    return AppliedFilterDragPayload.Deserialize(json);
+                    var payload = AppliedFilterDragPayload.Deserialize(json);
+                    return payload?.SourceIndices is { Count: > 0 } ? payload : null;
                 }
             }
 
             return null;
+        }
+
+        private static FilterPaletteDragPayload? _ReadPalettePayload(DragEventArgs e)
+        {
+            if (e.DataTransfer is null)
+            {
+                return null;
+            }
+
+            foreach (var item in e.DataTransfer.Items)
+            {
+                if (item.TryGetRaw(FilterPaletteDragPayload.Format) is string json)
+                {
+                    var payload = FilterPaletteDragPayload.Deserialize(json);
+                    return payload?.CatalogTypes is { Count: > 0 } ? payload : null;
+                }
+            }
+
+            return null;
+        }
+
+        private static List<FilterCatalogEntry> _ResolveCatalogEntries(FilterPaletteDragPayload payload)
+        {
+            var typeToEntry = FilterCatalog.Entries.ToDictionary(entry => entry.Type, StringComparer.Ordinal);
+            var resolved = new List<FilterCatalogEntry>();
+            foreach (var type in payload.CatalogTypes)
+            {
+                if (typeToEntry.TryGetValue(type, out var entry))
+                {
+                    resolved.Add(entry);
+                }
+            }
+
+            return resolved;
         }
 
         private static int _GetDropIndex(ListBox listBox, Point position)

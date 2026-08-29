@@ -77,6 +77,39 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies dropping a catalog row from Available Filters inserts at the drop index.
+        /// </summary>
+        [AvaloniaFact]
+        public void Drop_from_available_inserts_filter_at_drop_index()
+        {
+            var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
+            var lettersCase = _Entry("LettersCase");
+            _SelectPaletteEntry(paletteList, lettersCase);
+
+            var appliedList = appliedView.FindControl<ListBox>("AppliedFiltersList");
+            Assert.NotNull(appliedList);
+
+            var payload = new FilterPaletteDragPayload([lettersCase.Type]);
+            var dataTransfer = new DataTransfer();
+            dataTransfer.Add(DataTransferItem.Create(FilterPaletteDragPayload.Format, payload.Serialize()));
+
+            appliedList.RaiseEvent(
+                new DragEventArgs(DragDrop.DropEvent, dataTransfer, appliedList, default, KeyModifiers.None)
+            );
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
+            Assert.Equal("Letters Case", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+            Assert.Equal(
+                mainViewModel.AppliedFiltersViewModel.Steps[0],
+                mainViewModel.AppliedFiltersViewModel.SelectedSteps[0]
+            );
+            Assert.Equal(1, mainViewModel.FilterCount);
+
+            window.Close();
+        }
+
         private static (
             Window Window,
             MainWindowViewModel MainViewModel,
