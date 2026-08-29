@@ -17,12 +17,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns>Folded error text for the single details box.</returns>
         internal static string FormatDetailsText(RenameListFieldErrorDialogContent content)
         {
-            var blocks = content.Errors.Select(error => $"{error.UserExplanation}{Environment.NewLine}{error.TechnicalDetails}");
+            var blocks = content.Errors.Select(error =>
+                $"{error.UserExplanation}{Environment.NewLine}{error.TechnicalDetails}"
+            );
             return string.Join($"{Environment.NewLine}{Environment.NewLine}", blocks);
         }
 
         /// <summary>
-        /// Builds clipboard text for Show Field Error (summary, file, and folded errors).
+        /// Builds clipboard text for Show Load Errors (summary, file, and folded errors).
         /// </summary>
         /// <param name="content">Dialog content.</param>
         /// <returns>Multi-line text suitable for copy/paste.</returns>

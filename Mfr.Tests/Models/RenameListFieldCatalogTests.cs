@@ -542,11 +542,15 @@ namespace Mfr.Tests.Models
             var zebraTitle = _ItemWithSemantic(SemanticAudioField.Title, "Zebra");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
-            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, RenameListFieldCatalog.Resolve(errored, titleKey));
+            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, RenameListFieldCatalog.Resolve(errored, titleKey));
             Assert.True(RenameListFieldCatalog.CompareForSort(errored, titleKey, alphaTitle) > 0);
             Assert.True(RenameListFieldCatalog.CompareForSort(alphaTitle, titleKey, errored) < 0);
             Assert.True(RenameListFieldCatalog.CompareForSort(errored, titleKey, zebraTitle) > 0);
             Assert.True(RenameListFieldCatalog.CompareForSort(zebraTitle, titleKey, errored) < 0);
+
+            var otherErrored = FilterTestHelpers.CreateRenameItem(prefix: "also-bad", extension: ".mp3");
+            otherErrored.SetTagLibMetadataLoadError(new IOException("also missing"));
+            Assert.Equal(0, RenameListFieldCatalog.CompareForSort(errored, titleKey, otherErrored));
         }
 
         [Fact]

@@ -5,7 +5,7 @@ using Mfr.Models.RenameList.Fields.Basic;
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Tests for Rename List Show Field Error command state.
+    /// Tests for Rename List Show Load Errors command state.
     /// </summary>
     public sealed class RenameListViewModelFieldErrorTests : IDisposable
     {
@@ -41,7 +41,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.Equal("info.htm", entry.GetFieldText(fullNameKey));
-            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, entry.GetFieldText(titleKey));
+            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, entry.GetFieldText(titleKey));
 
             renameListViewModel.SetSelectedEntries([entry]);
             renameListViewModel.SetFocusedFieldKey(fullNameKey);

@@ -687,7 +687,7 @@ namespace Mfr.Tests.Ui.RenameList
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.Equal("info.htm", entry.GetFieldText(fullNameKey));
-            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, entry.GetFieldText(titleKey));
+            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, entry.GetFieldText(titleKey));
 
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
             var rowTexts = row.GetVisualDescendants()
@@ -696,11 +696,11 @@ namespace Mfr.Tests.Ui.RenameList
                 .Where(text => !string.IsNullOrEmpty(text))
                 .ToList();
             Assert.Contains("info.htm", rowTexts);
-            Assert.Contains(RenameListMetadataLoadErrors.DisplayText, rowTexts);
+            Assert.Contains(RenameListFieldCatalog.FieldLoadErrorText, rowTexts);
 
             var errorTextBlock = row.GetVisualDescendants()
                 .OfType<TextBlock>()
-                .First(textBlock => textBlock.Text == RenameListMetadataLoadErrors.DisplayText);
+                .First(textBlock => textBlock.Text == RenameListFieldCatalog.FieldLoadErrorText);
             var errorBrush = Assert.IsType<SolidColorBrush>(errorTextBlock.Foreground);
             Assert.Equal(Color.Parse("#808080"), errorBrush.Color);
 

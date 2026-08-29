@@ -4,17 +4,17 @@ using Mfr.Models.RenameList;
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Show Field Error command and focused-cell state for <see cref="RenameListViewModel"/>.
+    /// Show Load Errors command and focused-cell state for <see cref="RenameListViewModel"/>.
     /// </summary>
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Raised when the user requests the Show Field Error dialog.
+        /// Raised when the user requests the Show Load Errors dialog.
         /// </summary>
         public event EventHandler<RenameListFieldErrorDialogContent>? FieldErrorDialogRequested;
 
         /// <summary>
-        /// Gets whether Show Field Error should appear on the row context menu.
+        /// Gets whether Show Load Errors should appear on the row context menu.
         /// </summary>
         public bool CanShowFieldError => _CanShowFieldError();
 
@@ -56,10 +56,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            FieldErrorDialogRequested?.Invoke(
-                this,
-                new RenameListFieldErrorDialogContent(entry.FullPath, errors)
-            );
+            FieldErrorDialogRequested?.Invoke(this, new RenameListFieldErrorDialogContent(entry.FullPath, errors));
         }
 
         private bool _CanShowFieldError()

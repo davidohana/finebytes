@@ -1,7 +1,5 @@
 using Avalonia.Media;
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.Models.Rename;
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 
 namespace Mfr.Tests.Ui.RenameList

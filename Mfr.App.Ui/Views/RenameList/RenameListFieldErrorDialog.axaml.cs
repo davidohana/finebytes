@@ -5,7 +5,7 @@ using Mfr.App.Ui.ViewModels.RenameList;
 namespace Mfr.App.Ui.Views.RenameList
 {
     /// <summary>
-    /// Modal dialog for Rename List original metadata load errors (MFR7 Show Field Error).
+    /// Modal dialog for Rename List original metadata load errors (Show Load Errors).
     /// </summary>
     public partial class RenameListFieldErrorDialog : Window
     {
@@ -20,6 +20,7 @@ namespace Mfr.App.Ui.Views.RenameList
             ArgumentNullException.ThrowIfNull(content);
 
             InitializeComponent();
+            SummaryText.Text = RenameListFieldErrorDisplay.Summary;
             FilePathText.Text = content.FilePath;
             DetailsText.Text = RenameListFieldErrorDisplay.FormatDetailsText(content);
             _copyText = RenameListFieldErrorDisplay.FormatCopyText(content);

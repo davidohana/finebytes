@@ -2,12 +2,11 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
-using Mfr.Models.RenameList;
 
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Headless tests for the Rename List Show Field Error dialog.
+    /// Headless tests for the Rename List Show Load Errors dialog.
     /// </summary>
     public sealed class RenameListFieldErrorDialogTests
     {
@@ -22,26 +21,23 @@ namespace Mfr.Tests.Ui.RenameList
             var content = new RenameListFieldErrorDialogContent(
                 @"D:\Music\PLAYLIST.M3U",
                 [
-                    new RenameListLoadError(
-                        "This file could not be read as audio or media metadata.",
-                        tagLibMessage
-                    ),
-                    new RenameListLoadError(
-                        "This file could not be read as image or EXIF metadata.",
-                        imageMessage
-                    ),
+                    new RenameListLoadError("This file could not be read as audio or media metadata.", tagLibMessage),
+                    new RenameListLoadError("This file could not be read as image or EXIF metadata.", imageMessage),
                 ]
             );
             var dialog = new RenameListFieldErrorDialog(content);
             dialog.Show();
             dialog.UpdateLayout();
 
+            var summaryText = dialog.FindControl<TextBlock>("SummaryText");
             var filePathText = dialog.FindControl<TextBlock>("FilePathText");
             var detailsText = dialog.FindControl<TextBox>("DetailsText");
+            Assert.NotNull(summaryText);
             Assert.NotNull(filePathText);
             Assert.NotNull(detailsText);
 
             Assert.Equal("Error", dialog.Title);
+            Assert.Equal(RenameListFieldErrorDisplay.Summary, summaryText.Text);
             Assert.Equal(@"D:\Music\PLAYLIST.M3U", filePathText.Text);
             Assert.Contains(tagLibMessage, detailsText.Text, StringComparison.Ordinal);
             Assert.Contains(imageMessage, detailsText.Text, StringComparison.Ordinal);
@@ -52,20 +48,6 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies error foreground is MFR7 gray and is not applied to normal cells via transparent brush.
-        /// </summary>
-        [Fact]
-        public void ErrorBrush_is_gray_and_not_used_for_healthy_cells()
-        {
-            var brush = Assert.IsType<Avalonia.Media.SolidColorBrush>(RenameListFieldForegroundConverter.ErrorBrush);
-            Assert.Equal(Avalonia.Media.Color.Parse("#808080"), brush.Color);
-            Assert.Equal(
-                Avalonia.Media.Brushes.Transparent,
-                RenameListFieldForegroundConverter.Instance.Convert(null, typeof(Avalonia.Media.IBrush), null, null!)
-            );
-        }
-
-        /// <summary>
         /// Verifies recycled cells drop gray when they no longer show Error.
         /// </summary>
         [AvaloniaFact]
@@ -73,6 +55,10 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var textBlock = new TextBlock { Text = RenameListFieldCatalog.FieldLoadErrorText };
             RenameListFieldForegroundConverter.ApplyFromCellText(textBlock);
+            var errorBrush = Assert.IsType<Avalonia.Media.SolidColorBrush>(
+                RenameListFieldForegroundConverter.ErrorBrush
+            );
+            Assert.Equal(Avalonia.Media.Color.Parse("#808080"), errorBrush.Color);
             Assert.Same(RenameListFieldForegroundConverter.ErrorBrush, textBlock.Foreground);
 
             textBlock.Text = "Zero 7";

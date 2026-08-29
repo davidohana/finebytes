@@ -156,15 +156,9 @@ namespace Mfr.Models.RenameList
 
             var leftIsError = RenameListMetadataLoadErrors.HasLoadError(left, key);
             var rightIsError = RenameListMetadataLoadErrors.HasLoadError(right, key);
-            var errorOrder = RenameListFieldSortCompare.ErrorsLast(leftIsError, rightIsError);
-            if (errorOrder != 0)
+            if (leftIsError || rightIsError)
             {
-                return errorOrder;
-            }
-
-            if (leftIsError)
-            {
-                return 0;
+                return RenameListFieldSortCompare.ErrorsLast(leftIsError, rightIsError);
             }
 
             return GetField(key).CompareForSort(left.Original, right.Original);

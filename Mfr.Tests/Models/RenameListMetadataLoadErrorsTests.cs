@@ -1,6 +1,4 @@
 using Mfr.Filters;
-using Mfr.Models.Rename;
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Jpeg;
 
@@ -104,7 +102,7 @@ namespace Mfr.Tests.Models
                 RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
 
                 Assert.NotNull(item.TagLibMetadataLoadError);
-                var error = item.TagLibMetadataLoadError!;
+                var error = item.TagLibMetadataLoadError;
                 Assert.Contains("taglib", error.Message, StringComparison.OrdinalIgnoreCase);
 
                 var explanation = RenameListFieldCatalog.DescribeFieldLoadError(item, titleKey);

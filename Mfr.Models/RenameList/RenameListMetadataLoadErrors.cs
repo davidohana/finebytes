@@ -8,27 +8,12 @@ namespace Mfr.Models.RenameList
     internal static class RenameListMetadataLoadErrors
     {
         /// <summary>
-        /// Grid text for a failed original metadata bucket (MFR7 <c>PropDisplay</c> with exception).
-        /// </summary>
-        internal const string DisplayText = RenameListFieldCatalog.FieldLoadErrorText;
-
-        /// <summary>
-        /// Returns whether <paramref name="text"/> is the field-load error display value.
-        /// </summary>
-        /// <param name="text">Resolved grid text.</param>
-        /// <returns><see langword="true"/> when the cell shows a load failure.</returns>
-        internal static bool IsErrorDisplayText(string text)
-        {
-            return string.Equals(text, DisplayText, StringComparison.Ordinal);
-        }
-
-        /// <summary>
         /// Returns the stored load exception for one original field, when present.
         /// </summary>
         /// <param name="item">Rename row.</param>
         /// <param name="key">Original field key.</param>
         /// <param name="error">Stored exception when the field's metadata bucket failed.</param>
-        /// <returns><see langword="true"/> when the field should display <see cref="DisplayText"/>.</returns>
+        /// <returns><see langword="true"/> when the field should display <see cref="RenameListFieldCatalog.FieldLoadErrorText"/>.</returns>
         internal static bool TryGetLoadError(RenameItem item, RenameListFieldKey key, out Exception? error)
         {
             ArgumentNullException.ThrowIfNull(item);
@@ -48,7 +33,10 @@ namespace Mfr.Models.RenameList
         /// <param name="item">Rename row.</param>
         /// <param name="requirement">Metadata bucket required by a catalog field.</param>
         /// <param name="error">Stored exception when the bucket failed.</param>
-        /// <returns><see langword="true"/> when fields using the requirement should show <see cref="DisplayText"/>.</returns>
+        /// <returns>
+        /// <see langword="true"/> when fields using the requirement should show
+        /// <see cref="RenameListFieldCatalog.FieldLoadErrorText"/>.
+        /// </returns>
         internal static bool TryGetLoadError(
             RenameItem item,
             RenameListMetadataRequirement requirement,
@@ -56,11 +44,40 @@ namespace Mfr.Models.RenameList
         )
         {
             ArgumentNullException.ThrowIfNull(item);
-            return _TryGetLoadError(item, requirement, out error);
+
+            if (requirement == RenameListMetadataRequirement.None)
+            {
+                error = null;
+                return false;
+            }
+
+            if (
+                requirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags)
+                || requirement.HasFlag(RenameListMetadataRequirement.MediaProperties)
+            )
+            {
+                error = item.TagLibMetadataLoadError;
+                if (error is not null)
+                {
+                    return true;
+                }
+            }
+
+            if (requirement.HasFlag(RenameListMetadataRequirement.ImageProperties))
+            {
+                error = item.ImagePropertiesLoadError;
+                if (error is not null)
+                {
+                    return true;
+                }
+            }
+
+            error = null;
+            return false;
         }
 
         /// <summary>
-        /// Returns whether resolving an original field would show <see cref="DisplayText"/>.
+        /// Returns whether resolving an original field would show <see cref="RenameListFieldCatalog.FieldLoadErrorText"/>.
         /// </summary>
         /// <param name="item">Rename row.</param>
         /// <param name="key">Original field key.</param>
@@ -147,43 +164,6 @@ namespace Mfr.Models.RenameList
             }
 
             return "This field could not be loaded from disk.";
-        }
-
-        private static bool _TryGetLoadError(
-            RenameItem item,
-            RenameListMetadataRequirement requirement,
-            out Exception? error
-        )
-        {
-            if (requirement == RenameListMetadataRequirement.None)
-            {
-                error = null;
-                return false;
-            }
-
-            if (
-                requirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags)
-                || requirement.HasFlag(RenameListMetadataRequirement.MediaProperties)
-            )
-            {
-                error = item.TagLibMetadataLoadError;
-                if (error is not null)
-                {
-                    return true;
-                }
-            }
-
-            if (requirement.HasFlag(RenameListMetadataRequirement.ImageProperties))
-            {
-                error = item.ImagePropertiesLoadError;
-                if (error is not null)
-                {
-                    return true;
-                }
-            }
-
-            error = null;
-            return false;
         }
     }
 }

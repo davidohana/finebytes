@@ -1,6 +1,4 @@
-using System.Globalization;
 using Avalonia.Controls;
-using Avalonia.Data.Converters;
 using Avalonia.Media;
 using Mfr.Models.RenameList;
 
@@ -9,13 +7,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// <summary>
     /// Paints Rename List metadata load failures gray (MFR7 <c>ForeErrorColor</c>).
     /// </summary>
-    internal sealed class RenameListFieldForegroundConverter : IValueConverter
+    internal static class RenameListFieldForegroundConverter
     {
-        /// <summary>
-        /// Shared converter instance for grid column bindings.
-        /// </summary>
-        public static RenameListFieldForegroundConverter Instance { get; } = new();
-
         /// <summary>
         /// Gray foreground for metadata load-error cells (MFR7 <c>ForeErrorColor</c>).
         /// </summary>
@@ -27,7 +20,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="textBlock">Grid cell text.</param>
         /// <remarks>
         /// <para>
-        /// DataGrid recycles rows, so gray must be cleared when the same <see cref="TextBlock"/> later shows a real value.
+        /// DataGrid recycles rows, so gray must be cleared when the same <see cref="TextBlock"/> later shows a real
+        /// value. Avalonia's <c>DataGridCell</c> has no column property, so this keys off display text rather than
+        /// <see cref="RenameListEntry.IsFieldLoadError"/>.
         /// </para>
         /// </remarks>
         internal static void ApplyFromCellText(TextBlock textBlock)
@@ -41,39 +36,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             textBlock.ClearValue(TextBlock.ForegroundProperty);
-        }
-
-        /// <summary>
-        /// Returns gray for error cells; otherwise transparent so row foreground applies.
-        /// </summary>
-        /// <param name="entry">Grid row.</param>
-        /// <param name="key">Bound field key.</param>
-        /// <returns>Cell foreground brush.</returns>
-        internal static IBrush GetCellForeground(RenameListEntry? entry, RenameListFieldKey key)
-        {
-            if (entry is not null && entry.IsFieldLoadError(key))
-            {
-                return ErrorBrush;
-            }
-
-            return Brushes.Transparent;
-        }
-
-        /// <inheritdoc />
-        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        {
-            if (value is RenameListEntry entry && parameter is RenameListFieldKey key && entry.IsFieldLoadError(key))
-            {
-                return ErrorBrush;
-            }
-
-            return Brushes.Transparent;
-        }
-
-        /// <inheritdoc />
-        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
         }
     }
 }

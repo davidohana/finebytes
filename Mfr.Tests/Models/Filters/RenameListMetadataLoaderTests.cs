@@ -45,9 +45,9 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(item.MediaPropertiesLoadAttempted);
             Assert.NotNull(item.TagLibMetadataLoadError);
             Assert.NotNull(item.ImagePropertiesLoadError);
-            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, RenameListFieldCatalog.Resolve(item, audioKey));
-            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, RenameListFieldCatalog.Resolve(item, imageKey));
-            Assert.Equal(RenameListMetadataLoadErrors.DisplayText, RenameListFieldCatalog.Resolve(item, mediaKey));
+            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, RenameListFieldCatalog.Resolve(item, audioKey));
+            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, RenameListFieldCatalog.Resolve(item, imageKey));
+            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, RenameListFieldCatalog.Resolve(item, mediaKey));
         }
 
         [Fact]

@@ -420,10 +420,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (entry.IsFieldLoadError(fieldKey.Value))
             {
-                var userExplanation = RenameListFieldCatalog.DescribeFieldLoadError(
-                    entry.EngineItem,
-                    fieldKey.Value
-                );
+                var userExplanation = RenameListFieldCatalog.DescribeFieldLoadError(entry.EngineItem, fieldKey.Value);
                 _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatFieldError(
                     field.DisplayName,
                     userExplanation
