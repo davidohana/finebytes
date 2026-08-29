@@ -5,8 +5,13 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterEditors;
+using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.FilterEditors;
+using Mfr.Filters.Case;
+using Mfr.Filters.Space;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -72,18 +77,17 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal("Applied Filter: Audio Tag Remover", mainViewModel.FilterEditorViewModel.TitleText);
             Assert.Equal("Applied Filter: Audio Tag Remover", _TitleText(editorView));
-            Assert.False(mainViewModel.FilterEditorViewModel.HasApplyTo);
 
             window.Close();
         }
 
         /// <summary>
-        /// Verifies changing the Apply-To combo updates the Applied list subtitle.
+        /// Verifies Filter Options updates the Applied list Apply-To subtitle.
         /// </summary>
         [AvaloniaFact]
-        public void Apply_to_combo_updates_applied_list_subtitle()
+        public void Filter_options_updates_applied_list_subtitle()
         {
-            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            var (window, mainViewModel, _) = _ShowFilterEditorPanes();
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -91,14 +95,92 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var list = _AppliedList(window);
             Assert.Equal("File Prefix", _RowApplyToLabel(list, 0));
 
-            var combo = _ApplyToCombo(editorView);
-            Assert.NotNull(combo);
-            combo.SelectedItem = FilterApplyToOption.All[2];
+            var dialogVm = new FilterOptionsDialogViewModel(mainViewModel.AppliedFiltersViewModel.Steps[0])
+            {
+                SelectedApplyTo = FilterTargetOption.All[2],
+            };
+            var dialog = new FilterOptionsDialog(dialogVm);
+            dialog.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            dialog.Close(true);
+            mainViewModel.AppliedFiltersViewModel.ApplyFilterOptions(dialogVm);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal("Full File Name", mainViewModel.AppliedFiltersViewModel.Steps[0].ApplyToLabel);
             Assert.Equal("Full File Name", _RowApplyToLabel(list, 0));
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies optionless filters do not load an options editor template.
+        /// </summary>
+        [AvaloniaFact]
+        public void Optionless_filter_has_no_options_editor()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Null(mainViewModel.FilterEditorViewModel.OptionsEditor);
+            Assert.Null(_OptionsEditorSlot(editorView).Content);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Space Character checkbox edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Space_character_checkbox_updates_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<SpaceCharacterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<SpaceCharacterFilterEditorView>().Single();
+            var checkBox = editor.FindControl<CheckBox>("ReplaceUnderscoresCheckBox");
+            Assert.NotNull(checkBox);
+            Assert.True(checkBox.IsChecked);
+            checkBox.IsChecked = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (SpaceCharacterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.False(filter.Options.ReplaceUnderscores);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Letters Case mode combo edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Letters_case_mode_combo_updates_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<LettersCaseFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<LettersCaseFilterEditorView>().Single();
+            var combo = editor.FindControl<ComboBox>("ModeCombo");
+            Assert.NotNull(combo);
+            combo.SelectedItem = LettersCaseModeOption.FromMode(LettersCaseMode.UpperCase);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (LettersCaseFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(LettersCaseMode.UpperCase, filter.Options.Mode);
 
             window.Close();
         }
@@ -155,11 +237,11 @@ namespace Mfr.Tests.Ui.AppliedFilters
             return editorView.FindControl<TextBlock>("AppliedFilterTitle");
         }
 
-        private static ComboBox _ApplyToCombo(FilterEditorView editorView)
+        private static ContentControl _OptionsEditorSlot(FilterEditorView editorView)
         {
-            var combo = editorView.FindControl<ComboBox>("ApplyToCombo");
-            Assert.NotNull(combo);
-            return combo;
+            var slot = editorView.FindControl<ContentControl>("OptionsEditorSlot");
+            Assert.NotNull(slot);
+            return slot;
         }
 
         private static string _RowApplyToLabel(ListBox list, int rowIndex)

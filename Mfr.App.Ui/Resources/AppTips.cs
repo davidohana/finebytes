@@ -83,5 +83,8 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Applied Filters move-down shuttle tip.</summary>
         public const string MoveFilterDown = "Move selected filter down in the apply list (to apply it later)";
+
+        /// <summary>Applied Filters Filter Options toolbar tip.</summary>
+        public const string FilterOptions = "Edit filter name and Apply To options";
     }
 }

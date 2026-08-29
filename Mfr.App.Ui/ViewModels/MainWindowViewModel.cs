@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.Config;

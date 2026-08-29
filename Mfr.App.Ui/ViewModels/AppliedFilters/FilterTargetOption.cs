@@ -3,16 +3,16 @@ using Mfr.Models.Filters;
 namespace Mfr.App.Ui.ViewModels.AppliedFilters
 {
     /// <summary>
-    /// One Apply-To choice for string-target filters in Filter Configuration.
+    /// One <see cref="FilterTarget"/> choice for string-target filters in Filter Options.
     /// </summary>
     /// <param name="Label">Combo display text.</param>
     /// <param name="Target">Filter target instance written onto the selected step.</param>
-    public sealed record FilterApplyToOption(string Label, FilterTarget Target)
+    public sealed record FilterTargetOption(string Label, FilterTarget Target)
     {
         /// <summary>
-        /// Gets the Apply-To choices shown in Filter Configuration (MFR7 basic file-name targets).
+        /// Gets the file-name target choices shown in Filter Options.
         /// </summary>
-        public static IReadOnlyList<FilterApplyToOption> All { get; } =
+        public static IReadOnlyList<FilterTargetOption> All { get; } =
         [
             new("File Prefix", new FilePrefixTarget()),
             new("Extension", new FileExtensionTarget()),
@@ -24,7 +24,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// </summary>
         /// <param name="target">Current filter target.</param>
         /// <returns>The list entry for <paramref name="target"/>.</returns>
-        public static FilterApplyToOption? FromTarget(FilterTarget target)
+        public static FilterTargetOption? FromTarget(FilterTarget target)
         {
             ArgumentNullException.ThrowIfNull(target);
 

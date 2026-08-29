@@ -109,7 +109,14 @@
       <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,*,Auto" Margin="0,0,0,1">
         <Button Grid.Column="0" Classes="applied-filter-toolbar" Content="Presets" IsEnabled="False" />
         <Button Grid.Column="1" Classes="applied-filter-toolbar" Content="Save Preset" IsEnabled="False" />
-        <Button Grid.Column="3" Classes="applied-filter-toolbar" Content="Filter Options" IsEnabled="False" />
+        <Button
+          Grid.Column="3"
+          x:Name="FilterOptionsButton"
+          Classes="applied-filter-toolbar"
+          Content="Filter Options"
+          ToolTip.Tip="{x:Static resources:AppTips.FilterOptions}"
+          IsEnabled="{Binding CanShowFilterOptions}"
+        />
       </Grid>
       <Grid ColumnDefinitions="Auto,*">
         <Border Grid.Column="0" Classes="applied-filter-shuttle-rail">

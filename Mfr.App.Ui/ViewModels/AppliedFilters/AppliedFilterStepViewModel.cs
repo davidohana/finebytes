@@ -32,7 +32,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Gets the unique list label for this step.
         /// </summary>
-        public string DisplayName { get; }
+        [ObservableProperty]
+        private string _displayName;
 
         /// <summary>
         /// Gets the Apply-To subtitle for string-target filters.
@@ -54,6 +55,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             ArgumentNullException.ThrowIfNull(filter);
             Filter = filter;
             ApplyToLabel = FilterTargetLabels.GetApplyToLabel(filter);
+        }
+
+        /// <summary>
+        /// Replaces the list label shown for this step.
+        /// </summary>
+        /// <param name="displayName">New display name.</param>
+        internal void SetDisplayName(string displayName)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
+            DisplayName = displayName;
         }
     }
 }

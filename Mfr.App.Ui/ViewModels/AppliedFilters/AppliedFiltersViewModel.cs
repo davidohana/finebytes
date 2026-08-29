@@ -130,6 +130,44 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
+        /// Gets whether exactly one step is selected for Filter Options.
+        /// </summary>
+        public bool CanShowFilterOptions => _selectedSteps.Count == 1;
+
+        /// <summary>
+        /// Applies Filter Options dialog edits to the selected step.
+        /// </summary>
+        /// <param name="draft">Accepted dialog state.</param>
+        public void ApplyFilterOptions(FilterOptionsDialogViewModel draft)
+        {
+            ArgumentNullException.ThrowIfNull(draft);
+
+            if (_selectedSteps.Count != 1)
+            {
+                return;
+            }
+
+            var step = _selectedSteps[0];
+            if (!string.IsNullOrWhiteSpace(draft.Name))
+            {
+                step.SetDisplayName(draft.Name.Trim());
+            }
+
+            if (
+                draft.HasApplyTo
+                && draft.SelectedApplyTo is not null
+                && step.Filter is StringTargetFilter stringFilter
+            )
+            {
+                var currentApplyTo = FilterTargetOption.FromTarget(stringFilter.Target);
+                if (currentApplyTo != draft.SelectedApplyTo)
+                {
+                    step.SetFilter(stringFilter with { Target = draft.SelectedApplyTo.Target });
+                }
+            }
+        }
+
+        /// <summary>
         /// Builds a <see cref="FilterChain"/> matching the current stack.
         /// </summary>
         /// <returns>Enabled flags and filters in list order.</returns>
@@ -335,6 +373,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             RemoveStepsAtIndicesCommand.NotifyCanExecuteChanged();
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
+            OnPropertyChanged(nameof(CanShowFilterOptions));
         }
     }
 }

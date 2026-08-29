@@ -163,6 +163,25 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies Filter Options is available only for a single selected row.
+        /// </summary>
+        [Fact]
+        public void CanShowFilterOptions_requires_single_selection()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+
+            Assert.True(viewModel.CanShowFilterOptions);
+
+            viewModel.SetSelectedSteps([viewModel.Steps[0], viewModel.Steps[1]]);
+            Assert.False(viewModel.CanShowFilterOptions);
+
+            viewModel.SetSelectedSteps([]);
+            Assert.False(viewModel.CanShowFilterOptions);
+        }
+
+        /// <summary>
         /// Verifies append always adds at the end even when another row is selected.
         /// </summary>
         [Fact]

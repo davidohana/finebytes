@@ -1,0 +1,41 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors"
+  mc:Ignorable="d"
+  d:DesignWidth="360"
+  d:DesignHeight="120"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.LettersCaseFilterEditorView"
+  x:DataType="vm:LettersCaseFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <Border Classes="filter-editor-group">
+      <StackPanel Spacing="6">
+        <TextBlock Classes="filter-editor-group-title" Text="Casing Style" />
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Mode:" />
+          <ComboBox
+            x:Name="ModeCombo"
+            Grid.Column="1"
+            MinWidth="180"
+            HorizontalAlignment="Left"
+            ItemsSource="{Binding ModeOptions}"
+            SelectedItem="{Binding SelectedMode}"
+          >
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:LettersCaseModeOption">
+                <TextBlock Text="{Binding Label}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </Grid>
+        <StackPanel IsVisible="{Binding HasSkipWords}" Spacing="4">
+          <TextBlock Text="Skip words (comma-separated, title case only):" TextWrapping="Wrap" />
+          <TextBox x:Name="SkipWordsBox" Text="{Binding SkipWordsText}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

@@ -36,6 +36,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             _WireSelectionHandlers();
             _WireKeyHandlers();
             _WireDragDropHandlers();
+            _WireFilterOptionsHandlers();
             DataContextChanged += (_, _) =>
             {
                 if (DataContext is AppliedFiltersViewModel viewModel)

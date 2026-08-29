@@ -1,0 +1,69 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="220"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.SpaceCharacterFilterEditorView"
+  x:DataType="vm:SpaceCharacterFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <Border Classes="filter-editor-group">
+      <StackPanel Spacing="6">
+        <TextBlock Classes="filter-editor-group-title" Text="Define" />
+        <TextBlock Text="Use the following character to separate between words:" TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <RadioButton
+            x:Name="SpaceDefinitionRadio"
+            GroupName="SpaceCharacterDefinition"
+            Content="Space"
+            Checked="_OnDefinitionRadioChecked"
+          />
+          <RadioButton
+            x:Name="UnderscoreDefinitionRadio"
+            GroupName="SpaceCharacterDefinition"
+            Content="Underscore ( _ )"
+            Checked="_OnDefinitionRadioChecked"
+          />
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <RadioButton
+              x:Name="OtherDefinitionRadio"
+              GroupName="SpaceCharacterDefinition"
+              Content="Other:"
+              Checked="_OnDefinitionRadioChecked"
+            />
+            <TextBox x:Name="OtherCharacterBox" Width="28" MaxLength="1" Text="{Binding OtherCharacter}" />
+          </StackPanel>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+    <Border Classes="filter-editor-group">
+      <StackPanel Spacing="6">
+        <TextBlock Classes="filter-editor-group-title" Text="Replace" />
+        <TextBlock Text="Replace the following with the defined space character:" TextWrapping="Wrap" />
+        <WrapPanel>
+          <CheckBox x:Name="ReplaceSpacesCheckBox" Content="Spaces" IsChecked="{Binding ReplaceSpaces}" />
+          <CheckBox
+            x:Name="ReplaceUnderscoresCheckBox"
+            Margin="12,0,0,0"
+            Content="Underscores"
+            IsChecked="{Binding ReplaceUnderscores}"
+          />
+          <CheckBox
+            x:Name="ReplacePercent20CheckBox"
+            Margin="12,0,0,0"
+            Content="%20's"
+            IsChecked="{Binding ReplacePercent20}"
+          />
+        </WrapPanel>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <CheckBox x:Name="ReplaceCustomCheckBox" Content="Custom text:" IsChecked="{Binding ReplaceCustom}" />
+          <TextBox x:Name="CustomTextBox" MinWidth="120" Text="{Binding CustomText}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>
