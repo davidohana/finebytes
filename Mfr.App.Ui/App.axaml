@@ -32,6 +32,14 @@
     <Style Selector="DataGrid">
       <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
     </Style>
+    <!-- Fluent overlays rows/headers over the scrollbar slot (ColumnSpan/RowSpan). Cut that so cells sit beside the bar. -->
+    <Style Selector="DataGrid /template/ DataGridRowsPresenter#PART_RowsPresenter">
+      <Setter Property="Grid.ColumnSpan" Value="2" />
+      <Setter Property="Grid.RowSpan" Value="1" />
+    </Style>
+    <Style Selector="DataGrid /template/ DataGridColumnHeadersPresenter#PART_ColumnHeadersPresenter">
+      <Setter Property="Grid.ColumnSpan" Value="1" />
+    </Style>
     <Style Selector="TextBlock.pane-header">
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="Margin" Value="8,6" />
