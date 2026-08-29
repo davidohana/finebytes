@@ -20,6 +20,7 @@
 - `docs/image-metadata-model.md` (lazy MetadataExtractor image properties + EXIF cache)
 - `docs/debts.md` (deferred / later-work list)
 - `docs/rename-list-phase5-followups.md` (deferred shuttle/column refactors after Phase 5)
+- `docs/rename-list-phase6b-followups.md` (6c–6e leftovers before 8a Refresh)
 - `.editorconfig`
 - `.cursor/rules/refactor-no-legacy-compat.mdc`
 - `.cursor/rules/csharp-style.mdc`
