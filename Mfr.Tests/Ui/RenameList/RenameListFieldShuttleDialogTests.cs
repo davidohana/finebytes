@@ -1,8 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
@@ -20,17 +22,20 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public void Moving_a_column_keeps_the_moved_row_selected()
         {
-            var (dialog, dialogVm, _) = _ShowColumnsList();
+            var (dialog, dialogVm, list) = _ShowColumnsList();
             var movedKey = dialogVm.SelectedColumnRows[0].Column.Key;
 
-            dialogVm.SetSelectedColumnRows([0], 0);
-            Dispatcher.UIThread.RunJobs();
+            _ClickListIndex(dialog, list, 0, RawInputModifiers.None);
+            Assert.Equal(0, dialogVm.SelectedColumnRowIndex);
+            Assert.Equal(0, list.Selection.SelectedIndex);
+
             dialogVm.MoveSelectedColumnDownCommand.Execute(null);
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(1, dialogVm.SelectedColumnRowIndex);
             Assert.Equal(movedKey, dialogVm.SelectedColumnRows[1].Column.Key);
+            Assert.Equal(1, list.Selection.SelectedIndex);
 
             dialogVm.MoveSelectedColumnUpCommand.Execute(null);
             dialog.UpdateLayout();
@@ -38,6 +43,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(0, dialogVm.SelectedColumnRowIndex);
             Assert.Equal(movedKey, dialogVm.SelectedColumnRows[0].Column.Key);
+            Assert.Equal(0, list.Selection.SelectedIndex);
 
             dialog.Close();
         }
@@ -50,8 +56,11 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var (dialog, dialogVm, list) = _ShowColumnsList();
 
-            dialogVm.SetSelectedColumnRows([0, 1], 0);
-            Dispatcher.UIThread.RunJobs();
+            _ClickListIndex(dialog, list, 0, RawInputModifiers.None);
+            _ClickListIndex(dialog, list, 1, RawInputModifiers.Control);
+            Assert.Equal([0, 1], dialogVm.SelectedColumnRowIndices);
+            Assert.Equal(2, list.Selection.SelectedIndexes.Count);
+
             dialogVm.MoveSelectedColumnDownCommand.Execute(null);
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -60,6 +69,56 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(2, list.Selection.SelectedIndexes.Count);
             Assert.Contains(1, list.Selection.SelectedIndexes);
             Assert.Contains(2, list.Selection.SelectedIndexes);
+
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies Ctrl-clicking the last selected column clears selection in the ListBox and VM.
+        /// </summary>
+        [AvaloniaFact]
+        public void Ctrl_click_last_selected_column_clears_selection()
+        {
+            var (dialog, dialogVm, list) = _ShowColumnsList();
+
+            _ClickListIndex(dialog, list, 0, RawInputModifiers.None);
+            Assert.Equal(0, dialogVm.SelectedColumnRowIndex);
+
+            _ClickListIndex(dialog, list, 0, RawInputModifiers.Control);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Empty(dialogVm.SelectedColumnRowIndices);
+            Assert.Equal(-1, dialogVm.SelectedColumnRowIndex);
+            Assert.Empty(list.Selection.SelectedIndexes);
+
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies pressing a row in a multi-selection keeps the full selection before drag starts.
+        /// </summary>
+        [AvaloniaFact]
+        public void Press_on_multi_selected_column_keeps_selection()
+        {
+            var (dialog, dialogVm, list) = _ShowColumnsList();
+
+            _ClickListIndex(dialog, list, 0, RawInputModifiers.None);
+            _ClickListIndex(dialog, list, 1, RawInputModifiers.Control);
+            Assert.Equal(2, dialogVm.SelectedColumnRowIndices.Count);
+            Assert.Equal(2, list.Selection.SelectedIndexes.Count);
+
+            list.Focus();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            _PressListIndex(list, 1);
+
+            Assert.Equal(2, dialogVm.SelectedColumnRowIndices.Count);
+            Assert.Equal(2, list.Selection.SelectedIndexes.Count);
+
+            var releasePoint = _ListIndexClickPoint(dialog, list, 1);
+            dialog.MouseUp(releasePoint, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
 
             dialog.Close();
         }
@@ -75,9 +134,8 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(availableList);
             Assert.True(availableList.ItemCount >= 2);
 
-            availableList.Selection.Select(0);
-            availableList.Selection.Select(1);
-            Dispatcher.UIThread.RunJobs();
+            _ClickListIndex(dialog, availableList, 0, RawInputModifiers.None);
+            _ClickListIndex(dialog, availableList, 1, RawInputModifiers.Control);
 
             Assert.Equal(2, dialogVm.SelectedAvailableOriginalFields.Count);
             Assert.Equal(2, availableList.Selection.SelectedIndexes.Count);
@@ -91,17 +149,20 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public void Moving_a_sort_key_keeps_the_moved_row_selected()
         {
-            var (dialog, dialogVm, _) = _ShowSortList();
+            var (dialog, dialogVm, list) = _ShowSortList();
             var movedFieldKey = dialogVm.SelectedSortRows[0].Key.FieldKey;
 
-            dialogVm.SetSelectedSortRows([0], 0);
-            Dispatcher.UIThread.RunJobs();
+            _ClickListIndex(dialog, list, 0, RawInputModifiers.None);
+            Assert.Equal(0, dialogVm.SelectedSortRowIndex);
+            Assert.Equal(0, list.Selection.SelectedIndex);
+
             dialogVm.MoveSelectedSortKeyDownCommand.Execute(null);
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(1, dialogVm.SelectedSortRowIndex);
             Assert.Equal(movedFieldKey, dialogVm.SelectedSortRows[1].Key.FieldKey);
+            Assert.Equal(1, list.Selection.SelectedIndex);
 
             dialog.Close();
         }
@@ -184,6 +245,64 @@ namespace Mfr.Tests.Ui.RenameList
             dialog.Close();
         }
 
+        private static void _ClickListIndex(
+            RenameListFieldShuttleDialog dialog,
+            ListBox list,
+            int index,
+            RawInputModifiers modifiers
+        )
+        {
+            var windowPoint = _ListIndexClickPoint(dialog, list, index);
+            dialog.MouseMove(windowPoint, modifiers);
+            dialog.MouseDown(windowPoint, MouseButton.Left, modifiers);
+            dialog.MouseUp(windowPoint, MouseButton.Left, modifiers);
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        private static void _PressListIndex(ListBox list, int index)
+        {
+            var item = list.ContainerFromIndex(index) as ListBoxItem;
+            Assert.NotNull(item);
+
+            var point = new Point(8, 4);
+            var props = new PointerPointProperties(
+                RawInputModifiers.LeftMouseButton,
+                PointerUpdateKind.LeftButtonPressed
+            );
+            var pointer = new Pointer(1, PointerType.Mouse, true);
+            var args = new PointerPressedEventArgs(
+                item,
+                pointer,
+                list,
+                point,
+                0,
+                props,
+                KeyModifiers.None,
+                clickCount: 1
+            )
+            {
+                RoutedEvent = InputElement.PointerPressedEvent,
+            };
+            list.RaiseEvent(args);
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        private static Point _ListIndexClickPoint(RenameListFieldShuttleDialog dialog, ListBox list, int index)
+        {
+            var container = list.ContainerFromIndex(index) as Visual;
+            Assert.NotNull(container);
+
+            var labelText = container
+                .GetVisualDescendants()
+                .OfType<TextBlock>()
+                .FirstOrDefault(text => !string.IsNullOrEmpty(text.Text));
+            var target = (Visual?)labelText ?? container;
+            var local = new Point(Math.Max(8, target.Bounds.Width / 2), Math.Max(1, target.Bounds.Height / 2));
+            var windowPoint = target.TranslatePoint(local, dialog);
+            Assert.True(windowPoint.HasValue);
+            return windowPoint.Value;
+        }
+
         private static (
             RenameListFieldShuttleDialog Dialog,
             RenameListFieldShuttleDialogViewModel ViewModel,
@@ -194,7 +313,7 @@ namespace Mfr.Tests.Ui.RenameList
                 RenameListVisibleColumn.CreateDefaults(),
                 RenameListSortKey.DefaultKeys
             );
-            var dialog = new RenameListFieldShuttleDialog(dialogVm);
+            var dialog = new RenameListFieldShuttleDialog(dialogVm) { Width = 900, Height = 700 };
             dialog.Show();
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -215,7 +334,7 @@ namespace Mfr.Tests.Ui.RenameList
                 RenameListSortKey.DefaultKeys,
                 RenameListFieldShuttleTab.Sort
             );
-            var dialog = new RenameListFieldShuttleDialog(dialogVm);
+            var dialog = new RenameListFieldShuttleDialog(dialogVm) { Width = 900, Height = 700 };
             dialog.Show();
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

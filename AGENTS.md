@@ -9,6 +9,7 @@
 - Linting: `just lint` runs C# checks (`dotnet build`, `csharpier check`, `dotnet format … --verify-no-changes`) and markdown checks (`just lint-md`: `mdformat --check`, `pymarkdown scan`).
 - Follow project code style from `.editorconfig`.
 - Follow constraints in `.cursor/rules/*.mdc`.
+- UI interaction tests go through Avalonia Headless input (`window.MouseDown` / `KeyDown`); VM tests do not count for view sync. See `.cursor/rules/ui-headless-tests.mdc` and `Mfr.Tests/Ui/FileList/FileListViewTests.cs`.
 
 ## References
 
@@ -24,3 +25,4 @@
 - `.editorconfig`
 - `.cursor/rules/refactor-no-legacy-compat.mdc`
 - `.cursor/rules/csharp-style.mdc`
+- `.cursor/rules/ui-headless-tests.mdc`

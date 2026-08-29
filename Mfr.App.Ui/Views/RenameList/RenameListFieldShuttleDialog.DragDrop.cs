@@ -62,7 +62,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            if (e.Source is not Visual source || source.FindAncestorOfType<ListBoxItem>() is not { } item)
+            if (_FindListBoxItemFromSource(e.Source) is not { } item)
             {
                 return;
             }
@@ -604,6 +604,19 @@ namespace Mfr.App.Ui.Views.RenameList
             _dragStartArgs = null;
             _dragSelectionSnapshot = null;
             _dragHitIndex = null;
+        }
+
+        private static ListBoxItem? _FindListBoxItemFromSource(object? source)
+        {
+            for (var current = source as Visual; current is not null; current = current.GetVisualParent())
+            {
+                if (current is ListBoxItem item)
+                {
+                    return item;
+                }
+            }
+
+            return null;
         }
     }
 }

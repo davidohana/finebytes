@@ -1,0 +1,22 @@
+---
+description: Avalonia Headless interaction tests for UI glue, gestures, and layout
+globs: Mfr.Tests/Ui/**/*.cs,Mfr.App.Ui/**/*.cs,Mfr.App.Ui/**/*.axaml
+alwaysApply: false
+---
+
+# UI headless tests
+
+A `*ViewModelTests` `[Fact]` is not coverage for view sync. Pattern: `Mfr.Tests/Ui/FileList/FileListViewTests.cs`.
+
+When the change touches selection, drag, keyboard, focus routing, `ItemsSource` rebuild, overriding stock ListBox/DataGrid/ComboBox behavior, layout/hit-test, new AXAML/resources, or persisting visual state:
+
+- Add at least one `[AvaloniaFact]` that `Show`s the view and drives the **same path as play** (`window.MouseDown` / `KeyDown` / control `RaiseEvent`), not `vm.SetSelected…` / `Command.Execute` alone.
+- Assert **control and VM** (e.g. `list.Selection.SelectedIndexes` and `dialogVm.SelectedColumnRowIndices`).
+- After rebuild or recycle, assert the control still matches, not only the VM collection.
+- If you replace stock behavior, test the gesture the control would otherwise steal (Home/End on DataGrid, Ctrl-click, header double-click, press on a multi-selection).
+- New AXAML or image resources: constructing/showing the view in headless must not throw.
+- Session layout (column widths, splitters): reload and assert the **control**, not only the DTO.
+
+Do not two-way-bind `SelectedItem` / `SelectedIndex` on multi-select lists. Do not use pointer-over as a second source of truth for selection, hints, or row chrome.
+
+Do not add Playwright, WinAppDriver, or a second UI runner.

@@ -119,6 +119,12 @@ constant/map tests, and legacy-load tests.
 loop, and tests whose API was deleted. Drop low-value tests rather than rewriting them.
 Reuse existing fixtures when already touching that suite.
 
+View/AXAML sync needs a **gesture** (or construct/layout) headless test — selection, DnD
+press-collapse, stolen keys, focus routing, recycle, MinWidth/hit-test, AXAML load, session
+visual state. Do not treat `*ViewModelTests` as that coverage. Do not convert existing VM
+tests into headless tests; add a gesture fact instead. Play-found UI bug → lock with the
+same gesture, not a VM setter.
+
 ## After edits
 
 Run the affected tests. Format touched files if layout changed. Do not commit unless asked.
