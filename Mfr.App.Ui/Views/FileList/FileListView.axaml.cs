@@ -47,6 +47,7 @@ namespace Mfr.App.Ui.Views.FileList
         private FileListEntry? _dragHitEntry;
         private IReadOnlyList<FileListEntry>? _dragSelectionSnapshot;
         private bool _isDragPending;
+        private bool _isRenameListDragBackDrop;
 
         /// <summary>
         /// Gets or sets the Rename List Add Selected command.
@@ -91,6 +92,7 @@ namespace Mfr.App.Ui.Views.FileList
             _WireListingHomeEndKeyDown(LargeIconsList);
             _WireListingHomeEndKeyDown(TilesList);
             _WireListingHomeEndKeyDown(ThumbnailsList);
+            _WireRenameListDragBackDrop();
         }
 
         private void _WireListingHomeEndKeyDown(Control host)
@@ -472,7 +474,7 @@ namespace Mfr.App.Ui.Views.FileList
 
         private void _OnEntriesSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            if (_isSyncingSelection || _viewModel is null)
+            if (_isSyncingSelection || _viewModel is null || _isRenameListDragBackDrop)
             {
                 return;
             }
@@ -526,7 +528,7 @@ namespace Mfr.App.Ui.Views.FileList
             }
         }
 
-        private void _SyncSelectionToActiveListing()
+        private void _SyncSelectionToActiveListing(bool force = false)
         {
             if (_isSyncingSelection || _viewModel is null)
             {
@@ -538,37 +540,37 @@ namespace Mfr.App.Ui.Views.FileList
             {
                 if (_viewModel.IsReportView)
                 {
-                    _ApplySelection(ReportGrid);
+                    _ApplySelection(ReportGrid, force);
                     return;
                 }
 
                 if (_viewModel.IsListView)
                 {
-                    _ApplySelection(ListViewList);
+                    _ApplySelection(ListViewList, force);
                     return;
                 }
 
                 if (_viewModel.IsSmallIconsView)
                 {
-                    _ApplySelection(SmallIconsList);
+                    _ApplySelection(SmallIconsList, force);
                     return;
                 }
 
                 if (_viewModel.IsLargeIconsView)
                 {
-                    _ApplySelection(LargeIconsList);
+                    _ApplySelection(LargeIconsList, force);
                     return;
                 }
 
                 if (_viewModel.IsTilesView)
                 {
-                    _ApplySelection(TilesList);
+                    _ApplySelection(TilesList, force);
                     return;
                 }
 
                 if (_viewModel.IsThumbnailsView)
                 {
-                    _ApplySelection(ThumbnailsList);
+                    _ApplySelection(ThumbnailsList, force);
                 }
             }
             finally

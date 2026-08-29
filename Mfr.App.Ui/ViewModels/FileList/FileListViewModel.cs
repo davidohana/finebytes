@@ -620,18 +620,27 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
-        /// Navigates the File List to <paramref name="fullPath"/>'s folder and selects that item.
+        /// Navigates the File List to the focused path's folder and selects every matching row.
         /// </summary>
-        /// <param name="fullPath">Full file or folder path to locate.</param>
-        /// <returns><see langword="true"/> when the row was found in the current listing.</returns>
-        public bool TryLocatePath(string fullPath)
+        /// <param name="fullPaths">Full file or folder paths to locate.</param>
+        /// <param name="focusedPath">
+        /// Focused row path, or <see langword="null"/> to use the last entry in <paramref name="fullPaths"/>.
+        /// </param>
+        /// <returns><see langword="true"/> when at least one row was found in the listing.</returns>
+        public bool TryLocatePaths(IReadOnlyList<string> fullPaths, string? focusedPath)
         {
-            if (string.IsNullOrWhiteSpace(fullPath))
+            if (fullPaths.Count == 0)
             {
                 return false;
             }
 
-            var directoryPath = Path.GetDirectoryName(fullPath);
+            var anchorPath = focusedPath ?? fullPaths[^1];
+            if (string.IsNullOrWhiteSpace(anchorPath))
+            {
+                return false;
+            }
+
+            var directoryPath = Path.GetDirectoryName(anchorPath);
             if (string.IsNullOrWhiteSpace(directoryPath))
             {
                 return false;
@@ -647,14 +656,35 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 _Navigate(resolvedDirectory);
             }
 
-            var match = Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, fullPath));
-            if (match is null)
+            var pathToIsRequested = new HashSet<string>(PathComparers.Os);
+            foreach (var path in fullPaths)
+            {
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    pathToIsRequested.Add(path);
+                }
+            }
+
+            var matches = Entries.Where(entry => pathToIsRequested.Contains(entry.FullPath)).ToList();
+            if (matches.Count == 0)
             {
                 return false;
             }
 
-            SetSelectedEntries([match], match);
+            var focused =
+                matches.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, anchorPath)) ?? matches[^1];
+            SetSelectedEntries(matches, focused);
             return true;
+        }
+
+        /// <summary>
+        /// Navigates the File List to <paramref name="fullPath"/>'s folder and selects that item.
+        /// </summary>
+        /// <param name="fullPath">Full file or folder path to locate.</param>
+        /// <returns><see langword="true"/> when the row was found in the current listing.</returns>
+        public bool TryLocatePath(string fullPath)
+        {
+            return TryLocatePaths([fullPath], fullPath);
         }
 
         /// <summary>

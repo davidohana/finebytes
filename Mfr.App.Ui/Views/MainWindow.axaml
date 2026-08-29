@@ -414,6 +414,7 @@
           DataContext="{Binding FileListViewModel}"
           AddSelectedCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).RenameListViewModel.AddSelectedCommand}"
           AddAllCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).RenameListViewModel.AddAllCommand}"
+          RemoveSelectedFromRenameListCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).RenameListViewModel.RemoveSelectedCommand}"
         />
         <views:PaneSplitter
           x:Name="FileListSplitter"
