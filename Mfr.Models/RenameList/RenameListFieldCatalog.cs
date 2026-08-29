@@ -179,16 +179,16 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Grid text when original metadata load fails (MFR7 <c>PropDisplay</c> with exception).
+        /// Grid text when original metadata load fails (muted em dash; styling from <see cref="HasLoadError"/>).
         /// </summary>
-        public const string FieldLoadErrorText = "Error";
+        public const string FieldLoadErrorText = "\u2014";
 
         /// <summary>
         /// Returns whether an original field failed to load metadata from disk.
         /// </summary>
         /// <param name="item">Engine rename item.</param>
         /// <param name="key">Field key (original or preview).</param>
-        /// <returns><see langword="true"/> when the cell should show <c>Error</c>.</returns>
+        /// <returns><see langword="true"/> when the cell should show <see cref="FieldLoadErrorText"/>.</returns>
         public static bool HasLoadError(RenameItem item, RenameListFieldKey key)
         {
             return RenameListMetadataLoadErrors.HasLoadError(item, key);

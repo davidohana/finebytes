@@ -157,6 +157,10 @@
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock">
       <Setter Property="Margin" Value="{StaticResource DataGridTextColumnCellTextBlockMargin}" />
     </Style>
+    <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-load-error">
+      <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
+      <Setter Property="FontStyle" Value="Italic" />
+    </Style>
     <Style Selector="DataGrid.rename-list DataGridCell:focus /template/ Grid#FocusVisual">
       <Setter Property="IsVisible" Value="False" />
     </Style>

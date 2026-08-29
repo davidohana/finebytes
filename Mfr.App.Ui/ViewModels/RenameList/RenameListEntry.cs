@@ -53,7 +53,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Returns whether this original cell failed to load metadata from disk.
         /// </summary>
         /// <param name="key">Field key (original or preview).</param>
-        /// <returns><see langword="true"/> when the cell should show <c>Error</c>.</returns>
+        /// <returns><see langword="true"/> when the cell should show the load-error sentinel.</returns>
         public bool IsFieldLoadError(RenameListFieldKey key)
         {
             return RenameListFieldCatalog.HasLoadError(EngineItem, key);

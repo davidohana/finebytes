@@ -182,6 +182,20 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
         }
 
+        /// <summary>
+        /// Rebinds grid field cells after metadata hydrate so template cells pick up loaded values.
+        /// </summary>
+        private void _RefreshFieldDisplay()
+        {
+            if (Entries.Count == 0)
+            {
+                return;
+            }
+
+            Entries.ReplaceAll([.. Entries]);
+            _NotifyShowLoadErrorsChanged();
+        }
+
         private bool _CanRemoveSelected()
         {
             return !IsAdding && _selectedEntries.Count > 0;

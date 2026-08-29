@@ -653,7 +653,7 @@ namespace Mfr.Tests.Ui.RenameList
         /// Verifies basic columns still render when a sibling metadata column failed (6b grid regression).
         /// </summary>
         [AvaloniaFact]
-        public async Task Grid_shows_basic_text_and_Error_for_metadata_failure_on_same_row()
+        public async Task Grid_shows_basic_text_and_muted_dash_for_metadata_failure_on_same_row()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "info.htm");
@@ -688,6 +688,7 @@ namespace Mfr.Tests.Ui.RenameList
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.Equal("info.htm", entry.GetFieldText(fullNameKey));
             Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, entry.GetFieldText(titleKey));
+            Assert.True(entry.IsFieldLoadError(titleKey));
 
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
             var rowTexts = row.GetVisualDescendants()
@@ -700,15 +701,13 @@ namespace Mfr.Tests.Ui.RenameList
 
             var errorTextBlock = row.GetVisualDescendants()
                 .OfType<TextBlock>()
-                .First(textBlock => textBlock.Text == RenameListFieldCatalog.FieldLoadErrorText);
-            Assert.Same(RenameListLoadErrorForeground.Brush, errorTextBlock.Foreground);
-            var errorBrush = Assert.IsType<SolidColorBrush>(errorTextBlock.Foreground);
-            Assert.Equal(Color.Parse("#808080"), errorBrush.Color);
+                .First(textBlock => textBlock.Classes.Contains("rename-list-load-error"));
+            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, errorTextBlock.Text);
 
             var fullNameTextBlock = row.GetVisualDescendants()
                 .OfType<TextBlock>()
                 .First(textBlock => textBlock.Text == "info.htm");
-            Assert.NotSame(RenameListLoadErrorForeground.Brush, fullNameTextBlock.Foreground);
+            Assert.DoesNotContain("rename-list-load-error", fullNameTextBlock.Classes);
 
             window.Close();
         }
@@ -758,7 +757,7 @@ namespace Mfr.Tests.Ui.RenameList
             var titleTextBlock = row.GetVisualDescendants()
                 .OfType<TextBlock>()
                 .First(textBlock => textBlock.Text == "Error");
-            Assert.NotSame(RenameListLoadErrorForeground.Brush, titleTextBlock.Foreground);
+            Assert.DoesNotContain("rename-list-load-error", titleTextBlock.Classes);
 
             window.Close();
         }

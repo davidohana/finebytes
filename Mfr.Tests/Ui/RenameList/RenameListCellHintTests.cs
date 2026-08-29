@@ -35,7 +35,7 @@ namespace Mfr.Tests.Ui.RenameList
                 var hint = RenameListCellHint.FormatLoadError("Album Artists", explanation);
                 Assert.Equal(2, hint.Runs.Count);
                 Assert.Equal("Album Artists", hint.Runs[0].Text);
-                Assert.Contains("[Field value error]", hint.Runs[1].Text, StringComparison.Ordinal);
+                Assert.Contains("Could not read metadata:", hint.Runs[1].Text, StringComparison.Ordinal);
                 Assert.Contains("audio or media metadata", hint.Runs[1].Text, StringComparison.Ordinal);
             }
             finally

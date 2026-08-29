@@ -131,18 +131,15 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
-        /// Sets catalog text and grays only when that field has a stored load error.
+        /// Sets catalog text and load-error styling when that field has a stored load exception.
         /// </summary>
         private static void _ApplyFieldCell(TextBlock textBlock, RenameListEntry? entry, RenameListFieldKey key)
         {
             textBlock.Text = entry?.GetFieldText(key) ?? string.Empty;
-            if (entry?.IsFieldLoadError(key) == true)
-            {
-                textBlock.Foreground = RenameListLoadErrorForeground.Brush;
-                return;
-            }
-
+            var isLoadError = entry?.IsFieldLoadError(key) == true;
+            textBlock.Classes.Set("rename-list-load-error", isLoadError);
             textBlock.ClearValue(TextBlock.ForegroundProperty);
+            textBlock.ClearValue(TextBlock.FontStyleProperty);
         }
 
         private static int _ResolveEffectivePixelWidth(RenameListVisibleColumn visibleColumn, int minHeaderWidth)

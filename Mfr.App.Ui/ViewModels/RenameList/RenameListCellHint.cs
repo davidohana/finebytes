@@ -22,7 +22,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Builds the status-bar hint for a failed original metadata cell (MFR7 field-value error).
+        /// Builds the status-bar hint for a failed original metadata cell.
         /// </summary>
         /// <param name="columnHeader">Grid column header text.</param>
         /// <param name="userExplanation">Plain-language load-failure explanation.</param>
@@ -31,7 +31,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             return StatusHintDisplay.FromRuns(
                 new StatusHintRun(columnHeader) { FontWeight = FontWeight.Bold },
-                new StatusHintRun($": [Field value error] {userExplanation}")
+                new StatusHintRun($": Could not read metadata: {userExplanation}")
             );
         }
     }

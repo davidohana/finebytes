@@ -6,7 +6,7 @@ description: Leftovers after original field-load errors. 6c–6e shipped; next i
 # Rename List Phase 6b follow-ups
 
 Handover from the Phase 6b review. **6b is shipped:** row-level TagLib + image exceptions,
-gray `"Error"` cells, Show Load Errors dialog, status-bar `[Field value error]` hint,
+muted em-dash load-error cells, Show Load Errors dialog, status-bar `Could not read metadata:` hint,
 `ErrorsLast` sort.
 
 These phases are **6b leftovers**, not preview work. **6c–6e are shipped.** **8a Refresh**
@@ -42,19 +42,19 @@ true and the media requirement is satisfied (media key need not be requested).
 ## 6d — Structured gray (no display-text sentinel)
 
 **Shipped.** Cells are **`DataGridTemplateColumn`** + `FuncDataTemplate<RenameListEntry>`.
-Text comes from `GetFieldText`; gray from `IsFieldLoadError` (not `"Error"` text).
-`DataContextChanged` re-applies both when DataGrid recycles the row. Unused
+Text comes from `GetFieldText`; load-error styling from `IsFieldLoadError` via the
+`rename-list-load-error` cell class (theme muted foreground + italic), not display-text heuristics.
+Unused
 `RenameListFieldTextConverter` and the `LoadingRow` text-sentinel listeners are gone.
-Brush helper is [`RenameListLoadErrorForeground`](../Mfr.App.Ui/ViewModels/RenameList/RenameListLoadErrorForeground.cs).
 
-**Tests:** `Grid_cells_show_basic_field_text`; gray Title + not-gray Full File Name on the
+**Tests:** `Grid_cells_show_basic_field_text`; muted dash Title + normal Full File Name on the
 same failed-metadata row; a literal Title of `"Error"` without a stored load exception is
-not gray.
+not styled as load-error.
 
 ## 6e — `FieldError` → `LoadErrors` names
 
-**Shipped.** Menu, commands, and types say Load Errors. Cell word stays
-`FieldLoadErrorText = "Error"`. Catalog wrappers stay public (UI has no `InternalsVisibleTo` on
+**Shipped.** Menu, commands, and types say Load Errors. Failed cells show
+`FieldLoadErrorText` (`—`) with the `rename-list-load-error` class. Catalog wrappers stay public (UI has no `InternalsVisibleTo` on
 Models): `HasLoadError` / `HasAnyLoadError` / `ListLoadErrors` / `DescribeLoadError`.
 `_NotifyShowLoadErrorsChanged` stays inlined next to `ShowLoadErrors`.
 

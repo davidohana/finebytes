@@ -70,12 +70,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return true;
             }
 
-            return await AddProgress
+            var completed = await AddProgress
                 .RunAsync(
                     RenameListProgressOperation.MetadataHydrate,
                     (token, progress) => _renameList.EnsureMetadataLoaded(requirement, token, progress)
                 )
                 .ConfigureAwait(true);
+            if (completed)
+            {
+                _RefreshFieldDisplay();
+            }
+
+            return completed;
         }
 
         private async Task _HydrateThenSetSortKeysAsync(IReadOnlyList<RenameListSortKey> keys, bool resort)
