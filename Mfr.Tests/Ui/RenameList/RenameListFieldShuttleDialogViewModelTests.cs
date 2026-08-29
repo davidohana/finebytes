@@ -120,13 +120,14 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var dialogVm = _CreateDefaultDialog();
 
+            dialogVm.SelectedSortRowIndex = 0;
             dialogVm.SelectedAvailableSortField = RenameListFieldCatalog.GetField(
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FullPath
             );
             dialogVm.AddSelectedSortFieldCommand.Execute(null);
             Assert.Equal(4, dialogVm.SelectedSortRows.Count);
-            Assert.Equal(RenameListTestHelpers.FullPathKey, dialogVm.SelectedSortRows[^1].Key.FieldKey);
+            Assert.Equal(RenameListTestHelpers.FullPathKey, dialogVm.SelectedSortRows[1].Key.FieldKey);
 
             dialogVm.SelectedSortRowIndex = 0;
             dialogVm.ToggleSelectedSortDirectionCommand.Execute(null);
@@ -145,6 +146,158 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Empty(dialogVm.SelectedSortRows);
             Assert.True(dialogVm.CanConfirm);
             Assert.False(dialogVm.ClearSelectedSortKeysCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void Add_inserts_below_selected_row_or_appends_when_unselected()
+        {
+            var dialogVm = _CreateDefaultDialog();
+            var initialFirstKey = dialogVm.SelectedColumnRows[0].Column.Key;
+
+            dialogVm.SelectedColumnRowIndex = 0;
+            dialogVm.SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Name
+            );
+            dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
+
+            Assert.Equal(initialFirstKey, dialogVm.SelectedColumnRows[0].Column.Key);
+            Assert.Equal(BasicRenameListFields.Key.Name, dialogVm.SelectedColumnRows[1].Column.Key.PropertyKey);
+
+            dialogVm.ClearSelectedColumnsCommand.Execute(null);
+            dialogVm.SelectedColumnRowIndex = -1;
+            dialogVm.SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Name
+            );
+            dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
+
+            Assert.Single(dialogVm.SelectedColumnRows);
+            Assert.Equal(BasicRenameListFields.Key.Name, dialogVm.SelectedColumnRows[0].Column.Key.PropertyKey);
+        }
+
+        [Fact]
+        public void Add_all_inserts_block_below_selected_row()
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
+                    ),
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder)
+                    ),
+                ],
+                []
+            );
+
+            dialogVm.SelectedColumnRowIndex = 0;
+            var firstAvailable = dialogVm.AvailableOriginalFields[0];
+            dialogVm.AddAllOriginalFieldsCommand.Execute(null);
+
+            Assert.Equal(BasicRenameListFields.Key.ItemType, dialogVm.SelectedColumnRows[0].Column.Key.PropertyKey);
+            Assert.Equal(firstAvailable.PropertyKey, dialogVm.SelectedColumnRows[1].Column.Key.PropertyKey);
+            Assert.DoesNotContain(
+                dialogVm.SelectedColumnRows.Take(1),
+                row => row.Column.Key.PropertyKey == firstAvailable.PropertyKey
+            );
+        }
+
+        [Fact]
+        public void Multi_add_remove_and_block_move_columns()
+        {
+            var dialogVm = _CreateDefaultDialog();
+
+            dialogVm.SetSelectedAvailableOriginalFields(
+                [
+                    RenameListFieldCatalog.GetField(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                    RenameListFieldCatalog.GetField(BasicRenameListField.Group, BasicRenameListFields.Key.Extension),
+                ],
+                RenameListFieldCatalog.GetField(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
+            );
+            dialogVm.SelectedColumnRowIndex = 0;
+            dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
+
+            Assert.Equal(BasicRenameListFields.Key.Name, dialogVm.SelectedColumnRows[1].Column.Key.PropertyKey);
+            Assert.Equal(BasicRenameListFields.Key.Extension, dialogVm.SelectedColumnRows[2].Column.Key.PropertyKey);
+            Assert.DoesNotContain(
+                dialogVm.SelectedAvailableOriginalFields,
+                field => field.PropertyKey is BasicRenameListFields.Key.Name or BasicRenameListFields.Key.Extension
+            );
+
+            dialogVm.SetSelectedColumnRows([1, 2], 1);
+            dialogVm.RemoveSelectedColumnCommand.Execute(null);
+            Assert.Equal(4, dialogVm.SelectedColumnRows.Count);
+            Assert.Single(dialogVm.SelectedColumnRowIndices);
+
+            var firstKey = dialogVm.SelectedColumnRows[0].Column.Key;
+            var secondKey = dialogVm.SelectedColumnRows[1].Column.Key;
+            var thirdKey = dialogVm.SelectedColumnRows[2].Column.Key;
+            dialogVm.SetSelectedColumnRows([0, 1], 0);
+            dialogVm.MoveSelectedColumnDownCommand.Execute(null);
+
+            Assert.Equal(thirdKey, dialogVm.SelectedColumnRows[0].Column.Key);
+            Assert.Equal(firstKey, dialogVm.SelectedColumnRows[1].Column.Key);
+            Assert.Equal(secondKey, dialogVm.SelectedColumnRows[2].Column.Key);
+            Assert.Equal([1, 2], dialogVm.SelectedColumnRowIndices);
+            Assert.True(dialogVm.MoveSelectedColumnUpCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void Empty_right_selection_appends_added_columns()
+        {
+            var dialogVm = _CreateDefaultDialog();
+            var lastKey = dialogVm.SelectedColumnRows[^1].Column.Key;
+
+            dialogVm.SetSelectedColumnRows([], -1);
+            dialogVm.SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Name
+            );
+            dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
+
+            Assert.Equal(lastKey, dialogVm.SelectedColumnRows[^2].Column.Key);
+            Assert.Equal(BasicRenameListFields.Key.Name, dialogVm.SelectedColumnRows[^1].Column.Key.PropertyKey);
+        }
+
+        [Fact]
+        public void Add_inserts_below_last_index_of_multi_selection()
+        {
+            var dialogVm = _CreateDefaultDialog();
+
+            dialogVm.SetSelectedColumnRows([0, 1], 0);
+            dialogVm.SelectedAvailableOriginalField = RenameListFieldCatalog.GetField(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Name
+            );
+            dialogVm.AddSelectedOriginalFieldCommand.Execute(null);
+
+            Assert.Equal(BasicRenameListFields.Key.Name, dialogVm.SelectedColumnRows[2].Column.Key.PropertyKey);
+            Assert.Equal([2], dialogVm.SelectedColumnRowIndices);
+        }
+
+        [Fact]
+        public void Clear_columns_clears_row_selection()
+        {
+            var dialogVm = _CreateDefaultDialog();
+            dialogVm.SetSelectedColumnRows([0, 1], 0);
+
+            dialogVm.ClearSelectedColumnsCommand.Execute(null);
+
+            Assert.Empty(dialogVm.SelectedColumnRowIndices);
+            Assert.Equal(-1, dialogVm.SelectedColumnRowIndex);
+            Assert.False(dialogVm.RemoveSelectedColumnCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void SetSelectedColumnRows_ignores_out_of_range_indices()
+        {
+            var dialogVm = _CreateDefaultDialog();
+
+            dialogVm.SetSelectedColumnRows([0, 99], 99);
+
+            Assert.Equal([0], dialogVm.SelectedColumnRowIndices);
+            Assert.Equal(0, dialogVm.SelectedColumnRowIndex);
         }
 
         [Fact]
@@ -221,6 +374,27 @@ namespace Mfr.Tests.Ui.RenameList
             dialogVm.SelectedColumnRowIndex = dialogVm.SelectedColumnRows.Count - 1;
             Assert.True(dialogVm.MoveSelectedColumnUpCommand.CanExecute(null));
             Assert.False(dialogVm.MoveSelectedColumnDownCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void Non_contiguous_column_selection_can_move_up()
+        {
+            var dialogVm = _CreateDefaultDialog();
+            var firstKey = dialogVm.SelectedColumnRows[0].Column.Key;
+            var secondKey = dialogVm.SelectedColumnRows[1].Column.Key;
+            var thirdKey = dialogVm.SelectedColumnRows[2].Column.Key;
+
+            dialogVm.SetSelectedColumnRows([0, 2], 2);
+
+            Assert.True(dialogVm.MoveSelectedColumnUpCommand.CanExecute(null));
+
+            dialogVm.MoveSelectedColumnUpCommand.Execute(null);
+
+            Assert.Equal(firstKey, dialogVm.SelectedColumnRows[0].Column.Key);
+            Assert.Equal(thirdKey, dialogVm.SelectedColumnRows[1].Column.Key);
+            Assert.Equal(secondKey, dialogVm.SelectedColumnRows[2].Column.Key);
+            Assert.Equal([0, 1], dialogVm.SelectedColumnRowIndices);
+            Assert.Equal(1, dialogVm.SelectedColumnRowIndex);
         }
 
         [Fact]

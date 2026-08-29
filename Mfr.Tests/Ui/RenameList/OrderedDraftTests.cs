@@ -95,6 +95,92 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void GetInsertIndexBelowSelection_returns_index_after_anchor_or_end()
+        {
+            var draft = new OrderedDraft<string, string>(["a", "b", "c"], item => item) { SelectedIndex = 0 };
+
+            Assert.Equal(1, draft.GetInsertIndexBelowSelection());
+
+            draft.SelectedIndex = 2;
+            Assert.Equal(3, draft.GetInsertIndexBelowSelection());
+
+            draft.SelectedIndex = -1;
+            Assert.Equal(3, draft.GetInsertIndexBelowSelection());
+        }
+
+        [Fact]
+        public void TryInsertAt_inserts_at_index_and_skips_duplicates()
+        {
+            var draft = new OrderedDraft<string, string>(["a", "c"], item => item) { SelectedIndex = 0 };
+
+            Assert.True(draft.TryInsertAt(1, "b"));
+            Assert.Equal(["a", "b", "c"], draft.Items);
+            Assert.Equal(1, draft.SelectedIndex);
+
+            Assert.False(draft.TryInsertAt(0, "a"));
+            Assert.Equal(["a", "b", "c"], draft.Items);
+        }
+
+        [Fact]
+        public void TryInsertMany_inserts_in_order_and_skips_duplicates()
+        {
+            var draft = new OrderedDraft<string, string>(["a"], item => item) { SelectedIndex = 0 };
+
+            var insertedCount = draft.TryInsertMany(1, ["b", "a", "c"]);
+
+            Assert.Equal(2, insertedCount);
+            Assert.Equal(["a", "b", "c"], draft.Items);
+            Assert.Equal(2, draft.SelectedIndex);
+        }
+
+        [Fact]
+        public void TryRemoveAtIndices_removes_multiple_rows_and_clamps_selection()
+        {
+            var draft = new OrderedDraft<string, string>(["a", "b", "c", "d"], item => item) { SelectedIndex = 2 };
+
+            Assert.Equal(2, draft.TryRemoveAtIndices([1, 3]));
+
+            Assert.Equal(["a", "c"], draft.Items);
+            Assert.Equal(1, draft.SelectedIndex);
+        }
+
+        [Fact]
+        public void TryMoveBlock_moves_contiguous_selection()
+        {
+            var draft = new OrderedDraft<string, string>(["a", "b", "c", "d"], item => item) { SelectedIndex = 1 };
+
+            Assert.True(draft.TryMoveBlock([1, 2], 1));
+            Assert.Equal(["a", "d", "b", "c"], draft.Items);
+            Assert.Equal(2, draft.SelectedIndex);
+
+            Assert.True(draft.TryMoveBlock([2, 3], -1));
+            Assert.Equal(["a", "b", "c", "d"], draft.Items);
+            Assert.Equal(1, draft.SelectedIndex);
+        }
+
+        [Fact]
+        public void TryMoveBlock_moves_non_contiguous_items_independently()
+        {
+            var draft = new OrderedDraft<string, string>(["a", "b", "c"], item => item) { SelectedIndex = 2 };
+
+            Assert.True(draft.TryMoveBlock([0, 2], -1, out var newIndices));
+
+            Assert.Equal(["a", "c", "b"], draft.Items);
+            Assert.Equal([0, 1], newIndices);
+            Assert.Equal(1, draft.SelectedIndex);
+        }
+
+        [Fact]
+        public void TryMoveIndicesTo_reorders_block_to_target()
+        {
+            var draft = new OrderedDraft<string, string>(["a", "b", "c", "d"], item => item) { SelectedIndex = 1 };
+
+            Assert.True(draft.TryMoveIndicesTo([1, 2], 4));
+            Assert.Equal(["a", "d", "b", "c"], draft.Items);
+            Assert.Equal(2, draft.SelectedIndex);
+        }
+
+        [Fact]
         public void TrySetItem_replaces_when_key_matches()
         {
             var draft = new OrderedDraft<string, (string Key, int Value)>([("a", 1), ("b", 2)], item => item.Key)

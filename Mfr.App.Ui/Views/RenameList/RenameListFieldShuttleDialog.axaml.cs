@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -29,6 +28,8 @@ namespace Mfr.App.Ui.Views.RenameList
             DataContext = viewModel;
             viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             Closed += (_, _) => viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
+            _WireSelectionHandlers();
+            _WireDragDropHandlers();
         }
 
         private RenameListFieldShuttleDialogViewModel? _ViewModel =>
@@ -41,34 +42,17 @@ namespace Mfr.App.Ui.Views.RenameList
                 is not (
                     nameof(RenameListFieldShuttleDialogViewModel.SelectedColumnRows)
                     or nameof(RenameListFieldShuttleDialogViewModel.SelectedSortRows)
+                    or nameof(RenameListFieldShuttleDialogViewModel.AvailableOriginalFields)
+                    or nameof(RenameListFieldShuttleDialogViewModel.AvailablePreviewFields)
+                    or nameof(RenameListFieldShuttleDialogViewModel.AvailableSortFields)
+                    or nameof(RenameListFieldShuttleDialogViewModel.IsPreviewColumnsTab)
                 )
             )
             {
                 return;
             }
 
-            Dispatcher.UIThread.Post(_RestoreSelectedListIndexes, DispatcherPriority.Background);
-        }
-
-        private void _RestoreSelectedListIndexes()
-        {
-            if (_ViewModel is null)
-            {
-                return;
-            }
-
-            _RestoreListIndex(SelectedColumnsList, _ViewModel.SelectedColumnRowIndex);
-            _RestoreListIndex(SelectedSortList, _ViewModel.SelectedSortRowIndex);
-        }
-
-        private static void _RestoreListIndex(ListBox? list, int selectedIndex)
-        {
-            if (list is null || list.SelectedIndex == selectedIndex)
-            {
-                return;
-            }
-
-            list.SelectedIndex = selectedIndex;
+            _QueueRestoreListSelections();
         }
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)
@@ -103,12 +87,28 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnRemoveColumnDoubleTapped(object? sender, RoutedEventArgs e)
         {
-            _ViewModel?.RemoveSelectedColumnCommand.Execute(null);
+            if (_ViewModel is null || sender is not ListBox list || e.Source is not Control source)
+            {
+                return;
+            }
+
+            if (source.DataContext is RenameListFieldShuttleColumnRow row)
+            {
+                _ViewModel.RemoveColumnByKey(row.Column.Key);
+            }
         }
 
         private void _OnRemoveSortDoubleTapped(object? sender, RoutedEventArgs e)
         {
-            _ViewModel?.RemoveSelectedSortKeyCommand.Execute(null);
+            if (_ViewModel is null || sender is not ListBox list || e.Source is not Control source)
+            {
+                return;
+            }
+
+            if (source.DataContext is RenameListFieldShuttleSortRow row)
+            {
+                _ViewModel.RemoveSortKeyByFieldKey(row.Key.FieldKey);
+            }
         }
 
         private void _OnAddSelectedClick(object? sender, RoutedEventArgs e)
