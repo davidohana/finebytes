@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -81,89 +80,31 @@ namespace Mfr.Utils.Config
             if (segments.Length == 1)
             {
                 var leaf =
-                    _FindLeafField(containerType, segments[0])
+                    ConfigFieldBindings.FindLeaf(containerType, s_Naming, segments[0])
                     ?? throw new InvalidDataException(
                         $"Unknown config field '{segments[0]}' under '{containerType.Name}'."
                     );
 
-                var jsonName = s_Naming.ConvertName(leaf.Name);
-                parent[jsonName] = value;
+                parent[leaf.JsonName] = value;
                 return;
             }
 
             var section =
-                _FindSectionField(containerType, segments[0])
+                ConfigFieldBindings.FindSection(containerType, s_Naming, segments[0])
                 ?? throw new InvalidDataException($"Unknown config section '{segments[0]}'.");
 
-            var sectionKey = _GetSectionJsonKey(section);
             JsonObject sectionObject;
-            if (parent[sectionKey] is JsonObject existingSection)
+            if (parent[section.JsonName] is JsonObject existingSection)
             {
                 sectionObject = existingSection;
             }
             else
             {
                 sectionObject = [];
-                parent[sectionKey] = sectionObject;
+                parent[section.JsonName] = sectionObject;
             }
 
-            _MergeValidated(sectionObject, section.FieldType, segments[1..], value);
-        }
-
-        private static FieldInfo? _FindSectionField(Type containerType, string segment)
-        {
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            foreach (var field in containerType.GetFields(flags))
-            {
-                var attr = field.GetCustomAttribute<ConfigSectionAttribute>();
-                if (attr is null)
-                {
-                    continue;
-                }
-
-                var jsonKey = string.IsNullOrEmpty(attr.JsonName) ? s_Naming.ConvertName(field.Name) : attr.JsonName;
-                if (string.Equals(jsonKey, segment, StringComparison.OrdinalIgnoreCase))
-                {
-                    return field;
-                }
-            }
-
-            return null;
-        }
-
-        private static FieldInfo? _FindLeafField(Type containerType, string segment)
-        {
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            foreach (var field in containerType.GetFields(flags))
-            {
-                if (field.GetCustomAttribute<ConfigSectionAttribute>() is not null)
-                {
-                    continue;
-                }
-
-                var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
-                var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
-                var isBoolLeaf = field.FieldType == typeof(bool);
-                var isEnumLeaf = field.FieldType.IsEnum;
-                if (intRange is null && strMax is null && !isBoolLeaf && !isEnumLeaf)
-                {
-                    continue;
-                }
-
-                var jsonName = s_Naming.ConvertName(field.Name);
-                if (string.Equals(jsonName, segment, StringComparison.OrdinalIgnoreCase))
-                {
-                    return field;
-                }
-            }
-
-            return null;
-        }
-
-        private static string _GetSectionJsonKey(FieldInfo sectionField)
-        {
-            var attr = sectionField.GetCustomAttribute<ConfigSectionAttribute>()!;
-            return string.IsNullOrEmpty(attr.JsonName) ? s_Naming.ConvertName(sectionField.Name) : attr.JsonName;
+            _MergeValidated(sectionObject, section.Field.FieldType, segments[1..], value);
         }
     }
 }

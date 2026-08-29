@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Mfr.Utils.Config;
 
 namespace Mfr.Tests.Utils.Config
@@ -60,13 +61,28 @@ namespace Mfr.Tests.Utils.Config
         }
 
         [Fact]
-        public void Write_writes_nested_sections()
+        public void Write_then_Apply_round_trips_leaves_and_section()
         {
-            var root = ConfigJsonWriter.Write(new SampleSectionRoot { Inner = { Port = 7 } });
+            var original = new SampleSectionRoot
+            {
+                Inner =
+                {
+                    Port = 42,
+                    Enabled = false,
+                    Mode = SampleLeafMode.Folders,
+                    Name = "ok",
+                },
+            };
 
-            var inner = root["inner"]?.AsObject();
-            Assert.NotNull(inner);
-            Assert.Equal("7", inner["port"]?.GetValue<string>());
+            var json = ConfigJsonWriter.Write(original);
+            var copy = new SampleSectionRoot();
+            using var doc = JsonDocument.Parse(json.ToJsonString());
+            ConfigJsonApplier.Apply(doc.RootElement, copy);
+
+            Assert.Equal(42, copy.Inner.Port);
+            Assert.False(copy.Inner.Enabled);
+            Assert.Equal(SampleLeafMode.Folders, copy.Inner.Mode);
+            Assert.Equal("ok", copy.Inner.Name);
         }
     }
 }

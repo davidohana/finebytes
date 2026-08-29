@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -11,8 +10,6 @@ namespace Mfr.Utils.Config
     /// </summary>
     public static class ConfigJsonWriter
     {
-        private static readonly JsonNamingPolicy s_DefaultNaming = JsonNamingPolicy.CamelCase;
-
         /// <summary>
         /// Serializes <paramref name="configObject"/> to a new JSON object.
         /// </summary>
@@ -30,7 +27,7 @@ namespace Mfr.Utils.Config
             ArgumentNullException.ThrowIfNull(configObject);
 
             JsonObject root = [];
-            _WriteInto(root, configObject, jsonPropertyNamingPolicy);
+            _WriteInto(root, configObject, ConfigFieldBindings.ResolveNaming(jsonPropertyNamingPolicy));
             return root;
         }
 
@@ -39,171 +36,101 @@ namespace Mfr.Utils.Config
         /// </summary>
         /// <param name="root">JSON object receiving the fields.</param>
         /// <param name="configObject">Instance whose fields are written.</param>
-        /// <param name="jsonPropertyNamingPolicy">Optional naming policy forwarded to nested sections.</param>
-        private static void _WriteInto(JsonObject root, object configObject, JsonNamingPolicy? jsonPropertyNamingPolicy)
+        /// <param name="naming">JSON property naming policy.</param>
+        private static void _WriteInto(JsonObject root, object configObject, JsonNamingPolicy naming)
         {
-            var naming = jsonPropertyNamingPolicy ?? s_DefaultNaming;
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            foreach (var field in configObject.GetType().GetFields(flags))
+            foreach (var binding in ConfigFieldBindings.Enumerate(configObject.GetType(), naming))
             {
-                _WriteField(root, configObject, field, naming, jsonPropertyNamingPolicy);
+                _WriteBinding(root, configObject, binding, naming);
             }
         }
 
         /// <summary>
-        /// Classifies <paramref name="field"/> and writes a matching section or leaf value.
+        /// Writes one classified field from <paramref name="configObject"/> into <paramref name="root"/>.
         /// </summary>
-        /// <param name="root">JSON object receiving the field.</param>
-        /// <param name="configObject">Instance that owns <paramref name="field"/>.</param>
-        /// <param name="field">Public instance field to write.</param>
-        /// <param name="naming">JSON property naming policy.</param>
-        /// <param name="jsonPropertyNamingPolicy">Optional naming policy forwarded to nested sections.</param>
-        private static void _WriteField(
+        private static void _WriteBinding(
             JsonObject root,
             object configObject,
-            FieldInfo field,
-            JsonNamingPolicy naming,
-            JsonNamingPolicy? jsonPropertyNamingPolicy
+            ConfigFieldBinding binding,
+            JsonNamingPolicy naming
         )
         {
-            var sectionAttr = field.GetCustomAttribute<ConfigSectionAttribute>();
-            var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
-            var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
-
-            if (sectionAttr is not null)
+            switch (binding.Kind)
             {
-                if (intRange is not null || strMax is not null)
-                {
-                    throw new InvalidOperationException(
-                        $"Field '{field.Name}' cannot combine [{nameof(ConfigSectionAttribute)}] with leaf config attributes."
-                    );
-                }
-
-                _WriteSection(root, configObject, field, sectionAttr, naming, jsonPropertyNamingPolicy);
-                return;
-            }
-
-            if (intRange is not null && strMax is not null)
-            {
-                throw new InvalidOperationException(
-                    $"Field '{field.Name}' cannot specify both [{nameof(ConfigIntRangeAttribute)}] and [{nameof(ConfigStringMaxLengthAttribute)}]."
-                );
-            }
-
-            var jsonName = naming.ConvertName(field.Name);
-
-            if (intRange is not null)
-            {
-                _WriteIntLeaf(root, configObject, field, jsonName, intRange);
-                return;
-            }
-
-            if (strMax is not null)
-            {
-                _WriteStringLeaf(root, configObject, field, jsonName);
-                return;
-            }
-
-            if (field.FieldType == typeof(bool))
-            {
-                _WriteBoolLeaf(root, configObject, field, jsonName);
-                return;
-            }
-
-            if (field.FieldType.IsEnum)
-            {
-                _WriteEnumLeaf(root, configObject, field, jsonName, naming);
+                case ConfigFieldKind.Section:
+                    _WriteSection(root, configObject, binding, naming);
+                    return;
+                case ConfigFieldKind.Int:
+                    _WriteIntLeaf(root, configObject, binding);
+                    return;
+                case ConfigFieldKind.String:
+                    _WriteStringLeaf(root, configObject, binding);
+                    return;
+                case ConfigFieldKind.Bool:
+                    _WriteBoolLeaf(root, configObject, binding);
+                    return;
+                case ConfigFieldKind.Enum:
+                    _WriteEnumLeaf(root, configObject, binding, naming);
+                    return;
+                default:
+                    throw new InvalidOperationException($"Unhandled config field kind '{binding.Kind}'.");
             }
         }
 
         /// <summary>
-        /// Writes a nested JSON object for a <see cref="ConfigSectionAttribute"/> field.
+        /// Writes a nested JSON object for a section field.
         /// </summary>
         private static void _WriteSection(
             JsonObject root,
             object configObject,
-            FieldInfo field,
-            ConfigSectionAttribute sectionAttr,
-            JsonNamingPolicy naming,
-            JsonNamingPolicy? jsonPropertyNamingPolicy
+            ConfigFieldBinding binding,
+            JsonNamingPolicy naming
         )
         {
-            if (!field.FieldType.IsClass || field.FieldType == typeof(string))
-            {
-                throw new InvalidOperationException(
-                    $"Field '{field.Name}' has [{nameof(ConfigSectionAttribute)}] but is not a reference class type."
-                );
-            }
-
-            var nested = field.GetValue(configObject);
+            var nested = binding.Field.GetValue(configObject);
             if (nested is null)
             {
                 return;
             }
 
-            var sectionKey = sectionAttr.JsonName;
-            if (string.IsNullOrEmpty(sectionKey))
-            {
-                sectionKey = naming.ConvertName(field.Name);
-            }
-
             JsonObject sectionObject = [];
-            root[sectionKey] = sectionObject;
-            _WriteInto(sectionObject, nested, jsonPropertyNamingPolicy);
+            root[binding.JsonName] = sectionObject;
+            _WriteInto(sectionObject, nested, naming);
         }
 
         /// <summary>
         /// Writes an integer leaf as a JSON string.
         /// </summary>
-        private static void _WriteIntLeaf(
-            JsonObject root,
-            object configObject,
-            FieldInfo field,
-            string jsonName,
-            ConfigIntRangeAttribute intRange
-        )
+        private static void _WriteIntLeaf(JsonObject root, object configObject, ConfigFieldBinding binding)
         {
-            if (field.FieldType != typeof(int))
-            {
-                throw new InvalidOperationException(
-                    $"Field '{field.Name}' has [{nameof(ConfigIntRangeAttribute)}] but is not int."
-                );
-            }
-
-            var value = (int)field.GetValue(configObject)!;
+            var value = (int)binding.Field.GetValue(configObject)!;
+            var intRange = binding.IntRange!;
             if (value < intRange.MinInclusive || value > intRange.MaxInclusive)
             {
                 throw new InvalidOperationException(
-                    $"Field '{field.Name}' value {value} is outside [{intRange.MinInclusive}, {intRange.MaxInclusive}]."
+                    $"Field '{binding.Field.Name}' value {value} is outside [{intRange.MinInclusive}, {intRange.MaxInclusive}]."
                 );
             }
 
-            root[jsonName] = value.ToString(CultureInfo.InvariantCulture);
+            root[binding.JsonName] = value.ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
         /// Writes a string leaf as a JSON string (including empty).
         /// </summary>
-        private static void _WriteStringLeaf(JsonObject root, object configObject, FieldInfo field, string jsonName)
+        private static void _WriteStringLeaf(JsonObject root, object configObject, ConfigFieldBinding binding)
         {
-            if (field.FieldType != typeof(string))
-            {
-                throw new InvalidOperationException(
-                    $"Field '{field.Name}' has [{nameof(ConfigStringMaxLengthAttribute)}] but is not string."
-                );
-            }
-
-            var value = (string?)field.GetValue(configObject) ?? string.Empty;
-            root[jsonName] = value;
+            var value = (string?)binding.Field.GetValue(configObject) ?? string.Empty;
+            root[binding.JsonName] = value;
         }
 
         /// <summary>
         /// Writes an unannotated <c>bool</c> leaf as a JSON string.
         /// </summary>
-        private static void _WriteBoolLeaf(JsonObject root, object configObject, FieldInfo field, string jsonName)
+        private static void _WriteBoolLeaf(JsonObject root, object configObject, ConfigFieldBinding binding)
         {
-            var value = (bool)field.GetValue(configObject)!;
-            root[jsonName] = value ? "true" : "false";
+            var value = (bool)binding.Field.GetValue(configObject)!;
+            root[binding.JsonName] = value ? "true" : "false";
         }
 
         /// <summary>
@@ -212,13 +139,12 @@ namespace Mfr.Utils.Config
         private static void _WriteEnumLeaf(
             JsonObject root,
             object configObject,
-            FieldInfo field,
-            string jsonName,
+            ConfigFieldBinding binding,
             JsonNamingPolicy naming
         )
         {
-            var value = field.GetValue(configObject)!;
-            root[jsonName] = naming.ConvertName(value.ToString()!);
+            var value = binding.Field.GetValue(configObject)!;
+            root[binding.JsonName] = naming.ConvertName(value.ToString()!);
         }
     }
 }

@@ -2,7 +2,7 @@ namespace Mfr.Utils.Config
 {
     /// <summary>
     /// Declares inclusive integer bounds for JSON-backed fields.
-    /// <para>Used by <see cref="ConfigJsonApplier.Apply"/>.</para>
+    /// <para>Used by config JSON apply, write, and CLI <c>--set</c>.</para>
     /// </summary>
     /// <param name="minInclusive">Minimum allowed value when the JSON property is present.</param>
     /// <param name="maxInclusive">Maximum allowed value when the JSON property is present.</param>
@@ -22,7 +22,7 @@ namespace Mfr.Utils.Config
 
     /// <summary>
     /// Declares a maximum string length for JSON-backed fields.
-    /// <para>Used by <see cref="ConfigJsonApplier.Apply"/>.</para>
+    /// <para>Used by config JSON apply, write, and CLI <c>--set</c>.</para>
     /// </summary>
     /// <param name="maxLengthInclusive">Maximum allowed length when the JSON property is present.</param>
     [AttributeUsage(AttributeTargets.Field)]
@@ -37,15 +37,16 @@ namespace Mfr.Utils.Config
     /// <summary>
     /// Marks a nested config object mapped from a JSON object property.
     /// <para>
-    /// <see cref="ConfigJsonApplier.Apply"/> reads by <see cref="JsonName"/> or the field name, then recurses.
+    /// <see cref="ConfigJsonApplier.Apply"/> and <see cref="ConfigJsonWriter.Write"/> map by
+    /// <see cref="JsonName"/> or the field name, then recurse.
     /// </para>
     /// </summary>
-    /// <param name="jsonName">Optional JSON object property name; when null, the name is derived from the field name using the applier naming policy.</param>
+    /// <param name="jsonName">Optional JSON object property name; when null, the name is derived from the field name using the JSON naming policy.</param>
     [AttributeUsage(AttributeTargets.Field)]
     public sealed class ConfigSectionAttribute(string? jsonName = null) : Attribute
     {
         /// <summary>
-        /// Gets the JSON property name when set; otherwise the applier derives the name from the field.
+        /// Gets the JSON property name when set; otherwise the name is derived from the field.
         /// </summary>
         public string? JsonName { get; } = jsonName;
     }

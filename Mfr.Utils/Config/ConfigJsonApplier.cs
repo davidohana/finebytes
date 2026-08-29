@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json;
 
 namespace Mfr.Utils.Config
@@ -39,189 +38,119 @@ namespace Mfr.Utils.Config
         {
             ArgumentNullException.ThrowIfNull(target);
 
-            var naming = jsonPropertyNamingPolicy ?? JsonNamingPolicy.CamelCase;
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            foreach (var field in target.GetType().GetFields(flags))
+            var naming = ConfigFieldBindings.ResolveNaming(jsonPropertyNamingPolicy);
+            foreach (var binding in ConfigFieldBindings.Enumerate(target.GetType(), naming))
             {
-                _ApplyField(configObject, target, field, naming, jsonPropertyNamingPolicy);
+                _ApplyBinding(configObject, target, binding, naming);
             }
         }
 
         /// <summary>
-        /// Classifies <paramref name="field"/> and applies a matching section or leaf binding.
+        /// Applies one classified field from <paramref name="configObject"/> onto <paramref name="target"/>.
         /// </summary>
-        private static void _ApplyField(
+        private static void _ApplyBinding(
             JsonElement configObject,
             object target,
-            FieldInfo field,
-            JsonNamingPolicy naming,
-            JsonNamingPolicy? jsonPropertyNamingPolicy
+            ConfigFieldBinding binding,
+            JsonNamingPolicy naming
         )
         {
-            var sectionAttr = field.GetCustomAttribute<ConfigSectionAttribute>();
-            var intRange = field.GetCustomAttribute<ConfigIntRangeAttribute>();
-            var strMax = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>();
-
-            if (sectionAttr is not null)
+            switch (binding.Kind)
             {
-                if (intRange is not null || strMax is not null)
-                {
-                    throw new InvalidOperationException(
-                        $"Field '{field.Name}' cannot combine [{nameof(ConfigSectionAttribute)}] with leaf config attributes."
-                    );
-                }
-
-                _ApplySection(configObject, target, field, sectionAttr, naming, jsonPropertyNamingPolicy);
-                return;
-            }
-
-            if (intRange is not null && strMax is not null)
-            {
-                throw new InvalidOperationException(
-                    $"Field '{field.Name}' cannot specify both [{nameof(ConfigIntRangeAttribute)}] and [{nameof(ConfigStringMaxLengthAttribute)}]."
-                );
-            }
-
-            var jsonName = naming.ConvertName(field.Name);
-
-            if (intRange is not null)
-            {
-                _ApplyIntLeaf(configObject, target, field, jsonName, intRange);
-                return;
-            }
-
-            if (strMax is not null)
-            {
-                _ApplyStringLeaf(configObject, target, field, jsonName, strMax);
-                return;
-            }
-
-            if (field.FieldType == typeof(bool))
-            {
-                _ApplyBoolLeaf(configObject, target, field, jsonName);
-                return;
-            }
-
-            if (field.FieldType.IsEnum)
-            {
-                _ApplyEnumLeaf(configObject, target, field, jsonName);
+                case ConfigFieldKind.Section:
+                    _ApplySection(configObject, target, binding, naming);
+                    return;
+                case ConfigFieldKind.Int:
+                    _ApplyIntLeaf(configObject, target, binding);
+                    return;
+                case ConfigFieldKind.String:
+                    _ApplyStringLeaf(configObject, target, binding);
+                    return;
+                case ConfigFieldKind.Bool:
+                    _ApplyBoolLeaf(configObject, target, binding);
+                    return;
+                case ConfigFieldKind.Enum:
+                    _ApplyEnumLeaf(configObject, target, binding);
+                    return;
+                default:
+                    throw new InvalidOperationException($"Unhandled config field kind '{binding.Kind}'.");
             }
         }
 
         /// <summary>
-        /// Recurses into a nested JSON object for a <see cref="ConfigSectionAttribute"/> field.
+        /// Recurses into a nested JSON object for a section field.
         /// </summary>
         private static void _ApplySection(
             JsonElement configObject,
             object target,
-            FieldInfo field,
-            ConfigSectionAttribute sectionAttr,
-            JsonNamingPolicy naming,
-            JsonNamingPolicy? jsonPropertyNamingPolicy
+            ConfigFieldBinding binding,
+            JsonNamingPolicy naming
         )
         {
-            if (!field.FieldType.IsClass || field.FieldType == typeof(string))
-            {
-                throw new InvalidOperationException(
-                    $"Field '{field.Name}' has [{nameof(ConfigSectionAttribute)}] but is not a reference class type."
-                );
-            }
-
-            var nested = field.GetValue(target);
+            var nested = binding.Field.GetValue(target);
             if (nested is null)
             {
                 return;
             }
 
-            var sectionKey = sectionAttr.JsonName;
-            if (string.IsNullOrEmpty(sectionKey))
-            {
-                sectionKey = naming.ConvertName(field.Name);
-            }
-
-            if (!_TryGetObjectProperty(configObject, sectionKey, out var nestedObject))
+            if (!_TryGetObjectProperty(configObject, binding.JsonName, out var nestedObject))
             {
                 return;
             }
 
-            Apply(nestedObject, nested, jsonPropertyNamingPolicy);
+            Apply(nestedObject, nested, naming);
         }
 
         /// <summary>
         /// Reads and assigns an integer leaf using <see cref="ConfigIntRangeAttribute"/> bounds.
         /// </summary>
-        private static void _ApplyIntLeaf(
-            JsonElement configObject,
-            object target,
-            FieldInfo field,
-            string jsonName,
-            ConfigIntRangeAttribute intRange
-        )
+        private static void _ApplyIntLeaf(JsonElement configObject, object target, ConfigFieldBinding binding)
         {
-            if (field.FieldType != typeof(int))
-            {
-                throw new InvalidOperationException(
-                    $"Field '{field.Name}' has [{nameof(ConfigIntRangeAttribute)}] but is not int."
-                );
-            }
-
-            var value = (int)field.GetValue(target)!;
+            var value = (int)binding.Field.GetValue(target)!;
+            var intRange = binding.IntRange!;
             ConfigValueReader.ReadInt(
                 configObject,
-                jsonName,
+                binding.JsonName,
                 ref value,
                 minInclusive: intRange.MinInclusive,
                 maxInclusive: intRange.MaxInclusive
             );
-            field.SetValue(target, value);
+            binding.Field.SetValue(target, value);
         }
 
         /// <summary>
         /// Reads and assigns a string leaf using <see cref="ConfigStringMaxLengthAttribute"/> limits.
         /// </summary>
-        private static void _ApplyStringLeaf(
-            JsonElement configObject,
-            object target,
-            FieldInfo field,
-            string jsonName,
-            ConfigStringMaxLengthAttribute strMax
-        )
+        private static void _ApplyStringLeaf(JsonElement configObject, object target, ConfigFieldBinding binding)
         {
-            if (field.FieldType != typeof(string))
-            {
-                throw new InvalidOperationException(
-                    $"Field '{field.Name}' has [{nameof(ConfigStringMaxLengthAttribute)}] but is not string."
-                );
-            }
-
-            var value = (string)field.GetValue(target)!;
+            var value = (string)binding.Field.GetValue(target)!;
             ConfigValueReader.ReadString(
                 configObject,
-                jsonName,
+                binding.JsonName,
                 ref value,
-                maxLengthInclusive: strMax.MaxLengthInclusive
+                maxLengthInclusive: binding.StringMax!.MaxLengthInclusive
             );
-            field.SetValue(target, value);
+            binding.Field.SetValue(target, value);
         }
 
         /// <summary>
         /// Reads and assigns an unannotated <c>bool</c> leaf.
         /// </summary>
-        private static void _ApplyBoolLeaf(JsonElement configObject, object target, FieldInfo field, string jsonName)
+        private static void _ApplyBoolLeaf(JsonElement configObject, object target, ConfigFieldBinding binding)
         {
-            var value = (bool)field.GetValue(target)!;
-            ConfigValueReader.ReadBool(configObject, jsonName, ref value);
-            field.SetValue(target, value);
+            var value = (bool)binding.Field.GetValue(target)!;
+            ConfigValueReader.ReadBool(configObject, binding.JsonName, ref value);
+            binding.Field.SetValue(target, value);
         }
 
         /// <summary>
         /// Reads and assigns an unannotated enum leaf.
         /// </summary>
-        private static void _ApplyEnumLeaf(JsonElement configObject, object target, FieldInfo field, string jsonName)
+        private static void _ApplyEnumLeaf(JsonElement configObject, object target, ConfigFieldBinding binding)
         {
-            var value = field.GetValue(target)!;
-            ConfigValueReader.ReadEnum(configObject, jsonName, field.FieldType, ref value);
-            field.SetValue(target, value);
+            var value = binding.Field.GetValue(target)!;
+            ConfigValueReader.ReadEnum(configObject, binding.JsonName, binding.Field.FieldType, ref value);
+            binding.Field.SetValue(target, value);
         }
 
         /// <summary>
