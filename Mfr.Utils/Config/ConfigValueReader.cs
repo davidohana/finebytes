@@ -60,6 +60,7 @@ namespace Mfr.Utils.Config
         /// Reads an optional string property.
         /// <para>
         /// When <paramref name="propertyName"/> is missing or JSON null, <paramref name="value"/> is unchanged.
+        /// An empty string is accepted (optional values such as <c>log.directoryPath</c>).
         /// </para>
         /// </summary>
         /// <param name="configObject">A JSON object (typically the document root).</param>
@@ -67,7 +68,7 @@ namespace Mfr.Utils.Config
         /// <param name="value">Field to update when the property is set.</param>
         /// <param name="maxLengthInclusive">When set, the value must not exceed this length.</param>
         /// <exception cref="InvalidDataException">
-        /// Thrown when <paramref name="configObject"/> is not an object, the property is not a JSON string or null, the value is blank, or the length exceeds <paramref name="maxLengthInclusive"/>.
+        /// Thrown when <paramref name="configObject"/> is not an object, the property is not a JSON string or null, the value is whitespace-only, or the length exceeds <paramref name="maxLengthInclusive"/>.
         /// </exception>
         public static void ReadString(
             JsonElement configObject,
@@ -82,7 +83,9 @@ namespace Mfr.Utils.Config
                 return;
             }
 
-            if (raw.IsBlank())
+            // Empty is valid (optional paths such as log.directoryPath). Whitespace-only is not.
+            var isWhitespaceOnly = raw.Length > 0 && raw.IsBlank();
+            if (isWhitespaceOnly)
             {
                 throw new InvalidDataException($"'{propertyName}' must be a non-empty string (got '{raw}').");
             }

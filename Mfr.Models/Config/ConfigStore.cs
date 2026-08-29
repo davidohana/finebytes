@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Mfr.Utils;
 using Mfr.Utils.Config;
 
@@ -6,12 +7,13 @@ namespace Mfr.Models.Config
 {
     /// <summary>
     /// Loads optional process-wide config from JSON.
-    /// <para>Default file: <see cref="_DefaultConfigFilePath"/>.</para>
+    /// <para>Default file: <see cref="DefaultConfigFilePath"/>.</para>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>config.json</c> is optional. When the file is missing, or a property is omitted, values come from
-    /// <see cref="MfrConfig"/> field initializers.
+    /// When the default AppData file is missing, <see cref="EnsureDefaultFile"/> writes one with current
+    /// defaults so the user can hand-edit filter and log settings (there is no Options UI for these).
+    /// When a property is omitted, values still come from <see cref="MfrConfig"/> field initializers.
     /// </para>
     /// <para>
     /// The document root must be a JSON object with nested sections (e.g. <c>filters</c>, <c>log</c>). Each section is a JSON object;
@@ -34,7 +36,8 @@ namespace Mfr.Models.Config
         /// <summary>
         /// Default JSON config path (<see cref="AppDataPaths.RoamingRoot"/> + <c>config.json</c>).
         /// </summary>
-        private static string _DefaultConfigFilePath()
+        /// <returns>Absolute path to the default config JSON file.</returns>
+        public static string DefaultConfigFilePath()
         {
             return AppDataPaths.RoamingRoot().CombinePath("config.json");
         }
@@ -44,7 +47,7 @@ namespace Mfr.Models.Config
         /// <para>Schema: see <see cref="ConfigStore"/> remarks.</para>
         /// </summary>
         /// <param name="configFilePath">
-        /// Path to JSON. When <c>null</c> or whitespace, the default AppData path from <see cref="_DefaultConfigFilePath"/> is used.
+        /// Path to JSON. When <c>null</c> or whitespace, the default AppData path from <see cref="DefaultConfigFilePath"/> is used.
         /// </param>
         /// <exception cref="InvalidDataException">
         /// Thrown when a user-supplied file path does not exist, or when the file exists but JSON is invalid or values are out of range.
@@ -55,7 +58,7 @@ namespace Mfr.Models.Config
             Config = config;
 
             var useDefaultPath = configFilePath.IsBlank();
-            var path = useDefaultPath ? _DefaultConfigFilePath() : configFilePath!.Trim();
+            var path = useDefaultPath ? DefaultConfigFilePath() : configFilePath!.Trim();
             if (!File.Exists(path))
             {
                 if (!useDefaultPath)
@@ -75,6 +78,43 @@ namespace Mfr.Models.Config
             catch (Exception ex)
             {
                 throw new InvalidDataException($"Config file '{path}': {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Writes <see cref="Config"/> to JSON when the file is missing, so it can be hand-edited.
+        /// <para>
+        /// Existing files are left unchanged. Failures are swallowed so a missing AppData write does not
+        /// crash the app.
+        /// </para>
+        /// </summary>
+        /// <param name="configFilePath">
+        /// Path to JSON. When <c>null</c> or whitespace, <see cref="DefaultConfigFilePath"/> is used.
+        /// </param>
+        public static void EnsureDefaultFile(string? configFilePath = null)
+        {
+            try
+            {
+                var path = configFilePath.IsBlank() ? DefaultConfigFilePath() : configFilePath.Trim();
+                if (File.Exists(path))
+                {
+                    return;
+                }
+
+                var directory = Path.GetDirectoryName(path);
+                if (!string.IsNullOrWhiteSpace(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                JsonObject root = [];
+                ConfigJsonWriter.MergeInto(root, Config);
+                var json = root.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(path, json);
+            }
+            catch
+            {
+                // Creating the hand-edit file must not block startup.
             }
         }
 

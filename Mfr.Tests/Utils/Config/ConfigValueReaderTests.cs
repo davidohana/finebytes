@@ -117,7 +117,18 @@ namespace Mfr.Tests.Utils.Config
         }
 
         [Fact]
-        public void ReadString_blank_in_json_throws()
+        public void ReadString_empty_string_is_allowed()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"p":""}"""
+            );
+            var s = "d";
+            ConfigValueReader.ReadString(doc.RootElement, "p", ref s);
+            Assert.Equal(string.Empty, s);
+        }
+
+        [Fact]
+        public void ReadString_whitespace_only_in_json_throws()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """{"p":"   "}"""

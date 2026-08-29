@@ -41,6 +41,11 @@ namespace Mfr.App.Cli
             try
             {
                 ConfigStore.Load(options.ConfigFilePath);
+                if (options.ConfigFilePath.IsBlank())
+                {
+                    ConfigStore.EnsureDefaultFile();
+                }
+
                 ConfigStore.ApplyCliOverrides(options.ConfigOverrides);
             }
             catch (InvalidDataException ex)

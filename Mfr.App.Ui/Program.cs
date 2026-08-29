@@ -20,6 +20,7 @@ namespace Mfr.App.Ui
             try
             {
                 ConfigStore.Load();
+                ConfigStore.EnsureDefaultFile();
                 LogSession.Start(logLevel: LogEventLevel.Information, logConfig: ConfigStore.Config.Log);
                 return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
             }
