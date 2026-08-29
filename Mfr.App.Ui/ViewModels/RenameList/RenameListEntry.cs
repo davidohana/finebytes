@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.Models.Rename;
 using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
@@ -7,7 +8,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// <summary>
     /// One row in the Rename List grid.
     /// </summary>
-    public sealed class RenameListEntry
+    public sealed class RenameListEntry : ObservableObject
     {
         private static readonly RenameListFieldKey _itemTypeKey = RenameListFieldKey.Original(
             BasicRenameListField.Group,
@@ -53,6 +54,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Returns whether Show Error Details should list issues for this row.
         /// </summary>
         public bool HasRowError => RenameListFieldCatalog.HasAnyLoadError(EngineItem);
+
+        /// <summary>
+        /// Notifies the grid that <see cref="HasRowError"/> may have changed (after Refresh or metadata hydrate).
+        /// </summary>
+        internal void NotifyRowErrorChanged()
+        {
+            OnPropertyChanged(nameof(HasRowError));
+        }
 
         /// <summary>
         /// Returns whether this row path is missing from disk (whole-row gray; not a metadata load error).

@@ -1,4 +1,6 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Mfr.App.Ui.Resources;
@@ -37,6 +39,14 @@ namespace Mfr.App.Ui.Views.RenameList
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
+            mark.Bind(
+                Visual.IsVisibleProperty,
+                new Binding(nameof(RenameListEntry.HasRowError))
+                {
+                    FallbackValue = false,
+                    TargetNullValue = false,
+                }
+            );
             ToolTip.SetTip(
                 mark,
                 new ToolTip
@@ -50,17 +60,6 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
             );
             return mark;
-        }
-
-        /// <summary>
-        /// Shows or hides the mark from current row error state.
-        /// </summary>
-        /// <param name="mark">Status column mark.</param>
-        /// <param name="entry">Grid row, if any.</param>
-        public static void Apply(Control mark, RenameListEntry? entry)
-        {
-            ArgumentNullException.ThrowIfNull(mark);
-            mark.IsVisible = entry?.HasRowError == true;
         }
     }
 }

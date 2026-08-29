@@ -98,34 +98,10 @@ namespace Mfr.App.Ui.Views.RenameList
                 MinWidth = width,
                 MaxWidth = width,
                 Header = string.Empty,
-                CellTemplate = new FuncDataTemplate<RenameListEntry>((entry, _) => _CreateRowStatusCell(entry)),
+                CellTemplate = new FuncDataTemplate<RenameListEntry>((_, _) => RenameListRowErrorGlyph.Create()),
             };
             RenameListGridColumns.MarkAsRowStatusColumn(column);
             return column;
-        }
-
-        /// <summary>
-        /// Builds the fixed status cell and re-applies the error mark when rows are recycled.
-        /// </summary>
-        private static Grid _CreateRowStatusCell(RenameListEntry? entry)
-        {
-            var mark = RenameListRowErrorGlyph.Create();
-            var grid = new Grid
-            {
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                Children = { mark },
-            };
-
-            void _SyncMark()
-            {
-                var current = grid.DataContext as RenameListEntry ?? entry;
-                RenameListRowErrorGlyph.Apply(mark, current);
-            }
-
-            _SyncMark();
-            grid.DataContextChanged += (_, _) => _SyncMark();
-            return grid;
         }
 
         private void _EnsureRowStatusColumnFirst()

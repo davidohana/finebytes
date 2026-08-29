@@ -1,9 +1,7 @@
 using System.Collections;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
-using ShapePath = Avalonia.Controls.Shapes.Path;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -146,7 +144,6 @@ namespace Mfr.App.Ui.Views.RenameList
                 _viewModel.LoadErrorsDialogRequested -= _OnLoadErrorsDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.AddProgress.PropertyChanged -= _OnAddProgressPropertyChanged;
-                _viewModel.Entries.CollectionChanged -= _OnEntriesCollectionChanged;
             }
 
             _viewModel = DataContext as RenameListViewModel;
@@ -159,7 +156,6 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.LoadErrorsDialogRequested += _OnLoadErrorsDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
-            _viewModel.Entries.CollectionChanged += _OnEntriesCollectionChanged;
             _RebuildColumns();
             _ApplyFixedWidthFontClass();
             _SyncSelectionToGrid();
@@ -610,31 +606,6 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _OnLoadingRow(object? sender, DataGridRowEventArgs e)
         {
             _ApplyDropMarkClass(e.Row);
-            _ApplyRowErrorMark(e.Row);
-        }
-
-        private static void _ApplyRowErrorMark(DataGridRow row)
-        {
-            if (row.DataContext is not RenameListEntry entry)
-            {
-                return;
-            }
-
-            var mark = row.GetVisualDescendants()
-                .OfType<ShapePath>()
-                .FirstOrDefault(path => path.Classes.Contains(RenameListRowErrorGlyph.ClassName));
-            if (mark is not null)
-            {
-                RenameListRowErrorGlyph.Apply(mark, entry);
-            }
-        }
-
-        private void _RefreshRowErrorMarks()
-        {
-            foreach (var row in RenameGrid.GetVisualDescendants().OfType<DataGridRow>())
-            {
-                _ApplyRowErrorMark(row);
-            }
         }
 
         private void _ApplyDropMarkVisuals()
@@ -714,16 +685,6 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 _selectionChangeFromView = false;
             }
-        }
-
-        private void _OnEntriesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action != NotifyCollectionChangedAction.Reset)
-            {
-                return;
-            }
-
-            Dispatcher.UIThread.Post(_RefreshRowErrorMarks, DispatcherPriority.Loaded);
         }
 
         private void _OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

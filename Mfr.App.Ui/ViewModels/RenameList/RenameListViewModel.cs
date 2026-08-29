@@ -236,6 +236,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             Entries.ReplaceAll([.. Entries]);
+            foreach (var entry in Entries)
+            {
+                entry.NotifyRowErrorChanged();
+            }
             _NotifyShowLoadErrorsChanged();
         }
 
