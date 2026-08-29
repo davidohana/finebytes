@@ -81,6 +81,7 @@ namespace Mfr.Tests.Ui.RenameList
                 AddFolderContents = ConfigStore.Config.Ui.AddFolderContents,
                 RememberWindowState = ConfigStore.Config.Ui.RememberWindowState,
                 RememberLastFolder = ConfigStore.Config.Ui.RememberLastFolder,
+                RenameListUseFixedWidthFont = ConfigStore.Config.Ui.RenameListUseFixedWidthFont,
             };
             ConfigStore.Config.Ui.AddMode = RenameListAddMode.Files;
             ConfigStore.Config.Ui.AddFolderContents = true;
@@ -95,6 +96,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ConfigStore.Config.Ui.AddFolderContents = _originalUiConfig.AddFolderContents;
                 ConfigStore.Config.Ui.RememberWindowState = _originalUiConfig.RememberWindowState;
                 ConfigStore.Config.Ui.RememberLastFolder = _originalUiConfig.RememberLastFolder;
+                ConfigStore.Config.Ui.RenameListUseFixedWidthFont = _originalUiConfig.RenameListUseFixedWidthFont;
             }
 
             foreach (var fileListViewModel in _fileListViewModels)

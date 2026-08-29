@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Mfr.Utils;
 using Mfr.Utils.Config;
 
@@ -11,7 +12,8 @@ namespace Mfr.Models.Config
     /// <remarks>
     /// <para>
     /// <c>config.json</c> is optional. When the file is missing, or a property is omitted, values come from
-    /// <see cref="MfrConfig"/> field initializers.
+    /// <see cref="MfrConfig"/> field initializers. <see cref="Save"/> merge-writes the in-memory
+    /// <see cref="Config"/> without removing unrelated keys.
     /// </para>
     /// <para>
     /// The document root must be a JSON object with nested sections (e.g. <c>filters</c>, <c>log</c>, <c>ui</c>). Each section is a JSON object;
@@ -101,6 +103,48 @@ namespace Mfr.Models.Config
             catch (Exception ex)
             {
                 throw new InvalidDataException($"CLI config override: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Merge-writes <see cref="Config"/> to JSON.
+        /// <para>
+        /// When the file already exists, unrelated sections and keys are preserved. Failures are swallowed so UI
+        /// saves do not crash the app.
+        /// </para>
+        /// </summary>
+        /// <param name="configFilePath">
+        /// Path to JSON. When <c>null</c> or whitespace, the default AppData path from <see cref="_DefaultConfigFilePath"/> is used.
+        /// </param>
+        public static void Save(string? configFilePath = null)
+        {
+            try
+            {
+                var path = configFilePath.IsBlank() ? _DefaultConfigFilePath() : configFilePath.Trim();
+                var directory = Path.GetDirectoryName(path);
+                if (!string.IsNullOrWhiteSpace(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                JsonObject root;
+                if (File.Exists(path))
+                {
+                    var existingJson = File.ReadAllText(path);
+                    root = JsonNode.Parse(existingJson)?.AsObject() ?? [];
+                }
+                else
+                {
+                    root = [];
+                }
+
+                ConfigJsonWriter.MergeInto(root, Config);
+                var json = root.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(path, json);
+            }
+            catch
+            {
+                // Config save must not block UI or surface to the user.
             }
         }
     }

@@ -26,7 +26,11 @@ namespace Mfr.App.Ui.Views.RenameList
                 return null;
             }
 
-            return RenameListColumnAutoFit.ResolveAutoFitWidth(_viewModel.Entries, fieldKey.Value);
+            return RenameListColumnAutoFit.ResolveAutoFitWidth(
+                _viewModel.Entries,
+                fieldKey.Value,
+                _viewModel.UseFixedWidthFont
+            );
         }
     }
 }

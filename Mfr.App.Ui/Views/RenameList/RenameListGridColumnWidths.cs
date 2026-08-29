@@ -38,14 +38,17 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <param name="reservePreviewGlyph">
         /// When <see langword="true"/>, reserves space for the preview badge on preview columns.
         /// </param>
+        /// <param name="useFixedWidthFont"></param>
         /// <returns>Minimum column width in pixels.</returns>
         public static int GetMinimumHeaderWidth(
             string headerText,
             bool reserveSortGlyph = false,
-            bool reservePreviewGlyph = false
+            bool reservePreviewGlyph = false,
+            bool useFixedWidthFont = false
         )
         {
-            var width = GridColumnTextWidths.GetMinimumHeaderWidth(headerText);
+            var fontContext = GridColumnTextFontContext.ForRenameList(useFixedWidthFont);
+            var width = GridColumnTextWidths.GetMinimumHeaderWidth(headerText, fontContext);
             if (reserveSortGlyph)
             {
                 width += (int)Math.Ceiling(_MeasureSortGlyphReserve());
@@ -65,21 +68,25 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <param name="entries">Grid rows.</param>
         /// <param name="fieldKey">Column field key.</param>
         /// <param name="minHeaderWidth">Minimum width from the header label.</param>
+        /// <param name="useFixedWidthFont"></param>
         /// <returns>Auto-fit width in pixels.</returns>
         public static int GetAutoFitWidth(
             IEnumerable<RenameListEntry> entries,
             RenameListFieldKey fieldKey,
-            int minHeaderWidth
+            int minHeaderWidth,
+            bool useFixedWidthFont = false
         )
         {
             ArgumentNullException.ThrowIfNull(entries);
 
+            var fontContext = GridColumnTextFontContext.ForRenameList(useFixedWidthFont);
             var maxCellWidth = 0;
             foreach (var entry in entries)
             {
                 var cellWidth = GridColumnTextWidths.MeasureCellWidth(
                     entry.GetFieldText(fieldKey),
-                    GridColumnTextWidths.TextColumnCellMarginHorizontal
+                    GridColumnTextWidths.TextColumnCellMarginHorizontal,
+                    fontContext
                 );
                 if (cellWidth > maxCellWidth)
                 {

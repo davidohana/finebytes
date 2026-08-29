@@ -89,7 +89,8 @@ namespace Mfr.App.Ui.Views.RenameList
             var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 headerText,
                 reserveSortGlyph: canUserSort,
-                reservePreviewGlyph: key.IsPreview
+                reservePreviewGlyph: key.IsPreview,
+                useFixedWidthFont: _viewModel?.UseFixedWidthFont == true
             );
             var pixelWidth = _ResolveEffectivePixelWidth(visibleColumn, minHeaderWidth);
 
@@ -256,6 +257,38 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _viewModel.UpdateVisibleColumnWidth(fieldKey.Value, (int)Math.Round(width.Value));
+        }
+
+        private void _RefreshColumnMinimumWidths()
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            var useFixedWidthFont = _viewModel.UseFixedWidthFont;
+            foreach (var column in RenameGrid.Columns)
+            {
+                var fieldKey = RenameListGridColumns.GetFieldKey(column);
+                if (fieldKey is null)
+                {
+                    continue;
+                }
+
+                var field = RenameListFieldCatalog.GetField(fieldKey.Value);
+                var canUserSort = RenameListFieldCatalog.IsSortableKey(fieldKey.Value);
+                var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                    field.DisplayName,
+                    reserveSortGlyph: canUserSort,
+                    reservePreviewGlyph: fieldKey.Value.IsPreview,
+                    useFixedWidthFont: useFixedWidthFont
+                );
+                column.MinWidth = minHeaderWidth;
+                if (column.Width.IsAbsolute && column.Width.Value < minHeaderWidth)
+                {
+                    column.Width = new DataGridLength(minHeaderWidth, DataGridLengthUnitType.Pixel);
+                }
+            }
         }
     }
 }

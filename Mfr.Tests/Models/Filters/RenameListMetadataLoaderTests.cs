@@ -37,9 +37,7 @@ namespace Mfr.Tests.Models.Filters
 
             Assert.True(item.TagLibLoadAttempted);
             Assert.NotNull(item.TagLibMetadataLoadError);
-            Assert.True(
-                RenameListMetadataLoader.IsRequirementSatisfied(item, RenameListMetadataRequirement.TagLib)
-            );
+            Assert.True(RenameListMetadataLoader.IsRequirementSatisfied(item, RenameListMetadataRequirement.TagLib));
         }
 
         [Fact]
@@ -186,8 +184,7 @@ namespace Mfr.Tests.Models.Filters
         public void Combined_requirement_loads_each_flagged_bucket()
         {
             var item = _UnmarkedFixtureItem("tiny-exif.jpeg");
-            var requirement =
-                RenameListMetadataRequirement.TagLib | RenameListMetadataRequirement.ImageProperties;
+            var requirement = RenameListMetadataRequirement.TagLib | RenameListMetadataRequirement.ImageProperties;
 
             Assert.True(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
             RenameListMetadataLoader.TryEnsureLoaded(item, requirement);

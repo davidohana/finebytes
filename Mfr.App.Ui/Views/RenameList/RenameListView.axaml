@@ -55,6 +55,8 @@
           ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"
         />
         <Separator />
+        <MenuItem Header="Display Options..." Command="{Binding OpenDisplayOptionsCommand}" />
+        <Separator />
         <MenuItem
           Header="Remove Selected Item(s)"
           Command="{Binding RemoveSelectedCommand}"
@@ -90,6 +92,10 @@
         </Template>
       </Setter>
     </Style>
+    <Style Selector="DataGrid.rename-list.fixed-width-font">
+      <Setter Property="FontFamily" Value="{StaticResource RenameListFixedWidthFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+    </Style>
     <Style Selector="DataGrid.rename-list /template/ ScrollBar#PART_VerticalScrollbar">
       <Setter Property="AllowAutoHide" Value="False" />
     </Style>
@@ -107,6 +113,10 @@
       <Setter Property="SeparatorBrush" Value="{DynamicResource FileListSeparatorBrush}" />
       <Setter Property="AreSeparatorsVisible" Value="True" />
     </Style>
+    <Style Selector="DataGrid.rename-list.fixed-width-font DataGridColumnHeader">
+      <Setter Property="FontFamily" Value="{StaticResource RenameListFixedWidthFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+    </Style>
     <Style Selector="Border.rename-list-preview-glyph">
       <Setter Property="Background" Value="{DynamicResource FileListPreviewGlyphBackgroundBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource FileListPreviewGlyphBorderBrush}" />
@@ -120,6 +130,10 @@
       <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="Foreground" Value="{DynamicResource FileListPreviewGlyphForegroundBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list.fixed-width-font Border.rename-list-preview-glyph TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource RenameListFixedWidthFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridColumnHeader /template/ Path#SortIcon">
       <Setter Property="IsVisible" Value="False" />
@@ -138,6 +152,10 @@
       <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
       <Setter Property="Foreground" Value="{DynamicResource FileListSortGlyphForegroundBrush}" />
     </Style>
+    <Style Selector="DataGrid.rename-list.fixed-width-font Border.rename-list-sort-glyph TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource RenameListFixedWidthFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
+    </Style>
     <Style Selector="DataGrid.rename-list DataGridRow">
       <Setter Property="MinHeight" Value="20" />
       <Setter Property="Height" Value="20" />
@@ -153,6 +171,10 @@
       <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
       <Setter Property="Padding" Value="4,0" />
       <Setter Property="MinHeight" Value="0" />
+    </Style>
+    <Style Selector="DataGrid.rename-list.fixed-width-font DataGridCell">
+      <Setter Property="FontFamily" Value="{StaticResource RenameListFixedWidthFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock">
       <Setter Property="Margin" Value="{StaticResource DataGridTextColumnCellTextBlockMargin}" />

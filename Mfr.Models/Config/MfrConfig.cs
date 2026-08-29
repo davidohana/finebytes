@@ -86,6 +86,11 @@ namespace Mfr.Models.Config
         /// When true, restore and save the last File List folder across launches.
         /// </summary>
         public bool RememberLastFolder = true;
+
+        /// <summary>
+        /// When true, the Rename List grid uses a fixed-width font instead of the proportional File List font.
+        /// </summary>
+        public bool RenameListUseFixedWidthFont;
     }
 
     /// <summary>

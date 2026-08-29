@@ -4,6 +4,58 @@ using Avalonia.Media.TextFormatting;
 namespace Mfr.App.Ui.Views.GridColumnSizing
 {
     /// <summary>
+    /// Font context for <see cref="GridColumnTextWidths"/> measurement.
+    /// </summary>
+    internal readonly struct GridColumnTextFontContext
+    {
+        private static readonly FontFamily s_FileListFontFamily = new("Segoe UI, SegoeUI");
+        private static readonly FontFamily s_RenameListFixedWidthFontFamily = new("Cascadia Mono, Consolas, monospace");
+        private const double s_FileListFontSize = 12;
+
+        /// <summary>
+        /// Proportional File List / Rename List font.
+        /// </summary>
+        internal static GridColumnTextFontContext FileList { get; } = new(s_FileListFontFamily, s_FileListFontSize);
+
+        /// <summary>
+        /// Fixed-width Rename List font.
+        /// </summary>
+        internal static GridColumnTextFontContext RenameListFixedWidth { get; } =
+            new(s_RenameListFixedWidthFontFamily, s_FileListFontSize);
+
+        /// <summary>
+        /// Initializes a font context.
+        /// </summary>
+        /// <param name="fontFamily">Font family for measurement.</param>
+        /// <param name="fontSize">Font size in device-independent pixels.</param>
+        private GridColumnTextFontContext(FontFamily fontFamily, double fontSize)
+        {
+            FontFamily = fontFamily;
+            FontSize = fontSize;
+        }
+
+        /// <summary>
+        /// Gets the font family.
+        /// </summary>
+        internal FontFamily FontFamily { get; }
+
+        /// <summary>
+        /// Gets the font size.
+        /// </summary>
+        internal double FontSize { get; }
+
+        /// <summary>
+        /// Returns the Rename List measurement font for the current display mode.
+        /// </summary>
+        /// <param name="useFixedWidthFont">When <see langword="true"/>, use the fixed-width font.</param>
+        /// <returns>Measurement font context.</returns>
+        internal static GridColumnTextFontContext ForRenameList(bool useFixedWidthFont)
+        {
+            return useFixedWidthFont ? RenameListFixedWidth : FileList;
+        }
+    }
+
+    /// <summary>
     /// Shared File List / Rename List grid text measurement for header min-widths and splitter auto-fit.
     /// </summary>
     internal static class GridColumnTextWidths
@@ -33,8 +85,6 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// </summary>
         internal const double TextColumnCellMarginHorizontal = 12;
 
-        private static readonly FontFamily _FontFamily = new("Segoe UI, SegoeUI");
-        private const double _FontSize = 12;
         private const double _MeasurementSafetyBuffer = 8;
         private const double _TextWidthSlack = 1.02;
 
@@ -42,16 +92,24 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// Measures unwrapped text width in the File List / Rename List grid font.
         /// </summary>
         /// <param name="text">Text to measure.</param>
+        /// <param name="fontContext">Font context; defaults to <see cref="GridColumnTextFontContext.FileList"/>.</param>
         /// <returns>Layout width in device-independent pixels.</returns>
-        internal static double MeasureText(string text)
+        internal static double MeasureText(string text, GridColumnTextFontContext? fontContext = null)
         {
             if (string.IsNullOrEmpty(text))
             {
                 return 0;
             }
 
-            var typeface = new Typeface(_FontFamily, FontStyle.Normal, FontWeight.Normal);
-            using var layout = new TextLayout(text, typeface, _FontSize, null, maxWidth: double.PositiveInfinity);
+            var context = fontContext ?? GridColumnTextFontContext.FileList;
+            var typeface = new Typeface(context.FontFamily, FontStyle.Normal, FontWeight.Normal);
+            using var layout = new TextLayout(
+                text,
+                typeface,
+                context.FontSize,
+                null,
+                maxWidth: double.PositiveInfinity
+            );
             return layout.Width;
         }
 
@@ -59,11 +117,12 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// Gets the minimum pixel width needed to display a column header without truncation.
         /// </summary>
         /// <param name="headerText">Grid column header text.</param>
+        /// <param name="fontContext">Font context; defaults to <see cref="GridColumnTextFontContext.FileList"/>.</param>
         /// <returns>Minimum column width in pixels.</returns>
-        internal static int GetMinimumHeaderWidth(string headerText)
+        internal static int GetMinimumHeaderWidth(string headerText, GridColumnTextFontContext? fontContext = null)
         {
             ArgumentException.ThrowIfNullOrEmpty(headerText);
-            var textWidth = Math.Ceiling(MeasureText(headerText) * _TextWidthSlack);
+            var textWidth = Math.Ceiling(MeasureText(headerText, fontContext) * _TextWidthSlack);
             return (int)
                 Math.Ceiling(textWidth + HeaderHorizontalPadding + HeaderSeparatorWidth + _MeasurementSafetyBuffer);
         }
@@ -73,15 +132,20 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// </summary>
         /// <param name="text">Cell display text.</param>
         /// <param name="extraChrome">Additional horizontal content such as icon width or extra padding.</param>
+        /// <param name="fontContext">Font context; defaults to <see cref="GridColumnTextFontContext.FileList"/>.</param>
         /// <returns>Cell width in pixels.</returns>
-        internal static int MeasureCellWidth(string text, double extraChrome = 0)
+        internal static int MeasureCellWidth(
+            string text,
+            double extraChrome = 0,
+            GridColumnTextFontContext? fontContext = null
+        )
         {
             if (string.IsNullOrEmpty(text) && extraChrome <= 0)
             {
                 return 0;
             }
 
-            var textWidth = Math.Ceiling(MeasureText(text) * _TextWidthSlack);
+            var textWidth = Math.Ceiling(MeasureText(text, fontContext) * _TextWidthSlack);
             return (int)Math.Ceiling(textWidth + CellPaddingHorizontal + _MeasurementSafetyBuffer + extraChrome);
         }
 
