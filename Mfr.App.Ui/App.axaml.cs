@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
+using Mfr.App.Ui.Views.GridColumnSizing;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui
@@ -17,6 +18,7 @@ namespace Mfr.App.Ui
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
+            GridFonts.AddResources(Resources);
         }
 
         /// <inheritdoc />

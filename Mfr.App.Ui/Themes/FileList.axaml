@@ -43,8 +43,4 @@
       <SolidColorBrush x:Key="RenameListDropIndicatorBrush" Color="#FA8072" />
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
-  <FontFamily x:Key="FileListFont">Segoe UI, SegoeUI</FontFamily>
-  <FontFamily x:Key="RenameListFixedWidthFont">Cascadia Mono, Consolas, monospace</FontFamily>
-  <x:Double x:Key="FileListFontSize">12</x:Double>
-  <x:Double x:Key="FileListSortGlyphFontSize">11</x:Double>
 </ResourceDictionary>

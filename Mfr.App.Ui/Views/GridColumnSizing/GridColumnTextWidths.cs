@@ -8,20 +8,16 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
     /// </summary>
     internal readonly struct GridColumnTextFontContext
     {
-        private static readonly FontFamily s_FileListFontFamily = new("Segoe UI, SegoeUI");
-        private static readonly FontFamily s_RenameListFixedWidthFontFamily = new("Cascadia Mono, Consolas, monospace");
-        private const double s_FileListFontSize = 12;
-
         /// <summary>
         /// Proportional File List / Rename List font.
         /// </summary>
-        internal static GridColumnTextFontContext FileList { get; } = new(s_FileListFontFamily, s_FileListFontSize);
+        internal static GridColumnTextFontContext FileList { get; } = new(GridFonts.FileListFamily, GridFonts.FontSize);
 
         /// <summary>
         /// Fixed-width Rename List font.
         /// </summary>
         internal static GridColumnTextFontContext RenameListFixedWidth { get; } =
-            new(s_RenameListFixedWidthFontFamily, s_FileListFontSize);
+            new(GridFonts.RenameListFixedWidthFamily, GridFonts.FontSize);
 
         /// <summary>
         /// Initializes a font context.

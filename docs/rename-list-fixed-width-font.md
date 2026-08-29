@@ -52,6 +52,8 @@ Same pattern as **Auto-Sort**: `ToggleType="CheckBox"`, `IsChecked` one-way from
 
 ## Grid styling
 
+Family names and sizes live in `GridFonts`. `App.Initialize` registers the `FileListFont`, `RenameListFixedWidthFont`, `FileListFontSize`, and `FileListSortGlyphFontSize` theme keys from that type so styles and column measurement share one source.
+
 `RenameListView` toggles the `fixed-width-font` class on the DataGrid when `UseFixedWidthFont` changes. Parallel style selectors apply `RenameListFixedWidthFont` to the grid, headers, and cells. Sort and preview glyphs stay on `FileListFont` (same as header glyph-reserve measurement).
 
 Column minimum widths are recomputed on toggle; user-resized widths above the new minimum are preserved.
