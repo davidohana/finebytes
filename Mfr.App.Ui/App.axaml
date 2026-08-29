@@ -18,6 +18,7 @@
           <SolidColorBrush x:Key="PaneChromeBrush" Color="#2B2B2B" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
+      <x:Double x:Key="ScrollBarSize">12</x:Double>
     </ResourceDictionary>
   </Application.Resources>
   <Application.Styles>
@@ -32,13 +33,11 @@
     <Style Selector="DataGrid">
       <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
     </Style>
-    <!-- Fluent overlays rows/headers over the scrollbar slot (ColumnSpan/RowSpan). Cut that so cells sit beside the bar. -->
+    <!-- Fluent paints rows under the vertical scrollbar (ColumnSpan=3). Keep a real gutter.
+         Leave RowSpan=2 so V-bar width math still treats the bar as overlay. Header span is
+         applied in DataGridScrollGutter (template local ColumnSpan cannot be styled). -->
     <Style Selector="DataGrid /template/ DataGridRowsPresenter#PART_RowsPresenter">
       <Setter Property="Grid.ColumnSpan" Value="2" />
-      <Setter Property="Grid.RowSpan" Value="1" />
-    </Style>
-    <Style Selector="DataGrid /template/ DataGridColumnHeadersPresenter#PART_ColumnHeadersPresenter">
-      <Setter Property="Grid.ColumnSpan" Value="1" />
     </Style>
     <Style Selector="TextBlock.pane-header">
       <Setter Property="FontWeight" Value="SemiBold" />

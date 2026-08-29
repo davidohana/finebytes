@@ -11,6 +11,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _WireColumnAutoFit()
         {
             DataGridColumnAutoFit.Attach(RenameGrid, _ResolveAutoFitWidth);
+            DataGridScrollGutter.Attach(RenameGrid);
         }
 
         private int? _ResolveAutoFitWidth(DataGridColumn column)

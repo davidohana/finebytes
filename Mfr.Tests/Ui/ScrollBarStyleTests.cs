@@ -74,6 +74,21 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies File List report does not keep a horizontal scrollbar when star columns still fit.
+        /// </summary>
+        [AvaloniaFact]
+        public void FileListReport_hides_horizontal_scrollbar_when_columns_fit()
+        {
+            var (window, grid, _) = _ShowOverflowReportGrid();
+            var horizontalScrollBar = grid.GetVisualDescendants()
+                .OfType<ScrollBar>()
+                .First(bar => bar.Orientation == Orientation.Horizontal);
+
+            Assert.False(horizontalScrollBar.IsVisible);
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Rename List DataGrid scrollbars use expanded Fluent chrome.
         /// </summary>
         [AvaloniaFact]
@@ -152,6 +167,7 @@ namespace Mfr.Tests.Ui
         {
             var scrollBarSize = (double)Application.Current!.FindResource("ScrollBarSize")!;
 
+            Assert.Equal(12, scrollBarSize, precision: 0);
             Assert.False(verticalScrollBar.AllowAutoHide);
             Assert.True(verticalScrollBar.IsExpanded);
             Assert.Equal(scrollBarSize, verticalScrollBar.Bounds.Width, precision: 0);

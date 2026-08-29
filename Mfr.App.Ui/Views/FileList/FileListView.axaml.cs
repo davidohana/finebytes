@@ -80,6 +80,7 @@ namespace Mfr.App.Ui.Views.FileList
             );
             ReportGrid.CellPointerPressed += _OnReportCellPointerPressed;
             DataGridColumnAutoFit.Attach(ReportGrid, _ResolveReportAutoFitWidth);
+            DataGridScrollGutter.Attach(ReportGrid);
             _WireListingDrag(ReportGrid);
             _WireListBoxDrag(ListViewList);
             _WireListBoxDrag(SmallIconsList);
