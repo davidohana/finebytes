@@ -42,7 +42,7 @@ true and the media requirement is satisfied (media key need not be requested).
 ## 6d — Structured gray (no display-text sentinel)
 
 **Shipped.** Cells are **`DataGridTemplateColumn`** + `FuncDataTemplate<RenameListEntry>`.
-Text comes from `GetFieldText`; load-error styling from `IsFieldLoadError` via the
+Text comes from `GetFieldText`; load-error styling from `IsLoadError` via the
 `rename-list-load-error` cell class (theme muted foreground + italic), not display-text heuristics.
 Unused
 `RenameListFieldTextConverter` and the `LoadingRow` text-sentinel listeners are gone.
@@ -54,9 +54,11 @@ not styled as load-error.
 ## 6e — `FieldError` → `LoadErrors` names
 
 **Shipped.** Menu, commands, and types say Load Errors. Failed cells show
-`FieldLoadErrorText` (`—`) with the `rename-list-load-error` class. Catalog wrappers stay public (UI has no `InternalsVisibleTo` on
+`LoadErrorText` (`—`) with the `rename-list-load-error` class. Grid predicate is
+`IsLoadError`. Catalog wrappers stay public (UI has no `InternalsVisibleTo` on
 Models): `HasLoadError` / `HasAnyLoadError` / `ListLoadErrors` / `DescribeLoadError`.
-`_NotifyShowLoadErrorsChanged` stays inlined next to `ShowLoadErrors`.
+`_NotifyShowLoadErrorsChanged` stays inlined next to `ShowLoadErrors`. Focused-cell
+state was removed; the command is row-level.
 
 ## What not to do
 

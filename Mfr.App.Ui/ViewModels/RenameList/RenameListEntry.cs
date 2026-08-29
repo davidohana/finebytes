@@ -54,7 +54,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         /// <param name="key">Field key (original or preview).</param>
         /// <returns><see langword="true"/> when the cell should show the load-error sentinel.</returns>
-        public bool IsFieldLoadError(RenameListFieldKey key)
+        public bool IsLoadError(RenameListFieldKey key)
         {
             return RenameListFieldCatalog.HasLoadError(EngineItem, key);
         }

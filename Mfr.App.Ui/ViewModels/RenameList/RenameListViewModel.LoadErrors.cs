@@ -4,7 +4,7 @@ using Mfr.Models.RenameList;
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Show Load Errors command and focused-cell state for <see cref="RenameListViewModel"/>.
+    /// Show Load Errors command for <see cref="RenameListViewModel"/>.
     /// </summary>
     public sealed partial class RenameListViewModel
     {
@@ -19,43 +19,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool CanShowLoadErrors => _CanShowLoadErrors();
 
         /// <summary>
-        /// Gets the focused Rename List column for status hints.
-        /// </summary>
-        public RenameListFieldKey? FocusedFieldKey { get; private set; }
-
-        /// <summary>
-        /// Updates the focused column used for status-bar cell hints.
-        /// </summary>
-        /// <param name="fieldKey">Focused grid column key, or <see langword="null"/> when unset.</param>
-        public void SetFocusedFieldKey(RenameListFieldKey? fieldKey)
-        {
-            if (FocusedFieldKey == fieldKey)
-            {
-                return;
-            }
-
-            FocusedFieldKey = fieldKey;
-            OnPropertyChanged(nameof(FocusedFieldKey));
-        }
-
-        /// <summary>
         /// Shows stored metadata load failures for the selected row.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanShowLoadErrors))]
         public void ShowLoadErrors()
         {
-            if (_selectedEntries.Count != 1)
+            if (!_CanShowLoadErrors())
             {
                 return;
             }
 
             var entry = _selectedEntries[0];
             var errors = RenameListFieldCatalog.ListLoadErrors(entry.EngineItem);
-            if (errors.Count == 0)
-            {
-                return;
-            }
-
             LoadErrorsDialogRequested?.Invoke(this, new RenameListLoadErrorsDialogContent(entry.FullPath, errors));
         }
 

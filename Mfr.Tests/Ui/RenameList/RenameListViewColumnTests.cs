@@ -686,8 +686,8 @@ namespace Mfr.Tests.Ui.RenameList
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.Equal("info.htm", entry.GetFieldText(fullNameKey));
-            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, entry.GetFieldText(titleKey));
-            Assert.True(entry.IsFieldLoadError(titleKey));
+            Assert.Equal(RenameListFieldCatalog.LoadErrorText, entry.GetFieldText(titleKey));
+            Assert.True(entry.IsLoadError(titleKey));
 
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
             var rowTexts = row.GetVisualDescendants()
@@ -696,12 +696,12 @@ namespace Mfr.Tests.Ui.RenameList
                 .Where(text => !string.IsNullOrEmpty(text))
                 .ToList();
             Assert.Contains("info.htm", rowTexts);
-            Assert.Contains(RenameListFieldCatalog.FieldLoadErrorText, rowTexts);
+            Assert.Contains(RenameListFieldCatalog.LoadErrorText, rowTexts);
 
             var errorTextBlock = row.GetVisualDescendants()
                 .OfType<TextBlock>()
                 .First(textBlock => textBlock.Classes.Contains("rename-list-load-error"));
-            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, errorTextBlock.Text);
+            Assert.Equal(RenameListFieldCatalog.LoadErrorText, errorTextBlock.Text);
 
             var fullNameTextBlock = row.GetVisualDescendants()
                 .OfType<TextBlock>()
@@ -750,7 +750,7 @@ namespace Mfr.Tests.Ui.RenameList
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.Equal("tagged.wav", entry.GetFieldText(fullNameKey));
             Assert.Equal("Error", entry.GetFieldText(titleKey));
-            Assert.False(entry.IsFieldLoadError(titleKey));
+            Assert.False(entry.IsLoadError(titleKey));
 
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
             var titleTextBlock = row.GetVisualDescendants()

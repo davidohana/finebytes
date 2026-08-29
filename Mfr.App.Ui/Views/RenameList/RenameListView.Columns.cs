@@ -137,7 +137,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private static void _ApplyFieldCell(TextBlock textBlock, RenameListEntry? entry, RenameListFieldKey key)
         {
             textBlock.Text = entry?.GetFieldText(key) ?? string.Empty;
-            var isLoadError = entry?.IsFieldLoadError(key) == true;
+            var isLoadError = entry?.IsLoadError(key) == true;
             textBlock.Classes.Set("rename-list-load-error", isLoadError);
             textBlock.ClearValue(TextBlock.ForegroundProperty);
             textBlock.ClearValue(TextBlock.FontStyleProperty);

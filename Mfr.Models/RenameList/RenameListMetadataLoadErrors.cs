@@ -13,7 +13,7 @@ namespace Mfr.Models.RenameList
         /// <param name="item">Rename row.</param>
         /// <param name="key">Original field key.</param>
         /// <param name="error">Stored exception when the field's metadata bucket failed.</param>
-        /// <returns><see langword="true"/> when the field should display <see cref="RenameListFieldCatalog.FieldLoadErrorText"/>.</returns>
+        /// <returns><see langword="true"/> when the field should display <see cref="RenameListFieldCatalog.LoadErrorText"/>.</returns>
         internal static bool TryGetLoadError(RenameItem item, RenameListFieldKey key, out Exception? error)
         {
             ArgumentNullException.ThrowIfNull(item);
@@ -35,7 +35,7 @@ namespace Mfr.Models.RenameList
         /// <param name="error">Stored exception when the bucket failed.</param>
         /// <returns>
         /// <see langword="true"/> when fields using the requirement should show
-        /// <see cref="RenameListFieldCatalog.FieldLoadErrorText"/>.
+        /// <see cref="RenameListFieldCatalog.LoadErrorText"/>.
         /// </returns>
         internal static bool TryGetLoadError(
             RenameItem item,
@@ -74,7 +74,7 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Returns whether resolving an original field would show <see cref="RenameListFieldCatalog.FieldLoadErrorText"/>.
+        /// Returns whether resolving an original field would show <see cref="RenameListFieldCatalog.LoadErrorText"/>.
         /// </summary>
         /// <param name="item">Rename row.</param>
         /// <param name="key">Original field key.</param>

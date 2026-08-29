@@ -397,7 +397,6 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (entry is null || column is null)
             {
-                _viewModel.SetFocusedFieldKey(null);
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
@@ -405,22 +404,19 @@ namespace Mfr.App.Ui.Views.RenameList
             var fieldKey = RenameListGridColumns.GetFieldKey(column);
             if (fieldKey is null)
             {
-                _viewModel.SetFocusedFieldKey(null);
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
 
             if (!RenameListFieldCatalog.TryGetField(fieldKey.Value, out var field))
             {
-                _viewModel.SetFocusedFieldKey(null);
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
 
             _lastHintColumn = column;
-            _viewModel.SetFocusedFieldKey(fieldKey);
 
-            if (entry.IsFieldLoadError(fieldKey.Value))
+            if (entry.IsLoadError(fieldKey.Value))
             {
                 var userExplanation = RenameListFieldCatalog.DescribeLoadError(entry.EngineItem, fieldKey.Value);
                 _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatLoadError(

@@ -1,6 +1,5 @@
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
-using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -23,28 +22,12 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ShowLoadErrors_available_for_row_with_load_error()
         {
-            var dir = _context.CreateTempDir();
-            var path = Path.Combine(dir, "info.htm");
-            await File.WriteAllTextAsync(path, "<html></html>");
-            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
-            var fullNameKey = RenameListFieldKey.Original(
-                BasicRenameListField.Group,
-                BasicRenameListFields.Key.FullName
-            );
-
-            var renameListViewModel = _context.CreateRenameListViewModel(dir);
-            renameListViewModel.SetVisibleColumns([
-                new RenameListVisibleColumn(fullNameKey),
-                new RenameListVisibleColumn(titleKey),
-            ]);
-            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
-
-            var entry = Assert.Single(renameListViewModel.Entries);
-            Assert.Equal("info.htm", entry.GetFieldText(fullNameKey));
-            Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, entry.GetFieldText(titleKey));
+            var (renameListViewModel, path, entry) = await _AddHtmWithTitleAsync();
+            Assert.Equal("info.htm", entry.GetFieldText(RenameListTestHelpers.FullFileNameKey));
+            Assert.Equal(RenameListFieldCatalog.LoadErrorText, entry.GetFieldText(_TitleKey()));
+            Assert.True(entry.IsLoadError(_TitleKey()));
 
             renameListViewModel.SetSelectedEntries([entry]);
-            renameListViewModel.SetFocusedFieldKey(fullNameKey);
             Assert.True(renameListViewModel.CanShowLoadErrors);
 
             RenameListLoadErrorsDialogContent? content = null;
@@ -59,32 +42,87 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies Show Load Errors remains available when the focused column is a preview field.
+        /// Verifies Show Load Errors stays off when nothing is selected.
         /// </summary>
         [Fact]
-        public async Task ShowLoadErrors_available_when_preview_column_is_focused()
+        public async Task ShowLoadErrors_unavailable_when_nothing_selected()
+        {
+            var (renameListViewModel, _, _) = await _AddHtmWithTitleAsync();
+            Assert.Empty(renameListViewModel.SelectedEntries);
+            Assert.False(renameListViewModel.CanShowLoadErrors);
+            Assert.False(_TryShowLoadErrors(renameListViewModel));
+        }
+
+        /// <summary>
+        /// Verifies Show Load Errors stays off for a multi-row selection.
+        /// </summary>
+        [Fact]
+        public async Task ShowLoadErrors_unavailable_when_multiple_rows_selected()
         {
             var dir = _context.CreateTempDir();
-            var path = Path.Combine(dir, "info.htm");
-            await File.WriteAllTextAsync(path, "<html></html>");
-            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
-            var previewFullNameKey = RenameListFieldKey.Preview(
-                BasicRenameListField.Group,
-                BasicRenameListFields.Key.FullName
-            );
+            var firstPath = Path.Combine(dir, "info.htm");
+            var secondPath = Path.Combine(dir, "notes.htm");
+            await File.WriteAllTextAsync(firstPath, "<html></html>");
+            await File.WriteAllTextAsync(secondPath, "<html></html>");
+            var renameListViewModel = _CreateViewModelWithTitleColumn(dir);
+            await renameListViewModel.AddPathsAsync([firstPath, secondPath]).ConfigureAwait(true);
 
+            renameListViewModel.SetSelectedEntries([.. renameListViewModel.Entries]);
+            Assert.Equal(2, renameListViewModel.SelectedEntries.Count);
+            Assert.False(renameListViewModel.CanShowLoadErrors);
+            Assert.False(_TryShowLoadErrors(renameListViewModel));
+        }
+
+        /// <summary>
+        /// Verifies Show Load Errors stays off when the selected row has no stored load failure.
+        /// </summary>
+        [Fact]
+        public async Task ShowLoadErrors_unavailable_when_row_has_no_load_error()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "notes.txt");
+            await File.WriteAllTextAsync(path, "ok");
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
-            renameListViewModel.SetVisibleColumns([
-                new RenameListVisibleColumn(titleKey),
-                new RenameListVisibleColumn(previewFullNameKey),
-            ]);
             await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
 
             var entry = Assert.Single(renameListViewModel.Entries);
             renameListViewModel.SetSelectedEntries([entry]);
-            renameListViewModel.SetFocusedFieldKey(previewFullNameKey);
+            Assert.False(entry.IsLoadError(RenameListTestHelpers.FullFileNameKey));
+            Assert.False(renameListViewModel.CanShowLoadErrors);
+            Assert.False(_TryShowLoadErrors(renameListViewModel));
+        }
 
-            Assert.True(renameListViewModel.CanShowLoadErrors);
+        private async Task<(RenameListViewModel ViewModel, string Path, RenameListEntry Entry)> _AddHtmWithTitleAsync()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "info.htm");
+            await File.WriteAllTextAsync(path, "<html></html>");
+            var renameListViewModel = _CreateViewModelWithTitleColumn(dir);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            return (renameListViewModel, path, Assert.Single(renameListViewModel.Entries));
+        }
+
+        private RenameListViewModel _CreateViewModelWithTitleColumn(string dir)
+        {
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(RenameListTestHelpers.FullFileNameKey),
+                new RenameListVisibleColumn(_TitleKey()),
+            ]);
+            return renameListViewModel;
+        }
+
+        private static RenameListFieldKey _TitleKey()
+        {
+            return RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+        }
+
+        private static bool _TryShowLoadErrors(RenameListViewModel renameListViewModel)
+        {
+            var shown = false;
+            renameListViewModel.LoadErrorsDialogRequested += (_, _) => shown = true;
+            renameListViewModel.ShowLoadErrorsCommand.Execute(null);
+            return shown;
         }
     }
 }
