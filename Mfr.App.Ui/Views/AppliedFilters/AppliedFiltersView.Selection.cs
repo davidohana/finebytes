@@ -94,61 +94,25 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         {
             return
             [
-                .. listBox
-                    .Selection.SelectedIndexes.Where(index => index >= 0 && index < listBox.ItemCount)
+                .. ListBoxDrag
+                    .ReadSelectedIndices(listBox)
+                    .Where(index => index < listBox.ItemCount)
                     .Select(index => (AppliedFilterStepViewModel)listBox.Items[index]!),
             ];
         }
 
         private void _RestoreListSelection(ListBox listBox, IReadOnlyList<int> indices, int anchorIndex)
         {
-            var itemCount = listBox.ItemCount;
-            var desired = indices.Where(index => index >= 0 && index < itemCount).ToList();
-            if (_SelectionMatchesIndices(listBox, desired))
-            {
-                if (anchorIndex >= 0 && anchorIndex < itemCount)
-                {
-                    listBox.Selection.AnchorIndex = anchorIndex;
-                }
-
-                return;
-            }
-
             var wasSyncing = _isSyncingSelection;
             _isSyncingSelection = true;
             try
             {
-                var selection = listBox.Selection;
-                selection.BeginBatchUpdate();
-                try
-                {
-                    selection.Clear();
-                    foreach (var index in desired)
-                    {
-                        selection.Select(index);
-                    }
-
-                    if (anchorIndex >= 0 && anchorIndex < itemCount && desired.Contains(anchorIndex))
-                    {
-                        selection.AnchorIndex = anchorIndex;
-                        selection.Select(anchorIndex);
-                    }
-                }
-                finally
-                {
-                    selection.EndBatchUpdate();
-                }
+                ListBoxDrag.RestoreSelection(listBox, indices, anchorIndex);
             }
             finally
             {
                 _isSyncingSelection = wasSyncing;
             }
-        }
-
-        private static bool _SelectionMatchesIndices(ListBox listBox, IReadOnlyList<int> desired)
-        {
-            var current = listBox.Selection.SelectedIndexes.Where(index => index >= 0).OrderBy(index => index).ToList();
-            return desired.SequenceEqual(current);
         }
     }
 }

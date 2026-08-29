@@ -1,5 +1,4 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
-using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
 
@@ -17,7 +16,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Add_Creates_Enabled_Step_With_Defaults()
         {
             var viewModel = new AppliedFiltersViewModel();
-            var entry = _Entry("ShrinkSpaces");
+            var entry = AppliedFiltersTestUi.Entry("ShrinkSpaces");
 
             viewModel.AddCommand.Execute(entry);
 
@@ -37,7 +36,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Add_Duplicate_Types_Get_Numbered_Display_Names()
         {
             var viewModel = new AppliedFiltersViewModel();
-            var entry = _Entry("LettersCase");
+            var entry = AppliedFiltersTestUi.Entry("LettersCase");
 
             viewModel.AddCommand.Execute(entry);
             viewModel.SetSelectedSteps([]);
@@ -53,8 +52,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Add_Inserts_Before_First_Selected_Row()
         {
             var viewModel = new AppliedFiltersViewModel();
-            var shrinkSpaces = _Entry("ShrinkSpaces");
-            var lettersCase = _Entry("LettersCase");
+            var shrinkSpaces = AppliedFiltersTestUi.Entry("ShrinkSpaces");
+            var lettersCase = AppliedFiltersTestUi.Entry("LettersCase");
 
             viewModel.AddCommand.Execute(shrinkSpaces);
             viewModel.SetSelectedSteps([]);
@@ -77,9 +76,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void RemoveSelected_Removes_Selection_And_Keeps_Neighbor()
         {
             var viewModel = new AppliedFiltersViewModel();
-            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(_Entry("LettersCase"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             viewModel.SetSelectedSteps([viewModel.Steps[0]]);
 
             viewModel.RemoveSelectedCommand.Execute(null);
@@ -96,8 +95,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Clear_Removes_All_Steps()
         {
             var viewModel = new AppliedFiltersViewModel();
-            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
-            viewModel.AddCommand.Execute(_Entry("LettersCase"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
             viewModel.ClearCommand.Execute(null);
 
@@ -113,9 +112,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void MoveSelected_Reorders_Steps()
         {
             var viewModel = new AppliedFiltersViewModel();
-            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(_Entry("LettersCase"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             viewModel.SetSelectedSteps([viewModel.Steps[1]]);
 
             viewModel.MoveSelectedUpCommand.Execute(null);
@@ -136,9 +135,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void ToChain_Matches_Steps()
         {
             var viewModel = new AppliedFiltersViewModel();
-            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(_Entry("LettersCase"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             viewModel.Steps[1].Enabled = false;
 
             var chain = viewModel.ToChain();
@@ -158,7 +157,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var viewModel = new AppliedFiltersViewModel();
 
-            viewModel.AddCommand.Execute(_Entry("TagRemover"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
 
             Assert.Equal(string.Empty, viewModel.Steps[0].ApplyToLabel);
         }
@@ -170,8 +169,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Append_Adds_At_End_Even_With_Selection()
         {
             var viewModel = new AppliedFiltersViewModel();
-            var shrinkSpaces = _Entry("ShrinkSpaces");
-            var lettersCase = _Entry("LettersCase");
+            var shrinkSpaces = AppliedFiltersTestUi.Entry("ShrinkSpaces");
+            var lettersCase = AppliedFiltersTestUi.Entry("LettersCase");
 
             viewModel.AddCommand.Execute(shrinkSpaces);
             viewModel.SetSelectedSteps([viewModel.Steps[0]]);
@@ -188,11 +187,11 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void MoveStepsTo_reorders_selected_block()
         {
             var viewModel = new AppliedFiltersViewModel();
-            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(_Entry("LettersCase"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(_Entry("TagRemover"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
             viewModel.SetSelectedSteps([viewModel.Steps[1]]);
 
             viewModel.MoveStepsTo([1], targetIndex: 0);
@@ -211,10 +210,13 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void InsertFromCatalogAt_inserts_at_index_and_selects_new_steps()
         {
             var viewModel = new AppliedFiltersViewModel();
-            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
 
-            viewModel.InsertFromCatalogAt([_Entry("LettersCase"), _Entry("TagRemover")], insertIndex: 0);
+            viewModel.InsertFromCatalogAt(
+                [AppliedFiltersTestUi.Entry("LettersCase"), AppliedFiltersTestUi.Entry("TagRemover")],
+                insertIndex: 0
+            );
 
             Assert.Equal(
                 ["Letters Case", "Audio Tag Remover", "Shrink Spaces"],
@@ -232,9 +234,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void RemoveStepsAtIndices_removes_rows_and_selects_neighbor()
         {
             var viewModel = new AppliedFiltersViewModel();
-            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(_Entry("LettersCase"));
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             viewModel.SetSelectedSteps([]);
 
             viewModel.RemoveStepsAtIndices([0]);
@@ -242,11 +244,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Single(viewModel.Steps);
             Assert.Equal("Letters Case", viewModel.Steps[0].DisplayName);
             Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
-        }
-
-        private static FilterCatalogEntry _Entry(string type)
-        {
-            return FilterCatalog.Entries.Single(entry => entry.Type == type);
         }
     }
 }

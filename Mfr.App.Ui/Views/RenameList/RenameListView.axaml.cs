@@ -192,7 +192,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return false;
             }
 
-            if (_MatchesGesture(e, AppShortcuts.RemoveSelectedDelete))
+            if (KeyGestureMatch.Matches(e, AppShortcuts.RemoveSelectedDelete))
             {
                 if (_viewModel.RemoveSelectedCommand.CanExecute(null))
                 {
@@ -202,7 +202,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
             }
 
-            if (_MatchesGesture(e, AppShortcuts.LocateInFileList))
+            if (KeyGestureMatch.Matches(e, AppShortcuts.LocateInFileList))
             {
                 if (_viewModel.LocateInFileListCommand.CanExecute(null))
                 {
@@ -212,7 +212,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
             }
 
-            if (_MatchesGesture(e, AppShortcuts.MoveSelectedUp))
+            if (KeyGestureMatch.Matches(e, AppShortcuts.MoveSelectedUp))
             {
                 if (_viewModel.MoveSelectedUpCommand.CanExecute(null))
                 {
@@ -222,7 +222,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
             }
 
-            if (_MatchesGesture(e, AppShortcuts.MoveSelectedDown))
+            if (KeyGestureMatch.Matches(e, AppShortcuts.MoveSelectedDown))
             {
                 if (_viewModel.MoveSelectedDownCommand.CanExecute(null))
                 {
@@ -266,11 +266,6 @@ namespace Mfr.App.Ui.Views.RenameList
                     || (focused is Visual visual && visual.GetVisualAncestors().Contains(RenameGrid));
                 _viewModel.SetGridFocused(isGridFocused);
             });
-        }
-
-        private static bool _MatchesGesture(KeyEventArgs e, KeyGesture gesture)
-        {
-            return e.Key == gesture.Key && e.KeyModifiers == gesture.KeyModifiers;
         }
 
         private void _OnCurrentCellChanged(object? sender, EventArgs e)

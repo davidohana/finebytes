@@ -3,9 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.Views.AppliedFilters;
-using Mfr.Filters;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -20,7 +18,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void DragOver_marks_insert_row()
         {
-            var (window, _, list) = _ShowSeededList(selectIndex: 0);
+            var (window, _, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
             var payload = new AppliedFilterDragPayload([0]);
             var dataTransfer = new DataTransfer();
             dataTransfer.Add(DataTransferItem.Create(AppliedFilterDragPayload.Format, payload.Serialize()));
@@ -51,7 +49,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Drop_reorders_selected_filter()
         {
-            var (window, viewModel, list) = _ShowSeededList(selectIndex: 0);
+            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
             var payload = new AppliedFilterDragPayload([0]);
             var dataTransfer = new DataTransfer();
             dataTransfer.Add(DataTransferItem.Create(AppliedFilterDragPayload.Format, payload.Serialize()));
@@ -69,35 +67,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
 
             window.Close();
-        }
-
-        private static (Window Window, AppliedFiltersViewModel ViewModel, ListBox List) _ShowSeededList(int selectIndex)
-        {
-            var viewModel = new AppliedFiltersViewModel();
-            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
-            viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(_Entry("LettersCase"));
-            viewModel.SetSelectedSteps([viewModel.Steps[selectIndex]]);
-
-            var view = new AppliedFiltersView { DataContext = viewModel };
-            var window = new Window
-            {
-                Width = 280,
-                Height = 220,
-                Content = view,
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var list = view.FindControl<ListBox>("AppliedFiltersList");
-            Assert.NotNull(list);
-            return (window, viewModel, list);
-        }
-
-        private static FilterCatalogEntry _Entry(string type)
-        {
-            return FilterCatalog.Entries.Single(entry => entry.Type == type);
         }
     }
 }

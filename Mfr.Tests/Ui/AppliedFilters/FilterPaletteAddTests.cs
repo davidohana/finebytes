@@ -22,10 +22,10 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Enter_on_available_list_appends_selected_filter()
         {
             var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
-            var shrinkSpaces = _Entry("ShrinkSpaces");
+            var shrinkSpaces = AppliedFiltersTestUi.Entry("ShrinkSpaces");
             _SelectPaletteEntry(paletteList, shrinkSpaces);
 
-            _PressKeyOnControl(paletteList, Key.Enter);
+            AppliedFiltersTestUi.PressKeyOnControl(paletteList, Key.Enter);
 
             Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
             Assert.Equal("Shrink Spaces", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Double_click_on_available_list_appends_selected_filter()
         {
             var (window, mainViewModel, paletteList, _) = _ShowFilterPanes();
-            var lettersCase = _Entry("LettersCase");
+            var lettersCase = AppliedFiltersTestUi.Entry("LettersCase");
             _SelectPaletteEntry(paletteList, lettersCase);
 
             paletteList.RaiseEvent(new RoutedEventArgs(InputElement.DoubleTappedEvent));
@@ -61,7 +61,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Applied_add_button_appends_palette_selection()
         {
             var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
-            var shrinkSpaces = _Entry("ShrinkSpaces");
+            var shrinkSpaces = AppliedFiltersTestUi.Entry("ShrinkSpaces");
             _SelectPaletteEntry(paletteList, shrinkSpaces);
 
             var addButton = appliedView.FindControl<Button>("AddFromPaletteButton");
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Drop_from_available_inserts_filter_at_drop_index()
         {
             var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
-            var lettersCase = _Entry("LettersCase");
+            var lettersCase = AppliedFiltersTestUi.Entry("LettersCase");
             _SelectPaletteEntry(paletteList, lettersCase);
 
             var appliedList = appliedView.FindControl<ListBox>("AppliedFiltersList");
@@ -117,9 +117,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Drop_from_applied_to_palette_removes_filter()
         {
             var (window, mainViewModel, paletteList, _) = _ShowFilterPanes();
-            mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             mainViewModel.AppliedFiltersViewModel.SetSelectedSteps([]);
-            mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(_Entry("LettersCase"));
+            mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
             var payload = new AppliedFilterDragPayload([0]);
             var dataTransfer = new DataTransfer();
@@ -185,17 +185,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
             paletteList.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(entry, paletteList.SelectedItem);
-        }
-
-        private static void _PressKeyOnControl(Control control, Key key)
-        {
-            control.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = key });
-            Dispatcher.UIThread.RunJobs();
-        }
-
-        private static FilterCatalogEntry _Entry(string type)
-        {
-            return FilterCatalog.Entries.Single(entry => entry.Type == type);
         }
     }
 }

@@ -213,7 +213,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private static IReadOnlyList<int> _ReadSelectedIndices(ListBox listBox)
         {
-            return [.. listBox.Selection.SelectedIndexes.Where(index => index >= 0).OrderBy(index => index)];
+            return ListBoxDrag.ReadSelectedIndices(listBox);
         }
 
         private static IReadOnlyList<RenameListField> _ReadSelectedFields(ListBox listBox)
@@ -237,42 +237,11 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var itemCount = listBox.ItemCount;
-            var desired = indices.Where(index => index >= 0 && index < itemCount).ToList();
-            if (_SelectionMatchesIndices(listBox, desired))
-            {
-                if (anchorIndex >= 0 && anchorIndex < itemCount)
-                {
-                    listBox.Selection.AnchorIndex = anchorIndex;
-                }
-
-                return;
-            }
-
             var wasSyncing = _isSyncingSelection;
             _isSyncingSelection = true;
             try
             {
-                var selection = listBox.Selection;
-                selection.BeginBatchUpdate();
-                try
-                {
-                    selection.Clear();
-                    foreach (var index in desired)
-                    {
-                        selection.Select(index);
-                    }
-
-                    if (anchorIndex >= 0 && anchorIndex < itemCount && desired.Contains(anchorIndex))
-                    {
-                        selection.AnchorIndex = anchorIndex;
-                        selection.Select(anchorIndex);
-                    }
-                }
-                finally
-                {
-                    selection.EndBatchUpdate();
-                }
+                ListBoxDrag.RestoreSelection(listBox, indices, anchorIndex);
             }
             finally
             {
@@ -324,12 +293,6 @@ namespace Mfr.App.Ui.Views.RenameList
                     listBox.SelectedItem as RenameListField
                 );
             }
-        }
-
-        private static bool _SelectionMatchesIndices(ListBox listBox, IReadOnlyList<int> indices)
-        {
-            var selected = listBox.Selection.SelectedIndexes.Where(index => index >= 0).OrderBy(index => index);
-            return selected.SequenceEqual(indices);
         }
     }
 }

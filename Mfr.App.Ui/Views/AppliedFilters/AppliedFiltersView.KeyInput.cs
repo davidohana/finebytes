@@ -43,7 +43,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return false;
             }
 
-            if (_MatchesGesture(e, AppShortcuts.RemoveSelectedFilterDelete))
+            if (KeyGestureMatch.Matches(e, AppShortcuts.RemoveSelectedFilterDelete))
             {
                 if (_viewModel.RemoveSelectedCommand.CanExecute(null))
                 {
@@ -53,7 +53,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 }
             }
 
-            if (_MatchesGesture(e, AppShortcuts.MoveFilterUp))
+            if (KeyGestureMatch.Matches(e, AppShortcuts.MoveFilterUp))
             {
                 if (_viewModel.MoveSelectedUpCommand.CanExecute(null))
                 {
@@ -63,7 +63,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 }
             }
 
-            if (_MatchesGesture(e, AppShortcuts.MoveFilterDown))
+            if (KeyGestureMatch.Matches(e, AppShortcuts.MoveFilterDown))
             {
                 if (_viewModel.MoveSelectedDownCommand.CanExecute(null))
                 {
@@ -95,11 +95,6 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         private bool _IsEventFromAppliedList(KeyEventArgs e)
         {
             return e.Source is Visual source && source.GetVisualAncestors().Contains(AppliedFiltersList);
-        }
-
-        private static bool _MatchesGesture(KeyEventArgs e, KeyGesture gesture)
-        {
-            return e.Key == gesture.Key && e.KeyModifiers == gesture.KeyModifiers;
         }
     }
 }

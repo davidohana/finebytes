@@ -67,7 +67,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         public void Add(FilterCatalogEntry entry)
         {
             ArgumentNullException.ThrowIfNull(entry);
-            _InsertStep(entry, _GetInsertIndex());
+            InsertFromCatalogAt([entry], _GetInsertIndex());
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         public void Append(FilterCatalogEntry entry)
         {
             ArgumentNullException.ThrowIfNull(entry);
-            _InsertStep(entry, Steps.Count);
+            InsertFromCatalogAt([entry], Steps.Count);
         }
 
         /// <summary>
@@ -92,18 +92,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 return;
             }
 
-            var selected = _selectedSteps.ToHashSet();
-            var anchorIndex = _FindFirstSelectedIndex(selected);
-
-            for (var index = Steps.Count - 1; index >= 0; index--)
-            {
-                if (selected.Contains(Steps[index]))
-                {
-                    Steps.RemoveAt(index);
-                }
-            }
-
-            SetSelectedSteps(_SelectStepsAfterRemove(anchorIndex));
+            var indices = _selectedSteps.Select(Steps.IndexOf).Where(index => index >= 0).ToList();
+            RemoveStepsAtIndices(indices);
         }
 
         /// <summary>
@@ -184,14 +174,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             SetSelectedSteps(inserted);
         }
 
-        private void _InsertStep(FilterCatalogEntry entry, int insertIndex)
-        {
-            var step = _CreateStep(entry);
-            insertIndex = Math.Clamp(insertIndex, 0, Steps.Count);
-            Steps.Insert(insertIndex, step);
-            SetSelectedSteps([step]);
-        }
-
         private AppliedFilterStepViewModel _CreateStep(FilterCatalogEntry entry)
         {
             var filter = FilterCatalog.CreateDefault(entry);
@@ -210,6 +192,9 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             return firstSelectedIndex >= 0 ? firstSelectedIndex : Steps.Count;
         }
 
+        /// <summary>
+        /// Builds a unique list label: catalog display name, then <c>(2)</c>, <c>(3)</c>, … for duplicates.
+        /// </summary>
         private string _GenerateDisplayName(FilterCatalogEntry entry)
         {
             var sameTypeCount = Steps.Count(step => step.Filter.GetType() == entry.FilterType);

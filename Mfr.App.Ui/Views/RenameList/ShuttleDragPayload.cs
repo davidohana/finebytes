@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Avalonia.Input;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -25,14 +24,10 @@ namespace Mfr.App.Ui.Views.RenameList
     /// <param name="Keys">Ordered encoded field keys being dragged.</param>
     internal sealed record ShuttleDragPayload(ShuttleDragKind Kind, IReadOnlyList<string> Keys)
     {
-        private static readonly JsonSerializerOptions _JsonOptions = new() { WriteIndented = false };
-
         /// <summary>
         /// Avalonia data format for shuttle drag payloads.
         /// </summary>
-        public static readonly DataFormat<string> Format = DataFormat.CreateStringApplicationFormat(
-            "Mfr.ShuttleDragPayload"
-        );
+        public static readonly DataFormat<string> Format = JsonDragPayload.CreateFormat("Mfr.ShuttleDragPayload");
 
         /// <summary>
         /// Serializes the payload for drag transport.
@@ -40,22 +35,17 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <returns>JSON payload string.</returns>
         public string Serialize()
         {
-            return JsonSerializer.Serialize(this, _JsonOptions);
+            return JsonDragPayload.Serialize(this);
         }
 
         /// <summary>
-        /// Deserializes a drag payload from transport JSON.
+        /// Reads a shuttle drag payload from drag data.
         /// </summary>
-        /// <param name="json">Serialized payload.</param>
-        /// <returns>Payload when valid; otherwise <see langword="null"/>.</returns>
-        public static ShuttleDragPayload? Deserialize(string? json)
+        /// <param name="dataTransfer">Drag data, or <see langword="null"/>.</param>
+        /// <returns>Payload when present; otherwise <see langword="null"/>.</returns>
+        public static ShuttleDragPayload? TryRead(IDataTransfer? dataTransfer)
         {
-            if (string.IsNullOrWhiteSpace(json))
-            {
-                return null;
-            }
-
-            return JsonSerializer.Deserialize<ShuttleDragPayload>(json, _JsonOptions);
+            return JsonDragPayload.TryRead<ShuttleDragPayload>(dataTransfer, Format);
         }
     }
 }

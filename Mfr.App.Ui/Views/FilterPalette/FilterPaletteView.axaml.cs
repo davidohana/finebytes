@@ -54,58 +54,29 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _OnSearchKeyDown(object? sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (e.Key == Key.Enter && _TryAddSelectedToApplied())
             {
-                if (_TryAddSelectedToApplied())
-                {
-                    e.Handled = true;
-                }
-
+                e.Handled = true;
                 return;
             }
 
-            if (e.Key != Key.Escape)
+            if (e.Key == Key.Escape && _TryClearSearch())
             {
-                return;
+                e.Handled = true;
             }
-
-            if (DataContext is not FilterPaletteViewModel viewModel)
-            {
-                return;
-            }
-
-            if (string.IsNullOrEmpty(viewModel.SearchText))
-            {
-                return;
-            }
-
-            viewModel.SearchText = string.Empty;
-            e.Handled = true;
         }
 
         private void _OnFilterListKeyDown(object? sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (e.Key == Key.Enter && _TryAddSelectedToApplied())
             {
-                if (_TryAddSelectedToApplied())
-                {
-                    e.Handled = true;
-                }
-
+                e.Handled = true;
                 return;
             }
 
-            if (e.Key == Key.Escape)
+            if (e.Key == Key.Escape && _TryClearSearch())
             {
-                if (
-                    DataContext is FilterPaletteViewModel escapeViewModel
-                    && !string.IsNullOrEmpty(escapeViewModel.SearchText)
-                )
-                {
-                    escapeViewModel.SearchText = string.Empty;
-                    e.Handled = true;
-                }
-
+                e.Handled = true;
                 return;
             }
 
@@ -149,6 +120,22 @@ namespace Mfr.App.Ui.Views.FilterPalette
             }
 
             command.Execute(null);
+            return true;
+        }
+
+        private bool _TryClearSearch()
+        {
+            if (DataContext is not FilterPaletteViewModel viewModel)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(viewModel.SearchText))
+            {
+                return false;
+            }
+
+            viewModel.SearchText = string.Empty;
             return true;
         }
     }

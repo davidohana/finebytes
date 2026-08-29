@@ -6,9 +6,7 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.Views.AppliedFilters;
-using Mfr.Filters;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -23,7 +21,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Seeded_steps_render_in_list()
         {
-            var (window, viewModel, list) = _ShowSeededList();
+            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList();
 
             Assert.Equal(2, list.ItemCount);
             Assert.Equal("Shrink Spaces", _RowDisplayName(list, 0));
@@ -42,7 +40,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Checkbox_click_toggles_enabled_on_step_and_chain()
         {
-            var (window, viewModel, list) = _ShowSeededList();
+            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList();
             var step = viewModel.Steps[0];
             Assert.True(step.Enabled);
             Assert.True(viewModel.ToChain().Steps[0].Enabled);
@@ -77,7 +75,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal(0, viewModel.FilterCount);
 
-            viewModel.AppliedFiltersViewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.AppliedFiltersViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -85,29 +83,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(1, viewModel.AppliedFiltersViewModel.Count);
 
             window.Close();
-        }
-
-        private static (Window Window, AppliedFiltersViewModel ViewModel, ListBox List) _ShowSeededList()
-        {
-            var viewModel = new AppliedFiltersViewModel();
-            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
-            viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(_Entry("LettersCase"));
-
-            var view = new AppliedFiltersView { DataContext = viewModel };
-            var window = new Window
-            {
-                Width = 280,
-                Height = 220,
-                Content = view,
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var list = view.FindControl<ListBox>("AppliedFiltersList");
-            Assert.NotNull(list);
-            return (window, viewModel, list);
         }
 
         private static string _RowDisplayName(ListBox list, int rowIndex)
@@ -146,11 +121,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.MouseDown(windowPoint.Value, MouseButton.Left);
             window.MouseUp(windowPoint.Value, MouseButton.Left);
             Dispatcher.UIThread.RunJobs();
-        }
-
-        private static FilterCatalogEntry _Entry(string type)
-        {
-            return FilterCatalog.Entries.Single(entry => entry.Type == type);
         }
     }
 }

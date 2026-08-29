@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Avalonia.Input;
 
 namespace Mfr.App.Ui.Views.FilterPalette
@@ -9,14 +8,10 @@ namespace Mfr.App.Ui.Views.FilterPalette
     /// <param name="CatalogTypes">Ordered <see cref="Filters.FilterCatalogEntry.Type"/> values.</param>
     internal sealed record FilterPaletteDragPayload(IReadOnlyList<string> CatalogTypes)
     {
-        private static readonly JsonSerializerOptions _JsonOptions = new() { WriteIndented = false };
-
         /// <summary>
         /// Avalonia data format for Available Filters drag payloads.
         /// </summary>
-        public static readonly DataFormat<string> Format = DataFormat.CreateStringApplicationFormat(
-            "Mfr.FilterPaletteDragPayload"
-        );
+        public static readonly DataFormat<string> Format = JsonDragPayload.CreateFormat("Mfr.FilterPaletteDragPayload");
 
         /// <summary>
         /// Serializes the payload for drag transport.
@@ -24,22 +19,18 @@ namespace Mfr.App.Ui.Views.FilterPalette
         /// <returns>JSON payload string.</returns>
         public string Serialize()
         {
-            return JsonSerializer.Serialize(this, _JsonOptions);
+            return JsonDragPayload.Serialize(this);
         }
 
         /// <summary>
-        /// Deserializes a drag payload from transport JSON.
+        /// Reads an Available Filters catalog payload from drag data.
         /// </summary>
-        /// <param name="json">Serialized payload.</param>
-        /// <returns>Payload when valid; otherwise <see langword="null"/>.</returns>
-        public static FilterPaletteDragPayload? Deserialize(string? json)
+        /// <param name="dataTransfer">Drag data, or <see langword="null"/>.</param>
+        /// <returns>Payload when it contains at least one catalog type; otherwise <see langword="null"/>.</returns>
+        public static FilterPaletteDragPayload? TryRead(IDataTransfer? dataTransfer)
         {
-            if (string.IsNullOrWhiteSpace(json))
-            {
-                return null;
-            }
-
-            return JsonSerializer.Deserialize<FilterPaletteDragPayload>(json, _JsonOptions);
+            var payload = JsonDragPayload.TryRead<FilterPaletteDragPayload>(dataTransfer, Format);
+            return payload?.CatalogTypes is { Count: > 0 } ? payload : null;
         }
     }
 }

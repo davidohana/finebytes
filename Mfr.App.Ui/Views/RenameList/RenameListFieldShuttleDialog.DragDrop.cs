@@ -1,11 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
-using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList;
 
@@ -13,18 +9,12 @@ namespace Mfr.App.Ui.Views.RenameList
 {
     public partial class RenameListFieldShuttleDialog
     {
-        private const double DragThreshold = 4;
-
         private ListBox? _dragSourceList;
         private Point? _dragStartPoint;
         private PointerEventArgs? _dragStartArgs;
         private IReadOnlyList<int>? _dragSelectionSnapshot;
         private int? _dragHitIndex;
-        private ListBoxItem? _dropMarkItem;
-        private ListBox? _dropMarkList;
-        private int? _dropMarkInsertIndex;
-        private Canvas? _appendMarkHost;
-        private Rectangle? _appendMarkLine;
+        private readonly ListBoxDropMark _dropMark = new();
 
         private void _WireDragDropHandlers()
         {
@@ -57,36 +47,16 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            if (!e.GetCurrentPoint(listBox).Properties.IsLeftButtonPressed)
+            if (!ListBoxDrag.TryCapturePress(listBox, e, out var press))
             {
                 return;
             }
 
-            if (_FindListBoxItemFromSource(e.Source) is not { } item)
-            {
-                return;
-            }
-
-            var hitIndex = listBox.IndexFromContainer(item);
-            var selectedIndices = _ReadSelectedIndices(listBox);
-            var isExtendingSelection =
-                e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Shift);
-            // Avalonia collapses a multi-selection to the pressed row. Snapshot when pressing an
-            // already-selected row so SelectionChanged can undo that before paint (File List pattern).
-            if (
-                hitIndex >= 0
-                && selectedIndices.Count > 1
-                && !isExtendingSelection
-                && selectedIndices.Contains(hitIndex)
-            )
-            {
-                _dragSelectionSnapshot = selectedIndices;
-                _dragHitIndex = hitIndex;
-            }
-
+            _dragSelectionSnapshot = press.SelectionSnapshot;
+            _dragHitIndex = press.HitIndex;
             _dragSourceList = listBox;
-            _dragStartPoint = e.GetPosition(listBox);
-            _dragStartArgs = e;
+            _dragStartPoint = press.StartPoint;
+            _dragStartArgs = press.StartArgs;
         }
 
         private async void _OnListPointerMoved(object? sender, PointerEventArgs e)
@@ -102,8 +72,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var delta = e.GetPosition(_dragSourceList) - _dragStartPoint.Value;
-            if (Math.Abs(delta.X) < DragThreshold && Math.Abs(delta.Y) < DragThreshold)
+            if (ListBoxDrag.IsBelowThreshold(_dragStartPoint.Value, e.GetPosition(_dragSourceList)))
             {
                 return;
             }
@@ -118,8 +87,7 @@ namespace Mfr.App.Ui.Views.RenameList
             var dragArgs = _dragStartArgs;
             _ClearDragState();
 
-            var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(ShuttleDragPayload.Format, payload.Serialize()));
+            var dataTransfer = JsonDragPayload.CreateTransfer(ShuttleDragPayload.Format, payload);
 
             var effect = payload.Kind == ShuttleDragKind.AvailableField ? DragDropEffects.Copy : DragDropEffects.Move;
             try
@@ -128,7 +96,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
             finally
             {
-                _ClearDropMark();
+                _dropMark.Clear();
             }
         }
 
@@ -154,15 +122,15 @@ namespace Mfr.App.Ui.Views.RenameList
             if (_ViewModel is null || sender is not ListBox targetList)
             {
                 e.DragEffects = DragDropEffects.None;
-                _ClearDropMark();
+                _dropMark.Clear();
                 return;
             }
 
-            var payload = _ReadDragPayload(e);
+            var payload = ShuttleDragPayload.TryRead(e.DataTransfer);
             if (payload is null)
             {
                 e.DragEffects = DragDropEffects.None;
-                _ClearDropMark();
+                _dropMark.Clear();
                 return;
             }
 
@@ -171,11 +139,11 @@ namespace Mfr.App.Ui.Views.RenameList
             e.DragEffects = effect;
             if (effect == DragDropEffects.None || !_IsInsertDropTarget(payload, targetList))
             {
-                _ClearDropMark();
+                _dropMark.Clear();
                 return;
             }
 
-            _UpdateDropMark(targetList, e.GetPosition(targetList));
+            _dropMark.Update(targetList, e.GetPosition(targetList));
         }
 
         private void _OnListDragLeave(object? sender, DragEventArgs e)
@@ -192,10 +160,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            if (ReferenceEquals(listBox, _dropMarkList))
-            {
-                _ClearDropMark();
-            }
+            _dropMark.ClearIfHost(listBox);
         }
 
         private void _OnListDrop(object? sender, DragEventArgs e)
@@ -205,7 +170,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var payload = _ReadDragPayload(e);
+            var payload = ShuttleDragPayload.TryRead(e.DataTransfer);
             if (payload is null)
             {
                 return;
@@ -213,7 +178,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             e.Handled = true;
             var position = e.GetPosition(targetList);
-            _ClearDropMark();
+            _dropMark.Clear();
             _ApplyDrop(payload, targetList, position);
         }
 
@@ -239,14 +204,14 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 if (ReferenceEquals(targetList, SelectedColumnsList))
                 {
-                    _ViewModel.InsertColumnsAt(keys, _GetDropIndex(SelectedColumnsList, position));
+                    _ViewModel.InsertColumnsAt(keys, ListBoxDrag.GetDropIndex(SelectedColumnsList, position));
                     return;
                 }
 
                 if (ReferenceEquals(targetList, SelectedSortList))
                 {
                     var sortKeys = keys.Where(key => !key.IsPreview).ToList();
-                    _ViewModel.InsertSortKeysAt(sortKeys, _GetDropIndex(SelectedSortList, position));
+                    _ViewModel.InsertSortKeysAt(sortKeys, ListBoxDrag.GetDropIndex(SelectedSortList, position));
                 }
 
                 return;
@@ -267,7 +232,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 if (ReferenceEquals(targetList, SelectedColumnsList))
                 {
                     var sourceIndices = _IndicesForColumnKeys(keys);
-                    _ViewModel.MoveColumnsTo(sourceIndices, _GetDropIndex(SelectedColumnsList, position));
+                    _ViewModel.MoveColumnsTo(sourceIndices, ListBoxDrag.GetDropIndex(SelectedColumnsList, position));
                 }
 
                 return;
@@ -285,7 +250,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 if (ReferenceEquals(targetList, SelectedSortList))
                 {
                     var sourceIndices = _IndicesForSortKeys(keys);
-                    _ViewModel.MoveSortKeysTo(sourceIndices, _GetDropIndex(SelectedSortList, position));
+                    _ViewModel.MoveSortKeysTo(sourceIndices, ListBoxDrag.GetDropIndex(SelectedSortList, position));
                 }
             }
         }
@@ -411,67 +376,6 @@ namespace Mfr.App.Ui.Views.RenameList
             ];
         }
 
-        private static int _GetDropIndex(ListBox listBox, Point position)
-        {
-            var item = _HitTestListBoxItem(listBox, position);
-            if (item is null)
-            {
-                return listBox.ItemCount;
-            }
-
-            var itemIndex = listBox.IndexFromContainer(item);
-            if (itemIndex < 0)
-            {
-                return listBox.ItemCount;
-            }
-
-            var itemOrigin = item.TranslatePoint(default, listBox);
-            if (itemOrigin is null)
-            {
-                return itemIndex;
-            }
-
-            var midpoint = itemOrigin.Value.Y + (item.Bounds.Height / 2);
-            return position.Y >= midpoint ? itemIndex + 1 : itemIndex;
-        }
-
-        private static ListBoxItem? _HitTestListBoxItem(ListBox listBox, Point position)
-        {
-            foreach (var item in listBox.GetVisualDescendants().OfType<ListBoxItem>())
-            {
-                var origin = item.TranslatePoint(default, listBox);
-                if (origin is null)
-                {
-                    continue;
-                }
-
-                if (new Rect(origin.Value, item.Bounds.Size).Contains(position))
-                {
-                    return item;
-                }
-            }
-
-            return null;
-        }
-
-        private static ShuttleDragPayload? _ReadDragPayload(DragEventArgs e)
-        {
-            if (e.DataTransfer is null)
-            {
-                return null;
-            }
-
-            foreach (var item in e.DataTransfer.Items)
-            {
-                if (item.TryGetRaw(ShuttleDragPayload.Format) is string json)
-                {
-                    return ShuttleDragPayload.Deserialize(json);
-                }
-            }
-
-            return null;
-        }
-
         private bool _IsInsertDropTarget(ShuttleDragPayload payload, ListBox targetList)
         {
             return payload.Kind switch
@@ -483,99 +387,6 @@ namespace Mfr.App.Ui.Views.RenameList
                 ShuttleDragKind.SelectedSort when ReferenceEquals(targetList, SelectedSortList) => true,
                 _ => false,
             };
-        }
-
-        /// <summary>
-        /// Shows the salmon insert marker at the drop index: row highlight, or a line after the last item.
-        /// </summary>
-        private void _UpdateDropMark(ListBox listBox, Point position)
-        {
-            var insertIndex = _GetDropIndex(listBox, position);
-            if (_HitTestListBoxItem(listBox, position) is null && ReferenceEquals(listBox, _dropMarkList))
-            {
-                return;
-            }
-
-            if (ReferenceEquals(listBox, _dropMarkList) && _dropMarkInsertIndex == insertIndex)
-            {
-                return;
-            }
-
-            _ClearDropMark();
-            _dropMarkList = listBox;
-            _dropMarkInsertIndex = insertIndex;
-
-            if (insertIndex < listBox.ItemCount)
-            {
-                var item = listBox.ContainerFromIndex(insertIndex) as ListBoxItem;
-                if (item is not null)
-                {
-                    item.Classes.Set("drop-mark", true);
-                    _dropMarkItem = item;
-                }
-
-                return;
-            }
-
-            _ShowAppendMark(listBox);
-        }
-
-        private void _ShowAppendMark(ListBox listBox)
-        {
-            var y = 2.0;
-            if (
-                listBox.ItemCount > 0
-                && listBox.ContainerFromIndex(listBox.ItemCount - 1) is Control lastItem
-                && lastItem.TranslatePoint(default, listBox) is { } origin
-            )
-            {
-                y = origin.Y + lastItem.Bounds.Height;
-            }
-
-            _appendMarkHost ??= new Canvas { IsHitTestVisible = false };
-            _appendMarkLine ??= new Rectangle
-            {
-                Height = 3,
-                IsHitTestVisible = false,
-                Fill = _DropMarkBrush(),
-            };
-
-            if (_appendMarkLine.Parent is null)
-            {
-                _appendMarkHost.Children.Add(_appendMarkLine);
-            }
-
-            _appendMarkLine.Width = Math.Max(0, listBox.Bounds.Width - 4);
-            Canvas.SetLeft(_appendMarkLine, 2);
-            Canvas.SetTop(_appendMarkLine, Math.Clamp(y - 1.5, 0, Math.Max(0, listBox.Bounds.Height - 3)));
-            AdornerLayer.SetAdorner(listBox, _appendMarkHost);
-        }
-
-        private IBrush _DropMarkBrush()
-        {
-            if (
-                TryGetResource("RenameListDropIndicatorBrush", ActualThemeVariant, out var resource)
-                && resource is IBrush brush
-            )
-            {
-                return brush;
-            }
-
-            return new SolidColorBrush(Color.Parse("#FA8072"));
-        }
-
-        private void _ClearDropMark()
-        {
-            _dropMarkItem?.Classes.Set("drop-mark", false);
-            _dropMarkItem = null;
-
-            if (_dropMarkList is { } markedList)
-            {
-                AdornerLayer.SetAdorner(markedList, null);
-            }
-
-            _dropMarkList = null;
-            _dropMarkInsertIndex = null;
         }
 
         private DragDropEffects _GetDragEffect(ShuttleDragPayload payload, ListBox targetList)
@@ -604,19 +415,6 @@ namespace Mfr.App.Ui.Views.RenameList
             _dragStartArgs = null;
             _dragSelectionSnapshot = null;
             _dragHitIndex = null;
-        }
-
-        private static ListBoxItem? _FindListBoxItemFromSource(object? source)
-        {
-            for (var current = source as Visual; current is not null; current = current.GetVisualParent())
-            {
-                if (current is ListBoxItem item)
-                {
-                    return item;
-                }
-            }
-
-            return null;
         }
     }
 }
