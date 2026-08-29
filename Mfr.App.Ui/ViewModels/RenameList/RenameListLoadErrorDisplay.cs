@@ -34,7 +34,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns>Folded error text for the single details box.</returns>
         internal static string FormatDetailsText(RenameListLoadErrorsDialogContent content)
         {
-            var blocks = content.Errors.Select(error => _FormatDetailsBlock(content, error));
+            var blocks = content.Errors.Select(_FormatDetailsBlock);
             return string.Join($"{Environment.NewLine}{Environment.NewLine}", blocks);
         }
 
@@ -54,17 +54,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             );
         }
 
-        private static string _FormatDetailsBlock(
-            RenameListLoadErrorsDialogContent content,
-            RenameListLoadError error
-        )
+        private static string _FormatDetailsBlock(RenameListLoadError error)
         {
-            var technicalIsPathOnly = string.Equals(
-                error.TechnicalDetails,
-                content.FilePath,
-                StringComparison.OrdinalIgnoreCase
-            );
-            if (technicalIsPathOnly)
+            if (error.IsMissingFromDisk)
             {
                 return error.UserExplanation;
             }
@@ -74,12 +66,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private static bool _IsMissingOnly(RenameListLoadErrorsDialogContent content)
         {
-            return content.Errors.Count == 1
-                && string.Equals(
-                    content.Errors[0].UserExplanation,
-                    RenameListDiskPaths.MissingUserExplanation,
-                    StringComparison.Ordinal
-                );
+            return content.Errors is [{ IsMissingFromDisk: true }];
         }
     }
 }

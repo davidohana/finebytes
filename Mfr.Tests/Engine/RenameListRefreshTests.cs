@@ -101,16 +101,26 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies RefreshOriginals is a no-op on an empty list.
+        /// Verifies RefreshOriginals keeps the stored path when the file is gone and still clears caches.
         /// </summary>
         [Fact]
-        public void RefreshOriginals_Empty_List_Is_NoOp()
+        public void RefreshOriginals_Missing_Path_Keeps_Stored_Path_And_Clears_Caches()
         {
-            var renameList = new RenameList(includeHidden: true);
+            var path = Path.Combine(_tempRoot, "gone.txt");
+            File.WriteAllText(path, "old");
 
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+            var item = Assert.Single(renameList.RenameItems);
+            var storedPath = item.Original.FullPath;
+
+            File.Delete(path);
             renameList.RefreshOriginals();
 
-            Assert.Empty(renameList.RenameItems);
+            Assert.Equal(storedPath, item.Original.FullPath);
+            Assert.False(item.TagLibLoadAttempted);
+            Assert.Null(item.TagLibMetadataLoadError);
+            Assert.True(RenameListDiskPaths.IsMissingFromDisk(item));
         }
     }
 }

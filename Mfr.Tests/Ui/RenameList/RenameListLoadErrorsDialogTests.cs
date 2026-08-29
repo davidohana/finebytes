@@ -55,10 +55,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void Dialog_shows_missing_summary_for_absent_path()
         {
             const string path = @"D:\Music\1\Working on the Highway.mp3";
-            var content = new RenameListLoadErrorsDialogContent(
-                path,
-                [new RenameListLoadError(RenameListDiskPaths.MissingUserExplanation, path)]
-            );
+            var content = new RenameListLoadErrorsDialogContent(path, [RenameListDiskPaths.MissingLoadError(path)]);
             var dialog = new RenameListLoadErrorsDialog(content);
             dialog.Show();
             dialog.UpdateLayout();

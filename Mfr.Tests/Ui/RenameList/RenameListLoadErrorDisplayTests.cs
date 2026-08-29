@@ -36,13 +36,28 @@ namespace Mfr.Tests.Ui.RenameList
         public void FormatSummary_and_details_for_missing_file()
         {
             const string path = @"D:\Music\1\Working on the Highway.mp3";
+            var content = new RenameListLoadErrorsDialogContent(path, [RenameListDiskPaths.MissingLoadError(path)]);
+
+            Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, RenameListLoadErrorDisplay.FormatSummary(content));
+            Assert.Equal(
+                RenameListDiskPaths.MissingUserExplanation,
+                RenameListLoadErrorDisplay.FormatDetailsText(content)
+            );
+        }
+
+        /// <summary>
+        /// Verifies missing-path copy is keyed off the structured flag, not explanation text.
+        /// </summary>
+        [Fact]
+        public void FormatSummary_does_not_treat_matching_explanation_text_as_missing()
+        {
+            const string path = @"D:\Music\track.mp3";
             var content = new RenameListLoadErrorsDialogContent(
                 path,
                 [new RenameListLoadError(RenameListDiskPaths.MissingUserExplanation, path)]
             );
 
-            Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, RenameListLoadErrorDisplay.FormatSummary(content));
-            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, RenameListLoadErrorDisplay.FormatDetailsText(content));
+            Assert.Equal(RenameListLoadErrorDisplay.MetadataSummary, RenameListLoadErrorDisplay.FormatSummary(content));
         }
 
         /// <summary>

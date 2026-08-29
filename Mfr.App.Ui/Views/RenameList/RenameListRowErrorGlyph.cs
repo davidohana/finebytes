@@ -31,7 +31,6 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 Classes = { ClassName },
                 Data = _MarkGeometry,
-                Fill = new SolidColorBrush(Color.Parse("#C00000")),
                 Stretch = Stretch.Uniform,
                 Width = 7,
                 Height = 11,

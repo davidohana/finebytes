@@ -910,19 +910,14 @@ namespace Mfr.Engine.RenameList
                 return path;
             }
 
-            var parentDir = new DirectoryInfo(parent);
-            foreach (var entry in parentDir.GetFileSystemInfos())
+            var matches = new DirectoryInfo(parent).GetFileSystemInfos(fileName);
+            if (matches.Length == 0)
             {
-                if (!string.Equals(entry.Name, fileName, PathComparers.OsComparison))
-                {
-                    continue;
-                }
-
-                var resolvedParent = _ResolveOnDiskCasing(parent);
-                return Path.Combine(resolvedParent, entry.Name);
+                return path;
             }
 
-            return path;
+            var resolvedParent = _ResolveOnDiskCasing(parent);
+            return Path.Combine(resolvedParent, matches[0].Name);
         }
 
         /// <summary>

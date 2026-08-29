@@ -115,14 +115,18 @@ namespace Mfr.App.Ui.ViewModels
         private int _previewErrorCount;
 
         /// <summary>
-        /// Reloads the File List when it has focus; otherwise refreshes original Rename List fields from disk.
+        /// Refreshes original Rename List fields when that grid has focus; otherwise reloads the File List.
         /// </summary>
         [RelayCommand]
         public async Task RefreshFocusedPaneAsync()
         {
-            if (RenameListViewModel.IsGridFocused && RenameListViewModel.RefreshCommand.CanExecute(null))
+            if (RenameListViewModel.IsGridFocused)
             {
-                await RenameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+                if (RenameListViewModel.RefreshCommand.CanExecute(null))
+                {
+                    await RenameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+                }
+
                 return;
             }
 

@@ -8,15 +8,15 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 
 ### Global
 
-| Action            | Shortcut        |
-| ----------------- | --------------- |
-| GO                | Ctrl+G          |
-| Undo last         | Ctrl+Z          |
-| Log               | Ctrl+Shift+L    |
-| Options           | Ctrl+,          |
-| Exit              | Alt+F4          |
-| Refresh File List | F5              |
-| Go to address bar | Ctrl+L or Alt+D |
+| Action               | Shortcut        |
+| -------------------- | --------------- |
+| GO                   | Ctrl+G          |
+| Undo last            | Ctrl+Z          |
+| Log                  | Ctrl+Shift+L    |
+| Options              | Ctrl+,          |
+| Exit                 | Alt+F4          |
+| Refresh focused pane | F5              |
+| Go to address bar    | Ctrl+L or Alt+D |
 
 GO, Undo, Log, and Options appear in the menu and toolbar now; the commands themselves are still stubs.
 

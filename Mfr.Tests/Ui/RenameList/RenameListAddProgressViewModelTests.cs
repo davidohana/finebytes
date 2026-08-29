@@ -159,6 +159,41 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies original refresh uses refresh dialog copy even after a prior metadata hydrate.
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_Refresh_Uses_Refresh_Copy()
+        {
+            var viewModel = new RenameListAddProgressViewModel();
+            _ = await viewModel
+                .RunAsync(RenameListProgressOperation.MetadataHydrate, (_, _) => { })
+                .ConfigureAwait(true);
+
+            var completed = await viewModel
+                .RunAsync(
+                    RenameListProgressOperation.Refresh,
+                    (_, progress) =>
+                        progress.Report(
+                            new RenameListAddProgress(
+                                ScannedCount: 0,
+                                AddedCount: 0,
+                                LastPath: "C:\\a.mp3",
+                                MetadataTotalCount: 10,
+                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                MetadataProcessedCount: 4
+                            )
+                        )
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(completed);
+            Assert.Equal("Refreshing Rename List", viewModel.DialogTitle);
+            Assert.Equal("Refreshing: 4 of 10 files", viewModel.MetadataProgressText);
+            Assert.True(viewModel.ShowMetadataProgress);
+            Assert.False(viewModel.ShowResolveProgress);
+        }
+
+        /// <summary>
         /// Verifies add switches to a metadata stage instead of continuing the scanned counter.
         /// </summary>
         [Fact]

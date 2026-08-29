@@ -34,6 +34,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ShowResolveProgress))]
+        [NotifyPropertyChangedFor(nameof(DialogTitle))]
+        [NotifyPropertyChangedFor(nameof(MetadataProgressText))]
         private RenameListProgressOperation _operation = RenameListProgressOperation.Add;
 
         /// <summary>
@@ -81,14 +83,23 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the progress dialog window title for the current operation.
         /// </summary>
-        public string DialogTitle =>
-            Operation switch
+        public string DialogTitle
+        {
+            get
             {
-                RenameListProgressOperation.Refresh => "Refreshing Rename List",
-                RenameListProgressOperation.MetadataHydrate => "Reading file metadata",
-                RenameListProgressOperation.Add => "Adding to Rename List",
-                _ => "Adding to Rename List",
-            };
+                if (Operation == RenameListProgressOperation.Refresh)
+                {
+                    return "Refreshing Rename List";
+                }
+
+                if (Phase == RenameListAddProgressPhase.LoadMetadata)
+                {
+                    return "Reading file metadata";
+                }
+
+                return "Adding to Rename List";
+            }
+        }
 
         /// <summary>
         /// Gets the resolve-stage scan line for add operations.
@@ -104,7 +115,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets the metadata hydrate line shown as its own row.
         /// </summary>
         public string MetadataProgressText =>
-            $"Reading metadata: {MetadataProcessedCount} of {MetadataTotalCount} files";
+            Operation == RenameListProgressOperation.Refresh
+                ? $"Refreshing: {MetadataProcessedCount} of {MetadataTotalCount} files"
+                : $"Reading metadata: {MetadataProcessedCount} of {MetadataTotalCount} files";
 
         /// <summary>
         /// Gets whether scanned/added resolve lines should be shown.
@@ -147,7 +160,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Runs background work with operation-specific dialog copy.
         /// </summary>
-        /// <param name="operation">Add or metadata hydrate.</param>
+        /// <param name="operation">Add, metadata hydrate, or original refresh.</param>
         /// <param name="work">Engine work invoked with the operation cancel token and progress sink.</param>
         /// <returns>
         /// <see langword="true"/> when the work finished without user cancel; <see langword="false"/> when canceled.

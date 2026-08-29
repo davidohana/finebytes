@@ -1,6 +1,6 @@
 ---
 title: Rename List Phase 6b follow-ups
-description: Leftovers after original field-load errors. 6c–6e shipped; next is Phase 8a Refresh.
+description: Leftovers after original field-load errors. 6c–6e, 8a Refresh, and missing-on-disk gray shipped.
 ---
 
 # Rename List Phase 6b follow-ups
@@ -9,8 +9,8 @@ Handover from the Phase 6b review. **6b is shipped:** row-level TagLib + image e
 muted em-dash load-error cells, Show Load Errors dialog, status-bar `Could not read metadata:` hint,
 `ErrorsLast` sort.
 
-These phases are **6b leftovers**, not preview work. **6c–6e are shipped.** **8a Refresh**
-can start (Load Errors type names are in place).
+These phases are **6b leftovers**, not preview work. **6c–6e, 8a Original Refresh, and
+missing-on-disk gray (pulled forward from Phase 10) are shipped.** Next preview work is **8b**.
 
 Do **not** go back to per-field stored exceptions or format-specific user-message parsers.
 Keep two slots on `RenameItem` (`TagLibMetadataLoadError`, `ImagePropertiesLoadError`).
@@ -20,7 +20,7 @@ Keep two slots on `RenameItem` (`TagLibMetadataLoadError`, `ImagePropertiesLoadE
 1. ~~**6c** TagLib sibling load flags (loader only).~~
 1. ~~**6d** Structured gray (grid paint; no `"Error"` text compare).~~
 1. ~~**6e** Rename `FieldError` → `LoadErrors` (names match the menu).~~
-1. Then **8a** Original Refresh.
+1. ~~**8a** Original Refresh (F5, re-read disk; missing-on-disk gray shipped with it).~~
 
 ## 6c — TagLib sibling attempted flags
 
@@ -64,5 +64,5 @@ state was removed; the command is row-level.
 
 - Per-field exception maps; one TagLib + one image slot is enough
 - Format-specific `DescribeUserMessage` branches (playlist vs jpeg vs …)
-- Preview-error UI (**8c**) or missing-on-disk gray (**Phase 10**) — Phase 10 should reuse
-  6d’s structured cell foreground, not a second text sentinel
+- Preview-error UI (**8c**). Missing-on-disk gray reuses 6d’s structured cell foreground (not a
+  text sentinel). Live `Exists` checks match MFR7 `RenameItem.Exists`.

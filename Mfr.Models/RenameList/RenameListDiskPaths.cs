@@ -38,14 +38,25 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Builds the Show Load Errors entry for a missing row.
+        /// Builds the Show Error Details entry for a missing row.
         /// </summary>
         /// <param name="item">Engine rename item.</param>
         /// <returns>User and technical lines for the missing path.</returns>
         public static RenameListLoadError MissingLoadError(RenameItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
-            return new RenameListLoadError(MissingUserExplanation, item.Original.FullPath);
+            return MissingLoadError(item.Original.FullPath);
+        }
+
+        /// <summary>
+        /// Builds the Show Error Details entry for a missing path.
+        /// </summary>
+        /// <param name="fullPath">Stored original path that is absent from disk.</param>
+        /// <returns>User and technical lines for the missing path.</returns>
+        public static RenameListLoadError MissingLoadError(string fullPath)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(fullPath);
+            return new RenameListLoadError(MissingUserExplanation, fullPath, IsMissingFromDisk: true);
         }
     }
 }
