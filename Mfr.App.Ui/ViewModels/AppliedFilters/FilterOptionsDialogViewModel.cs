@@ -101,13 +101,13 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Gets whether substring scope controls are visible.
         /// </summary>
         [ObservableProperty]
-        private bool _isSubstringScope;
+        private bool _showSubstringOptions;
 
         /// <summary>
         /// Gets whether token scope controls are visible.
         /// </summary>
         [ObservableProperty]
-        private bool _isTokenScope;
+        private bool _showTokenOptions;
 
         /// <summary>
         /// Gets or sets the substring start position (1-based inclusive).
@@ -156,18 +156,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             return ScopeMode switch
             {
                 FilterApplyScopeMode.Whole => null,
-                FilterApplyScopeMode.Substring
-                    => new SubstringApplyScope(
-                        StartPosition: Math.Max(1, (int)SubstringStartPosition),
-                        StartAnchor: SubstringStartAnchorOption.Anchor,
-                        EndPosition: Math.Max(1, (int)SubstringEndPosition),
-                        EndAnchor: SubstringEndAnchorOption.Anchor
-                    ),
-                FilterApplyScopeMode.Token
-                    => new TokenApplyScope(
-                        Separator: TokenSeparator,
-                        TokenNumber: Math.Max(1, (int)TokenNumber)
-                    ),
+                FilterApplyScopeMode.Substring => new SubstringApplyScope(
+                    StartPosition: Math.Max(1, (int)SubstringStartPosition),
+                    StartAnchor: SubstringStartAnchorOption.Anchor,
+                    EndPosition: Math.Max(1, (int)SubstringEndPosition),
+                    EndAnchor: SubstringEndAnchorOption.Anchor
+                ),
+                FilterApplyScopeMode.Token => new TokenApplyScope(
+                    Separator: TokenSeparator,
+                    TokenNumber: Math.Max(1, (int)TokenNumber)
+                ),
                 _ => null,
             };
         }
@@ -285,8 +283,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
         private void _UpdateScopeVisibility(FilterApplyScopeMode mode)
         {
-            IsSubstringScope = mode == FilterApplyScopeMode.Substring;
-            IsTokenScope = mode == FilterApplyScopeMode.Token;
+            ShowSubstringOptions = mode == FilterApplyScopeMode.Substring;
+            ShowTokenOptions = mode == FilterApplyScopeMode.Token;
         }
     }
 }

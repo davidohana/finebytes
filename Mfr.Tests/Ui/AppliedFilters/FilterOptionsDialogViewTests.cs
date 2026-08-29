@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
@@ -64,7 +65,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies the token-number spinner shows its value and stacked buttons.
+        /// Verifies the token-number spinner, left-aligned labels, and aligned fields.
         /// </summary>
         [AvaloniaFact]
         public void Token_number_spinner_shows_value()
@@ -74,9 +75,37 @@ namespace Mfr.Tests.Ui.AppliedFilters
             try
             {
                 var spinner = dialog.FindControl<CompactNumericUpDown>("TokenNumberSpinner");
+                var separatorBox = dialog.FindControl<TextBox>("TokenSeparatorBox");
                 Assert.NotNull(spinner);
+                Assert.NotNull(separatorBox);
                 Assert.True(spinner.IsVisible);
                 CompactNumericUpDownAssert.ShowsStackedValue(spinner, expectedText: "1");
+
+                var title = dialog
+                    .GetVisualDescendants()
+                    .OfType<TextBlock>()
+                    .Single(block => block.IsVisible && block.Text == "Token");
+                var separatorLabel = dialog
+                    .GetVisualDescendants()
+                    .OfType<TextBlock>()
+                    .Single(block => block.IsVisible && block.Text == "Separator:");
+                var tokenNumberLabel = dialog
+                    .GetVisualDescendants()
+                    .OfType<TextBlock>()
+                    .Single(block => block.IsVisible && block.Text == "Token number:");
+
+                Assert.Equal(TextAlignment.Left, separatorLabel.TextAlignment);
+                Assert.Equal(TextAlignment.Left, tokenNumberLabel.TextAlignment);
+
+                var titleX = title.TranslatePoint(default, dialog)!.Value.X;
+                var separatorLabelX = separatorLabel.TranslatePoint(default, dialog)!.Value.X;
+                var tokenNumberLabelX = tokenNumberLabel.TranslatePoint(default, dialog)!.Value.X;
+                Assert.Equal(titleX, separatorLabelX);
+                Assert.Equal(titleX, tokenNumberLabelX);
+
+                var separatorBoxX = separatorBox.TranslatePoint(default, dialog)!.Value.X;
+                var spinnerX = spinner.TranslatePoint(default, dialog)!.Value.X;
+                Assert.Equal(separatorBoxX, spinnerX);
             }
             finally
             {

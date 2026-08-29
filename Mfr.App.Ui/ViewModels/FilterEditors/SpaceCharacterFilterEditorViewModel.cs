@@ -30,6 +30,51 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         private SpaceCharacterDefinition _definition;
 
         /// <summary>
+        /// Gets or sets whether the space-character definition is selected.
+        /// </summary>
+        public bool IsDefinitionSpace
+        {
+            get => Definition == SpaceCharacterDefinition.Space;
+            set
+            {
+                if (value)
+                {
+                    Definition = SpaceCharacterDefinition.Space;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the underscore definition is selected.
+        /// </summary>
+        public bool IsDefinitionUnderscore
+        {
+            get => Definition == SpaceCharacterDefinition.Underscore;
+            set
+            {
+                if (value)
+                {
+                    Definition = SpaceCharacterDefinition.Underscore;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the custom-character definition is selected.
+        /// </summary>
+        public bool IsDefinitionOther
+        {
+            get => Definition == SpaceCharacterDefinition.Other;
+            set
+            {
+                if (value)
+                {
+                    Definition = SpaceCharacterDefinition.Other;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the custom separator character when <see cref="Definition"/> is <see cref="SpaceCharacterDefinition.Other"/>.
         /// </summary>
         [ObservableProperty]
@@ -72,7 +117,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 return;
             }
 
-            _ApplyOptions();
+            OnPropertyChanged(nameof(IsDefinitionSpace));
+            OnPropertyChanged(nameof(IsDefinitionUnderscore));
+            OnPropertyChanged(nameof(IsDefinitionOther));
+            _TryApplyOptions();
         }
 
         partial void OnOtherCharacterChanged(string value)
@@ -88,48 +136,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 return;
             }
 
-            _ApplyOptions();
+            _TryApplyOptions();
         }
 
-        partial void OnReplaceSpacesChanged(bool value)
-        {
-            if (_isSyncing)
-            {
-                return;
-            }
+        partial void OnReplaceSpacesChanged(bool value) => _TryApplyOptions();
 
-            _ApplyOptions();
-        }
+        partial void OnReplaceUnderscoresChanged(bool value) => _TryApplyOptions();
 
-        partial void OnReplaceUnderscoresChanged(bool value)
-        {
-            if (_isSyncing)
-            {
-                return;
-            }
+        partial void OnReplacePercent20Changed(bool value) => _TryApplyOptions();
 
-            _ApplyOptions();
-        }
-
-        partial void OnReplacePercent20Changed(bool value)
-        {
-            if (_isSyncing)
-            {
-                return;
-            }
-
-            _ApplyOptions();
-        }
-
-        partial void OnReplaceCustomChanged(bool value)
-        {
-            if (_isSyncing)
-            {
-                return;
-            }
-
-            _ApplyOptions();
-        }
+        partial void OnReplaceCustomChanged(bool value) => _TryApplyOptions();
 
         partial void OnCustomTextChanged(string value)
         {
@@ -144,7 +160,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 return;
             }
 
-            _ApplyOptions();
+            _TryApplyOptions();
         }
 
         private void _SyncFromFilter(SpaceCharacterFilter filter)
@@ -166,7 +182,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             }
         }
 
-        private void _ApplyOptions()
+        private void _TryApplyOptions()
         {
             if (_isSyncing || Step.Filter is not SpaceCharacterFilter filter)
             {
@@ -180,13 +196,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 ReplacePercent20: ReplacePercent20,
                 CustomText: ReplaceCustom ? CustomText : string.Empty
             );
-
-            if (filter.Options == options)
-            {
-                return;
-            }
-
-            Step.SetFilter(filter with { Options = options });
+            ApplyIfChanged(filter, filter with { Options = options });
         }
 
         private char _ResolveSpaceCharacter()

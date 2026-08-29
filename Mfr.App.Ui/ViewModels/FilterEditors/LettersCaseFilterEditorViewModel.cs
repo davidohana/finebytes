@@ -91,13 +91,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
             var skipWords = _ParseSkipWords(SkipWordsText);
             var options = filter.Options with { Mode = SelectedMode.Mode, SkipWords = skipWords };
-
-            if (filter.Options == options)
-            {
-                return;
-            }
-
-            Step.SetFilter(filter with { Options = options });
+            ApplyIfChanged(filter, filter with { Options = options });
         }
 
         private static IReadOnlyList<string> _ParseSkipWords(string text)

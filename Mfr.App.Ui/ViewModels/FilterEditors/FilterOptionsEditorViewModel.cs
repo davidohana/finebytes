@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors
 {
@@ -21,5 +22,20 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// Gets the applied list row being edited.
         /// </summary>
         protected AppliedFilterStepViewModel Step { get; }
+
+        /// <summary>
+        /// Replaces the step filter when <paramref name="updated"/> differs from <paramref name="current"/>.
+        /// </summary>
+        /// <param name="current">Filter currently stored on the step.</param>
+        /// <param name="updated">Candidate replacement.</param>
+        protected void ApplyIfChanged(BaseFilter current, BaseFilter updated)
+        {
+            if (Equals(current, updated))
+            {
+                return;
+            }
+
+            Step.SetFilter(updated);
+        }
     }
 }

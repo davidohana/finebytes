@@ -20,20 +20,20 @@
             x:Name="SpaceDefinitionRadio"
             GroupName="SpaceCharacterDefinition"
             Content="Space"
-            Checked="_OnDefinitionRadioChecked"
+            IsChecked="{Binding IsDefinitionSpace, Mode=TwoWay}"
           />
           <RadioButton
             x:Name="UnderscoreDefinitionRadio"
             GroupName="SpaceCharacterDefinition"
             Content="Underscore ( _ )"
-            Checked="_OnDefinitionRadioChecked"
+            IsChecked="{Binding IsDefinitionUnderscore, Mode=TwoWay}"
           />
           <StackPanel Orientation="Horizontal" Spacing="4">
             <RadioButton
               x:Name="OtherDefinitionRadio"
               GroupName="SpaceCharacterDefinition"
               Content="Other:"
-              Checked="_OnDefinitionRadioChecked"
+              IsChecked="{Binding IsDefinitionOther, Mode=TwoWay}"
             />
             <TextBox x:Name="OtherCharacterBox" Width="28" MaxLength="1" Text="{Binding OtherCharacter}" />
           </StackPanel>

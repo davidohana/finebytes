@@ -20,7 +20,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             DisplayName = displayName;
             Filter = filter;
-            ApplyToLabel = FilterTargetLabels.GetApplyToLabel(filter);
+            ApplyToLabel = FilterTargetCatalog.GetApplyToLabel(filter);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             ArgumentNullException.ThrowIfNull(filter);
             Filter = filter;
-            ApplyToLabel = FilterTargetLabels.GetApplyToLabel(filter);
+            ApplyToLabel = FilterTargetCatalog.GetApplyToLabel(filter);
         }
 
         /// <summary>

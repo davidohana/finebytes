@@ -62,6 +62,22 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Reads the Apply-To subtitle from an Applied Filters list row.
+        /// </summary>
+        /// <param name="list">Applied Filters list.</param>
+        /// <param name="rowIndex">Zero-based row index.</param>
+        /// <returns>Subtitle text.</returns>
+        public static string RowApplyToLabel(ListBox list, int rowIndex)
+        {
+            var container = list.ContainerFromIndex(rowIndex) as Visual;
+            Assert.NotNull(container);
+
+            var textBlocks = container.GetVisualDescendants().OfType<TextBlock>().ToList();
+            Assert.True(textBlocks.Count > 1);
+            return textBlocks[1].Text ?? string.Empty;
+        }
+
+        /// <summary>
         /// Raises a tunneled key-down on <paramref name="control"/>.
         /// </summary>
         /// <param name="control">Target control.</param>

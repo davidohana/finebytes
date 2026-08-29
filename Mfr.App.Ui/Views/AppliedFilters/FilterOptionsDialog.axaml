@@ -23,7 +23,7 @@
       <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
       <Setter Property="Margin" Value="0,0,10,0" />
       <Setter Property="HorizontalAlignment" Value="Stretch" />
-      <Setter Property="TextAlignment" Value="Right" />
+      <Setter Property="TextAlignment" Value="Left" />
       <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="TextWrapping" Value="NoWrap" />
     </Style>
@@ -48,7 +48,6 @@
       <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Margin" Value="0,0,0,6" />
     </Style>
     <Style Selector="Border.filter-options-group">
       <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
@@ -161,7 +160,7 @@
             <ColumnDefinition Width="6" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-options-label" Text="Apply To:" />
+          <TextBlock Classes="filter-options-label" Text="Apply to:" />
           <ComboBox
             Grid.Column="1"
             Classes="filter-options-field"
@@ -234,12 +233,12 @@
           </StackPanel>
         </Grid>
 
-        <Border Classes="filter-options-group" IsVisible="{Binding IsSubstringScope}">
-          <StackPanel>
+        <Border Classes="filter-options-group" IsVisible="{Binding ShowSubstringOptions}">
+          <StackPanel Spacing="8">
             <TextBlock Classes="filter-options-group-title" Text="Substring" />
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -303,20 +302,25 @@
           </StackPanel>
         </Border>
 
-        <Border Classes="filter-options-group" IsVisible="{Binding IsTokenScope}">
+        <Border Classes="filter-options-group" IsVisible="{Binding ShowTokenOptions}">
           <StackPanel Spacing="8">
             <TextBlock Classes="filter-options-group-title" Text="Token" />
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
                 <ColumnDefinition Width="*" />
               </Grid.ColumnDefinitions>
               <TextBlock Classes="filter-options-label" Text="Separator:" />
-              <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding TokenSeparator}" />
+              <TextBox
+                x:Name="TokenSeparatorBox"
+                Grid.Column="1"
+                Classes="filter-options-field"
+                Text="{Binding TokenSeparator}"
+              />
             </Grid>
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
               <TextBlock Classes="filter-options-label" Text="Token number:" />

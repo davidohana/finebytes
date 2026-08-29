@@ -25,9 +25,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal(2, list.ItemCount);
             Assert.Equal("Shrink Spaces", _RowDisplayName(list, 0));
-            Assert.Equal("File Prefix", _RowApplyToLabel(list, 0));
+            Assert.Equal("File Prefix", AppliedFiltersTestUi.RowApplyToLabel(list, 0));
             Assert.Equal("Letters Case", _RowDisplayName(list, 1));
-            Assert.Equal("File Prefix", _RowApplyToLabel(list, 1));
+            Assert.Equal("File Prefix", AppliedFiltersTestUi.RowApplyToLabel(list, 1));
             Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
             Assert.Single(list.Selection.SelectedIndexes);
 
@@ -88,11 +88,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
         private static string _RowDisplayName(ListBox list, int rowIndex)
         {
             return _RowTextBlock(list, rowIndex, blockIndex: 0);
-        }
-
-        private static string _RowApplyToLabel(ListBox list, int rowIndex)
-        {
-            return _RowTextBlock(list, rowIndex, blockIndex: 1);
         }
 
         private static string _RowTextBlock(ListBox list, int rowIndex, int blockIndex)

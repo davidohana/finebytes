@@ -1,11 +1,8 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
-using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.AppliedFilters;
@@ -82,39 +79,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Filter Options updates the Applied list Apply-To subtitle.
-        /// </summary>
-        [AvaloniaFact]
-        public void Filter_options_updates_applied_list_subtitle()
-        {
-            var (window, mainViewModel, _) = _ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var list = _AppliedList(window);
-            Assert.Equal("File Prefix", _RowApplyToLabel(list, 0));
-
-            var dialogVm = new FilterOptionsDialogViewModel(mainViewModel.AppliedFiltersViewModel.Steps[0]);
-            dialogVm.SelectedTargetGroup = FilterTargetCatalog.Groups[0];
-            dialogVm.SelectedTargetOption = FilterTargetCatalog.Groups[0].Targets[2];
-            var dialog = new FilterOptionsDialog(dialogVm);
-            dialog.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            dialog.Close(true);
-            mainViewModel.AppliedFiltersViewModel.ApplyFilterOptions(dialogVm);
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            Assert.Equal("Full File Name", mainViewModel.AppliedFiltersViewModel.Steps[0].ApplyToLabel);
-            Assert.Equal("Full File Name", _RowApplyToLabel(list, 0));
-
-            window.Close();
-        }
-
-        /// <summary>
         /// Verifies optionless filters do not load an options editor template.
         /// </summary>
         [AvaloniaFact]
@@ -184,6 +148,57 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies Space Character definition radios persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Space_character_definition_radio_updates_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<SpaceCharacterFilterEditorView>().Single();
+            var radio = editor.FindControl<RadioButton>("UnderscoreDefinitionRadio");
+            Assert.NotNull(radio);
+            Assert.False(radio.IsChecked);
+            radio.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (SpaceCharacterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal('_', filter.Options.SpaceCharacter);
+            Assert.True(radio.IsChecked);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Letters Case skip-words edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Letters_case_skip_words_box_updates_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<LettersCaseFilterEditorView>().Single();
+            var skipWords = editor.FindControl<TextBox>("SkipWordsBox");
+            Assert.NotNull(skipWords);
+            Assert.True(skipWords.IsVisible);
+            skipWords.Text = "a, the";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (LettersCaseFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(["a", "the"], filter.Options.SkipWords);
+
+            window.Close();
+        }
+
         private static (
             Window Window,
             MainWindowViewModel MainViewModel,
@@ -241,16 +256,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var slot = editorView.FindControl<ContentControl>("OptionsEditorSlot");
             Assert.NotNull(slot);
             return slot;
-        }
-
-        private static string _RowApplyToLabel(ListBox list, int rowIndex)
-        {
-            var container = list.ContainerFromIndex(rowIndex) as Visual;
-            Assert.NotNull(container);
-
-            var textBlocks = container.GetVisualDescendants().OfType<TextBlock>().ToList();
-            Assert.True(textBlocks.Count > 1);
-            return textBlocks[1].Text ?? string.Empty;
         }
     }
 }

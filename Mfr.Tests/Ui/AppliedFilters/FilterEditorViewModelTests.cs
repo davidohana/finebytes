@@ -1,4 +1,3 @@
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.Filters.Space;

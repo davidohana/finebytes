@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Space;
-using Mfr.Models.Filters;
 using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Ui.AppliedFilters
@@ -31,10 +30,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Dialog_hides_apply_to_for_non_string_filters()
         {
-            var step = new AppliedFilterStepViewModel(
-                "Audio Tag Remover",
-                new Filters.Audio.TagRemoverFilter()
-            );
+            var step = new AppliedFilterStepViewModel("Audio Tag Remover", new Filters.Audio.TagRemoverFilter());
             var dialog = new FilterOptionsDialogViewModel(step);
 
             Assert.False(dialog.HasApplyTo);
@@ -49,9 +45,11 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new AppliedFiltersViewModel();
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
-            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
-            dialog.SelectedTargetGroup = FilterTargetCatalog.Groups[0];
-            dialog.SelectedTargetOption = FilterTargetCatalog.Groups[0].Targets[1];
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
+            {
+                SelectedTargetGroup = FilterTargetCatalog.Groups[0],
+                SelectedTargetOption = FilterTargetCatalog.Groups[0].Targets[1]
+            };
 
             applied.ApplyFilterOptions(dialog);
 
@@ -126,6 +124,76 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(StringScopeAnchor.Right, scope.StartAnchor);
             Assert.Equal(4, scope.EndPosition);
             Assert.Equal(StringScopeAnchor.Left, scope.EndAnchor);
+        }
+
+        /// <summary>
+        /// Verifies token apply scope round-trips through Filter Options.
+        /// </summary>
+        [Fact]
+        public void ApplyFilterOptions_updates_token_apply_scope()
+        {
+            var applied = new AppliedFiltersViewModel();
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
+            {
+                ScopeMode = FilterApplyScopeMode.Token,
+                TokenSeparator = "-",
+                TokenNumber = 2,
+            };
+
+            applied.ApplyFilterOptions(dialog);
+
+            Assert.Equal("File Prefix (Token)", applied.Steps[0].ApplyToLabel);
+            var filter = (ShrinkSpacesFilter)applied.ToChain().Steps[0].Filter;
+            var scope = Assert.IsType<TokenApplyScope>(filter.ApplyScope);
+            Assert.Equal("-", scope.Separator);
+            Assert.Equal(2, scope.TokenNumber);
+        }
+
+        /// <summary>
+        /// Verifies ancestor-folder level 1 uses the Parent Folder list subtitle.
+        /// </summary>
+        [Fact]
+        public void ApplyFilterOptions_ancestor_level_1_uses_parent_folder_label()
+        {
+            var applied = new AppliedFiltersViewModel();
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
+            var pathGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Path");
+            var ancestorOption = pathGroup.Targets.First(option => option.Kind == FilterTargetKind.AncestorFolder);
+            dialog.SelectedTargetGroup = pathGroup;
+            dialog.SelectedTargetOption = ancestorOption;
+            dialog.AncestorFolderLevel = 1;
+
+            applied.ApplyFilterOptions(dialog);
+
+            Assert.Equal("Parent Folder", applied.Steps[0].ApplyToLabel);
+            var filter = (ShrinkSpacesFilter)applied.ToChain().Steps[0].Filter;
+            var target = Assert.IsType<AncestorFolderTarget>(filter.Target);
+            Assert.Equal(1, target.Level);
+        }
+
+        /// <summary>
+        /// Verifies ancestor-folder level is written onto the step target.
+        /// </summary>
+        [Fact]
+        public void ApplyFilterOptions_updates_ancestor_folder_level()
+        {
+            var applied = new AppliedFiltersViewModel();
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
+            var pathGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Path");
+            var ancestorOption = pathGroup.Targets.First(option => option.Kind == FilterTargetKind.AncestorFolder);
+            dialog.SelectedTargetGroup = pathGroup;
+            dialog.SelectedTargetOption = ancestorOption;
+            dialog.AncestorFolderLevel = 3;
+
+            applied.ApplyFilterOptions(dialog);
+
+            Assert.Equal("Ancestor Folder (3)", applied.Steps[0].ApplyToLabel);
+            var filter = (ShrinkSpacesFilter)applied.ToChain().Steps[0].Filter;
+            var target = Assert.IsType<AncestorFolderTarget>(filter.Target);
+            Assert.Equal(3, target.Level);
         }
     }
 }

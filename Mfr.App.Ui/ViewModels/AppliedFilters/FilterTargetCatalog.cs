@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Models.Filters;
 using Mfr.Models.Tags;
 
@@ -26,16 +27,13 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             ]
         );
 
-        private static readonly FilterTargetGroupOption _audioTagGroup = new(
-            "Audio Tag",
-            _BuildSemanticAudioOptions()
-        );
+        private static readonly FilterTargetGroupOption _audioTagGroup = new("Audio Tag", _BuildSemanticAudioOptions());
 
         /// <summary>
         /// Gets Apply-To groups shown in Filter Options.
         /// </summary>
         public static IReadOnlyList<FilterTargetGroupOption> Groups { get; } =
-            [_fileNameGroup, _pathGroup, _audioTagGroup];
+        [_fileNameGroup, _pathGroup, _audioTagGroup];
 
         /// <summary>
         /// Resolves the catalog entry for <paramref name="target"/>.
@@ -48,47 +46,81 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             ArgumentNullException.ThrowIfNull(target);
 
-            if (target is AncestorFolderTarget ancestor)
+            var entry = _FindEntry(target);
+            if (entry is null)
             {
-                var option = _pathGroup.Targets.First(static entry => entry.Kind == FilterTargetKind.AncestorFolder);
-                return (_pathGroup, option, ancestor.Level);
+                return (_fileNameGroup, _fileNameGroup.Targets[0], 1);
             }
 
+            var ancestorFolderLevel = target is AncestorFolderTarget ancestor ? ancestor.Level : 1;
+            return (entry.Value.Group, entry.Value.Option, ancestorFolderLevel);
+        }
+
+        /// <summary>
+        /// Finds the catalog group and option for <paramref name="target"/>.
+        /// </summary>
+        /// <param name="target">Current filter target.</param>
+        /// <returns>Matching catalog entry, or <see langword="null"/> when the target is not in the catalog.</returns>
+        private static (FilterTargetGroupOption Group, FilterTargetOption Option)? _FindEntry(FilterTarget target)
+        {
             foreach (var group in Groups)
             {
                 foreach (var option in group.Targets)
                 {
-                    if (option.Matches(target, ancestorFolderLevel: 1))
+                    if (option.Matches(target))
                     {
-                        return (group, option, 1);
+                        return (group, option);
                     }
                 }
             }
 
-            return (_fileNameGroup, _fileNameGroup.Targets[0], 1);
+            return null;
         }
 
         /// <summary>
-        /// Gets the Applied-list subtitle for <paramref name="target"/>.
+        /// Gets the Applied-list subtitle for <paramref name="filter"/>.
+        /// </summary>
+        /// <param name="filter">Applied filter instance.</param>
+        /// <returns>Subtitle text for string-target filters; otherwise an empty string.</returns>
+        public static string GetApplyToLabel(BaseFilter filter)
+        {
+            ArgumentNullException.ThrowIfNull(filter);
+
+            if (filter is not StringTargetFilter stringFilter)
+            {
+                return string.Empty;
+            }
+
+            var label = GetLabel(stringFilter.Target);
+            if (string.IsNullOrEmpty(label))
+            {
+                return string.Empty;
+            }
+
+            return stringFilter.ApplyScope switch
+            {
+                SubstringApplyScope => $"{label} (Substring)",
+                TokenApplyScope => $"{label} (Token)",
+                _ => label,
+            };
+        }
+
+        /// <summary>
+        /// Gets the Apply-To display text for <paramref name="target"/>.
         /// </summary>
         /// <param name="target">Filter target instance.</param>
-        /// <returns>Human-readable Apply-To label.</returns>
+        /// <returns>Human-readable target label.</returns>
         public static string GetLabel(FilterTarget target)
         {
             ArgumentNullException.ThrowIfNull(target);
 
-            return target switch
+            if (target is AncestorFolderTarget ancestor)
             {
-                FilePrefixTarget => "File Prefix",
-                FileExtensionTarget => "Extension",
-                FileFullNameTarget => "Full File Name",
-                FullPathTarget => "Full Path",
-                ParentDirectoryTarget => "Parent Directory",
-                AncestorFolderTarget ancestor
-                    => ancestor.Level == 1 ? "Parent Folder" : $"Ancestor Folder ({ancestor.Level})",
-                SemanticAudioFieldTarget semantic => _GetSemanticAudioLabel(semantic.Field),
-                _ => string.Empty,
-            };
+                return ancestor.Level == 1 ? "Parent Folder" : $"Ancestor Folder ({ancestor.Level})";
+            }
+
+            var entry = _FindEntry(target);
+            return entry?.Option.Label ?? string.Empty;
         }
 
         private static IReadOnlyList<FilterTargetOption> _BuildSemanticAudioOptions()
@@ -96,7 +128,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             return
             [
                 .. Enum.GetValues<SemanticAudioField>()
-                    .Select(field => new FilterTargetOption(_GetSemanticAudioLabel(field), FilterTargetKind.SemanticAudio, field)),
+                    .Select(field => new FilterTargetOption(
+                        _GetSemanticAudioLabel(field),
+                        FilterTargetKind.SemanticAudio,
+                        field
+                    )),
             ];
         }
 

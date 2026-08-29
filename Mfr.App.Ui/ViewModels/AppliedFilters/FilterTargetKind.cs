@@ -43,11 +43,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
     /// <param name="Label">Target display text.</param>
     /// <param name="Kind">Target kind written onto the selected step.</param>
     /// <param name="AudioField">Semantic audio field when <paramref name="Kind"/> is <see cref="FilterTargetKind.SemanticAudio"/>.</param>
-    public sealed record FilterTargetOption(
-        string Label,
-        FilterTargetKind Kind,
-        SemanticAudioField? AudioField = null
-    )
+    public sealed record FilterTargetOption(string Label, FilterTargetKind Kind, SemanticAudioField? AudioField = null)
     {
         /// <summary>
         /// Builds a <see cref="FilterTarget"/> from this option and optional ancestor level.
@@ -73,9 +69,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Returns whether this option matches <paramref name="target"/>.
         /// </summary>
         /// <param name="target">Current filter target.</param>
-        /// <param name="ancestorFolderLevel">Current ancestor level when relevant.</param>
         /// <returns><see langword="true"/> when this option represents <paramref name="target"/>.</returns>
-        public bool Matches(FilterTarget target, int ancestorFolderLevel)
+        public bool Matches(FilterTarget target)
         {
             ArgumentNullException.ThrowIfNull(target);
 
@@ -86,10 +81,9 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 FilterTargetKind.FileFullName => target is FileFullNameTarget,
                 FilterTargetKind.FullPath => target is FullPathTarget,
                 FilterTargetKind.ParentDirectory => target is ParentDirectoryTarget,
-                FilterTargetKind.AncestorFolder
-                    => target is AncestorFolderTarget ancestor && ancestor.Level == Math.Max(1, ancestorFolderLevel),
-                FilterTargetKind.SemanticAudio
-                    => target is SemanticAudioFieldTarget semantic && semantic.Field == AudioField,
+                FilterTargetKind.AncestorFolder => target is AncestorFolderTarget,
+                FilterTargetKind.SemanticAudio => target is SemanticAudioFieldTarget semantic
+                    && semantic.Field == AudioField,
                 _ => false,
             };
         }
