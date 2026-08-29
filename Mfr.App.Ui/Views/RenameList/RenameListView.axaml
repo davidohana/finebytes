@@ -346,6 +346,13 @@
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AutoSort.png" />
         </ToggleButton>
+        <Button
+          Classes="rename-list-action"
+          Command="{Binding RefreshCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.Refresh}"
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Refresh.png" />
+        </Button>
       </StackPanel>
       <DataGrid
         x:Name="RenameGrid"
