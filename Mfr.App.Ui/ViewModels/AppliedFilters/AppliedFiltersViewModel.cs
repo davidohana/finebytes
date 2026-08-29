@@ -60,20 +60,25 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Appends a catalog filter with palette defaults.
+        /// Inserts a catalog filter at the current selection (MFR7 insert-before-selected).
         /// </summary>
         /// <param name="entry">Catalog row to add.</param>
         [RelayCommand]
         public void Add(FilterCatalogEntry entry)
         {
             ArgumentNullException.ThrowIfNull(entry);
+            _InsertStep(entry, _GetInsertIndex());
+        }
 
-            var filter = FilterCatalog.CreateDefault(entry);
-            var displayName = _GenerateDisplayName(entry);
-            var step = new AppliedFilterStepViewModel(displayName, filter);
-            var insertIndex = _GetInsertIndex();
-            Steps.Insert(insertIndex, step);
-            SetSelectedSteps([step]);
+        /// <summary>
+        /// Appends a catalog filter from the palette with defaults.
+        /// </summary>
+        /// <param name="entry">Catalog row to add.</param>
+        [RelayCommand]
+        public void Append(FilterCatalogEntry entry)
+        {
+            ArgumentNullException.ThrowIfNull(entry);
+            _InsertStep(entry, Steps.Count);
         }
 
         /// <summary>
@@ -151,6 +156,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             OnPropertyChanged(nameof(Count));
             ClearCommand.NotifyCanExecuteChanged();
             _NotifySelectionCommandsChanged();
+        }
+
+        private void _InsertStep(FilterCatalogEntry entry, int insertIndex)
+        {
+            var filter = FilterCatalog.CreateDefault(entry);
+            var displayName = _GenerateDisplayName(entry);
+            var step = new AppliedFilterStepViewModel(displayName, filter);
+            insertIndex = Math.Clamp(insertIndex, 0, Steps.Count);
+            Steps.Insert(insertIndex, step);
+            SetSelectedSteps([step]);
         }
 
         private int _GetInsertIndex()

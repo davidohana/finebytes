@@ -117,6 +117,7 @@
         ItemsSource="{Binding VisibleFilters}"
         SelectedItem="{Binding SelectedFilter}"
         KeyDown="_OnFilterListKeyDown"
+        DoubleTapped="_OnFilterListDoubleTapped"
       >
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="filters:FilterCatalogEntry">

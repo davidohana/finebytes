@@ -163,6 +163,24 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(string.Empty, viewModel.Steps[0].ApplyToLabel);
         }
 
+        /// <summary>
+        /// Verifies append always adds at the end even when another row is selected.
+        /// </summary>
+        [Fact]
+        public void Append_Adds_At_End_Even_With_Selection()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            var shrinkSpaces = _Entry("ShrinkSpaces");
+            var lettersCase = _Entry("LettersCase");
+
+            viewModel.AddCommand.Execute(shrinkSpaces);
+            viewModel.SetSelectedSteps([viewModel.Steps[0]]);
+            viewModel.AppendCommand.Execute(lettersCase);
+
+            Assert.Equal(["Shrink Spaces", "Letters Case"], viewModel.Steps.Select(step => step.DisplayName));
+            Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
+        }
+
         private static FilterCatalogEntry _Entry(string type)
         {
             return FilterCatalog.Entries.Single(entry => entry.Type == type);

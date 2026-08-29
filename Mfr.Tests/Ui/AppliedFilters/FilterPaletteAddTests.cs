@@ -1,0 +1,140 @@
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
+using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.FilterPalette;
+using Mfr.Filters;
+
+namespace Mfr.Tests.Ui.AppliedFilters
+{
+    /// <summary>
+    /// Headless tests for adding filters from Available to Applied.
+    /// </summary>
+    public sealed class FilterPaletteAddTests
+    {
+        /// <summary>
+        /// Verifies Enter on the Available list appends the selected catalog row.
+        /// </summary>
+        [AvaloniaFact]
+        public void Enter_on_available_list_appends_selected_filter()
+        {
+            var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
+            var shrinkSpaces = _Entry("ShrinkSpaces");
+            _SelectPaletteEntry(paletteList, shrinkSpaces);
+
+            _PressKeyOnControl(paletteList, Key.Enter);
+
+            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
+            Assert.Equal("Shrink Spaces", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+            Assert.Equal(1, appliedView.FindControl<ListBox>("AppliedFiltersList")!.ItemCount);
+            Assert.Equal(1, mainViewModel.FilterCount);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies double-click on the Available list appends the selected catalog row.
+        /// </summary>
+        [AvaloniaFact]
+        public void Double_click_on_available_list_appends_selected_filter()
+        {
+            var (window, mainViewModel, paletteList, _) = _ShowFilterPanes();
+            var lettersCase = _Entry("LettersCase");
+            _SelectPaletteEntry(paletteList, lettersCase);
+
+            paletteList.RaiseEvent(new RoutedEventArgs(InputElement.DoubleTappedEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
+            Assert.Equal("Letters Case", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the Applied Filters add button appends the palette selection.
+        /// </summary>
+        [AvaloniaFact]
+        public void Applied_add_button_appends_palette_selection()
+        {
+            var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
+            var shrinkSpaces = _Entry("ShrinkSpaces");
+            _SelectPaletteEntry(paletteList, shrinkSpaces);
+
+            var addButton = appliedView.FindControl<Button>("AddFromPaletteButton");
+            Assert.NotNull(addButton);
+            Assert.NotNull(addButton.Command);
+            Assert.True(addButton.Command.CanExecute(null));
+            addButton.Command.Execute(null);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
+            Assert.Equal("Shrink Spaces", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+
+            window.Close();
+        }
+
+        private static (
+            Window Window,
+            MainWindowViewModel MainViewModel,
+            ListBox PaletteList,
+            AppliedFiltersView AppliedView
+        ) _ShowFilterPanes()
+        {
+            var mainViewModel = new MainWindowViewModel();
+            var paletteView = new FilterPaletteView
+            {
+                DataContext = mainViewModel.FilterPaletteViewModel,
+                AddSelectedToAppliedCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
+            };
+            var appliedView = new AppliedFiltersView
+            {
+                DataContext = mainViewModel.AppliedFiltersViewModel,
+                AddFromPaletteCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
+            };
+
+            var grid = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitions("*,*"),
+                Children = { paletteView, appliedView },
+            };
+            Grid.SetColumn(appliedView, 1);
+
+            var window = new Window
+            {
+                Width = 560,
+                Height = 320,
+                Content = grid,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var paletteList = paletteView.FindControl<ListBox>("FilterList");
+            Assert.NotNull(paletteList);
+            return (window, mainViewModel, paletteList, appliedView);
+        }
+
+        private static void _SelectPaletteEntry(ListBox paletteList, FilterCatalogEntry entry)
+        {
+            paletteList.SelectedItem = entry;
+            paletteList.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(entry, paletteList.SelectedItem);
+        }
+
+        private static void _PressKeyOnControl(Control control, Key key)
+        {
+            control.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = key });
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        private static FilterCatalogEntry _Entry(string type)
+        {
+            return FilterCatalog.Entries.Single(entry => entry.Type == type);
+        }
+    }
+}

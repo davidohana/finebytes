@@ -416,7 +416,11 @@
               <ColumnDefinition Width="6" />
               <ColumnDefinition Width="*" MinWidth="120" />
             </Grid.ColumnDefinitions>
-            <filterpaletteviews:FilterPaletteView Grid.Column="0" DataContext="{Binding FilterPaletteViewModel}" />
+            <filterpaletteviews:FilterPaletteView
+              Grid.Column="0"
+              DataContext="{Binding FilterPaletteViewModel}"
+              AddSelectedToAppliedCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AddSelectedFilterFromPaletteCommand}"
+            />
             <views:PaneSplitter
               x:Name="AvailableAppliedSplitter"
               Grid.Column="1"
@@ -425,7 +429,11 @@
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
             />
-            <appliedfiltersviews:AppliedFiltersView Grid.Column="2" DataContext="{Binding AppliedFiltersViewModel}" />
+            <appliedfiltersviews:AppliedFiltersView
+              Grid.Column="2"
+              DataContext="{Binding AppliedFiltersViewModel}"
+              AddFromPaletteCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AddSelectedFilterFromPaletteCommand}"
+            />
           </Grid>
           <views:PaneSplitter
             x:Name="FilterEditorSplitter"

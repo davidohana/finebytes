@@ -47,6 +47,7 @@ namespace Mfr.App.Ui.ViewModels
 
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
             AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
+            FilterPaletteViewModel.PropertyChanged += _OnFilterPalettePropertyChanged;
             ItemCount = RenameListViewModel.ItemCount;
             FilterCount = AppliedFiltersViewModel.Count;
             WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
@@ -137,6 +138,21 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
+        /// Appends the selected Available Filters row to the Applied list.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanAddSelectedFilterFromPalette))]
+        public void AddSelectedFilterFromPalette()
+        {
+            var entry = FilterPaletteViewModel.SelectedFilter;
+            if (entry is null)
+            {
+                return;
+            }
+
+            AppliedFiltersViewModel.AppendCommand.Execute(entry);
+        }
+
+        /// <summary>
         /// Applies pending rename changes. Disabled until preview/GO is implemented.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanExecuteUnimplemented))]
@@ -208,6 +224,19 @@ namespace Mfr.App.Ui.ViewModels
             {
                 FilterCount = AppliedFiltersViewModel.Count;
             }
+        }
+
+        private void _OnFilterPalettePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(FilterPaletteViewModel.SelectedFilter))
+            {
+                AddSelectedFilterFromPaletteCommand.NotifyCanExecuteChanged();
+            }
+        }
+
+        private bool _CanAddSelectedFilterFromPalette()
+        {
+            return FilterPaletteViewModel.SelectedFilter is not null;
         }
 
         /// <summary>

@@ -78,7 +78,12 @@
       <TextBlock DockPanel.Dock="Top" Classes="pane-header" Text="Applied Filters" />
       <Grid ColumnDefinitions="28,*">
         <StackPanel Grid.Column="0" Margin="2,4,0,4" VerticalAlignment="Top">
-          <Button Classes="applied-filter-toolbar" ToolTip.Tip="Add selected filter" IsEnabled="False">
+          <Button
+            x:Name="AddFromPaletteButton"
+            Classes="applied-filter-toolbar"
+            ToolTip.Tip="Add selected filter"
+            Command="{Binding AddFromPaletteCommand, ElementName=AppliedFiltersRoot}"
+          >
             <Image Width="16" Height="16" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
           </Button>
           <Button Classes="applied-filter-toolbar" ToolTip.Tip="Remove selected filter" IsEnabled="False">
