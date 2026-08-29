@@ -22,6 +22,12 @@ namespace Mfr.Filters.Trimming
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, hyphen duplicates).
+        /// </summary>
+        public ShrinkDuplicateCharactersFilter()
+            : this(new FilePrefixTarget(), new ShrinkDuplicateCharactersOptions(Character: '-')) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "ShrinkDuplicateCharacters";

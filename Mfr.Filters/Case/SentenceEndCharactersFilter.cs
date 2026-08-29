@@ -25,6 +25,12 @@ namespace Mfr.Filters.Case
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, MFR7 sentence-end character set).
+        /// </summary>
+        public SentenceEndCharactersFilter()
+            : this(new FilePrefixTarget(), new SentenceEndCharactersOptions(Characters: "-.!")) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "SentenceEndCharacters";

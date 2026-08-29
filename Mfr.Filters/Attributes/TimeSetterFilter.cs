@@ -20,6 +20,17 @@ namespace Mfr.Filters.Attributes
     [FilterPalette(FilterGroup.Attributes, "Time Setter")]
     public sealed record TimeSetterFilter(TimeSetterOptions Options) : BaseFilter
     {
+        /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (last write time, current clock time).
+        /// </summary>
+        public TimeSetterFilter()
+            : this(
+                new TimeSetterOptions(
+                    TimestampField: TimestampField.LastWrite,
+                    Time: TimeOnly.FromDateTime(DateTime.Now)
+                )
+            ) { }
+
         /// <inheritdoc />
         public override string Type => "TimeSetter";
 

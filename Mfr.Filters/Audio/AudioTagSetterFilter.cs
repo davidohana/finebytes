@@ -118,6 +118,12 @@ namespace Mfr.Filters.Audio
         private Formatter DiscFormatter = FormatStringCompiler.EmptyFormatter;
         private Formatter DiscCountFormatter = FormatStringCompiler.EmptyFormatter;
 
+        /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (all fields disabled, auto-increment track enabled).
+        /// </summary>
+        public AudioTagSetterFilter()
+            : this(new AudioTagSetterOptions(TrackAutoIncrement: true)) { }
+
         /// <inheritdoc />
         public override string Type => "AudioTagSetter";
 

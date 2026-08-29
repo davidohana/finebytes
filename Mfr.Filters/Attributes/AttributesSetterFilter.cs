@@ -44,6 +44,19 @@ namespace Mfr.Filters.Attributes
     [FilterPalette(FilterGroup.Attributes, "Attributes Setter")]
     public sealed record AttributesSetterFilter(AttributesSetterOptions Options) : BaseFilter
     {
+        /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (all attribute flags unchanged).
+        /// </summary>
+        public AttributesSetterFilter()
+            : this(
+                new AttributesSetterOptions(
+                    ReadOnly: AttributeTriState.Keep,
+                    Hidden: AttributeTriState.Keep,
+                    Archive: AttributeTriState.Keep,
+                    System: AttributeTriState.Keep
+                )
+            ) { }
+
         /// <inheritdoc />
         public override string Type => "AttributesSetter";
 

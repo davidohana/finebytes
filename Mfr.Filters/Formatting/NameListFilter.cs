@@ -32,6 +32,12 @@ namespace Mfr.Filters.Formatting
         private Formatter? _compiledSuffix;
 
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty list path).
+        /// </summary>
+        public NameListFilter()
+            : this(new FilePrefixTarget(), new NameListOptions(FilePath: "")) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "NameList";

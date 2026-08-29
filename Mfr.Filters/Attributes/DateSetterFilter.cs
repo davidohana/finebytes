@@ -20,6 +20,17 @@ namespace Mfr.Filters.Attributes
     [FilterPalette(FilterGroup.Attributes, "Date Setter")]
     public sealed record DateSetterFilter(DateSetterOptions Options) : BaseFilter
     {
+        /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (last write date, today's calendar date).
+        /// </summary>
+        public DateSetterFilter()
+            : this(
+                new DateSetterOptions(
+                    TimestampField: TimestampField.LastWrite,
+                    Date: DateOnly.FromDateTime(DateTime.Today)
+                )
+            ) { }
+
         /// <inheritdoc />
         public override string Type => "DateSetter";
 

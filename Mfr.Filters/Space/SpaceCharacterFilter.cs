@@ -30,6 +30,21 @@ namespace Mfr.Filters.Space
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, space separator, common replacements).
+        /// </summary>
+        public SpaceCharacterFilter()
+            : this(
+                new FilePrefixTarget(),
+                new SpaceCharacterOptions(
+                    SpaceCharacter: ' ',
+                    ReplaceSpaces: true,
+                    ReplaceUnderscores: true,
+                    ReplacePercent20: true,
+                    CustomText: ""
+                )
+            ) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "SpaceCharacter";

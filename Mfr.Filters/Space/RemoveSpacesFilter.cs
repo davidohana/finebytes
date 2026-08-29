@@ -10,6 +10,12 @@ namespace Mfr.Filters.Space
         : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix target).
+        /// </summary>
+        public RemoveSpacesFilter()
+            : this(new FilePrefixTarget()) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "RemoveSpaces";

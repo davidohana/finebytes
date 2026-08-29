@@ -32,6 +32,15 @@ namespace Mfr.Filters.Space
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, hyphen triggers).
+        /// </summary>
+        public SpaceAroundFilter()
+            : this(
+                new FilePrefixTarget(),
+                new SpaceAroundOptions(AroundChars: "-", OnlyWhenNeighboringAreLettersOrDigits: true)
+            ) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "SpaceAround";

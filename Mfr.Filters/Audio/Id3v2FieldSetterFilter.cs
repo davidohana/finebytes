@@ -52,6 +52,12 @@ namespace Mfr.Filters.Audio
         private Formatter _textFormatter = FormatStringCompiler.EmptyFormatter;
         private string _normalizedFrameId = string.Empty;
 
+        /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (TIT2 frame, empty text).
+        /// </summary>
+        public Id3v2FieldSetterFilter()
+            : this(new Id3v2FieldSetterOptions(FrameId: "TIT2")) { }
+
         /// <inheritdoc />
         public override string Type => "Id3v2FieldSetter";
 

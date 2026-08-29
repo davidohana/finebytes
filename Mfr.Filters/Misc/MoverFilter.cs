@@ -42,6 +42,12 @@ namespace Mfr.Filters.Misc
         private Formatter? _compiledSubFolder;
 
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (<c>C:\</c> root, <c>MFR</c> sub-folder).
+        /// </summary>
+        public MoverFilter()
+            : this(new MoverOptions(RootFolder: @"C:\", SubFolder: "MFR")) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Mover";

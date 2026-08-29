@@ -24,6 +24,12 @@ namespace Mfr.Filters.Formatting
         private Formatter? _compiledTemplate;
 
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty template).
+        /// </summary>
+        public FormatterFilter()
+            : this(new FilePrefixTarget(), new FormatterOptions(Template: "")) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Formatter";

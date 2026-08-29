@@ -26,6 +26,12 @@ namespace Mfr.Filters.Formatting
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, hyphen delimiter, first token +1).
+        /// </summary>
+        public TokenMoverFilter()
+            : this(new FilePrefixTarget(), new TokenMoverOptions(Delimiter: "-", TokenNumber: 1, MoveBy: 1)) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "TokenMover";

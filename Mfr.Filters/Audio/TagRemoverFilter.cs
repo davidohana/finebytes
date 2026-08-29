@@ -54,6 +54,12 @@ namespace Mfr.Filters.Audio
     [FilterPalette(FilterGroup.Audio, "Audio Tag Remover")]
     public sealed record TagRemoverFilter(TagRemoverOptions Options) : BaseFilter
     {
+        /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (nuclear strip all embedded tags).
+        /// </summary>
+        public TagRemoverFilter()
+            : this(new TagRemoverOptions(All: true)) { }
+
         /// <inheritdoc />
         public override string Type => "TagRemover";
 

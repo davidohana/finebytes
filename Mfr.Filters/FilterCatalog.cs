@@ -10,7 +10,8 @@ namespace Mfr.Filters
     /// <param name="Type">JSON <c>type</c> discriminator (must match preset registration).</param>
     /// <param name="Group">Toolbar group that owns this filter.</param>
     /// <param name="DisplayName">Human-readable label shown in the list.</param>
-    public sealed record FilterCatalogEntry(string Type, FilterGroup Group, string DisplayName);
+    /// <param name="FilterType">Concrete filter CLR type (parameterless ctor supplies add-to-list defaults).</param>
+    public sealed record FilterCatalogEntry(string Type, FilterGroup Group, string DisplayName, Type FilterType);
 
     /// <summary>
     /// Product catalog of preset filters for the Available Filters palette.
@@ -52,7 +53,7 @@ namespace Mfr.Filters
             );
 
             var typeName = _ReadTypeDiscriminator(filterType);
-            return new FilterCatalogEntry(typeName, catalog.Group, catalog.DisplayName);
+            return new FilterCatalogEntry(typeName, catalog.Group, catalog.DisplayName, filterType);
         }
 
         private static string _ReadTypeDiscriminator(Type filterType)

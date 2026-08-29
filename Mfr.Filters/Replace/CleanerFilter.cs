@@ -19,6 +19,19 @@ namespace Mfr.Filters.Replace
         : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, custom character cleanup list).
+        /// </summary>
+        public CleanerFilter()
+            : this(
+                new FilePrefixTarget(),
+                new CleanerOptions(
+                    RemoveIllegalChars: false,
+                    CustomCharsToRemove: @"!""#$%&'()*+,/:;<=>?@[]\^`{}|~",
+                    Replacement: ""
+                )
+            ) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Cleaner";

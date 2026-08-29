@@ -33,6 +33,12 @@ namespace Mfr.Filters.Case
         private Dictionary<string, string>? _lowerWordToCasing;
 
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty list path, sentence-initial uppercasing).
+        /// </summary>
+        public CasingListFilter()
+            : this(new FilePrefixTarget(), new CasingListOptions(FilePath: "", UppercaseSentenceInitial: true)) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "CasingList";

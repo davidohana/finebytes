@@ -52,6 +52,19 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
+        /// Verifies every catalog type constructs via parameterless ctor and returns matching <see cref="BaseFilter.Type"/>.
+        /// </summary>
+        [Fact]
+        public void Every_Catalog_Type_Constructs_With_Default_Ctor()
+        {
+            foreach (var entry in FilterCatalog.Entries)
+            {
+                var instance = (BaseFilter)Activator.CreateInstance(entry.FilterType)!;
+                Assert.Equal(entry.Type, instance.Type);
+            }
+        }
+
+        /// <summary>
         /// Verifies MFR 7 display-name exceptions and group membership for known filters.
         /// </summary>
         [Fact]

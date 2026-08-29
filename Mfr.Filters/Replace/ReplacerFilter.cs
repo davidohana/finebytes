@@ -56,6 +56,22 @@ namespace Mfr.Filters.Replace
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty find/replace, replace all).
+        /// </summary>
+        public ReplacerFilter()
+            : this(
+                new FilePrefixTarget(),
+                new ReplacerOptions(
+                    Find: "",
+                    Replacement: "",
+                    Mode: ReplacerMode.Literal,
+                    CaseSensitive: false,
+                    ReplaceAll: true,
+                    WholeWord: false
+                )
+            ) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Replacer";

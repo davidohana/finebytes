@@ -14,6 +14,12 @@ namespace Mfr.Filters.Trimming
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, extract one character).
+        /// </summary>
+        public ExtractRightFilter()
+            : this(new FilePrefixTarget(), new CountFilterOptions(Count: 1)) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "ExtractRight";

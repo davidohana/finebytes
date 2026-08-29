@@ -39,6 +39,21 @@ namespace Mfr.Filters.Replace
         private List<(string Search, Formatter CompiledReplacement)>? _compiledEntries;
 
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty list path, replace all).
+        /// </summary>
+        public ReplaceListFilter()
+            : this(
+                new FilePrefixTarget(),
+                new ReplaceListOptions(
+                    FilePath: "",
+                    Mode: ReplacerMode.Literal,
+                    CaseSensitive: false,
+                    ReplaceAll: true,
+                    WholeWord: false
+                )
+            ) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "ReplaceList";

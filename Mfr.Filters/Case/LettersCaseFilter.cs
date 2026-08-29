@@ -115,6 +115,12 @@ namespace Mfr.Filters.Case
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, title case, no skip words).
+        /// </summary>
+        public LettersCaseFilter()
+            : this(new FilePrefixTarget(), new LettersCaseOptions(LettersCaseMode.TitleCase, [])) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "LettersCase";

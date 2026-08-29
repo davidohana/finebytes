@@ -46,6 +46,15 @@ namespace Mfr.Filters.Formatting
         private Formatter? _compiledText;
 
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, position 1 from start).
+        /// </summary>
+        public InserterFilter()
+            : this(
+                new FilePrefixTarget(),
+                new InserterOptions(Text: "", Position: 1, StartFrom: InserterOrigin.Beginning, Overwrite: false)
+            ) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Inserter";

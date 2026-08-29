@@ -30,6 +30,15 @@ namespace Mfr.Filters.Misc
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, width 2, first number only).
+        /// </summary>
+        public FixLeadingZerosFilter()
+            : this(
+                new FilePrefixTarget(),
+                new FixLeadingZerosOptions(Width: 2, RemoveExtraZeros: false, MaxCount: 1, WholeWordOnly: false)
+            ) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "FixLeadingZeros";

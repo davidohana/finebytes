@@ -43,6 +43,23 @@ namespace Mfr.Filters.Formatting
         : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, counter prepend with name suffix).
+        /// </summary>
+        public CounterFilter()
+            : this(
+                new FilePrefixTarget(),
+                new CounterOptions(
+                    Start: 1,
+                    Step: 1,
+                    Width: 0,
+                    PadChar: "0",
+                    Position: CounterPosition.Prepend,
+                    Separator: " - ",
+                    ResetPerFolder: true
+                )
+            ) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "Counter";

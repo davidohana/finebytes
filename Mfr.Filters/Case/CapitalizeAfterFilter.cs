@@ -25,6 +25,12 @@ namespace Mfr.Filters.Case
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, default trigger characters).
+        /// </summary>
+        public CapitalizeAfterFilter()
+            : this(new FilePrefixTarget(), new CapitalizeAfterOptions()) { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "CapitalizeAfter";

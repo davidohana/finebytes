@@ -29,6 +29,13 @@ namespace Mfr.Filters.Space
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, comma/semicolon/exclamation triggers).
+        /// </summary>
+        public SpaceAfterFilter()
+            : this(new FilePrefixTarget(), new SpaceAfterOptions(AfterChars: ",;!", OnlyWhenNextIsLetterOrDigit: true))
+        { }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "SpaceAfter";
