@@ -80,12 +80,17 @@ namespace Mfr.Tests.Cli
             };
             presetManager.SavePresets();
 
+            var configPath = dir.CombinePath("config.json");
+            File.WriteAllText(configPath, """{}""");
+
             var exitCode = CliApp.Run([
                 sourcePath,
                 "--preset",
                 "counter",
                 "--presets-file",
                 presetsFilePath,
+                "--config",
+                configPath,
                 "--dry-run",
             ]);
 

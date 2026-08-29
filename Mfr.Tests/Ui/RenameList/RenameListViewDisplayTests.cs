@@ -23,6 +23,8 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task UseFixedWidthFont_toggles_grid_style_class()
         {
+            SessionStore.Current.EnsureRenameList().UseFixedWidthFont = false;
+
             var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 1);
 
             Assert.DoesNotContain("fixed-width-font", grid.Classes);

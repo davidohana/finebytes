@@ -19,11 +19,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddSelected))]
         public async Task AddSelectedAsync()
         {
-            var addMode = SessionStore.Current.EnsureRenameList().AddMode;
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 _ToSourceItems(_fileListViewModel.SelectedEntries),
                 _fileListViewModel.Mask,
-                addMode
+                _SessionAddMode()
             );
             await _AddSourcesAsync(sources).ConfigureAwait(true);
         }
@@ -34,11 +33,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanAddAll))]
         public async Task AddAllAsync()
         {
-            var addMode = SessionStore.Current.EnsureRenameList().AddMode;
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 _ToSourceItems(_fileListViewModel.Entries),
                 _fileListViewModel.Mask,
-                addMode
+                _SessionAddMode()
             );
             await _AddSourcesAsync(sources).ConfigureAwait(true);
         }
@@ -51,8 +49,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             ArgumentNullException.ThrowIfNull(paths);
 
-            var addMode = SessionStore.Current.EnsureRenameList().AddMode;
-            var sources = RenameListAddSourceResolver.ResolveSourcesFromPaths(paths, _fileListViewModel.Mask, addMode);
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromPaths(
+                paths,
+                _fileListViewModel.Mask,
+                _SessionAddMode()
+            );
             await _AddSourcesAsync(sources).ConfigureAwait(true);
         }
 
@@ -74,7 +75,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var oldCount = _renameList.RenameItems.Count;
             LastAddError = string.Empty;
 
-            var renameList = SessionStore.Current.EnsureRenameList();
+            var addMode = _SessionAddMode();
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             var metadataRequirement = _CurrentMetadataRequirement();
             var addSummary = new RenameListAddSummary(0);
@@ -86,9 +87,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                         (token, progress) =>
                             addSummary = _renameList.AddSources(
                                 sources: sources,
-                                includeFiles: renameList.AddMode.IncludesFiles(),
-                                includeFolders: renameList.AddMode.IncludesFolders(),
-                                includeSubdirs: renameList.AddFolderContents,
+                                includeFiles: addMode.IncludesFiles(),
+                                includeFolders: addMode.IncludesFolders(),
+                                includeSubdirs: _SessionAddFolderContents(),
                                 excludeMasks: excludeMasks,
                                 cancellationToken: token,
                                 progress: progress,
@@ -258,7 +259,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return RenameListAddSourceResolver.CanResolveFromSelection(
                 _ToSourceItems(_fileListViewModel.SelectedEntries),
                 _fileListViewModel.Mask,
-                SessionStore.Current.EnsureRenameList().AddMode
+                _SessionAddMode()
             );
         }
 
@@ -279,8 +280,26 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return RenameListAddSourceResolver.CanResolveFromSelection(
                 _ToSourceItems(_fileListViewModel.Entries),
                 _fileListViewModel.Mask,
-                SessionStore.Current.EnsureRenameList().AddMode
+                _SessionAddMode()
             );
+        }
+
+        /// <summary>
+        /// Add mode from session, or files when the Rename List section is absent.
+        /// </summary>
+        /// <returns>The current add mode without creating a session section.</returns>
+        private static RenameListAddMode _SessionAddMode()
+        {
+            return SessionStore.Current.RenameList?.AddMode ?? RenameListAddMode.Files;
+        }
+
+        /// <summary>
+        /// Folder-contents flag from session, or true when the Rename List section is absent.
+        /// </summary>
+        /// <returns>Whether folder sources recurse.</returns>
+        private static bool _SessionAddFolderContents()
+        {
+            return SessionStore.Current.RenameList?.AddFolderContents ?? true;
         }
 
         private static IReadOnlyList<FileListSourceItem> _ToSourceItems(IEnumerable<FileListEntry> entries)

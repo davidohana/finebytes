@@ -83,11 +83,10 @@ namespace Mfr.Utils.Config
                 return;
             }
 
-            // Empty is valid (optional paths such as log.directoryPath). Whitespace-only is not.
             var isWhitespaceOnly = raw.Length > 0 && raw.IsBlank();
             if (isWhitespaceOnly)
             {
-                throw new InvalidDataException($"'{propertyName}' must be a non-empty string (got '{raw}').");
+                throw new InvalidDataException($"'{propertyName}' must not be whitespace-only (got '{raw}').");
             }
 
             if (maxLengthInclusive is { } maxLen && raw.Length > maxLen)

@@ -28,7 +28,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             UseFixedWidthFont = value;
             SessionStore.Current.EnsureRenameList().UseFixedWidthFont = value;
-            SessionStore.SaveCurrentPreferences();
+            SessionStore.TrySaveCurrent();
         }
 
         /// <summary>

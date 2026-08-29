@@ -138,7 +138,7 @@ namespace Mfr.Tests.Utils.Config
                 ConfigValueReader.ReadString(doc.RootElement, "p", ref s)
             );
             Assert.Contains("p", ex.Message);
-            Assert.Contains("non-empty", ex.Message);
+            Assert.Contains("whitespace-only", ex.Message);
         }
 
         [Fact]

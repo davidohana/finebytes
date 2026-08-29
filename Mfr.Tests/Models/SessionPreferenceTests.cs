@@ -1,3 +1,5 @@
+using Mfr.Tests.Ui.RenameList;
+
 namespace Mfr.Tests.Models
 {
     /// <summary>
@@ -5,30 +7,6 @@ namespace Mfr.Tests.Models
     /// </summary>
     public sealed class SessionPreferenceTests
     {
-        [Fact]
-        public void Load_empty_session_uses_preference_defaults()
-        {
-            var path = Path.Combine(Path.GetTempPath(), "mfr-test-pref-session-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(path, """{}""");
-            try
-            {
-                var session = SessionStore.Load(path);
-
-                Assert.Null(session.MainWindow);
-                Assert.Null(session.FileList);
-                Assert.Null(session.RenameList);
-                Assert.True(session.MainWindow?.RememberWindowState ?? true);
-                Assert.True(session.FileList?.RememberLastFolder ?? true);
-                Assert.Equal(RenameListAddMode.Files, session.RenameList?.AddMode ?? RenameListAddMode.Files);
-                Assert.True(session.RenameList?.AddFolderContents ?? true);
-                Assert.False(session.RenameList?.UseFixedWidthFont ?? false);
-            }
-            finally
-            {
-                File.Delete(path);
-            }
-        }
-
         [Fact]
         public void Save_and_Load_round_trips_preferences_on_owning_sections()
         {
@@ -94,38 +72,23 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void SaveCurrentPreferences_preserves_layout_fields()
+        public void TrySaveCurrent_writes_current_session()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-test-pref-session-" + Guid.NewGuid() + ".json");
-            var originalRenameList = SessionStore.Current.RenameList;
+            var originalPrefs = RenameListTestHelpers.SnapshotSessionPrefs();
             try
             {
-                SessionStore.Save(
-                    new SessionState
-                    {
-                        MainWindow = new SessionStateMainWindow
-                        {
-                            X = 40,
-                            Width = 800,
-                            Height = 600,
-                        },
-                    },
-                    path
-                );
-
                 SessionStore.Current.EnsureRenameList().AddMode = RenameListAddMode.Folders;
                 SessionStore.Current.EnsureRenameList().UseFixedWidthFont = true;
-                SessionStore.SaveCurrentPreferences(path);
+                SessionStore.TrySaveCurrent(path);
 
                 var loaded = SessionStore.Load(path);
-                Assert.NotNull(loaded.MainWindow);
-                Assert.Equal(40, loaded.MainWindow.X);
                 Assert.Equal(RenameListAddMode.Folders, loaded.RenameList?.AddMode);
                 Assert.True(loaded.RenameList?.UseFixedWidthFont);
             }
             finally
             {
-                SessionStore.Current.RenameList = originalRenameList;
+                RenameListTestHelpers.RestoreSessionPrefs(originalPrefs);
                 File.Delete(path);
             }
         }

@@ -23,10 +23,15 @@ namespace Mfr.Models.Config
         public static SessionState Current { get; private set; } = new();
 
         /// <summary>
+        /// Default session path last bound to <see cref="Current"/> by <see cref="Load"/>.
+        /// </summary>
+        private static string? s_CurrentDefaultPath;
+
+        /// <summary>
         /// Default session file path (<see cref="AppDataPaths.RoamingRoot"/> + <c>session.json</c>).
         /// </summary>
         /// <returns>Absolute path to the default session JSON file.</returns>
-        public static string DefaultSessionFilePath()
+        private static string _DefaultSessionFilePath()
         {
             return AppDataPaths.RoamingRoot().CombinePath("session.json");
         }
@@ -36,16 +41,18 @@ namespace Mfr.Models.Config
         /// <para>When <paramref name="sessionFilePath"/> is omitted, also assigns <see cref="Current"/>.</para>
         /// </summary>
         /// <param name="sessionFilePath">
-        /// Path to JSON. When <c>null</c> or whitespace, <see cref="DefaultSessionFilePath"/> is used.
+        /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultSessionFilePath"/> is used.
         /// </param>
         /// <returns>Deserialized state, or a new empty <see cref="SessionState"/> when missing or unreadable.</returns>
         public static SessionState Load(string? sessionFilePath = null)
         {
             var useDefaultPath = sessionFilePath.IsBlank();
-            var state = _Read(_ResolvePath(sessionFilePath));
+            var path = _ResolvePath(sessionFilePath);
+            var state = _Read(path);
             if (useDefaultPath)
             {
                 Current = state;
+                s_CurrentDefaultPath = path;
             }
 
             return state;
@@ -56,7 +63,7 @@ namespace Mfr.Models.Config
         /// </summary>
         /// <param name="state">Session values to persist.</param>
         /// <param name="sessionFilePath">
-        /// Path to JSON. When <c>null</c> or whitespace, <see cref="DefaultSessionFilePath"/> is used.
+        /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultSessionFilePath"/> is used.
         /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="state"/> is null.</exception>
         /// <exception cref="IOException">Thrown when the file cannot be written.</exception>
@@ -81,52 +88,30 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Writes live preference fields from <see cref="Current"/> into the session file, preserving last-used
-        /// layout already on disk (geometry, masks, sort, columns).
-        /// <para>Failures are swallowed so preference saves do not crash the app.</para>
+        /// Writes <see cref="Current"/> to the session file.
+        /// <para>
+        /// When <paramref name="sessionFilePath"/> is omitted, writes only if <see cref="Load"/> was called
+        /// for the default path. Failures are swallowed so preference saves do not crash the app.
+        /// </para>
         /// </summary>
         /// <param name="sessionFilePath">
-        /// Path to JSON. When <c>null</c> or whitespace, <see cref="DefaultSessionFilePath"/> is used.
+        /// Path to JSON. When <c>null</c> or whitespace, the default-path <see cref="Load"/> target is used.
         /// </param>
-        public static void SaveCurrentPreferences(string? sessionFilePath = null)
+        public static void TrySaveCurrent(string? sessionFilePath = null)
         {
             try
             {
-                var path = _ResolvePath(sessionFilePath);
-                var session = File.Exists(path) ? _Read(path) : new SessionState();
-                _CopyPreferences(Current, session);
-                Save(session, path);
+                var path = sessionFilePath.IsBlank() ? s_CurrentDefaultPath : sessionFilePath.Trim();
+                if (path is null)
+                {
+                    return;
+                }
+
+                Save(Current, path);
             }
             catch
             {
                 // Preference save must not block the UI or surface to the user.
-            }
-        }
-
-        /// <summary>
-        /// Copies add-policy, remember, and display flags from <paramref name="source"/> onto
-        /// <paramref name="target"/> without replacing last-used layout fields.
-        /// </summary>
-        /// <param name="source">Live in-memory session.</param>
-        /// <param name="target">Session document being written.</param>
-        private static void _CopyPreferences(SessionState source, SessionState target)
-        {
-            if (source.MainWindow is not null)
-            {
-                target.EnsureMainWindow().RememberWindowState = source.MainWindow.RememberWindowState;
-            }
-
-            if (source.FileList is not null)
-            {
-                target.EnsureFileList().RememberLastFolder = source.FileList.RememberLastFolder;
-            }
-
-            if (source.RenameList is not null)
-            {
-                var targetRenameList = target.EnsureRenameList();
-                targetRenameList.AddMode = source.RenameList.AddMode;
-                targetRenameList.AddFolderContents = source.RenameList.AddFolderContents;
-                targetRenameList.UseFixedWidthFont = source.RenameList.UseFixedWidthFont;
             }
         }
 
@@ -137,7 +122,7 @@ namespace Mfr.Models.Config
         /// <returns>Absolute path to the session JSON file.</returns>
         private static string _ResolvePath(string? sessionFilePath)
         {
-            return sessionFilePath.IsBlank() ? DefaultSessionFilePath() : sessionFilePath.Trim();
+            return sessionFilePath.IsBlank() ? _DefaultSessionFilePath() : sessionFilePath.Trim();
         }
 
         /// <summary>

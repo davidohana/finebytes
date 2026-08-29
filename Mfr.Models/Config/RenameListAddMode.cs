@@ -29,7 +29,7 @@ namespace Mfr.Models.Config
         /// <summary>
         /// Returns whether <paramref name="mode"/> includes file rows.
         /// </summary>
-        /// <param name="mode">Add mode from session UI preferences.</param>
+        /// <param name="mode">Add mode.</param>
         /// <returns><see langword="true"/> when files are included.</returns>
         public static bool IncludesFiles(this RenameListAddMode mode)
         {
@@ -39,7 +39,7 @@ namespace Mfr.Models.Config
         /// <summary>
         /// Returns whether <paramref name="mode"/> includes folder rows.
         /// </summary>
-        /// <param name="mode">Add mode from session UI preferences.</param>
+        /// <param name="mode">Add mode.</param>
         /// <returns><see langword="true"/> when folders are included.</returns>
         public static bool IncludesFolders(this RenameListAddMode mode)
         {

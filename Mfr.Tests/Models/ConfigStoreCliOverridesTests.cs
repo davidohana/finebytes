@@ -94,14 +94,5 @@ namespace Mfr.Tests.Models
             );
             Assert.Contains("CLI config override", ex.Message, StringComparison.Ordinal);
         }
-
-        [Fact]
-        public void ApplyCliOverrides_Rejects_Ui_Section()
-        {
-            var ex = Assert.Throws<InvalidDataException>(() =>
-                ConfigStore.ApplyCliOverrides(["ui.rememberLastFolder=false"])
-            );
-            Assert.Contains("Unknown config section 'ui'", ex.Message, StringComparison.Ordinal);
-        }
     }
 }

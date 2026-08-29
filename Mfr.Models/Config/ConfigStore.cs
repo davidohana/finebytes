@@ -7,7 +7,7 @@ namespace Mfr.Models.Config
 {
     /// <summary>
     /// Loads optional process-wide config from JSON.
-    /// <para>Default file: <see cref="DefaultConfigFilePath"/>.</para>
+    /// <para>Default file: <see cref="_DefaultConfigFilePath"/>.</para>
     /// </summary>
     /// <remarks>
     /// <para>
@@ -37,9 +37,19 @@ namespace Mfr.Models.Config
         /// Default JSON config path (<see cref="AppDataPaths.RoamingRoot"/> + <c>config.json</c>).
         /// </summary>
         /// <returns>Absolute path to the default config JSON file.</returns>
-        public static string DefaultConfigFilePath()
+        private static string _DefaultConfigFilePath()
         {
             return AppDataPaths.RoamingRoot().CombinePath("config.json");
+        }
+
+        /// <summary>
+        /// Resolves <paramref name="configFilePath"/> to the default config path when omitted.
+        /// </summary>
+        /// <param name="configFilePath">Explicit path, or blank for the default AppData file.</param>
+        /// <returns>Absolute path to the config JSON file.</returns>
+        private static string _ResolvePath(string? configFilePath)
+        {
+            return configFilePath.IsBlank() ? _DefaultConfigFilePath() : configFilePath.Trim();
         }
 
         /// <summary>
@@ -47,7 +57,7 @@ namespace Mfr.Models.Config
         /// <para>Schema: see <see cref="ConfigStore"/> remarks.</para>
         /// </summary>
         /// <param name="configFilePath">
-        /// Path to JSON. When <c>null</c> or whitespace, the default AppData path from <see cref="DefaultConfigFilePath"/> is used.
+        /// Path to JSON. When <c>null</c> or whitespace, the default AppData path from <see cref="_DefaultConfigFilePath"/> is used.
         /// </param>
         /// <exception cref="InvalidDataException">
         /// Thrown when a user-supplied file path does not exist, or when the file exists but JSON is invalid or values are out of range.
@@ -58,7 +68,7 @@ namespace Mfr.Models.Config
             Config = config;
 
             var useDefaultPath = configFilePath.IsBlank();
-            var path = useDefaultPath ? DefaultConfigFilePath() : configFilePath!.Trim();
+            var path = _ResolvePath(configFilePath);
             if (!File.Exists(path))
             {
                 if (!useDefaultPath)
@@ -89,13 +99,13 @@ namespace Mfr.Models.Config
         /// </para>
         /// </summary>
         /// <param name="configFilePath">
-        /// Path to JSON. When <c>null</c> or whitespace, <see cref="DefaultConfigFilePath"/> is used.
+        /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultConfigFilePath"/> is used.
         /// </param>
         public static void EnsureDefaultFile(string? configFilePath = null)
         {
             try
             {
-                var path = configFilePath.IsBlank() ? DefaultConfigFilePath() : configFilePath.Trim();
+                var path = _ResolvePath(configFilePath);
                 if (File.Exists(path))
                 {
                     return;
