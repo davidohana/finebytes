@@ -54,6 +54,8 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameGrid.CellPointerPressed += _OnCellPointerPressed;
             RenameGrid.LoadingRow += _OnLoadingRow;
             RenameGrid.AddHandler(KeyDownEvent, _OnGridKeyDown, RoutingStrategies.Tunnel);
+            RenameGrid.GotFocus += _OnGridFocusChanged;
+            RenameGrid.LostFocus += _OnGridFocusChanged;
             _WireHeaderContextMenu();
             _WireColumnReorder();
             _WireColumnAutoFit();
@@ -225,7 +227,39 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
             }
 
+            if (_MatchesGesture(e, AppShortcuts.Refresh))
+            {
+                if (_viewModel.RefreshCommand.CanExecute(null))
+                {
+                    _ = _viewModel.RefreshCommand.ExecuteAsync(null);
+                    e.Handled = true;
+                    return true;
+                }
+            }
+
             return false;
+        }
+
+        private void _OnGridFocusChanged(object? sender, RoutedEventArgs e)
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_viewModel is null)
+                {
+                    return;
+                }
+
+                var focused = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement();
+                var isGridFocused =
+                    focused == RenameGrid
+                    || (focused is Visual visual && visual.GetVisualAncestors().Contains(RenameGrid));
+                _viewModel.SetGridFocused(isGridFocused);
+            });
         }
 
         private static bool _MatchesGesture(KeyEventArgs e, KeyGesture gesture)

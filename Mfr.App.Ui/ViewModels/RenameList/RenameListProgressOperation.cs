@@ -14,5 +14,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Reading metadata for visible columns or Auto-Sort keys.
         /// </summary>
         MetadataHydrate,
+
+        /// <summary>
+        /// Re-reading original fields from disk for every row.
+        /// </summary>
+        Refresh,
     }
 }

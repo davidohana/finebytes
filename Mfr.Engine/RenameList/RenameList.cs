@@ -496,6 +496,43 @@ namespace Mfr.Engine.RenameList
             tracker.ReportFinal();
         }
 
+        /// <summary>
+        /// Re-reads original filesystem fields for every row and clears lazy metadata caches.
+        /// </summary>
+        /// <param name="cancellationToken">When canceled, stops without throwing.</param>
+        /// <param name="progress">Optional progress sink (metadata processed count, total, last path).</param>
+        /// <remarks>
+        /// <para>
+        /// Does not run preview. Missing paths keep the stored path; field-load errors clear with the cache
+        /// so a later hydrate can succeed.
+        /// </para>
+        /// </remarks>
+        public void RefreshOriginals(
+            CancellationToken cancellationToken = default,
+            IProgress<RenameListAddProgress>? progress = null
+        )
+        {
+            if (_renameItems.Count == 0)
+            {
+                return;
+            }
+
+            var tracker = new AddProgressTracker(progress, cancellationToken);
+            tracker.BeginMetadataPhase(_renameItems.Count);
+            foreach (var item in _renameItems)
+            {
+                if (tracker.IsCanceled)
+                {
+                    break;
+                }
+
+                _RefreshItemOriginal(item);
+                tracker.OnMetadataProcessed(item.Original.FullPath);
+            }
+
+            tracker.ReportFinal();
+        }
+
         private static int _CompareItems(RenameItem left, RenameItem right, IReadOnlyList<RenameListSortKey> keys)
         {
             foreach (var key in keys)
@@ -812,16 +849,101 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
+        /// Clears lazy metadata and re-stats <see cref="RenameItem.Original"/> from disk when the path still exists.
+        /// </summary>
+        private void _RefreshItemOriginal(RenameItem item)
+        {
+            var priorPath = item.Original.FullPath;
+            item.ClearMetadataCaches();
+
+            var resolvedPath = _ResolveExistingPath(priorPath);
+            if (resolvedPath is null)
+            {
+                return;
+            }
+
+            var priorKey = _NormalizePathKey(priorPath);
+            var resolvedKey = _NormalizePathKey(resolvedPath);
+            if (!string.Equals(priorKey, resolvedKey, StringComparison.Ordinal))
+            {
+                _includedResolvedPaths.Remove(priorKey);
+                _includedResolvedPaths.Add(resolvedKey);
+            }
+
+            var refreshedOriginal = _CreateOriginalSnapshot(resolvedPath, File.GetAttributes(resolvedPath));
+            var original = item.Original;
+            refreshedOriginal.RenameListIndex = original.RenameListIndex;
+            refreshedOriginal.InFolderIndex = original.InFolderIndex;
+            refreshedOriginal.RenameListTotalCount = original.RenameListTotalCount;
+            refreshedOriginal.RenameListFolderSiblingCount = original.RenameListFolderSiblingCount;
+            item.Original = refreshedOriginal;
+        }
+
+        /// <summary>
+        /// Resolves a stored path to the on-disk entry, including host casing, when it still exists.
+        /// </summary>
+        private static string? _ResolveExistingPath(string path)
+        {
+            if (File.Exists(path) || Directory.Exists(path))
+            {
+                return _ResolveOnDiskCasing(path);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Walks parent directories so the returned path uses filesystem casing (MFR7 <c>GetFullFileName</c>).
+        /// </summary>
+        private static string _ResolveOnDiskCasing(string path)
+        {
+            var trimmedDirectory = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var parent = Path.GetDirectoryName(trimmedDirectory);
+            var fileName = Path.GetFileName(trimmedDirectory);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return path;
+            }
+
+            if (string.IsNullOrEmpty(parent) || !Directory.Exists(parent))
+            {
+                return path;
+            }
+
+            var parentDir = new DirectoryInfo(parent);
+            foreach (var entry in parentDir.GetFileSystemInfos())
+            {
+                if (!string.Equals(entry.Name, fileName, PathComparers.OsComparison))
+                {
+                    continue;
+                }
+
+                var resolvedParent = _ResolveOnDiskCasing(parent);
+                return Path.Combine(resolvedParent, entry.Name);
+            }
+
+            return path;
+        }
+
+        /// <summary>
         /// Builds a rename item from a resolved filesystem path. Indices are filled after insert.
         /// </summary>
         private static RenameItem _CreateRenameItem(string fullPath, FileAttributes attrs)
+        {
+            return new RenameItem(_CreateOriginalSnapshot(fullPath, attrs));
+        }
+
+        /// <summary>
+        /// Builds an original <see cref="FileMeta"/> snapshot from a resolved path.
+        /// </summary>
+        private static FileMeta _CreateOriginalSnapshot(string fullPath, FileAttributes attrs)
         {
             var isDirectory = attrs.IsDirectory();
             var (directoryPath, prefix, extension) = isDirectory
                 ? _SplitRenamePathForDirectory(fullPath)
                 : _SplitRenamePathForFile(fullPath);
 
-            var originalFileMeta = new FileMeta(
+            return new FileMeta(
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
@@ -833,8 +955,6 @@ namespace Mfr.Engine.RenameList
                 lastAccessTime: File.GetLastAccessTime(fullPath),
                 fileSize: isDirectory ? 0 : new FileInfo(fullPath).Length
             );
-
-            return new RenameItem(originalFileMeta);
         }
 
         /// <summary>

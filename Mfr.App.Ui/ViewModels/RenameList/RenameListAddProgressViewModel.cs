@@ -82,7 +82,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets the progress dialog window title for the current operation.
         /// </summary>
         public string DialogTitle =>
-            Phase == RenameListAddProgressPhase.LoadMetadata ? "Reading file metadata" : "Adding to Rename List";
+            Operation switch
+            {
+                RenameListProgressOperation.Refresh => "Refreshing Rename List",
+                RenameListProgressOperation.MetadataHydrate => "Reading file metadata",
+                RenameListProgressOperation.Add => "Adding to Rename List",
+                _ => "Adding to Rename List",
+            };
 
         /// <summary>
         /// Gets the resolve-stage scan line for add operations.
@@ -159,10 +165,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var progress = new Progress<RenameListAddProgress>(_ApplyProgress);
 
             Operation = operation;
-            Phase =
-                operation == RenameListProgressOperation.MetadataHydrate
-                    ? RenameListAddProgressPhase.LoadMetadata
-                    : RenameListAddProgressPhase.ResolveSources;
+            Phase = operation is RenameListProgressOperation.MetadataHydrate or RenameListProgressOperation.Refresh
+                ? RenameListAddProgressPhase.LoadMetadata
+                : RenameListAddProgressPhase.ResolveSources;
             IsAdding = true;
             IsDialogVisible = false;
             ScannedCount = 0;

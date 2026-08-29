@@ -212,6 +212,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             OnPropertyChanged(nameof(ItemCount));
             ClearCommand.NotifyCanExecuteChanged();
             RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
+            _NotifyRefreshChanged();
         }
 
         /// <summary>
@@ -270,6 +271,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
             _NotifyShowLoadErrorsChanged();
+            _NotifyRefreshChanged();
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

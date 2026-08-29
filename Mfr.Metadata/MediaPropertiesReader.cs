@@ -36,6 +36,15 @@ namespace Mfr.Metadata
             ArgumentNullException.ThrowIfNull(file);
 
             var properties = file.Properties;
+            if (properties is null)
+            {
+                return new MediaProperties
+                {
+                    MimeType = file.MimeType.TrimmedOrNull(),
+                    PossiblyCorrupt = file.PossiblyCorrupt,
+                };
+            }
+
             var mediaTypes = properties.MediaTypes;
             string? mediaTypesText = null;
             if (mediaTypes != MediaTypes.None)
@@ -65,6 +74,11 @@ namespace Mfr.Metadata
 
         private static MpegAudioProperties? _TryMapMpeg(Properties properties)
         {
+            if (properties.Codecs is null)
+            {
+                return null;
+            }
+
             foreach (var codec in properties.Codecs)
             {
                 if (codec is not AudioHeader header)

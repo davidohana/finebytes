@@ -88,6 +88,28 @@ namespace Mfr.Tests.Metadata
             Assert.Throws<ArgumentException>(() => MediaPropertiesReader.Read("relative.mp3"));
         }
 
+        /// <summary>
+        /// Verifies TagLibFileReader survives files TagLib opens without stream properties.
+        /// </summary>
+        [Fact]
+        public void Read_InvalidWavPayload_DoesNotThrowNullReference()
+        {
+            var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.wav");
+            try
+            {
+                File.WriteAllText(path, "not audio");
+
+                var ex = Record.Exception(() => TagLibFileReader.Read(path));
+
+                Assert.NotNull(ex);
+                Assert.IsNotType<NullReferenceException>(ex);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
         [Fact]
         public void Read_UnsupportedTextFile_Throws()
         {

@@ -56,6 +56,7 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 | Remove selected rows    | Del          | Rename List grid focused  |
 | Clear                   | Ctrl+Shift+C | Main window               |
 | Locate in File List     | F4           | Rename List grid focused  |
+| Refresh                 | F5           | Rename List grid focused  |
 | Move selected up        | Ctrl+↑       | Rename List grid focused  |
 | Move selected down      | Ctrl+↓       | Rename List grid focused  |
 | Add/toggle sort level   | Shift+click  | Rename List column header |
@@ -70,15 +71,9 @@ Click the **Select Fields** toolbar button on the Rename List, or choose **Selec
 
 These shortcuts match MFR 7.4 and are already labeled on disabled menu items.
 
-| Action              | Shortcut |
-| ------------------- | -------- |
-| Rename List refresh | F5       |
-
-Rename List refresh will share F5 with the File List later (MFR 7.4 used F5 in both). Until then, F5 only reloads the File List.
-
-## Later (not on menus yet)
-
 | Action        | Shortcut | Notes                        |
 | ------------- | -------- | ---------------------------- |
 | Help          | F1       | Help UI is not in this build |
 | Manual rename | F2       | Rename List                  |
+
+F5 reloads the File List from the main window and address bar, or the Rename List when its grid has focus (MFR 7.4 shared the same key in both panes). Rename List refresh re-reads original fields only; preview recalculation arrives in a later phase.

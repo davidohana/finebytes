@@ -32,6 +32,11 @@
           Command="{Binding LocateInFileListCommand}"
           InputGesture="{x:Static input:AppShortcuts.LocateInFileList}"
         />
+        <MenuItem
+          Header="Refresh"
+          Command="{Binding RefreshCommand}"
+          InputGesture="{x:Static input:AppShortcuts.Refresh}"
+        />
         <Separator />
         <MenuItem
           Header="Move Selected Up"

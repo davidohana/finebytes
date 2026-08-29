@@ -33,7 +33,7 @@
     <KeyBinding Gesture="{x:Static input:AppShortcuts.UndoLast}" Command="{Binding UndoLastCommand}" />
     <KeyBinding Gesture="{x:Static input:AppShortcuts.ShowLog}" Command="{Binding ShowLogCommand}" />
     <KeyBinding Gesture="{x:Static input:AppShortcuts.ShowOptions}" Command="{Binding ShowOptionsCommand}" />
-    <KeyBinding Gesture="{x:Static input:AppShortcuts.Refresh}" Command="{Binding FileListViewModel.RefreshCommand}" />
+    <KeyBinding Gesture="{x:Static input:AppShortcuts.Refresh}" Command="{Binding RefreshFocusedPaneCommand}" />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.GoToAddress}"
       Command="{Binding FileListViewModel.BeginPathEditCommand}"
@@ -304,7 +304,11 @@
           ToolTip.Tip="{Binding RenameListViewModel.SortSummaryText}"
         />
         <MenuItem Header="Auto-Preview" IsEnabled="False" />
-        <MenuItem Header="Refresh" IsEnabled="False" InputGesture="{x:Static input:AppShortcuts.Refresh}" />
+        <MenuItem
+          Header="Refresh"
+          Command="{Binding RenameListViewModel.RefreshCommand}"
+          InputGesture="{x:Static input:AppShortcuts.Refresh}"
+        />
       </MenuItem>
       <MenuItem Header="F_ilters">
         <MenuItem Header="Presets" IsEnabled="False" />
