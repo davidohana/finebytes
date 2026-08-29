@@ -312,6 +312,25 @@
         />
       </MenuItem>
       <MenuItem Header="F_ilters">
+        <MenuItem Header="Add Selected Filter" Command="{Binding AddSelectedFilterFromPaletteCommand}" />
+        <MenuItem
+          Header="Remove Selected Filter"
+          Command="{Binding AppliedFiltersViewModel.RemoveSelectedCommand}"
+          InputGesture="{x:Static input:AppShortcuts.RemoveSelectedFilterDelete}"
+        />
+        <MenuItem Header="Remove All Filters" Command="{Binding AppliedFiltersViewModel.ClearCommand}" />
+        <Separator />
+        <MenuItem
+          Header="Move Filter Up"
+          Command="{Binding AppliedFiltersViewModel.MoveSelectedUpCommand}"
+          InputGesture="{x:Static input:AppShortcuts.MoveFilterUp}"
+        />
+        <MenuItem
+          Header="Move Filter Down"
+          Command="{Binding AppliedFiltersViewModel.MoveSelectedDownCommand}"
+          InputGesture="{x:Static input:AppShortcuts.MoveFilterDown}"
+        />
+        <Separator />
         <MenuItem Header="Presets" IsEnabled="False" />
         <MenuItem Header="Save Preset" IsEnabled="False" />
         <MenuItem Header="Filter Options" IsEnabled="False" />

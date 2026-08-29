@@ -71,6 +71,16 @@ Shift+click a column header to append a sort key, toggle its direction, or remov
 
 Click the **Select Fields** toolbar button on the Rename List, or choose **Select Visible Fields...** or **Select Sort Fields...** from the **Rename List** menu, the grid right-click menu, or a column-header right-click menu, to open the field shuttle (visible columns and Auto-Sort tabs). Right-click a column header and choose **Hide Field** to hide that column.
 
+### Applied Filters
+
+| Action             | Shortcut | Where it works               |
+| ------------------ | -------- | ---------------------------- |
+| Remove selected    | Del      | Applied Filters list focused |
+| Move selected up   | Ctrl+↑   | Applied Filters list focused |
+| Move selected down | Ctrl+↓   | Applied Filters list focused |
+
+**Filters → Add Selected Filter** appends the selected Available Filters row (same as Enter on the palette or the Applied Filters add shuttle). **Remove Selected Filter**, **Remove All Filters**, and **Move Filter Up/Down** are on the **Filters** menu and the Applied Filters shuttle column.
+
 ### Field shuttle (Select Fields dialog)
 
 | Action     | Shortcut | Where it works       |

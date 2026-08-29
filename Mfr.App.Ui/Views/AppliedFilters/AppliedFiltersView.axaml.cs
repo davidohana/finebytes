@@ -34,6 +34,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         {
             InitializeComponent();
             _WireSelectionHandlers();
+            _WireKeyHandlers();
             DataContextChanged += (_, _) =>
             {
                 if (DataContext is AppliedFiltersViewModel viewModel)

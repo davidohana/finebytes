@@ -115,30 +115,34 @@
               <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
             </Button>
             <Button
+              x:Name="RemoveFromAppliedButton"
               Classes="rename-list-action"
               ToolTip.Tip="{x:Static resources:AppTips.RemoveSelectedFilter}"
-              IsEnabled="False"
+              Command="{Binding RemoveSelectedCommand}"
             >
               <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/RemoveSelected.png" />
             </Button>
             <Button
+              x:Name="ClearAppliedButton"
               Classes="rename-list-action"
               ToolTip.Tip="{x:Static resources:AppTips.RemoveAllFilters}"
-              IsEnabled="False"
+              Command="{Binding ClearCommand}"
             >
               <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Clear.png" />
             </Button>
             <Button
+              x:Name="MoveAppliedUpButton"
               Classes="rename-list-action"
               ToolTip.Tip="{x:Static resources:AppTips.MoveFilterUp}"
-              IsEnabled="False"
+              Command="{Binding MoveSelectedUpCommand}"
             >
               <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveUp.png" />
             </Button>
             <Button
+              x:Name="MoveAppliedDownButton"
               Classes="rename-list-action"
               ToolTip.Tip="{x:Static resources:AppTips.MoveFilterDown}"
-              IsEnabled="False"
+              Command="{Binding MoveSelectedDownCommand}"
             >
               <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
             </Button>
