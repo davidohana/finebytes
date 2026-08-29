@@ -115,12 +115,37 @@ namespace Mfr.Tests.Engine
             var storedPath = item.Original.FullPath;
 
             File.Delete(path);
+            Assert.False(RenameListDiskPaths.IsMissingFromDisk(item));
+
             renameList.RefreshOriginals();
 
             Assert.Equal(storedPath, item.Original.FullPath);
             Assert.False(item.TagLibLoadAttempted);
             Assert.Null(item.TagLibMetadataLoadError);
             Assert.True(RenameListDiskPaths.IsMissingFromDisk(item));
+        }
+
+        /// <summary>
+        /// Verifies RefreshOriginals clears the missing snapshot when the path exists again.
+        /// </summary>
+        [Fact]
+        public void RefreshOriginals_Restored_Path_Clears_Missing_Flag()
+        {
+            var path = Path.Combine(_tempRoot, "back.txt");
+            File.WriteAllText(path, "old");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([path]);
+            var item = Assert.Single(renameList.RenameItems);
+            File.Delete(path);
+            renameList.RefreshOriginals();
+            Assert.True(RenameListDiskPaths.IsMissingFromDisk(item));
+
+            File.WriteAllText(path, "new");
+            renameList.RefreshOriginals();
+
+            Assert.False(RenameListDiskPaths.IsMissingFromDisk(item));
+            Assert.Equal("new".Length, item.Original.FileSize);
         }
     }
 }

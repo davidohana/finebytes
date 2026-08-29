@@ -859,8 +859,11 @@ namespace Mfr.Engine.RenameList
             var resolvedPath = _ResolveExistingPath(priorPath);
             if (resolvedPath is null)
             {
+                item.SetMissingFromDisk(true);
                 return;
             }
+
+            item.SetMissingFromDisk(false);
 
             var priorKey = _NormalizePathKey(priorPath);
             var resolvedKey = _NormalizePathKey(resolvedPath);

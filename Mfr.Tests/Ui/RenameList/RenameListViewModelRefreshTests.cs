@@ -88,5 +88,26 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal("After", entry.GetFieldText(titleKey));
         }
+
+        /// <summary>
+        /// Verifies a deleted file stays present in the grid until Refresh snapshots missing-from-disk.
+        /// </summary>
+        [Fact]
+        public async Task Refresh_snapshots_missing_from_disk()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "vanish.txt");
+            File.WriteAllText(path, "x");
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            var entry = Assert.Single(renameListViewModel.Entries);
+
+            File.Delete(path);
+            Assert.False(entry.IsMissingFromDisk);
+
+            await renameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+
+            Assert.True(entry.IsMissingFromDisk);
+        }
     }
 }

@@ -3,58 +3,31 @@ using Mfr.Models.RenameList.Fields.Basic;
 namespace Mfr.Tests.Models
 {
     /// <summary>
-    /// Disk presence checks for Rename List rows.
+    /// Snapshot missing-from-disk flag for Rename List rows.
     /// </summary>
-    public sealed class RenameListDiskPathsTests : IDisposable
+    public sealed class RenameListDiskPathsTests
     {
-        private readonly string _tempRoot;
-
         /// <summary>
-        /// Initializes a temp directory for disk-presence tests.
-        /// </summary>
-        public RenameListDiskPathsTests()
-        {
-            _tempRoot = Path.Combine(Path.GetTempPath(), "mfr-missing-" + Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(_tempRoot);
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            if (Directory.Exists(_tempRoot))
-            {
-                Directory.Delete(_tempRoot, recursive: true);
-            }
-        }
-
-        /// <summary>
-        /// Verifies an existing file is not missing.
+        /// Verifies a newly constructed item is not missing until add/refresh says so.
         /// </summary>
         [Fact]
-        public void ExistsOnDisk_true_for_existing_file()
+        public void IsMissingFromDisk_false_by_default()
         {
-            var path = Path.Combine(_tempRoot, "present.txt");
-            File.WriteAllText(path, "x");
+            var item = new RenameItem(_FileMeta("present.txt"));
 
-            var meta = _FileMeta(path);
-
-            Assert.True(RenameListDiskPaths.ExistsOnDisk(meta));
-            Assert.False(RenameListDiskPaths.IsMissingFromDisk(new RenameItem(meta)));
+            Assert.False(RenameListDiskPaths.IsMissingFromDisk(item));
         }
 
         /// <summary>
-        /// Verifies a deleted file path is missing.
+        /// Verifies catalog missing-state follows the snapshot flag, not a live path check.
         /// </summary>
         [Fact]
-        public void IsMissingFromDisk_true_when_file_deleted()
+        public void IsMissingFromDisk_reads_snapshot_flag()
         {
-            var path = Path.Combine(_tempRoot, "gone.txt");
-            File.WriteAllText(path, "x");
-            var meta = _FileMeta(path);
-            File.Delete(path);
+            var item = new RenameItem(_FileMeta("gone.txt"));
+            item.SetMissingFromDisk(true);
 
-            Assert.False(RenameListDiskPaths.ExistsOnDisk(meta));
-            Assert.True(RenameListDiskPaths.IsMissingFromDisk(new RenameItem(meta)));
+            Assert.True(RenameListDiskPaths.IsMissingFromDisk(item));
         }
 
         /// <summary>
@@ -63,15 +36,9 @@ namespace Mfr.Tests.Models
         [Fact]
         public void CompareForSort_missing_rows_sort_by_field_not_forced_last()
         {
-            var presentPath = Path.Combine(_tempRoot, "zzz.txt");
-            File.WriteAllText(presentPath, "z");
-            var missingPath = Path.Combine(_tempRoot, "aaa.txt");
-            File.WriteAllText(missingPath, "a");
-            var missingMeta = _FileMeta(missingPath);
-            File.Delete(missingPath);
-
-            var present = new RenameItem(_FileMeta(presentPath));
-            var missing = new RenameItem(missingMeta);
+            var present = new RenameItem(_FileMeta("zzz.txt"));
+            var missing = new RenameItem(_FileMeta("aaa.txt"));
+            missing.SetMissingFromDisk(true);
             var key = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
             Assert.True(RenameListFieldCatalog.CompareForSort(missing, key, present) < 0);
@@ -79,21 +46,18 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies Show Load Errors includes missing rows.
+        /// Verifies Show Error Details includes missing rows.
         /// </summary>
         [Fact]
         public void ListLoadErrors_includes_missing_from_disk()
         {
-            var path = Path.Combine(_tempRoot, "gone.txt");
-            File.WriteAllText(path, "x");
-            var meta = _FileMeta(path);
-            File.Delete(path);
+            var item = new RenameItem(_FileMeta("gone.txt"));
+            item.SetMissingFromDisk(true);
 
-            var item = new RenameItem(meta);
             var error = Assert.Single(RenameListFieldCatalog.ListLoadErrors(item));
 
             Assert.Equal(RenameListDiskPaths.MissingUserExplanation, error.UserExplanation);
-            Assert.Equal(meta.FullPath, error.TechnicalDetails);
+            Assert.Equal(item.Original.FullPath, error.TechnicalDetails);
             Assert.True(RenameListFieldCatalog.HasAnyLoadError(item));
         }
 
@@ -103,12 +67,9 @@ namespace Mfr.Tests.Models
         [Fact]
         public void HasLoadError_false_when_missing_even_with_stored_exception()
         {
-            var path = Path.Combine(_tempRoot, "tagged.wav");
-            File.WriteAllText(path, "not audio");
-            var meta = _FileMeta(path);
-            var item = new RenameItem(meta);
+            var item = new RenameItem(_FileMeta("tagged.wav"));
             item.SetTagLibMetadataLoadError(new IOException("failed"));
-            File.Delete(path);
+            item.SetMissingFromDisk(true);
 
             var titleKey = RenameListFieldKey.Original("AudioTag", "Title");
 
@@ -116,18 +77,14 @@ namespace Mfr.Tests.Models
             Assert.False(RenameListFieldCatalog.HasLoadError(item, titleKey));
         }
 
-        private static FileMeta _FileMeta(string path)
+        private static FileMeta _FileMeta(string fileName)
         {
-            var attrs = File.GetAttributes(path);
-            var directoryPath = Path.GetDirectoryName(path) ?? string.Empty;
             return new FileMeta(
                 renameListIndex: 0,
                 inFolderIndex: 0,
-                directoryPath: directoryPath,
-                prefix: Path.GetFileNameWithoutExtension(path),
-                extension: Path.GetExtension(path),
-                attributes: attrs,
-                fileSize: new FileInfo(path).Length
+                directoryPath: @"D:\tmp",
+                prefix: Path.GetFileNameWithoutExtension(fileName),
+                extension: Path.GetExtension(fileName)
             );
         }
     }

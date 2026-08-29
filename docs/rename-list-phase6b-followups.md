@@ -65,4 +65,4 @@ state was removed; the command is row-level.
 - Per-field exception maps; one TagLib + one image slot is enough
 - Format-specific `DescribeUserMessage` branches (playlist vs jpeg vs …)
 - Preview-error UI (**8c**). Missing-on-disk gray reuses 6d’s structured cell foreground (not a
-  text sentinel). Live `Exists` checks match MFR7 `RenameItem.Exists`.
+  text sentinel). Presence is snapshotted on add/refresh, not probed with live `Exists` on paint.

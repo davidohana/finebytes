@@ -104,6 +104,25 @@ namespace Mfr.Models.Rename
         internal string SentenceEndChars { get; set; } = ".!?";
 
         /// <summary>
+        /// Gets whether the last add or refresh found the original path absent from disk.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Not a live filesystem check. Add and Refresh write this flag; grid paint and scroll only read it.
+        /// </para>
+        /// </remarks>
+        internal bool IsMissingFromDisk { get; private set; }
+
+        /// <summary>
+        /// Records whether the original path was present on disk at the last add or refresh.
+        /// </summary>
+        /// <param name="isMissing"><see langword="true"/> when the path was absent.</param>
+        internal void SetMissingFromDisk(bool isMissing)
+        {
+            IsMissingFromDisk = isMissing;
+        }
+
+        /// <summary>
         /// Gets whether TagLib metadata (embedded tags and media properties) was loaded for this preview cycle.
         /// </summary>
         internal bool TagLibLoadAttempted { get; private set; }
