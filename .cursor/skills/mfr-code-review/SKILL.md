@@ -2,17 +2,23 @@
 name: mfr-code-review
 description: >-
   Reviews finebytes/MFR changes for correctness, KISS, YAGNI, naming, stale
-  APIs, layering, leftover flags, fragile heuristics, and test coverage;
-  applies high-confidence cleanup and adds worthwhile tests. Use when the user
-  asks for a code review, deep review, KISS/YAGNI pass, simplify/minimize/
-  cleanup/dedup, to review a plan phase or prior transcript, or says
-  auto-correct things you are sure about.
+  APIs, layering, leftover flags, fragile heuristics, dedup/reuse (local and
+  cross-file), and test coverage; applies high-confidence cleanup and adds
+  worthwhile tests; surfaces deeper refactor/dedup options clearly even when not
+  auto-applied. Use when the user asks for a code review, deep review,
+  KISS/YAGNI pass, simplify/minimize/cleanup/dedup, to review a plan phase or
+  prior transcript, or says auto-correct things you are sure about.
 ---
 
 # MFR code review
 
 Default posture: **correctness first**, then **delete and collapse**, then **tests that earn
 their keep**. Prefer a smaller design over a compatible one.
+
+Actively hunt **dedup and reuse** at every scope — local copy-paste, parallel types/views,
+shared policy in two layers, twin APIs, and test fixtures. Apply safe local wins in-pass;
+**always call out** stronger cross-file or structural dedups clearly in the report (the user
+welcomes deeper refactors — do not bury or skip them because they are not auto-applied).
 
 ## Resolve scope
 
@@ -43,13 +49,20 @@ auto-correct, refactor as needed, add coverage, or “review what’s done” af
 **Findings first** (report + suggested order, offer to implement) when the prompt is only
 “review / see if / see where / can it be” with no action words.
 
-**Propose only** (do not silently do):
+**Propose only** (do not silently do — but **must suggest clearly** in the report):
 
 - New shared types or layer moves
+- Merging parallel implementations (e.g. two views, two payloads, two resolvers)
+- Extracting a shared helper/base used by multiple callers
 - Behavior/interpretation changes, unless the user said they do not mind
-- Abstractions with a single caller
+- Abstractions with a single caller (still note if a second caller is imminent)
 - Cross-file fixture unifications that are a dedicated pass
 - Caching or perf work with no measured cost
+
+For each proposed dedup/refactor: name the **duplicated sites**, the **target shape**
+(what to extract, merge, or delete), **payoff** (lines, drift risk, one source of truth),
+**scope/cost** (files, tests, risk), and a **suggested order** if several items relate.
+Do not treat “deeper refactor” as optional silence — if duplication exists, say so.
 
 If leftover work is real after a named plan phase, list it in the report. Write a follow-up
 doc only when the user asks to handover, or when that phase already has one.
@@ -67,6 +80,22 @@ Do not launch Bugbot / security-review subagents unless the user asked for those
 - Do not detect errors by comparing user-visible text to a sentinel
 - User-cancel of a batch: return/break unless the API is actually throwing-cancel
 - Progress counts and phase labels must match the work that is happening
+
+### Dedup / reuse
+
+Hunt in this order:
+
+1. **Same file** — repeated blocks, twin branches, copy-pasted guards; extract a local helper
+   when it removes real duplication (apply if already touching the file).
+2. **Same feature area** — parallel partials, views, payloads, label maps, DnD handlers;
+   compare side by side and note what could be one type or one code path.
+3. **Cross-layer** — UI re-resolving what domain already decides; duplicate validation or
+   mapping in VM + view + tests.
+4. **Tests** — same scenario through VM + headless + integration; near-identical facts;
+   fixtures that could be one builder.
+
+When two sites implement the same policy or shape, prefer **one owner** — even if merging
+them is a follow-up pass. Flag “same logic, two homes” explicitly.
 
 ### KISS / YAGNI / cleanup
 
@@ -136,11 +165,16 @@ Lead with a one-paragraph verdict. Then:
 ```markdown
 ## Correctness (fixed | found)
 ## KISS / YAGNI (removed | proposed)
+## Dedup / reuse (applied | proposed)
 ## Naming / docs (if any)
 ## Tests (added | consolidated | skipped)
-## Deeper refactors (not done)
+## Deeper refactors (not done — always include when duplication exists)
 ## What to keep / what not to simplify
 ```
 
-Be specific (type/method names). Separate **applied** from **proposed**. For deeper items:
-why it pays off and why not now. If nothing is worth doing, say that and stop.
+Be specific (type/method names). Separate **applied** from **proposed**.
+
+**Dedup / reuse** and **Deeper refactors** may overlap — use Dedup for concrete duplication
+found; use Deeper refactors for structural follow-ups (shared types, layer moves, multi-file
+merges). Each proposed item needs: duplicated sites → target shape → payoff → scope/cost →
+suggested order. If nothing is worth doing, say that and stop.

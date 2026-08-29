@@ -110,6 +110,33 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies dropping an Applied row onto Available Filters removes it from the stack.
+        /// </summary>
+        [AvaloniaFact]
+        public void Drop_from_applied_to_palette_removes_filter()
+        {
+            var (window, mainViewModel, paletteList, _) = _ShowFilterPanes();
+            mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            mainViewModel.AppliedFiltersViewModel.SetSelectedSteps([]);
+            mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(_Entry("LettersCase"));
+
+            var payload = new AppliedFilterDragPayload([0]);
+            var dataTransfer = new DataTransfer();
+            dataTransfer.Add(DataTransferItem.Create(AppliedFilterDragPayload.Format, payload.Serialize()));
+
+            paletteList.RaiseEvent(
+                new DragEventArgs(DragDrop.DropEvent, dataTransfer, paletteList, default, KeyModifiers.None)
+            );
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
+            Assert.Equal("Letters Case", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+            Assert.Equal(1, mainViewModel.FilterCount);
+
+            window.Close();
+        }
+
         private static (
             Window Window,
             MainWindowViewModel MainViewModel,
@@ -122,6 +149,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             {
                 DataContext = mainViewModel.FilterPaletteViewModel,
                 AddSelectedToAppliedCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
+                AppliedFiltersViewModel = mainViewModel.AppliedFiltersViewModel,
             };
             var appliedView = new AppliedFiltersView
             {

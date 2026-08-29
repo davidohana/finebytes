@@ -4,6 +4,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterPalette;
+using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.Filters;
 
 namespace Mfr.App.Ui.Views.FilterPalette
@@ -19,10 +20,13 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _WireDragDropHandlers()
         {
+            DragDrop.SetAllowDrop(FilterList, true);
             FilterList.AddHandler(PointerPressedEvent, _OnListPointerPressed, RoutingStrategies.Tunnel);
             FilterList.AddHandler(PointerMovedEvent, _OnListPointerMoved, RoutingStrategies.Tunnel);
             FilterList.AddHandler(PointerReleasedEvent, _OnListPointerReleased, RoutingStrategies.Tunnel);
             FilterList.AddHandler(PointerCaptureLostEvent, _OnListPointerCaptureLost, RoutingStrategies.Tunnel);
+            FilterList.AddHandler(DragDrop.DragOverEvent, _OnListDragOver);
+            FilterList.AddHandler(DragDrop.DropEvent, _OnListDrop);
         }
 
         private void _OnListPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -118,6 +122,53 @@ namespace Mfr.App.Ui.Views.FilterPalette
         private void _OnListPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
         {
             _ClearDragState();
+        }
+
+        private void _OnListDragOver(object? sender, DragEventArgs e)
+        {
+            if (AppliedFiltersViewModel is null || _ReadAppliedReorderPayload(e) is null)
+            {
+                e.DragEffects = DragDropEffects.None;
+                return;
+            }
+
+            e.Handled = true;
+            e.DragEffects = DragDropEffects.Move;
+        }
+
+        private void _OnListDrop(object? sender, DragEventArgs e)
+        {
+            if (AppliedFiltersViewModel is null)
+            {
+                return;
+            }
+
+            if (_ReadAppliedReorderPayload(e) is not { } payload)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            AppliedFiltersViewModel.RemoveStepsAtIndices(payload.SourceIndices);
+        }
+
+        private static AppliedFilterDragPayload? _ReadAppliedReorderPayload(DragEventArgs e)
+        {
+            if (e.DataTransfer is null)
+            {
+                return null;
+            }
+
+            foreach (var item in e.DataTransfer.Items)
+            {
+                if (item.TryGetRaw(AppliedFilterDragPayload.Format) is string json)
+                {
+                    var payload = AppliedFilterDragPayload.Deserialize(json);
+                    return payload?.SourceIndices is { Count: > 0 } ? payload : null;
+                }
+            }
+
+            return null;
         }
 
         private static FilterPaletteDragPayload? _BuildDragPayload(ListBox listBox)

@@ -225,6 +225,25 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[1]);
         }
 
+        /// <summary>
+        /// Verifies drag-back removal deletes steps by index and updates selection.
+        /// </summary>
+        [Fact]
+        public void RemoveStepsAtIndices_removes_rows_and_selects_neighbor()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(_Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(_Entry("LettersCase"));
+            viewModel.SetSelectedSteps([]);
+
+            viewModel.RemoveStepsAtIndices([0]);
+
+            Assert.Single(viewModel.Steps);
+            Assert.Equal("Letters Case", viewModel.Steps[0].DisplayName);
+            Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
+        }
+
         private static FilterCatalogEntry _Entry(string type)
         {
             return FilterCatalog.Entries.Single(entry => entry.Type == type);

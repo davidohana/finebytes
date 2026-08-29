@@ -301,6 +301,37 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             SetSelectedSteps(moved);
         }
 
+        /// <summary>
+        /// Removes applied steps by list index (drag-back to Available Filters).
+        /// </summary>
+        /// <param name="indices">Row indices to remove.</param>
+        public void RemoveStepsAtIndices(IReadOnlyList<int> indices)
+        {
+            ArgumentNullException.ThrowIfNull(indices);
+
+            var sortedIndices = indices
+                .Where(index => index >= 0 && index < Steps.Count)
+                .OrderBy(index => index)
+                .ToList();
+            if (sortedIndices.Count == 0)
+            {
+                return;
+            }
+
+            var indexSet = sortedIndices.ToHashSet();
+            var anchorIndex = sortedIndices[0];
+
+            for (var index = Steps.Count - 1; index >= 0; index--)
+            {
+                if (indexSet.Contains(index))
+                {
+                    Steps.RemoveAt(index);
+                }
+            }
+
+            SetSelectedSteps(_SelectStepsAfterRemove(anchorIndex));
+        }
+
         private void _NotifySelectionCommandsChanged()
         {
             RemoveSelectedCommand.NotifyCanExecuteChanged();

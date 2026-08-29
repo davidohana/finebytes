@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 
 namespace Mfr.App.Ui.Views.FilterPalette
@@ -25,6 +26,21 @@ namespace Mfr.App.Ui.Views.FilterPalette
         {
             get => GetValue(AddSelectedToAppliedCommandProperty);
             set => SetValue(AddSelectedToAppliedCommandProperty, value);
+        }
+
+        /// <summary>
+        /// Applied Filters view model, set by the main window shell for drag-back removal.
+        /// </summary>
+        public static readonly StyledProperty<AppliedFiltersViewModel?> AppliedFiltersViewModelProperty =
+            AvaloniaProperty.Register<FilterPaletteView, AppliedFiltersViewModel?>(nameof(AppliedFiltersViewModel));
+
+        /// <summary>
+        /// Gets or sets the Applied Filters view model used when rows are dragged back to Available.
+        /// </summary>
+        public AppliedFiltersViewModel? AppliedFiltersViewModel
+        {
+            get => GetValue(AppliedFiltersViewModelProperty);
+            set => SetValue(AppliedFiltersViewModelProperty, value);
         }
 
         /// <summary>
