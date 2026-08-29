@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
@@ -50,6 +52,37 @@ namespace Mfr.Tests.Ui.RenameList
         )
         {
             return [new SessionStateRenameListSortField(fieldKey, descending)];
+        }
+
+        /// <summary>
+        /// Builds a dummy internal-reorder <see cref="DataTransfer"/> used by Rename List row drags.
+        /// </summary>
+        /// <returns>Transfer containing <see cref="RenameListView.InternalReorderFormat"/>.</returns>
+        internal static DataTransfer CreateInternalReorderDataTransfer()
+        {
+            var dataTransfer = new DataTransfer();
+            dataTransfer.Add(DataTransferItem.Create(RenameListView.InternalReorderFormat, "1"));
+            return dataTransfer;
+        }
+
+        /// <summary>
+        /// Builds an OS file <see cref="DataTransfer"/> from disk paths.
+        /// </summary>
+        /// <param name="window">Window whose storage provider resolves the paths.</param>
+        /// <param name="paths">Absolute file paths.</param>
+        /// <returns>Transfer containing those files.</returns>
+        internal static async Task<DataTransfer> CreateFileDataTransferAsync(Window window, IReadOnlyList<string> paths)
+        {
+            var storage = window.StorageProvider;
+            var dataTransfer = new DataTransfer();
+            foreach (var path in paths)
+            {
+                var item = await storage.TryGetFileFromPathAsync(path).ConfigureAwait(true);
+                Assert.NotNull(item);
+                dataTransfer.Add(DataTransferItem.CreateFile(item));
+            }
+
+            return dataTransfer;
         }
     }
 

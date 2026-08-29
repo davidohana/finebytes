@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
@@ -68,7 +67,7 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             var (view, window) = _Show(renameListViewModel);
 
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [alphaPath]);
+            var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [alphaPath]);
             var dragOverArgs = new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.None)
             {
                 DragEffects = DragDropEffects.None,
@@ -97,7 +96,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Single(renameListViewModel.Entries);
 
             var (view, window) = _Show(renameListViewModel);
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [dragPath]);
             var dragOverArgs = new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt)
             {
                 DragEffects = DragDropEffects.None,
@@ -126,7 +125,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([existingPath]);
 
             var (view, window) = _Show(renameListViewModel);
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [dragPath]);
             view.RaiseEvent(new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt));
             Assert.Empty(renameListViewModel.Entries);
 
@@ -159,7 +158,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[0]);
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [dragPath]);
             view.RaiseEvent(
                 new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
             );
@@ -195,7 +194,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[0]);
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [dragPath]);
             view.RaiseEvent(
                 new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
             );
@@ -232,7 +231,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
 
             var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1]);
-            var dataTransfer = _CreateInternalReorderDataTransfer();
+            var dataTransfer = RenameListTestHelpers.CreateInternalReorderDataTransfer();
             var dragOverArgs = new DragEventArgs(
                 DragDrop.DragOverEvent,
                 dataTransfer,
@@ -276,7 +275,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
 
             var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1]);
-            var dataTransfer = _CreateInternalReorderDataTransfer();
+            var dataTransfer = RenameListTestHelpers.CreateInternalReorderDataTransfer();
             view.RaiseEvent(
                 new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
             );
@@ -307,7 +306,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (view, window) = _Show(renameListViewModel);
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
-            var dataTransfer = _CreateInternalReorderDataTransfer();
+            var dataTransfer = RenameListTestHelpers.CreateInternalReorderDataTransfer();
             view.RaiseEvent(new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt));
 
             Assert.Equal(2, renameListViewModel.Entries.Count);
@@ -340,7 +339,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             var pointOnView = _PointOverEntry(view, grid, renameListViewModel.Entries[1], rowFractionY: 0.75);
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [dragPath]);
             view.RaiseEvent(
                 new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
             );
@@ -378,7 +377,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             var pointOnView = _PointBelowLastEntry(view, grid, renameListViewModel.Entries[1]);
-            var dataTransfer = await _CreateFileDataTransferAsync(window, [dragPath]);
+            var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [dragPath]);
             view.RaiseEvent(
                 new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, pointOnView, KeyModifiers.None)
             );
@@ -445,27 +444,6 @@ namespace Mfr.Tests.Ui.RenameList
             var pointOnView = row.TranslatePoint(local, view);
             Assert.True(pointOnView.HasValue);
             return pointOnView.Value;
-        }
-
-        private static async Task<DataTransfer> _CreateFileDataTransferAsync(Window window, IReadOnlyList<string> paths)
-        {
-            var storage = window.StorageProvider;
-            var dataTransfer = new DataTransfer();
-            foreach (var path in paths)
-            {
-                var item = await storage.TryGetFileFromPathAsync(path).ConfigureAwait(true);
-                Assert.NotNull(item);
-                dataTransfer.Add(DataTransferItem.CreateFile(item));
-            }
-
-            return dataTransfer;
-        }
-
-        private static DataTransfer _CreateInternalReorderDataTransfer()
-        {
-            var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(RenameListView.InternalReorderFormat, "1"));
-            return dataTransfer;
         }
 
         private static async Task _WaitUntil(Func<bool> condition)

@@ -1,13 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.FileList;
-using Mfr.App.Ui.Views.RenameList;
+using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Ui.FileList
 {
@@ -39,7 +38,7 @@ namespace Mfr.Tests.Ui.FileList
             var (_, renameListViewModel, view, window) = await _ShowWithRenameListAsync();
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
 
-            var dataTransfer = _CreateInternalReorderDataTransfer();
+            var dataTransfer = RenameListTestHelpers.CreateInternalReorderDataTransfer();
             var dragOverArgs = new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.None)
             {
                 DragEffects = DragDropEffects.None,
@@ -63,7 +62,7 @@ namespace Mfr.Tests.Ui.FileList
             view.RaiseEvent(
                 new DragEventArgs(
                     DragDrop.DropEvent,
-                    _CreateInternalReorderDataTransfer(),
+                    RenameListTestHelpers.CreateInternalReorderDataTransfer(),
                     view,
                     default,
                     KeyModifiers.None
@@ -104,7 +103,7 @@ namespace Mfr.Tests.Ui.FileList
             view.RaiseEvent(
                 new DragEventArgs(
                     DragDrop.DropEvent,
-                    _CreateInternalReorderDataTransfer(),
+                    RenameListTestHelpers.CreateInternalReorderDataTransfer(),
                     view,
                     default,
                     KeyModifiers.None
@@ -138,7 +137,9 @@ namespace Mfr.Tests.Ui.FileList
             Assert.NotEqual(DragDropEffects.Move, textArgs.DragEffects);
 
             var alphaPath = Path.Combine(((FileListViewModel)view.DataContext!).CurrentPath, "alpha.txt");
-            var fileTransfer = await _CreateFileDataTransferAsync(window, [alphaPath]).ConfigureAwait(true);
+            var fileTransfer = await RenameListTestHelpers
+                .CreateFileDataTransferAsync(window, [alphaPath])
+                .ConfigureAwait(true);
             var fileArgs = new DragEventArgs(DragDrop.DragOverEvent, fileTransfer, view, default, KeyModifiers.None)
             {
                 DragEffects = DragDropEffects.Copy,
@@ -162,6 +163,31 @@ namespace Mfr.Tests.Ui.FileList
             dataTransfer.Add(DataTransferItem.CreateText("not-a-rename-list-row"));
             view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, default, KeyModifiers.None));
             Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(2, renameListViewModel.Entries.Count);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies drag-back is a no-op when Remove Selected cannot run (empty selection / IsAdding).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task DragOver_And_Drop_When_Cannot_Remove_Does_Nothing()
+        {
+            var (_, renameListViewModel, view, window) = await _ShowWithRenameListAsync();
+            renameListViewModel.SetSelectedEntries([]);
+            Assert.False(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
+
+            var dataTransfer = RenameListTestHelpers.CreateInternalReorderDataTransfer();
+            var dragOverArgs = new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.None)
+            {
+                DragEffects = DragDropEffects.Move,
+            };
+            view.RaiseEvent(dragOverArgs);
+            Assert.Equal(DragDropEffects.None, dragOverArgs.DragEffects);
+
+            view.RaiseEvent(new DragEventArgs(DragDrop.DropEvent, dataTransfer, view, default, KeyModifiers.None));
+            _PumpDeferredDrop();
 
             Assert.Equal(2, renameListViewModel.Entries.Count);
             window.Close();
@@ -218,27 +244,6 @@ namespace Mfr.Tests.Ui.FileList
         {
             Dispatcher.UIThread.RunJobs();
             Dispatcher.UIThread.RunJobs();
-        }
-
-        private static DataTransfer _CreateInternalReorderDataTransfer()
-        {
-            var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(RenameListView.InternalReorderFormat, "1"));
-            return dataTransfer;
-        }
-
-        private static async Task<DataTransfer> _CreateFileDataTransferAsync(Window window, IReadOnlyList<string> paths)
-        {
-            var storage = window.StorageProvider;
-            var dataTransfer = new DataTransfer();
-            foreach (var path in paths)
-            {
-                var item = await storage.TryGetFileFromPathAsync(path).ConfigureAwait(true);
-                Assert.NotNull(item);
-                dataTransfer.Add(DataTransferItem.CreateFile(item));
-            }
-
-            return dataTransfer;
         }
     }
 }

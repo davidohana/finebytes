@@ -52,11 +52,7 @@ namespace Mfr.App.Ui.Views.FileList
             }
 
             e.Handled = true;
-            var command = RemoveSelectedFromRenameListCommand;
-            if (command is null)
-            {
-                return;
-            }
+            var command = RemoveSelectedFromRenameListCommand!;
 
             // Pointer release can select the row under the cursor; clear File List selection afterward.
             _isRenameListDragBackDrop = true;
