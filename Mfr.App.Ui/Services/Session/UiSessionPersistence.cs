@@ -26,8 +26,9 @@ namespace Mfr.App.Ui.Services.Session
             ArgumentNullException.ThrowIfNull(session);
 
             var windowRestored = false;
+            var mainWindow = session.MainWindow ?? new SessionStateMainWindow();
 
-            if (session.MainWindow?.RememberWindowState ?? true)
+            if (mainWindow.RememberWindowState)
             {
                 windowRestored = WindowSession.TryRestore(window, session.MainWindow);
 
@@ -63,8 +64,8 @@ namespace Mfr.App.Ui.Services.Session
 
             try
             {
-                var rememberWindow = session.MainWindow?.RememberWindowState ?? true;
-                var rememberLastFolder = session.FileList?.RememberLastFolder ?? true;
+                var rememberWindow = _RememberWindowState(session);
+                var rememberLastFolder = _RememberLastFolder(session);
 
                 if (rememberWindow)
                 {
@@ -108,6 +109,16 @@ namespace Mfr.App.Ui.Services.Session
             {
                 // Session save must not block shutdown or surface to the user.
             }
+        }
+
+        private static bool _RememberWindowState(SessionState session)
+        {
+            return (session.MainWindow ?? new SessionStateMainWindow()).RememberWindowState;
+        }
+
+        private static bool _RememberLastFolder(SessionState session)
+        {
+            return (session.FileList ?? new SessionStateFileList()).RememberLastFolder;
         }
 
         private static bool _IsPersistableFolder(string? path)
