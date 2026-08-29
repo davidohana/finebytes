@@ -36,7 +36,6 @@ namespace Mfr.App.Ui.Views.RenameList
         private DataGridColumn? _lastHintColumn;
         private AddProgressDialog? _addProgressDialog;
         private RenameListFieldShuttleDialog? _fieldShuttleDialog;
-        private RenameListDisplayOptionsDialog? _displayOptionsDialog;
         private Point? _dragStartPoint;
         private PointerEventArgs? _dragStartArgs;
         private RenameListEntry? _dragHitEntry;
@@ -72,50 +71,6 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             // Defer until any context menu closes so the modal centers on the owner window.
             Dispatcher.UIThread.Post(() => _ = _ShowFieldShuttleDialogAsync(tab));
-        }
-
-        private void _OnDisplayOptionsRequested(object? sender, EventArgs e)
-        {
-            Dispatcher.UIThread.Post(() => _ = _ShowDisplayOptionsDialogAsync());
-        }
-
-        private async Task _ShowDisplayOptionsDialogAsync()
-        {
-            if (_viewModel is null)
-            {
-                return;
-            }
-
-            if (TopLevel.GetTopLevel(this) is not Window owner)
-            {
-                return;
-            }
-
-            if (_displayOptionsDialog is not null)
-            {
-                return;
-            }
-
-            var dialogVm = new RenameListDisplayOptionsDialogViewModel(_viewModel.UseFixedWidthFont);
-            var dialog = new RenameListDisplayOptionsDialog(dialogVm);
-            _displayOptionsDialog = dialog;
-            try
-            {
-                var accepted = await dialog.ShowDialog<bool?>(owner);
-                if (accepted != true)
-                {
-                    return;
-                }
-
-                _viewModel.CommitDisplayOptions(dialogVm.UseFixedWidthFont);
-            }
-            finally
-            {
-                if (ReferenceEquals(_displayOptionsDialog, dialog))
-                {
-                    _displayOptionsDialog = null;
-                }
-            }
         }
 
         private async Task _ShowFieldShuttleDialogAsync(RenameListFieldShuttleTab tab)
@@ -184,7 +139,6 @@ namespace Mfr.App.Ui.Views.RenameList
             if (_viewModel is not null)
             {
                 _viewModel.FieldShuttleRequested -= _OnFieldShuttleRequested;
-                _viewModel.DisplayOptionsRequested -= _OnDisplayOptionsRequested;
                 _viewModel.LoadErrorsDialogRequested -= _OnLoadErrorsDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.AddProgress.PropertyChanged -= _OnAddProgressPropertyChanged;
@@ -197,7 +151,6 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _viewModel.FieldShuttleRequested += _OnFieldShuttleRequested;
-            _viewModel.DisplayOptionsRequested += _OnDisplayOptionsRequested;
             _viewModel.LoadErrorsDialogRequested += _OnLoadErrorsDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;

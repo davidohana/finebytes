@@ -5,12 +5,12 @@ using Mfr.App.Ui.ViewModels.RenameList;
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Tests for Rename List display preferences.
+    /// Tests for Rename List fixed-width font preference.
     /// </summary>
-    public sealed class RenameListDisplayOptionsTests
+    public sealed class RenameListFixedWidthFontTests
     {
         [Fact]
-        public void CommitDisplayOptions_updates_vm_and_in_memory_config()
+        public void SetUseFixedWidthFont_updates_vm_and_in_memory_config()
         {
             ConfigStore.Config.Ui.RenameListUseFixedWidthFont = false;
 
@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.RenameList
                 var renameListViewModel = new RenameListViewModel(fileListViewModel);
                 Assert.False(renameListViewModel.UseFixedWidthFont);
 
-                renameListViewModel.CommitDisplayOptions(useFixedWidthFont: true);
+                renameListViewModel.SetUseFixedWidthFont(true);
 
                 Assert.True(renameListViewModel.UseFixedWidthFont);
                 Assert.True(ConfigStore.Config.Ui.RenameListUseFixedWidthFont);
@@ -37,8 +37,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void Dialog_draft_does_not_change_vm_until_commit()
+        public void ToggleUseFixedWidthFont_flips_value()
         {
+            ConfigStore.Config.Ui.RenameListUseFixedWidthFont = false;
+
             var fileListViewModel = new FileListViewModel(
                 NullSystemIconProvider.Instance,
                 Path.GetTempPath(),
@@ -49,17 +51,20 @@ namespace Mfr.Tests.Ui.RenameList
                 var renameListViewModel = new RenameListViewModel(fileListViewModel);
                 Assert.False(renameListViewModel.UseFixedWidthFont);
 
-                var dialogVm = new RenameListDisplayOptionsDialogViewModel(renameListViewModel.UseFixedWidthFont)
-                {
-                    UseFixedWidthFont = true,
-                };
+                renameListViewModel.ToggleUseFixedWidthFontCommand.Execute(null);
 
-                Assert.True(dialogVm.UseFixedWidthFont);
+                Assert.True(renameListViewModel.UseFixedWidthFont);
+                Assert.True(ConfigStore.Config.Ui.RenameListUseFixedWidthFont);
+
+                renameListViewModel.ToggleUseFixedWidthFontCommand.Execute(null);
+
                 Assert.False(renameListViewModel.UseFixedWidthFont);
+                Assert.False(ConfigStore.Config.Ui.RenameListUseFixedWidthFont);
             }
             finally
             {
                 fileListViewModel.Dispose();
+                ConfigStore.Config.Ui.RenameListUseFixedWidthFont = false;
             }
         }
     }

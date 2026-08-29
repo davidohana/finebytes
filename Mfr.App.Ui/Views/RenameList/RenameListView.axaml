@@ -55,7 +55,12 @@
           ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"
         />
         <Separator />
-        <MenuItem Header="Display Options..." Command="{Binding OpenDisplayOptionsCommand}" />
+        <MenuItem
+          Header="Use Fixed-Width Font"
+          Command="{Binding ToggleUseFixedWidthFontCommand}"
+          ToggleType="CheckBox"
+          IsChecked="{Binding UseFixedWidthFont, Mode=OneWay}"
+        />
         <Separator />
         <MenuItem
           Header="Remove Selected Item(s)"

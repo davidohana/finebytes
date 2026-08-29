@@ -291,6 +291,12 @@
         />
         <Separator />
         <MenuItem
+          Header="Use Fixed-Width Font"
+          Command="{Binding RenameListViewModel.ToggleUseFixedWidthFontCommand}"
+          ToggleType="CheckBox"
+          IsChecked="{Binding RenameListViewModel.UseFixedWidthFont, Mode=OneWay}"
+        />
+        <MenuItem
           Header="Auto-Sort"
           Command="{Binding RenameListViewModel.ToggleAutoSortCommand}"
           ToggleType="CheckBox"

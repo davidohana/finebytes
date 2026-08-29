@@ -10,18 +10,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Raised when the view should open the Display Options dialog.
-        /// </summary>
-        public event EventHandler? DisplayOptionsRequested;
-
-        /// <summary>
         /// Gets whether the Rename List grid uses a fixed-width font.
         /// </summary>
         [ObservableProperty]
         private bool _useFixedWidthFont = ConfigStore.Config.Ui.RenameListUseFixedWidthFont;
 
         /// <summary>
-        /// Updates the live fixed-width font flag.
+        /// Updates the fixed-width font flag and persists it to <c>config.json</c>.
         /// </summary>
         /// <param name="value">New value.</param>
         public void SetUseFixedWidthFont(bool value)
@@ -32,26 +27,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             UseFixedWidthFont = value;
-        }
-
-        /// <summary>
-        /// Commits display options from the dialog and persists them to <c>config.json</c>.
-        /// </summary>
-        /// <param name="useFixedWidthFont">Draft fixed-width font choice.</param>
-        public void CommitDisplayOptions(bool useFixedWidthFont)
-        {
-            SetUseFixedWidthFont(useFixedWidthFont);
-            ConfigStore.Config.Ui.RenameListUseFixedWidthFont = useFixedWidthFont;
+            ConfigStore.Config.Ui.RenameListUseFixedWidthFont = value;
             ConfigStore.Save();
         }
 
         /// <summary>
-        /// Opens the Display Options dialog (context menu).
+        /// Toggles fixed-width font (context and main menus).
         /// </summary>
         [RelayCommand]
-        public void OpenDisplayOptions()
+        public void ToggleUseFixedWidthFont()
         {
-            DisplayOptionsRequested?.Invoke(this, EventArgs.Empty);
+            SetUseFixedWidthFont(!UseFixedWidthFont);
         }
     }
 }
