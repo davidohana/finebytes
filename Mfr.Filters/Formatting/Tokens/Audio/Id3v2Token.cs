@@ -42,7 +42,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
             var options = _ParseOptions(FormatOptionsParsing.TokenDisplayName(this), tokenArgs);
             return item =>
             {
-                item.EnsureEmbeddedTagsLoaded();
+                item.EnsureTagLibLoaded();
                 var overlay = item.Preview.AudioTagOverlay;
                 var isBareTxxx =
                     string.Equals(options.FrameId, "TXXX", StringComparison.Ordinal)
@@ -142,7 +142,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
 
             return item =>
             {
-                item.EnsureEmbeddedTagsLoaded();
+                item.EnsureTagLibLoaded();
                 var block = item.Preview.AudioTagOverlay.Id3v2;
                 if (block is null)
                 {

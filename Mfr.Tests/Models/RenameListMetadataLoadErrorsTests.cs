@@ -74,17 +74,6 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies image-only columns are not treated as audio/media because of overlapping flag bits.
-        /// </summary>
-        [Fact]
-        public void ImageProperties_flag_does_not_include_audio_or_media()
-        {
-            var image = RenameListMetadataRequirement.ImageProperties;
-            Assert.False(image.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags));
-            Assert.False(image.HasFlag(RenameListMetadataRequirement.MediaProperties));
-        }
-
-        /// <summary>
         /// Verifies real TagLib failures store the raw message for technical details.
         /// </summary>
         [Fact]

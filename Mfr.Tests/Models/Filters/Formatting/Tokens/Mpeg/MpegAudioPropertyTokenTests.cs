@@ -163,13 +163,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
             meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Mpeg;
 
             var item = new RenameItem(meta);
-            item.MarkEmbeddedTagsLoadAttempted();
-            Assert.False(item.MediaPropertiesLoadAttempted);
+            Assert.False(item.TagLibLoadAttempted);
             Assert.Null(item.Original.Media);
 
             var text = new MpegLayerToken().Compile(string.Empty)(item);
 
-            Assert.True(item.MediaPropertiesLoadAttempted);
+            Assert.True(item.TagLibLoadAttempted);
             Assert.NotNull(item.Original.Media);
             Assert.NotNull(item.Original.Media.Mpeg);
             Assert.Equal("III", text);
@@ -186,7 +185,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
             Assert.NotNull(item.Original.Media?.Mpeg);
             item.ClearMediaPropertiesCache();
 
-            Assert.False(item.MediaPropertiesLoadAttempted);
+            Assert.False(item.TagLibLoadAttempted);
             Assert.Null(item.Original.Media);
             Assert.Null(item.Preview.Media);
         }

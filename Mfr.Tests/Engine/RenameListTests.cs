@@ -1305,11 +1305,11 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
-            Assert.False(item.EmbeddedTagsLoadAttempted);
+            Assert.False(item.TagLibLoadAttempted);
 
             renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.EmbeddedAudioTags);
 
-            Assert.True(item.EmbeddedTagsLoadAttempted);
+            Assert.True(item.TagLibLoadAttempted);
             Assert.Equal("HydrateTitle", item.Original.AudioTagOverlay.Semantic().Title);
         }
 
@@ -1327,7 +1327,7 @@ namespace Mfr.Tests.Engine
             renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.None);
 
             var item = Assert.Single(renameList.RenameItems);
-            Assert.False(item.EmbeddedTagsLoadAttempted);
+            Assert.False(item.TagLibLoadAttempted);
         }
 
         /// <summary>
@@ -1421,7 +1421,7 @@ namespace Mfr.Tests.Engine
 
             renameList.Sort([new RenameListSortKey(titleKey)]);
 
-            Assert.All(renameList.RenameItems, item => Assert.False(item.EmbeddedTagsLoadAttempted));
+            Assert.All(renameList.RenameItems, item => Assert.False(item.TagLibLoadAttempted));
         }
 
         /// <summary>
@@ -1437,7 +1437,7 @@ namespace Mfr.Tests.Engine
             renameList.AddSources([path], metadataRequirement: RenameListMetadataRequirement.EmbeddedAudioTags);
 
             var item = Assert.Single(renameList.RenameItems);
-            Assert.True(item.EmbeddedTagsLoadAttempted);
+            Assert.True(item.TagLibLoadAttempted);
             Assert.Equal("BatchTitle", item.Original.AudioTagOverlay.Semantic().Title);
         }
 
@@ -1457,7 +1457,7 @@ namespace Mfr.Tests.Engine
             cts.Cancel();
             renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.EmbeddedAudioTags, cts.Token);
 
-            Assert.False(Assert.Single(renameList.RenameItems).EmbeddedTagsLoadAttempted);
+            Assert.False(Assert.Single(renameList.RenameItems).TagLibLoadAttempted);
         }
 
         [System.Runtime.Versioning.SupportedOSPlatform("windows")]

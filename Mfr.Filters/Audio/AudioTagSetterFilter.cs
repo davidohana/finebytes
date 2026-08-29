@@ -87,7 +87,7 @@ namespace Mfr.Filters.Audio
     /// </summary>
     /// <remarks>
     /// <para>
-    /// For files, the filter calls <see cref="RenameItemEmbeddedTagsExtensions.EnsureEmbeddedTagsLoaded"/> so preview tags reflect disk before applying per-field options.
+    /// For files, the filter calls <see cref="RenameItemEmbeddedTagsExtensions.EnsureTagLibLoaded"/> so preview tags reflect disk before applying per-field options.
     /// Writes broadcast onto every present tag block; an empty overlay gets the container's recommended empty block first.
     /// Directory rows cannot load tags and surface the same <see cref="InvalidOperationException"/> as other audio overlay operations
     /// (caught during preview and shown as the row’s <see cref="RenameItem.PreviewError"/>).
@@ -146,7 +146,7 @@ namespace Mfr.Filters.Audio
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
         {
-            item.EnsureEmbeddedTagsLoaded();
+            item.EnsureTagLibLoaded();
             var tags = item.Preview.AudioTagOverlay;
             var semanticTag = SemanticAudioTag.FromOverlay(tags);
 

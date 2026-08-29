@@ -104,14 +104,9 @@ namespace Mfr.Models.Rename
         internal string SentenceEndChars { get; set; } = ".!?";
 
         /// <summary>
-        /// Gets whether embedded tags were loaded for this preview cycle.
+        /// Gets whether TagLib metadata (embedded tags and media properties) was loaded for this preview cycle.
         /// </summary>
-        internal bool EmbeddedTagsLoadAttempted { get; private set; }
-
-        /// <summary>
-        /// Gets whether TagLib stream properties (media + optional MPEG) were loaded for this preview cycle.
-        /// </summary>
-        internal bool MediaPropertiesLoadAttempted { get; private set; }
+        internal bool TagLibLoadAttempted { get; private set; }
 
         /// <summary>
         /// Gets whether MetadataExtractor image properties and EXIF were loaded for this preview cycle.
@@ -149,19 +144,11 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
-        /// Marks embedded-tag load as attempted for this preview cycle.
+        /// Marks TagLib metadata load as attempted for this preview cycle.
         /// </summary>
-        internal void MarkEmbeddedTagsLoadAttempted()
+        internal void MarkTagLibLoadAttempted()
         {
-            EmbeddedTagsLoadAttempted = true;
-        }
-
-        /// <summary>
-        /// Marks TagLib stream-properties load as attempted for this preview cycle.
-        /// </summary>
-        internal void MarkMediaPropertiesLoadAttempted()
-        {
-            MediaPropertiesLoadAttempted = true;
+            TagLibLoadAttempted = true;
         }
 
         /// <summary>
@@ -241,7 +228,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void ClearEmbeddedTagsCache()
         {
-            EmbeddedTagsLoadAttempted = false;
+            TagLibLoadAttempted = false;
             TagLibMetadataLoadError = null;
             Original.AudioTagOverlay = new AudioTagOverlay();
             Preview.AudioTagOverlay = new AudioTagOverlay();
@@ -253,7 +240,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void ClearMediaPropertiesCache()
         {
-            MediaPropertiesLoadAttempted = false;
+            TagLibLoadAttempted = false;
             TagLibMetadataLoadError = null;
             Original.Media = null;
             Preview.Media = null;

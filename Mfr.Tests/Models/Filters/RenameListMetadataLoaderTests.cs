@@ -23,9 +23,23 @@ namespace Mfr.Tests.Models.Filters
             RenameListMetadataLoader.TryEnsureLoaded(item, imageKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, mediaKey);
 
-            Assert.False(item.EmbeddedTagsLoadAttempted);
+            Assert.False(item.TagLibLoadAttempted);
             Assert.False(item.ImagePropertiesLoadAttempted);
-            Assert.False(item.MediaPropertiesLoadAttempted);
+        }
+
+        [Fact]
+        public void TagLib_failure_on_audio_key_satisfies_media_requirement()
+        {
+            var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
+            var audioKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+
+            RenameListMetadataLoader.TryEnsureLoaded(item, audioKey);
+
+            Assert.True(item.TagLibLoadAttempted);
+            Assert.NotNull(item.TagLibMetadataLoadError);
+            Assert.True(
+                RenameListMetadataLoader.IsRequirementSatisfied(item, RenameListMetadataRequirement.MediaProperties)
+            );
         }
 
         [Fact]
@@ -40,9 +54,8 @@ namespace Mfr.Tests.Models.Filters
             RenameListMetadataLoader.TryEnsureLoaded(item, imageKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, mediaKey);
 
-            Assert.True(item.EmbeddedTagsLoadAttempted);
+            Assert.True(item.TagLibLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
-            Assert.True(item.MediaPropertiesLoadAttempted);
             Assert.NotNull(item.TagLibMetadataLoadError);
             Assert.NotNull(item.ImagePropertiesLoadError);
             Assert.Equal(RenameListFieldCatalog.FieldLoadErrorText, RenameListFieldCatalog.Resolve(item, audioKey));
@@ -62,10 +75,10 @@ namespace Mfr.Tests.Models.Filters
                 var item = _UnmarkedItem(path);
                 var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
-                Assert.False(item.EmbeddedTagsLoadAttempted);
+                Assert.False(item.TagLibLoadAttempted);
                 RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
 
-                Assert.True(item.EmbeddedTagsLoadAttempted);
+                Assert.True(item.TagLibLoadAttempted);
                 Assert.Equal("DiskTitle", RenameListFieldCatalog.Resolve(item, titleKey));
 
                 item.Original.AudioTagOverlay.ClearAllBlocks();
@@ -92,7 +105,7 @@ namespace Mfr.Tests.Models.Filters
         }
 
         [Fact]
-        public void Loads_media_properties_from_disk_and_marks_tags_as_sibling()
+        public void Loads_media_properties_from_disk_and_fills_tags()
         {
             var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(tempDir);
@@ -107,12 +120,10 @@ namespace Mfr.Tests.Models.Filters
                 var item = _UnmarkedItem(path);
                 var layerKey = RenameListFieldKey.Original(MpegRenameListFields.Group, "Layer");
 
-                Assert.False(item.MediaPropertiesLoadAttempted);
-                Assert.False(item.EmbeddedTagsLoadAttempted);
+                Assert.False(item.TagLibLoadAttempted);
                 RenameListMetadataLoader.TryEnsureLoaded(item, layerKey);
 
-                Assert.True(item.MediaPropertiesLoadAttempted);
-                Assert.True(item.EmbeddedTagsLoadAttempted);
+                Assert.True(item.TagLibLoadAttempted);
                 Assert.Equal("III", RenameListFieldCatalog.Resolve(item, layerKey));
             }
             finally
@@ -129,7 +140,7 @@ namespace Mfr.Tests.Models.Filters
 
             RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
 
-            Assert.True(item.EmbeddedTagsLoadAttempted);
+            Assert.True(item.TagLibLoadAttempted);
             Assert.Null(item.TagLibMetadataLoadError);
             Assert.Equal(string.Empty, RenameListFieldCatalog.Resolve(item, titleKey));
         }
@@ -145,7 +156,7 @@ namespace Mfr.Tests.Models.Filters
 
             item.ClearMetadataCaches();
             Assert.Null(item.TagLibMetadataLoadError);
-            Assert.False(item.EmbeddedTagsLoadAttempted);
+            Assert.False(item.TagLibLoadAttempted);
         }
 
         [Fact]
@@ -165,7 +176,7 @@ namespace Mfr.Tests.Models.Filters
         public void AnyItemNeedsLoad_false_when_all_rows_satisfied()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            item.MarkEmbeddedTagsLoadAttempted();
+            item.MarkTagLibLoadAttempted();
             var requirement = RenameListMetadataRequirement.EmbeddedAudioTags;
 
             Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
@@ -181,7 +192,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
             RenameListMetadataLoader.TryEnsureLoaded(item, requirement);
 
-            Assert.True(item.EmbeddedTagsLoadAttempted);
+            Assert.True(item.TagLibLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
         }

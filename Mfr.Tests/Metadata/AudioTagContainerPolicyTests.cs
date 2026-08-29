@@ -197,12 +197,12 @@ namespace Mfr.Tests.Metadata
         /// Loading embedded tags caches the container on both overlays so later filters can run capability checks for free.
         /// </summary>
         [Fact]
-        public void EnsureEmbeddedTagsLoaded_CachesDetectedContainerOnOverlays()
+        public void EnsureTagLibLoaded_CachesDetectedContainerOnOverlays()
         {
             var path = _CopyFixtureToTempDir("metaflac.flac");
             var item = _CreateRenameItemFor(path);
 
-            item.EnsureEmbeddedTagsLoaded();
+            item.EnsureTagLibLoaded();
 
             Assert.Equal(AudioContainerFormat.Flac, item.Original.AudioTagOverlay.ContainerFormat);
             Assert.Equal(AudioContainerFormat.Flac, item.Preview.AudioTagOverlay.ContainerFormat);

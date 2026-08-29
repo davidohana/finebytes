@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             };
 
             var item = new RenameItem(meta);
-            item.MarkEmbeddedTagsLoadAttempted();
+            item.MarkTagLibLoadAttempted();
             var filter = _CreateAllFilter();
             filter.Setup();
             filter.Apply(item);
@@ -100,7 +100,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             };
 
             var item = new RenameItem(meta);
-            item.MarkEmbeddedTagsLoadAttempted();
+            item.MarkTagLibLoadAttempted();
             var formatter = new FormatterFilter(
                 Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                 Options: new FormatterOptions("Formatted")
@@ -137,7 +137,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             };
 
             var item = new RenameItem(meta);
-            item.MarkEmbeddedTagsLoadAttempted();
+            item.MarkTagLibLoadAttempted();
             var setter = new AudioTagSetterFilter(
                 new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "FromSetter"))
             );

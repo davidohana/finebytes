@@ -15,7 +15,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
 
             return item =>
             {
-                item.EnsureMediaPropertiesLoaded();
+                item.EnsureTagLibLoaded();
                 return MediaPropertiesFormatting.Format(item.Original.Media, field);
             };
         }

@@ -22,14 +22,9 @@ namespace Mfr.Filters
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags))
+            if (_NeedsTagLib(metadataRequirement))
             {
-                _TryEnsureEmbeddedTagsLoaded(item);
-            }
-
-            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.MediaProperties))
-            {
-                _TryEnsureMediaPropertiesLoaded(item);
+                _TryEnsureTagLibLoaded(item);
             }
 
             if (metadataRequirement.HasFlag(RenameListMetadataRequirement.ImageProperties))
@@ -59,14 +54,7 @@ namespace Mfr.Filters
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (requirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags) && !item.EmbeddedTagsLoadAttempted)
-            {
-                return false;
-            }
-
-            if (
-                requirement.HasFlag(RenameListMetadataRequirement.MediaProperties) && !item.MediaPropertiesLoadAttempted
-            )
+            if (_NeedsTagLib(requirement) && !item.TagLibLoadAttempted)
             {
                 return false;
             }
@@ -99,33 +87,22 @@ namespace Mfr.Filters
             return items.Any(item => !IsRequirementSatisfied(item, requirement));
         }
 
-        private static void _TryEnsureEmbeddedTagsLoaded(RenameItem item)
+        private static bool _NeedsTagLib(RenameListMetadataRequirement requirement)
         {
-            if (item.EmbeddedTagsLoadAttempted || item.Original.Attributes.IsDirectory())
-            {
-                return;
-            }
-
-            try
-            {
-                item.EnsureEmbeddedTagsLoaded();
-            }
-            catch (Exception ex) when (_IsMetadataReadFailure(ex))
-            {
-                item.SetTagLibMetadataLoadError(ex);
-            }
+            return requirement.HasFlag(RenameListMetadataRequirement.EmbeddedAudioTags)
+                || requirement.HasFlag(RenameListMetadataRequirement.MediaProperties);
         }
 
-        private static void _TryEnsureMediaPropertiesLoaded(RenameItem item)
+        private static void _TryEnsureTagLibLoaded(RenameItem item)
         {
-            if (item.MediaPropertiesLoadAttempted || item.Original.Attributes.IsDirectory())
+            if (item.TagLibLoadAttempted || item.Original.Attributes.IsDirectory())
             {
                 return;
             }
 
             try
             {
-                item.EnsureMediaPropertiesLoaded();
+                item.EnsureTagLibLoaded();
             }
             catch (Exception ex) when (_IsMetadataReadFailure(ex))
             {

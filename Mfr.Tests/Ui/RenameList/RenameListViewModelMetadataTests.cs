@@ -40,7 +40,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.Equal("AddTitle", entry.GetFieldText(titleKey));
-            Assert.True(entry.EngineItem.EmbeddedTagsLoadAttempted);
+            Assert.True(entry.EngineItem.TagLibLoadAttempted);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
 
             var entry = Assert.Single(renameListViewModel.Entries);
-            Assert.False(entry.EngineItem.EmbeddedTagsLoadAttempted);
+            Assert.False(entry.EngineItem.TagLibLoadAttempted);
 
             await renameListViewModel
                 .ApplyFieldShuttleAsync(
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Ui.RenameList
                 .ConfigureAwait(true);
 
             Assert.Equal("ShuttleTitle", entry.GetFieldText(titleKey));
-            Assert.True(entry.EngineItem.EmbeddedTagsLoadAttempted);
+            Assert.True(entry.EngineItem.TagLibLoadAttempted);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.Equal(string.Empty, entry.GetFieldText(titleKey));
-            Assert.False(entry.EngineItem.EmbeddedTagsLoadAttempted);
+            Assert.False(entry.EngineItem.TagLibLoadAttempted);
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
 
             var entry = Assert.Single(renameListViewModel.Entries);
-            Assert.True(entry.EngineItem.EmbeddedTagsLoadAttempted);
+            Assert.True(entry.EngineItem.TagLibLoadAttempted);
 
             await renameListViewModel
                 .ApplyFieldShuttleAsync(
@@ -197,7 +197,7 @@ namespace Mfr.Tests.Ui.RenameList
             await _WaitForBackgroundAsync(renameListViewModel).ConfigureAwait(true);
 
             Assert.Equal(alphaPath, renameListViewModel.Entries[0].EngineItem.Original.FullPath);
-            Assert.All(renameListViewModel.Entries, entry => Assert.True(entry.EngineItem.EmbeddedTagsLoadAttempted));
+            Assert.All(renameListViewModel.Entries, entry => Assert.True(entry.EngineItem.TagLibLoadAttempted));
         }
 
         private static async Task _WaitUntilAsync(Func<bool> condition)

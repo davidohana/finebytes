@@ -25,10 +25,10 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies <see cref="RenameItemEmbeddedTagsExtensions.EnsureEmbeddedTagsLoaded"/> reads disk tags onto both snapshots.
+        /// Verifies <see cref="RenameItemEmbeddedTagsExtensions.EnsureTagLibLoaded"/> reads disk tags onto both snapshots.
         /// </summary>
         [Fact]
-        public void EnsureEmbeddedTagsLoaded_ReadsFromDisk_MirrorsOntoBothSnapshots()
+        public void EnsureTagLibLoaded_ReadsFromDisk_MirrorsOntoBothSnapshots()
         {
             var path = Path.Combine(_tempRoot, "tagged.wav");
             TaggedMinimalWav.WriteTagged(path, title: "DiskTitle", album: "SnapshotAlbum");
@@ -51,51 +51,32 @@ namespace Mfr.Tests.Models
             };
             item.Preview.AudioTagOverlay.MergeSemantic(mutated);
 
-            item.EnsureEmbeddedTagsLoaded();
+            item.EnsureTagLibLoaded();
 
             Assert.Equal("SnapshotAlbum", item.Original.AudioTagOverlay.Semantic().Album);
             Assert.Equal("SnapshotAlbum", item.Preview.AudioTagOverlay.Semantic().Album);
         }
 
         /// <summary>
-        /// Verifies a tags load also fills media properties when that cache has not been marked yet.
+        /// Verifies one TagLib load fills both tag overlays and media properties.
         /// </summary>
         [Fact]
-        public void EnsureEmbeddedTagsLoaded_AlsoLoadsMediaWhenUnmarked()
+        public void EnsureTagLibLoaded_FillsTagsAndMedia()
         {
-            var path = Path.Combine(_tempRoot, "tags-fill-media.wav");
+            var path = Path.Combine(_tempRoot, "tags-and-media.wav");
             TaggedMinimalWav.WriteTagged(path, title: "DiskTitle", album: "SnapshotAlbum");
             var item = _CreateUnmarkedItem(path);
 
-            item.EnsureEmbeddedTagsLoaded();
+            item.EnsureTagLibLoaded();
 
-            Assert.True(item.EmbeddedTagsLoadAttempted);
-            Assert.True(item.MediaPropertiesLoadAttempted);
+            Assert.True(item.TagLibLoadAttempted);
             Assert.Equal("SnapshotAlbum", item.Original.AudioTagOverlay.Semantic().Album);
+            Assert.Equal("SnapshotAlbum", item.Preview.AudioTagOverlay.Semantic().Album);
+            Assert.Equal(AudioContainerFormat.Riff, item.Original.AudioTagOverlay.ContainerFormat);
             var media = item.Original.Media;
             Assert.NotNull(media);
             Assert.Equal(media, item.Preview.Media);
             Assert.True(media.AudioChannels > 0);
-        }
-
-        /// <summary>
-        /// Verifies a media load also fills tag overlays when that cache has not been marked yet.
-        /// </summary>
-        [Fact]
-        public void EnsureMediaPropertiesLoaded_AlsoLoadsTagsWhenUnmarked()
-        {
-            var path = Path.Combine(_tempRoot, "media-fill-tags.wav");
-            TaggedMinimalWav.WriteTagged(path, title: "DiskTitle", album: "SnapshotAlbum");
-            var item = _CreateUnmarkedItem(path);
-
-            item.EnsureMediaPropertiesLoaded();
-
-            Assert.True(item.MediaPropertiesLoadAttempted);
-            Assert.True(item.EmbeddedTagsLoadAttempted);
-            Assert.NotNull(item.Original.Media);
-            Assert.Equal("SnapshotAlbum", item.Original.AudioTagOverlay.Semantic().Album);
-            Assert.Equal("SnapshotAlbum", item.Preview.AudioTagOverlay.Semantic().Album);
-            Assert.Equal(AudioContainerFormat.Riff, item.Original.AudioTagOverlay.ContainerFormat);
         }
 
         [Fact]

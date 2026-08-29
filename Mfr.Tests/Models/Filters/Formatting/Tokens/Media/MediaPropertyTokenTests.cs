@@ -130,7 +130,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
         }
 
         [Fact]
-        public void EnsureMediaPropertiesLoaded_ReadsFromDiskWhenNotMarked()
+        public void Compile_ReadsFromDiskWhenNotMarked()
         {
             var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "minimal-silent.wav");
             Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
@@ -151,13 +151,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
             meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Riff;
 
             var item = new RenameItem(meta);
-            item.MarkEmbeddedTagsLoadAttempted();
-            Assert.False(item.MediaPropertiesLoadAttempted);
+            Assert.False(item.TagLibLoadAttempted);
             Assert.Null(item.Original.Media);
 
             var text = new MediaChannelsToken().Compile(string.Empty)(item);
 
-            Assert.True(item.MediaPropertiesLoadAttempted);
+            Assert.True(item.TagLibLoadAttempted);
             Assert.NotNull(item.Original.Media);
             Assert.Equal("1", text);
         }

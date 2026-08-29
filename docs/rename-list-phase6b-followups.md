@@ -24,29 +24,21 @@ Keep two slots on `RenameItem` (`TagLibMetadataLoadError`, `ImagePropertiesLoadE
 
 ## 6c — TagLib sibling attempted flags
 
-[`RenameListMetadataLoader`](../Mfr.Filters/RenameListMetadataLoader.cs) catch on tags or
-media sets `TagLibMetadataLoadError` but does not mark the sibling bucket attempted.
-`EnsureEmbeddedTagsLoaded` / `EnsureMediaPropertiesLoaded` share one
-`TagLibFileReader.Read`; a failure means both buckets failed.
+**Shipped as one `TagLibLoadAttempted` flag** on `RenameItem` (not two sibling booleans). Tags and
+media share one `TagLibFileReader.Read`; `EnsureTagLibLoaded` fills both buckets. A failed tags load
+does not retry the same Read for media on the same hydrate. `HasLoadError` for audio and media columns
+already shares the one TagLib exception.
 
-On TagLib catch:
-
-- `SetTagLibMetadataLoadError(ex)`
-- Mark **both** `EmbeddedTagsLoadAttempted` and `MediaPropertiesLoadAttempted` if not already
-  set
-
-Then a failed tags load does not retry the same Read for media on the same hydrate.
-`HasLoadError` for audio and media columns already shares the one TagLib exception.
-
-**Test:** after `TryEnsureLoaded` with only an audio key on a missing file, both TagLib
-attempted flags are true (media key need not be requested). Extend
-[`RenameListMetadataLoaderTests`](../Mfr.Tests/Models/Filters/RenameListMetadataLoaderTests.cs).
+**Test:** after `TryEnsureLoaded` with only an audio key on a missing file, `TagLibLoadAttempted` is
+true and the media requirement is satisfied (media key need not be requested).
 
 **Also:** delete
 `RenameListMetadataLoadErrorsTests.ImageProperties_flag_does_not_include_audio_or_media`
 (asserts enum bit values only).
 
-**Out of scope:** image catch (no TagLib sibling).
+**Out of scope:** image catch (no TagLib sibling). Keep
+`RenameListMetadataRequirement.EmbeddedAudioTags` vs `MediaProperties` (column needs, not load
+attempted).
 
 ## 6d — Structured gray (no display-text sentinel)
 

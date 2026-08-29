@@ -81,7 +81,7 @@ namespace Mfr.Filters.Audio
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
         {
-            item.EnsureEmbeddedTagsLoaded();
+            item.EnsureTagLibLoaded();
 
             if (Options.All)
             {

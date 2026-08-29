@@ -69,11 +69,10 @@ flowchart TB
   - `Mfr.Filters` — `AudioTagSetter`, removers, `StringTargetFilter` + `EnsureTargetReady` then `FileMeta` get/set
 - **Commit** — `Mfr.Engine` — `CommitExecutor` (move → strip-all flag → Apply)
 
-The first TagLib preview open — tags via `EnsureEmbeddedTagsLoaded` or media via
-`EnsureMediaPropertiesLoaded` — maps both caches from one `TagLibFileReader.Read`. The sibling
-cache is filled only when that load flag is not already set, so seeded unit-test overlays are not
-overwritten. Commit Apply / strip still opens again to write. Filters do not reopen the file
-mid-chain.
+The first TagLib preview open (`EnsureTagLibLoaded`) maps both tag overlays and media properties from
+one `TagLibFileReader.Read`. Seeded unit-test rows mark `TagLibLoadAttempted` so Ensure is a no-op and
+overlays are not overwritten. Commit Apply / strip still opens again to write. Filters do not reopen the
+file mid-chain.
 
 The Rename List grid **eager-loads** metadata buckets for the union of visible columns and
 Auto-Sort keys (background hydrate on shuttle apply, header sort, and add). Formatter preview
@@ -240,7 +239,7 @@ Inputs: destination path, **Original** overlay (session snapshot), **Preview** o
 
 ## Filters and commit order
 
-1. Lazy load tags once (`EmbeddedTagsLoadAttempted`).
+1. Lazy load TagLib once (`TagLibLoadAttempted`).
 1. Preview filters mutate Preview overlay.
 1. Commit: filesystem move → optional nuclear strip → `AudioTagPersistence.Apply(Original, Preview)`.
 1. After commit, clear embedded-tag cache for re-preview.

@@ -26,7 +26,7 @@ namespace Mfr.Filters
             switch (target)
             {
                 case SemanticAudioFieldTarget:
-                    item.EnsureEmbeddedTagsLoaded();
+                    item.EnsureTagLibLoaded();
                     return;
                 case Id3v1FieldTarget:
                     item.EnsureAudioTagBlockSupported(AudioTagBlockKind.Id3v1);
