@@ -58,22 +58,58 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool CanRemove => _TryGetSelectedIndex(out _);
 
         /// <summary>
-        /// Gets whether the current selection can move up.
+        /// Gets whether any item at <paramref name="sourceIndices"/> can move one step toward <paramref name="offset"/>.
         /// </summary>
-        public bool CanMoveUp => _TryGetSelectedIndex(out var index) && index > 0;
-
-        /// <summary>
-        /// Gets whether the current selection can move down.
-        /// </summary>
-        public bool CanMoveDown => _TryGetSelectedIndex(out var index) && index < _items.Count - 1;
-
-        /// <summary>
-        /// Gets the index where a new item should be inserted below the current selection.
-        /// </summary>
-        /// <returns>Index in <c>[0, Count]</c>; when nothing is selected, returns <see cref="IReadOnlyCollection{T}.Count"/>.</returns>
-        public int GetInsertIndexBelowSelection()
+        /// <param name="sourceIndices">Indices of items to move.</param>
+        /// <param name="offset">Direction to move (-1 up, +1 down).</param>
+        /// <returns>
+        /// <see langword="true"/> when at least one selected item has an unselected neighbor in that direction.
+        /// </returns>
+        public bool CanMoveBlock(IReadOnlyList<int> sourceIndices, int offset)
         {
-            return SelectedIndex >= 0 ? SelectedIndex + 1 : _items.Count;
+            ArgumentNullException.ThrowIfNull(sourceIndices);
+
+            if (offset is not (-1 or 1))
+            {
+                return false;
+            }
+
+            var selectedKeys = _KeysAt(sourceIndices);
+            if (selectedKeys.Count == 0)
+            {
+                return false;
+            }
+
+            for (var index = 0; index < _items.Count; index++)
+            {
+                if (_CanSwapTowardNeighbor(selectedKeys, index, offset))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the index where a new item should be inserted below the last selected row.
+        /// </summary>
+        /// <param name="selectedIndices">Selected row indices in list order.</param>
+        /// <returns>Index in <c>[0, Count]</c>; when nothing is selected, returns <see cref="IReadOnlyCollection{T}.Count"/>.</returns>
+        public int GetInsertIndexBelow(IReadOnlyList<int> selectedIndices)
+        {
+            ArgumentNullException.ThrowIfNull(selectedIndices);
+
+            var lastSelected = -1;
+            foreach (var index in selectedIndices)
+            {
+                if (index > lastSelected && index >= 0 && index < _items.Count)
+                {
+                    lastSelected = index;
+                }
+            }
+
+            return lastSelected >= 0 ? lastSelected + 1 : _items.Count;
         }
 
         /// <summary>
@@ -141,20 +177,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Removes the selected item and clamps <see cref="SelectedIndex"/>.
-        /// </summary>
-        /// <returns><see langword="false"/> when nothing valid is selected.</returns>
-        public bool TryRemoveSelected()
-        {
-            if (!_TryGetSelectedIndex(out var index))
-            {
-                return false;
-            }
-
-            return TryRemoveAtIndices([index]) == 1;
-        }
-
-        /// <summary>
         /// Removes items at <paramref name="indices"/> and clamps <see cref="SelectedIndex"/>.
         /// </summary>
         /// <param name="indices">Item indices to remove.</param>
@@ -193,21 +215,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Moves the selected item by <paramref name="offset"/> positions (-1 up, +1 down).
-        /// </summary>
-        /// <param name="offset">Direction and distance to move.</param>
-        /// <returns><see langword="false"/> when the move is not allowed.</returns>
-        public bool TryMoveSelected(int offset)
-        {
-            if (!_TryGetSelectedIndex(out var index))
-            {
-                return false;
-            }
-
-            return TryMoveBlock([index], offset);
-        }
-
-        /// <summary>
         /// Moves selected items one position toward <paramref name="offset"/>, independently.
         /// </summary>
         /// <param name="sourceIndices">Indices of items to move.</param>
@@ -236,22 +243,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ArgumentNullException.ThrowIfNull(sourceIndices);
 
             newIndices = [];
-            if (offset is not (-1 or 1))
+            if (!CanMoveBlock(sourceIndices, offset))
             {
                 return false;
             }
 
-            var sortedSources = sourceIndices
-                .Where(index => index >= 0 && index < _items.Count)
-                .Distinct()
-                .OrderBy(index => index)
-                .ToList();
-            if (sortedSources.Count == 0)
-            {
-                return false;
-            }
-
-            var selectedKeys = sortedSources.Select(index => _keyOf(_items[index])).ToHashSet();
+            var selectedKeys = _KeysAt(sourceIndices);
             var hasAnchor = _TryGetSelectedIndex(out var anchorIndex);
             var trackedAnchor = hasAnchor ? _keyOf(_items[anchorIndex]) : default;
 
@@ -297,8 +294,25 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns><see langword="false"/> when the move is not allowed.</returns>
         public bool TryMoveIndicesTo(IReadOnlyList<int> sourceIndices, int targetIndex)
         {
+            return TryMoveIndicesTo(sourceIndices, targetIndex, out _);
+        }
+
+        /// <summary>
+        /// Moves items at <paramref name="sourceIndices"/> to <paramref name="targetIndex"/>, preserving their order.
+        /// </summary>
+        /// <param name="sourceIndices">Indices of items to move.</param>
+        /// <param name="targetIndex">Destination index in the list before the move.</param>
+        /// <param name="newIndices">Indices of the moved items after a successful move.</param>
+        /// <returns><see langword="false"/> when the move is not allowed.</returns>
+        public bool TryMoveIndicesTo(
+            IReadOnlyList<int> sourceIndices,
+            int targetIndex,
+            out IReadOnlyList<int> newIndices
+        )
+        {
             ArgumentNullException.ThrowIfNull(sourceIndices);
 
+            newIndices = [];
             var sortedSources = sourceIndices.Distinct().OrderBy(i => i).ToList();
             if (sortedSources.Count == 0)
             {
@@ -313,7 +327,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             targetIndex = Math.Clamp(targetIndex, 0, _items.Count);
             var movingItems = sortedSources.Select(index => _items[index]).ToList();
             var hasAnchor = _TryGetSelectedIndex(out var anchorIndex);
-            var anchorKey = hasAnchor ? _keyOf(_items[anchorIndex]) : default(TKey?);
+            var trackedAnchor = hasAnchor ? _keyOf(_items[anchorIndex]) : default;
 
             foreach (var index in sortedSources.OrderByDescending(i => i))
             {
@@ -324,10 +338,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             insertIndex = Math.Clamp(insertIndex, 0, _items.Count);
             _items.InsertRange(insertIndex, movingItems);
 
-            if (hasAnchor && anchorKey is not null)
+            newIndices = [.. Enumerable.Range(insertIndex, movingItems.Count)];
+            if (hasAnchor)
             {
-                var newAnchorIndex = _items.FindIndex(item => _keyOf(item).Equals(anchorKey));
-                SelectedIndex = newAnchorIndex;
+                SelectedIndex = _items.FindIndex(item =>
+                    EqualityComparer<TKey>.Default.Equals(_keyOf(item), trackedAnchor)
+                );
             }
 
             return true;
@@ -365,6 +381,27 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return true;
         }
 
+        /// <summary>
+        /// Keys of items at valid indices in <paramref name="indices"/>.
+        /// </summary>
+        /// <param name="indices">Candidate item indices.</param>
+        /// <returns>Unique keys for in-range indices.</returns>
+        private HashSet<TKey> _KeysAt(IReadOnlyList<int> indices)
+        {
+            return
+            [
+                .. indices.Where(index => index >= 0 && index < _items.Count).Select(index => _keyOf(_items[index])),
+            ];
+        }
+
+        /// <summary>
+        /// Gets whether the item at <paramref name="index"/> is selected and can swap with the neighbor toward
+        /// <paramref name="offset"/>.
+        /// </summary>
+        /// <param name="selectedKeys">Keys of the items being moved.</param>
+        /// <param name="index">Candidate item index.</param>
+        /// <param name="offset">Direction to move (-1 up, +1 down).</param>
+        /// <returns><see langword="true"/> when this item should swap with its neighbor.</returns>
         private bool _CanSwapTowardNeighbor(HashSet<TKey> selectedKeys, int index, int offset)
         {
             if (!selectedKeys.Contains(_keyOf(_items[index])))

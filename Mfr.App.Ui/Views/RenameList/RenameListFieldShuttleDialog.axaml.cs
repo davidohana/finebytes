@@ -87,7 +87,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnRemoveColumnDoubleTapped(object? sender, RoutedEventArgs e)
         {
-            if (_ViewModel is null || sender is not ListBox list || e.Source is not Control source)
+            if (_ViewModel is null || sender is not ListBox || e.Source is not Control source)
             {
                 return;
             }
@@ -100,7 +100,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnRemoveSortDoubleTapped(object? sender, RoutedEventArgs e)
         {
-            if (_ViewModel is null || sender is not ListBox list || e.Source is not Control source)
+            if (_ViewModel is null || sender is not ListBox || e.Source is not Control source)
             {
                 return;
             }
@@ -157,10 +157,8 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (button.DataContext is RenameListFieldShuttleSortRow row)
             {
-                _ViewModel.SelectedSortRowIndex = row.Index;
+                _ViewModel.ToggleSortDirectionAt(row.Index);
             }
-
-            _ViewModel.ToggleSelectedSortDirectionCommand.Execute(null);
         }
     }
 }

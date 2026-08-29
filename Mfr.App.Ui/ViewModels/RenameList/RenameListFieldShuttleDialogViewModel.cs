@@ -324,8 +324,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanRemoveSelectedColumn))]
         public void RemoveSelectedColumn()
         {
-            var indices = _GetColumnMoveIndices();
-            if (_columns.TryRemoveAtIndices(indices) == 0)
+            if (_columns.TryRemoveAtIndices(_selectedColumnRowIndices) == 0)
             {
                 return;
             }
@@ -340,8 +339,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedColumnUp))]
         public void MoveSelectedColumnUp()
         {
-            var indices = _GetColumnMoveIndices();
-            if (!_columns.TryMoveBlock(indices, -1, out var newIndices))
+            if (!_columns.TryMoveBlock(_selectedColumnRowIndices, -1, out var newIndices))
             {
                 return;
             }
@@ -356,8 +354,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedColumnDown))]
         public void MoveSelectedColumnDown()
         {
-            var indices = _GetColumnMoveIndices();
-            if (!_columns.TryMoveBlock(indices, 1, out var newIndices))
+            if (!_columns.TryMoveBlock(_selectedColumnRowIndices, 1, out var newIndices))
             {
                 return;
             }
@@ -397,8 +394,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanRemoveSelectedSortKey))]
         public void RemoveSelectedSortKey()
         {
-            var indices = _GetSortMoveIndices();
-            if (_sortKeys.TryRemoveAtIndices(indices) == 0)
+            if (_sortKeys.TryRemoveAtIndices(_selectedSortRowIndices) == 0)
             {
                 return;
             }
@@ -416,8 +412,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedSortKeyUp))]
         public void MoveSelectedSortKeyUp()
         {
-            var indices = _GetSortMoveIndices();
-            if (!_sortKeys.TryMoveBlock(indices, -1, out var newIndices))
+            if (!_sortKeys.TryMoveBlock(_selectedSortRowIndices, -1, out var newIndices))
             {
                 return;
             }
@@ -432,8 +427,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedSortKeyDown))]
         public void MoveSelectedSortKeyDown()
         {
-            var indices = _GetSortMoveIndices();
-            if (!_sortKeys.TryMoveBlock(indices, 1, out var newIndices))
+            if (!_sortKeys.TryMoveBlock(_selectedSortRowIndices, 1, out var newIndices))
             {
                 return;
             }
@@ -448,7 +442,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [RelayCommand(CanExecute = nameof(_CanToggleSelectedSortDirection))]
         public void ToggleSelectedSortDirection()
         {
-            var index = _sortKeys.SelectedIndex;
+            ToggleSortDirectionAt(_sortKeys.SelectedIndex);
+        }
+
+        /// <summary>
+        /// Toggles ascending/descending for the sort key at <paramref name="index"/> without changing row selection.
+        /// </summary>
+        /// <param name="index">Sort-row index to toggle.</param>
+        public void ToggleSortDirectionAt(int index)
+        {
             if (index < 0 || index >= _sortKeys.Items.Count)
             {
                 return;
@@ -492,17 +494,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanRemoveSelectedColumn()
         {
-            return _GetColumnMoveIndices().Count > 0;
+            return _selectedColumnRowIndices.Count > 0;
         }
 
         private bool _CanMoveSelectedColumnUp()
         {
-            return _CanMoveToward(_GetColumnMoveIndices(), _columns.Items.Count, offset: -1);
+            return _columns.CanMoveBlock(_selectedColumnRowIndices, offset: -1);
         }
 
         private bool _CanMoveSelectedColumnDown()
         {
-            return _CanMoveToward(_GetColumnMoveIndices(), _columns.Items.Count, offset: 1);
+            return _columns.CanMoveBlock(_selectedColumnRowIndices, offset: 1);
         }
 
         private bool _HasSelectedColumns()
@@ -517,17 +519,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanRemoveSelectedSortKey()
         {
-            return _GetSortMoveIndices().Count > 0;
+            return _selectedSortRowIndices.Count > 0;
         }
 
         private bool _CanMoveSelectedSortKeyUp()
         {
-            return _CanMoveToward(_GetSortMoveIndices(), _sortKeys.Items.Count, offset: -1);
+            return _sortKeys.CanMoveBlock(_selectedSortRowIndices, offset: -1);
         }
 
         private bool _CanMoveSelectedSortKeyDown()
         {
-            return _CanMoveToward(_GetSortMoveIndices(), _sortKeys.Items.Count, offset: 1);
+            return _sortKeys.CanMoveBlock(_selectedSortRowIndices, offset: 1);
         }
 
         private bool _CanToggleSelectedSortDirection()
@@ -542,11 +544,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private void _AddColumns(IEnumerable<RenameListFieldKey> keys)
         {
-            var insertIndex = _GetInsertIndexBelow(
-                _selectedColumnRowIndices,
-                _columns.SelectedIndex,
-                _columns.Items.Count
-            );
+            var insertIndex = _columns.GetInsertIndexBelow(_selectedColumnRowIndices);
             var items = keys.Select(key => new RenameListVisibleColumn(key)).ToList();
             if (items.Count == 0)
             {
@@ -568,11 +566,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private void _AddSortKeys(IEnumerable<RenameListFieldKey> fieldKeys)
         {
-            var insertIndex = _GetInsertIndexBelow(
-                _selectedSortRowIndices,
-                _sortKeys.SelectedIndex,
-                _sortKeys.Items.Count
-            );
+            var insertIndex = _sortKeys.GetInsertIndexBelow(_selectedSortRowIndices);
             var items = fieldKeys.Select(fieldKey => new RenameListSortKey(fieldKey)).ToList();
             if (items.Count == 0)
             {

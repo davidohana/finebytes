@@ -58,15 +58,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             ArgumentNullException.ThrowIfNull(sourceIndices);
 
-            if (!_columns.TryMoveIndicesTo(sourceIndices, targetIndex))
+            if (!_columns.TryMoveIndicesTo(sourceIndices, targetIndex, out var newIndices))
             {
                 return;
             }
 
-            _AssignColumnSelection(
-                _BuildMovedSelectionIndices(sourceIndices, targetIndex, _columns.Items.Count),
-                _columns.SelectedIndex
-            );
+            _AssignColumnSelection(newIndices, _columns.SelectedIndex);
             _RefreshLists();
         }
 
@@ -124,15 +121,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             ArgumentNullException.ThrowIfNull(sourceIndices);
 
-            if (!_sortKeys.TryMoveIndicesTo(sourceIndices, targetIndex))
+            if (!_sortKeys.TryMoveIndicesTo(sourceIndices, targetIndex, out var newIndices))
             {
                 return;
             }
 
-            _AssignSortSelection(
-                _BuildMovedSelectionIndices(sourceIndices, targetIndex, _sortKeys.Items.Count),
-                _sortKeys.SelectedIndex
-            );
+            _AssignSortSelection(newIndices, _sortKeys.SelectedIndex);
             _RefreshLists();
         }
 
@@ -179,23 +173,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var start = Math.Clamp(insertIndex, 0, totalCount - insertedCount);
             return [.. Enumerable.Range(start, insertedCount)];
-        }
-
-        private static IReadOnlyList<int> _BuildMovedSelectionIndices(
-            IReadOnlyList<int> sourceIndices,
-            int targetIndex,
-            int totalCount
-        )
-        {
-            var sortedSources = sourceIndices.Distinct().OrderBy(i => i).ToList();
-            if (sortedSources.Count == 0 || totalCount == 0)
-            {
-                return [];
-            }
-
-            var insertIndex = targetIndex - sortedSources.Count(index => index < targetIndex);
-            insertIndex = Math.Clamp(insertIndex, 0, totalCount - sortedSources.Count);
-            return [.. Enumerable.Range(insertIndex, sortedSources.Count)];
         }
     }
 }

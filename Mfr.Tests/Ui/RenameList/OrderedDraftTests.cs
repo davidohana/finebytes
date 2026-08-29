@@ -22,42 +22,42 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void TryRemoveSelected_clamps_selection_index()
+        public void TryRemoveAtIndices_clamps_selection_index_for_a_single_row()
         {
             var draft = new OrderedDraft<string, string>(["a", "b", "c"], item => item) { SelectedIndex = 2 };
 
-            Assert.True(draft.TryRemoveSelected());
+            Assert.Equal(1, draft.TryRemoveAtIndices([2]));
             Assert.Equal(["a", "b"], draft.Items);
             Assert.Equal(1, draft.SelectedIndex);
 
             draft.SelectedIndex = 1;
-            Assert.True(draft.TryRemoveSelected());
+            Assert.Equal(1, draft.TryRemoveAtIndices([1]));
             Assert.Equal(["a"], draft.Items);
             Assert.Equal(0, draft.SelectedIndex);
 
-            Assert.True(draft.TryRemoveSelected());
+            Assert.Equal(1, draft.TryRemoveAtIndices([0]));
             Assert.Empty(draft.Items);
             Assert.Equal(-1, draft.SelectedIndex);
         }
 
         [Fact]
-        public void TryMoveSelected_respects_bounds()
+        public void TryMoveBlock_respects_single_item_bounds()
         {
             var draft = new OrderedDraft<string, string>(["a", "b", "c"], item => item) { SelectedIndex = 0 };
 
-            Assert.False(draft.TryMoveSelected(-1));
+            Assert.False(draft.TryMoveBlock([0], -1));
             Assert.Equal(["a", "b", "c"], draft.Items);
             Assert.Equal(0, draft.SelectedIndex);
 
             draft.SelectedIndex = 1;
-            Assert.True(draft.TryMoveSelected(-1));
+            Assert.True(draft.TryMoveBlock([1], -1));
             Assert.Equal(["b", "a", "c"], draft.Items);
             Assert.Equal(0, draft.SelectedIndex);
-            Assert.False(draft.TryMoveSelected(-1));
+            Assert.False(draft.TryMoveBlock([0], -1));
 
             draft.SelectedIndex = 2;
-            Assert.False(draft.TryMoveSelected(1));
-            Assert.True(draft.TryMoveSelected(-1));
+            Assert.False(draft.TryMoveBlock([2], 1));
+            Assert.True(draft.TryMoveBlock([2], -1));
             Assert.Equal(["b", "c", "a"], draft.Items);
             Assert.Equal(1, draft.SelectedIndex);
         }
@@ -76,36 +76,38 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void CanExecute_flags_follow_selection()
+        public void CanRemove_follows_selection()
         {
             var draft = new OrderedDraft<string, string>(["a", "b"], item => item) { SelectedIndex = 0 };
 
             Assert.True(draft.CanRemove);
-            Assert.False(draft.CanMoveUp);
-            Assert.True(draft.CanMoveDown);
-
-            draft.SelectedIndex = 1;
-            Assert.True(draft.CanMoveUp);
-            Assert.False(draft.CanMoveDown);
 
             draft.SelectedIndex = -1;
             Assert.False(draft.CanRemove);
-            Assert.False(draft.CanMoveUp);
-            Assert.False(draft.CanMoveDown);
         }
 
         [Fact]
-        public void GetInsertIndexBelowSelection_returns_index_after_anchor_or_end()
+        public void GetInsertIndexBelow_uses_last_selected_index_or_end()
         {
-            var draft = new OrderedDraft<string, string>(["a", "b", "c"], item => item) { SelectedIndex = 0 };
+            var draft = new OrderedDraft<string, string>(["a", "b", "c"], item => item);
 
-            Assert.Equal(1, draft.GetInsertIndexBelowSelection());
+            Assert.Equal(3, draft.GetInsertIndexBelow([]));
 
-            draft.SelectedIndex = 2;
-            Assert.Equal(3, draft.GetInsertIndexBelowSelection());
+            Assert.Equal(1, draft.GetInsertIndexBelow([0]));
+            Assert.Equal(3, draft.GetInsertIndexBelow([0, 2]));
+            Assert.Equal(3, draft.GetInsertIndexBelow([2]));
+        }
 
-            draft.SelectedIndex = -1;
-            Assert.Equal(3, draft.GetInsertIndexBelowSelection());
+        [Fact]
+        public void CanMoveBlock_matches_independent_swap_rules()
+        {
+            var draft = new OrderedDraft<string, string>(["a", "b", "c"], item => item);
+
+            Assert.False(draft.CanMoveBlock([0], -1));
+            Assert.True(draft.CanMoveBlock([0], 1));
+            Assert.False(draft.CanMoveBlock([0, 1], -1));
+            Assert.True(draft.CanMoveBlock([0, 2], -1));
+            Assert.False(draft.CanMoveBlock([], 1));
         }
 
         [Fact]
@@ -175,8 +177,9 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var draft = new OrderedDraft<string, string>(["a", "b", "c", "d"], item => item) { SelectedIndex = 1 };
 
-            Assert.True(draft.TryMoveIndicesTo([1, 2], 4));
+            Assert.True(draft.TryMoveIndicesTo([1, 2], 4, out var newIndices));
             Assert.Equal(["a", "d", "b", "c"], draft.Items);
+            Assert.Equal([2, 3], newIndices);
             Assert.Equal(2, draft.SelectedIndex);
         }
 

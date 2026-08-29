@@ -157,16 +157,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _sortKeys.SelectedIndex = _ResolveAnchor(_selectedSortRowIndices, anchorIndex);
         }
 
-        private IReadOnlyList<int> _GetColumnMoveIndices()
-        {
-            return _selectedColumnRowIndices;
-        }
-
-        private IReadOnlyList<int> _GetSortMoveIndices()
-        {
-            return _selectedSortRowIndices;
-        }
-
         private bool _IsSingleColumnSelection(int index)
         {
             return _columns.SelectedIndex == index && _IsSingleIndexSelection(_selectedColumnRowIndices, index);
@@ -185,40 +175,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return indices.Count == 1 && indices[0] == index;
-        }
-
-        /// <summary>
-        /// Gets the insert index below the last selected row, or the list end when nothing is selected.
-        /// </summary>
-        private static int _GetInsertIndexBelow(IReadOnlyList<int> selectedIndices, int selectedIndex, int count)
-        {
-            if (selectedIndices.Count > 0)
-            {
-                return Math.Min(selectedIndices[^1] + 1, count);
-            }
-
-            return selectedIndex >= 0 ? selectedIndex + 1 : count;
-        }
-
-        private static bool _CanMoveToward(IReadOnlyList<int> indices, int itemCount, int offset)
-        {
-            if (indices.Count == 0 || itemCount == 0)
-            {
-                return false;
-            }
-
-            var indexToIsSelected = indices.ToHashSet();
-            foreach (var index in indices)
-            {
-                var neighborIndex = index + offset;
-                var neighborIsInRange = neighborIndex >= 0 && neighborIndex < itemCount;
-                if (neighborIsInRange && !indexToIsSelected.Contains(neighborIndex))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static IReadOnlyList<int> _NormalizeIndices(IReadOnlyList<int> indices, int itemCount)

@@ -398,6 +398,32 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void Contiguous_column_block_at_top_cannot_move_up()
+        {
+            var dialogVm = _CreateDefaultDialog();
+
+            dialogVm.SetSelectedColumnRows([0, 1], 0);
+
+            Assert.False(dialogVm.MoveSelectedColumnUpCommand.CanExecute(null));
+            Assert.True(dialogVm.MoveSelectedColumnDownCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void Toggle_sort_direction_keeps_multi_selection()
+        {
+            var dialogVm = _CreateDefaultDialog();
+            dialogVm.SetSelectedSortRows([0, 1], 0);
+            var firstDescending = dialogVm.SelectedSortRows[0].Key.Descending;
+
+            dialogVm.ToggleSortDirectionAt(1);
+
+            Assert.Equal([0, 1], dialogVm.SelectedSortRowIndices);
+            Assert.Equal(0, dialogVm.SelectedSortRowIndex);
+            Assert.Equal(firstDescending, dialogVm.SelectedSortRows[0].Key.Descending);
+            Assert.True(dialogVm.SelectedSortRows[1].Key.Descending);
+        }
+
+        [Fact]
         public void Preview_tab_flag_toggles_original_tab()
         {
             var dialogVm = _CreateDefaultDialog();
