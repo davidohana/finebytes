@@ -1,11 +1,12 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.Filters.Space;
+using Mfr.Tests.Ui;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -24,15 +25,15 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             try
             {
-                var start = dialog.FindControl<NumericUpDown>("SubstringStartSpinner");
-                var end = dialog.FindControl<NumericUpDown>("SubstringEndSpinner");
+                var start = dialog.FindControl<CompactNumericUpDown>("SubstringStartSpinner");
+                var end = dialog.FindControl<CompactNumericUpDown>("SubstringEndSpinner");
                 Assert.NotNull(start);
                 Assert.NotNull(end);
                 Assert.True(start.IsVisible);
                 Assert.True(end.IsVisible);
 
-                _AssertSpinnerShowsValue(start, expectedText: "1");
-                _AssertSpinnerShowsValue(end, expectedText: "5");
+                CompactNumericUpDownAssert.ShowsStackedValue(start, expectedText: "1");
+                CompactNumericUpDownAssert.ShowsStackedValue(end, expectedText: "5");
 
                 var fromTheBlocks = dialog
                     .GetVisualDescendants()
@@ -72,10 +73,10 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             try
             {
-                var spinner = dialog.FindControl<NumericUpDown>("TokenNumberSpinner");
+                var spinner = dialog.FindControl<CompactNumericUpDown>("TokenNumberSpinner");
                 Assert.NotNull(spinner);
                 Assert.True(spinner.IsVisible);
-                _AssertSpinnerShowsValue(spinner, expectedText: "1");
+                CompactNumericUpDownAssert.ShowsStackedValue(spinner, expectedText: "1");
             }
             finally
             {
@@ -92,50 +93,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
             return dialog;
-        }
-
-        private static void _AssertSpinnerShowsValue(NumericUpDown spinner, string expectedText)
-        {
-            Assert.True(
-                spinner.Bounds.Width >= 72,
-                $"Spinner width {spinner.Bounds.Width} is too narrow for the value and buttons."
-            );
-
-            var textBox = spinner.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
-            Assert.NotNull(textBox);
-            Assert.Equal(expectedText, textBox.Text);
-            Assert.True(
-                textBox.Bounds.Width >= 24,
-                $"Spinner text area width {textBox.Bounds.Width} cannot show the value."
-            );
-
-            var buttons = spinner
-                .GetVisualDescendants()
-                .OfType<RepeatButton>()
-                .OrderBy(button => button.Bounds.Y)
-                .ThenBy(button => button.Bounds.X)
-                .ToList();
-            Assert.Equal(2, buttons.Count);
-            foreach (var button in buttons)
-            {
-                Assert.True(
-                    button.Bounds.Width >= 10 && button.Bounds.Width <= 20,
-                    $"Spinner button width {button.Bounds.Width} should be a compact column."
-                );
-                Assert.True(
-                    button.Bounds.Height >= 8 && button.Bounds.Height <= 16,
-                    $"Spinner button height {button.Bounds.Height} should be a stacked half of the field."
-                );
-            }
-
-            Assert.True(
-                Math.Abs(buttons[0].Bounds.X - buttons[1].Bounds.X) <= 1,
-                $"Spinner buttons should share a column: {buttons[0].Bounds.X} vs {buttons[1].Bounds.X}."
-            );
-            Assert.True(
-                buttons[0].Bounds.Bottom <= buttons[1].Bounds.Y + 1,
-                $"Spinner buttons should stack vertically: up bottom {buttons[0].Bounds.Bottom}, down top {buttons[1].Bounds.Y}."
-            );
         }
     }
 }

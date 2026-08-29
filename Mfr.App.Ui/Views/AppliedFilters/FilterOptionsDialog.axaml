@@ -2,6 +2,7 @@
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.AppliedFilters"
+  xmlns:views="using:Mfr.App.Ui.Views"
   x:Class="Mfr.App.Ui.Views.AppliedFilters.FilterOptionsDialog"
   x:DataType="vm:FilterOptionsDialogViewModel"
   Title="Filter Options"
@@ -87,113 +88,6 @@
     <Style Selector="ComboBox.filter-options-field /template/ ContentPresenter#ContentPresenter">
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="Padding" Value="0" />
-    </Style>
-    <Style Selector="NumericUpDown.filter-options-field">
-      <Setter Property="Height" Value="26" />
-      <Setter Property="MinHeight" Value="26" />
-      <Setter Property="Padding" Value="4,0,0,0" />
-      <Setter Property="MinWidth" Value="0" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="HorizontalContentAlignment" Value="Left" />
-      <Setter Property="ShowButtonSpinner" Value="True" />
-      <Setter Property="ButtonSpinnerLocation" Value="Right" />
-    </Style>
-    <Style Selector="NumericUpDown.filter-options-spinner">
-      <Setter Property="Width" Value="80" />
-      <Setter Property="MinWidth" Value="80" />
-      <Setter Property="HorizontalAlignment" Value="Left" />
-    </Style>
-    <Style Selector="NumericUpDown.filter-options-field /template/ TextBox#PART_TextBox">
-      <Setter Property="MinWidth" Value="0" />
-      <Setter Property="MinHeight" Value="0" />
-      <Setter Property="Padding" Value="6,0,4,0" />
-      <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
-    <Style Selector="NumericUpDown.filter-options-field /template/ ButtonSpinner#PART_Spinner">
-      <Setter Property="MinWidth" Value="0" />
-      <Setter Property="MinHeight" Value="0" />
-      <Setter Property="Padding" Value="0" />
-      <Setter Property="Template">
-        <ControlTemplate TargetType="ButtonSpinner">
-          <Border
-            Background="{TemplateBinding Background}"
-            BorderBrush="{TemplateBinding BorderBrush}"
-            BorderThickness="{TemplateBinding BorderThickness}"
-            CornerRadius="{TemplateBinding CornerRadius}"
-          >
-            <DockPanel>
-              <Grid Width="16" DockPanel.Dock="Right" IsVisible="{TemplateBinding ShowButtonSpinner}">
-                <Grid.RowDefinitions>
-                  <RowDefinition Height="*" />
-                  <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <RepeatButton
-                  Name="PART_IncreaseButton"
-                  MinWidth="0"
-                  MinHeight="0"
-                  Padding="0"
-                  Background="Transparent"
-                  BorderThickness="0"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  HorizontalContentAlignment="Center"
-                  VerticalContentAlignment="Center"
-                >
-                  <Path
-                    Width="8"
-                    Height="4"
-                    Data="M0,5 L4.5,.5 9,5 6,5 4.5,3.5 3,5 z"
-                    Fill="{DynamicResource FileListForegroundBrush}"
-                    Stretch="Uniform"
-                  />
-                </RepeatButton>
-                <RepeatButton
-                  Name="PART_DecreaseButton"
-                  Grid.Row="1"
-                  MinWidth="0"
-                  MinHeight="0"
-                  Padding="0"
-                  Background="Transparent"
-                  BorderThickness="0"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  HorizontalContentAlignment="Center"
-                  VerticalContentAlignment="Center"
-                >
-                  <Path
-                    Width="8"
-                    Height="4"
-                    Data="M0,0 L3,0 4.5,1.5 6,0 9,0 4.5,4.5 z"
-                    Fill="{DynamicResource FileListForegroundBrush}"
-                    Stretch="Uniform"
-                  />
-                </RepeatButton>
-              </Grid>
-              <ContentPresenter
-                Name="PART_ContentPresenter"
-                Padding="{TemplateBinding Padding}"
-                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                Content="{TemplateBinding Content}"
-                ContentTemplate="{TemplateBinding ContentTemplate}"
-              />
-            </DockPanel>
-          </Border>
-        </ControlTemplate>
-      </Setter>
-    </Style>
-    <Style Selector="NumericUpDown.filter-options-field RepeatButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
     </Style>
     <Style Selector="RadioButton.filter-options-radio">
       <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
@@ -302,10 +196,9 @@
             <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
           <TextBlock Classes="filter-options-label" Text="Level:" />
-          <NumericUpDown
+          <views:CompactNumericUpDown
             x:Name="AncestorFolderLevelSpinner"
             Grid.Column="1"
-            Classes="filter-options-field filter-options-spinner"
             Minimum="1"
             Maximum="99"
             FormatString="0"
@@ -358,10 +251,9 @@
                 <RowDefinition Height="Auto" />
               </Grid.RowDefinitions>
               <TextBlock Classes="filter-options-label" Text="Start at position" />
-              <NumericUpDown
+              <views:CompactNumericUpDown
                 x:Name="SubstringStartSpinner"
                 Grid.Column="1"
-                Classes="filter-options-field filter-options-spinner"
                 Minimum="1"
                 Maximum="9999"
                 FormatString="0"
@@ -383,11 +275,10 @@
               <TextBlock Grid.Column="4" Classes="filter-options-suffix" Text="side (incl.)" />
 
               <TextBlock Grid.Row="2" Classes="filter-options-label" Text="End at position" />
-              <NumericUpDown
+              <views:CompactNumericUpDown
                 x:Name="SubstringEndSpinner"
                 Grid.Row="2"
                 Grid.Column="1"
-                Classes="filter-options-field filter-options-spinner"
                 Minimum="1"
                 Maximum="9999"
                 FormatString="0"
@@ -429,10 +320,9 @@
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
               <TextBlock Classes="filter-options-label" Text="Token number:" />
-              <NumericUpDown
+              <views:CompactNumericUpDown
                 x:Name="TokenNumberSpinner"
                 Grid.Column="1"
-                Classes="filter-options-field filter-options-spinner"
                 Minimum="1"
                 Maximum="9999"
                 FormatString="0"
