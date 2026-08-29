@@ -239,34 +239,6 @@
       <Setter Property="Stroke" Value="Transparent" />
       <Setter Property="Opacity" Value="1" />
     </Style>
-    <Style Selector="Button.rename-list-action">
-      <Setter Property="Width" Value="28" />
-      <Setter Property="Height" Value="28" />
-      <Setter Property="MinWidth" Value="28" />
-      <Setter Property="MinHeight" Value="28" />
-      <Setter Property="Padding" Value="2" />
-      <Setter Property="Margin" Value="1" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Transparent" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="2" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
-    <Style Selector="Button.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Transparent" />
-    </Style>
-    <Style Selector="Button.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
-    </Style>
-    <Style Selector="Button.rename-list-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-    </Style>
-    <Style Selector="Button.rename-list-action:disabled">
-      <Setter Property="Opacity" Value="0.4" />
-    </Style>
     <Style Selector="ToggleButton.rename-list-action">
       <Setter Property="Width" Value="28" />
       <Setter Property="Height" Value="28" />

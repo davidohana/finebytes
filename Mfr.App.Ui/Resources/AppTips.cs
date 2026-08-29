@@ -68,5 +68,20 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Typed-path box tip.</summary>
         public const string AddressEdit = "Enter to go, Esc to cancel";
+
+        /// <summary>Applied Filters add-from-palette shuttle tip.</summary>
+        public const string AddSelectedFilter = "Add selected filter to the Filter Apply List";
+
+        /// <summary>Applied Filters remove-selected shuttle tip.</summary>
+        public const string RemoveSelectedFilter = "Remove selected filter from the Filter Apply List";
+
+        /// <summary>Applied Filters clear-all shuttle tip.</summary>
+        public const string RemoveAllFilters = "Clear Filter Apply List";
+
+        /// <summary>Applied Filters move-up shuttle tip.</summary>
+        public const string MoveFilterUp = "Move selected filter up in the apply list (to apply it sooner)";
+
+        /// <summary>Applied Filters move-down shuttle tip.</summary>
+        public const string MoveFilterDown = "Move selected filter down in the apply list (to apply it later)";
     }
 }
