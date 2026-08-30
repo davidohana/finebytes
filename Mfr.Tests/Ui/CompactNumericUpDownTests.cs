@@ -42,5 +42,39 @@ namespace Mfr.Tests.Ui
                 window.Close();
             }
         }
+
+        /// <summary>
+        /// Verifies the decrease arrow stays visually idle at the minimum value.
+        /// </summary>
+        [AvaloniaFact]
+        public void Decrease_button_has_no_disabled_fill_at_minimum()
+        {
+            var spinner = new CompactNumericUpDown
+            {
+                Minimum = 1,
+                Maximum = 9999,
+                FormatString = "0",
+                Value = 1,
+            };
+            var window = new Window
+            {
+                Width = 200,
+                Height = 80,
+                Content = spinner,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                CompactNumericUpDownAssert.ShowsStackedValue(spinner, expectedText: "1");
+                CompactNumericUpDownAssert.DecreaseButtonHasTransparentFill(spinner);
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
     }
 }

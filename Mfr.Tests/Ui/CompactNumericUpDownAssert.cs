@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Views.Controls;
 
@@ -31,12 +33,7 @@ namespace Mfr.Tests.Ui
                 $"Spinner text area width {textBox.Bounds.Width} cannot show the value."
             );
 
-            var buttons = spinner
-                .GetVisualDescendants()
-                .OfType<RepeatButton>()
-                .OrderBy(button => button.Bounds.Y)
-                .ThenBy(button => button.Bounds.X)
-                .ToList();
+            var buttons = _StackedButtons(spinner);
             Assert.Equal(2, buttons.Count);
             foreach (var button in buttons)
             {
@@ -58,6 +55,42 @@ namespace Mfr.Tests.Ui
                 buttons[0].Bounds.Bottom <= buttons[1].Bounds.Y + 1,
                 $"Spinner buttons should stack vertically: up bottom {buttons[0].Bounds.Bottom}, down top {buttons[1].Bounds.Y}."
             );
+        }
+
+        /// <summary>
+        /// Asserts the decrease arrow has no disabled fill when the value is at minimum.
+        /// </summary>
+        /// <param name="spinner">Control under test, with value at minimum.</param>
+        public static void DecreaseButtonHasTransparentFill(CompactNumericUpDown spinner)
+        {
+            ArgumentNullException.ThrowIfNull(spinner);
+
+            var decrease = _StackedButtons(spinner)[1];
+            Assert.False(decrease.IsEnabled);
+            Assert.Equal(1d, decrease.Opacity);
+
+            var presenter = decrease
+                .GetVisualDescendants()
+                .OfType<ContentPresenter>()
+                .FirstOrDefault(part => part.Name == "PART_ContentPresenter");
+            Assert.NotNull(presenter);
+
+            var isTransparent =
+                presenter.Background is null || (presenter.Background is ISolidColorBrush brush && brush.Color.A == 0);
+            Assert.True(
+                isTransparent,
+                $"Decrease button at minimum should not have a gray fill; was {presenter.Background}."
+            );
+        }
+
+        private static List<RepeatButton> _StackedButtons(CompactNumericUpDown spinner)
+        {
+            return spinner
+                .GetVisualDescendants()
+                .OfType<RepeatButton>()
+                .OrderBy(button => button.Bounds.Y)
+                .ThenBy(button => button.Bounds.X)
+                .ToList();
         }
     }
 }

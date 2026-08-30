@@ -98,7 +98,14 @@
       </ControlTemplate>
     </Setter>
   </Style>
-  <Style Selector="NumericUpDown.compact-numeric RepeatButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+  <Style Selector="NumericUpDown.compact-numeric RepeatButton:pointerover:not(:disabled) /template/ ContentPresenter#PART_ContentPresenter">
     <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+  </Style>
+  <Style Selector="NumericUpDown.compact-numeric RepeatButton:disabled">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="NumericUpDown.compact-numeric RepeatButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
   </Style>
 </Styles>

@@ -188,7 +188,7 @@ Working list, interactions, context menu, manual order, unified field shuttle, d
 - **Extend Refresh:** after Phase 9 disk re-read, re-run preview when Auto-Preview on (full MFR7 refresh)
 - Re-run preview after add/remove/sort/reorder when Auto-Preview on
 - Status-bar counts (`_previewCount` / `_previewErrorCount` on [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) — not wired yet)
-- Applied Filters pane is still a stub — preview can use empty/identity filter chain until that pane exists
+- Applied Filters F1–F4 shipped (live `ToChain()`, Filter Options, Space Character / Letters Case editors). Preview should use that chain, not an empty/identity stack. Remaining filter option UIs are F5.
 
 ---
 
