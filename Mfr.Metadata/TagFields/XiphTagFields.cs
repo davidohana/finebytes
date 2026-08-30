@@ -16,44 +16,6 @@ namespace Mfr.Metadata.TagFields
     /// </remarks>
     internal static class XiphTagFields
     {
-        private static readonly string[] _KnownKeys =
-        [
-            "TITLE",
-            "ALBUM",
-            "ARTIST",
-            "ALBUMARTIST",
-            "COMPOSER",
-            "GENRE",
-            "DESCRIPTION",
-            "COMMENT",
-            "LYRICS",
-            "UNSYNCEDLYRICS",
-            "COPYRIGHT",
-            "GROUPING",
-            "CONTENTGROUP",
-            "DATE",
-            "YEAR",
-            "TRACKNUMBER",
-            "TRACKTOTAL",
-            "TOTALTRACKS",
-            "DISCNUMBER",
-            "DISCTOTAL",
-            "TOTALDISCS",
-            "BPM",
-            "TEMPO",
-            "CONDUCTOR",
-            "MUSICBRAINZ_ARTISTID",
-            "MUSICBRAINZ_ALBUMID",
-            "MUSICBRAINZ_ALBUMARTISTID",
-            "MUSICBRAINZ_TRACKID",
-            "MUSICBRAINZ_DISCID",
-            "MUSICBRAINZ_ALBUMSTATUS",
-            "MUSICBRAINZ_ALBUMTYPE",
-            "MUSICBRAINZ_RELEASECOUNTRY",
-            "MUSICIP_PUID",
-            "ASIN",
-        ];
-
         /// <summary>
         /// Reads the file's known Xiph fields.
         /// </summary>
@@ -67,7 +29,7 @@ namespace Mfr.Metadata.TagFields
             }
 
             var rows = new List<TextFieldRow>();
-            foreach (var key in _KnownKeys)
+            foreach (var key in XiphKnownKeys.All)
             {
                 var values = DelimitedText.TrimNonEmpty(live.GetField(key));
                 if (values.Length == 0)
@@ -118,7 +80,7 @@ namespace Mfr.Metadata.TagFields
 
         private static void _WriteAll(XiphComment live, XiphTagData data)
         {
-            foreach (var key in _KnownKeys)
+            foreach (var key in XiphKnownKeys.All)
             {
                 live.RemoveField(key);
             }

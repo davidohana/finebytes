@@ -7,6 +7,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
+using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
 
 namespace Mfr.Tests.Ui.AppliedFilters
@@ -108,6 +109,92 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 var separatorBoxX = separatorBox.TranslatePoint(new Point(), dialog)!.Value.X;
                 var spinnerX = spinner.TranslatePoint(new Point(), dialog)!.Value.X;
                 Assert.True(Math.Abs(separatorBoxX - spinnerX) <= 1);
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        /// <summary>
+        /// Verifies ancestor level is visible and ID3v2 multi-instance fields hide for singleton frames.
+        /// </summary>
+        [AvaloniaFact]
+        public void Target_parameter_rows_follow_selected_apply_to()
+        {
+            var step = new AppliedFilterStepViewModel("Fix Leading 0's", new ShrinkSpacesFilter());
+            var viewModel = new FilterOptionsDialogViewModel(step);
+            var pathGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Path");
+            var ancestorOption = pathGroup.Targets.First(option => option.Prototype is AncestorFolderTarget);
+            viewModel.SelectedTargetGroup = pathGroup;
+            viewModel.SelectedTargetOption = ancestorOption;
+
+            var dialog = new FilterOptionsDialog(viewModel);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                var levelGrid = dialog.FindControl<Grid>("AncestorFolderLevelGrid");
+                var id3v2Grid = dialog.FindControl<Grid>("Id3v2MultiInstanceFieldsGrid");
+                var levelSpinner = dialog.FindControl<CompactNumericUpDown>("AncestorFolderLevelSpinner");
+                Assert.NotNull(levelGrid);
+                Assert.NotNull(id3v2Grid);
+                Assert.NotNull(levelSpinner);
+                Assert.True(levelGrid.IsVisible);
+                Assert.True(levelSpinner.IsVisible);
+                Assert.False(id3v2Grid.IsVisible);
+
+                var id3v2Group = FilterTargetCatalog.Groups.First(group => group.Label == "ID3v2");
+                var titleOption = id3v2Group.Targets.First(option =>
+                    option.Prototype is Id3v2FrameTarget frame && frame.FrameId == "TIT2"
+                );
+                viewModel.SelectedTargetGroup = id3v2Group;
+                viewModel.SelectedTargetOption = titleOption;
+                dialog.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.False(levelGrid.IsVisible);
+                Assert.False(id3v2Grid.IsVisible);
+
+                var commentOption = id3v2Group.Targets.First(option =>
+                    option.Prototype is Id3v2FrameTarget frame && frame.FrameId == "COMM"
+                );
+                viewModel.SelectedTargetOption = commentOption;
+                dialog.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.False(levelGrid.IsVisible);
+                Assert.True(id3v2Grid.IsVisible);
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        /// <summary>
+        /// Verifies loading an ID3v2 multi-instance target shows language and description fields.
+        /// </summary>
+        [AvaloniaFact]
+        public void Id3v2_multi_instance_fields_load_from_filter()
+        {
+            var filter = new FormatterFilter(new Id3v2FrameTarget("COMM", "eng", "Primary"), new FormatterOptions("x"));
+            var step = new AppliedFilterStepViewModel("Formatter", filter);
+            var viewModel = new FilterOptionsDialogViewModel(step);
+            var dialog = new FilterOptionsDialog(viewModel);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                var id3v2Grid = dialog.FindControl<Grid>("Id3v2MultiInstanceFieldsGrid");
+                Assert.NotNull(id3v2Grid);
+                Assert.True(id3v2Grid.IsVisible);
+                Assert.Equal("eng", viewModel.Id3v2Language);
+                Assert.Equal("Primary", viewModel.Id3v2Description);
             }
             finally
             {

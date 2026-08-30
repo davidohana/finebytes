@@ -189,7 +189,23 @@
           </ComboBox>
         </Grid>
 
-        <Grid IsVisible="{Binding HasAncestorFolderLevel}">
+        <Grid x:Name="Id3v2MultiInstanceFieldsGrid" IsVisible="{Binding HasId3v2MultiInstanceFields}">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <TextBlock Classes="filter-options-label" Text="Language:" />
+          <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Language}" />
+          <TextBlock Grid.Row="2" Classes="filter-options-label" Text="Description:" />
+          <TextBox Grid.Row="2" Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Description}" />
+        </Grid>
+
+        <Grid x:Name="AncestorFolderLevelGrid" IsVisible="{Binding HasAncestorFolderLevel}">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
             <ColumnDefinition Width="Auto" />

@@ -12,7 +12,7 @@ namespace Mfr.Metadata.TagFields
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Only the singleton frame ids in <c>_SingletonFrameIds</c> plus <c>COMM</c> / <c>USLT</c> / <c>TXXX</c>
+    /// Only the singleton frame ids in <see cref="Id3v2ModeledFrame.SingletonFrameIds"/> plus <c>COMM</c> / <c>USLT</c> / <c>TXXX</c>
     /// are modeled; anything else (for example <c>APIC</c>, <c>UFID</c>, URL frames) stays on disk untouched.
     /// Multi-instance frames are identified by frame id plus language and description, so clearing one comment
     /// never removes its siblings.
@@ -20,55 +20,6 @@ namespace Mfr.Metadata.TagFields
     /// </remarks>
     internal static class Id3v2TagFields
     {
-        private static readonly HashSet<string> _SingletonFrameIds = new(StringComparer.Ordinal)
-        {
-            "TALB",
-            "TBPM",
-            "TCOM",
-            "TCON",
-            "TCOP",
-            "TDAT",
-            "TDEN",
-            "TDOR",
-            "TDRC",
-            "TDRL",
-            "TDTG",
-            "TENC",
-            "TEXT",
-            "TFLT",
-            "TIPL",
-            "TIT1",
-            "TIT2",
-            "TIT3",
-            "TKEY",
-            "TLAN",
-            "TLEN",
-            "TMED",
-            "TMOO",
-            "TOAL",
-            "TOFN",
-            "TOLY",
-            "TOPE",
-            "TORY",
-            "TOWN",
-            "TPE1",
-            "TPE2",
-            "TPE3",
-            "TPE4",
-            "TPOS",
-            "TPUB",
-            "TRCK",
-            "TRDA",
-            "TRSN",
-            "TRSO",
-            "TSIZ",
-            "TSOA",
-            "TSOP",
-            "TSSE",
-            "TSST",
-            "TYER",
-        };
-
         /// <summary>
         /// Reads the file's modeled ID3v2 frames.
         /// </summary>
@@ -134,7 +85,7 @@ namespace Mfr.Metadata.TagFields
         {
             live.Version = data.Version;
 
-            foreach (var frameId in _SingletonFrameIds)
+            foreach (var frameId in Id3v2ModeledFrame.SingletonFrameIds)
             {
                 live.RemoveFrames(frameId);
             }
@@ -196,7 +147,7 @@ namespace Mfr.Metadata.TagFields
                     case TextInformationFrame text:
                     {
                         var frameId = text.FrameId.ToString(StringType.Latin1);
-                        if (!_SingletonFrameIds.Contains(frameId))
+                        if (!Id3v2ModeledFrame.SingletonFrameIds.Contains(frameId))
                         {
                             break;
                         }

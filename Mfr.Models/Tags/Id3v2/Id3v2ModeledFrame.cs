@@ -22,6 +22,68 @@ namespace Mfr.Models.Tags.Id3v2
             new HashSet<string>(StringComparer.Ordinal) { "COMM", "USLT", "TXXX" };
 
         /// <summary>
+        /// Singleton text frame ids modeled for read, write, and Filter Options Apply-To.
+        /// </summary>
+        public static IReadOnlySet<string> SingletonFrameIds { get; } =
+            new HashSet<string>(StringComparer.Ordinal)
+            {
+                "TALB",
+                "TBPM",
+                "TCOM",
+                "TCON",
+                "TCOP",
+                "TDAT",
+                "TDEN",
+                "TDOR",
+                "TDRC",
+                "TDRL",
+                "TDTG",
+                "TENC",
+                "TEXT",
+                "TFLT",
+                "TIPL",
+                "TIT1",
+                "TIT2",
+                "TIT3",
+                "TKEY",
+                "TLAN",
+                "TLEN",
+                "TMED",
+                "TMOO",
+                "TOAL",
+                "TOFN",
+                "TOLY",
+                "TOPE",
+                "TORY",
+                "TOWN",
+                "TPE1",
+                "TPE2",
+                "TPE3",
+                "TPE4",
+                "TPOS",
+                "TPUB",
+                "TRCK",
+                "TRDA",
+                "TRSN",
+                "TRSO",
+                "TSIZ",
+                "TSOA",
+                "TSOP",
+                "TSSE",
+                "TSST",
+                "TYER",
+            };
+
+        /// <summary>
+        /// All modeled frame ids (singletons plus multi-instance) in stable Apply-To order.
+        /// </summary>
+        public static IReadOnlyList<string> AllModeledFrameIds { get; } =
+        [
+            .. SingletonFrameIds.OrderBy(static id => id, StringComparer.Ordinal),
+            .. MultiInstanceFrameIds.OrderBy(static id => id, StringComparer.Ordinal),
+        ];
+
+        /// <summary>
         /// Four-character frame id (for example <c>TIT2</c>, <c>COMM</c>).
         /// </summary>
         public string FrameId { get; init; } = "";

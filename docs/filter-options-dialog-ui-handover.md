@@ -5,9 +5,10 @@ Handoff for fixing remaining layout/styling in the Filter Options modal. View-mo
 ## What is already shipped (do not revert)
 
 - Filter Options modal moved out of Filter Configuration (MFR7 model).
-- VM supports: name, Apply To (group + property), Whole/Substring/Token scope, ancestor folder level.
+- VM supports: name, Apply To (group + property), Whole/Substring/Token scope, ancestor folder level, ID3v1 / ID3v2 / Xiph targets, and ID3v2 language/description for `COMM` / `USLT` / `TXXX`.
+- Apply-To catalog: `Mfr.App.Ui/ViewModels/AppliedFilters/FilterTargetCatalog.cs` (prototype `FilterTarget` per option; no `FilterTargetKind` enum).
 - Opened from Applied Filters toolbar, double-click row, and **Filters → Filter Options**.
-- Tests: `Mfr.Tests/Ui/AppliedFilters/FilterOptionsDialogViewModelTests.cs` (VM only; no view layout tests).
+- Tests: `Mfr.Tests/Ui/AppliedFilters/FilterOptionsDialogViewModelTests.cs`, `FilterOptionsDialogViewTests.cs`.
 
 ## Primary files
 
@@ -96,14 +97,18 @@ just run-ui
 1. Select **Substring** — spinners show values (default 1 and 5), arrows work, anchors show full `left`/`right`.
 1. Select **Token** — separator and token number spinner.
 1. Select **Path → Ancestor Folder** — Level spinner.
-1. Confirm dialog does not resize awkwardly; height grows when Substring/Token sections appear.
+1. Select **ID3v2 → COMM** — Language and Description rows appear; **TIT2** hides them.
+1. Select **ID3v1**, **Xiph** groups — property combo lists all modeled fields.
+1. Confirm dialog does not resize awkwardly; height grows when Substring/Token/parameter sections appear.
 
 Optional: add a headless UI test only if control bounds/visibility can be asserted meaningfully (see `.cursor/rules/ui-headless-tests.mdc`).
 
 ## Out of scope
 
-- VM / filter engine changes.
-- ID3v2 frame pickers, defaults reset, help `?`.
+- Filter engine / core `FilterTarget` model changes beyond existing ID3v1, ID3v2, and Xiph types.
+- Custom Xiph keys outside `XiphKnownKeys`.
+- Unmodeled ID3v2 frames (`APIC`, URL frames, …).
+- Defaults reset, help `?`.
 - Filter Configuration pane changes.
 
 ## Suggested first edit

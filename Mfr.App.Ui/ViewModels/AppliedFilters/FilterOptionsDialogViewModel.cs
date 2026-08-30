@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.Filters;
 using Mfr.Models.Filters;
+using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.App.Ui.ViewModels.AppliedFilters
 {
@@ -86,10 +87,28 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private FilterTargetOption? _selectedTargetOption;
 
         /// <summary>
+        /// Gets or sets the ID3v2 language for multi-instance frames.
+        /// </summary>
+        [ObservableProperty]
+        private string _id3v2Language = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the ID3v2 description for multi-instance frames.
+        /// </summary>
+        [ObservableProperty]
+        private string _id3v2Description = string.Empty;
+
+        /// <summary>
         /// Gets whether <see cref="AncestorFolderLevel"/> is shown.
         /// </summary>
         [ObservableProperty]
         private bool _hasAncestorFolderLevel;
+
+        /// <summary>
+        /// Gets whether ID3v2 language and description fields are shown.
+        /// </summary>
+        [ObservableProperty]
+        private bool _hasId3v2MultiInstanceFields;
 
         /// <summary>
         /// Gets or sets the apply-scope mode.
@@ -144,7 +163,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 return null;
             }
 
-            return SelectedTargetOption.BuildTarget((int)AncestorFolderLevel);
+            return SelectedTargetOption.BuildTarget(
+                ancestorFolderLevel: (int)AncestorFolderLevel,
+                id3v2Language: HasId3v2MultiInstanceFields ? Id3v2Language : null,
+                id3v2Description: HasId3v2MultiInstanceFields ? Id3v2Description : null
+            );
         }
 
         /// <summary>
@@ -183,7 +206,15 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
         partial void OnSelectedTargetOptionChanged(FilterTargetOption? value)
         {
-            HasAncestorFolderLevel = value?.Kind == FilterTargetKind.AncestorFolder;
+            _UpdateTargetParameterVisibility(value);
+        }
+
+        private void _UpdateTargetParameterVisibility(FilterTargetOption? option)
+        {
+            HasAncestorFolderLevel = option?.Prototype is AncestorFolderTarget;
+            HasId3v2MultiInstanceFields =
+                option?.Prototype is Id3v2FrameTarget frame
+                && Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frame.FrameId);
         }
 
         partial void OnScopeModeChanged(FilterApplyScopeMode value)
@@ -249,7 +280,18 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 TargetOptions = group.Targets;
                 SelectedTargetOption = option;
                 AncestorFolderLevel = ancestorLevel;
-                HasAncestorFolderLevel = option.Kind == FilterTargetKind.AncestorFolder;
+                if (stringFilter.Target is Id3v2FrameTarget id3v2)
+                {
+                    Id3v2Language = id3v2.Language ?? string.Empty;
+                    Id3v2Description = id3v2.Description ?? string.Empty;
+                }
+                else
+                {
+                    Id3v2Language = string.Empty;
+                    Id3v2Description = string.Empty;
+                }
+
+                _UpdateTargetParameterVisibility(option);
             }
             finally
             {
