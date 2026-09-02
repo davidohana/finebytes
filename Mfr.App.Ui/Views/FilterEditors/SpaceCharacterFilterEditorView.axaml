@@ -4,6 +4,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="220"
@@ -11,9 +12,8 @@
   x:DataType="vm:SpaceCharacterFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
-    <Border Classes="filter-editor-group">
+    <controls:FieldsetGroup Header="Define">
       <StackPanel Spacing="6">
-        <TextBlock Classes="filter-editor-group-title" Text="Define" />
         <TextBlock
           Classes="filter-editor-label"
           Text="Use the following character to separate between words:"
@@ -52,10 +52,9 @@
           </StackPanel>
         </StackPanel>
       </StackPanel>
-    </Border>
-    <Border Classes="filter-editor-group">
+    </controls:FieldsetGroup>
+    <controls:FieldsetGroup Header="Replace">
       <StackPanel Spacing="6">
-        <TextBlock Classes="filter-editor-group-title" Text="Replace" />
         <TextBlock
           Classes="filter-editor-label"
           Text="Replace the following with the defined space character:"
@@ -93,6 +92,6 @@
           <TextBox x:Name="CustomTextBox" Classes="filter-editor-field" MinWidth="120" Text="{Binding CustomText}" />
         </StackPanel>
       </StackPanel>
-    </Border>
+    </controls:FieldsetGroup>
   </StackPanel>
 </UserControl>

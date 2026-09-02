@@ -4,17 +4,12 @@ namespace Mfr.Filters.Space
     /// Options for defining the word-separator character and mapping common separators to it.
     /// </summary>
     /// <param name="SpaceCharacter">Single character used as the word separator for later filters.</param>
-    /// <param name="ReplaceSpaces">When true, replaces U+0020 SPACE with the defined space character.</param>
-    /// <param name="ReplaceUnderscores">When true, replaces underscore with the defined space character.</param>
-    /// <param name="ReplacePercent20">When true, replaces the literal percent-twenty sequence with the defined space character.</param>
-    /// <param name="CustomText">When non-empty, replaces this substring with the defined space character; when empty, has no effect.</param>
-    public sealed record SpaceCharacterOptions(
-        char SpaceCharacter,
-        bool ReplaceSpaces,
-        bool ReplaceUnderscores,
-        bool ReplacePercent20,
-        string CustomText
-    );
+    /// <param name="Replacements">Substrings replaced with the space character, applied in list order.</param>
+    public sealed record SpaceCharacterOptions(char SpaceCharacter, IReadOnlyList<string> Replacements)
+    {
+        /// <summary>MFR7 add-to-list defaults: %20, space, underscore.</summary>
+        public static IReadOnlyList<string> DefaultReplacements { get; } = ["%20", " ", "_"];
+    }
 
     /// <summary>
     /// Defines the word-separator character and optionally maps common separators to that character.
@@ -33,16 +28,7 @@ namespace Mfr.Filters.Space
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, space separator, common replacements).
         /// </summary>
         public SpaceCharacterFilter()
-            : this(
-                new FilePrefixTarget(),
-                new SpaceCharacterOptions(
-                    SpaceCharacter: ' ',
-                    ReplaceSpaces: true,
-                    ReplaceUnderscores: true,
-                    ReplacePercent20: true,
-                    CustomText: ""
-                )
-            ) { }
+            : this(new FilePrefixTarget(), new SpaceCharacterOptions(' ', SpaceCharacterOptions.DefaultReplacements)) { }
 
         /// <summary>
         /// Gets the filter type discriminator.
@@ -54,38 +40,12 @@ namespace Mfr.Filters.Space
             item.WordSeparator = Options.SpaceCharacter;
             var sep = Options.SpaceCharacter.ToString();
             var result = value;
-            foreach (var from in _GetReplacementSourceStrings(Options))
+            foreach (var from in Options.Replacements)
             {
                 result = result.Replace(from, sep, StringComparison.Ordinal);
             }
 
             return result;
-        }
-
-        private static List<string> _GetReplacementSourceStrings(SpaceCharacterOptions options)
-        {
-            var sources = new List<string>(capacity: 4);
-            if (options.ReplacePercent20)
-            {
-                sources.Add("%20");
-            }
-
-            if (options.ReplaceSpaces)
-            {
-                sources.Add(" ");
-            }
-
-            if (options.ReplaceUnderscores)
-            {
-                sources.Add("_");
-            }
-
-            if (options.CustomText.Length > 0)
-            {
-                sources.Add(options.CustomText);
-            }
-
-            return sources;
         }
     }
 }

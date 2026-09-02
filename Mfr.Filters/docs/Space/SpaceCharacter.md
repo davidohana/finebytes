@@ -6,28 +6,25 @@ Sets the **word separator** character for the rest of the rename pass and option
 
 - **`spaceCharacter`** (string or char)
   - **Single** character that becomes the word separator (first character used if a longer string is sent).
-- **`replaceSpaces`** (bool) — Replace U+0020 SPACE with `spaceCharacter`.
-- **`replaceUnderscores`** (bool) — Replace `_` with `spaceCharacter`.
-- **`replacePercent20`** (bool) — Replace the literal text `%20` with `spaceCharacter`.
-- **`customText`** (string) — If non-empty, every occurrence of this substring is replaced with `spaceCharacter`.
-
-Replacements are applied in order: `%20`, then space, then underscore, then custom text.
+- **`replacements`** (array of strings)
+  - Each listed substring is replaced with `spaceCharacter`, in array order.
+  - Built-in choices map to `"%20"`, `" "` (U+0020 SPACE), and `"_"`.
+  - Any other string is a custom replacement (for example `"++"`).
 
 ## Examples
 
-- `spaceCharacter`: `"_"`; `replacePercent20`: `true`; other flags: `false`
+- `spaceCharacter`: `"_"`; `replacements`: `["%20"]`
   - Before: `Gone%20With%20The%20Wind`
   - After: `Gone_With_The_Wind`
-- `spaceCharacter`: space; `replaceSpaces`: `true`; `replaceUnderscores`: `true`; `replacePercent20`:
-  `true`
+- `spaceCharacter`: space; `replacements`: `["%20", " ", "_"]`
   - Before: `a_b c%20d`
   - After: `a b c d`
-- `spaceCharacter`: `"-"`; `customText`: `"++"`; other flags: `false` — `a++b` → `a-b`
-- `spaceCharacter`: `"_"`; `replacePercent20`: `true`; [LettersCase](../Case/LettersCase.md); `mode`:
+- `spaceCharacter`: `"-"`; `replacements`: `["++"]` — `a++b` → `a-b`
+- `spaceCharacter`: `"_"`; `replacements`: `["%20"]`; [LettersCase](../Case/LettersCase.md); `mode`:
   `TitleCase`; `skipWords`: `["the"]`
   - Before: `gone%20with%20the%20wind`
   - After: `Gone_With_the_Wind`
-- `spaceCharacter`: `"_"`; `replacePercent20`: `true`; other flags: `false`
+- `spaceCharacter`: `"_"`; `replacements`: `["%20"]`
   - Before: `my song`
   - After: `my song`
   - Comment: Text unchanged; `WordSeparator` still set to `_` for later filters.
@@ -46,10 +43,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
   },
   "options": {
     "spaceCharacter": "_",
-    "replaceSpaces": false,
-    "replaceUnderscores": false,
-    "replacePercent20": true,
-    "customText": ""
+    "replacements": ["%20"]
   }
 }
 ```

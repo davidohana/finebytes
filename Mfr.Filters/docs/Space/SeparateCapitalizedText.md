@@ -16,7 +16,7 @@ No `options` object.
 
 - (no options); default word separator: `DandyWorhols01Godless` → `Dandy Worhols 01 Godless`
 - (no options); default word separator: `song2remix` → `song 2 remix` — Letter–digit and digit–letter boundaries.
-- [SpaceCharacter](SpaceCharacter.md); `spaceCharacter`: `"_"`; other flags: `false`; then this filter
+- [SpaceCharacter](SpaceCharacter.md); `spaceCharacter`: `"_"`; `replacements`: `[]`; then this filter
   - Before: `aBc12x`
   - After: `a_Bc_12_x`
   - Comment: Same rules; inserts underscores.

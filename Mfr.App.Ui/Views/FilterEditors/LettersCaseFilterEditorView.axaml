@@ -4,6 +4,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
   d:DesignWidth="360"
   d:DesignHeight="120"
@@ -11,9 +12,8 @@
   x:DataType="vm:LettersCaseFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
-    <Border Classes="filter-editor-group">
+    <controls:FieldsetGroup Header="Casing Style">
       <StackPanel Spacing="6">
-        <TextBlock Classes="filter-editor-group-title" Text="Casing Style" />
         <Grid ColumnDefinitions="Auto,*">
           <TextBlock
             Grid.Column="0"
@@ -47,6 +47,6 @@
           <TextBox x:Name="SkipWordsBox" Classes="filter-editor-field" Text="{Binding SkipWordsText}" />
         </StackPanel>
       </StackPanel>
-    </Border>
+    </controls:FieldsetGroup>
   </StackPanel>
 </UserControl>

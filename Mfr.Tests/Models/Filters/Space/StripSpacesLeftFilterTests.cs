@@ -27,13 +27,7 @@ namespace Mfr.Tests.Models.Filters.Space
         {
             var spaceFilter = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: '_',
-                    ReplaceSpaces: false,
-                    ReplaceUnderscores: false,
-                    ReplacePercent20: false,
-                    CustomText: ""
-                )
+                new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
 
             var trimFilter = new StripSpacesLeftFilter(_target);

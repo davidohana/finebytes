@@ -9,6 +9,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
     /// </summary>
     internal sealed partial class SpaceCharacterFilterEditorViewModel : FilterOptionsEditorViewModel
     {
+        private const string _percent20Replacement = "%20";
+        private const string _spaceReplacement = " ";
+        private const string _underscoreReplacement = "_";
+
         private bool _isSyncing;
 
         /// <summary>
@@ -169,12 +173,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             try
             {
                 var options = filter.Options;
-                (Definition, OtherCharacter) = _ReadDefinition(options.SpaceCharacter);
-                ReplaceSpaces = options.ReplaceSpaces;
-                ReplaceUnderscores = options.ReplaceUnderscores;
-                ReplacePercent20 = options.ReplacePercent20;
-                CustomText = options.CustomText;
-                ReplaceCustom = options.CustomText.Length > 0;
+                (Definition, OtherCharacter) = _ResolveDefinition(options.SpaceCharacter);
+                ReplacePercent20 = options.Replacements.Contains(_percent20Replacement);
+                ReplaceSpaces = options.Replacements.Contains(_spaceReplacement);
+                ReplaceUnderscores = options.Replacements.Contains(_underscoreReplacement);
+                CustomText = _ResolveCustomReplacementText(options.Replacements);
+                ReplaceCustom = CustomText.Length > 0;
             }
             finally
             {
@@ -191,12 +195,55 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
             var options = new SpaceCharacterOptions(
                 SpaceCharacter: _ResolveSpaceCharacter(),
-                ReplaceSpaces: ReplaceSpaces,
-                ReplaceUnderscores: ReplaceUnderscores,
-                ReplacePercent20: ReplacePercent20,
-                CustomText: ReplaceCustom ? CustomText : string.Empty
+                Replacements: _BuildReplacements()
             );
             ApplyIfChanged(filter, filter with { Options = options });
+        }
+
+        private List<string> _BuildReplacements()
+        {
+            var replacements = new List<string>(capacity: 4);
+            if (ReplacePercent20)
+            {
+                replacements.Add(_percent20Replacement);
+            }
+
+            if (ReplaceSpaces)
+            {
+                replacements.Add(_spaceReplacement);
+            }
+
+            if (ReplaceUnderscores)
+            {
+                replacements.Add(_underscoreReplacement);
+            }
+
+            if (ReplaceCustom && CustomText.Length > 0)
+            {
+                replacements.Add(CustomText);
+            }
+
+            return replacements;
+        }
+
+        private static string _ResolveCustomReplacementText(IReadOnlyList<string> replacements)
+        {
+            foreach (var replacement in replacements)
+            {
+                if (
+                    replacement
+                    is not (
+                        _percent20Replacement
+                        or _spaceReplacement
+                        or _underscoreReplacement
+                    )
+                )
+                {
+                    return replacement;
+                }
+            }
+
+            return string.Empty;
         }
 
         private char _ResolveSpaceCharacter()
@@ -211,7 +258,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             };
         }
 
-        private static (SpaceCharacterDefinition Definition, string OtherCharacter) _ReadDefinition(char spaceCharacter)
+        /// <summary>
+        /// Maps a persisted separator character to editor definition state.
+        /// </summary>
+        /// <param name="spaceCharacter">Separator from <see cref="SpaceCharacterOptions.SpaceCharacter"/>.</param>
+        /// <returns>
+        /// The matching <see cref="SpaceCharacterDefinition"/> and a one-character string when the definition is
+        /// <see cref="SpaceCharacterDefinition.Other"/>; otherwise an empty string.
+        /// </returns>
+        private static (SpaceCharacterDefinition Definition, string OtherCharacter) _ResolveDefinition(char spaceCharacter)
         {
             return spaceCharacter switch
             {

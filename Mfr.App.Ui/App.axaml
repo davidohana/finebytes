@@ -25,6 +25,7 @@
     <FluentTheme />
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
     <StyleInclude Source="/Themes/CompactNumericUpDown.axaml" />
+    <StyleInclude Source="/Themes/FieldsetGroup.axaml" />
     <Style Selector="ScrollViewer">
       <Setter Property="AllowAutoHide" Value="False" />
     </Style>

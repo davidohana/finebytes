@@ -117,7 +117,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Dispatcher.UIThread.RunJobs();
 
             var filter = (SpaceCharacterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            Assert.False(filter.Options.ReplaceUnderscores);
+            Assert.DoesNotContain("_", filter.Options.Replacements);
 
             window.Close();
         }

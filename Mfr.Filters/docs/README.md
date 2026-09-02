@@ -107,10 +107,7 @@ Top-level object for `presets.json`: a `presets` array; each item has `id`, `nam
               },
               "options": {
                 "spaceCharacter": "_",
-                "replaceSpaces": true,
-                "replaceUnderscores": false,
-                "replacePercent20": false,
-                "customText": ""
+                "replacements": [" "]
               }
             }
           },

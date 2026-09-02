@@ -18,13 +18,7 @@ namespace Mfr.Tests.Models.Filters.Space
         {
             var f = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: '_',
-                    ReplaceSpaces: false,
-                    ReplaceUnderscores: false,
-                    ReplacePercent20: true,
-                    CustomText: ""
-                )
+                new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: ["%20"])
             );
             Assert.Equal("Gone_With_The_Wind", FilterTestHelpers.ApplyToPrefix(f, "Gone%20With%20The%20Wind"));
         }
@@ -37,13 +31,7 @@ namespace Mfr.Tests.Models.Filters.Space
         {
             var f = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: ' ',
-                    ReplaceSpaces: true,
-                    ReplaceUnderscores: true,
-                    ReplacePercent20: true,
-                    CustomText: ""
-                )
+                new SpaceCharacterOptions(' ', SpaceCharacterOptions.DefaultReplacements)
             );
             Assert.Equal("a b c d", FilterTestHelpers.ApplyToPrefix(f, "a_b c%20d"));
         }
@@ -56,13 +44,7 @@ namespace Mfr.Tests.Models.Filters.Space
         {
             var f = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: '-',
-                    ReplaceSpaces: false,
-                    ReplaceUnderscores: false,
-                    ReplacePercent20: false,
-                    CustomText: "++"
-                )
+                new SpaceCharacterOptions(SpaceCharacter: '-', Replacements: ["++"])
             );
             Assert.Equal("a-b", FilterTestHelpers.ApplyToPrefix(f, "a++b"));
         }
@@ -75,13 +57,7 @@ namespace Mfr.Tests.Models.Filters.Space
         {
             var spaceFilter = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: '_',
-                    ReplaceSpaces: false,
-                    ReplaceUnderscores: false,
-                    ReplacePercent20: true,
-                    CustomText: ""
-                )
+                new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: ["%20"])
             );
             var titleFilter = new LettersCaseFilter(
                 _target,

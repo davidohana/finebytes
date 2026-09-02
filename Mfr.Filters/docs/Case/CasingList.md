@@ -29,7 +29,7 @@ Example list files use words like `and`, `or`, `with`, `RMX` or `and`, `us`, `th
   above; `uppercaseSentenceInitial`: `true`
   - Before: `03 - WiTH Or Without You Rmx`
   - After: `03 - With or Without You RMX`
-- [SpaceCharacter](../Space/SpaceCharacter.md); `spaceCharacter`: `"_"`; `replaceSpaces`: `true`;
+- [SpaceCharacter](../Space/SpaceCharacter.md); `spaceCharacter`: `"_"`; `replacements`: `[" "]`;
   `filePath`: list (`and`, `us`, `them`); `uppercaseSentenceInitial`: `true`
   - Before: `US_AND_THEM`
   - After: `Us_and_them`

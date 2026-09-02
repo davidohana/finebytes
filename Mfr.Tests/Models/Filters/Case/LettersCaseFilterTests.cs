@@ -204,13 +204,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var spaceCharFilter = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: '_',
-                    ReplaceSpaces: false,
-                    ReplaceUnderscores: false,
-                    ReplacePercent20: false,
-                    CustomText: ""
-                )
+                new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
             var sentenceFilter = new LettersCaseFilter(
                 _target,
@@ -231,13 +225,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var spaceCharFilter = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: '_',
-                    ReplaceSpaces: false,
-                    ReplaceUnderscores: false,
-                    ReplacePercent20: false,
-                    CustomText: ""
-                )
+                new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
             var titleFilter = new LettersCaseFilter(
                 _target,
@@ -260,13 +248,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var spaceCharFilter = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: '_',
-                    ReplaceSpaces: false,
-                    ReplaceUnderscores: false,
-                    ReplacePercent20: false,
-                    CustomText: ""
-                )
+                new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
             var sentenceFilter = new LettersCaseFilter(
                 _target,
@@ -289,13 +271,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var spaceCharFilter = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: '_',
-                    ReplaceSpaces: false,
-                    ReplaceUnderscores: false,
-                    ReplacePercent20: false,
-                    CustomText: ""
-                )
+                new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
             var sentenceFilter = new LettersCaseFilter(
                 _target,

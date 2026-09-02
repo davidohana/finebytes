@@ -90,13 +90,7 @@ namespace Mfr.Tests.Models.Filters.Case
             {
                 var spaceCharacterFilter = new SpaceCharacterFilter(
                     Target: _target,
-                    Options: new SpaceCharacterOptions(
-                        SpaceCharacter: '_',
-                        ReplaceSpaces: true,
-                        ReplaceUnderscores: false,
-                        ReplacePercent20: false,
-                        CustomText: ""
-                    )
+                    Options: new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [" "])
                 );
                 var casingFilter = _CreateFilter(filePath: casingListFilePath, uppercaseSentenceInitial: true);
                 var chain = FilterChain.CreateAllEnabled([spaceCharacterFilter, casingFilter]);

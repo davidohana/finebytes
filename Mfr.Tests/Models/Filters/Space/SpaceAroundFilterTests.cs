@@ -66,13 +66,7 @@ namespace Mfr.Tests.Models.Filters.Space
         {
             var spaceFilter = new SpaceCharacterFilter(
                 _target,
-                new SpaceCharacterOptions(
-                    SpaceCharacter: '_',
-                    ReplaceSpaces: false,
-                    ReplaceUnderscores: false,
-                    ReplacePercent20: false,
-                    CustomText: ""
-                )
+                new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
             var aroundFilter = _CreateFilter("-", onlyWhenNeighboringAreLettersOrDigits: true);
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a-b");
