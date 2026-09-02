@@ -31,6 +31,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 var end = dialog.FindControl<CompactNumericUpDown>("SubstringEndSpinner");
                 Assert.NotNull(start);
                 Assert.NotNull(end);
+                var fieldset = dialog
+                    .GetVisualDescendants()
+                    .OfType<FieldsetGroup>()
+                    .Single(group => group.IsVisible && Equals(group.Header, "Substring"));
+                Assert.NotNull(fieldset);
+
                 Assert.True(start.IsVisible);
                 Assert.True(end.IsVisible);
 
@@ -82,6 +88,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Assert.True(spinner.IsVisible);
                 CompactNumericUpDownAssert.ShowsStackedValue(spinner, expectedText: "1");
 
+                var fieldset = dialog
+                    .GetVisualDescendants()
+                    .OfType<FieldsetGroup>()
+                    .Single(group => group.IsVisible && Equals(group.Header, "Token"));
+                Assert.NotNull(fieldset);
+
                 var title = dialog
                     .GetVisualDescendants()
                     .OfType<TextBlock>()
@@ -100,11 +112,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Assert.Equal(TextAlignment.Left, separatorLabel.TextAlignment);
                 Assert.Equal(TextAlignment.Left, tokenNumberLabel.TextAlignment);
 
-                var titleX = title.TranslatePoint(new Point(), dialog)!.Value.X;
                 var separatorLabelX = separatorLabel.TranslatePoint(new Point(), dialog)!.Value.X;
                 var tokenNumberLabelX = tokenNumberLabel.TranslatePoint(new Point(), dialog)!.Value.X;
-                Assert.True(Math.Abs(titleX - separatorLabelX) <= 1);
-                Assert.True(Math.Abs(titleX - tokenNumberLabelX) <= 1);
+                Assert.True(Math.Abs(separatorLabelX - tokenNumberLabelX) <= 1);
 
                 var separatorBoxX = separatorBox.TranslatePoint(new Point(), dialog)!.Value.X;
                 var spinnerX = spinner.TranslatePoint(new Point(), dialog)!.Value.X;

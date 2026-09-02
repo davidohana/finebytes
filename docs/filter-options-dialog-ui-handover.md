@@ -82,7 +82,7 @@ Key sizes:
 | `filter-options-field`   | Base 26px height, FileList font/colors       |
 | `filter-options-spinner` | Fixed 72px width, `HorizontalAlignment=Left` |
 | `filter-options-anchor`  | Fixed 76px anchor combos                     |
-| `filter-options-group`   | Substring/Token bordered sections            |
+| `FieldsetGroup`          | Substring/Token fieldset group box sections  |
 
 ## How to verify
 

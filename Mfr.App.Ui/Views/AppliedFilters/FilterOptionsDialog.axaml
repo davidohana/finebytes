@@ -43,20 +43,6 @@
       <Setter Property="Margin" Value="8,0" />
       <Setter Property="TextWrapping" Value="NoWrap" />
     </Style>
-    <Style Selector="TextBlock.filter-options-group-title">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-    </Style>
-    <Style Selector="Border.filter-options-group">
-      <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="Padding" Value="10,8" />
-      <Setter Property="Margin" Value="0,4,0,0" />
-    </Style>
     <Style Selector="ComboBox.filter-options-field, TextBox.filter-options-field">
       <Setter Property="Height" Value="26" />
       <Setter Property="MinHeight" Value="26" />
@@ -249,78 +235,74 @@
           </StackPanel>
         </Grid>
 
-        <Border Classes="filter-options-group" IsVisible="{Binding ShowSubstringOptions}">
-          <StackPanel Spacing="8">
-            <TextBlock Classes="filter-options-group-title" Text="Substring" />
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="8" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
-              <TextBlock Classes="filter-options-label" Text="Start at position" />
-              <controls:CompactNumericUpDown
-                x:Name="SubstringStartSpinner"
-                Grid.Column="1"
-                Minimum="1"
-                Maximum="9999"
-                FormatString="0"
-                Value="{Binding SubstringStartPosition}"
-              />
-              <TextBlock Grid.Column="2" Classes="filter-options-from-the" Text="from the" />
-              <ComboBox
-                Grid.Column="3"
-                Classes="filter-options-field filter-options-anchor"
-                ItemsSource="{Binding ScopeAnchorOptions}"
-                SelectedItem="{Binding SubstringStartAnchorOption}"
-              >
-                <ComboBox.ItemTemplate>
-                  <DataTemplate x:DataType="vm:StringScopeAnchorOption">
-                    <TextBlock Text="{Binding Label}" />
-                  </DataTemplate>
-                </ComboBox.ItemTemplate>
-              </ComboBox>
-              <TextBlock Grid.Column="4" Classes="filter-options-suffix" Text="side (incl.)" />
+        <controls:FieldsetGroup Header="Substring" IsVisible="{Binding ShowSubstringOptions}">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="8" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Classes="filter-options-label" Text="Start at position" />
+            <controls:CompactNumericUpDown
+              x:Name="SubstringStartSpinner"
+              Grid.Column="1"
+              Minimum="1"
+              Maximum="9999"
+              FormatString="0"
+              Value="{Binding SubstringStartPosition}"
+            />
+            <TextBlock Grid.Column="2" Classes="filter-options-from-the" Text="from the" />
+            <ComboBox
+              Grid.Column="3"
+              Classes="filter-options-field filter-options-anchor"
+              ItemsSource="{Binding ScopeAnchorOptions}"
+              SelectedItem="{Binding SubstringStartAnchorOption}"
+            >
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:StringScopeAnchorOption">
+                  <TextBlock Text="{Binding Label}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Grid.Column="4" Classes="filter-options-suffix" Text="side (incl.)" />
 
-              <TextBlock Grid.Row="2" Classes="filter-options-label" Text="End at position" />
-              <controls:CompactNumericUpDown
-                x:Name="SubstringEndSpinner"
-                Grid.Row="2"
-                Grid.Column="1"
-                Minimum="1"
-                Maximum="9999"
-                FormatString="0"
-                Value="{Binding SubstringEndPosition}"
-              />
-              <TextBlock Grid.Row="2" Grid.Column="2" Classes="filter-options-from-the" Text="from the" />
-              <ComboBox
-                Grid.Row="2"
-                Grid.Column="3"
-                Classes="filter-options-field filter-options-anchor"
-                ItemsSource="{Binding ScopeAnchorOptions}"
-                SelectedItem="{Binding SubstringEndAnchorOption}"
-              >
-                <ComboBox.ItemTemplate>
-                  <DataTemplate x:DataType="vm:StringScopeAnchorOption">
-                    <TextBlock Text="{Binding Label}" />
-                  </DataTemplate>
-                </ComboBox.ItemTemplate>
-              </ComboBox>
-              <TextBlock Grid.Row="2" Grid.Column="4" Classes="filter-options-suffix" Text="side (incl.)" />
-            </Grid>
-          </StackPanel>
-        </Border>
+            <TextBlock Grid.Row="2" Classes="filter-options-label" Text="End at position" />
+            <controls:CompactNumericUpDown
+              x:Name="SubstringEndSpinner"
+              Grid.Row="2"
+              Grid.Column="1"
+              Minimum="1"
+              Maximum="9999"
+              FormatString="0"
+              Value="{Binding SubstringEndPosition}"
+            />
+            <TextBlock Grid.Row="2" Grid.Column="2" Classes="filter-options-from-the" Text="from the" />
+            <ComboBox
+              Grid.Row="2"
+              Grid.Column="3"
+              Classes="filter-options-field filter-options-anchor"
+              ItemsSource="{Binding ScopeAnchorOptions}"
+              SelectedItem="{Binding SubstringEndAnchorOption}"
+            >
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:StringScopeAnchorOption">
+                  <TextBlock Text="{Binding Label}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Grid.Row="2" Grid.Column="4" Classes="filter-options-suffix" Text="side (incl.)" />
+          </Grid>
+        </controls:FieldsetGroup>
 
-        <Border Classes="filter-options-group" IsVisible="{Binding ShowTokenOptions}">
+        <controls:FieldsetGroup Header="Token" IsVisible="{Binding ShowTokenOptions}">
           <StackPanel Spacing="8">
-            <TextBlock Classes="filter-options-group-title" Text="Token" />
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
@@ -350,7 +332,7 @@
               />
             </Grid>
           </StackPanel>
-        </Border>
+        </controls:FieldsetGroup>
       </StackPanel>
     </StackPanel>
   </DockPanel>
