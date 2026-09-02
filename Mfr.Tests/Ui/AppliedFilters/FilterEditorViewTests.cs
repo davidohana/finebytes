@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
-using Avalonia.Layout;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
@@ -215,15 +215,14 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             var editor = editorView.GetVisualDescendants().OfType<SpaceCharacterFilterEditorView>().Single();
             var group = editor.GetVisualDescendants().OfType<FieldsetGroup>().First();
-            var headerOverlay = group
+            var headerPresenter = group
                 .GetVisualDescendants()
-                .OfType<Border>()
-                .Single(item => item.Name == "PART_HeaderOverlay");
+                .OfType<ContentPresenter>()
+                .Single(item => item.Name == "PART_HeaderPresenter");
             var border = group.GetVisualDescendants().OfType<Border>().Single(item => item.Name == "PART_Border");
-            Assert.Equal(new Thickness(1), border.BorderThickness);
-            Assert.Equal(HorizontalAlignment.Left, headerOverlay.HorizontalAlignment);
-            Assert.True(headerOverlay.Bounds.Width > 0);
-            Assert.True(headerOverlay.Bounds.Width < group.Bounds.Width / 2);
+            Assert.Equal(new Thickness(1, 0, 1, 1), border.BorderThickness);
+            Assert.True(headerPresenter.Bounds.Width > 0);
+            Assert.True(headerPresenter.Bounds.Width < group.Bounds.Width / 2);
 
             window.Close();
         }

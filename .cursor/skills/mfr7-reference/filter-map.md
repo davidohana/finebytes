@@ -75,7 +75,7 @@ Compare output to `Mfr.Filters` types and `FilterCatalog.Entries`.
 
 ## Legacy source layout
 
-```
+```text
 D:\Devl\mfr7\Core\
   MfrFilters\Filters\     # filter + *FilterEditor.cs
   MfrFilters\FormattingParams\

@@ -36,12 +36,7 @@
 
           <!-- Top header band with line segments to the left and right of the header text -->
           <Grid Height="16" VerticalAlignment="Top" ColumnDefinitions="8,Auto,*">
-            <Border
-              Grid.Column="0"
-              Height="1"
-              VerticalAlignment="Center"
-              Background="{TemplateBinding BorderBrush}"
-            />
+            <Border Grid.Column="0" Height="1" VerticalAlignment="Center" Background="{TemplateBinding BorderBrush}" />
             <ContentPresenter
               Name="PART_HeaderPresenter"
               Grid.Column="1"
@@ -52,12 +47,7 @@
               FontWeight="SemiBold"
               RecognizesAccessKey="False"
             />
-            <Border
-              Grid.Column="2"
-              Height="1"
-              VerticalAlignment="Center"
-              Background="{TemplateBinding BorderBrush}"
-            />
+            <Border Grid.Column="2" Height="1" VerticalAlignment="Center" Background="{TemplateBinding BorderBrush}" />
           </Grid>
         </Grid>
       </ControlTemplate>

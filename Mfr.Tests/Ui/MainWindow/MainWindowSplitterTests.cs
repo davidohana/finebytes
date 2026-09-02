@@ -21,8 +21,8 @@ namespace Mfr.Tests.Ui.MainWindow
         public void FileListSplitter_Resizes_Columns()
         {
             var window = _ShowMainWindow();
-            var grid = window.FindControl<Grid>("TopPanesGrid");
-            var splitter = window.FindControl<GridSplitter>("FileListSplitter");
+            var grid = window.TopPanesGrid;
+            var splitter = window.FileListSplitter;
             var before = grid.ColumnDefinitions[0].ActualWidth;
 
             _Drag(splitter, deltaX: 80, deltaY: 0);
@@ -41,8 +41,8 @@ namespace Mfr.Tests.Ui.MainWindow
         public void AvailableAppliedSplitter_Resizes_Columns()
         {
             var window = _ShowMainWindow();
-            var grid = window.FindControl<Grid>("FilterListsGrid");
-            var splitter = window.FindControl<GridSplitter>("AvailableAppliedSplitter");
+            var grid = window.FilterListsGrid;
+            var splitter = window.AvailableAppliedSplitter;
             var before = grid.ColumnDefinitions[0].ActualWidth;
 
             _Drag(splitter, deltaX: 60, deltaY: 0);
@@ -61,8 +61,8 @@ namespace Mfr.Tests.Ui.MainWindow
         public void FilterEditorSplitter_Resizes_Rows()
         {
             var window = _ShowMainWindow();
-            var grid = window.FindControl<Grid>("FilterPanesGrid");
-            var splitter = window.FindControl<GridSplitter>("FilterEditorSplitter");
+            var grid = window.FilterPanesGrid;
+            var splitter = window.FilterEditorSplitter;
             var before = grid.RowDefinitions[0].ActualHeight;
 
             _Drag(splitter, deltaX: 0, deltaY: 50);
@@ -81,8 +81,8 @@ namespace Mfr.Tests.Ui.MainWindow
         public void RenameListSplitter_Resizes_Rows()
         {
             var window = _ShowMainWindow();
-            var grid = window.FindControl<Grid>("MainPanesGrid");
-            var splitter = window.FindControl<GridSplitter>("RenameListSplitter");
+            var grid = window.MainPanesGrid;
+            var splitter = window.RenameListSplitter;
             var before = grid.RowDefinitions[0].ActualHeight;
 
             _Drag(splitter, deltaX: 0, deltaY: 60);
@@ -101,7 +101,7 @@ namespace Mfr.Tests.Ui.MainWindow
         public void SplitterSession_Capture_And_Restore_FileList_Ratio()
         {
             var window = _ShowMainWindow();
-            var splitter = window.FindControl<GridSplitter>("FileListSplitter");
+            var splitter = window.FileListSplitter;
 
             _Drag(splitter, deltaX: 80, deltaY: 0);
             window.UpdateLayout();

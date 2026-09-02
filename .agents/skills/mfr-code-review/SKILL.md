@@ -25,9 +25,9 @@ welcomes deeper refactors — do not bury or skip them because they are not auto
 Pick one, in this order:
 
 1. **Plan phase** — that phase’s files and leftovers in the same area.
-2. **Prior transcript** — what that session changed; do not re-litigate unrelated work.
-3. **Path / type** — that code, callers, tests, and any parallel copy.
-4. **Unspecified** — current uncommitted + branch diff.
+1. **Prior transcript** — what that session changed; do not re-litigate unrelated work.
+1. **Path / type** — that code, callers, tests, and any parallel copy.
+1. **Unspecified** — current uncommitted + branch diff.
 
 Read nearby domain docs only when the change touches them. Style and no-legacy-compat rules
 are already always-on — do not restate them.
@@ -76,11 +76,11 @@ same pass.
 Delegate only for **discovery** or **specialized audits**. Subagent output is input; the parent
 merges, dedupes, prioritizes, and writes the final report. Subagents do **not** apply fixes.
 
-| Subagent | Launch when | Skip when |
-|----------|-------------|-----------|
-| **`explore`** | Hunting **cross-file dedup/reuse** — parallel views, payloads, DnD handlers, label maps, twin resolvers; scope is path/type and copies may live outside the diff | Diff is small, self-contained, or parallel sites are already obvious from open files |
-| **`bugbot`** | User asked; or diff is **large/risky** (rename engine, batch apply, cancel/progress, persistence, concurrency) | Typical UI/VM refactors; small feature-area reviews — overlaps the Correctness lens |
-| **`security-review`** | Diff touches **security-sensitive** surfaces: path traversal, deserializing untrusted input, shell/process spawn, network | Routine desktop UI, filters, session layout, internal models |
+| Subagent              | Launch when                                                                                                                                                      | Skip when                                                                            |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| **`explore`**         | Hunting **cross-file dedup/reuse** — parallel views, payloads, DnD handlers, label maps, twin resolvers; scope is path/type and copies may live outside the diff | Diff is small, self-contained, or parallel sites are already obvious from open files |
+| **`bugbot`**          | User asked; or diff is **large/risky** (rename engine, batch apply, cancel/progress, persistence, concurrency)                                                   | Typical UI/VM refactors; small feature-area reviews — overlaps the Correctness lens  |
+| **`security-review`** | Diff touches **security-sensitive** surfaces: path traversal, deserializing untrusted input, shell/process spawn, network                                        | Routine desktop UI, filters, session layout, internal models                         |
 
 **Do not** spin up a subagent per report section (Correctness agent, Dedup agent, etc.) — weak
 synthesis, heavy overlap.
@@ -117,11 +117,11 @@ Hunt in this order:
 
 1. **Same file** — repeated blocks, twin branches, copy-pasted guards; extract a local helper
    when it removes real duplication (apply if already touching the file).
-2. **Same feature area** — parallel partials, views, payloads, label maps, DnD handlers;
+1. **Same feature area** — parallel partials, views, payloads, label maps, DnD handlers;
    compare side by side and note what could be one type or one code path.
-3. **Cross-layer** — UI re-resolving what domain already decides; duplicate validation or
+1. **Cross-layer** — UI re-resolving what domain already decides; duplicate validation or
    mapping in VM + view + tests.
-4. **Tests** — same scenario through VM + headless + integration; near-identical facts;
+1. **Tests** — same scenario through VM + headless + integration; near-identical facts;
    fixtures that could be one builder.
 
 When two sites implement the same policy or shape, prefer **one owner** — even if merging

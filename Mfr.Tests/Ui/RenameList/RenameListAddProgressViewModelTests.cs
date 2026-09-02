@@ -111,11 +111,7 @@ namespace Mfr.Tests.Ui.RenameList
                     (_, progress) =>
                     {
                         progress.Report(new RenameListAddProgress(4, 2, lastPath));
-                        var deadline = Environment.TickCount64 + 2000;
-                        while (viewModel.ScannedCount != 4 && Environment.TickCount64 < deadline)
-                        {
-                            Thread.Sleep(10);
-                        }
+                        _WaitFor(() => viewModel.ScannedCount == 4);
                     }
                 )
                 .ConfigureAwait(true);
@@ -138,6 +134,7 @@ namespace Mfr.Tests.Ui.RenameList
                 .RunAsync(
                     RenameListProgressOperation.MetadataHydrate,
                     (_, progress) =>
+                    {
                         progress.Report(
                             new RenameListAddProgress(
                                 ScannedCount: 0,
@@ -147,7 +144,9 @@ namespace Mfr.Tests.Ui.RenameList
                                 Phase: RenameListAddProgressPhase.LoadMetadata,
                                 MetadataProcessedCount: 3
                             )
-                        )
+                        );
+                        _WaitFor(() => viewModel.MetadataProcessedCount == 3);
+                    }
                 )
                 .ConfigureAwait(true);
 
@@ -173,6 +172,7 @@ namespace Mfr.Tests.Ui.RenameList
                 .RunAsync(
                     RenameListProgressOperation.Refresh,
                     (_, progress) =>
+                    {
                         progress.Report(
                             new RenameListAddProgress(
                                 ScannedCount: 0,
@@ -182,7 +182,9 @@ namespace Mfr.Tests.Ui.RenameList
                                 Phase: RenameListAddProgressPhase.LoadMetadata,
                                 MetadataProcessedCount: 4
                             )
-                        )
+                        );
+                        _WaitFor(() => viewModel.MetadataProcessedCount == 4);
+                    }
                 )
                 .ConfigureAwait(true);
 
@@ -216,6 +218,7 @@ namespace Mfr.Tests.Ui.RenameList
                                 MetadataProcessedCount: 1
                             )
                         );
+                        _WaitFor(() => viewModel.MetadataProcessedCount == 1);
                     }
                 )
                 .ConfigureAwait(true);
@@ -242,6 +245,7 @@ namespace Mfr.Tests.Ui.RenameList
             var completed = await viewModel
                 .RunAsync(
                     (_, progress) =>
+                    {
                         progress.Report(
                             new RenameListAddProgress(
                                 ScannedCount: 100,
@@ -251,7 +255,9 @@ namespace Mfr.Tests.Ui.RenameList
                                 Phase: RenameListAddProgressPhase.LoadMetadata,
                                 MetadataProcessedCount: 1
                             )
-                        )
+                        );
+                        _WaitFor(() => viewModel.MetadataProcessedCount == 1);
+                    }
                 )
                 .ConfigureAwait(true);
 
@@ -295,12 +301,22 @@ namespace Mfr.Tests.Ui.RenameList
                                 MetadataProcessedCount: 5
                             )
                         );
+                        _WaitFor(() => viewModel.MetadataProcessedCount == 5);
                     }
                 )
                 .ConfigureAwait(true);
 
             Assert.True(completed);
             Assert.Equal("Reading metadata: 5 of 10 files", viewModel.MetadataProgressText);
+        }
+
+        private static void _WaitFor(Func<bool> condition)
+        {
+            var deadline = Environment.TickCount64 + 2000;
+            while (!condition() && Environment.TickCount64 < deadline)
+            {
+                Thread.Sleep(10);
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ If paths differ on another machine, search for `mfr7` under the user's `Devl` fo
 
 Copy this checklist and track progress:
 
-```
+```text
 MFR7 reference:
 - [ ] 1. Scope the feature (filter / token / UI pane / shortcut / preset / metadata)
 - [ ] 2. Check finebytes first (existing impl, tests, Mfr.Filters/docs)
