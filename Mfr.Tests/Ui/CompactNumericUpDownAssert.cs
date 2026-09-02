@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Presenters;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Views.Controls;
@@ -85,12 +85,11 @@ namespace Mfr.Tests.Ui
 
         private static List<RepeatButton> _StackedButtons(CompactNumericUpDown spinner)
         {
-            return spinner
+            return [.. spinner
                 .GetVisualDescendants()
                 .OfType<RepeatButton>()
                 .OrderBy(button => button.Bounds.Y)
-                .ThenBy(button => button.Bounds.X)
-                .ToList();
+                .ThenBy(button => button.Bounds.X)];
         }
     }
 }

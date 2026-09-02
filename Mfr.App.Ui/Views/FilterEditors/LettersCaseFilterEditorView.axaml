@@ -15,10 +15,17 @@
       <StackPanel Spacing="6">
         <TextBlock Classes="filter-editor-group-title" Text="Casing Style" />
         <Grid ColumnDefinitions="Auto,*">
-          <TextBlock Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Center" Text="Mode:" />
+          <TextBlock
+            Grid.Column="0"
+            Classes="filter-editor-label"
+            Margin="0,0,8,0"
+            VerticalAlignment="Center"
+            Text="Mode:"
+          />
           <ComboBox
             x:Name="ModeCombo"
             Grid.Column="1"
+            Classes="filter-editor-field"
             MinWidth="180"
             HorizontalAlignment="Left"
             ItemsSource="{Binding ModeOptions}"
@@ -32,8 +39,12 @@
           </ComboBox>
         </Grid>
         <StackPanel IsVisible="{Binding HasSkipWords}" Spacing="4">
-          <TextBlock Text="Skip words (comma-separated, title case only):" TextWrapping="Wrap" />
-          <TextBox x:Name="SkipWordsBox" Text="{Binding SkipWordsText}" />
+          <TextBlock
+            Classes="filter-editor-label"
+            Text="Skip words (comma-separated, title case only):"
+            TextWrapping="Wrap"
+          />
+          <TextBox x:Name="SkipWordsBox" Classes="filter-editor-field" Text="{Binding SkipWordsText}" />
         </StackPanel>
       </StackPanel>
     </Border>

@@ -14,16 +14,22 @@
     <Border Classes="filter-editor-group">
       <StackPanel Spacing="6">
         <TextBlock Classes="filter-editor-group-title" Text="Define" />
-        <TextBlock Text="Use the following character to separate between words:" TextWrapping="Wrap" />
+        <TextBlock
+          Classes="filter-editor-label"
+          Text="Use the following character to separate between words:"
+          TextWrapping="Wrap"
+        />
         <StackPanel Orientation="Horizontal" Spacing="12">
           <RadioButton
             x:Name="SpaceDefinitionRadio"
+            Classes="filter-editor-radio"
             GroupName="SpaceCharacterDefinition"
             Content="Space"
             IsChecked="{Binding IsDefinitionSpace, Mode=TwoWay}"
           />
           <RadioButton
             x:Name="UnderscoreDefinitionRadio"
+            Classes="filter-editor-radio"
             GroupName="SpaceCharacterDefinition"
             Content="Underscore ( _ )"
             IsChecked="{Binding IsDefinitionUnderscore, Mode=TwoWay}"
@@ -31,11 +37,18 @@
           <StackPanel Orientation="Horizontal" Spacing="4">
             <RadioButton
               x:Name="OtherDefinitionRadio"
+              Classes="filter-editor-radio"
               GroupName="SpaceCharacterDefinition"
               Content="Other:"
               IsChecked="{Binding IsDefinitionOther, Mode=TwoWay}"
             />
-            <TextBox x:Name="OtherCharacterBox" Width="28" MaxLength="1" Text="{Binding OtherCharacter}" />
+            <TextBox
+              x:Name="OtherCharacterBox"
+              Classes="filter-editor-field"
+              Width="28"
+              MaxLength="1"
+              Text="{Binding OtherCharacter}"
+            />
           </StackPanel>
         </StackPanel>
       </StackPanel>
@@ -43,25 +56,41 @@
     <Border Classes="filter-editor-group">
       <StackPanel Spacing="6">
         <TextBlock Classes="filter-editor-group-title" Text="Replace" />
-        <TextBlock Text="Replace the following with the defined space character:" TextWrapping="Wrap" />
+        <TextBlock
+          Classes="filter-editor-label"
+          Text="Replace the following with the defined space character:"
+          TextWrapping="Wrap"
+        />
         <WrapPanel>
-          <CheckBox x:Name="ReplaceSpacesCheckBox" Content="Spaces" IsChecked="{Binding ReplaceSpaces}" />
+          <CheckBox
+            x:Name="ReplaceSpacesCheckBox"
+            Classes="filter-editor-check"
+            Content="Spaces"
+            IsChecked="{Binding ReplaceSpaces}"
+          />
           <CheckBox
             x:Name="ReplaceUnderscoresCheckBox"
+            Classes="filter-editor-check"
             Margin="12,0,0,0"
             Content="Underscores"
             IsChecked="{Binding ReplaceUnderscores}"
           />
           <CheckBox
             x:Name="ReplacePercent20CheckBox"
+            Classes="filter-editor-check"
             Margin="12,0,0,0"
             Content="%20's"
             IsChecked="{Binding ReplacePercent20}"
           />
         </WrapPanel>
         <StackPanel Orientation="Horizontal" Spacing="4">
-          <CheckBox x:Name="ReplaceCustomCheckBox" Content="Custom text:" IsChecked="{Binding ReplaceCustom}" />
-          <TextBox x:Name="CustomTextBox" MinWidth="120" Text="{Binding CustomText}" />
+          <CheckBox
+            x:Name="ReplaceCustomCheckBox"
+            Classes="filter-editor-check"
+            Content="Custom text:"
+            IsChecked="{Binding ReplaceCustom}"
+          />
+          <TextBox x:Name="CustomTextBox" Classes="filter-editor-field" MinWidth="120" Text="{Binding CustomText}" />
         </StackPanel>
       </StackPanel>
     </Border>
