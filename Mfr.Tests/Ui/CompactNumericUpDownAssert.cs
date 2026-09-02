@@ -85,11 +85,14 @@ namespace Mfr.Tests.Ui
 
         private static List<RepeatButton> _StackedButtons(CompactNumericUpDown spinner)
         {
-            return [.. spinner
-                .GetVisualDescendants()
-                .OfType<RepeatButton>()
-                .OrderBy(button => button.Bounds.Y)
-                .ThenBy(button => button.Bounds.X)];
+            return
+            [
+                .. spinner
+                    .GetVisualDescendants()
+                    .OfType<RepeatButton>()
+                    .OrderBy(button => button.Bounds.Y)
+                    .ThenBy(button => button.Bounds.X),
+            ];
         }
     }
 }

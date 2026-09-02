@@ -28,7 +28,8 @@ namespace Mfr.Filters.Space
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, space separator, common replacements).
         /// </summary>
         public SpaceCharacterFilter()
-            : this(new FilePrefixTarget(), new SpaceCharacterOptions(' ', SpaceCharacterOptions.DefaultReplacements)) { }
+            : this(new FilePrefixTarget(), new SpaceCharacterOptions(' ', SpaceCharacterOptions.DefaultReplacements))
+        { }
 
         /// <summary>
         /// Gets the filter type discriminator.

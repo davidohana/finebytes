@@ -1,22 +1,28 @@
-<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <Style Selector="HeaderedContentControl.fieldset-group">
-    <Setter Property="Background" Value="Transparent" />
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="clr-namespace:Mfr.App.Ui.Views.Controls"
+>
+  <ControlTheme x:Key="{x:Type controls:FieldsetGroup}" TargetType="controls:FieldsetGroup">
+    <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="0" />
-    <Setter Property="Padding" Value="8,4,8,8" />
+    <Setter Property="Padding" Value="8,8,8,8" />
     <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
     <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
     <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
     <Setter Property="Template">
-      <ControlTemplate TargetType="HeaderedContentControl">
+      <ControlTemplate TargetType="controls:FieldsetGroup">
         <Grid>
+          <!-- Body box with left, bottom, and right borders starting at Y=8 (middle of 16px header) -->
           <Border
+            Name="PART_Border"
             Margin="0,8,0,0"
             Padding="{TemplateBinding Padding}"
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
-            BorderThickness="{TemplateBinding BorderThickness}"
+            BorderThickness="1,0,1,1"
             CornerRadius="{TemplateBinding CornerRadius}"
           >
             <ContentPresenter
@@ -27,22 +33,34 @@
               VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
             />
           </Border>
-          <Border
-            Margin="8,0,0,0"
-            Padding="4,0,4,0"
-            VerticalAlignment="Top"
-            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-          >
+
+          <!-- Top header band with line segments to the left and right of the header text -->
+          <Grid Height="16" VerticalAlignment="Top" ColumnDefinitions="8,Auto,*">
+            <Border
+              Grid.Column="0"
+              Height="1"
+              VerticalAlignment="Center"
+              Background="{TemplateBinding BorderBrush}"
+            />
             <ContentPresenter
               Name="PART_HeaderPresenter"
+              Grid.Column="1"
+              Padding="4,0"
+              VerticalAlignment="Center"
               Content="{TemplateBinding Header}"
               ContentTemplate="{TemplateBinding HeaderTemplate}"
               FontWeight="SemiBold"
               RecognizesAccessKey="False"
             />
-          </Border>
+            <Border
+              Grid.Column="2"
+              Height="1"
+              VerticalAlignment="Center"
+              Background="{TemplateBinding BorderBrush}"
+            />
+          </Grid>
         </Grid>
       </ControlTemplate>
     </Setter>
-  </Style>
-</Styles>
+  </ControlTheme>
+</ResourceDictionary>

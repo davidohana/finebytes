@@ -1,11 +1,14 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Layout;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
@@ -195,6 +198,32 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             var filter = (LettersCaseFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(["a", "the"], filter.Options.SkipWords);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the fieldset header is left-aligned on the top border instead of covering it.
+        /// </summary>
+        [AvaloniaFact]
+        public void Fieldset_header_does_not_cover_full_top_border()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<SpaceCharacterFilterEditorView>().Single();
+            var group = editor.GetVisualDescendants().OfType<FieldsetGroup>().First();
+            var headerOverlay = group
+                .GetVisualDescendants()
+                .OfType<Border>()
+                .Single(item => item.Name == "PART_HeaderOverlay");
+            var border = group.GetVisualDescendants().OfType<Border>().Single(item => item.Name == "PART_Border");
+            Assert.Equal(new Thickness(1), border.BorderThickness);
+            Assert.Equal(HorizontalAlignment.Left, headerOverlay.HorizontalAlignment);
+            Assert.True(headerOverlay.Bounds.Width > 0);
+            Assert.True(headerOverlay.Bounds.Width < group.Bounds.Width / 2);
 
             window.Close();
         }

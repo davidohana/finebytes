@@ -7,12 +7,7 @@ namespace Mfr.App.Ui.Views.Controls
     /// </summary>
     public class FieldsetGroup : HeaderedContentControl
     {
-        /// <summary>
-        /// Initializes a fieldset group with the shared <c>fieldset-group</c> style class.
-        /// </summary>
-        public FieldsetGroup()
-        {
-            Classes.Add("fieldset-group");
-        }
+        /// <inheritdoc />
+        protected override Type StyleKeyOverride => typeof(FieldsetGroup);
     }
 }

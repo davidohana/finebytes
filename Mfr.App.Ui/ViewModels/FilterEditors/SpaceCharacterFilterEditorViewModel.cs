@@ -230,14 +230,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         {
             foreach (var replacement in replacements)
             {
-                if (
-                    replacement
-                    is not (
-                        _percent20Replacement
-                        or _spaceReplacement
-                        or _underscoreReplacement
-                    )
-                )
+                if (replacement is not (_percent20Replacement or _spaceReplacement or _underscoreReplacement))
                 {
                     return replacement;
                 }
@@ -266,7 +259,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// The matching <see cref="SpaceCharacterDefinition"/> and a one-character string when the definition is
         /// <see cref="SpaceCharacterDefinition.Other"/>; otherwise an empty string.
         /// </returns>
-        private static (SpaceCharacterDefinition Definition, string OtherCharacter) _ResolveDefinition(char spaceCharacter)
+        private static (SpaceCharacterDefinition Definition, string OtherCharacter) _ResolveDefinition(
+            char spaceCharacter
+        )
         {
             return spaceCharacter switch
             {
