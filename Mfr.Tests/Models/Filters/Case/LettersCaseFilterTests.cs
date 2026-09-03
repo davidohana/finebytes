@@ -60,7 +60,7 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(
                     Mode: LettersCaseMode.WeirdCase,
-                    SkipWords: [],
+                    CapitalizeSkipWords: [],
                     WeirdUppercaseChancePercent: 0,
                     WeirdFixedPlaces: false
                 )
@@ -78,7 +78,7 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(
                     Mode: LettersCaseMode.WeirdCase,
-                    SkipWords: [],
+                    CapitalizeSkipWords: [],
                     WeirdUppercaseChancePercent: 100,
                     WeirdFixedPlaces: false
                 )
@@ -96,7 +96,7 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(
                     Mode: LettersCaseMode.WeirdCase,
-                    SkipWords: [],
+                    CapitalizeSkipWords: [],
                     WeirdUppercaseChancePercent: 50,
                     WeirdFixedPlaces: true
                 )
@@ -108,14 +108,14 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
-        /// Verifies title-case respects skip words.
+        /// Verifies capitalize respects skip words.
         /// </summary>
         [Fact]
-        public void Apply_TitleCase_SkipsConfiguredWords()
+        public void Apply_Capitalize_SkipsConfiguredWords()
         {
             var f = new LettersCaseFilter(
                 _target,
-                new LettersCaseOptions(LettersCaseMode.TitleCase, ["a", "the", "for"])
+                new LettersCaseOptions(LettersCaseMode.Capitalize, ["a", "the", "for"])
             );
             Assert.Equal("a Song for the World", FilterTestHelpers.ApplyToPrefix(f, "a song for the world"));
         }
@@ -218,22 +218,22 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
-        /// Verifies title case uses the configured word separator and preserves repeated separators.
+        /// Verifies capitalize uses the configured word separator and preserves repeated separators.
         /// </summary>
         [Fact]
-        public void Apply_TitleCase_UsesWordSeparatorAndPreservesRuns()
+        public void Apply_Capitalize_UsesWordSeparatorAndPreservesRuns()
         {
             var spaceCharFilter = new SpaceCharacterFilter(
                 _target,
                 new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
-            var titleFilter = new LettersCaseFilter(
+            var capitalizeFilter = new LettersCaseFilter(
                 _target,
-                new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"])
+                new LettersCaseOptions(LettersCaseMode.Capitalize, ["the"])
             );
             var item = FilterTestHelpers.CreateRenameItem(prefix: "__gone__with__the__wind__");
 
-            var chain = FilterChain.CreateAllEnabled([spaceCharFilter, titleFilter]);
+            var chain = FilterChain.CreateAllEnabled([spaceCharFilter, capitalizeFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 

@@ -378,7 +378,7 @@ namespace Mfr.Tests.Engine
                   },
                   "options": {
                     "mode": "UpperCase",
-                    "skipWords": [],
+                    "capitalizeSkipWords": [],
                     "weirdUppercaseChancePercent": 50,
                     "weirdFixedPlaces": false
                   },

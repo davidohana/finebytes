@@ -6,7 +6,7 @@ namespace Mfr.Filters.Case
     /// Options for letter-case transformations.
     /// </summary>
     /// <param name="Mode">Case transformation mode.</param>
-    /// <param name="SkipWords">Words to leave lowercased in title case mode.</param>
+    /// <param name="CapitalizeSkipWords">Words to leave lowercased in capitalize mode.</param>
     /// <param name="WeirdUppercaseChancePercent">
     /// Uppercase chance in percent for <see cref="LettersCaseMode.WeirdCase"/> (clamped to 0..100).
     /// </param>
@@ -17,7 +17,7 @@ namespace Mfr.Filters.Case
     /// </param>
     public sealed record LettersCaseOptions(
         LettersCaseMode Mode,
-        IReadOnlyList<string> SkipWords,
+        IReadOnlyList<string> CapitalizeSkipWords,
         int WeirdUppercaseChancePercent = 50,
         bool WeirdFixedPlaces = false
     );
@@ -26,11 +26,11 @@ namespace Mfr.Filters.Case
     /// Supported letter-case transformation modes.
     /// </summary>
     /// <remarks>
-    /// <para><b>Title case</b> and <b>sentence case</b> differ as follows: title case capitalizes
-    /// each segment between occurrences of the current word separator (skip-words apply per segment).
-    /// Sentence case lowercases the whole string, then capitalizes the first letter of the text and
-    /// the first letter after <c>.</c> <c>!</c> or <c>?</c> when followed by one or more occurrences of
-    /// the current word separator (U+0020 SPACE by default).</para>
+    /// <para><b>Capitalize</b> and <b>sentence case</b> differ as follows: capitalize uppercases the
+    /// first letter of each segment between occurrences of the current word separator (skip-words apply
+    /// per segment). Sentence case lowercases the whole string, then capitalizes the first letter of the
+    /// text and the first letter after <c>.</c> <c>!</c> or <c>?</c> when followed by one or more
+    /// occurrences of the current word separator (U+0020 SPACE by default).</para>
     /// <para>See each enum member for a concrete before/after example.</para>
     /// </remarks>
     public enum LettersCaseMode
@@ -65,18 +65,13 @@ namespace Mfr.Filters.Case
         WeirdCase,
 
         /// <summary>
-        /// Title-cases each segment between word separators.
-        /// <para>
-        /// Capitalizes the first letter of each segment between occurrences of the current word separator
-        /// (U+0020 SPACE by default; set by <c>SpaceCharacter</c> when used earlier in the chain);
-        /// words in <see cref="LettersCaseOptions.SkipWords"/> stay lowercase.
-        /// </para>
+        /// Capitalizes each word between word separators; <see cref="LettersCaseOptions.CapitalizeSkipWords"/> stay lowercase.
         /// </summary>
         /// <example>
         /// <para>Typical: <c>hello world</c> → <c>Hello World</c>.</para>
         /// <para>With skip-words <c>a</c>, <c>the</c>, <c>for</c>: <c>a song for the world</c> → <c>a Song for the World</c>.</para>
         /// </example>
-        TitleCase,
+        Capitalize,
 
         /// <summary>
         /// Sentence case: lowercase, then capitalize sentence starts.
@@ -84,7 +79,7 @@ namespace Mfr.Filters.Case
         /// Lowercases the string, then capitalizes the first letter of the whole string and the first
         /// letter after characters in <see cref="RenameItem.SentenceEndChars"/> (default <c>".!?"</c>;
         /// set by <c>SentenceEndCharacters</c> when used earlier in the chain) when followed by one or more
-        /// word-separator characters (same as title case: default U+0020 SPACE; set by <c>SpaceCharacter</c>
+        /// word-separator characters (same as capitalize: default U+0020 SPACE; set by <c>SpaceCharacter</c>
         /// when used earlier in the chain).
         /// </para>
         /// </summary>
@@ -115,10 +110,10 @@ namespace Mfr.Filters.Case
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, title case, no skip words).
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, capitalize, no skip words).
         /// </summary>
         public LettersCaseFilter()
-            : this(new FilePrefixTarget(), new LettersCaseOptions(LettersCaseMode.TitleCase, [])) { }
+            : this(new FilePrefixTarget(), new LettersCaseOptions(LettersCaseMode.Capitalize, [])) { }
 
         /// <summary>
         /// Gets the filter type discriminator.
@@ -138,7 +133,7 @@ namespace Mfr.Filters.Case
                     weirdUppercaseChancePercent: Options.WeirdUppercaseChancePercent,
                     weirdFixedPlaces: Options.WeirdFixedPlaces
                 ),
-                LettersCaseMode.TitleCase => _ApplyTitleCase(value, Options.SkipWords, item.WordSeparator),
+                LettersCaseMode.Capitalize => _ApplyCapitalize(value, Options.CapitalizeSkipWords, item.WordSeparator),
                 LettersCaseMode.SentenceCase => _ApplySentenceCase(value, item.WordSeparator, item.SentenceEndChars),
                 LettersCaseMode.InvertCase => _InvertCase(value),
                 _ => value,
@@ -211,7 +206,7 @@ namespace Mfr.Filters.Case
             }
         }
 
-        private static string _ApplyTitleCase(string input, IReadOnlyList<string> skipWords, char wordSeparator)
+        private static string _ApplyCapitalize(string input, IReadOnlyList<string> skipWords, char wordSeparator)
         {
             if (input.Length == 0)
             {
@@ -241,13 +236,13 @@ namespace Mfr.Filters.Case
                 }
 
                 var word = input[start..i];
-                sb.Append(_TitleCaseOneWord(word, skipWordToIsExcluded));
+                sb.Append(_CapitalizeOneWord(word, skipWordToIsExcluded));
             }
 
             return sb.ToString();
         }
 
-        private static string _TitleCaseOneWord(string word, HashSet<string> skipWordToIsExcluded)
+        private static string _CapitalizeOneWord(string word, HashSet<string> skipWordToIsExcluded)
         {
             if (skipWordToIsExcluded.Contains(word))
             {

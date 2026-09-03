@@ -37,7 +37,7 @@ namespace Mfr.Tests.Models.Filters.Case
             );
             var lettersCaseFilter = new LettersCaseFilter(
                 Target: _target,
-                Options: new LettersCaseOptions(LettersCaseMode.SentenceCase, SkipWords: [])
+                Options: new LettersCaseOptions(LettersCaseMode.SentenceCase, CapitalizeSkipWords: [])
             );
             var item = FilterTestHelpers.CreateRenameItem(prefix: "a - b. c");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersCaseFilter]);

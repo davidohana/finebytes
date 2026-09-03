@@ -21,7 +21,7 @@ Sets the **word separator** character for the rest of the rename pass and option
   - After: `a b c d`
 - `spaceCharacter`: `"-"`; `replacements`: `["++"]` — `a++b` → `a-b`
 - `spaceCharacter`: `"_"`; `replacements`: `["%20"]`; [LettersCase](../Case/LettersCase.md); `mode`:
-  `TitleCase`; `skipWords`: `["the"]`
+  `Capitalize`; `capitalizeSkipWords`: `["the"]`
   - Before: `gone%20with%20the%20wind`
   - After: `Gone_With_the_Wind`
 - `spaceCharacter`: `"_"`; `replacements`: `["%20"]`

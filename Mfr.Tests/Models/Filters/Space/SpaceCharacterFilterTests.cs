@@ -50,22 +50,22 @@ namespace Mfr.Tests.Models.Filters.Space
         }
 
         /// <summary>
-        /// Verifies SpaceCharacter then LettersCase TitleCase uses underscore as word boundary.
+        /// Verifies SpaceCharacter then LettersCase Capitalize uses underscore as word boundary.
         /// </summary>
         [Fact]
-        public void ApplyFilters_AfterSpaceCharacter_TitleCaseRespectsWordSeparator()
+        public void ApplyFilters_AfterSpaceCharacter_CapitalizeRespectsWordSeparator()
         {
             var spaceFilter = new SpaceCharacterFilter(
                 _target,
                 new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: ["%20"])
             );
-            var titleFilter = new LettersCaseFilter(
+            var capitalizeFilter = new LettersCaseFilter(
                 _target,
-                new LettersCaseOptions(LettersCaseMode.TitleCase, ["the"])
+                new LettersCaseOptions(LettersCaseMode.Capitalize, ["the"])
             );
 
             var item = FilterTestHelpers.CreateRenameItem(prefix: "gone%20with%20the%20wind");
-            var chain = FilterChain.CreateAllEnabled([spaceFilter, titleFilter]);
+            var chain = FilterChain.CreateAllEnabled([spaceFilter, capitalizeFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 

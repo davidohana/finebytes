@@ -191,7 +191,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Dispatcher.UIThread.RunJobs();
 
             var editor = editorView.GetVisualDescendants().OfType<LettersCaseFilterEditorView>().Single();
-            var skipWords = editor.FindControl<TextBox>("SkipWordsBox");
+            var skipWords = editor.FindControl<TextBox>("CapitalizeSkipWordsBox");
             Assert.NotNull(skipWords);
             Assert.True(skipWords.IsVisible);
             skipWords.Text = "a, the";
@@ -199,7 +199,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Dispatcher.UIThread.RunJobs();
 
             var filter = (LettersCaseFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            Assert.Equal(["a", "the"], filter.Options.SkipWords);
+            Assert.Equal(["a", "the"], filter.Options.CapitalizeSkipWords);
 
             window.Close();
         }

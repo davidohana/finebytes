@@ -79,7 +79,7 @@ Each filter in a preset has:
 - **TagRemover** has no `target`; `options.all` is a nuclear TagLib wipe (including unmodeled types such as XMP), or `options.blocks` lists selected modeled types to delete ([TagRemover](Audio/TagRemover.md)).
 - `options` — optional object; filters with no settings omit it.
 
-Property names use **camelCase**; enum values usually match the C# names (e.g. `TitleCase`, `Literal`).
+Property names use **camelCase**; enum values usually match the C# names (e.g. `Capitalize`, `Literal`).
 
 Each filter page uses an **Examples** section: prefer a four-column table (**Options**, **Before**, **After**, **Comment**) when every padded row fits in **120** characters; otherwise use a bullet list with the same fields. Use **Comment** only when the example is non-obvious (edge case, chain order, or why the result differs from a first guess). In table **Options** cells, put each option property on its **own line** (HTML `<br>` in the markdown source).
 
@@ -94,8 +94,8 @@ Top-level object for `presets.json`: a `presets` array; each item has `id`, `nam
   "presets": [
     {
       "id": "00000000-0000-4000-8000-000000000001",
-      "name": "Word boundary then title case",
-      "description": "Underscore as separator, then title-case the prefix.",
+      "name": "Word boundary then capitalize",
+      "description": "Underscore as separator, then capitalize the prefix.",
       "chain": {
         "steps": [
           {
@@ -119,8 +119,8 @@ Top-level object for `presets.json`: a `presets` array; each item has `id`, `nam
                 "targetType": "FilePrefix"
               },
               "options": {
-                "mode": "TitleCase",
-                "skipWords": ["the", "a"],
+                "mode": "Capitalize",
+                "capitalizeSkipWords": ["the", "a"],
                 "weirdUppercaseChancePercent": 50,
                 "weirdFixedPlaces": false
               }

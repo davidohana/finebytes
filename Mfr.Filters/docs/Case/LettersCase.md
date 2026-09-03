@@ -1,12 +1,12 @@
 # LettersCase
 
-Changes letter casing on the target segment. **Title case** and **sentence case** use the [word separator](../Space/SpaceCharacter.md) (default space). **Sentence case** uses [SentenceEndCharacters](SentenceEndCharacters.md) (default `.!?` until that filter runs).
+Changes letter casing on the target segment. **Capitalize** and **sentence case** use the [word separator](../Space/SpaceCharacter.md) (default space). **Sentence case** uses [SentenceEndCharacters](SentenceEndCharacters.md) (default `.!?` until that filter runs).
 
 ## Options
 
 - **`mode`** (enum, required) — One of the **Modes** below.
-- **`skipWords`** (array of string, default `[]`)
-  - **Title case only:** words matched case-insensitively stay lowercase.
+- **`capitalizeSkipWords`** (array of string, default `[]`)
+  - **Capitalize only:** words matched case-insensitively stay lowercase.
 - **`weirdUppercaseChancePercent`** (int, default `50`)
   - **Weird case only:** chance each letter is uppercased (clamped 0–100).
 - **`weirdFixedPlaces`** (bool, default `false`)
@@ -19,7 +19,7 @@ Changes letter casing on the target segment. **Title case** and **sentence case*
 - **`LowerCase`** — All letters lowercase.
 - **`FirstLetterUp`** — First character uppercased if it is a letter; rest of segment lowercased.
 - **`WeirdCase`** — Random/mixed case per `weirdUppercaseChancePercent` / `weirdFixedPlaces`.
-- **`TitleCase`** — Each word (between word separators) title-cased; `skipWords` stay lower.
+- **`Capitalize`** — Each word (between word separators) capitalized; `capitalizeSkipWords` stay lower.
 - **`SentenceCase`**
   - Whole segment lowercased, then first letter of segment and after sentence ends (see
     [SentenceEndCharacters](SentenceEndCharacters.md)), when followed by separator(s).
@@ -33,7 +33,7 @@ Changes letter casing on the target segment. **Title case** and **sentence case*
 - `mode`: `FirstLetterUp` — ` 123_aBC` → ` 123_abc`
 - `mode`: `WeirdCase`; `weirdUppercaseChancePercent`: `0` — `AbC XyZ` → `abc xyz`
 - `mode`: `WeirdCase`; `weirdUppercaseChancePercent`: `100` — `AbC XyZ` → `ABC XYZ`
-- `mode`: `TitleCase`; `skipWords`: `["a","the","for"]` — `a song for the world` → `a Song for the World`
+- `mode`: `Capitalize`; `capitalizeSkipWords`: `["a","the","for"]` — `a song for the world` → `a Song for the World`
 - `mode`: `SentenceCase`; (default [sentence-end characters](SentenceEndCharacters.md))
   - Before: `hello world. next line.`
   - After: `Hello world. Next line.`
@@ -57,7 +57,7 @@ Changes letter casing on the target segment. **Title case** and **sentence case*
   - Before: `hello._world._again`
   - After: `Hello._World._Again`
 - [SpaceCharacter](../Space/SpaceCharacter.md); `spaceCharacter`: `"_"`; [LettersCase](LettersCase.md);
-  `mode`: `TitleCase`; `skipWords`: `["the"]`
+  `mode`: `Capitalize`; `capitalizeSkipWords`: `["the"]`
   - Before: `__gone__with__the__wind__`
   - After: `__Gone__With__the__Wind__`
 - [SpaceCharacter](../Space/SpaceCharacter.md); `spaceCharacter`: `"_"`; [LettersCase](LettersCase.md);
@@ -83,8 +83,8 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
     "targetType": "FilePrefix"
   },
   "options": {
-    "mode": "TitleCase",
-    "skipWords": ["a", "an", "the", "of"],
+    "mode": "Capitalize",
+    "capitalizeSkipWords": ["a", "an", "the", "of"],
     "weirdUppercaseChancePercent": 50,
     "weirdFixedPlaces": false
   }

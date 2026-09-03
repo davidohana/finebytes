@@ -30,16 +30,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         private LettersCaseMode _mode;
 
         /// <summary>
-        /// Gets or sets whether Capitalize (title case) is selected.
+        /// Gets or sets whether Capitalize is selected.
         /// </summary>
-        public bool IsModeTitleCase
+        public bool IsModeCapitalize
         {
-            get => Mode == LettersCaseMode.TitleCase;
+            get => Mode == LettersCaseMode.Capitalize;
             set
             {
                 if (value)
                 {
-                    Mode = LettersCaseMode.TitleCase;
+                    Mode = LettersCaseMode.Capitalize;
                 }
             }
         }
@@ -137,28 +137,28 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// <summary>
         /// Gets whether skip-words editing is available for the current mode.
         /// </summary>
-        public bool HasSkipWords => Mode == LettersCaseMode.TitleCase;
+        public bool HasCapitalizeSkipWords => Mode == LettersCaseMode.Capitalize;
 
         /// <summary>
-        /// Gets or sets comma-separated skip words for title case.
+        /// Gets or sets comma-separated skip words for capitalize mode.
         /// </summary>
         [ObservableProperty]
-        private string _skipWordsText = string.Empty;
+        private string _capitalizeSkipWordsText = string.Empty;
 
         partial void OnModeChanged(LettersCaseMode value)
         {
-            OnPropertyChanged(nameof(IsModeTitleCase));
+            OnPropertyChanged(nameof(IsModeCapitalize));
             OnPropertyChanged(nameof(IsModeSentenceCase));
             OnPropertyChanged(nameof(IsModeInvertCase));
             OnPropertyChanged(nameof(IsModeUpperCase));
             OnPropertyChanged(nameof(IsModeFirstLetterUp));
             OnPropertyChanged(nameof(IsModeWeirdCase));
             OnPropertyChanged(nameof(IsModeLowerCase));
-            OnPropertyChanged(nameof(HasSkipWords));
+            OnPropertyChanged(nameof(HasCapitalizeSkipWords));
             _ApplyOptions();
         }
 
-        partial void OnSkipWordsTextChanged(string value) => _ApplyOptions();
+        partial void OnCapitalizeSkipWordsTextChanged(string value) => _ApplyOptions();
 
         private void _SyncFromFilter(LettersCaseFilter filter)
         {
@@ -166,7 +166,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             try
             {
                 Mode = filter.Options.Mode;
-                SkipWordsText = string.Join(", ", filter.Options.SkipWords);
+                CapitalizeSkipWordsText = string.Join(", ", filter.Options.CapitalizeSkipWords);
             }
             finally
             {
@@ -181,12 +181,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 return;
             }
 
-            var skipWords = _ParseSkipWords(SkipWordsText);
-            var options = filter.Options with { Mode = Mode, SkipWords = skipWords };
+            var capitalizeSkipWords = _ParseCapitalizeSkipWords(CapitalizeSkipWordsText);
+            var options = filter.Options with { Mode = Mode, CapitalizeSkipWords = capitalizeSkipWords };
             ApplyIfChanged(filter, filter with { Options = options });
         }
 
-        private static IReadOnlyList<string> _ParseSkipWords(string text)
+        private static IReadOnlyList<string> _ParseCapitalizeSkipWords(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
             {

@@ -16,10 +16,10 @@
       <StackPanel Spacing="6">
         <UniformGrid Columns="3">
           <controls:CompactRadioButton
-            x:Name="TitleCaseRadio"
+            x:Name="CapitalizeRadio"
             GroupName="LettersCaseMode"
             Content="Capitalize"
-            IsChecked="{Binding IsModeTitleCase, Mode=TwoWay}"
+            IsChecked="{Binding IsModeCapitalize, Mode=TwoWay}"
           />
           <controls:CompactRadioButton
             x:Name="SentenceCaseRadio"
@@ -58,13 +58,17 @@
             IsChecked="{Binding IsModeLowerCase, Mode=TwoWay}"
           />
         </UniformGrid>
-        <StackPanel IsVisible="{Binding HasSkipWords}" Spacing="4">
+        <StackPanel IsVisible="{Binding HasCapitalizeSkipWords}" Spacing="4">
           <TextBlock
             Classes="filter-editor-label"
-            Text="Skip words (comma-separated, title case only):"
+            Text="Skip words (comma-separated, Capitalize only):"
             TextWrapping="Wrap"
           />
-          <TextBox x:Name="SkipWordsBox" Classes="filter-editor-field" Text="{Binding SkipWordsText}" />
+          <TextBox
+            x:Name="CapitalizeSkipWordsBox"
+            Classes="filter-editor-field"
+            Text="{Binding CapitalizeSkipWordsText}"
+          />
         </StackPanel>
       </StackPanel>
     </controls:FieldsetGroup>
