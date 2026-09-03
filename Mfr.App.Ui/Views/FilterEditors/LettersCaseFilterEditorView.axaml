@@ -19,6 +19,7 @@
           Margin="0,0,16,4"
           GroupName="LettersCaseMode"
           Content="Capitalize"
+          ToolTip.Tip="First letter of each word uppercased; other letters lowercased. Words use the current word separator."
           IsChecked="{Binding IsModeCapitalize, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
@@ -26,6 +27,7 @@
           Margin="0,0,16,4"
           GroupName="LettersCaseMode"
           Content="Sentence case"
+          ToolTip.Tip="First letter of each sentence uppercased; other letters lowercased."
           IsChecked="{Binding IsModeSentenceCase, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
@@ -33,6 +35,7 @@
           Margin="0,0,16,4"
           GroupName="LettersCaseMode"
           Content="tOGGLE cASE"
+          ToolTip.Tip="Uppercase letters become lowercase and vice versa."
           IsChecked="{Binding IsModeInvertCase, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
@@ -40,6 +43,7 @@
           Margin="0,0,16,4"
           GroupName="LettersCaseMode"
           Content="UPPER CASE"
+          ToolTip.Tip="All letters uppercased."
           IsChecked="{Binding IsModeUpperCase, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
@@ -47,6 +51,7 @@
           Margin="0,0,16,4"
           GroupName="LettersCaseMode"
           Content="First letter up"
+          ToolTip.Tip="First letter uppercased; all other letters lowercased."
           IsChecked="{Binding IsModeFirstLetterUp, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
@@ -54,6 +59,7 @@
           Margin="0,0,16,4"
           GroupName="LettersCaseMode"
           Content="wEiRd CaSe"
+          ToolTip.Tip="Mixed casing. Chance of uppercase is set in Weird Case Settings."
           IsChecked="{Binding IsModeWeirdCase, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
@@ -61,6 +67,7 @@
           Margin="0,0,0,4"
           GroupName="LettersCaseMode"
           Content="lower case"
+          ToolTip.Tip="All letters lowercased."
           IsChecked="{Binding IsModeLowerCase, Mode=TwoWay}"
         />
       </WrapPanel>
