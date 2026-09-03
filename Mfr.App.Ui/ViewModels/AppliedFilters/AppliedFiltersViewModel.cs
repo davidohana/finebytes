@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Filters;
 using Mfr.Models.Filters;
@@ -37,6 +38,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Gets the number of applied filters.
         /// </summary>
         public int Count => Steps.Count;
+
+        /// <summary>
+        /// Raised when <see cref="ToChain"/> would change (stack membership, order, enabled, or filter options).
+        /// </summary>
+        public event EventHandler? ChainChanged;
+
+        /// <summary>
+        /// Raised after Filter Options are accepted so hosts can refresh dependent panes.
+        /// </summary>
+        public event EventHandler? FilterOptionsApplied;
 
         /// <summary>
         /// Replaces the current multi-selection.
@@ -135,11 +146,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         public bool CanShowFilterOptions => _selectedSteps.Count == 1;
 
         /// <summary>
-        /// Raised after Filter Options are accepted so hosts can refresh dependent panes.
-        /// </summary>
-        public event EventHandler? FilterOptionsApplied;
-
-        /// <summary>
         /// Applies Filter Options dialog edits to the selected step.
         /// </summary>
         /// <param name="draft">Accepted dialog state.</param>
@@ -184,10 +190,43 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
         private void _OnStepsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems is not null)
+            {
+                foreach (AppliedFilterStepViewModel step in e.NewItems)
+                {
+                    step.PropertyChanged += _OnStepPropertyChanged;
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems is not null)
+            {
+                foreach (AppliedFilterStepViewModel step in e.OldItems)
+                {
+                    step.PropertyChanged -= _OnStepPropertyChanged;
+                }
+            }
+
             OnPropertyChanged(nameof(Count));
             ClearCommand.NotifyCanExecuteChanged();
             RemoveStepsAtIndicesCommand.NotifyCanExecuteChanged();
             _NotifySelectionCommandsChanged();
+            _RaiseChainChanged();
+        }
+
+        private void _OnStepPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (
+                e.PropertyName
+                is nameof(AppliedFilterStepViewModel.Enabled)
+                    or nameof(AppliedFilterStepViewModel.Filter)
+            )
+            {
+                _RaiseChainChanged();
+            }
+        }
+
+        private void _RaiseChainChanged()
+        {
+            ChainChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

@@ -541,21 +541,19 @@ namespace Mfr.Engine.RenameList
         /// <summary>
         /// Previews rename outcomes for the current list without touching the filesystem.
         /// </summary>
-        /// <param name="preset">The rename preset (ordered filter chain).</param>
+        /// <param name="chain">Ordered filter steps (enabled flags honored).</param>
         /// <returns>The commit plan for the previewed items; pass this to <see cref="Commit"/>.</returns>
         /// <remarks>
         /// <para>
-        /// Call <see cref="FilterChain.SetupFilters"/> on <see cref="FilterPreset.Chain"/> before this method
-        /// so filter setup runs once for the chain (for example from the CLI before preview).
+        /// Calls <see cref="FilterChain.SetupFilters"/> before applying so each filter instance is set up once.
         /// </para>
         /// </remarks>
-        public CommitPlan Preview(FilterPreset preset)
+        public CommitPlan Preview(FilterChain chain)
         {
-            Log.Information(
-                "Starting preview for preset '{PresetName}' with {ItemCount} item(s).",
-                preset.Name,
-                _renameItems.Count
-            );
+            ArgumentNullException.ThrowIfNull(chain);
+            Log.Information("Starting preview with {ItemCount} item(s).", _renameItems.Count);
+
+            chain.SetupFilters();
 
             _PopulateRenameListCounterContext();
 
@@ -568,7 +566,7 @@ namespace Mfr.Engine.RenameList
             {
                 try
                 {
-                    preset.Chain.ApplyFilters(renameItem);
+                    chain.ApplyFilters(renameItem);
 
                     if (renameItem.PreviewError is null)
                     {

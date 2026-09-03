@@ -64,6 +64,25 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Notifies the grid that catalog field text or cell styling may have changed.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Template cells listen for this so preview / metadata / refresh updates repaint without replacing
+        /// row instances (same <see cref="RenameListEntry"/> keeps the same <c>DataContext</c>).
+        /// </para>
+        /// </remarks>
+        internal void NotifyFieldsChanged()
+        {
+            OnPropertyChanged(nameof(FieldDisplayRevision));
+        }
+
+        /// <summary>
+        /// Signal property for <see cref="NotifyFieldsChanged"/>; value is unused.
+        /// </summary>
+        public int FieldDisplayRevision => 0;
+
+        /// <summary>
         /// Returns whether this row path is missing from disk (whole-row gray; not a metadata load error).
         /// </summary>
         public bool IsMissingFromDisk => RenameListDiskPaths.IsMissingFromDisk(EngineItem);
@@ -104,7 +123,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public string FullFileNamePreview => GetFieldText(_fullNamePreviewKey);
 
         /// <summary>
-        /// Builds a grid row from a rename item (identity preview until filter preview exists).
+        /// Builds a grid row from a rename item.
         /// </summary>
         /// <param name="item">Engine rename item.</param>
         /// <returns>Row view model for the Rename List grid.</returns>

@@ -1662,15 +1662,14 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Applies <see cref="FilterChain.SetupFilters"/> then runs <see cref="RenameList.Preview"/>.
+        /// Runs <see cref="RenameList.Preview"/> on the preset chain.
         /// </summary>
         /// <param name="renameList">The list under test.</param>
-        /// <param name="preset">Preset whose chain will be set up.</param>
+        /// <param name="preset">Preset whose chain is previewed.</param>
         /// <returns>The commit plan to pass to <see cref="RenameList.Commit"/> when preview-only assertions or mutations must happen first.</returns>
         private static CommitPlan _SetupPreview(RenameList renameList, FilterPreset preset)
         {
-            preset.Chain.SetupFilters();
-            return renameList.Preview(preset);
+            return renameList.Preview(preset.Chain);
         }
 
         private static void _AssertSingleCommitOk(

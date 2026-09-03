@@ -53,8 +53,14 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         internal void SetFilter(BaseFilter filter)
         {
             ArgumentNullException.ThrowIfNull(filter);
+            if (ReferenceEquals(Filter, filter))
+            {
+                return;
+            }
+
             Filter = filter;
             ApplyToLabel = FilterTargetCatalog.GetApplyToLabel(filter);
+            OnPropertyChanged(nameof(Filter));
         }
 
         /// <summary>

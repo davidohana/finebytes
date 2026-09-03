@@ -94,8 +94,6 @@ namespace Mfr.App.Cli
                 ? loadedPreset
                 : throw new UserException($"Preset not found: '{options.PresetName}'.");
 
-            preset.Chain.SetupFilters();
-
             var renameList = new RenameList(includeHidden: options.IncludeHidden);
             renameList.AddSources(
                 sources: options.Sources,
@@ -110,7 +108,7 @@ namespace Mfr.App.Cli
                 throw new UserException("No files matched the provided sources.");
             }
 
-            var commitPlan = renameList.Preview(preset: preset);
+            var commitPlan = renameList.Preview(preset.Chain);
             var hasPreviewErrors = renameItems.Any(item => item.Status == RenameStatus.PreviewError);
             if (hasPreviewErrors)
             {

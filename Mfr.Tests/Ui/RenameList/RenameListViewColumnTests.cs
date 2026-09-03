@@ -6,6 +6,8 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
+using Mfr.Filters.Case;
+using Mfr.Models.Filters;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Models.Filters;
@@ -648,6 +650,59 @@ namespace Mfr.Tests.Ui.RenameList
                 .ToList();
 
             Assert.Contains(expected, rowTexts);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Preview updates the visible Full File Name Preview cell text (not only the VM).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Preview_updates_full_name_preview_cell_text()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 800,
+                Height = 180,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            var row = grid.GetVisualDescendants().OfType<DataGridRow>().First();
+            Assert.Contains(
+                "hello.txt",
+                row.GetVisualDescendants().OfType<TextBlock>().Select(textBlock => textBlock.Text)
+            );
+
+            renameListViewModel.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ])
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("HELLO.txt", renameListViewModel.Entries[0].FullFileNamePreview);
+            Assert.Contains(
+                "HELLO.txt",
+                row.GetVisualDescendants().OfType<TextBlock>().Select(textBlock => textBlock.Text)
+            );
 
             window.Close();
         }

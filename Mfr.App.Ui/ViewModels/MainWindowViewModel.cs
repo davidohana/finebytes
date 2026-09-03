@@ -49,9 +49,12 @@ namespace Mfr.App.Ui.ViewModels
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
             AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
             AppliedFiltersViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
+            AppliedFiltersViewModel.ChainChanged += _OnAppliedFiltersChainChanged;
             FilterPaletteViewModel.PropertyChanged += _OnFilterPalettePropertyChanged;
             ItemCount = RenameListViewModel.ItemCount;
             FilterCount = AppliedFiltersViewModel.Count;
+            ChangeCount = RenameListViewModel.ChangeCount;
+            PreviewErrorCount = RenameListViewModel.PreviewErrorCount;
             WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
         }
 
@@ -197,6 +200,16 @@ namespace Mfr.App.Ui.ViewModels
                 ItemCount = RenameListViewModel.ItemCount;
             }
 
+            if (e.PropertyName is nameof(RenameListViewModel.ChangeCount))
+            {
+                ChangeCount = RenameListViewModel.ChangeCount;
+            }
+
+            if (e.PropertyName is nameof(RenameListViewModel.PreviewErrorCount))
+            {
+                PreviewErrorCount = RenameListViewModel.PreviewErrorCount;
+            }
+
             if (
                 e.PropertyName is nameof(RenameListViewModel.LastAddError)
                 && !string.IsNullOrEmpty(RenameListViewModel.LastAddError)
@@ -236,6 +249,11 @@ namespace Mfr.App.Ui.ViewModels
         private void _OnFilterOptionsApplied(object? sender, EventArgs e)
         {
             FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
+        }
+
+        private void _OnAppliedFiltersChainChanged(object? sender, EventArgs e)
+        {
+            RenameListViewModel.Preview(AppliedFiltersViewModel.ToChain());
         }
 
         private void _OnFilterPalettePropertyChanged(object? sender, PropertyChangedEventArgs e)

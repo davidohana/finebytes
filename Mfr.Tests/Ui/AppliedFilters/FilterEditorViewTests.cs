@@ -313,6 +313,51 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies Letters Case radio edits re-run Rename List preview (Phase 10a).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Letters_case_mode_radio_updates_rename_list_preview()
+        {
+            var dir = Directory
+                .CreateDirectory(
+                    Path.Combine(Directory.GetCurrentDirectory(), "mfr_preview_ui_" + Guid.NewGuid().ToString("N"))
+                )
+                .FullName;
+            try
+            {
+                var path = Path.Combine(dir, "hello.txt");
+                File.WriteAllText(path, "x");
+
+                var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+                await mainViewModel.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+                mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+                window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                var editor = editorView.GetVisualDescendants().OfType<LettersCaseFilterEditorView>().Single();
+                var radio = editor.FindControl<RadioButton>("UpperCaseRadio");
+                Assert.NotNull(radio);
+                radio.IsChecked = true;
+                window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.Equal("HELLO.txt", mainViewModel.RenameListViewModel.Entries[0].FullFileNamePreview);
+                Assert.Equal(1, mainViewModel.ChangeCount);
+
+                window.Close();
+            }
+            finally
+            {
+                try
+                {
+                    Directory.Delete(dir, recursive: true);
+                }
+                catch (IOException) { }
+            }
+        }
+
         private static (
             Window Window,
             MainWindowViewModel MainViewModel,

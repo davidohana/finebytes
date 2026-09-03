@@ -147,21 +147,36 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
-        /// Builds one field cell and re-applies text and foreground when DataGrid recycles the row.
+        /// Builds one field cell and re-applies text when the row recycles or field values change.
         /// </summary>
         private static TextBlock _CreateFieldCell(RenameListEntry? entry, RenameListFieldKey key)
         {
             var textBlock = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
-            _ApplyFieldCell(textBlock, entry, key);
-            textBlock.DataContextChanged += (_, _) =>
+            RenameListEntry? subscribed = null;
+
+            void OnEntryPropertyChanged(object? sender, PropertyChangedEventArgs e)
             {
-                if (textBlock.DataContext is not RenameListEntry current)
+                if (e.PropertyName is not (nameof(RenameListEntry.FieldDisplayRevision) or null or ""))
                 {
                     return;
                 }
 
-                _ApplyFieldCell(textBlock, current, key);
-            };
+                if (textBlock.DataContext is RenameListEntry current)
+                {
+                    _ApplyFieldCell(textBlock, current, key);
+                }
+            }
+
+            void OnDataContextChanged(object? sender, EventArgs e)
+            {
+                subscribed?.PropertyChanged -= OnEntryPropertyChanged;
+                subscribed = textBlock.DataContext as RenameListEntry;
+                subscribed?.PropertyChanged += OnEntryPropertyChanged;
+                _ApplyFieldCell(textBlock, subscribed, key);
+            }
+
+            textBlock.DataContextChanged += OnDataContextChanged;
+            _ApplyFieldCell(textBlock, entry, key);
             return textBlock;
         }
 

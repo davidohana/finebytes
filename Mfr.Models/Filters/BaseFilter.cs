@@ -12,11 +12,40 @@ namespace Mfr.Models.Filters
         private bool _isSetupComplete;
 
         /// <summary>
+        /// Initializes a filter that has not completed setup.
+        /// </summary>
+        protected BaseFilter() { }
+
+        /// <summary>
+        /// Copy constructor used by <c>with</c> expressions.
+        /// </summary>
+        /// <param name="original">Source instance (setup state is not copied).</param>
+        /// <remarks>
+        /// <para>
+        /// Leaves <c>_isSetupComplete</c> false so option edits that produce a new instance via
+        /// <c>with</c> re-run <see cref="_Setup"/> on the next preview (cached setup data must not stick).
+        /// </para>
+        /// </remarks>
+        protected BaseFilter(BaseFilter original)
+        {
+            _ = original;
+        }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         [JsonIgnore]
         public abstract string Type { get; }
 
+        /// <summary>
+        /// Runs one-time preparation before this filter is applied.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Idempotent: subsequent calls are no-ops. Call once per instance before the first
+        /// <see cref="Apply"/> (typically via <see cref="FilterChain.SetupFilters"/>).
+        /// </para>
+        /// </remarks>
         internal void Setup()
         {
             if (_isSetupComplete)

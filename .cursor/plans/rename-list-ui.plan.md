@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–9 done. Next: Phase 10 preview core (Auto-Preview, re-preview on refresh), then 11 highlighting, 12 preview metadata columns, 13 hygiene, 14–15."
+overview: "Phases 1–9 and 10a done. Next: 10b list membership, 10c Auto-Preview toggle, 10d F5 re-preview; then 11 highlighting, 12–15."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -74,8 +74,17 @@ todos:
   - id: phase-9
     content: "Phase 9: Original Refresh — F5, re-read disk, menus/toolbar; missing-on-disk gray; shuttle OrderedDraft + DnD"
     status: completed
-  - id: phase-10
-    content: "Phase 10: Preview core — Preview(), Auto-Preview, re-preview on refresh, counts"
+  - id: phase-10a
+    content: "10a: Filter stack/options → ToChain() → Preview() → grid + status counts (always on)"
+    status: completed
+  - id: phase-10b
+    content: "10b: Re-preview when Rename List membership changes (add/remove/clear)"
+    status: pending
+  - id: phase-10c
+    content: "10c: Auto-Preview toggle — menu/toolbar, persist; cancel disables"
+    status: pending
+  - id: phase-10d
+    content: "10d: Re-preview after F5 original refresh when Auto-Preview on"
     status: pending
   - id: phase-11
     content: "Phase 11: Preview highlighting — red changed cells, preview-error rows, Show Preview Error"
@@ -109,13 +118,16 @@ Source of truth: [mfr7 help](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.htm
 ```mermaid
 flowchart LR
   P1_9[1-9 Done]
-  P10[10 Preview core]
+  P10a[10a Filter edits]
+  P10b[10b List membership]
+  P10c[10c Auto-Preview toggle]
+  P10d[10d F5 re-preview]
   P11[11 Highlighting]
   P12[12 Preview meta cols]
   P13[13 Hygiene]
   P14[14 Advanced]
   P15[15 GO]
-  P1_9 --> P10 --> P11 --> P12 --> P13 --> P14 --> P15
+  P1_9 --> P10a --> P10b --> P10c --> P10d --> P11 --> P12 --> P13 --> P14 --> P15
 ```
 
 ---
@@ -133,7 +145,10 @@ flowchart LR
 | **7** Full Auto-Sort | Done | Field-key sort for all non-preview fields | 7 / 7d |
 | **8** Original field-load errors | Done | Load-error cells, Show Load Errors, TagLib flag, structured gray, LoadErrors naming | 6b–6e |
 | **9** Original Refresh | Done | F5, re-read disk, menus/toolbar; missing-on-disk gray; shuttle OrderedDraft + DnD | 8a (+ part of 10) |
-| **10** Preview core | **Next** | `Preview()`, Auto-Preview, re-preview on refresh, counts | 8b |
+| **10a** Filter-edit preview | Done | Live `ToChain()` → `Preview()` → grid + status counts (always on) | 8b |
+| **10b** List membership | **Next** | Re-preview on Rename List add/remove/clear | 8b |
+| **10c** Auto-Preview toggle | Pending | Menu/toolbar, persist; cancel disables | 8b |
+| **10d** F5 re-preview | Pending | After original refresh, re-run preview when Auto-Preview on | 8b |
 | **11** Preview highlighting | Pending | Red changed cells, preview-error rows, Show Preview Error | 8c |
 | **12** Preview metadata columns | Pending | ID3/image preview cols after filters | 9 / 7b |
 | **13** Remaining hygiene | Partial | Color legend + Phase 5 follow-ups (glyph resources, test fixture, entry props) | 10 / 7c |
@@ -175,20 +190,38 @@ Working list, interactions, context menu, manual order, unified field shuttle, d
 | Shuttle hygiene | [OrderedDraft.cs](../../Mfr.App.Ui/ViewModels/RenameList/OrderedDraft.cs), [ShuttleDragPayload.cs](../../Mfr.App.Ui/Views/RenameList/ShuttleDragPayload.cs) |
 | Tests | [RenameListRefreshTests.cs](../../Mfr.Tests/Engine/RenameListRefreshTests.cs), [RenameListViewModelRefreshTests.cs](../../Mfr.Tests/Ui/RenameList/RenameListViewModelRefreshTests.cs), [MainWindowRefreshTests.cs](../../Mfr.Tests/Ui/MainWindow/MainWindowRefreshTests.cs) |
 
-**Does not call `Preview()`** — preview columns stay identity/stale until **Phase 10**.
+**Does not call `Preview()`** — preview columns stay identity/stale until **10a**.
 
 ---
 
-## Phase 10 — Preview core (next)
+## Phase 10 — Preview core (10a–10d)
 
-*(Was 8b.)* Engine already has `RenameList.Preview(FilterPreset)` (used by CLI). UI work:
+*(Was 8b.)* Engine has `RenameList.Preview(FilterChain)`. Grid preview columns already resolve `item.Preview` via the catalog. Applied Filters F1–F4 shipped (live `ToChain()`, Filter Options, Space Character / Letters Case). Remaining filter option UIs are F5.
 
-- Wire preview into grid: preview columns read `item.Preview` via catalog resolver (not identity `GetFieldText`)
-- **Auto-Preview** toggle — enable stub in [MainWindow.axaml](../../Mfr.App.Ui/Views/MainWindow.axaml) (`IsEnabled="False"` today)
-- **Extend Refresh:** after Phase 9 disk re-read, re-run preview when Auto-Preview on (full MFR7 refresh)
-- Re-run preview after add/remove/sort/reorder when Auto-Preview on
-- Status-bar counts (`_previewCount` / `_previewErrorCount` on [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) — not wired yet)
-- Applied Filters F1–F4 shipped (live `ToChain()`, Filter Options, Space Character / Letters Case editors). Preview should use that chain, not an empty/identity stack. Remaining filter option UIs are F5.
+Letter grain matches 1a–1f. Do not micro-split 10a (engine `Preview(FilterChain)` is a few lines and cannot ship without the UI hook).
+
+### 10a — Filter-edit preview — done
+
+Filter stack/options → `ToChain()` → `Preview()` → grid. Always on (toggle is 10c).
+
+- `Preview(FilterChain)`; `SetupFilters()` inside. `BaseFilter` `with` copies do not inherit `_isSetupComplete`.
+- `ChainChanged` on [AppliedFiltersViewModel](../../Mfr.App.Ui/ViewModels/AppliedFilters/AppliedFiltersViewModel.cs): add/remove/clear/reorder, Enabled, `SetFilter` (editors + Filter Options OK). Not display-name or selection.
+- [RenameListViewModel.Preview.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Preview.cs) → engine → `_RefreshFieldDisplay()`. [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) subscribes to `ChainChanged`.
+- Status-bar `ChangeCount` / `PreviewErrorCount`.
+
+**Gap until 10b:** files added *after* filters are on the stack stay identity until the next filter edit. Demo: add files first, then edit filters.
+
+### 10b — List membership (next)
+
+Re-preview after Rename List add/remove/clear using the current chain. Row sort/reorder does not change preview values. Without this, 10a’s gap remains.
+
+### 10c — Auto-Preview toggle
+
+Enable the stub in [MainWindow.axaml](../../Mfr.App.Ui/Views/MainWindow.axaml) (`IsEnabled="False"` today). Menu + toolbar, persist (MFR7 `PreviewEnabled`, default on). Canceling a long preview disables auto-preview. When off, skip 10a/10b/10d runs.
+
+### 10d — F5 re-preview
+
+After Phase 9 `RefreshOriginals`, re-run preview when Auto-Preview is on (full MFR7 refresh).
 
 ---
 
@@ -206,7 +239,7 @@ Working list, interactions, context menu, manual order, unified field shuttle, d
 
 *(Was 9 / 7b.)*
 
-After **Phase 10**. ID3/image **preview** columns when filters modify tags; shuttle Preview tab entries for `SupportsPreview` metadata fields.
+After **10a–10d**. ID3/image **preview** columns when filters modify tags; shuttle Preview tab entries for `SupportsPreview` metadata fields.
 
 ---
 
@@ -241,4 +274,4 @@ F2 free edit, export, Properties, drag-out to Explorer; Refresh reset of manual 
 
 ## What to implement next
 
-**Phase 10 Preview core** — wire `RenameList.Preview()` to the grid, Auto-Preview toggle, re-preview on refresh and list mutations, status counts. Then **11** highlighting, **12** preview metadata columns, **13** color legend + hygiene, **14–15**.
+**10b List membership** — re-preview after Rename List add/remove/clear. Then **10c** Auto-Preview toggle, **10d** F5 re-preview, **11** highlighting, **12–15**.

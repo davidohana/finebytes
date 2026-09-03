@@ -247,7 +247,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Rebinds grid field cells after metadata hydrate so template cells pick up loaded values.
+        /// Rebinds grid field cells after preview, metadata hydrate, or disk refresh.
         /// </summary>
         private void _RefreshFieldDisplay()
         {
@@ -256,9 +256,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            Entries.ReplaceAll([.. Entries]);
             foreach (var entry in Entries)
             {
+                entry.NotifyFieldsChanged();
                 entry.NotifyRowErrorChanged();
             }
             _NotifyShowLoadErrorsChanged();

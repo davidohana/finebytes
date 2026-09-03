@@ -277,8 +277,7 @@ namespace Mfr.Tests.Engine
 
         private static CommitPlan _SetupPreview(RenameList renameList, FilterPreset preset)
         {
-            preset.Chain.SetupFilters();
-            return renameList.Preview(preset);
+            return renameList.Preview(preset.Chain);
         }
     }
 }

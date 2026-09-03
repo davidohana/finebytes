@@ -61,6 +61,27 @@ namespace Mfr.Tests.Models.Filters
             );
         }
 
+        /// <summary>
+        /// Verifies a <c>with</c> clone must run setup again (setup-complete flag is not copied).
+        /// </summary>
+        [Fact]
+        public void With_clone_is_not_already_set_up()
+        {
+            var filter = new SetupCountingFilter(Target: _target);
+            filter.Setup();
+            Assert.Equal(1, filter.SetupCount);
+
+            var clone = filter with { };
+            clone.Setup();
+
+            Assert.Equal(1, filter.SetupCount);
+            Assert.Equal(2, clone.SetupCount);
+
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "name");
+            clone.Apply(item);
+            Assert.Equal("name-2", item.Preview.Prefix);
+        }
+
         private sealed record SetupCountingFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)
             : StringTargetFilter(Target, ApplyScope)
         {
