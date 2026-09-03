@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
     /// </summary>
     internal sealed partial class LettersCaseFilterEditorViewModel : FilterOptionsEditorViewModel
     {
-        private bool _isSyncing;
+        private bool _isLoading;
 
         /// <summary>
         /// Initializes the editor from the current step filter.
@@ -48,43 +48,29 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
         partial void OnSelectedModeChanged(LettersCaseModeOption? value)
         {
-            if (_isSyncing)
-            {
-                return;
-            }
-
             HasSkipWords = value?.Mode == LettersCaseMode.TitleCase;
             _ApplyOptions();
         }
 
-        partial void OnSkipWordsTextChanged(string value)
-        {
-            if (_isSyncing)
-            {
-                return;
-            }
-
-            _ApplyOptions();
-        }
+        partial void OnSkipWordsTextChanged(string value) => _ApplyOptions();
 
         private void _SyncFromFilter(LettersCaseFilter filter)
         {
-            _isSyncing = true;
+            _isLoading = true;
             try
             {
                 SelectedMode = LettersCaseModeOption.FromMode(filter.Options.Mode);
                 SkipWordsText = string.Join(", ", filter.Options.SkipWords);
-                HasSkipWords = filter.Options.Mode == LettersCaseMode.TitleCase;
             }
             finally
             {
-                _isSyncing = false;
+                _isLoading = false;
             }
         }
 
         private void _ApplyOptions()
         {
-            if (_isSyncing || SelectedMode is null || Step.Filter is not LettersCaseFilter filter)
+            if (_isLoading || SelectedMode is null || Step.Filter is not LettersCaseFilter filter)
             {
                 return;
             }

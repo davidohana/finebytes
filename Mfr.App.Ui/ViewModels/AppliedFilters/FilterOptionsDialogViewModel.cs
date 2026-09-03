@@ -10,7 +10,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
     /// </summary>
     public sealed partial class FilterOptionsDialogViewModel : ViewModelBase
     {
-        private bool _isSyncingTarget;
+        private bool _isLoadingTarget;
 
         /// <summary>
         /// Initializes draft fields from the selected applied-filter step.
@@ -195,7 +195,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
         partial void OnSelectedTargetGroupChanged(FilterTargetGroupOption? value)
         {
-            if (_isSyncingTarget)
+            if (_isLoadingTarget)
             {
                 return;
             }
@@ -273,7 +273,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private void _LoadFromStringFilter(StringTargetFilter stringFilter)
         {
             var (group, option, ancestorLevel) = FilterTargetCatalog.Resolve(stringFilter.Target);
-            _isSyncingTarget = true;
+            _isLoadingTarget = true;
             try
             {
                 SelectedTargetGroup = group;
@@ -295,7 +295,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
             finally
             {
-                _isSyncingTarget = false;
+                _isLoadingTarget = false;
             }
 
             switch (stringFilter.ApplyScope)

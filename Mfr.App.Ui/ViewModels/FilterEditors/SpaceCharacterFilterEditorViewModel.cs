@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         private const string _spaceReplacement = " ";
         private const string _underscoreReplacement = "_";
 
-        private bool _isSyncing;
+        private bool _isLoading;
 
         /// <summary>
         /// Initializes the editor from the current step filter.
@@ -116,11 +116,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
         partial void OnDefinitionChanged(SpaceCharacterDefinition value)
         {
-            if (_isSyncing)
-            {
-                return;
-            }
-
             OnPropertyChanged(nameof(IsDefinitionSpace));
             OnPropertyChanged(nameof(IsDefinitionUnderscore));
             OnPropertyChanged(nameof(IsDefinitionOther));
@@ -129,11 +124,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
         partial void OnOtherCharacterChanged(string value)
         {
-            if (_isSyncing)
-            {
-                return;
-            }
-
             if (Definition != SpaceCharacterDefinition.Other && !string.IsNullOrEmpty(value))
             {
                 Definition = SpaceCharacterDefinition.Other;
@@ -153,11 +143,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
         partial void OnCustomTextChanged(string value)
         {
-            if (_isSyncing)
-            {
-                return;
-            }
-
             if (!ReplaceCustom && !string.IsNullOrEmpty(value))
             {
                 ReplaceCustom = true;
@@ -169,7 +154,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
         private void _SyncFromFilter(SpaceCharacterFilter filter)
         {
-            _isSyncing = true;
+            _isLoading = true;
             try
             {
                 var options = filter.Options;
@@ -182,13 +167,13 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             }
             finally
             {
-                _isSyncing = false;
+                _isLoading = false;
             }
         }
 
         private void _TryApplyOptions()
         {
-            if (_isSyncing || Step.Filter is not SpaceCharacterFilter filter)
+            if (_isLoading || Step.Filter is not SpaceCharacterFilter filter)
             {
                 return;
             }
