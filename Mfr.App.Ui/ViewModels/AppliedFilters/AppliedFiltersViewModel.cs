@@ -14,6 +14,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
     public sealed partial class AppliedFiltersViewModel : ViewModelBase
     {
         private readonly List<AppliedFilterStepViewModel> _selectedSteps = [];
+        private int _chainChangedBatchDepth;
+        private bool _chainChangedQueued;
 
         /// <summary>
         /// Initializes an empty applied-filter list.
@@ -116,6 +118,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             if (Steps.Count == 0)
             {
                 return;
+            }
+
+            foreach (var step in Steps)
+            {
+                step.PropertyChanged -= _OnStepPropertyChanged;
             }
 
             Steps.Clear();
@@ -224,9 +231,40 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
         }
 
+        /// <summary>
+        /// Raises <see cref="ChainChanged"/>, or queues a single raise while a batch is open.
+        /// </summary>
         private void _RaiseChainChanged()
         {
+            if (_chainChangedBatchDepth > 0)
+            {
+                _chainChangedQueued = true;
+                return;
+            }
+
             ChainChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Runs a stack mutation and raises <see cref="ChainChanged"/> once if anything changed.
+        /// </summary>
+        /// <param name="action">Mutations that may fire multiple <see cref="ObservableCollection{T}.CollectionChanged"/> events.</param>
+        private void _WithSingleChainChanged(Action action)
+        {
+            _chainChangedBatchDepth++;
+            try
+            {
+                action();
+            }
+            finally
+            {
+                _chainChangedBatchDepth--;
+                if (_chainChangedBatchDepth == 0 && _chainChangedQueued)
+                {
+                    _chainChangedQueued = false;
+                    ChainChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
 
         /// <summary>
@@ -245,12 +283,15 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             insertIndex = Math.Clamp(insertIndex, 0, Steps.Count);
             var inserted = new List<AppliedFilterStepViewModel>();
-            for (var offset = 0; offset < entries.Count; offset++)
+            _WithSingleChainChanged(() =>
             {
-                var step = _CreateStep(entries[offset]);
-                Steps.Insert(insertIndex + offset, step);
-                inserted.Add(step);
-            }
+                for (var offset = 0; offset < entries.Count; offset++)
+                {
+                    var step = _CreateStep(entries[offset]);
+                    Steps.Insert(insertIndex + offset, step);
+                    inserted.Add(step);
+                }
+            });
 
             SetSelectedSteps(inserted);
         }
@@ -295,7 +336,12 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             var selected = _selectedSteps.ToHashSet();
-            if (!ListReorder.TryMoveSelectedTowardNeighbor(Steps, selected, offset))
+            var moved = false;
+            _WithSingleChainChanged(() =>
+            {
+                moved = ListReorder.TryMoveSelectedTowardNeighbor(Steps, selected, offset);
+            });
+            if (!moved)
             {
                 return;
             }
@@ -368,13 +414,18 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             ArgumentNullException.ThrowIfNull(sourceIndices);
 
-            if (!ListReorder.TryMoveIndicesTo(Steps, sourceIndices, targetIndex, out var newIndices))
+            IReadOnlyList<int> newIndices = [];
+            var moved = false;
+            _WithSingleChainChanged(() =>
+            {
+                moved = ListReorder.TryMoveIndicesTo(Steps, sourceIndices, targetIndex, out newIndices);
+            });
+            if (!moved)
             {
                 return;
             }
 
-            var moved = newIndices.Select(index => Steps[index]).ToList();
-            SetSelectedSteps(moved);
+            SetSelectedSteps([.. newIndices.Select(index => Steps[index])]);
         }
 
         /// <summary>
@@ -398,13 +449,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             var indexSet = sortedIndices.ToHashSet();
             var anchorIndex = sortedIndices[0];
 
-            for (var index = Steps.Count - 1; index >= 0; index--)
+            _WithSingleChainChanged(() =>
             {
-                if (indexSet.Contains(index))
+                for (var index = Steps.Count - 1; index >= 0; index--)
                 {
-                    Steps.RemoveAt(index);
+                    if (indexSet.Contains(index))
+                    {
+                        Steps.RemoveAt(index);
+                    }
                 }
-            }
+            });
 
             SetSelectedSteps(_SelectStepsAfterRemove(anchorIndex));
         }

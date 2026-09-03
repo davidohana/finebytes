@@ -264,5 +264,112 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal("Letters Case", viewModel.Steps[0].DisplayName);
             Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
         }
+
+        /// <summary>
+        /// Verifies inserting several catalog rows raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// </summary>
+        [Fact]
+        public void InsertFromCatalogAt_raises_chain_changed_once()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            var count = _CountChainChanged(
+                viewModel,
+                () =>
+                    viewModel.InsertFromCatalogAt(
+                        [AppliedFiltersTestUi.Entry("LettersCase"), AppliedFiltersTestUi.Entry("TagRemover")],
+                        insertIndex: 0
+                    )
+            );
+
+            Assert.Equal(1, count);
+        }
+
+        /// <summary>
+        /// Verifies removing several steps raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// </summary>
+        [Fact]
+        public void RemoveStepsAtIndices_raises_chain_changed_once()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+
+            var count = _CountChainChanged(viewModel, () => viewModel.RemoveStepsAtIndices([0, 1]));
+
+            Assert.Equal(1, count);
+            Assert.Empty(viewModel.Steps);
+        }
+
+        /// <summary>
+        /// Verifies a drag-reorder raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// </summary>
+        [Fact]
+        public void MoveStepsTo_raises_chain_changed_once()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+
+            var count = _CountChainChanged(viewModel, () => viewModel.MoveStepsTo([1], targetIndex: 0));
+
+            Assert.Equal(1, count);
+        }
+
+        /// <summary>
+        /// Verifies a neighbor-swap move raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// </summary>
+        [Fact]
+        public void MoveSelectedUp_raises_chain_changed_once()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            viewModel.SetSelectedSteps([viewModel.Steps[1]]);
+
+            var count = _CountChainChanged(viewModel, () => viewModel.MoveSelectedUpCommand.Execute(null));
+
+            Assert.Equal(1, count);
+        }
+
+        /// <summary>
+        /// Verifies renaming a step does not raise <see cref="AppliedFiltersViewModel.ChainChanged"/>.
+        /// </summary>
+        [Fact]
+        public void SetDisplayName_does_not_raise_chain_changed()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+
+            var count = _CountChainChanged(viewModel, () => viewModel.Steps[0].SetDisplayName("Custom"));
+
+            Assert.Equal(0, count);
+        }
+
+        /// <summary>
+        /// Counts <see cref="AppliedFiltersViewModel.ChainChanged"/> raises during <paramref name="action"/>.
+        /// </summary>
+        private static int _CountChainChanged(AppliedFiltersViewModel viewModel, Action action)
+        {
+            var count = 0;
+            void OnChanged(object? sender, EventArgs e)
+            {
+                count++;
+            }
+
+            viewModel.ChainChanged += OnChanged;
+            try
+            {
+                action();
+            }
+            finally
+            {
+                viewModel.ChainChanged -= OnChanged;
+            }
+
+            return count;
+        }
     }
 }

@@ -37,14 +37,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(0, renameList.ChangeCount);
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
-            applied
-                .Steps[0]
-                .SetFilter(
-                    new LettersCaseFilter(
-                        new FilePrefixTarget(),
-                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
-                    )
-                );
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
 
             Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
             Assert.Equal(1, renameList.ChangeCount);
@@ -64,14 +57,7 @@ namespace Mfr.Tests.Ui.RenameList
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
-            applied
-                .Steps[0]
-                .SetFilter(
-                    new LettersCaseFilter(
-                        new FilePrefixTarget(),
-                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
-                    )
-                );
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
 
             applied.Steps[0].Enabled = false;
@@ -93,14 +79,7 @@ namespace Mfr.Tests.Ui.RenameList
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
-            applied
-                .Steps[0]
-                .SetFilter(
-                    new LettersCaseFilter(
-                        new FilePrefixTarget(),
-                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
-                    )
-                );
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
             {
@@ -127,14 +106,7 @@ namespace Mfr.Tests.Ui.RenameList
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
-            applied
-                .Steps[0]
-                .SetFilter(
-                    new LettersCaseFilter(
-                        new FilePrefixTarget(),
-                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
-                    )
-                );
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
 
             applied.ClearCommand.Execute(null);
 
@@ -149,12 +121,40 @@ namespace Mfr.Tests.Ui.RenameList
             );
         }
 
+        /// <summary>
+        /// Verifies reordering two casing steps re-runs preview in the new stack order.
+        /// </summary>
+        [Fact]
+        public async Task Reordering_steps_applies_filters_in_new_order()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var (renameList, applied) = _CreateWiredPanes(dir);
+            await renameList.AddPathsAsync([path]).ConfigureAwait(true);
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.Steps[1].SetFilter(_LettersCase(LettersCaseMode.LowerCase));
+            Assert.Equal("hello.txt", renameList.Entries[0].FullFileNamePreview);
+
+            applied.MoveStepsTo([1], targetIndex: 0);
+
+            Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
+        }
+
         private (RenameListViewModel RenameList, AppliedFiltersViewModel Applied) _CreateWiredPanes(string dir)
         {
             var renameList = _context.CreateRenameListViewModel(dir);
             var applied = new AppliedFiltersViewModel();
             applied.ChainChanged += (_, _) => renameList.Preview(applied.ToChain());
             return (renameList, applied);
+        }
+
+        private static LettersCaseFilter _LettersCase(LettersCaseMode mode)
+        {
+            return new LettersCaseFilter(new FilePrefixTarget(), new LettersCaseOptions(mode, CapitalizeSkipWords: []));
         }
     }
 }
