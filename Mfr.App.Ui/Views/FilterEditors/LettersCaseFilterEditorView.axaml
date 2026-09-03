@@ -15,51 +15,44 @@
     <controls:FieldsetGroup Header="Casing Style">
       <StackPanel Spacing="6">
         <UniformGrid Columns="3">
-          <RadioButton
+          <controls:CompactRadioButton
             x:Name="TitleCaseRadio"
-            Classes="filter-editor-radio"
             GroupName="LettersCaseMode"
             Content="Capitalize"
             IsChecked="{Binding IsModeTitleCase, Mode=TwoWay}"
           />
-          <RadioButton
+          <controls:CompactRadioButton
             x:Name="SentenceCaseRadio"
-            Classes="filter-editor-radio"
             GroupName="LettersCaseMode"
             Content="Sentence case"
             IsChecked="{Binding IsModeSentenceCase, Mode=TwoWay}"
           />
-          <RadioButton
+          <controls:CompactRadioButton
             x:Name="InvertCaseRadio"
-            Classes="filter-editor-radio"
             GroupName="LettersCaseMode"
             Content="tOGGLE cASE"
             IsChecked="{Binding IsModeInvertCase, Mode=TwoWay}"
           />
-          <RadioButton
+          <controls:CompactRadioButton
             x:Name="UpperCaseRadio"
-            Classes="filter-editor-radio"
             GroupName="LettersCaseMode"
             Content="UPPER CASE"
             IsChecked="{Binding IsModeUpperCase, Mode=TwoWay}"
           />
-          <RadioButton
+          <controls:CompactRadioButton
             x:Name="FirstLetterUpRadio"
-            Classes="filter-editor-radio"
             GroupName="LettersCaseMode"
             Content="First letter up"
             IsChecked="{Binding IsModeFirstLetterUp, Mode=TwoWay}"
           />
-          <RadioButton
+          <controls:CompactRadioButton
             x:Name="WeirdCaseRadio"
-            Classes="filter-editor-radio"
             GroupName="LettersCaseMode"
             Content="wEiRd CaSe"
             IsChecked="{Binding IsModeWeirdCase, Mode=TwoWay}"
           />
-          <RadioButton
+          <controls:CompactRadioButton
             x:Name="LowerCaseRadio"
-            Classes="filter-editor-radio"
             GroupName="LettersCaseMode"
             Content="lower case"
             IsChecked="{Binding IsModeLowerCase, Mode=TwoWay}"

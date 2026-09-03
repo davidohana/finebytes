@@ -20,24 +20,21 @@
           TextWrapping="Wrap"
         />
         <StackPanel Orientation="Horizontal" Spacing="12">
-          <RadioButton
+          <controls:CompactRadioButton
             x:Name="SpaceDefinitionRadio"
-            Classes="filter-editor-radio"
             GroupName="SpaceCharacterDefinition"
             Content="Space"
             IsChecked="{Binding IsDefinitionSpace, Mode=TwoWay}"
           />
-          <RadioButton
+          <controls:CompactRadioButton
             x:Name="UnderscoreDefinitionRadio"
-            Classes="filter-editor-radio"
             GroupName="SpaceCharacterDefinition"
             Content="Underscore ( _ )"
             IsChecked="{Binding IsDefinitionUnderscore, Mode=TwoWay}"
           />
           <StackPanel Orientation="Horizontal" Spacing="4">
-            <RadioButton
+            <controls:CompactRadioButton
               x:Name="OtherDefinitionRadio"
-              Classes="filter-editor-radio"
               GroupName="SpaceCharacterDefinition"
               Content="Other:"
               IsChecked="{Binding IsDefinitionOther, Mode=TwoWay}"
@@ -61,31 +58,27 @@
           TextWrapping="Wrap"
         />
         <WrapPanel>
-          <CheckBox
+          <controls:CompactCheckBox
             x:Name="ReplaceSpacesCheckBox"
-            Classes="filter-editor-check"
             Content="Spaces"
             IsChecked="{Binding ReplaceSpaces}"
           />
-          <CheckBox
+          <controls:CompactCheckBox
             x:Name="ReplaceUnderscoresCheckBox"
-            Classes="filter-editor-check"
             Margin="12,0,0,0"
             Content="Underscores"
             IsChecked="{Binding ReplaceUnderscores}"
           />
-          <CheckBox
+          <controls:CompactCheckBox
             x:Name="ReplacePercent20CheckBox"
-            Classes="filter-editor-check"
             Margin="12,0,0,0"
             Content="%20's"
             IsChecked="{Binding ReplacePercent20}"
           />
         </WrapPanel>
         <StackPanel Orientation="Horizontal" Spacing="4">
-          <CheckBox
+          <controls:CompactCheckBox
             x:Name="ReplaceCustomCheckBox"
-            Classes="filter-editor-check"
             Content="Custom text:"
             IsChecked="{Binding ReplaceCustom}"
           />

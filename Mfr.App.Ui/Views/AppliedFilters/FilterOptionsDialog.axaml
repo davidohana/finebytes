@@ -74,29 +74,9 @@
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="Padding" Value="0" />
     </Style>
+    <!-- StyleKey is RadioButton (CompactRadioButton override); type selector would not match. -->
     <Style Selector="RadioButton.filter-options-radio">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Padding" Value="6,0,0,0" />
       <Setter Property="Margin" Value="0,0,16,0" />
-      <Setter Property="MinHeight" Value="22" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-    <Style Selector="RadioButton.filter-options-radio /template/ Ellipse#OuterEllipse">
-      <Setter Property="Width" Value="12" />
-      <Setter Property="Height" Value="12" />
-    </Style>
-    <Style Selector="RadioButton.filter-options-radio /template/ Ellipse#CheckOuterEllipse">
-      <Setter Property="Width" Value="12" />
-      <Setter Property="Height" Value="12" />
-    </Style>
-    <Style Selector="RadioButton.filter-options-radio /template/ Ellipse#CheckGlyph">
-      <Setter Property="Width" Value="5" />
-      <Setter Property="Height" Value="5" />
-    </Style>
-    <Style Selector="RadioButton.filter-options-radio /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Margin" Value="6,0,0,0" />
     </Style>
     <Style Selector="Button.filter-options-footer">
       <Setter Property="MinHeight" Value="24" />
@@ -214,19 +194,19 @@
           </Grid.ColumnDefinitions>
           <TextBlock Classes="filter-options-label" Text="Apply on:" />
           <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-            <RadioButton
+            <controls:CompactRadioButton
               Classes="filter-options-radio"
               GroupName="ApplyScope"
               Content="Whole"
               IsChecked="{Binding IsWholeScope, Mode=TwoWay}"
             />
-            <RadioButton
+            <controls:CompactRadioButton
               Classes="filter-options-radio"
               GroupName="ApplyScope"
               Content="Substring"
               IsChecked="{Binding IsSubstringScopeMode, Mode=TwoWay}"
             />
-            <RadioButton
+            <controls:CompactRadioButton
               Classes="filter-options-radio"
               GroupName="ApplyScope"
               Content="Token"

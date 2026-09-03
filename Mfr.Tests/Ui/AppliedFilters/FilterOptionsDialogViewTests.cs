@@ -212,6 +212,35 @@ namespace Mfr.Tests.Ui.AppliedFilters
             }
         }
 
+        /// <summary>
+        /// Verifies Apply-on radios keep space between options (CompactRadioButton StyleKey is RadioButton).
+        /// </summary>
+        [AvaloniaFact]
+        public void Apply_on_radios_keep_space_between_options()
+        {
+            var dialog = _Show(FilterApplyScopeMode.Whole);
+
+            try
+            {
+                var radios = dialog
+                    .GetVisualDescendants()
+                    .OfType<CompactRadioButton>()
+                    .Where(radio => radio.Classes.Contains("filter-options-radio"))
+                    .ToList();
+                Assert.Equal(3, radios.Count);
+
+                for (var i = 0; i < radios.Count - 1; i++)
+                {
+                    var gap = radios[i + 1].Bounds.Left - radios[i].Bounds.Right;
+                    Assert.True(gap >= 12, $"Expected gap between Apply-on radios, got {gap}.");
+                }
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
         private static FilterOptionsDialog _Show(FilterApplyScopeMode scopeMode)
         {
             var step = new AppliedFilterStepViewModel("Fix Leading 0's", new ShrinkSpacesFilter());

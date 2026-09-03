@@ -1,0 +1,46 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Fluent keeps a 20px glyph column + 8px padding; compact toggles shrink both. -->
+  <Style Selector="RadioButton.compact-radio">
+    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="Padding" Value="6,0,0,0" />
+    <Setter Property="MinHeight" Value="22" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="RadioButton.compact-radio /template/ Ellipse#OuterEllipse">
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+  </Style>
+  <Style Selector="RadioButton.compact-radio /template/ Ellipse#CheckOuterEllipse">
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+  </Style>
+  <Style Selector="RadioButton.compact-radio /template/ Ellipse#CheckGlyph">
+    <Setter Property="Width" Value="5" />
+    <Setter Property="Height" Value="5" />
+  </Style>
+  <Style Selector="RadioButton.compact-radio /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="RecognizesAccessKey" Value="False" />
+  </Style>
+
+  <Style Selector="CheckBox.compact-check">
+    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="Padding" Value="6,0,0,0" />
+    <Setter Property="MinHeight" Value="22" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="CheckBox.compact-check /template/ Border#NormalRectangle">
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+  </Style>
+  <Style Selector="CheckBox.compact-check /template/ Viewbox">
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+  </Style>
+  <Style Selector="CheckBox.compact-check /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="RecognizesAccessKey" Value="False" />
+  </Style>
+</Styles>

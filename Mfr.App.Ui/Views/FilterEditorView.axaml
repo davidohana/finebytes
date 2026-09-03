@@ -33,48 +33,6 @@
       <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
       <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
     </Style>
-    <Style Selector="RadioButton.filter-editor-radio">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Padding" Value="0" />
-      <Setter Property="MinHeight" Value="22" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-    <Style Selector="RadioButton.filter-editor-radio /template/ Ellipse#OuterEllipse">
-      <Setter Property="Width" Value="12" />
-      <Setter Property="Height" Value="12" />
-    </Style>
-    <Style Selector="RadioButton.filter-editor-radio /template/ Ellipse#CheckOuterEllipse">
-      <Setter Property="Width" Value="12" />
-      <Setter Property="Height" Value="12" />
-    </Style>
-    <Style Selector="RadioButton.filter-editor-radio /template/ Ellipse#CheckGlyph">
-      <Setter Property="Width" Value="5" />
-      <Setter Property="Height" Value="5" />
-    </Style>
-    <Style Selector="RadioButton.filter-editor-radio /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Margin" Value="2,0,0,0" />
-      <Setter Property="RecognizesAccessKey" Value="False" />
-    </Style>
-    <Style Selector="CheckBox.filter-editor-check">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="MinHeight" Value="22" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-    <Style Selector="CheckBox.filter-editor-check /template/ Border#NormalRectangle">
-      <Setter Property="Width" Value="12" />
-      <Setter Property="Height" Value="12" />
-    </Style>
-    <Style Selector="CheckBox.filter-editor-check /template/ Viewbox">
-      <Setter Property="Width" Value="12" />
-      <Setter Property="Height" Value="12" />
-    </Style>
-    <Style Selector="CheckBox.filter-editor-check /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="RecognizesAccessKey" Value="False" />
-    </Style>
     <Style Selector="TextBox.filter-editor-field, ComboBox.filter-editor-field">
       <Setter Property="Height" Value="22" />
       <Setter Property="MinHeight" Value="22" />
