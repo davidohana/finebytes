@@ -596,7 +596,8 @@ namespace Mfr.Engine.RenameList
                 renameItem.LogPreviewChangeDetail();
             }
 
-            return commitPlan;
+            var (changed, unchanged, errors) = CommitPlan.CountOutcomes(_renameItems);
+            return commitPlan with { ChangedCount = changed, UnchangedCount = unchanged, ErrorCount = errors };
         }
 
         /// <summary>

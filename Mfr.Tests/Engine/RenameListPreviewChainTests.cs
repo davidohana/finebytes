@@ -54,10 +54,13 @@ namespace Mfr.Tests.Engine
                 ),
             ]);
 
-            _ = renameList.Preview(chain);
+            var plan = renameList.Preview(chain);
 
             Assert.Equal("HELLO", renameList.RenameItems[0].Preview.Prefix);
             Assert.Equal(RenameStatus.PreviewOk, renameList.RenameItems[0].Status);
+            Assert.Equal(1, plan.ChangedCount);
+            Assert.Equal(0, plan.UnchangedCount);
+            Assert.Equal(0, plan.ErrorCount);
         }
 
         /// <summary>
@@ -82,10 +85,13 @@ namespace Mfr.Tests.Engine
             );
             Assert.Equal("HELLO", renameList.RenameItems[0].Preview.Prefix);
 
-            _ = renameList.Preview(new FilterChain { Steps = [] });
+            var identityPlan = renameList.Preview(new FilterChain { Steps = [] });
 
             Assert.Equal(renameList.RenameItems[0].Original.Prefix, renameList.RenameItems[0].Preview.Prefix);
             Assert.Equal("hello", renameList.RenameItems[0].Preview.Prefix);
+            Assert.Equal(0, identityPlan.ChangedCount);
+            Assert.Equal(1, identityPlan.UnchangedCount);
+            Assert.Equal(0, identityPlan.ErrorCount);
         }
     }
 }

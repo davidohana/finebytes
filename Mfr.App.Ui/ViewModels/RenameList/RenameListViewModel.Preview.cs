@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.Models.Filters;
-using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -36,26 +35,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _ = _renameList.Preview(chain);
-
-            var changed = 0;
-            var errors = 0;
-            foreach (var item in _renameList.RenameItems)
-            {
-                if (item.Status == RenameStatus.PreviewError)
-                {
-                    errors++;
-                    continue;
-                }
-
-                if (item.Status == RenameStatus.PreviewOk && item.HasPreviewChanges())
-                {
-                    changed++;
-                }
-            }
-
-            ChangeCount = changed;
-            PreviewErrorCount = errors;
+            var plan = _renameList.Preview(chain);
+            ChangeCount = plan.ChangedCount;
+            PreviewErrorCount = plan.ErrorCount;
             _RefreshFieldDisplay();
         }
     }

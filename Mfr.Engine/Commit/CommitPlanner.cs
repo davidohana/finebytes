@@ -34,7 +34,59 @@ namespace Mfr.Engine.Commit
     /// </remarks>
     /// <param name="Steps">Commit steps to apply in order.</param>
     /// <param name="UnresolvableCycleItems">Items that participate in a cycle the planner could not break with a single stash.</param>
-    public sealed record CommitPlan(IReadOnlyList<CommitStep> Steps, IReadOnlyList<RenameItem> UnresolvableCycleItems);
+    /// <param name="ChangedCount">
+    /// Items in <see cref="RenameStatus.PreviewOk"/> with preview changes (status-bar Changes).
+    /// </param>
+    /// <param name="UnchangedCount">
+    /// Items in <see cref="RenameStatus.PreviewOk"/> with no preview changes.
+    /// </param>
+    /// <param name="ErrorCount">Items in <see cref="RenameStatus.PreviewError"/>.</param>
+    public sealed record CommitPlan(
+        IReadOnlyList<CommitStep> Steps,
+        IReadOnlyList<RenameItem> UnresolvableCycleItems,
+        int ChangedCount = 0,
+        int UnchangedCount = 0,
+        int ErrorCount = 0
+    )
+    {
+        /// <summary>
+        /// Counts preview outcome buckets for status / CLI summary after a full preview pass.
+        /// </summary>
+        /// <param name="items">All rename items after preview status is final.</param>
+        /// <returns>Changed, unchanged, and error counts.</returns>
+        public static (int Changed, int Unchanged, int Errors) CountOutcomes(IEnumerable<RenameItem> items)
+        {
+            ArgumentNullException.ThrowIfNull(items);
+
+            var changed = 0;
+            var unchanged = 0;
+            var errors = 0;
+            foreach (var item in items)
+            {
+                if (item.Status == RenameStatus.PreviewError)
+                {
+                    errors++;
+                    continue;
+                }
+
+                if (item.Status != RenameStatus.PreviewOk)
+                {
+                    continue;
+                }
+
+                if (item.HasPreviewChanges())
+                {
+                    changed++;
+                }
+                else
+                {
+                    unchanged++;
+                }
+            }
+
+            return (changed, unchanged, errors);
+        }
+    }
 
     /// <summary>
     /// Builds an ordered commit plan that respects ancestor/descendant containment, path-shift chains, and cycles.
