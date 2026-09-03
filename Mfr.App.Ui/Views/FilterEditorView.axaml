@@ -64,6 +64,14 @@
       <Setter Property="MinHeight" Value="22" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+    <Style Selector="CheckBox.filter-editor-check /template/ Border#NormalRectangle">
+      <Setter Property="Width" Value="12" />
+      <Setter Property="Height" Value="12" />
+    </Style>
+    <Style Selector="CheckBox.filter-editor-check /template/ Viewbox">
+      <Setter Property="Width" Value="12" />
+      <Setter Property="Height" Value="12" />
+    </Style>
     <Style Selector="CheckBox.filter-editor-check /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="RecognizesAccessKey" Value="False" />
     </Style>

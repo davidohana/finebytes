@@ -6,38 +6,65 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
-  d:DesignWidth="360"
-  d:DesignHeight="120"
+  d:DesignWidth="420"
+  d:DesignHeight="200"
   x:Class="Mfr.App.Ui.Views.FilterEditors.LettersCaseFilterEditorView"
   x:DataType="vm:LettersCaseFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Casing Style">
       <StackPanel Spacing="6">
-        <Grid ColumnDefinitions="Auto,*">
-          <TextBlock
-            Grid.Column="0"
-            Classes="filter-editor-label"
-            Margin="0,0,8,0"
-            VerticalAlignment="Center"
-            Text="Mode:"
+        <UniformGrid Columns="3">
+          <RadioButton
+            x:Name="TitleCaseRadio"
+            Classes="filter-editor-radio"
+            GroupName="LettersCaseMode"
+            Content="Capitalize"
+            IsChecked="{Binding IsModeTitleCase, Mode=TwoWay}"
           />
-          <ComboBox
-            x:Name="ModeCombo"
-            Grid.Column="1"
-            Classes="filter-editor-field"
-            MinWidth="180"
-            HorizontalAlignment="Left"
-            ItemsSource="{Binding ModeOptions}"
-            SelectedItem="{Binding SelectedMode}"
-          >
-            <ComboBox.ItemTemplate>
-              <DataTemplate x:DataType="vm:LettersCaseModeOption">
-                <TextBlock Text="{Binding Label}" />
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-        </Grid>
+          <RadioButton
+            x:Name="SentenceCaseRadio"
+            Classes="filter-editor-radio"
+            GroupName="LettersCaseMode"
+            Content="Sentence case"
+            IsChecked="{Binding IsModeSentenceCase, Mode=TwoWay}"
+          />
+          <RadioButton
+            x:Name="InvertCaseRadio"
+            Classes="filter-editor-radio"
+            GroupName="LettersCaseMode"
+            Content="tOGGLE cASE"
+            IsChecked="{Binding IsModeInvertCase, Mode=TwoWay}"
+          />
+          <RadioButton
+            x:Name="UpperCaseRadio"
+            Classes="filter-editor-radio"
+            GroupName="LettersCaseMode"
+            Content="UPPER CASE"
+            IsChecked="{Binding IsModeUpperCase, Mode=TwoWay}"
+          />
+          <RadioButton
+            x:Name="FirstLetterUpRadio"
+            Classes="filter-editor-radio"
+            GroupName="LettersCaseMode"
+            Content="First letter up"
+            IsChecked="{Binding IsModeFirstLetterUp, Mode=TwoWay}"
+          />
+          <RadioButton
+            x:Name="WeirdCaseRadio"
+            Classes="filter-editor-radio"
+            GroupName="LettersCaseMode"
+            Content="wEiRd CaSe"
+            IsChecked="{Binding IsModeWeirdCase, Mode=TwoWay}"
+          />
+          <RadioButton
+            x:Name="LowerCaseRadio"
+            Classes="filter-editor-radio"
+            GroupName="LettersCaseMode"
+            Content="lower case"
+            IsChecked="{Binding IsModeLowerCase, Mode=TwoWay}"
+          />
+        </UniformGrid>
         <StackPanel IsVisible="{Binding HasSkipWords}" Spacing="4">
           <TextBlock
             Classes="filter-editor-label"

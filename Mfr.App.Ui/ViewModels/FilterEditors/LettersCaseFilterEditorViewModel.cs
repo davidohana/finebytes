@@ -24,21 +24,120 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         }
 
         /// <summary>
-        /// Gets the casing-mode choices.
-        /// </summary>
-        public IReadOnlyList<LettersCaseModeOption> ModeOptions => LettersCaseModeOption.All;
-
-        /// <summary>
         /// Gets or sets the selected casing mode.
         /// </summary>
         [ObservableProperty]
-        private LettersCaseModeOption? _selectedMode;
+        private LettersCaseMode _mode;
+
+        /// <summary>
+        /// Gets or sets whether Capitalize (title case) is selected.
+        /// </summary>
+        public bool IsModeTitleCase
+        {
+            get => Mode == LettersCaseMode.TitleCase;
+            set
+            {
+                if (value)
+                {
+                    Mode = LettersCaseMode.TitleCase;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether Sentence case is selected.
+        /// </summary>
+        public bool IsModeSentenceCase
+        {
+            get => Mode == LettersCaseMode.SentenceCase;
+            set
+            {
+                if (value)
+                {
+                    Mode = LettersCaseMode.SentenceCase;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether tOGGLE cASE is selected.
+        /// </summary>
+        public bool IsModeInvertCase
+        {
+            get => Mode == LettersCaseMode.InvertCase;
+            set
+            {
+                if (value)
+                {
+                    Mode = LettersCaseMode.InvertCase;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether UPPER CASE is selected.
+        /// </summary>
+        public bool IsModeUpperCase
+        {
+            get => Mode == LettersCaseMode.UpperCase;
+            set
+            {
+                if (value)
+                {
+                    Mode = LettersCaseMode.UpperCase;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether First letter up is selected.
+        /// </summary>
+        public bool IsModeFirstLetterUp
+        {
+            get => Mode == LettersCaseMode.FirstLetterUp;
+            set
+            {
+                if (value)
+                {
+                    Mode = LettersCaseMode.FirstLetterUp;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether wEiRd CaSe is selected.
+        /// </summary>
+        public bool IsModeWeirdCase
+        {
+            get => Mode == LettersCaseMode.WeirdCase;
+            set
+            {
+                if (value)
+                {
+                    Mode = LettersCaseMode.WeirdCase;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether lower case is selected.
+        /// </summary>
+        public bool IsModeLowerCase
+        {
+            get => Mode == LettersCaseMode.LowerCase;
+            set
+            {
+                if (value)
+                {
+                    Mode = LettersCaseMode.LowerCase;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets whether skip-words editing is available for the current mode.
         /// </summary>
-        [ObservableProperty]
-        private bool _hasSkipWords;
+        public bool HasSkipWords => Mode == LettersCaseMode.TitleCase;
 
         /// <summary>
         /// Gets or sets comma-separated skip words for title case.
@@ -46,9 +145,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         [ObservableProperty]
         private string _skipWordsText = string.Empty;
 
-        partial void OnSelectedModeChanged(LettersCaseModeOption? value)
+        partial void OnModeChanged(LettersCaseMode value)
         {
-            HasSkipWords = value?.Mode == LettersCaseMode.TitleCase;
+            OnPropertyChanged(nameof(IsModeTitleCase));
+            OnPropertyChanged(nameof(IsModeSentenceCase));
+            OnPropertyChanged(nameof(IsModeInvertCase));
+            OnPropertyChanged(nameof(IsModeUpperCase));
+            OnPropertyChanged(nameof(IsModeFirstLetterUp));
+            OnPropertyChanged(nameof(IsModeWeirdCase));
+            OnPropertyChanged(nameof(IsModeLowerCase));
+            OnPropertyChanged(nameof(HasSkipWords));
             _ApplyOptions();
         }
 
@@ -59,7 +165,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             _isLoading = true;
             try
             {
-                SelectedMode = LettersCaseModeOption.FromMode(filter.Options.Mode);
+                Mode = filter.Options.Mode;
                 SkipWordsText = string.Join(", ", filter.Options.SkipWords);
             }
             finally
@@ -70,13 +176,13 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
         private void _ApplyOptions()
         {
-            if (_isLoading || SelectedMode is null || Step.Filter is not LettersCaseFilter filter)
+            if (_isLoading || Step.Filter is not LettersCaseFilter filter)
             {
                 return;
             }
 
             var skipWords = _ParseSkipWords(SkipWordsText);
-            var options = filter.Options with { Mode = SelectedMode.Mode, SkipWords = skipWords };
+            var options = filter.Options with { Mode = Mode, SkipWords = skipWords };
             ApplyIfChanged(filter, filter with { Options = options });
         }
 

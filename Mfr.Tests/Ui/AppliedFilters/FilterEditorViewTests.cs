@@ -126,10 +126,10 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Letters Case mode combo edits persist on the applied step.
+        /// Verifies Letters Case mode radio edits persist on the applied step.
         /// </summary>
         [AvaloniaFact]
-        public void Letters_case_mode_combo_updates_chain_options()
+        public void Letters_case_mode_radio_updates_chain_options()
         {
             var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -139,14 +139,16 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.IsType<LettersCaseFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<LettersCaseFilterEditorView>().Single();
-            var combo = editor.FindControl<ComboBox>("ModeCombo");
-            Assert.NotNull(combo);
-            combo.SelectedItem = LettersCaseModeOption.FromMode(LettersCaseMode.UpperCase);
+            var radio = editor.FindControl<RadioButton>("UpperCaseRadio");
+            Assert.NotNull(radio);
+            Assert.False(radio.IsChecked);
+            radio.IsChecked = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             var filter = (LettersCaseFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(LettersCaseMode.UpperCase, filter.Options.Mode);
+            Assert.True(radio.IsChecked);
 
             window.Close();
         }
