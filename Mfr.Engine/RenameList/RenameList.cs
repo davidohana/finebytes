@@ -551,7 +551,6 @@ namespace Mfr.Engine.RenameList
         public CommitPlan Preview(FilterChain chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
-            Log.Information("Starting preview with {ItemCount} item(s).", _renameItems.Count);
 
             chain.SetupFilters();
 
@@ -596,8 +595,6 @@ namespace Mfr.Engine.RenameList
             {
                 renameItem.LogPreviewChangeDetail();
             }
-
-            _LogPreviewOutcomeSummary(_renameItems);
 
             return commitPlan;
         }
@@ -662,25 +659,6 @@ namespace Mfr.Engine.RenameList
             );
 
             return results;
-        }
-
-        /// <summary>
-        /// Counts preview results and writes the finished-preview log line.
-        /// </summary>
-        private static void _LogPreviewOutcomeSummary(IEnumerable<RenameItem> items)
-        {
-            var itemList = items.ToList();
-            var errors = itemList.Count(i => i.Status == RenameStatus.PreviewError);
-            var okItems = itemList.Where(i => i.Status == RenameStatus.PreviewOk).ToList();
-            var changed = okItems.Count(i => i.HasPreviewChanges());
-            var unchanged = okItems.Count(i => !i.HasPreviewChanges());
-
-            Log.Information(
-                "Finished preview. Changed: {PreviewChangedCount}, Unchanged: {PreviewUnchangedCount}, Errors: {PreviewErrorCount}.",
-                changed,
-                unchanged,
-                errors
-            );
         }
 
         /// <summary>

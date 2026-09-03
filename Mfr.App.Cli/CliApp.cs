@@ -108,7 +108,13 @@ namespace Mfr.App.Cli
                 throw new UserException("No files matched the provided sources.");
             }
 
+            Log.Information(
+                "Starting preview with preset '{PresetName}' ({ItemCount} item(s)).",
+                preset.Name,
+                renameItems.Count
+            );
             var commitPlan = renameList.Preview(preset.Chain);
+            _LogPreviewOutcome(renameItems);
             var hasPreviewErrors = renameItems.Any(item => item.Status == RenameStatus.PreviewError);
             if (hasPreviewErrors)
             {
@@ -139,6 +145,25 @@ namespace Mfr.App.Cli
                 item.Status is RenameStatus.PreviewError or RenameStatus.CommitError
             );
             return hasCommitErrors ? CliExitCode.UserError : CliExitCode.Success;
+        }
+
+        /// <summary>
+        /// Writes the CLI preview summary (changed / unchanged / errors).
+        /// </summary>
+        /// <param name="items">Previewed rename items.</param>
+        private static void _LogPreviewOutcome(IReadOnlyList<RenameItem> items)
+        {
+            var errors = items.Count(item => item.Status == RenameStatus.PreviewError);
+            var okItems = items.Where(item => item.Status == RenameStatus.PreviewOk).ToList();
+            var changed = okItems.Count(item => item.HasPreviewChanges());
+            var unchanged = okItems.Count(item => !item.HasPreviewChanges());
+
+            Log.Information(
+                "Finished preview. Changed: {PreviewChangedCount}, Unchanged: {PreviewUnchangedCount}, Errors: {PreviewErrorCount}.",
+                changed,
+                unchanged,
+                errors
+            );
         }
 
         private static bool _ConfirmApplyRenameItem(RenameItem item)
