@@ -261,47 +261,32 @@ namespace Mfr.Filters.Case
 
         private static string _ApplySentenceCase(string input, char wordSeparator, string sentenceEndChars)
         {
-            if (string.IsNullOrEmpty(input))
+            if (input.Length == 0)
             {
                 return input;
             }
 
             var chars = input.ToLowerInvariant().ToCharArray();
-            if (_IsAsciiLowerLetter(chars[0]))
+            if (char.IsAsciiLetterLower(chars[0]))
             {
                 chars[0] = char.ToUpperInvariant(chars[0]);
             }
 
-            if (sentenceEndChars.Length == 0)
+            for (var i = 0; i < chars.Length - 1; i++)
             {
-                return new string(chars);
-            }
-
-            var sentenceEndToIsIncluded = new HashSet<char>(sentenceEndChars.Where(c => c != wordSeparator));
-            if (sentenceEndToIsIncluded.Count == 0)
-            {
-                return new string(chars);
-            }
-
-            for (var i = 0; i < chars.Length; i++)
-            {
-                if (!sentenceEndToIsIncluded.Contains(chars[i]))
+                var isSentenceEnd = chars[i] != wordSeparator && sentenceEndChars.Contains(chars[i]);
+                if (!isSentenceEnd || chars[i + 1] != wordSeparator)
                 {
                     continue;
                 }
 
-                var j = i + 1;
-                if (j >= chars.Length || chars[j] != wordSeparator)
-                {
-                    continue;
-                }
-
+                var j = i + 2;
                 while (j < chars.Length && chars[j] == wordSeparator)
                 {
                     j++;
                 }
 
-                if (j >= chars.Length || !_IsAsciiLowerLetter(chars[j]))
+                if (j >= chars.Length || !char.IsAsciiLetterLower(chars[j]))
                 {
                     continue;
                 }
@@ -310,11 +295,6 @@ namespace Mfr.Filters.Case
             }
 
             return new string(chars);
-        }
-
-        private static bool _IsAsciiLowerLetter(char c)
-        {
-            return c is >= 'a' and <= 'z';
         }
 
         private static string _InvertCase(string input)
