@@ -32,12 +32,23 @@ namespace Mfr.Models.Filters
         }
 
         /// <summary>
-        /// Runs setup for every filter in the chain before applying any transformations.
+        /// Runs setup for every enabled filter in the chain before applying any transformations.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Disabled steps are skipped so a bad Casing List path or Formatter template on an
+        /// unchecked row does not fail (or reload) the whole preview.
+        /// </para>
+        /// </remarks>
         public void SetupFilters()
         {
             foreach (var step in Steps)
             {
+                if (!step.Enabled)
+                {
+                    continue;
+                }
+
                 step.Filter.Setup();
             }
         }

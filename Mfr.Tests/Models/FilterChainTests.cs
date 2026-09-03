@@ -79,10 +79,10 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies <see cref="FilterChain.SetupFilters"/> runs setup for every step, including disabled steps.
+        /// Verifies <see cref="FilterChain.SetupFilters"/> skips disabled steps.
         /// </summary>
         [Fact]
-        public void SetupFilters_RunsForDisabledStepsToo()
+        public void SetupFilters_SkipsDisabledSteps()
         {
             var disabled = new SetupCountingFilter(Target: _target);
             var enabled = new SetupCountingFilter(Target: _target);
@@ -97,8 +97,22 @@ namespace Mfr.Tests.Models
 
             chain.SetupFilters();
 
-            Assert.Equal(1, disabled.SetupCount);
+            Assert.Equal(0, disabled.SetupCount);
             Assert.Equal(1, enabled.SetupCount);
+        }
+
+        /// <summary>
+        /// Verifies a disabled step whose setup would throw does not fail <see cref="FilterChain.SetupFilters"/>.
+        /// </summary>
+        [Fact]
+        public void SetupFilters_DisabledThrowingSetup_DoesNotThrow()
+        {
+            var chain = new FilterChain
+            {
+                Steps = [new FilterChainStep(Enabled: false, Filter: new ThrowingSetupFilter(Target: _target))],
+            };
+
+            chain.SetupFilters();
         }
 
         private sealed record SetupCountingFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)
@@ -111,6 +125,22 @@ namespace Mfr.Tests.Models
             protected override void _Setup()
             {
                 SetupCount++;
+            }
+
+            protected override string _TransformValue(string value, RenameItem item)
+            {
+                return value;
+            }
+        }
+
+        private sealed record ThrowingSetupFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)
+            : StringTargetFilter(Target, ApplyScope)
+        {
+            public override string Type => "ThrowingSetup";
+
+            protected override void _Setup()
+            {
+                throw new InvalidOperationException("Setup failed.");
             }
 
             protected override string _TransformValue(string value, RenameItem item)

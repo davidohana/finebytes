@@ -545,7 +545,7 @@ namespace Mfr.Engine.RenameList
         /// <returns>The commit plan for the previewed items; pass this to <see cref="Commit"/>.</returns>
         /// <remarks>
         /// <para>
-        /// Calls <see cref="FilterChain.SetupFilters"/> before applying so each filter instance is set up once.
+        /// Calls <see cref="FilterChain.SetupFilters"/> before applying so each enabled filter is set up once.
         /// </para>
         /// </remarks>
         public CommitPlan Preview(FilterChain chain)
