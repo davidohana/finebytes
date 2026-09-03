@@ -8,7 +8,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="0" />
-    <Setter Property="Padding" Value="8,8,8,8" />
+    <Setter Property="Padding" Value="8,14,8,8" />
     <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
     <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
     <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />

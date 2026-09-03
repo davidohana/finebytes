@@ -205,6 +205,90 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies skip-words and weird-case settings hide when they do not apply to the selected mode.
+        /// </summary>
+        [AvaloniaFact]
+        public void Letters_case_mode_hides_irrelevant_option_groups()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<LettersCaseFilterEditorView>().Single();
+            var skipWords = editor.FindControl<FieldsetGroup>("SkipWordsGroup");
+            var weirdSettings = editor.FindControl<FieldsetGroup>("WeirdCaseSettingsGroup");
+            var upperCase = editor.FindControl<RadioButton>("UpperCaseRadio");
+            var weirdCase = editor.FindControl<RadioButton>("WeirdCaseRadio");
+            var capitalize = editor.FindControl<RadioButton>("CapitalizeRadio");
+            Assert.NotNull(skipWords);
+            Assert.NotNull(weirdSettings);
+            Assert.NotNull(upperCase);
+            Assert.NotNull(weirdCase);
+            Assert.NotNull(capitalize);
+
+            Assert.True(skipWords.IsVisible);
+            Assert.False(weirdSettings.IsVisible);
+
+            upperCase.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(skipWords.IsVisible);
+            Assert.False(weirdSettings.IsVisible);
+
+            weirdCase.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(skipWords.IsVisible);
+            Assert.True(weirdSettings.IsVisible);
+
+            capitalize.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(skipWords.IsVisible);
+            Assert.False(weirdSettings.IsVisible);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Letters Case weird-case edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Letters_case_weird_settings_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<LettersCaseFilterEditorView>().Single();
+            var weirdCase = editor.FindControl<RadioButton>("WeirdCaseRadio");
+            Assert.NotNull(weirdCase);
+            weirdCase.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var spinner = editor.FindControl<CompactNumericUpDown>("WeirdUppercaseChanceSpinner");
+            var fixedPlaces = editor.FindControl<CheckBox>("WeirdFixedPlacesCheckBox");
+            Assert.NotNull(spinner);
+            Assert.NotNull(fixedPlaces);
+            Assert.True(spinner.IsEffectivelyVisible);
+            Assert.Equal(50, spinner.Value);
+            spinner.Value = 25;
+            fixedPlaces.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (LettersCaseFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(LettersCaseMode.WeirdCase, filter.Options.Mode);
+            Assert.Equal(25, filter.Options.WeirdUppercaseChancePercent);
+            Assert.True(filter.Options.WeirdFixedPlaces);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies the fieldset header is left-aligned on the top border instead of covering it.
         /// </summary>
         [AvaloniaFact]

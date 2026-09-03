@@ -140,10 +140,27 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         public bool HasCapitalizeSkipWords => Mode == LettersCaseMode.Capitalize;
 
         /// <summary>
+        /// Gets whether weird-case settings are available for the current mode.
+        /// </summary>
+        public bool HasWeirdCaseOptions => Mode == LettersCaseMode.WeirdCase;
+
+        /// <summary>
         /// Gets or sets comma-separated skip words for capitalize mode.
         /// </summary>
         [ObservableProperty]
         private string _capitalizeSkipWordsText = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the uppercase chance for weird case (0–100).
+        /// </summary>
+        [ObservableProperty]
+        private decimal _weirdUppercaseChancePercent = 50;
+
+        /// <summary>
+        /// Gets or sets whether weird-case decisions depend only on character position.
+        /// </summary>
+        [ObservableProperty]
+        private bool _weirdFixedPlaces;
 
         partial void OnModeChanged(LettersCaseMode value)
         {
@@ -155,10 +172,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             OnPropertyChanged(nameof(IsModeWeirdCase));
             OnPropertyChanged(nameof(IsModeLowerCase));
             OnPropertyChanged(nameof(HasCapitalizeSkipWords));
+            OnPropertyChanged(nameof(HasWeirdCaseOptions));
             _ApplyOptions();
         }
 
         partial void OnCapitalizeSkipWordsTextChanged(string value) => _ApplyOptions();
+
+        partial void OnWeirdUppercaseChancePercentChanged(decimal value) => _ApplyOptions();
+
+        partial void OnWeirdFixedPlacesChanged(bool value) => _ApplyOptions();
 
         private void _SyncFromFilter(LettersCaseFilter filter)
         {
@@ -167,6 +189,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             {
                 Mode = filter.Options.Mode;
                 CapitalizeSkipWordsText = string.Join(", ", filter.Options.CapitalizeSkipWords);
+                WeirdUppercaseChancePercent = filter.Options.WeirdUppercaseChancePercent;
+                WeirdFixedPlaces = filter.Options.WeirdFixedPlaces;
             }
             finally
             {
@@ -182,7 +206,13 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             }
 
             var capitalizeSkipWords = _ParseCapitalizeSkipWords(CapitalizeSkipWordsText);
-            var options = filter.Options with { Mode = Mode, CapitalizeSkipWords = capitalizeSkipWords };
+            var options = filter.Options with
+            {
+                Mode = Mode,
+                CapitalizeSkipWords = capitalizeSkipWords,
+                WeirdUppercaseChancePercent = (int)Math.Clamp(WeirdUppercaseChancePercent, 0, 100),
+                WeirdFixedPlaces = WeirdFixedPlaces,
+            };
             ApplyIfChanged(filter, filter with { Options = options });
         }
 

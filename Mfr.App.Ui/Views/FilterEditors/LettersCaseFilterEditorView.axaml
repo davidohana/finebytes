@@ -7,69 +7,98 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
   d:DesignWidth="420"
-  d:DesignHeight="200"
+  d:DesignHeight="260"
   x:Class="Mfr.App.Ui.Views.FilterEditors.LettersCaseFilterEditorView"
   x:DataType="vm:LettersCaseFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Casing Style">
-      <StackPanel Spacing="6">
-        <UniformGrid Columns="3">
-          <controls:CompactRadioButton
-            x:Name="CapitalizeRadio"
-            GroupName="LettersCaseMode"
-            Content="Capitalize"
-            IsChecked="{Binding IsModeCapitalize, Mode=TwoWay}"
+      <WrapPanel Orientation="Horizontal">
+        <controls:CompactRadioButton
+          x:Name="CapitalizeRadio"
+          Margin="0,0,16,4"
+          GroupName="LettersCaseMode"
+          Content="Capitalize"
+          IsChecked="{Binding IsModeCapitalize, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          x:Name="SentenceCaseRadio"
+          Margin="0,0,16,4"
+          GroupName="LettersCaseMode"
+          Content="Sentence case"
+          IsChecked="{Binding IsModeSentenceCase, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          x:Name="InvertCaseRadio"
+          Margin="0,0,16,4"
+          GroupName="LettersCaseMode"
+          Content="tOGGLE cASE"
+          IsChecked="{Binding IsModeInvertCase, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          x:Name="UpperCaseRadio"
+          Margin="0,0,16,4"
+          GroupName="LettersCaseMode"
+          Content="UPPER CASE"
+          IsChecked="{Binding IsModeUpperCase, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          x:Name="FirstLetterUpRadio"
+          Margin="0,0,16,4"
+          GroupName="LettersCaseMode"
+          Content="First letter up"
+          IsChecked="{Binding IsModeFirstLetterUp, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          x:Name="WeirdCaseRadio"
+          Margin="0,0,16,4"
+          GroupName="LettersCaseMode"
+          Content="wEiRd CaSe"
+          IsChecked="{Binding IsModeWeirdCase, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          x:Name="LowerCaseRadio"
+          Margin="0,0,0,4"
+          GroupName="LettersCaseMode"
+          Content="lower case"
+          IsChecked="{Binding IsModeLowerCase, Mode=TwoWay}"
+        />
+      </WrapPanel>
+    </controls:FieldsetGroup>
+    <controls:FieldsetGroup x:Name="SkipWordsGroup" Header="Skip Words" IsVisible="{Binding HasCapitalizeSkipWords}">
+      <StackPanel Spacing="4">
+        <TextBlock Classes="filter-editor-label" Text="Leave lowercase (comma-separated):" TextWrapping="Wrap" />
+        <TextBox
+          x:Name="CapitalizeSkipWordsBox"
+          Classes="filter-editor-field"
+          Text="{Binding CapitalizeSkipWordsText}"
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+    <controls:FieldsetGroup
+      x:Name="WeirdCaseSettingsGroup"
+      Header="Weird Case Settings"
+      IsVisible="{Binding HasWeirdCaseOptions}"
+    >
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Percent of capital letters:" />
+          <controls:CompactNumericUpDown
+            x:Name="WeirdUppercaseChanceSpinner"
+            Width="56"
+            Minimum="0"
+            Maximum="100"
+            Increment="1"
+            FormatString="0"
+            Value="{Binding WeirdUppercaseChancePercent}"
           />
-          <controls:CompactRadioButton
-            x:Name="SentenceCaseRadio"
-            GroupName="LettersCaseMode"
-            Content="Sentence case"
-            IsChecked="{Binding IsModeSentenceCase, Mode=TwoWay}"
-          />
-          <controls:CompactRadioButton
-            x:Name="InvertCaseRadio"
-            GroupName="LettersCaseMode"
-            Content="tOGGLE cASE"
-            IsChecked="{Binding IsModeInvertCase, Mode=TwoWay}"
-          />
-          <controls:CompactRadioButton
-            x:Name="UpperCaseRadio"
-            GroupName="LettersCaseMode"
-            Content="UPPER CASE"
-            IsChecked="{Binding IsModeUpperCase, Mode=TwoWay}"
-          />
-          <controls:CompactRadioButton
-            x:Name="FirstLetterUpRadio"
-            GroupName="LettersCaseMode"
-            Content="First letter up"
-            IsChecked="{Binding IsModeFirstLetterUp, Mode=TwoWay}"
-          />
-          <controls:CompactRadioButton
-            x:Name="WeirdCaseRadio"
-            GroupName="LettersCaseMode"
-            Content="wEiRd CaSe"
-            IsChecked="{Binding IsModeWeirdCase, Mode=TwoWay}"
-          />
-          <controls:CompactRadioButton
-            x:Name="LowerCaseRadio"
-            GroupName="LettersCaseMode"
-            Content="lower case"
-            IsChecked="{Binding IsModeLowerCase, Mode=TwoWay}"
-          />
-        </UniformGrid>
-        <StackPanel IsVisible="{Binding HasCapitalizeSkipWords}" Spacing="4">
-          <TextBlock
-            Classes="filter-editor-label"
-            Text="Skip words (comma-separated, Capitalize only):"
-            TextWrapping="Wrap"
-          />
-          <TextBox
-            x:Name="CapitalizeSkipWordsBox"
-            Classes="filter-editor-field"
-            Text="{Binding CapitalizeSkipWordsText}"
-          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="%" />
         </StackPanel>
+        <controls:CompactCheckBox
+          x:Name="WeirdFixedPlacesCheckBox"
+          Content="Fixed Places"
+          IsChecked="{Binding WeirdFixedPlaces}"
+        />
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>
