@@ -5,7 +5,8 @@ Changes letter casing on the target segment. **Capitalize** and **sentence case*
 ## Options
 
 - **`mode`** (enum, required) — One of the **Modes** below.
-- **`capitalizeSkipWords`** (array of string, default `[]`)
+- **`capitalizeSkipWords`** (array of string, default `[]` in JSON; add-to-list uses
+  `a`, `an`, `the`, `and`, `or`, `of`, `to`, `for`, `in`, `on`, `at`, `by`, `with`)
   - **Capitalize only:** words matched case-insensitively stay lowercase.
 - **`weirdUppercaseChancePercent`** (int, default `50`)
   - **Weird case only:** chance each letter is uppercased (clamped 0–100).
@@ -84,7 +85,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
   },
   "options": {
     "mode": "Capitalize",
-    "capitalizeSkipWords": ["a", "an", "the", "of"],
+    "capitalizeSkipWords": ["a", "an", "the", "and", "or", "of", "to", "for", "in", "on", "at", "by", "with"],
     "weirdUppercaseChancePercent": 50,
     "weirdFixedPlaces": false
   }

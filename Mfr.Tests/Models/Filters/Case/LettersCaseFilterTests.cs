@@ -11,6 +11,21 @@ namespace Mfr.Tests.Models.Filters.Case
         private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
+        /// Verifies add-to-list defaults use capitalize mode and common skip words.
+        /// </summary>
+        [Fact]
+        public void ParameterlessCtor_UsesCapitalizeAndDefaultSkipWords()
+        {
+            var f = new LettersCaseFilter();
+            Assert.Equal(LettersCaseMode.Capitalize, f.Options.Mode);
+            Assert.Equal(LettersCaseOptions.DefaultCapitalizeSkipWords, f.Options.CapitalizeSkipWords);
+            Assert.Equal(
+                "a Song for the World",
+                FilterTestHelpers.ApplyToPrefix(f, "a song for the world")
+            );
+        }
+
+        /// <summary>
         /// Verifies upper-case mode.
         /// </summary>
         [Fact]

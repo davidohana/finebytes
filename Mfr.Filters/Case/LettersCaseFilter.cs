@@ -20,7 +20,14 @@ namespace Mfr.Filters.Case
         IReadOnlyList<string> CapitalizeSkipWords,
         int WeirdUppercaseChancePercent = 50,
         bool WeirdFixedPlaces = false
-    );
+    )
+    {
+        /// <summary>
+        /// Common English small words left lowercase in capitalize mode for new filter instances.
+        /// </summary>
+        public static IReadOnlyList<string> DefaultCapitalizeSkipWords { get; } =
+            ["a", "an", "the", "and", "or", "of", "to", "for", "in", "on", "at", "by", "with"];
+    }
 
     /// <summary>
     /// Supported letter-case transformation modes.
@@ -110,10 +117,13 @@ namespace Mfr.Filters.Case
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, capitalize, no skip words).
+        /// Creates a filter with add-to-list defaults (file prefix, capitalize, common skip words).
         /// </summary>
         public LettersCaseFilter()
-            : this(new FilePrefixTarget(), new LettersCaseOptions(LettersCaseMode.Capitalize, [])) { }
+            : this(
+                new FilePrefixTarget(),
+                new LettersCaseOptions(LettersCaseMode.Capitalize, LettersCaseOptions.DefaultCapitalizeSkipWords)
+            ) { }
 
         /// <summary>
         /// Gets the filter type discriminator.
