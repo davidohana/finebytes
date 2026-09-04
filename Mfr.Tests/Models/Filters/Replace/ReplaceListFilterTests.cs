@@ -29,6 +29,25 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
+        /// Verifies search text may contain spaces when whole-word matching is off.
+        /// </summary>
+        [Fact]
+        public void Apply_SearchWithSpaces_ReplacesLiteralPhrase()
+        {
+            var filter = _CreateFilter(
+                entries: [new ReplaceListEntry("Blue Train", "Blue_Train")],
+                mode: ReplacerMode.Literal,
+                caseSensitive: true,
+                replaceAll: true,
+                wholeWord: false
+            );
+
+            var result = FilterTestHelpers.ApplyToPrefix(filter, "Blue Train Live");
+
+            Assert.Equal("Blue_Train Live", result);
+        }
+
+        /// <summary>
         /// Verifies that an empty replacement strips the search string.
         /// </summary>
         [Fact]

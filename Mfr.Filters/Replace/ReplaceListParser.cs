@@ -9,8 +9,10 @@ namespace Mfr.Filters.Replace
         /// Validates entries for apply-time use.
         /// </summary>
         /// <remarks>
-        /// Empty list is allowed (no-op). Each search must be non-empty and free of whitespace.
-        /// Replacement may be empty (strip) or a single whitespace-free token.
+        /// Empty list is allowed (no-op). Each search must be non-empty after trim rules at the editor.
+        /// Search and replacement may contain whitespace. Search must not contain
+        /// <see cref="ReplaceListEntry.EditorSeparator"/> so editor text can round-trip.
+        /// Replacement may be empty (strip).
         /// </remarks>
         /// <param name="entries">Configured search/replace pairs in apply order.</param>
         /// <returns>Validated entries in the same order.</returns>
@@ -32,14 +34,16 @@ namespace Mfr.Filters.Replace
                     throw new UserException($"Replace-list entry {index}: search cannot be empty.");
                 }
 
+                if (search.Contains(ReplaceListEntry.EditorSeparator, StringComparison.Ordinal))
+                {
+                    throw new UserException(
+                        $"Replace-list entry {index}: search must not contain '{ReplaceListEntry.EditorSeparator}'."
+                    );
+                }
+
                 if (search.Length > maxLen)
                 {
                     throw new UserException($"Replace-list entry {index}: search exceeds maximum length ({maxLen}).");
-                }
-
-                if (search.Any(char.IsWhiteSpace))
-                {
-                    throw new UserException($"Replace-list entry {index}: search must not contain whitespace.");
                 }
 
                 if (replacement.Length > maxLen)
@@ -47,11 +51,6 @@ namespace Mfr.Filters.Replace
                     throw new UserException(
                         $"Replace-list entry {index}: replacement exceeds maximum length ({maxLen})."
                     );
-                }
-
-                if (replacement.Any(char.IsWhiteSpace))
-                {
-                    throw new UserException($"Replace-list entry {index}: replacement must not contain whitespace.");
                 }
 
                 validated.Add(entry);

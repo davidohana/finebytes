@@ -30,6 +30,19 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
+        /// Verifies whitespace in search or replacement is allowed.
+        /// </summary>
+        [Fact]
+        public void Validate_WhitespaceInPair_Allowed()
+        {
+            var entries = ReplaceListParser.Validate([new ReplaceListEntry("Blue Train", "Blue Train Live")]);
+
+            Assert.Single(entries);
+            Assert.Equal("Blue Train", entries[0].Search);
+            Assert.Equal("Blue Train Live", entries[0].Replacement);
+        }
+
+        /// <summary>
         /// Verifies empty or whitespace search is rejected.
         /// </summary>
         [Theory]
@@ -44,17 +57,15 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
-        /// Verifies whitespace inside search or replacement is rejected.
+        /// Verifies search containing the editor separator is rejected.
         /// </summary>
-        [Theory]
-        [InlineData("a b", "c", "search must not contain whitespace")]
-        [InlineData("a", "b c", "replacement must not contain whitespace")]
-        public void Validate_WhitespaceInPair_Throws(string search, string replacement, string expected)
+        [Fact]
+        public void Validate_SearchContainsEditorSeparator_Throws()
         {
             var ex = Assert.Throws<UserException>(() =>
-                ReplaceListParser.Validate([new ReplaceListEntry(search, replacement)])
+                ReplaceListParser.Validate([new ReplaceListEntry("a => b", "c")])
             );
-            Assert.Contains(expected, ex.Message, StringComparison.Ordinal);
+            Assert.Contains(ReplaceListEntry.EditorSeparator, ex.Message, StringComparison.Ordinal);
         }
 
         /// <summary>

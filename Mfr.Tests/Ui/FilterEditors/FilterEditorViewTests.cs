@@ -858,7 +858,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.True(replaceAll.IsChecked);
             Assert.True(wholeWord.IsChecked);
 
-            entries.Text = "a b\n. _";
+            entries.Text = "a => b\n. => _";
             wildcard.IsChecked = true;
             caseSensitive.IsChecked = true;
             replaceAll.IsChecked = false;

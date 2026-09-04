@@ -6,9 +6,15 @@ namespace Mfr.Filters.Replace
     /// <summary>
     /// One search/replace pair in a replace list.
     /// </summary>
-    /// <param name="Search">Search pattern text (no whitespace).</param>
-    /// <param name="Replacement">Replacement text (no whitespace), or empty to strip matches.</param>
-    public sealed record ReplaceListEntry(string Search, string Replacement);
+    /// <param name="Search">Search pattern text (may contain spaces; must not contain <see cref="EditorSeparator"/>).</param>
+    /// <param name="Replacement">Replacement text (may contain spaces), or empty to strip matches.</param>
+    public sealed record ReplaceListEntry(string Search, string Replacement)
+    {
+        /// <summary>
+        /// Separator used in Filter Configuration editor text between search and replacement.
+        /// </summary>
+        public const string EditorSeparator = "=>";
+    }
 
     /// <summary>
     /// Options for replace-list transformations embedded in the filter.

@@ -14,13 +14,14 @@ Applies **search/replace pairs** embedded in the filter options, in list order�
 
 ## Editor text format
 
-The Filter Configuration pane edits `entries` as **line-separated** pairs. Each non-empty line is either a lone `search` (empty replacement / strip) or **whitespace-separated** `search` then `replacement`. Lines with more than two tokens are ignored while typing. Search and replacement must not contain whitespace; each is limited to 1000 characters.
+The Filter Configuration pane edits `entries` as **line-separated** pairs. Each non-empty line is either a lone `search` (empty replacement / strip) or `search => replacement` (split on the **first** `=>`; surrounding spaces are trimmed). Search and replacement may contain spaces; search must not contain `=>`. Each side is limited to 1000 characters.
 
 **Example editor text**
 
 ```text
-a b
-. _
+a => b
+. => _
+Blue Train => Blue_Train
 x
 ```
 
@@ -31,6 +32,7 @@ x
   - After: `b_b`
   - Comment: Order matters: `a`→`b` first, then `.`→`_`.
 - `entries`: `x`→`""`; `mode`: `Literal`; `replaceAll`: `true` — `abxcx` → `abc`
+- `entries`: `Blue Train`→`Blue_Train`; `mode`: `Literal`; `replaceAll`: `true`; `wholeWord`: `false` — `Blue Train Live` → `Blue_Train Live`
 - `entries`: `f*o`→`X`; `mode`: `Wildcard`; `replaceAll`: `true` — `foo` → `X`
 - `entries`: `a`→`b`, `\.`→`_`,
   `[0-9]+`→`<counter:initial=10,step=1,padding=none,length=2,resetScope=global>`; `mode`: `Regex`; `caseSensitive`:

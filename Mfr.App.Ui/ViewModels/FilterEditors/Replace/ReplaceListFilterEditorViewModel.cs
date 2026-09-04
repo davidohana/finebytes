@@ -94,7 +94,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         }
 
         /// <summary>
-        /// Formats stored entries as line-separated whitespace pairs for the editor.
+        /// Formats stored entries as line-separated <c>search =&gt; replacement</c> pairs for the editor.
         /// </summary>
         private static string _FormatEntries(IReadOnlyList<ReplaceListEntry> entries)
         {
@@ -105,12 +105,17 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
 
             return string.Join(
                 '\n',
-                entries.Select(e => e.Replacement.Length == 0 ? e.Search : $"{e.Search} {e.Replacement}")
+                entries.Select(e =>
+                    e.Replacement.Length == 0
+                        ? e.Search
+                        : $"{e.Search} {ReplaceListEntry.EditorSeparator} {e.Replacement}"
+                )
             );
         }
 
         /// <summary>
-        /// Parses line-separated pairs: one token = strip; two tokens = search/replace; other lengths skipped.
+        /// Parses line-separated pairs using <see cref="ReplaceListEntry.EditorSeparator"/> (first occurrence);
+        /// a line without the separator is search-only (strip).
         /// </summary>
         private static ReplaceListEntry[] _ParseEntries(string text)
         {
@@ -130,22 +135,27 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
                     continue;
                 }
 
-                var parts = line.Split(
-                    (char[]?)null,
-                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
-                );
-                if (parts.Length == 1)
+                var sepIndex = line.IndexOf(ReplaceListEntry.EditorSeparator, StringComparison.Ordinal);
+                if (sepIndex < 0)
                 {
-                    entries.Add(new ReplaceListEntry(parts[0], string.Empty));
+                    var stripSearch = line.Trim();
+                    if (stripSearch.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    entries.Add(new ReplaceListEntry(stripSearch, string.Empty));
                     continue;
                 }
 
-                if (parts.Length != 2)
+                var search = line[..sepIndex].Trim();
+                if (search.Length == 0)
                 {
                     continue;
                 }
 
-                entries.Add(new ReplaceListEntry(parts[0], parts[1]));
+                var replacement = line[(sepIndex + ReplaceListEntry.EditorSeparator.Length)..].Trim();
+                entries.Add(new ReplaceListEntry(search, replacement));
             }
 
             return [.. entries];

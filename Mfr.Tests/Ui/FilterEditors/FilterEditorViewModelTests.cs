@@ -393,7 +393,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.True(editor.ReplaceAll);
             Assert.True(editor.WholeWord);
 
-            editor.EntriesText = "a b\n. _\nx";
+            editor.EntriesText = "a => b\nBlue Train => Blue_Train\nx";
             editor.Mode = ReplacerMode.Wildcard;
             editor.CaseSensitive = true;
             editor.ReplaceAll = false;
@@ -403,8 +403,8 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(3, options.Entries.Count);
             Assert.Equal("a", options.Entries[0].Search);
             Assert.Equal("b", options.Entries[0].Replacement);
-            Assert.Equal(".", options.Entries[1].Search);
-            Assert.Equal("_", options.Entries[1].Replacement);
+            Assert.Equal("Blue Train", options.Entries[1].Search);
+            Assert.Equal("Blue_Train", options.Entries[1].Replacement);
             Assert.Equal("x", options.Entries[2].Search);
             Assert.Equal("", options.Entries[2].Replacement);
             Assert.Equal(ReplacerMode.Wildcard, options.Mode);
