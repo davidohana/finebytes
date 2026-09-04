@@ -39,13 +39,13 @@ Do **not** batch unrelated filters. File-list / audio / Formatter stay separate 
 
 ## Location and naming
 
-| Piece | Path |
-| ----- | ---- |
-| VM | `Mfr.App.Ui/ViewModels/FilterEditors/<FilterGroup>/YourFilterEditorViewModel.cs` |
-| View | `Mfr.App.Ui/Views/FilterEditors/<FilterGroup>/YourFilterEditorView.axaml` (+ `.cs`) |
-| Factory | `Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs` (root) |
-| ViewLocator | `FilterEditorViewLocator` — prefix-replace; no edit if naming matches |
-| Tests | `Mfr.Tests/Ui/FilterEditors/FilterEditorViewModelTests.cs` + `FilterEditorViewTests.cs` |
+| Piece       | Path                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------- |
+| VM          | `Mfr.App.Ui/ViewModels/FilterEditors/<FilterGroup>/YourFilterEditorViewModel.cs`        |
+| View        | `Mfr.App.Ui/Views/FilterEditors/<FilterGroup>/YourFilterEditorView.axaml` (+ `.cs`)     |
+| Factory     | `Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs` (root)              |
+| ViewLocator | `FilterEditorViewLocator` — prefix-replace; no edit if naming matches                   |
+| Tests       | `Mfr.Tests/Ui/FilterEditors/FilterEditorViewModelTests.cs` + `FilterEditorViewTests.cs` |
 
 - Namespace / `x:Class` must match folder (`…FilterEditors.Trimming`, etc.).
 - Shared editor for multiple filters: one VM/view name that describes the shared surface (e.g. `SpaceTrigger…`, `Count…`); factory maps each filter type to it.
@@ -77,15 +77,15 @@ Add a `switch` arm in `FilterOptionsEditorFactory.Create`. Until registered, sel
 
 ## Reference editors by shape
 
-| Shape | Copy from |
-| ----- | --------- |
-| Shared numeric count | `Trimming/CountFilterEditor*` |
+| Shape                                        | Copy from                                         |
+| -------------------------------------------- | ------------------------------------------------- |
+| Shared numeric count                         | `Trimming/CountFilterEditor*`                     |
 | Single char (`MaxLength=1`, empty semantics) | `Trimming/ShrinkDuplicateCharactersFilterEditor*` |
-| Position start/end | `Trimming/TrimBetweenFilterEditor*` |
-| Multi checkbox + numeric | `Misc/FixLeadingZerosFilterEditor*` |
-| Shared two-filter labels differ | `Space/SpaceTriggerFilterEditor*` |
-| Enum / radio case mode | `Case/LettersCaseFilterEditor*` |
-| Space char catalog | `Space/SpaceCharacterFilterEditor*` |
+| Position start/end                           | `Trimming/TrimBetweenFilterEditor*`               |
+| Multi checkbox + numeric                     | `Misc/FixLeadingZerosFilterEditor*`               |
+| Shared two-filter labels differ              | `Space/SpaceTriggerFilterEditor*`                 |
+| Enum / radio case mode                       | `Case/LettersCaseFilterEditor*`                   |
+| Space char catalog                           | `Space/SpaceCharacterFilterEditor*`               |
 
 ## Tests
 

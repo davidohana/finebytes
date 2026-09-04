@@ -14,27 +14,16 @@
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6">
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
-          ToolTip.Tip="Characters that trigger inserting the word separator (set by Space Character, default U+0020 SPACE)."
-        >
-          <TextBlock
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            TextWrapping="Wrap"
-            MaxWidth="240"
-            Text="{Binding CharsPrompt}"
-          />
+        <controls:LabelBesideFieldPanel ToolTip.Tip="Characters that trigger inserting the word separator (set by Space Character, default U+0020 SPACE).">
+          <TextBlock Classes="filter-editor-label" TextWrapping="Wrap" Text="{Binding CharsPrompt}" />
           <TextBox
             x:Name="CharsBox"
             Classes="filter-editor-field"
             MinWidth="120"
             MaxLength="100"
-            VerticalAlignment="Center"
             Text="{Binding Chars}"
           />
-        </StackPanel>
+        </controls:LabelBesideFieldPanel>
         <controls:CompactCheckBox
           x:Name="NeighborCheckBox"
           Content="{Binding NeighborCheckLabel}"
