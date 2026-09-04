@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–11 done. Next: 12–15."
+overview: "Phases 1–11 + 13 hygiene done. Next: 12 → 14 → 15 → 16 (color legend)."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -93,13 +93,16 @@ todos:
     content: "Phase 12: preview columns for metadata fields (ID3-preview etc., after Phase 10)"
     status: pending
   - id: phase-13
-    content: "Phase 13: color legend (after 14/15); glyph + fixture hygiene done; keep entry props"
-    status: pending
+    content: "Phase 13: hygiene — glyph styles + RenameListUiTestContext; entry props kept"
+    status: completed
   - id: phase-14
     content: "Phase 14: advanced menus — F2, export, free edit, Properties, drag-out"
     status: pending
   - id: phase-15
     content: "Phase 15: GO commit from UI"
+    status: pending
+  - id: phase-16
+    content: "Phase 16: color-legend toolbar (MFR7) — after F2 blue + GO plum"
     status: pending
 isProject: false
 ---
@@ -111,23 +114,21 @@ Workspace copy of the Cursor plan (synced 2026-08-29). Canonical Cursor copy:
 
 Source of truth: [mfr7 help](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html), [FieldSelector.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/FieldSelector.cs), [SortFieldSelector.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/SortFieldSelector.cs), and the engine in [Mfr.Engine/RenameList/RenameList.cs](Mfr.Engine/RenameList/RenameList.cs).
 
-**Phase numbers = execution order** (renumbered 2026-08-29). Old labels in parentheses where helpful.
+**Phase numbers = execution order** (renumbered 2026-08-29; color legend moved to **16** after 14/15 on 2026-09-04). Old labels in parentheses where helpful.
 
 **No legacy migrations:** session and config use current shapes only; unknown or old JSON → MFR7 defaults (`AGENTS.md` refactoring policy). `SessionStateRenameListSortFieldJsonConverter` is gone; `sortFields` is field-key JSON only.
 
 ```mermaid
 flowchart LR
-  P1_9[1-9 Done]
-  P10a[10a Filter edits]
-  P10b[10b List membership]
-  P10c[10c Auto-Preview toggle]
-  P10d[10d F5 re-preview]
-  P11[11 Highlighting]
+  P1_11[1-11 Done]
   P12[12 Preview meta cols]
-  P13[13 Hygiene]
-  P14[14 Advanced]
+  P13[13 Hygiene done]
+  P14[14 Advanced F2]
   P15[15 GO]
-  P1_9 --> P10a --> P10b --> P10c --> P10d --> P11 --> P12 --> P13 --> P14 --> P15
+  P16[16 Color legend]
+  P1_11 --> P12
+  P13 -.-> P12
+  P12 --> P14 --> P15 --> P16
 ```
 
 ______________________________________________________________________
@@ -151,9 +152,10 @@ ______________________________________________________________________
 | **10d** F5 re-preview               | Done    | After original refresh, re-run preview when Auto-Preview on                         | 8b                |
 | **11** Preview highlighting         | Done    | Red changed preview cells, preview-error rows, Show Preview Error                   | 8c                |
 | **12** Preview metadata columns     | Pending | ID3/image preview cols after filters                                                | 9 / 7b            |
-| **13** Remaining hygiene            | Partial | Color legend after 14/15; glyph styles + test fixture done; keep entry props         | 10 / 7c           |
+| **13** Hygiene                      | Done    | Glyph styles + `RenameListUiTestContext`; entry convenience props kept              | 10 / 7c (part)    |
 | **14** Advanced menus               | Pending | F2, export, Properties, drag-out                                                    | 11 / 8            |
 | **15** GO                           | Pending | `Ctrl+G` → Commit                                                                   | 12 / 9            |
+| **16** Color legend                 | Pending | Toolbar toggle + side panel (MFR7); needs F2 blue + GO plum                         | 10 / 7c (legend)  |
 
 ______________________________________________________________________
 
@@ -259,16 +261,17 @@ After **10a–10d**. ID3/image **preview** columns when filters modify tags; shu
 
 ______________________________________________________________________
 
-## Phase 13 — remaining hygiene
+## Phase 13 — hygiene — done
 
-*(Was 10 / 7c; partial — missing-on-disk, OrderedDraft, shuttle DnD already shipped in Phase 9.)*
+*(Was 10 / 7c minus color legend.)* Missing-on-disk, OrderedDraft, and shuttle DnD shipped earlier in Phase 9.
 
-**Still open:**
+| Area              | Location                                                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Glyph styles      | Preview + sort badge styles in [Themes/RenameList.axaml](../../Mfr.App.Ui/Themes/RenameList.axaml) (app `StyleInclude`)                                |
+| Test fixture      | [RenameListUiTestContext](../../Mfr.Tests/Ui/RenameList/RenameListTestHelpers.cs) — ViewModel + Drop tests migrated                                    |
+| Entry convenience | Kept: `FullPath` / `FullFileName` / etc. remain cheap wrappers; grid path is `GetFieldText(key)`                                                       |
 
-- `RenameListEntry` convenience properties — keep; `GetFieldText` is the general API
-- Color-legend toolbar (MFR7) — after Phase 14/15 (blue manual rename + plum apply error)
-
-**Done in hygiene:** preview/sort glyph styles in [Themes/RenameList.axaml](../../Mfr.App.Ui/Themes/RenameList.axaml); Rename List UI tests use [RenameListUiTestContext](../../Mfr.Tests/Ui/RenameList/RenameListTestHelpers.cs).
+Color legend was split out to **Phase 16** (needs F2 blue + GO plum).
 
 ______________________________________________________________________
 
@@ -276,7 +279,7 @@ ______________________________________________________________________
 
 *(Was 11 / 8.)*
 
-F2 free edit, export, Properties, drag-out to Explorer; Refresh reset of manual renames when F2 exists.
+F2 free edit, export, Properties, drag-out to Explorer; Refresh reset of manual renames when F2 exists. Introduces **blue** manual-rename highlighting (needed before the color legend).
 
 ______________________________________________________________________
 
@@ -284,10 +287,18 @@ ______________________________________________________________________
 
 *(Was 12 / 9.)*
 
-`Ctrl+G` → `Commit`; Refresh clears last apply-error highlighting. Apply-error menu is **Show Rename Error** — reuse [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml) (not a third dialog clone). Distinct from Phase 8 **Show Load Errors**.
+`Ctrl+G` → `Commit`; Refresh clears last apply-error highlighting. Apply-error menu is **Show Rename Error** — reuse [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml) (not a third dialog clone). Distinct from Phase 8 **Show Load Errors**. Introduces **plum** apply-error highlighting (needed before the color legend).
+
+______________________________________________________________________
+
+## Phase 16 — color legend
+
+*(Was part of 10 / 7c.)* After **14** and **15** so the panel can document the full set: red changed preview, gray missing/load error, lavender preview error, blue manual rename, plum apply/rename error.
+
+MFR7 toolbar toggle + side panel ([renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) Highlighting; [Legend.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/Legend.cs)).
 
 ______________________________________________________________________
 
 ## What to implement next
 
-**12 Preview metadata columns** — ID3/image preview cols + shuttle Preview tab; then **13–15**.
+**12 Preview metadata columns** — ID3/image preview cols + shuttle Preview tab; then **14 → 15 → 16**.
