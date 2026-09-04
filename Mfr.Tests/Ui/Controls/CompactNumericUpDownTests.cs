@@ -17,22 +17,7 @@ namespace Mfr.Tests.Ui.Controls
         [AvaloniaFact]
         public void Shows_value_with_stacked_compact_arrows()
         {
-            var spinner = new CompactNumericUpDown
-            {
-                Minimum = 1,
-                Maximum = 9999,
-                FormatString = "0",
-                Value = 5,
-            };
-            var window = new Window
-            {
-                Width = 200,
-                Height = 80,
-                Content = spinner,
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
+            var (window, spinner) = _ShowSpinner(value: 5);
 
             try
             {
@@ -50,22 +35,7 @@ namespace Mfr.Tests.Ui.Controls
         [AvaloniaFact]
         public void Decrease_button_has_no_disabled_fill_at_minimum()
         {
-            var spinner = new CompactNumericUpDown
-            {
-                Minimum = 1,
-                Maximum = 9999,
-                FormatString = "0",
-                Value = 1,
-            };
-            var window = new Window
-            {
-                Width = 200,
-                Height = 80,
-                Content = spinner,
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
+            var (window, spinner) = _ShowSpinner(value: 1);
 
             try
             {
@@ -84,22 +54,7 @@ namespace Mfr.Tests.Ui.Controls
         [AvaloniaFact]
         public void Clips_value_below_minimum_without_validation_error()
         {
-            var spinner = new CompactNumericUpDown
-            {
-                Minimum = 1,
-                Maximum = 200,
-                FormatString = "0",
-                Value = 1,
-            };
-            var window = new Window
-            {
-                Width = 200,
-                Height = 80,
-                Content = spinner,
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
+            var (window, spinner) = _ShowSpinner(value: 1, maximum: 200);
 
             try
             {
@@ -124,26 +79,18 @@ namespace Mfr.Tests.Ui.Controls
         public void Empty_value_coerces_to_minimum_for_non_nullable_binding()
         {
             var vm = new SpinnerHost { Count = 5 };
-            var spinner = new CompactNumericUpDown
-            {
-                Minimum = 1,
-                Maximum = 200,
-                FormatString = "0",
-                DataContext = vm,
-                [!NumericUpDown.ValueProperty] = new Binding(nameof(SpinnerHost.Count))
+            var (window, spinner) = _ShowSpinner(
+                value: 5,
+                maximum: 200,
+                configure: control =>
                 {
-                    Mode = BindingMode.TwoWay,
-                },
-            };
-            var window = new Window
-            {
-                Width = 200,
-                Height = 80,
-                Content = spinner,
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
+                    control.DataContext = vm;
+                    control[!NumericUpDown.ValueProperty] = new Binding(nameof(SpinnerHost.Count))
+                    {
+                        Mode = BindingMode.TwoWay,
+                    };
+                }
+            );
 
             try
             {
@@ -161,6 +108,33 @@ namespace Mfr.Tests.Ui.Controls
             {
                 window.Close();
             }
+        }
+
+        private static (Window Window, CompactNumericUpDown Spinner) _ShowSpinner(
+            decimal value,
+            decimal maximum = 9999,
+            Action<CompactNumericUpDown>? configure = null
+        )
+        {
+            var spinner = new CompactNumericUpDown
+            {
+                Minimum = 1,
+                Maximum = maximum,
+                FormatString = "0",
+                Value = value,
+            };
+            configure?.Invoke(spinner);
+
+            var window = new Window
+            {
+                Width = 200,
+                Height = 80,
+                Content = spinner,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            return (window, spinner);
         }
 
         private sealed class SpinnerHost

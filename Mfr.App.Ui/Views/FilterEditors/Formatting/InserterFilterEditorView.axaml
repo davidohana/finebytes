@@ -62,13 +62,13 @@
               Content="Beginning"
               IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.Beginning}, Mode=TwoWay}"
             />
-          <controls:CompactRadioButton
-            x:Name="EndRadio"
-            GroupName="InserterOrigin"
-            Content="End"
-            IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.End}, Mode=TwoWay}"
-          />
-        </StackPanel>
+            <controls:CompactRadioButton
+              x:Name="EndRadio"
+              GroupName="InserterOrigin"
+              Content="End"
+              IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.End}, Mode=TwoWay}"
+            />
+          </StackPanel>
         </Grid>
         <controls:CompactCheckBox
           x:Name="OverwriteCheckBox"

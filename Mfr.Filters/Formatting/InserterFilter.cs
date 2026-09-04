@@ -106,30 +106,23 @@ namespace Mfr.Filters.Formatting
             return string.Concat(segment.AsSpan(0, insertIndex), inserted, segment.AsSpan(remainderStart));
         }
 
+        /// <summary>
+        /// Maps one-based <paramref name="position"/> to a zero-based insert index.
+        /// <para>
+        /// Beginning: <c>min(position - 1, length)</c>. End (MFR7): <c>max(0, length - position + 1)</c>
+        /// so position 1 appends.
+        /// </para>
+        /// </summary>
         private static int _ComputeInsertIndex(int length, int position, InserterOrigin startFrom)
         {
             var oneBased = position < 1 ? 1 : position;
 
             if (startFrom == InserterOrigin.Beginning)
             {
-                var zeroBased = oneBased - 1;
-                var exceedsLength = zeroBased > length;
-                if (exceedsLength)
-                {
-                    return length;
-                }
-
-                return zeroBased;
+                return Math.Min(oneBased - 1, length);
             }
 
-            // MFR7: index = Length - Pos + 1 (Pos 1 = append at Length).
-            var fromEndIndex = length - oneBased + 1;
-            if (fromEndIndex < 0)
-            {
-                return 0;
-            }
-
-            return fromEndIndex;
+            return Math.Max(0, length - oneBased + 1);
         }
     }
 }

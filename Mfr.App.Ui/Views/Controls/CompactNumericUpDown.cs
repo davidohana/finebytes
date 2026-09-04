@@ -20,7 +20,7 @@ namespace Mfr.App.Ui.Views.Controls
             MinHeightProperty.OverrideDefaultValue<CompactNumericUpDown>(26);
             HorizontalAlignmentProperty.OverrideDefaultValue<CompactNumericUpDown>(HorizontalAlignment.Left);
             VerticalAlignmentProperty.OverrideDefaultValue<CompactNumericUpDown>(VerticalAlignment.Center);
-            // Out-of-range typed values (e.g. 0 with Minimum=1) throw unless clipped.
+            // Typed values outside Minimum/Maximum throw unless clipped (see OnCoerceValue).
             ClipValueToMinMaxProperty.OverrideDefaultValue<CompactNumericUpDown>(true);
         }
 
@@ -35,12 +35,16 @@ namespace Mfr.App.Ui.Views.Controls
         /// <inheritdoc />
         protected override Type StyleKeyOverride => typeof(NumericUpDown);
 
-        /// <inheritdoc />
-        /// <remarks>
-        /// Empty text (Delete/Backspace) sets <see cref="NumericUpDown.Value"/> to null. Our editors bind
-        /// non-nullable <c>decimal</c>, which surfaces as <see cref="InvalidOperationException"/> validation.
-        /// Coerce empty to <see cref="NumericUpDown.Minimum"/> so all compact spinners stay bindable.
-        /// </remarks>
+        /// <summary>
+        /// Keeps <see cref="NumericUpDown.Value"/> bindable to non-nullable <c>decimal</c>.
+        /// <para>
+        /// Empty text (Delete/Backspace) would set Value to null and fail the binding; coerce to
+        /// <see cref="NumericUpDown.Minimum"/>. When <see cref="NumericUpDown.ClipValueToMinMax"/> is on,
+        /// also clamp out-of-range values (Avalonia only clips on text parse, not every Value set).
+        /// </para>
+        /// </summary>
+        /// <param name="baseValue">Candidate value before store.</param>
+        /// <returns>Coerced value.</returns>
         protected override decimal? OnCoerceValue(decimal? baseValue)
         {
             if (baseValue is null)

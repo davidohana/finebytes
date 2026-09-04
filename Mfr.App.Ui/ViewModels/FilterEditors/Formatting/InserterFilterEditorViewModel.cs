@@ -60,7 +60,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
 
             LoadWithoutApplying(() =>
             {
-                InsertText = filter.Options.Text ?? string.Empty;
+                InsertText = filter.Options.Text;
                 Position = filter.Options.Position;
                 StartFrom = filter.Options.StartFrom;
                 Overwrite = filter.Options.Overwrite;
@@ -75,7 +75,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
             }
 
             var options = new InserterOptions(
-                Text: InsertText ?? string.Empty,
+                Text: InsertText,
                 Position: ClampToInt(Position, 1, 200),
                 StartFrom: StartFrom,
                 Overwrite: Overwrite
