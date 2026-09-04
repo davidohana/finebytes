@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -100,46 +101,95 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var field = RenameListFieldCatalog.GetField(fieldKey);
-            var headerText = field.DisplayName;
-            var canHide = _viewModel.VisibleColumns.Count > 1;
+            var menu = _BuildColumnHeaderContextMenu(_viewModel, fieldKey);
+            header.ContextMenu = menu;
+            menu.PlacementTarget = header;
+            menu.Open(header);
+        }
 
-            var menu = new ContextMenu { DataContext = _viewModel };
-            menu.Items.Add(new MenuItem { Header = $"({headerText})", IsEnabled = false });
+        /// <summary>
+        /// Builds the column header menu in MFR7 order for the given field.
+        /// </summary>
+        /// <param name="viewModel">Bound Rename List view model.</param>
+        /// <param name="fieldKey">Field for the clicked header.</param>
+        /// <returns>A new context menu (caller opens it).</returns>
+        /// <remarks>
+        /// <para>
+        /// Order: title → Hide Field → (preview) Remove Unchanged → Export Name List (14b) →
+        /// Free Names Edit (14c, writable) → Select Visible Fields → Select Sort Fields.
+        /// Insert 14b/14c items in this method so order stays one place.
+        /// </para>
+        /// </remarks>
+        private static ContextMenu _BuildColumnHeaderContextMenu(
+            RenameListViewModel viewModel,
+            RenameListFieldKey fieldKey
+        )
+        {
+            var field = RenameListFieldCatalog.GetField(fieldKey);
+            var menu = new ContextMenu { DataContext = viewModel };
+            menu.Items.Add(new MenuItem { Header = $"({field.DisplayName})", IsEnabled = false });
             menu.Items.Add(new Separator());
 
-            // MFR7 order: Hide → (preview) Remove Unchanged → … → Select Fields
-            var hideField = new MenuItem { Header = "Hide Field", IsEnabled = canHide };
-            hideField.Click += (_, _) => _viewModel.HideColumn(fieldKey);
+            var hideField = new MenuItem
+            {
+                Header = "Hide Field",
+                IsEnabled = viewModel.VisibleColumns.Count > 1,
+            };
+            hideField.Click += (_, _) => viewModel.HideColumn(fieldKey);
             menu.Items.Add(hideField);
 
             if (fieldKey.IsPreview)
             {
-                var removeUnchanged = new MenuItem { Header = "Remove Unchanged Items" };
-                ToolTip.SetTip(removeUnchanged, AppTips.RemoveUnchangedItems);
-                removeUnchanged.Click += (_, _) => _viewModel.RemoveUnchanged(fieldKey);
-                menu.Items.Add(removeUnchanged);
+                menu.Items.Add(
+                    _CreateTipMenuItem(
+                        "Remove Unchanged Items",
+                        AppTips.RemoveUnchangedItems,
+                        () => viewModel.RemoveUnchanged(fieldKey)
+                    )
+                );
             }
 
-            var selectFields = new MenuItem
-            {
-                Header = "Select Visible Fields...",
-                Command = _viewModel.OpenFieldShuttleCommand,
-            };
-            ToolTip.SetTip(selectFields, AppTips.SelectRenameListFields);
-            menu.Items.Add(selectFields);
+            menu.Items.Add(
+                _CreateCommandMenuItem(
+                    "Select Visible Fields...",
+                    AppTips.SelectRenameListFields,
+                    viewModel.OpenFieldShuttleCommand
+                )
+            );
+            menu.Items.Add(
+                _CreateCommandMenuItem(
+                    "Select Sort Fields...",
+                    AppTips.EditRenameListSortFields,
+                    viewModel.OpenEditSortFieldsCommand
+                )
+            );
 
-            var selectSortFields = new MenuItem
-            {
-                Header = "Select Sort Fields...",
-                Command = _viewModel.OpenEditSortFieldsCommand,
-            };
-            ToolTip.SetTip(selectSortFields, AppTips.EditRenameListSortFields);
-            menu.Items.Add(selectSortFields);
+            return menu;
+        }
 
-            header.ContextMenu = menu;
-            menu.PlacementTarget = header;
-            menu.Open(header);
+        /// <summary>
+        /// Creates a menu item that runs an action on click and shows a tip.
+        /// </summary>
+        private static MenuItem _CreateTipMenuItem(string header, string tip, Action onClick)
+        {
+            var item = new MenuItem { Header = header };
+            ToolTip.SetTip(item, tip);
+            item.Click += (_, _) => onClick();
+            return item;
+        }
+
+        /// <summary>
+        /// Creates a menu item bound to a command with a tip.
+        /// </summary>
+        private static MenuItem _CreateCommandMenuItem(
+            string header,
+            string tip,
+            ICommand command
+        )
+        {
+            var item = new MenuItem { Header = header, Command = command };
+            ToolTip.SetTip(item, tip);
+            return item;
         }
     }
 }

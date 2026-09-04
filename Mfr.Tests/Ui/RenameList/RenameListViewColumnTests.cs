@@ -225,7 +225,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies the preview-column header menu offers Remove Unchanged Items and the original-column menu omits it.
+        /// Verifies preview-column header menu order (MFR7) and that original columns omit Remove Unchanged.
         /// </summary>
         [AvaloniaFact]
         public async Task Header_menu_offers_remove_unchanged_on_preview_column_only()
@@ -234,7 +234,10 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var originalKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            var originalKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Folder
+            );
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
             var originalHeader = grid.GetVisualDescendants()
@@ -245,11 +248,22 @@ namespace Mfr.Tests.Ui.RenameList
                 .First(header => RenameListGridColumns.TryResolveFieldKey(header) == previewKey);
 
             _RaiseHeaderContextMenu(originalHeader);
-            Assert.DoesNotContain("Remove Unchanged Items", _MenuHeaders(originalHeader.ContextMenu));
+            Assert.Equal(
+                ["(Parent Folder)", "Hide Field", "Select Visible Fields...", "Select Sort Fields..."],
+                _MenuHeaders(originalHeader.ContextMenu)
+            );
 
             _RaiseHeaderContextMenu(previewHeader);
-            Assert.Contains("Remove Unchanged Items", _MenuHeaders(previewHeader.ContextMenu));
-            Assert.Contains("Hide Field", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.Equal(
+                [
+                    "(Full File Name)",
+                    "Hide Field",
+                    "Remove Unchanged Items",
+                    "Select Visible Fields...",
+                    "Select Sort Fields...",
+                ],
+                _MenuHeaders(previewHeader.ContextMenu)
+            );
 
             window.Close();
         }

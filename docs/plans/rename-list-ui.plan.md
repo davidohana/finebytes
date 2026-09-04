@@ -314,7 +314,7 @@ MFR7 sources: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.
 | Free Names Edit     | Header menu (writable col)   | Temp `.txt` + add **Name List** filter targeting that field                  |
 | Manual Rename Field | F2 / row menu (writable col) | Dialog forces original **or** preview value; **blue** text until Cancel / F5 |
 
-Header menu today ([RenameListView.HeaderMenu.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)): title, Select Visible/Sort Fields, Hide Field. MFR7 order to restore: title → Hide Field → *(preview only)* Remove Unchanged → Export Name List → *(writable)* Free Names Edit → Auto-Sort → Select Fields. Keep existing Select Sort Fields if useful; do not regress Hide / Select / Auto-Sort.
+Header menu builder ([RenameListView.HeaderMenu.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs) `_BuildColumnHeaderContextMenu`): title → Hide Field → *(preview only)* Remove Unchanged → *(14b)* Export Name List → *(14c writable)* Free Names Edit → Select Visible Fields → Select Sort Fields. Insert 14b/14c in that method only. Keep Select Sort Fields; do not regress Hide / Select.
 
 ### 14a — Remove Unchanged Items — done
 
