@@ -2,10 +2,12 @@ using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
+using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters.Case;
 using Mfr.Filters.Misc;
+using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
 
@@ -246,6 +248,37 @@ namespace Mfr.Tests.Ui.FilterEditors
             var options = ((StripParenthesesFilter)step.Filter).Options;
             Assert.Equal(ParenthesisType.Square, options.Type);
             Assert.False(options.RemoveContents);
+        }
+
+        /// <summary>
+        /// Verifies Cleaner option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Cleaner_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Cleaner", new CleanerFilter());
+            var editor = new CleanerFilterEditorViewModel(step);
+
+            Assert.True(editor.RemoveIllegalChars);
+            Assert.Equal(@"!""#$%&'()*+,/:;<=>?@[]\^`{}|~", editor.CustomCharsToRemove);
+            Assert.False(editor.ReplaceWith);
+            Assert.Equal(string.Empty, editor.Replacement);
+
+            editor.RemoveIllegalChars = false;
+            editor.CustomCharsToRemove = "@#";
+            editor.Replacement = "_";
+            editor.ReplaceWith = true;
+
+            var options = ((CleanerFilter)step.Filter).Options;
+            Assert.False(options.RemoveIllegalChars);
+            Assert.Equal("@#", options.CustomCharsToRemove);
+            Assert.Equal("_", options.Replacement);
+
+            editor.ReplaceWith = false;
+
+            options = ((CleanerFilter)step.Filter).Options;
+            Assert.Equal(string.Empty, options.Replacement);
+            Assert.Equal("_", editor.Replacement);
         }
     }
 }

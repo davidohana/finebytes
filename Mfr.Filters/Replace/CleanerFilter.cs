@@ -19,13 +19,13 @@ namespace Mfr.Filters.Replace
         : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, custom character cleanup list).
+        /// Creates a filter with add-to-list defaults (file prefix, illegal chars on, MFR7 custom cleanup list).
         /// </summary>
         public CleanerFilter()
             : this(
                 new FilePrefixTarget(),
                 new CleanerOptions(
-                    RemoveIllegalChars: false,
+                    RemoveIllegalChars: true,
                     CustomCharsToRemove: @"!""#$%&'()*+,/:;<=>?@[]\^`{}|~",
                     Replacement: ""
                 )

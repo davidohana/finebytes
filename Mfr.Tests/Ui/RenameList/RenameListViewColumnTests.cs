@@ -234,10 +234,7 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var originalKey = RenameListFieldKey.Original(
-                BasicRenameListField.Group,
-                BasicRenameListFields.Key.Folder
-            );
+            var originalKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
             var originalHeader = grid.GetVisualDescendants()

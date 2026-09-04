@@ -152,16 +152,16 @@ ______________________________________________________________________
 
 ## Remaining phase order
 
-| Phase                           | What                                                                             | Was              |
-| ------------------------------- | -------------------------------------------------------------------------------- | ---------------- |
-| **12** Preview metadata columns | ID3/image preview cols after filters                                             | 9 / 7b           |
-| **14b** Export Name List        | Column → UTF-8 text file; save dialog; optional open in editor                   | 11 / 8           |
-| **14c** Free Names Edit         | Temp name-list + add `NameListFilter` targeted at writable column                | 11 / 8           |
-| **14d** Manual Rename (F2)      | Force original/preview value; blue cells; Cancel; F5 clears overrides            | 11 / 8           |
-| **14e** Properties              | Alt+Enter / row menu → Windows shell property sheet                              | 11 / 8           |
-| **14f** Drag-out                | Selected rows as `FileDrop` to Explorer (cell→filter drag deferred)              | 11 / 8           |
-| **15** GO                       | `Ctrl+G` → Commit                                                                | 12 / 9           |
-| **16** Color legend             | Toolbar toggle + side panel (MFR7); needs **14d** blue + GO plum                 | 10 / 7c (legend) |
+| Phase                           | What                                                                  | Was              |
+| ------------------------------- | --------------------------------------------------------------------- | ---------------- |
+| **12** Preview metadata columns | ID3/image preview cols after filters                                  | 9 / 7b           |
+| **14b** Export Name List        | Column → UTF-8 text file; save dialog; optional open in editor        | 11 / 8           |
+| **14c** Free Names Edit         | Temp name-list + add `NameListFilter` targeted at writable column     | 11 / 8           |
+| **14d** Manual Rename (F2)      | Force original/preview value; blue cells; Cancel; F5 clears overrides | 11 / 8           |
+| **14e** Properties              | Alt+Enter / row menu → Windows shell property sheet                   | 11 / 8           |
+| **14f** Drag-out                | Selected rows as `FileDrop` to Explorer (cell→filter drag deferred)   | 11 / 8           |
+| **15** GO                       | `Ctrl+G` → Commit                                                     | 12 / 9           |
+| **16** Color legend             | Toolbar toggle + side panel (MFR7); needs **14d** blue + GO plum      | 10 / 7c (legend) |
 
 ______________________________________________________________________
 
@@ -169,15 +169,15 @@ ______________________________________________________________________
 
 **Status (2026-09-04):** Phases **1–11**, **13**, and **14a** done. **Next: 12** → 14b–14f → 15 → 16.
 
-| Block                         | Shipped highlights                                                                                                                                                          |
-| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1–7**                       | Working list, Del/F4/hints, row menu, manual order + DnD, field shuttle, dynamic columns, session, extended original catalog, field-key Auto-Sort                           |
-| **8** Load errors             | Gray cells, Show Load Errors, TagLib flag, `ErrorsLast` — see [rename-list-phase6b-followups.md](../../docs/rename-list-phase6b-followups.md)                               |
-| **9** Original Refresh        | F5 `RefreshOriginals`, missing-on-disk gray, shuttle OrderedDraft + DnD                                                                                                     |
-| **10a–10d** Preview core      | `ToChain()` → `Preview()` always-on + Auto-Preview toggle; re-preview on membership / F5; status counts                                                                     |
-| **11** Preview highlighting   | Red changed cells, lavender preview-error rows, Show Preview Error                                                                                                          |
-| **13** Hygiene                | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                                           |
-| **14a** Remove Unchanged      | Preview-column header menu → `RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                                                 |
+| Block                       | Shipped highlights                                                                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1–7**                     | Working list, Del/F4/hints, row menu, manual order + DnD, field shuttle, dynamic columns, session, extended original catalog, field-key Auto-Sort |
+| **8** Load errors           | Gray cells, Show Load Errors, TagLib flag, `ErrorsLast` — see [rename-list-phase6b-followups.md](../../docs/rename-list-phase6b-followups.md)     |
+| **9** Original Refresh      | F5 `RefreshOriginals`, missing-on-disk gray, shuttle OrderedDraft + DnD                                                                           |
+| **10a–10d** Preview core    | `ToChain()` → `Preview()` always-on + Auto-Preview toggle; re-preview on membership / F5; status counts                                           |
+| **11** Preview highlighting | Red changed cells, lavender preview-error rows, Show Preview Error                                                                                |
+| **13** Hygiene              | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                 |
+| **14a** Remove Unchanged    | Preview-column header menu → `RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                       |
 
 ______________________________________________________________________
 

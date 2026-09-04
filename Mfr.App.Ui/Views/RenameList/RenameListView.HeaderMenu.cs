@@ -130,11 +130,7 @@ namespace Mfr.App.Ui.Views.RenameList
             menu.Items.Add(new MenuItem { Header = $"({field.DisplayName})", IsEnabled = false });
             menu.Items.Add(new Separator());
 
-            var hideField = new MenuItem
-            {
-                Header = "Hide Field",
-                IsEnabled = viewModel.VisibleColumns.Count > 1,
-            };
+            var hideField = new MenuItem { Header = "Hide Field", IsEnabled = viewModel.VisibleColumns.Count > 1 };
             hideField.Click += (_, _) => viewModel.HideColumn(fieldKey);
             menu.Items.Add(hideField);
 
@@ -181,11 +177,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <summary>
         /// Creates a menu item bound to a command with a tip.
         /// </summary>
-        private static MenuItem _CreateCommandMenuItem(
-            string header,
-            string tip,
-            ICommand command
-        )
+        private static MenuItem _CreateCommandMenuItem(string header, string tip, ICommand command)
         {
             var item = new MenuItem { Header = header, Command = command };
             ToolTip.SetTip(item, tip);
