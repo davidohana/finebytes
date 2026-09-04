@@ -14,11 +14,15 @@
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6">
-        <StackPanel Orientation="Horizontal" Spacing="4">
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          ToolTip.Tip="Target digit count. Shorter numbers are padded with leading zeros. Longer numbers stay unchanged unless the shrink option below is checked."
+        >
           <TextBlock
             Classes="filter-editor-label"
             VerticalAlignment="Center"
-            Text="Ensure that numbers have at least"
+            Text="Target width of"
           />
           <controls:CompactNumericUpDown
             x:Name="WidthSpinner"
@@ -29,19 +33,25 @@
             FormatString="0"
             Value="{Binding Width}"
           />
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="digits." />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="digits" />
         </StackPanel>
         <controls:CompactCheckBox
           x:Name="RemoveExtraZerosCheckBox"
-          Content="Remove extra leading zeros"
+          Content="Also shrink longer numbers to this width"
+          ToolTip.Tip="When unchecked, only pad shorter numbers (e.g. 7 → 007). When checked, strip surplus leading zeros first so over-padded numbers shrink to the target width (e.g. width 3: 0007 → 007)."
           IsChecked="{Binding RemoveExtraZeros}"
         />
         <controls:CompactCheckBox
           x:Name="WholeWordOnlyCheckBox"
           Content="Whole word only"
+          ToolTip.Tip="Skip digit groups that have a letter immediately before or after (e.g. leave the 1 in doc1 alone)."
           IsChecked="{Binding WholeWordOnly}"
         />
-        <StackPanel Orientation="Horizontal" Spacing="4">
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          ToolTip.Tip="Limit how many digit groups are changed, left to right. 0 means fix every match."
+        >
           <TextBlock
             Classes="filter-editor-label"
             VerticalAlignment="Center"

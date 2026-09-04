@@ -13,7 +13,10 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Define">
-      <StackPanel Spacing="6">
+      <StackPanel
+        Spacing="6"
+        ToolTip.Tip="Sets the word separator for later filters (e.g. Capitalize). Replacements below convert other separators into this character."
+      >
         <TextBlock
           Classes="filter-editor-label"
           Text="Use the following character to separate between words:"
@@ -44,6 +47,7 @@
               Classes="filter-editor-field"
               Width="28"
               MaxLength="1"
+              ToolTip.Tip="Any single character to use as the word separator (e.g. - or .)."
               Text="{Binding OtherCharacter}"
             />
           </StackPanel>
@@ -56,6 +60,7 @@
           Classes="filter-editor-label"
           Text="Replace the following with the defined space character:"
           TextWrapping="Wrap"
+          ToolTip.Tip="Each checked form is rewritten to the defined separator. Unchecked forms are left unchanged."
         />
         <WrapPanel>
           <controls:CompactCheckBox
@@ -73,6 +78,7 @@
             x:Name="ReplacePercent20CheckBox"
             Margin="12,0,0,0"
             Content="%20's"
+            ToolTip.Tip="Replace the literal text %20 (common URL-encoded spaces)."
             IsChecked="{Binding ReplacePercent20}"
           />
         </WrapPanel>
@@ -80,9 +86,16 @@
           <controls:CompactCheckBox
             x:Name="ReplaceCustomCheckBox"
             Content="Custom text:"
+            ToolTip.Tip="Replace this exact substring with the defined separator (e.g. ++ → -)."
             IsChecked="{Binding ReplaceCustom}"
           />
-          <TextBox x:Name="CustomTextBox" Classes="filter-editor-field" MinWidth="120" Text="{Binding CustomText}" />
+          <TextBox
+            x:Name="CustomTextBox"
+            Classes="filter-editor-field"
+            MinWidth="120"
+            ToolTip.Tip="Exact substring to replace when Custom text is checked."
+            Text="{Binding CustomText}"
+          />
         </StackPanel>
       </StackPanel>
     </controls:FieldsetGroup>

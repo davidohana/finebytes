@@ -13,7 +13,10 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <StackPanel Spacing="6">
+      <StackPanel
+        Spacing="6"
+        ToolTip.Tip="Deletes an inclusive 1-based range. Left counts from the start; Right from the end. If start is after end, the positions are swapped first."
+      >
         <TextBlock Classes="filter-editor-label" Text="Remove characters:" />
         <Grid ColumnDefinitions="Auto,4,Auto,4,Auto,4,Auto,4,Auto" RowDefinitions="Auto,6,Auto">
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Between position" />
@@ -25,6 +28,7 @@
             Maximum="1000"
             Increment="1"
             FormatString="0"
+            ToolTip.Tip="1-based start index from the chosen side (included in the removal)."
             Value="{Binding StartValue}"
           />
           <TextBlock Grid.Column="4" Classes="filter-editor-label" VerticalAlignment="Center" Text="from the" />
@@ -35,6 +39,7 @@
             Width="72"
             ItemsSource="{Binding AnchorSides}"
             SelectedItem="{Binding StartAnchor}"
+            ToolTip.Tip="Left: position 1 is the first character. Right: position 1 is the last character."
           />
           <TextBlock Grid.Column="8" Classes="filter-editor-label" VerticalAlignment="Center" Text="side (incl.)" />
 
@@ -48,6 +53,7 @@
             Maximum="1000"
             Increment="1"
             FormatString="0"
+            ToolTip.Tip="1-based end index from the chosen side (included in the removal)."
             Value="{Binding EndValue}"
           />
           <TextBlock
@@ -65,6 +71,7 @@
             Width="72"
             ItemsSource="{Binding AnchorSides}"
             SelectedItem="{Binding EndAnchor}"
+            ToolTip.Tip="Left: position 1 is the first character. Right: position 1 is the last character."
           />
           <TextBlock
             Grid.Row="2"

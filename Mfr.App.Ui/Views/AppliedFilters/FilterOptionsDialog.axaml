@@ -126,13 +126,18 @@
             <ColumnDefinition Width="6" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-options-label" Text="Apply to:" />
+          <TextBlock
+            Classes="filter-options-label"
+            Text="Apply to:"
+            ToolTip.Tip="Which part of the path or metadata this filter transforms (name, extension, folder, tags, …)."
+          />
           <ComboBox
             Grid.Column="1"
             Classes="filter-options-field"
             HorizontalAlignment="Stretch"
             ItemsSource="{Binding TargetGroups}"
             SelectedItem="{Binding SelectedTargetGroup}"
+            ToolTip.Tip="Target category (file name parts, folders, audio fields, …)."
           >
             <ComboBox.ItemTemplate>
               <DataTemplate x:DataType="vm:FilterTargetGroupOption">
@@ -146,6 +151,7 @@
             HorizontalAlignment="Stretch"
             ItemsSource="{Binding TargetOptions}"
             SelectedItem="{Binding SelectedTargetOption}"
+            ToolTip.Tip="Specific field within the selected category."
           >
             <ComboBox.ItemTemplate>
               <DataTemplate x:DataType="vm:FilterTargetOption">
@@ -165,9 +171,18 @@
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
-          <TextBlock Classes="filter-options-label" Text="Language:" />
+          <TextBlock
+            Classes="filter-options-label"
+            Text="Language:"
+            ToolTip.Tip="Optional ID3v2 language code used to pick among multiple frames with the same frame ID."
+          />
           <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Language}" />
-          <TextBlock Grid.Row="2" Classes="filter-options-label" Text="Description:" />
+          <TextBlock
+            Grid.Row="2"
+            Classes="filter-options-label"
+            Text="Description:"
+            ToolTip.Tip="Optional ID3v2 description used to pick among multiple frames with the same frame ID."
+          />
           <TextBox Grid.Row="2" Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Description}" />
         </Grid>
 
@@ -176,7 +191,11 @@
             <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
             <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-options-label" Text="Level:" />
+          <TextBlock
+            Classes="filter-options-label"
+            Text="Level:"
+            ToolTip.Tip="1 is the immediate parent folder name; higher values walk toward the drive root."
+          />
           <controls:CompactNumericUpDown
             x:Name="AncestorFolderLevelSpinner"
             Grid.Column="1"
@@ -184,6 +203,7 @@
             Maximum="99"
             FormatString="0"
             Value="{Binding AncestorFolderLevel}"
+            ToolTip.Tip="1 is the immediate parent folder name; higher values walk toward the drive root."
           />
         </Grid>
 
@@ -192,31 +212,40 @@
             <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-options-label" Text="Apply on:" />
+          <TextBlock
+            Classes="filter-options-label"
+            Text="Apply on:"
+            ToolTip.Tip="Limit the filter to the whole value, a character range, or one token after splitting."
+          />
           <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
             <controls:CompactRadioButton
               Classes="filter-options-radio"
               GroupName="ApplyScope"
               Content="Whole"
+              ToolTip.Tip="Apply the filter to the entire Apply-to value."
               IsChecked="{Binding IsWholeScope, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               Classes="filter-options-radio"
               GroupName="ApplyScope"
               Content="Substring"
+              ToolTip.Tip="Apply only to an inclusive character range within the value."
               IsChecked="{Binding IsSubstringScopeMode, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               Classes="filter-options-radio"
               GroupName="ApplyScope"
               Content="Token"
+              ToolTip.Tip="Split the value by a separator and apply only to one numbered piece."
               IsChecked="{Binding IsTokenScopeMode, Mode=TwoWay}"
             />
           </StackPanel>
         </Grid>
 
         <controls:FieldsetGroup Header="Substring" IsVisible="{Binding ShowSubstringOptions}">
-          <Grid>
+          <Grid
+            ToolTip.Tip="Inclusive 1-based range. Left counts from the start; Right from the end."
+          >
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
               <ColumnDefinition Width="Auto" />
@@ -244,6 +273,7 @@
               Classes="filter-options-field filter-options-anchor"
               ItemsSource="{Binding ScopeAnchorOptions}"
               SelectedItem="{Binding SubstringStartAnchorOption}"
+              ToolTip.Tip="Left: position 1 is the first character. Right: position 1 is the last character."
             >
               <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:StringScopeAnchorOption">
@@ -270,6 +300,7 @@
               Classes="filter-options-field filter-options-anchor"
               ItemsSource="{Binding ScopeAnchorOptions}"
               SelectedItem="{Binding SubstringEndAnchorOption}"
+              ToolTip.Tip="Left: position 1 is the first character. Right: position 1 is the last character."
             >
               <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:StringScopeAnchorOption">
@@ -288,12 +319,17 @@
                 <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
                 <ColumnDefinition Width="*" />
               </Grid.ColumnDefinitions>
-              <TextBlock Classes="filter-options-label" Text="Separator:" />
+              <TextBlock
+                Classes="filter-options-label"
+                Text="Separator:"
+                ToolTip.Tip="Characters that split the value into tokens (e.g. - or space)."
+              />
               <TextBox
                 x:Name="TokenSeparatorBox"
                 Grid.Column="1"
                 Classes="filter-options-field"
                 Text="{Binding TokenSeparator}"
+                ToolTip.Tip="Characters that split the value into tokens (e.g. - or space)."
               />
             </Grid>
             <Grid>
@@ -301,7 +337,11 @@
                 <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
-              <TextBlock Classes="filter-options-label" Text="Token number:" />
+              <TextBlock
+                Classes="filter-options-label"
+                Text="Token number:"
+                ToolTip.Tip="1-based index of the token to transform (1 = first piece)."
+              />
               <controls:CompactNumericUpDown
                 x:Name="TokenNumberSpinner"
                 Grid.Column="1"
@@ -309,6 +349,7 @@
                 Maximum="9999"
                 FormatString="0"
                 Value="{Binding TokenNumber}"
+                ToolTip.Tip="1-based index of the token to transform (1 = first piece)."
               />
             </Grid>
           </StackPanel>

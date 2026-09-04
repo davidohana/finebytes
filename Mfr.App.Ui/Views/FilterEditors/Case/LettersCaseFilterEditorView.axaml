@@ -73,7 +73,10 @@
       </WrapPanel>
     </controls:FieldsetGroup>
     <controls:FieldsetGroup x:Name="SkipWordsGroup" Header="Skip Words" IsVisible="{Binding HasCapitalizeSkipWords}">
-      <StackPanel Spacing="4">
+      <StackPanel
+        Spacing="4"
+        ToolTip.Tip="In Capitalize mode, these words stay lowercase (matched case-insensitively). Example: a, an, the."
+      >
         <TextBlock Classes="filter-editor-label" Text="Leave lowercase (comma-separated):" TextWrapping="Wrap" />
         <TextBox
           x:Name="CapitalizeSkipWordsBox"
@@ -88,7 +91,11 @@
       IsVisible="{Binding HasWeirdCaseOptions}"
     >
       <StackPanel Orientation="Horizontal" Spacing="12">
-        <StackPanel Orientation="Horizontal" Spacing="4">
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          ToolTip.Tip="Chance each letter is uppercased (0 = all lower, 100 = all upper). Other values mix case."
+        >
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Percent of capital letters:" />
           <controls:CompactNumericUpDown
             x:Name="WeirdUppercaseChanceSpinner"
@@ -104,6 +111,7 @@
         <controls:CompactCheckBox
           x:Name="WeirdFixedPlacesCheckBox"
           Content="Fixed Places"
+          ToolTip.Tip="When checked, the same character positions get the same case across files. When unchecked, each file’s list index changes the pattern."
           IsChecked="{Binding WeirdFixedPlaces}"
         />
       </StackPanel>

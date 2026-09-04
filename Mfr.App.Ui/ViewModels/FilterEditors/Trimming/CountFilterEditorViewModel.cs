@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters;
+using Mfr.Filters.Trimming;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
 {
@@ -20,6 +21,19 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         {
             _SyncFromFilter();
         }
+
+        /// <summary>
+        /// Gets a tooltip describing what the count means for the selected filter.
+        /// </summary>
+        public string CountToolTip =>
+            Step.Filter switch
+            {
+                TrimLeftFilter => "Removes this many characters from the start of the target.",
+                TrimRightFilter => "Removes this many characters from the end of the target.",
+                ExtractLeftFilter => "Keeps this many characters from the start; drops the rest.",
+                ExtractRightFilter => "Keeps this many characters from the end; drops the rest.",
+                _ => "How many characters this filter uses.",
+            };
 
         /// <summary>
         /// Gets or sets the number of characters.
