@@ -15,10 +15,15 @@
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6">
         <TextBlock Classes="filter-editor-label" Text="Remove characters:" />
-        <StackPanel Orientation="Horizontal" Spacing="4">
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Between position" />
+        <Grid ColumnDefinitions="Auto,4,Auto,4,Auto,4,Auto,4,Auto" RowDefinitions="Auto,6,Auto">
+          <TextBlock
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="Between position"
+          />
           <controls:CompactNumericUpDown
             x:Name="StartValueSpinner"
+            Grid.Column="2"
             Width="64"
             Minimum="1"
             Maximum="1000"
@@ -26,20 +31,37 @@
             FormatString="0"
             Value="{Binding StartValue}"
           />
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="from the" />
+          <TextBlock
+            Grid.Column="4"
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="from the"
+          />
           <ComboBox
             x:Name="StartAnchorCombo"
+            Grid.Column="6"
             Classes="filter-editor-field"
             Width="72"
             ItemsSource="{Binding AnchorSides}"
             SelectedItem="{Binding StartAnchor}"
           />
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="side (incl.)" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Spacing="4">
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="and position" />
+          <TextBlock
+            Grid.Column="8"
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="side (incl.)"
+          />
+
+          <TextBlock
+            Grid.Row="2"
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="and position"
+          />
           <controls:CompactNumericUpDown
             x:Name="EndValueSpinner"
+            Grid.Row="2"
+            Grid.Column="2"
             Width="64"
             Minimum="1"
             Maximum="1000"
@@ -47,16 +69,30 @@
             FormatString="0"
             Value="{Binding EndValue}"
           />
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="from the" />
+          <TextBlock
+            Grid.Row="2"
+            Grid.Column="4"
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="from the"
+          />
           <ComboBox
             x:Name="EndAnchorCombo"
+            Grid.Row="2"
+            Grid.Column="6"
             Classes="filter-editor-field"
             Width="72"
             ItemsSource="{Binding AnchorSides}"
             SelectedItem="{Binding EndAnchor}"
           />
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="side (incl.)" />
-        </StackPanel>
+          <TextBlock
+            Grid.Row="2"
+            Grid.Column="8"
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="side (incl.)"
+          />
+        </Grid>
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>
