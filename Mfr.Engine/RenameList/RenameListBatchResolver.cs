@@ -10,6 +10,7 @@ namespace Mfr.Engine.RenameList
         bool IncludeFiles,
         bool IncludeFolders,
         bool IncludeSubdirs,
+        bool IncludeHidden,
         IReadOnlyList<string>? ExcludeMasks
     );
 
@@ -26,15 +27,13 @@ namespace Mfr.Engine.RenameList
         /// <param name="tracker">The tracker for progress and cancellation.</param>
         /// <param name="batch">The target list to fill with resolved items.</param>
         /// <param name="includedResolvedPaths">The set of existing normalized paths to avoid duplicates.</param>
-        /// <param name="includeHidden">Whether hidden and system items are allowed.</param>
         /// <returns>The number of sources that were skipped due to errors.</returns>
         public static int FillBatch(
             List<string> sourceList,
             SourceResolveOptions resolveOptions,
             RenameListProgressTracker tracker,
             List<RenameItem> batch,
-            HashSet<string> includedResolvedPaths,
-            bool includeHidden
+            HashSet<string> includedResolvedPaths
         )
         {
             var skippedSourceCount = 0;
@@ -45,7 +44,7 @@ namespace Mfr.Engine.RenameList
                     break;
                 }
 
-                if (!_TryAddSource(source, resolveOptions, tracker, batch, includedResolvedPaths, includeHidden))
+                if (!_TryAddSource(source, resolveOptions, tracker, batch, includedResolvedPaths))
                 {
                     skippedSourceCount++;
                 }
@@ -59,13 +58,12 @@ namespace Mfr.Engine.RenameList
             SourceResolveOptions resolveOptions,
             RenameListProgressTracker tracker,
             List<RenameItem> batch,
-            HashSet<string> includedResolvedPaths,
-            bool includeHidden
+            HashSet<string> includedResolvedPaths
         )
         {
             try
             {
-                _AddSource(source, resolveOptions, tracker, batch, includedResolvedPaths, includeHidden);
+                _AddSource(source, resolveOptions, tracker, batch, includedResolvedPaths);
                 return true;
             }
             catch (Exception ex)
@@ -81,8 +79,7 @@ namespace Mfr.Engine.RenameList
             SourceResolveOptions resolveOptions,
             RenameListProgressTracker tracker,
             List<RenameItem> batch,
-            HashSet<string> includedResolvedPaths,
-            bool includeHidden
+            HashSet<string> includedResolvedPaths
         )
         {
             if (string.IsNullOrWhiteSpace(source))
@@ -108,12 +105,10 @@ namespace Mfr.Engine.RenameList
             );
             var addedCount = _CollectResolvedItems(
                 resolvedPaths: resolvedPaths,
-                includeFiles: resolveOptions.IncludeFiles,
-                includeFolders: resolveOptions.IncludeFolders,
+                resolveOptions: resolveOptions,
                 tracker: tracker,
                 batch: batch,
-                includedResolvedPaths: includedResolvedPaths,
-                includeHidden: includeHidden
+                includedResolvedPaths: includedResolvedPaths
             );
             Log.Information(
                 "Resolved source '{Source}', added {AddedCount} new item(s) (scanned {ScannedCount}).",
@@ -125,12 +120,10 @@ namespace Mfr.Engine.RenameList
 
         private static int _CollectResolvedItems(
             IEnumerable<string> resolvedPaths,
-            bool includeFiles,
-            bool includeFolders,
+            SourceResolveOptions resolveOptions,
             RenameListProgressTracker tracker,
             List<RenameItem> batch,
-            HashSet<string> includedResolvedPaths,
-            bool includeHidden
+            HashSet<string> includedResolvedPaths
         )
         {
             var addedCount = 0;
@@ -145,10 +138,8 @@ namespace Mfr.Engine.RenameList
 
                 var renameItem = _TryCreateResolvedItem(
                     fullPath: fullPath,
-                    includeFiles: includeFiles,
-                    includeFolders: includeFolders,
-                    includedResolvedPaths: includedResolvedPaths,
-                    includeHidden: includeHidden
+                    resolveOptions: resolveOptions,
+                    includedResolvedPaths: includedResolvedPaths
                 );
                 if (renameItem is null)
                 {
@@ -165,10 +156,8 @@ namespace Mfr.Engine.RenameList
 
         private static RenameItem? _TryCreateResolvedItem(
             string fullPath,
-            bool includeFiles,
-            bool includeFolders,
-            HashSet<string> includedResolvedPaths,
-            bool includeHidden
+            SourceResolveOptions resolveOptions,
+            HashSet<string> includedResolvedPaths
         )
         {
             var normalizedResolvedPath = RenameList.NormalizePathKey(fullPath);
@@ -183,9 +172,7 @@ namespace Mfr.Engine.RenameList
                     fullPath: fullPath,
                     normalizedResolvedPath: normalizedResolvedPath,
                     attrs: attrs,
-                    includeFiles: includeFiles,
-                    includeFolders: includeFolders,
-                    includeHidden: includeHidden
+                    resolveOptions: resolveOptions
                 )
             )
             {
@@ -200,24 +187,22 @@ namespace Mfr.Engine.RenameList
             string fullPath,
             string normalizedResolvedPath,
             FileAttributes attrs,
-            bool includeFiles,
-            bool includeFolders,
-            bool includeHidden
+            SourceResolveOptions resolveOptions
         )
         {
             var isHiddenOrSystem = attrs.HasFlag(FileAttributes.Hidden) || attrs.HasFlag(FileAttributes.System);
-            if (!includeHidden && isHiddenOrSystem)
+            if (!resolveOptions.IncludeHidden && isHiddenOrSystem)
             {
                 return false;
             }
 
             var isDirectory = attrs.IsDirectory();
-            if (isDirectory && !includeFolders)
+            if (isDirectory && !resolveOptions.IncludeFolders)
             {
                 return false;
             }
 
-            if (!isDirectory && !includeFiles)
+            if (!isDirectory && !resolveOptions.IncludeFiles)
             {
                 return false;
             }

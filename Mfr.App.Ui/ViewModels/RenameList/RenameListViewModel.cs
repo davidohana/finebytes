@@ -15,7 +15,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel : ViewModelBase
     {
         private readonly FileListViewModel _fileListViewModel;
-        private readonly EngineRenameList _renameList = new(includeHidden: false);
+        private readonly EngineRenameList _renameList = new();
         private readonly List<RenameListEntry> _selectedEntries = [];
         private List<RenameListSortKey> _sortKeys = [];
 

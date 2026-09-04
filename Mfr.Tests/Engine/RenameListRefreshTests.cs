@@ -34,7 +34,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, "refresh.txt");
             File.WriteAllText(path, "old");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
             var beforeWrite = item.Original.LastWriteTime;
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "Before", album: null);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
             renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.TagLib);
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, "missing.wav");
             File.WriteAllText(path, "not audio");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
             renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.TagLib);
@@ -109,7 +109,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, "gone.txt");
             File.WriteAllText(path, "old");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
             var storedPath = item.Original.FullPath;
@@ -134,7 +134,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, "back.txt");
             File.WriteAllText(path, "old");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
             File.Delete(path);
@@ -172,7 +172,7 @@ namespace Mfr.Tests.Engine
             File.WriteAllText(aLower, "a");
             File.WriteAllText(bLower, "b");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([aLower, bLower]);
             Assert.Equal(2, renameList.RenameItems.Count);
 

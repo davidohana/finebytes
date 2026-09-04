@@ -8,8 +8,7 @@ namespace Mfr.Engine.RenameList
     /// <summary>
     /// Maintains ordered rename sources and resolves them into file entries.
     /// </summary>
-    /// <param name="includeHidden">If <c>true</c>, includes hidden/system files while resolving.</param>
-    public sealed class RenameList(bool includeHidden)
+    public sealed class RenameList
     {
         /// <summary>
         /// Normalized full paths already present in <see cref="RenameItems"/>; used to dedupe adds.
@@ -34,7 +33,6 @@ namespace Mfr.Engine.RenameList
         /// </para>
         /// </remarks>
         private readonly Dictionary<string, int> _folderPathToCount = new(PathComparers.Os);
-        private readonly bool _includeHidden = includeHidden;
 
         /// <summary>
         /// Gets the resolved file items in current list order.
@@ -54,6 +52,7 @@ namespace Mfr.Engine.RenameList
         /// <param name="includeFiles">Whether file entries should be included from resolved paths.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <param name="includeSubdirs">Whether directory expansion should recurse into subdirectories.</param>
+        /// <param name="includeHidden">Whether hidden and system items are included while resolving.</param>
         /// <param name="excludeMasks">Exclusive file-name masks for discovered directory entries.</param>
         /// <param name="cancellationToken">When canceled, stops resolution and returns without throwing.</param>
         /// <param name="progress">Optional progress sink (resolve counts, metadata counts, last path).</param>
@@ -78,6 +77,7 @@ namespace Mfr.Engine.RenameList
             bool includeFiles = true,
             bool includeFolders = true,
             bool includeSubdirs = false,
+            bool includeHidden = false,
             IReadOnlyList<string>? excludeMasks = null,
             CancellationToken cancellationToken = default,
             IProgress<RenameListProgress>? progress = null,
@@ -92,7 +92,7 @@ namespace Mfr.Engine.RenameList
                 includeFiles,
                 includeFolders,
                 includeSubdirs,
-                _includeHidden,
+                includeHidden,
                 insertAtIndex
             );
 
@@ -101,6 +101,7 @@ namespace Mfr.Engine.RenameList
                 IncludeFiles: includeFiles,
                 IncludeFolders: includeFolders,
                 IncludeSubdirs: includeSubdirs,
+                IncludeHidden: includeHidden,
                 ExcludeMasks: excludeMasks
             );
             var batch = new List<RenameItem>();
@@ -113,8 +114,7 @@ namespace Mfr.Engine.RenameList
                     resolveOptions,
                     tracker,
                     batch,
-                    _includedResolvedPaths,
-                    _includeHidden
+                    _includedResolvedPaths
                 );
                 if (!tracker.IsCanceled)
                 {

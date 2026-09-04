@@ -70,7 +70,7 @@ namespace Mfr.Tests.Engine
 
             var sources = new[] { betaPath, _tempRoot.CombinePath("*.txt") };
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(sources: sources, includeFiles: true, includeFolders: false);
             var entries = renameList.RenameItems;
 
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Engine
         {
             var source = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources([source]);
             Assert.Equal(1, renameList.RenameItems.Count - beforeCount);
@@ -116,7 +116,7 @@ namespace Mfr.Tests.Engine
                 "gamma.txt"
             );
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath, gammaPath]);
             var betaItem = renameList.RenameItems[1];
             Assert.Equal(1, renameList.Remove(betaItem));
@@ -142,7 +142,7 @@ namespace Mfr.Tests.Engine
             );
             var deltaPath = TestHelpers.CreateFile(_tempRoot, "delta.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath, gammaPath]);
             renameList.AddSources([deltaPath], insertAtIndex: 1);
 
@@ -160,7 +160,7 @@ namespace Mfr.Tests.Engine
         {
             var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "alpha.txt", "beta.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath]);
             renameList.AddSources([betaPath], insertAtIndex: 0);
 
@@ -181,7 +181,7 @@ namespace Mfr.Tests.Engine
                 "gamma.txt"
             );
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath, gammaPath]);
             var items = renameList.RenameItems;
 
@@ -199,7 +199,7 @@ namespace Mfr.Tests.Engine
         {
             var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "alpha.txt", "beta.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath]);
             var items = renameList.RenameItems;
 
@@ -220,7 +220,7 @@ namespace Mfr.Tests.Engine
                 "gamma.txt"
             );
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath, gammaPath]);
             var items = renameList.RenameItems;
 
@@ -243,7 +243,7 @@ namespace Mfr.Tests.Engine
                 "gamma.txt"
             );
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath, gammaPath]);
             var items = renameList.RenameItems;
 
@@ -266,7 +266,7 @@ namespace Mfr.Tests.Engine
             );
             var deltaPath = TestHelpers.CreateFile(_tempRoot, "delta.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath, gammaPath, deltaPath]);
             var items = renameList.RenameItems;
 
@@ -289,7 +289,7 @@ namespace Mfr.Tests.Engine
                 "gamma.txt"
             );
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath, gammaPath]);
             var items = renameList.RenameItems;
 
@@ -311,7 +311,7 @@ namespace Mfr.Tests.Engine
                 "gamma.txt"
             );
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath, gammaPath]);
             var items = renameList.RenameItems;
 
@@ -336,7 +336,7 @@ namespace Mfr.Tests.Engine
             var folderPath = Path.Combine(_tempRoot, "folder-item");
             Directory.CreateDirectory(folderPath);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([rootFile, subFile, alphaFile, folderPath], includeFolders: true, includeFiles: true);
 
             Assert.True(renameList.Sort(RenameListSortKey.DefaultKeys));
@@ -358,7 +358,7 @@ namespace Mfr.Tests.Engine
             Directory.CreateDirectory(folderPath);
             var earlyFile = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([filePath, folderPath, earlyFile], includeFolders: true, includeFiles: true);
 
             Assert.True(
@@ -387,7 +387,7 @@ namespace Mfr.Tests.Engine
                 "gamma.txt"
             );
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath, gammaPath]);
 
             Assert.True(
@@ -413,7 +413,7 @@ namespace Mfr.Tests.Engine
                 "gamma.txt"
             );
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([gammaPath, betaPath, alphaPath]);
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -436,7 +436,7 @@ namespace Mfr.Tests.Engine
             File.SetCreationTime(earlyPath, new DateTime(2020, 1, 1, 12, 0, 0));
             File.SetCreationTime(latePath, new DateTime(2024, 6, 1, 12, 0, 0));
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([latePath, earlyPath]);
 
             var creationDateKey = RenameListFieldKey.Original(
@@ -455,14 +455,14 @@ namespace Mfr.Tests.Engine
         public void Sort_Empty_Keys_Or_Single_Item_Is_NoOp()
         {
             var path = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
 
             Assert.False(renameList.Sort([]));
             Assert.False(renameList.Sort(RenameListSortKey.DefaultKeys));
 
             var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "z.txt", "a.txt");
-            renameList = new RenameList(includeHidden: true);
+            renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath]);
             Assert.False(renameList.Sort([]));
             Assert.Equal([alphaPath, betaPath], renameList.RenameItems.Select(item => item.Original.FullPath));
@@ -476,7 +476,7 @@ namespace Mfr.Tests.Engine
         {
             var tenPath = TestHelpers.CreateFile(_tempRoot, "file10.txt");
             var twoPath = TestHelpers.CreateFile(_tempRoot, "file2.txt");
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([tenPath, twoPath]);
 
             var numericKey = RenameListFieldKey.Original(
@@ -498,7 +498,7 @@ namespace Mfr.Tests.Engine
             File.WriteAllText(largePath, new string('x', 50));
             File.WriteAllText(smallPath, "x");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([largePath, smallPath]);
 
             var sizeKey = RenameListFieldKey.Original(ExtendedRenameListFields.Group, ExtendedSizeField.SizeKey);
@@ -514,7 +514,7 @@ namespace Mfr.Tests.Engine
         {
             var betaPath = TestHelpers.CreateFile(_tempRoot, "beta.txt");
             var alphaPath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([betaPath, alphaPath]);
 
             var extensionKey = RenameListFieldKey.Original(
@@ -535,7 +535,7 @@ namespace Mfr.Tests.Engine
         public void Sort_Preview_Key_Does_Not_Throw_And_Keeps_Order()
         {
             var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "alpha.txt", "beta.txt");
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([betaPath, alphaPath]);
 
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
@@ -551,7 +551,7 @@ namespace Mfr.Tests.Engine
         {
             var path = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = renameList.RenameItems[0];
 
@@ -571,7 +571,7 @@ namespace Mfr.Tests.Engine
             var aSecondPath = TestHelpers.CreateFile(folderAPath, "a2.txt");
             var bFirstPath = TestHelpers.CreateFile(folderBPath, "b1.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([aFirstPath, aSecondPath, bFirstPath]);
             var items = renameList.RenameItems;
 
@@ -591,7 +591,7 @@ namespace Mfr.Tests.Engine
         {
             var path = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = renameList.RenameItems[0];
             renameList.Clear();
@@ -607,7 +607,7 @@ namespace Mfr.Tests.Engine
         {
             var (alphaPath, betaPath) = TestHelpers.CreateFiles(_tempRoot, "alpha.txt", "beta.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath]);
             renameList.AddSources([betaPath]);
             renameList.Clear();
@@ -632,7 +632,7 @@ namespace Mfr.Tests.Engine
         {
             var path = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources([path]);
             Assert.Equal(1, renameList.RenameItems.Count - beforeCount);
@@ -656,7 +656,7 @@ namespace Mfr.Tests.Engine
         public void AddSources_SingleRootPath_IsSkipped()
         {
             var rootPath = Path.GetPathRoot(Directory.GetCurrentDirectory())!;
-            var renameList = new RenameList(includeHidden: false);
+            var renameList = new RenameList();
 
             var summary = renameList.AddSources([rootPath]);
 
@@ -672,7 +672,7 @@ namespace Mfr.Tests.Engine
         {
             var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
             var rootPath = Path.GetPathRoot(Directory.GetCurrentDirectory())!;
-            var renameList = new RenameList(includeHidden: false);
+            var renameList = new RenameList();
 
             var summary = renameList.AddSources([filePath, rootPath]);
 
@@ -695,14 +695,14 @@ namespace Mfr.Tests.Engine
                 File.SetAttributes(hiddenPath, hiddenAttrs | FileAttributes.Hidden);
             }
 
-            var excludeHiddenList = new RenameList(includeHidden: false);
+            var excludeHiddenList = new RenameList();
             excludeHiddenList.AddSources([hiddenPath]);
             excludeHiddenList.AddSources([visiblePath]);
             var excludedHidden = excludeHiddenList.RenameItems.ToList();
 
-            var includeHiddenList = new RenameList(includeHidden: true);
-            includeHiddenList.AddSources([hiddenPath]);
-            includeHiddenList.AddSources([visiblePath]);
+            var includeHiddenList = new RenameList();
+            includeHiddenList.AddSources([hiddenPath], includeHidden: true);
+            includeHiddenList.AddSources([visiblePath], includeHidden: true);
             var includedHidden = includeHiddenList.RenameItems.ToList();
 
             Assert.Single(excludedHidden);
@@ -725,7 +725,7 @@ namespace Mfr.Tests.Engine
             var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(sources: [filePath, folderPath], includeFiles: false, includeFolders: true);
 
             var entry = Assert.Single(renameList.RenameItems);
@@ -740,7 +740,7 @@ namespace Mfr.Tests.Engine
         {
             var filePath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(sources: [filePath], includeFiles: false, includeFolders: true);
             Assert.Empty(renameList.RenameItems);
 
@@ -756,7 +756,7 @@ namespace Mfr.Tests.Engine
         {
             var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("release.v2")).FullName;
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([folderPath], includeFiles: false, includeFolders: true);
 
             var entry = Assert.Single(renameList.RenameItems);
@@ -777,7 +777,7 @@ namespace Mfr.Tests.Engine
             var folderFilePath = TestHelpers.CreateFile(folderPath, "inside.txt");
             TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(sources: [filePath, folderPath], includeFiles: true, includeFolders: false);
 
             Assert.Equal([filePath, folderFilePath], renameList.RenameItems.Select(entry => entry.Original.FullPath));
@@ -794,7 +794,7 @@ namespace Mfr.Tests.Engine
             var topLevelSecondPath = TestHelpers.CreateFile(folderPath, "second.log");
             var nestedFilePath = TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources(sources: [folderPath], includeFiles: true, includeFolders: false);
             var addedCount = renameList.RenameItems.Count - beforeCount;
@@ -818,7 +818,7 @@ namespace Mfr.Tests.Engine
             var nestedPath = TestHelpers.CreateFile(folderPath.CombinePath("Sub"), "nested.txt");
             var deeperPath = TestHelpers.CreateFile(folderPath.CombinePath("Sub", "Deep"), "deep.log");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources(
                 sources: [folderPath],
@@ -847,7 +847,7 @@ namespace Mfr.Tests.Engine
             var childFolder = Directory.CreateDirectory(folderPath.CombinePath("Disc1")).FullName;
             TestHelpers.CreateFile(childFolder, "nested.mp3");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources(
                 sources: [folderPath.CombinePath("*.mp3")],
@@ -873,7 +873,7 @@ namespace Mfr.Tests.Engine
             var childFolder = Directory.CreateDirectory(folderPath.CombinePath("Disc1")).FullName;
             var nestedFile = TestHelpers.CreateFile(childFolder, "track.mp3");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources(
                 sources: [folderPath],
@@ -904,7 +904,7 @@ namespace Mfr.Tests.Engine
         {
             var (topLevelMatch, _) = TestHelpers.CreateFiles(_tempRoot, "top.txt", "nested/nested.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources(sources: [_tempRoot.CombinePath("*.txt")], includeFiles: true, includeFolders: false);
             var addedCount = renameList.RenameItems.Count - beforeCount;
@@ -922,7 +922,7 @@ namespace Mfr.Tests.Engine
         {
             var alphaPath = TestHelpers.CreateFile(_tempRoot, "alpha.txt");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources(sources: [_tempRoot.CombinePath("*.txt")], includeFiles: true, includeFolders: false);
             Assert.Equal(1, renameList.RenameItems.Count - beforeCount);
@@ -947,7 +947,7 @@ namespace Mfr.Tests.Engine
                 "nested/deeper/deeper.txt"
             );
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources(
                 sources: [_tempRoot.CombinePath("*.txt")],
@@ -973,7 +973,7 @@ namespace Mfr.Tests.Engine
             TestHelpers.CreateFiles(_tempRoot, "a.txt", "b.txt", "nested/c.txt");
 
             var reports = new List<RenameListProgress>();
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(
                 sources: [_tempRoot.CombinePath("*.txt")],
                 includeFiles: true,
@@ -1002,7 +1002,7 @@ namespace Mfr.Tests.Engine
 
             using var cts = new CancellationTokenSource();
             cts.Cancel();
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(
                 sources: [_tempRoot.CombinePath("*.txt")],
                 includeFiles: true,
@@ -1028,7 +1028,7 @@ namespace Mfr.Tests.Engine
             }
 
             using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(5));
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([keepPath]);
 
             renameList.AddSources(
@@ -1052,7 +1052,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "ListIngestTitle", album: "ListIngestAlbum");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources([path]);
             Assert.Equal(1, renameList.RenameItems.Count - beforeCount);
@@ -1070,7 +1070,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "ListIngestTitle", album: "ListIngestAlbum");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -1090,7 +1090,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "RoundOneTitle", album: null);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -1116,7 +1116,7 @@ namespace Mfr.Tests.Engine
             var folder = Path.Combine(_tempRoot, "folder");
             Directory.CreateDirectory(folder);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources([folder], includeFiles: false, includeFolders: true);
             Assert.Equal(1, renameList.RenameItems.Count - beforeCount);
@@ -1134,7 +1134,7 @@ namespace Mfr.Tests.Engine
             var folder = Path.Combine(_tempRoot, "folder");
             Directory.CreateDirectory(folder);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources([folder], includeFiles: false, includeFolders: true);
             Assert.Equal(1, renameList.RenameItems.Count - beforeCount);
@@ -1157,7 +1157,7 @@ namespace Mfr.Tests.Engine
             var folder = Path.Combine(_tempRoot, "folder");
             Directory.CreateDirectory(folder);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             var beforeCount = renameList.RenameItems.Count;
             renameList.AddSources([folder], includeFiles: false, includeFolders: true);
             Assert.Equal(1, renameList.RenameItems.Count - beforeCount);
@@ -1191,7 +1191,7 @@ namespace Mfr.Tests.Engine
             var path = TestHelpers.CreateFile(_tempRoot, "note.txt");
             File.WriteAllText(path, "plain text payload");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -1212,7 +1212,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, "track.wav");
             MinimalWavFixture.CopyScratchTo(path);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
 
@@ -1251,7 +1251,7 @@ namespace Mfr.Tests.Engine
 
             try
             {
-                var renameList = new RenameList(includeHidden: false);
+                var renameList = new RenameList();
                 var summary = renameList.AddSources([deniedFolder.CombinePath("*")]);
 
                 Assert.Equal(1, summary.SkippedSourceCount);
@@ -1280,7 +1280,7 @@ namespace Mfr.Tests.Engine
 
             try
             {
-                var renameList = new RenameList(includeHidden: false);
+                var renameList = new RenameList();
                 var summary = renameList.AddSources([goodFile, deniedFolder.CombinePath("*")]);
 
                 Assert.Equal(1, summary.SkippedSourceCount);
@@ -1302,7 +1302,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "HydrateTitle", album: null);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             var item = Assert.Single(renameList.RenameItems);
             Assert.False(item.TagLibLoadAttempted);
@@ -1322,7 +1322,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "SkipTitle", album: null);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
             renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.None);
 
@@ -1341,7 +1341,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(betaPath, title: "Beta", album: null);
             TaggedMinimalWav.WriteTagged(alphaPath, title: "Alpha", album: null);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([betaPath, alphaPath]);
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
             renameList.EnsureMetadataLoaded(RenameListMetadataRequirement.TagLib);
@@ -1361,7 +1361,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(path, title: "ProgressTitle", album: null);
 
             var reports = new List<RenameListProgress>();
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(
                 [path],
                 metadataRequirement: RenameListMetadataRequirement.TagLib,
@@ -1387,7 +1387,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(path, title: "CancelTitle", album: null);
 
             using var cts = new CancellationTokenSource();
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(
                 [path],
                 metadataRequirement: RenameListMetadataRequirement.TagLib,
@@ -1415,7 +1415,7 @@ namespace Mfr.Tests.Engine
             TaggedMinimalWav.WriteTagged(alphaPath, title: "Beta", album: null);
             TaggedMinimalWav.WriteTagged(betaPath, title: "Alpha", album: null);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([alphaPath, betaPath]);
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
@@ -1433,7 +1433,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "BatchTitle", album: null);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path], metadataRequirement: RenameListMetadataRequirement.TagLib);
 
             var item = Assert.Single(renameList.RenameItems);
@@ -1450,7 +1450,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "CancelTitle", album: null);
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
 
             using var cts = new CancellationTokenSource();

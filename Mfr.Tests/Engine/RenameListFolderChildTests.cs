@@ -39,7 +39,7 @@ namespace Mfr.Tests.Engine
             var newFolderPath = dir.CombinePath("AlbumRenamed");
             var renamedFilePath = newFolderPath.CombinePath("song.mp3");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             // Add the folder by itself (folders-only) and the file as a direct source.
             renameList.AddSources(sources: [oldFolderPath], includeFiles: false, includeFolders: true);
             renameList.AddSources(sources: [oldFilePath], includeFiles: true, includeFolders: false);
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Engine
             File.WriteAllText(folderA.CombinePath("a.txt"), "from-a");
             File.WriteAllText(folderB.CombinePath("b.txt"), "from-b");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(sources: [folderA, folderB], includeFiles: false, includeFolders: true);
             Assert.Equal(2, renameList.RenameItems.Count);
 
@@ -135,7 +135,7 @@ namespace Mfr.Tests.Engine
 
             var destinationPath = dir.CombinePath("TRACK.mp3");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources([sourcePath]);
 
             var preset = _FormatterFullPathPreset("case-only-rename", destinationPath);
@@ -173,7 +173,7 @@ namespace Mfr.Tests.Engine
 
             var newFolder = dir.CombinePath("ALBUM");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             renameList.AddSources(sources: [oldFolder], includeFiles: false, includeFolders: true);
 
             var preset = _FormatterFullPathPreset("folder-case-rename", newFolder);
@@ -206,7 +206,7 @@ namespace Mfr.Tests.Engine
             var sourceFile = dir.CombinePath("loose.txt");
             File.WriteAllText(sourceFile, "x");
 
-            var renameList = new RenameList(includeHidden: true);
+            var renameList = new RenameList();
             // Order: file first, then folder. The planner must still commit the folder rename first
             // so the file's destination directory (newFolder) exists when the file is moved.
             renameList.AddSources(sources: [sourceFile, oldFolder], includeFiles: true, includeFolders: true);

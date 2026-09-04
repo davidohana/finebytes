@@ -94,12 +94,13 @@ namespace Mfr.App.Cli
                 ? loadedPreset
                 : throw new UserException($"Preset not found: '{options.PresetName}'.");
 
-            var renameList = new RenameList(includeHidden: options.IncludeHidden);
+            var renameList = new RenameList();
             renameList.AddSources(
                 sources: options.Sources,
                 includeFiles: options.IncludeFiles,
                 includeFolders: options.IncludeFolders,
-                includeSubdirs: options.IncludeSubdirs
+                includeSubdirs: options.IncludeSubdirs,
+                includeHidden: options.IncludeHidden
             );
             var renameItems = renameList.RenameItems;
 

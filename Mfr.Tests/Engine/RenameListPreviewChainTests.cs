@@ -44,7 +44,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, "hello.txt");
             File.WriteAllText(path, "x");
 
-            var renameList = new RenameList(includeHidden: false);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
 
             var chain = FilterChain.CreateAllEnabled([
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, "hello.txt");
             File.WriteAllText(path, "x");
 
-            var renameList = new RenameList(includeHidden: false);
+            var renameList = new RenameList();
             renameList.AddSources([path]);
 
             _ = renameList.Preview(
@@ -106,7 +106,7 @@ namespace Mfr.Tests.Engine
                 File.WriteAllText(path, "x");
             }
 
-            var renameList = new RenameList(includeHidden: false);
+            var renameList = new RenameList();
             renameList.AddSources(Directory.GetFiles(_tempRoot));
 
             using var cts = new CancellationTokenSource();
