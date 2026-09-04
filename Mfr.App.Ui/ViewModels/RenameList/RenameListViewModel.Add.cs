@@ -118,7 +118,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             if (!completed)
             {
                 _RollbackAddedItems(insertAt, oldCount);
-                _NotifyListChanged();
+                _NotifyListChangedAfterAdd(oldCount);
                 return;
             }
 
@@ -141,7 +141,21 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 skippedSourceCount: addSummary.SkippedSourceCount,
                 sourceCount: sources.Count
             );
-            _NotifyListChanged();
+            _NotifyListChangedAfterAdd(oldCount);
+        }
+
+        /// <summary>
+        /// Updates list chrome after add or cancel, and raises membership only when the engine count changed.
+        /// </summary>
+        private void _NotifyListChangedAfterAdd(int oldCount)
+        {
+            if (_renameList.RenameItems.Count == oldCount)
+            {
+                _NotifyListChanged();
+                return;
+            }
+
+            _NotifyMembershipChanged();
         }
 
         /// <summary>

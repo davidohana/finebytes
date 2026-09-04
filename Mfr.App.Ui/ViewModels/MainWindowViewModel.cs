@@ -47,10 +47,10 @@ namespace Mfr.App.Ui.ViewModels
             }
 
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
-            RenameListViewModel.MembershipChanged += _OnRenameListMembershipChanged;
+            RenameListViewModel.MembershipChanged += _OnPreviewInputsChanged;
             AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
             AppliedFiltersViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
-            AppliedFiltersViewModel.ChainChanged += _OnAppliedFiltersChainChanged;
+            AppliedFiltersViewModel.ChainChanged += _OnPreviewInputsChanged;
             FilterPaletteViewModel.PropertyChanged += _OnFilterPalettePropertyChanged;
             ItemCount = RenameListViewModel.ItemCount;
             FilterCount = AppliedFiltersViewModel.Count;
@@ -252,16 +252,17 @@ namespace Mfr.App.Ui.ViewModels
             FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
         }
 
-        private void _OnAppliedFiltersChainChanged(object? sender, EventArgs e)
+        /// <summary>
+        /// Re-runs Rename List preview when the filter chain or list membership changes.
+        /// </summary>
+        private void _OnPreviewInputsChanged(object? sender, EventArgs e)
         {
             _PreviewRenameList();
         }
 
-        private void _OnRenameListMembershipChanged(object? sender, EventArgs e)
-        {
-            _PreviewRenameList();
-        }
-
+        /// <summary>
+        /// Applies the live Applied Filters chain to the Rename List.
+        /// </summary>
         private void _PreviewRenameList()
         {
             RenameListViewModel.Preview(AppliedFiltersViewModel.ToChain());

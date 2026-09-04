@@ -213,9 +213,9 @@ Filter stack/options → `ToChain()` → `Preview()` → grid. Always on (toggle
 
 Re-preview after Rename List add/remove/clear using the current chain. Row sort/reorder does not change preview values.
 
-- `MembershipChanged` from `_NotifyListChanged` (add/remove/clear only).
-- [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) shares `_PreviewRenameList()` with `ChainChanged`.
-- Tests: add-after-filters, remove/clear counts, move does not raise membership.
+- `MembershipChanged` after add/remove/clear when membership actually changed (not sort/reorder, not no-op add).
+- [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) shares `_PreviewRenameList()` for chain and membership.
+- Tests: add-after-filters, remove/clear counts, move/duplicate-add do not raise membership; one MainWindow wiring fact.
 
 ### 10c — Auto-Preview toggle
 

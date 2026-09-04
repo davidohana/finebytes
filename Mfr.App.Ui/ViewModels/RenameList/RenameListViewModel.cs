@@ -243,12 +243,23 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             SetSelectedEntries([.. _selectedEntries]);
         }
 
+        /// <summary>
+        /// Refreshes item count and commands that depend on list size.
+        /// </summary>
         private void _NotifyListChanged()
         {
             OnPropertyChanged(nameof(ItemCount));
             ClearCommand.NotifyCanExecuteChanged();
             RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
             _NotifyRefreshChanged();
+        }
+
+        /// <summary>
+        /// Updates list chrome and raises <see cref="MembershipChanged"/>.
+        /// </summary>
+        private void _NotifyMembershipChanged()
+        {
+            _NotifyListChanged();
             MembershipChanged?.Invoke(this, EventArgs.Empty);
         }
 

@@ -32,7 +32,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var nextSelection = _SelectEntryAfterRemove(anchorIndex);
             SetSelectedEntries(nextSelection is null ? [] : [nextSelection]);
-            _NotifyListChanged();
+            _NotifyMembershipChanged();
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             SetSelectedEntries([.. Entries.Where(selected.Contains)]);
-            _NotifyListChanged();
+            _NotifyMembershipChanged();
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             SetDropMarkIndex(null);
             SetSelectedEntries([]);
             CellStatusHintDisplay = StatusHintDisplay.Empty;
-            _NotifyListChanged();
+            _NotifyMembershipChanged();
         }
 
         /// <summary>

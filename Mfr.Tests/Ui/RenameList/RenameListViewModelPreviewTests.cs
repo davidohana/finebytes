@@ -1,10 +1,11 @@
+using Avalonia.Headless.XUnit;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Case;
 using Mfr.Models.Filters;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Ui.AppliedFilters;
-using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -240,6 +241,51 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(0, membershipRaises);
             Assert.Equal("BBB.txt", renameList.Entries[0].FullFileNamePreview);
             Assert.Equal("AAA.txt", renameList.Entries[1].FullFileNamePreview);
+        }
+
+        /// <summary>
+        /// Verifies adding a path already on the list does not raise membership or re-preview.
+        /// </summary>
+        [Fact]
+        public async Task Duplicate_add_does_not_raise_membership()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var (renameList, applied) = _CreateWiredPanes(dir);
+            await renameList.AddPathsAsync([path]).ConfigureAwait(true);
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
+
+            var membershipRaises = 0;
+            renameList.MembershipChanged += (_, _) => membershipRaises++;
+            await renameList.AddPathsAsync([path]).ConfigureAwait(true);
+
+            Assert.Equal(0, membershipRaises);
+            Assert.Single(renameList.Entries);
+            Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
+        }
+
+        /// <summary>
+        /// Verifies MainWindow production wiring re-previews after add when filters are already on the stack.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task MainWindow_add_after_filters_applies_current_chain()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var main = new MainWindowViewModel(dir);
+            main.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.AppliedFiltersViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+
+            await main.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+            Assert.Equal(1, main.RenameListViewModel.ChangeCount);
         }
 
         private (RenameListViewModel RenameList, AppliedFiltersViewModel Applied) _CreateWiredPanes(string dir)
