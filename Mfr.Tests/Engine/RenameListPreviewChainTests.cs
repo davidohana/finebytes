@@ -1,4 +1,5 @@
 using Mfr.Filters.Case;
+using Mfr.Filters.Formatting;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Engine
@@ -123,6 +124,43 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal(0, plan.ChangedCount);
             Assert.All(renameList.RenameItems, item => Assert.Equal(item.Original.Prefix, item.Preview.Prefix));
+        }
+
+        /// <summary>
+        /// Verifies an unknown formatter token in Inserter setup becomes a per-row preview error (MFR7 parity).
+        /// </summary>
+        [Fact]
+        public void Preview_UnknownFormatterToken_MarksAllItemsPreviewError()
+        {
+            var path = Path.Combine(_tempRoot, "!_RENAME.BAT");
+            File.WriteAllText(path, "x");
+
+            var renameList = new RenameList();
+            renameList.AddSources([path]);
+
+            var chain = FilterChain.CreateAllEnabled([
+                new InserterFilter(
+                    new FilePrefixTarget(),
+                    new InserterOptions(
+                        Text: "ddAA <fsssss> AA111",
+                        Position: 1,
+                        StartFrom: InserterOrigin.Beginning,
+                        Overwrite: false
+                    )
+                ),
+            ]);
+
+            var plan = renameList.Preview(chain);
+
+            Assert.Equal(1, plan.ErrorCount);
+            var item = renameList.RenameItems[0];
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.NotNull(item.PreviewError);
+            Assert.Contains("Unknown formatter token", item.PreviewError.Message, StringComparison.Ordinal);
+            Assert.Contains("fsssss", item.PreviewError.Message, StringComparison.Ordinal);
+            Assert.Contains("Inserter", item.PreviewError.Message, StringComparison.Ordinal);
+            // Setup failed: preview stays at identity (no stale insert from a prior pass).
+            Assert.Equal(item.Original.Prefix, item.Preview.Prefix);
         }
     }
 }

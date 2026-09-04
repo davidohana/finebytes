@@ -115,6 +115,21 @@ namespace Mfr.Tests.Models
             chain.SetupFilters();
         }
 
+        /// <summary>
+        /// Verifies an enabled setup failure is wrapped with the filter type name.
+        /// </summary>
+        [Fact]
+        public void SetupFilters_ThrowingSetup_WrapsWithFilterType()
+        {
+            var chain = FilterChain.CreateAllEnabled([new ThrowingSetupFilter(Target: _target)]);
+
+            var ex = Assert.Throws<InvalidOperationException>(chain.SetupFilters);
+
+            Assert.Contains("ThrowingSetup", ex.Message, StringComparison.Ordinal);
+            Assert.Contains("Setup failed.", ex.Message, StringComparison.Ordinal);
+            Assert.IsType<InvalidOperationException>(ex.InnerException);
+        }
+
         private sealed record SetupCountingFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)
             : StringTargetFilter(Target, ApplyScope)
         {

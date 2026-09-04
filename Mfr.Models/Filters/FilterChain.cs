@@ -40,6 +40,10 @@ namespace Mfr.Models.Filters
         /// unchecked row does not fail (or reload) the whole preview.
         /// </para>
         /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when an enabled filter's setup fails. The message names the filter type; the original
+        /// exception is the <see cref="Exception.InnerException"/>.
+        /// </exception>
         public void SetupFilters()
         {
             foreach (var step in Steps)
@@ -49,7 +53,17 @@ namespace Mfr.Models.Filters
                     continue;
                 }
 
-                step.Filter.Setup();
+                try
+                {
+                    step.Filter.Setup();
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to initialize filter '{step.Filter.Type}': {ex.Message}",
+                        ex
+                    );
+                }
             }
         }
 
