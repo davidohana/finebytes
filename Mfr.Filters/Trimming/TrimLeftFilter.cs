@@ -11,7 +11,7 @@ namespace Mfr.Filters.Trimming
         FilterTarget Target,
         CountFilterOptions Options,
         StringApplyScope? ApplyScope = null
-    ) : StringTargetFilter(Target, ApplyScope)
+    ) : StringTargetFilter(Target, ApplyScope), ICountOptionsFilter
     {
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, trim one character).
@@ -23,6 +23,12 @@ namespace Mfr.Filters.Trimming
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "TrimLeft";
+
+        /// <inheritdoc />
+        public BaseFilter WithOptions(CountFilterOptions options)
+        {
+            return this with { Options = options };
+        }
 
         protected override string _TransformValue(string value, RenameItem item)
         {

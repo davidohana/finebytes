@@ -10,9 +10,9 @@ using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors;
+using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
-using Mfr.Filters.Trimming;
 using Mfr.Models.Filters;
 
 namespace Mfr.Tests.Ui.AppliedFilters
@@ -456,14 +456,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
         private static int _CountOf(BaseFilter filter)
         {
-            return filter switch
-            {
-                TrimLeftFilter f => f.Options.Count,
-                TrimRightFilter f => f.Options.Count,
-                ExtractLeftFilter f => f.Options.Count,
-                ExtractRightFilter f => f.Options.Count,
-                _ => throw new InvalidOperationException($"Unexpected filter type {filter.GetType()}."),
-            };
+            return Assert.IsAssignableFrom<ICountOptionsFilter>(filter).Options.Count;
         }
     }
 }
