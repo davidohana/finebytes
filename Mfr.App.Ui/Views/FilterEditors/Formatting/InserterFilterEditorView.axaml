@@ -22,7 +22,7 @@
               <TextBlock Classes="rich-tip-title" Text="Text inserted at the chosen position." />
               <TextBlock
                 Classes="rich-tip-body"
-                Text="May include formatter tokens such as &lt;Name&gt; when the string contains them."
+                Text="May include formatter tokens such as &lt;file-name&gt; when the string contains them."
               />
             </controls:RichToolTip>
           </ToolTip.Tip>
