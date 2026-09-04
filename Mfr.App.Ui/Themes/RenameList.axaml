@@ -1,0 +1,18 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="RenameListDropIndicatorBrush" Color="#FA8072" />
+      <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#808080" />
+      <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#C00000" />
+      <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF0000" />
+      <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#FFF0F5" />
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="RenameListDropIndicatorBrush" Color="#FA8072" />
+      <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#909090" />
+      <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#FF8080" />
+      <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF8080" />
+      <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#4A3038" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

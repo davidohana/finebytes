@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="FilterEditorTitleBarBrush" Color="#0066B8" />
+      <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#FFFFFF" />
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="FilterEditorTitleBarBrush" Color="#264F78" />
+      <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#F0F0F0" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

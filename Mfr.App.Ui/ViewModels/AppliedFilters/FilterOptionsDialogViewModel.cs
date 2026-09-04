@@ -144,7 +144,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Gets or sets the token separator string.
         /// </summary>
         [ObservableProperty]
-        private string _tokenSeparator = string.Empty;
+        private string _tokenSeparator = "-";
 
         /// <summary>
         /// Gets or sets the 1-based token index.
