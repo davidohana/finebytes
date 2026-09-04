@@ -445,9 +445,10 @@ namespace Mfr.Engine.RenameList
         /// <returns>The commit plan for the previewed items; pass this to <see cref="Commit"/>.</returns>
         /// <remarks>
         /// <para>
-        /// Calls <see cref="FilterChain.SetupFilters"/> before applying so each enabled filter is set up once.
-        /// Setup failures (e.g. unknown formatter token) are surfaced as <see cref="RenameStatus.PreviewError"/>
-        /// on every item — matching MFR7 <c>BeforeGroupApply</c> — instead of aborting the preview pass.
+        /// Resets every item, then calls <see cref="FilterChain.SetupFilters"/> once before applying so a
+        /// failed setup cannot leave a stale prior preview on screen. Setup failures (e.g. unknown formatter
+        /// token) are surfaced as <see cref="RenameStatus.PreviewError"/> on every item — matching MFR7
+        /// <c>BeforeGroupApply</c> — instead of aborting the preview pass.
         /// </para>
         /// <para>
         /// On cancel, items already processed keep their preview; remaining items stay at identity after reset.
@@ -465,61 +466,99 @@ namespace Mfr.Engine.RenameList
             var tracker = new RenameListProgressTracker(progress, cancellationToken);
             tracker.BeginMetadataPhase(_renameItems.Count);
 
-            // Reset before setup so a failed setup cannot leave a stale prior preview on screen.
             foreach (var item in _renameItems)
             {
                 item.ResetState();
             }
 
-            Exception? setupError = null;
-            try
-            {
-                chain.SetupFilters();
-            }
-            catch (Exception ex)
-            {
-                setupError = ex;
-                Log.Warning(ex, "Filter chain setup failed; marking all items as preview errors.");
-            }
-
+            var setupError = _TrySetupFilters(chain);
             if (setupError is not null)
             {
-                foreach (var renameItem in _renameItems)
-                {
-                    renameItem.SetPreviewError(message: setupError.Message, cause: setupError);
-                    tracker.OnMetadataProcessed(renameItem.Original.FullPath);
-                }
+                _MarkAllPreviewErrors(setupError, tracker);
             }
             else
             {
-                _PopulateRenameListCounterContext();
-
-                foreach (var renameItem in _renameItems)
-                {
-                    if (tracker.IsCanceled)
-                    {
-                        break;
-                    }
-
-                    try
-                    {
-                        chain.ApplyFilters(renameItem);
-
-                        if (renameItem.PreviewError is null)
-                        {
-                            renameItem.Status = RenameStatus.PreviewOk;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        renameItem.SetPreviewError(message: ex.Message, cause: ex);
-                        Log.Warning(ex, "Preview failed for '{SourcePath}'.", renameItem.Original.FullPath);
-                    }
-
-                    tracker.OnMetadataProcessed(renameItem.Original.FullPath);
-                }
+                _ApplyPreviewFilters(chain, tracker);
             }
 
+            return _CompletePreviewPlan(tracker);
+        }
+
+        /// <summary>
+        /// Runs <see cref="FilterChain.SetupFilters"/> and returns the failure, or <see langword="null"/> on success.
+        /// </summary>
+        /// <param name="chain">The chain to set up once for this preview pass.</param>
+        /// <returns>The setup exception when initialization failed; otherwise <see langword="null"/>.</returns>
+        private static Exception? _TrySetupFilters(FilterChain chain)
+        {
+            try
+            {
+                chain.SetupFilters();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Filter chain setup failed; marking all items as preview errors.");
+                return ex;
+            }
+        }
+
+        /// <summary>
+        /// Marks every item as a preview error after chain setup failed (MFR7 <c>BeforeGroupApply</c>).
+        /// </summary>
+        /// <param name="setupError">The setup failure to attach to each item.</param>
+        /// <param name="tracker">Progress sink updated once per item.</param>
+        private void _MarkAllPreviewErrors(Exception setupError, RenameListProgressTracker tracker)
+        {
+            foreach (var renameItem in _renameItems)
+            {
+                renameItem.SetPreviewError(message: setupError.Message, cause: setupError);
+                tracker.OnMetadataProcessed(renameItem.Original.FullPath);
+            }
+        }
+
+        /// <summary>
+        /// Applies enabled filters to each item until cancel, recording per-item preview errors without throwing.
+        /// </summary>
+        /// <param name="chain">The already-set-up filter chain.</param>
+        /// <param name="tracker">Cancel flag and per-item progress.</param>
+        private void _ApplyPreviewFilters(FilterChain chain, RenameListProgressTracker tracker)
+        {
+            _PopulateRenameListCounterContext();
+
+            foreach (var renameItem in _renameItems)
+            {
+                if (tracker.IsCanceled)
+                {
+                    break;
+                }
+
+                try
+                {
+                    chain.ApplyFilters(renameItem);
+
+                    if (renameItem.PreviewError is null)
+                    {
+                        renameItem.Status = RenameStatus.PreviewOk;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    renameItem.SetPreviewError(message: ex.Message, cause: ex);
+                    Log.Warning(ex, "Preview failed for '{SourcePath}'.", renameItem.Original.FullPath);
+                }
+
+                tracker.OnMetadataProcessed(renameItem.Original.FullPath);
+            }
+        }
+
+        /// <summary>
+        /// Rebases folder descendants, marks conflicts and unresolvable cycles, then returns the counted commit plan.
+        /// </summary>
+        /// <param name="tracker">Progress sink to flush after planning.</param>
+        /// <returns>The commit plan with outcome counts attached.</returns>
+        private CommitPlan _CompletePreviewPlan(RenameListProgressTracker tracker)
+        {
             RenamePreviewFolderRebaser.RebaseDescendants(_renameItems);
             PreviewConflictDetector.MarkConflicts(_renameItems);
 
