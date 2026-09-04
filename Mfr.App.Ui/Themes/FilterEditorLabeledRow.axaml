@@ -1,0 +1,32 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="clr-namespace:Mfr.App.Ui.Views.Controls"
+>
+  <ControlTheme x:Key="{x:Type controls:FilterEditorLabeledRow}" TargetType="controls:FilterEditorLabeledRow">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:FilterEditorLabeledRow">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition
+              Width="Auto"
+              SharedSizeGroup="{x:Static controls:FilterEditorLabeledRow.LabelSharedSizeGroup}"
+            />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="{TemplateBinding Label}" />
+          <ContentPresenter
+            Name="PART_ContentPresenter"
+            Grid.Column="2"
+            VerticalAlignment="Center"
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}"
+            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+          />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

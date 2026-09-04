@@ -16,21 +16,9 @@
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <TextBlock
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="Initial value:"
-            ToolTip.Tip="Value used for the first file (index 0)."
-          />
+        <controls:FilterEditorLabeledRow Label="Initial value:" ToolTip.Tip="Value used for the first file (index 0).">
           <controls:CompactNumericUpDown
             x:Name="StartSpinner"
-            Grid.Column="2"
             Width="72"
             HorizontalAlignment="Left"
             Minimum="-999999"
@@ -40,22 +28,10 @@
             ToolTip.Tip="Value used for the first file (index 0)."
             Value="{Binding Start}"
           />
-        </Grid>
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <TextBlock
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="Increment by:"
-            ToolTip.Tip="Added for each next file. May be negative."
-          />
+        </controls:FilterEditorLabeledRow>
+        <controls:FilterEditorLabeledRow Label="Increment by:" ToolTip.Tip="Added for each next file. May be negative.">
           <controls:CompactNumericUpDown
             x:Name="IncrementSpinner"
-            Grid.Column="2"
             Width="72"
             HorizontalAlignment="Left"
             Minimum="-99999"
@@ -65,55 +41,42 @@
             ToolTip.Tip="Added for each next file. May be negative."
             Value="{Binding Increment}"
           />
-        </Grid>
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <TextBlock
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="Leading 0's mode:"
-            ToolTip.Tip="How counter values are padded with leading zeros."
-          />
-          <ComboBox
-            x:Name="LeadingZerosModeCombo"
-            Grid.Column="2"
-            Classes="filter-editor-field"
-            Width="100"
-            HorizontalAlignment="Left"
-            ItemsSource="{Binding LeadingZerosModes}"
-            SelectedItem="{Binding LeadingZerosMode}"
-            ToolTip.Tip="None: no padding. Automatic: one width for the whole list (or folder). Custom: pad to Total length."
-          />
-          <TextBlock
-            Grid.Column="4"
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="Total length:"
-            IsVisible="{Binding HasCustomLength}"
-            ToolTip.Tip="Minimum digit count when Leading 0's mode is Custom."
-          />
-          <controls:CompactNumericUpDown
-            x:Name="CustomLengthSpinner"
-            Grid.Column="6"
-            Width="56"
-            HorizontalAlignment="Left"
-            Minimum="1"
-            Maximum="100"
-            Increment="1"
-            FormatString="0"
-            IsVisible="{Binding HasCustomLength}"
-            ToolTip.Tip="Minimum digit count when Leading 0's mode is Custom."
-            Value="{Binding CustomLength}"
-          />
-        </Grid>
+        </controls:FilterEditorLabeledRow>
+        <controls:FilterEditorLabeledRow
+          Label="Leading 0's mode:"
+          ToolTip.Tip="How counter values are padded with leading zeros."
+        >
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+            <ComboBox
+              x:Name="LeadingZerosModeCombo"
+              Classes="filter-editor-field"
+              Width="100"
+              HorizontalAlignment="Left"
+              ItemsSource="{Binding LeadingZerosModes}"
+              SelectedItem="{Binding LeadingZerosMode}"
+              ToolTip.Tip="None: no padding. Automatic: one width for the whole list (or folder). Custom: pad to Total length."
+            />
+            <TextBlock
+              Classes="filter-editor-label"
+              VerticalAlignment="Center"
+              Text="Total length:"
+              IsVisible="{Binding HasCustomLength}"
+              ToolTip.Tip="Minimum digit count when Leading 0's mode is Custom."
+            />
+            <controls:CompactNumericUpDown
+              x:Name="CustomLengthSpinner"
+              Width="56"
+              HorizontalAlignment="Left"
+              Minimum="1"
+              Maximum="100"
+              Increment="1"
+              FormatString="0"
+              IsVisible="{Binding HasCustomLength}"
+              ToolTip.Tip="Minimum digit count when Leading 0's mode is Custom."
+              Value="{Binding CustomLength}"
+            />
+          </StackPanel>
+        </controls:FilterEditorLabeledRow>
         <controls:CompactCheckBox
           x:Name="ResetPerFolderCheckBox"
           Content="Reset counter when folder changes"
@@ -124,14 +87,8 @@
     </controls:FieldsetGroup>
     <controls:FieldsetGroup Header="Placement">
       <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Position:" />
-          <WrapPanel Grid.Column="2" Orientation="Horizontal">
+        <controls:FilterEditorLabeledRow Label="Position:">
+          <WrapPanel Orientation="Horizontal">
             <controls:CompactRadioButton
               x:Name="PrependRadio"
               Margin="0,0,16,4"
@@ -157,22 +114,14 @@
               IsChecked="{Binding Position, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:CounterPosition.Replace}, Mode=TwoWay}"
             />
           </WrapPanel>
-        </Grid>
-        <Grid IsVisible="{Binding HasSeparatorOptions}">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <TextBlock
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="Separator:"
-            ToolTip.Tip="Text between the counter and the original segment."
-          />
+        </controls:FilterEditorLabeledRow>
+        <controls:FilterEditorLabeledRow
+          Label="Separator:"
+          IsVisible="{Binding HasSeparatorOptions}"
+          ToolTip.Tip="Text between the counter and the original segment."
+        >
           <TextBox
             x:Name="SeparatorBox"
-            Grid.Column="2"
             Classes="filter-editor-field"
             MinWidth="120"
             MaxWidth="240"
@@ -182,7 +131,7 @@
             ToolTip.Tip="Text between the counter and the original segment."
             Text="{Binding Separator}"
           />
-        </Grid>
+        </controls:FilterEditorLabeledRow>
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>

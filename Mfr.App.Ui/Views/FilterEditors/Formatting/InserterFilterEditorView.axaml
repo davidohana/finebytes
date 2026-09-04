@@ -29,16 +29,12 @@
             Text="{Binding InsertText}"
           />
         </StackPanel>
-        <Grid ToolTip.Tip="One-based character index. Beginning: 1 inserts before the first character; past the end appends. End: 1 appends after the last character; 2 inserts before the last; a large position prepends.">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="At position:" />
+        <controls:FilterEditorLabeledRow
+          Label="At position:"
+          ToolTip.Tip="One-based character index. Beginning: 1 inserts before the first character; past the end appends. End: 1 appends after the last character; 2 inserts before the last; a large position prepends."
+        >
           <controls:CompactNumericUpDown
             x:Name="PositionSpinner"
-            Grid.Column="2"
             Width="56"
             HorizontalAlignment="Left"
             Minimum="1"
@@ -47,15 +43,12 @@
             FormatString="0"
             Value="{Binding Position}"
           />
-        </Grid>
-        <Grid ToolTip.Tip="Direction to start counting the insert position from.">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Starting from:" />
-          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+        </controls:FilterEditorLabeledRow>
+        <controls:FilterEditorLabeledRow
+          Label="Starting from:"
+          ToolTip.Tip="Direction to start counting the insert position from."
+        >
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
             <controls:CompactRadioButton
               x:Name="BeginningRadio"
               GroupName="InserterOrigin"
@@ -69,7 +62,7 @@
               IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.End}, Mode=TwoWay}"
             />
           </StackPanel>
-        </Grid>
+        </controls:FilterEditorLabeledRow>
         <controls:CompactCheckBox
           x:Name="OverwriteCheckBox"
           Content="Overwrite characters"
