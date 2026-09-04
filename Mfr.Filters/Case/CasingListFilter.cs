@@ -6,16 +6,29 @@ namespace Mfr.Filters.Case
     /// <summary>
     /// Options for casing-list based word casing.
     /// </summary>
-    /// <param name="FilePath">Path to the casing-list text file (one word per line).</param>
+    /// <param name="Words">
+    /// Words to apply by exact spelling (case-insensitive match). Empty list is a no-op.
+    /// </param>
     /// <param name="UppercaseSentenceInitial">
     /// When <c>true</c>, uppercases the first letter at string start and after sentence-end boundaries
     /// (see <see cref="RenameItem.SentenceEndChars"/>, set by <c>SentenceEndCharacters</c> when used earlier
     /// in the chain; default <c>".!?"</c>).
     /// </param>
-    public sealed record CasingListOptions(string FilePath, bool UppercaseSentenceInitial = false);
+    public sealed record CasingListOptions(IReadOnlyList<string> Words, bool UppercaseSentenceInitial = false)
+    {
+        /// <summary>
+        /// Parses line-separated editor text into a word list (blank lines and list comments ignored).
+        /// </summary>
+        /// <param name="wordsText">Freeform one-word-per-line text.</param>
+        /// <returns>Canonical word spellings in order.</returns>
+        public static IReadOnlyList<string> ParseWordsText(string wordsText)
+        {
+            return CasingListParser.ParseWordLines(wordsText);
+        }
+    }
 
     /// <summary>
-    /// Changes each word's casing to match how it appears in a casing-list file.
+    /// Changes each word's casing to match how it appears in the configured word list.
     /// <para>
     /// Words not found in the list are left unchanged.
     /// </para>
@@ -33,10 +46,10 @@ namespace Mfr.Filters.Case
         private Dictionary<string, string>? _lowerWordToCasing;
 
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty list path, sentence-initial uppercasing).
+        /// Creates a filter with add-to-list defaults (file prefix, empty word list, sentence-initial uppercasing).
         /// </summary>
         public CasingListFilter()
-            : this(new FilePrefixTarget(), new CasingListOptions(FilePath: "", UppercaseSentenceInitial: true)) { }
+            : this(new FilePrefixTarget(), new CasingListOptions(Words: [], UppercaseSentenceInitial: true)) { }
 
         /// <summary>
         /// Gets the filter type discriminator.
@@ -44,11 +57,11 @@ namespace Mfr.Filters.Case
         public override string Type => "CasingList";
 
         /// <summary>
-        /// Loads and caches casing-list entries for this filter instance.
+        /// Builds and caches the casing-list map for this filter instance.
         /// </summary>
         protected override void _Setup()
         {
-            _lowerWordToCasing = CasingListParser.ParseFile(Options.FilePath);
+            _lowerWordToCasing = CasingListParser.BuildMap(Options.Words);
         }
 
         /// <summary>

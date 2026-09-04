@@ -7,7 +7,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
   d:DesignWidth="420"
-  d:DesignHeight="120"
+  d:DesignHeight="200"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Case.CasingListFilterEditorView"
   x:DataType="vm:CasingListFilterEditorViewModel"
 >
@@ -17,56 +17,30 @@
         <StackPanel Spacing="4">
           <ToolTip.Tip>
             <controls:RichToolTip>
-              <TextBlock Classes="rich-tip-title" Text="Text file with one word per line." />
+              <TextBlock Classes="rich-tip-title" Text="One word per line." />
               <TextBlock
                 Classes="rich-tip-body"
-                Text="Matched words take the exact casing from the file; unknown words are left unchanged. Blank lines and //, \\, or # comments are ignored."
-              />
-              <TextBlock
-                Classes="rich-tip-bullet"
-                Text="• Use … to browse; Reload after editing the file externally."
+                Text="Matched words take the exact casing from the list; unknown words are left unchanged. Blank lines and //, \\, or # comments are ignored."
               />
             </controls:RichToolTip>
           </ToolTip.Tip>
-          <TextBlock Classes="filter-editor-label" Text="Casing List file to use:" />
-          <DockPanel LastChildFill="True">
-            <Button
-              x:Name="ReloadButton"
-              DockPanel.Dock="Right"
-              Margin="4,0,0,0"
-              MinWidth="64"
-              Height="22"
-              Padding="8,0"
-              VerticalAlignment="Center"
-              HorizontalContentAlignment="Center"
-              VerticalContentAlignment="Center"
-              Content="Reload"
-              Command="{Binding ReloadCommand}"
-              IsEnabled="{Binding HasListFile}"
-              ToolTip.Tip="Re-read the casing list from the selected file after external edits."
-            />
-            <Button
-              x:Name="BrowseButton"
-              DockPanel.Dock="Right"
-              Margin="4,0,0,0"
-              MinWidth="28"
-              Height="22"
-              Padding="4,0"
-              VerticalAlignment="Center"
-              HorizontalContentAlignment="Center"
-              VerticalContentAlignment="Center"
-              Content="…"
-              Click="_BrowseButton_OnClick"
-              ToolTip.Tip="Browse for a casing list file."
-            />
-            <TextBox
-              x:Name="FilePathBox"
-              Classes="filter-editor-field"
-              MinWidth="160"
-              Watermark="[Not Selected]"
-              Text="{Binding FilePath}"
-            />
-          </DockPanel>
+          <TextBlock Classes="filter-editor-label" Text="Words (one per line):" />
+          <TextBox
+            x:Name="WordsBox"
+            MinHeight="88"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            FontFamily="{DynamicResource FileListFont}"
+            FontSize="{DynamicResource FileListFontSize}"
+            Foreground="{DynamicResource FileListForegroundBrush}"
+            Background="{DynamicResource FileListRowBrush}"
+            BorderBrush="{DynamicResource FileListAddressBarBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="3"
+            Padding="4,2"
+            Watermark="and&#x0a;or&#x0a;with&#x0a;RMX"
+            Text="{Binding WordsText}"
+          />
         </StackPanel>
         <controls:CompactCheckBox
           x:Name="UppercaseSentenceInitialCheckBox"

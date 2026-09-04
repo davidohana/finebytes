@@ -803,34 +803,21 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.IsType<CasingListFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<CasingListFilterEditorView>().Single();
-            var filePath = editor.FindControl<TextBox>("FilePathBox");
+            var words = editor.FindControl<TextBox>("WordsBox");
             var uppercase = editor.FindControl<CompactCheckBox>("UppercaseSentenceInitialCheckBox");
-            var reload = editor.FindControl<Button>("ReloadButton");
-            Assert.NotNull(filePath);
+            Assert.NotNull(words);
             Assert.NotNull(uppercase);
-            Assert.NotNull(reload);
-            Assert.Equal(string.Empty, filePath.Text);
+            Assert.Equal(string.Empty, words.Text);
             Assert.True(uppercase.IsChecked);
-            Assert.False(reload.IsEnabled);
 
-            filePath.Text = @"C:\Music\MFR\casing-list.txt";
+            words.Text = "and\nor\nRMX";
             uppercase.IsChecked = false;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             var filter = (CasingListFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            Assert.Equal(@"C:\Music\MFR\casing-list.txt", filter.Options.FilePath);
+            Assert.Equal(["and", "or", "RMX"], filter.Options.Words);
             Assert.False(filter.Options.UppercaseSentenceInitial);
-            Assert.True(reload.IsEnabled);
-
-            var before = mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            reload.Command!.Execute(null);
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var after = mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            Assert.NotSame(before, after);
-            Assert.Equal(@"C:\Music\MFR\casing-list.txt", ((CasingListFilter)after).Options.FilePath);
 
             window.Close();
         }

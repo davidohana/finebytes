@@ -1,36 +1,31 @@
 # CasingList
 
-Loads a **casing list** text file: **one word per line** (after trim). Comments and blank lines are ignored (lines starting with `//`, `\\`, or `# `). For each **word** in the target segment (split by the current [word separator](../Space/SpaceCharacter.md), default space), the filter looks up the word **case-insensitively**. If found, the word is replaced by the **exact spelling** from the file. Words not in the list are **unchanged**.
+Applies a **casing list** stored in the filter options as a **word array**. For each **word** in the target segment (split by the current [word separator](../Space/SpaceCharacter.md), default space), the filter looks up the word **case-insensitively**. If found, the word is replaced by the **exact spelling** from the list. Words not in the list are **unchanged**. An empty list is a no-op.
 
 Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceEndCharacters.md) and the word separator; place that filter **before** this one when you need custom sentence boundaries.
 
-Example list files use words like `and`, `or`, `with`, `RMX` or `and`, `us`, `them` as noted in the rows below.
-
 ## Options
 
-- **`filePath`** (string, required) — Path to the casing-list file.
+- **`words`** (`string[]`) — Words to apply by exact spelling. Duplicates: **last wins**.
 - **`uppercaseSentenceInitial`** (bool, default `false`)
   - If `true`, after list application, uppercases the first letter at the start of the segment and after configured
     sentence ends.
 
-## List file format
+## Editor text format
 
-- One word per line; spaces inside a line are invalid.
-- Duplicate words (same letters, different casing): **last line wins** in the file.
-- At least one non-comment word is required.
-- Each line is limited to 1000 characters (same cap as name-list files).
+The Filter Configuration pane edits `words` as one-word-per-line text. Blank lines and `//`, `\\`, or `# ` comments are ignored when converting that text into the stored array. Each word is limited to 1000 characters (same cap as name-list / replace-list files). Spaces inside a word are invalid.
 
 ## Examples
 
-- `filePath`: list (`and`, `or`, `with`, `RMX`); `uppercaseSentenceInitial`: `false`
+- `words`: `["and", "or", "with", "RMX"]`; `uppercaseSentenceInitial`: `false`
   - Before: `03 - WiTH Or Without You Rmx`
   - After: `03 - with or Without You RMX`
-- [SentenceEndCharacters](SentenceEndCharacters.md); `characters`: `"-.!"`; `filePath`: same list as
-  above; `uppercaseSentenceInitial`: `true`
+- [SentenceEndCharacters](SentenceEndCharacters.md); `characters`: `"-.!"`; same `words` as above;
+  `uppercaseSentenceInitial`: `true`
   - Before: `03 - WiTH Or Without You Rmx`
   - After: `03 - With or Without You RMX`
 - [SpaceCharacter](../Space/SpaceCharacter.md); `spaceCharacter`: `"_"`; `replacements`: `[" "]`;
-  `filePath`: list (`and`, `us`, `them`); `uppercaseSentenceInitial`: `true`
+  `words`: `["and", "us", "them"]`; `uppercaseSentenceInitial`: `true`
   - Before: `US_AND_THEM`
   - After: `Us_and_them`
   - Comment: Underscore word boundaries + casing list + sentence initial.
@@ -39,7 +34,7 @@ Put [SpaceCharacter](../Space/SpaceCharacter.md) first if words are separated by
 
 ## Sample preset (JSON)
 
-The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). Set `filePath` to your casing-list file.
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
 
 ```json
 {
@@ -48,7 +43,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
     "targetType": "FilePrefix"
   },
   "options": {
-    "filePath": "C:/Music/MFR/casing-list.txt",
+    "words": ["and", "or", "with", "RMX"],
     "uppercaseSentenceInitial": false
   }
 }

@@ -36,7 +36,7 @@ namespace Mfr.Models.Filters
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Disabled steps are skipped so a bad Casing List path or Formatter template on an
+        /// Disabled steps are skipped so a bad Casing List / Formatter template on an
         /// unchecked row does not fail (or reload) the whole preview.
         /// </para>
         /// </remarks>

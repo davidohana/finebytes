@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Case;
+using Mfr.Models;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
 {
@@ -21,12 +21,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         }
 
         /// <summary>
-        /// Gets or sets the path to the casing-list text file.
+        /// Gets or sets the line-separated editor text for the casing list (one word per line).
         /// </summary>
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(ReloadCommand))]
-        [NotifyPropertyChangedFor(nameof(HasListFile))]
-        private string _filePath = string.Empty;
+        private string _wordsText = string.Empty;
 
         /// <summary>
         /// Gets or sets whether sentence-initial letters are uppercased after list application.
@@ -34,34 +32,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         [ObservableProperty]
         private bool _uppercaseSentenceInitial = true;
 
-        /// <summary>
-        /// Gets whether a list file path is set (enables Reload).
-        /// </summary>
-        public bool HasListFile => !string.IsNullOrWhiteSpace(FilePath);
-
-        partial void OnFilePathChanged(string value) => _ApplyOptions();
+        partial void OnWordsTextChanged(string value) => _ApplyOptions();
 
         partial void OnUppercaseSentenceInitialChanged(bool value) => _ApplyOptions();
-
-        /// <summary>
-        /// Re-reads the casing list from disk without changing options (forces a new filter instance so setup runs again).
-        /// </summary>
-        [RelayCommand(CanExecute = nameof(HasListFile))]
-        public void Reload()
-        {
-            if (IsLoading || Step.Filter is not CasingListFilter filter)
-            {
-                return;
-            }
-
-            if (!HasListFile)
-            {
-                return;
-            }
-
-            // Value-equal options would skip ApplyIfChanged; clone so Setup re-loads the file.
-            Step.SetFilter(filter with { Options = filter.Options with { } });
-        }
 
         private void _SyncFromFilter()
         {
@@ -72,7 +45,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
 
             LoadWithoutApplying(() =>
             {
-                FilePath = filter.Options.FilePath;
+                WordsText = string.Join('\n', filter.Options.Words);
                 UppercaseSentenceInitial = filter.Options.UppercaseSentenceInitial;
             });
         }
@@ -84,10 +57,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
                 return;
             }
 
-            var options = new CasingListOptions(
-                FilePath: FilePath.Trim(),
-                UppercaseSentenceInitial: UppercaseSentenceInitial
-            );
+            IReadOnlyList<string> words;
+            try
+            {
+                words = CasingListOptions.ParseWordsText(WordsText);
+            }
+            catch (UserException)
+            {
+                // Keep the previous options until the text is valid again.
+                return;
+            }
+
+            var options = new CasingListOptions(Words: words, UppercaseSentenceInitial: UppercaseSentenceInitial);
             ApplyIfChanged(filter, filter with { Options = options });
         }
     }

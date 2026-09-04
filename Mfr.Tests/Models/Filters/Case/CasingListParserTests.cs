@@ -5,28 +5,22 @@ namespace Mfr.Tests.Models.Filters.Case
     /// <summary>
     /// Tests for <see cref="CasingListParser"/>.
     /// </summary>
-    public sealed class CasingListParserTests : IDisposable
+    public sealed class CasingListParserTests
     {
-        private readonly TempDirectoryFixture _tempDir = new();
-
         /// <summary>
-        /// Verifies successful parse builds lower-key to canonical-casing map.
+        /// Verifies line text parse keeps word order and trims.
         /// </summary>
         [Fact]
-        public void ParseFile_ValidWords_MapsLowerKeyToCanonicalCasing()
+        public void ParseWordLines_ValidWords_ReturnsTrimmedWords()
         {
-            var path = _CreateFile(
+            var words = CasingListParser.ParseWordLines(
                 """
                 and
-                RMX
+                  RMX
                 """
             );
 
-            var map = CasingListParser.ParseFile(path);
-
-            Assert.Equal(2, map.Count);
-            Assert.Equal("and", map["and"]);
-            Assert.Equal("RMX", map["rmx"]);
+            Assert.Equal(["and", "RMX"], words);
         }
 
         /// <summary>
@@ -36,9 +30,9 @@ namespace Mfr.Tests.Models.Filters.Case
         [InlineData("// note")]
         [InlineData(@"\\ note")]
         [InlineData("  # comment")]
-        public void ParseFile_Comments_AreIgnored(string commentLine)
+        public void ParseWordLines_Comments_AreIgnored(string commentLine)
         {
-            var path = _CreateFile(
+            var words = CasingListParser.ParseWordLines(
                 $"""
                 {commentLine}
 
@@ -46,127 +40,85 @@ namespace Mfr.Tests.Models.Filters.Case
                 """
             );
 
-            var map = CasingListParser.ParseFile(path);
-
-            Assert.Single(map);
-            Assert.Equal("hello", map["hello"]);
+            Assert.Equal(["hello"], words);
         }
 
         /// <summary>
         /// Verifies <c>#</c> without a following space is content, not a comment.
         /// </summary>
         [Fact]
-        public void ParseFile_HashWithoutSpace_IsNotComment()
+        public void ParseWordLines_HashWithoutSpace_IsNotComment()
         {
-            var path = _CreateFile("#tag");
+            var words = CasingListParser.ParseWordLines("#tag");
 
-            var map = CasingListParser.ParseFile(path);
-
-            Assert.Single(map);
-            Assert.Equal("#tag", map["#tag"]);
+            Assert.Equal(["#tag"], words);
         }
 
         /// <summary>
-        /// Verifies the last occurrence of a duplicate word wins.
-        /// </summary>
-        [Fact]
-        public void ParseFile_DuplicateWords_LastWins()
-        {
-            var path = _CreateFile(
-                """
-                foo
-                Foo
-                FOO
-                """
-            );
-
-            var map = CasingListParser.ParseFile(path);
-
-            Assert.Single(map);
-            Assert.Equal("FOO", map["foo"]);
-        }
-
-        /// <summary>
-        /// Verifies empty path throws.
+        /// Verifies empty or comment-only text yields an empty list.
         /// </summary>
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
-        public void ParseFile_EmptyPath_Throws(string filePath)
-        {
-            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseFile(filePath));
-            Assert.Contains("cannot be empty", ex.Message, StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Verifies missing file throws.
-        /// </summary>
-        [Fact]
-        public void ParseFile_MissingFile_Throws()
-        {
-            var path = Path.Combine(_tempDir.TempDir, "does-not-exist.txt");
-
-            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseFile(path));
-            Assert.Contains("not found", ex.Message, StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Verifies at least one word is required.
-        /// </summary>
-        [Theory]
-        [InlineData("")]
         [InlineData("   \n  \n")]
         [InlineData("// only")]
         [InlineData("# comment")]
-        public void ParseFile_NoWords_Throws(string content)
+        public void ParseWordLines_NoWords_ReturnsEmpty(string content)
         {
-            var path = _CreateFile(content);
-
-            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseFile(path));
-            Assert.Contains("at least one word", ex.Message, StringComparison.Ordinal);
+            Assert.Empty(CasingListParser.ParseWordLines(content));
         }
 
         /// <summary>
         /// Verifies a line containing a space is rejected with line number.
         /// </summary>
         [Fact]
-        public void ParseFile_LineWithMultipleWords_Throws()
+        public void ParseWordLines_LineWithMultipleWords_Throws()
         {
-            var path = _CreateFile(
-                """
-                ok
-                not ok
-                """
+            var ex = Assert.Throws<UserException>(
+                () =>
+                    CasingListParser.ParseWordLines(
+                        """
+                        ok
+                        not ok
+                        """
+                    )
             );
-
-            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseFile(path));
             Assert.Contains("line 2", ex.Message, StringComparison.Ordinal);
             Assert.Contains("exactly one word", ex.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
-        /// Verifies overly long lines are rejected.
+        /// Verifies map build is case-insensitive and last duplicate wins.
         /// </summary>
         [Fact]
-        public void ParseFile_LineTooLong_Throws()
+        public void BuildMap_DuplicateWords_LastWins()
+        {
+            var map = CasingListParser.BuildMap(["foo", "Foo", "FOO"]);
+
+            Assert.Single(map);
+            Assert.Equal("FOO", map["foo"]);
+        }
+
+        /// <summary>
+        /// Verifies BuildMap rejects words that contain spaces.
+        /// </summary>
+        [Fact]
+        public void BuildMap_WordWithSpace_Throws()
+        {
+            var ex = Assert.Throws<UserException>(() => CasingListParser.BuildMap(["ok", "not ok"]));
+            Assert.Contains("word 2", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies overly long lines are rejected when parsing editor text.
+        /// </summary>
+        [Fact]
+        public void ParseWordLines_LineTooLong_Throws()
         {
             var longWord = new string('x', ConfigStore.Config.Filters.MaxListFileLineLength + 1);
-            var path = _CreateFile(longWord);
 
-            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseFile(path));
+            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseWordLines(longWord));
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
-        }
-
-        public void Dispose()
-        {
-            _tempDir.Dispose();
-        }
-
-        private string _CreateFile(string content)
-        {
-            var path = Path.Combine(_tempDir.TempDir, $"casing-list-{Guid.NewGuid():N}.txt");
-            File.WriteAllText(path, content.ReplaceLineEndings(Environment.NewLine));
-            return path;
         }
     }
 }

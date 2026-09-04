@@ -1,21 +1,24 @@
 namespace Mfr.Filters.Case
 {
     /// <summary>
-    /// Parses and validates casing-list files.
+    /// Parses and validates casing-list words.
     /// </summary>
     internal static class CasingListParser
     {
         /// <summary>
-        /// Parses one-word-per-line casing entries from a text file.
+        /// Parses editor / freeform text into a word list (one word per line).
         /// </summary>
-        /// <param name="filePath">Casing-list file path.</param>
-        /// <returns>Case-insensitive map from lowercased word to canonical cased form.</returns>
-        internal static Dictionary<string, string> ParseFile(string filePath)
+        /// <param name="wordsText">Line-separated words; blank lines and list-file comments are ignored.</param>
+        /// <returns>Canonical word spellings in order; empty when there are no non-comment words.</returns>
+        internal static IReadOnlyList<string> ParseWordLines(string wordsText)
         {
-            ListFileParseHelpers.ValidateListFilePath(filePath, listKindLabel: "Casing-list");
+            if (string.IsNullOrWhiteSpace(wordsText))
+            {
+                return [];
+            }
 
-            var lowerWordToCasing = new Dictionary<string, string>(StringComparer.Ordinal);
-            var lines = File.ReadAllLines(filePath);
+            var words = new List<string>();
+            var lines = wordsText.ReplaceLineEndings("\n").Split('\n');
             var maxLineLen = ConfigStore.Config.Filters.MaxListFileLineLength;
             for (var i = 0; i < lines.Length; i++)
             {
@@ -27,7 +30,6 @@ namespace Mfr.Filters.Case
                 }
 
                 var trimmed = rawLine.Trim();
-                // Allow empty lines and comments so list files stay easy to maintain.
                 if (trimmed.Length == 0 || ListFileParseHelpers.IsListFileCommentLine(rawLine))
                 {
                     continue;
@@ -40,14 +42,43 @@ namespace Mfr.Filters.Case
                     );
                 }
 
-                var lowerWord = trimmed.ToLowerInvariant();
-                // Last duplicate wins, matching "reload from file" expectations.
-                lowerWordToCasing[lowerWord] = trimmed;
+                words.Add(trimmed);
             }
 
-            if (lowerWordToCasing.Count == 0)
+            return words;
+        }
+
+        /// <summary>
+        /// Builds a case-insensitive map from configured words (last duplicate wins).
+        /// </summary>
+        /// <param name="words">Canonical word spellings.</param>
+        /// <returns>Map from lowercased word to canonical form; empty when <paramref name="words"/> is empty.</returns>
+        internal static Dictionary<string, string> BuildMap(IReadOnlyList<string> words)
+        {
+            ArgumentNullException.ThrowIfNull(words);
+
+            var lowerWordToCasing = new Dictionary<string, string>(StringComparer.Ordinal);
+            var maxLineLen = ConfigStore.Config.Filters.MaxListFileLineLength;
+            for (var i = 0; i < words.Count; i++)
             {
-                throw new UserException("Casing-list file must contain at least one word.");
+                var word = words[i];
+                var index = i + 1;
+                if (string.IsNullOrWhiteSpace(word))
+                {
+                    throw new UserException($"Casing-list word {index} cannot be empty.");
+                }
+
+                if (word.Length > maxLineLen)
+                {
+                    throw new UserException($"Casing-list word {index} exceeds maximum length ({maxLineLen}).");
+                }
+
+                if (word.Contains(' '))
+                {
+                    throw new UserException($"Casing-list word {index} must be a single word (no spaces).");
+                }
+
+                lowerWordToCasing[word.ToLowerInvariant()] = word;
             }
 
             return lowerWordToCasing;
