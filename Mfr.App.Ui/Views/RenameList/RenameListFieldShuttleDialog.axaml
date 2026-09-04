@@ -204,20 +204,6 @@
     <Style Selector="Button.field-shuttle-direction:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
     </Style>
-    <Style Selector="Border.rename-list-preview-glyph">
-      <Setter Property="Background" Value="{DynamicResource FileListPreviewGlyphBackgroundBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListPreviewGlyphBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="Padding" Value="4,0" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-    <Style Selector="Border.rename-list-preview-glyph TextBlock">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListPreviewGlyphForegroundBrush}" />
-    </Style>
   </Window.Styles>
   <DockPanel Margin="12">
     <Grid DockPanel.Dock="Bottom" Margin="0,14,0,0" ColumnDefinitions="*,Auto,*">

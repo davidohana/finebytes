@@ -93,7 +93,7 @@ todos:
     content: "Phase 12: preview columns for metadata fields (ID3-preview etc., after Phase 10)"
     status: pending
   - id: phase-13
-    content: "Phase 13: color legend + Phase 5 follow-ups (glyph resources, test fixture, entry props)"
+    content: "Phase 13: color legend + remaining hygiene (fixture drive-by; entry props keep)"
     status: pending
   - id: phase-14
     content: "Phase 14: advanced menus — F2, export, free edit, Properties, drag-out"
@@ -151,7 +151,7 @@ ______________________________________________________________________
 | **10d** F5 re-preview               | Done    | After original refresh, re-run preview when Auto-Preview on                         | 8b                |
 | **11** Preview highlighting         | Done    | Red changed preview cells, preview-error rows, Show Preview Error                   | 8c                |
 | **12** Preview metadata columns     | Pending | ID3/image preview cols after filters                                                | 9 / 7b            |
-| **13** Remaining hygiene            | Partial | Color legend + Phase 5 follow-ups (glyph resources, test fixture, entry props)      | 10 / 7c           |
+| **13** Remaining hygiene            | Partial | Color legend after 14/15; glyph styles done; fixture drive-by; keep entry props      | 10 / 7c           |
 | **14** Advanced menus               | Pending | F2, export, Properties, drag-out                                                    | 11 / 8            |
 | **15** GO                           | Pending | `Ctrl+G` → Commit                                                                   | 12 / 9            |
 
@@ -263,12 +263,13 @@ ______________________________________________________________________
 
 *(Was 10 / 7c; partial — missing-on-disk, OrderedDraft, shuttle DnD already shipped in Phase 9.)*
 
-**Still open** ([rename-list-phase5-followups.md](../../docs/rename-list-phase5-followups.md)):
+**Still open:**
 
-- Preview glyph brush resources in one app-level dictionary
-- Headless test fixture consolidation (`RenameListUiTestContext`)
-- `RenameListEntry` convenience properties — delete when tests migrate to `GetFieldText(key)`
-- Color-legend toolbar (MFR7)
+- Headless test fixture consolidation (`RenameListUiTestContext`) — drive-by only
+- `RenameListEntry` convenience properties — keep; `GetFieldText` is the general API
+- Color-legend toolbar (MFR7) — after Phase 14/15 (blue manual rename + plum apply error)
+
+**Done in hygiene:** preview/sort glyph styles live in [Themes/RenameList.axaml](../../Mfr.App.Ui/Themes/RenameList.axaml) (app `StyleInclude`).
 
 ______________________________________________________________________
 
