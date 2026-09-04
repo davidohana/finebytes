@@ -135,6 +135,9 @@ namespace Mfr.App.Ui.ViewModels
         {
             if (RenameListViewModel.IsGridFocused)
             {
+                // Auto-Preview after membership changes holds IsAdding via the shared progress runner;
+                // wait so F5 is not skipped while that pass is still finishing.
+                await WaitForPendingPreviewAsync().ConfigureAwait(true);
                 if (RenameListViewModel.RefreshCommand.CanExecute(null))
                 {
                     await RenameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
