@@ -10,8 +10,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
     /// </summary>
     internal sealed partial class CountFilterEditorViewModel : FilterOptionsEditorViewModel
     {
-        private bool _isLoading;
-
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
@@ -50,25 +48,17 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                 return;
             }
 
-            _isLoading = true;
-            try
-            {
-                Count = countFilter.Options.Count;
-            }
-            finally
-            {
-                _isLoading = false;
-            }
+            LoadWithoutApplying(() => Count = countFilter.Options.Count);
         }
 
         private void _ApplyOptions()
         {
-            if (_isLoading || Step.Filter is not ICountOptionsFilter countFilter)
+            if (IsLoading || Step.Filter is not ICountOptionsFilter countFilter)
             {
                 return;
             }
 
-            var options = new CountFilterOptions(Count: (int)Math.Max(0, Count));
+            var options = new CountFilterOptions(Count: ClampToInt(Count, 0, 9999));
             ApplyIfChanged(Step.Filter, countFilter.WithOptions(options));
         }
     }

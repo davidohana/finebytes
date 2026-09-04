@@ -13,18 +13,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         private const string _spaceReplacement = " ";
         private const string _underscoreReplacement = "_";
 
-        private bool _isLoading;
-
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        /// <param name="filter">Current <see cref="SpaceCharacterFilter"/> instance.</param>
-        public SpaceCharacterFilterEditorViewModel(AppliedFilterStepViewModel step, SpaceCharacterFilter filter)
+        public SpaceCharacterFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
-            ArgumentNullException.ThrowIfNull(filter);
-            _SyncFromFilter(filter);
+            _SyncFromFilter();
         }
 
         /// <summary>
@@ -32,51 +28,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         /// </summary>
         [ObservableProperty]
         private SpaceCharacterDefinition _definition;
-
-        /// <summary>
-        /// Gets or sets whether the space-character definition is selected.
-        /// </summary>
-        public bool IsDefinitionSpace
-        {
-            get => Definition == SpaceCharacterDefinition.Space;
-            set
-            {
-                if (value)
-                {
-                    Definition = SpaceCharacterDefinition.Space;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether the underscore definition is selected.
-        /// </summary>
-        public bool IsDefinitionUnderscore
-        {
-            get => Definition == SpaceCharacterDefinition.Underscore;
-            set
-            {
-                if (value)
-                {
-                    Definition = SpaceCharacterDefinition.Underscore;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether the custom-character definition is selected.
-        /// </summary>
-        public bool IsDefinitionOther
-        {
-            get => Definition == SpaceCharacterDefinition.Other;
-            set
-            {
-                if (value)
-                {
-                    Definition = SpaceCharacterDefinition.Other;
-                }
-            }
-        }
 
         /// <summary>
         /// Gets or sets the custom separator character when <see cref="Definition"/> is <see cref="SpaceCharacterDefinition.Other"/>.
@@ -114,13 +65,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         [ObservableProperty]
         private string _customText = string.Empty;
 
-        partial void OnDefinitionChanged(SpaceCharacterDefinition value)
-        {
-            OnPropertyChanged(nameof(IsDefinitionSpace));
-            OnPropertyChanged(nameof(IsDefinitionUnderscore));
-            OnPropertyChanged(nameof(IsDefinitionOther));
-            _TryApplyOptions();
-        }
+        partial void OnDefinitionChanged(SpaceCharacterDefinition value) => _ApplyOptions();
 
         partial void OnOtherCharacterChanged(string value)
         {
@@ -130,16 +75,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                 return;
             }
 
-            _TryApplyOptions();
+            _ApplyOptions();
         }
 
-        partial void OnReplaceSpacesChanged(bool value) => _TryApplyOptions();
+        partial void OnReplaceSpacesChanged(bool value) => _ApplyOptions();
 
-        partial void OnReplaceUnderscoresChanged(bool value) => _TryApplyOptions();
+        partial void OnReplaceUnderscoresChanged(bool value) => _ApplyOptions();
 
-        partial void OnReplacePercent20Changed(bool value) => _TryApplyOptions();
+        partial void OnReplacePercent20Changed(bool value) => _ApplyOptions();
 
-        partial void OnReplaceCustomChanged(bool value) => _TryApplyOptions();
+        partial void OnReplaceCustomChanged(bool value) => _ApplyOptions();
 
         partial void OnCustomTextChanged(string value)
         {
@@ -149,13 +94,17 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                 return;
             }
 
-            _TryApplyOptions();
+            _ApplyOptions();
         }
 
-        private void _SyncFromFilter(SpaceCharacterFilter filter)
+        private void _SyncFromFilter()
         {
-            _isLoading = true;
-            try
+            if (Step.Filter is not SpaceCharacterFilter filter)
+            {
+                return;
+            }
+
+            LoadWithoutApplying(() =>
             {
                 var options = filter.Options;
                 (Definition, OtherCharacter) = _ResolveDefinition(options.SpaceCharacter);
@@ -164,16 +113,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                 ReplaceUnderscores = options.Replacements.Contains(_underscoreReplacement);
                 CustomText = _ResolveCustomReplacementText(options.Replacements);
                 ReplaceCustom = CustomText.Length > 0;
-            }
-            finally
-            {
-                _isLoading = false;
-            }
+            });
         }
 
-        private void _TryApplyOptions()
+        private void _ApplyOptions()
         {
-            if (_isLoading || Step.Filter is not SpaceCharacterFilter filter)
+            if (IsLoading || Step.Filter is not SpaceCharacterFilter filter)
             {
                 return;
             }

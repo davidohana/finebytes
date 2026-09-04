@@ -5,6 +5,8 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Case"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:caseFilters="using:Mfr.Filters.Case"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="260"
@@ -20,7 +22,7 @@
           GroupName="LettersCaseMode"
           Content="Capitalize"
           ToolTip.Tip="First letter of each word uppercased; other letters lowercased. Words use the current word separator."
-          IsChecked="{Binding IsModeCapitalize, Mode=TwoWay}"
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static caseFilters:LettersCaseMode.Capitalize}, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
           x:Name="SentenceCaseRadio"
@@ -28,7 +30,7 @@
           GroupName="LettersCaseMode"
           Content="Sentence case"
           ToolTip.Tip="First letter of each sentence uppercased; other letters lowercased."
-          IsChecked="{Binding IsModeSentenceCase, Mode=TwoWay}"
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static caseFilters:LettersCaseMode.SentenceCase}, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
           x:Name="InvertCaseRadio"
@@ -36,7 +38,7 @@
           GroupName="LettersCaseMode"
           Content="tOGGLE cASE"
           ToolTip.Tip="Uppercase letters become lowercase and vice versa."
-          IsChecked="{Binding IsModeInvertCase, Mode=TwoWay}"
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static caseFilters:LettersCaseMode.InvertCase}, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
           x:Name="UpperCaseRadio"
@@ -44,7 +46,7 @@
           GroupName="LettersCaseMode"
           Content="UPPER CASE"
           ToolTip.Tip="All letters uppercased."
-          IsChecked="{Binding IsModeUpperCase, Mode=TwoWay}"
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static caseFilters:LettersCaseMode.UpperCase}, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
           x:Name="FirstLetterUpRadio"
@@ -52,7 +54,7 @@
           GroupName="LettersCaseMode"
           Content="First letter up"
           ToolTip.Tip="First letter uppercased; all other letters lowercased."
-          IsChecked="{Binding IsModeFirstLetterUp, Mode=TwoWay}"
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static caseFilters:LettersCaseMode.FirstLetterUp}, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
           x:Name="WeirdCaseRadio"
@@ -60,7 +62,7 @@
           GroupName="LettersCaseMode"
           Content="wEiRd CaSe"
           ToolTip.Tip="Mixed casing. Chance of uppercase is set in Weird Case Settings."
-          IsChecked="{Binding IsModeWeirdCase, Mode=TwoWay}"
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static caseFilters:LettersCaseMode.WeirdCase}, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
           x:Name="LowerCaseRadio"
@@ -68,7 +70,7 @@
           GroupName="LettersCaseMode"
           Content="lower case"
           ToolTip.Tip="All letters lowercased."
-          IsChecked="{Binding IsModeLowerCase, Mode=TwoWay}"
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static caseFilters:LettersCaseMode.LowerCase}, Mode=TwoWay}"
         />
       </WrapPanel>
     </controls:FieldsetGroup>

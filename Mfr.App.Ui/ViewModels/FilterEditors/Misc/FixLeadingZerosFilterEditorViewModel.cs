@@ -9,8 +9,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
     /// </summary>
     internal sealed partial class FixLeadingZerosFilterEditorViewModel : FilterOptionsEditorViewModel
     {
-        private bool _isLoading;
-
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
@@ -60,44 +58,29 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
                 return;
             }
 
-            _isLoading = true;
-            try
+            LoadWithoutApplying(() =>
             {
                 Width = filter.Options.Width;
                 RemoveExtraZeros = filter.Options.RemoveExtraZeros;
                 MaxCount = filter.Options.MaxCount;
                 WholeWordOnly = filter.Options.WholeWordOnly;
-            }
-            finally
-            {
-                _isLoading = false;
-            }
+            });
         }
 
         private void _ApplyOptions()
         {
-            if (_isLoading || Step.Filter is not FixLeadingZerosFilter filter)
+            if (IsLoading || Step.Filter is not FixLeadingZerosFilter filter)
             {
                 return;
             }
 
             var options = new FixLeadingZerosOptions(
-                Width: _ClampWidth(Width),
+                Width: ClampToInt(Width, 1, 30),
                 RemoveExtraZeros: RemoveExtraZeros,
-                MaxCount: _ClampMaxCount(MaxCount),
+                MaxCount: ClampToInt(MaxCount, 0, 9999),
                 WholeWordOnly: WholeWordOnly
             );
             ApplyIfChanged(filter, filter with { Options = options });
-        }
-
-        private static int _ClampWidth(decimal value)
-        {
-            return Math.Clamp((int)value, 1, 30);
-        }
-
-        private static int _ClampMaxCount(decimal value)
-        {
-            return Math.Clamp((int)value, 0, 9999);
         }
     }
 }

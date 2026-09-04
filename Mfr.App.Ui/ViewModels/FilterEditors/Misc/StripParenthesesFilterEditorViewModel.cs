@@ -9,8 +9,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
     /// </summary>
     internal sealed partial class StripParenthesesFilterEditorViewModel : FilterOptionsEditorViewModel
     {
-        private bool _isLoading;
-
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
@@ -33,74 +31,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
         [ObservableProperty]
         private bool _removeContents = true;
 
-        /// <summary>
-        /// Gets or sets whether round parentheses are selected.
-        /// </summary>
-        public bool IsTypeRound
-        {
-            get => Type == ParenthesisType.Round;
-            set
-            {
-                if (value)
-                {
-                    Type = ParenthesisType.Round;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether square brackets are selected.
-        /// </summary>
-        public bool IsTypeSquare
-        {
-            get => Type == ParenthesisType.Square;
-            set
-            {
-                if (value)
-                {
-                    Type = ParenthesisType.Square;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether curly braces are selected.
-        /// </summary>
-        public bool IsTypeCurly
-        {
-            get => Type == ParenthesisType.Curly;
-            set
-            {
-                if (value)
-                {
-                    Type = ParenthesisType.Curly;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether angle brackets are selected.
-        /// </summary>
-        public bool IsTypeAngle
-        {
-            get => Type == ParenthesisType.Angle;
-            set
-            {
-                if (value)
-                {
-                    Type = ParenthesisType.Angle;
-                }
-            }
-        }
-
-        partial void OnTypeChanged(ParenthesisType value)
-        {
-            OnPropertyChanged(nameof(IsTypeRound));
-            OnPropertyChanged(nameof(IsTypeSquare));
-            OnPropertyChanged(nameof(IsTypeCurly));
-            OnPropertyChanged(nameof(IsTypeAngle));
-            _ApplyOptions();
-        }
+        partial void OnTypeChanged(ParenthesisType value) => _ApplyOptions();
 
         partial void OnRemoveContentsChanged(bool value) => _ApplyOptions();
 
@@ -111,21 +42,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
                 return;
             }
 
-            _isLoading = true;
-            try
+            LoadWithoutApplying(() =>
             {
                 Type = filter.Options.Type;
                 RemoveContents = filter.Options.RemoveContents;
-            }
-            finally
-            {
-                _isLoading = false;
-            }
+            });
         }
 
         private void _ApplyOptions()
         {
-            if (_isLoading || Step.Filter is not StripParenthesesFilter filter)
+            if (IsLoading || Step.Filter is not StripParenthesesFilter filter)
             {
                 return;
             }

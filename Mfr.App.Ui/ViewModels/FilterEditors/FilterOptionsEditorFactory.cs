@@ -27,11 +27,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
             return step.Filter switch
             {
-                SpaceCharacterFilter filter => new SpaceCharacterFilterEditorViewModel(step, filter),
+                SpaceCharacterFilter => new SpaceCharacterFilterEditorViewModel(step),
                 SpaceAfterFilter or SpaceAroundFilter => new SpaceTriggerFilterEditorViewModel(step),
-                LettersCaseFilter filter => new LettersCaseFilterEditorViewModel(step, filter),
-                CapitalizeAfterFilter => new CapitalizeAfterFilterEditorViewModel(step),
-                SentenceEndCharactersFilter => new SentenceEndCharactersFilterEditorViewModel(step),
+                LettersCaseFilter => new LettersCaseFilterEditorViewModel(step),
+                CapitalizeAfterFilter or SentenceEndCharactersFilter => new CharacterListFilterEditorViewModel(step),
                 ICountOptionsFilter => new CountFilterEditorViewModel(step),
                 ShrinkDuplicateCharactersFilter => new ShrinkDuplicateCharactersFilterEditorViewModel(step),
                 TrimBetweenFilter => new TrimBetweenFilterEditorViewModel(step),

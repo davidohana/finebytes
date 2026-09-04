@@ -8,23 +8,19 @@
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="80"
-  x:Class="Mfr.App.Ui.Views.FilterEditors.Case.SentenceEndCharactersFilterEditorView"
-  x:DataType="vm:SentenceEndCharactersFilterEditorViewModel"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Case.CharacterListFilterEditorView"
+  x:DataType="vm:CharacterListFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <controls:LabelBesideFieldPanel ToolTip.Tip="Characters that end a sentence for Letters Case (sentence mode) and Casing List (sentence initials). This filter does not change the name text.">
-        <TextBlock
-          Classes="filter-editor-label"
-          TextWrapping="Wrap"
-          Text="The following characters indicate that a sentence had ended:"
-        />
+      <controls:LabelBesideFieldPanel ToolTip.Tip="{Binding CharsToolTip}">
+        <TextBlock Classes="filter-editor-label" TextWrapping="Wrap" Text="{Binding CharsPrompt}" />
         <TextBox
           x:Name="CharsBox"
           Classes="filter-editor-field"
           MinWidth="120"
           MaxLength="100"
-          Text="{Binding Characters}"
+          Text="{Binding Chars}"
         />
       </controls:LabelBesideFieldPanel>
     </controls:FieldsetGroup>

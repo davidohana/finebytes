@@ -9,8 +9,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
     /// </summary>
     internal sealed partial class ShrinkDuplicateCharactersFilterEditorViewModel : FilterOptionsEditorViewModel
     {
-        private bool _isLoading;
-
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
@@ -36,20 +34,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                 return;
             }
 
-            _isLoading = true;
-            try
-            {
-                CharacterText = filter.Options.Character == '\0' ? string.Empty : filter.Options.Character.ToString();
-            }
-            finally
-            {
-                _isLoading = false;
-            }
+            LoadWithoutApplying(() =>
+                CharacterText = filter.Options.Character == '\0' ? string.Empty : filter.Options.Character.ToString()
+            );
         }
 
         private void _ApplyOptions()
         {
-            if (_isLoading || Step.Filter is not ShrinkDuplicateCharactersFilter filter)
+            if (IsLoading || Step.Filter is not ShrinkDuplicateCharactersFilter filter)
             {
                 return;
             }

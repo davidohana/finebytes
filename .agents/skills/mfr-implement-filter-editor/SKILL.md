@@ -33,7 +33,7 @@ Filter editor:
 
 **Default:** one filter type per pass.
 
-**Group only when it clearly saves work:** identical options type, near-identical UI (labels differ), or shared control surface + small value variant. Examples already shipped: Count L/R (`ICountOptionsFilter`); Space After + Around (`SpaceTriggerFilterEditorViewModel`).
+**Group only when it clearly saves work:** identical options type, near-identical UI (labels differ), or shared control surface + small value variant. Examples already shipped: Count L/R (`ICountOptionsFilter`); Space After + Around (`SpaceTriggerFilterEditorViewModel`); Capitalize After + Sentence End Characters (`CharacterListFilterEditorViewModel`).
 
 Do **not** batch unrelated filters. File-list / audio / Formatter stay separate unless options truly share.
 
@@ -56,10 +56,11 @@ Do **not** batch unrelated filters. File-list / audio / Formatter stay separate 
 Copy the closest shipped editor (see table below). Required shape:
 
 1. `internal sealed partial class … : FilterOptionsEditorViewModel`
-1. `_isLoading` gate around `_SyncFromFilter` so property setters do not re-apply during load
+1. `LoadWithoutApplying` around `_SyncFromFilter` so property setters do not re-apply during load
 1. `[ObservableProperty]` + `partial void OnXChanged` → `_ApplyOptions()`
-1. `_ApplyOptions`: early-return if `_isLoading` or wrong filter type; build options; `ApplyIfChanged(filter, filter with { Options = … })`
-1. Clamp / normalize UI values to match filter option constraints (ints from `decimal` NumericUpDown, empty char → `'\0'`, etc.)
+1. `_ApplyOptions`: early-return if `IsLoading` or wrong filter type; build options; `ApplyIfChanged(filter, filter with { Options = … })`
+1. Clamp / normalize UI values to match filter option constraints (`ClampToInt` for NumericUpDown, empty char → `'\0'`, etc.)
+1. Enum radios: bind `IsChecked` through `EnumToBooleanConverter.Instance` + `x:Static` (do not add per-value `IsXxx` properties)
 1. **Do not** call `Setup()`; **no** Apply button — live replace only
 1. Preview is already wired via `SetFilter` → chain change → Auto-Preview; do not re-wire `MainWindowViewModel`
 
@@ -77,15 +78,15 @@ Add a `switch` arm in `FilterOptionsEditorFactory.Create`. Until registered, sel
 
 ## Reference editors by shape
 
-| Shape                                        | Copy from                                         |
-| -------------------------------------------- | ------------------------------------------------- |
-| Shared numeric count                         | `Trimming/CountFilterEditor*`                     |
-| Single char (`MaxLength=1`, empty semantics) | `Trimming/ShrinkDuplicateCharactersFilterEditor*` |
-| Position start/end                           | `Trimming/TrimBetweenFilterEditor*`               |
-| Multi checkbox + numeric                     | `Misc/FixLeadingZerosFilterEditor*`               |
-| Shared two-filter labels differ              | `Space/SpaceTriggerFilterEditor*`                 |
-| Enum / radio case mode                       | `Case/LettersCaseFilterEditor*`                   |
-| Space char catalog                           | `Space/SpaceCharacterFilterEditor*`               |
+| Shape                                        | Copy from                                                              |
+| -------------------------------------------- | ---------------------------------------------------------------------- |
+| Shared numeric count                         | `Trimming/CountFilterEditor*`                                          |
+| Single char (`MaxLength=1`, empty semantics) | `Trimming/ShrinkDuplicateCharactersFilterEditor*`                      |
+| Position start/end                           | `Trimming/TrimBetweenFilterEditor*`                                    |
+| Multi checkbox + numeric                     | `Misc/FixLeadingZerosFilterEditor*`                                    |
+| Shared two-filter labels differ              | `Space/SpaceTriggerFilterEditor*` or `Case/CharacterListFilterEditor*` |
+| Enum / radio case mode                       | `Case/LettersCaseFilterEditor*`                                        |
+| Space char catalog                           | `Space/SpaceCharacterFilterEditor*`                                    |
 
 ## Tests
 

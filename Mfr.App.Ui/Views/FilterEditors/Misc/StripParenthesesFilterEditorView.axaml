@@ -5,6 +5,8 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Misc"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:miscFilters="using:Mfr.Filters.Misc"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="120"
@@ -25,28 +27,28 @@
               Margin="0,0,16,4"
               GroupName="StripParenthesesType"
               Content="( )"
-              IsChecked="{Binding IsTypeRound, Mode=TwoWay}"
+              IsChecked="{Binding Type, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static miscFilters:ParenthesisType.Round}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="SquareRadio"
               Margin="0,0,16,4"
               GroupName="StripParenthesesType"
               Content="[ ]"
-              IsChecked="{Binding IsTypeSquare, Mode=TwoWay}"
+              IsChecked="{Binding Type, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static miscFilters:ParenthesisType.Square}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="CurlyRadio"
               Margin="0,0,16,4"
               GroupName="StripParenthesesType"
               Content="{}{ }"
-              IsChecked="{Binding IsTypeCurly, Mode=TwoWay}"
+              IsChecked="{Binding Type, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static miscFilters:ParenthesisType.Curly}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="AngleRadio"
               Margin="0,0,0,4"
               GroupName="StripParenthesesType"
               Content="&lt; &gt;"
-              IsChecked="{Binding IsTypeAngle, Mode=TwoWay}"
+              IsChecked="{Binding Type, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static miscFilters:ParenthesisType.Angle}, Mode=TwoWay}"
             />
           </WrapPanel>
         </StackPanel>

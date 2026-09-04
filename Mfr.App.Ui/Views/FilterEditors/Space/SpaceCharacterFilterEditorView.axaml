@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Space"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="220"
@@ -27,20 +28,20 @@
             x:Name="SpaceDefinitionRadio"
             GroupName="SpaceCharacterDefinition"
             Content="Space"
-            IsChecked="{Binding IsDefinitionSpace, Mode=TwoWay}"
+            IsChecked="{Binding Definition, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:SpaceCharacterDefinition.Space}, Mode=TwoWay}"
           />
           <controls:CompactRadioButton
             x:Name="UnderscoreDefinitionRadio"
             GroupName="SpaceCharacterDefinition"
             Content="Underscore ( _ )"
-            IsChecked="{Binding IsDefinitionUnderscore, Mode=TwoWay}"
+            IsChecked="{Binding Definition, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:SpaceCharacterDefinition.Underscore}, Mode=TwoWay}"
           />
           <StackPanel Orientation="Horizontal" Spacing="4">
             <controls:CompactRadioButton
               x:Name="OtherDefinitionRadio"
               GroupName="SpaceCharacterDefinition"
               Content="Other:"
-              IsChecked="{Binding IsDefinitionOther, Mode=TwoWay}"
+              IsChecked="{Binding Definition, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:SpaceCharacterDefinition.Other}, Mode=TwoWay}"
             />
             <TextBox
               x:Name="OtherCharacterBox"

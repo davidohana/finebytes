@@ -10,8 +10,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
     /// </summary>
     internal sealed partial class SpaceTriggerFilterEditorViewModel : FilterOptionsEditorViewModel
     {
-        private bool _isLoading;
-
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
@@ -56,8 +54,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
 
         private void _SyncFromFilter()
         {
-            _isLoading = true;
-            try
+            LoadWithoutApplying(() =>
             {
                 if (Step.Filter is SpaceAfterFilter after)
                 {
@@ -71,16 +68,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                     Chars = around.Options.AroundChars;
                     OnlyWhenNeighborLetterOrDigit = around.Options.OnlyWhenNeighboringAreLettersOrDigits;
                 }
-            }
-            finally
-            {
-                _isLoading = false;
-            }
+            });
         }
 
         private void _ApplyOptions()
         {
-            if (_isLoading)
+            if (IsLoading)
             {
                 return;
             }
@@ -131,10 +124,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                     "Only when neighboring characters are letters or digits.",
                     "When checked, insert on each side only if that neighbor is a Unicode letter or digit."
                 ),
-                _ => (
-                    "Ensure a space beside each of the following characters:",
-                    "Only when neighboring characters are letters or digits.",
-                    "When checked, insert only beside letter or digit neighbors."
+                _ => throw new InvalidOperationException(
+                    $"Space trigger editor does not support {filter.GetType().Name}."
                 ),
             };
         }

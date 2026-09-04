@@ -199,11 +199,12 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Capitalize_after_options_update_step_options()
         {
             var step = new AppliedFilterStepViewModel("Capitalize After", new CapitalizeAfterFilter());
-            var editor = new CapitalizeAfterFilterEditorViewModel(step);
+            var editor = new CharacterListFilterEditorViewModel(step);
 
-            Assert.Equal(",!()[]{};-", editor.CapitalizeAfterChars);
+            Assert.Equal(",!()[]{};-", editor.Chars);
+            Assert.Contains("succeed", editor.CharsPrompt, StringComparison.OrdinalIgnoreCase);
 
-            editor.CapitalizeAfterChars = "._";
+            editor.Chars = "._";
 
             var options = ((CapitalizeAfterFilter)step.Filter).Options;
             Assert.Equal("._", options.CapitalizeAfterChars);
@@ -216,11 +217,12 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Sentence_end_characters_options_update_step_options()
         {
             var step = new AppliedFilterStepViewModel("Sentence End Characters", new SentenceEndCharactersFilter());
-            var editor = new SentenceEndCharactersFilterEditorViewModel(step);
+            var editor = new CharacterListFilterEditorViewModel(step);
 
-            Assert.Equal("-.!", editor.Characters);
+            Assert.Equal("-.!", editor.Chars);
+            Assert.Contains("sentence had ended", editor.CharsPrompt, StringComparison.OrdinalIgnoreCase);
 
-            editor.Characters = ":;";
+            editor.Chars = ":;";
 
             var options = ((SentenceEndCharactersFilter)step.Filter).Options;
             Assert.Equal(":;", options.Characters);
@@ -237,16 +239,13 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             Assert.Equal(ParenthesisType.Round, editor.Type);
             Assert.True(editor.RemoveContents);
-            Assert.True(editor.IsTypeRound);
 
-            editor.IsTypeSquare = true;
+            editor.Type = ParenthesisType.Square;
             editor.RemoveContents = false;
 
             var options = ((StripParenthesesFilter)step.Filter).Options;
             Assert.Equal(ParenthesisType.Square, options.Type);
             Assert.False(options.RemoveContents);
-            Assert.True(editor.IsTypeSquare);
-            Assert.False(editor.IsTypeRound);
         }
     }
 }

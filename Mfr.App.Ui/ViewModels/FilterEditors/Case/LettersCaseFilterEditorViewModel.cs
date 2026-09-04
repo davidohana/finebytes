@@ -9,18 +9,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
     /// </summary>
     internal sealed partial class LettersCaseFilterEditorViewModel : FilterOptionsEditorViewModel
     {
-        private bool _isLoading;
-
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        /// <param name="filter">Current <see cref="LettersCaseFilter"/> instance.</param>
-        public LettersCaseFilterEditorViewModel(AppliedFilterStepViewModel step, LettersCaseFilter filter)
+        public LettersCaseFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
-            ArgumentNullException.ThrowIfNull(filter);
-            _SyncFromFilter(filter);
+            _SyncFromFilter();
         }
 
         /// <summary>
@@ -28,111 +24,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         /// </summary>
         [ObservableProperty]
         private LettersCaseMode _mode;
-
-        /// <summary>
-        /// Gets or sets whether Capitalize is selected.
-        /// </summary>
-        public bool IsModeCapitalize
-        {
-            get => Mode == LettersCaseMode.Capitalize;
-            set
-            {
-                if (value)
-                {
-                    Mode = LettersCaseMode.Capitalize;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether Sentence case is selected.
-        /// </summary>
-        public bool IsModeSentenceCase
-        {
-            get => Mode == LettersCaseMode.SentenceCase;
-            set
-            {
-                if (value)
-                {
-                    Mode = LettersCaseMode.SentenceCase;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether tOGGLE cASE is selected.
-        /// </summary>
-        public bool IsModeInvertCase
-        {
-            get => Mode == LettersCaseMode.InvertCase;
-            set
-            {
-                if (value)
-                {
-                    Mode = LettersCaseMode.InvertCase;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether UPPER CASE is selected.
-        /// </summary>
-        public bool IsModeUpperCase
-        {
-            get => Mode == LettersCaseMode.UpperCase;
-            set
-            {
-                if (value)
-                {
-                    Mode = LettersCaseMode.UpperCase;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether First letter up is selected.
-        /// </summary>
-        public bool IsModeFirstLetterUp
-        {
-            get => Mode == LettersCaseMode.FirstLetterUp;
-            set
-            {
-                if (value)
-                {
-                    Mode = LettersCaseMode.FirstLetterUp;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether wEiRd CaSe is selected.
-        /// </summary>
-        public bool IsModeWeirdCase
-        {
-            get => Mode == LettersCaseMode.WeirdCase;
-            set
-            {
-                if (value)
-                {
-                    Mode = LettersCaseMode.WeirdCase;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether lower case is selected.
-        /// </summary>
-        public bool IsModeLowerCase
-        {
-            get => Mode == LettersCaseMode.LowerCase;
-            set
-            {
-                if (value)
-                {
-                    Mode = LettersCaseMode.LowerCase;
-                }
-            }
-        }
 
         /// <summary>
         /// Gets whether skip-words editing is available for the current mode.
@@ -164,13 +55,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
 
         partial void OnModeChanged(LettersCaseMode value)
         {
-            OnPropertyChanged(nameof(IsModeCapitalize));
-            OnPropertyChanged(nameof(IsModeSentenceCase));
-            OnPropertyChanged(nameof(IsModeInvertCase));
-            OnPropertyChanged(nameof(IsModeUpperCase));
-            OnPropertyChanged(nameof(IsModeFirstLetterUp));
-            OnPropertyChanged(nameof(IsModeWeirdCase));
-            OnPropertyChanged(nameof(IsModeLowerCase));
             OnPropertyChanged(nameof(HasCapitalizeSkipWords));
             OnPropertyChanged(nameof(HasWeirdCaseOptions));
             _ApplyOptions();
@@ -182,25 +66,25 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
 
         partial void OnWeirdFixedPlacesChanged(bool value) => _ApplyOptions();
 
-        private void _SyncFromFilter(LettersCaseFilter filter)
+        private void _SyncFromFilter()
         {
-            _isLoading = true;
-            try
+            if (Step.Filter is not LettersCaseFilter filter)
+            {
+                return;
+            }
+
+            LoadWithoutApplying(() =>
             {
                 Mode = filter.Options.Mode;
                 CapitalizeSkipWordsText = string.Join(", ", filter.Options.CapitalizeSkipWords);
                 WeirdUppercaseChancePercent = filter.Options.WeirdUppercaseChancePercent;
                 WeirdFixedPlaces = filter.Options.WeirdFixedPlaces;
-            }
-            finally
-            {
-                _isLoading = false;
-            }
+            });
         }
 
         private void _ApplyOptions()
         {
-            if (_isLoading || Step.Filter is not LettersCaseFilter filter)
+            if (IsLoading || Step.Filter is not LettersCaseFilter filter)
             {
                 return;
             }
@@ -210,7 +94,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
             {
                 Mode = Mode,
                 CapitalizeSkipWords = capitalizeSkipWords,
-                WeirdUppercaseChancePercent = (int)Math.Clamp(WeirdUppercaseChancePercent, 0, 100),
+                WeirdUppercaseChancePercent = ClampToInt(WeirdUppercaseChancePercent, 0, 100),
                 WeirdFixedPlaces = WeirdFixedPlaces,
             };
             ApplyIfChanged(filter, filter with { Options = options });

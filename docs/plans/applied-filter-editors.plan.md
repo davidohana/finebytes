@@ -115,8 +115,7 @@ ViewModels/FilterEditors/          Views/FilterEditors/
       SpaceTrigger… (After + Around)   SpaceTrigger…
     Case/                              Case/
     LettersCase…                     …
-    CapitalizeAfter…
-    SentenceEndCharacters…
+    CharacterList… (Capitalize After + Sentence End)
     CasingList…
   Trimming/                          Trimming/
     Count…                           …
@@ -216,8 +215,8 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 | **3 (done)** | **Trim Between**                | Trimming   | single                                             | `Position` start/end + side                                                 |
 | **4 (done)** | **Fix Leading 0's**             | Misc       | single                                             | width / remove extras / max / whole-word                                    |
 | **5 (done)** | **Space After + Around**        | Space      | Space After, Space Around                          | Shared `SpaceTrigger` chars+neighbor editor; two factory arms + tests       |
-| **6 (done)** | Capitalize After                | Case       | single                                             | trigger chars string                                                        |
-| **7 (done)** | Sentence End Characters         | Case       | single                                             | char list                                                                   |
+| **6 (done)** | Capitalize After                | Case       | single                                             | trigger chars string; later shared `CharacterList` editor with Sentence End |
+| **7 (done)** | Sentence End Characters         | Case       | single                                             | char list; later shared `CharacterList` editor with Capitalize After        |
 | **8 (done)** | Strip Parentheses               | Misc       | single                                             | pair type + remove contents                                                 |
 | **9 (next)** | Cleaner                         | Replace    | single                                             | illegal + custom + replacement                                              |
 | 10           | Counter                         | Formatting | single                                             | start / step / format                                                       |
