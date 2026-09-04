@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–9 and 10a done. Next: 10b list membership, 10c Auto-Preview toggle, 10d F5 re-preview; then 11 highlighting, 12–15."
+overview: "Phases 1–9 and 10a–10b done. Next: 10c Auto-Preview toggle, 10d F5 re-preview; then 11 highlighting, 12–15."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -79,7 +79,7 @@ todos:
     status: completed
   - id: phase-10b
     content: "10b: Re-preview when Rename List membership changes (add/remove/clear)"
-    status: pending
+    status: completed
   - id: phase-10c
     content: "10c: Auto-Preview toggle — menu/toolbar, persist; cancel disables"
     status: pending
@@ -146,7 +146,7 @@ flowchart LR
 | **8** Original field-load errors | Done | Load-error cells, Show Load Errors, TagLib flag, structured gray, LoadErrors naming | 6b–6e |
 | **9** Original Refresh | Done | F5, re-read disk, menus/toolbar; missing-on-disk gray; shuttle OrderedDraft + DnD | 8a (+ part of 10) |
 | **10a** Filter-edit preview | Done | Live `ToChain()` → `Preview()` → grid + status counts (always on) | 8b |
-| **10b** List membership | **Next** | Re-preview on Rename List add/remove/clear | 8b |
+| **10b** List membership | Done | Re-preview on Rename List add/remove/clear | 8b |
 | **10c** Auto-Preview toggle | Pending | Menu/toolbar, persist; cancel disables | 8b |
 | **10d** F5 re-preview | Pending | After original refresh, re-run preview when Auto-Preview on | 8b |
 | **11** Preview highlighting | Pending | Red changed cells, preview-error rows, Show Preview Error | 8c |
@@ -209,11 +209,13 @@ Filter stack/options → `ToChain()` → `Preview()` → grid. Always on (toggle
 - [RenameListViewModel.Preview.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Preview.cs) → engine → `_RefreshFieldDisplay()`. [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) subscribes to `ChainChanged`.
 - Status-bar `ChangeCount` / `PreviewErrorCount`.
 
-**Gap until 10b:** files added *after* filters are on the stack stay identity until the next filter edit. Demo: add files first, then edit filters.
+### 10b — List membership — done
 
-### 10b — List membership (next)
+Re-preview after Rename List add/remove/clear using the current chain. Row sort/reorder does not change preview values.
 
-Re-preview after Rename List add/remove/clear using the current chain. Row sort/reorder does not change preview values. Without this, 10a’s gap remains.
+- `MembershipChanged` from `_NotifyListChanged` (add/remove/clear only).
+- [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) shares `_PreviewRenameList()` with `ChainChanged`.
+- Tests: add-after-filters, remove/clear counts, move does not raise membership.
 
 ### 10c — Auto-Preview toggle
 
@@ -274,4 +276,4 @@ F2 free edit, export, Properties, drag-out to Explorer; Refresh reset of manual 
 
 ## What to implement next
 
-**10b List membership** — re-preview after Rename List add/remove/clear. Then **10c** Auto-Preview toggle, **10d** F5 re-preview, **11** highlighting, **12–15**.
+**10c Auto-Preview toggle** — menu/toolbar, persist; then **10d** F5 re-preview, **11** highlighting, **12–15**.

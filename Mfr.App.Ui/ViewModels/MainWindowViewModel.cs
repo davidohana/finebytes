@@ -47,6 +47,7 @@ namespace Mfr.App.Ui.ViewModels
             }
 
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
+            RenameListViewModel.MembershipChanged += _OnRenameListMembershipChanged;
             AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
             AppliedFiltersViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
             AppliedFiltersViewModel.ChainChanged += _OnAppliedFiltersChainChanged;
@@ -252,6 +253,16 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         private void _OnAppliedFiltersChainChanged(object? sender, EventArgs e)
+        {
+            _PreviewRenameList();
+        }
+
+        private void _OnRenameListMembershipChanged(object? sender, EventArgs e)
+        {
+            _PreviewRenameList();
+        }
+
+        private void _PreviewRenameList()
         {
             RenameListViewModel.Preview(AppliedFiltersViewModel.ToChain());
         }

@@ -79,6 +79,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public RenameListAddProgressViewModel AddProgress { get; } = new();
 
         /// <summary>
+        /// Raised after Rename List membership changes (add, remove, or clear — not sort/reorder).
+        /// </summary>
+        public event EventHandler? MembershipChanged;
+
+        /// <summary>
         /// Gets the rows shown in the Rename List grid.
         /// </summary>
         /// <para>
@@ -244,6 +249,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ClearCommand.NotifyCanExecuteChanged();
             RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
             _NotifyRefreshChanged();
+            MembershipChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

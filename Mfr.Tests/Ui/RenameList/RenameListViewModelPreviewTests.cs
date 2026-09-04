@@ -9,7 +9,7 @@ using Mfr.Tests.Ui.RenameList;
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Phase 10a: Applied Filters chain changes drive Rename List preview.
+    /// Phase 10a–10b: filter-chain and Rename List membership changes drive preview.
     /// </summary>
     public sealed class RenameListViewModelPreviewTests : IDisposable
     {
@@ -144,11 +144,110 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
         }
 
+        /// <summary>
+        /// Verifies adding files after filters are already on the stack applies the current chain (Phase 10b).
+        /// </summary>
+        [Fact]
+        public async Task Add_after_filters_applies_current_chain()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var (renameList, applied) = _CreateWiredPanes(dir);
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+
+            await renameList.AddPathsAsync([path]).ConfigureAwait(true);
+
+            Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
+            Assert.Equal(1, renameList.ChangeCount);
+        }
+
+        /// <summary>
+        /// Verifies removing a changed row updates change count from the remaining membership.
+        /// </summary>
+        [Fact]
+        public async Task Remove_updates_change_count()
+        {
+            var dir = _context.CreateTempDir();
+            var upperPath = Path.Combine(dir, "hello.txt");
+            var lowerPath = Path.Combine(dir, "WORLD.txt");
+            File.WriteAllText(upperPath, "x");
+            File.WriteAllText(lowerPath, "x");
+
+            var (renameList, applied) = _CreateWiredPanes(dir);
+            await renameList.AddPathsAsync([upperPath, lowerPath]).ConfigureAwait(true);
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            Assert.Equal(1, renameList.ChangeCount);
+
+            renameList.SetSelectedEntries([renameList.Entries[0]]);
+            renameList.RemoveSelectedCommand.Execute(null);
+
+            Assert.Single(renameList.Entries);
+            Assert.Equal("WORLD.txt", renameList.Entries[0].FullFileNamePreview);
+            Assert.Equal(0, renameList.ChangeCount);
+        }
+
+        /// <summary>
+        /// Verifies clearing the Rename List zeros preview status counts.
+        /// </summary>
+        [Fact]
+        public async Task Clear_zeros_preview_counts()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var (renameList, applied) = _CreateWiredPanes(dir);
+            await renameList.AddPathsAsync([path]).ConfigureAwait(true);
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            Assert.Equal(1, renameList.ChangeCount);
+
+            renameList.ClearCommand.Execute(null);
+
+            Assert.Empty(renameList.Entries);
+            Assert.Equal(0, renameList.ChangeCount);
+            Assert.Equal(0, renameList.PreviewErrorCount);
+        }
+
+        /// <summary>
+        /// Verifies row move does not change preview values or raise membership.
+        /// </summary>
+        [Fact]
+        public async Task Row_reorder_does_not_change_preview_or_raise_membership()
+        {
+            var dir = _context.CreateTempDir();
+            var firstPath = Path.Combine(dir, "aaa.txt");
+            var secondPath = Path.Combine(dir, "bbb.txt");
+            File.WriteAllText(firstPath, "x");
+            File.WriteAllText(secondPath, "x");
+
+            var (renameList, applied) = _CreateWiredPanes(dir);
+            await renameList.AddPathsAsync([firstPath, secondPath]).ConfigureAwait(true);
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            Assert.Equal("AAA.txt", renameList.Entries[0].FullFileNamePreview);
+            Assert.Equal("BBB.txt", renameList.Entries[1].FullFileNamePreview);
+
+            var membershipRaises = 0;
+            renameList.MembershipChanged += (_, _) => membershipRaises++;
+            renameList.SetSelectedEntries([renameList.Entries[1]]);
+            renameList.MoveSelectedUpCommand.Execute(null);
+
+            Assert.Equal(0, membershipRaises);
+            Assert.Equal("BBB.txt", renameList.Entries[0].FullFileNamePreview);
+            Assert.Equal("AAA.txt", renameList.Entries[1].FullFileNamePreview);
+        }
+
         private (RenameListViewModel RenameList, AppliedFiltersViewModel Applied) _CreateWiredPanes(string dir)
         {
             var renameList = _context.CreateRenameListViewModel(dir);
             var applied = new AppliedFiltersViewModel();
             applied.ChainChanged += (_, _) => renameList.Preview(applied.ToChain());
+            renameList.MembershipChanged += (_, _) => renameList.Preview(applied.ToChain());
             return (renameList, applied);
         }
 
