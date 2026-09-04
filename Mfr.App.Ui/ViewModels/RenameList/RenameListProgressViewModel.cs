@@ -9,9 +9,31 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// </summary>
     public sealed partial class RenameListProgressViewModel : ViewModelBase
     {
-        private const int DialogDelayMilliseconds = 500;
+        private const int DefaultDialogDelayMilliseconds = 500;
 
+        private readonly int _dialogDelayMilliseconds;
         private CancellationTokenSource? _cts;
+
+        /// <summary>
+        /// Creates progress state with the production dialog delay.
+        /// </summary>
+        public RenameListProgressViewModel()
+            : this(DefaultDialogDelayMilliseconds) { }
+
+        /// <summary>
+        /// Creates progress state with a custom dialog delay.
+        /// </summary>
+        /// <param name="dialogDelayMilliseconds">
+        /// Milliseconds work must run before the progress dialog appears; use a short value in tests.
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="dialogDelayMilliseconds"/> is negative.
+        /// </exception>
+        public RenameListProgressViewModel(int dialogDelayMilliseconds)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(dialogDelayMilliseconds);
+            _dialogDelayMilliseconds = dialogDelayMilliseconds;
+        }
 
         /// <summary>
         /// Gets whether a background operation is running.
@@ -195,7 +217,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MetadataTotalCount = 0;
             LastPath = string.Empty;
 
-            var showDialogDelay = Task.Delay(DialogDelayMilliseconds, CancellationToken.None);
+            var showDialogDelay = Task.Delay(_dialogDelayMilliseconds, CancellationToken.None);
             var workTask = Task.Run(() => work(token, progress), token);
 
             var completed = await Task.WhenAny(workTask, showDialogDelay).ConfigureAwait(true);

@@ -38,7 +38,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_Slow_Work_Shows_Dialog_Then_Hides()
         {
-            var viewModel = new RenameListProgressViewModel();
+            var viewModel = new RenameListProgressViewModel(dialogDelayMilliseconds: 20);
+            using var holdWork = new ManualResetEventSlim(false);
             var dialogBecameVisible = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             viewModel.PropertyChanged += (_, e) =>
             {
@@ -48,13 +49,14 @@ namespace Mfr.Tests.Ui.RenameList
                 }
             };
 
-            var run = viewModel.RunAsync((_, _) => Thread.Sleep(900));
+            var run = viewModel.RunAsync((_, _) => holdWork.Wait());
             await dialogBecameVisible.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
 
             Assert.True(viewModel.IsBusy);
             Assert.True(viewModel.IsDialogVisible);
             Assert.True(viewModel.CancelCommand.CanExecute(null));
 
+            holdWork.Set();
             Assert.True(await run.ConfigureAwait(true));
             Assert.False(viewModel.IsBusy);
             Assert.False(viewModel.IsDialogVisible);
