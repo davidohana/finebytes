@@ -46,6 +46,9 @@ dotnet_analyzer_diagnostic.category-Style.severity = warning
 dotnet_analyzer_diagnostic.category-Performance.severity = warning
 dotnet_analyzer_diagnostic.category-Reliability.severity = warning
 
+# Namespace must match folder relative to project RootNamespace.
+dotnet_diagnostic.IDE0130.severity = warning
+
 # Commonly useful built-in rules.
 dotnet_diagnostic.IDE0005.severity = warning
 dotnet_diagnostic.IDE0011.severity = warning

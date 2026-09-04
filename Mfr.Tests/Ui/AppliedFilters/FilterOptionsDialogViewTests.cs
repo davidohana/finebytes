@@ -9,6 +9,7 @@ using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
+using Mfr.Tests.Ui.Controls;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {

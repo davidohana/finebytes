@@ -6,7 +6,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Views.Controls;
 
-namespace Mfr.Tests.Ui
+namespace Mfr.Tests.Ui.Controls
 {
     /// <summary>
     /// Headless layout tests for <see cref="CompactRadioButton"/> and <see cref="CompactCheckBox"/>.

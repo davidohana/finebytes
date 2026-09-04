@@ -4,7 +4,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterEditors
 {
     /// <summary>
     /// Unit tests for <see cref="FilterEditorViewModel"/>.

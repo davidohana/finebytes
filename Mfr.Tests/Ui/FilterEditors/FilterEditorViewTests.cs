@@ -20,8 +20,9 @@ using Mfr.Filters.Case;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
 using Mfr.Models.Filters;
+using Mfr.Tests.Ui.AppliedFilters;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterEditors
 {
     /// <summary>
     /// Headless tests for the Filter Configuration pane.

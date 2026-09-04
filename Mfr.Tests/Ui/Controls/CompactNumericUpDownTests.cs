@@ -3,7 +3,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Mfr.App.Ui.Views.Controls;
 
-namespace Mfr.Tests.Ui
+namespace Mfr.Tests.Ui.Controls
 {
     /// <summary>
     /// Headless layout tests for <see cref="CompactNumericUpDown"/>.

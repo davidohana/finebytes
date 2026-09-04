@@ -4,7 +4,7 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Views.Controls;
 
-namespace Mfr.Tests.Ui
+namespace Mfr.Tests.Ui.Controls
 {
     /// <summary>
     /// Layout checks for <see cref="CompactNumericUpDown"/>.
