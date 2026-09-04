@@ -1,4 +1,5 @@
 using Mfr.Filters.Audio;
+using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
@@ -557,6 +558,67 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal(1, renameList.Remove(item));
             Assert.Empty(renameList.RenameItems);
+        }
+
+        /// <summary>
+        /// Verifies RemoveUnchanged keeps only rows whose preview for the key differs from the original.
+        /// </summary>
+        [Fact]
+        public void RemoveUnchanged_keeps_changed_preview_rows_only()
+        {
+            var (helloPath, worldPath, otherPath) = TestHelpers.CreateFiles(
+                _tempRoot,
+                "hello.txt",
+                "WORLD.txt",
+                "other.txt"
+            );
+
+            var renameList = new RenameList();
+            renameList.AddSources([helloPath, worldPath, otherPath]);
+            renameList.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ])
+            );
+
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            Assert.Equal(1, renameList.RemoveUnchanged(previewKey));
+
+            Assert.Equal([helloPath, otherPath], renameList.RenameItems.Select(item => item.Original.FullPath));
+            Assert.Equal([0, 1], renameList.RenameItems.Select(item => item.Original.RenameListIndex));
+        }
+
+        /// <summary>
+        /// Verifies RemoveUnchanged is a no-op for original keys and an empty list.
+        /// </summary>
+        [Fact]
+        public void RemoveUnchanged_original_key_or_empty_list_is_noop()
+        {
+            var emptyList = new RenameList();
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            Assert.Equal(0, emptyList.RemoveUnchanged(previewKey));
+
+            var path = TestHelpers.CreateFile(_tempRoot, "hello.txt");
+            var renameList = new RenameList();
+            renameList.AddSources([path]);
+            renameList.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ])
+            );
+
+            var originalKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            Assert.Equal(0, renameList.RemoveUnchanged(originalKey));
+            Assert.Single(renameList.RenameItems);
         }
 
         [Fact]

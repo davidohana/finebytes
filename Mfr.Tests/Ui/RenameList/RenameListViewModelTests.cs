@@ -1,6 +1,7 @@
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Filters.Case;
 using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Tests.Ui.RenameList
@@ -379,6 +380,60 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Same(renameListViewModel.Entries[1], renameListViewModel.SelectedEntries[0]);
             Assert.Equal(2, renameListViewModel.ItemCount);
             Assert.True(renameListViewModel.RemoveSelectedCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies RemoveUnchanged drops unchanged preview rows, clears selection, and raises MembershipChanged.
+        /// </summary>
+        [Fact]
+        public async Task RemoveUnchanged_drops_unchanged_preview_rows_and_clears_selection()
+        {
+            var dir = _context.CreateTempDir();
+            var helloPath = Path.Combine(dir, "hello.txt");
+            var worldPath = Path.Combine(dir, "WORLD.txt");
+            var otherPath = Path.Combine(dir, "other.txt");
+            await File.WriteAllTextAsync(helloPath, "x");
+            await File.WriteAllTextAsync(worldPath, "x");
+            await File.WriteAllTextAsync(otherPath, "x");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([helloPath, worldPath, otherPath]);
+            renameListViewModel.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ])
+            );
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            var membershipRaises = 0;
+            renameListViewModel.MembershipChanged += (_, _) => membershipRaises++;
+
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            renameListViewModel.RemoveUnchanged(previewKey);
+
+            Assert.Equal(["hello.txt", "other.txt"], _PreviewNames(renameListViewModel));
+            Assert.Empty(renameListViewModel.SelectedEntries);
+            Assert.Equal(1, membershipRaises);
+        }
+
+        /// <summary>
+        /// Verifies RemoveUnchanged is a no-op for an empty list and does not raise MembershipChanged.
+        /// </summary>
+        [Fact]
+        public void RemoveUnchanged_empty_list_is_noop()
+        {
+            var renameListViewModel = _context.CreateRenameListViewModel(_context.CreateTempDir());
+            var membershipRaises = 0;
+            renameListViewModel.MembershipChanged += (_, _) => membershipRaises++;
+
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            renameListViewModel.RemoveUnchanged(previewKey);
+
+            Assert.Equal(0, renameListViewModel.ItemCount);
+            Assert.Equal(0, membershipRaises);
         }
 
         /// <summary>

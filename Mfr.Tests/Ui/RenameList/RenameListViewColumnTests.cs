@@ -225,6 +225,36 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies the preview-column header menu offers Remove Unchanged Items and the original-column menu omits it.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Header_menu_offers_remove_unchanged_on_preview_column_only()
+        {
+            var (_, window, grid) = await _context.ShowWithRowsAsync(rowCount: 1);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var originalKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+            var originalHeader = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeader>()
+                .First(header => RenameListGridColumns.TryResolveFieldKey(header) == originalKey);
+            var previewHeader = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeader>()
+                .First(header => RenameListGridColumns.TryResolveFieldKey(header) == previewKey);
+
+            _RaiseHeaderContextMenu(originalHeader);
+            Assert.DoesNotContain("Remove Unchanged Items", _MenuHeaders(originalHeader.ContextMenu));
+
+            _RaiseHeaderContextMenu(previewHeader);
+            Assert.Contains("Remove Unchanged Items", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.Contains("Hide Field", _MenuHeaders(previewHeader.ContextMenu));
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies session column widths survive the initial grid layout pass.
         /// </summary>
         [AvaloniaFact]
@@ -1129,6 +1159,18 @@ namespace Mfr.Tests.Ui.RenameList
             var column = grid.Columns[visibleColumnIndex + 1];
             Assert.False(RenameListGridColumns.IsRowStatusColumn(column));
             return column;
+        }
+
+        private static void _RaiseHeaderContextMenu(DataGridColumnHeader header)
+        {
+            header.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        private static IReadOnlyList<string> _MenuHeaders(ContextMenu? menu)
+        {
+            Assert.NotNull(menu);
+            return [.. menu.Items.OfType<MenuItem>().Select(item => item.Header?.ToString() ?? string.Empty)];
         }
 
         private static void _AssertRowErrorGlyphVisible(DataGridRow row, bool shouldBeVisible)

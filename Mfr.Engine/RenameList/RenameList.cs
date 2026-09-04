@@ -254,6 +254,52 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
+        /// Removes every item whose preview for <paramref name="key"/> matches the original (MFR7 Remove Unchanged).
+        /// </summary>
+        /// <param name="key">Preview field key to compare; original keys are a no-op.</param>
+        /// <returns>The count of items removed.</returns>
+        /// <remarks>
+        /// <para>
+        /// Walks reverse and keeps rows where <see cref="RenameListFieldCatalog.IsPreviewChanged"/> is true.
+        /// </para>
+        /// </remarks>
+        public int RemoveUnchanged(RenameListFieldKey key)
+        {
+            if (!key.IsPreview || _renameItems.Count == 0)
+            {
+                return 0;
+            }
+
+            var removedCount = 0;
+            for (var i = _renameItems.Count - 1; i >= 0; i--)
+            {
+                var item = _renameItems[i];
+                if (RenameListFieldCatalog.IsPreviewChanged(item, key))
+                {
+                    continue;
+                }
+
+                _includedResolvedPaths.Remove(NormalizePathKey(item.Original.FullPath));
+                _renameItems.RemoveAt(i);
+                removedCount++;
+            }
+
+            if (removedCount == 0)
+            {
+                return 0;
+            }
+
+            _ReindexItems();
+            Log.Information(
+                "Removed {RemovedCount} unchanged item(s) for preview field {GroupId}/{PropertyKey}.",
+                removedCount,
+                key.GroupId,
+                key.PropertyKey
+            );
+            return removedCount;
+        }
+
+        /// <summary>
         /// Moves the given items one position by <paramref name="offset"/>.
         /// </summary>
         /// <param name="items">Items to move; entries not in the list are ignored.</param>

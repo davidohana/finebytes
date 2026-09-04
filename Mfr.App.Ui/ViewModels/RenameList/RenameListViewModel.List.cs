@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
+using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -33,6 +34,43 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var nextSelection = _SelectEntryAfterRemove(anchorIndex);
             SetSelectedEntries(nextSelection is null ? [] : [nextSelection]);
             _NotifyMembershipChanged();
+        }
+
+        /// <summary>
+        /// Removes every row whose preview for <paramref name="key"/> is unchanged (MFR7 Remove Unchanged Items).
+        /// </summary>
+        /// <param name="key">Preview column field key from the header menu.</param>
+        /// <remarks>
+        /// <para>
+        /// No-op for original keys, an empty list, or when busy. Clears selection afterward.
+        /// Raises <see cref="MembershipChanged"/> only when at least one row was removed.
+        /// </para>
+        /// </remarks>
+        public void RemoveUnchanged(RenameListFieldKey key)
+        {
+            if (IsBusy || !key.IsPreview || Entries.Count == 0)
+            {
+                return;
+            }
+
+            var removedCount = _renameList.RemoveUnchanged(key);
+            if (removedCount > 0)
+            {
+                var remaining = _renameList.RenameItems.ToHashSet();
+                for (var i = Entries.Count - 1; i >= 0; i--)
+                {
+                    if (!remaining.Contains(Entries[i].EngineItem))
+                    {
+                        Entries.RemoveAt(i);
+                    }
+                }
+
+                SetSelectedEntries([]);
+                _NotifyMembershipChanged();
+                return;
+            }
+
+            SetSelectedEntries([]);
         }
 
         /// <summary>

@@ -107,6 +107,20 @@ namespace Mfr.App.Ui.Views.RenameList
             var menu = new ContextMenu { DataContext = _viewModel };
             menu.Items.Add(new MenuItem { Header = $"({headerText})", IsEnabled = false });
             menu.Items.Add(new Separator());
+
+            // MFR7 order: Hide → (preview) Remove Unchanged → … → Select Fields
+            var hideField = new MenuItem { Header = "Hide Field", IsEnabled = canHide };
+            hideField.Click += (_, _) => _viewModel.HideColumn(fieldKey);
+            menu.Items.Add(hideField);
+
+            if (fieldKey.IsPreview)
+            {
+                var removeUnchanged = new MenuItem { Header = "Remove Unchanged Items" };
+                ToolTip.SetTip(removeUnchanged, AppTips.RemoveUnchangedItems);
+                removeUnchanged.Click += (_, _) => _viewModel.RemoveUnchanged(fieldKey);
+                menu.Items.Add(removeUnchanged);
+            }
+
             var selectFields = new MenuItem
             {
                 Header = "Select Visible Fields...",
@@ -123,10 +137,7 @@ namespace Mfr.App.Ui.Views.RenameList
             ToolTip.SetTip(selectSortFields, AppTips.EditRenameListSortFields);
             menu.Items.Add(selectSortFields);
 
-            var hideField = new MenuItem { Header = "Hide Field", IsEnabled = canHide };
-            hideField.Click += (_, _) => _viewModel.HideColumn(fieldKey);
-            menu.Items.Add(hideField);
-
+            header.ContextMenu = menu;
             menu.PlacementTarget = header;
             menu.Open(header);
         }

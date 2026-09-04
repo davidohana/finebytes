@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–11 + 13 hygiene done. Next: 12 → 14a–14f → 15 → 16 (color legend)."
+overview: "Phases 1–11 + 13 + 14a done. Next: 12 → 14b–14f → 15 → 16 (color legend)."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -97,7 +97,7 @@ todos:
     status: completed
   - id: phase-14a
     content: "14a: Remove Unchanged Items — engine + preview-column header menu"
-    status: pending
+    status: completed
   - id: phase-14b
     content: "14b: Export Name List — GenerateNameList + save dialog (+ optional edit)"
     status: pending
@@ -174,7 +174,7 @@ ______________________________________________________________________
 | **11** Preview highlighting         | Done    | Red changed preview cells, preview-error rows, Show Preview Error                   | 8c                |
 | **12** Preview metadata columns     | Pending | ID3/image preview cols after filters                                                | 9 / 7b            |
 | **13** Hygiene                      | Done    | Glyph styles + `RenameListUiTestContext`; entry convenience props kept              | 10 / 7c (part)    |
-| **14a** Remove Unchanged            | Pending | Header menu on preview cols; drop rows with unchanged preview for that field        | 11 / 8            |
+| **14a** Remove Unchanged            | Done    | Header menu on preview cols; drop rows with unchanged preview for that field        | 11 / 8            |
 | **14b** Export Name List            | Pending | Column → UTF-8 text file; save dialog; optional open in editor                      | 11 / 8            |
 | **14c** Free Names Edit             | Pending | Temp name-list + add `NameListFilter` targeted at writable column                   | 11 / 8            |
 | **14d** Manual Rename (F2)          | Pending | Force original/preview value; blue cells; Cancel; F5 clears overrides               | 11 / 8            |
@@ -291,11 +291,11 @@ ______________________________________________________________________
 
 *(Was 10 / 7c minus color legend.)* Missing-on-disk, OrderedDraft, and shuttle DnD shipped earlier in Phase 9.
 
-| Area              | Location                                                                                                                                               |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Glyph styles      | Preview + sort badge styles in [Themes/RenameList.axaml](../../Mfr.App.Ui/Themes/RenameList.axaml) (app `StyleInclude`)                                |
-| Test fixture      | [RenameListUiTestContext](../../Mfr.Tests/Ui/RenameList/RenameListTestHelpers.cs) — ViewModel + Drop tests migrated                                    |
-| Entry convenience | Kept: `FullPath` / `FullFileName` / etc. remain cheap wrappers; grid path is `GetFieldText(key)`                                                       |
+| Area              | Location                                                                                                                |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Glyph styles      | Preview + sort badge styles in [Themes/RenameList.axaml](../../Mfr.App.Ui/Themes/RenameList.axaml) (app `StyleInclude`) |
+| Test fixture      | [RenameListUiTestContext](../../Mfr.Tests/Ui/RenameList/RenameListTestHelpers.cs) — ViewModel + Drop tests migrated     |
+| Entry convenience | Kept: `FullPath` / `FullFileName` / etc. remain cheap wrappers; grid path is `GetFieldText(key)`                        |
 
 Color legend was split out to **Phase 16** (needs **14d** blue + GO plum).
 
@@ -309,14 +309,14 @@ MFR7 sources: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.
 
 **Do not conflate Free Names Edit with F2.** They are different features:
 
-| Feature | Entry | Effect |
-| ------- | ----- | ------ |
-| Free Names Edit | Header menu (writable col) | Temp `.txt` + add **Name List** filter targeting that field |
+| Feature             | Entry                        | Effect                                                                       |
+| ------------------- | ---------------------------- | ---------------------------------------------------------------------------- |
+| Free Names Edit     | Header menu (writable col)   | Temp `.txt` + add **Name List** filter targeting that field                  |
 | Manual Rename Field | F2 / row menu (writable col) | Dialog forces original **or** preview value; **blue** text until Cancel / F5 |
 
 Header menu today ([RenameListView.HeaderMenu.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)): title, Select Visible/Sort Fields, Hide Field. MFR7 order to restore: title → Hide Field → *(preview only)* Remove Unchanged → Export Name List → *(writable)* Free Names Edit → Auto-Sort → Select Fields. Keep existing Select Sort Fields if useful; do not regress Hide / Select / Auto-Sort.
 
-### 14a — Remove Unchanged Items
+### 14a — Remove Unchanged Items — done
 
 Drop every row whose **preview** for the header’s field is unchanged.
 
@@ -397,4 +397,4 @@ ______________________________________________________________________
 
 ## What to implement next
 
-**12 Preview metadata columns** — ID3/image preview cols + shuttle Preview tab; then **14a → 14f → 15 → 16**.
+**12 Preview metadata columns** — ID3/image preview cols + shuttle Preview tab; then **14b → 14f → 15 → 16**.

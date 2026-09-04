@@ -47,6 +47,9 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List Move Selected Down button and menu tip.</summary>
         public const string MoveSelectedDown = "Move selected down (Ctrl+Down)";
 
+        /// <summary>Rename List header: drop rows whose preview for this column is unchanged.</summary>
+        public const string RemoveUnchangedItems = "Remove items whose preview for this field is unchanged";
+
         /// <summary>Rename List field shuttle: visible columns (toolbar, context menu, main menu).</summary>
         public const string SelectRenameListFields = "Choose visible Rename List columns";
 
