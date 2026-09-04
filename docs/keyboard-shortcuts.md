@@ -97,4 +97,4 @@ These shortcuts match MFR 7.4 and are already labeled on disabled menu items.
 | Help          | F1       | Help UI is not in this build |
 | Manual rename | F2       | Rename List                  |
 
-F5 reloads the File List from the main window and address bar, or the Rename List when its grid has focus (MFR 7.4 shared the same key in both panes). Rename List refresh re-reads original fields only; preview recalculation arrives in a later phase.
+F5 reloads the File List from the main window and address bar, or the Rename List when its grid has focus (MFR 7.4 shared the same key in both panes). Rename List refresh re-reads original fields from disk, then re-runs preview when Auto-Preview is on.

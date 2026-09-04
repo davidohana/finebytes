@@ -147,5 +147,74 @@ namespace Mfr.Tests.Engine
             Assert.False(RenameListDiskPaths.IsMissingFromDisk(item));
             Assert.Equal("new".Length, item.Original.FileSize);
         }
+
+        /// <summary>
+        /// Verifies RefreshOriginals picks up Explorer-style case-only renames for siblings and their parent.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Exercises the per-pass listing cache: both siblings resolve under one parent enumeration, and a
+        /// second RefreshOriginals must not reuse a stale cache after another case-only rename.
+        /// </para>
+        /// </remarks>
+        [Fact]
+        public void RefreshOriginals_Updates_Leaf_And_Parent_Casing_For_Siblings()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var albumLower = Path.Combine(_tempRoot, "album");
+            Directory.CreateDirectory(albumLower);
+            var aLower = Path.Combine(albumLower, "a.txt");
+            var bLower = Path.Combine(albumLower, "b.txt");
+            File.WriteAllText(aLower, "a");
+            File.WriteAllText(bLower, "b");
+
+            var renameList = new RenameList(includeHidden: true);
+            renameList.AddSources([aLower, bLower]);
+            Assert.Equal(2, renameList.RenameItems.Count);
+
+            _CaseOnlyRenameFile(aLower, Path.Combine(albumLower, "A.TXT"));
+            _CaseOnlyRenameFile(bLower, Path.Combine(albumLower, "B.TXT"));
+            var albumUpper = Path.Combine(_tempRoot, "ALBUM");
+            _CaseOnlyRenameDirectory(albumLower, albumUpper);
+
+            renameList.RefreshOriginals();
+
+            Assert.Equal(Path.Combine(albumUpper, "A.TXT"), renameList.RenameItems[0].Original.FullPath);
+            Assert.Equal(Path.Combine(albumUpper, "B.TXT"), renameList.RenameItems[1].Original.FullPath);
+
+            var aMixed = Path.Combine(albumUpper, "a.Txt");
+            var bMixed = Path.Combine(albumUpper, "b.Txt");
+            _CaseOnlyRenameFile(Path.Combine(albumUpper, "A.TXT"), aMixed);
+            _CaseOnlyRenameFile(Path.Combine(albumUpper, "B.TXT"), bMixed);
+
+            renameList.RefreshOriginals();
+
+            Assert.Equal(aMixed, renameList.RenameItems[0].Original.FullPath);
+            Assert.Equal(bMixed, renameList.RenameItems[1].Original.FullPath);
+        }
+
+        private static void _CaseOnlyRenameFile(string fromPath, string toPath)
+        {
+            var tempPath = Path.Combine(
+                Path.GetDirectoryName(fromPath)!,
+                Path.GetFileName(fromPath) + ".mfrtmp-" + Guid.NewGuid().ToString("N")
+            );
+            File.Move(fromPath, tempPath);
+            File.Move(tempPath, toPath);
+        }
+
+        private static void _CaseOnlyRenameDirectory(string fromPath, string toPath)
+        {
+            var tempPath = Path.Combine(
+                Path.GetDirectoryName(fromPath)!,
+                Path.GetFileName(fromPath) + ".mfrtmp-" + Guid.NewGuid().ToString("N")
+            );
+            Directory.Move(fromPath, tempPath);
+            Directory.Move(tempPath, toPath);
+        }
     }
 }

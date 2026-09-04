@@ -499,6 +499,8 @@ namespace Mfr.Engine.RenameList
             }
 
             var tracker = new RenameListProgressTracker(progress, cancellationToken);
+            // Per-pass only: siblings share directory listings; disk can change between F5 calls.
+            var casingCache = new OnDiskCasingCache();
             tracker.BeginMetadataPhase(_renameItems.Count);
             foreach (var item in _renameItems)
             {
@@ -507,7 +509,7 @@ namespace Mfr.Engine.RenameList
                     break;
                 }
 
-                _RefreshItemOriginal(item);
+                _RefreshItemOriginal(item, casingCache);
                 tracker.OnMetadataProcessed(item.Original.FullPath);
             }
 
@@ -815,12 +817,12 @@ namespace Mfr.Engine.RenameList
         /// <summary>
         /// Clears lazy metadata and re-stats <see cref="RenameItem.Original"/> from disk when the path still exists.
         /// </summary>
-        private void _RefreshItemOriginal(RenameItem item)
+        private void _RefreshItemOriginal(RenameItem item, OnDiskCasingCache casingCache)
         {
             var priorPath = item.Original.FullPath;
             item.ClearMetadataCaches();
 
-            var resolvedPath = _ResolveExistingPath(priorPath);
+            var resolvedPath = _ResolveExistingPath(priorPath, casingCache);
             if (resolvedPath is null)
             {
                 item.SetMissingFromDisk(true);
@@ -849,42 +851,86 @@ namespace Mfr.Engine.RenameList
         /// <summary>
         /// Resolves a stored path to the on-disk entry, including host casing, when it still exists.
         /// </summary>
-        private static string? _ResolveExistingPath(string path)
+        private static string? _ResolveExistingPath(string path, OnDiskCasingCache casingCache)
         {
             if (File.Exists(path) || Directory.Exists(path))
             {
-                return _ResolveOnDiskCasing(path);
+                return casingCache.Resolve(path);
             }
 
             return null;
         }
 
         /// <summary>
-        /// Walks parent directories so the returned path uses filesystem casing (MFR7 <c>GetFullFileName</c>).
+        /// Per-<see cref="RefreshOriginals"/> cache so sibling rows share parent listings and resolved paths.
         /// </summary>
-        private static string _ResolveOnDiskCasing(string path)
+        /// <remarks>
+        /// <para>
+        /// Must not be reused across refresh calls: Explorer case-only renames change disk casing between F5s.
+        /// Walks parents like MFR7 <c>GetFullFileName</c>.
+        /// </para>
+        /// </remarks>
+        private sealed class OnDiskCasingCache
         {
-            var trimmedDirectory = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            var parent = Path.GetDirectoryName(trimmedDirectory);
-            var fileName = Path.GetFileName(trimmedDirectory);
-            if (string.IsNullOrEmpty(fileName))
+            private readonly Dictionary<string, string> _pathToResolved = new(PathComparers.Os);
+            private readonly Dictionary<string, Dictionary<string, string>> _parentToLeafName = new(PathComparers.Os);
+
+            /// <summary>
+            /// Returns <paramref name="path"/> with filesystem casing for each segment that still exists.
+            /// </summary>
+            /// <param name="path">Stored absolute path (any casing).</param>
+            /// <returns>Path rebuilt from on-disk leaf names; unchanged segments when listing finds no match.</returns>
+            public string Resolve(string path)
             {
-                return path;
+                if (_pathToResolved.TryGetValue(path, out var cached))
+                {
+                    return cached;
+                }
+
+                var resolved = _ResolveUncached(path);
+                _pathToResolved[path] = resolved;
+                return resolved;
             }
 
-            if (string.IsNullOrEmpty(parent) || !Directory.Exists(parent))
+            private string _ResolveUncached(string path)
             {
-                return path;
+                var trimmedDirectory = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                var parent = Path.GetDirectoryName(trimmedDirectory);
+                var fileName = Path.GetFileName(trimmedDirectory);
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return path;
+                }
+
+                if (string.IsNullOrEmpty(parent) || !Directory.Exists(parent))
+                {
+                    return path;
+                }
+
+                if (!_TryGetOnDiskLeafName(parent, fileName, out var onDiskLeafName))
+                {
+                    return path;
+                }
+
+                var resolvedParent = Resolve(parent);
+                return Path.Combine(resolvedParent, onDiskLeafName);
             }
 
-            var matches = new DirectoryInfo(parent).GetFileSystemInfos(fileName);
-            if (matches.Length == 0)
+            private bool _TryGetOnDiskLeafName(string parent, string fileName, out string onDiskLeafName)
             {
-                return path;
-            }
+                if (!_parentToLeafName.TryGetValue(parent, out var leafToCasing))
+                {
+                    leafToCasing = new Dictionary<string, string>(PathComparers.Os);
+                    foreach (var info in new DirectoryInfo(parent).EnumerateFileSystemInfos())
+                    {
+                        leafToCasing[info.Name] = info.Name;
+                    }
 
-            var resolvedParent = _ResolveOnDiskCasing(parent);
-            return Path.Combine(resolvedParent, matches[0].Name);
+                    _parentToLeafName[parent] = leafToCasing;
+                }
+
+                return leafToCasing.TryGetValue(fileName, out onDiskLeafName!);
+            }
         }
 
         /// <summary>

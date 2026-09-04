@@ -192,6 +192,9 @@ Working list, interactions, context menu, manual order, unified field shuttle, d
 
 **Does not call `Preview()`** — preview columns stay identity/stale until **10a**.
 
+F5 on-disk casing walk: per-pass `OnDiskCasingCache` in `RefreshOriginals` (shared parent
+listings + resolved paths; not reused across F5 calls).
+
 ______________________________________________________________________
 
 ## Phase 10 — Preview core (10a–10d)
