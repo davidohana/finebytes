@@ -304,6 +304,85 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("Reading metadata: 5 of 10 files", viewModel.MetadataProgressText);
         }
 
+        /// <summary>
+        /// Verifies preview operations expose preview dialog copy.
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_Preview_Uses_Preview_Copy()
+        {
+            var viewModel = new RenameListProgressViewModel();
+
+            var completed = await viewModel
+                .RunAsync(
+                    RenameListProgressOperation.Preview,
+                    (_, progress) =>
+                    {
+                        progress.Report(
+                            new RenameListProgress(
+                                ScannedCount: 0,
+                                AddedCount: 0,
+                                LastPath: "C:\\a.txt",
+                                MetadataTotalCount: 10,
+                                Phase: RenameListProgressPhase.LoadMetadata,
+                                MetadataProcessedCount: 4
+                            )
+                        );
+                        _WaitFor(() => viewModel.MetadataProcessedCount == 4);
+                    }
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(completed);
+            Assert.Equal("Previewing ...", viewModel.DialogTitle);
+            Assert.Equal("Previewing: 4 of 10 files", viewModel.MetadataProgressText);
+            Assert.True(viewModel.ShowMetadataProgress);
+            Assert.False(viewModel.ShowResolveProgress);
+        }
+
+        /// <summary>
+        /// Verifies a second RunAsync while busy is refused and does not steal the in-flight cancel token.
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_While_Busy_Does_Not_Start_Second_Operation()
+        {
+            var viewModel = new RenameListProgressViewModel();
+            var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var first = viewModel.RunAsync(
+                (token, _) =>
+                {
+                    started.TrySetResult();
+                    while (!token.IsCancellationRequested)
+                    {
+                        Thread.Sleep(20);
+                    }
+                }
+            );
+
+            await started.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
+            Assert.True(viewModel.IsBusy);
+
+            var secondWorkRan = false;
+            var second = await viewModel
+                .RunAsync(
+                    RenameListProgressOperation.Preview,
+                    (_, _) =>
+                    {
+                        secondWorkRan = true;
+                    }
+                )
+                .ConfigureAwait(true);
+
+            Assert.False(second);
+            Assert.False(secondWorkRan);
+            Assert.True(viewModel.IsBusy);
+            Assert.True(viewModel.CancelCommand.CanExecute(null));
+
+            viewModel.CancelCommand.Execute(null);
+
+            Assert.False(await first.ConfigureAwait(true));
+            Assert.False(viewModel.IsBusy);
+        }
+
         private static void _WaitFor(Func<bool> condition)
         {
             var deadline = Environment.TickCount64 + 2000;

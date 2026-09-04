@@ -87,8 +87,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return SessionStateRenameList.FromSortKeys(_sortKeys);
         }
 
+        /// <summary>
+        /// Replaces sort keys, hydrating metadata first when needed. No-op while a background operation is running.
+        /// </summary>
         private void _ApplySortKeys(IReadOnlyList<RenameListSortKey> keys, bool resort)
         {
+            if (IsBusy)
+            {
+                return;
+            }
+
             var sanitized = _SanitizeSortKeys(keys);
             var requirement = _CombinedMetadataRequirement(_visibleColumns, sanitized);
             if (_NeedsHydrate(requirement))

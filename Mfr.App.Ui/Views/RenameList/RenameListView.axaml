@@ -324,6 +324,7 @@
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AutoSort.png" />
         </ToggleButton>
         <ToggleButton
+          x:Name="AutoPreviewToggle"
           Classes="rename-list-action"
           IsChecked="{Binding IsAutoPreview, Mode=OneWay}"
           Command="{Binding ToggleAutoPreviewCommand}"

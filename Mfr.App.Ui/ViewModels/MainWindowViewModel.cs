@@ -219,7 +219,7 @@ namespace Mfr.App.Ui.ViewModels
 
             if (e.PropertyName is nameof(RenameListViewModel.IsAutoPreview) && RenameListViewModel.IsAutoPreview)
             {
-                _PreviewRenameList();
+                _RequestPreview();
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.IsBusy) && !RenameListViewModel.IsBusy && _previewDirty)
@@ -337,14 +337,6 @@ namespace Mfr.App.Ui.ViewModels
                     await _previewDrainTask.ConfigureAwait(true);
                 }
             }
-        }
-
-        /// <summary>
-        /// Applies the live Applied Filters chain to the Rename List when Auto-Preview is on.
-        /// </summary>
-        private void _PreviewRenameList()
-        {
-            _RequestPreview();
         }
 
         private void _OnFilterPalettePropertyChanged(object? sender, PropertyChangedEventArgs e)

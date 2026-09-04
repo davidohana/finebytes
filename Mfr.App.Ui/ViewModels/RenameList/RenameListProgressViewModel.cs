@@ -23,9 +23,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets whether the progress dialog should be shown.
         /// </summary>
+        /// <remarks>
         /// <para>
         /// Stays false until the operation has been running longer than a short delay, so fast work never flashes a dialog.
         /// </para>
+        /// </remarks>
         [ObservableProperty]
         private bool _isDialogVisible;
 
@@ -181,15 +183,27 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="operation">Add, metadata hydrate, refresh, or preview.</param>
         /// <param name="work">Engine work invoked with the operation cancel token and progress sink.</param>
         /// <returns>
-        /// <see langword="true"/> when the work finished without user cancel; <see langword="false"/> when canceled.
+        /// <see langword="true"/> when the work finished without user cancel; <see langword="false"/> when canceled
+        /// or when another operation is already running.
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="work"/> is <see langword="null"/>.</exception>
+        /// <remarks>
+        /// <para>
+        /// Refuses to start when another operation is already running so a second caller cannot replace the
+        /// in-flight cancel token or run two engine walks at once.
+        /// </para>
+        /// </remarks>
         internal async Task<bool> RunAsync(
             RenameListProgressOperation operation,
             Action<CancellationToken, IProgress<RenameListProgress>> work
         )
         {
             ArgumentNullException.ThrowIfNull(work);
+
+            if (IsBusy)
+            {
+                return false;
+            }
 
             _cts = new CancellationTokenSource();
             var token = _cts.Token;

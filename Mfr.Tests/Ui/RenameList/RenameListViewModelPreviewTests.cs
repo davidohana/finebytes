@@ -1,7 +1,11 @@
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views.RenameList;
 using Mfr.Filters.Case;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Ui.AppliedFilters;
@@ -382,6 +386,113 @@ namespace Mfr.Tests.Ui.RenameList
             {
                 renameList.Progress.PropertyChanged -= OnProgressChanged;
             }
+        }
+
+        /// <summary>
+        /// Verifies turning Auto-Sort on during an in-flight preview does not mutate the engine list.
+        /// </summary>
+        [Fact]
+        public async Task ToggleAutoSort_while_preview_busy_is_ignored()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var renameList = _context.CreateRenameListViewModel(dir);
+            await renameList.AddPathsAsync([path]).ConfigureAwait(true);
+            Assert.False(renameList.IsAutoSort);
+
+            void OnProgressChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName is nameof(RenameListProgressViewModel.IsBusy) && renameList.IsBusy)
+                {
+                    renameList.ToggleAutoSortCommand.Execute(null);
+                }
+            }
+
+            renameList.Progress.PropertyChanged += OnProgressChanged;
+            try
+            {
+                var chain = new FilterChain
+                {
+                    Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
+                };
+                var completed = await renameList.PreviewAsync(chain).ConfigureAwait(true);
+
+                Assert.True(completed);
+                Assert.False(renameList.IsAutoSort);
+                Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
+            }
+            finally
+            {
+                renameList.Progress.PropertyChanged -= OnProgressChanged;
+            }
+        }
+
+        /// <summary>
+        /// Verifies a second PreviewAsync during an in-flight preview is a no-op and does not disable Auto-Preview.
+        /// </summary>
+        [Fact]
+        public async Task PreviewAsync_while_busy_keeps_auto_preview()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var renameList = _context.CreateRenameListViewModel(dir);
+            await renameList.AddPathsAsync([path]).ConfigureAwait(true);
+            Assert.True(renameList.IsAutoPreview);
+
+            var chain = new FilterChain
+            {
+                Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
+            };
+            Task<bool>? nested = null;
+            void OnProgressChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName is nameof(RenameListProgressViewModel.IsBusy) && renameList.IsBusy)
+                {
+                    nested ??= renameList.PreviewAsync(chain);
+                }
+            }
+
+            renameList.Progress.PropertyChanged += OnProgressChanged;
+            try
+            {
+                var completed = await renameList.PreviewAsync(chain).ConfigureAwait(true);
+
+                Assert.True(completed);
+                Assert.NotNull(nested);
+                Assert.True(await nested.ConfigureAwait(true));
+                Assert.True(renameList.IsAutoPreview);
+            }
+            finally
+            {
+                renameList.Progress.PropertyChanged -= OnProgressChanged;
+            }
+        }
+
+        /// <summary>
+        /// Verifies the toolbar Auto-Preview toggle unchecks and turns the preference off.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Toolbar_auto_preview_toggle_unchecks()
+        {
+            var (renameListViewModel, window, _) = await _context.ShowWithRowsAsync(rowCount: 1);
+            var view = Assert.IsType<RenameListView>(window.Content);
+            var toggle = view.FindControl<ToggleButton>("AutoPreviewToggle");
+            Assert.NotNull(toggle);
+            Assert.True(toggle.IsChecked);
+            Assert.True(renameListViewModel.IsAutoPreview);
+            Assert.NotNull(toggle.Command);
+            Assert.True(toggle.Command.CanExecute(null));
+
+            toggle.Command.Execute(null);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(renameListViewModel.IsAutoPreview);
+            Assert.False(toggle.IsChecked);
+            window.Close();
         }
 
         private (RenameListViewModel RenameList, AppliedFiltersViewModel Applied) _CreateWiredPanes(string dir)

@@ -66,15 +66,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             if (Entries.Count == 0)
             {
-                ChangeCount = 0;
-                PreviewErrorCount = 0;
+                _ClearPreviewCounts();
                 return;
             }
 
-            var plan = _renameList.Preview(chain);
-            ChangeCount = plan.ChangedCount;
-            PreviewErrorCount = plan.ErrorCount;
-            _RefreshFieldDisplay();
+            _ApplyPreviewPlan(_renameList.Preview(chain));
         }
 
         /// <summary>
@@ -91,8 +87,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             if (Entries.Count == 0)
             {
-                ChangeCount = 0;
-                PreviewErrorCount = 0;
+                _ClearPreviewCounts();
                 return true;
             }
 
@@ -114,11 +109,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             if (plan is not null)
             {
-                ChangeCount = plan.ChangedCount;
-                PreviewErrorCount = plan.ErrorCount;
+                _ApplyPreviewPlan(plan);
             }
-
-            _RefreshFieldDisplay();
+            else
+            {
+                _RefreshFieldDisplay();
+            }
 
             if (!completed)
             {
@@ -126,6 +122,22 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return completed;
+        }
+
+        private void _ClearPreviewCounts()
+        {
+            ChangeCount = 0;
+            PreviewErrorCount = 0;
+        }
+
+        /// <summary>
+        /// Copies engine preview outcome counts onto the grid after a preview pass.
+        /// </summary>
+        private void _ApplyPreviewPlan(CommitPlan plan)
+        {
+            ChangeCount = plan.ChangedCount;
+            PreviewErrorCount = plan.ErrorCount;
+            _RefreshFieldDisplay();
         }
     }
 }
