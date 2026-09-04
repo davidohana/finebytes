@@ -9,7 +9,6 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="/Themes/FileList.axaml" />
         <ResourceInclude Source="/Themes/RenameList.axaml" />
-        <ResourceInclude Source="/Themes/FilterEditor.axaml" />
         <ResourceInclude Source="/Themes/FieldsetGroup.axaml" />
         <ResourceInclude Source="/Assets/Icons.axaml" />
       </ResourceDictionary.MergedDictionaries>
@@ -33,6 +32,7 @@
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
     <StyleInclude Source="/Themes/CompactNumericUpDown.axaml" />
     <StyleInclude Source="/Themes/CompactToggle.axaml" />
+    <StyleInclude Source="/Themes/FilterEditor.axaml" />
     <!-- Light selection highlight for all editable text. -->
     <Style Selector="TextBox">
       <Setter Property="SelectionBrush" Value="{DynamicResource TextSelectionBrush}" />

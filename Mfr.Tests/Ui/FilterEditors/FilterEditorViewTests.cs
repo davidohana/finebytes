@@ -359,6 +359,33 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Filter Configuration field chrome comes from app theme styles (not host-local).
+        /// </summary>
+        [AvaloniaFact]
+        public void Filter_editor_field_styles_come_from_app_theme()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(
+                AppliedFiltersTestUi.Entry("ShrinkDuplicateCharacters")
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<ShrinkDuplicateCharactersFilterEditorView>().Single();
+            var box = editor.FindControl<TextBox>("CharacterBox");
+            Assert.NotNull(box);
+            Assert.Equal(22, box.MinHeight);
+            Assert.Equal(22, box.Height);
+
+            var titleBar = editorView.GetVisualDescendants().OfType<Border>().First(border =>
+                border.Classes.Contains("filter-editor-title-bar")
+            );
+            Assert.Equal(22, titleBar.MinHeight);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Shrink Duplicate Characters edits persist on the applied step.
         /// </summary>
         [AvaloniaFact]
