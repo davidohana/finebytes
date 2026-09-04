@@ -14,18 +14,7 @@ namespace Mfr.Filters.Case
     /// (see <see cref="RenameItem.SentenceEndChars"/>, set by <c>SentenceEndCharacters</c> when used earlier
     /// in the chain; default <c>".!?"</c>).
     /// </param>
-    public sealed record CasingListOptions(IReadOnlyList<string> Words, bool UppercaseSentenceInitial = false)
-    {
-        /// <summary>
-        /// Parses space-separated editor text into a word list.
-        /// </summary>
-        /// <param name="wordsText">Whitespace-separated words.</param>
-        /// <returns>Canonical word spellings in order.</returns>
-        public static IReadOnlyList<string> ParseWordsText(string wordsText)
-        {
-            return CasingListParser.ParseWordsText(wordsText);
-        }
-    }
+    public sealed record CasingListOptions(IReadOnlyList<string> Words, bool UppercaseSentenceInitial = false);
 
     /// <summary>
     /// Changes each word's casing to match how it appears in the configured word list.

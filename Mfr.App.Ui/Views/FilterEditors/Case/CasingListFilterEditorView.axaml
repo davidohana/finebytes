@@ -27,18 +27,8 @@
           <TextBlock Classes="filter-editor-label" Text="Words:" />
           <TextBox
             x:Name="WordsBox"
+            Classes="filter-editor-field-wrap"
             MinWidth="240"
-            MinHeight="22"
-            AcceptsReturn="False"
-            TextWrapping="Wrap"
-            FontFamily="{DynamicResource FileListFont}"
-            FontSize="{DynamicResource FileListFontSize}"
-            Foreground="{DynamicResource FileListForegroundBrush}"
-            Background="{DynamicResource FileListRowBrush}"
-            BorderBrush="{DynamicResource FileListAddressBarBorderBrush}"
-            BorderThickness="1"
-            CornerRadius="3"
-            Padding="4,2"
             Watermark="and or with RMX"
             Text="{Binding WordsText}"
           />

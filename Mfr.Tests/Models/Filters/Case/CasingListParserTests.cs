@@ -8,36 +8,12 @@ namespace Mfr.Tests.Models.Filters.Case
     public sealed class CasingListParserTests
     {
         /// <summary>
-        /// Verifies space-separated text parse keeps word order.
+        /// Verifies an empty word list yields an empty map.
         /// </summary>
         [Fact]
-        public void ParseWordsText_ValidWords_ReturnsWords()
+        public void BuildMap_Empty_ReturnsEmpty()
         {
-            var words = CasingListParser.ParseWordsText("  and   RMX  ");
-
-            Assert.Equal(["and", "RMX"], words);
-        }
-
-        /// <summary>
-        /// Verifies newlines and tabs also act as separators.
-        /// </summary>
-        [Fact]
-        public void ParseWordsText_WhitespaceVariants_Split()
-        {
-            var words = CasingListParser.ParseWordsText("and\tor\nwith");
-
-            Assert.Equal(["and", "or", "with"], words);
-        }
-
-        /// <summary>
-        /// Verifies empty text yields an empty list.
-        /// </summary>
-        [Theory]
-        [InlineData("")]
-        [InlineData("   ")]
-        public void ParseWordsText_Blank_ReturnsEmpty(string content)
-        {
-            Assert.Empty(CasingListParser.ParseWordsText(content));
+            Assert.Empty(CasingListParser.BuildMap([]));
         }
 
         /// <summary>
@@ -53,24 +29,39 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
-        /// Verifies BuildMap rejects words that contain spaces.
+        /// Verifies BuildMap rejects empty or whitespace-only entries.
         /// </summary>
-        [Fact]
-        public void BuildMap_WordWithSpace_Throws()
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void BuildMap_EmptyWord_Throws(string word)
         {
-            var ex = Assert.Throws<UserException>(() => CasingListParser.BuildMap(["ok", "not ok"]));
-            Assert.Contains("word 2", ex.Message, StringComparison.Ordinal);
+            var ex = Assert.Throws<UserException>(() => CasingListParser.BuildMap(["ok", word]));
+            Assert.Contains("word 2 cannot be empty", ex.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
-        /// Verifies overly long words are rejected when parsing editor text.
+        /// Verifies BuildMap rejects words that contain whitespace.
+        /// </summary>
+        [Theory]
+        [InlineData("not ok")]
+        [InlineData("not\tok")]
+        public void BuildMap_WordWithWhitespace_Throws(string word)
+        {
+            var ex = Assert.Throws<UserException>(() => CasingListParser.BuildMap(["ok", word]));
+            Assert.Contains("word 2", ex.Message, StringComparison.Ordinal);
+            Assert.Contains("single word", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies overly long words are rejected.
         /// </summary>
         [Fact]
-        public void ParseWordsText_WordTooLong_Throws()
+        public void BuildMap_WordTooLong_Throws()
         {
             var longWord = new string('x', ConfigStore.Config.Filters.MaxListFileLineLength + 1);
 
-            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseWordsText(longWord));
+            var ex = Assert.Throws<UserException>(() => CasingListParser.BuildMap([longWord]));
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
         }
     }

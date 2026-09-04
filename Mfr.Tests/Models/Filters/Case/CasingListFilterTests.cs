@@ -89,6 +89,19 @@ namespace Mfr.Tests.Models.Filters.Case
             Assert.Contains("single word", ex.Message, StringComparison.Ordinal);
         }
 
+        /// <summary>
+        /// Verifies duplicate words use the last configured spelling.
+        /// </summary>
+        [Fact]
+        public void Apply_DuplicateWords_LastWins()
+        {
+            var filter = _CreateFilter(words: ["foo", "FOO"], uppercaseSentenceInitial: false);
+
+            var result = FilterTestHelpers.ApplyToPrefix(filter, "Foo");
+
+            Assert.Equal("FOO", result);
+        }
+
         private static CasingListFilter _CreateFilter(IReadOnlyList<string> words, bool uppercaseSentenceInitial)
         {
             var options = new CasingListOptions(Words: words, UppercaseSentenceInitial: uppercaseSentenceInitial);

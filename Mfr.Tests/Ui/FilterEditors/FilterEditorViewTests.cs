@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
@@ -807,6 +808,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             var uppercase = editor.FindControl<CompactCheckBox>("UppercaseSentenceInitialCheckBox");
             Assert.NotNull(words);
             Assert.NotNull(uppercase);
+            Assert.Equal(TextWrapping.Wrap, words.TextWrapping);
             Assert.Equal(string.Empty, words.Text);
             Assert.True(uppercase.IsChecked);
 

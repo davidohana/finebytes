@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Case;
-using Mfr.Models;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
 {
@@ -57,19 +56,30 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
                 return;
             }
 
-            IReadOnlyList<string> words;
-            try
+            var words = _ParseWords(WordsText);
+            if (
+                words.SequenceEqual(filter.Options.Words)
+                && UppercaseSentenceInitial == filter.Options.UppercaseSentenceInitial
+            )
             {
-                words = CasingListOptions.ParseWordsText(WordsText);
-            }
-            catch (UserException)
-            {
-                // Keep the previous options until the text is valid again.
                 return;
             }
 
             var options = new CasingListOptions(Words: words, UppercaseSentenceInitial: UppercaseSentenceInitial);
             ApplyIfChanged(filter, filter with { Options = options });
+        }
+
+        /// <summary>
+        /// Splits space-separated editor text into words.
+        /// </summary>
+        private static string[] _ParseWords(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return [];
+            }
+
+            return text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         }
     }
 }

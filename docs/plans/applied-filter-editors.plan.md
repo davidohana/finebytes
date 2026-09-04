@@ -42,7 +42,7 @@ todos:
     content: "F5 Inserter"
     status: completed
   - id: f5-casing-list
-    content: "F5 Casing List — inline words + sentence-initial"
+    content: "F5 Casing List — space-separated words + sentence-initial"
     status: completed
   - id: f5-replace-list
     content: "F5 Replace List"
@@ -221,7 +221,7 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 | **9 (done)**  | Cleaner                         | Replace    | single                                             | illegal + custom + replacement                                                                      |
 | **10 (done)** | Counter                         | Formatting | single                                             | start / step / leading-zeros mode (None/Automatic/Custom) / position / separator / reset-per-folder |
 | **11 (done)** | Inserter                        | Formatting | single                                             | text + position                                                                                     |
-| **12 (done)** | Casing List                     | Case       | single                                             | inline words (one per line) + sentence-initial                                                      |
+| **12 (done)** | Casing List                     | Case       | single                                             | space-separated words + sentence-initial                                                            |
 | **13 (next)** | Replace List                    | Replace    | single                                             | file path + mode/options                                                                            |
 | 14            | Name List                       | Formatting | single                                             | file path + prefix/suffix                                                                           |
 | 15            | Replacer                        | Replace    | single                                             | find/replace / regex / scope                                                                        |
