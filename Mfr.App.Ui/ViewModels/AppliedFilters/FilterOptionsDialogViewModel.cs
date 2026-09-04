@@ -153,13 +153,20 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private decimal _tokenNumber = 1;
 
         /// <summary>
-        /// Gets whether OK can accept the current draft.
+        /// Gets a short reason OK is disabled, or <see langword="null"/> when OK is allowed.
         /// </summary>
         /// <remarks>
         /// Token scope requires a non-empty separator (same rule as <see cref="StringApplyScopeTransform"/>).
         /// </remarks>
-        public bool CanConfirm =>
-            ScopeMode != FilterApplyScopeMode.Token || !string.IsNullOrEmpty(TokenSeparator);
+        public string? ConfirmDisabledReason =>
+            ScopeMode == FilterApplyScopeMode.Token && string.IsNullOrEmpty(TokenSeparator)
+                ? "Separator required"
+                : null;
+
+        /// <summary>
+        /// Gets whether OK can accept the current draft.
+        /// </summary>
+        public bool CanConfirm => ConfirmDisabledReason is null;
 
         /// <summary>
         /// Builds the Apply-To target from the current draft fields.
@@ -232,11 +239,13 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             OnPropertyChanged(nameof(IsWholeScope));
             OnPropertyChanged(nameof(IsSubstringScopeMode));
             OnPropertyChanged(nameof(IsTokenScopeMode));
+            OnPropertyChanged(nameof(ConfirmDisabledReason));
             OnPropertyChanged(nameof(CanConfirm));
         }
 
         partial void OnTokenSeparatorChanged(string value)
         {
+            OnPropertyChanged(nameof(ConfirmDisabledReason));
             OnPropertyChanged(nameof(CanConfirm));
         }
 

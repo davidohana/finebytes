@@ -110,6 +110,8 @@
         Content="OK"
         IsDefault="True"
         IsEnabled="{Binding CanConfirm}"
+        ToolTip.Tip="{Binding ConfirmDisabledReason}"
+        ToolTip.ShowOnDisabled="True"
         Click="_OnOkClick"
       />
       <Button Classes="filter-options-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />

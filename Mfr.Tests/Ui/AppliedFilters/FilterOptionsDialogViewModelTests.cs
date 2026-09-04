@@ -430,13 +430,16 @@ namespace Mfr.Tests.Ui.AppliedFilters
             };
 
             Assert.False(dialog.CanConfirm);
+            Assert.Equal("Token Separator required", dialog.ConfirmDisabledReason);
 
             dialog.TokenSeparator = "-";
             Assert.True(dialog.CanConfirm);
+            Assert.Null(dialog.ConfirmDisabledReason);
 
             dialog.ScopeMode = FilterApplyScopeMode.Whole;
             dialog.TokenSeparator = string.Empty;
             Assert.True(dialog.CanConfirm);
+            Assert.Null(dialog.ConfirmDisabledReason);
         }
 
         /// <summary>
