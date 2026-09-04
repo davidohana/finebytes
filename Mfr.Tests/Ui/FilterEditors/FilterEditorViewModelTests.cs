@@ -133,18 +133,18 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(2, editor.Width);
             Assert.False(editor.RemoveExtraZeros);
             Assert.Equal(1, editor.MaxCount);
-            Assert.False(editor.WholeWordOnly);
+            Assert.True(editor.WholeWordOnly);
 
             editor.Width = 4;
             editor.RemoveExtraZeros = true;
             editor.MaxCount = 0;
-            editor.WholeWordOnly = true;
+            editor.WholeWordOnly = false;
 
             var options = ((FixLeadingZerosFilter)step.Filter).Options;
             Assert.Equal(4, options.Width);
             Assert.True(options.RemoveExtraZeros);
             Assert.Equal(0, options.MaxCount);
-            Assert.True(options.WholeWordOnly);
+            Assert.False(options.WholeWordOnly);
         }
     }
 }

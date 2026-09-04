@@ -462,12 +462,12 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(2, widthSpinner.Value);
             Assert.Equal(1, maxCountSpinner.Value);
             Assert.False(removeExtraZeros.IsChecked);
-            Assert.False(wholeWordOnly.IsChecked);
+            Assert.True(wholeWordOnly.IsChecked);
 
             widthSpinner.Value = 4;
             maxCountSpinner.Value = 0;
             removeExtraZeros.IsChecked = true;
-            wholeWordOnly.IsChecked = true;
+            wholeWordOnly.IsChecked = false;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -475,7 +475,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(4, filter.Options.Width);
             Assert.Equal(0, filter.Options.MaxCount);
             Assert.True(filter.Options.RemoveExtraZeros);
-            Assert.True(filter.Options.WholeWordOnly);
+            Assert.False(filter.Options.WholeWordOnly);
 
             window.Close();
         }

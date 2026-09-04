@@ -25,7 +25,10 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_PadsNumericRuns()
         {
-            var f = new FixLeadingZerosFilter(_target, new FixLeadingZerosOptions(Width: 4, RemoveExtraZeros: false));
+            var f = new FixLeadingZerosFilter(
+                _target,
+                new FixLeadingZerosOptions(Width: 4, RemoveExtraZeros: false, WholeWordOnly: false)
+            );
             Assert.Equal("track0009", FilterTestHelpers.ApplyToPrefix(f, "track9"));
         }
 
@@ -35,7 +38,10 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_RemoveExtraZeros_NormalizesThenPads()
         {
-            var f = new FixLeadingZerosFilter(_target, new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true));
+            var f = new FixLeadingZerosFilter(
+                _target,
+                new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true, WholeWordOnly: false)
+            );
             Assert.Equal("x007", FilterTestHelpers.ApplyToPrefix(f, "x0007"));
         }
 

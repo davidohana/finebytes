@@ -43,7 +43,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
         /// Gets or sets whether only whole-word digit groups are fixed.
         /// </summary>
         [ObservableProperty]
-        private bool _wholeWordOnly;
+        private bool _wholeWordOnly = true;
 
         partial void OnWidthChanged(decimal value) => _ApplyOptions();
 
