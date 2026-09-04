@@ -1,6 +1,6 @@
 # ShrinkSpaces
 
-Collapses **each run** of the current **word separator** into a **single** character. The separator comes from [SpaceCharacter](SpaceCharacter.md) (default: space).
+Collapses **each run of two or more** of the current **word separator** into a **single** character (MFR7 `{2,}`). The separator comes from [SpaceCharacter](SpaceCharacter.md) (default: space).
 
 No `options` object.
 

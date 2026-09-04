@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace Mfr.Filters.Space
 {
     /// <summary>
@@ -24,9 +22,7 @@ namespace Mfr.Filters.Space
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var ch = item.WordSeparator;
-            var pattern = Regex.Escape(ch.ToString()) + "+";
-            return Regex.Replace(value, pattern, _ => ch.ToString());
+            return CharacterRunHelpers.CollapseAdjacentDuplicates(value, item.WordSeparator);
         }
     }
 }

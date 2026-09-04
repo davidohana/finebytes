@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace Mfr.Filters.Trimming
 {
     /// <summary>
@@ -42,8 +40,7 @@ namespace Mfr.Filters.Trimming
                 return value;
             }
 
-            var pattern = Regex.Escape(Options.Character.ToString()) + "+";
-            return Regex.Replace(value, pattern, _ => Options.Character.ToString());
+            return CharacterRunHelpers.CollapseAdjacentDuplicates(value, Options.Character);
         }
     }
 }

@@ -1,6 +1,6 @@
 # ShrinkDuplicateCharacters
 
-Collapses **runs** of the same chosen character into a **single** occurrence (for example `---` → `-`).
+Collapses **runs of two or more** of the same chosen character into a **single** occurrence (for example `---` → `-`; MFR7 `{2,}`).
 
 ## Options
 
