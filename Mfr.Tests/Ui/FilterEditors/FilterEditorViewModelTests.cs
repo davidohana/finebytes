@@ -1,6 +1,8 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors;
+using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
+using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
 
@@ -117,6 +119,32 @@ namespace Mfr.Tests.Ui.FilterEditors
             var options = ((TrimBetweenFilter)step.Filter).Options;
             Assert.Equal(new Position(13, Side.Left), options.Start);
             Assert.Equal(new Position(5, Side.Right), options.End);
+        }
+
+        /// <summary>
+        /// Verifies Fix Leading 0's option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Fix_leading_zeros_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Fix Leading 0's", new FixLeadingZerosFilter());
+            var editor = new FixLeadingZerosFilterEditorViewModel(step);
+
+            Assert.Equal(2, editor.Width);
+            Assert.False(editor.RemoveExtraZeros);
+            Assert.Equal(1, editor.MaxCount);
+            Assert.False(editor.WholeWordOnly);
+
+            editor.Width = 4;
+            editor.RemoveExtraZeros = true;
+            editor.MaxCount = 0;
+            editor.WholeWordOnly = true;
+
+            var options = ((FixLeadingZerosFilter)step.Filter).Options;
+            Assert.Equal(4, options.Width);
+            Assert.True(options.RemoveExtraZeros);
+            Assert.Equal(0, options.MaxCount);
+            Assert.True(options.WholeWordOnly);
         }
     }
 }

@@ -1,0 +1,63 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Misc"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="160"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Misc.FixLeadingZerosFilterEditorView"
+  x:DataType="vm:FixLeadingZerosFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="6">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="Ensure that numbers have at least"
+          />
+          <controls:CompactNumericUpDown
+            x:Name="WidthSpinner"
+            Width="56"
+            Minimum="1"
+            Maximum="30"
+            Increment="1"
+            FormatString="0"
+            Value="{Binding Width}"
+          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="digits." />
+        </StackPanel>
+        <controls:CompactCheckBox
+          x:Name="RemoveExtraZerosCheckBox"
+          Content="Remove extra leading zeros"
+          IsChecked="{Binding RemoveExtraZeros}"
+        />
+        <controls:CompactCheckBox
+          x:Name="WholeWordOnlyCheckBox"
+          Content="Whole word only"
+          IsChecked="{Binding WholeWordOnly}"
+        />
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="Maximum numbers to fix (0 = all):"
+          />
+          <controls:CompactNumericUpDown
+            x:Name="MaxCountSpinner"
+            Width="64"
+            Minimum="0"
+            Maximum="9999"
+            Increment="1"
+            FormatString="0"
+            Value="{Binding MaxCount}"
+          />
+        </StackPanel>
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>

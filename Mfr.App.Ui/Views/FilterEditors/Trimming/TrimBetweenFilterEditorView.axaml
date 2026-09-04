@@ -16,11 +16,7 @@
       <StackPanel Spacing="6">
         <TextBlock Classes="filter-editor-label" Text="Remove characters:" />
         <Grid ColumnDefinitions="Auto,4,Auto,4,Auto,4,Auto,4,Auto" RowDefinitions="Auto,6,Auto">
-          <TextBlock
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="Between position"
-          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Between position" />
           <controls:CompactNumericUpDown
             x:Name="StartValueSpinner"
             Grid.Column="2"
@@ -31,12 +27,7 @@
             FormatString="0"
             Value="{Binding StartValue}"
           />
-          <TextBlock
-            Grid.Column="4"
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="from the"
-          />
+          <TextBlock Grid.Column="4" Classes="filter-editor-label" VerticalAlignment="Center" Text="from the" />
           <ComboBox
             x:Name="StartAnchorCombo"
             Grid.Column="6"
@@ -45,19 +36,9 @@
             ItemsSource="{Binding AnchorSides}"
             SelectedItem="{Binding StartAnchor}"
           />
-          <TextBlock
-            Grid.Column="8"
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="side (incl.)"
-          />
+          <TextBlock Grid.Column="8" Classes="filter-editor-label" VerticalAlignment="Center" Text="side (incl.)" />
 
-          <TextBlock
-            Grid.Row="2"
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="and position"
-          />
+          <TextBlock Grid.Row="2" Classes="filter-editor-label" VerticalAlignment="Center" Text="and position" />
           <controls:CompactNumericUpDown
             x:Name="EndValueSpinner"
             Grid.Row="2"

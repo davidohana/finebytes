@@ -5,21 +5,22 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
-using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
+using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.App.Ui.Views.FilterEditors.Case;
+using Mfr.App.Ui.Views.FilterEditors.Misc;
 using Mfr.App.Ui.Views.FilterEditors.Space;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.Filters;
 using Mfr.Filters.Case;
+using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
-using Mfr.Models.Filters;
 using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.FilterEditors
@@ -432,6 +433,49 @@ namespace Mfr.Tests.Ui.FilterEditors
             var filter = (TrimBetweenFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(new Position(13, Side.Left), filter.Options.Start);
             Assert.Equal(new Position(5, Side.Right), filter.Options.End);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Fix Leading 0's option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Fix_leading_zeros_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("FixLeadingZeros"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<FixLeadingZerosFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<FixLeadingZerosFilterEditorView>().Single();
+            var widthSpinner = editor.FindControl<CompactNumericUpDown>("WidthSpinner");
+            var maxCountSpinner = editor.FindControl<CompactNumericUpDown>("MaxCountSpinner");
+            var removeExtraZeros = editor.FindControl<CompactCheckBox>("RemoveExtraZerosCheckBox");
+            var wholeWordOnly = editor.FindControl<CompactCheckBox>("WholeWordOnlyCheckBox");
+            Assert.NotNull(widthSpinner);
+            Assert.NotNull(maxCountSpinner);
+            Assert.NotNull(removeExtraZeros);
+            Assert.NotNull(wholeWordOnly);
+            Assert.Equal(2, widthSpinner.Value);
+            Assert.Equal(1, maxCountSpinner.Value);
+            Assert.False(removeExtraZeros.IsChecked);
+            Assert.False(wholeWordOnly.IsChecked);
+
+            widthSpinner.Value = 4;
+            maxCountSpinner.Value = 0;
+            removeExtraZeros.IsChecked = true;
+            wholeWordOnly.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (FixLeadingZerosFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(4, filter.Options.Width);
+            Assert.Equal(0, filter.Options.MaxCount);
+            Assert.True(filter.Options.RemoveExtraZeros);
+            Assert.True(filter.Options.WholeWordOnly);
 
             window.Close();
         }
