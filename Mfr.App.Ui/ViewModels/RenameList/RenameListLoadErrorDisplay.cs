@@ -27,7 +27,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         /// <param name="filePath">Original absolute path for the selected row.</param>
         /// <param name="errors">Distinct TagLib, image, and/or missing-path failures.</param>
-        /// <returns>Title, summary, path, and folded details.</returns>
+        /// <returns>Title, summary, path, user message, and optional technical details.</returns>
         internal static RenameListRowErrorDialogContent Create(
             string filePath,
             IReadOnlyList<RenameListLoadError> errors
@@ -37,7 +37,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 DialogTitle,
                 FormatSummary(errors),
                 filePath,
-                FormatDetailsText(errors)
+                FormatUserMessage(errors),
+                FormatTechnicalDetails(errors)
             );
         }
 
@@ -52,24 +53,36 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Builds the details box: friendly explanation plus technical line for each reader failure.
+        /// Builds the plain-language message shown in the initial dialog view.
         /// </summary>
         /// <param name="errors">Load issues for the row.</param>
-        /// <returns>Folded error text for the single details box.</returns>
-        internal static string FormatDetailsText(IReadOnlyList<RenameListLoadError> errors)
+        /// <returns>Joined user explanations.</returns>
+        internal static string FormatUserMessage(IReadOnlyList<RenameListLoadError> errors)
         {
-            var blocks = errors.Select(_FormatDetailsBlock);
-            return string.Join($"{Environment.NewLine}{Environment.NewLine}", blocks);
+            return string.Join(
+                $"{Environment.NewLine}{Environment.NewLine}",
+                errors.Select(error => error.UserExplanation)
+            );
         }
 
-        private static string _FormatDetailsBlock(RenameListLoadError error)
+        /// <summary>
+        /// Builds optional technical text for the Technical details expander.
+        /// </summary>
+        /// <param name="errors">Load issues for the row.</param>
+        /// <returns>Joined reader details, or <see langword="null"/> when none apply.</returns>
+        internal static string? FormatTechnicalDetails(IReadOnlyList<RenameListLoadError> errors)
         {
-            if (error.IsMissingFromDisk)
+            var technicalLines = errors
+                .Where(error => !error.IsMissingFromDisk)
+                .Select(error => error.TechnicalDetails)
+                .Where(details => !string.IsNullOrWhiteSpace(details))
+                .ToList();
+            if (technicalLines.Count == 0)
             {
-                return error.UserExplanation;
+                return null;
             }
 
-            return RenameListRowErrorDisplay.FormatDetailsBlock(error.UserExplanation, error.TechnicalDetails);
+            return string.Join($"{Environment.NewLine}{Environment.NewLine}", technicalLines);
         }
 
         private static bool _IsMissingOnly(IReadOnlyList<RenameListLoadError> errors)

@@ -6,11 +6,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// <param name="Title">Window title.</param>
     /// <param name="Summary">Headline shown at the top of the dialog.</param>
     /// <param name="FilePath">Absolute path of the errored row.</param>
-    /// <param name="DetailsText">Folded details for the read-only box.</param>
+    /// <param name="UserMessage">Plain-language explanation shown in the initial view.</param>
+    /// <param name="TechnicalDetails">
+    /// Optional stack / reader dump shown only under Technical details (and always included in Copy).
+    /// </param>
     public sealed record RenameListRowErrorDialogContent(
         string Title,
         string Summary,
         string FilePath,
-        string DetailsText
+        string UserMessage,
+        string? TechnicalDetails = null
     );
 }

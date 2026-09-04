@@ -39,7 +39,10 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(content);
             Assert.Equal(RenameListPreviewErrorDisplay.DialogTitle, content.Title);
             Assert.Equal(path, content.FilePath);
-            Assert.False(string.IsNullOrWhiteSpace(content.DetailsText));
+            Assert.False(string.IsNullOrWhiteSpace(content.UserMessage));
+            Assert.DoesNotContain("Stack Trace:", content.UserMessage, StringComparison.Ordinal);
+            Assert.NotNull(content.TechnicalDetails);
+            Assert.Contains("Stack Trace:", content.TechnicalDetails, StringComparison.Ordinal);
         }
 
         /// <summary>

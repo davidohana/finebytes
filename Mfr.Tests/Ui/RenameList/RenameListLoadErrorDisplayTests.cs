@@ -8,10 +8,10 @@ namespace Mfr.Tests.Ui.RenameList
     public sealed class RenameListLoadErrorDisplayTests
     {
         /// <summary>
-        /// Verifies copy text includes summary, path, and folded friendly plus technical lines.
+        /// Verifies copy text includes summary, path, user message, and technical details.
         /// </summary>
         [Fact]
-        public void Create_copy_text_includes_summary_and_folded_errors()
+        public void Create_copy_text_includes_summary_user_message_and_technical()
         {
             var technicalDetails = @"D:\Music\PLAYLIST.M3U (taglib/m3u)";
             var error = new RenameListLoadError(
@@ -26,13 +26,15 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Contains(@"D:\Music\PLAYLIST.M3U", copyText, StringComparison.Ordinal);
             Assert.Contains(error.UserExplanation, copyText, StringComparison.Ordinal);
             Assert.Contains(technicalDetails, copyText, StringComparison.Ordinal);
+            Assert.Equal(error.UserExplanation, content.UserMessage);
+            Assert.Equal(technicalDetails, content.TechnicalDetails);
         }
 
         /// <summary>
-        /// Verifies missing rows use a missing-path headline and omit the redundant path in details.
+        /// Verifies missing rows use a missing-path headline and omit technical details.
         /// </summary>
         [Fact]
-        public void FormatSummary_and_details_for_missing_file()
+        public void FormatSummary_and_user_message_for_missing_file()
         {
             const string path = @"D:\Music\1\Working on the Highway.mp3";
             IReadOnlyList<RenameListLoadError> errors = [RenameListDiskPaths.MissingLoadError(path)];
@@ -40,8 +42,9 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, RenameListLoadErrorDisplay.FormatSummary(errors));
             Assert.Equal(
                 RenameListDiskPaths.MissingUserExplanation,
-                RenameListLoadErrorDisplay.FormatDetailsText(errors)
+                RenameListLoadErrorDisplay.FormatUserMessage(errors)
             );
+            Assert.Null(RenameListLoadErrorDisplay.FormatTechnicalDetails(errors));
         }
 
         /// <summary>
@@ -60,10 +63,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies the details box folds each friendly explanation with its technical line.
+        /// Verifies user and technical text are kept separate for multiple reader failures.
         /// </summary>
         [Fact]
-        public void FormatDetailsText_folds_friendly_and_technical()
+        public void FormatUserMessage_and_technical_are_separate()
         {
             IReadOnlyList<RenameListLoadError> errors =
             [
@@ -71,14 +74,21 @@ namespace Mfr.Tests.Ui.RenameList
                 new RenameListLoadError("Could not read image metadata.", "format unknown"),
             ];
 
-            var details = RenameListLoadErrorDisplay.FormatDetailsText(errors);
-            var expected = string.Join(
+            var userMessage = RenameListLoadErrorDisplay.FormatUserMessage(errors);
+            var technical = RenameListLoadErrorDisplay.FormatTechnicalDetails(errors);
+            var expectedUser = string.Join(
                 $"{Environment.NewLine}{Environment.NewLine}",
-                $"Could not read audio metadata.{Environment.NewLine}taglib/htm",
-                $"Could not read image metadata.{Environment.NewLine}format unknown"
+                "Could not read audio metadata.",
+                "Could not read image metadata."
+            );
+            var expectedTechnical = string.Join(
+                $"{Environment.NewLine}{Environment.NewLine}",
+                "taglib/htm",
+                "format unknown"
             );
 
-            Assert.Equal(expected, details);
+            Assert.Equal(expectedUser, userMessage);
+            Assert.Equal(expectedTechnical, technical);
         }
     }
 }

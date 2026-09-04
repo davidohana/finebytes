@@ -8,10 +8,10 @@ namespace Mfr.Tests.Ui.RenameList
     public sealed class RenameListRowErrorDisplayTests
     {
         /// <summary>
-        /// Verifies copy text includes summary, path, and details.
+        /// Verifies copy text includes summary, path, user message, and technical details.
         /// </summary>
         [Fact]
-        public void FormatCopyText_includes_summary_path_and_details()
+        public void FormatCopyText_includes_summary_path_user_message_and_technical()
         {
             var content = RenameListPreviewErrorDisplay.Create(@"D:\a.txt", "failed", "System.Exception: boom");
             var copy = RenameListRowErrorDisplay.FormatCopyText(content);
@@ -22,13 +22,22 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies a details block omits the technical line when it is empty.
+        /// Verifies exception formatting includes type, message, and stack without dumping ToString().
         /// </summary>
         [Fact]
-        public void FormatDetailsBlock_omits_blank_technical_line()
+        public void FormatExceptionDetails_includes_type_message_and_inner()
         {
-            Assert.Equal("failed", RenameListRowErrorDisplay.FormatDetailsBlock("failed", technicalDetails: null));
-            Assert.Equal("failed", RenameListRowErrorDisplay.FormatDetailsBlock("failed", "  "));
+            var inner = new InvalidOperationException("inner");
+            var outer = new NotSupportedException("outer", inner);
+            var details = RenameListRowErrorDisplay.FormatExceptionDetails(outer);
+
+            Assert.NotNull(details);
+            Assert.Contains("Type: System.NotSupportedException", details, StringComparison.Ordinal);
+            Assert.Contains("Message: outer", details, StringComparison.Ordinal);
+            Assert.Contains("Stack Trace:", details, StringComparison.Ordinal);
+            Assert.Contains("Type: System.InvalidOperationException", details, StringComparison.Ordinal);
+            Assert.Contains("Message: inner", details, StringComparison.Ordinal);
+            Assert.Null(RenameListRowErrorDisplay.FormatExceptionDetails(null));
         }
     }
 }

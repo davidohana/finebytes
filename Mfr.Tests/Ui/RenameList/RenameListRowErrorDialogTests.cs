@@ -11,10 +11,10 @@ namespace Mfr.Tests.Ui.RenameList
     public sealed class RenameListRowErrorDialogTests
     {
         /// <summary>
-        /// Verifies load errors show a single copyable box with folded friendly and technical text.
+        /// Verifies load errors show user messages initially and technical text under the expander.
         /// </summary>
         [AvaloniaFact]
-        public void Dialog_shows_load_errors_and_one_details_box()
+        public void Dialog_shows_load_errors_with_collapsed_technical_details()
         {
             var tagLibMessage = @"D:\Music\PLAYLIST.M3U (taglib/m3u)";
             var imageMessage = "Cannot read image properties";
@@ -31,24 +31,30 @@ namespace Mfr.Tests.Ui.RenameList
 
             var summaryText = dialog.FindControl<TextBlock>("SummaryText");
             var filePathText = dialog.FindControl<TextBlock>("FilePathText");
-            var detailsText = dialog.FindControl<TextBox>("DetailsText");
+            var userMessageText = dialog.FindControl<TextBlock>("UserMessageText");
+            var technicalExpander = dialog.FindControl<Expander>("TechnicalDetailsExpander");
+            var technicalDetailsText = dialog.FindControl<TextBox>("TechnicalDetailsText");
             Assert.NotNull(summaryText);
             Assert.NotNull(filePathText);
-            Assert.NotNull(detailsText);
+            Assert.NotNull(userMessageText);
+            Assert.NotNull(technicalExpander);
+            Assert.NotNull(technicalDetailsText);
 
             Assert.Equal(RenameListLoadErrorDisplay.DialogTitle, dialog.Title);
             Assert.Equal(RenameListLoadErrorDisplay.MetadataSummary, summaryText.Text);
             Assert.Equal(@"D:\Music\PLAYLIST.M3U", filePathText.Text);
-            Assert.Contains(tagLibMessage, detailsText.Text, StringComparison.Ordinal);
-            Assert.Contains(imageMessage, detailsText.Text, StringComparison.Ordinal);
-            Assert.Contains("audio or media metadata", detailsText.Text, StringComparison.Ordinal);
-            Assert.Contains("image or EXIF metadata", detailsText.Text, StringComparison.Ordinal);
-            Assert.True(detailsText.IsReadOnly);
+            Assert.Contains("audio or media metadata", userMessageText.Text, StringComparison.Ordinal);
+            Assert.Contains("image or EXIF metadata", userMessageText.Text, StringComparison.Ordinal);
+            Assert.DoesNotContain(tagLibMessage, userMessageText.Text, StringComparison.Ordinal);
+            Assert.True(technicalExpander.IsVisible);
+            Assert.False(technicalExpander.IsExpanded);
+            Assert.Contains(tagLibMessage, technicalDetailsText.Text, StringComparison.Ordinal);
+            Assert.Contains(imageMessage, technicalDetailsText.Text, StringComparison.Ordinal);
             Assert.NotNull(dialog.FindControl<Button>("CopyButton"));
         }
 
         /// <summary>
-        /// Verifies missing rows show a missing-path headline instead of the metadata summary.
+        /// Verifies missing rows show a missing-path headline and hide the technical expander.
         /// </summary>
         [AvaloniaFact]
         public void Dialog_shows_missing_summary_for_absent_path()
@@ -60,24 +66,27 @@ namespace Mfr.Tests.Ui.RenameList
             dialog.UpdateLayout();
 
             var summaryText = dialog.FindControl<TextBlock>("SummaryText");
-            var detailsText = dialog.FindControl<TextBox>("DetailsText");
+            var userMessageText = dialog.FindControl<TextBlock>("UserMessageText");
+            var technicalExpander = dialog.FindControl<Expander>("TechnicalDetailsExpander");
             Assert.NotNull(summaryText);
-            Assert.NotNull(detailsText);
+            Assert.NotNull(userMessageText);
+            Assert.NotNull(technicalExpander);
 
             Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, summaryText.Text);
-            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, detailsText.Text);
+            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, userMessageText.Text);
+            Assert.False(technicalExpander.IsVisible);
         }
 
         /// <summary>
-        /// Verifies a preview failure shows summary, path, and folded message/technical text.
+        /// Verifies a preview failure shows the user message and keeps technical text collapsed.
         /// </summary>
         [AvaloniaFact]
-        public void Dialog_shows_preview_message_and_technical_details()
+        public void Dialog_shows_preview_message_and_collapsed_technical_details()
         {
             var content = RenameListPreviewErrorDisplay.Create(
                 @"D:\Music\album",
                 "Cannot apply audio tags to a directory.",
-                "System.InvalidOperationException: directory"
+                "Type: System.InvalidOperationException\nMessage: directory"
             );
             var dialog = new RenameListRowErrorDialog(content);
             dialog.Show();
@@ -85,25 +94,31 @@ namespace Mfr.Tests.Ui.RenameList
 
             var summaryText = dialog.FindControl<TextBlock>("SummaryText");
             var filePathText = dialog.FindControl<TextBlock>("FilePathText");
-            var detailsText = dialog.FindControl<TextBox>("DetailsText");
+            var userMessageText = dialog.FindControl<TextBlock>("UserMessageText");
+            var technicalExpander = dialog.FindControl<Expander>("TechnicalDetailsExpander");
+            var technicalDetailsText = dialog.FindControl<TextBox>("TechnicalDetailsText");
             Assert.NotNull(summaryText);
             Assert.NotNull(filePathText);
-            Assert.NotNull(detailsText);
+            Assert.NotNull(userMessageText);
+            Assert.NotNull(technicalExpander);
+            Assert.NotNull(technicalDetailsText);
 
             Assert.Equal(RenameListPreviewErrorDisplay.DialogTitle, dialog.Title);
             Assert.Equal(RenameListPreviewErrorDisplay.Summary, summaryText.Text);
             Assert.Equal(@"D:\Music\album", filePathText.Text);
-            Assert.Contains("Cannot apply audio tags", detailsText.Text, StringComparison.Ordinal);
-            Assert.Contains("InvalidOperationException", detailsText.Text, StringComparison.Ordinal);
-            Assert.True(detailsText.IsReadOnly);
+            Assert.Equal("Cannot apply audio tags to a directory.", userMessageText.Text);
+            Assert.DoesNotContain("InvalidOperationException", userMessageText.Text, StringComparison.Ordinal);
+            Assert.True(technicalExpander.IsVisible);
+            Assert.False(technicalExpander.IsExpanded);
+            Assert.Contains("InvalidOperationException", technicalDetailsText.Text, StringComparison.Ordinal);
             Assert.NotNull(dialog.FindControl<Button>("CopyButton"));
         }
 
         /// <summary>
-        /// Verifies the details box still works when technical text is absent.
+        /// Verifies the technical expander stays hidden when technical text is absent.
         /// </summary>
         [AvaloniaFact]
-        public void Dialog_shows_preview_message_only_without_technical_details()
+        public void Dialog_hides_technical_expander_without_technical_details()
         {
             var content = RenameListPreviewErrorDisplay.Create(
                 @"D:\Music\note.txt",
@@ -114,9 +129,12 @@ namespace Mfr.Tests.Ui.RenameList
             dialog.Show();
             dialog.UpdateLayout();
 
-            var detailsText = dialog.FindControl<TextBox>("DetailsText");
-            Assert.NotNull(detailsText);
-            Assert.Equal("Destination path already in use.", detailsText.Text);
+            var userMessageText = dialog.FindControl<TextBlock>("UserMessageText");
+            var technicalExpander = dialog.FindControl<Expander>("TechnicalDetailsExpander");
+            Assert.NotNull(userMessageText);
+            Assert.NotNull(technicalExpander);
+            Assert.Equal("Destination path already in use.", userMessageText.Text);
+            Assert.False(technicalExpander.IsVisible);
         }
     }
 }

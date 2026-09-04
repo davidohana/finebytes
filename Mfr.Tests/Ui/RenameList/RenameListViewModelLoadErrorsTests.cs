@@ -37,7 +37,8 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(content);
             Assert.Equal(RenameListLoadErrorDisplay.DialogTitle, content.Title);
             Assert.Equal(path, content.FilePath);
-            Assert.Contains("audio or media metadata", content.DetailsText, StringComparison.Ordinal);
+            Assert.Contains("audio or media metadata", content.UserMessage, StringComparison.Ordinal);
+            Assert.False(string.IsNullOrWhiteSpace(content.TechnicalDetails));
         }
 
         /// <summary>
@@ -117,7 +118,8 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(content);
             Assert.Equal(path, content.FilePath);
             Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, content.Summary);
-            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, content.DetailsText);
+            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, content.UserMessage);
+            Assert.Null(content.TechnicalDetails);
         }
 
         private async Task<(RenameListViewModel ViewModel, string Path, RenameListEntry Entry)> _AddHtmWithTitleAsync()

@@ -20,8 +20,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         /// <param name="filePath">Absolute path of the errored row.</param>
         /// <param name="message">User-facing preview error message.</param>
-        /// <param name="technicalDetails">Optional exception text for the details box.</param>
-        /// <returns>Title, summary, path, and folded details.</returns>
+        /// <param name="technicalDetails">Optional exception text for the Technical details expander.</param>
+        /// <returns>Title, summary, path, user message, and optional technical details.</returns>
         internal static RenameListRowErrorDialogContent Create(
             string filePath,
             string message,
@@ -32,7 +32,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 DialogTitle,
                 Summary,
                 filePath,
-                RenameListRowErrorDisplay.FormatDetailsBlock(message, technicalDetails)
+                message,
+                string.IsNullOrWhiteSpace(technicalDetails) ? null : technicalDetails
             );
         }
     }

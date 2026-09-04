@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
@@ -6,35 +8,53 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     internal static class RenameListRowErrorDisplay
     {
         /// <summary>
-        /// Builds clipboard text (summary, path, and details).
+        /// Builds clipboard text (summary, path, user message, and technical details when present).
         /// </summary>
         /// <param name="content">Dialog content.</param>
         /// <returns>Multi-line text suitable for copy/paste.</returns>
         internal static string FormatCopyText(RenameListRowErrorDialogContent content)
         {
-            return string.Join(
-                Environment.NewLine,
-                content.Summary,
-                content.FilePath,
-                string.Empty,
-                content.DetailsText
-            );
+            var lines = new List<string> { content.Summary, content.FilePath, string.Empty, content.UserMessage };
+            if (!string.IsNullOrWhiteSpace(content.TechnicalDetails))
+            {
+                lines.Add(string.Empty);
+                lines.Add(content.TechnicalDetails);
+            }
+
+            return string.Join(Environment.NewLine, lines);
         }
 
         /// <summary>
-        /// Joins a user-facing explanation with an optional technical line.
+        /// Formats an exception chain for the Technical details expander (type, message, stack).
         /// </summary>
-        /// <param name="explanation">Plain-language message.</param>
-        /// <param name="technicalDetails">Optional exception or reader text.</param>
-        /// <returns><paramref name="explanation"/>, plus a following technical line when present.</returns>
-        internal static string FormatDetailsBlock(string explanation, string? technicalDetails)
+        /// <param name="exception">Root exception, or <see langword="null"/>.</param>
+        /// <returns>Multi-line diagnostic text, or <see langword="null"/> when <paramref name="exception"/> is null.</returns>
+        internal static string? FormatExceptionDetails(Exception? exception)
         {
-            if (string.IsNullOrWhiteSpace(technicalDetails))
+            if (exception is null)
             {
-                return explanation;
+                return null;
             }
 
-            return $"{explanation}{Environment.NewLine}{technicalDetails}";
+            var builder = new StringBuilder();
+            _AppendException(builder, exception);
+            return builder.ToString().TrimEnd();
+        }
+
+        private static void _AppendException(StringBuilder builder, Exception exception)
+        {
+            builder.Append("Type: ");
+            builder.AppendLine(exception.GetType().FullName);
+            builder.Append("Message: ");
+            builder.AppendLine(exception.Message);
+            builder.AppendLine("Stack Trace:");
+            builder.AppendLine(exception.StackTrace ?? string.Empty);
+            builder.AppendLine("-----");
+
+            if (exception.InnerException is not null)
+            {
+                _AppendException(builder, exception.InnerException);
+            }
         }
     }
 }

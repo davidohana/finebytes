@@ -40,7 +40,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 RenameListPreviewErrorDisplay.Create(
                     entry.FullPath,
                     previewError.Message,
-                    previewError.Cause?.ToString()
+                    RenameListRowErrorDisplay.FormatExceptionDetails(previewError.Cause)
                 )
             );
         }

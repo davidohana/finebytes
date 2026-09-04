@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <summary>
         /// Initializes the dialog with shared row-error content.
         /// </summary>
-        /// <param name="content">Title, summary, path, and details.</param>
+        /// <param name="content">Title, summary, path, user message, and optional technical details.</param>
         public RenameListRowErrorDialog(RenameListRowErrorDialogContent content)
         {
             ArgumentNullException.ThrowIfNull(content);
@@ -23,7 +23,15 @@ namespace Mfr.App.Ui.Views.RenameList
             Title = content.Title;
             SummaryText.Text = content.Summary;
             FilePathText.Text = content.FilePath;
-            DetailsText.Text = content.DetailsText;
+            UserMessageText.Text = content.UserMessage;
+
+            var hasTechnicalDetails = !string.IsNullOrWhiteSpace(content.TechnicalDetails);
+            TechnicalDetailsExpander.IsVisible = hasTechnicalDetails;
+            if (hasTechnicalDetails)
+            {
+                TechnicalDetailsText.Text = content.TechnicalDetails;
+            }
+
             _copyText = RenameListRowErrorDisplay.FormatCopyText(content);
         }
 
