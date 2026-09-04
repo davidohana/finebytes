@@ -122,10 +122,7 @@ namespace Mfr.Tests.Engine
             var plan = renameList.Preview(chain, cts.Token);
 
             Assert.Equal(0, plan.ChangedCount);
-            Assert.All(
-                renameList.RenameItems,
-                item => Assert.Equal(item.Original.Prefix, item.Preview.Prefix)
-            );
+            Assert.All(renameList.RenameItems, item => Assert.Equal(item.Original.Prefix, item.Preview.Prefix));
         }
     }
 }

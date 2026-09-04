@@ -9,9 +9,9 @@ using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.RenameList
 {
-        /// <summary>
-        /// Phase 10a–10c: filter-chain and membership preview, Auto-Preview toggle.
-        /// </summary>
+    /// <summary>
+    /// Phase 10a–10c: filter-chain and membership preview, Auto-Preview toggle.
+    /// </summary>
     public sealed class RenameListViewModelPreviewTests : IDisposable
     {
         private readonly RenameListUiTestContext _context = new();
@@ -361,10 +361,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             void OnProgressChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
             {
-                if (
-                    e.PropertyName is nameof(RenameListAddProgressViewModel.IsAdding)
-                    && renameList.IsAdding
-                )
+                if (e.PropertyName is nameof(RenameListAddProgressViewModel.IsAdding) && renameList.IsAdding)
                 {
                     renameList.AddProgress.CancelCommand.Execute(null);
                 }
