@@ -11,6 +11,7 @@
 - Project skills live in `.agents/skills/` only (Cursor and Antigravity both load this path). Do not add a parallel `.cursor/skills/` tree.
 - Always-on agent constraints live in this file. On-demand workflows live in skills under `.agents/skills/`.
 - UI interaction tests: see skill `mfr-ui-headless-tests` and `Mfr.Tests/Ui/FileList/FileListViewTests.cs`.
+- Plans: save all implementation / feature plans under `docs/plans/` (kebab-case names, e.g. `docs/plans/rename-list-ui.plan.md`). Do not put project plans in `.cursor/plans/` or elsewhere.
 
 ## C# code style
 
@@ -54,6 +55,7 @@ Example (Rename List Auto-Sort): session `sortFields` entries are `{ "key": …,
 - `docs/audio-tag-model.md` (embedded audio tag read/write/Apply)
 - `docs/image-metadata-model.md` (lazy MetadataExtractor image properties + EXIF cache)
 - `docs/debts.md` (deferred / later-work list)
+- `docs/plans/` (implementation / feature plans)
 - `docs/rename-list-phase5-followups.md` (deferred shuttle/column refactors after Phase 5)
 - `docs/rename-list-phase6b-followups.md` (6c–6e shipped; next is 8a Refresh)
 - `.editorconfig`

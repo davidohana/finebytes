@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "python .cursor/hooks/format-on-stop.py"
+      }
+    ],
+    "stop": [
+      {
+        "command": "python .cursor/hooks/format-on-stop.py",
+        "timeout": 600
+      }
+    ]
+  }
+}
