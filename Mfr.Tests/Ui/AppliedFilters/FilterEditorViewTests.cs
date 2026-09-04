@@ -12,6 +12,7 @@ using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
+using Mfr.Filters.Trimming;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -309,6 +310,46 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(new Thickness(1, 0, 1, 1), border.BorderThickness);
             Assert.True(headerPresenter.Bounds.Width > 0);
             Assert.True(headerPresenter.Bounds.Width < group.Bounds.Width / 2);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Count filter numeric edits persist on the applied step for all four count filter types.
+        /// </summary>
+        [AvaloniaTheory]
+        [InlineData("TrimLeft")]
+        [InlineData("TrimRight")]
+        [InlineData("ExtractLeft")]
+        [InlineData("ExtractRight")]
+        public void Count_filter_numeric_box_updates_chain_options(string filterType)
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry(filterType));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<CountFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<CountFilterEditorView>().Single();
+            var spinner = editor.FindControl<CompactNumericUpDown>("CountSpinner");
+            Assert.NotNull(spinner);
+            Assert.Equal(1, spinner.Value);
+
+            spinner.Value = 5;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var count = filter switch
+            {
+                TrimLeftFilter f => f.Options.Count,
+                TrimRightFilter f => f.Options.Count,
+                ExtractLeftFilter f => f.Options.Count,
+                ExtractRightFilter f => f.Options.Count,
+                _ => throw new InvalidOperationException(),
+            };
+            Assert.Equal(5, count);
 
             window.Close();
         }

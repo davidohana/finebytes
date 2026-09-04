@@ -167,13 +167,13 @@ Working list, interactions, context menu, manual order, unified field shuttle, d
 
 *(Was 6b–6e.)* See [rename-list-phase6b-followups.md](../../docs/rename-list-phase6b-followups.md).
 
-| Area                       | Location                                                                                                                                                                                                        |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Load-error text + styling  | `LoadErrorText` (`—`), `rename-list-load-error` class in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs)                                                               |
+| Area                       | Location                                                                                                                                                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Load-error text + styling  | `LoadErrorText` (`—`), `rename-list-load-error` class in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs)                                                                  |
 | Show Load Errors           | [RenameListViewModel.LoadErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.LoadErrors.cs), shared [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml) |
-| Row error indicator        | [RenameListRowErrorGlyph.cs](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorGlyph.cs) + `HasRowError` on [RenameListEntry](../../Mfr.App.Ui/ViewModels/RenameList/RenameListEntry.cs)                      |
-| TagLib single-attempt flag | `TagLibLoadAttempted` on [RenameItem](../../Mfr.Models/Rename/RenameItem.cs)                                                                                                                                    |
-| Sort tie-break             | `ErrorsLast` in [RenameListFieldSortCompare.cs](../../Mfr.Models/RenameList/RenameListFieldSortCompare.cs)                                                                                                      |
+| Row error indicator        | [RenameListRowErrorGlyph.cs](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorGlyph.cs) + `HasRowError` on [RenameListEntry](../../Mfr.App.Ui/ViewModels/RenameList/RenameListEntry.cs)                         |
+| TagLib single-attempt flag | `TagLibLoadAttempted` on [RenameItem](../../Mfr.Models/Rename/RenameItem.cs)                                                                                                                                       |
+| Sort tie-break             | `ErrorsLast` in [RenameListFieldSortCompare.cs](../../Mfr.Models/RenameList/RenameListFieldSortCompare.cs)                                                                                                         |
 
 **Not preview errors:** distinct from **Phase 11 Show Preview Error** and Phase 15 apply/GO errors.
 
@@ -237,13 +237,13 @@ ______________________________________________________________________
 
 *(Was 8c.)*
 
-| Area                   | Location                                                                                                                                                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Changed-cell detection | `RenameListFieldCatalog.IsPreviewChanged` + `RenameListEntry.IsPreviewChanged`                                                                                                                                            |
-| Red preview text       | `rename-list-preview-changed` in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs) / [RenameListView.axaml](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml)                |
-| Preview-error row bg   | `rename-list-preview-error` (LavenderBlush / dark muted) on [DataGridRow](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs)                                                                                      |
+| Area                   | Location                                                                                                                                                                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Changed-cell detection | `RenameListFieldCatalog.IsPreviewChanged` + `RenameListEntry.IsPreviewChanged`                                                                                                                                           |
+| Red preview text       | `rename-list-preview-changed` in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs) / [RenameListView.axaml](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml)               |
+| Preview-error row bg   | `rename-list-preview-error` (LavenderBlush / dark muted) on [DataGridRow](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs)                                                                                     |
 | Show Preview Error     | [RenameListViewModel.PreviewErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.PreviewErrors.cs), shared [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml) |
-| Status-bar marker      | `RenameListCellHint.PreviewErrorMarker` (`[Item Preview Error]`) prepended to `FormatParts`                                                                                                                               |
+| Status-bar marker      | `RenameListCellHint.PreviewErrorMarker` (`[Item Preview Error]`) prepended to `FormatParts`                                                                                                                              |
 
 Highlighting is the last preview result (not gated on Auto-Preview). **Show Preview Error** stays available while a row still has `PreviewError`.
 

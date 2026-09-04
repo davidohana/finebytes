@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: f5-count-lr
     content: "F5 Count L/R — shared CountFilterOptions editor + factory for Trim/Extract Left/Right + tests for all four"
-    status: pending
+    status: completed
   - id: f5-shrink-dup
     content: "F5 Shrink Duplicate Characters — single-char editor"
     status: pending
@@ -84,7 +84,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-04):** F1–F4 done. **Next: F5 Count L/R** (Trim/Extract Left/Right — shared `CountFilterOptions` editor). Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-04):** F5 Count L/R done. **Next: F5 Shrink Duplicate Characters** (single filter). Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ### Already shipped (F1–F4)
 
@@ -99,12 +99,12 @@ Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical
 Same as F4b/F4c — **one pass = one filter, or one intentional group** (see grouping rule below):
 
 1. Read MFR7 `*FilterEditor` + help for each filter in the pass (`mfr7-reference` skill).
-2. Add `…FilterEditorViewModel` under `ViewModels/FilterEditors/` (or one shared editor when options type / UI is identical).
-3. Add matching `…FilterEditorView.axaml` (+ code-behind). ViewLocator resolves by naming convention.
-4. Register in [`FilterOptionsEditorFactory`](../../Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs).
-5. Live-replace via `filter with { Options = … }` + `ApplyIfChanged` — no Apply button; do not call `Setup()`.
-6. VM unit tests + headless gesture → `ToChain()` options match (**each** filter type in the group).
-7. Use compact controls (`CompactNumericUpDown`, `CompactCheckBox`, `CompactRadioButton`, `FieldsetGroup`).
+1. Add `…FilterEditorViewModel` under `ViewModels/FilterEditors/` (or one shared editor when options type / UI is identical).
+1. Add matching `…FilterEditorView.axaml` (+ code-behind). ViewLocator resolves by naming convention.
+1. Register in [`FilterOptionsEditorFactory`](../../Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs).
+1. Live-replace via `filter with { Options = … }` + `ApplyIfChanged` — no Apply button; do not call `Setup()`.
+1. VM unit tests + headless gesture → `ToChain()` options match (**each** filter type in the group).
+1. Use compact controls (`CompactNumericUpDown`, `CompactCheckBox`, `CompactRadioButton`, `FieldsetGroup`).
 
 Until a type is registered, selecting it still shows title only (Apply To stays in Filter Options).
 
@@ -128,32 +128,32 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 
 ### Ordered backlog
 
-| Order | Pass | Filters | Options / notes |
-| --- | --- | --- | --- |
-| **1 (next)** | **Count L/R** | Trim Left, Trim Right, Extract Left, Extract Right | Shared `CountFilterOptions` editor + four factory arms + tests for all four |
-| 2 | Shrink Duplicate Characters | single | `char` — not count-style |
-| 3 | Trim Between | single | `Position` start/end + side |
-| 4 | Fix Leading 0's | single | width / remove extras / max / whole-word |
-| 5 | **Space After + Around** | Space After, Space Around | Chars string + neighbor checkbox (shared pattern; two option records) |
-| 6 | Capitalize After | single | trigger chars string |
-| 7 | Sentence End Characters | single | char list |
-| 8 | Strip Parentheses | single | pair type + remove contents |
-| 9 | Cleaner | single | illegal + custom + replacement |
-| 10 | Counter | single | start / step / format |
-| 11 | Inserter | single | text + position |
-| 12 | Casing List | single | file path + sentence-initial |
-| 13 | Replace List | single | file path + mode/options |
-| 14 | Name List | single | file path + prefix/suffix |
-| 15 | Replacer | single | find/replace / regex / scope |
-| 16 | Token Mover | single | token indices / destination |
-| 17 | Mover | single | substring move |
-| 18 | **Date + Time Setter** | Date Setter, Time Setter | Shared timestamp-field picker; date vs time value |
-| 19 | Time Shifter | single | field + amount + unit (not grouped with setters) |
-| 20 | Attributes Setter | single | attribute flags |
-| 21 | Audio Tag Remover | single | all / block types |
-| 22 | Audio Tag Setter | single | per-field format specs |
-| 23 | ID3v2 Field Setter | single | frame + value |
-| **last** | Formatter | single | format string + token UI — own sub-project |
+| Order        | Pass                        | Filters                                            | Options / notes                                                             |
+| ------------ | --------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------- |
+| **1 (done)** | **Count L/R**               | Trim Left, Trim Right, Extract Left, Extract Right | Shared `CountFilterOptions` editor + four factory arms + tests for all four |
+| **2 (next)** | Shrink Duplicate Characters | single                                             | `char` — not count-style                                                    |
+| 3            | Trim Between                | single                                             | `Position` start/end + side                                                 |
+| 4            | Fix Leading 0's             | single                                             | width / remove extras / max / whole-word                                    |
+| 5            | **Space After + Around**    | Space After, Space Around                          | Chars string + neighbor checkbox (shared pattern; two option records)       |
+| 6            | Capitalize After            | single                                             | trigger chars string                                                        |
+| 7            | Sentence End Characters     | single                                             | char list                                                                   |
+| 8            | Strip Parentheses           | single                                             | pair type + remove contents                                                 |
+| 9            | Cleaner                     | single                                             | illegal + custom + replacement                                              |
+| 10           | Counter                     | single                                             | start / step / format                                                       |
+| 11           | Inserter                    | single                                             | text + position                                                             |
+| 12           | Casing List                 | single                                             | file path + sentence-initial                                                |
+| 13           | Replace List                | single                                             | file path + mode/options                                                    |
+| 14           | Name List                   | single                                             | file path + prefix/suffix                                                   |
+| 15           | Replacer                    | single                                             | find/replace / regex / scope                                                |
+| 16           | Token Mover                 | single                                             | token indices / destination                                                 |
+| 17           | Mover                       | single                                             | substring move                                                              |
+| 18           | **Date + Time Setter**      | Date Setter, Time Setter                           | Shared timestamp-field picker; date vs time value                           |
+| 19           | Time Shifter                | single                                             | field + amount + unit (not grouped with setters)                            |
+| 20           | Attributes Setter           | single                                             | attribute flags                                                             |
+| 21           | Audio Tag Remover           | single                                             | all / block types                                                           |
+| 22           | Audio Tag Setter            | single                                             | per-field format specs                                                      |
+| 23           | ID3v2 Field Setter          | single                                             | frame + value                                                               |
+| **last**     | Formatter                   | single                                             | format string + token UI — own sub-project                                  |
 
 **Corrections vs older F5a–f batches:** Shrink Duplicate is **not** count-style; **Trim Between** was missing from the batch list; Fix Leading 0's is its own richer editor.
 

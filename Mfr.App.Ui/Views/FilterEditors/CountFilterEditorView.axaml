@@ -1,0 +1,30 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="260"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.CountFilterEditorView"
+  x:DataType="vm:CountFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Number of characters:" />
+        <controls:CompactNumericUpDown
+          x:Name="CountSpinner"
+          Width="64"
+          Minimum="0"
+          Maximum="9999"
+          Increment="1"
+          FormatString="0"
+          Value="{Binding Count}"
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>
