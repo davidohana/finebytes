@@ -199,7 +199,7 @@ ______________________________________________________________________
 
 ## Phase 10 — Preview core (10a–10d)
 
-*(Was 8b.)* Engine has `RenameList.Preview(FilterChain)`. Grid preview columns already resolve `item.Preview` via the catalog. Applied Filters F1–F4 shipped (live `ToChain()`, Filter Options, Space Character / Letters Case). Remaining filter option UIs are F5 — one filter per pass; see [applied-filter-editors.plan.md](applied-filter-editors.plan.md) (next: Trim Left).
+*(Was 8b.)* Engine has `RenameList.Preview(FilterChain)`. Grid preview columns already resolve `item.Preview` via the catalog. Applied Filters F1–F4 shipped (live `ToChain()`, Filter Options, Space Character / Letters Case). Remaining filter option UIs are F5 — group only when options/UI are shared; see [applied-filter-editors.plan.md](applied-filter-editors.plan.md) (next: Count L/R).
 
 Letter grain matches 1a–1f. Do not micro-split 10a (engine `Preview(FilterChain)` is a few lines and cannot ship without the UI hook).
 
