@@ -8,6 +8,8 @@
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="/Themes/FileList.axaml" />
+        <ResourceInclude Source="/Themes/RenameList.axaml" />
+        <ResourceInclude Source="/Themes/FilterEditor.axaml" />
         <ResourceInclude Source="/Themes/FieldsetGroup.axaml" />
         <ResourceInclude Source="/Assets/Icons.axaml" />
       </ResourceDictionary.MergedDictionaries>
