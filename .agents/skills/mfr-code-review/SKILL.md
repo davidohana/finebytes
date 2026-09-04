@@ -4,10 +4,12 @@ description: >-
   Reviews finebytes/MFR changes for correctness, KISS, YAGNI, naming, stale
   APIs, layering, leftover flags, fragile heuristics, dedup/reuse (local and
   cross-file), and test coverage; applies high-confidence cleanup and adds
-  worthwhile tests; surfaces deeper refactor/dedup options clearly even when not
-  auto-applied; may delegate to explore/bugbot/security-review when triggers match. Use when the user asks for a code review, deep review,
-  KISS/YAGNI pass, simplify/minimize/cleanup/dedup, to review a plan phase or
-  prior transcript, or says auto-correct things you are sure about.
+  worthwhile tests; surfaces deeper refactor/dedup options ranked by
+  cost-to-value (risk, LOC, churn vs payoff) even when not auto-applied; may
+  delegate to explore/bugbot/security-review when triggers match. Use when the
+  user asks for a code review, deep review, KISS/YAGNI pass,
+  simplify/minimize/cleanup/dedup, to review a plan phase or prior transcript,
+  or says auto-correct things you are sure about.
 ---
 
 # MFR code review
@@ -17,8 +19,9 @@ their keep**. Prefer a smaller design over a compatible one.
 
 Actively hunt **dedup and reuse** at every scope — local copy-paste, parallel types/views,
 shared policy in two layers, twin APIs, and test fixtures. Apply safe local wins in-pass;
-**always call out** stronger cross-file or structural dedups clearly in the report (the user
-welcomes deeper refactors — do not bury or skip them because they are not auto-applied).
+**always call out** stronger cross-file or structural dedups clearly in the report, ranked by
+**cost-to-value** (the user welcomes deeper refactors — do not bury or skip them because they
+are not auto-applied).
 
 ## Resolve scope
 
@@ -60,9 +63,21 @@ auto-correct, refactor as needed, add coverage, or “review what’s done” af
 - Caching or perf work with no measured cost
 
 For each proposed dedup/refactor: name the **duplicated sites**, the **target shape**
-(what to extract, merge, or delete), **payoff** (lines, drift risk, one source of truth),
-**scope/cost** (files, tests, risk), and a **suggested order** if several items relate.
+(what to extract, merge, or delete), **value**, **cost**, and a **cost-to-value rank**.
 Do not treat “deeper refactor” as optional silence — if duplication exists, say so.
+
+**Prioritize deeper refactors by cost-to-value** (best ratio first). Do not list by discovery
+order or by how ambitious they sound.
+
+- **Value** — lines / types deleted, drift surfaces closed, one source of truth, fewer future
+  copies when the next similar feature lands, clearer ownership.
+- **Cost** — behavior/regression **risk**, **LOC added** (net and temporary scaffolding),
+  **churn** (files touched, renames, AXAML/VM/test fan-out), test rewrite burden, blast radius
+  outside the current feature, and whether the merge needs a dedicated pass vs rides along.
+
+Prefer a small, low-risk delete over a large elegant merge with high churn. Call out
+**negative** cost-to-value explicitly (high cost, weak payoff) and put those last or under
+“do not do.”
 
 If leftover work is real after a named plan phase, list it in the report. Write a follow-up
 doc only when the user asks to handover, or when that phase already has one.
@@ -198,7 +213,7 @@ Lead with a one-paragraph verdict. Then:
 ## Dedup / reuse (applied | proposed)
 ## Naming / docs (if any)
 ## Tests (added | consolidated | skipped)
-## Deeper refactors (not done — always include when duplication exists)
+## Deeper refactors (not done — always include when duplication exists; ranked best cost-to-value first)
 ## What to keep / what not to simplify
 ```
 
@@ -206,5 +221,19 @@ Be specific (type/method names). Separate **applied** from **proposed**.
 
 **Dedup / reuse** and **Deeper refactors** may overlap — use Dedup for concrete duplication
 found; use Deeper refactors for structural follow-ups (shared types, layer moves, multi-file
-merges). Each proposed item needs: duplicated sites → target shape → payoff → scope/cost →
-suggested order. If nothing is worth doing, say that and stop.
+merges).
+
+**Deeper refactors** — numbered list, **best cost-to-value first**. Each item:
+
+```markdown
+N. **Short title**
+   Sites: …
+   Target: …
+   Value: … (delete X; close drift; one owner; …)
+   Cost: … (risk; net/temp LOC; churn: files/tests; blast radius)
+   Rank: high | medium | low cost-to-value — do first / later / skip
+```
+
+If several items relate, the number order **is** the suggested order (do not add a second
+ordering scheme). Put “do not merge / do not simplify” under **What to keep**, not as fake
+refactors. If nothing is worth doing, say that and stop.
