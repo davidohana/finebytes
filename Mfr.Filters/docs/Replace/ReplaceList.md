@@ -1,57 +1,48 @@
 # ReplaceList
 
-Loads a **replace list file** and applies **search/replace pairs** in file order—like multiple [Replacer](Replacer.md) steps sharing the same mode and flags. Replacement lines may include formatter tokens (for example `<counter:…>`) where supported.
+Applies **search/replace pairs** embedded in the filter options, in list order—like multiple [Replacer](Replacer.md) steps sharing the same mode and flags. Replacement values may include formatter tokens (for example `<counter:…>`) where supported. An empty list is a no-op.
 
 ## Options
 
-| Property        | Type          | Description                                                                |
-| --------------- | ------------- | -------------------------------------------------------------------------- |
-| `filePath`      | string        | Path to the replace-list file.                                             |
-| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — applies to **every** pair in the file. |
-| `caseSensitive` | bool          | Matching flag for all pairs.                                               |
-| `replaceAll`    | bool          | Replace all matches per pair.                                              |
-| `wholeWord`     | bool          | Whole-word restriction for all pairs.                                      |
+| Property        | Type          | Description                                                    |
+| --------------- | ------------- | -------------------------------------------------------------- |
+| `entries`       | object[]      | `{ "search", "replacement" }` pairs applied in order.          |
+| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — applies to **every** pair. |
+| `caseSensitive` | bool          | Matching flag for all pairs.                                   |
+| `replaceAll`    | bool          | Replace all matches per pair.                                  |
+| `wholeWord`     | bool          | Whole-word restriction for all pairs.                          |
 
-## Replace-list file format
+## Editor text format
 
-- Each entry is two lines: `S:` + search, then `R:` + replacement.
-- Comment lines: `//`, `\\`, or `# ` (hash + space) after optional whitespace.
-- Empty lines ignored.
-- Search and replacement (after the prefix) must be non-empty; use `<EMPTY>` on the `R:` line to remove the match.
-- Each `S:`/`R:` line at most 1000 characters.
-- At least one pair required.
+The Filter Configuration pane edits `entries` as **line-separated** pairs. Each non-empty line is either a lone `search` (empty replacement / strip) or **whitespace-separated** `search` then `replacement`. Lines with more than two tokens are ignored while typing. Search and replacement must not contain whitespace; each is limited to 1000 characters.
 
-**Example file**
+**Example editor text**
 
 ```text
-S:a
-R:b
-
-S:\.
-R:_
+a b
+. _
+x
 ```
 
 ## Examples
 
-- `filePath`: pairs `a`→`b`, then `.`→`_`; `mode`: `Literal`; `replaceAll`: `true`
+- `entries`: `a`→`b`, then `.`→`_`; `mode`: `Literal`; `replaceAll`: `true`
   - Before: `a.a`
   - After: `b_b`
   - Comment: Order matters: `a`→`b` first, then `.`→`_`.
-- `filePath`: `S:x` / `R:<EMPTY>`; `mode`: `Literal`; `replaceAll`: `true` — `abxcx` → `abc`
-- `filePath`: `S:f*o` / `R:X`; `mode`: `Wildcard`; `replaceAll`: `true` — `foo` → `X`
-- `filePath`: `a`→`b`, `.`→`_`,
+- `entries`: `x`→`""`; `mode`: `Literal`; `replaceAll`: `true` — `abxcx` → `abc`
+- `entries`: `f*o`→`X`; `mode`: `Wildcard`; `replaceAll`: `true` — `foo` → `X`
+- `entries`: `a`→`b`, `\.`→`_`,
   `[0-9]+`→`<counter:initial=10,step=1,padding=none,length=2,resetScope=global>`; `mode`: `Regex`; `caseSensitive`:
   `false`; `replaceAll`: `true`; global index: `0`
   - Before: `01.-.Blue.Train`
   - After: `10_-_Blue_Trbin`
   - Comment: Regex replaces digit runs; yields `Trbin`.
-- (same file as row above); global index: `1` — `02.-.A.Moment's.Notice` → `11_-_b_Moment's_Notice`
-
-The list is loaded at filter **setup**; reload the preset or app after editing the file.
+- (same entries as row above); global index: `1` — `02.-.A.Moment's.Notice` → `11_-_b_Moment's_Notice`
 
 ## Sample preset (JSON)
 
-The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). Set `filePath` to your replace-list file.
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)).
 
 ```json
 {
@@ -60,11 +51,14 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
     "targetType": "FilePrefix"
   },
   "options": {
-    "filePath": "C:/Music/MFR/replace-list.txt",
+    "entries": [
+      { "search": "a", "replacement": "b" },
+      { "search": ".", "replacement": "_" }
+    ],
     "mode": "Literal",
     "caseSensitive": true,
     "replaceAll": true,
-    "wholeWord": false
+    "wholeWord": true
   }
 }
 ```

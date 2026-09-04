@@ -377,5 +377,40 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(["and", "or", "RMX"], options.Words);
             Assert.False(options.UppercaseSentenceInitial);
         }
+
+        /// <summary>
+        /// Verifies Replace List option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Replace_list_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Replace List", new ReplaceListFilter());
+            var editor = new ReplaceListFilterEditorViewModel(step);
+
+            Assert.Equal(string.Empty, editor.EntriesText);
+            Assert.Equal(ReplacerMode.Literal, editor.Mode);
+            Assert.False(editor.CaseSensitive);
+            Assert.True(editor.ReplaceAll);
+            Assert.True(editor.WholeWord);
+
+            editor.EntriesText = "a b\n. _\nx";
+            editor.Mode = ReplacerMode.Wildcard;
+            editor.CaseSensitive = true;
+            editor.ReplaceAll = false;
+            editor.WholeWord = false;
+
+            var options = ((ReplaceListFilter)step.Filter).Options;
+            Assert.Equal(3, options.Entries.Count);
+            Assert.Equal("a", options.Entries[0].Search);
+            Assert.Equal("b", options.Entries[0].Replacement);
+            Assert.Equal(".", options.Entries[1].Search);
+            Assert.Equal("_", options.Entries[1].Replacement);
+            Assert.Equal("x", options.Entries[2].Search);
+            Assert.Equal("", options.Entries[2].Replacement);
+            Assert.Equal(ReplacerMode.Wildcard, options.Mode);
+            Assert.True(options.CaseSensitive);
+            Assert.False(options.ReplaceAll);
+            Assert.False(options.WholeWord);
+        }
     }
 }

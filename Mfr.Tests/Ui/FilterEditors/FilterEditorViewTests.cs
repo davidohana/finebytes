@@ -826,6 +826,61 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Replace List option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Replace_list_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ReplaceList"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<ReplaceListFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<ReplaceListFilterEditorView>().Single();
+            var entries = editor.FindControl<TextBox>("EntriesBox");
+            var literal = editor.FindControl<CompactRadioButton>("LiteralRadio");
+            var wildcard = editor.FindControl<CompactRadioButton>("WildcardRadio");
+            var caseSensitive = editor.FindControl<CompactCheckBox>("CaseSensitiveCheckBox");
+            var replaceAll = editor.FindControl<CompactCheckBox>("ReplaceAllCheckBox");
+            var wholeWord = editor.FindControl<CompactCheckBox>("WholeWordCheckBox");
+            Assert.NotNull(entries);
+            Assert.NotNull(literal);
+            Assert.NotNull(wildcard);
+            Assert.NotNull(caseSensitive);
+            Assert.NotNull(replaceAll);
+            Assert.NotNull(wholeWord);
+            Assert.True(entries.AcceptsReturn);
+            Assert.Equal(string.Empty, entries.Text);
+            Assert.True(literal.IsChecked);
+            Assert.False(caseSensitive.IsChecked);
+            Assert.True(replaceAll.IsChecked);
+            Assert.True(wholeWord.IsChecked);
+
+            entries.Text = "a b\n. _";
+            wildcard.IsChecked = true;
+            caseSensitive.IsChecked = true;
+            replaceAll.IsChecked = false;
+            wholeWord.IsChecked = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (ReplaceListFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(2, filter.Options.Entries.Count);
+            Assert.Equal("a", filter.Options.Entries[0].Search);
+            Assert.Equal("b", filter.Options.Entries[0].Replacement);
+            Assert.Equal(".", filter.Options.Entries[1].Search);
+            Assert.Equal("_", filter.Options.Entries[1].Replacement);
+            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Mode);
+            Assert.True(filter.Options.CaseSensitive);
+            Assert.False(filter.Options.ReplaceAll);
+            Assert.False(filter.Options.WholeWord);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Letters Case radio edits re-run Rename List preview (Phase 10a).
         /// </summary>
         [AvaloniaFact]

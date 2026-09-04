@@ -8,7 +8,7 @@ namespace Mfr.Models.Config
     public sealed class FilterConfig
     {
         /// <summary>
-        /// Maximum length (characters) for name-list and replace-list file lines, and for each casing-list word.
+        /// Maximum length (characters) for name-list file lines, each casing-list word, and each replace-list search/replacement.
         /// </summary>
         [ConfigIntRange(1, 60000)]
         public int MaxListFileLineLength = 1000;

@@ -5,105 +5,24 @@ namespace Mfr.Tests.Models.Filters.Replace
     /// <summary>
     /// Tests for <see cref="ReplaceListParser"/>.
     /// </summary>
-    public sealed class ReplaceListParserTests : IDisposable
+    public sealed class ReplaceListParserTests
     {
-        private readonly TempDirectoryFixture _tempDir = new();
-
-        public void Dispose()
-        {
-            _tempDir.Dispose();
-        }
-
         /// <summary>
-        /// Verifies parser ignores various comment styles.
-        /// </summary>
-        [Theory]
-        [InlineData("// comment")]
-        [InlineData(@"\\ comment")]
-        [InlineData("  # comment")]
-        public void ParseFile_Comments_AreIgnored(string commentLine)
-        {
-            var path = _CreateFile(
-                $"""
-                {commentLine}
-                S:a
-                R:b
-                """
-            );
-
-            var entries = ReplaceListParser.ParseFile(path);
-
-            Assert.Single(entries);
-            Assert.Equal("a", entries[0].Search);
-            Assert.Equal("b", entries[0].Replacement);
-        }
-
-        /// <summary>
-        /// Verifies '#'-prefixed text without following space is treated as data, not comment.
+        /// Verifies an empty entry list validates to empty.
         /// </summary>
         [Fact]
-        public void ParseFile_HashWithoutSpace_IsNotComment()
+        public void Validate_Empty_ReturnsEmpty()
         {
-            var path = _CreateFile(
-                """
-                S:#a
-                R:b
-                """
-            );
-
-            var entries = ReplaceListParser.ParseFile(path);
-
-            Assert.Single(entries);
-            Assert.Equal("#a", entries[0].Search);
-            Assert.Equal("b", entries[0].Replacement);
+            Assert.Empty(ReplaceListParser.Validate([]));
         }
 
         /// <summary>
-        /// Verifies parser requires at least one replacement entry.
-        /// </summary>
-        [Theory]
-        [InlineData("")]
-        [InlineData("   ")]
-        [InlineData("// comment only")]
-        [InlineData("# comment only")]
-        public void ParseFile_NoEntries_Throws(string content)
-        {
-            var path = _CreateFile(content);
-
-            var ex = Assert.Throws<UserException>(() => ReplaceListParser.ParseFile(path));
-            Assert.Contains("must contain at least one replacement entry", ex.Message);
-        }
-
-        /// <summary>
-        /// Verifies parser rejects empty entries or missing prefixes.
-        /// </summary>
-        [Theory]
-        [InlineData("S:x\nR:", "replace line cannot be empty")]
-        [InlineData("S:\nR:b", "search line cannot be empty")]
-        [InlineData("a\nR:b", "search line must start with 'S:'")]
-        [InlineData("S:a", "found a search line without a corresponding replace line")]
-        public void ParseFile_InvalidFormat_Throws(string content, string expectedError)
-        {
-            var path = _CreateFile(content);
-
-            var ex = Assert.Throws<UserException>(() => ReplaceListParser.ParseFile(path));
-            Assert.Contains(expectedError, ex.Message);
-        }
-
-        /// <summary>
-        /// Verifies parser maps &lt;EMPTY&gt; token to empty replacement.
+        /// Verifies empty replacement string is kept (strip).
         /// </summary>
         [Fact]
-        public void ParseFile_EmptyReplacementToken_MapsToEmptyString()
+        public void Validate_EmptyReplacementString_Kept()
         {
-            var path = _CreateFile(
-                """
-                S:x
-                R:<EMPTY>
-                """
-            );
-
-            var entries = ReplaceListParser.ParseFile(path);
+            var entries = ReplaceListParser.Validate([new ReplaceListEntry("x", "")]);
 
             Assert.Single(entries);
             Assert.Equal("x", entries[0].Search);
@@ -111,43 +30,47 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
-        /// Verifies parser ignores blank lines between pairs.
+        /// Verifies empty or whitespace search is rejected.
         /// </summary>
         [Theory]
-        [InlineData("S:a\nR:b\n\n\nS:c\nR:d")]
-        public void ParseFile_BlankLinesBetweenPairs_AreAllowed(string content)
+        [InlineData("")]
+        [InlineData("   ")]
+        public void Validate_EmptySearch_Throws(string search)
         {
-            var path = _CreateFile(content);
-
-            var entries = ReplaceListParser.ParseFile(path);
-
-            Assert.Equal(2, entries.Count);
-            Assert.Equal("a", entries[0].Search);
-            Assert.Equal("c", entries[1].Search);
+            var ex = Assert.Throws<UserException>(() =>
+                ReplaceListParser.Validate([new ReplaceListEntry(search, "b")])
+            );
+            Assert.Contains("search cannot be empty", ex.Message, StringComparison.Ordinal);
         }
 
         /// <summary>
-        /// Verifies parser rejects lines over maximum length.
+        /// Verifies whitespace inside search or replacement is rejected.
+        /// </summary>
+        [Theory]
+        [InlineData("a b", "c", "search must not contain whitespace")]
+        [InlineData("a", "b c", "replacement must not contain whitespace")]
+        public void Validate_WhitespaceInPair_Throws(string search, string replacement, string expected)
+        {
+            var ex = Assert.Throws<UserException>(() =>
+                ReplaceListParser.Validate([new ReplaceListEntry(search, replacement)])
+            );
+            Assert.Contains(expected, ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies overly long search or replacement is rejected.
         /// </summary>
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void ParseFile_LineTooLong_Throws(bool isSearch)
+        public void Validate_PartTooLong_Throws(bool isSearch)
         {
-            var maxListFileLineLength = ConfigStore.Config.Filters.MaxListFileLineLength;
-            var tooLong = new string('x', maxListFileLineLength + 1);
-            var content = isSearch ? $"S:{tooLong}\nR:b" : $"S:a\nR:{tooLong}";
-            var path = _CreateFile(content);
+            var maxLen = ConfigStore.Config.Filters.MaxListFileLineLength;
+            var tooLong = new string('x', maxLen + 1);
+            var entry = isSearch ? new ReplaceListEntry(tooLong, "b") : new ReplaceListEntry("a", tooLong);
 
-            var ex = Assert.Throws<UserException>(() => ReplaceListParser.ParseFile(path));
-            Assert.Contains($"line length exceeds {maxListFileLineLength}", ex.Message);
-        }
-
-        private string _CreateFile(string content)
-        {
-            var path = Path.Combine(_tempDir.TempDir, $"test-{Guid.NewGuid():N}.txt");
-            File.WriteAllText(path, content.ReplaceLineEndings(Environment.NewLine));
-            return path;
+            var ex = Assert.Throws<UserException>(() => ReplaceListParser.Validate([entry]));
+            Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
         }
     }
 }

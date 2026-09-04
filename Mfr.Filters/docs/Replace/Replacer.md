@@ -45,7 +45,7 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
   - After: `Category`
   - Comment: No standalone word `cat` in `Category` (substring doesn’t count).
 
-For many rules from a file, use [ReplaceList](ReplaceList.md).
+For many rules in one step, use [ReplaceList](ReplaceList.md).
 
 ## Sample preset (JSON)
 

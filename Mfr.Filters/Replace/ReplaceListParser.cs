@@ -1,162 +1,63 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Mfr.Filters.Replace
 {
     /// <summary>
-    /// Represents one parsed replace-list entry.
-    /// </summary>
-    /// <param name="Search">Search pattern text.</param>
-    /// <param name="Replacement">Replacement text.</param>
-    internal readonly record struct ReplaceListEntry(string Search, string Replacement);
-
-    /// <summary>
-    /// Parses and validates replace-list files.
+    /// Validates replace-list entries embedded in filter options.
     /// </summary>
     internal static class ReplaceListParser
     {
-        internal const string EmptyReplacementToken = "<EMPTY>";
-
         /// <summary>
-        /// Parses and validates replace-list entries from a file.
+        /// Validates entries for apply-time use.
         /// </summary>
         /// <remarks>
-        /// Expected format:
-        /// <list type="bullet">
-        /// <item>
-        /// <description>Comment lines may appear anywhere and must start with <c>//</c>, <c>\\</c>, or <c># </c> (hash followed by a space, after optional leading whitespace).</description>
-        /// </item>
-        /// <item>
-        /// <description>Empty lines are ignored.</description>
-        /// </item>
-        /// <item>
-        /// <description>Each replace entry is two lines: search line starting with <c>S:</c> and replacement line starting with <c>R:</c>.</description>
-        /// </item>
-        /// <item>
-        /// <description>Search and replacement lines cannot be empty (excluding the prefix). Use <c>&lt;EMPTY&gt;</c> on replacement lines to strip the matched search text.</description>
-        /// </item>
-        /// <item>
-        /// <description>Search and replacement lines must be at most the configured list-file line limit (default 1000 characters each).</description>
-        /// </item>
-        /// <item>
-        /// <description>At least one replacement entry must be present.</description>
-        /// </item>
-        /// </list>
-        /// Example file content:
-        /// <code>
-        /// # START OF REPLACE LIST
-        /// S:a
-        /// R:b
-        ///
-        /// S:.
-        /// R:_
-        /// # END OF REPLACE LIST
-        /// </code>
+        /// Empty list is allowed (no-op). Each search must be non-empty and free of whitespace.
+        /// Replacement may be empty (strip) or a single whitespace-free token.
         /// </remarks>
-        /// <param name="filePath">Replace-list file path.</param>
-        /// <returns>Parsed replace-list entries in file order.</returns>
-        internal static List<ReplaceListEntry> ParseFile(string filePath)
+        /// <param name="entries">Configured search/replace pairs in apply order.</param>
+        /// <returns>Validated entries in the same order.</returns>
+        internal static List<ReplaceListEntry> Validate(IReadOnlyList<ReplaceListEntry> entries)
         {
-            ListFileParseHelpers.ValidateListFilePath(filePath, listKindLabel: "Replace-list");
+            ArgumentNullException.ThrowIfNull(entries);
 
-            var lines = _ReadNonCommentAndNonEmptyLines(filePath);
-            if (lines.Count == 0)
-            {
-                throw new UserException("Replace-list file must contain at least one replacement entry.");
-            }
-
-            _ValidateLineLength(lines);
-
-            var entries = new List<ReplaceListEntry>();
-            var i = 0;
-
-            while (i < lines.Count)
-            {
-                var searchLine = lines[i++];
-                if (!searchLine.Text.StartsWith("S:", StringComparison.Ordinal))
-                {
-                    _ThrowInvalidFormat(searchLine.LineNumber, "search line must start with 'S:'.");
-                }
-
-                if (i >= lines.Count)
-                {
-                    _ThrowInvalidFormat(
-                        searchLine.LineNumber,
-                        "found a search line without a corresponding replace line."
-                    );
-                }
-
-                var replaceLine = lines[i++];
-                if (!replaceLine.Text.StartsWith("R:", StringComparison.Ordinal))
-                {
-                    _ThrowInvalidFormat(replaceLine.LineNumber, "replace line must start with 'R:'.");
-                }
-
-                var searchText = searchLine.Text[2..];
-                var replaceText = replaceLine.Text[2..];
-
-                if (string.IsNullOrEmpty(searchText))
-                {
-                    _ThrowInvalidFormat(searchLine.LineNumber, "search line cannot be empty.");
-                }
-
-                if (string.IsNullOrEmpty(replaceText))
-                {
-                    _ThrowInvalidFormat(
-                        replaceLine.LineNumber,
-                        $"replace line cannot be empty. Use '{EmptyReplacementToken}' to strip matches."
-                    );
-                }
-
-                entries.Add(new ReplaceListEntry(searchText, _ResolveEmptyReplacementToken(replaceText)));
-            }
-
-            return entries;
-        }
-
-        private static List<ReplaceListFileLine> _ReadNonCommentAndNonEmptyLines(string filePath)
-        {
-            var lines = File.ReadAllLines(filePath);
-            return
-            [
-                .. lines
-                    .Select((text, index) => new ReplaceListFileLine(Text: text, LineNumber: index + 1))
-                    .Where(line =>
-                        !string.IsNullOrWhiteSpace(line.Text) && !ListFileParseHelpers.IsListFileCommentLine(line.Text)
-                    ),
-            ];
-        }
-
-        private static void _ValidateLineLength(IReadOnlyList<ReplaceListFileLine> lines)
-        {
             var maxLen = ConfigStore.Config.Filters.MaxListFileLineLength;
-            var firstInvalidLine = lines.FirstOrDefault(line => line.Text.Length > maxLen);
-            if (firstInvalidLine == default)
+            var validated = new List<ReplaceListEntry>(entries.Count);
+            for (var i = 0; i < entries.Count; i++)
             {
-                return;
+                var index = i + 1;
+                var entry = entries[i];
+                var search = entry.Search;
+                var replacement = entry.Replacement;
+
+                if (string.IsNullOrWhiteSpace(search))
+                {
+                    throw new UserException($"Replace-list entry {index}: search cannot be empty.");
+                }
+
+                if (search.Length > maxLen)
+                {
+                    throw new UserException($"Replace-list entry {index}: search exceeds maximum length ({maxLen}).");
+                }
+
+                if (search.Any(char.IsWhiteSpace))
+                {
+                    throw new UserException($"Replace-list entry {index}: search must not contain whitespace.");
+                }
+
+                if (replacement.Length > maxLen)
+                {
+                    throw new UserException(
+                        $"Replace-list entry {index}: replacement exceeds maximum length ({maxLen})."
+                    );
+                }
+
+                if (replacement.Any(char.IsWhiteSpace))
+                {
+                    throw new UserException($"Replace-list entry {index}: replacement must not contain whitespace.");
+                }
+
+                validated.Add(entry);
             }
 
-            _ThrowInvalidFormat(
-                lineNumber: firstInvalidLine.LineNumber,
-                detail: $"line length exceeds {maxLen} characters."
-            );
+            return validated;
         }
-
-        private static string _ResolveEmptyReplacementToken(string replacement)
-        {
-            if (string.Equals(replacement, EmptyReplacementToken, StringComparison.Ordinal))
-            {
-                return string.Empty;
-            }
-
-            return replacement;
-        }
-
-        [DoesNotReturn]
-        private static void _ThrowInvalidFormat(int lineNumber, string detail)
-        {
-            throw new UserException($"Invalid replace-list format at line {lineNumber}: {detail}");
-        }
-
-        private readonly record struct ReplaceListFileLine(string Text, int LineNumber);
     }
 }

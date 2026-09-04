@@ -1,0 +1,94 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Replace"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:replaceFilters="using:Mfr.Filters.Replace"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="280"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Replace.ReplaceListFilterEditorView"
+  x:DataType="vm:ReplaceListFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Replace List">
+      <StackPanel Spacing="4">
+        <ToolTip.Tip>
+          <controls:RichToolTip>
+            <TextBlock Classes="rich-tip-title" Text="One search/replace pair per line." />
+            <TextBlock
+              Classes="rich-tip-body"
+              Text="Separate search and replacement with whitespace. A lone search word strips matches."
+            />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: a b  (replaces a with b)" />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: x  (removes x)" />
+            <TextBlock
+              Classes="rich-tip-bullet"
+              Text="• Lines with more than two tokens are ignored while typing."
+            />
+          </controls:RichToolTip>
+        </ToolTip.Tip>
+        <TextBlock Classes="filter-editor-label" Text="Entries:" />
+        <TextBox
+          x:Name="EntriesBox"
+          Classes="filter-editor-field-wrap"
+          MinWidth="240"
+          MinHeight="88"
+          AcceptsReturn="True"
+          Watermark="a b"
+          Text="{Binding EntriesText}"
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+    <controls:FieldsetGroup Header="Mode">
+      <WrapPanel Orientation="Horizontal">
+        <controls:CompactRadioButton
+          x:Name="LiteralRadio"
+          Margin="0,0,16,4"
+          GroupName="ReplaceListMode"
+          Content="Literal"
+          ToolTip.Tip="Search text is matched exactly."
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Literal}, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          x:Name="WildcardRadio"
+          Margin="0,0,16,4"
+          GroupName="ReplaceListMode"
+          Content="Wildcard"
+          ToolTip.Tip="* matches any characters; ? matches one character."
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Wildcard}, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          x:Name="RegexRadio"
+          Margin="0,0,0,4"
+          GroupName="ReplaceListMode"
+          Content="Regex"
+          ToolTip.Tip="Search text is a .NET regular expression."
+          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Regex}, Mode=TwoWay}"
+        />
+      </WrapPanel>
+    </controls:FieldsetGroup>
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="4">
+        <controls:CompactCheckBox
+          x:Name="CaseSensitiveCheckBox"
+          Content="Case sensitive"
+          IsChecked="{Binding CaseSensitive}"
+        />
+        <controls:CompactCheckBox
+          x:Name="ReplaceAllCheckBox"
+          Content="Replace all matches"
+          IsChecked="{Binding ReplaceAll}"
+        />
+        <controls:CompactCheckBox
+          x:Name="WholeWordCheckBox"
+          Content="Replace only whole words"
+          IsChecked="{Binding WholeWord}"
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>

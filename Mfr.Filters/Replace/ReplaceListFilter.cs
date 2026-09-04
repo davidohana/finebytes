@@ -4,15 +4,22 @@ using Mfr.Utils;
 namespace Mfr.Filters.Replace
 {
     /// <summary>
-    /// Options for replace-list transformations loaded from a file.
+    /// One search/replace pair in a replace list.
     /// </summary>
-    /// <param name="FilePath">Path to the replace-list file parsed by <see cref="ReplaceListParser"/>.</param>
+    /// <param name="Search">Search pattern text (no whitespace).</param>
+    /// <param name="Replacement">Replacement text (no whitespace), or empty to strip matches.</param>
+    public sealed record ReplaceListEntry(string Search, string Replacement);
+
+    /// <summary>
+    /// Options for replace-list transformations embedded in the filter.
+    /// </summary>
+    /// <param name="Entries">Search/replace pairs applied in order. Empty list is a no-op.</param>
     /// <param name="Mode">Pattern interpretation mode.</param>
     /// <param name="CaseSensitive">Whether matching is case-sensitive.</param>
     /// <param name="ReplaceAll">Whether all matches are replaced for each pair.</param>
     /// <param name="WholeWord">Whether matching is constrained to whole words.</param>
     public sealed record ReplaceListOptions(
-        string FilePath,
+        IReadOnlyList<ReplaceListEntry> Entries,
         ReplacerMode Mode,
         bool CaseSensitive,
         bool ReplaceAll,
@@ -20,10 +27,10 @@ namespace Mfr.Filters.Replace
     );
 
     /// <summary>
-    /// Applies sequential replacements from a replace-list file.
+    /// Applies sequential replacements from an embedded replace list.
     /// </summary>
     /// <remarks>
-    /// Replace entries are applied in file order. This is equivalent to chaining multiple
+    /// Replace entries are applied in list order. This is equivalent to chaining multiple
     /// <see cref="ReplacerFilter"/> instances with the same mode/options.
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
@@ -39,17 +46,17 @@ namespace Mfr.Filters.Replace
         private List<(string Search, Formatter CompiledReplacement)>? _compiledEntries;
 
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty list path, replace all).
+        /// Creates a filter with add-to-list defaults (file prefix, empty list, replace all, whole word).
         /// </summary>
         public ReplaceListFilter()
             : this(
                 new FilePrefixTarget(),
                 new ReplaceListOptions(
-                    FilePath: "",
+                    Entries: [],
                     Mode: ReplacerMode.Literal,
                     CaseSensitive: false,
                     ReplaceAll: true,
-                    WholeWord: false
+                    WholeWord: true
                 )
             ) { }
 
@@ -60,7 +67,7 @@ namespace Mfr.Filters.Replace
 
         protected override void _Setup()
         {
-            var entries = ReplaceListParser.ParseFile(filePath: Options.FilePath);
+            var entries = ReplaceListParser.Validate(Options.Entries);
             _compiledEntries = [.. entries.Select(e => (e.Search, FormatStringCompiler.Compile(e.Replacement)))];
         }
 
