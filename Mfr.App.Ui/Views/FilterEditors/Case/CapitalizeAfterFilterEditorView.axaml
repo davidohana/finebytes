@@ -1,0 +1,32 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Case"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="80"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Case.CapitalizeAfterFilterEditorView"
+  x:DataType="vm:CapitalizeAfterFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <controls:LabelBesideFieldPanel ToolTip.Tip="Each character in this list is a trigger: the next character in the name is uppercased. Empty list leaves the name unchanged.">
+        <TextBlock
+          Classes="filter-editor-label"
+          TextWrapping="Wrap"
+          Text="Capitalize letters which succeed the following characters:"
+        />
+        <TextBox
+          x:Name="CharsBox"
+          Classes="filter-editor-field"
+          MinWidth="120"
+          MaxLength="100"
+          Text="{Binding CapitalizeAfterChars}"
+        />
+      </controls:LabelBesideFieldPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>

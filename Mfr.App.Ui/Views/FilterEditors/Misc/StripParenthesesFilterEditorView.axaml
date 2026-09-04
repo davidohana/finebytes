@@ -1,0 +1,62 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Misc"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="120"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Misc.StripParenthesesFilterEditorView"
+  x:DataType="vm:StripParenthesesFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="6">
+        <StackPanel
+          Spacing="4"
+          ToolTip.Tip="Choose which bracket pair to strip. Unmatched open or close characters are left alone."
+        >
+          <TextBlock Classes="filter-editor-label" Text="Strip text inside:" />
+          <WrapPanel Orientation="Horizontal">
+            <controls:CompactRadioButton
+              x:Name="RoundRadio"
+              Margin="0,0,16,4"
+              GroupName="StripParenthesesType"
+              Content="( )"
+              IsChecked="{Binding IsTypeRound, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="SquareRadio"
+              Margin="0,0,16,4"
+              GroupName="StripParenthesesType"
+              Content="[ ]"
+              IsChecked="{Binding IsTypeSquare, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="CurlyRadio"
+              Margin="0,0,16,4"
+              GroupName="StripParenthesesType"
+              Content="{}{ }"
+              IsChecked="{Binding IsTypeCurly, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="AngleRadio"
+              Margin="0,0,0,4"
+              GroupName="StripParenthesesType"
+              Content="&lt; &gt;"
+              IsChecked="{Binding IsTypeAngle, Mode=TwoWay}"
+            />
+          </WrapPanel>
+        </StackPanel>
+        <controls:CompactCheckBox
+          x:Name="RemoveContentsCheckBox"
+          Content="Remove contents"
+          ToolTip.Tip="When checked, remove the opening and closing brackets and everything between them. When unchecked, remove only the bracket characters and keep the inner text."
+          IsChecked="{Binding RemoveContents}"
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>

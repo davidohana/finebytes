@@ -1,8 +1,10 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors;
+using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
+using Mfr.Filters.Case;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
@@ -51,7 +53,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         {
             var editor = new FilterEditorViewModel();
             var first = new AppliedFilterStepViewModel("Shrink Spaces", new ShrinkSpacesFilter());
-            var second = new AppliedFilterStepViewModel("Letters Case", new Filters.Case.LettersCaseFilter());
+            var second = new AppliedFilterStepViewModel("Letters Case", new LettersCaseFilter());
 
             editor.SyncSelection([first, second]);
 
@@ -188,6 +190,63 @@ namespace Mfr.Tests.Ui.FilterEditors
             var options = ((SpaceAroundFilter)step.Filter).Options;
             Assert.Equal("+=", options.AroundChars);
             Assert.False(options.OnlyWhenNeighboringAreLettersOrDigits);
+        }
+
+        /// <summary>
+        /// Verifies Capitalize After trigger-char edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Capitalize_after_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Capitalize After", new CapitalizeAfterFilter());
+            var editor = new CapitalizeAfterFilterEditorViewModel(step);
+
+            Assert.Equal(",!()[]{};-", editor.CapitalizeAfterChars);
+
+            editor.CapitalizeAfterChars = "._";
+
+            var options = ((CapitalizeAfterFilter)step.Filter).Options;
+            Assert.Equal("._", options.CapitalizeAfterChars);
+        }
+
+        /// <summary>
+        /// Verifies Sentence End Characters list edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Sentence_end_characters_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Sentence End Characters", new SentenceEndCharactersFilter());
+            var editor = new SentenceEndCharactersFilterEditorViewModel(step);
+
+            Assert.Equal("-.!", editor.Characters);
+
+            editor.Characters = ":;";
+
+            var options = ((SentenceEndCharactersFilter)step.Filter).Options;
+            Assert.Equal(":;", options.Characters);
+        }
+
+        /// <summary>
+        /// Verifies Strip Parentheses type/contents edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Strip_parentheses_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Strip Parentheses", new StripParenthesesFilter());
+            var editor = new StripParenthesesFilterEditorViewModel(step);
+
+            Assert.Equal(ParenthesisType.Round, editor.Type);
+            Assert.True(editor.RemoveContents);
+            Assert.True(editor.IsTypeRound);
+
+            editor.IsTypeSquare = true;
+            editor.RemoveContents = false;
+
+            var options = ((StripParenthesesFilter)step.Filter).Options;
+            Assert.Equal(ParenthesisType.Square, options.Type);
+            Assert.False(options.RemoveContents);
+            Assert.True(editor.IsTypeSquare);
+            Assert.False(editor.IsTypeRound);
         }
     }
 }

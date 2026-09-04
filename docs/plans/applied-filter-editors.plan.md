@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around done. Next: Capitalize After, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
+overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around + Capitalize After + Sentence End + Strip Parentheses done. Next: Cleaner, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
 todos:
   - id: f1-f4
     content: "F1–F4: ctors, Applied list, Filter Options/Apply To, Space Character + Letters Case"
@@ -25,13 +25,13 @@ todos:
     status: completed
   - id: f5-capitalize-after
     content: "F5 Capitalize After"
-    status: pending
+    status: completed
   - id: f5-sentence-end
     content: "F5 Sentence End Characters"
-    status: pending
+    status: completed
   - id: f5-strip-parens
     content: "F5 Strip Parentheses"
-    status: pending
+    status: completed
   - id: f5-cleaner
     content: "F5 Cleaner"
     status: pending
@@ -87,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-04):** F5 Space After + Around done. **Next: F5 Capitalize After**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-04):** F5 Capitalize After + Sentence End Characters + Strip Parentheses done. **Next: F5 Cleaner**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ### Already shipped (F1–F4)
 
@@ -216,10 +216,10 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 | **3 (done)** | **Trim Between**                | Trimming   | single                                             | `Position` start/end + side                                                 |
 | **4 (done)** | **Fix Leading 0's**             | Misc       | single                                             | width / remove extras / max / whole-word                                    |
 | **5 (done)** | **Space After + Around**        | Space      | Space After, Space Around                          | Shared `SpaceTrigger` chars+neighbor editor; two factory arms + tests       |
-| **6 (next)** | Capitalize After                | Case       | single                                             | trigger chars string                                                        |
-| 7            | Sentence End Characters         | Case       | single                                             | char list                                                                   |
-| 8            | Strip Parentheses               | Misc       | single                                             | pair type + remove contents                                                 |
-| 9            | Cleaner                         | Replace    | single                                             | illegal + custom + replacement                                              |
+| **6 (done)** | Capitalize After                | Case       | single                                             | trigger chars string                                                        |
+| **7 (done)** | Sentence End Characters         | Case       | single                                             | char list                                                                   |
+| **8 (done)** | Strip Parentheses               | Misc       | single                                             | pair type + remove contents                                                 |
+| **9 (next)** | Cleaner                         | Replace    | single                                             | illegal + custom + replacement                                              |
 | 10           | Counter                         | Formatting | single                                             | start / step / format                                                       |
 | 11           | Inserter                        | Formatting | single                                             | text + position                                                             |
 | 12           | Casing List                     | Case       | single                                             | file path + sentence-initial                                                |

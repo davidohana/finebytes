@@ -547,6 +547,98 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Capitalize After option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Capitalize_after_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("CapitalizeAfter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<CapitalizeAfterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<CapitalizeAfterFilterEditorView>().Single();
+            var charsBox = editor.FindControl<TextBox>("CharsBox");
+            Assert.NotNull(charsBox);
+            Assert.Equal(",!()[]{};-", charsBox.Text);
+
+            charsBox.Text = "._";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (CapitalizeAfterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal("._", filter.Options.CapitalizeAfterChars);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Sentence End Characters option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Sentence_end_characters_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(
+                AppliedFiltersTestUi.Entry("SentenceEndCharacters")
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<SentenceEndCharactersFilterEditorViewModel>(
+                mainViewModel.FilterEditorViewModel.OptionsEditor
+            );
+
+            var editor = editorView.GetVisualDescendants().OfType<SentenceEndCharactersFilterEditorView>().Single();
+            var charsBox = editor.FindControl<TextBox>("CharsBox");
+            Assert.NotNull(charsBox);
+            Assert.Equal("-.!", charsBox.Text);
+
+            charsBox.Text = ":;";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (SentenceEndCharactersFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(":;", filter.Options.Characters);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Strip Parentheses option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Strip_parentheses_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("StripParentheses"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<StripParenthesesFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<StripParenthesesFilterEditorView>().Single();
+            var squareRadio = editor.FindControl<RadioButton>("SquareRadio");
+            var removeContents = editor.FindControl<CompactCheckBox>("RemoveContentsCheckBox");
+            Assert.NotNull(squareRadio);
+            Assert.NotNull(removeContents);
+            Assert.True(removeContents.IsChecked);
+
+            squareRadio.IsChecked = true;
+            removeContents.IsChecked = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (StripParenthesesFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(ParenthesisType.Square, filter.Options.Type);
+            Assert.False(filter.Options.RemoveContents);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Letters Case radio edits re-run Rename List preview (Phase 10a).
         /// </summary>
         [AvaloniaFact]

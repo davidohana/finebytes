@@ -30,10 +30,13 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 SpaceCharacterFilter filter => new SpaceCharacterFilterEditorViewModel(step, filter),
                 SpaceAfterFilter or SpaceAroundFilter => new SpaceTriggerFilterEditorViewModel(step),
                 LettersCaseFilter filter => new LettersCaseFilterEditorViewModel(step, filter),
+                CapitalizeAfterFilter => new CapitalizeAfterFilterEditorViewModel(step),
+                SentenceEndCharactersFilter => new SentenceEndCharactersFilterEditorViewModel(step),
                 ICountOptionsFilter => new CountFilterEditorViewModel(step),
                 ShrinkDuplicateCharactersFilter => new ShrinkDuplicateCharactersFilterEditorViewModel(step),
                 TrimBetweenFilter => new TrimBetweenFilterEditorViewModel(step),
                 FixLeadingZerosFilter => new FixLeadingZerosFilterEditorViewModel(step),
+                StripParenthesesFilter => new StripParenthesesFilterEditorViewModel(step),
                 _ => null,
             };
         }
