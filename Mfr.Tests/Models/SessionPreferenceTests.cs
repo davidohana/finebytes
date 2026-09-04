@@ -20,6 +20,7 @@ namespace Mfr.Tests.Models
                         AddMode = RenameListAddMode.Folders,
                         AddFolderContents = false,
                         UseFixedWidthFont = true,
+                        PreviewEnabled = false,
                     },
                 };
 
@@ -31,6 +32,7 @@ namespace Mfr.Tests.Models
                 Assert.Equal(RenameListAddMode.Folders, loaded.RenameList?.AddMode);
                 Assert.False(loaded.RenameList?.AddFolderContents);
                 Assert.True(loaded.RenameList?.UseFixedWidthFont);
+                Assert.False(loaded.RenameList?.PreviewEnabled);
             }
             finally
             {
@@ -50,7 +52,8 @@ namespace Mfr.Tests.Models
                   "renameList": {
                     "addMode": "filesAndFolders",
                     "addFolderContents": false,
-                    "useFixedWidthFont": true
+                    "useFixedWidthFont": true,
+                    "previewEnabled": false
                   }
                 }
                 """
@@ -62,6 +65,7 @@ namespace Mfr.Tests.Models
                 Assert.Equal(RenameListAddMode.FilesAndFolders, session.RenameList?.AddMode);
                 Assert.False(session.RenameList?.AddFolderContents);
                 Assert.True(session.RenameList?.UseFixedWidthFont);
+                Assert.False(session.RenameList?.PreviewEnabled);
             }
             finally
             {

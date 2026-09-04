@@ -3,14 +3,15 @@ using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Case;
+using Mfr.Models.Filters;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.RenameList
 {
-    /// <summary>
-    /// Phase 10a–10b: filter-chain and Rename List membership changes drive preview.
-    /// </summary>
+        /// <summary>
+        /// Phase 10a–10c: filter-chain and membership preview, Auto-Preview toggle.
+        /// </summary>
     public sealed class RenameListViewModelPreviewTests : IDisposable
     {
         private readonly RenameListUiTestContext _context = new();
@@ -280,11 +281,111 @@ namespace Mfr.Tests.Ui.RenameList
             var main = new MainWindowViewModel(dir);
             main.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             main.AppliedFiltersViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
 
             await main.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
 
             Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
             Assert.Equal(1, main.RenameListViewModel.ChangeCount);
+        }
+
+        /// <summary>
+        /// Verifies turning Auto-Preview off skips chain-driven preview updates.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Auto_preview_off_skips_chain_preview()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var main = new MainWindowViewModel(dir);
+            await main.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+
+            main.RenameListViewModel.IsAutoPreview = false;
+            main.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.AppliedFiltersViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+
+            Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+            Assert.Equal(0, main.RenameListViewModel.ChangeCount);
+        }
+
+        /// <summary>
+        /// Verifies turning Auto-Preview back on re-runs preview with the current chain.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Auto_preview_on_repreviews_current_chain()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var main = new MainWindowViewModel(dir);
+            await main.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+
+            main.RenameListViewModel.IsAutoPreview = false;
+            main.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.AppliedFiltersViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+
+            main.RenameListViewModel.ToggleAutoPreviewCommand.Execute(null);
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+
+            Assert.True(main.RenameListViewModel.IsAutoPreview);
+            Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+            Assert.Equal(1, main.RenameListViewModel.ChangeCount);
+        }
+
+        /// <summary>
+        /// Verifies canceling an in-progress preview disables Auto-Preview (MFR7).
+        /// </summary>
+        [Fact]
+        public async Task PreviewAsync_cancel_disables_auto_preview()
+        {
+            var dir = _context.CreateTempDir();
+            var paths = new List<string>();
+            for (var i = 0; i < 40; i++)
+            {
+                var path = Path.Combine(dir, $"f{i:D2}.txt");
+                File.WriteAllText(path, "x");
+                paths.Add(path);
+            }
+
+            var renameList = _context.CreateRenameListViewModel(dir);
+            await renameList.AddPathsAsync(paths).ConfigureAwait(true);
+            Assert.True(renameList.IsAutoPreview);
+
+            void OnProgressChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (
+                    e.PropertyName is nameof(RenameListAddProgressViewModel.IsAdding)
+                    && renameList.IsAdding
+                )
+                {
+                    renameList.AddProgress.CancelCommand.Execute(null);
+                }
+            }
+
+            renameList.AddProgress.PropertyChanged += OnProgressChanged;
+            try
+            {
+                var chain = new FilterChain
+                {
+                    Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
+                };
+                var completed = await renameList.PreviewAsync(chain).ConfigureAwait(true);
+
+                Assert.False(completed);
+                Assert.False(renameList.IsAutoPreview);
+            }
+            finally
+            {
+                renameList.AddProgress.PropertyChanged -= OnProgressChanged;
+            }
         }
 
         private (RenameListViewModel RenameList, AppliedFiltersViewModel Applied) _CreateWiredPanes(string dir)

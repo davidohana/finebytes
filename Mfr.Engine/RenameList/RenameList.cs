@@ -542,13 +542,23 @@ namespace Mfr.Engine.RenameList
         /// Previews rename outcomes for the current list without touching the filesystem.
         /// </summary>
         /// <param name="chain">Ordered filter steps (enabled flags honored).</param>
+        /// <param name="cancellationToken">When canceled, stops applying remaining items without throwing.</param>
+        /// <param name="progress">Optional progress sink (processed count, total, last path).</param>
         /// <returns>The commit plan for the previewed items; pass this to <see cref="Commit"/>.</returns>
         /// <remarks>
         /// <para>
         /// Calls <see cref="FilterChain.SetupFilters"/> before applying so each enabled filter is set up once.
         /// </para>
+        /// <para>
+        /// On cancel, items already processed keep their preview; remaining items stay at identity after reset.
+        /// Conflict detection and commit planning still run on the partial result.
+        /// </para>
         /// </remarks>
-        public CommitPlan Preview(FilterChain chain)
+        public CommitPlan Preview(
+            FilterChain chain,
+            CancellationToken cancellationToken = default,
+            IProgress<RenameListAddProgress>? progress = null
+        )
         {
             ArgumentNullException.ThrowIfNull(chain);
 
@@ -561,8 +571,16 @@ namespace Mfr.Engine.RenameList
                 item.ResetState();
             }
 
+            var tracker = new AddProgressTracker(progress, cancellationToken);
+            tracker.BeginMetadataPhase(_renameItems.Count);
+
             foreach (var renameItem in _renameItems)
             {
+                if (tracker.IsCanceled)
+                {
+                    break;
+                }
+
                 try
                 {
                     chain.ApplyFilters(renameItem);
@@ -577,6 +595,8 @@ namespace Mfr.Engine.RenameList
                     renameItem.SetPreviewError(message: ex.Message, cause: ex);
                     Log.Warning(ex, "Preview failed for '{SourcePath}'.", renameItem.Original.FullPath);
                 }
+
+                tracker.OnMetadataProcessed(renameItem.Original.FullPath);
             }
 
             RenamePreviewFolderRebaser.RebaseDescendants(_renameItems);
@@ -595,6 +615,8 @@ namespace Mfr.Engine.RenameList
             {
                 renameItem.LogPreviewChangeDetail();
             }
+
+            tracker.ReportFinal();
 
             var (changed, unchanged, errors) = CommitPlan.CountOutcomes(_renameItems);
             return commitPlan with { ChangedCount = changed, UnchangedCount = unchanged, ErrorCount = errors };

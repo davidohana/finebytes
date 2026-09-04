@@ -92,6 +92,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     return "Refreshing Rename List";
                 }
 
+                if (Operation == RenameListProgressOperation.Preview)
+                {
+                    return "Previewing ...";
+                }
+
                 if (Phase == RenameListAddProgressPhase.LoadMetadata)
                 {
                     return "Reading file metadata";
@@ -114,10 +119,23 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the metadata hydrate line shown as its own row.
         /// </summary>
-        public string MetadataProgressText =>
-            Operation == RenameListProgressOperation.Refresh
-                ? $"Refreshing: {MetadataProcessedCount} of {MetadataTotalCount} files"
-                : $"Reading metadata: {MetadataProcessedCount} of {MetadataTotalCount} files";
+        public string MetadataProgressText
+        {
+            get
+            {
+                if (Operation == RenameListProgressOperation.Refresh)
+                {
+                    return $"Refreshing: {MetadataProcessedCount} of {MetadataTotalCount} files";
+                }
+
+                if (Operation == RenameListProgressOperation.Preview)
+                {
+                    return $"Previewing: {MetadataProcessedCount} of {MetadataTotalCount} files";
+                }
+
+                return $"Reading metadata: {MetadataProcessedCount} of {MetadataTotalCount} files";
+            }
+        }
 
         /// <summary>
         /// Gets whether scanned/added resolve lines should be shown.
@@ -178,7 +196,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var progress = new Progress<RenameListAddProgress>(_ApplyProgress);
 
             Operation = operation;
-            Phase = operation is RenameListProgressOperation.MetadataHydrate or RenameListProgressOperation.Refresh
+            Phase = operation
+                is RenameListProgressOperation.MetadataHydrate
+                    or RenameListProgressOperation.Refresh
+                    or RenameListProgressOperation.Preview
                 ? RenameListAddProgressPhase.LoadMetadata
                 : RenameListAddProgressPhase.ResolveSources;
             IsAdding = true;

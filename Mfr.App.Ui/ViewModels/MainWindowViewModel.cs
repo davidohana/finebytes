@@ -24,6 +24,9 @@ namespace Mfr.App.Ui.ViewModels
         private CancellationTokenSource? _statusHintClearCts;
         private string _transientStatusHint = string.Empty;
         private StatusHintDisplay _paneStatusHintDisplay = StatusHintDisplay.Empty;
+        private bool _previewDirty;
+        private bool _previewRunning;
+        private Task _previewDrainTask = Task.CompletedTask;
 
         /// <summary>
         /// Initializes pane view models for the 7.4 layout.
@@ -211,6 +214,20 @@ namespace Mfr.App.Ui.ViewModels
                 PreviewErrorCount = RenameListViewModel.PreviewErrorCount;
             }
 
+            if (e.PropertyName is nameof(RenameListViewModel.IsAutoPreview) && RenameListViewModel.IsAutoPreview)
+            {
+                _PreviewRenameList();
+            }
+
+            if (
+                e.PropertyName is nameof(RenameListViewModel.IsAdding)
+                && !RenameListViewModel.IsAdding
+                && _previewDirty
+            )
+            {
+                _RequestPreview();
+            }
+
             if (
                 e.PropertyName is nameof(RenameListViewModel.LastAddError)
                 && !string.IsNullOrEmpty(RenameListViewModel.LastAddError)
@@ -257,15 +274,78 @@ namespace Mfr.App.Ui.ViewModels
         /// </summary>
         private void _OnPreviewInputsChanged(object? sender, EventArgs e)
         {
-            _PreviewRenameList();
+            _RequestPreview();
         }
 
         /// <summary>
-        /// Applies the live Applied Filters chain to the Rename List.
+        /// Queues a preview pass when Auto-Preview is on (coalesces overlapping requests).
+        /// </summary>
+        private void _RequestPreview()
+        {
+            if (!RenameListViewModel.IsAutoPreview)
+            {
+                return;
+            }
+
+            _previewDirty = true;
+            if (_previewRunning)
+            {
+                return;
+            }
+
+            _previewDrainTask = _DrainPreviewAsync();
+        }
+
+        /// <summary>
+        /// Waits for any in-flight Auto-Preview drain started by this window (tests).
+        /// </summary>
+        /// <returns>A task that completes when the current drain finishes.</returns>
+        internal Task WaitForPendingPreviewAsync()
+        {
+            return _previewDrainTask;
+        }
+
+        /// <summary>
+        /// Applies the live Applied Filters chain until the queue is idle or Auto-Preview turns off.
+        /// </summary>
+        private async Task _DrainPreviewAsync()
+        {
+            if (_previewRunning)
+            {
+                return;
+            }
+
+            _previewRunning = true;
+            try
+            {
+                while (_previewDirty && RenameListViewModel.IsAutoPreview)
+                {
+                    if (RenameListViewModel.IsAdding)
+                    {
+                        break;
+                    }
+
+                    _previewDirty = false;
+                    await RenameListViewModel.PreviewAsync(AppliedFiltersViewModel.ToChain()).ConfigureAwait(true);
+                }
+            }
+            finally
+            {
+                _previewRunning = false;
+                if (_previewDirty && RenameListViewModel.IsAutoPreview && !RenameListViewModel.IsAdding)
+                {
+                    _previewDrainTask = _DrainPreviewAsync();
+                    await _previewDrainTask.ConfigureAwait(true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the live Applied Filters chain to the Rename List when Auto-Preview is on.
         /// </summary>
         private void _PreviewRenameList()
         {
-            RenameListViewModel.Preview(AppliedFiltersViewModel.ToChain());
+            _RequestPreview();
         }
 
         private void _OnFilterPalettePropertyChanged(object? sender, PropertyChangedEventArgs e)

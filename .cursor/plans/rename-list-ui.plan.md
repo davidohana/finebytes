@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–9 and 10a–10b done. Next: 10c Auto-Preview toggle, 10d F5 re-preview; then 11 highlighting, 12–15."
+overview: "Phases 1–9 and 10a–10c done. Next: 10d F5 re-preview; then 11 highlighting, 12–15."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -82,7 +82,7 @@ todos:
     status: completed
   - id: phase-10c
     content: "10c: Auto-Preview toggle — menu/toolbar, persist; cancel disables"
-    status: pending
+    status: completed
   - id: phase-10d
     content: "10d: Re-preview after F5 original refresh when Auto-Preview on"
     status: pending
@@ -147,7 +147,7 @@ flowchart LR
 | **9** Original Refresh | Done | F5, re-read disk, menus/toolbar; missing-on-disk gray; shuttle OrderedDraft + DnD | 8a (+ part of 10) |
 | **10a** Filter-edit preview | Done | Live `ToChain()` → `Preview()` → grid + status counts (always on) | 8b |
 | **10b** List membership | Done | Re-preview on Rename List add/remove/clear | 8b |
-| **10c** Auto-Preview toggle | Pending | Menu/toolbar, persist; cancel disables | 8b |
+| **10c** Auto-Preview toggle | Done | Menu/toolbar, persist; cancel disables | 8b |
 | **10d** F5 re-preview | Pending | After original refresh, re-run preview when Auto-Preview on | 8b |
 | **11** Preview highlighting | Pending | Red changed cells, preview-error rows, Show Preview Error | 8c |
 | **12** Preview metadata columns | Pending | ID3/image preview cols after filters | 9 / 7b |
@@ -217,9 +217,9 @@ Re-preview after Rename List add/remove/clear using the current chain. Row sort/
 - [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) shares `_PreviewRenameList()` for chain and membership.
 - Tests: add-after-filters, remove/clear counts, move/duplicate-add do not raise membership; one MainWindow wiring fact.
 
-### 10c — Auto-Preview toggle
+### 10c — Auto-Preview toggle — done
 
-Enable the stub in [MainWindow.axaml](../../Mfr.App.Ui/Views/MainWindow.axaml) (`IsEnabled="False"` today). Menu + toolbar, persist (MFR7 `PreviewEnabled`, default on). Canceling a long preview disables auto-preview. When off, skip 10a/10b/10d runs.
+Menu + toolbar toggle (`IsAutoPreview`, default on), session `previewEnabled`. When off, skip automatic preview. Turning on re-previews. Long preview uses cancelable progress; cancel calls `DisableAutoPreview`.
 
 ### 10d — F5 re-preview
 
@@ -276,4 +276,4 @@ F2 free edit, export, Properties, drag-out to Explorer; Refresh reset of manual 
 
 ## What to implement next
 
-**10c Auto-Preview toggle** — menu/toolbar, persist; then **10d** F5 re-preview, **11** highlighting, **12–15**.
+**10d F5 re-preview** — after Phase 9 `RefreshOriginals`, re-run preview when Auto-Preview is on; then **11** highlighting, **12–15**.

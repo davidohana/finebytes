@@ -193,6 +193,12 @@ namespace Mfr.Models.Config
         public bool UseFixedWidthFont { get; set; } = true;
 
         /// <summary>
+        /// When true, filter-chain and membership changes re-run Rename List preview (MFR7 <c>PreviewEnabled</c>).
+        /// </summary>
+        [JsonPropertyName("previewEnabled")]
+        public bool PreviewEnabled { get; set; } = true;
+
+        /// <summary>
         /// Converts persisted session fields into sort keys.
         /// </summary>
         /// <param name="fields">Session fields in priority order.</param>

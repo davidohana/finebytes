@@ -305,7 +305,13 @@
           IsChecked="{Binding RenameListViewModel.IsAutoSort, Mode=OneWay}"
           ToolTip.Tip="{Binding RenameListViewModel.SortSummaryText}"
         />
-        <MenuItem Header="Auto-Preview" IsEnabled="False" />
+        <MenuItem
+          Header="Auto-Preview"
+          Command="{Binding RenameListViewModel.ToggleAutoPreviewCommand}"
+          ToggleType="CheckBox"
+          IsChecked="{Binding RenameListViewModel.IsAutoPreview, Mode=OneWay}"
+          ToolTip.Tip="{x:Static resources:AppTips.AutoPreview}"
+        />
         <MenuItem
           Header="Refresh"
           Command="{Binding RenameListViewModel.RefreshCommand}"

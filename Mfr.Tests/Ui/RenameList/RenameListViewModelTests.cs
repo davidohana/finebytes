@@ -936,6 +936,7 @@ namespace Mfr.Tests.Ui.RenameList
                     AddMode = RenameListAddMode.Folders,
                     AddFolderContents = false,
                     UseFixedWidthFont = true,
+                    PreviewEnabled = false,
                     SortFields = [],
                 }
             );
@@ -943,12 +944,14 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(RenameListAddMode.Folders, renameListViewModel.AddMode);
             Assert.False(renameListViewModel.AddFolderContents);
             Assert.True(renameListViewModel.UseFixedWidthFont);
+            Assert.False(renameListViewModel.IsAutoPreview);
             Assert.False(renameListViewModel.IsAutoSort);
 
             var captured = renameListViewModel.CaptureSession();
             Assert.Equal(RenameListAddMode.Folders, captured.AddMode);
             Assert.False(captured.AddFolderContents);
             Assert.True(captured.UseFixedWidthFont);
+            Assert.False(captured.PreviewEnabled);
             Assert.NotNull(captured.SortFields);
             Assert.Empty(captured.SortFields);
         }

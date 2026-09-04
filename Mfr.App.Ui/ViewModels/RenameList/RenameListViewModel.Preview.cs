@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Mfr.Engine.Commit;
 using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -21,9 +23,43 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private int _previewErrorCount;
 
         /// <summary>
+        /// Gets whether filter-chain and membership changes automatically re-run preview (MFR7 Auto-Preview).
+        /// </summary>
+        [ObservableProperty]
+        private bool _isAutoPreview = true;
+
+        /// <summary>
+        /// Toggles Auto-Preview. Turning it on notifies so the shell re-previews.
+        /// </summary>
+        [RelayCommand]
+        public void ToggleAutoPreview()
+        {
+            IsAutoPreview = !IsAutoPreview;
+        }
+
+        /// <summary>
+        /// Turns Auto-Preview off (MFR7: canceling a long preview disables auto-preview).
+        /// </summary>
+        public void DisableAutoPreview()
+        {
+            if (!IsAutoPreview)
+            {
+                return;
+            }
+
+            IsAutoPreview = false;
+        }
+
+        /// <summary>
         /// Runs the filter chain over every Rename List item and refreshes preview columns.
         /// </summary>
         /// <param name="chain">Live Applied Filters chain.</param>
+        /// <remarks>
+        /// <para>
+        /// Synchronous path for tests and callers that already own the UI thread. Prefer
+        /// <see cref="PreviewAsync"/> from the shell so long runs show cancelable progress.
+        /// </para>
+        /// </remarks>
         public void Preview(FilterChain chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
@@ -39,6 +75,57 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ChangeCount = plan.ChangedCount;
             PreviewErrorCount = plan.ErrorCount;
             _RefreshFieldDisplay();
+        }
+
+        /// <summary>
+        /// Runs preview on a background thread with delayed cancelable progress (MFR7 PreviewProgressDialog).
+        /// </summary>
+        /// <param name="chain">Live Applied Filters chain.</param>
+        /// <returns>
+        /// <see langword="true"/> when preview finished; <see langword="false"/> when canceled
+        /// (Auto-Preview is then disabled).
+        /// </returns>
+        public async Task<bool> PreviewAsync(FilterChain chain)
+        {
+            ArgumentNullException.ThrowIfNull(chain);
+
+            if (Entries.Count == 0)
+            {
+                ChangeCount = 0;
+                PreviewErrorCount = 0;
+                return true;
+            }
+
+            if (IsAdding)
+            {
+                return true;
+            }
+
+            CommitPlan? plan = null;
+            var completed = await AddProgress
+                .RunAsync(
+                    RenameListProgressOperation.Preview,
+                    (token, progress) =>
+                    {
+                        plan = _renameList.Preview(chain, token, progress);
+                    }
+                )
+                .ConfigureAwait(true);
+
+            if (plan is not null)
+            {
+                ChangeCount = plan.ChangedCount;
+                PreviewErrorCount = plan.ErrorCount;
+            }
+
+            _RefreshFieldDisplay();
+
+            if (!completed)
+            {
+                DisableAutoPreview();
+            }
+
+            return completed;
         }
     }
 }

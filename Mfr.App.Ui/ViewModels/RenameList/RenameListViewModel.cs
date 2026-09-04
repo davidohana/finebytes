@@ -39,6 +39,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             AddMode = section.AddMode;
             AddFolderContents = section.AddFolderContents;
             UseFixedWidthFont = section.UseFixedWidthFont;
+            IsAutoPreview = section.PreviewEnabled;
         }
 
         /// <summary>
@@ -55,6 +56,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             AddMode = section.AddMode;
             AddFolderContents = section.AddFolderContents;
             UseFixedWidthFont = section.UseFixedWidthFont;
+            IsAutoPreview = section.PreviewEnabled;
         }
 
         /// <summary>
@@ -70,6 +72,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 AddMode = AddMode,
                 AddFolderContents = AddFolderContents,
                 UseFixedWidthFont = UseFixedWidthFont,
+                PreviewEnabled = IsAutoPreview,
             };
         }
 

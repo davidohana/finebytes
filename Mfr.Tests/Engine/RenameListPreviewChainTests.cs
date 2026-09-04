@@ -93,5 +93,39 @@ namespace Mfr.Tests.Engine
             Assert.Equal(1, identityPlan.UnchangedCount);
             Assert.Equal(0, identityPlan.ErrorCount);
         }
+
+        /// <summary>
+        /// Verifies cancel stops remaining items without throwing.
+        /// </summary>
+        [Fact]
+        public void Preview_cancel_stops_without_throwing()
+        {
+            for (var i = 0; i < 20; i++)
+            {
+                var path = Path.Combine(_tempRoot, $"f{i:D2}.txt");
+                File.WriteAllText(path, "x");
+            }
+
+            var renameList = new RenameList(includeHidden: false);
+            renameList.AddSources(Directory.GetFiles(_tempRoot));
+
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            var chain = FilterChain.CreateAllEnabled([
+                new LettersCaseFilter(
+                    new FilePrefixTarget(),
+                    new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                ),
+            ]);
+
+            var plan = renameList.Preview(chain, cts.Token);
+
+            Assert.Equal(0, plan.ChangedCount);
+            Assert.All(
+                renameList.RenameItems,
+                item => Assert.Equal(item.Original.Prefix, item.Preview.Prefix)
+            );
+        }
     }
 }

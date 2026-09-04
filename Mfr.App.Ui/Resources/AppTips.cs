@@ -53,6 +53,9 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List field shuttle: Auto-Sort fields (context and main menus).</summary>
         public const string EditRenameListSortFields = "Choose Auto-Sort fields and order";
 
+        /// <summary>Rename List Auto-Preview toolbar and menu tip (MFR7 AutoPreview).</summary>
+        public const string AutoPreview = "Auto-Preview. Push or unpush to change status.";
+
         /// <summary>Rename List row-error badge in the status column.</summary>
         public const string RenameListRowErrorGlyph =
             "This row has an error. Right-click and choose Show Error Details.";

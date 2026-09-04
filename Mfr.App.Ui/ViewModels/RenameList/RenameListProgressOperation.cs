@@ -19,5 +19,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Re-reading original fields from disk for every row.
         /// </summary>
         Refresh,
+
+        /// <summary>
+        /// Applying the filter chain to produce Rename List preview values.
+        /// </summary>
+        Preview,
     }
 }

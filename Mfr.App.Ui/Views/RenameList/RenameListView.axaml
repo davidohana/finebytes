@@ -323,6 +323,14 @@
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AutoSort.png" />
         </ToggleButton>
+        <ToggleButton
+          Classes="rename-list-action"
+          IsChecked="{Binding IsAutoPreview, Mode=OneWay}"
+          Command="{Binding ToggleAutoPreviewCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.AutoPreview}"
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AutoPreview.png" />
+        </ToggleButton>
         <Button
           Classes="rename-list-action"
           Command="{Binding RefreshCommand}"
