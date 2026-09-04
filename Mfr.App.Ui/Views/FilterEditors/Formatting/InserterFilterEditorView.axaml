@@ -1,0 +1,78 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Formatting"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:formattingFilters="using:Mfr.Filters.Formatting"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="180"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Formatting.InserterFilterEditorView"
+  x:DataType="vm:InserterFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="6">
+        <StackPanel
+          Spacing="4"
+          ToolTip.Tip="Text inserted at the chosen position. May include formatter tokens such as &lt;Name&gt; when the string contains them."
+        >
+          <TextBlock Classes="filter-editor-label" Text="Insert the string:" />
+          <TextBox
+            x:Name="InsertTextBox"
+            Classes="filter-editor-field"
+            MinWidth="240"
+            MaxLength="500"
+            Text="{Binding InsertText}"
+          />
+        </StackPanel>
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          ToolTip.Tip="One-based character index. Position 1 from Beginning inserts before the first character. If the position exceeds the name length, Beginning appends and End prepends."
+        >
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="At position:" />
+          <controls:CompactNumericUpDown
+            x:Name="PositionSpinner"
+            Width="56"
+            Minimum="1"
+            Maximum="200"
+            Increment="1"
+            FormatString="0"
+            Value="{Binding Position}"
+          />
+        </StackPanel>
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          ToolTip.Tip="Direction to start counting the insert position from."
+        >
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Starting from:" />
+          <controls:CompactRadioButton
+            x:Name="BeginningRadio"
+            Margin="0,0,16,0"
+            GroupName="InserterOrigin"
+            Content="Beginning"
+            IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.Beginning}, Mode=TwoWay}"
+          />
+          <controls:CompactRadioButton
+            x:Name="EndRadio"
+            GroupName="InserterOrigin"
+            Content="End"
+            IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.End}, Mode=TwoWay}"
+          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="of name." />
+        </StackPanel>
+        <controls:CompactCheckBox
+          x:Name="OverwriteCheckBox"
+          Content="Overwrite characters"
+          ToolTip.Tip="When checked, inserted text replaces existing characters at the insert point instead of shifting them."
+          IsChecked="{Binding Overwrite}"
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>

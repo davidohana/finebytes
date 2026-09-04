@@ -42,6 +42,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 StripParenthesesFilter => new StripParenthesesFilterEditorViewModel(step),
                 CleanerFilter => new CleanerFilterEditorViewModel(step),
                 CounterFilter => new CounterFilterEditorViewModel(step),
+                InserterFilter => new InserterFilterEditorViewModel(step),
                 _ => null,
             };
         }
