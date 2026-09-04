@@ -13,7 +13,8 @@ namespace Mfr.Filters.Formatting
         Beginning,
 
         /// <summary>
-        /// Counts from the last character; position <c>1</c> inserts before the last character.
+        /// Counts from the end of the segment; position <c>1</c> inserts after the last character (append).
+        /// Position <c>2</c> inserts before the last character.
         /// </summary>
         End,
     }
@@ -121,12 +122,14 @@ namespace Mfr.Filters.Formatting
                 return zeroBased;
             }
 
-            if (oneBased > length)
+            // MFR7: index = Length - Pos + 1 (Pos 1 = append at Length).
+            var fromEndIndex = length - oneBased + 1;
+            if (fromEndIndex < 0)
             {
                 return 0;
             }
 
-            return length - oneBased;
+            return fromEndIndex;
         }
     }
 }

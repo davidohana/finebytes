@@ -29,7 +29,7 @@
             Text="{Binding InsertText}"
           />
         </StackPanel>
-        <Grid ToolTip.Tip="One-based character index. Position 1 from Beginning inserts before the first character. If the position exceeds the name length, Beginning appends and End prepends.">
+        <Grid ToolTip.Tip="One-based character index. Beginning: 1 inserts before the first character; past the end appends. End: 1 appends after the last character; 2 inserts before the last; a large position prepends.">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
             <ColumnDefinition Width="8" />
@@ -62,14 +62,13 @@
               Content="Beginning"
               IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.Beginning}, Mode=TwoWay}"
             />
-            <controls:CompactRadioButton
-              x:Name="EndRadio"
-              GroupName="InserterOrigin"
-              Content="End"
-              IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.End}, Mode=TwoWay}"
-            />
-            <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="of name." />
-          </StackPanel>
+          <controls:CompactRadioButton
+            x:Name="EndRadio"
+            GroupName="InserterOrigin"
+            Content="End"
+            IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.End}, Mode=TwoWay}"
+          />
+        </StackPanel>
         </Grid>
         <controls:CompactCheckBox
           x:Name="OverwriteCheckBox"

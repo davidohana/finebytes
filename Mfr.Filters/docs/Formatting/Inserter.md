@@ -19,8 +19,9 @@ Inserts **resolved text** at a fixed **one-based character position** in the tar
     the segment length** (i.e. the insert point would be after the last character), the text is inserted at the **end**
     of the segment.
 - **`End`**
-  - `position` counts from the **last** character: `1` = insert before the **last** character. If **`position` exceeds
-    the segment length**, the text is inserted at the **beginning** of the segment.
+  - `position` counts from the **end** of the segment (MFR7: index = length − position + 1): `1` = insert **after**
+    the last character (append). `2` = insert before the last character. If the computed index is negative (position
+    larger than length + 1), the text is inserted at the **beginning** of the segment.
 
 ### Overwrite (`overwrite`)
 
@@ -35,7 +36,8 @@ When `true`, the segment becomes `original[..insertIndex) + inserted + original[
   - Before: `ab`
   - After: `abX`
   - Comment: Position past end → append.
-- `text`: `"_"`; `position`: `1`; `startFrom`: `End`; `overwrite`: `false` — `ab` → `a_b` — Before last character.
+- `text`: `"_"`; `position`: `1`; `startFrom`: `End`; `overwrite`: `false` — `ab` → `ab_` — Append (after last character).
+- `text`: `"_"`; `position`: `2`; `startFrom`: `End`; `overwrite`: `false` — `ab` → `a_b` — Before last character.
 - `text`: `"**"`; `position`: `2`; `startFrom`: `Beginning`; `overwrite`: `true`
   - Before: `abcd`
   - After: `a**d`

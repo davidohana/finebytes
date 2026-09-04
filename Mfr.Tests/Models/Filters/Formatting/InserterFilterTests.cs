@@ -36,14 +36,27 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies counting from the end: position 1 inserts before the last character.
+        /// Verifies MFR7 end counting: position 1 appends after the last character.
         /// </summary>
         [Fact]
-        public void Apply_FromEnd_Position1_InsertsBeforeLastCharacter()
+        public void Apply_FromEnd_Position1_AppendsAtEnd()
         {
             var f = new InserterFilter(
                 _target,
                 new InserterOptions(Text: "_", Position: 1, StartFrom: InserterOrigin.End, Overwrite: false)
+            );
+            Assert.Equal("ab_", FilterTestHelpers.ApplyToPrefix(f, "ab"));
+        }
+
+        /// <summary>
+        /// Verifies end counting: position 2 inserts before the last character.
+        /// </summary>
+        [Fact]
+        public void Apply_FromEnd_Position2_InsertsBeforeLastCharacter()
+        {
+            var f = new InserterFilter(
+                _target,
+                new InserterOptions(Text: "_", Position: 2, StartFrom: InserterOrigin.End, Overwrite: false)
             );
             Assert.Equal("a_b", FilterTestHelpers.ApplyToPrefix(f, "ab"));
         }
