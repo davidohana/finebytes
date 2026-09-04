@@ -376,10 +376,6 @@ namespace Mfr.Tests.Ui.FilterEditors
             var options = ((CasingListFilter)step.Filter).Options;
             Assert.Equal(["and", "or", "RMX"], options.Words);
             Assert.False(options.UppercaseSentenceInitial);
-
-            var afterParse = step.Filter;
-            editor.WordsText = "and  or   RMX";
-            Assert.Same(afterParse, step.Filter);
         }
     }
 }

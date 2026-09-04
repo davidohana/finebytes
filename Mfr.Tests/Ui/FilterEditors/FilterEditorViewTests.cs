@@ -211,6 +211,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             var skipWords = editor.FindControl<TextBox>("CapitalizeSkipWordsBox");
             Assert.NotNull(skipWords);
             Assert.True(skipWords.IsVisible);
+            Assert.Equal(TextWrapping.Wrap, skipWords.TextWrapping);
             skipWords.Text = "a, the";
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

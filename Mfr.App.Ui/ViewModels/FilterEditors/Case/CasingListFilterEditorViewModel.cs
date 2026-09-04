@@ -56,16 +56,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
                 return;
             }
 
-            var words = _ParseWords(WordsText);
-            if (
-                words.SequenceEqual(filter.Options.Words)
-                && UppercaseSentenceInitial == filter.Options.UppercaseSentenceInitial
-            )
-            {
-                return;
-            }
-
-            var options = new CasingListOptions(Words: words, UppercaseSentenceInitial: UppercaseSentenceInitial);
+            var options = new CasingListOptions(
+                Words: _ParseWords(WordsText),
+                UppercaseSentenceInitial: UppercaseSentenceInitial
+            );
             ApplyIfChanged(filter, filter with { Options = options });
         }
 

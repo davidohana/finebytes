@@ -97,7 +97,7 @@
         <TextBlock Classes="filter-editor-label" Text="Leave lowercase (comma-separated):" TextWrapping="Wrap" />
         <TextBox
           x:Name="CapitalizeSkipWordsBox"
-          Classes="filter-editor-field"
+          Classes="filter-editor-field-wrap"
           Text="{Binding CapitalizeSkipWordsText}"
         />
       </StackPanel>

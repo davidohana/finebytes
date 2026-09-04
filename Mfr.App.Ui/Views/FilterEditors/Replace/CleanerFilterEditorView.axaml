@@ -33,7 +33,7 @@
           <TextBox
             x:Name="CustomCharsBox"
             Grid.Column="2"
-            Classes="filter-editor-field"
+            Classes="filter-editor-field-wrap"
             MinWidth="240"
             MaxLength="100"
             VerticalAlignment="Center"
