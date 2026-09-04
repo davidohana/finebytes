@@ -85,28 +85,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the progress dialog window title for the current operation.
         /// </summary>
-        public string DialogTitle
-        {
-            get
-            {
-                if (Operation == RenameListProgressOperation.Refresh)
-                {
-                    return "Refreshing Rename List";
-                }
-
-                if (Operation == RenameListProgressOperation.Preview)
-                {
-                    return "Previewing ...";
-                }
-
-                if (Phase == RenameListProgressPhase.LoadMetadata)
-                {
-                    return "Reading file metadata";
-                }
-
-                return "Adding to Rename List";
-            }
-        }
+        public string DialogTitle => RenameListProgressCopy.DialogTitle(Operation, Phase);
 
         /// <summary>
         /// Gets the resolve-stage scan line for add operations.
@@ -121,28 +100,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the per-row progress line shown for metadata, refresh, or preview.
         /// </summary>
-        public string MetadataProgressText
-        {
-            get
-            {
-                if (Operation == RenameListProgressOperation.Refresh)
-                {
-                    return $"Refreshing: {MetadataProcessedCount} of {MetadataTotalCount} files";
-                }
-
-                if (Operation == RenameListProgressOperation.Preview)
-                {
-                    return $"Previewing: {MetadataProcessedCount} of {MetadataTotalCount} files";
-                }
-
-                return $"Reading metadata: {MetadataProcessedCount} of {MetadataTotalCount} files";
-            }
-        }
+        public string MetadataProgressText =>
+            RenameListProgressCopy.MetadataProgressText(Operation, MetadataProcessedCount, MetadataTotalCount);
 
         /// <summary>
         /// Gets whether scanned/added resolve lines should be shown.
         /// </summary>
-        public bool ShowResolveProgress => Operation == RenameListProgressOperation.Add;
+        public bool ShowResolveProgress => RenameListProgressCopy.For(Operation).ShowResolve;
 
         /// <summary>
         /// Gets whether the per-row progress line should be shown.
@@ -210,12 +174,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var progress = new Progress<RenameListProgress>(_ApplyProgress);
 
             Operation = operation;
-            Phase = operation
-                is RenameListProgressOperation.MetadataHydrate
-                    or RenameListProgressOperation.Refresh
-                    or RenameListProgressOperation.Preview
-                ? RenameListProgressPhase.LoadMetadata
-                : RenameListProgressPhase.ResolveSources;
+            Phase = RenameListProgressCopy.For(operation).InitialPhase;
             IsBusy = true;
             IsDialogVisible = false;
             ScannedCount = 0;

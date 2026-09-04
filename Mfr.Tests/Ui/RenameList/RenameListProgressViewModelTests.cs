@@ -383,6 +383,69 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.False(viewModel.IsBusy);
         }
 
+        /// <summary>
+        /// Verifies each operation's initial phase, resolve visibility, and dialog titles stay aligned.
+        /// </summary>
+        [Theory]
+        [InlineData(
+            RenameListProgressOperation.Add,
+            RenameListProgressPhase.ResolveSources,
+            true,
+            "Adding to Rename List",
+            "Reading file metadata",
+            "Reading metadata: 2 of 5 files"
+        )]
+        [InlineData(
+            RenameListProgressOperation.MetadataHydrate,
+            RenameListProgressPhase.LoadMetadata,
+            false,
+            "Reading file metadata",
+            "Reading file metadata",
+            "Reading metadata: 2 of 5 files"
+        )]
+        [InlineData(
+            RenameListProgressOperation.Refresh,
+            RenameListProgressPhase.LoadMetadata,
+            false,
+            "Refreshing Rename List",
+            "Refreshing Rename List",
+            "Refreshing: 2 of 5 files"
+        )]
+        [InlineData(
+            RenameListProgressOperation.Preview,
+            RenameListProgressPhase.LoadMetadata,
+            false,
+            "Previewing ...",
+            "Previewing ...",
+            "Previewing: 2 of 5 files"
+        )]
+        public void ProgressCopy_matches_operation(
+            RenameListProgressOperation operation,
+            RenameListProgressPhase initialPhase,
+            bool showResolve,
+            string resolveTitle,
+            string metadataTitle,
+            string metadataLine
+        )
+        {
+            var copy = RenameListProgressCopy.For(operation);
+
+            Assert.Equal(initialPhase, copy.InitialPhase);
+            Assert.Equal(showResolve, copy.ShowResolve);
+            Assert.Equal(
+                resolveTitle,
+                RenameListProgressCopy.DialogTitle(operation, RenameListProgressPhase.ResolveSources)
+            );
+            Assert.Equal(
+                metadataTitle,
+                RenameListProgressCopy.DialogTitle(operation, RenameListProgressPhase.LoadMetadata)
+            );
+            Assert.Equal(
+                metadataLine,
+                RenameListProgressCopy.MetadataProgressText(operation, processedCount: 2, totalCount: 5)
+            );
+        }
+
         private static void _WaitFor(Func<bool> condition)
         {
             var deadline = Environment.TickCount64 + 2000;
