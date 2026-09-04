@@ -252,9 +252,7 @@
         </Grid>
 
         <controls:FieldsetGroup Header="Substring" IsVisible="{Binding ShowSubstringOptions}">
-          <Grid
-            ToolTip.Tip="Inclusive 1-based range. Left counts from the start; Right from the end."
-          >
+          <Grid ToolTip.Tip="Inclusive 1-based range. Left counts from the start; Right from the end.">
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
               <ColumnDefinition Width="Auto" />

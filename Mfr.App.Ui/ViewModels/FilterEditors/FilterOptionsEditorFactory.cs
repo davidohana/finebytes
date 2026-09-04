@@ -28,6 +28,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             return step.Filter switch
             {
                 SpaceCharacterFilter filter => new SpaceCharacterFilterEditorViewModel(step, filter),
+                SpaceAfterFilter or SpaceAroundFilter => new SpaceTriggerFilterEditorViewModel(step),
                 LettersCaseFilter filter => new LettersCaseFilterEditorViewModel(step, filter),
                 ICountOptionsFilter => new CountFilterEditorViewModel(step),
                 ShrinkDuplicateCharactersFilter => new ShrinkDuplicateCharactersFilterEditorViewModel(step),

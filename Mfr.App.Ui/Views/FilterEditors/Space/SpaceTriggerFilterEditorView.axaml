@@ -1,0 +1,47 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Space"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="120"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Space.SpaceTriggerFilterEditorView"
+  x:DataType="vm:SpaceTriggerFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="6">
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          ToolTip.Tip="Characters that trigger inserting the word separator (set by Space Character, default U+0020 SPACE)."
+        >
+          <TextBlock
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            TextWrapping="Wrap"
+            MaxWidth="240"
+            Text="{Binding CharsPrompt}"
+          />
+          <TextBox
+            x:Name="CharsBox"
+            Classes="filter-editor-field"
+            MinWidth="120"
+            MaxLength="100"
+            VerticalAlignment="Center"
+            Text="{Binding Chars}"
+          />
+        </StackPanel>
+        <controls:CompactCheckBox
+          x:Name="NeighborCheckBox"
+          Content="{Binding NeighborCheckLabel}"
+          ToolTip.Tip="{Binding NeighborCheckToolTip}"
+          IsChecked="{Binding OnlyWhenNeighborLetterOrDigit}"
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>

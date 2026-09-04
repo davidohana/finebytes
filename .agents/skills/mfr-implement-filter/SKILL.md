@@ -8,6 +8,8 @@ description: >-
 
 # MFR: implement a filter
 
+For Filter Configuration **option editors** (VM / AXAML / factory / tests), use [mfr-implement-filter-editor](../mfr-implement-filter-editor/SKILL.md) instead.
+
 ## Code
 
 1. **Location.** Add the filter class under `Mfr.Filters/<Group>/` (e.g. `Space/`, `Case/`). Filters sit in **L2**; they reference `Mfr.Models` only (see `docs/mfr-folder-layering.md`).

@@ -19,11 +19,7 @@
           Spacing="4"
           ToolTip.Tip="Target digit count. Shorter numbers are padded with leading zeros. Longer numbers stay unchanged unless the shrink option below is checked."
         >
-          <TextBlock
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Text="Target width of"
-          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Target width of" />
           <controls:CompactNumericUpDown
             x:Name="WidthSpinner"
             Width="56"

@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's done. Next: Space After + Around, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
+overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around done. Next: Capitalize After, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
 todos:
   - id: f1-f4
     content: "F1–F4: ctors, Applied list, Filter Options/Apply To, Space Character + Letters Case"
@@ -22,7 +22,7 @@ todos:
     status: completed
   - id: f5-space-after-around
     content: "F5 Space After + Space Around — shared chars+neighbor editor pattern + both factories/tests"
-    status: pending
+    status: completed
   - id: f5-capitalize-after
     content: "F5 Capitalize After"
     status: pending
@@ -87,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-04):** F5 Fix Leading 0's done. **Next: F5 Space After + Around**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-04):** F5 Space After + Around done. **Next: F5 Capitalize After**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ### Already shipped (F1–F4)
 
@@ -110,10 +110,10 @@ ViewModels/FilterEditors/          Views/FilterEditors/
   FilterEditorViewModel.cs           FilterEditorView.axaml(+.cs)
   FilterOptionsEditorViewModel.cs    FilterEditorViewLocator.cs
   FilterOptionsEditorFactory.cs
-  Space/                             Space/
-    SpaceCharacter…                  SpaceCharacter…
-    SpaceAfter… / SpaceAround…       …
-  Case/                              Case/
+    Space/                             Space/
+      SpaceCharacter…                  SpaceCharacter…
+      SpaceTrigger… (After + Around)   SpaceTrigger…
+    Case/                              Case/
     LettersCase…                     …
     CapitalizeAfter…
     SentenceEndCharacters…
@@ -174,6 +174,8 @@ ______________________________________________________________________
 
 ## Pattern to copy (every F5 pass)
 
+Agent checklist: [mfr-implement-filter-editor](../../.agents/skills/mfr-implement-filter-editor/SKILL.md) (plus `mfr7-reference`).
+
 Same as F4b/F4c — **one pass = one filter, or one intentional group** (see grouping rule below):
 
 1. Read MFR7 `*FilterEditor` + help for each filter in the pass (`mfr7-reference` skill).
@@ -213,8 +215,8 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 | **2 (done)** | **Shrink Duplicate Characters** | Trimming   | single                                             | `char` — not count-style                                                    |
 | **3 (done)** | **Trim Between**                | Trimming   | single                                             | `Position` start/end + side                                                 |
 | **4 (done)** | **Fix Leading 0's**             | Misc       | single                                             | width / remove extras / max / whole-word                                    |
-| **5 (next)** | **Space After + Around**        | Space      | Space After, Space Around                          | Chars string + neighbor checkbox (shared pattern; two option records)       |
-| 6            | Capitalize After                | Case       | single                                             | trigger chars string                                                        |
+| **5 (done)** | **Space After + Around**        | Space      | Space After, Space Around                          | Shared `SpaceTrigger` chars+neighbor editor; two factory arms + tests       |
+| **6 (next)** | Capitalize After                | Case       | single                                             | trigger chars string                                                        |
 | 7            | Sentence End Characters         | Case       | single                                             | char list                                                                   |
 | 8            | Strip Parentheses               | Misc       | single                                             | pair type + remove contents                                                 |
 | 9            | Cleaner                         | Replace    | single                                             | illegal + custom + replacement                                              |
@@ -258,6 +260,7 @@ ______________________________________________________________________
 
 ## References
 
+- Agent skill: [mfr-implement-filter-editor](../../.agents/skills/mfr-implement-filter-editor/SKILL.md)
 - MFR7: `FilterEdit.cs`, per-filter `*FilterEditor.cs`, help under `mfr7/Site/finebytes/mfr/Help/`
 - Prior slice: Cursor plan `applied_filter_editors_c4a4260f.plan.md` (F1–F4 history)
 - Rename List preview: [rename-list-ui.plan.md](rename-list-ui.plan.md) Phase 10–11

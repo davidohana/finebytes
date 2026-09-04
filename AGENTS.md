@@ -67,4 +67,4 @@ Example (Rename List Auto-Sort): session `sortFields` entries are `{ "key": …,
 - `docs/rename-list-phase5-followups.md` (deferred shuttle/column refactors after Phase 5)
 - `docs/rename-list-phase6b-followups.md` (6c–6e shipped; next is 8a Refresh)
 - `.editorconfig`
-- Skills: `.agents/skills/` — `mfr-code-review`, `mfr-implement-filter`, `mfr7-reference`, `mfr-ui-headless-tests`
+- Skills: `.agents/skills/` — `mfr-code-review`, `mfr-implement-filter`, `mfr-implement-filter-editor`, `mfr7-reference`, `mfr-ui-headless-tests`

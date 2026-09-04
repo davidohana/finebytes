@@ -141,6 +141,7 @@ Produce this before coding:
 ### Step 8 — Implement in finebytes
 
 - Filters: follow [mfr-implement-filter/SKILL.md](../mfr-implement-filter/SKILL.md).
+- Filter Configuration option editors: follow [mfr-implement-filter-editor/SKILL.md](../mfr-implement-filter-editor/SKILL.md).
 - Preserve MFR7 **display-name exceptions** (`TagRemover` → `Audio Tag Remover`, etc.); see `FilterCatalogTests.Known_Display_Names_And_Groups`.
 - Map MFR7 groups to `FilterGroup`: Case, Space, Trimmer→Trimming, Replace, Format→Formatting, ID3→Audio, Attrs→Attributes, Misc.
 - Prefer clean modern design over legacy shims (see `AGENTS.md` refactoring policy); document intentional behavior changes in the brief.
@@ -180,6 +181,7 @@ Use `Help/Images/hotspots.gif` for labeled shell regions.
 ## Related finebytes skills and docs
 
 - Implement filters: [mfr-implement-filter](../mfr-implement-filter/SKILL.md)
+- Implement filter editors: [mfr-implement-filter-editor](../mfr-implement-filter-editor/SKILL.md)
 - Filter name / group map: [filter-map.md](filter-map.md)
 - Formatter token map: [formatter-tokens.md](formatter-tokens.md)
 - Shortcuts: `docs/keyboard-shortcuts.md`

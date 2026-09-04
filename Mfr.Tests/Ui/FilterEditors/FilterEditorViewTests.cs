@@ -481,6 +481,72 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Space After option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Space_after_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceAfter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<SpaceTriggerFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<SpaceTriggerFilterEditorView>().Single();
+            var charsBox = editor.FindControl<TextBox>("CharsBox");
+            var neighborCheck = editor.FindControl<CompactCheckBox>("NeighborCheckBox");
+            Assert.NotNull(charsBox);
+            Assert.NotNull(neighborCheck);
+            Assert.Equal(",;!", charsBox.Text);
+            Assert.True(neighborCheck.IsChecked);
+
+            charsBox.Text = ".,";
+            neighborCheck.IsChecked = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (SpaceAfterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(".,", filter.Options.AfterChars);
+            Assert.False(filter.Options.OnlyWhenNextIsLetterOrDigit);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Space Around option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Space_around_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceAround"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<SpaceTriggerFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<SpaceTriggerFilterEditorView>().Single();
+            var charsBox = editor.FindControl<TextBox>("CharsBox");
+            var neighborCheck = editor.FindControl<CompactCheckBox>("NeighborCheckBox");
+            Assert.NotNull(charsBox);
+            Assert.NotNull(neighborCheck);
+            Assert.Equal("-", charsBox.Text);
+            Assert.True(neighborCheck.IsChecked);
+
+            charsBox.Text = "+=";
+            neighborCheck.IsChecked = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (SpaceAroundFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal("+=", filter.Options.AroundChars);
+            Assert.False(filter.Options.OnlyWhenNeighboringAreLettersOrDigits);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Letters Case radio edits re-run Rename List preview (Phase 10a).
         /// </summary>
         [AvaloniaFact]
@@ -508,6 +574,8 @@ namespace Mfr.Tests.Ui.FilterEditors
                 Assert.NotNull(radio);
                 radio.IsChecked = true;
                 window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+                await mainViewModel.WaitForPendingPreviewAsync().ConfigureAwait(true);
                 Dispatcher.UIThread.RunJobs();
 
                 Assert.Equal("HELLO.txt", mainViewModel.RenameListViewModel.Entries[0].FullFileNamePreview);
