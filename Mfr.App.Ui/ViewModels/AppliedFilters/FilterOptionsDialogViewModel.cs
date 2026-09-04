@@ -153,6 +153,15 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private decimal _tokenNumber = 1;
 
         /// <summary>
+        /// Gets whether OK can accept the current draft.
+        /// </summary>
+        /// <remarks>
+        /// Token scope requires a non-empty separator (same rule as <see cref="StringApplyScopeTransform"/>).
+        /// </remarks>
+        public bool CanConfirm =>
+            ScopeMode != FilterApplyScopeMode.Token || !string.IsNullOrEmpty(TokenSeparator);
+
+        /// <summary>
         /// Builds the Apply-To target from the current draft fields.
         /// </summary>
         /// <returns>Target instance, or <see langword="null"/> when Apply-To is unavailable.</returns>
@@ -223,6 +232,12 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             OnPropertyChanged(nameof(IsWholeScope));
             OnPropertyChanged(nameof(IsSubstringScopeMode));
             OnPropertyChanged(nameof(IsTokenScopeMode));
+            OnPropertyChanged(nameof(CanConfirm));
+        }
+
+        partial void OnTokenSeparatorChanged(string value)
+        {
+            OnPropertyChanged(nameof(CanConfirm));
         }
 
         /// <summary>

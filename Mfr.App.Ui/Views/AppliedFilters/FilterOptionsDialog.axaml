@@ -104,7 +104,14 @@
       Spacing="8"
       Margin="0,14,0,0"
     >
-      <Button x:Name="OkButton" Classes="filter-options-footer" Content="OK" IsDefault="True" Click="_OnOkClick" />
+      <Button
+        x:Name="OkButton"
+        Classes="filter-options-footer"
+        Content="OK"
+        IsDefault="True"
+        IsEnabled="{Binding CanConfirm}"
+        Click="_OnOkClick"
+      />
       <Button Classes="filter-options-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
     </StackPanel>
 

@@ -29,6 +29,11 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)
         {
+            if (DataContext is FilterOptionsDialogViewModel { CanConfirm: false })
+            {
+                return;
+            }
+
             Close(true);
         }
 

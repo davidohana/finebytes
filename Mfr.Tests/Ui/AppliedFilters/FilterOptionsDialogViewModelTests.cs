@@ -415,6 +415,31 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies OK is blocked while token scope has an empty separator.
+        /// </summary>
+        [Fact]
+        public void CanConfirm_is_false_when_token_separator_empty()
+        {
+            var applied = new AppliedFiltersViewModel();
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
+            {
+                ScopeMode = FilterApplyScopeMode.Token,
+                TokenSeparator = string.Empty,
+            };
+
+            Assert.False(dialog.CanConfirm);
+
+            dialog.TokenSeparator = "-";
+            Assert.True(dialog.CanConfirm);
+
+            dialog.ScopeMode = FilterApplyScopeMode.Whole;
+            dialog.TokenSeparator = string.Empty;
+            Assert.True(dialog.CanConfirm);
+        }
+
+        /// <summary>
         /// Verifies ancestor-folder level 1 uses the Parent Folder list subtitle.
         /// </summary>
         [Fact]
