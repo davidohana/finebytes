@@ -22,14 +22,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var selected = _selectedEntries.ToHashSet();
             var anchorIndex = _FindFirstSelectedIndex(selected);
             _renameList.Remove(_selectedEntries.Select(entry => entry.EngineItem));
-
-            for (var i = Entries.Count - 1; i >= 0; i--)
-            {
-                if (selected.Contains(Entries[i]))
-                {
-                    Entries.RemoveAt(i);
-                }
-            }
+            _PruneEntriesNotInEngine();
 
             var nextSelection = _SelectEntryAfterRemove(anchorIndex);
             SetSelectedEntries(nextSelection is null ? [] : [nextSelection]);
@@ -57,15 +50,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var removedCount = _renameList.RemoveUnchanged(key);
             if (removedCount > 0)
             {
-                var remaining = _renameList.RenameItems.ToHashSet();
-                for (var i = Entries.Count - 1; i >= 0; i--)
-                {
-                    if (!remaining.Contains(Entries[i].EngineItem))
-                    {
-                        Entries.RemoveAt(i);
-                    }
-                }
-
+                _PruneEntriesNotInEngine();
                 _NotifyMembershipChanged();
             }
 
@@ -86,17 +71,25 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var selected = _selectedEntries.ToHashSet();
             var toRemove = Entries.Where(entry => !selected.Contains(entry)).Select(entry => entry.EngineItem).ToList();
             _renameList.Remove(toRemove);
+            _PruneEntriesNotInEngine();
 
+            SetSelectedEntries([.. Entries.Where(selected.Contains)]);
+            _NotifyMembershipChanged();
+        }
+
+        /// <summary>
+        /// Drops UI rows whose engine items are no longer in the rename list.
+        /// </summary>
+        private void _PruneEntriesNotInEngine()
+        {
+            var remaining = _renameList.RenameItems.ToHashSet();
             for (var i = Entries.Count - 1; i >= 0; i--)
             {
-                if (!selected.Contains(Entries[i]))
+                if (!remaining.Contains(Entries[i].EngineItem))
                 {
                     Entries.RemoveAt(i);
                 }
             }
-
-            SetSelectedEntries([.. Entries.Where(selected.Contains)]);
-            _NotifyMembershipChanged();
         }
 
         /// <summary>
