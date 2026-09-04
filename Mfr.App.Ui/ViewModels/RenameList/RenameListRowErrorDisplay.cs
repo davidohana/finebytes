@@ -8,13 +8,29 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     internal static class RenameListRowErrorDisplay
     {
         /// <summary>
+        /// Builds the primary details box text (file path and user message).
+        /// </summary>
+        /// <param name="filePath">Absolute path of the errored row.</param>
+        /// <param name="userMessage">Plain-language explanation.</param>
+        /// <returns>Path, blank line, then message.</returns>
+        internal static string FormatPrimaryDetails(string filePath, string userMessage)
+        {
+            return string.Join(Environment.NewLine, filePath, string.Empty, userMessage);
+        }
+
+        /// <summary>
         /// Builds clipboard text (summary, path, user message, and technical details when present).
         /// </summary>
         /// <param name="content">Dialog content.</param>
         /// <returns>Multi-line text suitable for copy/paste.</returns>
         internal static string FormatCopyText(RenameListRowErrorDialogContent content)
         {
-            var lines = new List<string> { content.Summary, content.FilePath, string.Empty, content.UserMessage };
+            var lines = new List<string>
+            {
+                content.Summary,
+                string.Empty,
+                FormatPrimaryDetails(content.FilePath, content.UserMessage),
+            };
             if (!string.IsNullOrWhiteSpace(content.TechnicalDetails))
             {
                 lines.Add(string.Empty);

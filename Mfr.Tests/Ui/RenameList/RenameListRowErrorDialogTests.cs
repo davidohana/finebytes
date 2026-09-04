@@ -11,7 +11,7 @@ namespace Mfr.Tests.Ui.RenameList
     public sealed class RenameListRowErrorDialogTests
     {
         /// <summary>
-        /// Verifies load errors show user messages initially and technical text under the expander.
+        /// Verifies load errors show path and user message in one box, with technical text collapsed.
         /// </summary>
         [AvaloniaFact]
         public void Dialog_shows_load_errors_with_collapsed_technical_details()
@@ -30,22 +30,20 @@ namespace Mfr.Tests.Ui.RenameList
             dialog.UpdateLayout();
 
             var summaryText = dialog.FindControl<TextBlock>("SummaryText");
-            var filePathText = dialog.FindControl<TextBlock>("FilePathText");
-            var userMessageText = dialog.FindControl<TextBlock>("UserMessageText");
+            var primaryDetailsText = dialog.FindControl<TextBox>("PrimaryDetailsText");
             var technicalExpander = dialog.FindControl<Expander>("TechnicalDetailsExpander");
             var technicalDetailsText = dialog.FindControl<TextBox>("TechnicalDetailsText");
             Assert.NotNull(summaryText);
-            Assert.NotNull(filePathText);
-            Assert.NotNull(userMessageText);
+            Assert.NotNull(primaryDetailsText);
             Assert.NotNull(technicalExpander);
             Assert.NotNull(technicalDetailsText);
 
             Assert.Equal(RenameListLoadErrorDisplay.DialogTitle, dialog.Title);
             Assert.Equal(RenameListLoadErrorDisplay.MetadataSummary, summaryText.Text);
-            Assert.Equal(@"D:\Music\PLAYLIST.M3U", filePathText.Text);
-            Assert.Contains("audio or media metadata", userMessageText.Text, StringComparison.Ordinal);
-            Assert.Contains("image or EXIF metadata", userMessageText.Text, StringComparison.Ordinal);
-            Assert.DoesNotContain(tagLibMessage, userMessageText.Text, StringComparison.Ordinal);
+            Assert.Contains(@"D:\Music\PLAYLIST.M3U", primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.Contains("audio or media metadata", primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.Contains("image or EXIF metadata", primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.DoesNotContain(tagLibMessage, primaryDetailsText.Text, StringComparison.Ordinal);
             Assert.True(technicalExpander.IsVisible);
             Assert.False(technicalExpander.IsExpanded);
             Assert.Contains(tagLibMessage, technicalDetailsText.Text, StringComparison.Ordinal);
@@ -66,19 +64,20 @@ namespace Mfr.Tests.Ui.RenameList
             dialog.UpdateLayout();
 
             var summaryText = dialog.FindControl<TextBlock>("SummaryText");
-            var userMessageText = dialog.FindControl<TextBlock>("UserMessageText");
+            var primaryDetailsText = dialog.FindControl<TextBox>("PrimaryDetailsText");
             var technicalExpander = dialog.FindControl<Expander>("TechnicalDetailsExpander");
             Assert.NotNull(summaryText);
-            Assert.NotNull(userMessageText);
+            Assert.NotNull(primaryDetailsText);
             Assert.NotNull(technicalExpander);
 
             Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, summaryText.Text);
-            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, userMessageText.Text);
+            Assert.Contains(path, primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.Contains(RenameListDiskPaths.MissingUserExplanation, primaryDetailsText.Text, StringComparison.Ordinal);
             Assert.False(technicalExpander.IsVisible);
         }
 
         /// <summary>
-        /// Verifies a preview failure shows the user message and keeps technical text collapsed.
+        /// Verifies a preview failure shows path and message together and keeps technical text collapsed.
         /// </summary>
         [AvaloniaFact]
         public void Dialog_shows_preview_message_and_collapsed_technical_details()
@@ -93,21 +92,19 @@ namespace Mfr.Tests.Ui.RenameList
             dialog.UpdateLayout();
 
             var summaryText = dialog.FindControl<TextBlock>("SummaryText");
-            var filePathText = dialog.FindControl<TextBlock>("FilePathText");
-            var userMessageText = dialog.FindControl<TextBlock>("UserMessageText");
+            var primaryDetailsText = dialog.FindControl<TextBox>("PrimaryDetailsText");
             var technicalExpander = dialog.FindControl<Expander>("TechnicalDetailsExpander");
             var technicalDetailsText = dialog.FindControl<TextBox>("TechnicalDetailsText");
             Assert.NotNull(summaryText);
-            Assert.NotNull(filePathText);
-            Assert.NotNull(userMessageText);
+            Assert.NotNull(primaryDetailsText);
             Assert.NotNull(technicalExpander);
             Assert.NotNull(technicalDetailsText);
 
             Assert.Equal(RenameListPreviewErrorDisplay.DialogTitle, dialog.Title);
             Assert.Equal(RenameListPreviewErrorDisplay.Summary, summaryText.Text);
-            Assert.Equal(@"D:\Music\album", filePathText.Text);
-            Assert.Equal("Cannot apply audio tags to a directory.", userMessageText.Text);
-            Assert.DoesNotContain("InvalidOperationException", userMessageText.Text, StringComparison.Ordinal);
+            Assert.Contains(@"D:\Music\album", primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.Contains("Cannot apply audio tags to a directory.", primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.DoesNotContain("InvalidOperationException", primaryDetailsText.Text, StringComparison.Ordinal);
             Assert.True(technicalExpander.IsVisible);
             Assert.False(technicalExpander.IsExpanded);
             Assert.Contains("InvalidOperationException", technicalDetailsText.Text, StringComparison.Ordinal);
@@ -129,11 +126,12 @@ namespace Mfr.Tests.Ui.RenameList
             dialog.Show();
             dialog.UpdateLayout();
 
-            var userMessageText = dialog.FindControl<TextBlock>("UserMessageText");
+            var primaryDetailsText = dialog.FindControl<TextBox>("PrimaryDetailsText");
             var technicalExpander = dialog.FindControl<Expander>("TechnicalDetailsExpander");
-            Assert.NotNull(userMessageText);
+            Assert.NotNull(primaryDetailsText);
             Assert.NotNull(technicalExpander);
-            Assert.Equal("Destination path already in use.", userMessageText.Text);
+            Assert.Contains(@"D:\Music\note.txt", primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.Contains("Destination path already in use.", primaryDetailsText.Text, StringComparison.Ordinal);
             Assert.False(technicalExpander.IsVisible);
         }
     }

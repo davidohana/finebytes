@@ -22,8 +22,10 @@ namespace Mfr.App.Ui.Views.RenameList
             InitializeComponent();
             Title = content.Title;
             SummaryText.Text = content.Summary;
-            FilePathText.Text = content.FilePath;
-            UserMessageText.Text = content.UserMessage;
+            PrimaryDetailsText.Text = RenameListRowErrorDisplay.FormatPrimaryDetails(
+                content.FilePath,
+                content.UserMessage
+            );
 
             var hasTechnicalDetails = !string.IsNullOrWhiteSpace(content.TechnicalDetails);
             TechnicalDetailsExpander.IsVisible = hasTechnicalDetails;

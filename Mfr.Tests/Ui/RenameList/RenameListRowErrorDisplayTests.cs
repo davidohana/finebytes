@@ -8,6 +8,16 @@ namespace Mfr.Tests.Ui.RenameList
     public sealed class RenameListRowErrorDisplayTests
     {
         /// <summary>
+        /// Verifies the primary details box joins path and user message with a blank line.
+        /// </summary>
+        [Fact]
+        public void FormatPrimaryDetails_joins_path_and_user_message()
+        {
+            var text = RenameListRowErrorDisplay.FormatPrimaryDetails(@"D:\a.txt", "failed");
+            Assert.Equal($"D:\\a.txt{Environment.NewLine}{Environment.NewLine}failed", text);
+        }
+
+        /// <summary>
         /// Verifies copy text includes summary, path, user message, and technical details.
         /// </summary>
         [Fact]
