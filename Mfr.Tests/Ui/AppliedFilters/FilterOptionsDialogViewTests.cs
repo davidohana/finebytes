@@ -242,6 +242,50 @@ namespace Mfr.Tests.Ui.AppliedFilters
             }
         }
 
+        /// <summary>
+        /// Verifies Apply-on radio selection updates <see cref="FilterOptionsDialogViewModel.ScopeMode"/>.
+        /// </summary>
+        [AvaloniaFact]
+        public void Apply_on_radio_updates_scope_mode()
+        {
+            var dialog = _Show(FilterApplyScopeMode.Whole);
+
+            try
+            {
+                var viewModel = Assert.IsType<FilterOptionsDialogViewModel>(dialog.DataContext);
+                Assert.Equal(FilterApplyScopeMode.Whole, viewModel.ScopeMode);
+                Assert.False(viewModel.ShowSubstringOptions);
+                Assert.False(viewModel.ShowTokenOptions);
+
+                var substringRadio = dialog.FindControl<RadioButton>("SubstringScopeRadio");
+                Assert.NotNull(substringRadio);
+                substringRadio.IsChecked = true;
+                dialog.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.Equal(FilterApplyScopeMode.Substring, viewModel.ScopeMode);
+                Assert.True(viewModel.ShowSubstringOptions);
+                Assert.False(viewModel.ShowTokenOptions);
+                Assert.True(substringRadio.IsChecked);
+
+                var tokenRadio = dialog.FindControl<RadioButton>("TokenScopeRadio");
+                Assert.NotNull(tokenRadio);
+                tokenRadio.IsChecked = true;
+                dialog.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.Equal(FilterApplyScopeMode.Token, viewModel.ScopeMode);
+                Assert.False(viewModel.ShowSubstringOptions);
+                Assert.True(viewModel.ShowTokenOptions);
+                Assert.True(tokenRadio.IsChecked);
+                Assert.False(substringRadio.IsChecked);
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
         private static FilterOptionsDialog _Show(FilterApplyScopeMode scopeMode)
         {
             var step = new AppliedFilterStepViewModel("Fix Leading 0's", new ShrinkSpacesFilter());

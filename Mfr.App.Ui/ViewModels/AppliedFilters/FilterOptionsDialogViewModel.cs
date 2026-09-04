@@ -160,7 +160,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// </remarks>
         public string? ConfirmDisabledReason =>
             ScopeMode == FilterApplyScopeMode.Token && string.IsNullOrEmpty(TokenSeparator)
-                ? "Separator required"
+                ? "Token Separator required"
                 : null;
 
         /// <summary>
@@ -236,9 +236,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         partial void OnScopeModeChanged(FilterApplyScopeMode value)
         {
             _UpdateScopeVisibility(value);
-            OnPropertyChanged(nameof(IsWholeScope));
-            OnPropertyChanged(nameof(IsSubstringScopeMode));
-            OnPropertyChanged(nameof(IsTokenScopeMode));
             OnPropertyChanged(nameof(ConfirmDisabledReason));
             OnPropertyChanged(nameof(CanConfirm));
         }
@@ -247,51 +244,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             OnPropertyChanged(nameof(ConfirmDisabledReason));
             OnPropertyChanged(nameof(CanConfirm));
-        }
-
-        /// <summary>
-        /// Gets or sets whether whole-field scope is selected.
-        /// </summary>
-        public bool IsWholeScope
-        {
-            get => ScopeMode == FilterApplyScopeMode.Whole;
-            set
-            {
-                if (value)
-                {
-                    ScopeMode = FilterApplyScopeMode.Whole;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether substring scope is selected.
-        /// </summary>
-        public bool IsSubstringScopeMode
-        {
-            get => ScopeMode == FilterApplyScopeMode.Substring;
-            set
-            {
-                if (value)
-                {
-                    ScopeMode = FilterApplyScopeMode.Substring;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether token scope is selected.
-        /// </summary>
-        public bool IsTokenScopeMode
-        {
-            get => ScopeMode == FilterApplyScopeMode.Token;
-            set
-            {
-                if (value)
-                {
-                    ScopeMode = FilterApplyScopeMode.Token;
-                }
-            }
         }
 
         private void _LoadFromStringFilter(StringTargetFilter stringFilter)
@@ -342,9 +294,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             _UpdateScopeVisibility(ScopeMode);
-            OnPropertyChanged(nameof(IsWholeScope));
-            OnPropertyChanged(nameof(IsSubstringScopeMode));
-            OnPropertyChanged(nameof(IsTokenScopeMode));
         }
 
         private void _UpdateScopeVisibility(FilterApplyScopeMode mode)
