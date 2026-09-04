@@ -1,4 +1,7 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterEditors.Case;
+using Mfr.App.Ui.ViewModels.FilterEditors.Space;
+using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;

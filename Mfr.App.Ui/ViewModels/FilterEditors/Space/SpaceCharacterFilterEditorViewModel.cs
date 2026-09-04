@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Space;
 
-namespace Mfr.App.Ui.ViewModels.FilterEditors
+namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
 {
     /// <summary>
     /// Filter Configuration editor for <see cref="SpaceCharacterFilter"/>.

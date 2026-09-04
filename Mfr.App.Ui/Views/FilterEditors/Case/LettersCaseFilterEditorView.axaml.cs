@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace Mfr.App.Ui.Views.FilterEditors
+namespace Mfr.App.Ui.Views.FilterEditors.Case
 {
     /// <summary>
     /// Option editor for <see cref="Filters.Case.LettersCaseFilter"/>.

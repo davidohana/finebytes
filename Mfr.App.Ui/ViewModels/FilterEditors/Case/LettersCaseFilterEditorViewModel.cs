@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Case;
 
-namespace Mfr.App.Ui.ViewModels.FilterEditors
+namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
 {
     /// <summary>
     /// Filter Configuration editor for <see cref="LettersCaseFilter"/>.

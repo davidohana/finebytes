@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace Mfr.App.Ui.Views.FilterEditors
+namespace Mfr.App.Ui.Views.FilterEditors.Trimming
 {
     /// <summary>
     /// Option editor for count-based filters (Trim/Extract Left/Right).

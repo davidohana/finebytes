@@ -7,14 +7,14 @@ namespace Mfr.App.Ui.Views.FilterEditors
     /// <summary>
     /// Resolves a type-specific filter editor view from its view model by naming convention.
     /// <para>
-    /// <c>Mfr.App.Ui.ViewModels.FilterEditors.FooViewModel</c> maps to
-    /// <c>Mfr.App.Ui.Views.FilterEditors.FooView</c>.
+    /// <c>Mfr.App.Ui.ViewModels.FilterEditors[.Category].FooViewModel</c> maps to
+    /// <c>Mfr.App.Ui.Views.FilterEditors[.Category].FooView</c>.
     /// </para>
     /// </summary>
     public sealed class FilterEditorViewLocator : IDataTemplate
     {
-        private const string ViewModelNamespace = "Mfr.App.Ui.ViewModels.FilterEditors";
-        private const string ViewNamespace = "Mfr.App.Ui.Views.FilterEditors";
+        private const string ViewModelNamespacePrefix = "Mfr.App.Ui.ViewModels.FilterEditors";
+        private const string ViewNamespacePrefix = "Mfr.App.Ui.Views.FilterEditors";
         private const string ViewModelSuffix = "ViewModel";
 
         /// <inheritdoc />
@@ -42,23 +42,29 @@ namespace Mfr.App.Ui.Views.FilterEditors
         /// Maps <paramref name="viewModelType"/> to the paired editor view type.
         /// </summary>
         /// <param name="viewModelType">Editor view-model type.</param>
-        /// <returns>Matching view type in <see cref="ViewNamespace"/>.</returns>
+        /// <returns>Matching view type under <see cref="ViewNamespacePrefix"/>.</returns>
         /// <exception cref="InvalidOperationException">No view type follows the naming convention.</exception>
         private static Type _ResolveViewType(Type viewModelType)
         {
             ArgumentNullException.ThrowIfNull(viewModelType);
 
-            if (
-                viewModelType.Namespace != ViewModelNamespace
-                || !viewModelType.Name.EndsWith(ViewModelSuffix, StringComparison.Ordinal)
-            )
+            var viewModelNamespace = viewModelType.Namespace;
+            var isUnderFilterEditors =
+                viewModelNamespace == ViewModelNamespacePrefix
+                || (
+                    viewModelNamespace is not null
+                    && viewModelNamespace.StartsWith(ViewModelNamespacePrefix + ".", StringComparison.Ordinal)
+                );
+            if (!isUnderFilterEditors || !viewModelType.Name.EndsWith(ViewModelSuffix, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException(
-                    $"Filter editor view model must live in {ViewModelNamespace} and end with {ViewModelSuffix}: {viewModelType.FullName}."
+                    $"Filter editor view model must live under {ViewModelNamespacePrefix} and end with {ViewModelSuffix}: {viewModelType.FullName}."
                 );
             }
 
-            var viewTypeName = $"{ViewNamespace}.{viewModelType.Name[..^ViewModelSuffix.Length]}View";
+            var relativeNamespace = viewModelNamespace![ViewModelNamespacePrefix.Length..];
+            var viewTypeName =
+                $"{ViewNamespacePrefix}{relativeNamespace}.{viewModelType.Name[..^ViewModelSuffix.Length]}View";
             return viewModelType.Assembly.GetType(viewTypeName)
                 ?? throw new InvalidOperationException(
                     $"No filter editor view registered for {viewModelType.Name}. Expected type {viewTypeName}."

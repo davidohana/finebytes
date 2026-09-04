@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.ViewModels.FilterEditors
+namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
 {
     /// <summary>
     /// Word-separator definition choices for <see cref="SpaceCharacterFilterEditorViewModel"/>.

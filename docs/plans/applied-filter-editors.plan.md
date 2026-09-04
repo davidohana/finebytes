@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: f5-reorg-subfolders
     content: "F5 reorg — move editors into FilterGroup subfolders (mirror Mfr.Filters); update ViewLocator + usings"
-    status: pending
+    status: completed
   - id: f5-trim-between
     content: "F5 Trim Between — start/end Position editor"
     status: pending
@@ -87,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-04):** F5 Shrink Duplicate Characters done. **Next: F5 reorg** (category subfolders), then **Trim Between**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-04):** F5 reorg (category subfolders) done. **Next: F5 Trim Between**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ### Already shipped (F1–F4)
 
@@ -107,8 +107,8 @@ Flat `FilterEditors/` will not scale (~25 option editors). Mirror [`FilterGroup`
 
 ```text
 ViewModels/FilterEditors/          Views/FilterEditors/
-  FilterEditorViewModel.cs           FilterEditorViewLocator.cs
-  FilterOptionsEditorViewModel.cs
+  FilterEditorViewModel.cs           FilterEditorView.axaml(+.cs)
+  FilterOptionsEditorViewModel.cs    FilterEditorViewLocator.cs
   FilterOptionsEditorFactory.cs
   Space/                             Space/
     SpaceCharacter…                  SpaceCharacter…
@@ -208,10 +208,10 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 
 | Order | Pass | Folder | Filters | Options / notes |
 | ----- | ---- | ------ | ------- | --------------- |
-| **0 (next)** | **Reorg subfolders** | all | — | Move existing editors; ViewLocator prefix-replace; no behavior change |
+| **0 (done)** | **Reorg subfolders** | all | — | Move existing editors; ViewLocator prefix-replace; no behavior change |
 | **1 (done)** | **Count L/R** | Trimming | Trim Left, Trim Right, Extract Left, Extract Right | Shared `CountFilterOptions` editor + four factory arms + tests for all four |
 | **2 (done)** | **Shrink Duplicate Characters** | Trimming | single | `char` — not count-style |
-| **3** | Trim Between | Trimming | single | `Position` start/end + side |
+| **3 (next)** | Trim Between | Trimming | single | `Position` start/end + side |
 | 4 | Fix Leading 0's | Misc | single | width / remove extras / max / whole-word |
 | 5 | **Space After + Around** | Space | Space After, Space Around | Chars string + neighbor checkbox (shared pattern; two option records) |
 | 6 | Capitalize After | Case | single | trigger chars string |
@@ -252,7 +252,7 @@ ______________________________________________________________________
 ## Layering / files
 
 - Defaults: parameterless ctor; `FilterCatalog.CreateDefault`
-- UI: `Views/FilterEditors/<FilterGroup>/…`, `ViewModels/FilterEditors/<FilterGroup>/…` (shared host types stay at `FilterEditors/` root)
+- UI: `Views/FilterEditors/<FilterGroup>/…`, `ViewModels/FilterEditors/<FilterGroup>/…` (host: `FilterEditorView` / factory / base VMs / ViewLocator at `FilterEditors/` root)
 - Wiring: factory + ViewLocator only; `MainWindowViewModel` already selects the editor
 - Preview: already hooked via `ChainChanged` → `ToChain()` → `Preview()` — do not re-wire; just ensure `SetFilter` keeps raising chain changes
 

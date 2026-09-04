@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters;
 
-namespace Mfr.App.Ui.ViewModels.FilterEditors
+namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
 {
     /// <summary>
     /// Filter Configuration editor for count-based filters (Trim/Extract Left/Right).
