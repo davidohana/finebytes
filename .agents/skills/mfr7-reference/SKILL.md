@@ -13,14 +13,14 @@ Use MFR7 as the **behavior and UX reference** for the finebytes rewrite. This sk
 
 ## Reference locations
 
-| Resource | Path | Best for |
-|----------|------|----------|
-| Legacy source | `D:\Devl\mfr7` | Filter logic, options, editor UI, shortcuts, preset XML |
-| Installed app | `C:\Program Files\FineBytes\MFR7\MFR.exe` | Live behavior, dialogs, manual QA |
-| Help HTML + screenshots | `C:\Program Files\FineBytes\MFR7\Help\` | User-facing descriptions, examples, option dialogs (GIF/PNG in `Help/Images/`) |
-| Help (source copy) | `D:\Devl\mfr7\Site\finebytes\mfr\Help\` | Same HTML as install; use when Help is missing from Program Files |
-| Tooltips / control hints | `C:\Program Files\FineBytes\MFR7\hints.txt` | Status-bar and toolbar hint text |
-| Already-ported behavior | `finebytes` repo | Tests/docs that cite MFR7; do not re-derive what is already captured |
+| Resource                 | Path                                        | Best for                                                                       |
+| ------------------------ | ------------------------------------------- | ------------------------------------------------------------------------------ |
+| Legacy source            | `D:\Devl\mfr7`                              | Filter logic, options, editor UI, shortcuts, preset XML                        |
+| Installed app            | `C:\Program Files\FineBytes\MFR7\MFR.exe`   | Live behavior, dialogs, manual QA                                              |
+| Help HTML + screenshots  | `C:\Program Files\FineBytes\MFR7\Help\`     | User-facing descriptions, examples, option dialogs (GIF/PNG in `Help/Images/`) |
+| Help (source copy)       | `D:\Devl\mfr7\Site\finebytes\mfr\Help\`     | Same HTML as install; use when Help is missing from Program Files              |
+| Tooltips / control hints | `C:\Program Files\FineBytes\MFR7\hints.txt` | Status-bar and toolbar hint text                                               |
+| Already-ported behavior  | `finebytes` repo                            | Tests/docs that cite MFR7; do not re-derive what is already captured           |
 
 If paths differ on another machine, search for `mfr7` under the user's `Devl` folder and `FineBytes\MFR7` under Program Files.
 
@@ -42,26 +42,26 @@ MFR7 reference:
 
 ### Step 1 — Scope
 
-| Feature kind | Start in finebytes | Then in MFR7 |
-|--------------|-------------------|--------------|
-| Preset filter | `Mfr.Filters/<Group>/`, `Mfr.Filters/docs/` | `Core/MfrFilters/Filters/<Group>/` |
-| Formatter token | `Mfr.Filters/Formatting/Tokens/` | `Core/MfrFilters/FormattingParams/` + `Help/*fp.html` |
-| Filter palette / groups | `FilterGroup.cs`, `FilterCatalog.cs` | `Core/MfrLib/Filters/FilterGroups.cs`, `[FilterInfo(...)]` |
-| Main window / panes | `Mfr.App.Ui/`, `Mfr.App.Ui/README.md` | `Core/MFRGui/Forms/` |
-| Keyboard shortcuts | `docs/keyboard-shortcuts.md` | `Core/MFRGui/Forms/Main/Main.cs`, `RenameList/RenameList.cs` (`.Shortcut =`) |
-| Audio tags | `docs/audio-tag-model.md` | `Core/MfrFilters/Filters/Audio/`, `Help/id3*.html` |
-| Image / EXIF | `docs/image-metadata-model.md` | `Help/eximagefp.html`, `basicimagefp.html`, `MetaDataExtractor` usage in source |
-| CLI | `Mfr.App.Cli/` | `Core/MfrConsole/Console.cs`, `Help/console.html` |
-| Presets | `Mfr.Engine/Presets/PresetJsonOptions.cs` | MFR7 XML preset serialization in `Core/MfrLib/` (search `Preset`, `Serialize`) |
+| Feature kind            | Start in finebytes                          | Then in MFR7                                                                    |
+| ----------------------- | ------------------------------------------- | ------------------------------------------------------------------------------- |
+| Preset filter           | `Mfr.Filters/<Group>/`, `Mfr.Filters/docs/` | `Core/MfrFilters/Filters/<Group>/`                                              |
+| Formatter token         | `Mfr.Filters/Formatting/Tokens/`            | `Core/MfrFilters/FormattingParams/` + `Help/*fp.html`                           |
+| Filter palette / groups | `FilterGroup.cs`, `FilterCatalog.cs`        | `Core/MfrLib/Filters/FilterGroups.cs`, `[FilterInfo(...)]`                      |
+| Main window / panes     | `Mfr.App.Ui/`, `Mfr.App.Ui/README.md`       | `Core/MFRGui/Forms/`                                                            |
+| Keyboard shortcuts      | `docs/keyboard-shortcuts.md`                | `Core/MFRGui/Forms/Main/Main.cs`, `RenameList/RenameList.cs` (`.Shortcut =`)    |
+| Audio tags              | `docs/audio-tag-model.md`                   | `Core/MfrFilters/Filters/Audio/`, `Help/id3*.html`                              |
+| Image / EXIF            | `docs/image-metadata-model.md`              | `Help/eximagefp.html`, `basicimagefp.html`, `MetaDataExtractor` usage in source |
+| CLI                     | `Mfr.App.Cli/`                              | `Core/MfrConsole/Console.cs`, `Help/console.html`                               |
+| Presets                 | `Mfr.Engine/Presets/PresetJsonOptions.cs`   | MFR7 XML preset serialization in `Core/MfrLib/` (search `Preset`, `Serialize`)  |
 
 ### Step 2 — Check finebytes first
 
 Before diving into MFR7:
 
 1. Grep finebytes for `MFR7`, `MFR 7`, or the feature name.
-2. Read matching tests — they often encode parity examples (e.g. `Id3v2TokenTests`, `SpaceCharacterFilterTests`).
-3. Read `Mfr.Filters/docs/<Group>/<FilterType>.md` if present.
-4. Read architecture docs: `docs/mfr-folder-layering.md`, `docs/magic-file-renamer-design.md`, domain docs under `docs/`.
+1. Read matching tests — they often encode parity examples (e.g. `Id3v2TokenTests`, `SpaceCharacterFilterTests`).
+1. Read `Mfr.Filters/docs/<Group>/<FilterType>.md` if present.
+1. Read architecture docs: `docs/mfr-folder-layering.md`, `docs/magic-file-renamer-design.md`, domain docs under `docs/`.
 
 If finebytes already documents behavior, treat MFR7 as confirmation only.
 
@@ -89,8 +89,8 @@ Name mapping (MFR7 class → finebytes type, groups, help file): see [filter-map
 For a filter or token:
 
 1. Read `Help/<helpFileName>` from the install or Site copy.
-2. Extract: purpose, option labels, **worked examples** (`<CODE>` blocks), target-field notes.
-3. Open referenced images under `Help/Images/` — these are the **option-dialog screenshots** (GIF/PNG). Read image files directly when implementing UI parity.
+1. Extract: purpose, option labels, **worked examples** (`<CODE>` blocks), target-field notes.
+1. Open referenced images under `Help/Images/` — these are the **option-dialog screenshots** (GIF/PNG). Read image files directly when implementing UI parity.
 
 Help pages also link related topics (e.g. Space Character → following filters use its separator).
 
@@ -99,9 +99,9 @@ Help pages also link related topics (e.g. Space Character → following filters 
 Read in this order:
 
 1. **Filter class** (`*Filter.cs`) — `Apply`, `BeforeGroupApply`, public option fields, target handling.
-2. **Editor** (`*FilterEditor.cs` + `.resx`) — control layout, defaults, validation messages.
-3. **Shared base** — e.g. `BaseFormatterFilter`, `Filter.cs` in `Core/FiltersBase/`.
-4. **GUI integration** — how the main window invokes the feature (`Core/MFRGui/`).
+1. **Editor** (`*FilterEditor.cs` + `.resx`) — control layout, defaults, validation messages.
+1. **Shared base** — e.g. `BaseFormatterFilter`, `Filter.cs` in `Core/FiltersBase/`.
+1. **GUI integration** — how the main window invokes the feature (`Core/MFRGui/`).
 
 For formatter behavior, trace from `FormattingParams/*FormattingParameter.cs` into format-string parsing.
 
