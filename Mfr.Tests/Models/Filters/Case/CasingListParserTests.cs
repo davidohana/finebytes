@@ -8,83 +8,36 @@ namespace Mfr.Tests.Models.Filters.Case
     public sealed class CasingListParserTests
     {
         /// <summary>
-        /// Verifies line text parse keeps word order and trims.
+        /// Verifies space-separated text parse keeps word order.
         /// </summary>
         [Fact]
-        public void ParseWordLines_ValidWords_ReturnsTrimmedWords()
+        public void ParseWordsText_ValidWords_ReturnsWords()
         {
-            var words = CasingListParser.ParseWordLines(
-                """
-                and
-                  RMX
-                """
-            );
+            var words = CasingListParser.ParseWordsText("  and   RMX  ");
 
             Assert.Equal(["and", "RMX"], words);
         }
 
         /// <summary>
-        /// Verifies comment lines and blank lines are skipped.
-        /// </summary>
-        [Theory]
-        [InlineData("// note")]
-        [InlineData(@"\\ note")]
-        [InlineData("  # comment")]
-        public void ParseWordLines_Comments_AreIgnored(string commentLine)
-        {
-            var words = CasingListParser.ParseWordLines(
-                $"""
-                {commentLine}
-
-                hello
-                """
-            );
-
-            Assert.Equal(["hello"], words);
-        }
-
-        /// <summary>
-        /// Verifies <c>#</c> without a following space is content, not a comment.
+        /// Verifies newlines and tabs also act as separators.
         /// </summary>
         [Fact]
-        public void ParseWordLines_HashWithoutSpace_IsNotComment()
+        public void ParseWordsText_WhitespaceVariants_Split()
         {
-            var words = CasingListParser.ParseWordLines("#tag");
+            var words = CasingListParser.ParseWordsText("and\tor\nwith");
 
-            Assert.Equal(["#tag"], words);
+            Assert.Equal(["and", "or", "with"], words);
         }
 
         /// <summary>
-        /// Verifies empty or comment-only text yields an empty list.
+        /// Verifies empty text yields an empty list.
         /// </summary>
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
-        [InlineData("   \n  \n")]
-        [InlineData("// only")]
-        [InlineData("# comment")]
-        public void ParseWordLines_NoWords_ReturnsEmpty(string content)
+        public void ParseWordsText_Blank_ReturnsEmpty(string content)
         {
-            Assert.Empty(CasingListParser.ParseWordLines(content));
-        }
-
-        /// <summary>
-        /// Verifies a line containing a space is rejected with line number.
-        /// </summary>
-        [Fact]
-        public void ParseWordLines_LineWithMultipleWords_Throws()
-        {
-            var ex = Assert.Throws<UserException>(
-                () =>
-                    CasingListParser.ParseWordLines(
-                        """
-                        ok
-                        not ok
-                        """
-                    )
-            );
-            Assert.Contains("line 2", ex.Message, StringComparison.Ordinal);
-            Assert.Contains("exactly one word", ex.Message, StringComparison.Ordinal);
+            Assert.Empty(CasingListParser.ParseWordsText(content));
         }
 
         /// <summary>
@@ -110,14 +63,14 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
-        /// Verifies overly long lines are rejected when parsing editor text.
+        /// Verifies overly long words are rejected when parsing editor text.
         /// </summary>
         [Fact]
-        public void ParseWordLines_LineTooLong_Throws()
+        public void ParseWordsText_WordTooLong_Throws()
         {
             var longWord = new string('x', ConfigStore.Config.Filters.MaxListFileLineLength + 1);
 
-            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseWordLines(longWord));
+            var ex = Assert.Throws<UserException>(() => CasingListParser.ParseWordsText(longWord));
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
         }
     }

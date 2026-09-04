@@ -21,7 +21,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         }
 
         /// <summary>
-        /// Gets or sets the line-separated editor text for the casing list (one word per line).
+        /// Gets or sets the space-separated editor text for the casing list.
         /// </summary>
         [ObservableProperty]
         private string _wordsText = string.Empty;
@@ -45,7 +45,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
 
             LoadWithoutApplying(() =>
             {
-                WordsText = string.Join('\n', filter.Options.Words);
+                WordsText = string.Join(' ', filter.Options.Words);
                 UppercaseSentenceInitial = filter.Options.UppercaseSentenceInitial;
             });
         }

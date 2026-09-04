@@ -370,7 +370,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(string.Empty, editor.WordsText);
             Assert.True(editor.UppercaseSentenceInitial);
 
-            editor.WordsText = "and\nor\nRMX";
+            editor.WordsText = "and or RMX";
             editor.UppercaseSentenceInitial = false;
 
             var options = ((CasingListFilter)step.Filter).Options;

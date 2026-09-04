@@ -6,46 +6,33 @@ namespace Mfr.Filters.Case
     internal static class CasingListParser
     {
         /// <summary>
-        /// Parses editor / freeform text into a word list (one word per line).
+        /// Parses space-separated editor text into a word list.
         /// </summary>
-        /// <param name="wordsText">Line-separated words; blank lines and list-file comments are ignored.</param>
-        /// <returns>Canonical word spellings in order; empty when there are no non-comment words.</returns>
-        internal static IReadOnlyList<string> ParseWordLines(string wordsText)
+        /// <param name="wordsText">Whitespace-separated words.</param>
+        /// <returns>Canonical word spellings in order; empty when there are no words.</returns>
+        internal static IReadOnlyList<string> ParseWordsText(string wordsText)
         {
             if (string.IsNullOrWhiteSpace(wordsText))
             {
                 return [];
             }
 
-            var words = new List<string>();
-            var lines = wordsText.ReplaceLineEndings("\n").Split('\n');
-            var maxLineLen = ConfigStore.Config.Filters.MaxListFileLineLength;
-            for (var i = 0; i < lines.Length; i++)
+            var tokens = wordsText.Split(
+                (char[]?)null,
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+            );
+            var maxWordLen = ConfigStore.Config.Filters.MaxListFileLineLength;
+            for (var i = 0; i < tokens.Length; i++)
             {
-                var lineNumber = i + 1;
-                var rawLine = lines[i];
-                if (rawLine.Length > maxLineLen)
-                {
-                    throw new UserException($"Casing-list line {lineNumber} exceeds maximum length ({maxLineLen}).");
-                }
-
-                var trimmed = rawLine.Trim();
-                if (trimmed.Length == 0 || ListFileParseHelpers.IsListFileCommentLine(rawLine))
-                {
-                    continue;
-                }
-
-                if (trimmed.Contains(' '))
+                if (tokens[i].Length > maxWordLen)
                 {
                     throw new UserException(
-                        $"Invalid casing-list format at line {lineNumber}: line must contain exactly one word."
+                        $"Casing-list word {i + 1} exceeds maximum length ({maxWordLen})."
                     );
                 }
-
-                words.Add(trimmed);
             }
 
-            return words;
+            return tokens;
         }
 
         /// <summary>
@@ -58,7 +45,7 @@ namespace Mfr.Filters.Case
             ArgumentNullException.ThrowIfNull(words);
 
             var lowerWordToCasing = new Dictionary<string, string>(StringComparer.Ordinal);
-            var maxLineLen = ConfigStore.Config.Filters.MaxListFileLineLength;
+            var maxWordLen = ConfigStore.Config.Filters.MaxListFileLineLength;
             for (var i = 0; i < words.Count; i++)
             {
                 var word = words[i];
@@ -68,9 +55,9 @@ namespace Mfr.Filters.Case
                     throw new UserException($"Casing-list word {index} cannot be empty.");
                 }
 
-                if (word.Length > maxLineLen)
+                if (word.Length > maxWordLen)
                 {
-                    throw new UserException($"Casing-list word {index} exceeds maximum length ({maxLineLen}).");
+                    throw new UserException($"Casing-list word {index} exceeds maximum length ({maxWordLen}).");
                 }
 
                 if (word.Contains(' '))

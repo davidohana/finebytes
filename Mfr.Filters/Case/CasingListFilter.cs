@@ -17,13 +17,13 @@ namespace Mfr.Filters.Case
     public sealed record CasingListOptions(IReadOnlyList<string> Words, bool UppercaseSentenceInitial = false)
     {
         /// <summary>
-        /// Parses line-separated editor text into a word list (blank lines and list comments ignored).
+        /// Parses space-separated editor text into a word list.
         /// </summary>
-        /// <param name="wordsText">Freeform one-word-per-line text.</param>
+        /// <param name="wordsText">Whitespace-separated words.</param>
         /// <returns>Canonical word spellings in order.</returns>
         public static IReadOnlyList<string> ParseWordsText(string wordsText)
         {
-            return CasingListParser.ParseWordLines(wordsText);
+            return CasingListParser.ParseWordsText(wordsText);
         }
     }
 

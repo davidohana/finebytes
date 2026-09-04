@@ -1,8 +1,7 @@
 namespace Mfr.Filters
 {
     /// <summary>
-    /// Shared validation and comment rules for text list files loaded by filters (name list, replace list)
-    /// and for inline line-oriented list text (casing list).
+    /// Shared validation and comment rules for text list files loaded by filters (name list, replace list).
     /// </summary>
     internal static class ListFileParseHelpers
     {

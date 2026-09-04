@@ -7,7 +7,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
   d:DesignWidth="420"
-  d:DesignHeight="200"
+  d:DesignHeight="120"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Case.CasingListFilterEditorView"
   x:DataType="vm:CasingListFilterEditorViewModel"
 >
@@ -17,18 +17,19 @@
         <StackPanel Spacing="4">
           <ToolTip.Tip>
             <controls:RichToolTip>
-              <TextBlock Classes="rich-tip-title" Text="One word per line." />
+              <TextBlock Classes="rich-tip-title" Text="Space-separated words." />
               <TextBlock
                 Classes="rich-tip-body"
-                Text="Matched words take the exact casing from the list; unknown words are left unchanged. Blank lines and //, \\, or # comments are ignored."
+                Text="Matched words take the exact casing from the list; unknown words are left unchanged."
               />
             </controls:RichToolTip>
           </ToolTip.Tip>
-          <TextBlock Classes="filter-editor-label" Text="Words (one per line):" />
+          <TextBlock Classes="filter-editor-label" Text="Words:" />
           <TextBox
             x:Name="WordsBox"
-            MinHeight="88"
-            AcceptsReturn="True"
+            MinWidth="240"
+            MinHeight="22"
+            AcceptsReturn="False"
             TextWrapping="Wrap"
             FontFamily="{DynamicResource FileListFont}"
             FontSize="{DynamicResource FileListFontSize}"
@@ -38,7 +39,7 @@
             BorderThickness="1"
             CornerRadius="3"
             Padding="4,2"
-            Watermark="and&#x0a;or&#x0a;with&#x0a;RMX"
+            Watermark="and or with RMX"
             Text="{Binding WordsText}"
           />
         </StackPanel>

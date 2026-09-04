@@ -810,7 +810,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(string.Empty, words.Text);
             Assert.True(uppercase.IsChecked);
 
-            words.Text = "and\nor\nRMX";
+            words.Text = "and or RMX";
             uppercase.IsChecked = false;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

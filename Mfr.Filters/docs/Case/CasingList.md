@@ -13,7 +13,7 @@ Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceE
 
 ## Editor text format
 
-The Filter Configuration pane edits `words` as one-word-per-line text. Blank lines and `//`, `\\`, or `# ` comments are ignored when converting that text into the stored array. Each word is limited to 1000 characters (same cap as name-list / replace-list files). Spaces inside a word are invalid.
+The Filter Configuration pane edits `words` as **space-separated** text (e.g. `and or with RMX`). Each word is limited to 1000 characters (same cap as name-list / replace-list files).
 
 ## Examples
 
