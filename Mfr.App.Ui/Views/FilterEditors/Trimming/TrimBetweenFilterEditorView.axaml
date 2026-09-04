@@ -1,0 +1,63 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Trimming"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="160"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Trimming.TrimBetweenFilterEditorView"
+  x:DataType="vm:TrimBetweenFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="6">
+        <TextBlock Classes="filter-editor-label" Text="Remove characters:" />
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Between position" />
+          <controls:CompactNumericUpDown
+            x:Name="StartValueSpinner"
+            Width="64"
+            Minimum="1"
+            Maximum="1000"
+            Increment="1"
+            FormatString="0"
+            Value="{Binding StartValue}"
+          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="from the" />
+          <ComboBox
+            x:Name="StartAnchorCombo"
+            Classes="filter-editor-field"
+            Width="72"
+            ItemsSource="{Binding AnchorSides}"
+            SelectedItem="{Binding StartAnchor}"
+          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="side (incl.)" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="and position" />
+          <controls:CompactNumericUpDown
+            x:Name="EndValueSpinner"
+            Width="64"
+            Minimum="1"
+            Maximum="1000"
+            Increment="1"
+            FormatString="0"
+            Value="{Binding EndValue}"
+          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="from the" />
+          <ComboBox
+            x:Name="EndAnchorCombo"
+            Classes="filter-editor-field"
+            Width="72"
+            ItemsSource="{Binding AnchorSides}"
+            SelectedItem="{Binding EndAnchor}"
+          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="side (incl.)" />
+        </StackPanel>
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>

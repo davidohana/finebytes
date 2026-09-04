@@ -29,6 +29,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 LettersCaseFilter filter => new LettersCaseFilterEditorViewModel(step, filter),
                 ICountOptionsFilter => new CountFilterEditorViewModel(step),
                 ShrinkDuplicateCharactersFilter => new ShrinkDuplicateCharactersFilterEditorViewModel(step),
+                TrimBetweenFilter => new TrimBetweenFilterEditorViewModel(step),
                 _ => null,
             };
         }
