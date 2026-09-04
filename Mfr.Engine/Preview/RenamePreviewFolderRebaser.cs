@@ -39,7 +39,7 @@ namespace Mfr.Engine.Preview
         {
             ArgumentNullException.ThrowIfNull(items);
 
-            var folderRenames = _CollectFolderRenames(items);
+            var folderRenames = PreviewFolderPathChanges.Collect(items);
             if (folderRenames.Count == 0)
             {
                 return;
@@ -52,27 +52,6 @@ namespace Mfr.Engine.Preview
                 .Where(item => item.Status != RenameStatus.PreviewError)
                 .ToList()
                 .ForEach(item => _RebaseItemAgainstAncestors(item, folderRenames));
-        }
-
-        /// <summary>
-        /// Collects folder items that actually rename path in the current preview pass.
-        /// </summary>
-        /// <param name="items">All previewed rename items for the batch.</param>
-        /// <returns>
-        /// A list of directory items whose <see cref="RenameItem.Preview"/> full path differs from
-        /// <see cref="RenameItem.Original"/> by ordinal comparison.
-        /// </returns>
-        /// <remarks>
-        /// These items are used as ancestor rebase sources. Directory items without a path change are excluded.
-        /// </remarks>
-        private static List<RenameItem> _CollectFolderRenames(IReadOnlyList<RenameItem> items)
-        {
-            return
-            [
-                .. items
-                    .Where(item => item.Original.Attributes.IsDirectory())
-                    .Where(item => !item.IsPreviewPathUnchanged()),
-            ];
         }
 
         /// <summary>

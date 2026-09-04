@@ -128,7 +128,7 @@ namespace Mfr.Engine.Commit
                 return new CommitPlan(Steps: [], UnresolvableCycleItems: []);
             }
 
-            var folderRenames = _CollectFolderRenames(participants);
+            var folderRenames = PreviewFolderPathChanges.Collect(participants);
             var dependsOn = _BuildDependencyEdges(participants, folderRenames);
             var steps = new List<CommitStep>();
             var unresolvable = new List<RenameItem>();
@@ -281,23 +281,6 @@ namespace Mfr.Engine.Commit
                     dependsOn[descendant].Add(ancestor);
                 }
             }
-        }
-
-        /// <summary>
-        /// Folder items in this batch whose preview path differs from the original.
-        /// </summary>
-        private static List<RenameItem> _CollectFolderRenames(IReadOnlyList<RenameItem> participants)
-        {
-            var folderRenames = new List<RenameItem>();
-            foreach (var item in participants)
-            {
-                if (item.Original.Attributes.IsDirectory() && !item.IsPreviewPathUnchanged())
-                {
-                    folderRenames.Add(item);
-                }
-            }
-
-            return folderRenames;
         }
 
         private static RenameItem? _PickReadyItem(

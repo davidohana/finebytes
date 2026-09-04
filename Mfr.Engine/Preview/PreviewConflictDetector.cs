@@ -32,7 +32,7 @@ namespace Mfr.Engine.Preview
             }
 
             var movingSourcePaths = _BuildMovingSourceSet(candidateItems);
-            var folderRenameAncestors = _BuildFolderRenameList(candidateItems);
+            var folderRenameAncestors = PreviewFolderPathChanges.Collect(candidateItems);
             var duplicateDestinations = _BuildDuplicateDestinationSet(candidateItems);
             var originalPaths = candidateItems.Select(item => item.Original.FullPath).ToHashSet(PathComparers.Os);
 
@@ -108,16 +108,6 @@ namespace Mfr.Engine.Preview
                 .Where(item => !item.IsPreviewPathUnchanged())
                 .Select(item => item.Original.FullPath)
                 .ToHashSet(PathComparers.Os);
-        }
-
-        private static List<RenameItem> _BuildFolderRenameList(IReadOnlyList<RenameItem> candidateItems)
-        {
-            return
-            [
-                .. candidateItems.Where(item =>
-                    item.Original.Attributes.IsDirectory() && !item.IsPreviewPathUnchanged()
-                ),
-            ];
         }
 
         private static HashSet<string> _BuildDuplicateDestinationSet(IReadOnlyList<RenameItem> candidateItems)
