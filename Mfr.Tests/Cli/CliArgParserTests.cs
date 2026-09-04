@@ -6,6 +6,7 @@ namespace Mfr.Tests.Cli
     /// <summary>
     /// Tests command-line parsing behavior in <see cref="CliArgParser"/>.
     /// </summary>
+    [Collection(CliArgParserCollection.Name)]
     public class CliArgParserTests
     {
         [Fact]
