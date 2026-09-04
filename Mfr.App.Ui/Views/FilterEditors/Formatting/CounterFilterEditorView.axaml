@@ -9,7 +9,7 @@
   xmlns:formattingFilters="using:Mfr.Filters.Formatting"
   mc:Ignorable="d"
   d:DesignWidth="420"
-  d:DesignHeight="260"
+  d:DesignHeight="280"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Formatting.CounterFilterEditorView"
   x:DataType="vm:CounterFilterEditorViewModel"
 >
@@ -70,41 +70,49 @@
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
             <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="8" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
           <TextBlock
             Classes="filter-editor-label"
             VerticalAlignment="Center"
-            Text="Width (0 = none):"
-            ToolTip.Tip="Minimum digit count. 0 leaves numbers unpadded."
+            Text="Leading 0's mode:"
+            ToolTip.Tip="How counter values are padded with leading zeros."
           />
-          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
-            <controls:CompactNumericUpDown
-              x:Name="WidthSpinner"
-              Width="56"
-              Minimum="0"
-              Maximum="100"
-              Increment="1"
-              FormatString="0"
-              ToolTip.Tip="Minimum digit count. 0 leaves numbers unpadded."
-              Value="{Binding Width}"
-            />
-            <TextBlock
-              Classes="filter-editor-label"
-              VerticalAlignment="Center"
-              Text="Pad with:"
-              ToolTip.Tip="Left-pad character when Width is greater than 0. A space pads with spaces."
-            />
-            <TextBox
-              x:Name="PadCharBox"
-              Classes="filter-editor-field"
-              Width="36"
-              MaxLength="1"
-              VerticalAlignment="Center"
-              ToolTip.Tip="Left-pad character when Width is greater than 0. A space pads with spaces."
-              Text="{Binding PadCharText}"
-            />
-          </StackPanel>
+          <ComboBox
+            x:Name="LeadingZerosModeCombo"
+            Grid.Column="2"
+            Classes="filter-editor-field"
+            Width="100"
+            HorizontalAlignment="Left"
+            ItemsSource="{Binding LeadingZerosModes}"
+            SelectedItem="{Binding LeadingZerosMode}"
+            ToolTip.Tip="None: no padding. Automatic: one width for the whole list (or folder). Custom: pad to Total length."
+          />
+          <TextBlock
+            Grid.Column="4"
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="Total length:"
+            IsVisible="{Binding HasCustomLength}"
+            ToolTip.Tip="Minimum digit count when Leading 0's mode is Custom."
+          />
+          <controls:CompactNumericUpDown
+            x:Name="CustomLengthSpinner"
+            Grid.Column="6"
+            Width="56"
+            HorizontalAlignment="Left"
+            Minimum="1"
+            Maximum="100"
+            Increment="1"
+            FormatString="0"
+            IsVisible="{Binding HasCustomLength}"
+            ToolTip.Tip="Minimum digit count when Leading 0's mode is Custom."
+            Value="{Binding CustomLength}"
+          />
         </Grid>
         <controls:CompactCheckBox
           x:Name="ResetPerFolderCheckBox"

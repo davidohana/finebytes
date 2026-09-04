@@ -20,7 +20,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 new CounterOptions(
                     Start: 1,
                     Step: 1,
-                    Width: 3,
+                    LeadingZerosMode: CounterLeadingZerosMode.Custom,
+                    CustomLength: 3,
                     PadChar: "0",
                     Position: CounterPosition.Replace,
                     Separator: "",
@@ -41,7 +42,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 new CounterOptions(
                     Start: 0,
                     Step: 1,
-                    Width: 0,
+                    LeadingZerosMode: CounterLeadingZerosMode.None,
+                    CustomLength: 2,
                     PadChar: "0",
                     Position: CounterPosition.Prepend,
                     Separator: "_",
@@ -62,7 +64,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 new CounterOptions(
                     Start: 0,
                     Step: 1,
-                    Width: 0,
+                    LeadingZerosMode: CounterLeadingZerosMode.None,
+                    CustomLength: 2,
                     PadChar: "0",
                     Position: CounterPosition.Append,
                     Separator: "-",
@@ -83,7 +86,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 new CounterOptions(
                     Start: 10,
                     Step: 5,
-                    Width: 0,
+                    LeadingZerosMode: CounterLeadingZerosMode.None,
+                    CustomLength: 2,
                     PadChar: "0",
                     Position: CounterPosition.Replace,
                     Separator: "",
@@ -104,7 +108,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 new CounterOptions(
                     Start: 7,
                     Step: 1,
-                    Width: 4,
+                    LeadingZerosMode: CounterLeadingZerosMode.Custom,
+                    CustomLength: 4,
                     PadChar: "1",
                     Position: CounterPosition.Replace,
                     Separator: "",
@@ -112,6 +117,46 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 )
             );
             Assert.Equal("   7", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
+        }
+
+        /// <summary>
+        /// Verifies automatic padding uses rename-list total count.
+        /// </summary>
+        [Fact]
+        public void Apply_Automatic_PadsToListWidth()
+        {
+            var f = new CounterFilter(
+                _target,
+                new CounterOptions(
+                    Start: 1,
+                    Step: 1,
+                    LeadingZerosMode: CounterLeadingZerosMode.Automatic,
+                    CustomLength: 2,
+                    PadChar: "0",
+                    Position: CounterPosition.Replace,
+                    Separator: "",
+                    ResetPerFolder: false
+                )
+            );
+
+            // List of 100 → indices 0..99 → values 1..100 → width 3
+            var first = FilterTestHelpers.CreateRenameItem(
+                prefix: "x",
+                renameListIndex: 0,
+                renameListTotalCount: 100
+            );
+            f.Setup();
+            f.Apply(first);
+            Assert.Equal("001", first.Preview.Prefix);
+
+            var last = FilterTestHelpers.CreateRenameItem(
+                prefix: "x",
+                renameListIndex: 99,
+                renameListTotalCount: 100
+            );
+            f.Setup();
+            f.Apply(last);
+            Assert.Equal("100", last.Preview.Prefix);
         }
     }
 }

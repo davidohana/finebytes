@@ -294,8 +294,9 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             Assert.Equal(1, editor.Start);
             Assert.Equal(1, editor.Increment);
-            Assert.Equal(0, editor.Width);
-            Assert.Equal("0", editor.PadCharText);
+            Assert.Equal(CounterLeadingZerosMode.None, editor.LeadingZerosMode);
+            Assert.Equal(2, editor.CustomLength);
+            Assert.False(editor.HasCustomLength);
             Assert.Equal(CounterPosition.Prepend, editor.Position);
             Assert.Equal(" - ", editor.Separator);
             Assert.True(editor.ResetPerFolder);
@@ -303,30 +304,32 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             editor.Start = 10;
             editor.Increment = 5;
-            editor.Width = 3;
-            editor.PadCharText = " ";
+            editor.LeadingZerosMode = CounterLeadingZerosMode.Custom;
+            editor.CustomLength = 3;
             editor.Position = CounterPosition.Replace;
             editor.Separator = "_";
             editor.ResetPerFolder = false;
 
+            Assert.True(editor.HasCustomLength);
             Assert.False(editor.HasSeparatorOptions);
 
             var options = ((CounterFilter)step.Filter).Options;
             Assert.Equal(10, options.Start);
             Assert.Equal(5, options.Step);
-            Assert.Equal(3, options.Width);
-            Assert.Equal("1", options.PadChar);
+            Assert.Equal(CounterLeadingZerosMode.Custom, options.LeadingZerosMode);
+            Assert.Equal(3, options.CustomLength);
             Assert.Equal(CounterPosition.Replace, options.Position);
             Assert.Equal("_", options.Separator);
             Assert.False(options.ResetPerFolder);
 
             editor.Position = CounterPosition.Append;
-            editor.PadCharText = "X";
+            editor.LeadingZerosMode = CounterLeadingZerosMode.Automatic;
 
             options = ((CounterFilter)step.Filter).Options;
             Assert.Equal(CounterPosition.Append, options.Position);
-            Assert.Equal("X", options.PadChar);
+            Assert.Equal(CounterLeadingZerosMode.Automatic, options.LeadingZerosMode);
             Assert.True(editor.HasSeparatorOptions);
+            Assert.False(editor.HasCustomLength);
         }
 
         /// <summary>

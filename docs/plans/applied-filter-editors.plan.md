@@ -219,7 +219,7 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 | **7 (done)**  | Sentence End Characters         | Case       | single                                             | char list; later shared `CharacterList` editor with Capitalize After        |
 | **8 (done)**  | Strip Parentheses               | Misc       | single                                             | pair type + remove contents                                                 |
 | **9 (done)**  | Cleaner                         | Replace    | single                                             | illegal + custom + replacement                                              |
-| **10 (done)** | Counter                         | Formatting | single                                             | start / step / width / pad / position / separator / reset-per-folder        |
+| **10 (done)** | Counter                         | Formatting | single                                             | start / step / leading-zeros mode (None/Automatic/Custom) / position / separator / reset-per-folder |
 | **11 (done)** | Inserter                        | Formatting | single                                             | text + position                                                             |
 | **12 (next)** | Casing List                     | Case       | single                                             | file path + sentence-initial                                                |
 | 13            | Replace List                    | Replace    | single                                             | file path + mode/options                                                    |

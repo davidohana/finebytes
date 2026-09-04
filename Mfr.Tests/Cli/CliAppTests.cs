@@ -69,7 +69,8 @@ namespace Mfr.Tests.Cli
                         Options: new CounterOptions(
                             Start: 1,
                             Step: 1,
-                            Width: 3,
+                            LeadingZerosMode: CounterLeadingZerosMode.Custom,
+                            CustomLength: 3,
                             PadChar: "0",
                             Position: CounterPosition.Replace,
                             Separator: " - ",

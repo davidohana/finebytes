@@ -20,6 +20,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
         }
 
         /// <summary>
+        /// Gets the Leading 0's mode choices (MFR7 labels).
+        /// </summary>
+        public IReadOnlyList<CounterLeadingZerosMode> LeadingZerosModes { get; } =
+            [CounterLeadingZerosMode.None, CounterLeadingZerosMode.Automatic, CounterLeadingZerosMode.Custom];
+
+        /// <summary>
         /// Gets or sets the counter start value (index 0).
         /// </summary>
         [ObservableProperty]
@@ -32,16 +38,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
         private decimal _increment = 1;
 
         /// <summary>
-        /// Gets or sets the minimum padded width (<c>0</c> = no padding).
+        /// Gets or sets the leading-zero padding mode.
         /// </summary>
         [ObservableProperty]
-        private decimal _width;
+        private CounterLeadingZerosMode _leadingZerosMode = CounterLeadingZerosMode.None;
 
         /// <summary>
-        /// Gets or sets the pad character shown in the editor (space stored as options <c>"1"</c>).
+        /// Gets or sets the digit width when mode is Custom.
         /// </summary>
         [ObservableProperty]
-        private string _padCharText = "0";
+        private decimal _customLength = 2;
 
         /// <summary>
         /// Gets or sets where the formatted counter is placed relative to the segment.
@@ -62,6 +68,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
         private bool _resetPerFolder = true;
 
         /// <summary>
+        /// Gets whether the custom length spinner is shown.
+        /// </summary>
+        public bool HasCustomLength => LeadingZerosMode == CounterLeadingZerosMode.Custom;
+
+        /// <summary>
         /// Gets whether separator editing applies (prepend/append).
         /// </summary>
         public bool HasSeparatorOptions => Position is CounterPosition.Prepend or CounterPosition.Append;
@@ -70,9 +81,13 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
 
         partial void OnIncrementChanged(decimal value) => _ApplyOptions();
 
-        partial void OnWidthChanged(decimal value) => _ApplyOptions();
+        partial void OnLeadingZerosModeChanged(CounterLeadingZerosMode value)
+        {
+            OnPropertyChanged(nameof(HasCustomLength));
+            _ApplyOptions();
+        }
 
-        partial void OnPadCharTextChanged(string value) => _ApplyOptions();
+        partial void OnCustomLengthChanged(decimal value) => _ApplyOptions();
 
         partial void OnPositionChanged(CounterPosition value)
         {
@@ -95,8 +110,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
             {
                 Start = filter.Options.Start;
                 Increment = filter.Options.Step;
-                Width = filter.Options.Width;
-                PadCharText = _PadCharToUi(filter.Options.PadChar);
+                LeadingZerosMode = filter.Options.LeadingZerosMode;
+                CustomLength = Math.Max(filter.Options.CustomLength, 1);
                 Position = filter.Options.Position;
                 Separator = filter.Options.Separator ?? string.Empty;
                 ResetPerFolder = filter.Options.ResetPerFolder;
@@ -113,49 +128,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
             var options = new CounterOptions(
                 Start: ClampToInt(Start, -999999, 999999),
                 Step: ClampToInt(Increment, -99999, 99999),
-                Width: ClampToInt(Width, 0, 100),
-                PadChar: _PadCharFromUi(PadCharText),
+                LeadingZerosMode: LeadingZerosMode,
+                CustomLength: ClampToInt(CustomLength, 1, 100),
+                PadChar: filter.Options.PadChar ?? "0",
                 Position: Position,
                 Separator: Separator ?? string.Empty,
                 ResetPerFolder: ResetPerFolder
             );
             ApplyIfChanged(filter, filter with { Options = options });
-        }
-
-        private static string _PadCharToUi(string? padChar)
-        {
-            if (string.IsNullOrEmpty(padChar) || padChar == "0")
-            {
-                return "0";
-            }
-
-            if (padChar == "1")
-            {
-                return " ";
-            }
-
-            return padChar[0].ToString();
-        }
-
-        private static string _PadCharFromUi(string? text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return "0";
-            }
-
-            var c = text[0];
-            if (c == ' ')
-            {
-                return "1";
-            }
-
-            if (c == '0')
-            {
-                return "0";
-            }
-
-            return c.ToString();
         }
     }
 }
