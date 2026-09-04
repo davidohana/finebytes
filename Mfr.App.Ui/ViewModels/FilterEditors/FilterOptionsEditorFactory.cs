@@ -1,11 +1,13 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
+using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters;
 using Mfr.Filters.Case;
+using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
@@ -39,6 +41,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 FixLeadingZerosFilter => new FixLeadingZerosFilterEditorViewModel(step),
                 StripParenthesesFilter => new StripParenthesesFilterEditorViewModel(step),
                 CleanerFilter => new CleanerFilterEditorViewModel(step),
+                CounterFilter => new CounterFilterEditorViewModel(step),
                 _ => null,
             };
         }

@@ -1,11 +1,13 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
+using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters.Case;
+using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
@@ -279,6 +281,52 @@ namespace Mfr.Tests.Ui.FilterEditors
             options = ((CleanerFilter)step.Filter).Options;
             Assert.Equal(string.Empty, options.Replacement);
             Assert.Equal("_", editor.Replacement);
+        }
+
+        /// <summary>
+        /// Verifies Counter option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Counter_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Counter", new CounterFilter());
+            var editor = new CounterFilterEditorViewModel(step);
+
+            Assert.Equal(1, editor.Start);
+            Assert.Equal(1, editor.Increment);
+            Assert.Equal(0, editor.Width);
+            Assert.Equal("0", editor.PadCharText);
+            Assert.Equal(CounterPosition.Prepend, editor.Position);
+            Assert.Equal(" - ", editor.Separator);
+            Assert.True(editor.ResetPerFolder);
+            Assert.True(editor.HasSeparatorOptions);
+
+            editor.Start = 10;
+            editor.Increment = 5;
+            editor.Width = 3;
+            editor.PadCharText = " ";
+            editor.Position = CounterPosition.Replace;
+            editor.Separator = "_";
+            editor.ResetPerFolder = false;
+
+            Assert.False(editor.HasSeparatorOptions);
+
+            var options = ((CounterFilter)step.Filter).Options;
+            Assert.Equal(10, options.Start);
+            Assert.Equal(5, options.Step);
+            Assert.Equal(3, options.Width);
+            Assert.Equal("1", options.PadChar);
+            Assert.Equal(CounterPosition.Replace, options.Position);
+            Assert.Equal("_", options.Separator);
+            Assert.False(options.ResetPerFolder);
+
+            editor.Position = CounterPosition.Append;
+            editor.PadCharText = "X";
+
+            options = ((CounterFilter)step.Filter).Options;
+            Assert.Equal(CounterPosition.Append, options.Position);
+            Assert.Equal("X", options.PadChar);
+            Assert.True(editor.HasSeparatorOptions);
         }
     }
 }

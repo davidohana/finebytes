@@ -1,0 +1,131 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Formatting"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:formattingFilters="using:Mfr.Filters.Formatting"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="260"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Formatting.CounterFilterEditorView"
+  x:DataType="vm:CounterFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="6">
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          ToolTip.Tip="Counter value for the first file (index 0). Later files use Initial + Increment × index."
+        >
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Initial value:" />
+          <controls:CompactNumericUpDown
+            x:Name="StartSpinner"
+            Width="72"
+            Minimum="-999999"
+            Maximum="999999"
+            Increment="1"
+            FormatString="0"
+            Value="{Binding Start}"
+          />
+        </StackPanel>
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          ToolTip.Tip="Amount added for each next file. May be negative."
+        >
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Increment by:" />
+          <controls:CompactNumericUpDown
+            x:Name="IncrementSpinner"
+            Width="72"
+            Minimum="-99999"
+            Maximum="99999"
+            Increment="1"
+            FormatString="0"
+            Value="{Binding Increment}"
+          />
+        </StackPanel>
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          ToolTip.Tip="Minimum digit width. 0 leaves the number unpadded. Shorter values are left-padded with the pad character."
+        >
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Width (0 = none):" />
+          <controls:CompactNumericUpDown
+            x:Name="WidthSpinner"
+            Width="56"
+            Minimum="0"
+            Maximum="100"
+            Increment="1"
+            FormatString="0"
+            Value="{Binding Width}"
+          />
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Pad with:" />
+          <TextBox
+            x:Name="PadCharBox"
+            Classes="filter-editor-field"
+            Width="36"
+            MaxLength="1"
+            VerticalAlignment="Center"
+            ToolTip.Tip="Character used for left-padding when Width is greater than 0. Default is 0. A space pads with spaces."
+            Text="{Binding PadCharText}"
+          />
+        </StackPanel>
+        <StackPanel
+          Spacing="4"
+          ToolTip.Tip="Prepend or append places the counter before/after the current segment with the separator. Replace discards the segment and keeps only the counter."
+        >
+          <TextBlock Classes="filter-editor-label" Text="Position:" />
+          <WrapPanel Orientation="Horizontal">
+            <controls:CompactRadioButton
+              x:Name="PrependRadio"
+              Margin="0,0,16,4"
+              GroupName="CounterPosition"
+              Content="Prepend"
+              IsChecked="{Binding Position, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:CounterPosition.Prepend}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="AppendRadio"
+              Margin="0,0,16,4"
+              GroupName="CounterPosition"
+              Content="Append"
+              IsChecked="{Binding Position, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:CounterPosition.Append}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="ReplaceRadio"
+              Margin="0,0,0,4"
+              GroupName="CounterPosition"
+              Content="Replace"
+              IsChecked="{Binding Position, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:CounterPosition.Replace}, Mode=TwoWay}"
+            />
+          </WrapPanel>
+        </StackPanel>
+        <StackPanel
+          Orientation="Horizontal"
+          Spacing="4"
+          IsVisible="{Binding HasSeparatorOptions}"
+          ToolTip.Tip="Text inserted between the counter and the original segment when prepending or appending."
+        >
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Separator:" />
+          <TextBox
+            x:Name="SeparatorBox"
+            Classes="filter-editor-field"
+            MinWidth="120"
+            MaxLength="100"
+            VerticalAlignment="Center"
+            Text="{Binding Separator}"
+          />
+        </StackPanel>
+        <controls:CompactCheckBox
+          x:Name="ResetPerFolderCheckBox"
+          Content="Reset counter when folder changes"
+          ToolTip.Tip="When checked, numbering uses each file’s index within its folder. When unchecked, numbering uses the global Rename List index."
+          IsChecked="{Binding ResetPerFolder}"
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>
