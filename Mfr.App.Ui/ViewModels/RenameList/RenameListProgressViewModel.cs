@@ -254,6 +254,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 _cts = null;
             }
 
+            // Let the progress dialog Close continuation run before callers refresh the grid.
+            await Task.Yield();
+
             return !canceled;
         }
 

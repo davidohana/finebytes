@@ -344,6 +344,35 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies a preview pass raises one list-level field-display revision, not a per-row notify storm.
+        /// </summary>
+        [Fact]
+        public async Task Preview_bumps_field_display_revision_once()
+        {
+            var dir = _context.CreateTempDir();
+            var paths = new List<string>();
+            for (var i = 0; i < 8; i++)
+            {
+                var path = Path.Combine(dir, $"f{i}.txt");
+                File.WriteAllText(path, "x");
+                paths.Add(path);
+            }
+
+            var renameList = _context.CreateRenameListViewModel(dir);
+            await renameList.AddPathsAsync(paths).ConfigureAwait(true);
+            var revisionBefore = renameList.FieldDisplayRevision;
+
+            renameList.Preview(
+                new FilterChain
+                {
+                    Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
+                }
+            );
+
+            Assert.Equal(revisionBefore + 1, renameList.FieldDisplayRevision);
+        }
+
+        /// <summary>
         /// Verifies canceling an in-progress preview disables Auto-Preview (MFR7).
         /// </summary>
         [Fact]

@@ -331,11 +331,6 @@ namespace Mfr.App.Ui.ViewModels
             finally
             {
                 _previewRunning = false;
-                if (_previewDirty && RenameListViewModel.IsAutoPreview && !RenameListViewModel.IsBusy)
-                {
-                    _previewDrainTask = _DrainPreviewAsync();
-                    await _previewDrainTask.ConfigureAwait(true);
-                }
             }
         }
 

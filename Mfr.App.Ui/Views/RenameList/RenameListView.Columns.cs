@@ -98,7 +98,9 @@ namespace Mfr.App.Ui.Views.RenameList
                 MinWidth = width,
                 MaxWidth = width,
                 Header = string.Empty,
-                CellTemplate = new FuncDataTemplate<RenameListEntry>((_, _) => RenameListRowErrorGlyph.Create()),
+                CellTemplate = new FuncDataTemplate<RenameListEntry>(
+                    (_, _) => RenameListRowErrorGlyph.Create(_viewModel)
+                ),
             };
             RenameListGridColumns.MarkAsRowStatusColumn(column);
             return column;
@@ -149,10 +151,15 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <summary>
         /// Builds one field cell and re-applies text when the row recycles or field values change.
         /// </summary>
-        private static TextBlock _CreateFieldCell(RenameListEntry? entry, RenameListFieldKey key)
+        private TextBlock _CreateFieldCell(RenameListEntry? entry, RenameListFieldKey key)
         {
             var textBlock = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
             RenameListEntry? subscribed = null;
+
+            void ApplyCurrent()
+            {
+                _ApplyFieldCell(textBlock, textBlock.DataContext as RenameListEntry ?? entry, key);
+            }
 
             void OnEntryPropertyChanged(object? sender, PropertyChangedEventArgs e)
             {
@@ -161,10 +168,17 @@ namespace Mfr.App.Ui.Views.RenameList
                     return;
                 }
 
-                if (textBlock.DataContext is RenameListEntry current)
+                ApplyCurrent();
+            }
+
+            void OnListPropertyChanged(object? sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName is not (nameof(RenameListViewModel.FieldDisplayRevision) or null or ""))
                 {
-                    _ApplyFieldCell(textBlock, current, key);
+                    return;
                 }
+
+                ApplyCurrent();
             }
 
             void OnDataContextChanged(object? sender, EventArgs e)
@@ -172,11 +186,13 @@ namespace Mfr.App.Ui.Views.RenameList
                 subscribed?.PropertyChanged -= OnEntryPropertyChanged;
                 subscribed = textBlock.DataContext as RenameListEntry;
                 subscribed?.PropertyChanged += OnEntryPropertyChanged;
-                _ApplyFieldCell(textBlock, subscribed, key);
+                ApplyCurrent();
             }
 
             textBlock.DataContextChanged += OnDataContextChanged;
-            _ApplyFieldCell(textBlock, entry, key);
+            _viewModel?.PropertyChanged += OnListPropertyChanged;
+
+            ApplyCurrent();
             return textBlock;
         }
 

@@ -175,6 +175,28 @@ namespace Mfr.Tests.Engine
             Assert.Equal(newInner.CombinePath("track.txt"), thirdStep.ActualSourcePath);
         }
 
+        /// <summary>
+        /// Verifies a large set of independent renames is planned without an all-pairs scan.
+        /// </summary>
+        [Fact]
+        public void Build_many_independent_renames_emits_one_finalize_each()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var items = new List<RenameItem>(2000);
+            for (var i = 0; i < 2000; i++)
+            {
+                var item = _CreateFileItem(dir, $"f{i:D4}.txt");
+                _RetargetPreview(item, dir, $"g{i:D4}.txt");
+                items.Add(item);
+            }
+
+            var plan = CommitPlanner.Build(items);
+
+            Assert.Equal(2000, plan.Steps.Count);
+            Assert.Empty(plan.UnresolvableCycleItems);
+            Assert.All(plan.Steps, step => Assert.IsType<FinalizeStep>(step));
+        }
+
         private static RenameItem _CreateFileItem(string directoryPath, string fileName)
         {
             var meta = new FileMeta(

@@ -1,4 +1,5 @@
 using Serilog;
+using Serilog.Events;
 
 namespace Mfr.Engine.Preview
 {
@@ -13,7 +14,7 @@ namespace Mfr.Engine.Preview
         /// <param name="renameItem">The previewed item to inspect.</param>
         internal static void LogPreviewChangeDetail(this RenameItem renameItem)
         {
-            if (!renameItem.HasPreviewChanges())
+            if (!Log.IsEnabled(LogEventLevel.Debug) || !renameItem.HasPreviewChanges())
             {
                 return;
             }

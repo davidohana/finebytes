@@ -119,6 +119,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool IsBusy => Progress.IsBusy;
 
         /// <summary>
+        /// Signal that catalog field text, load-error styling, or row-error glyphs may have changed.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Grid cells listen for this instead of a per-row <see cref="RenameListEntry.NotifyFieldsChanged"/>
+        /// loop, so a preview of tens of thousands of items does not stall the UI (and freeze the progress
+        /// dialog) with one PropertyChanged per row.
+        /// </para>
+        /// </remarks>
+        [ObservableProperty]
+        private int _fieldDisplayRevision;
+
+        /// <summary>
         /// Gets whether Auto-Sort is active (one or more sort keys).
         /// </summary>
         public bool IsAutoSort => _sortKeys.Count > 0;
@@ -276,11 +289,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            foreach (var entry in Entries)
-            {
-                entry.NotifyFieldsChanged();
-                entry.NotifyRowErrorChanged();
-            }
+            FieldDisplayRevision++;
             _NotifyShowLoadErrorsChanged();
         }
 

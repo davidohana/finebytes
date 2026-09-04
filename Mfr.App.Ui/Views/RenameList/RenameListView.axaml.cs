@@ -945,6 +945,11 @@ namespace Mfr.App.Ui.Views.RenameList
                     _progressDialog = null;
                 }
             }
+
+            if (_viewModel.Progress.IsDialogVisible)
+            {
+                await _SyncProgressDialogAsync().ConfigureAwait(true);
+            }
         }
 
         private void _SyncSelectionToGrid()

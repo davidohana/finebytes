@@ -1,6 +1,7 @@
 using Mfr.Filters;
 using Mfr.Utils;
 using Serilog;
+using Serilog.Events;
 
 namespace Mfr.Engine.RenameList
 {
@@ -566,13 +567,18 @@ namespace Mfr.Engine.RenameList
 
             _PopulateRenameListCounterContext();
 
-            foreach (var item in _renameItems)
-            {
-                item.ResetState();
-            }
-
             var tracker = new RenameListProgressTracker(progress, cancellationToken);
             tracker.BeginMetadataPhase(_renameItems.Count);
+
+            foreach (var item in _renameItems)
+            {
+                if (tracker.IsCanceled)
+                {
+                    break;
+                }
+
+                item.ResetState();
+            }
 
             foreach (var renameItem in _renameItems)
             {
@@ -611,9 +617,12 @@ namespace Mfr.Engine.RenameList
                 );
             }
 
-            foreach (var renameItem in _renameItems)
+            if (Log.IsEnabled(LogEventLevel.Debug))
             {
-                renameItem.LogPreviewChangeDetail();
+                foreach (var renameItem in _renameItems)
+                {
+                    renameItem.LogPreviewChangeDetail();
+                }
             }
 
             tracker.ReportFinal();

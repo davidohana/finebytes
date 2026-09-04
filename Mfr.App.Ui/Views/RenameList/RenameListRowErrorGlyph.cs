@@ -26,8 +26,12 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <summary>
         /// Builds a centered red exclamation mark for the status column.
         /// </summary>
+        /// <param name="listViewModel">
+        /// Host list; when set, visibility refreshes from <see cref="RenameListViewModel.FieldDisplayRevision"/>
+        /// instead of a per-row <see cref="RenameListEntry.HasRowError"/> notification.
+        /// </param>
         /// <returns>Styled row-error mark control.</returns>
-        public static Control Create()
+        public static Control Create(RenameListViewModel? listViewModel = null)
         {
             var mark = new ShapePath
             {
@@ -39,10 +43,31 @@ namespace Mfr.App.Ui.Views.RenameList
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-            mark.Bind(
-                Visual.IsVisibleProperty,
-                new Binding(nameof(RenameListEntry.HasRowError)) { FallbackValue = false, TargetNullValue = false }
-            );
+            if (listViewModel is null)
+            {
+                mark.Bind(
+                    Visual.IsVisibleProperty,
+                    new Binding(nameof(RenameListEntry.HasRowError)) { FallbackValue = false, TargetNullValue = false }
+                );
+            }
+            else
+            {
+                void ApplyVisibility()
+                {
+                    mark.IsVisible = mark.DataContext is RenameListEntry { HasRowError: true };
+                }
+
+                mark.DataContextChanged += (_, _) => ApplyVisibility();
+                listViewModel.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName is nameof(RenameListViewModel.FieldDisplayRevision) or null or "")
+                    {
+                        ApplyVisibility();
+                    }
+                };
+                ApplyVisibility();
+            }
+
             ToolTip.SetTip(
                 mark,
                 new ToolTip

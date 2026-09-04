@@ -34,6 +34,7 @@ namespace Mfr.Engine.Preview
             var movingSourcePaths = _BuildMovingSourceSet(candidateItems);
             var folderRenameAncestors = _BuildFolderRenameList(candidateItems);
             var duplicateDestinations = _BuildDuplicateDestinationSet(candidateItems);
+            var originalPaths = candidateItems.Select(item => item.Original.FullPath).ToHashSet(PathComparers.Os);
 
             foreach (var item in candidateItems)
             {
@@ -73,16 +74,32 @@ namespace Mfr.Engine.Preview
                     continue;
                 }
 
-                var destinationOccupiedOnDisk = Directory.Exists(destinationPath) || File.Exists(destinationPath);
+                var destinationOccupiedOnDisk = _DestinationOccupied(
+                    destinationPath: destinationPath,
+                    originalPaths: originalPaths
+                );
                 if (destinationOccupiedOnDisk)
                 {
                     item.SetPreviewError(
                         message: $"Destination '{destinationPath}' is already in use (not vacated by another rename item in this batch).",
                         cause: null
                     );
-                    continue;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns whether <paramref name="destinationPath"/> is already used, preferring in-list
+        /// original paths so preview does not call <see cref="File.Exists"/> once per row.
+        /// </summary>
+        private static bool _DestinationOccupied(string destinationPath, HashSet<string> originalPaths)
+        {
+            if (originalPaths.Contains(destinationPath))
+            {
+                return true;
+            }
+
+            return Directory.Exists(destinationPath) || File.Exists(destinationPath);
         }
 
         private static HashSet<string> _BuildMovingSourceSet(IReadOnlyList<RenameItem> candidateItems)

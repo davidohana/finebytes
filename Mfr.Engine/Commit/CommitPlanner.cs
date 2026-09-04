@@ -128,7 +128,8 @@ namespace Mfr.Engine.Commit
                 return new CommitPlan(Steps: [], UnresolvableCycleItems: []);
             }
 
-            var dependsOn = _BuildDependencyEdges(participants);
+            var folderRenames = _CollectFolderRenames(participants);
+            var dependsOn = _BuildDependencyEdges(participants, folderRenames);
             var steps = new List<CommitStep>();
             var unresolvable = new List<RenameItem>();
             var remaining = new HashSet<RenameItem>(participants);
@@ -141,7 +142,7 @@ namespace Mfr.Engine.Commit
                 {
                     var actualSourcePath = _ResolveActualSourcePath(
                         item: readyItem,
-                        participants: participants,
+                        folderRenames: folderRenames,
                         stashedTempPaths: stashedTempPaths
                     );
                     steps.Add(new FinalizeStep(readyItem, actualSourcePath));
@@ -152,7 +153,7 @@ namespace Mfr.Engine.Commit
                 var cycleHandled = _TryHandleCycle(
                     remaining: remaining,
                     dependsOn: dependsOn,
-                    participants: participants,
+                    folderRenames: folderRenames,
                     stashedTempPaths: stashedTempPaths,
                     steps: steps,
                     unresolvable: unresolvable
@@ -172,6 +173,7 @@ namespace Mfr.Engine.Commit
         /// <c>item → set of items that must commit before it</c>.
         /// </summary>
         /// <param name="participants">All items that will be committed in this batch.</param>
+        /// <param name="folderRenames">Directory participants whose preview path changed.</param>
         /// <returns>
         /// A dictionary keyed by every participant; the value is the set of other participants
         /// whose commit must precede this item's commit.
@@ -188,9 +190,14 @@ namespace Mfr.Engine.Commit
         /// <b>Path-shift:</b> if <c>subject.Preview.FullPath</c> equals <c>other.Original.FullPath</c>,
         /// then <c>other</c> must vacate that path before <c>subject</c> can claim it.
         /// </para>
+        /// <para>
+        /// Edges are built with original-path lookup and a renamed-folder pass, not an all-pairs scan,
+        /// so preview of tens of thousands of independent file renames stays linear.
+        /// </para>
         /// </remarks>
         private static Dictionary<RenameItem, HashSet<RenameItem>> _BuildDependencyEdges(
-            IReadOnlyList<RenameItem> participants
+            IReadOnlyList<RenameItem> participants,
+            IReadOnlyList<RenameItem> folderRenames
         )
         {
             var dependsOn = new Dictionary<RenameItem, HashSet<RenameItem>>(ReferenceEqualityComparer.Instance);
@@ -199,73 +206,103 @@ namespace Mfr.Engine.Commit
                 dependsOn[item] = new HashSet<RenameItem>(ReferenceEqualityComparer.Instance);
             }
 
+            _AddPathShiftEdges(participants, dependsOn);
+            _AddContainmentEdges(participants, folderRenames, dependsOn);
+            return dependsOn;
+        }
+
+        /// <summary>
+        /// Adds path-shift edges via original-path lookup (O(n)), not an all-pairs scan.
+        /// </summary>
+        private static void _AddPathShiftEdges(
+            IReadOnlyList<RenameItem> participants,
+            Dictionary<RenameItem, HashSet<RenameItem>> dependsOn
+        )
+        {
+            var originalPathToItem = new Dictionary<string, RenameItem>(PathComparers.Os);
+            foreach (var item in participants)
+            {
+                originalPathToItem.TryAdd(item.Original.FullPath, item);
+            }
+
             foreach (var subject in participants)
             {
-                foreach (var other in participants)
+                if (!_ItemPathChanges(subject))
                 {
-                    if (ReferenceEquals(subject, other))
+                    continue;
+                }
+
+                if (
+                    !originalPathToItem.TryGetValue(subject.Preview.FullPath, out var other)
+                    || ReferenceEquals(subject, other)
+                    || !_ItemPathChanges(other)
+                )
+                {
+                    continue;
+                }
+
+                dependsOn[subject].Add(other);
+            }
+        }
+
+        /// <summary>
+        /// Adds folder-before-descendant edges by walking renamed folders against the list, not n² pairs.
+        /// </summary>
+        private static void _AddContainmentEdges(
+            IReadOnlyList<RenameItem> participants,
+            IReadOnlyList<RenameItem> folderRenames,
+            Dictionary<RenameItem, HashSet<RenameItem>> dependsOn
+        )
+        {
+            if (folderRenames.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var ancestor in folderRenames)
+            {
+                foreach (var descendant in participants)
+                {
+                    if (ReferenceEquals(ancestor, descendant))
                     {
                         continue;
                     }
 
-                    var containmentEdge = _IsAncestorRenameOf(ancestor: other, descendant: subject);
-                    var pathShiftEdge = _SubjectPreviewClaimsOtherSource(subject: subject, other: other);
-                    if (containmentEdge || pathShiftEdge)
+                    if (
+                        !PathRelations.IsDescendantOf(
+                            candidate: descendant.Original.FullPath,
+                            ancestor: ancestor.Original.FullPath
+                        )
+                    )
                     {
-                        dependsOn[subject].Add(other);
+                        continue;
                     }
+
+                    dependsOn[descendant].Add(ancestor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Folder items in this batch whose preview path differs from the original.
+        /// </summary>
+        private static List<RenameItem> _CollectFolderRenames(IReadOnlyList<RenameItem> participants)
+        {
+            var folderRenames = new List<RenameItem>();
+            foreach (var item in participants)
+            {
+                if (item.Original.Attributes.IsDirectory() && _ItemPathChanges(item))
+                {
+                    folderRenames.Add(item);
                 }
             }
 
-            return dependsOn;
+            return folderRenames;
         }
 
-        private static bool _IsAncestorRenameOf(RenameItem ancestor, RenameItem descendant)
+        private static bool _ItemPathChanges(RenameItem item)
         {
-            if (!ancestor.Original.Attributes.IsDirectory())
-            {
-                return false;
-            }
-
-            var ancestorRenames = !string.Equals(
-                ancestor.Original.FullPath,
-                ancestor.Preview.FullPath,
-                StringComparison.Ordinal
-            );
-            if (!ancestorRenames)
-            {
-                return false;
-            }
-
-            return PathRelations.IsDescendantOf(
-                candidate: descendant.Original.FullPath,
-                ancestor: ancestor.Original.FullPath
-            );
-        }
-
-        private static bool _SubjectPreviewClaimsOtherSource(RenameItem subject, RenameItem other)
-        {
-            var subjectPathChanges = !string.Equals(
-                subject.Original.FullPath,
-                subject.Preview.FullPath,
-                StringComparison.Ordinal
-            );
-            if (!subjectPathChanges)
-            {
-                return false;
-            }
-
-            var otherPathChanges = !string.Equals(
-                other.Original.FullPath,
-                other.Preview.FullPath,
-                StringComparison.Ordinal
-            );
-            if (!otherPathChanges)
-            {
-                return false;
-            }
-
-            return PathComparers.Os.Equals(subject.Preview.FullPath, other.Original.FullPath);
+            return !string.Equals(item.Original.FullPath, item.Preview.FullPath, StringComparison.Ordinal);
         }
 
         private static RenameItem? _PickReadyItem(
@@ -279,7 +316,7 @@ namespace Mfr.Engine.Commit
         private static bool _TryHandleCycle(
             HashSet<RenameItem> remaining,
             Dictionary<RenameItem, HashSet<RenameItem>> dependsOn,
-            IReadOnlyList<RenameItem> participants,
+            IReadOnlyList<RenameItem> folderRenames,
             Dictionary<RenameItem, string> stashedTempPaths,
             List<CommitStep> steps,
             List<RenameItem> unresolvable
@@ -328,7 +365,7 @@ namespace Mfr.Engine.Commit
 
                 var actualSourcePath = _ResolveActualSourcePath(
                     item: ready,
-                    participants: participants,
+                    folderRenames: folderRenames,
                     stashedTempPaths: stashedTempPaths
                 );
                 steps.Add(new FinalizeStep(ready, actualSourcePath));
@@ -426,7 +463,7 @@ namespace Mfr.Engine.Commit
 
         private static string _ResolveActualSourcePath(
             RenameItem item,
-            IReadOnlyList<RenameItem> participants,
+            IReadOnlyList<RenameItem> folderRenames,
             Dictionary<RenameItem, string> stashedTempPaths
         )
         {
@@ -435,10 +472,17 @@ namespace Mfr.Engine.Commit
                 return stashedTempPath;
             }
 
+            if (folderRenames.Count == 0)
+            {
+                return item.Original.FullPath;
+            }
+
             // Apply ancestor renames innermost-first so chained ancestors compose correctly.
-            var ancestors = participants
+            var ancestors = folderRenames
                 .Where(other => !ReferenceEquals(other, item))
-                .Where(other => _IsAncestorRenameOf(ancestor: other, descendant: item))
+                .Where(other =>
+                    PathRelations.IsDescendantOf(candidate: item.Original.FullPath, ancestor: other.Original.FullPath)
+                )
                 .OrderByDescending(other => other.Original.FullPath.Length);
 
             var actualSourcePath = item.Original.FullPath;
