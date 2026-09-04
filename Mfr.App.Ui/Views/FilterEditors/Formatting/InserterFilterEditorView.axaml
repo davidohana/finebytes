@@ -15,7 +15,7 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <StackPanel Spacing="6">
+      <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
         <StackPanel
           Spacing="4"
           ToolTip.Tip="Text inserted at the chosen position. May include formatter tokens such as &lt;Name&gt; when the string contains them."
@@ -29,43 +29,48 @@
             Text="{Binding InsertText}"
           />
         </StackPanel>
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
-          ToolTip.Tip="One-based character index. Position 1 from Beginning inserts before the first character. If the position exceeds the name length, Beginning appends and End prepends."
-        >
+        <Grid ToolTip.Tip="One-based character index. Position 1 from Beginning inserts before the first character. If the position exceeds the name length, Beginning appends and End prepends.">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="At position:" />
           <controls:CompactNumericUpDown
             x:Name="PositionSpinner"
+            Grid.Column="2"
             Width="56"
+            HorizontalAlignment="Left"
             Minimum="1"
             Maximum="200"
             Increment="1"
             FormatString="0"
             Value="{Binding Position}"
           />
-        </StackPanel>
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
-          ToolTip.Tip="Direction to start counting the insert position from."
-        >
+        </Grid>
+        <Grid ToolTip.Tip="Direction to start counting the insert position from.">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Starting from:" />
-          <controls:CompactRadioButton
-            x:Name="BeginningRadio"
-            Margin="0,0,16,0"
-            GroupName="InserterOrigin"
-            Content="Beginning"
-            IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.Beginning}, Mode=TwoWay}"
-          />
-          <controls:CompactRadioButton
-            x:Name="EndRadio"
-            GroupName="InserterOrigin"
-            Content="End"
-            IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.End}, Mode=TwoWay}"
-          />
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="of name." />
-        </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+            <controls:CompactRadioButton
+              x:Name="BeginningRadio"
+              GroupName="InserterOrigin"
+              Content="Beginning"
+              IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.Beginning}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="EndRadio"
+              GroupName="InserterOrigin"
+              Content="End"
+              IsChecked="{Binding StartFrom, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:InserterOrigin.End}, Mode=TwoWay}"
+            />
+            <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="of name." />
+          </StackPanel>
+        </Grid>
         <controls:CompactCheckBox
           x:Name="OverwriteCheckBox"
           Content="Overwrite characters"

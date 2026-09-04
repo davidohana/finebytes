@@ -15,71 +15,82 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <StackPanel Spacing="6">
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
-          ToolTip.Tip="Counter value for the first file (index 0). Later files use Initial + Increment × index."
-        >
+      <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
+        <Grid ToolTip.Tip="Counter value for the first file (index 0). Later files use Initial + Increment × index.">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Initial value:" />
           <controls:CompactNumericUpDown
             x:Name="StartSpinner"
+            Grid.Column="2"
             Width="72"
+            HorizontalAlignment="Left"
             Minimum="-999999"
             Maximum="999999"
             Increment="1"
             FormatString="0"
             Value="{Binding Start}"
           />
-        </StackPanel>
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
-          ToolTip.Tip="Amount added for each next file. May be negative."
-        >
+        </Grid>
+        <Grid ToolTip.Tip="Amount added for each next file. May be negative.">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Increment by:" />
           <controls:CompactNumericUpDown
             x:Name="IncrementSpinner"
+            Grid.Column="2"
             Width="72"
+            HorizontalAlignment="Left"
             Minimum="-99999"
             Maximum="99999"
             Increment="1"
             FormatString="0"
             Value="{Binding Increment}"
           />
-        </StackPanel>
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
-          ToolTip.Tip="Minimum digit width. 0 leaves the number unpadded. Shorter values are left-padded with the pad character."
-        >
+        </Grid>
+        <Grid ToolTip.Tip="Minimum digit width. 0 leaves the number unpadded. Shorter values are left-padded with the pad character.">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Width (0 = none):" />
-          <controls:CompactNumericUpDown
-            x:Name="WidthSpinner"
-            Width="56"
-            Minimum="0"
-            Maximum="100"
-            Increment="1"
-            FormatString="0"
-            Value="{Binding Width}"
-          />
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Pad with:" />
-          <TextBox
-            x:Name="PadCharBox"
-            Classes="filter-editor-field"
-            Width="36"
-            MaxLength="1"
-            VerticalAlignment="Center"
-            ToolTip.Tip="Character used for left-padding when Width is greater than 0. Default is 0. A space pads with spaces."
-            Text="{Binding PadCharText}"
-          />
-        </StackPanel>
-        <StackPanel
-          Spacing="4"
-          ToolTip.Tip="Prepend or append places the counter before/after the current segment with the separator. Replace discards the segment and keeps only the counter."
-        >
-          <TextBlock Classes="filter-editor-label" Text="Position:" />
-          <WrapPanel Orientation="Horizontal">
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+            <controls:CompactNumericUpDown
+              x:Name="WidthSpinner"
+              Width="56"
+              Minimum="0"
+              Maximum="100"
+              Increment="1"
+              FormatString="0"
+              Value="{Binding Width}"
+            />
+            <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Pad with:" />
+            <TextBox
+              x:Name="PadCharBox"
+              Classes="filter-editor-field"
+              Width="36"
+              MaxLength="1"
+              VerticalAlignment="Center"
+              ToolTip.Tip="Character used for left-padding when Width is greater than 0. Default is 0. A space pads with spaces."
+              Text="{Binding PadCharText}"
+            />
+          </StackPanel>
+        </Grid>
+        <Grid ToolTip.Tip="Prepend or append places the counter before/after the current segment with the separator. Replace discards the segment and keeps only the counter.">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Position:" />
+          <WrapPanel Grid.Column="2" Orientation="Horizontal">
             <controls:CompactRadioButton
               x:Name="PrependRadio"
               Margin="0,0,16,4"
@@ -102,23 +113,29 @@
               IsChecked="{Binding Position, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static formattingFilters:CounterPosition.Replace}, Mode=TwoWay}"
             />
           </WrapPanel>
-        </StackPanel>
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
+        </Grid>
+        <Grid
           IsVisible="{Binding HasSeparatorOptions}"
           ToolTip.Tip="Text inserted between the counter and the original segment when prepending or appending."
         >
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterEditorLabel" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Separator:" />
           <TextBox
             x:Name="SeparatorBox"
+            Grid.Column="2"
             Classes="filter-editor-field"
             MinWidth="120"
+            MaxWidth="240"
+            HorizontalAlignment="Left"
             MaxLength="100"
             VerticalAlignment="Center"
             Text="{Binding Separator}"
           />
-        </StackPanel>
+        </Grid>
         <controls:CompactCheckBox
           x:Name="ResetPerFolderCheckBox"
           Content="Reset counter when folder changes"
