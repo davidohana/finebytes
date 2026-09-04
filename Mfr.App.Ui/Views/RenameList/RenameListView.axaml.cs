@@ -127,34 +127,30 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnLoadErrorsDialogRequested(object? sender, RenameListLoadErrorsDialogContent content)
         {
-            Dispatcher.UIThread.Post(() => _ = _ShowLoadErrorsDialogAsync(content));
-        }
-
-        private async Task _ShowLoadErrorsDialogAsync(RenameListLoadErrorsDialogContent content)
-        {
-            if (TopLevel.GetTopLevel(this) is not Window owner)
-            {
-                return;
-            }
-
-            var dialog = new RenameListLoadErrorsDialog(content);
-            await dialog.ShowDialog(owner);
+            _PostShowDialog(() => new RenameListLoadErrorsDialog(content));
         }
 
         private void _OnPreviewErrorDialogRequested(object? sender, RenameListPreviewErrorDialogContent content)
         {
-            Dispatcher.UIThread.Post(() => _ = _ShowPreviewErrorDialogAsync(content));
+            _PostShowDialog(() => new RenameListPreviewErrorDialog(content));
         }
 
-        private async Task _ShowPreviewErrorDialogAsync(RenameListPreviewErrorDialogContent content)
+        /// <summary>
+        /// Posts a modal after the current input event so a row context menu can close first.
+        /// </summary>
+        private void _PostShowDialog(Func<Window> createDialog)
+        {
+            Dispatcher.UIThread.Post(() => _ = _ShowDialogAsync(createDialog));
+        }
+
+        private async Task _ShowDialogAsync(Func<Window> createDialog)
         {
             if (TopLevel.GetTopLevel(this) is not Window owner)
             {
                 return;
             }
 
-            var dialog = new RenameListPreviewErrorDialog(content);
-            await dialog.ShowDialog(owner);
+            await createDialog().ShowDialog(owner);
         }
 
         private void _OnDataContextChanged(object? sender, EventArgs e)
@@ -489,9 +485,12 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var cellText = entry.GetFieldText(fieldKey.Value);
-            _viewModel.CellStatusHintDisplay = entry.HasPreviewError
-                ? RenameListCellHint.FormatPartsWithPreviewError(field.DisplayName, cellText)
-                : RenameListCellHint.FormatParts(field.DisplayName, cellText);
+            if (entry.HasPreviewError)
+            {
+                cellText = $"{RenameListCellHint.PreviewErrorMarker} {cellText}";
+            }
+
+            _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatParts(field.DisplayName, cellText);
         }
 
         private void _OnDragOver(object? sender, DragEventArgs e)
@@ -702,9 +701,13 @@ namespace Mfr.App.Ui.Views.RenameList
             }
         }
 
-        private static void _ApplyPreviewErrorRowClass(DataGridRow row)
+        /// <summary>
+        /// Applies lavender preview-error row styling while Auto-Preview is on (MFR7 PreviewErrorBackColor).
+        /// </summary>
+        private void _ApplyPreviewErrorRowClass(DataGridRow row)
         {
-            var hasPreviewError = row.DataContext is RenameListEntry { HasPreviewError: true };
+            var hasPreviewError =
+                _viewModel?.IsAutoPreview == true && row.DataContext is RenameListEntry { HasPreviewError: true };
             row.Classes.Set("rename-list-preview-error", hasPreviewError);
         }
 

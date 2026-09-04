@@ -62,13 +62,16 @@ namespace Mfr.Tests.Ui.RenameList
         /// Verifies preview-error hints include the MFR7 item-preview-error marker.
         /// </summary>
         [Fact]
-        public void FormatPartsWithPreviewError_Includes_Marker()
+        public void FormatParts_Includes_PreviewError_Marker_When_Prefixed()
         {
-            var hint = RenameListCellHint.FormatPartsWithPreviewError("Full File Name", "alpha.txt");
+            var hint = RenameListCellHint.FormatParts(
+                "Full File Name",
+                $"{RenameListCellHint.PreviewErrorMarker} alpha.txt"
+            );
             Assert.Equal(2, hint.Runs.Count);
             Assert.Equal("Full File Name", hint.Runs[0].Text);
             Assert.Equal(FontWeight.Bold, hint.Runs[0].FontWeight);
-            Assert.Equal(": [Item Preview Error] alpha.txt", hint.Runs[1].Text);
+            Assert.Equal($": {RenameListCellHint.PreviewErrorMarker} alpha.txt", hint.Runs[1].Text);
         }
     }
 }

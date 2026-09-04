@@ -285,7 +285,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Rebinds grid field cells after preview, metadata hydrate, or disk refresh.
+        /// Rebinds grid field cells after preview, metadata hydrate, disk refresh, or Auto-Preview toggle.
         /// </summary>
         private void _RefreshFieldDisplay()
         {

@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.Input;
-using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -46,7 +45,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 new RenameListPreviewErrorDialogContent(
                     entry.FullPath,
                     previewError.Message,
-                    _FormatTechnicalDetails(previewError)
+                    previewError.Cause?.ToString()
                 )
             );
         }
@@ -66,11 +65,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             OnPropertyChanged(nameof(CanShowPreviewError));
             OnPropertyChanged(nameof(CanShowRowErrorMenu));
             ShowPreviewErrorCommand.NotifyCanExecuteChanged();
-        }
-
-        private static string? _FormatTechnicalDetails(RenameItemError previewError)
-        {
-            return previewError.Cause?.ToString();
         }
     }
 }

@@ -243,7 +243,9 @@ ______________________________________________________________________
 | Red preview text       | `rename-list-preview-changed` in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs) / [RenameListView.axaml](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml)                |
 | Preview-error row bg   | `rename-list-preview-error` (LavenderBlush / dark muted) on [DataGridRow](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs)                                                                                      |
 | Show Preview Error     | [RenameListViewModel.PreviewErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.PreviewErrors.cs), [RenameListPreviewErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListPreviewErrorDialog.axaml) |
-| Status-bar marker      | `RenameListCellHint.FormatPartsWithPreviewError` (`[Item Preview Error]`)                                                                                                                                                 |
+| Status-bar marker      | `RenameListCellHint.PreviewErrorMarker` (`[Item Preview Error]`) prepended to `FormatParts`                                                                                                                               |
+
+Red/lavender highlighting applies only while Auto-Preview is on (MFR7 `PreviewEnabled`). Stale preview text remains; **Show Preview Error** stays available.
 
 **Not apply/rename errors:** plum **Show Rename Error** is Phase 15. Sort-by-preview-column (one-shot) still deferred.
 

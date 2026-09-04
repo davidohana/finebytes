@@ -51,6 +51,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Re-applies changed-cell and preview-error highlighting when Auto-Preview toggles.
+        /// </summary>
+        partial void OnIsAutoPreviewChanged(bool value)
+        {
+            _RefreshFieldDisplay();
+        }
+
+        /// <summary>
         /// Runs the filter chain over every Rename List item and refreshes preview columns.
         /// </summary>
         /// <param name="chain">Live Applied Filters chain.</param>
