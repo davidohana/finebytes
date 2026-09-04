@@ -20,6 +20,8 @@ namespace Mfr.App.Ui.Views.Controls
             MinHeightProperty.OverrideDefaultValue<CompactNumericUpDown>(26);
             HorizontalAlignmentProperty.OverrideDefaultValue<CompactNumericUpDown>(HorizontalAlignment.Left);
             VerticalAlignmentProperty.OverrideDefaultValue<CompactNumericUpDown>(VerticalAlignment.Center);
+            // Out-of-range typed values (e.g. 0 with Minimum=1) throw unless clipped.
+            ClipValueToMinMaxProperty.OverrideDefaultValue<CompactNumericUpDown>(true);
         }
 
         /// <summary>
@@ -32,5 +34,26 @@ namespace Mfr.App.Ui.Views.Controls
 
         /// <inheritdoc />
         protected override Type StyleKeyOverride => typeof(NumericUpDown);
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// Empty text (Delete/Backspace) sets <see cref="NumericUpDown.Value"/> to null. Our editors bind
+        /// non-nullable <c>decimal</c>, which surfaces as <see cref="InvalidOperationException"/> validation.
+        /// Coerce empty to <see cref="NumericUpDown.Minimum"/> so all compact spinners stay bindable.
+        /// </remarks>
+        protected override decimal? OnCoerceValue(decimal? baseValue)
+        {
+            if (baseValue is null)
+            {
+                return Minimum;
+            }
+
+            if (ClipValueToMinMax)
+            {
+                return Math.Clamp(baseValue.Value, Minimum, Maximum);
+            }
+
+            return base.OnCoerceValue(baseValue);
+        }
     }
 }

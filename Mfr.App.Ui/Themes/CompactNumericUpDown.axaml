@@ -16,6 +16,7 @@
     <Setter Property="HorizontalContentAlignment" Value="Left" />
     <Setter Property="ShowButtonSpinner" Value="True" />
     <Setter Property="ButtonSpinnerLocation" Value="Right" />
+    <Setter Property="ClipValueToMinMax" Value="True" />
   </Style>
   <Style Selector="NumericUpDown.compact-numeric /template/ TextBox#PART_TextBox">
     <Setter Property="MinWidth" Value="0" />
