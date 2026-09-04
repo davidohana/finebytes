@@ -114,6 +114,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(4, viewModel.ScannedCount);
             Assert.Equal(2, viewModel.AddedCount);
             Assert.Equal(lastPath, viewModel.LastPath);
+            Assert.False(viewModel.ShowProgressBar);
         }
 
         /// <summary>
@@ -148,6 +149,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("Reading file metadata", viewModel.DialogTitle);
             Assert.Equal("Reading metadata: 3 of 10 files", viewModel.MetadataProgressText);
             Assert.True(viewModel.ShowMetadataProgress);
+            Assert.True(viewModel.ShowProgressBar);
             Assert.False(viewModel.ShowResolveProgress);
         }
 
@@ -186,6 +188,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("Refreshing Rename List", viewModel.DialogTitle);
             Assert.Equal("Refreshing: 4 of 10 files", viewModel.MetadataProgressText);
             Assert.True(viewModel.ShowMetadataProgress);
+            Assert.True(viewModel.ShowProgressBar);
             Assert.False(viewModel.ShowResolveProgress);
         }
 
@@ -202,6 +205,7 @@ namespace Mfr.Tests.Ui.RenameList
                     (_, progress) =>
                     {
                         progress.Report(new RenameListProgress(100, 50, "C:\\done.mp3"));
+                        _WaitFor(() => viewModel.ScannedCount == 100 && !viewModel.ShowProgressBar);
                         progress.Report(
                             new RenameListProgress(
                                 ScannedCount: 100,
@@ -212,7 +216,7 @@ namespace Mfr.Tests.Ui.RenameList
                                 MetadataProcessedCount: 1
                             )
                         );
-                        _WaitFor(() => viewModel.MetadataProcessedCount == 1);
+                        _WaitFor(() => viewModel.MetadataProcessedCount == 1 && viewModel.ShowProgressBar);
                     }
                 )
                 .ConfigureAwait(true);
@@ -225,6 +229,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(50, viewModel.AddedCount);
             Assert.True(viewModel.ShowResolveProgress);
             Assert.True(viewModel.ShowMetadataProgress);
+            Assert.True(viewModel.ShowProgressBar);
             Assert.Equal("Added 50 files", viewModel.SecondaryProgressText);
         }
 
@@ -336,6 +341,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("Previewing ...", viewModel.DialogTitle);
             Assert.Equal("Previewing: 4 of 10 files", viewModel.MetadataProgressText);
             Assert.True(viewModel.ShowMetadataProgress);
+            Assert.True(viewModel.ShowProgressBar);
             Assert.False(viewModel.ShowResolveProgress);
         }
 

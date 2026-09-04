@@ -74,6 +74,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(MetadataProgressText))]
+        [NotifyPropertyChangedFor(nameof(ShowProgressBar))]
         private int _metadataTotalCount;
 
         /// <summary>
@@ -112,6 +113,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets whether the per-row progress line should be shown.
         /// </summary>
         public bool ShowMetadataProgress => Phase == RenameListProgressPhase.LoadMetadata;
+
+        /// <summary>
+        /// Gets whether the determinate progress bar should be shown.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// True only when the engine has reported a known total (metadata, refresh, preview, or add's
+        /// metadata stage). Hidden during resolve because the filesystem walk length is unknown.
+        /// </para>
+        /// </remarks>
+        public bool ShowProgressBar => MetadataTotalCount > 0;
 
         /// <summary>
         /// Requests cancel for the in-progress operation.

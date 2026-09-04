@@ -7,9 +7,9 @@
   Title="{Binding DialogTitle}"
   Icon="/Assets/mfr.ico"
   Width="560"
-  Height="230"
+  Height="254"
   MinWidth="520"
-  MinHeight="210"
+  MinHeight="234"
   WindowStartupLocation="CenterOwner"
   CanResize="False"
   ShowInTaskbar="False"
@@ -42,6 +42,13 @@
         HorizontalAlignment="Center"
         IsVisible="{Binding ShowMetadataProgress}"
         Text="{Binding MetadataProgressText}"
+      />
+      <ProgressBar
+        Minimum="0"
+        Maximum="{Binding MetadataTotalCount}"
+        Value="{Binding MetadataProcessedCount}"
+        IsVisible="{Binding ShowProgressBar}"
+        Height="16"
       />
       <TextBlock
         HorizontalAlignment="Stretch"
