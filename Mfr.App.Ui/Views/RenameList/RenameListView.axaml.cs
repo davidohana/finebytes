@@ -125,14 +125,9 @@ namespace Mfr.App.Ui.Views.RenameList
             }
         }
 
-        private void _OnLoadErrorsDialogRequested(object? sender, RenameListLoadErrorsDialogContent content)
+        private void _OnRowErrorDialogRequested(object? sender, RenameListRowErrorDialogContent content)
         {
-            _PostShowDialog(() => new RenameListLoadErrorsDialog(content));
-        }
-
-        private void _OnPreviewErrorDialogRequested(object? sender, RenameListPreviewErrorDialogContent content)
-        {
-            _PostShowDialog(() => new RenameListPreviewErrorDialog(content));
+            _PostShowDialog(() => new RenameListRowErrorDialog(content));
         }
 
         /// <summary>
@@ -158,8 +153,7 @@ namespace Mfr.App.Ui.Views.RenameList
             if (_viewModel is not null)
             {
                 _viewModel.FieldShuttleRequested -= _OnFieldShuttleRequested;
-                _viewModel.LoadErrorsDialogRequested -= _OnLoadErrorsDialogRequested;
-                _viewModel.PreviewErrorDialogRequested -= _OnPreviewErrorDialogRequested;
+                _viewModel.RowErrorDialogRequested -= _OnRowErrorDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.Progress.PropertyChanged -= _OnProgressPropertyChanged;
             }
@@ -171,8 +165,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _viewModel.FieldShuttleRequested += _OnFieldShuttleRequested;
-            _viewModel.LoadErrorsDialogRequested += _OnLoadErrorsDialogRequested;
-            _viewModel.PreviewErrorDialogRequested += _OnPreviewErrorDialogRequested;
+            _viewModel.RowErrorDialogRequested += _OnRowErrorDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.Progress.PropertyChanged += _OnProgressPropertyChanged;
             _RebuildColumns();
@@ -702,12 +695,11 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
-        /// Applies lavender preview-error row styling while Auto-Preview is on (MFR7 PreviewErrorBackColor).
+        /// Applies lavender preview-error row styling from the last preview pass.
         /// </summary>
-        private void _ApplyPreviewErrorRowClass(DataGridRow row)
+        private static void _ApplyPreviewErrorRowClass(DataGridRow row)
         {
-            var hasPreviewError =
-                _viewModel?.IsAutoPreview == true && row.DataContext is RenameListEntry { HasPreviewError: true };
+            var hasPreviewError = row.DataContext is RenameListEntry { HasPreviewError: true };
             row.Classes.Set("rename-list-preview-error", hasPreviewError);
         }
 

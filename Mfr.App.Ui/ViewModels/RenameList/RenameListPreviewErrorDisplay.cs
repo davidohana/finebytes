@@ -6,38 +6,33 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     internal static class RenameListPreviewErrorDisplay
     {
         /// <summary>
+        /// Window title for Show Preview Error.
+        /// </summary>
+        internal const string DialogTitle = "Preview Error";
+
+        /// <summary>
         /// Short summary shown at the top of the dialog.
         /// </summary>
         internal const string Summary = "Preview failed for this item. It will be skipped when applying changes.";
 
         /// <summary>
-        /// Builds the details box text (message plus optional technical line).
+        /// Builds shared dialog content for Show Preview Error.
         /// </summary>
-        /// <param name="content">Dialog content.</param>
-        /// <returns>Folded error text for the details box.</returns>
-        internal static string FormatDetailsText(RenameListPreviewErrorDialogContent content)
+        /// <param name="filePath">Absolute path of the errored row.</param>
+        /// <param name="message">User-facing preview error message.</param>
+        /// <param name="technicalDetails">Optional exception text for the details box.</param>
+        /// <returns>Title, summary, path, and folded details.</returns>
+        internal static RenameListRowErrorDialogContent Create(
+            string filePath,
+            string message,
+            string? technicalDetails
+        )
         {
-            if (string.IsNullOrWhiteSpace(content.TechnicalDetails))
-            {
-                return content.Message;
-            }
-
-            return $"{content.Message}{Environment.NewLine}{content.TechnicalDetails}";
-        }
-
-        /// <summary>
-        /// Builds clipboard text for Show Preview Error.
-        /// </summary>
-        /// <param name="content">Dialog content.</param>
-        /// <returns>Multi-line text suitable for copy/paste.</returns>
-        internal static string FormatCopyText(RenameListPreviewErrorDialogContent content)
-        {
-            return string.Join(
-                Environment.NewLine,
+            return new RenameListRowErrorDialogContent(
+                DialogTitle,
                 Summary,
-                content.FilePath,
-                string.Empty,
-                FormatDetailsText(content)
+                filePath,
+                RenameListRowErrorDisplay.FormatDetailsBlock(message, technicalDetails)
             );
         }
     }

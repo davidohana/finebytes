@@ -32,14 +32,14 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(renameListViewModel.CanShowPreviewError);
             Assert.True(renameListViewModel.CanShowRowErrorMenu);
 
-            RenameListPreviewErrorDialogContent? content = null;
-            renameListViewModel.PreviewErrorDialogRequested += (_, value) => content = value;
+            RenameListRowErrorDialogContent? content = null;
+            renameListViewModel.RowErrorDialogRequested += (_, value) => content = value;
             renameListViewModel.ShowPreviewErrorCommand.Execute(null);
 
             Assert.NotNull(content);
+            Assert.Equal(RenameListPreviewErrorDisplay.DialogTitle, content.Title);
             Assert.Equal(path, content.FilePath);
-            Assert.False(string.IsNullOrWhiteSpace(content.Message));
-            Assert.False(string.IsNullOrWhiteSpace(content.TechnicalDetails));
+            Assert.False(string.IsNullOrWhiteSpace(content.DetailsText));
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Mfr.Tests.Ui.RenameList
         private static bool _TryShowPreviewError(RenameListViewModel renameListViewModel)
         {
             var shown = false;
-            renameListViewModel.PreviewErrorDialogRequested += (_, _) => shown = true;
+            renameListViewModel.RowErrorDialogRequested += (_, _) => shown = true;
             renameListViewModel.ShowPreviewErrorCommand.Execute(null);
             return shown;
         }

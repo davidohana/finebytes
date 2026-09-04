@@ -166,12 +166,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             void ApplyCurrent()
             {
-                _ApplyFieldCell(
-                    textBlock,
-                    textBlock.DataContext as RenameListEntry ?? entry,
-                    key,
-                    highlightPreviewChanges: listViewModel.IsAutoPreview
-                );
+                _ApplyFieldCell(textBlock, textBlock.DataContext as RenameListEntry ?? entry, key);
             }
 
             textBlock.DataContextChanged += (_, _) => ApplyCurrent();
@@ -219,21 +214,12 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <summary>
         /// Sets catalog text; missing/load-error/changed-preview cells get style classes.
         /// </summary>
-        /// <remarks>
-        /// Preview-changed red text follows MFR7: only while Auto-Preview is on.
-        /// </remarks>
-        private static void _ApplyFieldCell(
-            TextBlock textBlock,
-            RenameListEntry? entry,
-            RenameListFieldKey key,
-            bool highlightPreviewChanges
-        )
+        private static void _ApplyFieldCell(TextBlock textBlock, RenameListEntry? entry, RenameListFieldKey key)
         {
             textBlock.Text = entry?.GetFieldText(key) ?? string.Empty;
             var isMissing = entry?.IsMissingFromDisk == true;
             var isLoadError = !isMissing && entry?.IsLoadError(key) == true;
-            var isPreviewChanged =
-                highlightPreviewChanges && !isMissing && !isLoadError && entry?.IsPreviewChanged(key) == true;
+            var isPreviewChanged = !isMissing && !isLoadError && entry?.IsPreviewChanged(key) == true;
             textBlock.Classes.Set("rename-list-missing-on-disk", isMissing);
             textBlock.Classes.Set("rename-list-load-error", isLoadError);
             textBlock.Classes.Set("rename-list-preview-changed", isPreviewChanged);

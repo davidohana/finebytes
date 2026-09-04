@@ -9,9 +9,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Raised when the user requests the Show Load Errors dialog.
+        /// Raised when the user requests a row error dialog (load, preview, or later apply).
         /// </summary>
-        public event EventHandler<RenameListLoadErrorsDialogContent>? LoadErrorsDialogRequested;
+        public event EventHandler<RenameListRowErrorDialogContent>? RowErrorDialogRequested;
 
         /// <summary>
         /// Gets whether Show Load Errors should appear on the row context menu.
@@ -31,7 +31,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var entry = _selectedEntries[0];
             var errors = RenameListFieldCatalog.ListLoadErrors(entry.EngineItem);
-            LoadErrorsDialogRequested?.Invoke(this, new RenameListLoadErrorsDialogContent(entry.FullPath, errors));
+            RowErrorDialogRequested?.Invoke(this, RenameListLoadErrorDisplay.Create(entry.FullPath, errors));
         }
 
         private bool _CanShowLoadErrors()

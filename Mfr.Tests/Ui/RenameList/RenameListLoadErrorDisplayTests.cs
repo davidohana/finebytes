@@ -11,17 +11,17 @@ namespace Mfr.Tests.Ui.RenameList
         /// Verifies copy text includes summary, path, and folded friendly plus technical lines.
         /// </summary>
         [Fact]
-        public void FormatCopyText_includes_summary_and_folded_errors()
+        public void Create_copy_text_includes_summary_and_folded_errors()
         {
             var technicalDetails = @"D:\Music\PLAYLIST.M3U (taglib/m3u)";
             var error = new RenameListLoadError(
                 "This file could not be read as audio or media metadata.",
                 technicalDetails
             );
-            var content = new RenameListLoadErrorsDialogContent(@"D:\Music\PLAYLIST.M3U", [error]);
+            var content = RenameListLoadErrorDisplay.Create(@"D:\Music\PLAYLIST.M3U", [error]);
+            var copyText = RenameListRowErrorDisplay.FormatCopyText(content);
 
-            var copyText = RenameListLoadErrorDisplay.FormatCopyText(content);
-
+            Assert.Equal(RenameListLoadErrorDisplay.DialogTitle, content.Title);
             Assert.Contains(RenameListLoadErrorDisplay.MetadataSummary, copyText, StringComparison.Ordinal);
             Assert.Contains(@"D:\Music\PLAYLIST.M3U", copyText, StringComparison.Ordinal);
             Assert.Contains(error.UserExplanation, copyText, StringComparison.Ordinal);
@@ -35,12 +35,12 @@ namespace Mfr.Tests.Ui.RenameList
         public void FormatSummary_and_details_for_missing_file()
         {
             const string path = @"D:\Music\1\Working on the Highway.mp3";
-            var content = new RenameListLoadErrorsDialogContent(path, [RenameListDiskPaths.MissingLoadError(path)]);
+            IReadOnlyList<RenameListLoadError> errors = [RenameListDiskPaths.MissingLoadError(path)];
 
-            Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, RenameListLoadErrorDisplay.FormatSummary(content));
+            Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, RenameListLoadErrorDisplay.FormatSummary(errors));
             Assert.Equal(
                 RenameListDiskPaths.MissingUserExplanation,
-                RenameListLoadErrorDisplay.FormatDetailsText(content)
+                RenameListLoadErrorDisplay.FormatDetailsText(errors)
             );
         }
 
@@ -51,12 +51,12 @@ namespace Mfr.Tests.Ui.RenameList
         public void FormatSummary_does_not_treat_matching_explanation_text_as_missing()
         {
             const string path = @"D:\Music\track.mp3";
-            var content = new RenameListLoadErrorsDialogContent(
-                path,
-                [new RenameListLoadError(RenameListDiskPaths.MissingUserExplanation, path)]
-            );
+            IReadOnlyList<RenameListLoadError> errors =
+            [
+                new RenameListLoadError(RenameListDiskPaths.MissingUserExplanation, path),
+            ];
 
-            Assert.Equal(RenameListLoadErrorDisplay.MetadataSummary, RenameListLoadErrorDisplay.FormatSummary(content));
+            Assert.Equal(RenameListLoadErrorDisplay.MetadataSummary, RenameListLoadErrorDisplay.FormatSummary(errors));
         }
 
         /// <summary>
@@ -65,15 +65,13 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void FormatDetailsText_folds_friendly_and_technical()
         {
-            var content = new RenameListLoadErrorsDialogContent(
-                @"D:\Music\info.htm",
-                [
-                    new RenameListLoadError("Could not read audio metadata.", "taglib/htm"),
-                    new RenameListLoadError("Could not read image metadata.", "format unknown"),
-                ]
-            );
+            IReadOnlyList<RenameListLoadError> errors =
+            [
+                new RenameListLoadError("Could not read audio metadata.", "taglib/htm"),
+                new RenameListLoadError("Could not read image metadata.", "format unknown"),
+            ];
 
-            var details = RenameListLoadErrorDisplay.FormatDetailsText(content);
+            var details = RenameListLoadErrorDisplay.FormatDetailsText(errors);
             var expected = string.Join(
                 $"{Environment.NewLine}{Environment.NewLine}",
                 $"Could not read audio metadata.{Environment.NewLine}taglib/htm",

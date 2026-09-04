@@ -8,11 +8,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Raised when the user requests the Show Preview Error dialog.
-        /// </summary>
-        public event EventHandler<RenameListPreviewErrorDialogContent>? PreviewErrorDialogRequested;
-
-        /// <summary>
         /// Gets whether Show Preview Error should appear on the row context menu.
         /// </summary>
         public bool CanShowPreviewError => _CanShowPreviewError();
@@ -40,9 +35,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            PreviewErrorDialogRequested?.Invoke(
+            RowErrorDialogRequested?.Invoke(
                 this,
-                new RenameListPreviewErrorDialogContent(
+                RenameListPreviewErrorDisplay.Create(
                     entry.FullPath,
                     previewError.Message,
                     previewError.Cause?.ToString()

@@ -30,15 +30,14 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([entry]);
             Assert.True(renameListViewModel.CanShowLoadErrors);
 
-            RenameListLoadErrorsDialogContent? content = null;
-            renameListViewModel.LoadErrorsDialogRequested += (_, value) => content = value;
+            RenameListRowErrorDialogContent? content = null;
+            renameListViewModel.RowErrorDialogRequested += (_, value) => content = value;
             renameListViewModel.ShowLoadErrorsCommand.Execute(null);
 
             Assert.NotNull(content);
+            Assert.Equal(RenameListLoadErrorDisplay.DialogTitle, content.Title);
             Assert.Equal(path, content.FilePath);
-            var error = Assert.Single(content.Errors);
-            Assert.Equal("This file could not be read as audio or media metadata.", error.UserExplanation);
-            Assert.False(string.IsNullOrWhiteSpace(error.TechnicalDetails));
+            Assert.Contains("audio or media metadata", content.DetailsText, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -111,14 +110,14 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([entry]);
             Assert.True(renameListViewModel.CanShowLoadErrors);
 
-            RenameListLoadErrorsDialogContent? content = null;
-            renameListViewModel.LoadErrorsDialogRequested += (_, value) => content = value;
+            RenameListRowErrorDialogContent? content = null;
+            renameListViewModel.RowErrorDialogRequested += (_, value) => content = value;
             renameListViewModel.ShowLoadErrorsCommand.Execute(null);
 
             Assert.NotNull(content);
             Assert.Equal(path, content.FilePath);
-            var error = Assert.Single(content.Errors);
-            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, error.UserExplanation);
+            Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, content.Summary);
+            Assert.Equal(RenameListDiskPaths.MissingUserExplanation, content.DetailsText);
         }
 
         private async Task<(RenameListViewModel ViewModel, string Path, RenameListEntry Entry)> _AddHtmWithTitleAsync()
@@ -149,7 +148,7 @@ namespace Mfr.Tests.Ui.RenameList
         private static bool _TryShowLoadErrors(RenameListViewModel renameListViewModel)
         {
             var shown = false;
-            renameListViewModel.LoadErrorsDialogRequested += (_, _) => shown = true;
+            renameListViewModel.RowErrorDialogRequested += (_, _) => shown = true;
             renameListViewModel.ShowLoadErrorsCommand.Execute(null);
             return shown;
         }

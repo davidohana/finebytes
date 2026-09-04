@@ -170,7 +170,7 @@ Working list, interactions, context menu, manual order, unified field shuttle, d
 | Area                       | Location                                                                                                                                                                                                        |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Load-error text + styling  | `LoadErrorText` (`—`), `rename-list-load-error` class in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs)                                                               |
-| Show Load Errors           | [RenameListViewModel.LoadErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.LoadErrors.cs), [RenameListLoadErrorsDialog](../../Mfr.App.Ui/Views/RenameList/RenameListLoadErrorsDialog.axaml) |
+| Show Load Errors           | [RenameListViewModel.LoadErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.LoadErrors.cs), shared [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml) |
 | Row error indicator        | [RenameListRowErrorGlyph.cs](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorGlyph.cs) + `HasRowError` on [RenameListEntry](../../Mfr.App.Ui/ViewModels/RenameList/RenameListEntry.cs)                      |
 | TagLib single-attempt flag | `TagLibLoadAttempted` on [RenameItem](../../Mfr.Models/Rename/RenameItem.cs)                                                                                                                                    |
 | Sort tie-break             | `ErrorsLast` in [RenameListFieldSortCompare.cs](../../Mfr.Models/RenameList/RenameListFieldSortCompare.cs)                                                                                                      |
@@ -242,10 +242,10 @@ ______________________________________________________________________
 | Changed-cell detection | `RenameListFieldCatalog.IsPreviewChanged` + `RenameListEntry.IsPreviewChanged`                                                                                                                                            |
 | Red preview text       | `rename-list-preview-changed` in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs) / [RenameListView.axaml](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml)                |
 | Preview-error row bg   | `rename-list-preview-error` (LavenderBlush / dark muted) on [DataGridRow](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs)                                                                                      |
-| Show Preview Error     | [RenameListViewModel.PreviewErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.PreviewErrors.cs), [RenameListPreviewErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListPreviewErrorDialog.axaml) |
+| Show Preview Error     | [RenameListViewModel.PreviewErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.PreviewErrors.cs), shared [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml) |
 | Status-bar marker      | `RenameListCellHint.PreviewErrorMarker` (`[Item Preview Error]`) prepended to `FormatParts`                                                                                                                               |
 
-Red/lavender highlighting applies only while Auto-Preview is on (MFR7 `PreviewEnabled`). Stale preview text remains; **Show Preview Error** stays available.
+Highlighting is the last preview result (not gated on Auto-Preview). **Show Preview Error** stays available while a row still has `PreviewError`.
 
 **Not apply/rename errors:** plum **Show Rename Error** is Phase 15. Sort-by-preview-column (one-shot) still deferred.
 
@@ -284,7 +284,7 @@ ______________________________________________________________________
 
 *(Was 12 / 9.)*
 
-`Ctrl+G` → `Commit`; Refresh clears last apply-error highlighting. Apply-error menu is **Show Rename Error** — not Phase 8 **Show Load Errors**.
+`Ctrl+G` → `Commit`; Refresh clears last apply-error highlighting. Apply-error menu is **Show Rename Error** — reuse [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml) (not a third dialog clone). Distinct from Phase 8 **Show Load Errors**.
 
 ______________________________________________________________________
 

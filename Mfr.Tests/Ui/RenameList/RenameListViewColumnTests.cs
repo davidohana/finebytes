@@ -770,19 +770,6 @@ namespace Mfr.Tests.Ui.RenameList
                 .First(textBlock => textBlock.Text == "hello.txt");
             Assert.DoesNotContain("rename-list-preview-changed", originalTextBlock.Classes);
 
-            renameListViewModel.IsAutoPreview = false;
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            Assert.DoesNotContain(
-                row.GetVisualDescendants().OfType<TextBlock>(),
-                textBlock => textBlock.Classes.Contains("rename-list-preview-changed")
-            );
-            Assert.Contains(
-                "HELLO.txt",
-                row.GetVisualDescendants().OfType<TextBlock>().Select(textBlock => textBlock.Text)
-            );
-
             window.Close();
         }
 
@@ -829,12 +816,6 @@ namespace Mfr.Tests.Ui.RenameList
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
             Assert.Contains("rename-list-preview-error", row.Classes);
-
-            renameListViewModel.IsAutoPreview = false;
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-            Assert.DoesNotContain("rename-list-preview-error", row.Classes);
-            Assert.True(entry.HasPreviewError);
 
             window.Close();
         }

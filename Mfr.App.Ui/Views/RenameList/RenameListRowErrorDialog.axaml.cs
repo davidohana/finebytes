@@ -5,29 +5,30 @@ using Mfr.App.Ui.ViewModels.RenameList;
 namespace Mfr.App.Ui.Views.RenameList
 {
     /// <summary>
-    /// Modal dialog for Rename List Show Load Errors (missing path and metadata reader failures).
+    /// Modal dialog for Rename List row errors (load, preview, and later apply).
     /// </summary>
-    public partial class RenameListLoadErrorsDialog : Window
+    public partial class RenameListRowErrorDialog : Window
     {
         private readonly string _copyText;
 
         /// <summary>
-        /// Initializes the dialog with all reader failures on the selected row.
+        /// Initializes the dialog with shared row-error content.
         /// </summary>
-        /// <param name="content">File path and stored load errors.</param>
-        public RenameListLoadErrorsDialog(RenameListLoadErrorsDialogContent content)
+        /// <param name="content">Title, summary, path, and details.</param>
+        public RenameListRowErrorDialog(RenameListRowErrorDialogContent content)
         {
             ArgumentNullException.ThrowIfNull(content);
 
             InitializeComponent();
-            SummaryText.Text = RenameListLoadErrorDisplay.FormatSummary(content);
+            Title = content.Title;
+            SummaryText.Text = content.Summary;
             FilePathText.Text = content.FilePath;
-            DetailsText.Text = RenameListLoadErrorDisplay.FormatDetailsText(content);
-            _copyText = RenameListLoadErrorDisplay.FormatCopyText(content);
+            DetailsText.Text = content.DetailsText;
+            _copyText = RenameListRowErrorDisplay.FormatCopyText(content);
         }
 
         /// <inheritdoc />
-        public RenameListLoadErrorsDialog()
+        public RenameListRowErrorDialog()
         {
             InitializeComponent();
             _copyText = string.Empty;

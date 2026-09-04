@@ -1,8 +1,7 @@
 <Window
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  x:Class="Mfr.App.Ui.Views.RenameList.RenameListPreviewErrorDialog"
-  Title="Preview Error"
+  x:Class="Mfr.App.Ui.Views.RenameList.RenameListRowErrorDialog"
   Icon="/Assets/mfr.ico"
   Width="480"
   MinWidth="400"
