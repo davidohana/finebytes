@@ -10,18 +10,12 @@ namespace Mfr.Tests.Ui.RenameList
     /// </summary>
     public sealed class RenameListViewModelTests : IDisposable
     {
-        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
-        private readonly List<FileListViewModel> _fileListViewModels = [];
+        private readonly RenameListUiTestContext _context = new();
 
         /// <inheritdoc />
         public void Dispose()
         {
-            foreach (var fileListViewModel in _fileListViewModels)
-            {
-                fileListViewModel.Dispose();
-            }
-
-            _tempDirectoryFixture.Dispose();
+            _context.Dispose();
         }
 
         /// <summary>
@@ -31,7 +25,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Adds_Files_And_Ignores_Duplicates()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             var alpha = _FileEntry(dir, "alpha.txt");
@@ -56,7 +50,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddPaths_Folder_Uses_FileList_Mask()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             fileListViewModel.Mask = "*.mp3";
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
@@ -75,7 +69,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddPaths_FoldersOnly_Skips_Files()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel)
             {
                 AddMode = RenameListAddMode.Folders,
@@ -96,7 +90,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddPaths_Empty_Or_NonAddable_Does_Nothing()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             await renameListViewModel.AddPathsAsync([]);
@@ -112,7 +106,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddPaths_Blocked_While_IsBusy()
         {
-            var parent = _tempDirectoryFixture.CreateTempDir();
+            var parent = _context.CreateTempDir();
             var tree = Path.Combine(parent, "tree");
             Directory.CreateDirectory(tree);
             for (var i = 0; i < 200; i++)
@@ -122,7 +116,7 @@ namespace Mfr.Tests.Ui.RenameList
                 File.WriteAllText(Path.Combine(nested, $"f{i:D3}.txt"), "x");
             }
 
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(tree)]);
 
@@ -142,7 +136,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Honors_Include_Mask()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             fileListViewModel.Mask = "*.txt";
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
@@ -164,7 +158,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Honors_Exclude_Masks()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             fileListViewModel.ApplyExcludeMasks(enabled: true, editorText: "*.txt");
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
@@ -186,7 +180,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddAll_Adds_Listed_Masked_Files_Without_Selection()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             fileListViewModel.Mask = "*.txt";
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
@@ -204,7 +198,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Folder_Default_AddsNestedFilesNotFolder()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
@@ -225,7 +219,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Folder_AddFoldersAndContents_AddsNestedFolderRows()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel)
             {
                 AddMode = RenameListAddMode.FilesAndFolders,
@@ -248,7 +242,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Folder_ContentsOff_AddsFolderAndTopLevelFiles()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel)
             {
                 AddMode = RenameListAddMode.FilesAndFolders,
@@ -273,7 +267,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddAll_Expands_Listed_Folders_Like_AddSelected()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileListViewModel = _CreateFileListViewModel(albumPath);
+            var fileListViewModel = _context.CreateFileListViewModel(albumPath);
             fileListViewModel.Mask = "*.mp3";
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
@@ -297,7 +291,7 @@ namespace Mfr.Tests.Ui.RenameList
             var (parent, albumPath) = _CreateAlbumTree();
             var other = Path.Combine(parent, "other.txt");
             File.WriteAllText(other, "o");
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FileEntry(parent, "other.txt"), _FolderEntry(albumPath)]);
 
@@ -315,7 +309,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Folder_FilesOffFoldersOn_AddsFolderAndDescendants()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel)
             {
                 AddMode = RenameListAddMode.Folders,
@@ -337,7 +331,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void AddSelected_CanExecute_DependsOnAddModeAndSelection()
         {
             var (parent, albumPath) = _CreateAlbumTree();
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var folderEntry = _FolderEntry(albumPath);
             var fileEntry = _FileEntry(parent, "other.txt");
             File.WriteAllText(fileEntry.FullPath, "o");
@@ -363,7 +357,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task RemoveSelected_Drops_Rows_And_Keeps_Selection_At_Index()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([
@@ -394,7 +388,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task TryJumpSelection_Replaces_Multi_Select_With_First_Row()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([
@@ -418,7 +412,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task TryJumpSelection_Jumps_To_Last_Row()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([
@@ -442,7 +436,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_With_RenameList_Selection_Inserts_After_And_Selects_First_New()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "gamma.log")]);
@@ -468,7 +462,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AddSelected_Without_RenameList_Selection_Appends()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt"), _FileEntry(dir, "gamma.log")]);
@@ -489,7 +483,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task SetDropMarkIndex_Out_Of_Range_Clears()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt")]);
@@ -512,7 +506,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task ReorderSelectedToDropMark_Append_Mark_Moves_Selection_To_End()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([
@@ -537,7 +531,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task RemoveAllButSelected_Keeps_Only_Selected_Rows()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([
@@ -568,7 +562,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task Clear_Removes_All_Rows()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             Assert.False(renameListViewModel.ClearCommand.CanExecute(null));
@@ -592,7 +586,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void SortByFieldKey_Append_Cycles_Keys()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             renameListViewModel.SortByFieldKey(
@@ -653,7 +647,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task SortByFieldKey_Append_Removing_Last_Key_Disables_AutoSort()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([
@@ -688,7 +682,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void SortByFieldKey_Replace_Still_Replaces_Entire_List()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             renameListViewModel.SortByFieldKey(
@@ -709,7 +703,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void SetSortKeys_Updates_Summary_And_ColumnStates()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             renameListViewModel.SetSortKeys([
@@ -737,7 +731,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void OpenFieldShuttle_Raises_FieldShuttleRequested_With_Columns_Tab()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             RenameListFieldShuttleTab? tab = null;
             renameListViewModel.FieldShuttleRequested += (_, requestedTab) => tab = requestedTab;
@@ -755,7 +749,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void OpenEditSortFields_Raises_FieldShuttleRequested_With_Sort_Tab()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             RenameListFieldShuttleTab? tab = null;
             renameListViewModel.FieldShuttleRequested += (_, requestedTab) => tab = requestedTab;
@@ -773,7 +767,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void SortByFieldKey_Preview_And_Unmapped_Are_NoOps()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             renameListViewModel.SetSortKeys([new RenameListSortKey(RenameListTestHelpers.FullFileNameKey)]);
 
@@ -792,7 +786,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void SetSortKeys_Drops_Preview_Unknown_And_Duplicate_Keys()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
             var unknownKey = RenameListFieldKey.Original("Unknown", "Missing");
@@ -814,7 +808,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void ApplySession_Drops_Unsortable_Keys()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
@@ -836,7 +830,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AutoSort_Add_Appends_And_Resorts_Ignoring_Selection()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
             Assert.True(renameListViewModel.IsAutoSort);
@@ -859,7 +853,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task MoveSelected_Cancels_AutoSort()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
 
@@ -886,7 +880,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void ToggleAutoSort_Restores_Default_Keys()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             Assert.False(renameListViewModel.IsAutoSort);
 
@@ -907,7 +901,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void ApplySession_Null_Uses_Default()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             Assert.False(renameListViewModel.IsAutoSort);
 
@@ -927,7 +921,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void ApplySessionSection_Restores_Add_Policy_And_Font()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             renameListViewModel.ApplySessionSection(
@@ -963,7 +957,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void ApplySession_Empty_Disables_And_Capture_RoundTrips()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             renameListViewModel.ApplySession(
                 RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey, descending: true)
@@ -974,7 +968,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.False(renameListViewModel.IsAutoSort);
             Assert.Empty(renameListViewModel.CaptureSortFields());
 
-            var restored = new RenameListViewModel(_CreateFileListViewModel(dir));
+            var restored = new RenameListViewModel(_context.CreateFileListViewModel(dir));
             restored.ApplySession(renameListViewModel.CaptureSortFields());
             Assert.False(restored.IsAutoSort);
         }
@@ -986,7 +980,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task AutoSort_Ignores_DropMark()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
 
@@ -1004,7 +998,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task CancelAutoSort_Disables_Without_Resort_And_Allows_DropMark()
         {
             var dir = _CreateThreeFileFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
 
@@ -1035,7 +1029,7 @@ namespace Mfr.Tests.Ui.RenameList
             var (parent, albumPath) = _CreateAlbumTree();
             var nestedDir = Path.Combine(albumPath, "disc1");
             var nestedPath = Path.Combine(nestedDir, "nested.mp3");
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.NavigateTo(parent);
@@ -1061,7 +1055,7 @@ namespace Mfr.Tests.Ui.RenameList
         public async Task LocateInFileList_Sets_Error_When_Item_Not_Listed()
         {
             var dir = _CreateSampleFolder();
-            var fileListViewModel = _CreateFileListViewModel(dir);
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.SetSelectedEntries([_FileEntry(dir, "alpha.txt")]);
@@ -1080,7 +1074,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddSelected_Cancel_Discards_Partial_Batch()
         {
-            var parent = _tempDirectoryFixture.CreateTempDir();
+            var parent = _context.CreateTempDir();
             var tree = Path.Combine(parent, "tree");
             Directory.CreateDirectory(tree);
             for (var i = 0; i < 200; i++)
@@ -1090,7 +1084,7 @@ namespace Mfr.Tests.Ui.RenameList
                 File.WriteAllText(Path.Combine(nested, $"f{i:D3}.txt"), "x");
             }
 
-            var fileListViewModel = _CreateFileListViewModel(parent);
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(tree)]);
 
@@ -1109,7 +1103,7 @@ namespace Mfr.Tests.Ui.RenameList
 
         private string _CreateSampleFolder()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
             File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
             return dir;
@@ -1117,7 +1111,7 @@ namespace Mfr.Tests.Ui.RenameList
 
         private string _CreateThreeFileFolder()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
             File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
             File.WriteAllText(Path.Combine(dir, "gamma.log"), "g");
@@ -1126,24 +1120,13 @@ namespace Mfr.Tests.Ui.RenameList
 
         private (string parent, string albumPath) _CreateAlbumTree()
         {
-            var parent = _tempDirectoryFixture.CreateTempDir();
+            var parent = _context.CreateTempDir();
             var albumPath = Path.Combine(parent, "album");
             Directory.CreateDirectory(Path.Combine(albumPath, "disc1"));
             File.WriteAllText(Path.Combine(albumPath, "track.mp3"), "t");
             File.WriteAllText(Path.Combine(albumPath, "readme.txt"), "r");
             File.WriteAllText(Path.Combine(albumPath, "disc1", "nested.mp3"), "n");
             return (parent, albumPath);
-        }
-
-        private FileListViewModel _CreateFileListViewModel(string path)
-        {
-            var fileListViewModel = new FileListViewModel(
-                NullSystemIconProvider.Instance,
-                path,
-                NullFileShellOpener.Instance
-            );
-            _fileListViewModels.Add(fileListViewModel);
-            return fileListViewModel;
         }
 
         private static FileListEntry _FolderEntry(string directoryPath)
@@ -1207,11 +1190,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             try
             {
-                var fileListViewModel = new FileListViewModel(
-                    NullSystemIconProvider.Instance,
-                    parent,
-                    NullFileShellOpener.Instance
-                );
+                var fileListViewModel = _context.CreateFileListViewModel(parent);
                 var renameListViewModel = new RenameListViewModel(fileListViewModel);
                 var deniedEntry = fileListViewModel.Entries.Single(entry => entry.IsDirectory);
                 fileListViewModel.SetSelectedEntries([deniedEntry]);

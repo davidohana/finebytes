@@ -93,7 +93,7 @@ todos:
     content: "Phase 12: preview columns for metadata fields (ID3-preview etc., after Phase 10)"
     status: pending
   - id: phase-13
-    content: "Phase 13: color legend + remaining hygiene (fixture drive-by; entry props keep)"
+    content: "Phase 13: color legend (after 14/15); glyph + fixture hygiene done; keep entry props"
     status: pending
   - id: phase-14
     content: "Phase 14: advanced menus — F2, export, free edit, Properties, drag-out"
@@ -151,7 +151,7 @@ ______________________________________________________________________
 | **10d** F5 re-preview               | Done    | After original refresh, re-run preview when Auto-Preview on                         | 8b                |
 | **11** Preview highlighting         | Done    | Red changed preview cells, preview-error rows, Show Preview Error                   | 8c                |
 | **12** Preview metadata columns     | Pending | ID3/image preview cols after filters                                                | 9 / 7b            |
-| **13** Remaining hygiene            | Partial | Color legend after 14/15; glyph styles done; fixture drive-by; keep entry props      | 10 / 7c           |
+| **13** Remaining hygiene            | Partial | Color legend after 14/15; glyph styles + test fixture done; keep entry props         | 10 / 7c           |
 | **14** Advanced menus               | Pending | F2, export, Properties, drag-out                                                    | 11 / 8            |
 | **15** GO                           | Pending | `Ctrl+G` → Commit                                                                   | 12 / 9            |
 
@@ -265,11 +265,10 @@ ______________________________________________________________________
 
 **Still open:**
 
-- Headless test fixture consolidation (`RenameListUiTestContext`) — drive-by only
 - `RenameListEntry` convenience properties — keep; `GetFieldText` is the general API
 - Color-legend toolbar (MFR7) — after Phase 14/15 (blue manual rename + plum apply error)
 
-**Done in hygiene:** preview/sort glyph styles live in [Themes/RenameList.axaml](../../Mfr.App.Ui/Themes/RenameList.axaml) (app `StyleInclude`).
+**Done in hygiene:** preview/sort glyph styles in [Themes/RenameList.axaml](../../Mfr.App.Ui/Themes/RenameList.axaml); Rename List UI tests use [RenameListUiTestContext](../../Mfr.Tests/Ui/RenameList/RenameListTestHelpers.cs).
 
 ______________________________________________________________________
 

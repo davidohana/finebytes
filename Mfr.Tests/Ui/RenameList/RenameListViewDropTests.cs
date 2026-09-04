@@ -5,8 +5,6 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 
@@ -17,18 +15,12 @@ namespace Mfr.Tests.Ui.RenameList
     /// </summary>
     public sealed class RenameListViewDropTests : IDisposable
     {
-        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
-        private readonly List<FileListViewModel> _fileListViewModels = [];
+        private readonly RenameListUiTestContext _context = new();
 
         /// <inheritdoc />
         public void Dispose()
         {
-            foreach (var fileListViewModel in _fileListViewModels)
-            {
-                fileListViewModel.Dispose();
-            }
-
-            _tempDirectoryFixture.Dispose();
+            _context.Dispose();
         }
 
         /// <summary>
@@ -37,10 +29,9 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public void DragOver_NonFile_Sets_None()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            var (view, window) = _Show(renameListViewModel);
+            var dir = _context.CreateTempDir();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            var (view, window) = _context.Show(renameListViewModel);
 
             var dataTransfer = new DataTransfer();
             dataTransfer.Add(DataTransferItem.CreateText("not-a-file"));
@@ -60,12 +51,11 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragOver_Files_Sets_Copy()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
             File.WriteAllText(alphaPath, "a");
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
-            var (view, window) = _Show(renameListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            var (view, window) = _context.Show(renameListViewModel);
 
             var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [alphaPath]);
             var dragOverArgs = new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.None)
@@ -84,18 +74,17 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragOver_Alt_Clears_Existing_Entries()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var existingPath = Path.Combine(dir, "existing.txt");
             var dragPath = Path.Combine(dir, "drag.txt");
             File.WriteAllText(existingPath, "e");
             File.WriteAllText(dragPath, "d");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([existingPath]);
             Assert.Single(renameListViewModel.Entries);
 
-            var (view, window) = _Show(renameListViewModel);
+            var (view, window) = _context.Show(renameListViewModel);
             var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [dragPath]);
             var dragOverArgs = new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt)
             {
@@ -114,17 +103,16 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragOver_Alt_Then_Drop_Replaces_List()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var existingPath = Path.Combine(dir, "existing.txt");
             var dragPath = Path.Combine(dir, "drag.txt");
             File.WriteAllText(existingPath, "e");
             File.WriteAllText(dragPath, "d");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([existingPath]);
 
-            var (view, window) = _Show(renameListViewModel);
+            var (view, window) = _context.Show(renameListViewModel);
             var dataTransfer = await RenameListTestHelpers.CreateFileDataTransferAsync(window, [dragPath]);
             view.RaiseEvent(new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt));
             Assert.Empty(renameListViewModel.Entries);
@@ -142,17 +130,16 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragLeave_Clears_DropMark()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
             var dragPath = Path.Combine(dir, "drag.txt");
             File.WriteAllText(alphaPath, "a");
             File.WriteAllText(dragPath, "d");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([alphaPath]);
 
-            var (view, window) = _Show(renameListViewModel);
+            var (view, window) = _context.Show(renameListViewModel);
             var grid = view.FindControl<DataGrid>("RenameGrid");
             Assert.NotNull(grid);
             Dispatcher.UIThread.RunJobs();
@@ -178,17 +165,16 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragLeave_Inside_Pane_Keeps_DropMark()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
             var dragPath = Path.Combine(dir, "drag.txt");
             File.WriteAllText(alphaPath, "a");
             File.WriteAllText(dragPath, "d");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([alphaPath]);
 
-            var (view, window) = _Show(renameListViewModel);
+            var (view, window) = _context.Show(renameListViewModel);
             var grid = view.FindControl<DataGrid>("RenameGrid");
             Assert.NotNull(grid);
             Dispatcher.UIThread.RunJobs();
@@ -214,17 +200,16 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragOver_Internal_Reorder_Sets_Move_And_DropMark()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
             var betaPath = Path.Combine(dir, "beta.md");
             File.WriteAllText(alphaPath, "a");
             File.WriteAllText(betaPath, "b");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
 
-            var (view, window) = _Show(renameListViewModel);
+            var (view, window) = _context.Show(renameListViewModel);
             var grid = view.FindControl<DataGrid>("RenameGrid");
             Assert.NotNull(grid);
             Dispatcher.UIThread.RunJobs();
@@ -256,19 +241,18 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragOver_Internal_Reorder_With_AutoSort_Cancels_AutoSort_And_Sets_DropMark()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
             var betaPath = Path.Combine(dir, "beta.md");
             File.WriteAllText(alphaPath, "a");
             File.WriteAllText(betaPath, "b");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             renameListViewModel.ApplySession(RenameListTestHelpers.SortSession(RenameListTestHelpers.FullFileNameKey));
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
             Assert.True(renameListViewModel.IsAutoSort);
 
-            var (view, window) = _Show(renameListViewModel);
+            var (view, window) = _context.Show(renameListViewModel);
             var grid = view.FindControl<DataGrid>("RenameGrid");
             Assert.NotNull(grid);
             Dispatcher.UIThread.RunJobs();
@@ -294,17 +278,16 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragOver_Internal_Reorder_Alt_Does_Not_Clear()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
             var betaPath = Path.Combine(dir, "beta.md");
             File.WriteAllText(alphaPath, "a");
             File.WriteAllText(betaPath, "b");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
 
-            var (view, window) = _Show(renameListViewModel);
+            var (view, window) = _context.Show(renameListViewModel);
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
             var dataTransfer = RenameListTestHelpers.CreateInternalReorderDataTransfer();
             view.RaiseEvent(new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, view, default, KeyModifiers.Alt));
@@ -321,7 +304,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragOver_Last_Row_Lower_Half_Sets_Append_Mark()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
             var betaPath = Path.Combine(dir, "beta.md");
             var dragPath = Path.Combine(dir, "drag.txt");
@@ -329,11 +312,10 @@ namespace Mfr.Tests.Ui.RenameList
             File.WriteAllText(betaPath, "b");
             File.WriteAllText(dragPath, "d");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
 
-            var (view, window) = _Show(renameListViewModel);
+            var (view, window) = _context.Show(renameListViewModel);
             var grid = view.FindControl<DataGrid>("RenameGrid");
             Assert.NotNull(grid);
             Dispatcher.UIThread.RunJobs();
@@ -359,7 +341,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task DragOver_Below_Last_Row_Sets_Append_Mark()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
+            var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
             var betaPath = Path.Combine(dir, "beta.md");
             var dragPath = Path.Combine(dir, "drag.txt");
@@ -367,11 +349,10 @@ namespace Mfr.Tests.Ui.RenameList
             File.WriteAllText(betaPath, "b");
             File.WriteAllText(dragPath, "d");
 
-            var fileListViewModel = _CreateFileListViewModel(dir);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
 
-            var (view, window) = _Show(renameListViewModel);
+            var (view, window) = _context.Show(renameListViewModel);
             var grid = view.FindControl<DataGrid>("RenameGrid");
             Assert.NotNull(grid);
             Dispatcher.UIThread.RunJobs();
@@ -387,31 +368,6 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(AdornerLayer.GetAdorner(grid));
 
             window.Close();
-        }
-
-        private FileListViewModel _CreateFileListViewModel(string path)
-        {
-            var fileListViewModel = new FileListViewModel(
-                NullSystemIconProvider.Instance,
-                path,
-                NullFileShellOpener.Instance
-            );
-            _fileListViewModels.Add(fileListViewModel);
-            return fileListViewModel;
-        }
-
-        private static (RenameListView View, Window Window) _Show(RenameListViewModel viewModel)
-        {
-            var view = new RenameListView { DataContext = viewModel };
-            var window = new Window
-            {
-                Width = 600,
-                Height = 300,
-                Content = view,
-            };
-            window.Show();
-            window.UpdateLayout();
-            return (view, window);
         }
 
         private static Point _PointOverEntry(

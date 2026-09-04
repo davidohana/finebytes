@@ -141,6 +141,31 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Shows a Rename List view hosted in a window.
+        /// </summary>
+        /// <param name="viewModel">Rename List view model.</param>
+        /// <param name="width">Host window width.</param>
+        /// <param name="height">Host window height.</param>
+        /// <returns>View and host window.</returns>
+        public (RenameListView View, Window Window) Show(
+            RenameListViewModel viewModel,
+            double width = 600,
+            double height = 300
+        )
+        {
+            var view = new RenameListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = width,
+                Height = height,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            return (view, window);
+        }
+
+        /// <summary>
         /// Shows a Rename List window with <paramref name="rowCount"/> sample files added.
         /// </summary>
         /// <param name="rowCount">Number of files to create and add.</param>
@@ -160,15 +185,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync(paths);
             Assert.Equal(rowCount, renameListViewModel.Entries.Count);
 
-            var view = new RenameListView { DataContext = renameListViewModel };
-            var window = new Window
-            {
-                Width = 800,
-                Height = 180,
-                Content = view,
-            };
-            window.Show();
-            window.UpdateLayout();
+            var (view, window) = Show(renameListViewModel, width: 800, height: 180);
             Dispatcher.UIThread.RunJobs();
 
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();

@@ -5,7 +5,6 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 ## Rename List
 
 - Color-legend toolbar (MFR7) — after F2 blue + GO plum (Phases 14/15)
-- Headless fixture: migrate remaining tests to `RenameListUiTestContext` when touching those files
 
 ## File List context menu
 
