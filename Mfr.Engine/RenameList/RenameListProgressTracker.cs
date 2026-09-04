@@ -1,38 +1,38 @@
 namespace Mfr.Engine.RenameList
 {
     /// <summary>
-    /// Progress snapshot while resolving sources and hydrating metadata.
+    /// Progress snapshot for a Rename List background operation.
     /// </summary>
     /// <param name="ScannedCount">Filesystem entries visited during resolve.</param>
     /// <param name="AddedCount">Items newly accepted into the rename list during resolve.</param>
     /// <param name="LastPath">Most recent path considered.</param>
-    /// <param name="MetadataTotalCount">Total rows for metadata hydrate; zero during resolve.</param>
+    /// <param name="MetadataTotalCount">Total rows for metadata/preview work; zero during resolve.</param>
     /// <param name="Phase">Current stage of the operation.</param>
-    /// <param name="MetadataProcessedCount">Rows whose metadata has been read during hydrate.</param>
-    public sealed record RenameListAddProgress(
+    /// <param name="MetadataProcessedCount">Rows processed during metadata hydrate or preview.</param>
+    public sealed record RenameListProgress(
         int ScannedCount,
         int AddedCount,
         string LastPath,
         int MetadataTotalCount = 0,
-        RenameListAddProgressPhase Phase = RenameListAddProgressPhase.ResolveSources,
+        RenameListProgressPhase Phase = RenameListProgressPhase.ResolveSources,
         int MetadataProcessedCount = 0
     );
 
     /// <summary>
-    /// Throttles <see cref="RenameListAddProgress"/> reports and holds the cancel flag for one operation.
+    /// Throttles <see cref="RenameListProgress"/> reports and holds the cancel flag for one operation.
     /// </summary>
     /// <param name="progress">Optional progress sink; when null, counts are still tracked for a final report.</param>
     /// <param name="cancellationToken">When canceled, the walk should stop without throwing.</param>
-    internal sealed class AddProgressTracker(
-        IProgress<RenameListAddProgress>? progress,
+    internal sealed class RenameListProgressTracker(
+        IProgress<RenameListProgress>? progress,
         CancellationToken cancellationToken = default
     )
     {
         private const int ProgressRefreshMilliseconds = 200;
 
-        private readonly IProgress<RenameListAddProgress>? _progress = progress;
+        private readonly IProgress<RenameListProgress>? _progress = progress;
         private long _lastReportTicks = Environment.TickCount64;
-        private RenameListAddProgressPhase _phase = RenameListAddProgressPhase.ResolveSources;
+        private RenameListProgressPhase _phase = RenameListProgressPhase.ResolveSources;
         private int _metadataProcessedCount;
         private int _metadataTotalCount;
 
@@ -62,12 +62,12 @@ namespace Mfr.Engine.RenameList
         public CancellationToken Token { get; } = cancellationToken;
 
         /// <summary>
-        /// Switches progress to the metadata hydrate stage.
+        /// Switches progress to the per-row work stage (metadata hydrate or preview).
         /// </summary>
-        /// <param name="totalItems">Rows to read metadata for.</param>
+        /// <param name="totalItems">Rows to process.</param>
         public void BeginMetadataPhase(int totalItems)
         {
-            _phase = RenameListAddProgressPhase.LoadMetadata;
+            _phase = RenameListProgressPhase.LoadMetadata;
             _metadataProcessedCount = 0;
             _metadataTotalCount = totalItems;
             _lastReportTicks = 0;
@@ -97,9 +97,9 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Records one metadata row processed during the hydrate stage.
+        /// Records one row processed during metadata hydrate or preview.
         /// </summary>
-        /// <param name="path">Path whose metadata was read or skipped.</param>
+        /// <param name="path">Path whose row was processed or skipped.</param>
         public void OnMetadataProcessed(string path)
         {
             _metadataProcessedCount++;
@@ -139,7 +139,7 @@ namespace Mfr.Engine.RenameList
         private void _Report()
         {
             _progress?.Report(
-                new RenameListAddProgress(
+                new RenameListProgress(
                     ScannedCount,
                     AddedCount,
                     LastPath,

@@ -5,9 +5,9 @@ using Mfr.Engine.RenameList;
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Tracks a background Rename List add or metadata hydrate: progress counts, delayed dialog visibility, and cancel.
+    /// Tracks a background Rename List operation: progress counts, delayed dialog visibility, and cancel.
     /// </summary>
-    public sealed partial class RenameListAddProgressViewModel : ViewModelBase
+    public sealed partial class RenameListProgressViewModel : ViewModelBase
     {
         private const int DialogDelayMilliseconds = 200;
 
@@ -18,7 +18,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(CancelCommand))]
-        private bool _isAdding;
+        private bool _isBusy;
 
         /// <summary>
         /// Gets whether the progress dialog should be shown.
@@ -44,7 +44,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(DialogTitle))]
         [NotifyPropertyChangedFor(nameof(ShowMetadataProgress))]
-        private RenameListAddProgressPhase _phase = RenameListAddProgressPhase.ResolveSources;
+        private RenameListProgressPhase _phase = RenameListProgressPhase.ResolveSources;
 
         /// <summary>
         /// Gets how many filesystem entries have been scanned during resolve.
@@ -61,14 +61,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private int _addedCount;
 
         /// <summary>
-        /// Gets how many rows have had metadata read during hydrate.
+        /// Gets how many rows have been processed during metadata hydrate or preview.
         /// </summary>
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(MetadataProgressText))]
         private int _metadataProcessedCount;
 
         /// <summary>
-        /// Gets the total row count for metadata hydrate; zero during resolve.
+        /// Gets the total row count for metadata/preview work; zero during resolve.
         /// </summary>
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(MetadataProgressText))]
@@ -97,7 +97,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     return "Previewing ...";
                 }
 
-                if (Phase == RenameListAddProgressPhase.LoadMetadata)
+                if (Phase == RenameListProgressPhase.LoadMetadata)
                 {
                     return "Reading file metadata";
                 }
@@ -117,7 +117,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public string SecondaryProgressText => $"Added {AddedCount} files";
 
         /// <summary>
-        /// Gets the metadata hydrate line shown as its own row.
+        /// Gets the per-row progress line shown for metadata, refresh, or preview.
         /// </summary>
         public string MetadataProgressText
         {
@@ -143,9 +143,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool ShowResolveProgress => Operation == RenameListProgressOperation.Add;
 
         /// <summary>
-        /// Gets whether the metadata progress line should be shown.
+        /// Gets whether the per-row progress line should be shown.
         /// </summary>
-        public bool ShowMetadataProgress => Phase == RenameListAddProgressPhase.LoadMetadata;
+        public bool ShowMetadataProgress => Phase == RenameListProgressPhase.LoadMetadata;
 
         /// <summary>
         /// Requests cancel for the in-progress operation.
@@ -153,7 +153,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <remarks>
         /// <para>
         /// During add, the engine stops resolving sources and discards its staging batch (items not yet in the
-        /// rename list), so the live list stays unchanged.
+        /// rename list), so the live list stays unchanged. Canceling preview also disables Auto-Preview.
         /// </para>
         /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanCancel))]
@@ -170,7 +170,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <see langword="true"/> when the work finished without user cancel; <see langword="false"/> when canceled.
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="work"/> is <see langword="null"/>.</exception>
-        internal Task<bool> RunAsync(Action<CancellationToken, IProgress<RenameListAddProgress>> work)
+        internal Task<bool> RunAsync(Action<CancellationToken, IProgress<RenameListProgress>> work)
         {
             return RunAsync(RenameListProgressOperation.Add, work);
         }
@@ -178,7 +178,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Runs background work with operation-specific dialog copy.
         /// </summary>
-        /// <param name="operation">Add, metadata hydrate, or original refresh.</param>
+        /// <param name="operation">Add, metadata hydrate, refresh, or preview.</param>
         /// <param name="work">Engine work invoked with the operation cancel token and progress sink.</param>
         /// <returns>
         /// <see langword="true"/> when the work finished without user cancel; <see langword="false"/> when canceled.
@@ -186,23 +186,23 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="work"/> is <see langword="null"/>.</exception>
         internal async Task<bool> RunAsync(
             RenameListProgressOperation operation,
-            Action<CancellationToken, IProgress<RenameListAddProgress>> work
+            Action<CancellationToken, IProgress<RenameListProgress>> work
         )
         {
             ArgumentNullException.ThrowIfNull(work);
 
             _cts = new CancellationTokenSource();
             var token = _cts.Token;
-            var progress = new Progress<RenameListAddProgress>(_ApplyProgress);
+            var progress = new Progress<RenameListProgress>(_ApplyProgress);
 
             Operation = operation;
             Phase = operation
                 is RenameListProgressOperation.MetadataHydrate
                     or RenameListProgressOperation.Refresh
                     or RenameListProgressOperation.Preview
-                ? RenameListAddProgressPhase.LoadMetadata
-                : RenameListAddProgressPhase.ResolveSources;
-            IsAdding = true;
+                ? RenameListProgressPhase.LoadMetadata
+                : RenameListProgressPhase.ResolveSources;
+            IsBusy = true;
             IsDialogVisible = false;
             ScannedCount = 0;
             AddedCount = 0;
@@ -211,10 +211,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             LastPath = string.Empty;
 
             var showDialogDelay = Task.Delay(DialogDelayMilliseconds, CancellationToken.None);
-            var addTask = Task.Run(() => work(token, progress), token);
+            var workTask = Task.Run(() => work(token, progress), token);
 
-            var completed = await Task.WhenAny(addTask, showDialogDelay).ConfigureAwait(true);
-            if (completed == showDialogDelay && !addTask.IsCompleted)
+            var completed = await Task.WhenAny(workTask, showDialogDelay).ConfigureAwait(true);
+            if (completed == showDialogDelay && !workTask.IsCompleted)
             {
                 IsDialogVisible = true;
             }
@@ -222,7 +222,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var canceled = false;
             try
             {
-                await addTask.ConfigureAwait(true);
+                await workTask.ConfigureAwait(true);
             }
             catch (OperationCanceledException)
             {
@@ -233,8 +233,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 // Engine stops the walk without throwing; treat a signaled token as user cancel.
                 canceled = canceled || token.IsCancellationRequested;
-                // Clear IsAdding before hiding the dialog so programmatic Close is not canceled.
-                IsAdding = false;
+                // Clear IsBusy before hiding the dialog so programmatic Close is not canceled.
+                IsBusy = false;
                 IsDialogVisible = false;
                 _cts.Dispose();
                 _cts = null;
@@ -243,7 +243,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return !canceled;
         }
 
-        private void _ApplyProgress(RenameListAddProgress progress)
+        private void _ApplyProgress(RenameListProgress progress)
         {
             Phase = progress.Phase;
             ScannedCount = progress.ScannedCount;
@@ -255,7 +255,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanCancel()
         {
-            return IsAdding;
+            return IsBusy;
         }
     }
 }

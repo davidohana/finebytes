@@ -21,7 +21,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ArgumentNullException.ThrowIfNull(columns);
             ArgumentNullException.ThrowIfNull(sortKeys);
 
-            if (IsAdding)
+            if (IsBusy)
             {
                 return;
             }
@@ -70,7 +70,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return true;
             }
 
-            var completed = await AddProgress
+            var completed = await Progress
                 .RunAsync(
                     RenameListProgressOperation.MetadataHydrate,
                     (token, progress) => _renameList.EnsureMetadataLoaded(requirement, token, progress)

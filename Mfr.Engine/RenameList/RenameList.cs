@@ -73,7 +73,7 @@ namespace Mfr.Engine.RenameList
             bool includeSubdirs = false,
             IReadOnlyList<string>? excludeMasks = null,
             CancellationToken cancellationToken = default,
-            IProgress<RenameListAddProgress>? progress = null,
+            IProgress<RenameListProgress>? progress = null,
             int? insertAtIndex = null,
             RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None
         )
@@ -89,7 +89,7 @@ namespace Mfr.Engine.RenameList
                 insertAtIndex
             );
 
-            var tracker = new AddProgressTracker(progress, cancellationToken);
+            var tracker = new RenameListProgressTracker(progress, cancellationToken);
             var resolveOptions = new SourceResolveOptions(
                 IncludeFiles: includeFiles,
                 IncludeFolders: includeFolders,
@@ -132,7 +132,7 @@ namespace Mfr.Engine.RenameList
         private int _FillBatch(
             List<string> sourceList,
             SourceResolveOptions resolveOptions,
-            AddProgressTracker tracker,
+            RenameListProgressTracker tracker,
             List<RenameItem> batch
         )
         {
@@ -174,7 +174,7 @@ namespace Mfr.Engine.RenameList
         private bool _TryAddSource(
             string source,
             SourceResolveOptions resolveOptions,
-            AddProgressTracker tracker,
+            RenameListProgressTracker tracker,
             List<RenameItem> batch
         )
         {
@@ -197,7 +197,7 @@ namespace Mfr.Engine.RenameList
         private void _AddSource(
             string source,
             SourceResolveOptions resolveOptions,
-            AddProgressTracker tracker,
+            RenameListProgressTracker tracker,
             List<RenameItem> batch
         )
         {
@@ -261,7 +261,7 @@ namespace Mfr.Engine.RenameList
         private static void _EnsureMetadataLoaded(
             List<RenameItem> items,
             RenameListMetadataRequirement requirement,
-            AddProgressTracker tracker
+            RenameListProgressTracker tracker
         )
         {
             if (requirement == RenameListMetadataRequirement.None || items.Count == 0)
@@ -463,7 +463,7 @@ namespace Mfr.Engine.RenameList
         public void EnsureMetadataLoaded(
             RenameListMetadataRequirement requirement,
             CancellationToken cancellationToken = default,
-            IProgress<RenameListAddProgress>? progress = null
+            IProgress<RenameListProgress>? progress = null
         )
         {
             if (requirement == RenameListMetadataRequirement.None || _renameItems.Count == 0)
@@ -471,7 +471,7 @@ namespace Mfr.Engine.RenameList
                 return;
             }
 
-            var tracker = new AddProgressTracker(progress, cancellationToken);
+            var tracker = new RenameListProgressTracker(progress, cancellationToken);
             _EnsureMetadataLoaded(_renameItems, requirement, tracker);
             tracker.ReportFinal();
         }
@@ -489,7 +489,7 @@ namespace Mfr.Engine.RenameList
         /// </remarks>
         public void RefreshOriginals(
             CancellationToken cancellationToken = default,
-            IProgress<RenameListAddProgress>? progress = null
+            IProgress<RenameListProgress>? progress = null
         )
         {
             if (_renameItems.Count == 0)
@@ -497,7 +497,7 @@ namespace Mfr.Engine.RenameList
                 return;
             }
 
-            var tracker = new AddProgressTracker(progress, cancellationToken);
+            var tracker = new RenameListProgressTracker(progress, cancellationToken);
             tracker.BeginMetadataPhase(_renameItems.Count);
             foreach (var item in _renameItems)
             {
@@ -557,7 +557,7 @@ namespace Mfr.Engine.RenameList
         public CommitPlan Preview(
             FilterChain chain,
             CancellationToken cancellationToken = default,
-            IProgress<RenameListAddProgress>? progress = null
+            IProgress<RenameListProgress>? progress = null
         )
         {
             ArgumentNullException.ThrowIfNull(chain);
@@ -571,7 +571,7 @@ namespace Mfr.Engine.RenameList
                 item.ResetState();
             }
 
-            var tracker = new AddProgressTracker(progress, cancellationToken);
+            var tracker = new RenameListProgressTracker(progress, cancellationToken);
             tracker.BeginMetadataPhase(_renameItems.Count);
 
             foreach (var renameItem in _renameItems)
@@ -699,7 +699,7 @@ namespace Mfr.Engine.RenameList
             IEnumerable<string> resolvedPaths,
             bool includeFiles,
             bool includeFolders,
-            AddProgressTracker tracker,
+            RenameListProgressTracker tracker,
             List<RenameItem> batch
         )
         {

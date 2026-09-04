@@ -4,24 +4,24 @@ using Mfr.App.Ui.ViewModels.RenameList;
 namespace Mfr.App.Ui.Views.RenameList
 {
     /// <summary>
-    /// Modal progress dialog shown while a long Rename List add is running.
+    /// Modal progress dialog shown while a long Rename List background operation is running.
     /// </summary>
-    public partial class AddProgressDialog : Window
+    public partial class RenameListProgressDialog : Window
     {
         /// <summary>
         /// Initializes the dialog (designer / default).
         /// </summary>
-        public AddProgressDialog()
+        public RenameListProgressDialog()
         {
             InitializeComponent();
             Closing += _OnClosing;
         }
 
         /// <summary>
-        /// Initializes the dialog bound to add-progress state.
+        /// Initializes the dialog bound to progress state.
         /// </summary>
         /// <param name="viewModel">Progress counts and cancel command.</param>
-        public AddProgressDialog(RenameListAddProgressViewModel viewModel)
+        public RenameListProgressDialog(RenameListProgressViewModel viewModel)
             : this()
         {
             DataContext = viewModel;
@@ -30,7 +30,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _OnClosing(object? sender, WindowClosingEventArgs e)
         {
             // Match MFR7: ignore close while the worker is still running (Cancel requests stop instead).
-            if (DataContext is RenameListAddProgressViewModel { IsAdding: true } viewModel)
+            if (DataContext is RenameListProgressViewModel { IsBusy: true } viewModel)
             {
                 e.Cancel = true;
                 viewModel.CancelCommand.Execute(null);

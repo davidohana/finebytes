@@ -169,7 +169,7 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
-        /// Verifies drag-back is a no-op when Remove Selected cannot run (empty selection / IsAdding).
+        /// Verifies drag-back is a no-op when Remove Selected cannot run (empty selection / IsBusy).
         /// </summary>
         [AvaloniaFact]
         public async Task DragOver_And_Drop_When_Cannot_Remove_Does_Nothing()

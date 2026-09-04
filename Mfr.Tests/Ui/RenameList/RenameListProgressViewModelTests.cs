@@ -3,9 +3,9 @@ using Mfr.App.Ui.ViewModels.RenameList;
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Tests delayed dialog visibility, progress updates, and cancel for Rename List add.
+    /// Tests delayed dialog visibility, progress updates, and cancel for Rename List background work.
     /// </summary>
-    public sealed class RenameListAddProgressViewModelTests
+    public sealed class RenameListProgressViewModelTests
     {
         /// <summary>
         /// Verifies a fast add completes without showing the progress dialog.
@@ -13,14 +13,11 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_Fast_Work_Does_Not_Show_Dialog()
         {
-            var viewModel = new RenameListAddProgressViewModel();
+            var viewModel = new RenameListProgressViewModel();
             var dialogBecameVisible = false;
             viewModel.PropertyChanged += (_, e) =>
             {
-                if (
-                    e.PropertyName is nameof(RenameListAddProgressViewModel.IsDialogVisible)
-                    && viewModel.IsDialogVisible
-                )
+                if (e.PropertyName is nameof(RenameListProgressViewModel.IsDialogVisible) && viewModel.IsDialogVisible)
                 {
                     dialogBecameVisible = true;
                 }
@@ -30,7 +27,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.True(completed);
             Assert.False(dialogBecameVisible);
-            Assert.False(viewModel.IsAdding);
+            Assert.False(viewModel.IsBusy);
             Assert.False(viewModel.IsDialogVisible);
             Assert.False(viewModel.CancelCommand.CanExecute(null));
         }
@@ -41,14 +38,11 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_Slow_Work_Shows_Dialog_Then_Hides()
         {
-            var viewModel = new RenameListAddProgressViewModel();
+            var viewModel = new RenameListProgressViewModel();
             var dialogBecameVisible = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             viewModel.PropertyChanged += (_, e) =>
             {
-                if (
-                    e.PropertyName is nameof(RenameListAddProgressViewModel.IsDialogVisible)
-                    && viewModel.IsDialogVisible
-                )
+                if (e.PropertyName is nameof(RenameListProgressViewModel.IsDialogVisible) && viewModel.IsDialogVisible)
                 {
                     dialogBecameVisible.TrySetResult();
                 }
@@ -57,12 +51,12 @@ namespace Mfr.Tests.Ui.RenameList
             var run = viewModel.RunAsync((_, _) => Thread.Sleep(400));
             await dialogBecameVisible.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
 
-            Assert.True(viewModel.IsAdding);
+            Assert.True(viewModel.IsBusy);
             Assert.True(viewModel.IsDialogVisible);
             Assert.True(viewModel.CancelCommand.CanExecute(null));
 
             Assert.True(await run.ConfigureAwait(true));
-            Assert.False(viewModel.IsAdding);
+            Assert.False(viewModel.IsBusy);
             Assert.False(viewModel.IsDialogVisible);
         }
 
@@ -72,7 +66,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_Cancel_Returns_False()
         {
-            var viewModel = new RenameListAddProgressViewModel();
+            var viewModel = new RenameListProgressViewModel();
             var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             var run = viewModel.RunAsync(
                 (token, _) =>
@@ -86,13 +80,13 @@ namespace Mfr.Tests.Ui.RenameList
             );
 
             await started.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
-            Assert.True(viewModel.IsAdding);
+            Assert.True(viewModel.IsBusy);
             Assert.True(viewModel.CancelCommand.CanExecute(null));
 
             viewModel.CancelCommand.Execute(null);
 
             Assert.False(await run.ConfigureAwait(true));
-            Assert.False(viewModel.IsAdding);
+            Assert.False(viewModel.IsBusy);
             Assert.False(viewModel.IsDialogVisible);
             Assert.False(viewModel.CancelCommand.CanExecute(null));
         }
@@ -103,14 +97,14 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_Applies_Progress_Reports()
         {
-            var viewModel = new RenameListAddProgressViewModel();
+            var viewModel = new RenameListProgressViewModel();
             var lastPath = Path.Combine("folder", "file.txt");
 
             var completed = await viewModel
                 .RunAsync(
                     (_, progress) =>
                     {
-                        progress.Report(new RenameListAddProgress(4, 2, lastPath));
+                        progress.Report(new RenameListProgress(4, 2, lastPath));
                         _WaitFor(() => viewModel.ScannedCount == 4);
                     }
                 )
@@ -128,7 +122,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_MetadataHydrate_Uses_Hydrate_Copy()
         {
-            var viewModel = new RenameListAddProgressViewModel();
+            var viewModel = new RenameListProgressViewModel();
 
             var completed = await viewModel
                 .RunAsync(
@@ -136,12 +130,12 @@ namespace Mfr.Tests.Ui.RenameList
                     (_, progress) =>
                     {
                         progress.Report(
-                            new RenameListAddProgress(
+                            new RenameListProgress(
                                 ScannedCount: 0,
                                 AddedCount: 0,
                                 LastPath: "C:\\a.mp3",
                                 MetadataTotalCount: 10,
-                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                Phase: RenameListProgressPhase.LoadMetadata,
                                 MetadataProcessedCount: 3
                             )
                         );
@@ -163,7 +157,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_Refresh_Uses_Refresh_Copy()
         {
-            var viewModel = new RenameListAddProgressViewModel();
+            var viewModel = new RenameListProgressViewModel();
             _ = await viewModel
                 .RunAsync(RenameListProgressOperation.MetadataHydrate, (_, _) => { })
                 .ConfigureAwait(true);
@@ -174,12 +168,12 @@ namespace Mfr.Tests.Ui.RenameList
                     (_, progress) =>
                     {
                         progress.Report(
-                            new RenameListAddProgress(
+                            new RenameListProgress(
                                 ScannedCount: 0,
                                 AddedCount: 0,
                                 LastPath: "C:\\a.mp3",
                                 MetadataTotalCount: 10,
-                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                Phase: RenameListProgressPhase.LoadMetadata,
                                 MetadataProcessedCount: 4
                             )
                         );
@@ -201,20 +195,20 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_Add_Metadata_Phase_Switches_Progress_Copy()
         {
-            var viewModel = new RenameListAddProgressViewModel();
+            var viewModel = new RenameListProgressViewModel();
 
             var completed = await viewModel
                 .RunAsync(
                     (_, progress) =>
                     {
-                        progress.Report(new RenameListAddProgress(100, 50, "C:\\done.mp3"));
+                        progress.Report(new RenameListProgress(100, 50, "C:\\done.mp3"));
                         progress.Report(
-                            new RenameListAddProgress(
+                            new RenameListProgress(
                                 ScannedCount: 100,
                                 AddedCount: 50,
                                 LastPath: "C:\\a.mp3",
                                 MetadataTotalCount: 50,
-                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                Phase: RenameListProgressPhase.LoadMetadata,
                                 MetadataProcessedCount: 1
                             )
                         );
@@ -224,7 +218,7 @@ namespace Mfr.Tests.Ui.RenameList
                 .ConfigureAwait(true);
 
             Assert.True(completed);
-            Assert.Equal(RenameListAddProgressPhase.LoadMetadata, viewModel.Phase);
+            Assert.Equal(RenameListProgressPhase.LoadMetadata, viewModel.Phase);
             Assert.Equal("Reading file metadata", viewModel.DialogTitle);
             Assert.Equal("Scanned 100 files", viewModel.PrimaryProgressText);
             Assert.Equal("Reading metadata: 1 of 50 files", viewModel.MetadataProgressText);
@@ -240,19 +234,19 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_Add_Metadata_Phase_Applies_Resolve_Totals_Without_Prior_Resolve_Report()
         {
-            var viewModel = new RenameListAddProgressViewModel();
+            var viewModel = new RenameListProgressViewModel();
 
             var completed = await viewModel
                 .RunAsync(
                     (_, progress) =>
                     {
                         progress.Report(
-                            new RenameListAddProgress(
+                            new RenameListProgress(
                                 ScannedCount: 100,
                                 AddedCount: 50,
                                 LastPath: "C:\\a.mp3",
                                 MetadataTotalCount: 50,
-                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                Phase: RenameListProgressPhase.LoadMetadata,
                                 MetadataProcessedCount: 1
                             )
                         );
@@ -262,7 +256,7 @@ namespace Mfr.Tests.Ui.RenameList
                 .ConfigureAwait(true);
 
             Assert.True(completed);
-            Assert.Equal(RenameListAddProgressPhase.LoadMetadata, viewModel.Phase);
+            Assert.Equal(RenameListProgressPhase.LoadMetadata, viewModel.Phase);
             Assert.Equal("Scanned 100 files", viewModel.PrimaryProgressText);
             Assert.Equal("Added 50 files", viewModel.SecondaryProgressText);
             Assert.Equal("Reading metadata: 1 of 50 files", viewModel.MetadataProgressText);
@@ -274,7 +268,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task RunAsync_Metadata_Progress_Updates_MetadataProgressText()
         {
-            var viewModel = new RenameListAddProgressViewModel();
+            var viewModel = new RenameListProgressViewModel();
 
             var completed = await viewModel
                 .RunAsync(
@@ -282,22 +276,22 @@ namespace Mfr.Tests.Ui.RenameList
                     (_, progress) =>
                     {
                         progress.Report(
-                            new RenameListAddProgress(
+                            new RenameListProgress(
                                 ScannedCount: 0,
                                 AddedCount: 0,
                                 LastPath: "C:\\a.mp3",
                                 MetadataTotalCount: 10,
-                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                Phase: RenameListProgressPhase.LoadMetadata,
                                 MetadataProcessedCount: 1
                             )
                         );
                         progress.Report(
-                            new RenameListAddProgress(
+                            new RenameListProgress(
                                 ScannedCount: 0,
                                 AddedCount: 0,
                                 LastPath: "C:\\e.mp3",
                                 MetadataTotalCount: 10,
-                                Phase: RenameListAddProgressPhase.LoadMetadata,
+                                Phase: RenameListProgressPhase.LoadMetadata,
                                 MetadataProcessedCount: 5
                             )
                         );

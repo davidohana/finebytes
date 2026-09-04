@@ -360,13 +360,13 @@ namespace Mfr.Tests.Ui.RenameList
 
             void OnProgressChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
             {
-                if (e.PropertyName is nameof(RenameListAddProgressViewModel.IsAdding) && renameList.IsAdding)
+                if (e.PropertyName is nameof(RenameListProgressViewModel.IsBusy) && renameList.IsBusy)
                 {
-                    renameList.AddProgress.CancelCommand.Execute(null);
+                    renameList.Progress.CancelCommand.Execute(null);
                 }
             }
 
-            renameList.AddProgress.PropertyChanged += OnProgressChanged;
+            renameList.Progress.PropertyChanged += OnProgressChanged;
             try
             {
                 var chain = new FilterChain
@@ -380,7 +380,7 @@ namespace Mfr.Tests.Ui.RenameList
             }
             finally
             {
-                renameList.AddProgress.PropertyChanged -= OnProgressChanged;
+                renameList.Progress.PropertyChanged -= OnProgressChanged;
             }
         }
 

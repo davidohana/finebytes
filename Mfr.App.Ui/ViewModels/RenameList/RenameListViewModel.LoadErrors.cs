@@ -36,7 +36,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanShowLoadErrors()
         {
-            if (IsAdding || _selectedEntries.Count != 1)
+            if (IsBusy || _selectedEntries.Count != 1)
             {
                 return false;
             }

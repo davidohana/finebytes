@@ -135,7 +135,7 @@ namespace Mfr.App.Ui.ViewModels
         {
             if (RenameListViewModel.IsGridFocused)
             {
-                // Auto-Preview after membership changes holds IsAdding via the shared progress runner;
+                // Auto-Preview after membership changes holds IsBusy via the shared progress runner;
                 // wait so F5 is not skipped while that pass is still finishing.
                 await WaitForPendingPreviewAsync().ConfigureAwait(true);
                 if (RenameListViewModel.RefreshCommand.CanExecute(null))
@@ -222,11 +222,7 @@ namespace Mfr.App.Ui.ViewModels
                 _PreviewRenameList();
             }
 
-            if (
-                e.PropertyName is nameof(RenameListViewModel.IsAdding)
-                && !RenameListViewModel.IsAdding
-                && _previewDirty
-            )
+            if (e.PropertyName is nameof(RenameListViewModel.IsBusy) && !RenameListViewModel.IsBusy && _previewDirty)
             {
                 _RequestPreview();
             }
@@ -323,7 +319,7 @@ namespace Mfr.App.Ui.ViewModels
             {
                 while (_previewDirty && RenameListViewModel.IsAutoPreview)
                 {
-                    if (RenameListViewModel.IsAdding)
+                    if (RenameListViewModel.IsBusy)
                     {
                         break;
                     }
@@ -335,7 +331,7 @@ namespace Mfr.App.Ui.ViewModels
             finally
             {
                 _previewRunning = false;
-                if (_previewDirty && RenameListViewModel.IsAutoPreview && !RenameListViewModel.IsAdding)
+                if (_previewDirty && RenameListViewModel.IsAutoPreview && !RenameListViewModel.IsBusy)
                 {
                     _previewDrainTask = _DrainPreviewAsync();
                     await _previewDrainTask.ConfigureAwait(true);

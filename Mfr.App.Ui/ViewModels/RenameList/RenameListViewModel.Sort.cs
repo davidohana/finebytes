@@ -56,7 +56,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </param>
         public void SortByFieldKey(RenameListFieldKey key, bool append = false)
         {
-            if (!RenameListFieldCatalog.IsSortableKey(key) || IsAdding)
+            if (!RenameListFieldCatalog.IsSortableKey(key) || IsBusy)
             {
                 return;
             }

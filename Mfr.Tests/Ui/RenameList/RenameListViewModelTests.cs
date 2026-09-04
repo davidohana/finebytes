@@ -110,7 +110,7 @@ namespace Mfr.Tests.Ui.RenameList
         /// Verifies AddPathsAsync is ignored while an add is already running.
         /// </summary>
         [Fact]
-        public async Task AddPaths_Blocked_While_IsAdding()
+        public async Task AddPaths_Blocked_While_IsBusy()
         {
             var parent = _tempDirectoryFixture.CreateTempDir();
             var tree = Path.Combine(parent, "tree");
@@ -127,7 +127,7 @@ namespace Mfr.Tests.Ui.RenameList
             fileListViewModel.SetSelectedEntries([_FolderEntry(tree)]);
 
             var addSelected = renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            await _WaitUntil(() => renameListViewModel.IsAdding);
+            await _WaitUntil(() => renameListViewModel.IsBusy);
 
             await renameListViewModel.AddPathsAsync([Path.Combine(tree, "d000", "f000.txt")]);
             await addSelected;
@@ -1095,13 +1095,13 @@ namespace Mfr.Tests.Ui.RenameList
             fileListViewModel.SetSelectedEntries([_FolderEntry(tree)]);
 
             var addTask = renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
-            await _WaitUntil(() => renameListViewModel.IsAdding).ConfigureAwait(true);
+            await _WaitUntil(() => renameListViewModel.IsBusy).ConfigureAwait(true);
 
             Assert.False(renameListViewModel.AddSelectedCommand.CanExecute(null));
-            renameListViewModel.AddProgress.CancelCommand.Execute(null);
+            renameListViewModel.Progress.CancelCommand.Execute(null);
             await addTask.ConfigureAwait(true);
 
-            Assert.False(renameListViewModel.IsAdding);
+            Assert.False(renameListViewModel.IsBusy);
             Assert.Empty(renameListViewModel.Entries);
             Assert.Equal(0, renameListViewModel.ItemCount);
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));

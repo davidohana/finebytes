@@ -972,14 +972,14 @@ namespace Mfr.Tests.Engine
         {
             TestHelpers.CreateFiles(_tempRoot, "a.txt", "b.txt", "nested/c.txt");
 
-            var reports = new List<RenameListAddProgress>();
+            var reports = new List<RenameListProgress>();
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources(
                 sources: [_tempRoot.CombinePath("*.txt")],
                 includeFiles: true,
                 includeFolders: false,
                 includeSubdirs: true,
-                progress: new SynchronousProgress<RenameListAddProgress>(reports.Add)
+                progress: new SynchronousProgress<RenameListProgress>(reports.Add)
             );
 
             Assert.Equal(3, renameList.RenameItems.Count);
@@ -987,7 +987,7 @@ namespace Mfr.Tests.Engine
             var last = reports[^1];
             Assert.True(last.ScannedCount >= 3);
             Assert.Equal(3, last.AddedCount);
-            Assert.Equal(RenameListAddProgressPhase.ResolveSources, last.Phase);
+            Assert.Equal(RenameListProgressPhase.ResolveSources, last.Phase);
             Assert.Equal(0, last.MetadataProcessedCount);
             Assert.False(string.IsNullOrWhiteSpace(last.LastPath));
         }
@@ -1360,17 +1360,17 @@ namespace Mfr.Tests.Engine
             var path = Path.Combine(_tempRoot, $"tagged_{Guid.NewGuid():N}.wav");
             TaggedMinimalWav.WriteTagged(path, title: "ProgressTitle", album: null);
 
-            var reports = new List<RenameListAddProgress>();
+            var reports = new List<RenameListProgress>();
             var renameList = new RenameList(includeHidden: true);
             renameList.AddSources(
                 [path],
                 metadataRequirement: RenameListMetadataRequirement.TagLib,
-                progress: new SynchronousProgress<RenameListAddProgress>(reports.Add)
+                progress: new SynchronousProgress<RenameListProgress>(reports.Add)
             );
 
             Assert.NotEmpty(reports);
             var last = reports[^1];
-            Assert.Equal(RenameListAddProgressPhase.LoadMetadata, last.Phase);
+            Assert.Equal(RenameListProgressPhase.LoadMetadata, last.Phase);
             Assert.Equal(1, last.AddedCount);
             Assert.True(last.ScannedCount >= 1);
             Assert.Equal(1, last.MetadataProcessedCount);
@@ -1392,9 +1392,9 @@ namespace Mfr.Tests.Engine
                 [path],
                 metadataRequirement: RenameListMetadataRequirement.TagLib,
                 cancellationToken: cts.Token,
-                progress: new SynchronousProgress<RenameListAddProgress>(report =>
+                progress: new SynchronousProgress<RenameListProgress>(report =>
                 {
-                    if (report.Phase == RenameListAddProgressPhase.LoadMetadata)
+                    if (report.Phase == RenameListProgressPhase.LoadMetadata)
                     {
                         cts.Cancel();
                     }

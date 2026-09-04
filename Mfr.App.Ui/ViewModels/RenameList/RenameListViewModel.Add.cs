@@ -72,7 +72,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         private async Task _AddSourcesAsync(IReadOnlyList<string> sources)
         {
-            if (sources.Count == 0 || IsAdding)
+            if (sources.Count == 0 || IsBusy)
             {
                 return;
             }
@@ -92,7 +92,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var completed = false;
             try
             {
-                completed = await AddProgress
+                completed = await Progress
                     .RunAsync(
                         (token, progress) =>
                             addSummary = _renameList.AddSources(
@@ -275,7 +275,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelected()
         {
-            if (IsAdding)
+            if (IsBusy)
             {
                 return false;
             }
@@ -289,7 +289,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddAll()
         {
-            if (IsAdding)
+            if (IsBusy)
             {
                 return false;
             }

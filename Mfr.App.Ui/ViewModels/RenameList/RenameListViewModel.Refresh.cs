@@ -24,7 +24,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var requirement = _CurrentMetadataRequirement();
-            var completed = await AddProgress
+            var completed = await Progress
                 .RunAsync(
                     RenameListProgressOperation.Refresh,
                     (token, progress) =>
@@ -66,7 +66,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanRefresh()
         {
-            return !IsAdding && Entries.Count > 0;
+            return !IsBusy && Entries.Count > 0;
         }
 
         private void _NotifyRefreshChanged()

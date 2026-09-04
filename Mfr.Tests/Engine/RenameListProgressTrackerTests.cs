@@ -1,9 +1,9 @@
 namespace Mfr.Tests.Engine
 {
     /// <summary>
-    /// Tests for <see cref="AddProgressTracker"/> progress snapshots.
+    /// Tests for <see cref="RenameListProgressTracker"/> progress snapshots.
     /// </summary>
-    public sealed class AddProgressTrackerTests
+    public sealed class RenameListProgressTrackerTests
     {
         /// <summary>
         /// Verifies metadata reports keep resolve totals and use a separate processed count.
@@ -11,8 +11,8 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Metadata_Phase_Keeps_Resolve_Counts()
         {
-            var reports = new List<RenameListAddProgress>();
-            var tracker = new AddProgressTracker(new SynchronousProgress<RenameListAddProgress>(reports.Add));
+            var reports = new List<RenameListProgress>();
+            var tracker = new RenameListProgressTracker(new SynchronousProgress<RenameListProgress>(reports.Add));
 
             tracker.OnScanned(@"C:\a.mp3");
             tracker.OnAdded(@"C:\a.mp3");
@@ -25,7 +25,7 @@ namespace Mfr.Tests.Engine
             Assert.Equal(1, last.AddedCount);
             Assert.Equal(1, last.MetadataProcessedCount);
             Assert.Equal(2, last.MetadataTotalCount);
-            Assert.Equal(RenameListAddProgressPhase.LoadMetadata, last.Phase);
+            Assert.Equal(RenameListProgressPhase.LoadMetadata, last.Phase);
             Assert.Equal(@"C:\a.mp3", last.LastPath);
         }
 
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Engine
         public void IsCanceled_Follows_Token()
         {
             using var cts = new CancellationTokenSource();
-            var tracker = new AddProgressTracker(progress: null, cts.Token);
+            var tracker = new RenameListProgressTracker(progress: null, cts.Token);
 
             Assert.False(tracker.IsCanceled);
             cts.Cancel();

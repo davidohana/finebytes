@@ -37,7 +37,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private bool _isSyncingSelection;
         private bool _selectionChangeFromView;
         private DataGridColumn? _lastHintColumn;
-        private AddProgressDialog? _addProgressDialog;
+        private RenameListProgressDialog? _progressDialog;
         private RenameListFieldShuttleDialog? _fieldShuttleDialog;
         private Point? _dragStartPoint;
         private PointerEventArgs? _dragStartArgs;
@@ -148,7 +148,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 _viewModel.FieldShuttleRequested -= _OnFieldShuttleRequested;
                 _viewModel.LoadErrorsDialogRequested -= _OnLoadErrorsDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
-                _viewModel.AddProgress.PropertyChanged -= _OnAddProgressPropertyChanged;
+                _viewModel.Progress.PropertyChanged -= _OnProgressPropertyChanged;
             }
 
             _viewModel = DataContext as RenameListViewModel;
@@ -160,7 +160,7 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.FieldShuttleRequested += _OnFieldShuttleRequested;
             _viewModel.LoadErrorsDialogRequested += _OnLoadErrorsDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
-            _viewModel.AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
+            _viewModel.Progress.PropertyChanged += _OnProgressPropertyChanged;
             _RebuildColumns();
             _ApplyFixedWidthFontClass();
             _SyncSelectionToGrid();
@@ -187,7 +187,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private bool _TryHandleRenameListShortcut(KeyEventArgs e)
         {
-            if (_viewModel is null || _viewModel.IsAdding || e.Handled)
+            if (_viewModel is null || _viewModel.IsBusy || e.Handled)
             {
                 return false;
             }
@@ -283,7 +283,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             _ClearDragState();
 
-            if (_viewModel is null || hit is null || _viewModel.IsAdding)
+            if (_viewModel is null || hit is null || _viewModel.IsBusy)
             {
                 return;
             }
@@ -480,7 +480,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             var isReorder = _IsInternalReorder(e);
             var canAccept = isReorder || _CanAcceptFileDrop(e);
-            if (_viewModel is null || _viewModel.IsAdding || !canAccept)
+            if (_viewModel is null || _viewModel.IsBusy || !canAccept)
             {
                 e.DragEffects = DragDropEffects.None;
                 _ClearDropMark();
@@ -525,7 +525,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             e.Handled = true;
 
-            if (_viewModel is null || _viewModel.IsAdding)
+            if (_viewModel is null || _viewModel.IsBusy)
             {
                 _ClearDropMark();
                 return;
@@ -901,28 +901,28 @@ namespace Mfr.App.Ui.Views.RenameList
             }
         }
 
-        private void _OnAddProgressPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void _OnProgressPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is nameof(RenameListAddProgressViewModel.IsDialogVisible))
+            if (e.PropertyName is nameof(RenameListProgressViewModel.IsDialogVisible))
             {
-                _ = _SyncAddProgressDialogAsync();
+                _ = _SyncProgressDialogAsync();
             }
         }
 
-        private async Task _SyncAddProgressDialogAsync()
+        private async Task _SyncProgressDialogAsync()
         {
             if (_viewModel is null)
             {
                 return;
             }
 
-            if (!_viewModel.AddProgress.IsDialogVisible)
+            if (!_viewModel.Progress.IsDialogVisible)
             {
-                _addProgressDialog?.Close();
+                _progressDialog?.Close();
                 return;
             }
 
-            if (_addProgressDialog is not null)
+            if (_progressDialog is not null)
             {
                 return;
             }
@@ -932,17 +932,17 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var dialog = new AddProgressDialog(_viewModel.AddProgress);
-            _addProgressDialog = dialog;
+            var dialog = new RenameListProgressDialog(_viewModel.Progress);
+            _progressDialog = dialog;
             try
             {
                 await dialog.ShowDialog(owner);
             }
             finally
             {
-                if (ReferenceEquals(_addProgressDialog, dialog))
+                if (ReferenceEquals(_progressDialog, dialog))
                 {
-                    _addProgressDialog = null;
+                    _progressDialog = null;
                 }
             }
         }

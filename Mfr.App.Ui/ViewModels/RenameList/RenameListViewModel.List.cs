@@ -143,7 +143,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             try
             {
-                if (IsAdding || _selectedEntries.Count == 0)
+                if (IsBusy || _selectedEntries.Count == 0)
                 {
                     return false;
                 }

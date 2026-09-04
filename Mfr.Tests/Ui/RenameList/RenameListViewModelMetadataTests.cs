@@ -132,7 +132,7 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.False(renameListViewModel.IsAdding);
+            Assert.False(renameListViewModel.IsBusy);
             Assert.Equal("FamilyTitle", entry.GetFieldText(titleKey));
             Assert.Equal("FamilyAlbum", entry.GetFieldText(albumKey));
         }
@@ -169,8 +169,8 @@ namespace Mfr.Tests.Ui.RenameList
                 []
             );
 
-            await _WaitUntilAsync(() => renameListViewModel.IsAdding).ConfigureAwait(true);
-            renameListViewModel.AddProgress.CancelCommand.Execute(null);
+            await _WaitUntilAsync(() => renameListViewModel.IsBusy).ConfigureAwait(true);
+            renameListViewModel.Progress.CancelCommand.Execute(null);
             await shuttle.ConfigureAwait(true);
 
             Assert.Equal(originalColumns, renameListViewModel.VisibleColumns);
@@ -214,12 +214,12 @@ namespace Mfr.Tests.Ui.RenameList
         private static async Task _WaitForBackgroundAsync(RenameListViewModel viewModel)
         {
             var deadline = Environment.TickCount64 + 10_000;
-            while (viewModel.IsAdding && Environment.TickCount64 < deadline)
+            while (viewModel.IsBusy && Environment.TickCount64 < deadline)
             {
                 await Task.Delay(20).ConfigureAwait(true);
             }
 
-            Assert.False(viewModel.IsAdding);
+            Assert.False(viewModel.IsBusy);
         }
     }
 }

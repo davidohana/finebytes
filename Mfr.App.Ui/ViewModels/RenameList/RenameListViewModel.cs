@@ -29,7 +29,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _fileListViewModel = fileListViewModel;
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;
-            AddProgress.PropertyChanged += _OnAddProgressPropertyChanged;
+            Progress.PropertyChanged += _OnProgressPropertyChanged;
             _ApplySessionScalarDefaults();
         }
 
@@ -77,9 +77,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Gets progress, cancel, and delayed-dialog state for the current add.
+        /// Gets progress, cancel, and delayed-dialog state for the current background operation.
         /// </summary>
-        public RenameListAddProgressViewModel AddProgress { get; } = new();
+        public RenameListProgressViewModel Progress { get; } = new();
 
         /// <summary>
         /// Raised after Rename List membership changes (add, remove, or clear — not sort/reorder).
@@ -114,9 +114,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public int ItemCount => Entries.Count;
 
         /// <summary>
-        /// Gets whether an add operation is in progress.
+        /// Gets whether a Rename List background operation is in progress.
         /// </summary>
-        public bool IsAdding => AddProgress.IsAdding;
+        public bool IsBusy => Progress.IsBusy;
 
         /// <summary>
         /// Gets whether Auto-Sort is active (one or more sort keys).
@@ -286,22 +286,22 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanRemoveSelected()
         {
-            return !IsAdding && _selectedEntries.Count > 0;
+            return !IsBusy && _selectedEntries.Count > 0;
         }
 
         private bool _CanRemoveAllButSelected()
         {
-            return !IsAdding && _selectedEntries.Count > 0 && _selectedEntries.Count < Entries.Count;
+            return !IsBusy && _selectedEntries.Count > 0 && _selectedEntries.Count < Entries.Count;
         }
 
         private bool _CanClear()
         {
-            return !IsAdding && Entries.Count > 0;
+            return !IsBusy && Entries.Count > 0;
         }
 
         private bool _CanLocateInFileList()
         {
-            return !IsAdding && _GetFocusedSelectedEntry() is not null;
+            return !IsBusy && _GetFocusedSelectedEntry() is not null;
         }
 
         private RenameListEntry? _GetFocusedSelectedEntry()
@@ -309,14 +309,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return _selectedEntries.Count > 0 ? _selectedEntries[^1] : null;
         }
 
-        private void _OnAddProgressPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void _OnProgressPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is not nameof(RenameListAddProgressViewModel.IsAdding))
+            if (e.PropertyName is not nameof(RenameListProgressViewModel.IsBusy))
             {
                 return;
             }
 
-            OnPropertyChanged(nameof(IsAdding));
+            OnPropertyChanged(nameof(IsBusy));
             AddSelectedCommand.NotifyCanExecuteChanged();
             AddAllCommand.NotifyCanExecuteChanged();
             RemoveSelectedCommand.NotifyCanExecuteChanged();

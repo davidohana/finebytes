@@ -1,9 +1,9 @@
 namespace Mfr.Engine.RenameList
 {
     /// <summary>
-    /// Stage within one Rename List add or metadata background operation.
+    /// Stage within one Rename List background operation (add, metadata, refresh, or preview).
     /// </summary>
-    public enum RenameListAddProgressPhase
+    public enum RenameListProgressPhase
     {
         /// <summary>
         /// Walking sources and accepting rename rows.
@@ -11,7 +11,7 @@ namespace Mfr.Engine.RenameList
         ResolveSources,
 
         /// <summary>
-        /// Reading TagLib / MetadataExtractor caches for visible columns or Auto-Sort.
+        /// Reading TagLib / MetadataExtractor caches, or applying preview filters per row.
         /// </summary>
         LoadMetadata,
     }

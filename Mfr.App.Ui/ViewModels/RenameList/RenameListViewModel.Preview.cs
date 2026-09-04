@@ -96,13 +96,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return true;
             }
 
-            if (IsAdding)
+            if (IsBusy)
             {
                 return true;
             }
 
             CommitPlan? plan = null;
-            var completed = await AddProgress
+            var completed = await Progress
                 .RunAsync(
                     RenameListProgressOperation.Preview,
                     (token, progress) =>
