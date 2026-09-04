@@ -23,7 +23,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
         /// Gets the Leading 0's mode choices (MFR7 labels).
         /// </summary>
         public IReadOnlyList<CounterLeadingZerosMode> LeadingZerosModes { get; } =
-            [CounterLeadingZerosMode.None, CounterLeadingZerosMode.Automatic, CounterLeadingZerosMode.Custom];
+        [CounterLeadingZerosMode.None, CounterLeadingZerosMode.Automatic, CounterLeadingZerosMode.Custom];
 
         /// <summary>
         /// Gets or sets the counter start value (index 0).
@@ -130,7 +130,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
                 Step: ClampToInt(Increment, -99999, 99999),
                 LeadingZerosMode: LeadingZerosMode,
                 CustomLength: ClampToInt(CustomLength, 1, 100),
-                PadChar: filter.Options.PadChar ?? "0",
                 Position: Position,
                 Separator: Separator ?? string.Empty,
                 ResetPerFolder: ResetPerFolder

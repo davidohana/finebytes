@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Mfr.Filters.Formatting
 {
     /// <summary>
@@ -34,7 +32,6 @@ namespace Mfr.Filters.Formatting
     /// <param name="Step">Counter increment step.</param>
     /// <param name="LeadingZerosMode">Leading-zero padding style.</param>
     /// <param name="CustomLength">Digit width when <paramref name="LeadingZerosMode"/> is <see cref="CounterLeadingZerosMode.Custom"/>.</param>
-    /// <param name="PadChar">Pad character selector (<c>"0"</c> → <c>0</c>; <c>"1"</c> → space; else first char).</param>
     /// <param name="Position">Where to place the counter result.</param>
     /// <param name="Separator">Separator used for prepend/append mode.</param>
     /// <param name="ResetPerFolder">Whether to reset per folder.</param>
@@ -43,7 +40,6 @@ namespace Mfr.Filters.Formatting
         int Step,
         CounterLeadingZerosMode LeadingZerosMode,
         int CustomLength,
-        string PadChar,
         CounterPosition Position,
         string Separator,
         bool ResetPerFolder
@@ -70,7 +66,6 @@ namespace Mfr.Filters.Formatting
                     Step: 1,
                     LeadingZerosMode: CounterLeadingZerosMode.None,
                     CustomLength: 2,
-                    PadChar: "0",
                     Position: CounterPosition.Prepend,
                     Separator: " - ",
                     ResetPerFolder: true
@@ -87,17 +82,7 @@ namespace Mfr.Filters.Formatting
             var usePerFolder = Options.ResetPerFolder;
             var n = usePerFolder ? item.Original.InFolderIndex : item.Original.RenameListIndex;
             var counter = Options.Start + ((long)Options.Step * n);
-
-            var pad = Options.PadChar switch
-            {
-                "0" => '0',
-                "1" => ' ',
-                _ => string.IsNullOrEmpty(Options.PadChar) ? '0' : Options.PadChar[0],
-            };
-
-            var raw = counter.ToString(CultureInfo.InvariantCulture);
-            var padWidth = _ResolvePadWidth(item, usePerFolder);
-            var formatted = padWidth > 0 ? raw.PadLeft(padWidth, pad) : raw;
+            var formatted = CounterPadding.Format(counter, _ResolvePadWidth(item, usePerFolder));
 
             return Options.Position switch
             {
@@ -124,26 +109,12 @@ namespace Mfr.Filters.Formatting
                     }
 
                     var maxIndex = Math.Max(listCount - 1, 0);
-                    return _AutomaticCounterWidth(Options.Start, Options.Step, maxIndex);
+                    return CounterPadding.AutomaticDigitWidth(Options.Start, Options.Step, maxIndex);
                 case CounterLeadingZerosMode.Custom:
                     return Math.Max(Options.CustomLength, 1);
                 default:
                     return 0;
             }
-        }
-
-        /// <summary>
-        /// Width needed so every value <c>start + step×i</c> for <c>i</c> in <c>0…maxIndex</c> fits when formatted invariant.
-        /// </summary>
-        private static int _AutomaticCounterWidth(int start, int step, int maxIndex)
-        {
-            var v0 = start + ((long)step * 0);
-            var v1 = start + ((long)step * maxIndex);
-            var lo = Math.Min(v0, v1);
-            var hi = Math.Max(v0, v1);
-            var w0 = lo.ToString(CultureInfo.InvariantCulture).Length;
-            var w1 = hi.ToString(CultureInfo.InvariantCulture).Length;
-            return Math.Max(w0, w1);
         }
     }
 }

@@ -110,8 +110,6 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                 var usePerFolder = options.ResetOnFolderChange == 1;
                 var n = usePerFolder ? item.Original.InFolderIndex : item.Original.RenameListIndex;
                 var value = options.InitialValue + ((long)options.IncrementBy * n);
-                var raw = value.ToString(CultureInfo.InvariantCulture);
-
                 var padWidth = _ResolvePadWidth(
                     options.PaddingMode,
                     options.LeadingZeroesTotalLength,
@@ -121,12 +119,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                     usePerFolder
                 );
 
-                if (padWidth <= 0 || padWidth <= raw.Length)
-                {
-                    return raw;
-                }
-
-                return raw.PadLeft(padWidth, '0');
+                return CounterPadding.Format(value, padWidth);
             };
         }
 
@@ -222,7 +215,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                     );
 
                     var maxIndex = Math.Max(listCount - 1, 0);
-                    return _AutomaticCounterWidth(start: start, step: step, maxIndex: maxIndex);
+                    return CounterPadding.AutomaticDigitWidth(start: start, step: step, maxIndex: maxIndex);
                 case CounterPaddingMode.Fixed:
                     Require.That(
                         leadingZeroesTotalLength >= 1,
@@ -234,25 +227,6 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                 default:
                     throw new UnreachableException();
             }
-        }
-
-        /// <summary>
-        /// Width needed so every value <c>start + step×i</c> for <c>i</c> in <c>0…maxIndex</c> fits when formatted invariant.
-        /// </summary>
-        private static int _AutomaticCounterWidth(int start, int step, int maxIndex)
-        {
-            var v0 = start + ((long)step * 0);
-            var v1 = start + ((long)step * maxIndex);
-            var lo = Math.Min(v0, v1);
-            var hi = Math.Max(v0, v1);
-            var w0 = _InvariantFormattedLength(lo);
-            var w1 = _InvariantFormattedLength(hi);
-            return Math.Max(w0, w1);
-        }
-
-        private static int _InvariantFormattedLength(long value)
-        {
-            return value.ToString(CultureInfo.InvariantCulture).Length;
         }
     }
 }

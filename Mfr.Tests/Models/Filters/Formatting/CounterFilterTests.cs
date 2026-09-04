@@ -22,7 +22,6 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Step: 1,
                     LeadingZerosMode: CounterLeadingZerosMode.Custom,
                     CustomLength: 3,
-                    PadChar: "0",
                     Position: CounterPosition.Replace,
                     Separator: "",
                     ResetPerFolder: false
@@ -44,7 +43,6 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Step: 1,
                     LeadingZerosMode: CounterLeadingZerosMode.None,
                     CustomLength: 2,
-                    PadChar: "0",
                     Position: CounterPosition.Prepend,
                     Separator: "_",
                     ResetPerFolder: false
@@ -66,7 +64,6 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Step: 1,
                     LeadingZerosMode: CounterLeadingZerosMode.None,
                     CustomLength: 2,
-                    PadChar: "0",
                     Position: CounterPosition.Append,
                     Separator: "-",
                     ResetPerFolder: false
@@ -88,7 +85,6 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Step: 5,
                     LeadingZerosMode: CounterLeadingZerosMode.None,
                     CustomLength: 2,
-                    PadChar: "0",
                     Position: CounterPosition.Replace,
                     Separator: "",
                     ResetPerFolder: true
@@ -98,25 +94,24 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies <c>padChar</c> <c>"1"</c> pads with space (documented in filter guide).
+        /// Verifies custom padding places the sign before zero digits (not <c>PadLeft</c> mangling).
         /// </summary>
         [Fact]
-        public void Apply_PadCharSpace_PadsWithSpaces()
+        public void Apply_Custom_Negative_PadsSignSafe()
         {
             var f = new CounterFilter(
                 _target,
                 new CounterOptions(
-                    Start: 7,
+                    Start: -5,
                     Step: 1,
                     LeadingZerosMode: CounterLeadingZerosMode.Custom,
-                    CustomLength: 4,
-                    PadChar: "1",
+                    CustomLength: 3,
                     Position: CounterPosition.Replace,
                     Separator: "",
                     ResetPerFolder: false
                 )
             );
-            Assert.Equal("   7", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
+            Assert.Equal("-005", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
         }
 
         /// <summary>
@@ -132,7 +127,6 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Step: 1,
                     LeadingZerosMode: CounterLeadingZerosMode.Automatic,
                     CustomLength: 2,
-                    PadChar: "0",
                     Position: CounterPosition.Replace,
                     Separator: "",
                     ResetPerFolder: false
@@ -140,23 +134,73 @@ namespace Mfr.Tests.Models.Filters.Formatting
             );
 
             // List of 100 → indices 0..99 → values 1..100 → width 3
-            var first = FilterTestHelpers.CreateRenameItem(
-                prefix: "x",
-                renameListIndex: 0,
-                renameListTotalCount: 100
-            );
+            var first = FilterTestHelpers.CreateRenameItem(prefix: "x", renameListIndex: 0, renameListTotalCount: 100);
             f.Setup();
             f.Apply(first);
             Assert.Equal("001", first.Preview.Prefix);
 
-            var last = FilterTestHelpers.CreateRenameItem(
-                prefix: "x",
-                renameListIndex: 99,
-                renameListTotalCount: 100
-            );
+            var last = FilterTestHelpers.CreateRenameItem(prefix: "x", renameListIndex: 99, renameListTotalCount: 100);
             f.Setup();
             f.Apply(last);
             Assert.Equal("100", last.Preview.Prefix);
+        }
+
+        /// <summary>
+        /// Verifies automatic padding with reset-per-folder uses folder sibling count.
+        /// </summary>
+        [Fact]
+        public void Apply_Automatic_ResetPerFolder_UsesFolderSiblingWidth()
+        {
+            var f = new CounterFilter(
+                _target,
+                new CounterOptions(
+                    Start: 1,
+                    Step: 1,
+                    LeadingZerosMode: CounterLeadingZerosMode.Automatic,
+                    CustomLength: 2,
+                    Position: CounterPosition.Replace,
+                    Separator: "",
+                    ResetPerFolder: true
+                )
+            );
+
+            // Global list 1000 would need width 4; folder of 10 → values 1..10 → width 2
+            var item = FilterTestHelpers.CreateRenameItem(
+                prefix: "x",
+                renameListIndex: 50,
+                inFolderIndex: 0,
+                renameListTotalCount: 1000,
+                renameListFolderSiblingCount: 10
+            );
+            f.Setup();
+            f.Apply(item);
+            Assert.Equal("01", item.Preview.Prefix);
+        }
+
+        /// <summary>
+        /// Verifies automatic width uses absolute digit count so negatives pad like MFR7.
+        /// </summary>
+        [Fact]
+        public void Apply_Automatic_NegativeRange_PadsSignSafe()
+        {
+            var f = new CounterFilter(
+                _target,
+                new CounterOptions(
+                    Start: -9,
+                    Step: 1,
+                    LeadingZerosMode: CounterLeadingZerosMode.Automatic,
+                    CustomLength: 2,
+                    Position: CounterPosition.Replace,
+                    Separator: "",
+                    ResetPerFolder: false
+                )
+            );
+
+            // Indices 0..9 → values -9..0 → digit width 1; index 0 → "-9"
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "x", renameListIndex: 0, renameListTotalCount: 10);
+            f.Setup();
+            f.Apply(item);
+            Assert.Equal("-9", item.Preview.Prefix);
         }
     }
 }

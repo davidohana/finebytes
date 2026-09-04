@@ -152,6 +152,21 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
         }
 
         /// <summary>
+        /// Verifies fixed padding places the sign before zero digits for negatives.
+        /// </summary>
+        [Fact]
+        public void Resolve_PaddingFixed_Negative_PadsSignSafe()
+        {
+            var token = new CounterToken();
+            var item = FilterTestHelpers.CreateRenameItem(renameListIndex: 0, inFolderIndex: 0);
+
+            Assert.Equal(
+                "-005",
+                token.Compile(tokenArgs: "initial=-5,step=1,padding=fixed,length=3,resetScope=global")(item)
+            );
+        }
+
+        /// <summary>
         /// Verifies positional-style fragments without <c>=</c> throw.
         /// </summary>
         [Fact]

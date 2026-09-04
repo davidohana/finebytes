@@ -8,9 +8,6 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 - **`step`** (int) — `value = start + step * n`.
 - **`leadingZerosMode`** (string (enum)) — `None`, `Automatic`, or `Custom` — see **Leading zeros** below.
 - **`customLength`** (int) — Digit width when `leadingZerosMode` is `Custom` (minimum `1`). Ignored for other modes.
-- **`padChar`** (string)
-  - `"0"` → pad with `0`; `"1"` → pad with space; any other non-empty string uses its **first** character; empty uses
-    `0`.
 - **`position`** (string (enum)) — `Replace`, `Prepend`, or `Append` — see **Position** below.
 - **`separator`** (string) — Between counter and original segment for `Prepend` / `Append`.
 - **`resetPerFolder`** (bool) — If `true`, `n` is the file’s index **within its folder**; if `false`, **global** index.
@@ -22,6 +19,8 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 | `None`      | No padding.                                                                                     |
 | `Automatic` | Left-pad so every value in the active list scope (global or per-folder) shares one digit width. |
 | `Custom`    | Left-pad to `customLength` digits.                                                              |
+
+Padding always uses digit `0`. Negative values keep the sign before the padded digits (e.g. `-005`).
 
 ### Position (`position`)
 
@@ -35,8 +34,8 @@ Computes a numeric value from each file’s **global** or **per-folder** index a
 
 Assume **global** index as in each row unless `resetPerFolder` is noted.
 
-- `start`: `1`; `step`: `1`; `leadingZerosMode`: `Custom`; `customLength`: `3`; `padChar`: `"0"`; `position`:
-  `Replace`; `resetPerFolder`: `false`; global index: `4`
+- `start`: `1`; `step`: `1`; `leadingZerosMode`: `Custom`; `customLength`: `3`; `position`: `Replace`;
+  `resetPerFolder`: `false`; global index: `4`
   - Before: `old`
   - After: `005`
 - `start`: `0`; `step`: `1`; `leadingZerosMode`: `None`; `position`: `Prepend`; `separator`: `"_"`; global index:
@@ -56,6 +55,10 @@ Assume **global** index as in each row unless `resetPerFolder` is noted.
   - Before: `x`
   - After: `001`
   - Comment: Width fits values `1`…`100`.
+- `start`: `-5`; `step`: `1`; `leadingZerosMode`: `Custom`; `customLength`: `3`; `position`: `Replace`; global
+  index: `0`
+  - Before: `x`
+  - After: `-005`
 
 For templates with `<file-name>`-style tokens, see [Formatter](Formatter.md).
 
@@ -74,7 +77,6 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
     "step": 1,
     "leadingZerosMode": "Custom",
     "customLength": 3,
-    "padChar": "0",
     "position": "Prepend",
     "separator": "_",
     "resetPerFolder": false

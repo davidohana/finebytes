@@ -1503,7 +1503,6 @@ namespace Mfr.Tests.Engine
             Step: 1,
             LeadingZerosMode: CounterLeadingZerosMode.Custom,
             CustomLength: 3,
-            PadChar: "0",
             Position: CounterPosition.Replace,
             Separator: " - ",
             ResetPerFolder: false
