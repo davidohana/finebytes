@@ -916,39 +916,37 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            if (!_viewModel.Progress.IsDialogVisible)
+            while (true)
             {
-                _progressDialog?.Close();
-                return;
-            }
-
-            if (_progressDialog is not null)
-            {
-                return;
-            }
-
-            if (TopLevel.GetTopLevel(this) is not Window owner)
-            {
-                return;
-            }
-
-            var dialog = new RenameListProgressDialog(_viewModel.Progress);
-            _progressDialog = dialog;
-            try
-            {
-                await dialog.ShowDialog(owner);
-            }
-            finally
-            {
-                if (ReferenceEquals(_progressDialog, dialog))
+                if (!_viewModel.Progress.IsDialogVisible)
                 {
-                    _progressDialog = null;
+                    _progressDialog?.Close();
+                    return;
                 }
-            }
 
-            if (_viewModel.Progress.IsDialogVisible)
-            {
-                await _SyncProgressDialogAsync().ConfigureAwait(true);
+                if (_progressDialog is not null)
+                {
+                    return;
+                }
+
+                if (TopLevel.GetTopLevel(this) is not Window owner)
+                {
+                    return;
+                }
+
+                var dialog = new RenameListProgressDialog(_viewModel.Progress);
+                _progressDialog = dialog;
+                try
+                {
+                    await dialog.ShowDialog(owner).ConfigureAwait(true);
+                }
+                finally
+                {
+                    if (ReferenceEquals(_progressDialog, dialog))
+                    {
+                        _progressDialog = null;
+                    }
+                }
             }
         }
 

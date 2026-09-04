@@ -65,11 +65,11 @@ namespace Mfr.App.Ui.Views.RenameList
             try
             {
                 RenameGrid.Columns.Clear();
-                RenameGrid.Columns.Add(_CreateRowStatusColumn());
+                RenameGrid.Columns.Add(_CreateRowStatusColumn(_viewModel));
                 var visibleColumns = _viewModel.VisibleColumns;
                 foreach (var visibleColumn in visibleColumns)
                 {
-                    RenameGrid.Columns.Add(_CreateGridColumn(visibleColumn));
+                    RenameGrid.Columns.Add(_CreateGridColumn(_viewModel, visibleColumn));
                 }
             }
             finally
@@ -88,7 +88,10 @@ namespace Mfr.App.Ui.Views.RenameList
             );
         }
 
-        private DataGridTemplateColumn _CreateRowStatusColumn()
+        /// <summary>
+        /// Builds the leading status column whose cells listen for list-level field display refreshes.
+        /// </summary>
+        private DataGridTemplateColumn _CreateRowStatusColumn(RenameListViewModel listViewModel)
         {
             const int width = 20;
             var column = new DataGridTemplateColumn
@@ -99,7 +102,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 MaxWidth = width,
                 Header = string.Empty,
                 CellTemplate = new FuncDataTemplate<RenameListEntry>(
-                    (_, _) => RenameListRowErrorGlyph.Create(_viewModel)
+                    (_, _) => RenameListRowErrorGlyph.Create(listViewModel)
                 ),
             };
             RenameListGridColumns.MarkAsRowStatusColumn(column);
@@ -117,17 +120,17 @@ namespace Mfr.App.Ui.Views.RenameList
             statusColumn.DisplayIndex = 0;
         }
 
-        private DataGridTemplateColumn _CreateGridColumn(RenameListVisibleColumn visibleColumn)
+        private DataGridTemplateColumn _CreateGridColumn(
+            RenameListViewModel listViewModel,
+            RenameListVisibleColumn visibleColumn
+        )
         {
             var key = visibleColumn.Key;
             var field = RenameListFieldCatalog.GetField(key);
             var headerText = field.DisplayName;
             var canUserSort = RenameListFieldCatalog.IsSortableKey(key);
 
-            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                key,
-                _viewModel?.UseFixedWidthFont == true
-            );
+            var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(key, listViewModel.UseFixedWidthFont);
             var pixelWidth = _ResolveEffectivePixelWidth(visibleColumn, minHeaderWidth);
 
             var column = new DataGridTemplateColumn
@@ -135,13 +138,15 @@ namespace Mfr.App.Ui.Views.RenameList
                 CanUserSort = canUserSort,
                 Width = new DataGridLength(pixelWidth, DataGridLengthUnitType.Pixel),
                 MinWidth = minHeaderWidth,
-                CellTemplate = new FuncDataTemplate<RenameListEntry>((entry, _) => _CreateFieldCell(entry, key)),
+                CellTemplate = new FuncDataTemplate<RenameListEntry>(
+                    (entry, _) => _CreateFieldCell(entry, key, listViewModel)
+                ),
             };
 
             RenameListGridColumns.SetFieldKey(column, key);
 
             column.HeaderTemplate = canUserSort
-                ? new FuncDataTemplate<object>((_, _) => _BuildSortableHeader(_viewModel!, headerText, key))
+                ? new FuncDataTemplate<object>((_, _) => _BuildSortableHeader(listViewModel, headerText, key))
                 : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key));
 
             column.PropertyChanged += (_, args) => _OnGridColumnPropertyChanged(column, args);
@@ -151,26 +156,37 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <summary>
         /// Builds one field cell and re-applies text when the row recycles or field values change.
         /// </summary>
-        private TextBlock _CreateFieldCell(RenameListEntry? entry, RenameListFieldKey key)
+        private TextBlock _CreateFieldCell(
+            RenameListEntry? entry,
+            RenameListFieldKey key,
+            RenameListViewModel listViewModel
+        )
         {
             var textBlock = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
-            RenameListEntry? subscribed = null;
 
             void ApplyCurrent()
             {
                 _ApplyFieldCell(textBlock, textBlock.DataContext as RenameListEntry ?? entry, key);
             }
 
-            void OnEntryPropertyChanged(object? sender, PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName is not (nameof(RenameListEntry.FieldDisplayRevision) or null or ""))
-                {
-                    return;
-                }
+            textBlock.DataContextChanged += (_, _) => ApplyCurrent();
+            ListenToFieldDisplayRevision(textBlock, listViewModel, ApplyCurrent);
+            ApplyCurrent();
+            return textBlock;
+        }
 
-                ApplyCurrent();
-            }
-
+        /// <summary>
+        /// Re-runs <paramref name="apply"/> when catalog field text or row-error state may have changed.
+        /// </summary>
+        /// <param name="control">Cell or glyph that should refresh while attached to the visual tree.</param>
+        /// <param name="listViewModel">List that bumps <see cref="RenameListViewModel.FieldDisplayRevision"/>.</param>
+        /// <param name="apply">Refresh callback for the current row data context.</param>
+        internal static void ListenToFieldDisplayRevision(
+            Control control,
+            RenameListViewModel listViewModel,
+            Action apply
+        )
+        {
             void OnListPropertyChanged(object? sender, PropertyChangedEventArgs e)
             {
                 if (e.PropertyName is not (nameof(RenameListViewModel.FieldDisplayRevision) or null or ""))
@@ -178,22 +194,21 @@ namespace Mfr.App.Ui.Views.RenameList
                     return;
                 }
 
-                ApplyCurrent();
+                apply();
             }
 
-            void OnDataContextChanged(object? sender, EventArgs e)
+            void OnAttached(object? sender, VisualTreeAttachmentEventArgs e)
             {
-                subscribed?.PropertyChanged -= OnEntryPropertyChanged;
-                subscribed = textBlock.DataContext as RenameListEntry;
-                subscribed?.PropertyChanged += OnEntryPropertyChanged;
-                ApplyCurrent();
+                listViewModel.PropertyChanged += OnListPropertyChanged;
             }
 
-            textBlock.DataContextChanged += OnDataContextChanged;
-            _viewModel?.PropertyChanged += OnListPropertyChanged;
+            void OnDetached(object? sender, VisualTreeAttachmentEventArgs e)
+            {
+                listViewModel.PropertyChanged -= OnListPropertyChanged;
+            }
 
-            ApplyCurrent();
-            return textBlock;
+            control.AttachedToVisualTree += OnAttached;
+            control.DetachedFromVisualTree += OnDetached;
         }
 
         /// <summary>

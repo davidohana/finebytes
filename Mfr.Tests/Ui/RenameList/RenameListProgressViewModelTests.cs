@@ -48,7 +48,7 @@ namespace Mfr.Tests.Ui.RenameList
                 }
             };
 
-            var run = viewModel.RunAsync((_, _) => Thread.Sleep(400));
+            var run = viewModel.RunAsync((_, _) => Thread.Sleep(900));
             await dialogBecameVisible.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
 
             Assert.True(viewModel.IsBusy);

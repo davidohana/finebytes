@@ -227,7 +227,7 @@ namespace Mfr.Engine.Commit
 
             foreach (var subject in participants)
             {
-                if (!_ItemPathChanges(subject))
+                if (subject.IsPreviewPathUnchanged())
                 {
                     continue;
                 }
@@ -235,7 +235,7 @@ namespace Mfr.Engine.Commit
                 if (
                     !originalPathToItem.TryGetValue(subject.Preview.FullPath, out var other)
                     || ReferenceEquals(subject, other)
-                    || !_ItemPathChanges(other)
+                    || other.IsPreviewPathUnchanged()
                 )
                 {
                     continue;
@@ -291,18 +291,13 @@ namespace Mfr.Engine.Commit
             var folderRenames = new List<RenameItem>();
             foreach (var item in participants)
             {
-                if (item.Original.Attributes.IsDirectory() && _ItemPathChanges(item))
+                if (item.Original.Attributes.IsDirectory() && !item.IsPreviewPathUnchanged())
                 {
                     folderRenames.Add(item);
                 }
             }
 
             return folderRenames;
-        }
-
-        private static bool _ItemPathChanges(RenameItem item)
-        {
-            return !string.Equals(item.Original.FullPath, item.Preview.FullPath, StringComparison.Ordinal);
         }
 
         private static RenameItem? _PickReadyItem(

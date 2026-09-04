@@ -56,33 +56,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool HasRowError => RenameListFieldCatalog.HasAnyLoadError(EngineItem);
 
         /// <summary>
-        /// Notifies the grid that <see cref="HasRowError"/> may have changed (after Refresh or metadata hydrate).
-        /// </summary>
-        internal void NotifyRowErrorChanged()
-        {
-            OnPropertyChanged(nameof(HasRowError));
-        }
-
-        /// <summary>
-        /// Notifies the grid that catalog field text or cell styling may have changed.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Template cells listen for this so preview / metadata / refresh updates repaint without replacing
-        /// row instances (same <see cref="RenameListEntry"/> keeps the same <c>DataContext</c>).
-        /// </para>
-        /// </remarks>
-        internal void NotifyFieldsChanged()
-        {
-            OnPropertyChanged(nameof(FieldDisplayRevision));
-        }
-
-        /// <summary>
-        /// Signal property for <see cref="NotifyFieldsChanged"/>; value is unused.
-        /// </summary>
-        public int FieldDisplayRevision => 0;
-
-        /// <summary>
         /// Returns whether this row path is missing from disk (whole-row gray; not a metadata load error).
         /// </summary>
         public bool IsMissingFromDisk => RenameListDiskPaths.IsMissingFromDisk(EngineItem);

@@ -123,9 +123,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Grid cells listen for this instead of a per-row <see cref="RenameListEntry.NotifyFieldsChanged"/>
-        /// loop, so a preview of tens of thousands of items does not stall the UI (and freeze the progress
-        /// dialog) with one PropertyChanged per row.
+        /// Grid cells and row-error glyphs listen for this so a preview of tens of thousands of items
+        /// does not stall the UI with one PropertyChanged per row.
         /// </para>
         /// </remarks>
         [ObservableProperty]

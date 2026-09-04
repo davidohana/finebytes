@@ -1,6 +1,4 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Mfr.App.Ui.Resources;
@@ -27,12 +25,13 @@ namespace Mfr.App.Ui.Views.RenameList
         /// Builds a centered red exclamation mark for the status column.
         /// </summary>
         /// <param name="listViewModel">
-        /// Host list; when set, visibility refreshes from <see cref="RenameListViewModel.FieldDisplayRevision"/>
-        /// instead of a per-row <see cref="RenameListEntry.HasRowError"/> notification.
+        /// Host list whose <see cref="RenameListViewModel.FieldDisplayRevision"/> refreshes visibility.
         /// </param>
         /// <returns>Styled row-error mark control.</returns>
-        public static Control Create(RenameListViewModel? listViewModel = null)
+        public static Control Create(RenameListViewModel listViewModel)
         {
+            ArgumentNullException.ThrowIfNull(listViewModel);
+
             var mark = new ShapePath
             {
                 Classes = { ClassName },
@@ -43,30 +42,15 @@ namespace Mfr.App.Ui.Views.RenameList
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-            if (listViewModel is null)
-            {
-                mark.Bind(
-                    Visual.IsVisibleProperty,
-                    new Binding(nameof(RenameListEntry.HasRowError)) { FallbackValue = false, TargetNullValue = false }
-                );
-            }
-            else
-            {
-                void ApplyVisibility()
-                {
-                    mark.IsVisible = mark.DataContext is RenameListEntry { HasRowError: true };
-                }
 
-                mark.DataContextChanged += (_, _) => ApplyVisibility();
-                listViewModel.PropertyChanged += (_, e) =>
-                {
-                    if (e.PropertyName is nameof(RenameListViewModel.FieldDisplayRevision) or null or "")
-                    {
-                        ApplyVisibility();
-                    }
-                };
-                ApplyVisibility();
+            void ApplyVisibility()
+            {
+                mark.IsVisible = mark.DataContext is RenameListEntry { HasRowError: true };
             }
+
+            mark.DataContextChanged += (_, _) => ApplyVisibility();
+            RenameListView.ListenToFieldDisplayRevision(mark, listViewModel, ApplyVisibility);
+            ApplyVisibility();
 
             ToolTip.SetTip(
                 mark,

@@ -572,11 +572,6 @@ namespace Mfr.Engine.RenameList
 
             foreach (var item in _renameItems)
             {
-                if (tracker.IsCanceled)
-                {
-                    break;
-                }
-
                 item.ResetState();
             }
 
