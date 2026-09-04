@@ -22,6 +22,8 @@
       <SolidColorBrush x:Key="RenameListDropIndicatorBrush" Color="#FA8072" />
       <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#808080" />
       <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#C00000" />
+      <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF0000" />
+      <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#FFF0F5" />
       <SolidColorBrush x:Key="FilterEditorTitleBarBrush" Color="#0066B8" />
       <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#FFFFFF" />
     </ResourceDictionary>
@@ -47,6 +49,8 @@
       <SolidColorBrush x:Key="RenameListDropIndicatorBrush" Color="#FA8072" />
       <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#909090" />
       <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#FF8080" />
+      <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF8080" />
+      <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#4A3038" />
       <SolidColorBrush x:Key="FilterEditorTitleBarBrush" Color="#264F78" />
       <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#F0F0F0" />
     </ResourceDictionary>

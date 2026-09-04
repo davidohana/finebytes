@@ -47,6 +47,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private void _NotifyShowLoadErrorsChanged()
         {
             OnPropertyChanged(nameof(CanShowLoadErrors));
+            OnPropertyChanged(nameof(CanShowRowErrorMenu));
             ShowLoadErrorsCommand.NotifyCanExecuteChanged();
         }
     }

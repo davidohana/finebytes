@@ -200,6 +200,26 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
+        /// Returns whether a preview column differs from the matching original snapshot (MFR7 red text).
+        /// </summary>
+        /// <param name="item">Engine rename item.</param>
+        /// <param name="key">Field key (original or preview).</param>
+        /// <returns>
+        /// <see langword="true"/> only for preview keys whose display text differs from the original.
+        /// </returns>
+        public static bool IsPreviewChanged(RenameItem item, RenameListFieldKey key)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            if (!key.IsPreview)
+            {
+                return false;
+            }
+
+            var field = GetField(key);
+            return !string.Equals(field.Resolve(item.Original), field.Resolve(item.Preview), StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// Returns whether the row has any issue for Show Load Errors (missing on disk or metadata load failure).
         /// </summary>
         /// <param name="item">Engine rename item.</param>

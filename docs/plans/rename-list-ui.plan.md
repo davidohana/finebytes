@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–9 and 10a–10d done. Next: 11 highlighting, then 12–15."
+overview: "Phases 1–11 done. Next: 12–15."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -88,7 +88,7 @@ todos:
     status: completed
   - id: phase-11
     content: "Phase 11: Preview highlighting — red changed cells, preview-error rows, Show Preview Error"
-    status: pending
+    status: completed
   - id: phase-12
     content: "Phase 12: preview columns for metadata fields (ID3-preview etc., after Phase 10)"
     status: pending
@@ -149,7 +149,7 @@ ______________________________________________________________________
 | **10b** List membership             | Done    | Re-preview on Rename List add/remove/clear                                          | 8b                |
 | **10c** Auto-Preview toggle         | Done    | Menu/toolbar, persist; cancel disables                                              | 8b                |
 | **10d** F5 re-preview               | Done    | After original refresh, re-run preview when Auto-Preview on                         | 8b                |
-| **11** Preview highlighting         | Pending | Red changed cells, preview-error rows, Show Preview Error                           | 8c                |
+| **11** Preview highlighting         | Done    | Red changed preview cells, preview-error rows, Show Preview Error                   | 8c                |
 | **12** Preview metadata columns     | Pending | ID3/image preview cols after filters                                                | 9 / 7b            |
 | **13** Remaining hygiene            | Partial | Color legend + Phase 5 follow-ups (glyph resources, test fixture, entry props)      | 10 / 7c           |
 | **14** Advanced menus               | Pending | F2, export, Properties, drag-out                                                    | 11 / 8            |
@@ -233,13 +233,19 @@ After Phase 9 `RefreshOriginals`, re-run preview when Auto-Preview is on (full M
 
 ______________________________________________________________________
 
-## Phase 11 — Preview highlighting
+## Phase 11 — Preview highlighting — done
 
 *(Was 8c.)*
 
-- Red changed preview **cells** (preview column headers already show preview glyph)
-- Preview-error rows (lavender/plum); **Show Preview Error** — distinct from **Show Load Errors** (Phase 8)
-- Sort-by-preview-column (one-shot) still deferred
+| Area                   | Location                                                                                                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Changed-cell detection | `RenameListFieldCatalog.IsPreviewChanged` + `RenameListEntry.IsPreviewChanged`                                                                                                                                            |
+| Red preview text       | `rename-list-preview-changed` in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs) / [RenameListView.axaml](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml)                |
+| Preview-error row bg   | `rename-list-preview-error` (LavenderBlush / dark muted) on [DataGridRow](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs)                                                                                      |
+| Show Preview Error     | [RenameListViewModel.PreviewErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.PreviewErrors.cs), [RenameListPreviewErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListPreviewErrorDialog.axaml) |
+| Status-bar marker      | `RenameListCellHint.FormatPartsWithPreviewError` (`[Item Preview Error]`)                                                                                                                                                 |
+
+**Not apply/rename errors:** plum **Show Rename Error** is Phase 15. Sort-by-preview-column (one-shot) still deferred.
 
 ______________________________________________________________________
 
@@ -282,4 +288,4 @@ ______________________________________________________________________
 
 ## What to implement next
 
-**11 Preview highlighting** — red changed preview cells, preview-error rows, Show Preview Error; then **12–15**.
+**12 Preview metadata columns** — ID3/image preview cols + shuttle Preview tab; then **13–15**.

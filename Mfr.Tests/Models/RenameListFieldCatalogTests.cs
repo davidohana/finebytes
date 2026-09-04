@@ -201,6 +201,25 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
+        public void IsPreviewChanged_true_only_for_changed_preview_keys()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: ".txt");
+            var originalKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, originalKey));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, previewKey));
+
+            item.Preview.Prefix = "after";
+
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, originalKey));
+            Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, previewKey));
+        }
+
+        [Fact]
         public void GetField_returns_registered_field()
         {
             var expected = RenameListFieldCatalog.All.Single(field =>

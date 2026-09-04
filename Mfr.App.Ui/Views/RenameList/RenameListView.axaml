@@ -22,11 +22,16 @@
       <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
       <ContextMenu x:Key="RenameListRowContextMenu" x:Shared="False">
         <MenuItem
+          Header="Show Preview Error"
+          Command="{Binding ShowPreviewErrorCommand}"
+          IsVisible="{Binding CanShowPreviewError}"
+        />
+        <MenuItem
           Header="Show Error Details"
           Command="{Binding ShowLoadErrorsCommand}"
           IsVisible="{Binding CanShowLoadErrors}"
         />
-        <Separator IsVisible="{Binding CanShowLoadErrors}" />
+        <Separator IsVisible="{Binding CanShowRowErrorMenu}" />
         <MenuItem
           Header="Locate in File List"
           Command="{Binding LocateInFileListCommand}"
@@ -181,6 +186,12 @@
       <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
       <Setter Property="FontStyle" Value="Italic" />
     </Style>
+    <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-preview-changed">
+      <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-preview-changed">
+      <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
+    </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-missing-on-disk">
       <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
     </Style>
@@ -215,6 +226,20 @@
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <!-- MFR7 PreviewErrorBackColor (LavenderBlush) -->
+    <Style Selector="DataGrid.rename-list DataGridRow.rename-list-preview-error">
+      <Setter Property="Background" Value="{DynamicResource RenameListPreviewErrorRowBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow.rename-list-preview-error /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource RenameListPreviewErrorRowBrush}" />
+      <Setter Property="Stroke" Value="Transparent" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow.rename-list-preview-error:selected /template/ Rectangle#BackgroundRectangle">
       <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
       <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />

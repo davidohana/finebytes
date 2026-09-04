@@ -198,6 +198,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
             _NotifyShowLoadErrorsChanged();
+            _NotifyShowPreviewErrorChanged();
         }
 
         /// <summary>
@@ -295,6 +296,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             FieldDisplayRevision++;
             _NotifyShowLoadErrorsChanged();
+            _NotifyShowPreviewErrorChanged();
         }
 
         private bool _CanRemoveSelected()
@@ -339,6 +341,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
             _NotifyShowLoadErrorsChanged();
+            _NotifyShowPreviewErrorChanged();
             _NotifyRefreshChanged();
         }
 

@@ -212,15 +212,17 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
-        /// Sets catalog text; missing rows use whole-row gray, load failures use per-cell styling.
+        /// Sets catalog text; missing/load-error/changed-preview cells get style classes.
         /// </summary>
         private static void _ApplyFieldCell(TextBlock textBlock, RenameListEntry? entry, RenameListFieldKey key)
         {
             textBlock.Text = entry?.GetFieldText(key) ?? string.Empty;
             var isMissing = entry?.IsMissingFromDisk == true;
             var isLoadError = !isMissing && entry?.IsLoadError(key) == true;
+            var isPreviewChanged = !isMissing && !isLoadError && entry?.IsPreviewChanged(key) == true;
             textBlock.Classes.Set("rename-list-missing-on-disk", isMissing);
             textBlock.Classes.Set("rename-list-load-error", isLoadError);
+            textBlock.Classes.Set("rename-list-preview-changed", isPreviewChanged);
             textBlock.ClearValue(TextBlock.ForegroundProperty);
             textBlock.ClearValue(TextBlock.FontStyleProperty);
         }

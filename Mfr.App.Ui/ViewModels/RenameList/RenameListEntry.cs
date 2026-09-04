@@ -56,6 +56,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool HasRowError => RenameListFieldCatalog.HasAnyLoadError(EngineItem);
 
         /// <summary>
+        /// Returns whether the last preview left a preview error on this row (lavender highlight).
+        /// </summary>
+        public bool HasPreviewError => EngineItem.PreviewError is not null;
+
+        /// <summary>
         /// Returns whether this row path is missing from disk (whole-row gray; not a metadata load error).
         /// </summary>
         public bool IsMissingFromDisk => RenameListDiskPaths.IsMissingFromDisk(EngineItem);
@@ -68,6 +73,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool IsLoadError(RenameListFieldKey key)
         {
             return RenameListFieldCatalog.HasLoadError(EngineItem, key);
+        }
+
+        /// <summary>
+        /// Returns whether this preview cell differs from the original (MFR7 red text).
+        /// </summary>
+        /// <param name="key">Field key (original or preview).</param>
+        /// <returns><see langword="true"/> when the preview column should use changed-value styling.</returns>
+        public bool IsPreviewChanged(RenameListFieldKey key)
+        {
+            return RenameListFieldCatalog.IsPreviewChanged(EngineItem, key);
         }
 
         /// <summary>

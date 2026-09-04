@@ -141,12 +141,29 @@ namespace Mfr.App.Ui.Views.RenameList
             await dialog.ShowDialog(owner);
         }
 
+        private void _OnPreviewErrorDialogRequested(object? sender, RenameListPreviewErrorDialogContent content)
+        {
+            Dispatcher.UIThread.Post(() => _ = _ShowPreviewErrorDialogAsync(content));
+        }
+
+        private async Task _ShowPreviewErrorDialogAsync(RenameListPreviewErrorDialogContent content)
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            var dialog = new RenameListPreviewErrorDialog(content);
+            await dialog.ShowDialog(owner);
+        }
+
         private void _OnDataContextChanged(object? sender, EventArgs e)
         {
             if (_viewModel is not null)
             {
                 _viewModel.FieldShuttleRequested -= _OnFieldShuttleRequested;
                 _viewModel.LoadErrorsDialogRequested -= _OnLoadErrorsDialogRequested;
+                _viewModel.PreviewErrorDialogRequested -= _OnPreviewErrorDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.Progress.PropertyChanged -= _OnProgressPropertyChanged;
             }
@@ -159,6 +176,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             _viewModel.FieldShuttleRequested += _OnFieldShuttleRequested;
             _viewModel.LoadErrorsDialogRequested += _OnLoadErrorsDialogRequested;
+            _viewModel.PreviewErrorDialogRequested += _OnPreviewErrorDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.Progress.PropertyChanged += _OnProgressPropertyChanged;
             _RebuildColumns();
@@ -471,7 +489,9 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var cellText = entry.GetFieldText(fieldKey.Value);
-            _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatParts(field.DisplayName, cellText);
+            _viewModel.CellStatusHintDisplay = entry.HasPreviewError
+                ? RenameListCellHint.FormatPartsWithPreviewError(field.DisplayName, cellText)
+                : RenameListCellHint.FormatParts(field.DisplayName, cellText);
         }
 
         private void _OnDragOver(object? sender, DragEventArgs e)
@@ -671,6 +691,21 @@ namespace Mfr.App.Ui.Views.RenameList
         private void _OnLoadingRow(object? sender, DataGridRowEventArgs e)
         {
             _ApplyDropMarkClass(e.Row);
+            _ApplyPreviewErrorRowClass(e.Row);
+        }
+
+        private void _ApplyPreviewErrorRowHighlights()
+        {
+            foreach (var row in RenameGrid.GetVisualDescendants().OfType<DataGridRow>())
+            {
+                _ApplyPreviewErrorRowClass(row);
+            }
+        }
+
+        private static void _ApplyPreviewErrorRowClass(DataGridRow row)
+        {
+            var hasPreviewError = row.DataContext is RenameListEntry { HasPreviewError: true };
+            row.Classes.Set("rename-list-preview-error", hasPreviewError);
         }
 
         private void _ApplyDropMarkVisuals()
@@ -849,6 +884,12 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 _ApplyFixedWidthFontClass();
                 _RefreshColumnMinimumWidths();
+            }
+
+            if (e.PropertyName is nameof(RenameListViewModel.FieldDisplayRevision))
+            {
+                _ApplyPreviewErrorRowHighlights();
+                _PublishFocusedCellHint();
             }
         }
 

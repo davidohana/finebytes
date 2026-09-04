@@ -7,8 +7,10 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Filters.Case;
+using Mfr.Filters.Formatting;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Ui.RenameList
@@ -702,6 +704,118 @@ namespace Mfr.Tests.Ui.RenameList
                 "HELLO.txt",
                 row.GetVisualDescendants().OfType<TextBlock>().Select(textBlock => textBlock.Text)
             );
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies changed preview cells get the red-text style class (Phase 11).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Preview_marks_changed_preview_cells_red()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+            var originalKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(originalKey),
+                new RenameListVisibleColumn(previewKey),
+            ]);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 900,
+                Height = 200,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            renameListViewModel.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ])
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.True(entry.IsPreviewChanged(previewKey));
+            Assert.False(entry.IsPreviewChanged(originalKey));
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
+            var changedTextBlock = row.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .First(textBlock => textBlock.Classes.Contains("rename-list-preview-changed"));
+            Assert.Equal("HELLO.txt", changedTextBlock.Text);
+
+            var originalTextBlock = row.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .First(textBlock => textBlock.Text == "hello.txt");
+            Assert.DoesNotContain("rename-list-preview-changed", originalTextBlock.Classes);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies preview-error rows get the lavender highlight class (Phase 11).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Preview_marks_preview_error_rows()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "note.txt");
+            File.WriteAllText(path, "plain text");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 800,
+                Height = 180,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            renameListViewModel.Preview(
+                FilterChain.CreateAllEnabled([
+                    new FormatterFilter(
+                        Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
+                        Options: new FormatterOptions("x")
+                    ),
+                ])
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.True(entry.HasPreviewError);
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
+            Assert.Contains("rename-list-preview-error", row.Classes);
 
             window.Close();
         }
