@@ -5,7 +5,10 @@ namespace Mfr.Filters.Trimming
     /// <summary>
     /// Options for <see cref="ShrinkDuplicateCharactersFilter"/>.
     /// </summary>
-    /// <param name="Character">Character whose adjacent duplicate occurrences are collapsed.</param>
+    /// <param name="Character">
+    /// Character whose adjacent duplicate occurrences are collapsed.
+    /// <c>\0</c> (empty editor) is a no-op.
+    /// </param>
     public sealed record ShrinkDuplicateCharactersOptions(char Character);
 
     /// <summary>
@@ -34,7 +37,6 @@ namespace Mfr.Filters.Trimming
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            // MFR7: empty editor / '\0' means no operation.
             if (Options.Character == '\0')
             {
                 return value;

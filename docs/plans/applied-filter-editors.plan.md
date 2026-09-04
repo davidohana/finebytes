@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F4 shipped. F5 remaining option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass. Next: Trim Between."
+overview: "F1–F4 shipped. Reorg editors into FilterGroup subfolders next, then F5 remaining option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass. After reorg: Trim Between."
 todos:
   - id: f1-f4
     content: "F1–F4: ctors, Applied list, Filter Options/Apply To, Space Character + Letters Case"
@@ -11,6 +11,9 @@ todos:
   - id: f5-shrink-dup
     content: "F5 Shrink Duplicate Characters — single-char editor"
     status: completed
+  - id: f5-reorg-subfolders
+    content: "F5 reorg — move editors into FilterGroup subfolders (mirror Mfr.Filters); update ViewLocator + usings"
+    status: pending
   - id: f5-trim-between
     content: "F5 Trim Between — start/end Position editor"
     status: pending
@@ -84,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-04):** F5 Shrink Duplicate Characters done. **Next: F5 Trim Between** (single filter). Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-04):** F5 Shrink Duplicate Characters done. **Next: F5 reorg** (category subfolders), then **Trim Between**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ### Already shipped (F1–F4)
 
@@ -94,14 +97,89 @@ Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical
 - Option editors: **Space Character**, **Letters Case**.
 - Optionless string filters: title only (no body) — Shrink/Remove/Strip Spaces, Separate Capitalized Text, Uppercase Initials.
 
-### Pattern to copy (every F5 pass)
+______________________________________________________________________
+
+## Folder layout (do before more F5 editors)
+
+Flat `FilterEditors/` will not scale (~25 option editors). Mirror [`FilterGroup`](../../Mfr.Filters/FilterGroup.cs) / `Mfr.Filters` category folders under **both** VM and view trees.
+
+### Target tree
+
+```text
+ViewModels/FilterEditors/          Views/FilterEditors/
+  FilterEditorViewModel.cs           FilterEditorViewLocator.cs
+  FilterOptionsEditorViewModel.cs
+  FilterOptionsEditorFactory.cs
+  Space/                             Space/
+    SpaceCharacter…                  SpaceCharacter…
+    SpaceAfter… / SpaceAround…       …
+  Case/                              Case/
+    LettersCase…                     …
+    CapitalizeAfter…
+    SentenceEndCharacters…
+    CasingList…
+  Trimming/                          Trimming/
+    Count…                           …
+    ShrinkDuplicateCharacters…
+    TrimBetween…
+  Replace/                           Replace/
+    Cleaner…, ReplaceList…, Replacer…
+  Formatting/                        Formatting/
+    Counter…, Inserter…, NameList…
+    TokenMover…, Formatter…
+  Attributes/                        Attributes/
+    DateSetter… / TimeSetter…
+    TimeShifter…, AttributesSetter…
+  Audio/                             Audio/
+    TagRemover…, AudioTagSetter…
+    Id3v2FieldSetter…
+  Misc/                              Misc/
+    FixLeadingZeros…
+    StripParentheses…
+    Mover…
+```
+
+Namespaces follow folders, e.g. `Mfr.App.Ui.ViewModels.FilterEditors.Trimming` ↔ `Mfr.App.Ui.Views.FilterEditors.Trimming`.
+
+### Shared vs per-filter
+
+| Location | Contents |
+| -------- | -------- |
+| **Root** `FilterEditors/` | Base VMs, factory, ViewLocator; any helper used by ≥2 categories |
+| **Category subfolder** | That group's `*FilterEditorViewModel` / `*FilterEditorView` (+ helpers used only there, e.g. `SpaceCharacterDefinition` → `Space/`) |
+
+### ViewLocator change (required for reorg)
+
+Today the locator requires an **exact** flat namespace (`ViewModels.FilterEditors` → `Views.FilterEditors`). After reorg, resolve by **prefix replace**:
+
+- VM namespace must start with `Mfr.App.Ui.ViewModels.FilterEditors`
+- View type = same relative suffix under `Mfr.App.Ui.Views.FilterEditors`, with `ViewModel` → `View` on the type name
+
+Example: `…ViewModels.FilterEditors.Trimming.CountFilterEditorViewModel` → `…Views.FilterEditors.Trimming.CountFilterEditorView`.
+
+Keep types in the same category folder on both sides; do not cross-map categories.
+
+### Reorg pass checklist
+
+1. Create the eight category folders under VM + Views.
+1. Move existing editors: Space Character → `Space/`; Letters Case → `Case/`; Count + Shrink Duplicate → `Trimming/`; move `SpaceCharacterDefinition` with Space.
+1. Update namespaces + factory/test usings.
+1. Teach `FilterEditorViewLocator` the prefix-replace rule; keep `Match` on `FilterOptionsEditorViewModel`.
+1. Build + existing Filter Editor VM/headless tests green.
+1. No behavior changes — move only.
+
+Do this **before Trim Between** so new editors land in the right folder from the start.
+
+______________________________________________________________________
+
+## Pattern to copy (every F5 pass)
 
 Same as F4b/F4c — **one pass = one filter, or one intentional group** (see grouping rule below):
 
 1. Read MFR7 `*FilterEditor` + help for each filter in the pass (`mfr7-reference` skill).
-1. Add `…FilterEditorViewModel` under `ViewModels/FilterEditors/` (or one shared editor when options type / UI is identical).
-1. Add matching `…FilterEditorView.axaml` (+ code-behind). ViewLocator resolves by naming convention.
-1. Register in [`FilterOptionsEditorFactory`](../../Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs).
+1. Add `…FilterEditorViewModel` under `ViewModels/FilterEditors/<FilterGroup>/` (or one shared editor when options type / UI is identical).
+1. Add matching `…FilterEditorView.axaml` (+ code-behind) under `Views/FilterEditors/<same group>/`. ViewLocator resolves by naming + folder convention.
+1. Register in [`FilterOptionsEditorFactory`](../../Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs) (stays at root; add category `using`s as needed).
 1. Live-replace via `filter with { Options = … }` + `ApplyIfChanged` — no Apply button; do not call `Setup()`.
 1. VM unit tests + headless gesture → `ToChain()` options match (**each** filter type in the group).
 1. Use compact controls (`CompactNumericUpDown`, `CompactCheckBox`, `CompactRadioButton`, `FieldsetGroup`).
@@ -128,32 +206,33 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 
 ### Ordered backlog
 
-| Order        | Pass                        | Filters                                            | Options / notes                                                             |
-| ------------ | --------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------- |
-| **1 (done)** | **Count L/R**                        | Trim Left, Trim Right, Extract Left, Extract Right | Shared `CountFilterOptions` editor + four factory arms + tests for all four |
-| **2 (done)** | **Shrink Duplicate Characters**      | single                                             | `char` — not count-style                                                    |
-| **3 (next)** | Trim Between                         | single                                             | `Position` start/end + side                                                 |
-| 4            | Fix Leading 0's             | single                                             | width / remove extras / max / whole-word                                    |
-| 5            | **Space After + Around**    | Space After, Space Around                          | Chars string + neighbor checkbox (shared pattern; two option records)       |
-| 6            | Capitalize After            | single                                             | trigger chars string                                                        |
-| 7            | Sentence End Characters     | single                                             | char list                                                                   |
-| 8            | Strip Parentheses           | single                                             | pair type + remove contents                                                 |
-| 9            | Cleaner                     | single                                             | illegal + custom + replacement                                              |
-| 10           | Counter                     | single                                             | start / step / format                                                       |
-| 11           | Inserter                    | single                                             | text + position                                                             |
-| 12           | Casing List                 | single                                             | file path + sentence-initial                                                |
-| 13           | Replace List                | single                                             | file path + mode/options                                                    |
-| 14           | Name List                   | single                                             | file path + prefix/suffix                                                   |
-| 15           | Replacer                    | single                                             | find/replace / regex / scope                                                |
-| 16           | Token Mover                 | single                                             | token indices / destination                                                 |
-| 17           | Mover                       | single                                             | substring move                                                              |
-| 18           | **Date + Time Setter**      | Date Setter, Time Setter                           | Shared timestamp-field picker; date vs time value                           |
-| 19           | Time Shifter                | single                                             | field + amount + unit (not grouped with setters)                            |
-| 20           | Attributes Setter           | single                                             | attribute flags                                                             |
-| 21           | Audio Tag Remover           | single                                             | all / block types                                                           |
-| 22           | Audio Tag Setter            | single                                             | per-field format specs                                                      |
-| 23           | ID3v2 Field Setter          | single                                             | frame + value                                                               |
-| **last**     | Formatter                   | single                                             | format string + token UI — own sub-project                                  |
+| Order | Pass | Folder | Filters | Options / notes |
+| ----- | ---- | ------ | ------- | --------------- |
+| **0 (next)** | **Reorg subfolders** | all | — | Move existing editors; ViewLocator prefix-replace; no behavior change |
+| **1 (done)** | **Count L/R** | Trimming | Trim Left, Trim Right, Extract Left, Extract Right | Shared `CountFilterOptions` editor + four factory arms + tests for all four |
+| **2 (done)** | **Shrink Duplicate Characters** | Trimming | single | `char` — not count-style |
+| **3** | Trim Between | Trimming | single | `Position` start/end + side |
+| 4 | Fix Leading 0's | Misc | single | width / remove extras / max / whole-word |
+| 5 | **Space After + Around** | Space | Space After, Space Around | Chars string + neighbor checkbox (shared pattern; two option records) |
+| 6 | Capitalize After | Case | single | trigger chars string |
+| 7 | Sentence End Characters | Case | single | char list |
+| 8 | Strip Parentheses | Misc | single | pair type + remove contents |
+| 9 | Cleaner | Replace | single | illegal + custom + replacement |
+| 10 | Counter | Formatting | single | start / step / format |
+| 11 | Inserter | Formatting | single | text + position |
+| 12 | Casing List | Case | single | file path + sentence-initial |
+| 13 | Replace List | Replace | single | file path + mode/options |
+| 14 | Name List | Formatting | single | file path + prefix/suffix |
+| 15 | Replacer | Replace | single | find/replace / regex / scope |
+| 16 | Token Mover | Formatting | single | token indices / destination |
+| 17 | Mover | Misc | single | substring move |
+| 18 | **Date + Time Setter** | Attributes | Date Setter, Time Setter | Shared timestamp-field picker; date vs time value |
+| 19 | Time Shifter | Attributes | single | field + amount + unit (not grouped with setters) |
+| 20 | Attributes Setter | Attributes | single | attribute flags |
+| 21 | Audio Tag Remover | Audio | single | all / block types |
+| 22 | Audio Tag Setter | Audio | single | per-field format specs |
+| 23 | ID3v2 Field Setter | Audio | single | frame + value |
+| **last** | Formatter | Formatting | single | format string + token UI — own sub-project |
 
 **Corrections vs older F5a–f batches:** Shrink Duplicate is **not** count-style; **Trim Between** was missing from the batch list; Fix Leading 0's is its own richer editor.
 
@@ -173,7 +252,7 @@ ______________________________________________________________________
 ## Layering / files
 
 - Defaults: parameterless ctor; `FilterCatalog.CreateDefault`
-- UI: `Views/FilterEditors/*`, `ViewModels/FilterEditors/*`
+- UI: `Views/FilterEditors/<FilterGroup>/…`, `ViewModels/FilterEditors/<FilterGroup>/…` (shared host types stay at `FilterEditors/` root)
 - Wiring: factory + ViewLocator only; `MainWindowViewModel` already selects the editor
 - Preview: already hooked via `ChainChanged` → `ToChain()` → `Preview()` — do not re-wire; just ensure `SetFilter` keeps raising chain changes
 

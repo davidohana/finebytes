@@ -76,5 +76,23 @@ namespace Mfr.Tests.Ui.AppliedFilters
             editor.CharacterText = string.Empty;
             Assert.Equal('\0', ((ShrinkDuplicateCharactersFilter)step.Filter).Options.Character);
         }
+
+        /// <summary>
+        /// Verifies an empty/null character on the filter loads as an empty editor field.
+        /// </summary>
+        [Fact]
+        public void Shrink_duplicate_null_character_loads_as_empty_text()
+        {
+            var step = new AppliedFilterStepViewModel(
+                "Shrink Duplicate Characters",
+                new ShrinkDuplicateCharactersFilter(
+                    new FilePrefixTarget(),
+                    new ShrinkDuplicateCharactersOptions(Character: '\0')
+                )
+            );
+            var editor = new ShrinkDuplicateCharactersFilterEditorViewModel(step);
+
+            Assert.Equal(string.Empty, editor.CharacterText);
+        }
     }
 }

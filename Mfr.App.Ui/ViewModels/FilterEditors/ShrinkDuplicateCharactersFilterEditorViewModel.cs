@@ -54,7 +54,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 return;
             }
 
-            var character = CharacterText.Length == 0 ? '\0' : CharacterText[0];
+            var character = string.IsNullOrEmpty(CharacterText) ? '\0' : CharacterText[0];
             var options = new ShrinkDuplicateCharactersOptions(Character: character);
             ApplyIfChanged(filter, filter with { Options = options });
         }
