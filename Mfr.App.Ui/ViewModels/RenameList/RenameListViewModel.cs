@@ -87,6 +87,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public event EventHandler? MembershipChanged;
 
         /// <summary>
+        /// Raised after a successful original Refresh (F5 re-read from disk).
+        /// </summary>
+        public event EventHandler? OriginalsRefreshed;
+
+        /// <summary>
         /// Gets the rows shown in the Rename List grid.
         /// </summary>
         /// <para>

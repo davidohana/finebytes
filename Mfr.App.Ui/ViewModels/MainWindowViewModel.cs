@@ -51,6 +51,7 @@ namespace Mfr.App.Ui.ViewModels
 
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
             RenameListViewModel.MembershipChanged += _OnPreviewInputsChanged;
+            RenameListViewModel.OriginalsRefreshed += _OnPreviewInputsChanged;
             AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
             AppliedFiltersViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
             AppliedFiltersViewModel.ChainChanged += _OnPreviewInputsChanged;
@@ -269,7 +270,7 @@ namespace Mfr.App.Ui.ViewModels
         }
 
         /// <summary>
-        /// Re-runs Rename List preview when the filter chain or list membership changes.
+        /// Re-runs Rename List preview when the filter chain, list membership, or originals refresh.
         /// </summary>
         private void _OnPreviewInputsChanged(object? sender, EventArgs e)
         {

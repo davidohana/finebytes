@@ -3,8 +3,14 @@ using CommunityToolkit.Mvvm.Input;
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Original Refresh (re-read disk fields; no preview) for <see cref="RenameListViewModel"/>.
+    /// Original Refresh (re-read disk fields) for <see cref="RenameListViewModel"/>.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Does not run preview itself. Raises <see cref="OriginalsRefreshed"/> so the shell can re-preview
+    /// when Auto-Preview is on (MFR7 full F5 refresh).
+    /// </para>
+    /// </remarks>
     public sealed partial class RenameListViewModel
     {
         /// <summary>
@@ -47,6 +53,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _RefreshFieldDisplay();
+            OriginalsRefreshed?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

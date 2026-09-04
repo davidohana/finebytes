@@ -13,7 +13,7 @@ using Mfr.Tests.Ui.AppliedFilters;
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Phase 10a–10c: filter-chain and membership preview, Auto-Preview toggle.
+    /// Phase 10a–10d: filter-chain and membership preview, Auto-Preview toggle, F5 re-preview.
     /// </summary>
     public sealed class RenameListViewModelPreviewTests : IDisposable
     {
@@ -294,6 +294,92 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies Refresh raises OriginalsRefreshed and wired panes re-apply the current chain.
+        /// </summary>
+        [Fact]
+        public async Task Refresh_raises_originals_refreshed_and_repreviews()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var (renameList, applied) = _CreateWiredPanes(dir);
+            await renameList.AddPathsAsync([path]).ConfigureAwait(true);
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
+
+            // Force a stale identity preview while the Upper filter remains on the stack.
+            renameList.Preview(new FilterChain { Steps = [] });
+            Assert.Equal("hello.txt", renameList.Entries[0].FullFileNamePreview);
+
+            var originalsRaises = 0;
+            renameList.OriginalsRefreshed += (_, _) => originalsRaises++;
+            await renameList.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+
+            Assert.Equal(1, originalsRaises);
+            Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
+            Assert.Equal(1, renameList.ChangeCount);
+        }
+
+        /// <summary>
+        /// Verifies MainWindow re-previews after F5 Refresh when Auto-Preview is on.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task MainWindow_refresh_repreviews_when_auto_preview_on()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var main = new MainWindowViewModel(dir);
+            await main.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+            main.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.AppliedFiltersViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+            Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+
+            main.RenameListViewModel.Preview(new FilterChain { Steps = [] });
+            Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+
+            await main.RenameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+
+            Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+            Assert.Equal(1, main.RenameListViewModel.ChangeCount);
+        }
+
+        /// <summary>
+        /// Verifies Refresh does not re-preview when Auto-Preview is off.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task MainWindow_refresh_skips_preview_when_auto_preview_off()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "hello.txt");
+            File.WriteAllText(path, "x");
+
+            var main = new MainWindowViewModel(dir);
+            await main.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+            main.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.AppliedFiltersViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+            Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+
+            main.RenameListViewModel.IsAutoPreview = false;
+            main.RenameListViewModel.Preview(new FilterChain { Steps = [] });
+            Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+
+            await main.RenameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+            await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
+
+            Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
+            Assert.Equal(0, main.RenameListViewModel.ChangeCount);
+        }
+
+        /// <summary>
         /// Verifies turning Auto-Preview off skips chain-driven preview updates.
         /// </summary>
         [AvaloniaFact]
@@ -530,6 +616,7 @@ namespace Mfr.Tests.Ui.RenameList
             var applied = new AppliedFiltersViewModel();
             applied.ChainChanged += (_, _) => renameList.Preview(applied.ToChain());
             renameList.MembershipChanged += (_, _) => renameList.Preview(applied.ToChain());
+            renameList.OriginalsRefreshed += (_, _) => renameList.Preview(applied.ToChain());
             return (renameList, applied);
         }
 
