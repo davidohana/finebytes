@@ -91,19 +91,20 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return true;
             }
 
+            // Busy refuse must not disable Auto-Preview (unlike user cancel).
             if (IsBusy)
             {
                 return true;
             }
 
             CommitPlan? plan = null;
-            var completed = await Progress
-                .RunAsync(
+            var completed = await _RunProgressAsync(
                     RenameListProgressOperation.Preview,
                     (token, progress) =>
                     {
                         plan = _renameList.Preview(chain, token, progress);
-                    }
+                    },
+                    onCancel: DisableAutoPreview
                 )
                 .ConfigureAwait(true);
 
@@ -114,11 +115,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             else
             {
                 _RefreshFieldDisplay();
-            }
-
-            if (!completed)
-            {
-                DisableAutoPreview();
             }
 
             return completed;

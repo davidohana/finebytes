@@ -65,18 +65,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private async Task<bool> _HydrateIfNeededAsync(RenameListMetadataRequirement requirement)
         {
-            if (IsBusy)
-            {
-                return false;
-            }
-
             if (!_NeedsHydrate(requirement))
             {
                 return true;
             }
 
-            var completed = await Progress
-                .RunAsync(
+            var completed = await _RunProgressAsync(
                     RenameListProgressOperation.MetadataHydrate,
                     (token, progress) => _renameList.EnsureMetadataLoaded(requirement, token, progress)
                 )

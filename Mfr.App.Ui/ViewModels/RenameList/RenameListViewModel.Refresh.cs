@@ -24,8 +24,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var requirement = _CurrentMetadataRequirement();
-            var completed = await Progress
-                .RunAsync(
+            var completed = await _RunProgressAsync(
                     RenameListProgressOperation.Refresh,
                     (token, progress) =>
                     {

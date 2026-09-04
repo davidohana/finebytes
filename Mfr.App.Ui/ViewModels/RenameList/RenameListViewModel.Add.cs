@@ -89,11 +89,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             var metadataRequirement = _CurrentMetadataRequirement();
             var addSummary = new RenameListAddSummary(0);
+            void OnAddCanceled()
+            {
+                _RollbackAddedItems(insertAt, oldCount);
+                _NotifyListChangedAfterAdd(oldCount);
+            }
+
             var completed = false;
             try
             {
-                completed = await Progress
-                    .RunAsync(
+                completed = await _RunProgressAsync(
+                        RenameListProgressOperation.Add,
                         (token, progress) =>
                             addSummary = _renameList.AddSources(
                                 sources: sources,
@@ -105,7 +111,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                                 progress: progress,
                                 insertAtIndex: insertAt,
                                 metadataRequirement: metadataRequirement
-                            )
+                            ),
+                        onCancel: OnAddCanceled
                     )
                     .ConfigureAwait(true);
             }
@@ -113,12 +120,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 LastAddError = ex.Message;
                 Log.Error(ex, "Unexpected failure while adding rename sources.");
+                OnAddCanceled();
+                return;
             }
 
             if (!completed)
             {
-                _RollbackAddedItems(insertAt, oldCount);
-                _NotifyListChangedAfterAdd(oldCount);
                 return;
             }
 
