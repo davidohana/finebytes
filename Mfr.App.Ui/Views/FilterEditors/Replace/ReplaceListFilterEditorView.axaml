@@ -14,32 +14,6 @@
   x:DataType="vm:ReplaceListFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
-    <controls:FieldsetGroup Header="Replace List">
-      <StackPanel Spacing="4">
-        <ToolTip.Tip>
-          <controls:RichToolTip>
-            <TextBlock Classes="rich-tip-title" Text="One search/replace pair per line." />
-            <TextBlock
-              Classes="rich-tip-body"
-              Text="Separate search and replacement with =&gt;. A lone search line strips matches. Spaces are allowed."
-            />
-            <TextBlock Classes="rich-tip-bullet" Text="• Example: a =&gt; b" />
-            <TextBlock Classes="rich-tip-bullet" Text="• Example: Blue Train =&gt; Blue_Train" />
-            <TextBlock Classes="rich-tip-bullet" Text="• Example: x  (removes x)" />
-          </controls:RichToolTip>
-        </ToolTip.Tip>
-        <TextBlock Classes="filter-editor-label" Text="Entries:" />
-        <TextBox
-          x:Name="EntriesBox"
-          Classes="filter-editor-field-wrap"
-          MinWidth="240"
-          MinHeight="88"
-          AcceptsReturn="True"
-          Watermark="a => b"
-          Text="{Binding EntriesText}"
-        />
-      </StackPanel>
-    </controls:FieldsetGroup>
     <controls:FieldsetGroup Header="Mode">
       <WrapPanel Orientation="Horizontal">
         <controls:CompactRadioButton
@@ -67,6 +41,32 @@
           IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Regex}, Mode=TwoWay}"
         />
       </WrapPanel>
+    </controls:FieldsetGroup>
+    <controls:FieldsetGroup Header="Replace List">
+      <StackPanel Spacing="4">
+        <ToolTip.Tip>
+          <controls:RichToolTip>
+            <TextBlock Classes="rich-tip-title" Text="One search/replace pair per line." />
+            <TextBlock
+              Classes="rich-tip-body"
+              Text="Separate search and replacement with =&gt;. A lone search line strips matches. Spaces are allowed."
+            />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: a =&gt; b" />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: Blue Train =&gt; Blue_Train" />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: x  (removes x)" />
+          </controls:RichToolTip>
+        </ToolTip.Tip>
+        <TextBlock Classes="filter-editor-label" Text="Entries:" />
+        <TextBox
+          x:Name="EntriesBox"
+          Classes="filter-editor-field-wrap"
+          MinWidth="240"
+          MinHeight="88"
+          AcceptsReturn="True"
+          Watermark="{Binding EntriesWatermark}"
+          Text="{Binding EntriesText}"
+        />
+      </StackPanel>
     </controls:FieldsetGroup>
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="4">

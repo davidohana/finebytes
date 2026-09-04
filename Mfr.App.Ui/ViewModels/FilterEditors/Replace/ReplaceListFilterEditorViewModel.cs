@@ -29,7 +29,19 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         /// Gets or sets the pattern interpretation mode for all pairs.
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(EntriesWatermark))]
         private ReplacerMode _mode = ReplacerMode.Literal;
+
+        /// <summary>
+        /// Gets a mode-specific example watermark for an empty entries box.
+        /// </summary>
+        public string EntriesWatermark =>
+            Mode switch
+            {
+                ReplacerMode.Wildcard => "DSC*.JPG => photo.jpg\ntrack?.mp3 => track0.mp3\n*.tmp",
+                ReplacerMode.Regex => "[0-9]+ => N\n\\. => _\n\\s+ => _",
+                _ => ". => _\nfeat. => feature.\nLive",
+            };
 
         /// <summary>
         /// Gets or sets whether matching is case-sensitive.

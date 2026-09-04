@@ -389,9 +389,15 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             Assert.Equal(string.Empty, editor.EntriesText);
             Assert.Equal(ReplacerMode.Literal, editor.Mode);
+            Assert.Equal(". => _\nfeat. => feature.\nLive", editor.EntriesWatermark);
             Assert.False(editor.CaseSensitive);
             Assert.True(editor.ReplaceAll);
             Assert.True(editor.WholeWord);
+
+            editor.Mode = ReplacerMode.Wildcard;
+            Assert.Equal("DSC*.JPG => photo.jpg\ntrack?.mp3 => track0.mp3\n*.tmp", editor.EntriesWatermark);
+            editor.Mode = ReplacerMode.Regex;
+            Assert.Equal("[0-9]+ => N\n\\. => _\n\\s+ => _", editor.EntriesWatermark);
 
             editor.EntriesText = "a => b\nBlue Train => Blue_Train\nx";
             editor.Mode = ReplacerMode.Wildcard;
