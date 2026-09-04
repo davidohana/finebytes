@@ -14,7 +14,7 @@ namespace Mfr.Filters.Trimming
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, trim one character).
+        /// Creates a filter with MFR7 add-to-list defaults (file prefix, extract one character).
         /// </summary>
         public ExtractLeftFilter()
             : this(new FilePrefixTarget(), new CountFilterOptions(Count: 1)) { }

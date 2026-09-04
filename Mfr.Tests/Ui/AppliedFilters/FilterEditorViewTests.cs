@@ -13,6 +13,7 @@ using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
+using Mfr.Models.Filters;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -339,17 +340,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
             spinner.Value = 5;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
+            Assert.Equal(5, _CountOf(mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter));
 
-            var filter = mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            var count = filter switch
-            {
-                TrimLeftFilter f => f.Options.Count,
-                TrimRightFilter f => f.Options.Count,
-                ExtractLeftFilter f => f.Options.Count,
-                ExtractRightFilter f => f.Options.Count,
-                _ => throw new InvalidOperationException(),
-            };
-            Assert.Equal(5, count);
+            spinner.Value = 0;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(0, _CountOf(mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter));
 
             window.Close();
         }
@@ -456,6 +452,18 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var slot = editorView.FindControl<ContentControl>("OptionsEditorSlot");
             Assert.NotNull(slot);
             return slot;
+        }
+
+        private static int _CountOf(BaseFilter filter)
+        {
+            return filter switch
+            {
+                TrimLeftFilter f => f.Options.Count,
+                TrimRightFilter f => f.Options.Count,
+                ExtractLeftFilter f => f.Options.Count,
+                ExtractRightFilter f => f.Options.Count,
+                _ => throw new InvalidOperationException($"Unexpected filter type {filter.GetType()}."),
+            };
         }
     }
 }

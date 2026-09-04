@@ -33,17 +33,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
         private void _SyncFromFilter()
         {
+            var count = _TryGetCount(Step.Filter);
+            if (count is null)
+            {
+                return;
+            }
+
             _isLoading = true;
             try
             {
-                Count = Step.Filter switch
-                {
-                    TrimLeftFilter f => f.Options.Count,
-                    TrimRightFilter f => f.Options.Count,
-                    ExtractLeftFilter f => f.Options.Count,
-                    ExtractRightFilter f => f.Options.Count,
-                    _ => 0,
-                };
+                Count = count.Value;
             }
             finally
             {
@@ -59,16 +58,48 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             }
 
             var options = new CountFilterOptions(Count: (int)Math.Max(0, Count));
-            BaseFilter updated = Step.Filter switch
+            var updated = _WithCount(Step.Filter, options);
+            if (updated is null)
+            {
+                return;
+            }
+
+            ApplyIfChanged(Step.Filter, updated);
+        }
+
+        /// <summary>
+        /// Reads the character count from a Trim/Extract Left/Right filter.
+        /// </summary>
+        /// <param name="filter">Current step filter.</param>
+        /// <returns>The count, or <see langword="null"/> when <paramref name="filter"/> is not a count filter.</returns>
+        private static int? _TryGetCount(BaseFilter filter)
+        {
+            return filter switch
+            {
+                TrimLeftFilter f => f.Options.Count,
+                TrimRightFilter f => f.Options.Count,
+                ExtractLeftFilter f => f.Options.Count,
+                ExtractRightFilter f => f.Options.Count,
+                _ => null,
+            };
+        }
+
+        /// <summary>
+        /// Returns a copy of <paramref name="filter"/> with <paramref name="options"/> applied.
+        /// </summary>
+        /// <param name="filter">Current step filter.</param>
+        /// <param name="options">Replacement count options.</param>
+        /// <returns>The updated filter, or <see langword="null"/> when <paramref name="filter"/> is not a count filter.</returns>
+        private static BaseFilter? _WithCount(BaseFilter filter, CountFilterOptions options)
+        {
+            return filter switch
             {
                 TrimLeftFilter f => f with { Options = options },
                 TrimRightFilter f => f with { Options = options },
                 ExtractLeftFilter f => f with { Options = options },
                 ExtractRightFilter f => f with { Options = options },
-                var other => other,
+                _ => null,
             };
-
-            ApplyIfChanged(Step.Filter, updated);
         }
     }
 }
