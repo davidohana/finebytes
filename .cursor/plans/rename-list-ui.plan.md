@@ -113,7 +113,7 @@ Source of truth: [mfr7 help](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.htm
 
 **Phase numbers = execution order** (renumbered 2026-08-29). Old labels in parentheses where helpful.
 
-**No legacy migrations:** session and config use current shapes only; unknown or old JSON → MFR7 defaults ([refactor-no-legacy-compat](../rules/refactor-no-legacy-compat.mdc)). `SessionStateRenameListSortFieldJsonConverter` is gone; `sortFields` is field-key JSON only.
+**No legacy migrations:** session and config use current shapes only; unknown or old JSON → MFR7 defaults (`AGENTS.md` refactoring policy). `SessionStateRenameListSortFieldJsonConverter` is gone; `sortFields` is field-key JSON only.
 
 ```mermaid
 flowchart LR

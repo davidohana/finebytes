@@ -1,7 +1,13 @@
 ---
-description: Avalonia Headless interaction tests for UI glue, gestures, and layout
-globs: Mfr.Tests/Ui/**/*.cs,Mfr.App.Ui/**/*.cs,Mfr.App.Ui/**/*.axaml
-alwaysApply: false
+name: mfr-ui-headless-tests
+description: >-
+  Avalonia Headless interaction tests for UI glue, gestures, and layout. Use when
+  changing Mfr.App.Ui views/AXAML, File List / Rename List / Filter Palette
+  selection or DnD, or Mfr.Tests/Ui headless coverage — not for ViewModel-only tests.
+paths:
+  - "Mfr.Tests/Ui/**/*.cs"
+  - "Mfr.App.Ui/**/*.cs"
+  - "Mfr.App.Ui/**/*.axaml"
 ---
 
 # UI headless tests

@@ -101,7 +101,7 @@ just run-ui
 1. Select **ID3v1**, **Xiph** groups — property combo lists all modeled fields.
 1. Confirm dialog does not resize awkwardly; height grows when Substring/Token/parameter sections appear.
 
-Optional: add a headless UI test only if control bounds/visibility can be asserted meaningfully (see `.cursor/rules/ui-headless-tests.mdc`).
+Optional: add a headless UI test only if control bounds/visibility can be asserted meaningfully (see skill `mfr-ui-headless-tests`).
 
 ## Out of scope
 
