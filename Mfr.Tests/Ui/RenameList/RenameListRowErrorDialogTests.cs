@@ -72,7 +72,11 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(RenameListLoadErrorDisplay.MissingSummary, summaryText.Text);
             Assert.Contains(path, primaryDetailsText.Text, StringComparison.Ordinal);
-            Assert.Contains(RenameListDiskPaths.MissingUserExplanation, primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.Contains(
+                RenameListDiskPaths.MissingUserExplanation,
+                primaryDetailsText.Text,
+                StringComparison.Ordinal
+            );
             Assert.False(technicalExpander.IsVisible);
         }
 
@@ -103,7 +107,11 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(RenameListPreviewErrorDisplay.DialogTitle, dialog.Title);
             Assert.Equal(RenameListPreviewErrorDisplay.Summary, summaryText.Text);
             Assert.Contains(@"D:\Music\album", primaryDetailsText.Text, StringComparison.Ordinal);
-            Assert.Contains("Cannot apply audio tags to a directory.", primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.Contains(
+                "Cannot apply audio tags to a directory.",
+                primaryDetailsText.Text,
+                StringComparison.Ordinal
+            );
             Assert.DoesNotContain("InvalidOperationException", primaryDetailsText.Text, StringComparison.Ordinal);
             Assert.True(technicalExpander.IsVisible);
             Assert.False(technicalExpander.IsExpanded);

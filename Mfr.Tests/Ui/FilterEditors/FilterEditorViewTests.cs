@@ -790,6 +790,52 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Casing List option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Casing_list_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("CasingList"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<CasingListFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<CasingListFilterEditorView>().Single();
+            var filePath = editor.FindControl<TextBox>("FilePathBox");
+            var uppercase = editor.FindControl<CompactCheckBox>("UppercaseSentenceInitialCheckBox");
+            var reload = editor.FindControl<Button>("ReloadButton");
+            Assert.NotNull(filePath);
+            Assert.NotNull(uppercase);
+            Assert.NotNull(reload);
+            Assert.Equal(string.Empty, filePath.Text);
+            Assert.True(uppercase.IsChecked);
+            Assert.False(reload.IsEnabled);
+
+            filePath.Text = @"C:\Music\MFR\casing-list.txt";
+            uppercase.IsChecked = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (CasingListFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(@"C:\Music\MFR\casing-list.txt", filter.Options.FilePath);
+            Assert.False(filter.Options.UppercaseSentenceInitial);
+            Assert.True(reload.IsEnabled);
+
+            var before = mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            reload.Command!.Execute(null);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var after = mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.NotSame(before, after);
+            Assert.Equal(@"C:\Music\MFR\casing-list.txt", ((CasingListFilter)after).Options.FilePath);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Letters Case radio edits re-run Rename List preview (Phase 10a).
         /// </summary>
         [AvaloniaFact]

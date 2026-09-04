@@ -357,5 +357,43 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(InserterOrigin.End, options.StartFrom);
             Assert.True(options.Overwrite);
         }
+
+        /// <summary>
+        /// Verifies Casing List option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Casing_list_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Casing List", new CasingListFilter());
+            var editor = new CasingListFilterEditorViewModel(step);
+
+            Assert.Equal(string.Empty, editor.FilePath);
+            Assert.True(editor.UppercaseSentenceInitial);
+
+            editor.FilePath = @"C:\Music\MFR\casing-list.txt";
+            editor.UppercaseSentenceInitial = false;
+
+            var options = ((CasingListFilter)step.Filter).Options;
+            Assert.Equal(@"C:\Music\MFR\casing-list.txt", options.FilePath);
+            Assert.False(options.UppercaseSentenceInitial);
+        }
+
+        /// <summary>
+        /// Verifies Reload forces a new filter instance so setup re-reads the list file.
+        /// </summary>
+        [Fact]
+        public void Casing_list_reload_replaces_filter_instance()
+        {
+            var step = new AppliedFilterStepViewModel("Casing List", new CasingListFilter());
+            var editor = new CasingListFilterEditorViewModel(step) { FilePath = @"C:\Music\MFR\casing-list.txt" };
+
+            var before = step.Filter;
+            Assert.True(editor.ReloadCommand.CanExecute(null));
+            editor.ReloadCommand.Execute(null);
+
+            Assert.NotSame(before, step.Filter);
+            Assert.Equal(@"C:\Music\MFR\casing-list.txt", ((CasingListFilter)step.Filter).Options.FilePath);
+            Assert.True(((CasingListFilter)step.Filter).Options.UppercaseSentenceInitial);
+        }
     }
 }

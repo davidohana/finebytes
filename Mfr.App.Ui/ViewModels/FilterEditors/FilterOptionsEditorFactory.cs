@@ -35,6 +35,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 SpaceAfterFilter or SpaceAroundFilter => new SpaceTriggerFilterEditorViewModel(step),
                 LettersCaseFilter => new LettersCaseFilterEditorViewModel(step),
                 CapitalizeAfterFilter or SentenceEndCharactersFilter => new CharacterListFilterEditorViewModel(step),
+                CasingListFilter => new CasingListFilterEditorViewModel(step),
                 ICountOptionsFilter => new CountFilterEditorViewModel(step),
                 ShrinkDuplicateCharactersFilter => new ShrinkDuplicateCharactersFilterEditorViewModel(step),
                 TrimBetweenFilter => new TrimBetweenFilterEditorViewModel(step),
