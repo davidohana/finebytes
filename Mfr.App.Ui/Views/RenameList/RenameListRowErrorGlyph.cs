@@ -3,6 +3,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Mfr.App.Ui.Resources;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views.Controls;
 using ShapePath = Avalonia.Controls.Shapes.Path;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -52,18 +53,7 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameListView.ListenToFieldDisplayRevision(mark, listViewModel, ApplyVisibility);
             ApplyVisibility();
 
-            ToolTip.SetTip(
-                mark,
-                new ToolTip
-                {
-                    Content = new TextBlock
-                    {
-                        Text = AppTips.RenameListRowErrorGlyph,
-                        TextWrapping = TextWrapping.Wrap,
-                        MaxWidth = 280,
-                    },
-                }
-            );
+            ToolTip.SetTip(mark, RichToolTip.Wrap(AppTips.RenameListRowErrorGlyph));
             return mark;
         }
     }

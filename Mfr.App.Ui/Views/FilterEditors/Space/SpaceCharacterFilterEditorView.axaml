@@ -14,10 +14,16 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Define">
-      <StackPanel
-        Spacing="6"
-        ToolTip.Tip="Sets the word separator for later filters (e.g. Capitalize). Replacements below convert other separators into this character."
-      >
+      <StackPanel Spacing="6">
+        <ToolTip.Tip>
+          <controls:RichToolTip>
+            <TextBlock Classes="rich-tip-body" Text="Sets the word separator for later filters (e.g. Capitalize)." />
+            <TextBlock
+              Classes="rich-tip-bullet"
+              Text="• Replacements below convert other separators into this character."
+            />
+          </controls:RichToolTip>
+        </ToolTip.Tip>
         <TextBlock
           Classes="filter-editor-label"
           Text="Use the following character to separate between words:"
@@ -87,9 +93,15 @@
           <controls:CompactCheckBox
             x:Name="ReplaceCustomCheckBox"
             Content="Custom text:"
-            ToolTip.Tip="Replace this exact substring with the defined separator (e.g. ++ → -)."
             IsChecked="{Binding ReplaceCustom}"
-          />
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-body" Text="Replace this exact substring with the defined separator." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Example: ++ → -." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </controls:CompactCheckBox>
           <TextBox
             x:Name="CustomTextBox"
             Classes="filter-editor-field"

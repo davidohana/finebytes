@@ -14,11 +14,17 @@
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6">
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
-          ToolTip.Tip="Target digit count. Shorter numbers are padded with leading zeros. Longer numbers stay unchanged unless the shrink option below is checked."
-        >
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-title" Text="Target digit count." />
+              <TextBlock Classes="rich-tip-bullet" Text="• Shorter numbers are padded with leading zeros." />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Longer numbers stay unchanged unless the shrink option below is checked."
+              />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Target width of" />
           <controls:CompactNumericUpDown
             x:Name="WidthSpinner"
@@ -34,20 +40,31 @@
         <controls:CompactCheckBox
           x:Name="RemoveExtraZerosCheckBox"
           Content="Also shrink longer numbers to this width"
-          ToolTip.Tip="When unchecked, only pad shorter numbers (e.g. 7 → 007). When checked, strip surplus leading zeros first so over-padded numbers shrink to the target width (e.g. width 3: 0007 → 007)."
           IsChecked="{Binding RemoveExtraZeros}"
-        />
+        >
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: only pad shorter numbers (e.g. 7 → 007)." />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Checked: strip surplus leading zeros first so over-padded numbers shrink (e.g. width 3: 0007 → 007)."
+              />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
+        </controls:CompactCheckBox>
         <controls:CompactCheckBox
           x:Name="WholeWordOnlyCheckBox"
           Content="Whole word only"
           ToolTip.Tip="Skip digit groups that have a letter immediately before or after (e.g. leave the 1 in doc1 alone)."
           IsChecked="{Binding WholeWordOnly}"
         />
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
-          ToolTip.Tip="Limit how many digit groups are changed, left to right. 0 means fix every match."
-        >
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-body" Text="Limit how many digit groups are changed, left to right." />
+              <TextBlock Classes="rich-tip-bullet" Text="• 0 means fix every match." />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
           <TextBlock
             Classes="filter-editor-label"
             VerticalAlignment="Center"

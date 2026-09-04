@@ -21,9 +21,18 @@
           Margin="0,0,16,4"
           GroupName="LettersCaseMode"
           Content="Capitalize"
-          ToolTip.Tip="First letter of each word uppercased; other letters lowercased. Words use the current word separator."
           IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static caseFilters:LettersCaseMode.Capitalize}, Mode=TwoWay}"
-        />
+        >
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock
+                Classes="rich-tip-body"
+                Text="First letter of each word uppercased; other letters lowercased."
+              />
+              <TextBlock Classes="rich-tip-bullet" Text="• Words use the current word separator." />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
+        </controls:CompactRadioButton>
         <controls:CompactRadioButton
           x:Name="SentenceCaseRadio"
           Margin="0,0,16,4"
@@ -75,10 +84,16 @@
       </WrapPanel>
     </controls:FieldsetGroup>
     <controls:FieldsetGroup x:Name="SkipWordsGroup" Header="Skip Words" IsVisible="{Binding HasCapitalizeSkipWords}">
-      <StackPanel
-        Spacing="4"
-        ToolTip.Tip="In Capitalize mode, these words stay lowercase (matched case-insensitively). Example: a, an, the."
-      >
+      <StackPanel Spacing="4">
+        <ToolTip.Tip>
+          <controls:RichToolTip>
+            <TextBlock
+              Classes="rich-tip-body"
+              Text="In Capitalize mode, these words stay lowercase (matched case-insensitively)."
+            />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: a, an, the." />
+          </controls:RichToolTip>
+        </ToolTip.Tip>
         <TextBlock Classes="filter-editor-label" Text="Leave lowercase (comma-separated):" TextWrapping="Wrap" />
         <TextBox
           x:Name="CapitalizeSkipWordsBox"
@@ -93,11 +108,14 @@
       IsVisible="{Binding HasWeirdCaseOptions}"
     >
       <StackPanel Orientation="Horizontal" Spacing="12">
-        <StackPanel
-          Orientation="Horizontal"
-          Spacing="4"
-          ToolTip.Tip="Chance each letter is uppercased (0 = all lower, 100 = all upper). Other values mix case."
-        >
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-title" Text="Chance each letter is uppercased." />
+              <TextBlock Classes="rich-tip-bullet" Text="• 0 = all lower, 100 = all upper." />
+              <TextBlock Classes="rich-tip-bullet" Text="• Other values mix case." />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Percent of capital letters:" />
           <controls:CompactNumericUpDown
             x:Name="WeirdUppercaseChanceSpinner"
@@ -113,9 +131,18 @@
         <controls:CompactCheckBox
           x:Name="WeirdFixedPlacesCheckBox"
           Content="Fixed Places"
-          ToolTip.Tip="When checked, the same character positions get the same case across files. When unchecked, each file’s list index changes the pattern."
           IsChecked="{Binding WeirdFixedPlaces}"
-        />
+        >
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Checked: the same character positions get the same case across files."
+              />
+              <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: each file’s list index changes the pattern." />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
+        </controls:CompactCheckBox>
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>

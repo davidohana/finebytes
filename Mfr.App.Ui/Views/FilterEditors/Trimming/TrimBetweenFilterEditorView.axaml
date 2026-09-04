@@ -13,10 +13,14 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <StackPanel
-        Spacing="6"
-        ToolTip.Tip="Deletes an inclusive 1-based range. Left counts from the start; Right from the end. If start is after end, the positions are swapped first."
-      >
+      <StackPanel Spacing="6">
+        <ToolTip.Tip>
+          <controls:RichToolTip>
+            <TextBlock Classes="rich-tip-title" Text="Deletes an inclusive 1-based range." />
+            <TextBlock Classes="rich-tip-bullet" Text="• Left counts from the start; Right from the end." />
+            <TextBlock Classes="rich-tip-bullet" Text="• If start is after end, the positions are swapped first." />
+          </controls:RichToolTip>
+        </ToolTip.Tip>
         <TextBlock Classes="filter-editor-label" Text="Remove characters:" />
         <Grid ColumnDefinitions="Auto,4,Auto,4,Auto,4,Auto,4,Auto" RowDefinitions="Auto,6,Auto">
           <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Between position" />
@@ -39,8 +43,14 @@
             Width="72"
             ItemsSource="{Binding AnchorSides}"
             SelectedItem="{Binding StartAnchor}"
-            ToolTip.Tip="Left: position 1 is the first character. Right: position 1 is the last character."
-          />
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-bullet" Text="• Left: position 1 is the first character." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Right: position 1 is the last character." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </ComboBox>
           <TextBlock Grid.Column="8" Classes="filter-editor-label" VerticalAlignment="Center" Text="side (incl.)" />
 
           <TextBlock Grid.Row="2" Classes="filter-editor-label" VerticalAlignment="Center" Text="and position" />
@@ -71,8 +81,14 @@
             Width="72"
             ItemsSource="{Binding AnchorSides}"
             SelectedItem="{Binding EndAnchor}"
-            ToolTip.Tip="Left: position 1 is the first character. Right: position 1 is the last character."
-          />
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-bullet" Text="• Left: position 1 is the first character." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Right: position 1 is the last character." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </ComboBox>
           <TextBlock
             Grid.Row="2"
             Grid.Column="8"

@@ -13,7 +13,14 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <controls:LabelBesideFieldPanel ToolTip.Tip="Collapses runs of two or more of this character into one (e.g. --- → -). Empty box leaves the name unchanged.">
+      <controls:LabelBesideFieldPanel>
+        <ToolTip.Tip>
+          <controls:RichToolTip>
+            <TextBlock Classes="rich-tip-body" Text="Collapses runs of two or more of this character into one." />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: --- → -." />
+            <TextBlock Classes="rich-tip-bullet" Text="• Empty box leaves the name unchanged." />
+          </controls:RichToolTip>
+        </ToolTip.Tip>
         <TextBlock
           Classes="filter-editor-label"
           TextWrapping="Wrap"

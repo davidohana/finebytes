@@ -54,8 +54,15 @@
               HorizontalAlignment="Left"
               ItemsSource="{Binding LeadingZerosModes}"
               SelectedItem="{Binding LeadingZerosMode}"
-              ToolTip.Tip="None: no padding. Automatic: one width for the whole list (or folder). Custom: pad to Total length."
-            />
+            >
+              <ToolTip.Tip>
+                <controls:RichToolTip>
+                  <TextBlock Classes="rich-tip-bullet" Text="• None: no padding." />
+                  <TextBlock Classes="rich-tip-bullet" Text="• Automatic: one width for the whole list (or folder)." />
+                  <TextBlock Classes="rich-tip-bullet" Text="• Custom: pad to Total length." />
+                </controls:RichToolTip>
+              </ToolTip.Tip>
+            </ComboBox>
             <TextBlock
               Classes="filter-editor-label"
               VerticalAlignment="Center"
@@ -80,9 +87,15 @@
         <controls:CompactCheckBox
           x:Name="ResetPerFolderCheckBox"
           Content="Reset counter when folder changes"
-          ToolTip.Tip="When checked, use each file’s index within its folder. When unchecked, use the global Rename List index."
           IsChecked="{Binding ResetPerFolder}"
-        />
+        >
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-bullet" Text="• Checked: use each file’s index within its folder." />
+              <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: use the global Rename List index." />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
+        </controls:CompactCheckBox>
       </StackPanel>
     </controls:FieldsetGroup>
     <controls:FieldsetGroup Header="Placement">

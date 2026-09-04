@@ -14,11 +14,16 @@
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6">
-        <Grid
-          ColumnDefinitions="Auto,4,*"
-          RowDefinitions="Auto,6,Auto"
-          ToolTip.Tip="Each character in this list is removed or replaced. Leave empty to clean only illegal characters when that option is checked."
-        >
+        <Grid ColumnDefinitions="Auto,4,*" RowDefinitions="Auto,6,Auto">
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-title" Text="Each character in this list is removed or replaced." />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Leave empty to clean only illegal characters when that option is checked."
+              />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
           <TextBlock
             Classes="filter-editor-label"
             VerticalAlignment="Center"
@@ -39,9 +44,18 @@
             Grid.Row="2"
             Content="Replace with:"
             VerticalAlignment="Center"
-            ToolTip.Tip="When checked, each cleaned character is replaced with this string. When unchecked, cleaned characters are deleted."
             IsChecked="{Binding ReplaceWith}"
-          />
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock
+                  Classes="rich-tip-bullet"
+                  Text="• Checked: each cleaned character is replaced with this string."
+                />
+                <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: cleaned characters are deleted." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </controls:CompactCheckBox>
           <TextBox
             x:Name="ReplacementBox"
             Grid.Row="2"
@@ -50,16 +64,34 @@
             MinWidth="240"
             MaxLength="100"
             VerticalAlignment="Center"
-            ToolTip.Tip="When checked, each cleaned character is replaced with this string. When unchecked, cleaned characters are deleted."
             Text="{Binding Replacement}"
-          />
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock
+                  Classes="rich-tip-bullet"
+                  Text="• Checked: each cleaned character is replaced with this string."
+                />
+                <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: cleaned characters are deleted." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </TextBox>
         </Grid>
         <controls:CompactCheckBox
           x:Name="RemoveIllegalCharsCheckBox"
           Content="Also remove illegal file-name characters"
-          ToolTip.Tip="Also clean characters that are illegal in file names on this OS (for example \ / : * ? &quot; &lt; &gt; |)."
           IsChecked="{Binding RemoveIllegalChars}"
-        />
+        >
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock
+                Classes="rich-tip-body"
+                Text="Also clean characters that are illegal in file names on this OS."
+              />
+              <TextBlock Classes="rich-tip-bullet" Text="• Examples: \ / : * ? &quot; &lt; &gt; |" />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
+        </controls:CompactCheckBox>
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>

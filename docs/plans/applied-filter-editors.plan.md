@@ -207,33 +207,33 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 
 ### Ordered backlog
 
-| Order         | Pass                            | Folder     | Filters                                            | Options / notes                                                             |
-| ------------- | ------------------------------- | ---------- | -------------------------------------------------- | --------------------------------------------------------------------------- |
-| **0 (done)**  | **Reorg subfolders**            | all        | —                                                  | Move existing editors; ViewLocator prefix-replace; no behavior change       |
-| **1 (done)**  | **Count L/R**                   | Trimming   | Trim Left, Trim Right, Extract Left, Extract Right | Shared `CountFilterOptions` editor + four factory arms + tests for all four |
-| **2 (done)**  | **Shrink Duplicate Characters** | Trimming   | single                                             | `char` — not count-style                                                    |
-| **3 (done)**  | **Trim Between**                | Trimming   | single                                             | `Position` start/end + side                                                 |
-| **4 (done)**  | **Fix Leading 0's**             | Misc       | single                                             | width / remove extras / max / whole-word                                    |
-| **5 (done)**  | **Space After + Around**        | Space      | Space After, Space Around                          | Shared `SpaceTrigger` chars+neighbor editor; two factory arms + tests       |
-| **6 (done)**  | Capitalize After                | Case       | single                                             | trigger chars string; later shared `CharacterList` editor with Sentence End |
-| **7 (done)**  | Sentence End Characters         | Case       | single                                             | char list; later shared `CharacterList` editor with Capitalize After        |
-| **8 (done)**  | Strip Parentheses               | Misc       | single                                             | pair type + remove contents                                                 |
-| **9 (done)**  | Cleaner                         | Replace    | single                                             | illegal + custom + replacement                                              |
+| Order         | Pass                            | Folder     | Filters                                            | Options / notes                                                                                     |
+| ------------- | ------------------------------- | ---------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **0 (done)**  | **Reorg subfolders**            | all        | —                                                  | Move existing editors; ViewLocator prefix-replace; no behavior change                               |
+| **1 (done)**  | **Count L/R**                   | Trimming   | Trim Left, Trim Right, Extract Left, Extract Right | Shared `CountFilterOptions` editor + four factory arms + tests for all four                         |
+| **2 (done)**  | **Shrink Duplicate Characters** | Trimming   | single                                             | `char` — not count-style                                                                            |
+| **3 (done)**  | **Trim Between**                | Trimming   | single                                             | `Position` start/end + side                                                                         |
+| **4 (done)**  | **Fix Leading 0's**             | Misc       | single                                             | width / remove extras / max / whole-word                                                            |
+| **5 (done)**  | **Space After + Around**        | Space      | Space After, Space Around                          | Shared `SpaceTrigger` chars+neighbor editor; two factory arms + tests                               |
+| **6 (done)**  | Capitalize After                | Case       | single                                             | trigger chars string; later shared `CharacterList` editor with Sentence End                         |
+| **7 (done)**  | Sentence End Characters         | Case       | single                                             | char list; later shared `CharacterList` editor with Capitalize After                                |
+| **8 (done)**  | Strip Parentheses               | Misc       | single                                             | pair type + remove contents                                                                         |
+| **9 (done)**  | Cleaner                         | Replace    | single                                             | illegal + custom + replacement                                                                      |
 | **10 (done)** | Counter                         | Formatting | single                                             | start / step / leading-zeros mode (None/Automatic/Custom) / position / separator / reset-per-folder |
-| **11 (done)** | Inserter                        | Formatting | single                                             | text + position                                                             |
-| **12 (next)** | Casing List                     | Case       | single                                             | file path + sentence-initial                                                |
-| 13            | Replace List                    | Replace    | single                                             | file path + mode/options                                                    |
-| 14            | Name List                       | Formatting | single                                             | file path + prefix/suffix                                                   |
-| 15            | Replacer                        | Replace    | single                                             | find/replace / regex / scope                                                |
-| 16            | Token Mover                     | Formatting | single                                             | token indices / destination                                                 |
-| 17            | Mover                           | Misc       | single                                             | substring move                                                              |
-| 18            | **Date + Time Setter**          | Attributes | Date Setter, Time Setter                           | Shared timestamp-field picker; date vs time value                           |
-| 19            | Time Shifter                    | Attributes | single                                             | field + amount + unit (not grouped with setters)                            |
-| 20            | Attributes Setter               | Attributes | single                                             | attribute flags                                                             |
-| 21            | Audio Tag Remover               | Audio      | single                                             | all / block types                                                           |
-| 22            | Audio Tag Setter                | Audio      | single                                             | per-field format specs                                                      |
-| 23            | ID3v2 Field Setter              | Audio      | single                                             | frame + value                                                               |
-| **last**      | Formatter                       | Formatting | single                                             | format string + token UI — own sub-project                                  |
+| **11 (done)** | Inserter                        | Formatting | single                                             | text + position                                                                                     |
+| **12 (next)** | Casing List                     | Case       | single                                             | file path + sentence-initial                                                                        |
+| 13            | Replace List                    | Replace    | single                                             | file path + mode/options                                                                            |
+| 14            | Name List                       | Formatting | single                                             | file path + prefix/suffix                                                                           |
+| 15            | Replacer                        | Replace    | single                                             | find/replace / regex / scope                                                                        |
+| 16            | Token Mover                     | Formatting | single                                             | token indices / destination                                                                         |
+| 17            | Mover                           | Misc       | single                                             | substring move                                                                                      |
+| 18            | **Date + Time Setter**          | Attributes | Date Setter, Time Setter                           | Shared timestamp-field picker; date vs time value                                                   |
+| 19            | Time Shifter                    | Attributes | single                                             | field + amount + unit (not grouped with setters)                                                    |
+| 20            | Attributes Setter               | Attributes | single                                             | attribute flags                                                                                     |
+| 21            | Audio Tag Remover               | Audio      | single                                             | all / block types                                                                                   |
+| 22            | Audio Tag Setter                | Audio      | single                                             | per-field format specs                                                                              |
+| 23            | ID3v2 Field Setter              | Audio      | single                                             | frame + value                                                                                       |
+| **last**      | Formatter                       | Formatting | single                                             | format string + token UI — own sub-project                                                          |
 
 **Corrections vs older F5a–f batches:** Shrink Duplicate is **not** count-style; **Trim Between** was missing from the batch list; Fix Leading 0's is its own richer editor.
 

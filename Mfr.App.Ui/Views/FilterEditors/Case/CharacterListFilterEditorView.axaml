@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Case"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="80"
@@ -13,7 +14,7 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <controls:LabelBesideFieldPanel ToolTip.Tip="{Binding CharsToolTip}">
+      <controls:LabelBesideFieldPanel ToolTip.Tip="{Binding CharsToolTip, Converter={x:Static converters:RichToolTipConverter.Instance}}">
         <TextBlock Classes="filter-editor-label" TextWrapping="Wrap" Text="{Binding CharsPrompt}" />
         <TextBox
           x:Name="CharsBox"

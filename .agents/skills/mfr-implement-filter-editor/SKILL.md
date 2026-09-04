@@ -70,7 +70,7 @@ Copy the closest shipped editor (see table below). Required shape:
 1. Prefer `FieldsetGroup`, `CompactNumericUpDown`, `CompactCheckBox`, `CompactRadioButton`, `filter-editor-label`
 1. **Label/control columns:** when several rows are label + control, put them in a parent with `Grid.IsSharedSizeScope="True"` and give each row a `Grid` whose first `ColumnDefinition` uses `SharedSizeGroup="FilterEditorLabel"` (same group name across those rows) so control left edges line up. Mirror `FilterOptionsDialog.axaml` / `Formatting/CounterFilterEditorView.axaml`. Do not use stacked `Orientation="Horizontal"` StackPanels for multi-row label+field forms — labels of different lengths will stagger the inputs. Full-width rows (checkbox-only, label-above multiline text) stay outside that pattern.
 1. Give interactive controls `x:Name` for headless `FindControl`
-1. Labels / `ToolTip.Tip` from MFR7 editor + help (parity over invention)
+1. Labels / `ToolTip.Tip` from MFR7 editor + help (parity over invention). For longer tips, use `controls:RichToolTip` (title / body / bullets) or `RichToolTipConverter` for bound strings
 1. Theme styles live in `Mfr.App.Ui/Themes/FilterEditor.axaml` — reuse classes; do not invent one-off chrome
 
 ## Factory

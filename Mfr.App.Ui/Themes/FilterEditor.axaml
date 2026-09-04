@@ -52,4 +52,16 @@
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Padding" Value="0" />
   </Style>
+
+  <Style Selector="TextBlock.rich-tip-title">
+    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style Selector="TextBlock.rich-tip-body, TextBlock.rich-tip-bullet">
+    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
 </Styles>

@@ -111,7 +111,7 @@
         Content="OK"
         IsDefault="True"
         IsEnabled="{Binding CanConfirm}"
-        ToolTip.Tip="{Binding ConfirmDisabledReason}"
+        ToolTip.Tip="{Binding ConfirmDisabledReason, Converter={x:Static converters:RichToolTipConverter.Instance}}"
         ToolTip.ShowOnDisabled="True"
         Click="_OnOkClick"
       />
@@ -181,18 +181,29 @@
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
-          <TextBlock
-            Classes="filter-options-label"
-            Text="Language:"
-            ToolTip.Tip="Optional ID3v2 language code used to pick among multiple frames with the same frame ID."
-          />
+          <TextBlock Classes="filter-options-label" Text="Language:">
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-body" Text="Optional ID3v2 language code." />
+                <TextBlock
+                  Classes="rich-tip-bullet"
+                  Text="• Used to pick among multiple frames with the same frame ID."
+                />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </TextBlock>
           <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Language}" />
-          <TextBlock
-            Grid.Row="2"
-            Classes="filter-options-label"
-            Text="Description:"
-            ToolTip.Tip="Optional ID3v2 description used to pick among multiple frames with the same frame ID."
-          />
+          <TextBlock Grid.Row="2" Classes="filter-options-label" Text="Description:">
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-body" Text="Optional ID3v2 description." />
+                <TextBlock
+                  Classes="rich-tip-bullet"
+                  Text="• Used to pick among multiple frames with the same frame ID."
+                />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </TextBlock>
           <TextBox Grid.Row="2" Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Description}" />
         </Grid>
 
@@ -201,11 +212,14 @@
             <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
             <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
-          <TextBlock
-            Classes="filter-options-label"
-            Text="Level:"
-            ToolTip.Tip="1 is the immediate parent folder name; higher values walk toward the drive root."
-          />
+          <TextBlock Classes="filter-options-label" Text="Level:">
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-bullet" Text="• 1 is the immediate parent folder name." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Higher values walk toward the drive root." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </TextBlock>
           <controls:CompactNumericUpDown
             x:Name="AncestorFolderLevelSpinner"
             Grid.Column="1"
@@ -213,8 +227,14 @@
             Maximum="99"
             FormatString="0"
             Value="{Binding AncestorFolderLevel}"
-            ToolTip.Tip="1 is the immediate parent folder name; higher values walk toward the drive root."
-          />
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-bullet" Text="• 1 is the immediate parent folder name." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Higher values walk toward the drive root." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </controls:CompactNumericUpDown>
         </Grid>
 
         <Grid>
@@ -222,11 +242,16 @@
             <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
-          <TextBlock
-            Classes="filter-options-label"
-            Text="Apply on:"
-            ToolTip.Tip="Limit the filter to the whole value, a character range, or one token after splitting."
-          />
+          <TextBlock Classes="filter-options-label" Text="Apply on:">
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-title" Text="Limit where the filter runs." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Whole: entire Apply-to value." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Substring: inclusive character range." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Token: one piece after splitting." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </TextBlock>
           <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
             <controls:CompactRadioButton
               x:Name="WholeScopeRadio"
@@ -256,7 +281,14 @@
         </Grid>
 
         <controls:FieldsetGroup Header="Substring" IsVisible="{Binding ShowSubstringOptions}">
-          <Grid ToolTip.Tip="Inclusive 1-based range. Left counts from the start; Right from the end.">
+          <Grid>
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-title" Text="Inclusive 1-based range." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Left counts from the start." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Right counts from the end." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
               <ColumnDefinition Width="Auto" />
@@ -284,8 +316,13 @@
               Classes="filter-options-field filter-options-anchor"
               ItemsSource="{Binding ScopeAnchorOptions}"
               SelectedItem="{Binding SubstringStartAnchorOption}"
-              ToolTip.Tip="Left: position 1 is the first character. Right: position 1 is the last character."
             >
+              <ToolTip.Tip>
+                <controls:RichToolTip>
+                  <TextBlock Classes="rich-tip-bullet" Text="• Left: position 1 is the first character." />
+                  <TextBlock Classes="rich-tip-bullet" Text="• Right: position 1 is the last character." />
+                </controls:RichToolTip>
+              </ToolTip.Tip>
               <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:StringScopeAnchorOption">
                   <TextBlock Text="{Binding Label}" />
@@ -311,8 +348,13 @@
               Classes="filter-options-field filter-options-anchor"
               ItemsSource="{Binding ScopeAnchorOptions}"
               SelectedItem="{Binding SubstringEndAnchorOption}"
-              ToolTip.Tip="Left: position 1 is the first character. Right: position 1 is the last character."
             >
+              <ToolTip.Tip>
+                <controls:RichToolTip>
+                  <TextBlock Classes="rich-tip-bullet" Text="• Left: position 1 is the first character." />
+                  <TextBlock Classes="rich-tip-bullet" Text="• Right: position 1 is the last character." />
+                </controls:RichToolTip>
+              </ToolTip.Tip>
               <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:StringScopeAnchorOption">
                   <TextBlock Text="{Binding Label}" />

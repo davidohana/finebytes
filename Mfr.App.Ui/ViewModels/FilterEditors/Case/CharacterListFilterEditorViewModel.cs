@@ -89,11 +89,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
             {
                 CapitalizeAfterFilter => (
                     "Capitalize letters which succeed the following characters:",
-                    "Each character in this list is a trigger: the next character in the name is uppercased. Empty list leaves the name unchanged."
+                    "Each character in this list is a trigger.\nThe next character in the name is uppercased.\nEmpty list leaves the name unchanged."
                 ),
                 SentenceEndCharactersFilter => (
                     "The following characters indicate that a sentence had ended:",
-                    "Characters that end a sentence for Letters Case (sentence mode) and Casing List (sentence initials). This filter does not change the name text."
+                    "Characters that end a sentence for Letters Case (sentence mode) and Casing List (sentence initials).\nThis filter does not change the name text."
                 ),
                 _ => throw new InvalidOperationException(
                     $"Character list editor does not support {filter.GetType().Name}."

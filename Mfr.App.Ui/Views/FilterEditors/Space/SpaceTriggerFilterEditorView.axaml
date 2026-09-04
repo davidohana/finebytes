@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Space"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="120"
@@ -14,7 +15,16 @@
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6">
-        <controls:LabelBesideFieldPanel ToolTip.Tip="Characters that trigger inserting the word separator (set by Space Character, default U+0020 SPACE).">
+        <controls:LabelBesideFieldPanel>
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-body" Text="Characters that trigger inserting the word separator." />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Separator is set by Space Character (default U+0020 SPACE)."
+              />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
           <TextBlock Classes="filter-editor-label" TextWrapping="Wrap" Text="{Binding CharsPrompt}" />
           <TextBox
             x:Name="CharsBox"
@@ -27,7 +37,7 @@
         <controls:CompactCheckBox
           x:Name="NeighborCheckBox"
           Content="{Binding NeighborCheckLabel}"
-          ToolTip.Tip="{Binding NeighborCheckToolTip}"
+          ToolTip.Tip="{Binding NeighborCheckToolTip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
           IsChecked="{Binding OnlyWhenNeighborLetterOrDigit}"
         />
       </StackPanel>

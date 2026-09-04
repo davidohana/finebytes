@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Trimming"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="260"
@@ -13,7 +14,11 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <StackPanel Orientation="Horizontal" Spacing="4" ToolTip.Tip="{Binding CountToolTip}">
+      <StackPanel
+        Orientation="Horizontal"
+        Spacing="4"
+        ToolTip.Tip="{Binding CountToolTip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+      >
         <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Number of characters:" />
         <controls:CompactNumericUpDown
           x:Name="CountSpinner"
