@@ -14,9 +14,13 @@
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key="PaneChromeBrush" Color="#F0F0F0" />
+          <SolidColorBrush x:Key="TextSelectionBrush" Color="#B8DCFF" />
+          <SolidColorBrush x:Key="TextSelectionForegroundBrush" Color="#000000" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="PaneChromeBrush" Color="#2B2B2B" />
+          <SolidColorBrush x:Key="TextSelectionBrush" Color="#264F78" />
+          <SolidColorBrush x:Key="TextSelectionForegroundBrush" Color="#F0F0F0" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
       <x:Double x:Key="ScrollBarSize">12</x:Double>
@@ -27,6 +31,15 @@
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
     <StyleInclude Source="/Themes/CompactNumericUpDown.axaml" />
     <StyleInclude Source="/Themes/CompactToggle.axaml" />
+    <!-- Light selection highlight for all editable text. -->
+    <Style Selector="TextBox">
+      <Setter Property="SelectionBrush" Value="{DynamicResource TextSelectionBrush}" />
+      <Setter Property="SelectionForegroundBrush" Value="{DynamicResource TextSelectionForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBox /template/ TextPresenter#PART_TextPresenter">
+      <Setter Property="SelectionBrush" Value="{DynamicResource TextSelectionBrush}" />
+      <Setter Property="SelectionForegroundBrush" Value="{DynamicResource TextSelectionForegroundBrush}" />
+    </Style>
     <Style Selector="ScrollViewer">
       <Setter Property="AllowAutoHide" Value="False" />
     </Style>
