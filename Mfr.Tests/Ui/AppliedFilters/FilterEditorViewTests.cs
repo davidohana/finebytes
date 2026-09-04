@@ -13,6 +13,7 @@ using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
+using Mfr.Filters.Trimming;
 using Mfr.Models.Filters;
 
 namespace Mfr.Tests.Ui.AppliedFilters
@@ -346,6 +347,45 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(0, _CountOf(mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter));
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Shrink Duplicate Characters edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Shrink_duplicate_character_box_updates_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(
+                AppliedFiltersTestUi.Entry("ShrinkDuplicateCharacters")
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<ShrinkDuplicateCharactersFilterEditorViewModel>(
+                mainViewModel.FilterEditorViewModel.OptionsEditor
+            );
+
+            var editor = editorView.GetVisualDescendants().OfType<ShrinkDuplicateCharactersFilterEditorView>().Single();
+            var box = editor.FindControl<TextBox>("CharacterBox");
+            Assert.NotNull(box);
+            Assert.Equal("-", box.Text);
+
+            box.Text = ">";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (ShrinkDuplicateCharactersFilter)
+                mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal('>', filter.Options.Character);
+
+            box.Text = string.Empty;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            filter = (ShrinkDuplicateCharactersFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal('\0', filter.Options.Character);
 
             window.Close();
         }

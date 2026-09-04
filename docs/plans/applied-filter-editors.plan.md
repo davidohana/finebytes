@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F4 shipped. F5 remaining option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass. Next: Count L/R (Trim/Extract)."
+overview: "F1–F4 shipped. F5 remaining option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass. Next: Trim Between."
 todos:
   - id: f1-f4
     content: "F1–F4: ctors, Applied list, Filter Options/Apply To, Space Character + Letters Case"
@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: f5-shrink-dup
     content: "F5 Shrink Duplicate Characters — single-char editor"
-    status: pending
+    status: completed
   - id: f5-trim-between
     content: "F5 Trim Between — start/end Position editor"
     status: pending
@@ -84,7 +84,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-04):** F5 Count L/R done. **Next: F5 Shrink Duplicate Characters** (single filter). Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-04):** F5 Shrink Duplicate Characters done. **Next: F5 Trim Between** (single filter). Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ### Already shipped (F1–F4)
 
@@ -130,9 +130,9 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 
 | Order        | Pass                        | Filters                                            | Options / notes                                                             |
 | ------------ | --------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------- |
-| **1 (done)** | **Count L/R**               | Trim Left, Trim Right, Extract Left, Extract Right | Shared `CountFilterOptions` editor + four factory arms + tests for all four |
-| **2 (next)** | Shrink Duplicate Characters | single                                             | `char` — not count-style                                                    |
-| 3            | Trim Between                | single                                             | `Position` start/end + side                                                 |
+| **1 (done)** | **Count L/R**                        | Trim Left, Trim Right, Extract Left, Extract Right | Shared `CountFilterOptions` editor + four factory arms + tests for all four |
+| **2 (done)** | **Shrink Duplicate Characters**      | single                                             | `char` — not count-style                                                    |
+| **3 (next)** | Trim Between                         | single                                             | `Position` start/end + side                                                 |
 | 4            | Fix Leading 0's             | single                                             | width / remove extras / max / whole-word                                    |
 | 5            | **Space After + Around**    | Space After, Space Around                          | Chars string + neighbor checkbox (shared pattern; two option records)       |
 | 6            | Capitalize After            | single                                             | trigger chars string                                                        |

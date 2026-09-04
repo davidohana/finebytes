@@ -6,6 +6,7 @@ Collapses **runs** of the same chosen character into a **single** occurrence (fo
 
 - **`character`** (string or char)
   - The character to deduplicate; typically one character (first character wins if a longer string is provided).
+  - Empty / null character (`\0`) is a no-op (MFR7 empty editor).
 
 ## Examples
 

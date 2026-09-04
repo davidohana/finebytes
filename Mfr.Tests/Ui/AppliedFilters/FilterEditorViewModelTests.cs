@@ -1,6 +1,7 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.Filters.Space;
+using Mfr.Filters.Trimming;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -52,6 +53,28 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.True(editor.HasSelectedStep);
             Assert.Equal("Applied Filter: Shrink Spaces", editor.TitleText);
+        }
+
+        /// <summary>
+        /// Verifies Shrink Duplicate Characters character edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Shrink_duplicate_character_text_updates_step_options()
+        {
+            var step = new AppliedFilterStepViewModel(
+                "Shrink Duplicate Characters",
+                new ShrinkDuplicateCharactersFilter()
+            );
+            var editor = new ShrinkDuplicateCharactersFilterEditorViewModel(step);
+
+            Assert.Equal("-", editor.CharacterText);
+            Assert.Equal('-', ((ShrinkDuplicateCharactersFilter)step.Filter).Options.Character);
+
+            editor.CharacterText = ">";
+            Assert.Equal('>', ((ShrinkDuplicateCharactersFilter)step.Filter).Options.Character);
+
+            editor.CharacterText = string.Empty;
+            Assert.Equal('\0', ((ShrinkDuplicateCharactersFilter)step.Filter).Options.Character);
         }
     }
 }

@@ -2,6 +2,7 @@ using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
+using Mfr.Filters.Trimming;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors
 {
@@ -24,6 +25,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 SpaceCharacterFilter filter => new SpaceCharacterFilterEditorViewModel(step, filter),
                 LettersCaseFilter filter => new LettersCaseFilterEditorViewModel(step, filter),
                 ICountOptionsFilter => new CountFilterEditorViewModel(step),
+                ShrinkDuplicateCharactersFilter => new ShrinkDuplicateCharactersFilterEditorViewModel(step),
                 _ => null,
             };
         }

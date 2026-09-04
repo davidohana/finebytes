@@ -34,6 +34,12 @@ namespace Mfr.Filters.Trimming
 
         protected override string _TransformValue(string value, RenameItem item)
         {
+            // MFR7: empty editor / '\0' means no operation.
+            if (Options.Character == '\0')
+            {
+                return value;
+            }
+
             var pattern = Regex.Escape(Options.Character.ToString()) + "+";
             return Regex.Replace(value, pattern, _ => Options.Character.ToString());
         }

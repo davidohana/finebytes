@@ -52,5 +52,19 @@ namespace Mfr.Tests.Models.Filters.Trimming
 
             Assert.Equal("abc def", FilterTestHelpers.ApplyToPrefix(filter, "abc def"));
         }
+
+        /// <summary>
+        /// Verifies MFR7 empty-editor / null character is a no-op.
+        /// </summary>
+        [Fact]
+        public void Apply_NullCharacter_ReturnsInputAsIs()
+        {
+            var filter = new ShrinkDuplicateCharactersFilter(
+                _target,
+                new ShrinkDuplicateCharactersOptions(Character: '\0')
+            );
+
+            Assert.Equal("a---b", FilterTestHelpers.ApplyToPrefix(filter, "a---b"));
+        }
     }
 }
