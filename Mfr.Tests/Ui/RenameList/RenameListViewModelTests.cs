@@ -437,6 +437,39 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies RemoveUnchanged clears selection even when every preview row is already changed.
+        /// </summary>
+        [Fact]
+        public async Task RemoveUnchanged_clears_selection_when_nothing_removed()
+        {
+            var dir = _context.CreateTempDir();
+            var helloPath = Path.Combine(dir, "hello.txt");
+            await File.WriteAllTextAsync(helloPath, "x");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([helloPath]);
+            renameListViewModel.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ])
+            );
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            var membershipRaises = 0;
+            renameListViewModel.MembershipChanged += (_, _) => membershipRaises++;
+
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            renameListViewModel.RemoveUnchanged(previewKey);
+
+            Assert.Equal(["hello.txt"], _PreviewNames(renameListViewModel));
+            Assert.Empty(renameListViewModel.SelectedEntries);
+            Assert.Equal(0, membershipRaises);
+        }
+
+        /// <summary>
         /// Verifies TryJumpSelection replaces multi-select with the first row.
         /// </summary>
         [Fact]

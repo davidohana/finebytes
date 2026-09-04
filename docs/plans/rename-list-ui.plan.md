@@ -321,8 +321,8 @@ Header menu today ([RenameListView.HeaderMenu.cs](../../Mfr.App.Ui/Views/RenameL
 Drop every row whose **preview** for the header’s field is unchanged.
 
 - **When shown:** preview columns only (`fieldKey.IsPreview`) — MFR7 `if (hi.IsPreview)`.
-- **Engine:** `RenameList.RemoveUnchanged(RenameListFieldKey key)` — walk reverse; keep when `RenameListFieldCatalog.IsPreviewChanged(item, key)`; raise `MembershipChanged` like other removes.
-- **UI:** header menu item → VM command with the clicked key; clear selection after.
+- **Engine:** `RenameList.RemoveUnchanged(RenameListFieldKey key)` — drop rows where `IsPreviewChanged` is false (via `Remove`).
+- **UI:** header menu item → VM with the clicked key; clear selection after (even if nothing removed); `MembershipChanged` only when rows were dropped.
 - **Tests:** mixed changed/unchanged preview rows; original-column menu omits item; empty list no-op.
 - **Deps:** Phase 11 `IsPreviewChanged` (done). No new catalog flags.
 

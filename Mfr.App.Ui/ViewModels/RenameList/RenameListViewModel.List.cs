@@ -42,8 +42,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="key">Preview column field key from the header menu.</param>
         /// <remarks>
         /// <para>
-        /// No-op for original keys, an empty list, or when busy. Clears selection afterward.
-        /// Raises <see cref="MembershipChanged"/> only when at least one row was removed.
+        /// No-op for original keys, an empty list, or when busy. Always clears selection afterward
+        /// (MFR7), even when nothing was removed. Raises <see cref="MembershipChanged"/> only when
+        /// at least one row was removed.
         /// </para>
         /// </remarks>
         public void RemoveUnchanged(RenameListFieldKey key)
@@ -65,9 +66,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     }
                 }
 
-                SetSelectedEntries([]);
                 _NotifyMembershipChanged();
-                return;
             }
 
             SetSelectedEntries([]);

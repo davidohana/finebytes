@@ -260,7 +260,8 @@ namespace Mfr.Engine.RenameList
         /// <returns>The count of items removed.</returns>
         /// <remarks>
         /// <para>
-        /// Walks reverse and keeps rows where <see cref="RenameListFieldCatalog.IsPreviewChanged"/> is true.
+        /// Collects rows where <see cref="RenameListFieldCatalog.IsPreviewChanged"/> is false, then
+        /// delegates to <see cref="Remove(IEnumerable{RenameItem})"/> for path-set and reindex.
         /// </para>
         /// </remarks>
         public int RemoveUnchanged(RenameListFieldKey key)
@@ -270,33 +271,8 @@ namespace Mfr.Engine.RenameList
                 return 0;
             }
 
-            var removedCount = 0;
-            for (var i = _renameItems.Count - 1; i >= 0; i--)
-            {
-                var item = _renameItems[i];
-                if (RenameListFieldCatalog.IsPreviewChanged(item, key))
-                {
-                    continue;
-                }
-
-                _includedResolvedPaths.Remove(NormalizePathKey(item.Original.FullPath));
-                _renameItems.RemoveAt(i);
-                removedCount++;
-            }
-
-            if (removedCount == 0)
-            {
-                return 0;
-            }
-
-            _ReindexItems();
-            Log.Information(
-                "Removed {RemovedCount} unchanged item(s) for preview field {GroupId}/{PropertyKey}.",
-                removedCount,
-                key.GroupId,
-                key.PropertyKey
-            );
-            return removedCount;
+            var unchanged = _renameItems.Where(item => !RenameListFieldCatalog.IsPreviewChanged(item, key)).ToList();
+            return Remove(unchanged);
         }
 
         /// <summary>
