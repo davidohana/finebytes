@@ -19,10 +19,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var f = new LettersCaseFilter();
             Assert.Equal(LettersCaseMode.Capitalize, f.Options.Mode);
             Assert.Equal(LettersCaseOptions.DefaultCapitalizeSkipWords, f.Options.CapitalizeSkipWords);
-            Assert.Equal(
-                "a Song for the World",
-                FilterTestHelpers.ApplyToPrefix(f, "a song for the world")
-            );
+            Assert.Equal("a Song for the World", FilterTestHelpers.ApplyToPrefix(f, "a song for the world"));
         }
 
         /// <summary>

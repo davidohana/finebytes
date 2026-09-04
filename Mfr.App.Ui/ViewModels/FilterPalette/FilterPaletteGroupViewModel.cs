@@ -33,7 +33,10 @@ namespace Mfr.App.Ui.ViewModels.FilterPalette
         /// <summary>
         /// Gets the MFR 7 filter-group toolbar icon.
         /// </summary>
-        public IImage Icon { get; } = _LoadIcon(iconAssetPath);
+        /// <para>
+        /// Loaded on first access so constructing the palette does not require Avalonia's asset loader.
+        /// </para>
+        public IImage Icon => field ??= _LoadIcon(iconAssetPath);
 
         /// <summary>
         /// Whether this group is the active exclusive selection.
@@ -41,6 +44,9 @@ namespace Mfr.App.Ui.ViewModels.FilterPalette
         [ObservableProperty]
         private bool _isSelected;
 
+        /// <summary>
+        /// Reads the PNG from the Mfr.App.Ui avares pack.
+        /// </summary>
         private static Bitmap _LoadIcon(string assetPath)
         {
             var uri = new Uri($"avares://Mfr.App.Ui{assetPath}");
