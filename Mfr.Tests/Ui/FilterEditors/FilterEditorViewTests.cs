@@ -377,9 +377,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(22, box.MinHeight);
             Assert.Equal(22, box.Height);
 
-            var titleBar = editorView.GetVisualDescendants().OfType<Border>().First(border =>
-                border.Classes.Contains("filter-editor-title-bar")
-            );
+            var titleBar = editorView
+                .GetVisualDescendants()
+                .OfType<Border>()
+                .First(border => border.Classes.Contains("filter-editor-title-bar"));
             Assert.Equal(22, titleBar.MinHeight);
 
             window.Close();
