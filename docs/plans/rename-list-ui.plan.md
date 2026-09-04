@@ -130,32 +130,32 @@ flowchart LR
   P1_9 --> P10a --> P10b --> P10c --> P10d --> P11 --> P12 --> P13 --> P14 --> P15
 ```
 
----
+______________________________________________________________________
 
 ## Sequential phase order
 
-| Phase | Status | What | Was |
-|---|---|---|---|
-| **1** Working list | Done | Add/remove, grid, progress, external drag-drop | 1 |
-| **2** Quick interactions | Done | Del, F4, cell hint | 2 |
-| **3** Row context menu | Done | Locate, Move, Remove, Clear | 3 |
-| **4** Sort / manual order | Done | 4a–4e (4e superseded by Phase 7) | 4 |
-| **5** Field shuttle + columns | Done | 5a–5g: catalog, dynamic grid, dialog, session | 5 |
-| **6** Extended **original** catalog | Done | Dates, size, ID3, image/JPEG — no Preview() | 6 / 7a |
-| **7** Full Auto-Sort | Done | Field-key sort for all non-preview fields | 7 / 7d |
-| **8** Original field-load errors | Done | Load-error cells, Show Load Errors, TagLib flag, structured gray, LoadErrors naming | 6b–6e |
-| **9** Original Refresh | Done | F5, re-read disk, menus/toolbar; missing-on-disk gray; shuttle OrderedDraft + DnD | 8a (+ part of 10) |
-| **10a** Filter-edit preview | Done | Live `ToChain()` → `Preview()` → grid + status counts (always on) | 8b |
-| **10b** List membership | Done | Re-preview on Rename List add/remove/clear | 8b |
-| **10c** Auto-Preview toggle | Done | Menu/toolbar, persist; cancel disables | 8b |
-| **10d** F5 re-preview | Pending | After original refresh, re-run preview when Auto-Preview on | 8b |
-| **11** Preview highlighting | Pending | Red changed cells, preview-error rows, Show Preview Error | 8c |
-| **12** Preview metadata columns | Pending | ID3/image preview cols after filters | 9 / 7b |
-| **13** Remaining hygiene | Partial | Color legend + Phase 5 follow-ups (glyph resources, test fixture, entry props) | 10 / 7c |
-| **14** Advanced menus | Pending | F2, export, Properties, drag-out | 11 / 8 |
-| **15** GO | Pending | `Ctrl+G` → Commit | 12 / 9 |
+| Phase                               | Status  | What                                                                                | Was               |
+| ----------------------------------- | ------- | ----------------------------------------------------------------------------------- | ----------------- |
+| **1** Working list                  | Done    | Add/remove, grid, progress, external drag-drop                                      | 1                 |
+| **2** Quick interactions            | Done    | Del, F4, cell hint                                                                  | 2                 |
+| **3** Row context menu              | Done    | Locate, Move, Remove, Clear                                                         | 3                 |
+| **4** Sort / manual order           | Done    | 4a–4e (4e superseded by Phase 7)                                                    | 4                 |
+| **5** Field shuttle + columns       | Done    | 5a–5g: catalog, dynamic grid, dialog, session                                       | 5                 |
+| **6** Extended **original** catalog | Done    | Dates, size, ID3, image/JPEG — no Preview()                                         | 6 / 7a            |
+| **7** Full Auto-Sort                | Done    | Field-key sort for all non-preview fields                                           | 7 / 7d            |
+| **8** Original field-load errors    | Done    | Load-error cells, Show Load Errors, TagLib flag, structured gray, LoadErrors naming | 6b–6e             |
+| **9** Original Refresh              | Done    | F5, re-read disk, menus/toolbar; missing-on-disk gray; shuttle OrderedDraft + DnD   | 8a (+ part of 10) |
+| **10a** Filter-edit preview         | Done    | Live `ToChain()` → `Preview()` → grid + status counts (always on)                   | 8b                |
+| **10b** List membership             | Done    | Re-preview on Rename List add/remove/clear                                          | 8b                |
+| **10c** Auto-Preview toggle         | Done    | Menu/toolbar, persist; cancel disables                                              | 8b                |
+| **10d** F5 re-preview               | Pending | After original refresh, re-run preview when Auto-Preview on                         | 8b                |
+| **11** Preview highlighting         | Pending | Red changed cells, preview-error rows, Show Preview Error                           | 8c                |
+| **12** Preview metadata columns     | Pending | ID3/image preview cols after filters                                                | 9 / 7b            |
+| **13** Remaining hygiene            | Partial | Color legend + Phase 5 follow-ups (glyph resources, test fixture, entry props)      | 10 / 7c           |
+| **14** Advanced menus               | Pending | F2, export, Properties, drag-out                                                    | 11 / 8            |
+| **15** GO                           | Pending | `Ctrl+G` → Commit                                                                   | 12 / 9            |
 
----
+______________________________________________________________________
 
 ## Current status (2026-08-29)
 
@@ -167,13 +167,13 @@ Working list, interactions, context menu, manual order, unified field shuttle, d
 
 *(Was 6b–6e.)* See [rename-list-phase6b-followups.md](../../docs/rename-list-phase6b-followups.md).
 
-| Area | Location |
-|---|---|
-| Load-error text + styling | `LoadErrorText` (`—`), `rename-list-load-error` class in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs) |
-| Show Load Errors | [RenameListViewModel.LoadErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.LoadErrors.cs), [RenameListLoadErrorsDialog](../../Mfr.App.Ui/Views/RenameList/RenameListLoadErrorsDialog.axaml) |
-| Row error indicator | [RenameListRowErrorGlyph.cs](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorGlyph.cs) + `HasRowError` on [RenameListEntry](../../Mfr.App.Ui/ViewModels/RenameList/RenameListEntry.cs) |
-| TagLib single-attempt flag | `TagLibLoadAttempted` on [RenameItem](../../Mfr.Models/Rename/RenameItem.cs) |
-| Sort tie-break | `ErrorsLast` in [RenameListFieldSortCompare.cs](../../Mfr.Models/RenameList/RenameListFieldSortCompare.cs) |
+| Area                       | Location                                                                                                                                                                                                        |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Load-error text + styling  | `LoadErrorText` (`—`), `rename-list-load-error` class in [RenameListView.Columns.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs)                                                               |
+| Show Load Errors           | [RenameListViewModel.LoadErrors.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.LoadErrors.cs), [RenameListLoadErrorsDialog](../../Mfr.App.Ui/Views/RenameList/RenameListLoadErrorsDialog.axaml) |
+| Row error indicator        | [RenameListRowErrorGlyph.cs](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorGlyph.cs) + `HasRowError` on [RenameListEntry](../../Mfr.App.Ui/ViewModels/RenameList/RenameListEntry.cs)                      |
+| TagLib single-attempt flag | `TagLibLoadAttempted` on [RenameItem](../../Mfr.Models/Rename/RenameItem.cs)                                                                                                                                    |
+| Sort tie-break             | `ErrorsLast` in [RenameListFieldSortCompare.cs](../../Mfr.Models/RenameList/RenameListFieldSortCompare.cs)                                                                                                      |
 
 **Not preview errors:** distinct from **Phase 11 Show Preview Error** and Phase 15 apply/GO errors.
 
@@ -181,18 +181,18 @@ Working list, interactions, context menu, manual order, unified field shuttle, d
 
 *(Was 8a; missing-on-disk gray and shuttle hygiene pulled forward from old Phase 10.)*
 
-| Area | Location |
-|---|---|
-| Engine re-read | `RenameList.RefreshOriginals` in [RenameList.cs](../../Mfr.Engine/RenameList/RenameList.cs) |
-| VM command | [RenameListViewModel.Refresh.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Refresh.cs) |
-| F5 routing | [MainWindowViewModel.RefreshFocusedPaneAsync](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) |
-| Missing-on-disk | [RenameListDiskPaths.cs](../../Mfr.Models/RenameList/RenameListDiskPaths.cs), `rename-list-missing-on-disk` styling |
-| Shuttle hygiene | [OrderedDraft.cs](../../Mfr.App.Ui/ViewModels/RenameList/OrderedDraft.cs), [ShuttleDragPayload.cs](../../Mfr.App.Ui/Views/RenameList/ShuttleDragPayload.cs) |
-| Tests | [RenameListRefreshTests.cs](../../Mfr.Tests/Engine/RenameListRefreshTests.cs), [RenameListViewModelRefreshTests.cs](../../Mfr.Tests/Ui/RenameList/RenameListViewModelRefreshTests.cs), [MainWindowRefreshTests.cs](../../Mfr.Tests/Ui/MainWindow/MainWindowRefreshTests.cs) |
+| Area            | Location                                                                                                                                                                                                                                                                    |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Engine re-read  | `RenameList.RefreshOriginals` in [RenameList.cs](../../Mfr.Engine/RenameList/RenameList.cs)                                                                                                                                                                                 |
+| VM command      | [RenameListViewModel.Refresh.cs](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Refresh.cs)                                                                                                                                                                     |
+| F5 routing      | [MainWindowViewModel.RefreshFocusedPaneAsync](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs)                                                                                                                                                                           |
+| Missing-on-disk | [RenameListDiskPaths.cs](../../Mfr.Models/RenameList/RenameListDiskPaths.cs), `rename-list-missing-on-disk` styling                                                                                                                                                         |
+| Shuttle hygiene | [OrderedDraft.cs](../../Mfr.App.Ui/ViewModels/RenameList/OrderedDraft.cs), [ShuttleDragPayload.cs](../../Mfr.App.Ui/Views/RenameList/ShuttleDragPayload.cs)                                                                                                                 |
+| Tests           | [RenameListRefreshTests.cs](../../Mfr.Tests/Engine/RenameListRefreshTests.cs), [RenameListViewModelRefreshTests.cs](../../Mfr.Tests/Ui/RenameList/RenameListViewModelRefreshTests.cs), [MainWindowRefreshTests.cs](../../Mfr.Tests/Ui/MainWindow/MainWindowRefreshTests.cs) |
 
 **Does not call `Preview()`** — preview columns stay identity/stale until **10a**.
 
----
+______________________________________________________________________
 
 ## Phase 10 — Preview core (10a–10d)
 
@@ -225,7 +225,7 @@ Menu + toolbar toggle (`IsAutoPreview`, default on), session `previewEnabled`. W
 
 After Phase 9 `RefreshOriginals`, re-run preview when Auto-Preview is on (full MFR7 refresh).
 
----
+______________________________________________________________________
 
 ## Phase 11 — Preview highlighting
 
@@ -235,7 +235,7 @@ After Phase 9 `RefreshOriginals`, re-run preview when Auto-Preview is on (full M
 - Preview-error rows (lavender/plum); **Show Preview Error** — distinct from **Show Load Errors** (Phase 8)
 - Sort-by-preview-column (one-shot) still deferred
 
----
+______________________________________________________________________
 
 ## Phase 12 — preview metadata columns
 
@@ -243,7 +243,7 @@ After Phase 9 `RefreshOriginals`, re-run preview when Auto-Preview is on (full M
 
 After **10a–10d**. ID3/image **preview** columns when filters modify tags; shuttle Preview tab entries for `SupportsPreview` metadata fields.
 
----
+______________________________________________________________________
 
 ## Phase 13 — remaining hygiene
 
@@ -256,7 +256,7 @@ After **10a–10d**. ID3/image **preview** columns when filters modify tags; shu
 - `RenameListEntry` convenience properties — delete when tests migrate to `GetFieldText(key)`
 - Color-legend toolbar (MFR7)
 
----
+______________________________________________________________________
 
 ## Phase 14 — advanced menus
 
@@ -264,7 +264,7 @@ After **10a–10d**. ID3/image **preview** columns when filters modify tags; shu
 
 F2 free edit, export, Properties, drag-out to Explorer; Refresh reset of manual renames when F2 exists.
 
----
+______________________________________________________________________
 
 ## Phase 15 — GO
 
@@ -272,7 +272,7 @@ F2 free edit, export, Properties, drag-out to Explorer; Refresh reset of manual 
 
 `Ctrl+G` → `Commit`; Refresh clears last apply-error highlighting. Apply-error menu is **Show Rename Error** — not Phase 8 **Show Load Errors**.
 
----
+______________________________________________________________________
 
 ## What to implement next
 
