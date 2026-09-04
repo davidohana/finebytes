@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// </summary>
     public sealed partial class RenameListProgressViewModel : ViewModelBase
     {
-        private const int DialogDelayMilliseconds = 200;
+        private const int DialogDelayMilliseconds = 500;
 
         private CancellationTokenSource? _cts;
 
