@@ -9,10 +9,13 @@
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key="FilterEditorTitleBarBrush" Color="#0066B8" />
           <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#FFFFFF" />
+          <!-- Shown at TextControlPlaceholderOpacity (0.5); keep base color soft. -->
+          <SolidColorBrush x:Key="FilterEditorWatermarkBrush" Color="#A8A8A8" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="FilterEditorTitleBarBrush" Color="#264F78" />
           <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#F0F0F0" />
+          <SolidColorBrush x:Key="FilterEditorWatermarkBrush" Color="#8A8A8A" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
       <!-- x:Shared=False: each ComboBox needs its own tip visual (one parent). -->
@@ -98,6 +101,35 @@
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="MinHeight" Value="0" />
     <Setter Property="Padding" Value="4,0" />
+  </Style>
+
+  <!--
+    Watermarks look like filled values at rest. Hide unless the empty field is focused.
+    Foreground (not Opacity): PART_Watermark Opacity is a template local DynamicResource.
+  -->
+  <Style
+    Selector="TextBox.filter-editor-field /template/ TextBlock#PART_Watermark,
+              TextBox.filter-editor-field-wrap /template/ TextBlock#PART_Watermark,
+              ComboBox.filter-editor-field /template/ TextBox#PART_EditableTextBox /template/ TextBlock#PART_Watermark,
+              ComboBox.filter-editor-field /template/ TextBlock#PlaceholderTextBlock"
+  >
+    <Setter Property="Foreground" Value="Transparent" />
+  </Style>
+  <Style
+    Selector="TextBox.filter-editor-field:pointerover /template/ TextBlock#PART_Watermark,
+              TextBox.filter-editor-field-wrap:pointerover /template/ TextBlock#PART_Watermark,
+              ComboBox.filter-editor-field:pointerover /template/ TextBox#PART_EditableTextBox /template/ TextBlock#PART_Watermark,
+              ComboBox.filter-editor-field:pointerover /template/ TextBlock#PlaceholderTextBlock"
+  >
+    <Setter Property="Foreground" Value="Transparent" />
+  </Style>
+  <Style
+    Selector="TextBox.filter-editor-field:focus /template/ TextBlock#PART_Watermark,
+              TextBox.filter-editor-field-wrap:focus /template/ TextBlock#PART_Watermark,
+              ComboBox.filter-editor-field /template/ TextBox#PART_EditableTextBox:focus /template/ TextBlock#PART_Watermark,
+              ComboBox.filter-editor-field:focus /template/ TextBlock#PlaceholderTextBlock"
+  >
+    <Setter Property="Foreground" Value="{DynamicResource FilterEditorWatermarkBrush}" />
   </Style>
 
   <Style Selector="TextBlock.rich-tip-title">

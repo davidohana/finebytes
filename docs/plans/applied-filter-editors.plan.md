@@ -1,261 +1,144 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F4 shipped. F5 option editors complete through Formatter (format-string box; token picker deferred). Preset/session/help polish still out of scope."
+overview: "F1–F5 shipped: Applied list + Filter Configuration host + every option-bearing filter has a live editor. Next: Formatter FormatEditor UX, presets, session chain, filter chrome (heart/reset/help), Filter Options polish."
 todos:
-  - id: f1-f4
-    content: "F1–F4: ctors, Applied list, Filter Options/Apply To, Space Character + Letters Case"
+  - id: f1-f5-complete
+    content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
     status: completed
-  - id: f5-count-lr
-    content: "F5 Count L/R — shared CountFilterOptions editor + factory for Trim/Extract Left/Right + tests for all four"
-    status: completed
-  - id: f5-shrink-dup
-    content: "F5 Shrink Duplicate Characters — single-char editor"
-    status: completed
-  - id: f5-reorg-subfolders
-    content: "F5 reorg — move editors into FilterGroup subfolders (mirror Mfr.Filters); update ViewLocator + usings"
-    status: completed
-  - id: f5-trim-between
-    content: "F5 Trim Between — start/end Position editor"
-    status: completed
-  - id: f5-fix-leading-zeros
-    content: "F5 Fix Leading 0's"
-    status: completed
-  - id: f5-space-after-around
-    content: "F5 Space After + Space Around — shared chars+neighbor editor pattern + both factories/tests"
-    status: completed
-  - id: f5-capitalize-after
-    content: "F5 Capitalize After"
-    status: completed
-  - id: f5-sentence-end
-    content: "F5 Sentence End Characters"
-    status: completed
-  - id: f5-strip-parens
-    content: "F5 Strip Parentheses"
-    status: completed
-  - id: f5-cleaner
-    content: "F5 Cleaner"
-    status: completed
-  - id: f5-counter
-    content: "F5 Counter"
-    status: completed
-  - id: f5-inserter
-    content: "F5 Inserter"
-    status: completed
-  - id: f5-casing-list
-    content: "F5 Casing List — space-separated words + sentence-initial"
-    status: completed
-  - id: f5-replace-list
-    content: "F5 Replace List — embedded line pairs (`search => replacement`) + mode/options"
-    status: completed
-  - id: f5-name-list
-    content: "F5 Name List — embedded one-name-per-line text + prefix/suffix"
-    status: completed
-  - id: f5-replacer
-    content: "F5 Replacer"
-    status: completed
-  - id: f5-token-mover
-    content: "F5 Token Mover"
-    status: completed
-  - id: f5-mover
-    content: "F5 Mover — root folder + optional sub-folder template"
-    status: completed
-  - id: f5-date-time-setter
-    content: "F5 Date/Time Setter — one filter with optional date + time checkboxes + timestamp-field picker"
-    status: completed
-  - id: f5-time-shifter
-    content: "F5 Time Shifter"
-    status: completed
-  - id: f5-attributes-setter
-    content: "F5 Attributes Setter"
-    status: completed
-  - id: f5-tag-remover
-    content: "F5 Audio Tag Remover"
-    status: completed
-  - id: f5-audio-tag-setter
-    content: "F5 Audio Tag Setter"
-    status: completed
-  - id: f5-id3v2-field-setter
-    content: "F5 ID3v2 Field Setter"
-    status: completed
-  - id: f5-formatter
-    content: "F5 Formatter — format-string box (token picker deferred)"
-    status: completed
+  - id: f6-formatter-format-editor
+    content: "F6 Formatter FormatEditor — token catalog, insert at caret, parse-error jump (box already shipped)"
+    status: pending
+  - id: f7-presets-ui
+    content: "F7 Presets UI — enable Presets / Save Preset; load/save chain via PresetManager"
+    status: pending
+  - id: f8-session-chain
+    content: "F8 Session — persist + restore working Applied Filters chain (current schema only)"
+    status: pending
+  - id: f9-filter-chrome
+    content: "F9 Filter chrome — instance heart/favorite, reset-to-defaults, per-filter help ?"
+    status: pending
+  - id: f10-filter-options-polish
+    content: "F10 Filter Options dialog — XAML/layout polish vs MFR7 (dialog already functional)"
+    status: pending
 isProject: false
 ---
 
 # Applied Filters + Filter Configuration
 
-Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
+Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-05):** F5 Formatter done (format-string box only; rich token/FormatEditor UX deferred). All F5 option editors registered. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-06):** **F5 complete.** Every option-bearing catalog filter has a registered Filter Configuration editor; optionless string filters stay title-only by design. Live option replace + Rename List Auto-Preview via `ToChain()` already work. Remaining work is product chrome around the chain (presets, session, help/heart) plus rich Formatter UX.
 
-## Already shipped (F1–F4)
+______________________________________________________________________
+
+## Shipped (F1–F5)
+
+### Host + Applied list (F1–F4)
 
 - Catalog `CreateDefault` + parameterless ctors; Applied list (add/remove/reorder/enable/DnD); Filters menu.
-- Filter Options modal (name / Apply To / scope) — see [filter-options-dialog-ui-handover.md](../filter-options-dialog-ui-handover.md).
-- Filter Configuration host: title + `FilterOptionsEditorFactory` + `FilterEditorViewLocator`.
-- Option editors: **Space Character**, **Letters Case**.
-- Optionless string filters: title only (no body) — Shrink/Remove/Strip Spaces, Separate Capitalized Text, Uppercase Initials.
+- Filter Options modal (name / Apply To / scope) — `FilterOptionsDialog` (+ VM/tests); functional, polish deferred to F10.
+- Filter Configuration host: title + `FilterOptionsEditorFactory` + `FilterEditorViewLocator` (prefix-replace by `FilterGroup` folder).
+- Live preview: `SetFilter` → `ChainChanged` → `ToChain()` → Rename List `Preview()` when Auto-Preview is on (Rename List Phase 10–11).
 
-______________________________________________________________________
+### Folder layout (F5 reorg — done)
 
-## Folder layout (do before more F5 editors)
+Editors live under `ViewModels/FilterEditors/<FilterGroup>/` ↔ `Views/FilterEditors/<same>/`. Root holds base VMs, factory, host, ViewLocator only. Namespaces match folders.
 
-Flat `FilterEditors/` will not scale (~25 option editors). Mirror [`FilterGroup`](../../Mfr.Filters/FilterGroup.cs) / `Mfr.Filters` category folders under **both** VM and view trees.
+### Option editors by group
 
-### Target tree
+| Group        | Editors (shared where noted)                                                                                         |
+| ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| **Space**    | Space Character; Space After + Around → shared `SpaceTrigger`                                                        |
+| **Case**     | Letters Case; Capitalize After + Sentence End → shared `CharacterList`; Casing List                                  |
+| **Trimming** | Count L/R (Trim/Extract Left/Right) → shared `Count`; Shrink Duplicate Characters; Trim Between                      |
+| **Replace**  | Cleaner; Replacer; Replace List                                                                                      |
+| **Formatting** | Counter; Inserter; Name List; Token Mover; **Formatter** (format-string box only)                                  |
+| **Attributes** | Date/Time Setter; Time Shifter; Attributes Setter                                                                  |
+| **Audio**    | Tag Remover; Audio Tag Setter; ID3v2 Field Setter                                                                    |
+| **Misc**     | Fix Leading 0's; Strip Parentheses; Mover (`PathMover`)                                                              |
 
-```text
-ViewModels/FilterEditors/          Views/FilterEditors/
-  FilterEditorViewModel.cs           FilterEditorView.axaml(+.cs)
-  FilterOptionsEditorViewModel.cs    FilterEditorViewLocator.cs
-  FilterOptionsEditorFactory.cs
-    Space/                             Space/
-      SpaceCharacter…                  SpaceCharacter…
-      SpaceTrigger… (After + Around)   SpaceTrigger…
-    Case/                              Case/
-    LettersCase…                     …
-    CharacterList… (Capitalize After + Sentence End)
-    CasingList…
-  Trimming/                          Trimming/
-    Count…                           …
-    ShrinkDuplicateCharacters…
-    TrimBetween…
-  Replace/                           Replace/
-    Cleaner…, ReplaceList…, Replacer…
-  Formatting/                        Formatting/
-    Counter…, Inserter…, NameList…
-    TokenMover…, Formatter…
-  Attributes/                        Attributes/
-    DateTimeSetter…
-    TimeShifter…, AttributesSetter…
-  Audio/                             Audio/
-    TagRemover…, AudioTagSetter…
-    Id3v2FieldSetter…
-  Misc/                              Misc/
-    FixLeadingZeros…
-    StripParentheses…
-    Mover…
-```
+**Optionless (title only, intentional):** Shrink/Remove/Strip Spaces, Separate Capitalized Text, Uppercase Initials.
 
-Namespaces follow folders, e.g. `Mfr.App.Ui.ViewModels.FilterEditors.Trimming` ↔ `Mfr.App.Ui.Views.FilterEditors.Trimming`.
+### Implementation pattern (reference)
 
-### Shared vs per-filter
+Agent checklist: [mfr-implement-filter-editor](../../.agents/skills/mfr-implement-filter-editor/SKILL.md) (+ `mfr7-reference`). Still the template if a **new** filter type needs an editor later:
 
-- **Root** `FilterEditors/` — base VMs, factory, ViewLocator; any helper used by ≥2 categories
-- **Category subfolder** — that group's `*FilterEditorViewModel` / `*FilterEditorView` (+ helpers used only there, e.g. `SpaceCharacterDefinition` → `Space/`)
-
-### ViewLocator change (required for reorg)
-
-Today the locator requires an **exact** flat namespace (`ViewModels.FilterEditors` → `Views.FilterEditors`). After reorg, resolve by **prefix replace**:
-
-- VM namespace must start with `Mfr.App.Ui.ViewModels.FilterEditors`
-- View type = same relative suffix under `Mfr.App.Ui.Views.FilterEditors`, with `ViewModel` → `View` on the type name
-
-Example: `…ViewModels.FilterEditors.Trimming.CountFilterEditorViewModel` → `…Views.FilterEditors.Trimming.CountFilterEditorView`.
-
-Keep types in the same category folder on both sides; do not cross-map categories.
-
-### Reorg pass checklist
-
-1. Create the eight category folders under VM + Views.
-1. Move existing editors: Space Character → `Space/`; Letters Case → `Case/`; Count + Shrink Duplicate → `Trimming/`; move `SpaceCharacterDefinition` with Space.
-1. Update namespaces + factory/test usings.
-1. Teach `FilterEditorViewLocator` the prefix-replace rule; keep `Match` on `FilterOptionsEditorViewModel`.
-1. Build + existing Filter Editor VM/headless tests green.
-1. No behavior changes — move only.
-
-Do this **before Trim Between** so new editors land in the right folder from the start.
-
-______________________________________________________________________
-
-## Pattern to copy (every F5 pass)
-
-Agent checklist: [mfr-implement-filter-editor](../../.agents/skills/mfr-implement-filter-editor/SKILL.md) (plus `mfr7-reference`).
-
-Same as F4b/F4c — **one pass = one filter, or one intentional group** (see grouping rule below):
-
-1. Read MFR7 `*FilterEditor` + help for each filter in the pass (`mfr7-reference` skill).
-1. Add `…FilterEditorViewModel` under `ViewModels/FilterEditors/<FilterGroup>/` (or one shared editor when options type / UI is identical).
-1. Add matching `…FilterEditorView.axaml` (+ code-behind) under `Views/FilterEditors/<same group>/`. ViewLocator resolves by naming + folder convention.
-1. Register in [`FilterOptionsEditorFactory`](../../Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs) (stays at root; add category `using`s as needed).
+1. VM + AXAML under matching `FilterGroup` folders; register in `FilterOptionsEditorFactory`.
 1. Live-replace via `filter with { Options = … }` + `ApplyIfChanged` — no Apply button; do not call `Setup()`.
-1. VM unit tests + headless gesture → `ToChain()` options match (**each** filter type in the group).
-1. Use compact controls (`CompactNumericUpDown`, `CompactCheckBox`, `CompactRadioButton`, `FieldsetGroup`).
+1. VM + headless tests under `Mfr.Tests/Ui/FilterEditors/<Group>/`.
+1. Compact controls + `SharedSizeGroup="FilterEditorLabel"` for multi-row label+field forms.
 
-Until a type is registered, selecting it still shows title only (Apply To stays in Filter Options).
+Non-product cleanup (shared controls, clamp helpers, etc.): [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md) — optional, not blocking F6+.
 
 ______________________________________________________________________
 
-## Phase F5 — Remaining editors
+## Remaining backlog (F6+)
 
-### Grouping rule
+Ordered for product value. Do **not** mix these into a single “editor” pass — each is its own feature slice.
 
-**Default:** one filter type per agent pass.
+### F6 — Formatter FormatEditor UX
 
-**Group in one pass only when it clearly saves work**, for example:
+**Shipped today:** multiline format-string box + tip; edits update `FormatterFilter.Options.Template`.
 
-- Identical options type / same shared editor (e.g. all four Count L/R filters).
-- Near-identical UI with only labels/property names differing (e.g. Space After + Space Around).
-- Shared control surface plus a small value variant (historical example was Date + Time Setter; those are now one `DateTimeSetter` filter).
+**Still needed (MFR7 `FormatEditor` parity):**
 
-Do **not** batch unrelated filters just to shrink the todo list. File-list filters (Casing / Replace / Name List) stay separate — they share a path-picker *idea* but different option shapes. Audio tag editors stay separate. Time Shifter stays separate from Date/Time Setter.
+1. **Token catalog** — browsable list of formatting parameters, grouped like MFR7 help (`filenamefp`, `filepropsfp`, `generalfp`, audio/image, …). Source of truth: finebytes `IFormatToken` types + [formatter-tokens.md](../../.agents/skills/mfr7-reference/formatter-tokens.md); UI reference `Help/formateditor.html` / `formateditor.gif`.
+1. **Insert at caret** — pick a token (optionally with a small options dialog for parameterized tokens) → insert `<token:…>` into the template at the caret / selection.
+1. **Parse-error feedback** — surface template parse failures; jump caret / highlight bad span when possible.
+1. **Reuse decision** — same control may later serve Mover sub-folder template, Audio Tag Setter field formats, and other format-string surfaces; design F6 so the editor is shareable, but ship Formatter first.
 
-When grouping: ship the shared editor once, wire every factory arm in that pass, and cover **each** type with VM + headless tests in the same pass.
+Own sub-project; not a one-afternoon filter-editor pass. Skill note: Formatter rich builder is explicitly out of scope for `mfr-implement-filter-editor`.
 
-### Ordered backlog
+### F7 — Presets UI
 
-- **0 (done)** — **Reorg subfolders** (all) — move existing editors; ViewLocator prefix-replace; no behavior change
-- **1 (done)** — **Count L/R** (Trimming) — Trim Left, Trim Right, Extract Left, Extract Right; shared `CountFilterOptions` editor + four factory arms + tests for all four
-- **2 (done)** — **Shrink Duplicate Characters** (Trimming) — `char` — not count-style
-- **3 (done)** — **Trim Between** (Trimming) — `Position` start/end + side
-- **4 (done)** — **Fix Leading 0's** (Misc) — width / remove extras / max / whole-word
-- **5 (done)** — **Space After + Around** (Space) — Space After, Space Around; shared `SpaceTrigger` chars+neighbor editor; two factory arms + tests
-- **6 (done)** — Capitalize After (Case) — trigger chars string; later shared `CharacterList` editor with Sentence End
-- **7 (done)** — Sentence End Characters (Case) — char list; later shared `CharacterList` editor with Capitalize After
-- **8 (done)** — Strip Parentheses (Misc) — pair type + remove contents
-- **9 (done)** — Cleaner (Replace) — illegal + custom + replacement
-- **10 (done)** — Counter (Formatting) — start / step / leading-zeros mode (None/Automatic/Custom) / position / separator / reset-per-folder
-- **11 (done)** — Inserter (Formatting) — text + position
-- **12 (done)** — Casing List (Case) — space-separated words + sentence-initial
-- **13 (done)** — Replace List (Replace) — embedded line pairs (`search => replacement`) + mode/options
-- **14 (done)** — Name List (Formatting) — embedded one-name-per-line text + prefix/suffix
-- **15 (done)** — Replacer (Replace) — find/replace / regex / scope
-- **16 (done)** — Token Mover (Formatting) — token indices / destination
-- **17 (done)** — **Mover** (Misc) — root folder + optional sub-folder template (formatter tokens / `\`)
-- **18 (done)** — **Date/Time Setter** (Attributes) — one `DateTimeSetter` filter; optional date + time checkboxes; timestamp-field picker
-- **19 (done)** — Time Shifter (Attributes) — field + amount + unit (not grouped with setters)
-- **20 (done)** — Attributes Setter (Attributes) — attribute flags
-- **21 (done)** — Audio Tag Remover (Audio) — all / block types
-- **22 (done)** — Audio Tag Setter (Audio) — per-field format specs
-- **23 (done)** — ID3v2 Field Setter (Audio) — frame + value
-- **last (done)** — Formatter (Formatting) — format-string box; token catalog / FormatEditor UX deferred
+Engine already has `PresetManager` + JSON preset shape (`Mfr.Filters` docs). UI stubs exist (`Presets` / `Save Preset` menu items, disabled).
 
-**Corrections vs older F5a–f batches:** Shrink Duplicate is **not** count-style; **Trim Between** was missing from the batch list; Fix Leading 0's is its own richer editor.
+1. Enable **Presets** menu: list named presets → replace (or confirm-replace) Applied Filters chain from preset steps.
+1. Enable **Save Preset**: name prompt → serialize current `ToChain()` into presets store.
+1. Edge cases: empty chain, overwrite same name, load errors (bad JSON / unknown filter type → clear message, no silent remap).
+1. Tests: VM + headless for load/save round-trip of a small chain.
 
-### User-facing (each pass)
+### F8 — Session persist of working chain
 
-Select that filter in Applied → Filter Configuration shows its options; edits update the step and (with Auto-Preview) Rename List preview. Other unfinished types stay title-only.
+Rename List / other session fields already persist; Applied Filters chain does not yet.
 
-### Still out of scope for F5
+1. Add current-schema fields on `SessionState` for the working chain (steps: type, options, enabled, display name, Apply To / scope as already modeled).
+1. Save on change (debounced) / shutdown; restore on launch.
+1. Missing/unrecognized → defaults (first launch), **no** legacy converters (`AGENTS.md` persistence policy).
+1. Tests: serialize/deserialize round-trip; unknown type drops to empty or skips that step with documented behavior.
 
-- Preset load/save UI; session persist of the working chain
-- Instance rename heart/reset; filter help `?`
-- Filter Options XAML polish ([handover](../filter-options-dialog-ui-handover.md))
-- Formatter rich token/FormatEditor UX (catalog, insert, parse-error jump) — format-string box shipped
+### F9 — Filter chrome (heart / reset / help)
+
+MFR7 Applied / Filter Configuration chrome still missing:
+
+1. **Instance heart / favorite** — mark an applied-step instance name (or options snapshot) as favorite; clarify product meaning vs presets before coding (MFR7 heart vs preset overlap).
+1. **Reset to defaults** — restore selected step options (+ maybe name) from `FilterCatalog.CreateDefault` / parameterless ctor without removing the step from the list.
+1. **Help `?`** — open per-filter help (ported help pages or MFR7 `Help/*.html` mapping). Wire from Filter Configuration title bar and/or Filter Options.
+
+### F10 — Filter Options dialog polish
+
+Dialog already edits name, Apply To, and scope. Polish only:
+
+1. Layout / spacing / control sizing vs MFR7 Filter Options.
+1. Shared label column alignment (same `SharedSizeGroup` pattern as filter editors where it still drifts).
+1. Any remaining Apply To / scope edge cases discovered in use — fix with tests, not a full rewrite.
 
 ______________________________________________________________________
 
 ## Layering / files
 
 - Defaults: parameterless ctor; `FilterCatalog.CreateDefault`
-- UI: `Views/FilterEditors/<FilterGroup>/…`, `ViewModels/FilterEditors/<FilterGroup>/…` (host: `FilterEditorView` / factory / base VMs / ViewLocator at `FilterEditors/` root)
-- Wiring: factory + ViewLocator only; `MainWindowViewModel` already selects the editor
-- Preview: already hooked via `ChainChanged` → `ToChain()` → `Preview()` — do not re-wire; just ensure `SetFilter` keeps raising chain changes
+- UI editors: `Views/FilterEditors/<FilterGroup>/…`, `ViewModels/FilterEditors/<FilterGroup>/…`
+- Host: `FilterEditorView` / factory / base VMs / ViewLocator at `FilterEditors/` root
+- Filter Options: `Views/AppliedFilters/FilterOptionsDialog*`
+- Wiring: factory + ViewLocator; `MainWindowViewModel` already selects the editor
+- Preview: already hooked — do not re-wire for F6+ editor polish
 
 ## References
 
 - Agent skill: [mfr-implement-filter-editor](../../.agents/skills/mfr-implement-filter-editor/SKILL.md)
-- MFR7: `FilterEdit.cs`, per-filter `*FilterEditor.cs`, help under `mfr7/Site/finebytes/mfr/Help/`
-- Prior slice: Cursor plan `applied_filter_editors_c4a4260f.plan.md` (F1–F4 history)
+- MFR7: `FilterEdit.cs`, per-filter `*FilterEditor.cs`, FormatEditor help / images; help under `mfr7/Site/finebytes/mfr/Help/`
+- Formatter tokens: [formatter-tokens.md](../../.agents/skills/mfr7-reference/formatter-tokens.md)
+- Optional cleanup: [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md)
 - Rename List preview: [rename-list-ui.plan.md](rename-list-ui.plan.md) Phase 10–11
+- Prior slice history: Cursor plan `applied_filter_editors_c4a4260f.plan.md` (F1–F4)

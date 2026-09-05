@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–13 + 14a done. Next: 14b–14f → 15 → 16 (color legend)."
+overview: "Phases 1–13 + 14a done. Next: 14b → 14c → 14d → 14e → 14f → 15 → 16."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -63,7 +63,7 @@ todos:
     content: "5g: Field-key cell hints; legacy RenameListCellHint string paths removed"
     status: completed
   - id: phase-6
-    content: "Phase 6: extended original catalog — Extended, AudioTag, Image, Jpeg (preview deferred to 12)"
+    content: "Phase 6: extended original catalog — Extended, AudioTag, Image, Jpeg, Media, Mpeg (preview later)"
     status: completed
   - id: phase-7
     content: "Phase 7: generalized Auto-Sort — all non-preview catalog fields (field-key sort)"
@@ -127,176 +127,227 @@ isProject: false
 
 # Rename List UI (phased to MFR 7.4)
 
-Workspace copy of the Cursor plan (synced 2026-08-29). Canonical Cursor copy:
-`C:\Users\david\.cursor\plans\rename_list_ui_63d0c474.plan.md`.
+Canonical plan: this file under `docs/plans/`. Sources: [mfr7 help](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html), [FieldSelector.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/FieldSelector.cs), [SortFieldSelector.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/SortFieldSelector.cs), [RenameList.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/RenameList.cs) (UI), engine [Mfr.Engine/RenameList/RenameList.cs](../../Mfr.Engine/RenameList/RenameList.cs).
 
-Source of truth: [mfr7 help](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html), [FieldSelector.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/FieldSelector.cs), [SortFieldSelector.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/SortFieldSelector.cs), and the engine in [Mfr.Engine/RenameList/RenameList.cs](Mfr.Engine/RenameList/RenameList.cs).
+**Phase numbers = execution order.** Color legend is **16** (needs 14d blue + 15 plum).
 
-**Phase numbers = execution order** (renumbered 2026-08-29; color legend moved to **16** after 14/15 on 2026-09-04). Old labels in parentheses where helpful.
-
-**No legacy migrations:** session and config use current shapes only; unknown or old JSON → MFR7 defaults (`AGENTS.md` refactoring policy). `SessionStateRenameListSortFieldJsonConverter` is gone; `sortFields` is field-key JSON only.
+**No legacy migrations:** session/config use current shapes only; unknown JSON → defaults (`AGENTS.md`). `sortFields` is field-key JSON only.
 
 ```mermaid
 flowchart LR
-  Done[1-13 + 14a done]
+  Done[1–13 + 14a]
   P14b[14b Export]
-  P14c[14c Free Names Edit]
-  P14d[14d Manual F2 blue]
+  P14c[14c Free Names]
+  P14d[14d Manual F2]
   P14e[14e Properties]
   P14f[14f Drag-out]
   P15[15 GO]
-  P16[16 Color legend]
+  P16[16 Legend]
   Done --> P14b --> P14c --> P14d
   P14d --> P14e --> P14f --> P15 --> P16
 ```
 
 ______________________________________________________________________
 
-## Remaining phase order
+## Status (2026-09-06)
 
-| Phase                    | What                                                                  | Was              |
-| ------------------------ | --------------------------------------------------------------------- | ---------------- |
-| **14b** Export Name List | Column → UTF-8 text file; save dialog; optional open in editor        | 11 / 8           |
-| **14c** Free Names Edit  | Embed generated names in `NameListFilter` targeted at writable column | 11 / 8           |
-| **14d** Manual Rename    | Force original/preview value; blue cells; Cancel; F5 clears overrides | 11 / 8           |
-| **14e** Properties       | Alt+Enter / row menu → Windows shell property sheet                   | 11 / 8           |
-| **14f** Drag-out         | Selected rows as `FileDrop` to Explorer (cell→filter drag deferred)   | 11 / 8           |
-| **15** GO                | `Ctrl+G` → Commit                                                     | 12 / 9           |
-| **16** Color legend      | Toolbar toggle + side panel (MFR7); needs **14d** blue + GO plum      | 10 / 7c (legend) |
+| | |
+| --- | --- |
+| **Shipped** | Phases **1–13** and **14a** |
+| **Next** | **14b** Export Name List |
+| **Then** | 14c → 14d → 14e → 14f → **15** GO → **16** color legend |
+| **Blocked on** | 16 needs 14d (blue) + 15 (plum); 15 must honor 14d overrides |
 
 ______________________________________________________________________
 
-## Already shipped (1–13, 14a)
+## Shipped (1–13, 14a) — consolidated
 
-**Status (2026-09-05):** Phases **1–13** and **14a** done. **Next: 14b** → 14c–14f → 15 → 16.
+Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, and Remove Unchanged. Detail below is reference only; do not re-open unless a regression.
 
-| Block                       | Shipped highlights                                                                                                                                |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1–7**                     | Working list, Del/F4/hints, row menu, manual order + DnD, field shuttle, dynamic columns, session, extended original catalog, field-key Auto-Sort |
-| **8** Load errors           | Gray cells, Show Load Errors, TagLib flag, `ErrorsLast` — see [rename-list-phase6b-followups.md](../../docs/rename-list-phase6b-followups.md)     |
-| **9** Original Refresh      | F5 `RefreshOriginals`, missing-on-disk gray, shuttle OrderedDraft + DnD                                                                           |
-| **10a–10d** Preview core    | `ToChain()` → `Preview()` always-on + Auto-Preview toggle; re-preview on membership / F5; status counts                                           |
-| **11** Preview highlighting | Red changed cells, lavender preview-error rows, Show Preview Error                                                                                |
-| **12** Preview metadata     | Extended dates/attrs + AudioTag `ReadWriteApply` preview cols; First\*/TagTypes/Image/Jpeg stay original-only                                     |
-| **13** Hygiene              | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                 |
-| **14a** Remove Unchanged    | Preview-column header menu → `RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                       |
+| Block | What shipped |
+| --- | --- |
+| **1–4** Shell + order | Multi-select File List → Add Selected/All; Del/F4/status hint; row menu; move up/down; insert-at-selection; File List/Explorer drop marker; internal reorder DnD |
+| **5** Columns | `RenameListFieldKey` catalog, dynamic DataGrid columns, unified field shuttle (Visible \| Sort), session `visibleColumns` + widths, field-key cell hints |
+| **6** Catalog (original) | Extended, AudioTag, Image, Jpeg, Media Properties, Mpeg — originals in shuttle |
+| **7** Auto-Sort | Field-key sort on all non-preview catalog fields; header click / Shift+click |
+| **8** Load errors | Gray load-error cells, missing-on-disk gray, Show Load Errors, TagLib / image error surfacing |
+| **9** Refresh | F5 `RefreshOriginals`, missing-on-disk gray, shuttle OrderedDraft + DnD |
+| **10** Preview core | Always-on `ToChain()` → `Preview()`; Auto-Preview toggle + persist; re-preview on membership / F5; status counts |
+| **11** Preview highlight | Red changed cells (`rename-list-preview-changed`), lavender preview-error rows, Show Preview Error via shared error dialog |
+| **12** Preview metadata | Extended dates/attrs + AudioTag semantic (`ReadWriteApply`) preview cols; First\* / Tag Types / Image / Jpeg / Media / Mpeg stay original-only; Size / Folder File Count original-only |
+| **13** Hygiene | Glyph styles in Themes; `RenameListUiTestContext` |
+| **14a** Remove Unchanged | Preview-column header menu → `RenameList.RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped |
 
-______________________________________________________________________
+**Already reusable for remaining work (do not rebuild):**
 
-## Phase 12 — preview metadata columns
+- `NameListFilter` + embedded `NameListOptions.Entries` + F5 Name List editor (one name per line) — ready for **14c**
+- Engine `RenameList.Preview` / `Commit` / `CommitExecutor` + `RenameItem.CommitError` + `RenameListCommitTests` — ready for **15** UI wiring
+- `RenameListRowErrorDialog` — reuse for Show Rename Error (**15**), not a third dialog
+- Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs) — insert 14b/14c after Remove Unchanged
+- Cell/row classes: red / gray / lavender in `RenameListView.axaml`; **blue** and **plum** still missing
+- `MainWindowViewModel.Go()` + `AppShortcuts.Go` / menu / toolbar — **stubs**; Ctrl+G labeled but no-op ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
 
-*(Was 9 / 7b.)* **Done (2026-09-05).**
+**Write vs preview (important for 14c/14d):**
 
-After **10a–10d**. Enable **preview** column variants for catalog fields that filters can mutate on `Preview` (MFR7 Preview Fields tab: any non-`ReadOnly` prop). Phase 6 shipped Extended / AudioTag / Image / Jpeg as **original-only**; this phase flips `SupportsPreview` where MFR7 allows preview.
-
-### Scope (MFR7 parity)
-
-| Group                          | Preview columns                                                              | Why                                                                                                                                                                                                                                                       |
-| ------------------------------ | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Extended** (File Properties) | **Creation Date**, **Last Write Date**, **Last Access Date**, **Attributes** | **Done (12a).** MFR7 `PropertyType.ReadWrite`. `DateTimeSetter` / `TimeShifter` write `item.Preview.CreationTime` / `LastWriteTime` / `LastAccessTime`; attributes filters write preview attrs. Size / Folder File Count stay original-only (`ReadOnly`). |
-| **AudioTag** (ID3 etc.)        | Writable tag fields (27)                                                     | **Done.** MFR7 `ReadWriteApply` — First\* + Tag Types stay `ReadOnly`.                                                                                                                                                                                    |
-| **Image / Jpeg**               | None in this phase                                                           | MFR7 EXIF incl. Date/Time Taken is `ReadOnly` — originals only (Phase 6).                                                                                                                                                                                 |
-
-Shuttle **Preview** tab lists every field with `SupportsPreview` that is not already visible as a preview column (same rule as today for Basic).
-
-### Work
-
-- **Catalog (12a done):** Extended dates/attrs are no longer `OriginalOnlyRenameListField` / `supportsPreview: false`. Preview key resolve uses **preview** `FileMeta` (dates via existing `FormatFileDate`); original columns keep original meta. Size / Folder File Count stay original-only.
-- **Catalog (AudioTag done):** semantic fields `supportsPreview: true`; First\* + Tag Types remain original-only.
-- **Grid / red cells:** Phase 11 highlighting already compares original vs preview text — once preview cols exist, Date/Time Setter / Audio Tag Setter changes show red on the matching preview column.
-- **Tests:** DateTimeSetter → Creation preview; Attributes preview; Size non-previewable; AudioTagSetter → Title preview; Jpeg DateTaken non-previewable; shuttle Preview tab counts.
-- **14c/14d note:** MFR7 Free Names / Manual Rename require `ReadWriteApply` — Extended dates are `ReadWrite` only (preview yes, Free-Edit / F2 no). Do not invent `SupportsWrite` for dates here; AudioTag semantic fields that are `ReadWriteApply` get write when 14c ships.
-
-### Exit
-
-Shuttle Preview tab offers Extended date/attrs and AudioTag writable fields. Live preview + red changed cells work for Date/Time Setter and Audio Tag Setter; Image/Jpeg stay original-only.
+| MFR7 type | Examples | Preview col | Free Names / F2 |
+| --- | --- | --- | --- |
+| `ReadWriteApply` | Basic name/path fields; AudioTag semantic | yes | **yes** → need `SupportsWrite` |
+| `ReadWrite` | Extended dates/attrs | yes (12) | **no** |
+| `ReadOnly` | Size, Image, Jpeg, Media, Mpeg, First\*, Tag Types | no | **no** |
 
 ______________________________________________________________________
 
-## Phase 14 — advanced menus (14a–14f)
+## Remaining — execution order
 
-*(Was 11 / 8.)* After **12** (preview metadata cols useful for Free Names / Manual Rename on tags). Letter grain like 10a–10d. **14a done** (see table above).
+| Phase | What | Depends on |
+| --- | --- | --- |
+| **14b** Export Name List | Column → UTF-8 `.txt`; save dialog; optional open in editor | — |
+| **14c** Free Names Edit | Same lines → `NameListFilter` on Applied Filters | 14b helper + `SupportsWrite` |
+| **14d** Manual Rename (F2) | Force original/preview; blue cells; Cancel; F5 clears | `SupportsWrite` |
+| **14e** Properties | Alt+Enter / row menu → Windows property sheet | — (parallel-safe after 14d) |
+| **14f** Drag-out | Selected rows as FileDrop to Explorer | coexist with 4d reorder |
+| **15** GO | `Ctrl+G` → Commit; plum apply errors; Show Rename Error | 14d overrides in commit path |
+| **16** Color legend | Toolbar toggle + side panel | 14d blue + 15 plum |
 
-MFR7 sources: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) (`#removeunchanged`, `#export`, `#freeedit`, `#manualrename`, `#morefeats`), [RenameList.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/RenameList.cs) header/body menus, [RenameItemList.GenerateNameList](d:/Devl/mfr7/Core/MfrLib/Items/RenameItemList.cs).
+______________________________________________________________________
 
-**Do not conflate Free Names Edit with F2.** They are different features:
+## Phase 14 — advanced menus (14b–14f)
 
-| Feature             | Entry                        | Effect                                                                       |
-| ------------------- | ---------------------------- | ---------------------------------------------------------------------------- |
-| Free Names Edit     | Header menu (writable col)   | Embed names in **Name List** filter targeting that field                     |
-| Manual Rename Field | F2 / row menu (writable col) | Dialog forces original **or** preview value; **blue** text until Cancel / F5 |
+MFR7: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) (`#export`, `#freeedit`, `#manualrename`, `#removeunchanged`, `#morefeats`), UI `RenameList.cs`, `RenameItemList.GenerateNameList`.
 
-Header menu builder ([RenameListView.HeaderMenu.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs) `_BuildColumnHeaderContextMenu`): title → Hide Field → *(preview only)* Remove Unchanged → *(14b)* Export Name List → *(14c writable)* Free Names Edit → Select Visible Fields → Select Sort Fields. Insert 14b/14c in that method only. Keep Select Sort Fields; do not regress Hide / Select.
+**Do not conflate** Export (file) ≠ Free Names (filter) ≠ Manual Rename (F2 force/blue).
+
+Header menu order ([`_BuildColumnHeaderContextMenu`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)):
+
+`(title)` → Hide Field → *(preview)* Remove Unchanged → **(14b) Export Name List** → **(14c writable) Free Names Edit** → Select Visible Fields → Select Sort Fields.
 
 ### 14b — Export Name List
 
-Write one line per rename-list row = display text of the clicked column (original or preview).
+One line per rename-list row = display text of the clicked column (original or preview).
 
-- **Engine:** `GenerateNameList(path, RenameListFieldKey)` — UTF-8, `GetFieldText` / catalog resolve (MFR7 `GetDisplayText(Preview)`). Shared helper for 14c.
-- **UI:** SaveFileDialog from header menu (any column). On success, ask “Edit?” and open with default editor (`UseShellExecute`) — same as MFR7.
-- **Tests:** file contents match row order and preview vs original values; dialog cancel leaves disk alone (VM/engine unit + light UI if needed).
-- **Not in scope:** Name List Filter creation (that is 14c).
+**Work**
+
+- **Engine:** `GenerateNameList(path, RenameListFieldKey)` — UTF-8, one `WriteLine` per row via `GetFieldText` / catalog resolve (MFR7 `GetDisplayText(Preview)`). Shared with 14c (in-memory lines helper + file writer).
+- **UI:** Header menu on **any** column. Avalonia save dialog (`Save Name List as`, `*.txt`). On success: `"Name list saved to {path}. Edit?"` → Yes opens with default editor (`UseShellExecute`). Cancel = no write.
+- **Tests:** contents match row order and original vs preview values; cancel leaves disk alone.
+
+**Not in scope:** creating a Name List filter (14c).
 
 ### 14c — Free Names Edit
 
-Header command on **writable** columns only (MFR7 `PropertyType.ReadWriteApply`).
+Header command on **writable** columns only (`SupportsWrite` / MFR7 `ReadWriteApply`).
 
-- **Catalog:** add `SupportsWrite` (or equivalent) on `RenameListField` — true for fields that map to a `FilterTarget` filters can write (start with Basic path/name fields that already have targets; extend when Phase 12 preview tag cols ship). `SupportsPreview` alone is not enough (read-only originals use `supportsPreview: false` but are not Free-Edit targets).
-- **Flow:** generate name-list lines (same content as 14b export) → construct `NameListFilter` with `Target` from field→`FilterTarget` map, `Options.Entries` = those lines, display name `"{Field} List"` (unique with `*` suffix like MFR7) → `AppliedFiltersViewModel.Add` + select the step so Filter Configuration shows the embedded list.
-- **Filter editor:** F5 Name List already edits embedded one-name-per-line text (plus prefix/suffix). No external file / Edit-in-notepad action.
-- **Tests:** writable Basic preview/original creates filter with correct target + file lines; non-writable column omits menu item; unique instance names.
-- **Not in scope:** blue manual cells (14d); does not mutate Original/Preview directly.
+**Work**
+
+- **Catalog:** add `SupportsWrite` on `RenameListField` (or equivalent). True for fields that map to a `FilterTarget` filters can write:
+  - Start: Basic path/name (Name, Extension, FullName, Folder, FullPath) + AudioTag semantic fields that already preview.
+  - False for Extended dates/attrs (`ReadWrite` only) even though they have preview cols.
+- **Field → target map:** field key → `FilterTarget` (File Prefix / Extension / FullName / Parent Folder / Full Path / audio targets).
+- **Flow:** generate lines (same as 14b) → `NameListFilter` with that `Target`, `Options.Entries` = lines, display name `"{Field} List"` with `*` suffix while name exists (MFR7) → add + **select** on Applied Filters so Filter Configuration shows the list.
+- **AppliedFilters API:** today only `Add`/`Append` from catalog entries — need add-concrete-instance + select (or equivalent).
+- **Editor:** existing F5 Name List editor is enough (no temp file / notepad Edit link — intentional finebytes diff from MFR7 file-backed flow).
+- **Tests:** writable Basic/Audio creates filter with correct target + lines; non-writable omits menu; unique instance names.
+
+**Not in scope:** blue manual cells (14d); does not mutate Original/Preview directly.
 
 ### 14d — Manual Rename Field (F2)
 
 Largest substep — model + blue highlight (required before Phase 16).
 
-- **Behavior (MFR7):** focused writable column + selection → InputBox “Set the original|preview value of field …” with first non-error cell as default → same string applied to all selected rows (skip error cells). Multi-select sets **identical** values. Changes apply on **GO** (Phase 15), not immediately to disk.
-- **Model:** per-item forced value for `(fieldKey)` on original and/or preview (MFR7 `PropStatus.ForceValue`). Catalog resolve must prefer forced text; `IsPreviewChanged` / red styling still correct when forced preview ≠ original (or forced original). Track `IsManuallyRenamed(key)` for blue.
-- **UI:** F2 + row context **Manual Rename Field**; **Cancel Manual Rename** when that cell is forced. Enable only for `SupportsWrite` and non-error focused cell. Disabled F2 in [keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md) becomes live.
-- **Styling:** `rename-list-manual-rename` blue foreground (MFR7 manual-rename blue). Precedence vs red/gray: blue wins for manually forced cells (document in Themes).
-- **Refresh:** Phase 9 `RefreshOriginals` / F5 clears **all** manual overrides (MFR7 refresh resets manually changed fields). Hook in existing refresh path; tests prove F5 wipes blue.
-- **Tests:** force original vs preview; multi-select same value; Cancel one cell; F5 clears; non-writable / error cells no-op; blue class applied.
-- **Out of scope here:** commit of forced values (Phase 15 must honor overrides when planning apply).
+**Behavior (MFR7)**
+
+- Focused writable column + selection → InputBox “Set the original|preview value of field …” with first non-error cell as default → same string on all selected non-error rows.
+- Changes apply on **GO** (15), not immediately to disk.
+- **Cancel Manual Rename** clears force on focused cell only.
+- F5 `RefreshOriginals` clears **all** manual overrides (and later apply errors).
+
+**Work**
+
+- **Model:** per-item forced value for `(fieldKey)` on original and/or preview (MFR7 `PropStatus.ForceValue`). Catalog / `GetFieldText` prefer forced text; `IsPreviewChanged` / red still correct when forced preview ≠ original; `IsManuallyRenamed` for blue.
+- **Pipeline (MFR7):** forced **original** before filters; forced **preview** after filters. Phase 15 commit must see the same.
+- **UI:** enable F2 ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md) still lists it under “not implemented”); row menu Manual Rename Field + Cancel; enable only for `SupportsWrite` and non-error focused cell.
+- **Styling:** `rename-list-manual-rename` blue foreground; blue wins over red for forced cells (document precedence in Themes / view styles).
+- **Tests:** force original vs preview; multi-select identical value; Cancel one cell; F5 clears; non-writable / error no-op; blue class applied.
+
+**Out of scope here:** disk commit (15).
 
 ### 14e — Properties
 
-Windows property sheet for the focused/selected item (MFR7 Alt+Enter / row **Properties**).
+Windows property sheet for the focused item (MFR7 Alt+Enter / row **Properties**; single selection).
 
-- **UI:** row context menu + `Alt+Enter` when Rename List focused and selection non-empty (single item like MFR7 `DisplayProperties` on focused row).
-- **Impl:** shell “properties” for `FullPath` (Windows). Distinct from File List Properties debt (dialog) in [debts.md](../../docs/debts.md) — do not block on that.
-- **Tests:** command enabled/disabled with selection; opener invoked with path (fake opener in VM tests). Headless: menu item present.
+**Work**
+
+- Row context menu + `Alt+Enter` when Rename List focused and selection non-empty.
+- Shell `"properties"` verb on `FullPath` (Windows). Thin helper; fake opener in VM tests.
+- Distinct from File List Properties debt in [debts.md](../../docs/debts.md) — do not block on that.
+
+**Tests:** enabled/disabled with selection; opener called with path; headless menu item present.
 
 ### 14f — Drag-out to Explorer
 
-Selected Rename List rows drag as filesystem paths for Explorer / apps that accept files.
+Selected Rename List rows drag as filesystem paths.
 
-- **UI:** start drag from row(s) with `DataFormats.File` / platform file-list payload of selected `FullPath`s (MFR7 `DataFormats.FileDrop`). Coexist with existing internal reorder DnD (4d) — outbound FileDrop when dragging **outside** the grid; keep internal reorder when dropping on the grid.
-- **Defer:** cell-text / rename-item payload drops onto filter editors (Formatter format string, ID3 setter drop zone) — note in [debts.md](../../docs/debts.md) if not shipping here.
-- **Tests:** drag payload contains selected paths; empty selection does not start file drag.
+**Work**
 
-### Phase 14 exit criteria
+- Start drag with Avalonia file-list / `DataFormats.Files` of selected `FullPath`s (MFR7 `FileDrop`).
+- Coexist with internal reorder (4d): outbound FileDrop when dragging **outside** the grid; keep reorder when dropping on the grid.
+- **Defer:** cell-text / rename-item drops onto filter editors — note in [debts.md](../../docs/debts.md) if skipped.
 
-Header menu matches MFR7 feature set for Remove Unchanged / Export / Free Names Edit; F2 manual rename + blue; Properties; Explorer drag-out. Then **15** (GO + plum) → **16** (legend documents red / gray / lavender / blue / plum).
+**Tests:** payload has selected paths; empty selection does not start file drag.
+
+### Phase 14 exit
+
+Header menu has Export + Free Names Edit; F2 manual rename + blue; Properties; Explorer drag-out. Then **15** → **16**.
 
 ______________________________________________________________________
 
 ## Phase 15 — GO
 
-*(Was 12 / 9.)*
+Wire UI to existing engine commit.
 
-`Ctrl+G` → `Commit`; Refresh clears last apply-error highlighting. Apply-error menu is **Show Rename Error** — reuse [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml) (not a third dialog clone). Distinct from Phase 8 **Show Load Errors**. Introduces **plum** apply-error highlighting (needed before the color legend). **Must apply 14d manual overrides** when building the commit plan.
+**MFR7 flow:** clear apply errors → ensure preview if needed → warn on preview-error count → apply with progress → plum rows for apply/rename errors → row menu **Show Rename Error**.
+
+**Work**
+
+- Implement `MainWindowViewModel.Go()` (today empty): Preview if stale / needed → `Commit` → update grid statuses.
+- Progress: reuse Rename List progress patterns from preview/refresh.
+- **Plum** row highlighting for `CommitError` / rename failure (`rename-list-commit-error` or similar).
+- Row menu **Show Rename Error** → reuse `RenameListRowErrorDialog` (not Show Load Errors / Show Preview Error copy).
+- F5 refresh clears apply-error highlight (with manual overrides from 14d).
+- **Must apply 14d forced original/preview** when building the commit plan.
+- Update [keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md): GO leaves the “stubs” note.
+
+**Already done:** `RenameList.Commit`, `CommitExecutor`, audio-tag Apply path, commit unit tests.
+
+**Exit:** Ctrl+G / menu / toolbar commit real renames; plum + Show Rename Error work; preview-error rows skipped on apply like MFR7.
 
 ______________________________________________________________________
 
 ## Phase 16 — color legend
 
-*(Was part of 10 / 7c.)* After **14d** and **15** so the panel can document the full set: red changed preview, gray missing/load error, lavender preview error, blue manual rename, plum apply/rename error.
+After **14d** and **15** so the panel documents the full set.
 
-MFR7 toolbar toggle + side panel ([renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) Highlighting; [Legend.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/Legend.cs)).
+MFR7: toolbar CheckOnClick + right-dock legend (~112–120px) — [Legend.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/Legend.cs), help Highlighting section.
+
+| Swatch | Meaning | Finebytes status |
+| --- | --- | --- |
+| Black | Original / unchanged | default |
+| Red fg | Value changed | shipped (11) |
+| Blue fg | Forced / manual rename | **14d** |
+| Gray fg | Load / missing error | shipped (8/9) |
+| Lavender bg | Preview error | shipped (11) |
+| Plum bg | Rename / apply error | **15** |
+
+Footer hint: right-click cell/row for error details. Toggle shrinks grid width (mirror other `rename-list-action` toggles). Persist toggle in session if cheap; otherwise default off like MFR7.
+
+**Exit:** legend matches shipped colors; toolbar toggle shows/hides panel. Update [debts.md](../../docs/debts.md) to drop the legend bullet when done.
 
 ______________________________________________________________________
 
 ## What to implement next
 
-**14b Export Name List** — then **14c → 14f → 15 → 16**.
+1. **14b** — `GenerateNameList` + header Export + save/Edit?
+2. **14c** — `SupportsWrite` + field→`FilterTarget` + add named `NameListFilter`
+3. **14d** — force model + F2/Cancel + blue + F5 clear
+4. **14e** Properties → **14f** drag-out
+5. **15** GO UI + plum → **16** legend

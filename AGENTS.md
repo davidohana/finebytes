@@ -74,7 +74,6 @@ Cloud Agents run on Linux (Ubuntu 24.04), but Magic File Renamer is a Windows-ta
 - `docs/image-metadata-model.md` (lazy MetadataExtractor image properties + EXIF cache)
 - `docs/debts.md` (deferred / later-work list)
 - `docs/plans/` (implementation / feature plans)
-- `docs/rename-list-phase5-followups.md` (deferred shuttle/column refactors after Phase 5)
-- `docs/rename-list-phase6b-followups.md` (6c–6e shipped; next is 8a Refresh)
+- `docs/plans/rename-list-ui.plan.md` (Rename List UI; 1–13 + 14a done; next 14b–16)
 - `.editorconfig`
 - Skills: `.agents/skills/` — `mfr-code-review`, `mfr-implement-filter`, `mfr-implement-filter-editor`, `mfr7-reference`, `mfr-ui-headless-tests`
