@@ -31,17 +31,33 @@ namespace Mfr.Models.RenameList.Fields.Extended
         ];
     }
 
-    internal abstract class ExtendedRenameListField(string propertyKey, string displayName, int? defaultWidth = null)
-        : OriginalOnlyRenameListField(
+    /// <summary>
+    /// Shared base for MFR7 Extended ("File Properties") Rename List fields.
+    /// </summary>
+    /// <param name="propertyKey">Property key within the Extended group.</param>
+    /// <param name="displayName">User-visible column label.</param>
+    /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
+    /// <param name="supportsPreview">
+    /// When <see langword="true"/>, a preview column variant may be added (MFR7 <c>ReadWrite</c> dates/attrs).
+    /// </param>
+    internal abstract class ExtendedRenameListField(
+        string propertyKey,
+        string displayName,
+        int? defaultWidth = null,
+        bool supportsPreview = false
+    )
+        : RenameListField(
             ExtendedRenameListFields.Group,
             ExtendedRenameListFields.GroupLabel,
             propertyKey,
             displayName,
-            defaultWidth
+            defaultWidth,
+            isSortable: true,
+            supportsPreview
         );
 
     internal sealed class ExtendedCreationDateField()
-        : ExtendedRenameListField(CreationDateKey, "Creation Date", defaultWidth: 110)
+        : ExtendedRenameListField(CreationDateKey, "Creation Date", defaultWidth: 110, supportsPreview: true)
     {
         public const string CreationDateKey = "CreationDate";
 
@@ -58,7 +74,7 @@ namespace Mfr.Models.RenameList.Fields.Extended
     }
 
     internal sealed class ExtendedLastWriteDateField()
-        : ExtendedRenameListField(LastWriteDateKey, "Last Write Date", defaultWidth: 110)
+        : ExtendedRenameListField(LastWriteDateKey, "Last Write Date", defaultWidth: 110, supportsPreview: true)
     {
         public const string LastWriteDateKey = "LastWriteDate";
 
@@ -75,7 +91,7 @@ namespace Mfr.Models.RenameList.Fields.Extended
     }
 
     internal sealed class ExtendedLastAccessDateField()
-        : ExtendedRenameListField(LastAccessDateKey, "Last Access Date", defaultWidth: 110)
+        : ExtendedRenameListField(LastAccessDateKey, "Last Access Date", defaultWidth: 110, supportsPreview: true)
     {
         public const string LastAccessDateKey = "LastAccessDate";
 
@@ -108,7 +124,7 @@ namespace Mfr.Models.RenameList.Fields.Extended
     }
 
     internal sealed class ExtendedAttributesField()
-        : ExtendedRenameListField(AttributesKey, "Attributes", defaultWidth: 65)
+        : ExtendedRenameListField(AttributesKey, "Attributes", defaultWidth: 65, supportsPreview: true)
     {
         public const string AttributesKey = "Attrs";
 
