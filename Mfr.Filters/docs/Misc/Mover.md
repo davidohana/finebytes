@@ -10,7 +10,8 @@ The preview **Parent Directory** is replaced with `RootFolder` + `\` + resolved 
 - **`subFolder`** (string)
   - Optional. Template appended below `rootFolder`. Use `\` to build nested levels. Supports formatter tokens
     (`<file-name>`, `<parent-folder>`, `<now:format>`, `<counter:…>`). Use `""` when none; items then land directly in
-    `rootFolder`.
+    `rootFolder`. Must resolve under `rootFolder` (Windows drive or UNC absolutes, and other rooted leftovers after
+    stripping a leading `\`, are rejected so `Path.Combine` cannot discard the root).
 
 ## Examples
 
