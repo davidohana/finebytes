@@ -542,7 +542,6 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(17, dialogVm.AvailableOriginalFields.Count);
             Assert.Empty(dialogVm.AvailablePreviewFields);
-            Assert.DoesNotContain(dialogVm.AvailablePreviewFields, field => field.PropertyKey == "ExifDirectory*36867");
         }
 
         private static RenameListFieldShuttleDialogViewModel _CreateDefaultDialog()

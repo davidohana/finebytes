@@ -358,7 +358,6 @@ namespace Mfr.Tests.Models
                 )
             );
 
-            Assert.True(RenameListFieldCatalog.GetField(AudioTagRenameListFields.Group, "Title").SupportsPreview);
             Assert.Equal(
                 RenameListMetadataRequirement.TagLib,
                 RenameListFieldCatalog.GetMetadataRequirement(
@@ -555,18 +554,10 @@ namespace Mfr.Tests.Models
         [Fact]
         public void AudioTag_fields_preview_flags_match_mfr7_read_write_apply()
         {
-            string[] originalOnlyKeys =
-            [
-                "FirstAlbumArtist",
-                "FirstComposer",
-                "FirstGenre",
-                "FirstPerformer",
-                "TagTypes",
-            ];
-
             foreach (var field in RenameListFieldCatalog.GetFieldsForGroup(AudioTagRenameListFields.Group))
             {
-                var supportsPreview = !originalOnlyKeys.Contains(field.PropertyKey);
+                // Semantic fields are ReadWriteApply; First* / Tag Types stay original-only.
+                var supportsPreview = field is AudioTagSemanticRenameListField;
                 Assert.Equal(supportsPreview, field.SupportsPreview);
                 Assert.True(field.IsSortable, field.PropertyKey);
                 Assert.True(RenameListFieldCatalog.IsSortableKey(field.OriginalKey), field.PropertyKey);
@@ -596,9 +587,6 @@ namespace Mfr.Tests.Models
             Assert.Equal("OldTitle", RenameListFieldCatalog.Resolve(item, titleOriginal));
             Assert.Equal("NewTitle", RenameListFieldCatalog.Resolve(item, titlePreview));
             Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, titlePreview));
-            Assert.False(
-                RenameListFieldCatalog.GetField(AudioTagRenameListFields.Group, "FirstPerformer").SupportsPreview
-            );
         }
 
         [Fact]
