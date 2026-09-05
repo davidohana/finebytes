@@ -43,6 +43,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
 
         partial void OnMoveByChanged(decimal value) => _ApplyOptions();
 
+        /// <summary>
+        /// Copies current filter options into editor properties without live replace.
+        /// </summary>
         private void _SyncFromFilter()
         {
             if (Step.Filter is not TokenMoverFilter filter)
@@ -58,6 +61,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
             });
         }
 
+        /// <summary>
+        /// Writes clamped spinner values into a new <see cref="TokenMoverOptions"/> on the step filter.
+        /// </summary>
         private void _ApplyOptions()
         {
             if (IsLoading || Step.Filter is not TokenMoverFilter filter)
@@ -66,7 +72,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
             }
 
             var options = new TokenMoverOptions(
-                Delimiter: Delimiter,
+                Delimiter: Delimiter ?? string.Empty,
                 TokenNumber: ClampToInt(TokenNumber, 1, 1000),
                 MoveBy: ClampToInt(MoveBy, -999, 999)
             );
