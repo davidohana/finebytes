@@ -37,6 +37,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(FindToolTip))]
         [NotifyPropertyChangedFor(nameof(ReplacementToolTip))]
+        [NotifyPropertyChangedFor(nameof(FindWatermark))]
+        [NotifyPropertyChangedFor(nameof(ReplacementWatermark))]
         private ReplacerMode _mode = ReplacerMode.Literal;
 
         /// <summary>
@@ -62,6 +64,30 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
                     "Replacement for each match.\nLeave empty to strip matches.",
                 ReplacerMode.Regex =>
                     "Replacement for each match.\nLeave empty to strip matches.\n$0 / $1… refer to captured groups.",
+                _ => throw new ArgumentOutOfRangeException(nameof(Mode), Mode, null),
+            };
+
+        /// <summary>
+        /// Gets a mode-specific example watermark for an empty Find box.
+        /// </summary>
+        public string FindWatermark =>
+            Mode switch
+            {
+                ReplacerMode.Literal => "feat.",
+                ReplacerMode.Wildcard => "DSC*.JPG",
+                ReplacerMode.Regex => @"\((.+)\)",
+                _ => throw new ArgumentOutOfRangeException(nameof(Mode), Mode, null),
+            };
+
+        /// <summary>
+        /// Gets a mode-specific example watermark for an empty Replace box.
+        /// </summary>
+        public string ReplacementWatermark =>
+            Mode switch
+            {
+                ReplacerMode.Literal => "feature.",
+                ReplacerMode.Wildcard => "photo.jpg",
+                ReplacerMode.Regex => "$1",
                 _ => throw new ArgumentOutOfRangeException(nameof(Mode), Mode, null),
             };
 
