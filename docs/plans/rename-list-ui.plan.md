@@ -63,7 +63,7 @@ todos:
     content: "5g: Field-key cell hints; legacy RenameListCellHint string paths removed"
     status: completed
   - id: phase-6
-    content: "Phase 6: extended original catalog — Extended, AudioTag, Image, Jpeg (no Preview() needed)"
+    content: "Phase 6: extended original catalog — Extended, AudioTag, Image, Jpeg (preview deferred to 12)"
     status: completed
   - id: phase-7
     content: "Phase 7: generalized Auto-Sort — all non-preview catalog fields (field-key sort)"
@@ -90,7 +90,7 @@ todos:
     content: "Phase 11: Preview highlighting — red changed cells, preview-error rows, Show Preview Error"
     status: completed
   - id: phase-12
-    content: "Phase 12: preview columns for metadata fields (ID3-preview etc., after Phase 10)"
+    content: "Phase 12: preview cols — Extended dates/attrs + ID3/audio tags (after Phase 10)"
     status: pending
   - id: phase-13
     content: "Phase 13: hygiene — glyph styles + RenameListUiTestContext; entry props kept"
@@ -136,7 +136,7 @@ Source of truth: [mfr7 help](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.htm
 ```mermaid
 flowchart LR
   Done[1-11 + 13 + 14a done]
-  P12[12 Preview meta cols]
+  P12[12 Preview dates+tags]
   P14b[14b Export]
   P14c[14c Free Names Edit]
   P14d[14d Manual F2 blue]
@@ -154,7 +154,7 @@ ______________________________________________________________________
 
 | Phase                           | What                                                                  | Was              |
 | ------------------------------- | --------------------------------------------------------------------- | ---------------- |
-| **12** Preview metadata columns | ID3/image preview cols after filters                                  | 9 / 7b           |
+| **12** Preview metadata columns | Extended dates/attrs + ID3/audio preview cols after filters           | 9 / 7b           |
 | **14b** Export Name List        | Column → UTF-8 text file; save dialog; optional open in editor        | 11 / 8           |
 | **14c** Free Names Edit         | Embed generated names in `NameListFilter` targeted at writable column | 11 / 8           |
 | **14d** Manual Rename (F2)      | Force original/preview value; blue cells; Cancel; F5 clears overrides | 11 / 8           |
@@ -185,7 +185,28 @@ ______________________________________________________________________
 
 *(Was 9 / 7b.)*
 
-After **10a–10d**. ID3/image **preview** columns when filters modify tags; shuttle Preview tab entries for `SupportsPreview` metadata fields.
+After **10a–10d**. Enable **preview** column variants for catalog fields that filters can mutate on `Preview` (MFR7 Preview Fields tab: any non-`ReadOnly` prop). Phase 6 shipped Extended / AudioTag / Image / Jpeg as **original-only**; this phase flips `SupportsPreview` where MFR7 allows preview.
+
+### Scope (MFR7 parity)
+
+| Group | Preview columns | Why |
+| ----- | --------------- | --- |
+| **Extended** (File Properties) | **Creation Date**, **Last Write Date**, **Last Access Date**, **Attributes** | MFR7 `PropertyType.ReadWrite`. `DateTimeSetter` / `TimeShifter` write `item.Preview.CreationTime` / `LastWriteTime` / `LastAccessTime`; attributes filters write preview attrs. Size / Folder File Count stay original-only (`ReadOnly`). |
+| **AudioTag** (ID3 etc.) | Writable tag fields | MFR7 `ReadWriteApply` — preview when tag-setter filters change tags. |
+| **Image / Jpeg** | None in this phase | MFR7 EXIF incl. Date/Time Taken is `ReadOnly` — originals only (Phase 6). |
+
+Shuttle **Preview** tab lists every field with `SupportsPreview` that is not already visible as a preview column (same rule as today for Basic).
+
+### Work
+
+- **Catalog:** stop treating Extended dates/attrs (and AudioTag writable fields) as `OriginalOnlyRenameListField` / `supportsPreview: false`. Preview key resolve uses **preview** `FileMeta` (dates via existing `FormatFileDate`); original columns keep original meta.
+- **Grid / red cells:** Phase 11 highlighting already compares original vs preview text — once preview cols exist, Date/Time Setter changes show red on the matching date preview column.
+- **Tests:** DateTimeSetter (and/or TimeShifter) → Creation/LastWrite/LastAccess preview text differs from original; unchanged dates do not highlight; Attributes preview when an attributes filter mutates; AudioTag smoke for one writable tag; Size / Jpeg DateTaken remain non-previewable in shuttle.
+- **14c/14d note:** MFR7 Free Names / Manual Rename require `ReadWriteApply` — Extended dates are `ReadWrite` only (preview yes, Free-Edit / F2 no). Do not invent `SupportsWrite` for dates here; tag fields that are `ReadWriteApply` get write when 14c ships.
+
+### Exit
+
+Shuttle Preview tab offers Extended date/attrs + AudioTag preview fields; live preview + red changed cells work for Date/Time Setter against those date columns; Image/Jpeg stay original-only.
 
 ______________________________________________________________________
 
@@ -275,4 +296,4 @@ ______________________________________________________________________
 
 ## What to implement next
 
-**12 Preview metadata columns** — ID3/image preview cols + shuttle Preview tab; then **14b → 14f → 15 → 16**.
+**12 Preview metadata columns** — Extended date/attrs + ID3/audio preview cols + shuttle Preview tab (Date/Time Setter red cells); then **14b → 14f → 15 → 16**.
