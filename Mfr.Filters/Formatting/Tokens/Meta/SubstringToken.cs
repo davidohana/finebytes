@@ -29,6 +29,12 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
     /// or a literal with embedded tokens; it is resolved before the substring is applied.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "Substring",
+        "General",
+        "Use a substring of another format string",
+        "substr:start=1,end=-1,source=<file-name>"
+    )]
     internal sealed class SubstringToken : IFormatToken
     {
         /// <summary>

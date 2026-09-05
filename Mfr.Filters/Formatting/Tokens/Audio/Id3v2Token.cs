@@ -19,6 +19,12 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// suffix selects a non-primary instance.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "ID3v2 Custom Field",
+        "Audio\\ID3",
+        "Use a custom field info from ID3v2 tag of MP3 file",
+        "id3v2:TIT2"
+    )]
     internal sealed class Id3v2Token : IFormatToken
     {
         /// <summary>
@@ -130,6 +136,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// <see cref="Models.Tags.Id3v2.Id3v2TagData.Version"/>. Empty when no ID3v2 block is present.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo("ID3v2 Version", "Audio\\ID3", "ID3v2 tag version (e.g. 2.3 / 2.4)", "id3v2-version")]
     internal sealed class Id3v2VersionToken : IFormatToken
     {
         /// <inheritdoc />

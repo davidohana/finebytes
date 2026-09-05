@@ -13,7 +13,7 @@ namespace Mfr.Filters.Formatting
     /// implementation in this assembly with a parameterless constructor is instantiated once at
     /// startup and registered under each of its <see cref="IFormatToken.Names"/>. Add a new token by
     /// dropping a new class implementing <see cref="IFormatToken"/> under
-    /// <c>Mfr.Filters.Formatting.Tokens.*</c>.
+    /// <c>Mfr.Filters.Formatting.Tokens.*</c> with <see cref="FormatTokenInfoAttribute"/>.
     /// </para>
     /// <para>
     /// Nesting is handled at compile time: tokens whose argument contains a nested format string
@@ -24,8 +24,6 @@ namespace Mfr.Filters.Formatting
     /// </remarks>
     internal static class FormatStringCompiler
     {
-        private static readonly Dictionary<string, IFormatToken> _nameToToken = _DiscoverTokens();
-
         /// <summary>
         /// Formatter that always yields <see cref="string.Empty"/> (e.g. when a preset omits a field or uses a literal with no template).
         /// </summary>
@@ -58,7 +56,7 @@ namespace Mfr.Filters.Formatting
                 }
 
                 var tokenStart = i;
-                var tokenEnd = _FindMatchingClose(template, tokenStart);
+                var tokenEnd = FormatStringScan.FindMatchingClose(template, tokenStart);
                 if (tokenEnd < 0)
                 {
                     i++;
@@ -124,7 +122,7 @@ namespace Mfr.Filters.Formatting
                     continue;
                 }
 
-                var close = _FindMatchingClose(text, i);
+                var close = FormatStringScan.FindMatchingClose(text, i);
                 if (close < 0 || close <= i + 1)
                 {
                     continue;
@@ -137,10 +135,9 @@ namespace Mfr.Filters.Formatting
                 }
 
                 var innerStr = inner.ToString();
-                var colonIndex = innerStr.IndexOf(':');
-                var namePart = colonIndex < 0 ? innerStr : innerStr[..colonIndex];
+                FormatStringScan.SplitNameAndArgs(innerStr, out var namePart, out _);
                 namePart = namePart.Trim();
-                if (_LooksLikeFormatterTokenName(namePart))
+                if (FormatStringScan.LooksLikeFormatterTokenName(namePart))
                 {
                     return true;
                 }
@@ -149,58 +146,10 @@ namespace Mfr.Filters.Formatting
             return false;
         }
 
-        private static bool _LooksLikeFormatterTokenName(string name)
-        {
-            if (name.Length < 2 || !char.IsAsciiLetter(name[0]))
-            {
-                return false;
-            }
-
-            for (var k = 1; k < name.Length; k++)
-            {
-                var c = name[k];
-                if (char.IsAsciiLetterOrDigit(c) || c is '-' or '_')
-                {
-                    continue;
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Scans forward from the opening <c>&lt;</c> at <paramref name="openIndex"/> and returns the
-        /// index of the matching closing <c>&gt;</c>, or <c>-1</c> when no balanced close is found.
-        /// </summary>
-        private static int _FindMatchingClose(string template, int openIndex)
-        {
-            var depth = 0;
-            for (var j = openIndex; j < template.Length; j++)
-            {
-                if (template[j] == '<')
-                {
-                    depth++;
-                }
-                else if (template[j] == '>')
-                {
-                    depth--;
-                    if (depth == 0)
-                    {
-                        return j;
-                    }
-                }
-            }
-            return -1;
-        }
-
         private static Formatter _CompileToken(string tokenInner)
         {
-            var colonIndex = tokenInner.IndexOf(':');
-            var name = colonIndex < 0 ? tokenInner : tokenInner[..colonIndex];
-            var tokenArgs = colonIndex < 0 ? "" : tokenInner[(colonIndex + 1)..];
-            if (!_nameToToken.TryGetValue(name, out var token))
+            FormatStringScan.SplitNameAndArgs(tokenInner, out var name, out var tokenArgs);
+            if (!FormatTokenRegistry.NameToToken.TryGetValue(name, out var token))
             {
                 throw new NotSupportedException(
                     $"Unknown formatter token '<{name}>'. See the Formatter docs for supported tokens."
@@ -208,32 +157,6 @@ namespace Mfr.Filters.Formatting
             }
 
             return token.Compile(tokenArgs);
-        }
-
-        private static Dictionary<string, IFormatToken> _DiscoverTokens()
-        {
-            var map = new Dictionary<string, IFormatToken>(StringComparer.Ordinal);
-            var tokenTypes = typeof(FormatStringCompiler)
-                .Assembly.GetTypes()
-                .Where(t => t.IsClass && !t.IsAbstract && typeof(IFormatToken).IsAssignableFrom(t));
-
-            foreach (var tokenType in tokenTypes)
-            {
-                var token = (IFormatToken)Activator.CreateInstance(tokenType)!;
-                foreach (var name in token.Names)
-                {
-                    if (map.TryGetValue(name, out var registeredToken))
-                    {
-                        throw new InvalidOperationException(
-                            $"Format token name '{name}' is registered by multiple types "
-                                + $"('{registeredToken.GetType().FullName}' and '{tokenType.FullName}')."
-                        );
-                    }
-
-                    map[name] = token;
-                }
-            }
-            return map;
         }
     }
 }

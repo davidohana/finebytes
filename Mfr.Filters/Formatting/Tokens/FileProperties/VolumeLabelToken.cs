@@ -3,6 +3,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// <summary>
     /// Resolves the <c>&lt;label&gt;</c> token to the volume label of the drive holding the file.
     /// </summary>
+    [FormatTokenInfo(
+        "Disk Label",
+        "File Properties",
+        "Use the label of the disk on which the file is located",
+        "label"
+    )]
     internal sealed class VolumeLabelToken : IFormatToken
     {
         /// <inheritdoc />

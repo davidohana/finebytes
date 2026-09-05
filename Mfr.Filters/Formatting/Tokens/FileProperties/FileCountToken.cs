@@ -11,6 +11,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// Subfolders are not counted. Returns an empty string when the directory does not exist.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "Folder File Count",
+        "File Properties",
+        "Use the count of files in the item's folder",
+        "file-count"
+    )]
     internal sealed class FileCountToken : IFormatToken
     {
         /// <inheritdoc />

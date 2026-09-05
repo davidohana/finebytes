@@ -13,6 +13,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// the level exceeds path depth.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "Parent Folder",
+        "File Name",
+        "Use a parent folder name in which the file is located",
+        "parent-folder"
+    )]
     internal sealed class ParentFolderToken : IFormatToken
     {
         /// <inheritdoc />

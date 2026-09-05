@@ -23,6 +23,12 @@ namespace Mfr.Filters.Formatting.Tokens.Meta
     /// <c>source</c> may contain nested format tokens and commas inside <c>&lt;…&gt;</c>; commas at bracket depth 0 separate options.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "Token",
+        "General",
+        "Use a token from another format string",
+        "token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<file-name>"
+    )]
     internal sealed class TokenExtractToken : IFormatToken
     {
         /// <summary>

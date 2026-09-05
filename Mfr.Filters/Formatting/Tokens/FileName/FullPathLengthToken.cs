@@ -10,6 +10,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// Uses preview so the value tracks predicted renames and moves.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo("Full Path Length", "File Name", "Character length of the preview full path", "full-path-length")]
     internal sealed class FullPathLengthToken : IFormatToken
     {
         /// <inheritdoc />

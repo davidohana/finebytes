@@ -8,6 +8,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// Returns the drive letter (e.g. <c>C:</c>) for local paths, or <c>$</c> for UNC paths.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "Drive Letter",
+        "File Properties",
+        "Use the drive letter on which the file is located",
+        "drive-letter"
+    )]
     internal sealed class DriveLetterToken : IFormatToken
     {
         /// <inheritdoc />

@@ -24,6 +24,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// <c>b</c>/<c>bytes</c>, <c>kb</c>, <c>mb</c>, <c>gb</c> (case-insensitive).
     /// </para>
     /// </remarks>
+    [FormatTokenInfo("Size", "File Properties", "Use the file's size", "file-size")]
     internal sealed class FileSizeToken : IFormatToken
     {
         private const double Kb = 1024;

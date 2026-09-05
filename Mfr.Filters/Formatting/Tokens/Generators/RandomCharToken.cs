@@ -11,6 +11,7 @@ namespace Mfr.Filters.Formatting.Tokens.Generators
     /// after trimming, the bounds are swapped. Any characters work—for example <c>A,Z</c>, <c>0,9</c>, or <c>a,z</c>.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo("Random Char", "General", "Adds a random character, in a specified range", "random-char:A,Z")]
     internal sealed class RandomCharToken : IFormatToken
     {
         /// <inheritdoc />

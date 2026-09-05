@@ -22,6 +22,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Width", "Image\\Properties", "Image width in pixels", "image-width")]
     internal sealed class ImageWidthToken : ImagePropertyTokenBase
     {
         /// <summary>Registers <c>&lt;image-width&gt;</c>.</summary>
@@ -30,6 +31,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Height", "Image\\Properties", "Image height in pixels", "image-height")]
     internal sealed class ImageHeightToken : ImagePropertyTokenBase
     {
         /// <summary>Registers <c>&lt;image-height&gt;</c>.</summary>
@@ -38,6 +40,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Bit Depth", "Image\\Properties", "Image bit depth", "image-bit-depth")]
     internal sealed class ImageBitDepthToken : ImagePropertyTokenBase
     {
         /// <summary>Registers <c>&lt;image-bit-depth&gt;</c>.</summary>
@@ -46,6 +49,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Format", "Image\\Properties", "Image file format (i.e. JPEG)", "image-format")]
     internal sealed class ImageFormatToken : ImagePropertyTokenBase
     {
         /// <summary>Registers <c>&lt;image-format&gt;</c>.</summary>
@@ -54,6 +58,12 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo(
+        "Horizontal Resolution",
+        "Image\\Properties",
+        "Image horizontal resolution (DPI)",
+        "image-horz-res"
+    )]
     internal sealed class ImageHorzResToken : ImagePropertyTokenBase
     {
         /// <summary>Registers <c>&lt;image-horz-res&gt;</c>.</summary>
@@ -62,6 +72,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Vertical Resolution", "Image\\Properties", "Image vertical resolution (DPI)", "image-vert-res")]
     internal sealed class ImageVertResToken : ImagePropertyTokenBase
     {
         /// <summary>Registers <c>&lt;image-vert-res&gt;</c>.</summary>
@@ -70,6 +81,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Frames Count", "Image\\Properties", "Number of frames in the image", "image-frame-count")]
     internal sealed class ImageFrameCountToken : ImagePropertyTokenBase
     {
         /// <summary>Registers <c>&lt;image-frame-count&gt;</c>.</summary>

@@ -10,6 +10,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// Full name is preview prefix plus extension. Uses preview so the value tracks predicted renames.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo("File Name Length", "File Name", "Character length of the preview full name", "file-name-length")]
     internal sealed class FileNameLengthToken : IFormatToken
     {
         /// <inheritdoc />
