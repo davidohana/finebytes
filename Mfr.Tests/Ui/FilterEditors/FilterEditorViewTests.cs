@@ -839,14 +839,18 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.IsType<ReplacerFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<ReplacerFilterEditorView>().Single();
+            var mode = editor.FindControl<ReplacerModeFieldset>("ModeFieldset");
+            var matchOptions = editor.FindControl<ReplacerMatchOptionsFieldset>("MatchOptionsFieldset");
+            Assert.NotNull(mode);
+            Assert.NotNull(matchOptions);
             var find = editor.FindControl<TextBox>("FindBox");
             var replacement = editor.FindControl<TextBox>("ReplacementBox");
-            var literal = editor.FindControl<CompactRadioButton>("LiteralRadio");
-            var wildcard = editor.FindControl<CompactRadioButton>("WildcardRadio");
-            var regex = editor.FindControl<CompactRadioButton>("RegexRadio");
-            var caseSensitive = editor.FindControl<CompactCheckBox>("CaseSensitiveCheckBox");
-            var replaceAll = editor.FindControl<CompactCheckBox>("ReplaceAllCheckBox");
-            var wholeWord = editor.FindControl<CompactCheckBox>("WholeWordCheckBox");
+            var literal = mode.FindControl<CompactRadioButton>("LiteralRadio");
+            var wildcard = mode.FindControl<CompactRadioButton>("WildcardRadio");
+            var regex = mode.FindControl<CompactRadioButton>("RegexRadio");
+            var caseSensitive = matchOptions.FindControl<CompactCheckBox>("CaseSensitiveCheckBox");
+            var replaceAll = matchOptions.FindControl<CompactCheckBox>("ReplaceAllCheckBox");
+            var wholeWord = matchOptions.FindControl<CompactCheckBox>("WholeWordCheckBox");
             Assert.NotNull(find);
             Assert.NotNull(replacement);
             Assert.NotNull(literal);
@@ -902,12 +906,16 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.IsType<ReplaceListFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<ReplaceListFilterEditorView>().Single();
+            var mode = editor.FindControl<ReplacerModeFieldset>("ModeFieldset");
+            var matchOptions = editor.FindControl<ReplacerMatchOptionsFieldset>("MatchOptionsFieldset");
+            Assert.NotNull(mode);
+            Assert.NotNull(matchOptions);
             var entries = editor.FindControl<TextBox>("EntriesBox");
-            var literal = editor.FindControl<CompactRadioButton>("LiteralRadio");
-            var wildcard = editor.FindControl<CompactRadioButton>("WildcardRadio");
-            var caseSensitive = editor.FindControl<CompactCheckBox>("CaseSensitiveCheckBox");
-            var replaceAll = editor.FindControl<CompactCheckBox>("ReplaceAllCheckBox");
-            var wholeWord = editor.FindControl<CompactCheckBox>("WholeWordCheckBox");
+            var literal = mode.FindControl<CompactRadioButton>("LiteralRadio");
+            var wildcard = mode.FindControl<CompactRadioButton>("WildcardRadio");
+            var caseSensitive = matchOptions.FindControl<CompactCheckBox>("CaseSensitiveCheckBox");
+            var replaceAll = matchOptions.FindControl<CompactCheckBox>("ReplaceAllCheckBox");
+            var wholeWord = matchOptions.FindControl<CompactCheckBox>("WholeWordCheckBox");
             Assert.NotNull(entries);
             Assert.NotNull(literal);
             Assert.NotNull(wildcard);

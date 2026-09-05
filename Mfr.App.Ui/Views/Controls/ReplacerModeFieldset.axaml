@@ -1,0 +1,40 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:replaceFilters="using:Mfr.Filters.Replace"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="60"
+  x:Class="Mfr.App.Ui.Views.Controls.ReplacerModeFieldset"
+  x:CompileBindings="False"
+>
+  <controls:FieldsetGroup Header="Mode">
+    <WrapPanel Orientation="Horizontal">
+      <controls:CompactRadioButton
+        x:Name="LiteralRadio"
+        Margin="0,0,16,4"
+        Content="Literal"
+        ToolTip.Tip="Search text is matched exactly."
+        IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Literal}, Mode=TwoWay}"
+      />
+      <controls:CompactRadioButton
+        x:Name="WildcardRadio"
+        Margin="0,0,16,4"
+        Content="Wildcard"
+        ToolTip.Tip="* matches any characters; ? matches one character."
+        IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Wildcard}, Mode=TwoWay}"
+      />
+      <controls:CompactRadioButton
+        x:Name="RegexRadio"
+        Margin="0,0,0,4"
+        Content="Regex"
+        ToolTip.Tip="Search text is a .NET regular expression."
+        IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Regex}, Mode=TwoWay}"
+      />
+    </WrapPanel>
+  </controls:FieldsetGroup>
+</UserControl>

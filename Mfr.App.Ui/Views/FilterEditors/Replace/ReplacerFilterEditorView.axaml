@@ -6,7 +6,6 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Replace"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:converters="using:Mfr.App.Ui.Converters"
-  xmlns:replaceFilters="using:Mfr.Filters.Replace"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="240"
@@ -14,34 +13,7 @@
   x:DataType="vm:ReplacerFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
-    <controls:FieldsetGroup Header="Mode">
-      <WrapPanel Orientation="Horizontal">
-        <controls:CompactRadioButton
-          x:Name="LiteralRadio"
-          Margin="0,0,16,4"
-          GroupName="ReplacerMode"
-          Content="Literal"
-          ToolTip.Tip="Search text is matched exactly."
-          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Literal}, Mode=TwoWay}"
-        />
-        <controls:CompactRadioButton
-          x:Name="WildcardRadio"
-          Margin="0,0,16,4"
-          GroupName="ReplacerMode"
-          Content="Wildcard"
-          ToolTip.Tip="* matches any characters; ? matches one character."
-          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Wildcard}, Mode=TwoWay}"
-        />
-        <controls:CompactRadioButton
-          x:Name="RegexRadio"
-          Margin="0,0,0,4"
-          GroupName="ReplacerMode"
-          Content="Regex"
-          ToolTip.Tip="Search text is a .NET regular expression."
-          IsChecked="{Binding Mode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static replaceFilters:ReplacerMode.Regex}, Mode=TwoWay}"
-        />
-      </WrapPanel>
-    </controls:FieldsetGroup>
+    <controls:ReplacerModeFieldset x:Name="ModeFieldset" GroupName="ReplacerMode" />
     <controls:FieldsetGroup Header="Find / Replace">
       <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
         <controls:FilterEditorLabeledRow
@@ -58,27 +30,6 @@
         </controls:FilterEditorLabeledRow>
       </StackPanel>
     </controls:FieldsetGroup>
-    <controls:FieldsetGroup Header="Options">
-      <StackPanel Spacing="4">
-        <controls:CompactCheckBox
-          x:Name="CaseSensitiveCheckBox"
-          Content="Case sensitive"
-          ToolTip.Tip="When checked, only matches with the same letter casing are replaced."
-          IsChecked="{Binding CaseSensitive}"
-        />
-        <controls:CompactCheckBox
-          x:Name="ReplaceAllCheckBox"
-          Content="Replace all matches"
-          ToolTip.Tip="When unchecked, only the first match in each name is replaced."
-          IsChecked="{Binding ReplaceAll}"
-        />
-        <controls:CompactCheckBox
-          x:Name="WholeWordCheckBox"
-          Content="Replace only whole words"
-          ToolTip.Tip="Only replace matches that form a whole word (non letter/digit on both sides)."
-          IsChecked="{Binding WholeWord}"
-        />
-      </StackPanel>
-    </controls:FieldsetGroup>
+    <controls:ReplacerMatchOptionsFieldset x:Name="MatchOptionsFieldset" />
   </StackPanel>
 </UserControl>

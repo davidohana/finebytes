@@ -1,0 +1,35 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="100"
+  x:Class="Mfr.App.Ui.Views.Controls.ReplacerMatchOptionsFieldset"
+  x:CompileBindings="False"
+>
+  <controls:FieldsetGroup Header="Options">
+    <StackPanel Spacing="4">
+      <controls:CompactCheckBox
+        x:Name="CaseSensitiveCheckBox"
+        Content="Case sensitive"
+        ToolTip.Tip="When checked, only matches with the same letter casing are replaced."
+        IsChecked="{Binding CaseSensitive}"
+      />
+      <controls:CompactCheckBox
+        x:Name="ReplaceAllCheckBox"
+        Content="Replace all matches"
+        ToolTip.Tip="When unchecked, only the first match in each name is replaced."
+        IsChecked="{Binding ReplaceAll}"
+      />
+      <controls:CompactCheckBox
+        x:Name="WholeWordCheckBox"
+        Content="Replace only whole words"
+        ToolTip.Tip="Only replace matches that form a whole word (non letter/digit on both sides)."
+        IsChecked="{Binding WholeWord}"
+      />
+    </StackPanel>
+  </controls:FieldsetGroup>
+</UserControl>
