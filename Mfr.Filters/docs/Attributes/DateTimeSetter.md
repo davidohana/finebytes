@@ -39,4 +39,4 @@ Preview updates the corresponding `DateTime` on `FileMeta`; commit applies the f
 }
 ```
 
-`date` is an ISO **date-only** value (`yyyy-MM-DD`) in the Windows file-time range **1601-01-01** through **9999-12-31**. `time` uses the **time-only** form (`HH:mm:ss`, hours 00–23). The Filter Configuration editor rejects illegal values and restores the last valid text.
+`date` is an ISO **date-only** value (`yyyy-MM-DD`) in **1601-01-01** through **2100-12-31** (Windows FILETIME minimum; far-future years are rejected). `time` uses **`HH:mm:ss`** or **`HH:mm`** (hours 00–23). The Filter Configuration editor rejects illegal values and restores the last valid text; an incomplete time no longer blocks a valid date edit (and vice versa).
