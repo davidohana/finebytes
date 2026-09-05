@@ -6,7 +6,7 @@ namespace Mfr.Models.RenameList
     /// One Rename List catalog field: metadata plus value resolution for original/preview snapshots.
     /// </summary>
     /// <param name="groupId">MFR7 property group id (e.g. <c>Basic</c>).</param>
-    /// <param name="groupDisplayName">User-visible group label in the field shuttle dropdown.</param>
+    /// <param name="groupDisplayName">User-visible group label in the field shuttle groups list.</param>
     /// <param name="propertyKey">Property key within the group (e.g. <c>FullName</c>).</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">
@@ -34,7 +34,7 @@ namespace Mfr.Models.RenameList
         public string GroupId { get; } = groupId;
 
         /// <summary>
-        /// Gets the user-visible group label in the field shuttle dropdown.
+        /// Gets the user-visible group label in the field shuttle groups list.
         /// </summary>
         public string GroupDisplayName { get; } = groupDisplayName;
 

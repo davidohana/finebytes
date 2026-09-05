@@ -40,7 +40,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Gets property groups available in the shuttle dropdown.
+        /// Gets property groups available in the shuttle groups list.
         /// </summary>
         public IReadOnlyList<RenameListFieldGroupOption> Groups { get; }
 

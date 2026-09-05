@@ -4,7 +4,7 @@ namespace Mfr.Models.RenameList
     /// Catalog field that is original-only: sortable but no preview column.
     /// </summary>
     /// <param name="groupId">MFR7 property group id.</param>
-    /// <param name="groupDisplayName">User-visible group label in the field shuttle dropdown.</param>
+    /// <param name="groupDisplayName">User-visible group label in the field shuttle groups list.</param>
     /// <param name="propertyKey">Property key within the group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>

@@ -13,7 +13,7 @@ namespace Mfr.Models.RenameList.Fields.Extended
         public const string Group = "Extended";
 
         /// <summary>
-        /// User-visible group label in the field shuttle dropdown.
+        /// User-visible group label in the field shuttle groups list.
         /// </summary>
         public const string GroupLabel = "File Properties";
 

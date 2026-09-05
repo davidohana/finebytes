@@ -11,7 +11,7 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
         public const string Group = "MPEG";
 
         /// <summary>
-        /// User-visible group label in the field shuttle dropdown.
+        /// User-visible group label in the field shuttle groups list.
         /// </summary>
         public const string GroupLabel = "MP3 Properties";
 

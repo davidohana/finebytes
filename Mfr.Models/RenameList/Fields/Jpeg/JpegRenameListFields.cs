@@ -11,7 +11,7 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
         public const string Group = "Jpeg";
 
         /// <summary>
-        /// User-visible group label in the field shuttle dropdown.
+        /// User-visible group label in the field shuttle groups list.
         /// </summary>
         public const string GroupLabel = "Jpeg Tag";
 

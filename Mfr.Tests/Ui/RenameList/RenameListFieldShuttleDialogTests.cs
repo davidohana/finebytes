@@ -8,6 +8,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Extended;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -139,6 +140,42 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(2, dialogVm.SelectedAvailableOriginalFields.Count);
             Assert.Equal(2, availableList.Selection.SelectedIndexes.Count);
+
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies clicking a property group updates the available-fields list.
+        /// </summary>
+        [AvaloniaFact]
+        public void Clicking_a_group_refreshes_available_fields()
+        {
+            var (dialog, dialogVm, _) = _ShowColumnsList();
+            var groupsList = dialog.FindControl<ListBox>("ColumnGroupsList");
+            var availableList = dialog.FindControl<ListBox>("AvailableOriginalFieldsList");
+            Assert.NotNull(groupsList);
+            Assert.NotNull(availableList);
+            Assert.Equal(BasicRenameListField.Group, dialogVm.SelectedGroup?.GroupId);
+
+            var extendedIndex = -1;
+            for (var i = 0; i < dialogVm.Groups.Count; i++)
+            {
+                if (dialogVm.Groups[i].GroupId == ExtendedRenameListFields.Group)
+                {
+                    extendedIndex = i;
+                    break;
+                }
+            }
+
+            Assert.True(extendedIndex >= 0);
+            _ClickListIndex(dialog, groupsList, extendedIndex, RawInputModifiers.None);
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(ExtendedRenameListFields.Group, dialogVm.SelectedGroup?.GroupId);
+            Assert.Equal(extendedIndex, groupsList.Selection.SelectedIndex);
+            Assert.Equal(dialogVm.AvailableOriginalFields.Count, availableList.ItemCount);
+            Assert.Equal(6, availableList.ItemCount);
 
             dialog.Close();
         }
