@@ -172,7 +172,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             if (text.Length >= DateTextLength)
             {
                 _RevertBoundText(
-                    () => DateText,
+                    () => DateText ?? string.Empty,
                     value => DateText = value,
                     filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture),
                     text
@@ -204,7 +204,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             if (looksComplete)
             {
                 _RevertBoundText(
-                    () => TimeText,
+                    () => TimeText ?? string.Empty,
                     value => TimeText = value,
                     filter.Options.Time.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture),
                     text

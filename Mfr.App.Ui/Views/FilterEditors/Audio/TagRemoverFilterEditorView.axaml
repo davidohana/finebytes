@@ -35,7 +35,7 @@
           </ToolTip.Tip>
         </controls:CompactCheckBox>
         <TextBlock Classes="filter-editor-label" Text="Tag types to remove:" />
-        <WrapPanel Orientation="Horizontal" IsEnabled="{Binding AreBlockTypesEnabled}">
+        <WrapPanel Orientation="Horizontal">
           <ToolTip.Tip>
             <controls:RichToolTip>
               <TextBlock
@@ -54,6 +54,7 @@
             Margin="0,0,16,4"
             Content="ID3v1"
             IsChecked="{Binding RemoveId3v1}"
+            IsEnabled="{Binding AreBlockTypesEnabled}"
             ToolTip.Tip="ID3v1 trailer (MP3)."
           />
           <controls:CompactCheckBox
@@ -61,6 +62,7 @@
             Margin="0,0,16,4"
             Content="ID3v2"
             IsChecked="{Binding RemoveId3v2}"
+            IsEnabled="{Binding AreBlockTypesEnabled}"
             ToolTip.Tip="ID3v2 frames (MP3)."
           />
           <controls:CompactCheckBox
@@ -68,6 +70,7 @@
             Margin="0,0,16,4"
             Content="Xiph comment"
             IsChecked="{Binding RemoveXiph}"
+            IsEnabled="{Binding AreBlockTypesEnabled}"
             ToolTip.Tip="Xiph/Vorbis comment (FLAC, Ogg, Opus)."
           />
           <controls:CompactCheckBox
@@ -75,6 +78,7 @@
             Margin="0,0,16,4"
             Content="APEv2"
             IsChecked="{Binding RemoveApe}"
+            IsEnabled="{Binding AreBlockTypesEnabled}"
             ToolTip.Tip="APEv2 tag (FLAC, Monkey's Audio)."
           />
           <controls:CompactCheckBox
@@ -82,6 +86,7 @@
             Margin="0,0,16,4"
             Content="Apple/iTunes"
             IsChecked="{Binding RemoveApple}"
+            IsEnabled="{Binding AreBlockTypesEnabled}"
             ToolTip.Tip="Apple/iTunes ilst metadata (MP4, M4A)."
           />
           <controls:CompactCheckBox
@@ -89,6 +94,7 @@
             Margin="0,0,16,4"
             Content="ASF"
             IsChecked="{Binding RemoveAsf}"
+            IsEnabled="{Binding AreBlockTypesEnabled}"
             ToolTip.Tip="ASF extended content descriptors (WMA)."
           />
           <controls:CompactCheckBox
@@ -96,6 +102,7 @@
             Margin="0,0,0,4"
             Content="RIFF INFO"
             IsChecked="{Binding RemoveRiffInfo}"
+            IsEnabled="{Binding AreBlockTypesEnabled}"
             ToolTip.Tip="RIFF LIST/INFO chunk (WAV)."
           />
         </WrapPanel>

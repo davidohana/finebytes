@@ -11,10 +11,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
     internal sealed partial class TimeShifterFilterEditorViewModel : FilterOptionsEditorViewModel
     {
         /// <summary>Signed amount spinner lower bound (must match AXAML Minimum).</summary>
-        public const int AmountMin = -10_000_000;
+        public const decimal AmountMin = -10_000_000m;
 
         /// <summary>Signed amount spinner upper bound (must match AXAML Maximum).</summary>
-        public const int AmountMax = 10_000_000;
+        public const decimal AmountMax = 10_000_000m;
 
         /// <summary>
         /// Unit combo order: MFR7 Days-first list, with Months/Years instead of Milliseconds.
@@ -105,7 +105,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 
             var options = new TimeShifterOptions(
                 TimestampField: SelectedTimestampField.Field,
-                Amount: ClampToInt(Amount, AmountMin, AmountMax),
+                Amount: ClampToInt(Amount, (int)AmountMin, (int)AmountMax),
                 Unit: SelectedUnit
             );
             ApplyIfChanged(filter, filter with { Options = options });
