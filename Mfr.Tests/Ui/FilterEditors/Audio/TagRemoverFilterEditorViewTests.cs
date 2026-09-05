@@ -28,25 +28,15 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Dispatcher.UIThread.RunJobs();
 
             Assert.IsType<TagRemoverFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
-            var editorVm = (TagRemoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!;
+            var editorVm = (TagRemoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor;
 
             var editor = editorView.GetVisualDescendants().OfType<TagRemoverFilterEditorView>().Single();
             var removeAll = editor.FindControl<CompactCheckBox>("RemoveAllCheckBox");
             var id3v1 = editor.FindControl<CompactCheckBox>("Id3v1CheckBox");
             var id3v2 = editor.FindControl<CompactCheckBox>("Id3v2CheckBox");
-            var xiph = editor.FindControl<CompactCheckBox>("XiphCheckBox");
-            var ape = editor.FindControl<CompactCheckBox>("ApeCheckBox");
-            var apple = editor.FindControl<CompactCheckBox>("AppleCheckBox");
-            var asf = editor.FindControl<CompactCheckBox>("AsfCheckBox");
-            var riff = editor.FindControl<CompactCheckBox>("RiffInfoCheckBox");
             Assert.NotNull(removeAll);
             Assert.NotNull(id3v1);
             Assert.NotNull(id3v2);
-            Assert.NotNull(xiph);
-            Assert.NotNull(ape);
-            Assert.NotNull(apple);
-            Assert.NotNull(asf);
-            Assert.NotNull(riff);
             Assert.True(removeAll.IsChecked);
             Assert.False(editorVm.AreBlockTypesEnabled);
             Assert.False(id3v1.IsEnabled);
@@ -57,19 +47,13 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
 
             Assert.True(editorVm.AreBlockTypesEnabled);
             Assert.True(id3v1.IsEnabled);
-            Assert.True(id3v1.IsChecked);
-            Assert.True(id3v2.IsChecked);
+            Assert.False(id3v1.IsChecked);
+            Assert.False(id3v2.IsChecked);
 
             var filter = (TagRemoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            Assert.False(filter.Options.All);
-            Assert.Equal(7, filter.Options.Blocks!.Count);
+            Assert.True(filter.Options.All);
 
-            id3v2.IsChecked = false;
-            xiph.IsChecked = false;
-            ape.IsChecked = false;
-            apple.IsChecked = false;
-            asf.IsChecked = false;
-            riff.IsChecked = false;
+            id3v1.IsChecked = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

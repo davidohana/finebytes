@@ -24,6 +24,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// Gets or sets whether every TagLib tag type is stripped (nuclear mode).
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(AreBlockTypesEnabled))]
         private bool _removeAll = true;
 
         /// <summary>
@@ -80,12 +81,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
                 return;
             }
 
-            if (!value && !_AnyBlockSelected())
-            {
-                LoadWithoutApplying(_SelectAllBlocks);
-            }
-
-            OnPropertyChanged(nameof(AreBlockTypesEnabled));
+            // Leaving nuclear does not seed every block kind (no container supports all seven).
+            // Stay on nuclear options until the user checks at least one type.
             _ApplyOptions();
         }
 
@@ -103,6 +100,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
 
         partial void OnRemoveRiffInfoChanged(bool value) => _OnBlockChanged();
 
+        /// <summary>
+        /// Snaps empty selective mode back to nuclear, then applies options.
+        /// </summary>
         private void _OnBlockChanged()
         {
             if (IsLoading)
@@ -113,12 +113,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             if (!RemoveAll && !_AnyBlockSelected())
             {
                 LoadWithoutApplying(() => RemoveAll = true);
-                OnPropertyChanged(nameof(AreBlockTypesEnabled));
             }
 
             _ApplyOptions();
         }
 
+        /// <summary>
+        /// Copies current filter options into editor properties without live replace.
+        /// </summary>
         private void _SyncFromFilter()
         {
             if (Step.Filter is not TagRemoverFilter filter)
@@ -128,8 +130,20 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
 
             LoadWithoutApplying(() =>
             {
-                RemoveAll = filter.Options.All;
+                var all = filter.Options.All;
                 var blocks = filter.Options.Blocks ?? [];
+                if (!all && blocks.Count == 0)
+                {
+                    all = true;
+                }
+
+                RemoveAll = all;
+                if (all)
+                {
+                    _ClearBlockFlags();
+                    return;
+                }
+
                 var selected = blocks.ToHashSet();
                 RemoveId3v1 = selected.Contains(AudioTagBlockKind.Id3v1);
                 RemoveId3v2 = selected.Contains(AudioTagBlockKind.Id3v2);
@@ -139,9 +153,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
                 RemoveAsf = selected.Contains(AudioTagBlockKind.Asf);
                 RemoveRiffInfo = selected.Contains(AudioTagBlockKind.RiffInfo);
             });
-            OnPropertyChanged(nameof(AreBlockTypesEnabled));
         }
 
+        /// <summary>
+        /// Replaces the step filter when nuclear/selective options change.
+        /// </summary>
         private void _ApplyOptions()
         {
             if (IsLoading || Step.Filter is not TagRemoverFilter filter)
@@ -159,6 +175,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
                 var blocks = _SelectedBlocks();
                 if (blocks.Count == 0)
                 {
+                    // Selective UI with nothing checked yet — keep nuclear options on the step.
                     return;
                 }
 
@@ -168,22 +185,31 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             ApplyIfChanged(filter, filter with { Options = options });
         }
 
+        /// <summary>
+        /// Returns whether any selective block checkbox is checked.
+        /// </summary>
         private bool _AnyBlockSelected()
         {
             return RemoveId3v1 || RemoveId3v2 || RemoveXiph || RemoveApe || RemoveApple || RemoveAsf || RemoveRiffInfo;
         }
 
-        private void _SelectAllBlocks()
+        /// <summary>
+        /// Clears all selective block checkboxes (nuclear UI state).
+        /// </summary>
+        private void _ClearBlockFlags()
         {
-            RemoveId3v1 = true;
-            RemoveId3v2 = true;
-            RemoveXiph = true;
-            RemoveApe = true;
-            RemoveApple = true;
-            RemoveAsf = true;
-            RemoveRiffInfo = true;
+            RemoveId3v1 = false;
+            RemoveId3v2 = false;
+            RemoveXiph = false;
+            RemoveApe = false;
+            RemoveApple = false;
+            RemoveAsf = false;
+            RemoveRiffInfo = false;
         }
 
+        /// <summary>
+        /// Builds the ordered list of checked selective block kinds.
+        /// </summary>
         private List<AudioTagBlockKind> _SelectedBlocks()
         {
             var blocks = new List<AudioTagBlockKind>(7);
