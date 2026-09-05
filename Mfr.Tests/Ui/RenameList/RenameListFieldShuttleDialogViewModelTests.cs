@@ -459,7 +459,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void Original_only_group_has_no_preview_fields_and_add_all_adds_originals()
+        public void Extended_group_offers_date_and_attrs_preview_fields()
         {
             var dialogVm = new RenameListFieldShuttleDialogViewModel(
                 [
@@ -472,7 +472,23 @@ namespace Mfr.Tests.Ui.RenameList
             dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == ExtendedRenameListFields.Group);
 
             Assert.Equal(6, dialogVm.AvailableOriginalFields.Count);
-            Assert.Empty(dialogVm.AvailablePreviewFields);
+            Assert.Equal(
+                [
+                    ExtendedCreationDateField.CreationDateKey,
+                    ExtendedLastWriteDateField.LastWriteDateKey,
+                    ExtendedLastAccessDateField.LastAccessDateKey,
+                    ExtendedAttributesField.AttributesKey,
+                ],
+                dialogVm.AvailablePreviewFields.Select(field => field.PropertyKey)
+            );
+            Assert.DoesNotContain(
+                dialogVm.AvailablePreviewFields,
+                field => field.PropertyKey == ExtendedSizeField.SizeKey
+            );
+            Assert.DoesNotContain(
+                dialogVm.AvailablePreviewFields,
+                field => field.PropertyKey == ExtendedFileCountField.FileCountKey
+            );
             Assert.Equal(6, dialogVm.AvailableSortFields.Count);
 
             dialogVm.AddAllOriginalFieldsCommand.Execute(null);
