@@ -750,7 +750,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies Attributes Setter On/Off/Leave radio edits replace the step filter options.
+        /// Verifies Attributes Setter On/Off/Keep radio edits replace the step filter options.
         /// </summary>
         [Fact]
         public void Attributes_setter_options_update_step_options()
