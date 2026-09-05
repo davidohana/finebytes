@@ -98,7 +98,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             {
                 AttributeTriState.Set => true,
                 AttributeTriState.Clear => false,
-                AttributeTriState.Keep => throw new NotImplementedException(),
+                AttributeTriState.Keep => null,
                 _ => null,
             };
         }
