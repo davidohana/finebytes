@@ -38,6 +38,21 @@ namespace Mfr.Tests.Models.Filters.Misc
         }
 
         /// <summary>
+        /// Verifies clearing SubFolder via <c>with</c> does not keep a previously compiled sub-folder template.
+        /// </summary>
+        [Fact]
+        public void With_ClearingSubFolder_DropsPreviousCompiledTemplate()
+        {
+            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: "1"));
+            filter.Setup();
+
+            var cleared = filter with { Options = new MoverOptions(Dest, SubFolder: "") };
+            var item = FilterTestHelpers.ApplyReturnItem(cleared, "track", directory: Source);
+
+            Assert.Equal(Dest, item.Preview.DirectoryPath);
+        }
+
+        /// <summary>
         /// Verifies the preview directory is Root combined with a static sub-folder.
         /// </summary>
         [Fact]

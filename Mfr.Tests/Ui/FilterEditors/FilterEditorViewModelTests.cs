@@ -505,5 +505,65 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(2, options.TokenNumber);
             Assert.Equal(-1, options.MoveBy);
         }
+
+        /// <summary>
+        /// Verifies Mover option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Mover_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
+            var editor = new MoverFilterEditorViewModel(step);
+
+            Assert.Equal(@"C:\", editor.RootFolder);
+            Assert.Equal("MFR", editor.SubFolder);
+
+            editor.RootFolder = @"D:\Music";
+            editor.SubFolder = @"<parent-folder>\<file-name>";
+
+            var options = ((MoverFilter)step.Filter).Options;
+            Assert.Equal(@"D:\Music", options.RootFolder);
+            Assert.Equal(@"<parent-folder>\<file-name>", options.SubFolder);
+        }
+
+        /// <summary>
+        /// Verifies Browse applies a picked root folder to the step options.
+        /// </summary>
+        [Fact]
+        public async Task Mover_browse_applies_picked_root_folder()
+        {
+            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
+            var editor = new MoverFilterEditorViewModel(step)
+            {
+                PickRootFolderAsync = (current, _) =>
+                {
+                    Assert.Equal(@"C:\", current);
+                    return Task.FromResult<string?>(@"D:\Picked");
+                },
+            };
+
+            await editor.BrowseRootFolderCommand.ExecuteAsync(null);
+
+            Assert.Equal(@"D:\Picked", editor.RootFolder);
+            Assert.Equal(@"D:\Picked", ((MoverFilter)step.Filter).Options.RootFolder);
+        }
+
+        /// <summary>
+        /// Verifies Browse leaves options unchanged when the picker is cancelled.
+        /// </summary>
+        [Fact]
+        public async Task Mover_browse_cancelled_leaves_root_unchanged()
+        {
+            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
+            var editor = new MoverFilterEditorViewModel(step)
+            {
+                PickRootFolderAsync = (_, _) => Task.FromResult<string?>(null),
+            };
+
+            await editor.BrowseRootFolderCommand.ExecuteAsync(null);
+
+            Assert.Equal(@"C:\", editor.RootFolder);
+            Assert.Equal(@"C:\", ((MoverFilter)step.Filter).Options.RootFolder);
+        }
     }
 }

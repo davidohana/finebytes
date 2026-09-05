@@ -67,10 +67,10 @@ namespace Mfr.Filters.Misc
                 nameof(MoverOptions.RootFolder)
             );
 
-            if (!string.IsNullOrEmpty(Options.SubFolder))
-            {
-                _compiledSubFolder = FormatStringCompiler.Compile(Options.SubFolder);
-            }
+            // Always assign: `with` clones copy this field, so a prior non-empty SubFolder must not stick.
+            _compiledSubFolder = string.IsNullOrEmpty(Options.SubFolder)
+                ? null
+                : FormatStringCompiler.Compile(Options.SubFolder);
         }
 
         /// <inheritdoc />

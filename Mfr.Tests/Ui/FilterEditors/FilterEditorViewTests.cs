@@ -1034,6 +1034,45 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Mover option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Mover_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Mover"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<MoverFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<MoverFilterEditorView>().Single();
+            var rootFolder = editor.FindControl<TextBox>("RootFolderBox");
+            var subFolder = editor.FindControl<TextBox>("SubFolderBox");
+            var browse = editor.FindControl<HyperlinkButton>("BrowseRootButton");
+            Assert.NotNull(rootFolder);
+            Assert.NotNull(subFolder);
+            Assert.NotNull(browse);
+            Assert.Equal(@"C:\", rootFolder.Text);
+            Assert.Equal("MFR", subFolder.Text);
+            Assert.Same(
+                ((MoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!).BrowseRootFolderCommand,
+                browse.Command
+            );
+
+            rootFolder.Text = @"E:\Archive";
+            subFolder.Text = "<now:yyyy>";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (MoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(@"E:\Archive", filter.Options.RootFolder);
+            Assert.Equal("<now:yyyy>", filter.Options.SubFolder);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Letters Case radio edits re-run Rename List preview (Phase 10a).
         /// </summary>
         [AvaloniaFact]

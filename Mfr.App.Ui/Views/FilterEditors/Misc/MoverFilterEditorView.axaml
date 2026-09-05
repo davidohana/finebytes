@@ -1,0 +1,81 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Misc"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="180"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Misc.MoverFilterEditorView"
+  x:DataType="vm:MoverFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="6">
+        <StackPanel Spacing="4">
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-title" Text="Static absolute destination path." />
+              <TextBlock
+                Classes="rich-tip-body"
+                Text="All items are moved under this root. Required; must be a fully qualified path."
+              />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="Root folder:" />
+            <HyperlinkButton
+              x:Name="BrowseRootButton"
+              Grid.Column="1"
+              Padding="4,0"
+              VerticalAlignment="Center"
+              Content="Browse"
+              ToolTip.Tip="Choose an absolute destination folder."
+              Command="{Binding BrowseRootFolderCommand}"
+            />
+          </Grid>
+          <TextBox
+            x:Name="RootFolderBox"
+            Classes="filter-editor-field-wrap"
+            MinWidth="240"
+            MaxLength="200"
+            Watermark="C:\"
+            Text="{Binding RootFolder}"
+          />
+        </StackPanel>
+        <StackPanel Spacing="4">
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-title" Text="Optional path appended below the root folder." />
+              <TextBlock
+                Classes="rich-tip-body"
+                Text="Combined after Root folder for each renamed item."
+              />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• May include formatter tokens such as &lt;parent-folder&gt; or &lt;file-name&gt;."
+              />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Use backslashes (\) to create nested folders, e.g. &lt;parent-folder&gt;\&lt;file-name&gt;."
+              />
+              <TextBlock Classes="rich-tip-bullet" Text="• Leave empty to land items directly in the root folder." />
+              <TextBlock Classes="rich-tip-bullet" Text="• Non-existent folders are created on commit; original folders are not erased." />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
+          <TextBlock Classes="filter-editor-label" Text="Sub-Folder:" />
+          <TextBox
+            x:Name="SubFolderBox"
+            Classes="filter-editor-field-wrap"
+            MinWidth="240"
+            MaxLength="500"
+            Watermark="MFR"
+            Text="{Binding SubFolder}"
+          />
+        </StackPanel>
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>
