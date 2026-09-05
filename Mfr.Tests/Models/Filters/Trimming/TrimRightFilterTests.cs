@@ -11,33 +11,20 @@ namespace Mfr.Tests.Models.Filters.Trimming
         private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
-        /// Verifies trimming from the right by count.
+        /// Verifies right trim clamps count to <c>[0, length]</c> then drops that many characters.
         /// </summary>
-        [Fact]
-        public void Apply_RemovesRightCharacters()
+        /// <param name="count">Requested trim length (may be negative or past the segment).</param>
+        /// <param name="input">Prefix under test.</param>
+        /// <param name="expected">Prefix after trim.</param>
+        [Theory]
+        [InlineData(2, "abcd", "ab")]
+        [InlineData(0, "ab", "ab")]
+        [InlineData(-1, "ab", "ab")]
+        [InlineData(10, "hi", "")]
+        public void Apply_RemovesRightCharacters_ClampingCount(int count, string input, string expected)
         {
-            var f = new TrimRightFilter(_target, new CountFilterOptions(2));
-            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
-        }
-
-        /// <summary>
-        /// Verifies non-positive count leaves the segment unchanged.
-        /// </summary>
-        [Fact]
-        public void Apply_NonPositiveCount_ReturnsOriginal()
-        {
-            var f = new TrimRightFilter(_target, new CountFilterOptions(0));
-            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "ab"));
-        }
-
-        /// <summary>
-        /// Verifies over-trim yields empty string.
-        /// </summary>
-        [Fact]
-        public void Apply_CountExceedsLength_ReturnsEmpty()
-        {
-            var f = new TrimRightFilter(_target, new CountFilterOptions(10));
-            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "hi"));
+            var f = new TrimRightFilter(_target, new CountFilterOptions(count));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
         }
     }
 }
