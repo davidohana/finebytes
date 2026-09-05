@@ -52,6 +52,16 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
+        /// Verifies a null list element applies as an empty name.
+        /// </summary>
+        [Fact]
+        public void Apply_NullEntry_IsEmptyName()
+        {
+            var f = _CreateFilter(["First", null!, "Second"]);
+            Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "b", renameListIndex: 1));
+        }
+
+        /// <summary>
         /// Verifies an empty list leaves the original value unchanged.
         /// </summary>
         [Fact]
@@ -126,6 +136,45 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var typed = Assert.IsType<NameListFilter>(filter);
             Assert.Empty(typed.Options.Entries);
             Assert.Equal("old", FilterTestHelpers.ApplyToPrefix(typed, "old", renameListIndex: 0));
+        }
+
+        /// <summary>
+        /// Verifies null <c>prefix</c>/<c>suffix</c> coerce to empty and still apply.
+        /// </summary>
+        [Fact]
+        public void JsonDeserialize_NullPrefixSuffix_CoerceToEmpty()
+        {
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "NameList",
+                  "target": {
+                    "targetType": "FilePrefix"
+                  },
+                  "options": {
+                    "entries": ["Only"],
+                    "prefix": null,
+                    "suffix": null
+                  }
+                }
+                """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            var typed = Assert.IsType<NameListFilter>(filter);
+            Assert.Equal(string.Empty, typed.Options.Prefix);
+            Assert.Equal(string.Empty, typed.Options.Suffix);
+            Assert.Equal("Only", FilterTestHelpers.ApplyToPrefix(typed, "old", renameListIndex: 0));
+        }
+
+        /// <summary>
+        /// Verifies constructor null prefix/suffix coerce to empty.
+        /// </summary>
+        [Fact]
+        public void Options_NullPrefixSuffix_CoerceToEmpty()
+        {
+            var options = new NameListOptions(Entries: ["A"], Prefix: null!, Suffix: null!);
+            Assert.Equal(string.Empty, options.Prefix);
+            Assert.Equal(string.Empty, options.Suffix);
         }
 
         private static NameListFilter _CreateFilter(IReadOnlyList<string> entries)
