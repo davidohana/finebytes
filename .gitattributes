@@ -1,0 +1,23 @@
+# Line-ending policy. Mirrors .editorconfig and .csharpierrc.json, which mandate
+# CRLF for these file types. Declaring it here guarantees CSharpier and mdformat
+# see CRLF working-tree endings on every platform (Windows, Linux/macOS, Cloud
+# Agents) while repository blobs stay LF-normalized. Without this, a Linux
+# checkout gets LF working-tree files and `just format` / `just lint` fail.
+*.cs     text eol=crlf
+*.csproj text eol=crlf
+*.axaml  text eol=crlf
+*.slnx   text eol=crlf
+*.md     text eol=crlf
+
+# Binary assets: never apply line-ending conversion.
+*.png  binary
+*.ico  binary
+*.gif  binary
+*.jpg  binary
+*.jpeg binary
+*.mp3  binary
+*.wav  binary
+*.wma  binary
+*.ogg  binary
+*.flac binary
+*.m4a  binary

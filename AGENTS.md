@@ -54,6 +54,18 @@
 
 Example (Rename List Auto-Sort): session `sortFields` entries are `{ "key": …, "descending": … }` only — no `"column"` enum, no `SessionState*JsonConverter` for backward compatibility.
 
+## Cursor Cloud specific instructions
+
+Cloud Agents run on Linux (Ubuntu 24.04), but Magic File Renamer is a Windows-targeted desktop app (`WinExe`, `.ico`, `app.manifest`, COM interop, Windows path/attribute semantics). The repo-managed `.cursor/` environment (`Dockerfile` + `install.sh` + `environment.json`) provisions the .NET 10 SDK, `just`, Avalonia native deps, `Xvfb`, fonts, and the markdown `.venv` automatically.
+
+- Build, lint, and format all work on Linux: `just build`, `just lint`, `just format`. CRLF is enforced cross-platform via `.gitattributes`, so do not "fix" line endings by hand.
+- Running the UI needs a display: `Xvfb` is started on `:99` at boot and `DISPLAY=:99` is preset, so `just run-ui` renders headlessly. Capture the window with `xwd -root -silent | convert - shot.png`.
+- Expected test failures on Linux: `dotnet test` reports a fixed set of ~35 failures that assert Windows-only behavior. These are **not** environment problems — treat a run in which only these fail as green. They cover:
+  - Windows path semantics (`C:\…`, drive letters, UNC, `\` separators): `MoverFilterTests`, `FormatStringCompilerTests`, `FormatterFilterTests`, `ParentFolderTokenTests`, `DriveLetterTokenTests`, `FileListPathTests`, `RenameListFieldCatalogTests`, `CleanerFilterTests`, and `ProjectReferenceArchitectureTests` (hardcoded `\` in test paths).
+  - Windows file attributes (Hidden): `RenameListCommitTests.Commit_AttributesOnly_*`.
+  - Windows path/rendering assumptions in UI tests: `FileListViewTests.Thumbnail_*`, `RenameListViewColumnTests`, `RenameListEntryMapperTests`, `RenameListViewModelMetadataTests`.
+- To confirm your change did not add regressions, compare failing-test signatures against the list above rather than the raw pass/fail count.
+
 ## References
 
 - `CONTRIBUTING.md`

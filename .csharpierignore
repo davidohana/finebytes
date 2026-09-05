@@ -1,2 +1,4 @@
 # Format .cs, .csproj, .axaml, .slnx. Skip other XML-ish formats.
+# Globs are case-sensitive on Linux/macOS, so match casing explicitly (e.g. NuGet.Config).
 **/*.{xml,props,targets,xaml,config,resx,nuspec,DotSettings}
+**/NuGet.Config
