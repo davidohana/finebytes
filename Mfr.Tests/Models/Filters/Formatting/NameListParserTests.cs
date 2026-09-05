@@ -17,6 +17,15 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
+        /// Verifies null entries validate as empty (missing JSON / incomplete options).
+        /// </summary>
+        [Fact]
+        public void Validate_Null_ReturnsEmpty()
+        {
+            Assert.Empty(NameListParser.Validate(null));
+        }
+
+        /// <summary>
         /// Verifies blank-line entries are kept.
         /// </summary>
         [Fact]

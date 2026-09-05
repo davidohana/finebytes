@@ -8,14 +8,20 @@ namespace Mfr.Filters.Formatting
     /// <param name="Entries">Names in rename-list index order (one per line in the editor). Empty list is a no-op.</param>
     /// <param name="Prefix">Optional format string prepended to each list entry; supports formatter tokens (for example <c>&lt;counter:...&gt;</c>).</param>
     /// <param name="Suffix">Optional format string appended after each list entry; supports formatter tokens.</param>
-    public sealed record NameListOptions(IReadOnlyList<string> Entries, string Prefix = "", string Suffix = "");
+    public sealed record NameListOptions(IReadOnlyList<string> Entries = null!, string Prefix = "", string Suffix = "")
+    {
+        /// <summary>
+        /// Gets names in rename-list index order. Missing or null becomes empty (no-op).
+        /// </summary>
+        public IReadOnlyList<string> Entries { get; init; } = Entries ?? [];
+    }
 
     /// <summary>
     /// Replaces the target field with the name-list line matching the item's list position, with optional prefix and suffix templates.
     /// </summary>
     /// <remarks>
     /// Entry index <c>k</c> in the list applies to the rename item whose <see cref="FileMeta.RenameListIndex"/> is <c>k</c> (zero-based).
-    /// This matches a column exported via Export Name List edited in-place.
+    /// The Filter Configuration editor edits the embedded list as one name per line (Free Names Edit).
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Name list and optional prefix/suffix templates.</param>
@@ -27,7 +33,6 @@ namespace Mfr.Filters.Formatting
         StringApplyScope? ApplyScope = null
     ) : StringTargetFilter(Target, ApplyScope)
     {
-        private IReadOnlyList<string>? _entries;
         private Formatter? _compiledPrefix;
         private Formatter? _compiledSuffix;
 
@@ -35,7 +40,7 @@ namespace Mfr.Filters.Formatting
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty list).
         /// </summary>
         public NameListFilter()
-            : this(new FilePrefixTarget(), new NameListOptions(Entries: [])) { }
+            : this(new FilePrefixTarget(), new NameListOptions()) { }
 
         /// <summary>
         /// Gets the filter type discriminator.
@@ -47,7 +52,7 @@ namespace Mfr.Filters.Formatting
         /// </summary>
         protected override void _Setup()
         {
-            _entries = NameListParser.Validate(Options.Entries);
+            NameListParser.Validate(Options.Entries);
             _compiledPrefix = FormatStringCompiler.Compile(Options.Prefix);
             _compiledSuffix = FormatStringCompiler.Compile(Options.Suffix);
         }
@@ -60,7 +65,7 @@ namespace Mfr.Filters.Formatting
         /// <returns>The new field value, or <paramref name="value"/> when the list is empty.</returns>
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var entries = Check.NotNull(_entries, "Name-list setup must complete before transform.");
+            var entries = Options.Entries;
             if (entries.Count == 0)
             {
                 return value;

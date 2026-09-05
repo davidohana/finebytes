@@ -63,11 +63,11 @@ namespace Mfr.Filters.Formatting
         /// Empty list is allowed (no-op). Blank lines are kept as empty names. Each entry is limited
         /// to the configured list-line maximum (default 1000 characters).
         /// </remarks>
-        /// <param name="entries">Configured names in rename-list index order.</param>
-        /// <returns>The same <paramref name="entries"/> list after checks succeed.</returns>
-        internal static IReadOnlyList<string> Validate(IReadOnlyList<string> entries)
+        /// <param name="entries">Configured names in rename-list index order. Null is treated as empty.</param>
+        /// <returns>The same <paramref name="entries"/> list after checks succeed, or empty when null.</returns>
+        internal static IReadOnlyList<string> Validate(IReadOnlyList<string>? entries)
         {
-            ArgumentNullException.ThrowIfNull(entries);
+            entries ??= [];
 
             var maxLen = ConfigStore.Config.Filters.MaxListFileLineLength;
             for (var i = 0; i < entries.Count; i++)

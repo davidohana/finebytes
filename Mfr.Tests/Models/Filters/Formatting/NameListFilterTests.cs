@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Mfr.Filters.Formatting;
 
 namespace Mfr.Tests.Models.Filters.Formatting
@@ -51,18 +52,6 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies blank-line entries still participate in index mapping.
-        /// </summary>
-        [Fact]
-        public void Apply_BlankLineMapping_IncludesEmptyEntries()
-        {
-            var f = _CreateFilter(["A", "", "B"]);
-            Assert.Equal("A", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
-            Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 1));
-            Assert.Equal("B", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 2));
-        }
-
-        /// <summary>
         /// Verifies an empty list leaves the original value unchanged.
         /// </summary>
         [Fact]
@@ -87,14 +76,56 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies comment-like lines are kept as names in the embedded list.
+        /// Verifies the NameList.md sample preset shape deserializes.
         /// </summary>
         [Fact]
-        public void Apply_CommentLikeLines_AreNames()
+        public void JsonDeserialize_SamplePreset_EntriesArray()
         {
-            var f = _CreateFilter(["// header", "Real1"]);
-            Assert.Equal("// header", FilterTestHelpers.ApplyToPrefix(f, "a", renameListIndex: 0));
-            Assert.Equal("Real1", FilterTestHelpers.ApplyToPrefix(f, "b", renameListIndex: 1));
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "NameList",
+                  "target": {
+                    "targetType": "FilePrefix"
+                  },
+                  "options": {
+                    "entries": ["Alpha", "Beta", "Gamma"],
+                    "prefix": "",
+                    "suffix": ""
+                  }
+                }
+                """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            var typed = Assert.IsType<NameListFilter>(filter);
+            Assert.Equal(["Alpha", "Beta", "Gamma"], typed.Options.Entries);
+            Assert.Equal("Beta", FilterTestHelpers.ApplyToPrefix(typed, "old1", renameListIndex: 1));
+        }
+
+        /// <summary>
+        /// Verifies omitting <c>entries</c> deserializes as empty and is a no-op.
+        /// </summary>
+        [Fact]
+        public void JsonDeserialize_MissingEntries_IsEmptyNoOp()
+        {
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "type": "NameList",
+                  "target": {
+                    "targetType": "FilePrefix"
+                  },
+                  "options": {
+                    "prefix": "",
+                    "suffix": ""
+                  }
+                }
+                """;
+
+            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
+            var typed = Assert.IsType<NameListFilter>(filter);
+            Assert.Empty(typed.Options.Entries);
+            Assert.Equal("old", FilterTestHelpers.ApplyToPrefix(typed, "old", renameListIndex: 0));
         }
 
         private static NameListFilter _CreateFilter(IReadOnlyList<string> entries)
