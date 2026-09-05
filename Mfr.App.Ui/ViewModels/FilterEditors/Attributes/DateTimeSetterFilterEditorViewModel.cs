@@ -3,13 +3,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Attributes;
-using Mfr.Models.Filters;
 using Mfr.Models.Media;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 {
     /// <summary>
-    /// Shared Filter Configuration editor for <see cref="DateSetterFilter"/> and <see cref="TimeSetterFilter"/>.
+    /// Filter Configuration editor for <see cref="DateTimeSetterFilter"/>.
     /// </summary>
     internal sealed partial class DateTimeSetterFilterEditorViewModel : FilterOptionsEditorViewModel
     {
@@ -30,8 +29,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         public DateTimeSetterFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
-            (IsDateMode, ValuePhrase) = _ResolveMode(step.Filter);
-            _selectedTimestampField = _ChoiceFor(TimestampField.LastWrite);
+            _selectedTimestampField = s_TimestampFields[1];
             _SyncFromFilter();
         }
 
@@ -41,153 +39,133 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         public IReadOnlyList<TimestampFieldChoice> TimestampFields => s_TimestampFields;
 
         /// <summary>
-        /// Gets whether this editor is editing a date (vs time-of-day).
-        /// </summary>
-        public bool IsDateMode { get; }
-
-        /// <summary>
-        /// Gets whether this editor is editing a time-of-day (vs date).
-        /// </summary>
-        public bool IsTimeMode => !IsDateMode;
-
-        /// <summary>
-        /// Gets the trailing label after the field combo (<c>date to:</c> / <c>time to:</c>).
-        /// </summary>
-        public string ValuePhrase { get; }
-
-        /// <summary>
         /// Gets or sets which filesystem timestamp to set.
         /// </summary>
         [ObservableProperty]
         private TimestampFieldChoice _selectedTimestampField;
 
         /// <summary>
-        /// Gets or sets the calendar date text (<c>yyyy-MM-dd</c>, date mode only).
+        /// Gets or sets whether the calendar date is applied.
+        /// </summary>
+        [ObservableProperty]
+        private bool _setDate;
+
+        /// <summary>
+        /// Gets or sets the calendar date text (<c>yyyy-MM-dd</c>).
         /// </summary>
         [ObservableProperty]
         private string _dateText = string.Empty;
 
         /// <summary>
-        /// Gets or sets the time-of-day text (<c>HH:mm:ss</c>, time mode only).
+        /// Gets or sets whether the time-of-day is applied.
+        /// </summary>
+        [ObservableProperty]
+        private bool _setTime;
+
+        /// <summary>
+        /// Gets or sets the time-of-day text (<c>HH:mm:ss</c>).
         /// </summary>
         [ObservableProperty]
         private string _timeText = string.Empty;
 
         partial void OnSelectedTimestampFieldChanged(TimestampFieldChoice value) => _ApplyOptions();
 
+        partial void OnSetDateChanged(bool value) => _ApplyOptions();
+
         partial void OnDateTextChanged(string value) => _ApplyOptions();
+
+        partial void OnSetTimeChanged(bool value) => _ApplyOptions();
 
         partial void OnTimeTextChanged(string value) => _ApplyOptions();
 
         /// <summary>
-        /// Sets the value control to today (date) or now (time), matching MFR7 Current.
+        /// Sets enabled value fields to today and/or now.
         /// </summary>
         [RelayCommand]
         public void SetCurrent()
         {
-            if (IsDateMode)
+            if (SetDate)
             {
                 DateText = DateTime.Today.ToString(DateFormat, CultureInfo.InvariantCulture);
-                return;
             }
 
-            TimeText = DateTime.Now.ToString(TimeFormat, CultureInfo.InvariantCulture);
+            if (SetTime)
+            {
+                TimeText = DateTime.Now.ToString(TimeFormat, CultureInfo.InvariantCulture);
+            }
         }
 
-        /// <summary>
-        /// Loads combo + value text from the step filter without pushing option replaces.
-        /// </summary>
         private void _SyncFromFilter()
         {
             LoadWithoutApplying(() =>
             {
-                if (Step.Filter is DateSetterFilter dateSetter)
+                if (Step.Filter is not DateTimeSetterFilter filter)
                 {
-                    SelectedTimestampField = _ChoiceFor(dateSetter.Options.TimestampField);
-                    DateText = dateSetter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture);
                     return;
                 }
 
-                if (Step.Filter is TimeSetterFilter timeSetter)
-                {
-                    SelectedTimestampField = _ChoiceFor(timeSetter.Options.TimestampField);
-                    TimeText = timeSetter.Options.Time.ToString(TimeFormat, CultureInfo.InvariantCulture);
-                }
+                SelectedTimestampField = _ChoiceFor(filter.Options.TimestampField);
+                SetDate = filter.Options.SetDate;
+                DateText = filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture);
+                SetTime = filter.Options.SetTime;
+                TimeText = filter.Options.Time.ToString(TimeFormat, CultureInfo.InvariantCulture);
             });
         }
 
-        /// <summary>
-        /// Parses the visible value and replaces step options when the parse succeeds.
-        /// </summary>
         private void _ApplyOptions()
         {
-            if (IsLoading || SelectedTimestampField is null)
+            if (IsLoading || SelectedTimestampField is null || Step.Filter is not DateTimeSetterFilter filter)
             {
                 return;
             }
 
-            if (Step.Filter is DateSetterFilter dateSetter)
-            {
-                if (
-                    !DateOnly.TryParseExact(
-                        DateText.Trim(),
-                        DateFormat,
-                        CultureInfo.InvariantCulture,
-                        DateTimeStyles.None,
-                        out var date
-                    )
+            if (
+                !DateOnly.TryParseExact(
+                    (DateText ?? string.Empty).Trim(),
+                    DateFormat,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var date
                 )
-                {
-                    return;
-                }
-
-                var options = new DateSetterOptions(TimestampField: SelectedTimestampField.Field, Date: date);
-                ApplyIfChanged(dateSetter, dateSetter with { Options = options });
+            )
+            {
                 return;
             }
 
-            if (Step.Filter is TimeSetterFilter timeSetter)
-            {
-                if (
-                    !TimeOnly.TryParseExact(
-                        TimeText.Trim(),
-                        TimeFormat,
-                        CultureInfo.InvariantCulture,
-                        DateTimeStyles.None,
-                        out var time
-                    )
+            if (
+                !TimeOnly.TryParseExact(
+                    (TimeText ?? string.Empty).Trim(),
+                    TimeFormat,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var time
                 )
-                {
-                    return;
-                }
-
-                var options = new TimeSetterOptions(TimestampField: SelectedTimestampField.Field, Time: time);
-                ApplyIfChanged(timeSetter, timeSetter with { Options = options });
+            )
+            {
+                return;
             }
+
+            var options = new DateTimeSetterOptions(
+                TimestampField: SelectedTimestampField.Field,
+                SetDate: SetDate,
+                Date: date,
+                SetTime: SetTime,
+                Time: time
+            );
+            ApplyIfChanged(filter, filter with { Options = options });
         }
 
-        /// <summary>
-        /// Maps a <see cref="TimestampField"/> to its combo row; unknown values fall back to Last Write.
-        /// </summary>
         private static TimestampFieldChoice _ChoiceFor(TimestampField field)
         {
-            return s_TimestampFields.FirstOrDefault(c => c.Field == field)
-                ?? s_TimestampFields.First(c => c.Field == TimestampField.LastWrite);
-        }
-
-        /// <summary>
-        /// Resolves date vs time UI mode and the trailing phrase from the step filter type.
-        /// </summary>
-        private static (bool IsDateMode, string ValuePhrase) _ResolveMode(BaseFilter filter)
-        {
-            return filter switch
+            foreach (var choice in s_TimestampFields)
             {
-                DateSetterFilter => (true, "date to:"),
-                TimeSetterFilter => (false, "time to:"),
-                _ => throw new InvalidOperationException(
-                    $"Date/time setter editor does not support {filter.GetType().Name}."
-                ),
-            };
+                if (choice.Field == field)
+                {
+                    return choice;
+                }
+            }
+
+            return s_TimestampFields[1];
         }
     }
 }

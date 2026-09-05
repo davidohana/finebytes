@@ -7,8 +7,7 @@ These pages document **per-filter `options`** (and behavior). Common preset fiel
 ### Attributes
 
 - [AttributesSetter](Attributes/AttributesSetter.md)
-- [DateSetter](Attributes/DateSetter.md)
-- [TimeSetter](Attributes/TimeSetter.md)
+- [DateTimeSetter](Attributes/DateTimeSetter.md)
 - [TimeShifter](Attributes/TimeShifter.md)
 
 ### Audio
@@ -73,7 +72,7 @@ Each filter in a preset has:
 - `enabled` — if `false`, the filter is skipped.
 - `target` — for **string** filters acting on renamed metadata (most built-ins): a polymorphic object with discriminator **`targetType`** (values such as **`FilePrefix`**, **`FileExtension`**, **`FileFullName`**, **`AncestorFolder`**, **`FullPath`**, **`ParentDirectory`**, **`AudioField`**, **`Id3v1Field`**, **`Id3v2Frame`**, **`XiphField`**). **`AncestorFolder`** adds **`level`**: positive integer counting up from the immediate parent folder. **`AudioField`** adds **`field`**: camelCase name of the embedded audio overlay property (`title`, `album`, `year`, …); see [Formatter](Formatting/Formatter.md) **Target**. Format-specific targets address one tag block only (**`Id3v1Field.field`**, **`Id3v2Frame.frameId`** plus optional **`language`** / **`description`**, **`XiphField.key`**) and fail preview when the container cannot hold that block.
 - **`applyScope`** (optional; string-target filters only) — limits the filter to a **substring** or **token** of the resolved target string, then splices the result back (discriminator **`scopeType`**: **`Substring`** or **`Token`**). Omit for default “whole field” behavior. See [docs/magic-file-renamer-design.md](../../docs/magic-file-renamer-design.md) §6 (filter system).
-- For [DateSetter](Attributes/DateSetter.md), [TimeSetter](Attributes/TimeSetter.md), and [TimeShifter](Attributes/TimeShifter.md), `options` includes **`timestampField`**: which **filesystem timestamp field** to edit (not a clock value) — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings), together with the other filter-specific options.
+- For [DateTimeSetter](Attributes/DateTimeSetter.md) and [TimeShifter](Attributes/TimeShifter.md), `options` includes **`timestampField`**: which **filesystem timestamp field** to edit (not a clock value) — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings), together with the other filter-specific options.
 - **AttributesSetter** has no `target`; it always updates filesystem attributes ([AttributesSetter](Attributes/AttributesSetter.md)).
 - **AudioTagSetter** has no `target`; it updates multiple embedded audio tag fields from `options` ([AudioTagSetter](Audio/AudioTagSetter.md)).
 - **Id3v2FieldSetter** has no `target`; it sets one modeled ID3v2 frame from `options.frameId` / `text` / optional `onlyIfEmpty` ([Id3v2FieldSetter](Audio/Id3v2FieldSetter.md)).

@@ -3,7 +3,7 @@ using Mfr.Filters.Attributes;
 namespace Mfr.Tests.Models.Filters.Attributes
 {
     /// <summary>
-    /// Tests for <see cref="DateSetterFilter"/> and <see cref="TimeSetterFilter"/>.
+    /// Tests for <see cref="DateTimeSetterFilter"/>.
     /// </summary>
     public sealed class DateTimeSetterFilterTests
     {
@@ -14,15 +14,21 @@ namespace Mfr.Tests.Models.Filters.Attributes
 
         [Theory]
         [MemberData(nameof(TimestampFields))]
-        public void DateSetter_preserves_time_of_day_on_selected_field(TimestampField field)
+        public void DateOnly_preserves_time_of_day_on_selected_field(TimestampField field)
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 creationTime: s_Base,
                 lastWriteTime: s_Base,
                 lastAccessTime: s_Base
             );
-            var filter = new DateSetterFilter(
-                Options: new DateSetterOptions(TimestampField: field, Date: new DateOnly(2020, 12, 25))
+            var filter = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: field,
+                    SetDate: true,
+                    Date: new DateOnly(2020, 12, 25),
+                    SetTime: false,
+                    Time: new TimeOnly(0, 0, 0)
+                )
             );
             filter.Setup();
             filter.Apply(item);
@@ -34,15 +40,21 @@ namespace Mfr.Tests.Models.Filters.Attributes
 
         [Theory]
         [MemberData(nameof(TimestampFields))]
-        public void TimeSetter_preserves_calendar_date_on_selected_field(TimestampField field)
+        public void TimeOnly_preserves_calendar_date_on_selected_field(TimestampField field)
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 creationTime: s_Base,
                 lastWriteTime: s_Base,
                 lastAccessTime: s_Base
             );
-            var filter = new TimeSetterFilter(
-                Options: new TimeSetterOptions(TimestampField: field, Time: new TimeOnly(9, 0, 15))
+            var filter = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: field,
+                    SetDate: false,
+                    Date: new DateOnly(2000, 1, 1),
+                    SetTime: true,
+                    Time: new TimeOnly(9, 0, 15)
+                )
             );
             filter.Setup();
             filter.Apply(item);
@@ -53,49 +65,76 @@ namespace Mfr.Tests.Models.Filters.Attributes
         }
 
         [Fact]
-        public void DateSetter_and_TimeSetter_preserve_DateTimeKind()
+        public void DateAndTime_LastAccess_sets_both()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: s_Base);
+            var filter = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: TimestampField.LastAccess,
+                    SetDate: true,
+                    Date: new DateOnly(2019, 1, 1),
+                    SetTime: true,
+                    Time: new TimeOnly(23, 59, 1)
+                )
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(new DateTime(2019, 1, 1, 23, 59, 1, DateTimeKind.Unspecified), item.Preview.LastAccessTime);
+        }
+
+        [Fact]
+        public void Neither_no_op()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
+            var filter = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: TimestampField.LastWrite,
+                    SetDate: false,
+                    Date: new DateOnly(2019, 1, 1),
+                    SetTime: false,
+                    Time: new TimeOnly(23, 59, 1)
+                )
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(s_Base, item.Preview.LastWriteTime);
+        }
+
+        [Fact]
+        public void Preserves_DateTimeKind()
         {
             var localBase = new DateTime(2024, 3, 15, 14, 5, 30, DateTimeKind.Local);
             var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: localBase);
 
-            var setDate = new DateSetterFilter(
-                Options: new DateSetterOptions(
+            var setDate = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
                     TimestampField: TimestampField.LastWrite,
-                    Date: new DateOnly(2020, 12, 25)
+                    SetDate: true,
+                    Date: new DateOnly(2020, 12, 25),
+                    SetTime: false,
+                    Time: new TimeOnly(0, 0, 0)
                 )
             );
             setDate.Setup();
             setDate.Apply(item);
             Assert.Equal(DateTimeKind.Local, item.Preview.LastWriteTime.Kind);
 
-            var setTime = new TimeSetterFilter(
-                Options: new TimeSetterOptions(TimestampField: TimestampField.LastWrite, Time: new TimeOnly(9, 0, 15))
+            var setTime = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: TimestampField.LastWrite,
+                    SetDate: false,
+                    Date: new DateOnly(2000, 1, 1),
+                    SetTime: true,
+                    Time: new TimeOnly(9, 0, 15)
+                )
             );
             setTime.Setup();
             setTime.Apply(item);
 
             Assert.Equal(DateTimeKind.Local, item.Preview.LastWriteTime.Kind);
             Assert.Equal(new DateTime(2020, 12, 25, 9, 0, 15, DateTimeKind.Local), item.Preview.LastWriteTime);
-        }
-
-        [Fact]
-        public void Chain_DateSetter_then_TimeSetter_composes_on_last_access()
-        {
-            var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: s_Base);
-            var setDate = new DateSetterFilter(
-                Options: new DateSetterOptions(
-                    TimestampField: TimestampField.LastAccess,
-                    Date: new DateOnly(2019, 1, 1)
-                )
-            );
-            var setTime = new TimeSetterFilter(
-                Options: new TimeSetterOptions(TimestampField: TimestampField.LastAccess, Time: new TimeOnly(23, 59, 1))
-            );
-            var chain = FilterChain.CreateAllEnabled([setDate, setTime]);
-            chain.SetupFilters();
-            chain.ApplyFilters(item);
-
-            Assert.Equal(new DateTime(2019, 1, 1, 23, 59, 1, DateTimeKind.Unspecified), item.Preview.LastAccessTime);
         }
 
         private static void _AssertOtherFieldsUnchanged(FileMeta preview, TimestampField selected)
