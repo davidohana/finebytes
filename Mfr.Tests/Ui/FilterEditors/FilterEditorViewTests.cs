@@ -1108,6 +1108,50 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Attributes Setter tri-state checkbox edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Attributes_setter_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AttributesSetter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<AttributesSetterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<AttributesSetterFilterEditorView>().Single();
+            var readOnlyBox = editor.FindControl<CheckBox>("ReadOnlyCheckBox");
+            var hiddenBox = editor.FindControl<CheckBox>("HiddenCheckBox");
+            var archiveBox = editor.FindControl<CheckBox>("ArchiveCheckBox");
+            var systemBox = editor.FindControl<CheckBox>("SystemCheckBox");
+            Assert.NotNull(readOnlyBox);
+            Assert.NotNull(hiddenBox);
+            Assert.NotNull(archiveBox);
+            Assert.NotNull(systemBox);
+            Assert.True(readOnlyBox.IsThreeState);
+            Assert.Null(readOnlyBox.IsChecked);
+            Assert.Null(hiddenBox.IsChecked);
+            Assert.Null(archiveBox.IsChecked);
+            Assert.Null(systemBox.IsChecked);
+
+            hiddenBox.IsChecked = true;
+            archiveBox.IsChecked = false;
+            readOnlyBox.IsChecked = true;
+            systemBox.IsChecked = null;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (AttributesSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(AttributeTriState.Set, filter.Options.ReadOnly);
+            Assert.Equal(AttributeTriState.Set, filter.Options.Hidden);
+            Assert.Equal(AttributeTriState.Clear, filter.Options.Archive);
+            Assert.Equal(AttributeTriState.Keep, filter.Options.System);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Letters Case radio edits re-run Rename List preview (Phase 10a).
         /// </summary>
         [AvaloniaFact]
