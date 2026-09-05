@@ -4,13 +4,19 @@ Applies **search/replace pairs** embedded in the filter options, in list order, 
 
 ## Options
 
-| Property        | Type          | Description                                                    |
-| --------------- | ------------- | -------------------------------------------------------------- |
-| `entries`       | object[]      | `{ "search", "replacement" }` pairs applied in order.          |
-| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — applies to **every** pair. |
-| `caseSensitive` | bool          | Matching flag for all pairs.                                   |
-| `replaceAll`    | bool          | Replace all matches per pair.                                  |
-| `wholeWord`     | bool          | Whole-word restriction for all pairs.                          |
+| Property  | Type     | Description                                                                                       |
+| --------- | -------- | ------------------------------------------------------------------------------------------------- |
+| `entries` | object[] | `{ "search", "replacement" }` pairs applied in order.                                             |
+| `match`   | object   | Shared match policy (`mode`, `caseSensitive`, `replaceAll`, `wholeWord`) — same shape as Replacer |
+
+### Match (`match`)
+
+| Property        | Type          | Description                                                              |
+| --------------- | ------------- | ------------------------------------------------------------------------ |
+| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — applies to **every** pair.           |
+| `caseSensitive` | bool          | Matching flag for all pairs.                                             |
+| `replaceAll`    | bool          | Replace all matches per pair.                                            |
+| `wholeWord`     | bool          | Whole-word restriction for all pairs. Default: `true` (unlike Replacer). |
 
 ## Editor text format
 
@@ -57,10 +63,12 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
       { "search": "a", "replacement": "b" },
       { "search": ".", "replacement": "_" }
     ],
-    "mode": "Literal",
-    "caseSensitive": true,
-    "replaceAll": true,
-    "wholeWord": true
+    "match": {
+      "mode": "Literal",
+      "caseSensitive": true,
+      "replaceAll": true,
+      "wholeWord": true
+    }
   }
 }
 ```

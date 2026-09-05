@@ -259,10 +259,12 @@ namespace Mfr.Tests.Engine
                 Options: new ReplacerOptions(
                     Find: find,
                     Replacement: replacement,
-                    Mode: ReplacerMode.Literal,
-                    CaseSensitive: true,
-                    ReplaceAll: false,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: false,
+                        WholeWord: false
+                    )
                 )
             );
         }

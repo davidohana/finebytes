@@ -13,7 +13,7 @@
   x:DataType="vm:ReplacerFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
-    <controls:ReplacerModeFieldset x:Name="ModeFieldset" GroupName="ReplacerMode" />
+    <controls:ReplacerModeFieldset x:Name="ModeFieldset" GroupName="ReplacerMode" DataContext="{Binding Match}" />
     <controls:FieldsetGroup Header="Find / Replace">
       <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
         <controls:FilterEditorLabeledRow
@@ -42,6 +42,6 @@
         </controls:FilterEditorLabeledRow>
       </StackPanel>
     </controls:FieldsetGroup>
-    <controls:ReplacerMatchOptionsFieldset x:Name="MatchOptionsFieldset" />
+    <controls:ReplacerMatchOptionsFieldset x:Name="MatchOptionsFieldset" DataContext="{Binding Match}" />
   </StackPanel>
 </UserControl>

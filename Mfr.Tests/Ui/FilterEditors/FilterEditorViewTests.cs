@@ -886,16 +886,16 @@ namespace Mfr.Tests.Ui.FilterEditors
             var filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.Equal("dog", filter.Options.Find);
             Assert.Equal("cat", filter.Options.Replacement);
-            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Mode);
-            Assert.True(filter.Options.CaseSensitive);
-            Assert.False(filter.Options.ReplaceAll);
-            Assert.True(filter.Options.WholeWord);
+            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Match.Mode);
+            Assert.True(filter.Options.Match.CaseSensitive);
+            Assert.False(filter.Options.Match.ReplaceAll);
+            Assert.True(filter.Options.Match.WholeWord);
 
             regex.IsChecked = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
             filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            Assert.Equal(ReplacerMode.Regex, filter.Options.Mode);
+            Assert.Equal(ReplacerMode.Regex, filter.Options.Match.Mode);
             Assert.Equal(@"\((.+)\)", find.Watermark);
             Assert.Equal("$1", replacement.Watermark);
 
@@ -958,10 +958,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal("b", filter.Options.Entries[0].Replacement);
             Assert.Equal(".", filter.Options.Entries[1].Search);
             Assert.Equal("_", filter.Options.Entries[1].Replacement);
-            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Mode);
-            Assert.True(filter.Options.CaseSensitive);
-            Assert.False(filter.Options.ReplaceAll);
-            Assert.False(filter.Options.WholeWord);
+            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Match.Mode);
+            Assert.True(filter.Options.Match.CaseSensitive);
+            Assert.False(filter.Options.Match.ReplaceAll);
+            Assert.False(filter.Options.Match.WholeWord);
 
             window.Close();
         }

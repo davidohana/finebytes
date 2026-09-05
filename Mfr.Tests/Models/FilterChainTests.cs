@@ -35,10 +35,12 @@ namespace Mfr.Tests.Models
                     Options: new ReplacerOptions(
                         "a",
                         "x",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: true,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: true,
+                            WholeWord: false
+                        )
                     )
                 ),
                 new ReplacerFilter(
@@ -46,10 +48,12 @@ namespace Mfr.Tests.Models
                     Options: new ReplacerOptions(
                         "b",
                         "y",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: true,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: true,
+                            WholeWord: false
+                        )
                     )
                 ),
             ]);
