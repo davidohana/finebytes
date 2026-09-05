@@ -102,5 +102,20 @@ namespace Mfr.Tests.Models.Filters.Space
             );
             Assert.Equal("a-b", FilterTestHelpers.ApplyToPrefix(f, "a++b"));
         }
+
+        /// <summary>
+        /// Verifies an undefined Other separator fails setup (MFR7 parity).
+        /// </summary>
+        [Fact]
+        public void Setup_UndefinedSpaceCharacter_ThrowsUserException()
+        {
+            var f = new SpaceCharacterFilter(
+                _target,
+                new SpaceCharacterOptions(SpaceCharacter: '\0', Replacements: SpaceCharacterOptions.DefaultReplacements)
+            );
+
+            var ex = Assert.Throws<UserException>(f.Setup);
+            Assert.Equal("Space character not defined", ex.Message);
+        }
     }
 }

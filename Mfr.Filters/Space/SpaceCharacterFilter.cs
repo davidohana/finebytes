@@ -3,7 +3,10 @@ namespace Mfr.Filters.Space
     /// <summary>
     /// Options for defining the word-separator character and mapping common separators to it.
     /// </summary>
-    /// <param name="SpaceCharacter">Single character used as the word separator for later filters.</param>
+    /// <param name="SpaceCharacter">
+    /// Single character used as the word separator for later filters. Use <c>\0</c> only for an incomplete
+    /// Other definition (rejected in <see cref="SpaceCharacterFilter"/> setup).
+    /// </param>
     /// <param name="Replacements">Substrings replaced with the space character, applied in list order.</param>
     public sealed record SpaceCharacterOptions(char SpaceCharacter, IReadOnlyList<string> Replacements)
     {
@@ -45,6 +48,17 @@ namespace Mfr.Filters.Space
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "SpaceCharacter";
+
+        /// <summary>
+        /// Rejects an undefined Other separator (MFR7 <c>Space character not defined</c>).
+        /// </summary>
+        protected override void _Setup()
+        {
+            if (Options.SpaceCharacter == '\0')
+            {
+                throw new UserException("Space character not defined");
+            }
+        }
 
         protected override string _TransformValue(string value, RenameItem item)
         {

@@ -48,7 +48,7 @@ Editor now uses `CasingListParser.ParseEditorText` / `FormatEditorText`. Keep do
 
 ### 7. Space Character MFR7 empty-Other validation — **done**
 
-Editor skips apply when Other + empty (keeps last valid options; no silent `' '` fallback). MFR7 rejects undefined custom space at apply time.
+Empty Other persists `\0`; filter `_Setup` throws `UserException` ("Space character not defined") so preview shows errors instead of silently keeping the last separator or falling back to `' '`.
 
 ### 8. `CountFilterOptions.ClampToLength` helper — **medium**
 

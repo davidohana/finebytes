@@ -127,8 +127,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Other with an empty character box does not apply (MFR7 rejects undefined custom space at
-        /// apply time). Live preview keeps the last valid options instead of silently falling back to U+0020 SPACE.
+        /// Other with an empty character box persists <c>\0</c>. <see cref="SpaceCharacterFilter"/> setup then
+        /// throws (MFR7 message) so preview shows an error instead of silently falling back to U+0020 SPACE.
         /// </para>
         /// </remarks>
         private void _ApplyOptions()
@@ -138,12 +138,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                 return;
             }
 
-            if (!_TryResolveSpaceCharacter(out var spaceCharacter))
-            {
-                return;
-            }
-
-            var options = new SpaceCharacterOptions(SpaceCharacter: spaceCharacter, Replacements: _BuildReplacements());
+            var options = new SpaceCharacterOptions(
+                SpaceCharacter: _ResolveSpaceCharacter(),
+                Replacements: _BuildReplacements()
+            );
             ApplyIfChanged(filter, filter with { Options = options });
         }
 
@@ -205,33 +203,19 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         /// <summary>
         /// Resolves the separator character from definition radios and the Other text box.
         /// </summary>
-        /// <param name="spaceCharacter">Word separator to persist when resolution succeeds.</param>
         /// <returns>
-        /// <see langword="true"/> when the definition is complete; <see langword="false"/> when Other is selected
-        /// with an empty character (do not persist).
+        /// Word separator to persist; Other with an empty box yields <c>\0</c> (rejected at filter setup).
         /// </returns>
-        private bool _TryResolveSpaceCharacter(out char spaceCharacter)
+        private char _ResolveSpaceCharacter()
         {
-            if (Definition == SpaceCharacterDefinition.Space)
+            return Definition switch
             {
-                spaceCharacter = ' ';
-                return true;
-            }
-
-            if (Definition == SpaceCharacterDefinition.Underscore)
-            {
-                spaceCharacter = '_';
-                return true;
-            }
-
-            if (Definition == SpaceCharacterDefinition.Other && OtherCharacter.Length > 0)
-            {
-                spaceCharacter = OtherCharacter[0];
-                return true;
-            }
-
-            spaceCharacter = default;
-            return false;
+                SpaceCharacterDefinition.Space => ' ',
+                SpaceCharacterDefinition.Underscore => '_',
+                SpaceCharacterDefinition.Other when OtherCharacter.Length > 0 => OtherCharacter[0],
+                SpaceCharacterDefinition.Other => '\0',
+                _ => '\0',
+            };
         }
 
         /// <summary>
@@ -240,7 +224,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         /// <param name="spaceCharacter">Separator from <see cref="SpaceCharacterOptions.SpaceCharacter"/>.</param>
         /// <returns>
         /// The matching <see cref="SpaceCharacterDefinition"/> and a one-character string when the definition is
-        /// <see cref="SpaceCharacterDefinition.Other"/>; otherwise an empty string.
+        /// <see cref="SpaceCharacterDefinition.Other"/>; otherwise an empty string. <c>\0</c> maps to Other with
+        /// an empty box.
         /// </returns>
         private static (SpaceCharacterDefinition Definition, string OtherCharacter) _ResolveDefinition(
             char spaceCharacter
@@ -250,6 +235,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
             {
                 ' ' => (SpaceCharacterDefinition.Space, string.Empty),
                 '_' => (SpaceCharacterDefinition.Underscore, string.Empty),
+                '\0' => (SpaceCharacterDefinition.Other, string.Empty),
                 var other => (SpaceCharacterDefinition.Other, other.ToString()),
             };
         }

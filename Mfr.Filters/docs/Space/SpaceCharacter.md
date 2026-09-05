@@ -6,6 +6,7 @@ Sets the **word separator** character for the rest of the rename pass and option
 
 - **`spaceCharacter`** (string or char)
   - **Single** character that becomes the word separator (first character used if a longer string is sent).
+  - Empty / undefined Other (NUL) fails setup with **Space character not defined** (MFR7 parity).
 - **`replacements`** (array of strings)
   - Each listed substring is replaced with `spaceCharacter`, in array order.
   - Built-in choices map to `"%20"`, `" "` (U+0020 SPACE), and `"_"`.
