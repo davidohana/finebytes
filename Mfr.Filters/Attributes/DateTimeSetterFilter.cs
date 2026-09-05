@@ -22,9 +22,18 @@ namespace Mfr.Filters.Attributes
     /// Sets the calendar date and/or time-of-day for creation, last write, or last access time.
     /// </summary>
     /// <param name="Options">Timestamp field and optional date/time values.</param>
+    /// <remarks>
+    /// <para>
+    /// Calendar dates should stay in the Windows file-time range <c>1601-01-01</c>..<c>9999-12-31</c>.
+    /// Out-of-range dates are ignored at apply time so preview/commit cannot request illegal timestamps.
+    /// </para>
+    /// </remarks>
     [FilterPalette(FilterGroup.Attributes, "Date/Time Setter")]
     public sealed record DateTimeSetterFilter(DateTimeSetterOptions Options) : BaseFilter
     {
+        private static readonly DateOnly s_MinFileDate = new(1601, 1, 1);
+        private static readonly DateOnly s_MaxFileDate = new(9999, 12, 31);
+
         /// <summary>
         /// Creates a filter with defaults (last write; date and time both on, today/now).
         /// </summary>
@@ -50,6 +59,11 @@ namespace Mfr.Filters.Attributes
                 return;
             }
 
+            if (Options.SetDate && !_IsValidFileDate(Options.Date))
+            {
+                return;
+            }
+
             TimestampFields.Update(item.Preview, Options.TimestampField, _Apply);
         }
 
@@ -70,6 +84,11 @@ namespace Mfr.Filters.Attributes
             }
 
             return result;
+        }
+
+        private static bool _IsValidFileDate(DateOnly date)
+        {
+            return date >= s_MinFileDate && date <= s_MaxFileDate;
         }
     }
 }

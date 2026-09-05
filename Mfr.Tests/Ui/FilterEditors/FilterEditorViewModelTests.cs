@@ -671,6 +671,90 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies illegal clock times are not applied and the text reverts to the last valid value.
+        /// </summary>
+        [Fact]
+        public void Date_time_setter_rejects_illegal_time_and_reverts_text()
+        {
+            var step = new AppliedFilterStepViewModel(
+                "Date/Time Setter",
+                new DateTimeSetterFilter(
+                    Options: new DateTimeSetterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        SetDate: true,
+                        Date: new DateOnly(2020, 12, 25),
+                        SetTime: true,
+                        Time: new TimeOnly(23, 19, 1)
+                    )
+                )
+            );
+            var editor = new DateTimeSetterFilterEditorViewModel(step) { TimeText = "25:19:01" };
+
+            Assert.Equal("23:19:01", editor.TimeText);
+            var options = ((DateTimeSetterFilter)step.Filter).Options;
+            Assert.Equal(new TimeOnly(23, 19, 1), options.Time);
+            Assert.Equal(new DateOnly(2020, 12, 25), options.Date);
+        }
+
+        /// <summary>
+        /// Verifies non-calendar dates and pre-file-time years are not applied and text reverts.
+        /// </summary>
+        [Fact]
+        public void Date_time_setter_rejects_illegal_date_and_reverts_text()
+        {
+            var step = new AppliedFilterStepViewModel(
+                "Date/Time Setter",
+                new DateTimeSetterFilter(
+                    Options: new DateTimeSetterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        SetDate: true,
+                        Date: new DateOnly(2020, 12, 25),
+                        SetTime: true,
+                        Time: new TimeOnly(9, 0, 15)
+                    )
+                )
+            );
+            var editor = new DateTimeSetterFilterEditorViewModel(step) { DateText = "2024-02-30" };
+            Assert.Equal("2020-12-25", editor.DateText);
+            Assert.Equal(new DateOnly(2020, 12, 25), ((DateTimeSetterFilter)step.Filter).Options.Date);
+
+            editor.DateText = "1600-12-31";
+            Assert.Equal("2020-12-25", editor.DateText);
+            Assert.Equal(new DateOnly(2020, 12, 25), ((DateTimeSetterFilter)step.Filter).Options.Date);
+        }
+
+        /// <summary>
+        /// Verifies date-only edits still apply when time is unchecked even if time text is illegal.
+        /// </summary>
+        [Fact]
+        public void Date_time_setter_set_date_ignores_illegal_time_when_time_unchecked()
+        {
+            var step = new AppliedFilterStepViewModel(
+                "Date/Time Setter",
+                new DateTimeSetterFilter(
+                    Options: new DateTimeSetterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        SetDate: true,
+                        Date: new DateOnly(2020, 12, 25),
+                        SetTime: false,
+                        Time: new TimeOnly(9, 0, 15)
+                    )
+                )
+            );
+            var editor = new DateTimeSetterFilterEditorViewModel(step)
+            {
+                TimeText = "25:19:01",
+                DateText = "2019-01-01",
+            };
+
+            var options = ((DateTimeSetterFilter)step.Filter).Options;
+            Assert.Equal(new DateOnly(2019, 1, 1), options.Date);
+            Assert.False(options.SetTime);
+            Assert.Equal(new TimeOnly(9, 0, 15), options.Time);
+            Assert.Equal("25:19:01", editor.TimeText);
+        }
+
+        /// <summary>
         /// Verifies Time Shifter option edits replace the step filter options.
         /// </summary>
         [Fact]
@@ -750,7 +834,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies Attributes Setter tri-state checkbox edits replace the step filter options.
+        /// Verifies Attributes Setter On/Off/Keep radio edits replace the step filter options.
         /// </summary>
         [Fact]
         public void Attributes_setter_options_update_step_options()
@@ -758,10 +842,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             var step = new AppliedFilterStepViewModel("Attributes Setter", new AttributesSetterFilter());
             var editor = new AttributesSetterFilterEditorViewModel(step);
 
-            Assert.Null(editor.ReadOnlyChecked);
-            Assert.Null(editor.HiddenChecked);
-            Assert.Null(editor.ArchiveChecked);
-            Assert.Null(editor.SystemChecked);
+            Assert.Equal(AttributeTriState.Keep, editor.ReadOnly);
+            Assert.Equal(AttributeTriState.Keep, editor.Hidden);
+            Assert.Equal(AttributeTriState.Keep, editor.Archive);
+            Assert.Equal(AttributeTriState.Keep, editor.System);
 
             var defaults = ((AttributesSetterFilter)step.Filter).Options;
             Assert.Equal(AttributeTriState.Keep, defaults.ReadOnly);
@@ -769,10 +853,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(AttributeTriState.Keep, defaults.Archive);
             Assert.Equal(AttributeTriState.Keep, defaults.System);
 
-            editor.HiddenChecked = true;
-            editor.ArchiveChecked = false;
-            editor.ReadOnlyChecked = true;
-            editor.SystemChecked = null;
+            editor.Hidden = AttributeTriState.Set;
+            editor.Archive = AttributeTriState.Clear;
+            editor.ReadOnly = AttributeTriState.Set;
+            editor.System = AttributeTriState.Keep;
 
             var options = ((AttributesSetterFilter)step.Filter).Options;
             Assert.Equal(AttributeTriState.Set, options.ReadOnly);
