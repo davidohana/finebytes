@@ -33,5 +33,40 @@ namespace Mfr.Filters.Attributes
         {
             return date >= Min && date <= Max;
         }
+
+        /// <summary>
+        /// Clamps <paramref name="value"/>'s calendar date into <see cref="Min"/>..<see cref="Max"/>.
+        /// </summary>
+        /// <param name="value">Candidate timestamp (time-of-day and <see cref="DateTime.Kind"/> are kept).</param>
+        /// <returns>
+        /// <paramref name="value"/> unchanged when in range; otherwise the nearer range endpoint with the same
+        /// time-of-day and kind.
+        /// </returns>
+        public static DateTime Clamp(DateTime value)
+        {
+            var date = DateOnly.FromDateTime(value);
+            if (IsInRange(date))
+            {
+                return value;
+            }
+
+            var limit = date < Min ? Min : Max;
+            return limit.ToDateTime(TimeOnly.FromDateTime(value), value.Kind);
+        }
+
+        /// <summary>
+        /// Builds a timestamp on <see cref="Min"/> or <see cref="Max"/> with the given time-of-day and kind.
+        /// </summary>
+        /// <param name="towardMax">
+        /// When <see langword="true"/>, uses <see cref="Max"/>; otherwise <see cref="Min"/>.
+        /// </param>
+        /// <param name="time">Time-of-day to keep.</param>
+        /// <param name="kind"><see cref="DateTime.Kind"/> for the result.</param>
+        /// <returns>Endpoint date combined with <paramref name="time"/>.</returns>
+        public static DateTime AtBound(bool towardMax, TimeOnly time, DateTimeKind kind)
+        {
+            var limit = towardMax ? Max : Min;
+            return limit.ToDateTime(time, kind);
+        }
     }
 }

@@ -26,6 +26,7 @@ This doc lists **not done** work only.
 - Date + Time Setter → one `DateTimeSetter` filter + editor (#24)
 - Attributes Setter radios bind `AttributeTriState` directly (#29)
 - `FileTimestampDateLimits` shared range owner (#30)
+- Time Shifter overflow: clamp via `FileTimestampDateLimits` (no throw on ±10M spinner amounts)
 - Per-editor Filter Configuration test suites under `Mfr.Tests/Ui/FilterEditors/<Group>/` (master after #24–#30)
 - Shared timestamp-field combo catalog on `TimestampFieldChoice` (autofix)
 - Tag Remover block-kind catalog UI (`AudioTagBlockKindChoice` + row VMs + `ItemsControl`)
@@ -36,13 +37,9 @@ This doc lists **not done** work only.
 
 - Shipped: `AudioTagBlockKindChoice` + `TagRemoverBlockRowViewModel` + `ItemsControl` over rows; selection = `IsSelected` → `Blocks` list.
 
-### 2. Time Shifter DateTime overflow policy — **medium / high**
+### 2. Time Shifter DateTime overflow policy — **done**
 
-- **Sites:** `TimeShifterFilter._Shift` (`AddMonths` / `AddYears` / …); editor ±10M spinners
-- **Target:** catch/clamp out-of-range `Add*` in domain (no-op or clamp), and/or unit-aware UI maxes; optionally reuse `FileTimestampDateLimits` when the shifted calendar date would leave the product range
-- **Value:** preview/apply never throws on legal spinner input; closes commit failure modes
-- **Cost:** medium (behavior choice + filter tests); editor-only tighter max is smaller but weaker
-- **Rank:** medium–high — harden when touching Attributes filters again
+- Shipped: `_Shift` catches `Add*` overflow and clamps via `FileTimestampDateLimits.Clamp` / `AtBound` (spinner ±10M kept; domain owns safety).
 
 ### 3. Shared timestamp-field RichToolTip resource — **medium**
 

@@ -61,6 +61,13 @@ namespace Mfr.Filters.Attributes
     /// Shifts creation, last write, or last access time by an amount in the chosen unit.
     /// </summary>
     /// <param name="Options">Timestamp field, amount, and unit.</param>
+    /// <remarks>
+    /// <para>
+    /// Shifted calendar dates are clamped to <see cref="FileTimestampDateLimits.Min"/>..<see cref="FileTimestampDateLimits.Max"/>.
+    /// When <c>DateTime.Add*</c> throws (amount too large for the unit or result outside <see cref="DateTime"/>),
+    /// the field is set to the nearer product-range endpoint with the current time-of-day preserved.
+    /// </para>
+    /// </remarks>
     [FilterPalette(FilterGroup.Attributes, "Time Shifter")]
     public sealed record TimeShifterFilter(TimeShifterOptions Options) : BaseFilter
     {
@@ -85,18 +92,40 @@ namespace Mfr.Filters.Attributes
             );
         }
 
+        /// <summary>
+        /// Applies the unit shift, then clamps into the product file-timestamp date range.
+        /// </summary>
         private static DateTime _Shift(DateTime current, int amount, TimeShiftUnit unit)
         {
-            return unit switch
+            if (amount == 0)
             {
-                TimeShiftUnit.Seconds => current.AddSeconds(amount),
-                TimeShiftUnit.Minutes => current.AddMinutes(amount),
-                TimeShiftUnit.Hours => current.AddHours(amount),
-                TimeShiftUnit.Days => current.AddDays(amount),
-                TimeShiftUnit.Months => current.AddMonths(amount),
-                TimeShiftUnit.Years => current.AddYears(amount),
-                _ => throw new UnreachableException(),
-            };
+                return current;
+            }
+
+            DateTime shifted;
+            try
+            {
+                shifted = unit switch
+                {
+                    TimeShiftUnit.Seconds => current.AddSeconds(amount),
+                    TimeShiftUnit.Minutes => current.AddMinutes(amount),
+                    TimeShiftUnit.Hours => current.AddHours(amount),
+                    TimeShiftUnit.Days => current.AddDays(amount),
+                    TimeShiftUnit.Months => current.AddMonths(amount),
+                    TimeShiftUnit.Years => current.AddYears(amount),
+                    _ => throw new UnreachableException(),
+                };
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return FileTimestampDateLimits.AtBound(
+                    towardMax: amount > 0,
+                    time: TimeOnly.FromDateTime(current),
+                    kind: current.Kind
+                );
+            }
+
+            return FileTimestampDateLimits.Clamp(shifted);
         }
     }
 }

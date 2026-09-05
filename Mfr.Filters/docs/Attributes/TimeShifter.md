@@ -10,6 +10,8 @@ Choose which timestamp field to edit with the `timestampField` property inside `
 
 `unit` values: `seconds`, `minutes`, `hours`, `days`, `months`, `years` (calendar months and years use `DateTime.AddMonths` / `AddYears`).
 
+Shifted calendar dates stay inside the shared product range (`1601-01-01`..`2100-12-31`, same as Date/Time Setter). If the shift would leave that range — or `DateTime.Add*` throws because the amount/result is out of range — the field is clamped to the nearer endpoint and the original time-of-day is kept.
+
 Preview updates the corresponding `DateTime` on `FileMeta`; commit applies the filesystem APIs when the preview differs from the scan-time original.
 
 ## Examples
