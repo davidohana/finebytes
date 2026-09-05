@@ -1,4 +1,8 @@
-<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+>
   <Styles.Resources>
     <ResourceDictionary>
       <ResourceDictionary.ThemeDictionaries>
@@ -11,6 +15,12 @@
           <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#F0F0F0" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
+      <!-- x:Shared=False: each ComboBox needs its own tip visual (one parent). -->
+      <controls:RichToolTip x:Key="TimestampFieldComboTip" x:Shared="False">
+        <TextBlock Classes="rich-tip-bullet" Text="• Creation: file/folder creation time." />
+        <TextBlock Classes="rich-tip-bullet" Text="• Last Write: last modified time." />
+        <TextBlock Classes="rich-tip-bullet" Text="• Last Access: last accessed time." />
+      </controls:RichToolTip>
     </ResourceDictionary>
   </Styles.Resources>
 

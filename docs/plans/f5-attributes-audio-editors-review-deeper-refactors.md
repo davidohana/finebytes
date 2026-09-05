@@ -30,6 +30,7 @@ This doc lists **not done** work only.
 - Per-editor Filter Configuration test suites under `Mfr.Tests/Ui/FilterEditors/<Group>/` (master after #24–#30)
 - Shared timestamp-field combo catalog on `TimestampFieldChoice` (autofix)
 - Tag Remover block-kind catalog UI (`AudioTagBlockKindChoice` + row VMs + `ItemsControl`)
+- Shared timestamp-field RichToolTip (`TimestampFieldComboTip` in `FilterEditor.axaml`)
 
 ## Ranked follow-ups (best cost-to-value first)
 
@@ -41,13 +42,9 @@ This doc lists **not done** work only.
 
 - Shipped: `_Shift` catches `Add*` overflow and clamps via `FileTimestampDateLimits.Clamp` / `AtBound` (spinner ±10M kept; domain owns safety).
 
-### 3. Shared timestamp-field RichToolTip resource — **medium**
+### 3. Shared timestamp-field RichToolTip resource — **done**
 
-- **Sites:** identical Creation / Last Write / Last Access bullets in `DateTimeSetterFilterEditorView.axaml` and `TimeShifterFilterEditorView.axaml`
-- **Target:** one tip resource or small tip control used by both
-- **Value:** closes tip-text drift
-- **Cost:** low–medium AXAML; weak until a tip wording change is needed
-- **Rank:** medium — later / ride along
+- Shipped: `TimestampFieldComboTip` in `Themes/FilterEditor.axaml` (`x:Shared="False"`); Date/Time Setter + Time Shifter combo tips bind `{StaticResource TimestampFieldComboTip}`.
 
 ### 4. AudioTagBlockKind UI display names — **partial / medium**
 

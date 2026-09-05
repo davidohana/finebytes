@@ -25,15 +25,8 @@
             HorizontalAlignment="Left"
             ItemsSource="{Binding TimestampFields}"
             SelectedItem="{Binding SelectedTimestampField}"
-          >
-            <ToolTip.Tip>
-              <controls:RichToolTip>
-                <TextBlock Classes="rich-tip-bullet" Text="• Creation: file/folder creation time." />
-                <TextBlock Classes="rich-tip-bullet" Text="• Last Write: last modified time." />
-                <TextBlock Classes="rich-tip-bullet" Text="• Last Access: last accessed time." />
-              </controls:RichToolTip>
-            </ToolTip.Tip>
-          </ComboBox>
+            ToolTip.Tip="{StaticResource TimestampFieldComboTip}"
+          />
         </controls:FilterEditorLabeledRow>
         <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="6">
           <controls:CompactCheckBox
