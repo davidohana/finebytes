@@ -1,0 +1,45 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Formatting"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="160"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Formatting.FormatterFilterEditorView"
+  x:DataType="vm:FormatterFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="4">
+        <ToolTip.Tip>
+          <controls:RichToolTip>
+            <TextBlock Classes="rich-tip-title" Text="Pattern that replaces the target field." />
+            <TextBlock
+              Classes="rich-tip-body"
+              Text="Literals plus formatting parameters such as &lt;file-name&gt; or &lt;counter:…&gt;. Tokens resolve from the current file/folder context when the filter runs."
+            />
+            <TextBlock
+              Classes="rich-tip-bullet"
+              Text="• Example: &lt;counter:initial=1,step=1&gt;.&lt;image-width&gt;x&lt;image-height&gt;"
+            />
+          </controls:RichToolTip>
+        </ToolTip.Tip>
+        <TextBlock Classes="filter-editor-label" Text="Format string:" />
+        <TextBox
+          x:Name="TemplateBox"
+          Classes="filter-editor-field-wrap"
+          MinWidth="240"
+          MinHeight="64"
+          AcceptsReturn="True"
+          MaxLength="2000"
+          Watermark="&lt;file-name&gt;"
+          Text="{Binding Template}"
+        />
+        <controls:FilterEditorHint Text="Literals plus formatting parameters such as &lt;file-name&gt;." />
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>

@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around + Capitalize After + Sentence End + Strip Parentheses + Cleaner + Counter + Inserter + Casing List + Replace List + Name List + Replacer + Token Mover + Mover + Date/Time Setter + Time Shifter + Attributes Setter + Audio Tag Remover + Audio Tag Setter + ID3v2 Field Setter done. Next: Formatter (own sub-project; last)."
+overview: "F1–F4 shipped. F5 option editors complete through Formatter (format-string box; token picker deferred). Preset/session/help polish still out of scope."
 todos:
   - id: f1-f4
     content: "F1–F4: ctors, Applied list, Filter Options/Apply To, Space Character + Letters Case"
@@ -78,8 +78,8 @@ todos:
     content: "F5 ID3v2 Field Setter"
     status: completed
   - id: f5-formatter
-    content: "F5 Formatter — token builder (own sub-project; last)"
-    status: pending
+    content: "F5 Formatter — format-string box (token picker deferred)"
+    status: completed
 isProject: false
 ---
 
@@ -87,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-05):** F5 ID3v2 Field Setter done. **Next: F5 Formatter** (own sub-project; last). Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-05):** F5 Formatter done (format-string box only; rich token/FormatEditor UX deferred). All F5 option editors registered. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ## Already shipped (F1–F4)
 
@@ -229,7 +229,7 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 - **21 (done)** — Audio Tag Remover (Audio) — all / block types
 - **22 (done)** — Audio Tag Setter (Audio) — per-field format specs
 - **23 (done)** — ID3v2 Field Setter (Audio) — frame + value
-- **last** — Formatter (Formatting) — format string + token UI — own sub-project
+- **last (done)** — Formatter (Formatting) — format-string box; token catalog / FormatEditor UX deferred
 
 **Corrections vs older F5a–f batches:** Shrink Duplicate is **not** count-style; **Trim Between** was missing from the batch list; Fix Leading 0's is its own richer editor.
 
@@ -242,7 +242,7 @@ Select that filter in Applied → Filter Configuration shows its options; edits 
 - Preset load/save UI; session persist of the working chain
 - Instance rename heart/reset; filter help `?`
 - Filter Options XAML polish ([handover](../filter-options-dialog-ui-handover.md))
-- Formatter token catalog UX beyond a minimal format-string box (defer rich builder to the Formatter pass)
+- Formatter rich token/FormatEditor UX (catalog, insert, parse-error jump) — format-string box shipped
 
 ______________________________________________________________________
 

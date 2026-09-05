@@ -53,6 +53,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 InserterFilter => new InserterFilterEditorViewModel(step),
                 NameListFilter => new NameListFilterEditorViewModel(step),
                 TokenMoverFilter => new TokenMoverFilterEditorViewModel(step),
+                FormatterFilter => new FormatterFilterEditorViewModel(step),
                 DateTimeSetterFilter => new DateTimeSetterFilterEditorViewModel(step),
                 TimeShifterFilter => new TimeShifterFilterEditorViewModel(step),
                 AttributesSetterFilter => new AttributesSetterFilterEditorViewModel(step),
