@@ -85,7 +85,6 @@ namespace Mfr.Filters.Replace
         {
             ArgumentNullException.ThrowIfNull(entries);
 
-            var maxLen = ConfigStore.Config.Filters.MaxListFileLineLength;
             for (var i = 0; i < entries.Count; i++)
             {
                 var index = i + 1;
@@ -97,17 +96,8 @@ namespace Mfr.Filters.Replace
                     throw new UserException($"Replace-list entry {index}: search cannot be empty.");
                 }
 
-                if (search.Length > maxLen)
-                {
-                    throw new UserException($"Replace-list entry {index}: search exceeds maximum length ({maxLen}).");
-                }
-
-                if (replacement.Length > maxLen)
-                {
-                    throw new UserException(
-                        $"Replace-list entry {index}: replacement exceeds maximum length ({maxLen})."
-                    );
-                }
+                ListEntryLength.ThrowIfTooLong(search, $"Replace-list entry {index}: search");
+                ListEntryLength.ThrowIfTooLong(replacement, $"Replace-list entry {index}: replacement");
             }
 
             return entries;

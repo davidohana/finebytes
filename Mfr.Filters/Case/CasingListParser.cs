@@ -15,7 +15,6 @@ namespace Mfr.Filters.Case
             ArgumentNullException.ThrowIfNull(words);
 
             var lowerWordToCasing = new Dictionary<string, string>(StringComparer.Ordinal);
-            var maxWordLen = ConfigStore.Config.Filters.MaxListFileLineLength;
             for (var i = 0; i < words.Count; i++)
             {
                 var word = words[i];
@@ -25,10 +24,7 @@ namespace Mfr.Filters.Case
                     throw new UserException($"Casing-list word {index} cannot be empty.");
                 }
 
-                if (word.Length > maxWordLen)
-                {
-                    throw new UserException($"Casing-list word {index} exceeds maximum length ({maxWordLen}).");
-                }
+                ListEntryLength.ThrowIfTooLong(word, $"Casing-list word {index}");
 
                 if (word.Any(char.IsWhiteSpace))
                 {

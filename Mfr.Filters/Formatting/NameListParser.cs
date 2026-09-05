@@ -69,15 +69,9 @@ namespace Mfr.Filters.Formatting
         {
             entries ??= [];
 
-            var maxLen = ConfigStore.Config.Filters.MaxListFileLineLength;
             for (var i = 0; i < entries.Count; i++)
             {
-                var index = i + 1;
-                var line = entries[i];
-                if (line.Length > maxLen)
-                {
-                    throw new UserException($"Name-list entry {index} exceeds maximum length ({maxLen}).");
-                }
+                ListEntryLength.ThrowIfTooLong(entries[i], $"Name-list entry {i + 1}");
             }
 
             return entries;
