@@ -2,7 +2,7 @@ using Mfr.Filters.Case;
 
 namespace Mfr.Tests.Models.Filters.Case
 {
-    public class CapitalizeAfterFilterTests
+    public sealed class CapitalizeAfterFilterTests
     {
         private readonly FilterTarget _target = new FilePrefixTarget();
 
@@ -24,6 +24,14 @@ namespace Mfr.Tests.Models.Filters.Case
 
             Assert.Equal("hello.World_Again", FilterTestHelpers.ApplyToPrefix(filter, "hello.world_again"));
             Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(filter, "a,b")); // , is not in custom set
+        }
+
+        [Fact]
+        public void Apply_EmptyChars_LeavesUnchanged()
+        {
+            var filter = new CapitalizeAfterFilter(_target, new CapitalizeAfterOptions(CapitalizeAfterChars: ""));
+
+            Assert.Equal("hello,world", FilterTestHelpers.ApplyToPrefix(filter, "hello,world"));
         }
 
         [Fact]
