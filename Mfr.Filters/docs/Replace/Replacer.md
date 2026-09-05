@@ -4,14 +4,14 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 
 ## Options
 
-| Property        | Type          | Description                                                           |
-| --------------- | ------------- | --------------------------------------------------------------------- |
-| `find`          | string        | Search pattern (meaning depends on `mode`). Empty → no-op.            |
+| Property        | Type          | Description                                                                                                       |
+| --------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `find`          | string        | Search pattern (meaning depends on `mode`). Empty → no-op.                                                        |
 | `replacement`   | string        | Replacement text. In `Regex` mode, `$0` / `$1`… are substitutions; in `Literal` / `Wildcard` they are plain text. |
-| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — see **Modes**.                    |
-| `caseSensitive` | bool          | Match case when searching.                                            |
-| `replaceAll`    | bool          | If `true`, replace every match; if `false`, only the **first** match. |
-| `wholeWord`     | bool          | Restrict matches to whole words (word boundaries).                    |
+| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — see **Modes**.                                                                |
+| `caseSensitive` | bool          | Match case when searching.                                                                                        |
+| `replaceAll`    | bool          | If `true`, replace every match; if `false`, only the **first** match.                                             |
+| `wholeWord`     | bool          | Restrict matches to whole words (word boundaries).                                                                |
 
 ### Modes (`mode`)
 

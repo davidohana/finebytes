@@ -40,13 +40,19 @@ Do **not** batch unrelated filters. File-list / audio / Formatter stay separate 
 ## Location and naming
 
 - **VM** — `Mfr.App.Ui/ViewModels/FilterEditors/<FilterGroup>/YourFilterEditorViewModel.cs`
+
 - **View** — `Mfr.App.Ui/Views/FilterEditors/<FilterGroup>/YourFilterEditorView.axaml` (+ `.cs`)
+
 - **Factory** — `Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs` (root)
+
 - **ViewLocator** — `FilterEditorViewLocator` — prefix-replace; no edit if naming matches
+
 - **Tests** — `Mfr.Tests/Ui/FilterEditors/FilterEditorViewModelTests.cs` + `FilterEditorViewTests.cs`
 
 - Namespace / `x:Class` must match folder (`…FilterEditors.Trimming`, etc.).
+
 - Shared editor for multiple filters: one VM/view name that describes the shared surface (e.g. `SpaceTrigger…`, `Count…`); factory maps each filter type to it.
+
 - Root `FilterEditors/` holds base VMs, factory, host, ViewLocator only — not per-filter editors.
 
 ## ViewModel pattern

@@ -560,7 +560,7 @@ namespace Mfr.Tests.Ui.FilterEditors
                 )
             );
             var step = new AppliedFilterStepViewModel("Replace List", filter);
-            var editor = new ReplaceListFilterEditorViewModel(step)
+            _ = new ReplaceListFilterEditorViewModel(step)
             {
                 Mode = ReplacerMode.Regex,
                 CaseSensitive = true,

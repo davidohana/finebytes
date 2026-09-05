@@ -39,11 +39,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Options_clamp_spinner_bounds()
         {
             var step = new AppliedFilterStepViewModel("Token Mover", new TokenMoverFilter());
-            var editor = new TokenMoverFilterEditorViewModel(step)
-            {
-                TokenNumber = 0,
-                MoveBy = -1000
-            };
+            var editor = new TokenMoverFilterEditorViewModel(step) { TokenNumber = 0, MoveBy = -1000 };
 
             var options = ((TokenMoverFilter)step.Filter).Options;
             Assert.Equal(1, options.TokenNumber);

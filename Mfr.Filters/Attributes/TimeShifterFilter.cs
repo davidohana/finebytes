@@ -78,21 +78,11 @@ namespace Mfr.Filters.Attributes
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
         {
-            var preview = item.Preview;
-            switch (Options.TimestampField)
-            {
-                case TimestampField.Creation:
-                    preview.CreationTime = _Shift(preview.CreationTime, Options.Amount, Options.Unit);
-                    break;
-                case TimestampField.LastWrite:
-                    preview.LastWriteTime = _Shift(preview.LastWriteTime, Options.Amount, Options.Unit);
-                    break;
-                case TimestampField.LastAccess:
-                    preview.LastAccessTime = _Shift(preview.LastAccessTime, Options.Amount, Options.Unit);
-                    break;
-                default:
-                    throw new UnreachableException();
-            }
+            TimestampFields.Update(
+                item.Preview,
+                Options.TimestampField,
+                current => _Shift(current, Options.Amount, Options.Unit)
+            );
         }
 
         private static DateTime _Shift(DateTime current, int amount, TimeShiftUnit unit)

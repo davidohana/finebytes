@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace Mfr.Filters.Attributes
@@ -37,21 +36,11 @@ namespace Mfr.Filters.Attributes
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
         {
-            var preview = item.Preview;
-            switch (Options.TimestampField)
-            {
-                case TimestampField.Creation:
-                    preview.CreationTime = _SetTimePreserveDate(preview.CreationTime, Options.Time);
-                    break;
-                case TimestampField.LastWrite:
-                    preview.LastWriteTime = _SetTimePreserveDate(preview.LastWriteTime, Options.Time);
-                    break;
-                case TimestampField.LastAccess:
-                    preview.LastAccessTime = _SetTimePreserveDate(preview.LastAccessTime, Options.Time);
-                    break;
-                default:
-                    throw new UnreachableException();
-            }
+            TimestampFields.Update(
+                item.Preview,
+                Options.TimestampField,
+                current => _SetTimePreserveDate(current, Options.Time)
+            );
         }
 
         /// <summary>

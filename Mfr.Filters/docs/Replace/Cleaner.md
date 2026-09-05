@@ -4,11 +4,11 @@ Replaces **invalid file-name characters** (optional) and any **custom** characte
 
 ## Options
 
-| Property              | Type   | Description                                                                 |
-| --------------------- | ------ | --------------------------------------------------------------------------- |
+| Property              | Type   | Description                                                                                        |
+| --------------------- | ------ | -------------------------------------------------------------------------------------------------- |
 | `removeIllegalChars`  | bool   | If `true`, characters illegal in Windows file names are replaced (fixed set, host OS independent). |
-| `customCharsToRemove` | string | Extra characters to replace (can be empty).                                 |
-| `replacement`         | string | Substitute for each removed character (can be empty to delete).             |
+| `customCharsToRemove` | string | Extra characters to replace (can be empty).                                                        |
+| `replacement`         | string | Substitute for each removed character (can be empty to delete).                                    |
 
 If there is nothing to remove, the segment is unchanged.
 

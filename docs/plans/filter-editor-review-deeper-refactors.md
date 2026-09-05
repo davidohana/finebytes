@@ -18,12 +18,9 @@ Synthesized from per-filter worktree reviews and [cross-editor dedup explore](ht
 
 ## Ranked follow-ups (best cost-to-value first)
 
-### 1. Shared timestamp ApplyCore mutator — **high**
+### 1. Shared timestamp ApplyCore mutator — **done**
 
-- **Sites:** `DateSetterFilter.ApplyCore`, `TimeSetterFilter.ApplyCore`, `TimeShifterFilter.ApplyCore`
-- **Target:** e.g. `TimestampFields.Update(preview, field, Func<DateTime, DateTime>)`
-- **Value:** delete three identical field switches; close drift before Time Shifter editor
-- **Cost:** low risk; Attributes-only; ~20–40 LOC
+`TimestampFields.Update` owns the Creation / LastWrite / LastAccess switch; Date Setter, Time Setter, and Time Shifter pass field-specific transforms.
 
 ### 2. Shared `ReplacerMatchOptions` record — **high**
 
@@ -94,37 +91,37 @@ Editor now uses `CasingListParser.ParseEditorText` / `FormatEditorText`. Keep do
 
 ## Explicit non-goals / skip
 
-| Idea | Why skip |
-|------|----------|
+| Idea                                              | Why skip                                                       |
+| ------------------------------------------------- | -------------------------------------------------------------- |
 | Merge Counter ↔ Inserter ↔ Token Mover “position” | Different models (placement enum vs char index vs token index) |
-| Merge Replacer + Replace List into one editor | Primary surfaces differ; mode/match already shared |
-| Unify Space After/Around option JSON schema | Editor already shared; persist key rename for little gain |
-| Merge four Count filters into one type + enum | High JSON/palette/docs churn |
-| Merge Date + Time Setter filter types | Product/schema pass — not a review cleanup |
-| Shared single-char editor VM | Only Shrink Dup today; weak until a second identical editor |
-| Force-merge list parsers (Name/Replace/Casing) | Intentional blank / `=>` / whitespace semantics differ |
-| Non-regex `CharacterRunHelpers` rewrite | Micro-gain; shared Shrink Spaces risk |
+| Merge Replacer + Replace List into one editor     | Primary surfaces differ; mode/match already shared             |
+| Unify Space After/Around option JSON schema       | Editor already shared; persist key rename for little gain      |
+| Merge four Count filters into one type + enum     | High JSON/palette/docs churn                                   |
+| Merge Date + Time Setter filter types             | Product/schema pass — not a review cleanup                     |
+| Shared single-char editor VM                      | Only Shrink Dup today; weak until a second identical editor    |
+| Force-merge list parsers (Name/Replace/Casing)    | Intentional blank / `=>` / whitespace semantics differ         |
+| Non-regex `CharacterRunHelpers` rewrite           | Micro-gain; shared Shrink Spaces risk                          |
 
 ## PR index (this review pass)
 
-| PR | Filter / area |
-|----|----------------|
-| #4 | Counter |
-| #6 | Replace List |
-| #7 | Name List |
-| #8 | Replacer |
-| #9 | Inserter |
-| #10 | Token Mover |
-| #11 | Date/Time Setter |
-| #12 | Space Character |
-| #13 | Trim Between |
+| PR  | Filter / area     |
+| --- | ----------------- |
+| #4  | Counter           |
+| #6  | Replace List      |
+| #7  | Name List         |
+| #8  | Replacer          |
+| #9  | Inserter          |
+| #10 | Token Mover       |
+| #11 | Date/Time Setter  |
+| #12 | Space Character   |
+| #13 | Trim Between      |
 | #14 | Strip Parentheses |
-| #15 | Casing List |
-| #16 | Character List |
-| #17 | Space Trigger |
-| #18 | Letters Case |
-| #19 | Count L/R |
-| #20 | Shrink Duplicate |
-| #21 | Cleaner |
+| #15 | Casing List       |
+| #16 | Character List    |
+| #17 | Space Trigger     |
+| #18 | Letters Case      |
+| #19 | Count L/R         |
+| #20 | Shrink Duplicate  |
+| #21 | Cleaner           |
 | #22 | Fix Leading Zeros |
-| #23 | Mover |
+| #23 | Mover             |
