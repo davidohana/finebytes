@@ -1,4 +1,5 @@
 using System.Globalization;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
@@ -214,17 +215,45 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 
         private void _RevertDateText(DateTimeSetterFilter filter)
         {
-            LoadWithoutApplying(() =>
-            {
-                DateText = filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture);
-            });
+            var restored = filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture);
+            LoadWithoutApplying(() => DateText = restored);
+            _NudgeBoundText(() => DateText, value => DateText = value, restored);
         }
 
         private void _RevertTimeText(DateTimeSetterFilter filter)
         {
-            LoadWithoutApplying(() =>
+            var restored = filter.Options.Time.ToString(TimeFormat, CultureInfo.InvariantCulture);
+            LoadWithoutApplying(() => TimeText = restored);
+            _NudgeBoundText(() => TimeText, value => TimeText = value, restored);
+        }
+
+        /// <summary>
+        /// Re-pushes a restored value after the current TwoWay TextBox write settles.
+        /// </summary>
+        /// <remarks>
+        /// Avalonia can ignore a same-stack source write while applying a TextBox edit; posting a
+        /// clear-then-restore forces the bound control to show the reverted value.
+        /// </remarks>
+        private void _NudgeBoundText(Func<string> getText, Action<string> setText, string restored)
+        {
+            Dispatcher.UIThread.Post(() =>
             {
-                TimeText = filter.Options.Time.ToString(TimeFormat, CultureInfo.InvariantCulture);
+                if (IsLoading)
+                {
+                    return;
+                }
+
+                LoadWithoutApplying(() =>
+                {
+                    if (getText() != restored)
+                    {
+                        setText(restored);
+                        return;
+                    }
+
+                    setText(string.Empty);
+                    setText(restored);
+                });
             });
         }
 
