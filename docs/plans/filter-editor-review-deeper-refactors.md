@@ -26,12 +26,9 @@ Synthesized from per-filter worktree reviews and [cross-editor dedup explore](ht
 
 `ReplacerOptions` / `ReplaceListOptions` nest one `match` record (Mode + CaseSensitive + ReplaceAll + WholeWord); editor VMs share `ReplacerMatchOptionsEditor`. Defaults: Replacer `WholeWord` false, Replace List true.
 
-### 3. Sentence End side-effect outside scoped transform — **high**
+### 3. Sentence End side-effect outside scoped transform — **done**
 
-- **Sites:** `SentenceEndCharactersFilter._TransformValue` + `StringApplyScopeTransform` early return on out-of-range token
-- **Target:** always set `SentenceEndChars` in `ApplyCore` (or ignore ApplyScope / drop `StringTargetFilter`)
-- **Value:** matches MFR7 “state only” semantics; closes missed-token bug
-- **Cost:** medium (inheritance / sealed ApplyCore, tests)
+`SentenceEndCharactersFilter` is a state-only `BaseFilter` (no `Target` / `ApplyScope`); `ApplyCore` always sets `SentenceEndChars`.
 
 ### 4. Isolate remaining editor tests like Mover — **high / medium**
 

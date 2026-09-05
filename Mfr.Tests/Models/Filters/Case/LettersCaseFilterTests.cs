@@ -199,10 +199,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_SentenceCase_UsesConfiguredSentenceEndCharacters()
         {
-            var sentenceEndFilter = new SentenceEndCharactersFilter(
-                _target,
-                new SentenceEndCharactersOptions(Characters: ":;")
-            );
+            var sentenceEndFilter = new SentenceEndCharactersFilter(new SentenceEndCharactersOptions(Characters: ":;"));
             var lettersFilter = new LettersCaseFilter(
                 _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, [])
@@ -221,10 +218,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_SentenceCase_WithNoSentenceEndCharacters_CapitalizesOnlyStart()
         {
-            var sentenceEndFilter = new SentenceEndCharactersFilter(
-                _target,
-                new SentenceEndCharactersOptions(Characters: "")
-            );
+            var sentenceEndFilter = new SentenceEndCharactersFilter(new SentenceEndCharactersOptions(Characters: ""));
             var lettersFilter = new LettersCaseFilter(
                 _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, [])
@@ -243,10 +237,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_SentenceCase_IgnoresSentenceEndCharsMatchingSeparator()
         {
-            var sentenceEndFilter = new SentenceEndCharactersFilter(
-                _target,
-                new SentenceEndCharactersOptions(Characters: ". ")
-            );
+            var sentenceEndFilter = new SentenceEndCharactersFilter(new SentenceEndCharactersOptions(Characters: ". "));
             var lettersFilter = new LettersCaseFilter(
                 _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, [])

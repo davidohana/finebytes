@@ -12,39 +12,31 @@ namespace Mfr.Filters.Case
     public sealed record SentenceEndCharactersOptions(string Characters = ".!?");
 
     /// <summary>
-    /// Defines which characters separate sentences for later filters in the chain. Does not change the target text.
+    /// Defines which characters separate sentences for later filters in the chain. Does not change any target text.
+    /// <para>
+    /// State-only (like MFR7): no <see cref="FilterTarget"/> or <see cref="StringApplyScope"/> — always updates
+    /// <see cref="RenameItem.SentenceEndChars"/> when the filter runs.
+    /// </para>
     /// </summary>
-    /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Sentence-end character list.</param>
-    /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     [FilterPalette(FilterGroup.Case, "Sentence End Characters")]
-    public sealed record SentenceEndCharactersFilter(
-        FilterTarget Target,
-        SentenceEndCharactersOptions Options,
-        StringApplyScope? ApplyScope = null
-    ) : StringTargetFilter(Target, ApplyScope)
+    public sealed record SentenceEndCharactersFilter(SentenceEndCharactersOptions Options) : BaseFilter
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, MFR7 sentence-end character set).
+        /// Creates a filter with MFR7 add-to-list defaults (MFR7 sentence-end character set).
         /// </summary>
         public SentenceEndCharactersFilter()
-            : this(new FilePrefixTarget(), new SentenceEndCharactersOptions(Characters: "-.!")) { }
+            : this(new SentenceEndCharactersOptions(Characters: "-.!")) { }
 
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "SentenceEndCharacters";
 
-        /// <summary>
-        /// Updates <see cref="RenameItem.SentenceEndChars"/> and returns the segment unchanged.
-        /// </summary>
-        /// <param name="value">Input text segment (unchanged).</param>
-        /// <param name="item">Rename item whose sentence-end settings are updated.</param>
-        /// <returns>The same <paramref name="value"/> value.</returns>
-        protected override string _TransformValue(string value, RenameItem item)
+        /// <inheritdoc />
+        protected internal override void ApplyCore(RenameItem item)
         {
             item.SentenceEndChars = Options.Characters;
-            return value;
         }
     }
 }

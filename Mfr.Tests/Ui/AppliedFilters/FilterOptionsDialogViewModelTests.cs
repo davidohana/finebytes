@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
 using Mfr.Models.Tags;
@@ -42,6 +43,20 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.False(dialog.HasApplyTo);
 
             Assert.Null(dialog.SelectedTargetOption);
+        }
+
+        /// <summary>
+        /// Verifies Sentence End Characters hides Apply-To (state-only filter).
+        /// </summary>
+        [Fact]
+        public void Dialog_hides_apply_to_for_sentence_end_characters()
+        {
+            var step = new AppliedFilterStepViewModel("Sentence End Characters", new SentenceEndCharactersFilter());
+
+            var dialog = new FilterOptionsDialogViewModel(step);
+
+            Assert.False(dialog.HasApplyTo);
+            Assert.Empty(step.ApplyToLabel);
         }
 
         /// <summary>
