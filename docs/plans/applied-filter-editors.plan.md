@@ -67,7 +67,7 @@ todos:
     status: pending
   - id: f5-attributes-setter
     content: "F5 Attributes Setter"
-    status: pending
+    status: completed
   - id: f5-tag-remover
     content: "F5 Audio Tag Remover"
     status: pending
@@ -87,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-05):** F5 Mover + Date Setter + Time Setter done. **Next: F5 Time Shifter**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-05):** F5 Mover + Date Setter + Time Setter + Attributes Setter done. **Next: F5 Time Shifter**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ## Already shipped (F1–F4)
 
@@ -225,7 +225,7 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 - **17 (done)** — **Mover** (Misc) — root folder + optional sub-folder template (formatter tokens / `\`)
 - **18 (done)** — **Date + Time Setter** (Attributes) — Date Setter, Time Setter; shared timestamp-field picker; date vs time value
 - **19 (next)** — Time Shifter (Attributes) — field + amount + unit (not grouped with setters)
-- **20** — Attributes Setter (Attributes) — attribute flags
+- **20 (done)** — Attributes Setter (Attributes) — attribute flags
 - **21** — Audio Tag Remover (Audio) — all / block types
 - **22** — Audio Tag Setter (Audio) — per-field format specs
 - **23** — ID3v2 Field Setter (Audio) — frame + value
