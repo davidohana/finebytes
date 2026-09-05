@@ -177,7 +177,7 @@ ______________________________________________________________________
 | **9** Original Refresh      | F5 `RefreshOriginals`, missing-on-disk gray, shuttle OrderedDraft + DnD                                                                           |
 | **10a–10d** Preview core    | `ToChain()` → `Preview()` always-on + Auto-Preview toggle; re-preview on membership / F5; status counts                                           |
 | **11** Preview highlighting | Red changed cells, lavender preview-error rows, Show Preview Error                                                                                |
-| **12** Preview metadata     | Extended dates/attrs + AudioTag `ReadWriteApply` preview cols; First*/TagTypes/Image/Jpeg stay original-only                                      |
+| **12** Preview metadata     | Extended dates/attrs + AudioTag `ReadWriteApply` preview cols; First\*/TagTypes/Image/Jpeg stay original-only                                     |
 | **13** Hygiene              | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                 |
 | **14a** Remove Unchanged    | Preview-column header menu → `RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                       |
 
@@ -194,7 +194,7 @@ After **10a–10d**. Enable **preview** column variants for catalog fields that 
 | Group                          | Preview columns                                                              | Why                                                                                                                                                                                                                                                       |
 | ------------------------------ | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Extended** (File Properties) | **Creation Date**, **Last Write Date**, **Last Access Date**, **Attributes** | **Done (12a).** MFR7 `PropertyType.ReadWrite`. `DateTimeSetter` / `TimeShifter` write `item.Preview.CreationTime` / `LastWriteTime` / `LastAccessTime`; attributes filters write preview attrs. Size / Folder File Count stay original-only (`ReadOnly`). |
-| **AudioTag** (ID3 etc.)        | Writable tag fields (27)                                                     | **Done.** MFR7 `ReadWriteApply` — First* + Tag Types stay `ReadOnly`.                                                                                                                                                                                     |
+| **AudioTag** (ID3 etc.)        | Writable tag fields (27)                                                     | **Done.** MFR7 `ReadWriteApply` — First\* + Tag Types stay `ReadOnly`.                                                                                                                                                                                    |
 | **Image / Jpeg**               | None in this phase                                                           | MFR7 EXIF incl. Date/Time Taken is `ReadOnly` — originals only (Phase 6).                                                                                                                                                                                 |
 
 Shuttle **Preview** tab lists every field with `SupportsPreview` that is not already visible as a preview column (same rule as today for Basic).
@@ -202,7 +202,7 @@ Shuttle **Preview** tab lists every field with `SupportsPreview` that is not alr
 ### Work
 
 - **Catalog (12a done):** Extended dates/attrs are no longer `OriginalOnlyRenameListField` / `supportsPreview: false`. Preview key resolve uses **preview** `FileMeta` (dates via existing `FormatFileDate`); original columns keep original meta. Size / Folder File Count stay original-only.
-- **Catalog (AudioTag done):** semantic fields `supportsPreview: true`; First* + Tag Types remain original-only.
+- **Catalog (AudioTag done):** semantic fields `supportsPreview: true`; First\* + Tag Types remain original-only.
 - **Grid / red cells:** Phase 11 highlighting already compares original vs preview text — once preview cols exist, Date/Time Setter / Audio Tag Setter changes show red on the matching preview column.
 - **Tests:** DateTimeSetter → Creation preview; Attributes preview; Size non-previewable; AudioTagSetter → Title preview; Jpeg DateTaken non-previewable; shuttle Preview tab counts.
 - **14c/14d note:** MFR7 Free Names / Manual Rename require `ReadWriteApply` — Extended dates are `ReadWrite` only (preview yes, Free-Edit / F2 no). Do not invent `SupportsWrite` for dates here; AudioTag semantic fields that are `ReadWriteApply` get write when 14c ships.

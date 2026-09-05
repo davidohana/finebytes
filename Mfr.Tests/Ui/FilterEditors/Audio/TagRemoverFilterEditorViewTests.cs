@@ -52,7 +52,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.False(id3v2.IsChecked);
 
             var filter = (TagRemoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            Assert.True(filter.Options.All);
+            Assert.False(filter.Options.All);
+            Assert.Empty(filter.Options.Blocks ?? []);
 
             id3v1.IsChecked = true;
             window.UpdateLayout();
@@ -67,9 +68,10 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Dispatcher.UIThread.RunJobs();
 
             filter = (TagRemoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            Assert.True(filter.Options.All);
-            Assert.True(removeAll.IsChecked);
-            Assert.False(editorVm.AreBlockTypesEnabled);
+            Assert.False(filter.Options.All);
+            Assert.Empty(filter.Options.Blocks ?? []);
+            Assert.False(removeAll.IsChecked);
+            Assert.True(editorVm.AreBlockTypesEnabled);
 
             window.Close();
         }

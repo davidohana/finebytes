@@ -28,7 +28,7 @@
               />
               <TextBlock
                 Classes="rich-tip-bullet"
-                Text="• Unchecked: remove only the selected block types below (unmodeled types stay on disk)."
+                Text="• Unchecked: remove only the selected block types below (none selected = remove nothing)."
               />
               <TextBlock Classes="rich-tip-bullet" Text="• Tag removal cannot be undone with the app Undo control." />
             </controls:RichToolTip>
@@ -46,7 +46,7 @@
                 Classes="rich-tip-body"
                 Text="Select which modeled tag blocks to delete when not removing all tags."
               />
-              <TextBlock Classes="rich-tip-bullet" Text="• At least one type is required in selective mode." />
+              <TextBlock Classes="rich-tip-bullet" Text="• None selected: leave tags unchanged (no-op)." />
               <TextBlock
                 Classes="rich-tip-bullet"
                 Text="• Naming a block the file’s container cannot hold is a preview error."

@@ -51,24 +51,22 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
                 return;
             }
 
-            // Leaving nuclear does not seed every block kind (no container supports all seven).
-            // Stay on nuclear options until the user checks at least one type.
+            if (value)
+            {
+                LoadWithoutApplying(_ClearBlockSelections);
+            }
+
             _ApplyOptions();
         }
 
         /// <summary>
-        /// Snaps empty selective mode back to nuclear, then applies options.
+        /// Applies selective block selection (empty selection is a no-op, not nuclear).
         /// </summary>
         private void _OnBlockChanged()
         {
             if (IsLoading)
             {
                 return;
-            }
-
-            if (!RemoveAll && !_AnyBlockSelected())
-            {
-                LoadWithoutApplying(() => RemoveAll = true);
             }
 
             _ApplyOptions();
@@ -88,10 +86,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             {
                 var all = filter.Options.All;
                 var blocks = filter.Options.Blocks ?? [];
-                if (!all && blocks.Count == 0)
-                {
-                    all = true;
-                }
 
                 RemoveAll = all;
                 if (all)
@@ -125,25 +119,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             }
             else
             {
-                var blocks = _SelectedBlocks();
-                if (blocks.Count == 0)
-                {
-                    // Selective UI with nothing checked yet — keep nuclear options on the step.
-                    return;
-                }
-
-                options = new TagRemoverOptions(All: false, Blocks: blocks);
+                // Empty selection is intentional no-op (matches unchecked = leave tags alone).
+                options = new TagRemoverOptions(All: false, Blocks: _SelectedBlocks());
             }
 
             ApplyIfChanged(filter, filter with { Options = options });
-        }
-
-        /// <summary>
-        /// Returns whether any selective block checkbox is checked.
-        /// </summary>
-        private bool _AnyBlockSelected()
-        {
-            return BlockRows.Any(row => row.IsSelected);
         }
 
         /// <summary>

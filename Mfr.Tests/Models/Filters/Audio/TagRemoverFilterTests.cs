@@ -29,15 +29,33 @@ namespace Mfr.Tests.Models.Filters.Audio
         }
 
         /// <summary>
-        /// Verifies an empty block list with <c>all</c> false is rejected as a misconfigured preset.
+        /// Verifies an empty block list with <c>all</c> false is a no-op (Setup succeeds, Apply does nothing).
         /// </summary>
         [Fact]
-        public void Setup_EmptyBlocks_WithoutAll_ThrowsArgumentException()
+        public void Apply_EmptyBlocks_WithoutAll_IsNoOp()
         {
+            var meta = new FileMeta(
+                0,
+                0,
+                @"C:\Music",
+                "x",
+                ".wav",
+                renameListTotalCount: 1,
+                renameListFolderSiblingCount: 1
+            )
+            {
+                AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "KeepMe"),
+            };
+
+            var item = new RenameItem(meta);
+            item.MarkTagLibLoadAttempted();
             var filter = new TagRemoverFilter(new TagRemoverOptions(Blocks: []));
 
-            var ex = Assert.Throws<ArgumentException>(filter.Setup);
-            Assert.Contains("at least one tag block type", ex.Message, StringComparison.Ordinal);
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.False(item.StripAllEmbeddedTagsOnCommit);
+            Assert.Equal("KeepMe", item.Preview.AudioTagOverlay.Semantic().Title);
         }
 
         /// <summary>

@@ -77,7 +77,7 @@ Each filter in a preset has:
 - **SentenceEndCharacters** has no `target`; it only updates rename-item sentence-end characters for later filters ([SentenceEndCharacters](Case/SentenceEndCharacters.md)).
 - **AudioTagSetter** has no `target`; it updates multiple embedded audio tag fields from `options` ([AudioTagSetter](Audio/AudioTagSetter.md)).
 - **Id3v2FieldSetter** has no `target`; it sets one modeled ID3v2 frame from `options.frameId` / `text` / optional `onlyIfEmpty` ([Id3v2FieldSetter](Audio/Id3v2FieldSetter.md)).
-- **TagRemover** has no `target`; `options.all` is a nuclear TagLib wipe (including unmodeled types such as XMP), or `options.blocks` lists selected modeled types to delete ([TagRemover](Audio/TagRemover.md)).
+- **TagRemover** has no `target`; `options.all` is a nuclear TagLib wipe (including unmodeled types such as XMP), or `options.blocks` lists selected modeled types to delete (empty/omitted with `all` false = no-op) ([TagRemover](Audio/TagRemover.md)).
 - `options` — optional object; filters with no settings omit it.
 
 Property names use **camelCase**; enum values usually match the C# names (e.g. `Capitalize`, `Literal`).

@@ -165,7 +165,7 @@ Dedicated audio filters:
 
 - `AudioTagSetter` — multi-field semantic set (no target)
 - `Id3v2FieldSetter` — one modeled ID3v2 frame (`frameId`, `text`, optional `onlyIfEmpty` / `language` / `description`); no target. String filters with an `Id3v2Frame` target remain valid for transforms without `onlyIfEmpty`.
-- `TagRemover` — null selected blocks (`options.blocks`), or clear all + strip on commit (`options.all`)
+- `TagRemover` — null selected blocks (`options.blocks`; empty = no-op), or clear all + strip on commit (`options.all`)
 - `SetFromFreeDB` — still product-scoped separately
 
 ## ID3v2 rules

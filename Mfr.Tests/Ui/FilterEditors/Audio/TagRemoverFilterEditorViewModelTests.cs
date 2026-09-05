@@ -28,11 +28,13 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.True(editor.AreBlockTypesEnabled);
             Assert.False(_Row(editor, AudioTagBlockKind.Id3v1).IsSelected);
             Assert.False(_Row(editor, AudioTagBlockKind.Id3v2).IsSelected);
-            // Selective UI with no blocks yet keeps nuclear options on the step.
-            Assert.True(((TagRemoverFilter)step.Filter).Options.All);
+            // Unchecked Remove-all with no blocks → selective no-op (not hidden nuclear).
+            var options = ((TagRemoverFilter)step.Filter).Options;
+            Assert.False(options.All);
+            Assert.Empty(options.Blocks ?? []);
 
             _Row(editor, AudioTagBlockKind.Id3v1).IsSelected = true;
-            var options = ((TagRemoverFilter)step.Filter).Options;
+            options = ((TagRemoverFilter)step.Filter).Options;
             Assert.False(options.All);
             Assert.Equal([AudioTagBlockKind.Id3v1], options.Blocks);
 
@@ -47,9 +49,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.Equal([AudioTagBlockKind.Id3v1], options.Blocks);
 
             _Row(editor, AudioTagBlockKind.Id3v1).IsSelected = false;
-            Assert.True(editor.RemoveAll);
-            Assert.False(editor.AreBlockTypesEnabled);
-            Assert.True(((TagRemoverFilter)step.Filter).Options.All);
+            Assert.False(editor.RemoveAll);
+            Assert.True(editor.AreBlockTypesEnabled);
+            options = ((TagRemoverFilter)step.Filter).Options;
+            Assert.False(options.All);
+            Assert.Empty(options.Blocks ?? []);
         }
 
         /// <summary>
@@ -72,14 +76,16 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
 
             editor.RemoveAll = false;
             Assert.False(_Row(editor, AudioTagBlockKind.Id3v2).IsSelected);
-            Assert.True(((TagRemoverFilter)step.Filter).Options.All);
+            var options = ((TagRemoverFilter)step.Filter).Options;
+            Assert.False(options.All);
+            Assert.Empty(options.Blocks ?? []);
         }
 
         /// <summary>
-        /// Verifies empty selective options normalize to nuclear on sync.
+        /// Verifies empty selective options stay selective (no-op) on sync.
         /// </summary>
         [Fact]
-        public void Tag_remover_empty_selective_options_sync_as_nuclear()
+        public void Tag_remover_empty_selective_options_sync_as_noop()
         {
             var step = new AppliedFilterStepViewModel(
                 "Audio Tag Remover",
@@ -87,8 +93,9 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             );
             var editor = new TagRemoverFilterEditorViewModel(step);
 
-            Assert.True(editor.RemoveAll);
-            Assert.False(editor.AreBlockTypesEnabled);
+            Assert.False(editor.RemoveAll);
+            Assert.True(editor.AreBlockTypesEnabled);
+            Assert.All(editor.BlockRows, row => Assert.False(row.IsSelected));
         }
 
         /// <summary>

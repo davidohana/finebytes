@@ -39,11 +39,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Id3v2_field_setter_options_update_step_options()
         {
             var step = new AppliedFilterStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
-            var editor = new Id3v2FieldSetterFilterEditorViewModel(step)
+            _ = new Id3v2FieldSetterFilterEditorViewModel(step)
             {
                 SelectedFrame = Id3v2FrameChoice.For("TALB"),
                 Text = "<file-name>",
-                OnlyIfEmpty = true
+                OnlyIfEmpty = true,
             };
 
             var options = ((Id3v2FieldSetterFilter)step.Filter).Options;
@@ -63,7 +63,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             var step = new AppliedFilterStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
             var editor = new Id3v2FieldSetterFilterEditorViewModel(step)
             {
-                SelectedFrame = Id3v2FrameChoice.For("COMM")
+                SelectedFrame = Id3v2FrameChoice.For("COMM"),
             };
             Assert.True(editor.ShowsLanguage);
             Assert.True(editor.ShowsDescription);

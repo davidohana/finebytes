@@ -11,7 +11,7 @@ Removes embedded tag blocks — either **selected** types, or a **nuclear** wipe
   - Preview: Nulls each listed block
   - Commit: `RemoveTags` for those types only; surviving blocks stay writable by later filters
 
-When `all` is true, `blocks` is ignored. When `all` is false (or omitted), `blocks` must list at least one type.
+When `all` is true, `blocks` is ignored. When `all` is false (or omitted) and `blocks` is missing or empty, the filter is a **no-op** (nothing removed).
 
 Removing a tag type also deletes content the overlay does not model on that block, such as **embedded art**. **You cannot undo this with the app's Undo control**—only filesystem or backup restore.
 
@@ -41,7 +41,7 @@ So for a normal MP3/FLAC/M4A that only carries modeled blocks, `all: true` and `
 
 - **`all`** (boolean) — When `true`, nuclear strip (see above). Default `false`.
 - **`blocks`** (array of strings)
-  - Tag block types to remove when `all` is false. At least one entry required unless `all` is true.
+  - Tag block types to remove when `all` is false. Empty or omitted → no-op.
 
 Valid `blocks` values and the containers that can hold them:
 

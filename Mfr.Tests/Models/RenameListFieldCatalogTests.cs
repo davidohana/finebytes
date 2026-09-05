@@ -9,7 +9,6 @@ using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
 using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
-using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Models
 {

@@ -17,7 +17,7 @@ namespace Mfr.Filters.Audio
     /// <param name="Blocks">
     /// Tag block types to drop when <paramref name="All"/> is <see langword="false"/>, by JSON name
     /// (<c>id3v1</c>, <c>id3v2</c>, <c>xiph</c>, <c>ape</c>, <c>apple</c>, <c>asf</c>, <c>riffInfo</c>).
-    /// At least one entry is required unless <paramref name="All"/> is <see langword="true"/>.
+    /// Empty or omitted with <paramref name="All"/> false is a no-op (nothing removed).
     /// Listing every modeled kind is still not a nuclear strip: unmodeled TagLib types stay on disk.
     /// </param>
     public sealed record TagRemoverOptions(
@@ -62,27 +62,6 @@ namespace Mfr.Filters.Audio
 
         /// <inheritdoc />
         public override string Type => "TagRemover";
-
-        /// <inheritdoc />
-        /// <exception cref="ArgumentException">
-        /// <c>all</c> is false and <c>blocks</c> is missing or empty, which would make the filter a no-op.
-        /// </exception>
-        protected override void _Setup()
-        {
-            if (Options.All)
-            {
-                return;
-            }
-
-            var blocks = Options.Blocks ?? [];
-            if (blocks.Count == 0)
-            {
-                throw new ArgumentException(
-                    "TagRemover requires at least one tag block type in 'blocks' when 'all' is false.",
-                    nameof(Options)
-                );
-            }
-        }
 
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
