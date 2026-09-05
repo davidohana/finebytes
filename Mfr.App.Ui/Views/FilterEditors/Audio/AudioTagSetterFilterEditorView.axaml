@@ -6,14 +6,14 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Audio"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
-  d:DesignWidth="480"
-  d:DesignHeight="640"
+  d:DesignWidth="560"
+  d:DesignHeight="480"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Audio.AudioTagSetterFilterEditorView"
   x:DataType="vm:AudioTagSetterFilterEditorViewModel"
 >
   <UserControl.Resources>
     <DataTemplate x:Key="AudioTagSetterFieldRowTemplate" x:DataType="vm:AudioTagSetterFieldRowViewModel">
-      <Grid>
+      <Grid Margin="0,0,8,4">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="6" />
@@ -30,7 +30,7 @@
           IsChecked="{Binding IsActive}"
           ToolTip.Tip="{Binding Tip}"
           Tag="{Binding Kind}"
-          VerticalAlignment="Top"
+          VerticalAlignment="Center"
         />
         <TextBlock
           Grid.Column="2"
@@ -42,17 +42,17 @@
         <Panel Grid.Column="4">
           <TextBox
             Classes="filter-editor-field"
-            MinWidth="160"
+            MinWidth="100"
             Watermark="{Binding Watermark}"
             Text="{Binding Text}"
             Tag="{Binding Kind}"
             ToolTip.Tip="{Binding Tip}"
             IsVisible="{Binding ShowsPlainText}"
-            VerticalAlignment="Top"
+            VerticalAlignment="Center"
           />
           <ComboBox
             Classes="filter-editor-field"
-            MinWidth="160"
+            MinWidth="100"
             HorizontalAlignment="Stretch"
             IsEditable="True"
             PlaceholderText="{Binding Watermark}"
@@ -61,7 +61,7 @@
             Tag="{Binding Kind}"
             ToolTip.Tip="{Binding Tip}"
             IsVisible="{Binding UsesGenreCombo}"
-            VerticalAlignment="Top"
+            VerticalAlignment="Center"
           />
           <TextBox
             Classes="filter-editor-field-wrap"
@@ -73,7 +73,7 @@
             Tag="{Binding Kind}"
             ToolTip.Tip="{Binding Tip}"
             IsVisible="{Binding Multiline}"
-            VerticalAlignment="Top"
+            VerticalAlignment="Center"
           />
         </Panel>
         <controls:CompactCheckBox
@@ -119,19 +119,32 @@
                 <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: leave the field unchanged." />
               </controls:RichToolTip>
             </ToolTip.Tip>
-            <ItemsControl
-              ItemsSource="{Binding Rows}"
-              ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
-            >
-              <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                  <StackPanel Spacing="4" />
-                </ItemsPanelTemplate>
-              </ItemsControl.ItemsPanel>
-            </ItemsControl>
+            <StackPanel Spacing="4">
+              <ItemsControl
+                ItemsSource="{Binding CompactRows}"
+                ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
+              >
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <UniformGrid Columns="2" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+              <ItemsControl
+                ItemsSource="{Binding FullWidthRows}"
+                ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
+              >
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Spacing="4" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+            </StackPanel>
           </controls:FieldsetGroup>
         </DataTemplate>
       </ItemsControl.ItemTemplate>
     </ItemsControl>
+    <controls:FilterEditorHint Text="Gray a checkbox (indeterminate) to set that field only when it is currently empty." />
   </StackPanel>
 </UserControl>

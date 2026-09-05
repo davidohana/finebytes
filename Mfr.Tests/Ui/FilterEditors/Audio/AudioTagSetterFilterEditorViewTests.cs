@@ -1,5 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Layout;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
@@ -97,15 +99,28 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Dispatcher.UIThread.RunJobs();
 
             var editor = editorView.GetVisualDescendants().OfType<AudioTagSetterFilterEditorView>().Single();
-            var bpmBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.BeatsPerMinute);
+            var performersBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.Performers);
+            var titleBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.Title);
             var albumArtistsBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.AlbumArtists);
             var genreCombo = _FindVisibleFieldComboBox(editor, AudioTagSetterFieldKind.Genre);
+            var lyricsCheck = _FindFieldCheckBox(editor, AudioTagSetterFieldKind.Lyrics);
+            var lyricsBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.Lyrics);
 
-            Assert.True(bpmBox.Bounds.Width > 1 && albumArtistsBox.Bounds.Width > 1);
-            Assert.Equal(albumArtistsBox.Bounds.X, bpmBox.Bounds.X, precision: 0);
-            Assert.Equal(albumArtistsBox.Bounds.X, genreCombo.Bounds.X, precision: 0);
+            Assert.True(performersBox.Bounds.Width > 1 && titleBox.Bounds.Width > 1);
+            Assert.Equal(_LeftInEditor(editor, performersBox), _LeftInEditor(editor, titleBox), precision: 0);
+            Assert.Equal(_LeftInEditor(editor, albumArtistsBox), _LeftInEditor(editor, genreCombo), precision: 0);
+            Assert.True(_LeftInEditor(editor, albumArtistsBox) > _LeftInEditor(editor, performersBox));
+            Assert.Equal(VerticalAlignment.Center, lyricsCheck.VerticalAlignment);
+            Assert.True(lyricsBox.Bounds.Width > performersBox.Bounds.Width);
 
             window.Close();
+        }
+
+        private static double _LeftInEditor(AudioTagSetterFilterEditorView editor, Control control)
+        {
+            var point = control.TranslatePoint(new Point(0, 0), editor);
+            Assert.NotNull(point);
+            return point.Value.X;
         }
 
         private static CompactCheckBox _FindFieldCheckBox(

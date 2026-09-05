@@ -42,7 +42,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         public IReadOnlyList<AudioTagSetterFieldRowViewModel> FieldRows { get; }
 
         /// <summary>
-        /// Gets field rows grouped into editor fieldsets (Track / Disc, Basic, Extended).
+        /// Gets field rows grouped into editor fieldsets (Basic, Track / Disc, Extended).
         /// </summary>
         public IReadOnlyList<AudioTagSetterFieldSectionViewModel> Sections { get; }
 
