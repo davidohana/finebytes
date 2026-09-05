@@ -13,8 +13,8 @@
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <StackPanel Spacing="6">
-        <Grid ColumnDefinitions="Auto,4,*" RowDefinitions="Auto,6,Auto">
+      <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
+        <controls:FilterEditorLabeledRow Label="Characters to clean:">
           <ToolTip.Tip>
             <controls:RichToolTip>
               <TextBlock Classes="rich-tip-title" Text="Each character in this list is removed or replaced." />
@@ -24,24 +24,25 @@
               />
             </controls:RichToolTip>
           </ToolTip.Tip>
-          <TextBlock
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            TextWrapping="Wrap"
-            Text="Characters to clean:"
-          />
           <TextBox
             x:Name="CustomCharsBox"
-            Grid.Column="2"
             Classes="filter-editor-field-wrap"
             MinWidth="240"
             MaxLength="100"
-            VerticalAlignment="Center"
             Text="{Binding CustomCharsToRemove}"
           />
+        </controls:FilterEditorLabeledRow>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition
+              Width="Auto"
+              SharedSizeGroup="{x:Static controls:FilterEditorLabeledRow.LabelSharedSizeGroup}"
+            />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
           <controls:CompactCheckBox
             x:Name="ReplaceWithCheckBox"
-            Grid.Row="2"
             Content="Replace with:"
             VerticalAlignment="Center"
             IsChecked="{Binding ReplaceWith}"
@@ -58,7 +59,6 @@
           </controls:CompactCheckBox>
           <TextBox
             x:Name="ReplacementBox"
-            Grid.Row="2"
             Grid.Column="2"
             Classes="filter-editor-field"
             MinWidth="240"

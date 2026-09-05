@@ -61,12 +61,9 @@ Empty Other persists `\0`; filter `_Setup` throws `UserException` ("Space charac
 - **Value:** less alloc per file
 - **Cost:** low LOC; only worth if hot
 
-### 10. Cleaner → `FilterEditorLabeledRow` — **medium** (UI polish)
+### 10. Cleaner → `FilterEditorLabeledRow` — **done**
 
-- **Sites:** Cleaner AXAML hand-rolled Grid vs Replacer labeled rows
-- **Target:** one labeled-row for “Characters to clean”
-- **Value:** consistent filter-editor chrome
-- **Cost:** low; 1 AXAML + possible headless tweak
+“Characters to clean” uses `FilterEditorLabeledRow`; Replace-with keeps a checkbox-as-label Grid under the same `SharedSizeScope`.
 
 ### 11. Replace List Regex compile at Setup — **medium**
 
