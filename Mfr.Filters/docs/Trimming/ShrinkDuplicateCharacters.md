@@ -4,9 +4,10 @@ Collapses **runs of two or more** of the same chosen character into a **single**
 
 ## Options
 
-- **`character`** (string or char)
-  - The character to deduplicate; typically one character (first character wins if a longer string is provided).
-  - Empty / null character (`\0`) is a no-op (MFR7 empty editor).
+- **`character`** (char)
+  - The character whose adjacent runs of length ≥ 2 are collapsed to one.
+  - Preset JSON uses a one-character string (for example `"-"`). Longer or empty JSON strings fail to deserialize.
+  - `\0` (Filter Configuration empty box) is a no-op (MFR7 empty editor).
 
 ## Examples
 
