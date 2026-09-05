@@ -25,6 +25,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
                 )),
             ];
             _kindToRow = FieldRows.ToDictionary(row => row.Kind);
+            Sections =
+            [
+                .. Enum.GetValues<AudioTagSetterFieldGroup>()
+                    .Select(group => new AudioTagSetterFieldSectionViewModel(
+                        AudioTagSetterFieldChoice.HeaderFor(group),
+                        [.. FieldRows.Where(row => row.Group == group)]
+                    )),
+            ];
             _SyncFromFilter();
         }
 
@@ -32,6 +40,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// Gets the per-field option rows (three-state mode + format text).
         /// </summary>
         public IReadOnlyList<AudioTagSetterFieldRowViewModel> FieldRows { get; }
+
+        /// <summary>
+        /// Gets field rows grouped into editor fieldsets (Track / Disc, Basic, Extended).
+        /// </summary>
+        public IReadOnlyList<AudioTagSetterFieldSectionViewModel> Sections { get; }
 
         /// <summary>
         /// Copies current filter options into editor rows without live replace.

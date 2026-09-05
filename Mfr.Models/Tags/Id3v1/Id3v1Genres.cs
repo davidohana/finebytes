@@ -164,6 +164,11 @@ namespace Mfr.Models.Tags.Id3v1
         ];
 
         /// <summary>
+        /// Gets the Winamp-extended ID3v1 genre names in index order (0–147).
+        /// </summary>
+        public static IReadOnlyList<string> Names { get; } = _Audio;
+
+        /// <summary>
         /// Maps a genre name to its ID3v1 index.
         /// </summary>
         /// <param name="name">Genre display name (case-insensitive).</param>

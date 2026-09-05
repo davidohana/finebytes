@@ -39,7 +39,9 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             Assert.Equal(@"C:\", rootFolder.Text);
             Assert.Equal("MFR", subFolder.Text);
             Assert.Same(
-                ((PathMoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor).BrowseRootFolderCommand,
+                (
+                    (PathMoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor
+                ).BrowseRootFolderCommand,
                 browse.Command
             );
 

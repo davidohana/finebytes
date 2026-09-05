@@ -128,6 +128,30 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             );
             Assert.True(_Row(editor, AudioTagSetterFieldKind.Lyrics).Multiline);
             Assert.True(_Row(editor, AudioTagSetterFieldKind.Track).ShowsAutoIncrement);
+            Assert.True(_Row(editor, AudioTagSetterFieldKind.Genre).UsesGenreCombo);
+            Assert.NotEmpty(_Row(editor, AudioTagSetterFieldKind.Genre).GenreSuggestions);
+            Assert.Contains("Rock", _Row(editor, AudioTagSetterFieldKind.Genre).GenreSuggestions);
+
+            Assert.Equal(
+                ["Track / Disc", "Basic", "Extended"],
+                editor.Sections.Select(section => section.Header)
+            );
+            Assert.Equal(
+                editor.FieldRows.Select(row => row.Kind),
+                editor.Sections.SelectMany(section => section.Rows).Select(row => row.Kind)
+            );
+            Assert.All(
+                editor.Sections[0].Rows,
+                row => Assert.Equal(AudioTagSetterFieldGroup.TrackDisc, row.Group)
+            );
+            Assert.All(
+                editor.Sections[1].Rows,
+                row => Assert.Equal(AudioTagSetterFieldGroup.Basic, row.Group)
+            );
+            Assert.All(
+                editor.Sections[2].Rows,
+                row => Assert.Equal(AudioTagSetterFieldGroup.Extended, row.Group)
+            );
         }
 
         /// <summary>
@@ -146,6 +170,25 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             track.AutoIncrement = false;
             Assert.Null(((AudioTagSetterFilter)step.Filter).Options.Track);
             Assert.False(((AudioTagSetterFilter)step.Filter).Options.TrackAutoIncrement);
+        }
+
+        /// <summary>
+        /// Verifies genre field uses combo suggestions and updates step options.
+        /// </summary>
+        [Fact]
+        public void Audio_tag_setter_genre_text_updates_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
+            var editor = new AudioTagSetterFilterEditorViewModel(step);
+            var genre = _Row(editor, AudioTagSetterFieldKind.Genre);
+
+            Assert.True(genre.UsesGenreCombo);
+            genre.Text = "Rock";
+            genre.IsActive = true;
+
+            var options = ((AudioTagSetterFilter)step.Filter).Options;
+            Assert.NotNull(options.Genre);
+            Assert.Equal("Rock", options.Genre.Text);
         }
 
         private static AudioTagSetterFieldRowViewModel _Row(

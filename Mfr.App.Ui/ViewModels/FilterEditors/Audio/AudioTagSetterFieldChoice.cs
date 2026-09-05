@@ -4,18 +4,22 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
     /// Catalog metadata for one Audio Tag Setter field row.
     /// </summary>
     /// <param name="Kind">Which overlay field this row edits.</param>
+    /// <param name="Group">Which options fieldset this row belongs to.</param>
     /// <param name="Label">Three-state checkbox content (MFR7 “Set …:” wording where it existed).</param>
     /// <param name="Tip">Short per-field tooltip body.</param>
     /// <param name="Watermark">Optional text-box watermark (format examples / defaults).</param>
     /// <param name="ShowsAutoIncrement">When true, show the track auto-increment checkbox beside the value.</param>
     /// <param name="Multiline">When true, use a taller multi-line value box (lyrics).</param>
+    /// <param name="UsesGenreCombo">When true, use an editable genre ComboBox with ID3v1 suggestions.</param>
     internal sealed record AudioTagSetterFieldChoice(
         AudioTagSetterFieldKind Kind,
+        AudioTagSetterFieldGroup Group,
         string Label,
         string Tip,
         string Watermark = "",
         bool ShowsAutoIncrement = false,
-        bool Multiline = false
+        bool Multiline = false,
+        bool UsesGenreCombo = false
     )
     {
         /// <summary>
@@ -25,6 +29,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         [
             new(
                 AudioTagSetterFieldKind.Track,
+                AudioTagSetterFieldGroup.TrackDisc,
                 "Set track number:",
                 "Track index after formatting (0–255 base). Empty always clears. With auto-increment, Rename List index is added to the base before clamping to 255.",
                 Watermark: "1",
@@ -32,101 +37,134 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             ),
             new(
                 AudioTagSetterFieldKind.TrackCount,
+                AudioTagSetterFieldGroup.TrackDisc,
                 "Set track count:",
                 "Total tracks (n of m). Empty or 0 clears; otherwise 1–255.",
                 Watermark: "12"
             ),
             new(
                 AudioTagSetterFieldKind.Disc,
+                AudioTagSetterFieldGroup.TrackDisc,
                 "Set disc:",
                 "Disc index. Empty or 0 clears; otherwise 1–255.",
                 Watermark: "1"
             ),
             new(
                 AudioTagSetterFieldKind.DiscCount,
+                AudioTagSetterFieldGroup.TrackDisc,
                 "Set disc count:",
                 "Total discs. Empty or 0 clears; otherwise 1–255.",
                 Watermark: "2"
             ),
             new(
                 AudioTagSetterFieldKind.Performers,
+                AudioTagSetterFieldGroup.Basic,
                 "Set performer(s):",
-                "Primary artists. Use ';' for multiple values. May include formatter tokens.",
+                "Primary artists. Use ';' to separate multiple values.",
                 Watermark: "<parent-folder:1>"
             ),
             new(
                 AudioTagSetterFieldKind.AlbumArtists,
+                AudioTagSetterFieldGroup.Basic,
                 "Set album artist(s):",
-                "Album artists. Use ';' for multiple values. May include formatter tokens.",
+                "Album artists. Use ';' to separate multiple values.",
                 Watermark: "<parent-folder:1>"
             ),
             new(
                 AudioTagSetterFieldKind.Title,
+                AudioTagSetterFieldGroup.Basic,
                 "Set title:",
-                "Track title. May include formatter tokens.",
+                "Track title.",
                 Watermark: "<file-name>"
             ),
             new(
                 AudioTagSetterFieldKind.Album,
+                AudioTagSetterFieldGroup.Basic,
                 "Set album:",
-                "Album name. May include formatter tokens.",
+                "Album name.",
                 Watermark: "<parent-folder:1>"
             ),
             new(
                 AudioTagSetterFieldKind.Year,
+                AudioTagSetterFieldGroup.Basic,
                 "Set year:",
                 "Release year 1–9999 after formatting. Empty or 0 clears.",
                 Watermark: "2004"
             ),
             new(
                 AudioTagSetterFieldKind.Genre,
+                AudioTagSetterFieldGroup.Basic,
                 "Set genre(s):",
-                "Genre text. Use ';' for multiple values. ID3v1 accepts only predefined genre names.",
-                Watermark: "Rock"
+                "Use ';' to separate multiple values. ID3v1 accepts only predefined genre names.",
+                Watermark: "Rock",
+                UsesGenreCombo: true
             ),
             new(
                 AudioTagSetterFieldKind.Comment,
+                AudioTagSetterFieldGroup.Basic,
                 "Set comment:",
-                "Comment text. May include formatter tokens.",
+                "Comment text.",
                 Watermark: "Tagged via MFR"
             ),
             new(
                 AudioTagSetterFieldKind.Composers,
+                AudioTagSetterFieldGroup.Extended,
                 "Set composer(s):",
-                "Composers. Use ';' for multiple values. May include formatter tokens.",
+                "Composers. Use ';' to separate multiple values.",
                 Watermark: "J. S. Bach"
             ),
             new(
                 AudioTagSetterFieldKind.Conductor,
+                AudioTagSetterFieldGroup.Extended,
                 "Set conductor:",
-                "Conductor or director. May include formatter tokens.",
+                "Conductor or director.",
                 Watermark: "Karajan"
             ),
             new(
                 AudioTagSetterFieldKind.Grouping,
+                AudioTagSetterFieldGroup.Extended,
                 "Set grouping:",
-                "Content group / work title. May include formatter tokens.",
+                "Content group / work title.",
                 Watermark: "Suite"
             ),
             new(
                 AudioTagSetterFieldKind.Copyright,
+                AudioTagSetterFieldGroup.Extended,
                 "Set copyright:",
-                "Copyright notice. May include formatter tokens.",
+                "Copyright notice.",
                 Watermark: "© 2004"
             ),
             new(
                 AudioTagSetterFieldKind.BeatsPerMinute,
+                AudioTagSetterFieldGroup.Extended,
                 "Set BPM:",
                 "Tempo 1–65535 after formatting. Empty or 0 clears.",
                 Watermark: "120"
             ),
             new(
                 AudioTagSetterFieldKind.Lyrics,
+                AudioTagSetterFieldGroup.Extended,
                 "Set lyrics:",
-                "Unsynchronised lyrics. May include formatter tokens.",
+                "Unsynchronised lyrics.",
                 Watermark: "Verse one",
                 Multiline: true
             ),
         ];
+
+        /// <summary>
+        /// Fieldset header for a catalog group.
+        /// </summary>
+        /// <param name="group">Catalog group.</param>
+        /// <returns>Header text for <see cref="AudioTagSetterFieldSectionViewModel"/>.</returns>
+        public static string HeaderFor(AudioTagSetterFieldGroup group)
+        {
+            return group switch
+            {
+                AudioTagSetterFieldGroup.TrackDisc => "Track / Disc",
+                AudioTagSetterFieldGroup.Basic => "Basic",
+                AudioTagSetterFieldGroup.Extended => "Extended",
+                _ => throw new ArgumentOutOfRangeException(nameof(group), group, null),
+            };
+        }
     }
 }

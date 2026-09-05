@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mfr.Models.Tags.Id3v1;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
 {
@@ -18,6 +19,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// </summary>
         public const string AutoIncrementTag = "AutoIncrement";
 
+        private static readonly IReadOnlyList<string> _SortedGenreNames =
+        [
+            .. Id3v1Genres.Names.OrderBy(name => name, StringComparer.OrdinalIgnoreCase),
+        ];
+
         private readonly Action _onChanged;
 
         /// <summary>
@@ -30,11 +36,13 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             ArgumentNullException.ThrowIfNull(choice);
             ArgumentNullException.ThrowIfNull(onChanged);
             Kind = choice.Kind;
+            Group = choice.Group;
             Label = choice.Label;
             Tip = choice.Tip;
             Watermark = choice.Watermark;
             ShowsAutoIncrement = choice.ShowsAutoIncrement;
             Multiline = choice.Multiline;
+            UsesGenreCombo = choice.UsesGenreCombo;
             _onChanged = onChanged;
             _autoIncrement = choice.ShowsAutoIncrement;
         }
@@ -43,6 +51,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// Gets which overlay field this row edits.
         /// </summary>
         public AudioTagSetterFieldKind Kind { get; }
+
+        /// <summary>
+        /// Gets which options fieldset this row belongs to.
+        /// </summary>
+        public AudioTagSetterFieldGroup Group { get; }
 
         /// <summary>
         /// Gets the three-state checkbox label.
@@ -68,6 +81,21 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// Gets whether the value box is multi-line (lyrics).
         /// </summary>
         public bool Multiline { get; }
+
+        /// <summary>
+        /// Gets whether the value control is an editable genre ComboBox.
+        /// </summary>
+        public bool UsesGenreCombo { get; }
+
+        /// <summary>
+        /// Gets whether the single-line text box is shown (not genre combo / lyrics).
+        /// </summary>
+        public bool ShowsPlainText => !Multiline && !UsesGenreCombo;
+
+        /// <summary>
+        /// Gets ID3v1 genre suggestions for the genre ComboBox (alphabetical, MFR7 Sorted).
+        /// </summary>
+        public IReadOnlyList<string> GenreSuggestions => UsesGenreCombo ? _SortedGenreNames : [];
 
         /// <summary>
         /// Gets or sets the three-state activation (<c>true</c> set, <c>null</c> only-if-empty, <c>false</c> omit).
