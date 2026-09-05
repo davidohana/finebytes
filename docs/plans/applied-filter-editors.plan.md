@@ -45,7 +45,7 @@ todos:
     content: "F5 Casing List — space-separated words + sentence-initial"
     status: completed
   - id: f5-replace-list
-    content: "F5 Replace List — embedded line pairs (search replace) + mode/options"
+    content: "F5 Replace List — embedded line pairs (`search => replacement`) + mode/options"
     status: completed
   - id: f5-name-list
     content: "F5 Name List"
@@ -222,7 +222,7 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 | **10 (done)** | Counter                         | Formatting | single                                             | start / step / leading-zeros mode (None/Automatic/Custom) / position / separator / reset-per-folder |
 | **11 (done)** | Inserter                        | Formatting | single                                             | text + position                                                                                     |
 | **12 (done)** | Casing List                     | Case       | single                                             | space-separated words + sentence-initial                                                            |
-| **13 (done)** | Replace List                    | Replace    | single                                             | embedded line pairs (`search replacement`) + mode/options                                           |
+| **13 (done)** | Replace List                    | Replace    | single                                             | embedded line pairs (`search => replacement`) + mode/options                                        |
 | **14 (next)** | Name List                       | Formatting | single                                             | file path + prefix/suffix                                                                           |
 | 15            | Replacer                        | Replace    | single                                             | find/replace / regex / scope                                                                        |
 | 16            | Token Mover                     | Formatting | single                                             | token indices / destination                                                                         |

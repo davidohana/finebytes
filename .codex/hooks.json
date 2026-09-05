@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python 'd:\\Devl\\finebytes\\.codex\\hooks\\format-on-stop.py'",
+            "timeout": 600
+          }
+        ]
+      }
+    ]
+  }
+}

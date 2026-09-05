@@ -30,16 +30,21 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
-        /// Verifies whitespace in search or replacement is allowed.
+        /// Verifies whitespace in search or replacement is allowed, including <c>=&gt;</c> in search.
         /// </summary>
         [Fact]
-        public void Validate_WhitespaceInPair_Allowed()
+        public void Validate_WhitespaceAndSeparatorInSearch_Allowed()
         {
-            var entries = ReplaceListParser.Validate([new ReplaceListEntry("Blue Train", "Blue Train Live")]);
+            var entries = ReplaceListParser.Validate([
+                new ReplaceListEntry("Blue Train", "Blue Train Live"),
+                new ReplaceListEntry("a=>b", "x"),
+            ]);
 
-            Assert.Single(entries);
+            Assert.Equal(2, entries.Count);
             Assert.Equal("Blue Train", entries[0].Search);
             Assert.Equal("Blue Train Live", entries[0].Replacement);
+            Assert.Equal("a=>b", entries[1].Search);
+            Assert.Equal("x", entries[1].Replacement);
         }
 
         /// <summary>
@@ -57,18 +62,6 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
-        /// Verifies search containing the editor separator is rejected.
-        /// </summary>
-        [Fact]
-        public void Validate_SearchContainsEditorSeparator_Throws()
-        {
-            var ex = Assert.Throws<UserException>(() =>
-                ReplaceListParser.Validate([new ReplaceListEntry("a => b", "c")])
-            );
-            Assert.Contains(ReplaceListEntry.EditorSeparator, ex.Message, StringComparison.Ordinal);
-        }
-
-        /// <summary>
         /// Verifies overly long search or replacement is rejected.
         /// </summary>
         [Theory]
@@ -82,6 +75,67 @@ namespace Mfr.Tests.Models.Filters.Replace
 
             var ex = Assert.Throws<UserException>(() => ReplaceListParser.Validate([entry]));
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies editor text parses into search/replace pairs.
+        /// </summary>
+        [Theory]
+        [InlineData("a => b", "a", "b")]
+        [InlineData("a=>b", "a", "b")]
+        [InlineData("Blue Train => Blue_Train", "Blue Train", "Blue_Train")]
+        [InlineData("x", "x", "")]
+        [InlineData("a =>", "a", "")]
+        [InlineData("a => b => c", "a", "b => c")]
+        public void ParseEditorText_Line_YieldsPair(string text, string search, string replacement)
+        {
+            var entries = ReplaceListParser.ParseEditorText(text);
+
+            Assert.Single(entries);
+            Assert.Equal(search, entries[0].Search);
+            Assert.Equal(replacement, entries[0].Replacement);
+        }
+
+        /// <summary>
+        /// Verifies blank lines, empty search, and CRLF are handled.
+        /// </summary>
+        [Fact]
+        public void ParseEditorText_SkipsBlankAndEmptySearch_AcceptsCrlf()
+        {
+            var entries = ReplaceListParser.ParseEditorText("a => b\r\n\r\n=> skip\nx\n");
+
+            Assert.Equal(2, entries.Count);
+            Assert.Equal("a", entries[0].Search);
+            Assert.Equal("b", entries[0].Replacement);
+            Assert.Equal("x", entries[1].Search);
+            Assert.Equal("", entries[1].Replacement);
+        }
+
+        /// <summary>
+        /// Verifies empty editor text parses to no entries.
+        /// </summary>
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData("\n\n")]
+        public void ParseEditorText_Empty_ReturnsEmpty(string text)
+        {
+            Assert.Empty(ReplaceListParser.ParseEditorText(text));
+        }
+
+        /// <summary>
+        /// Verifies format/parse round-trips structured entries.
+        /// </summary>
+        [Fact]
+        public void FormatEditorText_RoundTripsThroughParse()
+        {
+            ReplaceListEntry[] entries = [new("a", "b"), new("Blue Train", "Blue_Train"), new("x", "")];
+
+            var text = ReplaceListParser.FormatEditorText(entries);
+            var parsed = ReplaceListParser.ParseEditorText(text);
+
+            Assert.Equal("a => b\nBlue Train => Blue_Train\nx", text);
+            Assert.Equal(entries, parsed);
         }
     }
 }

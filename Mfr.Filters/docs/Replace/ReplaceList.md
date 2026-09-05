@@ -14,7 +14,7 @@ Applies **search/replace pairs** embedded in the filter options, in list orderâ€
 
 ## Editor text format
 
-The Filter Configuration pane edits `entries` as **line-separated** pairs. Each non-empty line is either a lone `search` (empty replacement / strip) or `search => replacement` (split on the **first** `=>`; surrounding spaces are trimmed). Search and replacement may contain spaces; search must not contain `=>`. Each side is limited to 1000 characters.
+The Filter Configuration pane edits `entries` as **line-separated** pairs. Each non-empty line is either a lone `search` (empty replacement / strip) or `search => replacement` (split on the **first** `=>`; surrounding spaces are trimmed). Search and replacement may contain spaces. The editor cannot express `=>` inside search (JSON/`entries` can). Each side is limited to 1000 characters.
 
 **Example editor text**
 

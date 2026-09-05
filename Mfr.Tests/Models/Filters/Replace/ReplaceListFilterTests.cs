@@ -48,6 +48,25 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
+        /// Verifies apply-time search may contain <c>=&gt;</c> (editor-only limitation).
+        /// </summary>
+        [Fact]
+        public void Apply_SearchContainingEditorSeparator_ReplacesLiteral()
+        {
+            var filter = _CreateFilter(
+                entries: [new ReplaceListEntry("a=>b", "x")],
+                mode: ReplacerMode.Literal,
+                caseSensitive: true,
+                replaceAll: true,
+                wholeWord: false
+            );
+
+            var result = FilterTestHelpers.ApplyToPrefix(filter, "xa=>by");
+
+            Assert.Equal("xxy", result);
+        }
+
+        /// <summary>
         /// Verifies that an empty replacement strips the search string.
         /// </summary>
         [Fact]

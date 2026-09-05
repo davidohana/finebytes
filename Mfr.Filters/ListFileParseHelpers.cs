@@ -9,7 +9,7 @@ namespace Mfr.Filters
         /// Validates that <paramref name="filePath"/> is non-empty and that the file exists.
         /// </summary>
         /// <param name="filePath">Path supplied by the user.</param>
-        /// <param name="listKindLabel">Short label for errors, for example <c>Name-list</c> or <c>Replace-list</c>.</param>
+        /// <param name="listKindLabel">Short label for errors, for example <c>Name-list</c>.</param>
         /// <exception cref="UserException">Thrown when the path is empty or the file is missing.</exception>
         internal static void ValidateListFilePath(string filePath, string listKindLabel)
         {

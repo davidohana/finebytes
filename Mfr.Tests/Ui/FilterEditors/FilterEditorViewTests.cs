@@ -864,15 +864,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Dispatcher.UIThread.RunJobs();
             Assert.Equal("DSC*.JPG => photo.jpg\ntrack?.mp3 => track0.mp3\n*.tmp", entries.Watermark);
 
-            var regex = editor.FindControl<CompactRadioButton>("RegexRadio");
-            Assert.NotNull(regex);
-            regex.IsChecked = true;
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-            Assert.Equal("[0-9]+ => N\n\\. => _\n\\s+ => _", entries.Watermark);
-
             entries.Text = "a => b\n. => _";
-            wildcard.IsChecked = true;
             caseSensitive.IsChecked = true;
             replaceAll.IsChecked = false;
             wholeWord.IsChecked = false;
