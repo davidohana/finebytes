@@ -1,10 +1,9 @@
 using Avalonia.Controls;
-using Mfr.Filters.Replace;
 
 namespace Mfr.App.Ui.Views.FilterEditors.Replace
 {
     /// <summary>
-    /// Option editor for <see cref="ReplacerFilter"/>.
+    /// Option editor for <see cref="Filters.Replace.ReplacerFilter"/>.
     /// </summary>
     public partial class ReplacerFilterEditorView : UserControl
     {
