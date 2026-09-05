@@ -14,7 +14,6 @@ using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
-using Mfr.Models.Media;
 
 namespace Mfr.Tests.Ui.FilterEditors
 {
@@ -225,9 +224,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Space_character_other_text_selects_other_definition()
         {
             var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
-            var editor = new SpaceCharacterFilterEditorViewModel(step);
-
-            editor.OtherCharacter = ".";
+            var editor = new SpaceCharacterFilterEditorViewModel(step) { OtherCharacter = "." };
 
             Assert.Equal(SpaceCharacterDefinition.Other, editor.Definition);
             Assert.Equal('.', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);

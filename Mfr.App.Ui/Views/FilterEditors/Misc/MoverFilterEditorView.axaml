@@ -14,13 +14,17 @@
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6">
-        <StackPanel Spacing="4">
+        <StackPanel x:Name="RootFolderDropTarget" Spacing="4">
           <ToolTip.Tip>
             <controls:RichToolTip>
               <TextBlock Classes="rich-tip-title" Text="Static absolute destination path." />
               <TextBlock
                 Classes="rich-tip-body"
                 Text="All items are moved under this root. Required; must be a fully qualified path."
+              />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Drag a folder (or file) from the File List to set this path; a file uses its parent folder."
               />
             </controls:RichToolTip>
           </ToolTip.Tip>
