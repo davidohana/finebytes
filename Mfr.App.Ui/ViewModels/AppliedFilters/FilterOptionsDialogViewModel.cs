@@ -105,10 +105,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private bool _hasAncestorFolderLevel;
 
         /// <summary>
-        /// Gets whether ID3v2 language and description fields are shown.
+        /// Gets whether ID3v2 description (and optionally language) fields are shown.
         /// </summary>
         [ObservableProperty]
         private bool _hasId3v2MultiInstanceFields;
+
+        /// <summary>
+        /// Gets whether the ID3v2 language field is shown (<c>COMM</c> / <c>USLT</c>).
+        /// </summary>
+        [ObservableProperty]
+        private bool _hasId3v2Language;
 
         /// <summary>
         /// Gets or sets the apply-scope mode.
@@ -181,7 +187,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             return SelectedTargetOption.BuildTarget(
                 ancestorFolderLevel: (int)AncestorFolderLevel,
-                id3v2Language: HasId3v2MultiInstanceFields ? Id3v2Language : null,
+                id3v2Language: HasId3v2Language ? Id3v2Language : null,
                 id3v2Description: HasId3v2MultiInstanceFields ? Id3v2Description : null
             );
         }
@@ -228,9 +234,15 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private void _UpdateTargetParameterVisibility(FilterTargetOption? option)
         {
             HasAncestorFolderLevel = option?.Prototype is AncestorFolderTarget;
-            HasId3v2MultiInstanceFields =
-                option?.Prototype is Id3v2FrameTarget frame
-                && Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frame.FrameId);
+            if (option?.Prototype is Id3v2FrameTarget frame)
+            {
+                HasId3v2MultiInstanceFields = Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(frame.FrameId);
+                HasId3v2Language = Id3v2ModeledFrame.UsesLanguageIdentity(frame.FrameId);
+                return;
+            }
+
+            HasId3v2MultiInstanceFields = false;
+            HasId3v2Language = false;
         }
 
         partial void OnScopeModeChanged(FilterApplyScopeMode value)

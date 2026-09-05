@@ -171,41 +171,48 @@
           </ComboBox>
         </Grid>
 
-        <Grid x:Name="Id3v2MultiInstanceFieldsGrid" IsVisible="{Binding HasId3v2MultiInstanceFields}">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
-          </Grid.RowDefinitions>
-          <TextBlock Classes="filter-options-label" Text="Language:">
-            <ToolTip.Tip>
-              <controls:RichToolTip>
-                <TextBlock Classes="rich-tip-body" Text="Optional ID3v2 language code." />
-                <TextBlock
-                  Classes="rich-tip-bullet"
-                  Text="• Used to pick among multiple frames with the same frame ID."
-                />
-              </controls:RichToolTip>
-            </ToolTip.Tip>
-          </TextBlock>
-          <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Language}" />
-          <TextBlock Grid.Row="2" Classes="filter-options-label" Text="Description:">
-            <ToolTip.Tip>
-              <controls:RichToolTip>
-                <TextBlock Classes="rich-tip-body" Text="Optional ID3v2 description." />
-                <TextBlock
-                  Classes="rich-tip-bullet"
-                  Text="• Used to pick among multiple frames with the same frame ID."
-                />
-              </controls:RichToolTip>
-            </ToolTip.Tip>
-          </TextBlock>
-          <TextBox Grid.Row="2" Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Description}" />
-        </Grid>
+        <StackPanel
+          x:Name="Id3v2MultiInstanceFieldsPanel"
+          Spacing="8"
+          IsVisible="{Binding HasId3v2MultiInstanceFields}"
+        >
+          <Grid x:Name="Id3v2LanguageGrid" IsVisible="{Binding HasId3v2Language}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Classes="filter-options-label" Text="Language:">
+              <ToolTip.Tip>
+                <controls:RichToolTip>
+                  <TextBlock Classes="rich-tip-body" Text="Optional ID3v2 language code." />
+                  <TextBlock
+                    Classes="rich-tip-bullet"
+                    Text="• Used to pick among multiple COMM / USLT frames with the same frame ID."
+                  />
+                </controls:RichToolTip>
+              </ToolTip.Tip>
+            </TextBlock>
+            <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Language}" />
+          </Grid>
+          <Grid x:Name="Id3v2DescriptionGrid">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Classes="filter-options-label" Text="Description:">
+              <ToolTip.Tip>
+                <controls:RichToolTip>
+                  <TextBlock Classes="rich-tip-body" Text="Optional ID3v2 description." />
+                  <TextBlock
+                    Classes="rich-tip-bullet"
+                    Text="• Used to pick among multiple frames with the same frame ID."
+                  />
+                </controls:RichToolTip>
+              </ToolTip.Tip>
+            </TextBlock>
+            <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Description}" />
+          </Grid>
+        </StackPanel>
 
         <Grid x:Name="AncestorFolderLevelGrid" IsVisible="{Binding HasAncestorFolderLevel}">
           <Grid.ColumnDefinitions>

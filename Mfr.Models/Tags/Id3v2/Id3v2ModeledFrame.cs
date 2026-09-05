@@ -9,8 +9,9 @@ namespace Mfr.Models.Tags.Id3v2
     /// <remarks>
     /// <para>
     /// Singleton frames (for example <c>TIT2</c>) use <see cref="FrameId"/> only. Multi-instance frames
-    /// (<c>COMM</c>, <c>USLT</c>, <c>TXXX</c>) also carry <see cref="Language"/> and/or <see cref="Description"/>
-    /// as identity. Unmodeled frames (for example <c>APIC</c>) are omitted and left on disk by field-patch Apply.
+    /// (<c>COMM</c>, <c>USLT</c>, <c>TXXX</c>) also carry <see cref="Description"/> and, for
+    /// <c>COMM</c>/<c>USLT</c>, <see cref="Language"/> as identity. Unmodeled frames (for example <c>APIC</c>)
+    /// are omitted and left on disk by field-patch Apply.
     /// </para>
     /// </remarks>
     public sealed class Id3v2ModeledFrame : IEquatable<Id3v2ModeledFrame?>
@@ -20,6 +21,16 @@ namespace Mfr.Models.Tags.Id3v2
         /// </summary>
         public static IReadOnlySet<string> MultiInstanceFrameIds { get; } =
             new HashSet<string>(StringComparer.Ordinal) { "COMM", "USLT", "TXXX" };
+
+        /// <summary>
+        /// Returns whether <paramref name="frameId"/> uses ISO-639-2 language as part of frame identity.
+        /// </summary>
+        /// <param name="frameId">Four-character frame id (uppercase).</param>
+        /// <returns><see langword="true"/> for <c>COMM</c> and <c>USLT</c>; otherwise <see langword="false"/>.</returns>
+        public static bool UsesLanguageIdentity(string frameId)
+        {
+            return frameId is "COMM" or "USLT";
+        }
 
         /// <summary>
         /// Singleton text frame ids modeled for read, write, and Filter Options Apply-To.

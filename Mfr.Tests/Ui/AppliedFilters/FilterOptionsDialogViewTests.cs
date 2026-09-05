@@ -148,14 +148,14 @@ namespace Mfr.Tests.Ui.AppliedFilters
             try
             {
                 var levelGrid = dialog.FindControl<Grid>("AncestorFolderLevelGrid");
-                var id3v2Grid = dialog.FindControl<Grid>("Id3v2MultiInstanceFieldsGrid");
+                var id3v2Panel = dialog.FindControl<StackPanel>("Id3v2MultiInstanceFieldsPanel");
                 var levelSpinner = dialog.FindControl<CompactNumericUpDown>("AncestorFolderLevelSpinner");
                 Assert.NotNull(levelGrid);
-                Assert.NotNull(id3v2Grid);
+                Assert.NotNull(id3v2Panel);
                 Assert.NotNull(levelSpinner);
                 Assert.True(levelGrid.IsVisible);
                 Assert.True(levelSpinner.IsVisible);
-                Assert.False(id3v2Grid.IsVisible);
+                Assert.False(id3v2Panel.IsVisible);
 
                 var id3v2Group = FilterTargetCatalog.Groups.First(group => group.Label == "ID3v2");
                 var titleOption = id3v2Group.Targets.First(option =>
@@ -167,7 +167,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Dispatcher.UIThread.RunJobs();
 
                 Assert.False(levelGrid.IsVisible);
-                Assert.False(id3v2Grid.IsVisible);
+                Assert.False(id3v2Panel.IsVisible);
 
                 var commentOption = id3v2Group.Targets.First(option =>
                     option.Prototype is Id3v2FrameTarget frame && frame.FrameId == "COMM"
@@ -177,7 +177,21 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Dispatcher.UIThread.RunJobs();
 
                 Assert.False(levelGrid.IsVisible);
-                Assert.True(id3v2Grid.IsVisible);
+                Assert.True(id3v2Panel.IsVisible);
+                Assert.True(viewModel.HasId3v2Language);
+
+                var customOption = id3v2Group.Targets.First(option =>
+                    option.Prototype is Id3v2FrameTarget frame && frame.FrameId == "TXXX"
+                );
+                viewModel.SelectedTargetOption = customOption;
+                dialog.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.True(id3v2Panel.IsVisible);
+                Assert.False(viewModel.HasId3v2Language);
+                var languageGrid = dialog.FindControl<Grid>("Id3v2LanguageGrid");
+                Assert.NotNull(languageGrid);
+                Assert.False(languageGrid.IsVisible);
             }
             finally
             {
@@ -201,9 +215,10 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             try
             {
-                var id3v2Grid = dialog.FindControl<Grid>("Id3v2MultiInstanceFieldsGrid");
-                Assert.NotNull(id3v2Grid);
-                Assert.True(id3v2Grid.IsVisible);
+                var id3v2Panel = dialog.FindControl<StackPanel>("Id3v2MultiInstanceFieldsPanel");
+                Assert.NotNull(id3v2Panel);
+                Assert.True(id3v2Panel.IsVisible);
+                Assert.True(viewModel.HasId3v2Language);
                 Assert.Equal("eng", viewModel.Id3v2Language);
                 Assert.Equal("Primary", viewModel.Id3v2Description);
             }

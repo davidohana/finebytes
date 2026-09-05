@@ -320,6 +320,40 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies TXXX keeps description and drops language even if the language box still has text.
+        /// </summary>
+        [Fact]
+        public void ApplyFilterOptions_id3v2_txxx_ignores_language()
+        {
+            var applied = new AppliedFiltersViewModel();
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
+            var id3v2Group = FilterTargetCatalog.Groups.First(group => group.Label == "ID3v2");
+            var commentOption = id3v2Group.Targets.First(option =>
+                option.Prototype is Id3v2FrameTarget frame && frame.FrameId == "COMM"
+            );
+            dialog.SelectedTargetGroup = id3v2Group;
+            dialog.SelectedTargetOption = commentOption;
+            dialog.Id3v2Language = "eng";
+            dialog.Id3v2Description = "catalog";
+
+            var customOption = id3v2Group.Targets.First(option =>
+                option.Prototype is Id3v2FrameTarget frame && frame.FrameId == "TXXX"
+            );
+            dialog.SelectedTargetOption = customOption;
+            Assert.True(dialog.HasId3v2MultiInstanceFields);
+            Assert.False(dialog.HasId3v2Language);
+
+            applied.ApplyFilterOptions(dialog);
+
+            var filter = (ShrinkSpacesFilter)applied.ToChain().Steps[0].Filter;
+            var target = Assert.IsType<Id3v2FrameTarget>(filter.Target);
+            Assert.Equal("TXXX", target.FrameId);
+            Assert.Null(target.Language);
+            Assert.Equal("catalog", target.Description);
+        }
+
+        /// <summary>
         /// Verifies loading an ID3v1 target resolves the matching catalog group and option.
         /// </summary>
         [Fact]

@@ -149,7 +149,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 return $"{frame.FrameId.ToUpperInvariant()} ({frame.Description})";
             }
 
-            return _GetId3v2FrameLabel(frame.FrameId);
+            return Id3v2FrameLabels.For(frame.FrameId);
         }
 
         private static IReadOnlyList<FilterTargetOption> _BuildSemanticAudioOptions()
@@ -178,7 +178,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             return
             [
                 .. Id3v2ModeledFrame.AllModeledFrameIds.Select(frameId => new FilterTargetOption(
-                    _GetId3v2FrameLabel(frameId),
+                    Id3v2FrameLabels.For(frameId),
                     new Id3v2FrameTarget(frameId)
                 )),
             ];
@@ -227,33 +227,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 SemanticAudioField.MusicIpId => "MusicIP Id",
                 SemanticAudioField.AmazonId => "Amazon Id",
                 _ => field.ToString(),
-            };
-        }
-
-        private static string _GetId3v2FrameLabel(string frameId)
-        {
-            return frameId.ToUpperInvariant() switch
-            {
-                "TALB" => "TALB (Album)",
-                "TBPM" => "TBPM (BPM)",
-                "TCOM" => "TCOM (Composer)",
-                "TCON" => "TCON (Genre)",
-                "TCOP" => "TCOP (Copyright)",
-                "COMM" => "COMM (Comment)",
-                "TENC" => "TENC (Encoded By)",
-                "TEXT" => "TEXT (Lyricist)",
-                "TIT1" => "TIT1 (Grouping)",
-                "TIT2" => "TIT2 (Title)",
-                "TIT3" => "TIT3 (Subtitle)",
-                "TPE1" => "TPE1 (Artist)",
-                "TPE2" => "TPE2 (Album Artist)",
-                "TPOS" => "TPOS (Disc)",
-                "TRCK" => "TRCK (Track)",
-                "TYER" => "TYER (Year)",
-                "TDRC" => "TDRC (Recording Date)",
-                "USLT" => "USLT (Lyrics)",
-                "TXXX" => "TXXX (Custom)",
-                _ => frameId,
             };
         }
 

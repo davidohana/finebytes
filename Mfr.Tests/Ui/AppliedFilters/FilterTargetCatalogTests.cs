@@ -1,5 +1,6 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Models.Tags.Id3v1;
+using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -72,6 +73,25 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 "TXXX (MusicBrainz Artist Id)",
                 FilterTargetCatalog.GetLabel(new Id3v2FrameTarget("TXXX", Description: "MusicBrainz Artist Id"))
             );
+        }
+
+        /// <summary>
+        /// Verifies every modeled ID3v2 frame has a friendly Apply-To label (not a bare frame id).
+        /// </summary>
+        [Fact]
+        public void Id3v2_options_cover_all_modeled_frames_with_friendly_labels()
+        {
+            var id3v2Group = FilterTargetCatalog.Groups.First(group => group.Label == "ID3v2");
+            Assert.Equal(Id3v2ModeledFrame.AllModeledFrameIds.Count, id3v2Group.Targets.Count);
+
+            foreach (var frameId in Id3v2ModeledFrame.AllModeledFrameIds)
+            {
+                var option = id3v2Group.Targets.Single(o =>
+                    o.Prototype is Id3v2FrameTarget frame && frame.FrameId == frameId
+                );
+                Assert.Equal(Id3v2FrameLabels.For(frameId), option.Label);
+                Assert.NotEqual(frameId, option.Label);
+            }
         }
 
         private sealed record UnknownFilterTarget : FilterTarget;
