@@ -292,9 +292,9 @@ namespace Mfr.Tests.Models
                 attributes: FileAttributes.ReadOnly | FileAttributes.Archive
             );
 
-            _AssertField(item, ExtendedRenameListFields.Group, "CreationDate", created.ToString("g"));
-            _AssertField(item, ExtendedRenameListFields.Group, "LastWriteDate", created.AddDays(1).ToString("g"));
-            _AssertField(item, ExtendedRenameListFields.Group, "LastAccessDate", created.AddDays(2).ToString("g"));
+            _AssertField(item, ExtendedRenameListFields.Group, "CreationDate", created.ToString("G"));
+            _AssertField(item, ExtendedRenameListFields.Group, "LastWriteDate", created.AddDays(1).ToString("G"));
+            _AssertField(item, ExtendedRenameListFields.Group, "LastAccessDate", created.AddDays(2).ToString("G"));
             _AssertField(item, ExtendedRenameListFields.Group, "Size", "2048");
             _AssertField(item, ExtendedRenameListFields.Group, "Attrs", "RA--");
         }
@@ -407,7 +407,7 @@ namespace Mfr.Tests.Models
                 item,
                 JpegRenameListFields.Group,
                 "ExifDirectory*36867",
-                new DateTime(2024, 7, 4, 9, 30, 0, DateTimeKind.Unspecified).ToString("g")
+                new DateTime(2024, 7, 4, 9, 30, 0, DateTimeKind.Unspecified).ToString("G")
             );
 
             Assert.False(RenameListFieldCatalog.GetField(ImageRenameListFields.Group, "Width").SupportsPreview);
@@ -588,7 +588,7 @@ namespace Mfr.Tests.Models
 
             var expectedCreation = new DateTime(2020, 12, 25, 15, 4, 5, DateTimeKind.Unspecified);
             Assert.Equal(
-                created.ToString("g"),
+                created.ToString("G"),
                 RenameListFieldCatalog.Resolve(
                     item,
                     RenameListFieldKey.Original(
@@ -597,7 +597,7 @@ namespace Mfr.Tests.Models
                     )
                 )
             );
-            Assert.Equal(expectedCreation.ToString("g"), RenameListFieldCatalog.Resolve(item, creationPreview));
+            Assert.Equal(expectedCreation.ToString("G"), RenameListFieldCatalog.Resolve(item, creationPreview));
             Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, creationPreview));
             Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, lastWritePreview));
             Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, lastAccessPreview));

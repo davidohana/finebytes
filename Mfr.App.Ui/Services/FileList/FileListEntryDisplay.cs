@@ -53,7 +53,7 @@ namespace Mfr.App.Ui.Services.FileList
         /// Formats <paramref name="lastWriteTime"/> for the Date modified column.
         /// </summary>
         /// <param name="lastWriteTime">Last write time, or <see langword="null"/> when unknown.</param>
-        /// <returns>A general-date string, or empty when <paramref name="lastWriteTime"/> is null.</returns>
+        /// <returns>A general date/time long string (with seconds), or empty when <paramref name="lastWriteTime"/> is null.</returns>
         public static string FormatDate(DateTime? lastWriteTime)
         {
             if (lastWriteTime is null)
@@ -61,7 +61,7 @@ namespace Mfr.App.Ui.Services.FileList
                 return string.Empty;
             }
 
-            return lastWriteTime.Value.ToString("g", CultureInfo.CurrentCulture);
+            return lastWriteTime.Value.ToString("G", CultureInfo.CurrentCulture);
         }
 
         /// <summary>

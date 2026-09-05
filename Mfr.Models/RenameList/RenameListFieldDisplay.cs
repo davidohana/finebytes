@@ -11,7 +11,7 @@ namespace Mfr.Models.RenameList
     internal static class RenameListFieldDisplay
     {
         /// <summary>
-        /// Formats a filesystem timestamp for grid display (general date/time short).
+        /// Formats a filesystem timestamp for grid display (general date/time long, with seconds).
         /// </summary>
         /// <param name="value">Timestamp from scan or preview metadata.</param>
         /// <returns>Culture-formatted date/time, or empty when unset.</returns>
@@ -22,7 +22,7 @@ namespace Mfr.Models.RenameList
                 return string.Empty;
             }
 
-            return value.ToString("g", CultureInfo.CurrentCulture);
+            return value.ToString("G", CultureInfo.CurrentCulture);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Formats <see cref="ExifData.DateTaken"/> with general date/time short pattern.
+        /// Formats <see cref="ExifData.DateTaken"/> with general date/time long pattern (with seconds).
         /// </summary>
         /// <param name="exif">Loaded EXIF snapshot, or <see langword="null"/>.</param>
         /// <returns>Formatted date/time, or empty when absent.</returns>
