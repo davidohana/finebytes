@@ -10,27 +10,17 @@ namespace Mfr.Tests.Models.Filters.Trimming
         private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
-        /// Verifies example from issue:
-        /// Portishead - Glory Box >>> Portishead - Box
-        /// Remove characters between position 13 from the left side (incl.) and position 5 from the right side (incl.)
+        /// Verifies the MFR7 help example:
+        /// Portishead - Glory Box → Portishead - Box
+        /// (left 13 incl. through right 5 incl.).
         /// </summary>
         [Fact]
         public void Apply_IssueExample()
         {
+            // "Portishead - Glory Box" (len 22): left 13 is the space before 'G';
+            // right 5 is 'y'. Removal is " Glory" → "Portishead - Box".
             var options = new TrimBetweenFilterOptions(new Position(13, Side.Left), new Position(5, Side.Right));
             var f = new TrimBetweenFilter(_target, options);
-
-            // "Portishead - Glory Box"
-            // Pos 13 (Left, 1-based) is 'G' (P-1, o-2, r-3, t-4, i-5, s-6, h-7, e-8, a-9, d-10, ' '-11, --12, ' '-13)
-            // Wait, let's re-count "Portishead - Glory Box"
-            // P o r t i s h e a d   -   G l o r y   B o x
-            // 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22
-            // Pos 13 (Left) is 'G'
-            // Pos 5 (Right) is:
-            // x (1), o (2), B (3), ' ' (4), y (5)
-            // So from 'G' (13) to 'y' (17)
-            // "G l o r y" is 5 chars.
-            // "Portishead - " + " Box" = "Portishead - Box"
 
             Assert.Equal("Portishead - Box", FilterTestHelpers.ApplyToPrefix(f, "Portishead - Glory Box"));
         }
@@ -75,11 +65,27 @@ namespace Mfr.Tests.Models.Filters.Trimming
         public void Apply_ClampedPositions()
         {
             var options = new TrimBetweenFilterOptions(
-                new Position(0, Side.Left), // Clamps to 1 (index 0)
-                new Position(100, Side.Left) // Clamps to length (index length-1)
+                new Position(0, Side.Left), // Clamps to index 0
+                new Position(100, Side.Left) // Clamps to length-1
             );
             var f = new TrimBetweenFilter(_target, options);
             Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "abc"));
+        }
+
+        [Fact]
+        public void Apply_Empty_ReturnsEmpty()
+        {
+            var options = new TrimBetweenFilterOptions(new Position(1, Side.Left), new Position(1, Side.Right));
+            var f = new TrimBetweenFilter(_target, options);
+            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, ""));
+        }
+
+        [Fact]
+        public void Apply_SameStartAndEnd_RemovesOneCharacter()
+        {
+            var options = new TrimBetweenFilterOptions(new Position(2, Side.Left), new Position(2, Side.Left));
+            var f = new TrimBetweenFilter(_target, options);
+            Assert.Equal("ac", FilterTestHelpers.ApplyToPrefix(f, "abc"));
         }
     }
 }
