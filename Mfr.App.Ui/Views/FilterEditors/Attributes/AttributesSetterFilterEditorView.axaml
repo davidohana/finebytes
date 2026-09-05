@@ -5,50 +5,105 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Attributes"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:attrFilters="using:Mfr.Filters.Attributes"
   mc:Ignorable="d"
   d:DesignWidth="420"
-  d:DesignHeight="140"
+  d:DesignHeight="160"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Attributes.AttributesSetterFilterEditorView"
   x:DataType="vm:AttributesSetterFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <StackPanel Spacing="4">
-        <ToolTip.Tip>
-          <controls:RichToolTip>
-            <TextBlock Classes="rich-tip-title" Text="Filesystem attribute flags." />
-            <TextBlock Classes="rich-tip-bullet" Text="• Checked: turn the attribute on for every item." />
-            <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: turn the attribute off for every item." />
-            <TextBlock
-              Classes="rich-tip-bullet"
-              Text="• Gray (indeterminate): leave the attribute unchanged (default)."
+      <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
+        <controls:FilterEditorLabeledRow Label="Read-only:">
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+            <controls:CompactRadioButton
+              x:Name="ReadOnlyOnRadio"
+              GroupName="AttributesSetterReadOnly"
+              Content="On"
+              IsChecked="{Binding ReadOnly, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Set}, Mode=TwoWay}"
             />
-          </controls:RichToolTip>
-        </ToolTip.Tip>
-        <controls:CompactCheckBox
-          x:Name="ReadOnlyCheckBox"
-          Content="Read-only"
-          IsThreeState="True"
-          IsChecked="{Binding ReadOnlyChecked}"
-        />
-        <controls:CompactCheckBox
-          x:Name="HiddenCheckBox"
-          Content="Hidden"
-          IsThreeState="True"
-          IsChecked="{Binding HiddenChecked}"
-        />
-        <controls:CompactCheckBox
-          x:Name="ArchiveCheckBox"
-          Content="Archive"
-          IsThreeState="True"
-          IsChecked="{Binding ArchiveChecked}"
-        />
-        <controls:CompactCheckBox
-          x:Name="SystemCheckBox"
-          Content="System"
-          IsThreeState="True"
-          IsChecked="{Binding SystemChecked}"
-        />
+            <controls:CompactRadioButton
+              x:Name="ReadOnlyOffRadio"
+              GroupName="AttributesSetterReadOnly"
+              Content="Off"
+              IsChecked="{Binding ReadOnly, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Clear}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="ReadOnlyLeaveRadio"
+              GroupName="AttributesSetterReadOnly"
+              Content="Leave"
+              IsChecked="{Binding ReadOnly, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Keep}, Mode=TwoWay}"
+            />
+          </StackPanel>
+        </controls:FilterEditorLabeledRow>
+        <controls:FilterEditorLabeledRow Label="Hidden:">
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+            <controls:CompactRadioButton
+              x:Name="HiddenOnRadio"
+              GroupName="AttributesSetterHidden"
+              Content="On"
+              IsChecked="{Binding Hidden, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Set}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="HiddenOffRadio"
+              GroupName="AttributesSetterHidden"
+              Content="Off"
+              IsChecked="{Binding Hidden, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Clear}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="HiddenLeaveRadio"
+              GroupName="AttributesSetterHidden"
+              Content="Leave"
+              IsChecked="{Binding Hidden, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Keep}, Mode=TwoWay}"
+            />
+          </StackPanel>
+        </controls:FilterEditorLabeledRow>
+        <controls:FilterEditorLabeledRow Label="Archive:">
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+            <controls:CompactRadioButton
+              x:Name="ArchiveOnRadio"
+              GroupName="AttributesSetterArchive"
+              Content="On"
+              IsChecked="{Binding Archive, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Set}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="ArchiveOffRadio"
+              GroupName="AttributesSetterArchive"
+              Content="Off"
+              IsChecked="{Binding Archive, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Clear}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="ArchiveLeaveRadio"
+              GroupName="AttributesSetterArchive"
+              Content="Leave"
+              IsChecked="{Binding Archive, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Keep}, Mode=TwoWay}"
+            />
+          </StackPanel>
+        </controls:FilterEditorLabeledRow>
+        <controls:FilterEditorLabeledRow Label="System:">
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+            <controls:CompactRadioButton
+              x:Name="SystemOnRadio"
+              GroupName="AttributesSetterSystem"
+              Content="On"
+              IsChecked="{Binding System, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Set}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="SystemOffRadio"
+              GroupName="AttributesSetterSystem"
+              Content="Off"
+              IsChecked="{Binding System, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Clear}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              x:Name="SystemLeaveRadio"
+              GroupName="AttributesSetterSystem"
+              Content="Leave"
+              IsChecked="{Binding System, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Keep}, Mode=TwoWay}"
+            />
+          </StackPanel>
+        </controls:FilterEditorLabeledRow>
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>
