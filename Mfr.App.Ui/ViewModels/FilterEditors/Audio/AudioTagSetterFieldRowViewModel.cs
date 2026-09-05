@@ -117,7 +117,17 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
 
         partial void OnIsActiveChanged(bool? value) => _onChanged();
 
-        partial void OnTextChanged(string value) => _onChanged();
+        partial void OnTextChanged(string value)
+        {
+            // Typing into an omitted field enables overwrite mode so the value is applied.
+            if (IsActive is false && !string.IsNullOrEmpty(value))
+            {
+                IsActive = true;
+                return;
+            }
+
+            _onChanged();
+        }
 
         partial void OnAutoIncrementChanged(bool value) => _onChanged();
     }

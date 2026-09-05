@@ -36,7 +36,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             var title = _Row(editor, AudioTagSetterFieldKind.Title);
 
             title.Text = "<file-name>";
-            title.IsActive = true;
+            Assert.True(title.IsActive);
             var options = ((AudioTagSetterFilter)step.Filter).Options;
             Assert.NotNull(options.Title);
             Assert.Equal("<file-name>", options.Title.Text);
@@ -53,6 +53,32 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         }
 
         /// <summary>
+        /// Verifies typing into an omitted field checks it (overwrite), without changing only-if-empty.
+        /// </summary>
+        [Fact]
+        public void Audio_tag_setter_typing_checks_omitted_field()
+        {
+            var step = new AppliedFilterStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
+            var editor = new AudioTagSetterFilterEditorViewModel(step);
+            var album = _Row(editor, AudioTagSetterFieldKind.Album);
+
+            Assert.False(album.IsActive);
+            album.Text = "Demo";
+            Assert.True(album.IsActive);
+            var options = ((AudioTagSetterFilter)step.Filter).Options;
+            Assert.NotNull(options.Album);
+            Assert.Equal("Demo", options.Album.Text);
+            Assert.False(options.Album.OnlyIfEmpty);
+
+            album.IsActive = null;
+            album.Text = "Still only if empty";
+            Assert.Null(album.IsActive);
+            options = ((AudioTagSetterFilter)step.Filter).Options;
+            Assert.NotNull(options.Album);
+            Assert.True(options.Album.OnlyIfEmpty);
+        }
+
+        /// <summary>
         /// Verifies track auto-increment and track field options update together.
         /// </summary>
         [Fact]
@@ -63,7 +89,6 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             var track = _Row(editor, AudioTagSetterFieldKind.Track);
 
             track.Text = "1";
-            track.IsActive = true;
             track.AutoIncrement = false;
 
             var options = ((AudioTagSetterFilter)step.Filter).Options;
@@ -182,9 +207,9 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
 
             Assert.True(genre.UsesGenreCombo);
             genre.Text = "Rock";
-            genre.IsActive = true;
 
             var options = ((AudioTagSetterFilter)step.Filter).Options;
+            Assert.True(genre.IsActive);
             Assert.NotNull(options.Genre);
             Assert.Equal("Rock", options.Genre.Text);
         }

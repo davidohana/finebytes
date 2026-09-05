@@ -39,10 +39,10 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.Equal(string.Empty, titleBox.Text);
 
             titleBox.Text = "<file-name>";
-            titleCheck.IsChecked = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
+            Assert.True(titleCheck.IsChecked);
             var filter = (AudioTagSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.NotNull(filter.Options.Title);
             Assert.Equal("<file-name>", filter.Options.Title.Text);
@@ -67,11 +67,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.True(autoInc.IsChecked);
 
             trackBox.Text = "1";
-            trackCheck.IsChecked = true;
             autoInc.IsChecked = false;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
+            Assert.True(trackCheck.IsChecked);
             filter = (AudioTagSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.NotNull(filter.Options.Track);
             Assert.Equal("1", filter.Options.Track.Text);
@@ -80,10 +80,10 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             var genreCheck = _FindFieldCheckBox(editor, AudioTagSetterFieldKind.Genre);
             var genreCombo = _FindVisibleFieldComboBox(editor, AudioTagSetterFieldKind.Genre);
             genreCombo.Text = "Jazz";
-            genreCheck.IsChecked = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
+            Assert.True(genreCheck.IsChecked);
             filter = (AudioTagSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.NotNull(filter.Options.Genre);
             Assert.Equal("Jazz", filter.Options.Genre.Text);
