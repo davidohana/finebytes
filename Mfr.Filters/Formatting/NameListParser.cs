@@ -1,42 +1,83 @@
 namespace Mfr.Filters.Formatting
 {
     /// <summary>
-    /// Parses name-list files (one entry per line) used by <see cref="NameListFilter"/>.
+    /// Parses Filter Configuration editor text and validates embedded name-list entries.
     /// </summary>
-    internal static class NameListParser
+    public static class NameListParser
     {
         /// <summary>
-        /// Parses name-list entries from a text file (UTF-8, same as other list file parsers).
+        /// Formats stored entries as line-separated names.
         /// </summary>
-        /// <param name="filePath">Path to the name-list file.</param>
-        /// <returns>Ordered entries; index <c>k</c> maps to rename item <see cref="FileMeta.RenameListIndex"/> <c>k</c>.</returns>
-        internal static IReadOnlyList<string> ParseFile(string filePath)
+        /// <param name="entries">Names in rename-list index order.</param>
+        /// <returns>Editor text; a trailing empty entry is preserved with an extra newline.</returns>
+        public static string FormatEditorText(IReadOnlyList<string> entries)
         {
-            ListFileParseHelpers.ValidateListFilePath(filePath, listKindLabel: "Name-list");
-
-            var rawLines = File.ReadAllLines(filePath);
-            var entries = new List<string>(rawLines.Length);
-            var maxLineLen = ConfigStore.Config.Filters.MaxListFileLineLength;
-            for (var i = 0; i < rawLines.Length; i++)
-            {
-                var lineNumber = i + 1;
-                var line = rawLines[i];
-                if (line.Length > maxLineLen)
-                {
-                    throw new UserException($"Name-list line {lineNumber} exceeds maximum length ({maxLineLen}).");
-                }
-
-                if (ListFileParseHelpers.IsListFileCommentLine(line))
-                {
-                    continue;
-                }
-
-                entries.Add(line);
-            }
+            ArgumentNullException.ThrowIfNull(entries);
 
             if (entries.Count == 0)
             {
-                throw new UserException("Name-list file must contain at least one name entry.");
+                return string.Empty;
+            }
+
+            var text = string.Join('\n', entries);
+            if (entries[^1].Length == 0)
+            {
+                return text + "\n";
+            }
+
+            return text;
+        }
+
+        /// <summary>
+        /// Parses line-separated names (one entry per line, including blank lines).
+        /// </summary>
+        /// <remarks>
+        /// A trailing newline after the last non-empty line does not add an extra entry (same as
+        /// reading lines from a file). Interior blank lines are kept. Does not skip comment-like
+        /// lines; those are names. Does not throw; length limits are enforced when the filter is
+        /// applied.
+        /// </remarks>
+        /// <param name="text">Multiline editor text.</param>
+        /// <returns>Parsed names in line order.</returns>
+        public static IReadOnlyList<string> ParseEditorText(string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return [];
+            }
+
+            var entries = new List<string>();
+            using var reader = new StringReader(text);
+            while (reader.ReadLine() is { } line)
+            {
+                entries.Add(line);
+            }
+
+            return entries;
+        }
+
+        /// <summary>
+        /// Validates embedded entries for apply-time use.
+        /// </summary>
+        /// <remarks>
+        /// Empty list is allowed (no-op). Blank lines are kept as empty names. Each entry is limited
+        /// to the configured list-line maximum (default 1000 characters).
+        /// </remarks>
+        /// <param name="entries">Configured names in rename-list index order.</param>
+        /// <returns>The same <paramref name="entries"/> list after checks succeed.</returns>
+        internal static IReadOnlyList<string> Validate(IReadOnlyList<string> entries)
+        {
+            ArgumentNullException.ThrowIfNull(entries);
+
+            var maxLen = ConfigStore.Config.Filters.MaxListFileLineLength;
+            for (var i = 0; i < entries.Count; i++)
+            {
+                var index = i + 1;
+                var line = entries[i];
+                if (line.Length > maxLen)
+                {
+                    throw new UserException($"Name-list entry {index} exceeds maximum length ({maxLen}).");
+                }
             }
 
             return entries;

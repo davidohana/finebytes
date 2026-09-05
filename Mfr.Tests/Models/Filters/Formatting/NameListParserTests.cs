@@ -5,31 +5,24 @@ namespace Mfr.Tests.Models.Filters.Formatting
     /// <summary>
     /// Tests for <see cref="NameListParser"/>.
     /// </summary>
-    public sealed class NameListParserTests : IDisposable
+    public sealed class NameListParserTests
     {
-        private readonly TempDirectoryFixture _tempDir = new();
-
-        /// <inheritdoc />
-        public void Dispose()
+        /// <summary>
+        /// Verifies an empty entry list validates to empty.
+        /// </summary>
+        [Fact]
+        public void Validate_Empty_ReturnsEmpty()
         {
-            _tempDir.Dispose();
+            Assert.Empty(NameListParser.Validate([]));
         }
 
         /// <summary>
-        /// Verifies ordered entries preserve blank lines.
+        /// Verifies blank-line entries are kept.
         /// </summary>
         [Fact]
-        public void ParseFile_PreservesLinesAndBlanks()
+        public void Validate_BlankEntries_Kept()
         {
-            var path = _CreateFile(
-                """
-                A
-
-                B
-                """
-            );
-
-            var entries = NameListParser.ParseFile(path);
+            var entries = NameListParser.Validate(["A", "", "B"]);
 
             Assert.Equal(3, entries.Count);
             Assert.Equal("A", entries[0]);
@@ -38,84 +31,78 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies comment lines are skipped and do not produce entries.
+        /// Verifies overly long entries are rejected.
         /// </summary>
         [Fact]
-        public void ParseFile_CommentLines_Skipped()
+        public void Validate_EntryTooLong_Throws()
         {
-            var path = _CreateFile(
-                """
-                // header
-                Real1
-                # also a comment
-                Real2
-                """
-            );
+            var maxLen = ConfigStore.Config.Filters.MaxListFileLineLength;
+            var tooLong = new string('x', maxLen + 1);
 
-            var entries = NameListParser.ParseFile(path);
-
-            Assert.Equal(2, entries.Count);
-            Assert.Equal("Real1", entries[0]);
-            Assert.Equal("Real2", entries[1]);
-        }
-
-        /// <summary>
-        /// Verifies empty path throws.
-        /// </summary>
-        [Theory]
-        [InlineData("")]
-        [InlineData("   ")]
-        public void ParseFile_EmptyPath_Throws(string filePath)
-        {
-            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(filePath));
-            Assert.Contains("cannot be empty", ex.Message, StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Verifies missing file throws.
-        /// </summary>
-        [Fact]
-        public void ParseFile_MissingFile_Throws()
-        {
-            var path = Path.Combine(_tempDir.TempDir, "does-not-exist.txt");
-
-            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path));
-            Assert.Contains("not found", ex.Message, StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Verifies at least one non-comment entry is required.
-        /// </summary>
-        [Theory]
-        [InlineData("")]
-        [InlineData("// only\n")]
-        [InlineData("# comment only")]
-        public void ParseFile_NoEntries_Throws(string content)
-        {
-            var path = _CreateFile(content);
-
-            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path));
-            Assert.Contains("at least one name entry", ex.Message, StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Verifies overly long lines are rejected.
-        /// </summary>
-        [Fact]
-        public void ParseFile_LineTooLong_Throws()
-        {
-            var longLine = new string('x', ConfigStore.Config.Filters.MaxListFileLineLength + 1);
-            var path = _CreateFile(longLine);
-
-            var ex = Assert.Throws<UserException>(() => NameListParser.ParseFile(path));
+            var ex = Assert.Throws<UserException>(() => NameListParser.Validate([tooLong]));
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
         }
 
-        private string _CreateFile(string content)
+        /// <summary>
+        /// Verifies editor text parses one name per line, keeping blanks and CRLF.
+        /// </summary>
+        [Fact]
+        public void ParseEditorText_PreservesLinesAndBlanks_AcceptsCrlf()
         {
-            var path = Path.Combine(_tempDir.TempDir, $"name-list-{Guid.NewGuid():N}.txt");
-            File.WriteAllText(path, content.ReplaceLineEndings(Environment.NewLine));
-            return path;
+            var entries = NameListParser.ParseEditorText("A\r\n\r\nB\n");
+
+            Assert.Equal(3, entries.Count);
+            Assert.Equal("A", entries[0]);
+            Assert.Equal(string.Empty, entries[1]);
+            Assert.Equal("B", entries[2]);
+        }
+
+        /// <summary>
+        /// Verifies a trailing newline after the last name does not add an extra entry.
+        /// </summary>
+        [Fact]
+        public void ParseEditorText_TrailingNewline_DoesNotAddEntry()
+        {
+            var entries = NameListParser.ParseEditorText("Alpha\nBeta\n");
+
+            Assert.Equal(["Alpha", "Beta"], entries);
+        }
+
+        /// <summary>
+        /// Verifies comment-like lines are kept as names in editor text.
+        /// </summary>
+        [Fact]
+        public void ParseEditorText_CommentLikeLines_Kept()
+        {
+            var entries = NameListParser.ParseEditorText("// header\nReal1\n# also a comment");
+
+            Assert.Equal(["// header", "Real1", "# also a comment"], entries);
+        }
+
+        /// <summary>
+        /// Verifies empty editor text parses to no entries.
+        /// </summary>
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void ParseEditorText_Empty_ReturnsEmpty(string? text)
+        {
+            Assert.Empty(NameListParser.ParseEditorText(text));
+        }
+
+        /// <summary>
+        /// Verifies format/parse round-trips structured entries, including a trailing blank.
+        /// </summary>
+        [Fact]
+        public void FormatEditorText_RoundTripsThroughParse()
+        {
+            string[] entries = ["Alpha", "", "Beta", ""];
+
+            var text = NameListParser.FormatEditorText(entries);
+            var parsed = NameListParser.ParseEditorText(text);
+
+            Assert.Equal("Alpha\n\nBeta\n\n", text);
+            Assert.Equal(entries, parsed);
         }
     }
 }

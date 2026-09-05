@@ -45,6 +45,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 ReplaceListFilter => new ReplaceListFilterEditorViewModel(step),
                 CounterFilter => new CounterFilterEditorViewModel(step),
                 InserterFilter => new InserterFilterEditorViewModel(step),
+                NameListFilter => new NameListFilterEditorViewModel(step),
                 _ => null,
             };
         }

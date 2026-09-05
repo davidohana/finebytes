@@ -886,6 +886,45 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Name List option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Name_list_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("NameList"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<NameListFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<NameListFilterEditorView>().Single();
+            var entries = editor.FindControl<TextBox>("EntriesBox");
+            var prefix = editor.FindControl<TextBox>("PrefixBox");
+            var suffix = editor.FindControl<TextBox>("SuffixBox");
+            Assert.NotNull(entries);
+            Assert.NotNull(prefix);
+            Assert.NotNull(suffix);
+            Assert.True(entries.AcceptsReturn);
+            Assert.Equal(string.Empty, entries.Text);
+            Assert.Equal(string.Empty, prefix.Text);
+            Assert.Equal(string.Empty, suffix.Text);
+
+            entries.Text = "Alpha\nBeta";
+            prefix.Text = "pre_";
+            suffix.Text = "_suf";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (NameListFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(["Alpha", "Beta"], filter.Options.Entries);
+            Assert.Equal("pre_", filter.Options.Prefix);
+            Assert.Equal("_suf", filter.Options.Suffix);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Letters Case radio edits re-run Rename List preview (Phase 10a).
         /// </summary>
         [AvaloniaFact]

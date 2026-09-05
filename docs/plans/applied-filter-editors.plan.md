@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around + Capitalize After + Sentence End + Strip Parentheses + Cleaner + Counter + Inserter + Casing List + Replace List done. Next: Name List, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
+overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around + Capitalize After + Sentence End + Strip Parentheses + Cleaner + Counter + Inserter + Casing List + Replace List + Name List done. Next: Replacer, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
 todos:
   - id: f1-f4
     content: "F1–F4: ctors, Applied list, Filter Options/Apply To, Space Character + Letters Case"
@@ -48,8 +48,8 @@ todos:
     content: "F5 Replace List — embedded line pairs (`search => replacement`) + mode/options"
     status: completed
   - id: f5-name-list
-    content: "F5 Name List"
-    status: pending
+    content: "F5 Name List — embedded one-name-per-line text + prefix/suffix"
+    status: completed
   - id: f5-replacer
     content: "F5 Replacer"
     status: pending
@@ -87,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-05):** F5 Replace List done. **Next: F5 Name List**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-05):** F5 Name List done. **Next: F5 Replacer**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ## Already shipped (F1–F4)
 
@@ -223,8 +223,8 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 | **11 (done)** | Inserter                        | Formatting | single                                             | text + position                                                                                     |
 | **12 (done)** | Casing List                     | Case       | single                                             | space-separated words + sentence-initial                                                            |
 | **13 (done)** | Replace List                    | Replace    | single                                             | embedded line pairs (`search => replacement`) + mode/options                                        |
-| **14 (next)** | Name List                       | Formatting | single                                             | file path + prefix/suffix                                                                           |
-| 15            | Replacer                        | Replace    | single                                             | find/replace / regex / scope                                                                        |
+| **14 (done)** | Name List                       | Formatting | single                                             | embedded one-name-per-line text + prefix/suffix                                                     |
+| **15 (next)** | Replacer                        | Replace    | single                                             | find/replace / regex / scope                                                                        |
 | 16            | Token Mover                     | Formatting | single                                             | token indices / destination                                                                         |
 | 17            | Mover                           | Misc       | single                                             | substring move                                                                                      |
 | 18            | **Date + Time Setter**          | Attributes | Date Setter, Time Setter                           | Shared timestamp-field picker; date vs time value                                                   |

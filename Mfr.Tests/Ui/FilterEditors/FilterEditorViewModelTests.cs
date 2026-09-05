@@ -418,5 +418,28 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.False(options.ReplaceAll);
             Assert.False(options.WholeWord);
         }
+
+        /// <summary>
+        /// Verifies Name List option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Name_list_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Name List", new NameListFilter());
+            var editor = new NameListFilterEditorViewModel(step);
+
+            Assert.Equal(string.Empty, editor.EntriesText);
+            Assert.Equal(string.Empty, editor.Prefix);
+            Assert.Equal(string.Empty, editor.Suffix);
+
+            editor.EntriesText = "Alpha\n\nBeta";
+            editor.Prefix = "pre_";
+            editor.Suffix = "_suf";
+
+            var options = ((NameListFilter)step.Filter).Options;
+            Assert.Equal(["Alpha", "", "Beta"], options.Entries);
+            Assert.Equal("pre_", options.Prefix);
+            Assert.Equal("_suf", options.Suffix);
+        }
     }
 }

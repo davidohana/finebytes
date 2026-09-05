@@ -30,6 +30,7 @@ These pages document **per-filter `options`** (and behavior). Common preset fiel
 - [Counter](Formatting/Counter.md)
 - [Formatter](Formatting/Formatter.md)
 - [Inserter](Formatting/Inserter.md)
+- [NameList](Formatting/NameList.md)
 - [TokenMover](Formatting/TokenMover.md)
 
 ### Misc

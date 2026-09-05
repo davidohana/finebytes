@@ -102,7 +102,7 @@ todos:
     content: "14b: Export Name List — GenerateNameList + save dialog (+ optional edit)"
     status: pending
   - id: phase-14c
-    content: "14c: Free Names Edit — temp name-list + NameListFilter on Applied Filters"
+    content: "14c: Free Names Edit — embed generated names in NameListFilter on Applied Filters"
     status: pending
   - id: phase-14d
     content: "14d: Manual Rename Field (F2) — overrides, blue cells, Cancel, F5 reset"
@@ -156,7 +156,7 @@ ______________________________________________________________________
 | ------------------------------- | --------------------------------------------------------------------- | ---------------- |
 | **12** Preview metadata columns | ID3/image preview cols after filters                                  | 9 / 7b           |
 | **14b** Export Name List        | Column → UTF-8 text file; save dialog; optional open in editor        | 11 / 8           |
-| **14c** Free Names Edit         | Temp name-list + add `NameListFilter` targeted at writable column     | 11 / 8           |
+| **14c** Free Names Edit         | Embed generated names in `NameListFilter` targeted at writable column | 11 / 8           |
 | **14d** Manual Rename (F2)      | Force original/preview value; blue cells; Cancel; F5 clears overrides | 11 / 8           |
 | **14e** Properties              | Alt+Enter / row menu → Windows shell property sheet                   | 11 / 8           |
 | **14f** Drag-out                | Selected rows as `FileDrop` to Explorer (cell→filter drag deferred)   | 11 / 8           |
@@ -199,7 +199,7 @@ MFR7 sources: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.
 
 | Feature             | Entry                        | Effect                                                                       |
 | ------------------- | ---------------------------- | ---------------------------------------------------------------------------- |
-| Free Names Edit     | Header menu (writable col)   | Temp `.txt` + add **Name List** filter targeting that field                  |
+| Free Names Edit     | Header menu (writable col)   | Embed names in **Name List** filter targeting that field                     |
 | Manual Rename Field | F2 / row menu (writable col) | Dialog forces original **or** preview value; **blue** text until Cancel / F5 |
 
 Header menu builder ([RenameListView.HeaderMenu.cs](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs) `_BuildColumnHeaderContextMenu`): title → Hide Field → *(preview only)* Remove Unchanged → *(14b)* Export Name List → *(14c writable)* Free Names Edit → Select Visible Fields → Select Sort Fields. Insert 14b/14c in that method only. Keep Select Sort Fields; do not regress Hide / Select.
@@ -218,8 +218,8 @@ Write one line per rename-list row = display text of the clicked column (origina
 Header command on **writable** columns only (MFR7 `PropertyType.ReadWriteApply`).
 
 - **Catalog:** add `SupportsWrite` (or equivalent) on `RenameListField` — true for fields that map to a `FilterTarget` filters can write (start with Basic path/name fields that already have targets; extend when Phase 12 preview tag cols ship). `SupportsPreview` alone is not enough (read-only originals use `supportsPreview: false` but are not Free-Edit targets).
-- **Flow:** temp `*.txt` via 14b helper → construct `NameListFilter` with `Target` from field→`FilterTarget` map, `Options.FilePath` = temp, display name `"{Field} List"` (unique with `*` suffix like MFR7) → `AppliedFiltersViewModel.Add` + select → info dialog pointing at Edit in the Name List editor.
-- **Filter editor:** ensure Name List editor can open/edit the file (applied-filter-editors F5 NameList); if Edit is missing, ship a minimal open-in-editor action with this phase.
+- **Flow:** generate name-list lines (same content as 14b export) → construct `NameListFilter` with `Target` from field→`FilterTarget` map, `Options.Entries` = those lines, display name `"{Field} List"` (unique with `*` suffix like MFR7) → `AppliedFiltersViewModel.Add` + select the step so Filter Configuration shows the embedded list.
+- **Filter editor:** F5 Name List already edits embedded one-name-per-line text (plus prefix/suffix). No external file / Edit-in-notepad action.
 - **Tests:** writable Basic preview/original creates filter with correct target + file lines; non-writable column omits menu item; unique instance names.
 - **Not in scope:** blue manual cells (14d); does not mutate Original/Preview directly.
 

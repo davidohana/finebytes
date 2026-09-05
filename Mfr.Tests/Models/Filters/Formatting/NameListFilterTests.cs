@@ -15,24 +15,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_MapsLineIndexToGlobalIndex()
         {
-            var path = _WriteTemp(
-                """
-                Alpha
-                Beta
-                Gamma
-                """
-            );
-            try
-            {
-                var f = _CreateFilter(path);
-                Assert.Equal("Alpha", FilterTestHelpers.ApplyToPrefix(f, "old0", renameListIndex: 0));
-                Assert.Equal("Beta", FilterTestHelpers.ApplyToPrefix(f, "old1", renameListIndex: 1));
-                Assert.Equal("Gamma", FilterTestHelpers.ApplyToPrefix(f, "old2", renameListIndex: 2));
-            }
-            finally
-            {
-                File.Delete(path);
-            }
+            var f = _CreateFilter(["Alpha", "Beta", "Gamma"]);
+            Assert.Equal("Alpha", FilterTestHelpers.ApplyToPrefix(f, "old0", renameListIndex: 0));
+            Assert.Equal("Beta", FilterTestHelpers.ApplyToPrefix(f, "old1", renameListIndex: 1));
+            Assert.Equal("Gamma", FilterTestHelpers.ApplyToPrefix(f, "old2", renameListIndex: 2));
         }
 
         /// <summary>
@@ -41,23 +27,15 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_PrefixSuffixAndCounterToken()
         {
-            var path = _WriteTemp("One");
-            try
-            {
-                var f = new NameListFilter(
-                    Target: _target,
-                    Options: new NameListOptions(
-                        FilePath: path,
-                        Prefix: "<counter:initial=10,step=1,padding=none,length=2,resetScope=global>_",
-                        Suffix: "_end"
-                    )
-                );
-                Assert.Equal("10_One_end", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
-            }
-            finally
-            {
-                File.Delete(path);
-            }
+            var f = new NameListFilter(
+                Target: _target,
+                Options: new NameListOptions(
+                    Entries: ["One"],
+                    Prefix: "<counter:initial=10,step=1,padding=none,length=2,resetScope=global>_",
+                    Suffix: "_end"
+                )
+            );
+            Assert.Equal("10_One_end", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
         }
 
         /// <summary>
@@ -66,24 +44,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_BlankLines_AreEntries()
         {
-            var path = _WriteTemp(
-                """
-                First
-
-                Second
-                """
-            );
-            try
-            {
-                var f = _CreateFilter(path);
-                Assert.Equal("First", FilterTestHelpers.ApplyToPrefix(f, "a", renameListIndex: 0));
-                Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "b", renameListIndex: 1));
-                Assert.Equal("Second", FilterTestHelpers.ApplyToPrefix(f, "c", renameListIndex: 2));
-            }
-            finally
-            {
-                File.Delete(path);
-            }
+            var f = _CreateFilter(["First", "", "Second"]);
+            Assert.Equal("First", FilterTestHelpers.ApplyToPrefix(f, "a", renameListIndex: 0));
+            Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "b", renameListIndex: 1));
+            Assert.Equal("Second", FilterTestHelpers.ApplyToPrefix(f, "c", renameListIndex: 2));
         }
 
         /// <summary>
@@ -92,24 +56,20 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_BlankLineMapping_IncludesEmptyEntries()
         {
-            var path = _WriteTemp(
-                """
-                A
+            var f = _CreateFilter(["A", "", "B"]);
+            Assert.Equal("A", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
+            Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 1));
+            Assert.Equal("B", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 2));
+        }
 
-                B
-                """
-            );
-            try
-            {
-                var f = _CreateFilter(path);
-                Assert.Equal("A", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
-                Assert.Equal(string.Empty, FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 1));
-                Assert.Equal("B", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 2));
-            }
-            finally
-            {
-                File.Delete(path);
-            }
+        /// <summary>
+        /// Verifies an empty list leaves the original value unchanged.
+        /// </summary>
+        [Fact]
+        public void Apply_EmptyList_IsNoOp()
+        {
+            var f = _CreateFilter([]);
+            Assert.Equal("old", FilterTestHelpers.ApplyToPrefix(f, "old", renameListIndex: 0));
         }
 
         /// <summary>
@@ -118,60 +78,31 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_TooFewLines_ThrowsUserException()
         {
-            var path = _WriteTemp("Only");
-            try
-            {
-                var f = _CreateFilter(path);
-                var ex = Assert.Throws<UserException>(() =>
-                    FilterTestHelpers.ApplyToPrefix(f, "old", renameListIndex: 1)
-                );
-                Assert.Contains("Name-list has", ex.Message, StringComparison.Ordinal);
-            }
-            finally
-            {
-                File.Delete(path);
-            }
+            var f = _CreateFilter(["Only"]);
+            var ex = Assert.Throws<UserException>(() => FilterTestHelpers.ApplyToPrefix(f, "old", renameListIndex: 1));
+            Assert.Equal(
+                "Name-list has 1 line(s) but rename item is 2. Add lines or adjust the rename list.",
+                ex.Message
+            );
         }
 
         /// <summary>
-        /// Verifies comment lines do not consume list indices.
+        /// Verifies comment-like lines are kept as names in the embedded list.
         /// </summary>
         [Fact]
-        public void Apply_CommentLinesSkipped()
+        public void Apply_CommentLikeLines_AreNames()
         {
-            var path = _WriteTemp(
-                """
-                // header
-                Real1
-                # also a comment
-                Real2
-                """
-            );
-            try
-            {
-                var f = _CreateFilter(path);
-                Assert.Equal("Real1", FilterTestHelpers.ApplyToPrefix(f, "a", renameListIndex: 0));
-                Assert.Equal("Real2", FilterTestHelpers.ApplyToPrefix(f, "b", renameListIndex: 1));
-            }
-            finally
-            {
-                File.Delete(path);
-            }
+            var f = _CreateFilter(["// header", "Real1"]);
+            Assert.Equal("// header", FilterTestHelpers.ApplyToPrefix(f, "a", renameListIndex: 0));
+            Assert.Equal("Real1", FilterTestHelpers.ApplyToPrefix(f, "b", renameListIndex: 1));
         }
 
-        private static NameListFilter _CreateFilter(string path)
+        private static NameListFilter _CreateFilter(IReadOnlyList<string> entries)
         {
             return new NameListFilter(
                 Target: _target,
-                Options: new NameListOptions(FilePath: path, Prefix: "", Suffix: "")
+                Options: new NameListOptions(Entries: entries, Prefix: "", Suffix: "")
             );
-        }
-
-        private static string _WriteTemp(string content)
-        {
-            var path = Path.Combine(Path.GetTempPath(), $"mfr_namelist_tests_{Guid.NewGuid():N}.txt");
-            File.WriteAllText(path, content);
-            return path;
         }
     }
 }
