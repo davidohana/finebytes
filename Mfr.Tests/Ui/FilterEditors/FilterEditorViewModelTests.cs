@@ -7,6 +7,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
+using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
@@ -14,7 +15,6 @@ using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
-using Mfr.Models.Media;
 
 namespace Mfr.Tests.Ui.FilterEditors
 {
@@ -225,9 +225,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Space_character_other_text_selects_other_definition()
         {
             var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
-            var editor = new SpaceCharacterFilterEditorViewModel(step);
-
-            editor.OtherCharacter = ".";
+            var editor = new SpaceCharacterFilterEditorViewModel(step) { OtherCharacter = "." };
 
             Assert.Equal(SpaceCharacterDefinition.Other, editor.Definition);
             Assert.Equal('.', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);
@@ -649,6 +647,35 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             Assert.Equal(@"C:\", editor.RootFolder);
             Assert.Equal(@"C:\", ((MoverFilter)step.Filter).Options.RootFolder);
+        }
+
+        /// <summary>
+        /// Verifies folder-path resolution for File List drops onto path fields.
+        /// </summary>
+        [Fact]
+        public void Filter_editor_file_drop_resolves_folder_or_parent()
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "mfr-filter-drop-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(dir);
+            try
+            {
+                var nested = Path.Combine(dir, "Nested");
+                Directory.CreateDirectory(nested);
+                var filePath = Path.Combine(nested, "a.txt");
+                File.WriteAllText(filePath, "x");
+
+                Assert.Equal(nested, FilterEditorFileDrop.TryResolveFolderPath([nested]));
+                Assert.Equal(nested, FilterEditorFileDrop.TryResolveFolderPath([filePath]));
+                Assert.Null(FilterEditorFileDrop.TryResolveFolderPath([]));
+            }
+            finally
+            {
+                try
+                {
+                    Directory.Delete(dir, recursive: true);
+                }
+                catch (IOException) { }
+            }
         }
 
         /// <summary>

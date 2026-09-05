@@ -77,7 +77,9 @@ namespace Mfr.Tests.Ui.RenameList
             var dataTransfer = new DataTransfer();
             foreach (var path in paths)
             {
-                var item = await storage.TryGetFileFromPathAsync(path).ConfigureAwait(true);
+                IStorageItem? item = Directory.Exists(path)
+                    ? await storage.TryGetFolderFromPathAsync(path).ConfigureAwait(true)
+                    : await storage.TryGetFileFromPathAsync(path).ConfigureAwait(true);
                 Assert.NotNull(item);
                 dataTransfer.Add(DataTransferItem.CreateFile(item));
             }
