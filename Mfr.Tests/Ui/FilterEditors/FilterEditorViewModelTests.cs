@@ -158,6 +158,82 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Space Character defaults sync and option edits replace the step filter.
+        /// </summary>
+        [Fact]
+        public void Space_character_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
+            var editor = new SpaceCharacterFilterEditorViewModel(step);
+
+            Assert.Equal(SpaceCharacterDefinition.Space, editor.Definition);
+            Assert.Equal(string.Empty, editor.OtherCharacter);
+            Assert.True(editor.ReplacePercent20);
+            Assert.True(editor.ReplaceSpaces);
+            Assert.True(editor.ReplaceUnderscores);
+            Assert.False(editor.ReplaceCustom);
+            Assert.Equal(string.Empty, editor.CustomText);
+            Assert.Equal(
+                SpaceCharacterOptions.DefaultReplacements,
+                ((SpaceCharacterFilter)step.Filter).Options.Replacements
+            );
+
+            editor.Definition = SpaceCharacterDefinition.Underscore;
+            editor.ReplaceSpaces = false;
+            editor.CustomText = "++";
+
+            var options = ((SpaceCharacterFilter)step.Filter).Options;
+            Assert.Equal('_', options.SpaceCharacter);
+            Assert.Equal(
+                [SpaceCharacterOptions.Percent20Replacement, SpaceCharacterOptions.UnderscoreReplacement, "++"],
+                options.Replacements
+            );
+            Assert.True(editor.ReplaceCustom);
+        }
+
+        /// <summary>
+        /// Verifies a non-default Space Character filter loads into the editor fields.
+        /// </summary>
+        [Fact]
+        public void Space_character_loads_non_default_options()
+        {
+            var step = new AppliedFilterStepViewModel(
+                "Space Character",
+                new SpaceCharacterFilter(
+                    new FilePrefixTarget(),
+                    new SpaceCharacterOptions(
+                        SpaceCharacter: '-',
+                        Replacements: [SpaceCharacterOptions.Percent20Replacement, "++"]
+                    )
+                )
+            );
+            var editor = new SpaceCharacterFilterEditorViewModel(step);
+
+            Assert.Equal(SpaceCharacterDefinition.Other, editor.Definition);
+            Assert.Equal("-", editor.OtherCharacter);
+            Assert.True(editor.ReplacePercent20);
+            Assert.False(editor.ReplaceSpaces);
+            Assert.False(editor.ReplaceUnderscores);
+            Assert.True(editor.ReplaceCustom);
+            Assert.Equal("++", editor.CustomText);
+        }
+
+        /// <summary>
+        /// Verifies typing an Other character selects the Other definition.
+        /// </summary>
+        [Fact]
+        public void Space_character_other_text_selects_other_definition()
+        {
+            var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
+            var editor = new SpaceCharacterFilterEditorViewModel(step);
+
+            editor.OtherCharacter = ".";
+
+            Assert.Equal(SpaceCharacterDefinition.Other, editor.Definition);
+            Assert.Equal('.', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);
+        }
+
+        /// <summary>
         /// Verifies Space After chars/neighbor edits replace the step filter options.
         /// </summary>
         [Fact]
@@ -587,7 +663,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.True(editor.IsDateMode);
             Assert.Equal("date to:", editor.ValuePhrase);
             Assert.Equal(TimestampField.LastWrite, editor.SelectedTimestampField.Field);
-            Assert.Equal(DateTime.Today.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), editor.DateText);
+            Assert.Equal(
+                DateTime.Today.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+                editor.DateText
+            );
 
             editor.SelectedTimestampField = editor.TimestampFields.Single(c => c.Field == TimestampField.Creation);
             editor.DateText = "2020-12-25";
@@ -624,7 +703,10 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             editor.SetCurrentCommand.Execute(null);
             options = ((TimeSetterFilter)step.Filter).Options;
-            Assert.Equal(editor.TimeText, options.Time.ToString("HH':'mm':'ss", System.Globalization.CultureInfo.InvariantCulture));
+            Assert.Equal(
+                editor.TimeText,
+                options.Time.ToString("HH':'mm':'ss", System.Globalization.CultureInfo.InvariantCulture)
+            );
         }
     }
 }

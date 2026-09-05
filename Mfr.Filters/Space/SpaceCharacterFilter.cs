@@ -7,8 +7,18 @@ namespace Mfr.Filters.Space
     /// <param name="Replacements">Substrings replaced with the space character, applied in list order.</param>
     public sealed record SpaceCharacterOptions(char SpaceCharacter, IReadOnlyList<string> Replacements)
     {
+        /// <summary>Literal <c>%20</c> (URL-encoded space) replacement token.</summary>
+        public const string Percent20Replacement = "%20";
+
+        /// <summary>U+0020 SPACE replacement token.</summary>
+        public const string SpaceReplacement = " ";
+
+        /// <summary>Underscore replacement token.</summary>
+        public const string UnderscoreReplacement = "_";
+
         /// <summary>MFR7 add-to-list defaults: %20, space, underscore.</summary>
-        public static IReadOnlyList<string> DefaultReplacements { get; } = ["%20", " ", "_"];
+        public static IReadOnlyList<string> DefaultReplacements { get; } =
+        [Percent20Replacement, SpaceReplacement, UnderscoreReplacement];
     }
 
     /// <summary>
@@ -43,6 +53,12 @@ namespace Mfr.Filters.Space
             var result = value;
             foreach (var from in Options.Replacements)
             {
+                // Empty oldValue throws from string.Replace; skip invalid entries from hand-edited presets.
+                if (from.Length == 0)
+                {
+                    continue;
+                }
+
                 result = result.Replace(from, sep, StringComparison.Ordinal);
             }
 

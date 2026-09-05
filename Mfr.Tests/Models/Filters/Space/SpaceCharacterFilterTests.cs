@@ -71,5 +71,36 @@ namespace Mfr.Tests.Models.Filters.Space
 
             Assert.Equal("Gone_With_the_Wind", item.Preview.Prefix);
         }
+
+        /// <summary>
+        /// Verifies WordSeparator is set even when replacements leave the text unchanged.
+        /// </summary>
+        [Fact]
+        public void Apply_WithNoMatchingReplacements_SetsWordSeparatorOnly()
+        {
+            var item = FilterTestHelpers.ApplyReturnItem(
+                new SpaceCharacterFilter(
+                    _target,
+                    new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: ["%20"])
+                ),
+                "my song"
+            );
+
+            Assert.Equal("my song", item.Preview.Prefix);
+            Assert.Equal('_', item.WordSeparator);
+        }
+
+        /// <summary>
+        /// Verifies empty replacement entries are skipped (string.Replace rejects empty oldValue).
+        /// </summary>
+        [Fact]
+        public void Apply_EmptyReplacementEntry_IsSkipped()
+        {
+            var f = new SpaceCharacterFilter(
+                _target,
+                new SpaceCharacterOptions(SpaceCharacter: '-', Replacements: ["", "++"])
+            );
+            Assert.Equal("a-b", FilterTestHelpers.ApplyToPrefix(f, "a++b"));
+        }
     }
 }
