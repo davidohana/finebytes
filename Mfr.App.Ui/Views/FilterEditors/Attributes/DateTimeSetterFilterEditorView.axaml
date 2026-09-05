@@ -51,8 +51,9 @@
             MaxLength="10"
             IsEnabled="{Binding SetDate}"
             Watermark="yyyy-MM-dd"
-            Text="{Binding DateText}"
-            ToolTip.Tip="Calendar date as yyyy-MM-dd (1601-01-01 through 2100-12-31)."
+            Text="{Binding DateText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+            LostFocus="_OnDateBoxLostFocus"
+            ToolTip.Tip="Calendar date as yyyy-MM-dd (1601-01-01 through 2100-12-31). Always shown as a full date."
           />
           <Button
             Grid.Column="2"
@@ -84,9 +85,10 @@
             Width="88"
             MaxLength="8"
             IsEnabled="{Binding SetTime}"
-            Watermark="HH:mm[:ss]"
-            Text="{Binding TimeText}"
-            ToolTip.Tip="Time of day as HH:mm:ss or HH:mm (hours 00-23)."
+            Watermark="HH:mm:ss"
+            Text="{Binding TimeText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+            LostFocus="_OnTimeBoxLostFocus"
+            ToolTip.Tip="Time of day as HH:mm:ss (HH:mm also accepted). Always shown as HH:mm:ss."
           />
         </Grid>
       </StackPanel>

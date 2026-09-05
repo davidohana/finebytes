@@ -16,9 +16,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         private const string DateFormat = "yyyy-MM-dd";
         private const string TimeFormatWithSeconds = "HH':'mm':'ss";
         private const string TimeFormatMinutes = "HH':'mm";
-        private const int DateTextLength = 10;
-        private const int TimeTextLengthMinutes = 5;
-        private const int TimeTextLengthWithSeconds = 8;
 
         private static readonly string[] s_TimeFormats = [TimeFormatWithSeconds, TimeFormatMinutes];
 
@@ -63,7 +60,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         private bool _setTime;
 
         /// <summary>
-        /// Gets or sets the time-of-day text (<c>HH:mm:ss</c> or <c>HH:mm</c>).
+        /// Gets or sets the time-of-day text (<c>HH:mm:ss</c>).
         /// </summary>
         [ObservableProperty]
         private string _timeText = string.Empty;
@@ -96,6 +93,61 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         }
 
         /// <summary>
+        /// Commits <see cref="DateText"/>: apply when valid, otherwise restore the full applied date.
+        /// </summary>
+        /// <remarks>
+        /// Call from the date TextBox <c>LostFocus</c> handler so partial edits cannot remain visible.
+        /// </remarks>
+        public void CommitDateText()
+        {
+            if (IsLoading || Step.Filter is not DateTimeSetterFilter filter)
+            {
+                return;
+            }
+
+            var date = filter.Options.Date;
+            if (_TryParseDate(DateText, out var parsed))
+            {
+                date = parsed;
+                _SetDateTextCanonical(date);
+            }
+            else
+            {
+                _SetDateTextCanonical(filter.Options.Date);
+            }
+
+            _ApplyResolved(filter, date, filter.Options.Time);
+        }
+
+        /// <summary>
+        /// Commits <see cref="TimeText"/>: apply when valid, otherwise restore the full applied time.
+        /// </summary>
+        /// <remarks>
+        /// Call from the time TextBox <c>LostFocus</c> handler so partial edits cannot remain visible.
+        /// Accepted <c>HH:mm</c> input is rewritten to <c>HH:mm:ss</c>.
+        /// </remarks>
+        public void CommitTimeText()
+        {
+            if (IsLoading || Step.Filter is not DateTimeSetterFilter filter)
+            {
+                return;
+            }
+
+            var time = filter.Options.Time;
+            if (_TryParseTime(TimeText, out var parsed))
+            {
+                time = parsed;
+                _SetTimeTextCanonical(time);
+            }
+            else
+            {
+                _SetTimeTextCanonical(filter.Options.Time);
+            }
+
+            _ApplyResolved(filter, filter.Options.Date, time);
+        }
+
+        /// <summary>
         /// Copies current filter options into editor properties without live replace.
         /// </summary>
         private void _SyncFromFilter()
@@ -118,6 +170,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         /// <summary>
         /// Parses enabled date/time text and replaces the step filter when options change.
         /// </summary>
+        /// <remarks>
+        /// Text boxes commit on LostFocus; once the VM sees text it must be a full canonical value —
+        /// partial or illegal input is restored to the last applied date/time.
+        /// </remarks>
         private void _ApplyOptions()
         {
             if (IsLoading || SelectedTimestampField is null || Step.Filter is not DateTimeSetterFilter filter)
@@ -125,18 +181,43 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                 return;
             }
 
-            // Resolve each enabled field independently so an incomplete sibling cannot block a valid edit
-            // (e.g. date 2026-09-05 must still apply while time text is mid-edit "18:1").
+            // Resolve each enabled field independently so a bad sibling cannot block a valid edit.
             var date = filter.Options.Date;
             var time = filter.Options.Time;
             if (SetDate)
             {
-                _ResolveDate(filter, ref date);
+                if (_TryParseDate(DateText, out var parsedDate))
+                {
+                    date = parsedDate;
+                    _SetDateTextCanonical(date);
+                }
+                else
+                {
+                    _SetDateTextCanonical(filter.Options.Date);
+                }
             }
 
             if (SetTime)
             {
-                _ResolveTime(filter, ref time);
+                if (_TryParseTime(TimeText, out var parsedTime))
+                {
+                    time = parsedTime;
+                    _SetTimeTextCanonical(time);
+                }
+                else
+                {
+                    _SetTimeTextCanonical(filter.Options.Time);
+                }
+            }
+
+            _ApplyResolved(filter, date, time);
+        }
+
+        private void _ApplyResolved(DateTimeSetterFilter filter, DateOnly date, TimeOnly time)
+        {
+            if (SelectedTimestampField is null)
+            {
+                return;
             }
 
             var options = new DateTimeSetterOptions(
@@ -149,80 +230,61 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             ApplyIfChanged(filter, filter with { Options = options });
         }
 
-        /// <summary>
-        /// Parses <see cref="DateText"/> into a supported file date, or reverts complete illegal input.
-        /// </summary>
-        private void _ResolveDate(DateTimeSetterFilter filter, ref DateOnly date)
+        private static bool _TryParseDate(string? text, out DateOnly date)
         {
-            var text = (DateText ?? string.Empty).Trim();
-            if (
-                DateOnly.TryParseExact(
-                    text,
+            return DateOnly.TryParseExact(
+                    (text ?? string.Empty).Trim(),
                     DateFormat,
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.None,
-                    out var parsed
-                ) && FileTimestampDateLimits.IsInRange(parsed)
-            )
-            {
-                date = parsed;
-                return;
-            }
-
-            if (text.Length >= DateTextLength)
-            {
-                _RevertBoundText(
-                    () => DateText ?? string.Empty,
-                    value => DateText = value,
-                    filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture),
-                    text
-                );
-            }
+                    out date
+                ) && FileTimestampDateLimits.IsInRange(date);
         }
 
-        /// <summary>
-        /// Parses <see cref="TimeText"/> as <c>HH:mm:ss</c> or <c>HH:mm</c>, or reverts complete illegal input.
-        /// </summary>
-        private void _ResolveTime(DateTimeSetterFilter filter, ref TimeOnly time)
+        private static bool _TryParseTime(string? text, out TimeOnly time)
         {
-            var text = (TimeText ?? string.Empty).Trim();
-            if (
-                TimeOnly.TryParseExact(
-                    text,
-                    s_TimeFormats,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var parsed
-                )
-            )
+            return TimeOnly.TryParseExact(
+                (text ?? string.Empty).Trim(),
+                s_TimeFormats,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out time
+            );
+        }
+
+        private void _SetDateTextCanonical(DateOnly date)
+        {
+            var canonical = date.ToString(DateFormat, CultureInfo.InvariantCulture);
+            if (DateText == canonical)
             {
-                time = parsed;
                 return;
             }
 
-            var looksComplete = text.Length is TimeTextLengthMinutes or >= TimeTextLengthWithSeconds;
-            if (looksComplete)
+            LoadWithoutApplying(() => DateText = canonical);
+            _NudgeBoundText(() => DateText, value => DateText = value, canonical);
+        }
+
+        private void _SetTimeTextCanonical(TimeOnly time)
+        {
+            var canonical = time.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture);
+            if (TimeText == canonical)
             {
-                _RevertBoundText(
-                    () => TimeText ?? string.Empty,
-                    value => TimeText = value,
-                    filter.Options.Time.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture),
-                    text
-                );
+                return;
             }
+
+            LoadWithoutApplying(() => TimeText = canonical);
+            _NudgeBoundText(() => TimeText, value => TimeText = value, canonical);
         }
 
         /// <summary>
-        /// Restores bound TextBox text after complete illegal input, without clobbering a newer edit.
+        /// Re-pushes a restored value after the current TwoWay TextBox write settles.
         /// </summary>
         /// <remarks>
         /// Avalonia can ignore a same-stack source write while applying a TextBox edit; posting a
-        /// clear-then-restore forces the bound control to show the reverted value when it is still
-        /// showing the rejected text. If the user typed again before the post runs, leave that text.
+        /// clear-then-restore forces the bound control to show the reverted value.
         /// </remarks>
-        private void _RevertBoundText(Func<string> getText, Action<string> setText, string restored, string rejected)
+        private void _NudgeBoundText(Func<string> getText, Action<string> setText, string restored)
         {
-            LoadWithoutApplying(() => setText(restored));
             Dispatcher.UIThread.Post(() =>
             {
                 if (IsLoading)
@@ -232,19 +294,13 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 
                 LoadWithoutApplying(() =>
                 {
-                    var current = getText();
-                    if (current != restored && current != rejected)
+                    if (getText() != restored)
                     {
-                        return;
-                    }
-
-                    if (current == restored)
-                    {
-                        setText(string.Empty);
                         setText(restored);
                         return;
                     }
 
+                    setText(string.Empty);
                     setText(restored);
                 });
             });
