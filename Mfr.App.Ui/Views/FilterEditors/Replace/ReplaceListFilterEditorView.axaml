@@ -73,16 +73,19 @@
         <controls:CompactCheckBox
           x:Name="CaseSensitiveCheckBox"
           Content="Case sensitive"
+          ToolTip.Tip="When checked, only matches with the same letter casing are replaced."
           IsChecked="{Binding CaseSensitive}"
         />
         <controls:CompactCheckBox
           x:Name="ReplaceAllCheckBox"
           Content="Replace all matches"
+          ToolTip.Tip="When unchecked, only the first match in each name is replaced."
           IsChecked="{Binding ReplaceAll}"
         />
         <controls:CompactCheckBox
           x:Name="WholeWordCheckBox"
           Content="Replace only whole words"
+          ToolTip.Tip="Only replace matches that form a whole word (non letter/digit on both sides)."
           IsChecked="{Binding WholeWord}"
         />
       </StackPanel>

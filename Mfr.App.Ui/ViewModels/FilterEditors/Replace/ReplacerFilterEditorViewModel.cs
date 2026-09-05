@@ -104,8 +104,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
 
             LoadWithoutApplying(() =>
             {
-                Find = filter.Options.Find ?? string.Empty;
-                Replacement = filter.Options.Replacement ?? string.Empty;
+                Find = filter.Options.Find;
+                Replacement = filter.Options.Replacement;
                 Mode = filter.Options.Mode;
                 CaseSensitive = filter.Options.CaseSensitive;
                 ReplaceAll = filter.Options.ReplaceAll;
