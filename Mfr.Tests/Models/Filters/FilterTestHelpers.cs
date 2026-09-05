@@ -48,7 +48,7 @@ namespace Mfr.Tests.Models.Filters
             Action<FileMeta>? configureOriginal = null
         )
         {
-            directory ??= @"C:\Music\Album";
+            directory ??= TestPaths.Absolute("Music", "Album");
             var baseline = new DateTime(2024, 6, 1, 12, 30, 45, DateTimeKind.Unspecified);
             var resolvedTotal = renameListTotalCount ?? Math.Max(renameListIndex + 1, 1);
             var resolvedFolder = renameListFolderSiblingCount ?? Math.Max(inFolderIndex + 1, 1);

@@ -525,9 +525,8 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public void GetAutoFitWidth_fits_typical_music_library_paths()
         {
-            const string parentFolder = @"D:\Music\General\QRS\Supergrass - 2005 - Road To Rouen";
-            const string fullPath =
-                @"D:\Music\General\QRS\Supergrass - 2005 - Road To Rouen\01 - Tales of Endurance (Part 1).mp3";
+            var parentFolder = TestPaths.Absolute("Music", "General", "QRS", "Supergrass - 2005 - Road To Rouen");
+            var fullPath = Path.Combine(parentFolder, "01 - Tales of Endurance (Part 1).mp3");
 
             var parentFolderKey = RenameListFieldKey.Original(
                 BasicRenameListField.Group,

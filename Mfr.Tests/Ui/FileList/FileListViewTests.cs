@@ -179,7 +179,7 @@ namespace Mfr.Tests.Ui.FileList
         {
             var viewModel = _CreateThumbnailsViewModel(folderCount: 4);
             var (window, list) = _ShowThumbnails(viewModel);
-            var entry = Assert.Single(viewModel.Entries, item => item.Name == ".config");
+            var entry = Assert.Single(viewModel.Entries, item => item.Name == "ab");
             viewModel.SelectedEntry = entry;
             window.UpdateLayout();
 
@@ -200,7 +200,7 @@ namespace Mfr.Tests.Ui.FileList
         {
             var viewModel = _CreateThumbnailsViewModel(folderCount: 4);
             var (window, list) = _ShowThumbnails(viewModel);
-            var entry = Assert.Single(viewModel.Entries, item => item.Name == ".config");
+            var entry = Assert.Single(viewModel.Entries, item => item.Name == "ab");
             var square = _ThumbnailSquare(list, entry);
 
             Assert.Equal(viewModel.ThumbnailSize, square.Bounds.Width, precision: 0);
@@ -223,7 +223,7 @@ namespace Mfr.Tests.Ui.FileList
             var viewModel = _CreateThumbnailsViewModel(folderCount: 80);
             var (window, list) = _ShowThumbnails(viewModel);
             var scrollViewer = list.GetVisualDescendants().OfType<ScrollViewer>().First();
-            var entry = Assert.Single(viewModel.Entries, item => item.Name == ".config");
+            var entry = Assert.Single(viewModel.Entries, item => item.Name == "ab");
             viewModel.SelectedEntry = entry;
             window.UpdateLayout();
 
@@ -878,7 +878,7 @@ namespace Mfr.Tests.Ui.FileList
         private FileListViewModel _CreateThumbnailsViewModel(int folderCount)
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            Directory.CreateDirectory(Path.Combine(dir, ".config"));
+            Directory.CreateDirectory(Path.Combine(dir, "ab"));
             for (var i = 0; i < folderCount; i++)
             {
                 Directory.CreateDirectory(Path.Combine(dir, $"folder{i:D3}"));

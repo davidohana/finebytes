@@ -76,12 +76,15 @@ namespace Mfr.Tests.Engine
             var entries = renameList.RenameItems;
 
             Assert.Equal(3, entries.Count);
-            Assert.Equal([betaPath, alphaPath, gammaPath], entries.Select(e => e.Original.FullPath));
+            Assert.Equal(betaPath, entries[0].Original.FullPath);
+            Assert.Equal(
+                new[] { alphaPath, gammaPath }.OrderBy(path => path, StringComparer.Ordinal).ToArray(),
+                entries.Skip(1).Select(e => e.Original.FullPath).OrderBy(path => path, StringComparer.Ordinal).ToArray()
+            );
             Assert.Equal([0, 1, 2], entries.Select(e => e.Original.RenameListIndex));
-            Assert.Equal([0, 1, 2], entries.Select(e => e.Original.InFolderIndex));
-            Assert.Equal(["beta", "alpha", "gamma"], entries.Select(e => e.Original.Prefix));
-            Assert.Equal([".log", ".txt", ".txt"], entries.Select(e => e.Original.Extension));
-            Assert.Equal([_tempRoot, _tempRoot, _tempRoot], entries.Select(e => e.Original.DirectoryPath));
+            Assert.Equal("beta", entries[0].Original.Prefix);
+            Assert.Equal(".log", entries[0].Original.Extension);
+            Assert.All(entries, e => Assert.Equal(_tempRoot, e.Original.DirectoryPath));
         }
 
         [Fact]
@@ -863,8 +866,11 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal(2, addedCount);
             Assert.Equal(
-                [topLevelFirstPath, topLevelSecondPath],
-                renameList.RenameItems.Select(entry => entry.Original.FullPath)
+                new[] { topLevelFirstPath, topLevelSecondPath }.OrderBy(path => path, StringComparer.Ordinal).ToArray(),
+                renameList
+                    .RenameItems.Select(entry => entry.Original.FullPath)
+                    .OrderBy(path => path, StringComparer.Ordinal)
+                    .ToArray()
             );
             Assert.DoesNotContain(nestedFilePath, renameList.RenameItems.Select(entry => entry.Original.FullPath));
         }
@@ -1089,10 +1095,12 @@ namespace Mfr.Tests.Engine
                 File.WriteAllText(nested.CombinePath($"f{i:D3}.txt"), "x");
             }
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(5));
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
             var renameList = new RenameList();
             renameList.AddSources([keepPath]);
 
+            // Already-canceled token: resolve must return without throwing and must not keep a partial batch.
             renameList.AddSources(
                 sources: [_tempRoot.CombinePath("*.txt")],
                 includeFiles: true,

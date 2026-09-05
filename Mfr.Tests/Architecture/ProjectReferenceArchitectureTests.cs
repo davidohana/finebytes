@@ -99,7 +99,10 @@ namespace Mfr.Tests.Architecture
 
         private static List<string> _LoadProjectReferencePaths(string repoRoot, string projectPathFromRepoRoot)
         {
-            var projectFullPath = Path.Combine(repoRoot, projectPathFromRepoRoot);
+            var projectFullPath = Path.Combine(
+                repoRoot,
+                projectPathFromRepoRoot.Replace('\\', Path.DirectorySeparatorChar)
+            );
 
             var document = XDocument.Load(projectFullPath);
 
@@ -114,6 +117,8 @@ namespace Mfr.Tests.Architecture
                     .Select(reference => reference.Attribute("Include")?.Value)
                     .Where(include => !string.IsNullOrWhiteSpace(include))
                     .Select(include => include!)
+                    // csproj Include paths use '\'; normalize before Combine/GetFullPath on Unix.
+                    .Select(include => include.Replace('\\', Path.DirectorySeparatorChar))
                     .Select(include => Path.GetFullPath(Path.Combine(projectDirectory, include)))
                     .Select(fullPath => Path.GetRelativePath(repoRoot, fullPath))
                     .Select(relativePath => relativePath.Replace('/', '\\')),

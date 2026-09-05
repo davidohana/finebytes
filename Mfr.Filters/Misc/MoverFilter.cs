@@ -89,9 +89,12 @@ namespace Mfr.Filters.Misc
             }
 
             var resolved = _compiledSubFolder(item);
-            // Strip a leading slash so Path.Combine appends relative segments. Otherwise a value like
+            // SubFolder templates use Windows-style '\' for nested levels (MFR7). Normalize to the host
+            // separator so Path.Combine builds real nested segments on Linux CI as well as Windows.
+            var normalized = resolved.Replace('\\', Path.DirectorySeparatorChar);
+            // Strip a leading separator so Path.Combine appends relative segments. Otherwise a value like
             // "\Sub" is rooted on Windows and Path.Combine ignores RootFolder entirely.
-            var relative = resolved.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var relative = normalized.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
             var relativeIsEmpty = string.IsNullOrEmpty(relative);
             if (relativeIsEmpty)

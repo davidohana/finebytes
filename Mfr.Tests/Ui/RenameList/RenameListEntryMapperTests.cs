@@ -12,10 +12,11 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void ToEntry_GetFieldText_matches_catalog_and_convenience_properties()
         {
+            var directory = TestPaths.Absolute("Photos", "2024");
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "vacation007",
                 extension: ".jpg",
-                directory: @"D:\Photos\2024"
+                directory: directory
             );
             var entry = RenameListEntry.ToEntry(item);
             var fullNameKey = RenameListFieldKey.Original(
@@ -26,7 +27,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("vacation007.jpg", entry.GetFieldText(fullNameKey));
             Assert.Equal(entry.GetFieldText(fullNameKey), entry.FullFileName);
             Assert.Equal("File", entry.FileFolder);
-            Assert.Equal(@"D:\Photos\2024\vacation007.jpg", entry.FullPath);
+            Assert.Equal(Path.Combine(directory, "vacation007.jpg"), entry.FullPath);
         }
 
         [Fact]

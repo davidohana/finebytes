@@ -294,7 +294,15 @@ namespace Mfr.App.Ui.Services.FileList
         /// </returns>
         public static string DirectoryDisplayName(string path)
         {
-            var name = Path.GetFileName(path.TrimTrailingSeparator());
+            var trimmed = path.TrimTrailingSeparator();
+            // Windows-style paths keep '\' as the segment separator. Path.GetFileName only splits on the
+            // host separator, so on Linux CI fall back to the last '\\' segment.
+            if (trimmed.Contains('\\'))
+            {
+                return LastUncSegment(trimmed);
+            }
+
+            var name = Path.GetFileName(trimmed);
             return string.IsNullOrEmpty(name) ? LastUncSegment(path) : name;
         }
 

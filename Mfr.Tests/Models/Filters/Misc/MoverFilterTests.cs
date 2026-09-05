@@ -8,16 +8,21 @@ namespace Mfr.Tests.Models.Filters.Misc
     /// </summary>
     public class MoverFilterTests
     {
+        private static string Dest => TestPaths.Absolute("Dest");
+        private static string Source => TestPaths.Absolute("Source");
+        private static string Music => TestPaths.Absolute("Music");
+        private static string Archive => TestPaths.Absolute("Archive");
+
         /// <summary>
         /// Verifies the preview directory is set to RootFolder when SubFolder is omitted.
         /// </summary>
         [Fact]
         public void Apply_RootOnly_SetsDirectoryToRoot()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Dest"));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: @"C:\Source");
+            var filter = new MoverFilter(new MoverOptions(Dest));
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
-            Assert.Equal(@"C:\Dest", item.Preview.DirectoryPath);
+            Assert.Equal(Dest, item.Preview.DirectoryPath);
         }
 
         /// <summary>
@@ -26,10 +31,10 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_EmptySubFolder_SetsDirectoryToRoot()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Dest", SubFolder: ""));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: @"C:\Source");
+            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: ""));
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
-            Assert.Equal(@"C:\Dest", item.Preview.DirectoryPath);
+            Assert.Equal(Dest, item.Preview.DirectoryPath);
         }
 
         /// <summary>
@@ -38,10 +43,10 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_StaticSubFolder_CombinesRootAndSubFolder()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Dest", SubFolder: "Albums"));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: @"C:\Source");
+            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: "Albums"));
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
-            Assert.Equal(@"C:\Dest\Albums", item.Preview.DirectoryPath);
+            Assert.Equal(Path.Combine(Dest, "Albums"), item.Preview.DirectoryPath);
         }
 
         /// <summary>
@@ -50,10 +55,10 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_MultiLevelSubFolder_CombinesRootAndDeepPath()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Dest", SubFolder: @"Artist\Album"));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: @"C:\Source");
+            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: @"Artist\Album"));
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
-            Assert.Equal(@"C:\Dest\Artist\Album", item.Preview.DirectoryPath);
+            Assert.Equal(Path.Combine(Dest, "Artist", "Album"), item.Preview.DirectoryPath);
         }
 
         /// <summary>
@@ -62,8 +67,8 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_DoesNotChangePrefix()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Dest", SubFolder: "Sub"));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "my-track", directory: @"C:\Source");
+            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: "Sub"));
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "my-track", directory: Source);
 
             Assert.Equal("my-track", item.Preview.Prefix);
         }
@@ -74,8 +79,8 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_DoesNotChangeExtension()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Dest"));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", extension: ".flac", directory: @"C:\Source");
+            var filter = new MoverFilter(new MoverOptions(Dest));
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", extension: ".flac", directory: Source);
 
             Assert.Equal(".flac", item.Preview.Extension);
         }
@@ -86,10 +91,14 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_TemplateSubFolder_ResolvesToken()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Music", SubFolder: "<file-name>"));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "Blue Moon", directory: @"C:\Downloads");
+            var filter = new MoverFilter(new MoverOptions(Music, SubFolder: "<file-name>"));
+            var item = FilterTestHelpers.ApplyReturnItem(
+                filter,
+                "Blue Moon",
+                directory: TestPaths.Absolute("Downloads")
+            );
 
-            Assert.Equal(@"C:\Music\Blue Moon", item.Preview.DirectoryPath);
+            Assert.Equal(Path.Combine(Music, "Blue Moon"), item.Preview.DirectoryPath);
         }
 
         /// <summary>
@@ -98,10 +107,14 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_TemplateWithStaticSegment_ProducesCompoundPath()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Music", SubFolder: @"Artists\<parent-folder>"));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: @"C:\Downloads\Junkies");
+            var filter = new MoverFilter(new MoverOptions(Music, SubFolder: @"Artists\<parent-folder>"));
+            var item = FilterTestHelpers.ApplyReturnItem(
+                filter,
+                "track",
+                directory: TestPaths.Absolute("Downloads", "Junkies")
+            );
 
-            Assert.Equal(@"C:\Music\Artists\Junkies", item.Preview.DirectoryPath);
+            Assert.Equal(Path.Combine(Music, "Artists", "Junkies"), item.Preview.DirectoryPath);
         }
 
         /// <summary>
@@ -110,10 +123,10 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_SubFolderWithLeadingSeparator_StripsAndCombines()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Dest", SubFolder: @"\Sub"));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: @"C:\Source");
+            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: @"\Sub"));
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
-            Assert.Equal(@"C:\Dest\Sub", item.Preview.DirectoryPath);
+            Assert.Equal(Path.Combine(Dest, "Sub"), item.Preview.DirectoryPath);
         }
 
         /// <summary>
@@ -155,10 +168,10 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_OriginalDirectoryUnchanged()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Dest"));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: @"C:\Source");
+            var filter = new MoverFilter(new MoverOptions(Dest));
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
-            Assert.Equal(@"C:\Source", item.Original.DirectoryPath);
+            Assert.Equal(Source, item.Original.DirectoryPath);
         }
 
         /// <summary>
@@ -169,11 +182,11 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_FolderEntry_MultipliesPreviewDirectoryAndKeepsFolderName()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Archive", SubFolder: "Sorted"));
+            var filter = new MoverFilter(new MoverOptions(Archive, SubFolder: "Sorted"));
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "Photos",
                 extension: string.Empty,
-                directory: @"C:\Inbox",
+                directory: TestPaths.Absolute("Inbox"),
                 attributes: FileAttributes.Directory
             );
             filter.Setup();
@@ -182,8 +195,8 @@ namespace Mfr.Tests.Models.Filters.Misc
             var entryIsDirectoryAfterMove =
                 item.Preview.Attributes.IsDirectory() && item.Original.Attributes.IsDirectory();
             Assert.True(entryIsDirectoryAfterMove);
-            Assert.Equal(@"C:\Archive\Sorted", item.Preview.DirectoryPath);
-            Assert.Equal(@"C:\Archive\Sorted\Photos", item.Preview.FullPath);
+            Assert.Equal(Path.Combine(Archive, "Sorted"), item.Preview.DirectoryPath);
+            Assert.Equal(Path.Combine(Archive, "Sorted", "Photos"), item.Preview.FullPath);
         }
 
         /// <summary>
@@ -192,18 +205,18 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_FolderEntry_TemplateUsesOriginalParentSegment()
         {
-            var filter = new MoverFilter(new MoverOptions(@"C:\Music", SubFolder: "<parent-folder>"));
+            var filter = new MoverFilter(new MoverOptions(Music, SubFolder: "<parent-folder>"));
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "TheTrinitySession",
                 extension: string.Empty,
-                directory: @"C:\Downloads\CowboyJunkies",
+                directory: TestPaths.Absolute("Downloads", "CowboyJunkies"),
                 attributes: FileAttributes.Directory
             );
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal(@"C:\Music\CowboyJunkies", item.Preview.DirectoryPath);
-            Assert.Equal(@"C:\Music\CowboyJunkies\TheTrinitySession", item.Preview.FullPath);
+            Assert.Equal(Path.Combine(Music, "CowboyJunkies"), item.Preview.DirectoryPath);
+            Assert.Equal(Path.Combine(Music, "CowboyJunkies", "TheTrinitySession"), item.Preview.FullPath);
         }
     }
 }
