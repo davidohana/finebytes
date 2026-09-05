@@ -1149,7 +1149,7 @@ namespace Mfr.Tests.Engine
             Assert.True(File.Exists(destinationFolderC.CombinePath("inside-b.txt")));
         }
 
-        [Fact]
+        [WindowsFact]
         /// <summary>
         /// Verifies attribute-only preview commits call <see cref="File.SetAttributes"/> on the source path.
         /// </summary>
@@ -1390,7 +1390,7 @@ namespace Mfr.Tests.Engine
             Assert.False(File.Exists(nestedFilePath));
         }
 
-        [Fact]
+        [WindowsFact]
         /// <summary>
         /// Verifies attribute-only preview commits call <see cref="File.SetAttributes"/> on an included directory path.
         /// </summary>

@@ -52,11 +52,16 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_FullPathTarget_SetsPreviewFromTemplate()
         {
-            var template = @"D:\Staging\<full-name>";
+            var staging = TestPaths.Absolute("Staging");
+            var template = Path.Combine(staging, "<full-name>");
             var f = new FormatterFilter(new FullPathTarget(), new FormatterOptions(template));
-            var item = FilterTestHelpers.ApplyReturnItem(f, inputPrefix: "song", directory: @"C:\Music\Album");
-            Assert.Equal(@"D:\Staging\song.mp3", item.Preview.FullPath);
-            Assert.Equal(@"D:\Staging", item.Preview.DirectoryPath);
+            var item = FilterTestHelpers.ApplyReturnItem(
+                f,
+                inputPrefix: "song",
+                directory: TestPaths.Absolute("Music", "Album")
+            );
+            Assert.Equal(Path.Combine(staging, "song.mp3"), item.Preview.FullPath);
+            Assert.Equal(staging, item.Preview.DirectoryPath);
             Assert.Equal("song", item.Preview.Prefix);
             Assert.Equal(".mp3", item.Preview.Extension);
         }
@@ -67,12 +72,17 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_ParentDirectoryTarget_LiteralTemplate_MovesDirectoryOnly()
         {
-            var f = new FormatterFilter(new ParentDirectoryTarget(), new FormatterOptions(@"D:\Archived"));
-            var item = FilterTestHelpers.ApplyReturnItem(f, inputPrefix: "song", directory: @"C:\Music\Album");
-            Assert.Equal(@"D:\Archived", item.Preview.DirectoryPath);
+            var archived = TestPaths.Absolute("Archived");
+            var f = new FormatterFilter(new ParentDirectoryTarget(), new FormatterOptions(archived));
+            var item = FilterTestHelpers.ApplyReturnItem(
+                f,
+                inputPrefix: "song",
+                directory: TestPaths.Absolute("Music", "Album")
+            );
+            Assert.Equal(archived, item.Preview.DirectoryPath);
             Assert.Equal("song", item.Preview.Prefix);
             Assert.Equal(".mp3", item.Preview.Extension);
-            Assert.Equal(@"D:\Archived\song.mp3", item.Preview.FullPath);
+            Assert.Equal(Path.Combine(archived, "song.mp3"), item.Preview.FullPath);
         }
 
         /// <summary>
@@ -81,9 +91,17 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Apply_ParentDirectoryTarget_TokenFromPreviewDirectory()
         {
-            var f = new FormatterFilter(new ParentDirectoryTarget(), new FormatterOptions(@"D:\Libs\<parent-folder>"));
-            var item = FilterTestHelpers.ApplyReturnItem(f, inputPrefix: "track", directory: @"C:\Music\Album");
-            Assert.Equal(@"D:\Libs\Album", item.Preview.DirectoryPath);
+            var libs = TestPaths.Absolute("Libs");
+            var f = new FormatterFilter(
+                new ParentDirectoryTarget(),
+                new FormatterOptions(Path.Combine(libs, "<parent-folder>"))
+            );
+            var item = FilterTestHelpers.ApplyReturnItem(
+                f,
+                inputPrefix: "track",
+                directory: TestPaths.Absolute("Music", "Album")
+            );
+            Assert.Equal(Path.Combine(libs, "Album"), item.Preview.DirectoryPath);
         }
     }
 }

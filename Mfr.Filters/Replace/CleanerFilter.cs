@@ -1,3 +1,5 @@
+using Mfr.Utils;
+
 namespace Mfr.Filters.Replace
 {
     /// <summary>
@@ -38,7 +40,8 @@ namespace Mfr.Filters.Replace
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var invalidChars = Options.RemoveIllegalChars ? Path.GetInvalidFileNameChars() : [];
+            // Windows illegal-name set: this product renames Windows files (see WindowsFileNameChars).
+            var invalidChars = Options.RemoveIllegalChars ? WindowsFileNameChars.Invalid : [];
             var customChars = Options.CustomCharsToRemove ?? "";
             var chars = invalidChars.Concat(customChars).ToHashSet();
 

@@ -142,42 +142,46 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Resolve_file_row_basic_fields()
         {
+            var directory = TestPaths.Absolute("Photos", "2024");
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "vacation007",
                 extension: ".jpg",
-                directory: @"D:\Photos\2024"
+                directory: directory
             );
+            var fullPath = Path.Combine(directory, "vacation007.jpg");
 
             _AssertField(item, BasicRenameListFields.Key.ItemType, "File");
             _AssertField(item, BasicRenameListFields.Key.Name, "vacation007");
             _AssertField(item, BasicRenameListFields.Key.Extension, "jpg");
             _AssertField(item, BasicRenameListFields.Key.FullName, "vacation007.jpg");
-            _AssertField(item, BasicRenameListFields.Key.Folder, @"D:\Photos\2024");
-            _AssertField(item, BasicRenameListFields.Key.FullPath, @"D:\Photos\2024\vacation007.jpg");
+            _AssertField(item, BasicRenameListFields.Key.Folder, directory);
+            _AssertField(item, BasicRenameListFields.Key.FullPath, fullPath);
             _AssertField(item, BasicRenameListFields.Key.FileNameNumeric, "7");
             _AssertField(item, BasicRenameListFields.Key.FileNameLength, "15");
-            _AssertField(item, BasicRenameListFields.Key.FullPathLength, "30");
+            _AssertField(item, BasicRenameListFields.Key.FullPathLength, fullPath.Length.ToString());
         }
 
         [Fact]
         public void Resolve_folder_row_basic_fields()
         {
+            var directory = TestPaths.Absolute("Music");
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "Album",
                 extension: "",
-                directory: @"D:\Music",
+                directory: directory,
                 attributes: FileAttributes.Directory
             );
+            var fullPath = Path.Combine(directory, "Album");
 
             _AssertField(item, BasicRenameListFields.Key.ItemType, "Folder");
             _AssertField(item, BasicRenameListFields.Key.Name, "Album");
             _AssertField(item, BasicRenameListFields.Key.Extension, "");
             _AssertField(item, BasicRenameListFields.Key.FullName, "Album");
-            _AssertField(item, BasicRenameListFields.Key.Folder, @"D:\Music");
-            _AssertField(item, BasicRenameListFields.Key.FullPath, @"D:\Music\Album");
+            _AssertField(item, BasicRenameListFields.Key.Folder, directory);
+            _AssertField(item, BasicRenameListFields.Key.FullPath, fullPath);
             _AssertField(item, BasicRenameListFields.Key.FileNameNumeric, "0");
             _AssertField(item, BasicRenameListFields.Key.FileNameLength, "5");
-            _AssertField(item, BasicRenameListFields.Key.FullPathLength, "14");
+            _AssertField(item, BasicRenameListFields.Key.FullPathLength, fullPath.Length.ToString());
         }
 
         [Fact]
