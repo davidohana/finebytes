@@ -192,9 +192,17 @@ namespace Mfr.Tests.Ui.RenameList
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([betaPath, alphaPath]).ConfigureAwait(true);
+            await _WaitForBackgroundAsync(renameListViewModel).ConfigureAwait(true);
 
             renameListViewModel.SortByFieldKey(titleKey);
-            await _WaitForBackgroundAsync(renameListViewModel).ConfigureAwait(true);
+            // Hydrate+sort may be async (IsBusy) or sync when metadata is already warm — wait for outcome.
+            await _WaitUntilAsync(() =>
+                    !renameListViewModel.IsBusy
+                    && renameListViewModel.Entries.Count >= 2
+                    && renameListViewModel.Entries[0].EngineItem.Original.FullPath == alphaPath
+                    && renameListViewModel.Entries.All(entry => entry.EngineItem.TagLibLoadAttempted)
+                )
+                .ConfigureAwait(true);
 
             Assert.Equal(alphaPath, renameListViewModel.Entries[0].EngineItem.Original.FullPath);
             Assert.All(renameListViewModel.Entries, entry => Assert.True(entry.EngineItem.TagLibLoadAttempted));

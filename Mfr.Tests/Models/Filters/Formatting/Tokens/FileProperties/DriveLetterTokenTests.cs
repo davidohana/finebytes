@@ -10,7 +10,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
         /// <summary>
         /// Verifies a local path returns the drive letter without a trailing separator.
         /// </summary>
-        [Fact]
+        [WindowsFact]
         public void Resolve_LocalPath_ReturnsDriveWithoutSeparator()
         {
             var token = new DriveLetterToken();
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
         /// <summary>
         /// Verifies UNC paths return <c>$</c> as documented for network shares.
         /// </summary>
-        [Fact]
+        [WindowsFact]
         public void Resolve_UncPath_ReturnsDollarSign()
         {
             var token = new DriveLetterToken();
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
         /// <summary>
         /// Verifies a path with no resolvable root returns an empty string.
         /// </summary>
-        [Fact]
+        [WindowsFact]
         public void Resolve_NoRoot_ReturnsEmpty()
         {
             var token = new DriveLetterToken();

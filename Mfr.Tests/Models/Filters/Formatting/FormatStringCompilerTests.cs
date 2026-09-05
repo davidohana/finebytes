@@ -24,7 +24,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
                 extension: ".mp3",
-                directory: @"C:\Music\My Album"
+                directory: TestPaths.Absolute("Music", "My Album")
             );
 
             var compiled = FormatStringCompiler.Compile(template: "<file-name><ext>-<parent-folder>");

@@ -14,7 +14,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_NoArg_ReturnsImmediateParent()
         {
             var token = new ParentFolderToken();
-            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Music\My Album");
+            var item = FilterTestHelpers.CreateRenameItem(directory: TestPaths.Absolute("Music", "My Album"));
 
             Assert.Equal("My Album", token.Compile(tokenArgs: "")(item));
         }
@@ -26,7 +26,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_LevelOne_MatchesNoArg()
         {
             var token = new ParentFolderToken();
-            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Music\My Album");
+            var item = FilterTestHelpers.CreateRenameItem(directory: TestPaths.Absolute("Music", "My Album"));
 
             Assert.Equal("My Album", token.Compile(tokenArgs: "1")(item));
         }
@@ -38,7 +38,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_LevelTwo_ReturnsGrandparent()
         {
             var token = new ParentFolderToken();
-            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Medical Data\apr03\patients");
+            var item = FilterTestHelpers.CreateRenameItem(
+                directory: TestPaths.Absolute("Medical Data", "apr03", "patients")
+            );
 
             Assert.Equal("apr03", token.Compile(tokenArgs: "2")(item));
         }
@@ -50,7 +52,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_LevelTooHigh_ReturnsEmpty()
         {
             var token = new ParentFolderToken();
-            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Medical Data\apr03\patients");
+            var item = FilterTestHelpers.CreateRenameItem(
+                directory: TestPaths.Absolute("Medical Data", "apr03", "patients")
+            );
 
             Assert.Equal(string.Empty, token.Compile(tokenArgs: "5")(item));
         }
@@ -62,11 +66,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_UsesPreviewNotOriginal()
         {
             var token = new ParentFolderToken();
-            var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Music\Album");
-            item.Preview.DirectoryPath = @"D:\Libs\Staging";
+            var original = TestPaths.Absolute("Music", "Album");
+            var item = FilterTestHelpers.CreateRenameItem(directory: original);
+            item.Preview.DirectoryPath = TestPaths.Absolute("Libs", "Staging");
 
             Assert.Equal("Staging", token.Compile(tokenArgs: "")(item));
-            Assert.Equal(@"C:\Music\Album", item.Original.DirectoryPath);
+            Assert.Equal(original, item.Original.DirectoryPath);
         }
     }
 }

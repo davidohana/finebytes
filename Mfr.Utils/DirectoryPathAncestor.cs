@@ -139,10 +139,10 @@ namespace Mfr.Utils
                 );
             }
 
-            if (newSegmentName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            if (newSegmentName.IndexOfAny(WindowsFileNameChars.Invalid) >= 0)
             {
                 throw new ArgumentException(
-                    $"Ancestor folder segment '{newSegmentName}' contains invalid characters for this platform.",
+                    $"Ancestor folder segment '{newSegmentName}' contains invalid characters for Windows file names.",
                     nameof(newSegmentName)
                 );
             }
