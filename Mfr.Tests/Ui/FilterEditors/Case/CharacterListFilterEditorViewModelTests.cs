@@ -16,14 +16,17 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Capitalize_after_options_update_step_options()
         {
             var step = new AppliedFilterStepViewModel("Capitalize After", new CapitalizeAfterFilter());
+
             var editor = new CharacterListFilterEditorViewModel(step);
 
             Assert.Equal(",!()[]{};-", editor.Chars);
+
             Assert.Contains("succeed", editor.CharsPrompt, StringComparison.OrdinalIgnoreCase);
 
             editor.Chars = "._";
 
             var options = ((CapitalizeAfterFilter)step.Filter).Options;
+
             Assert.Equal("._", options.CapitalizeAfterChars);
         }
 
@@ -34,14 +37,17 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Sentence_end_characters_options_update_step_options()
         {
             var step = new AppliedFilterStepViewModel("Sentence End Characters", new SentenceEndCharactersFilter());
+
             var editor = new CharacterListFilterEditorViewModel(step);
 
             Assert.Equal("-.!", editor.Chars);
+
             Assert.Contains("sentence had ended", editor.CharsPrompt, StringComparison.OrdinalIgnoreCase);
 
             editor.Chars = ":;";
 
             var options = ((SentenceEndCharactersFilter)step.Filter).Options;
+
             Assert.Equal(":;", options.Characters);
         }
     }

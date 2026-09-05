@@ -45,12 +45,9 @@ Per-editor VM/view suites live under `Mfr.Tests/Ui/FilterEditors/<Group>/`; shar
 
 Editor now uses `CasingListParser.ParseEditorText` / `FormatEditorText`. Keep domain validation at `BuildMap` / Setup.
 
-### 7. Space Character MFR7 empty-Other validation — **medium**
+### 7. Space Character MFR7 empty-Other validation — **done**
 
-- **Sites:** `_ResolveSpaceCharacter` empty Other → `' '`
-- **Target:** don’t persist / don’t apply when Other + empty (or clear error)
-- **Value:** closes silent Space fallback drift vs MFR7
-- **Cost:** small UX decision + tests
+Editor skips apply when Other + empty (keeps last valid options; no silent `' '` fallback). MFR7 rejects undefined custom space at apply time.
 
 ### 8. `CountFilterOptions.ClampToLength` helper — **medium**
 

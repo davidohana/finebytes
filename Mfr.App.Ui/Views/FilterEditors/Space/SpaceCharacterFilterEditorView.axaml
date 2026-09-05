@@ -54,7 +54,7 @@
               Classes="filter-editor-field"
               Width="28"
               MaxLength="1"
-              Watermark="-"
+              HorizontalContentAlignment="Center"
               ToolTip.Tip="Any single character to use as the word separator (e.g. - or .)."
               Text="{Binding OtherCharacter}"
             />
@@ -107,8 +107,7 @@
             x:Name="CustomTextBox"
             Classes="filter-editor-field"
             MinWidth="120"
-            Watermark="++"
-            ToolTip.Tip="Exact substring to replace when Custom text is checked."
+            ToolTip.Tip="Exact substring to replace when Custom text is checked (e.g. ++)."
             Text="{Binding CustomText}"
           />
         </StackPanel>

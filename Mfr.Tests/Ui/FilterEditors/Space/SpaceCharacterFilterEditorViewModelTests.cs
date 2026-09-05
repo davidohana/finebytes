@@ -82,5 +82,36 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
             Assert.Equal(SpaceCharacterDefinition.Other, editor.Definition);
             Assert.Equal('.', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);
         }
+
+        /// <summary>
+        /// Verifies Other with an empty character does not overwrite the last valid separator (no silent space fallback).
+        /// </summary>
+        [Fact]
+        public void Space_character_empty_other_does_not_apply()
+        {
+            var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
+            var editor = new SpaceCharacterFilterEditorViewModel(step) { Definition = SpaceCharacterDefinition.Other };
+            Assert.Equal(' ', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);
+
+            editor.OtherCharacter = "-";
+            Assert.Equal('-', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);
+
+            editor.OtherCharacter = string.Empty;
+            Assert.Equal(SpaceCharacterDefinition.Other, editor.Definition);
+            Assert.Equal('-', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);
+        }
+
+        /// <summary>
+        /// Verifies typing a second Other character replaces the first (MFR7 KeyPress parity).
+        /// </summary>
+        [Fact]
+        public void Space_character_other_text_keeps_last_character()
+        {
+            var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
+            var editor = new SpaceCharacterFilterEditorViewModel(step) { OtherCharacter = "-." };
+
+            Assert.Equal(".", editor.OtherCharacter);
+            Assert.Equal('.', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);
+        }
     }
 }

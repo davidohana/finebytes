@@ -6,7 +6,6 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.Filters;
-using Mfr.Filters.Trimming;
 using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.FilterEditors.Trimming

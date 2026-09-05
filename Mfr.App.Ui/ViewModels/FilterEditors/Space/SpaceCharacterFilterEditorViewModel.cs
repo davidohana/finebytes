@@ -65,7 +65,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
 
         partial void OnOtherCharacterChanged(string value)
         {
-            if (Definition != SpaceCharacterDefinition.Other && !string.IsNullOrEmpty(value))
+            // MFR7 replaces the custom char on each keypress; keep the last character when pasting.
+            if (value.Length > 1)
+            {
+                OtherCharacter = value[^1].ToString();
+                return;
+            }
+
+            if (Definition != SpaceCharacterDefinition.Other && value.Length > 0)
             {
                 Definition = SpaceCharacterDefinition.Other;
                 return;
@@ -118,6 +125,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         /// <summary>
         /// Writes current editor fields onto the step filter when options changed.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Other with an empty character box does not apply (MFR7 rejects undefined custom space at
+        /// apply time). Live preview keeps the last valid options instead of silently falling back to U+0020 SPACE.
+        /// </para>
+        /// </remarks>
         private void _ApplyOptions()
         {
             if (IsLoading || Step.Filter is not SpaceCharacterFilter filter)
@@ -125,10 +138,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                 return;
             }
 
-            var options = new SpaceCharacterOptions(
-                SpaceCharacter: _ResolveSpaceCharacter(),
-                Replacements: _BuildReplacements()
-            );
+            if (!_TryResolveSpaceCharacter(out var spaceCharacter))
+            {
+                return;
+            }
+
+            var options = new SpaceCharacterOptions(SpaceCharacter: spaceCharacter, Replacements: _BuildReplacements());
             ApplyIfChanged(filter, filter with { Options = options });
         }
 
@@ -190,16 +205,33 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         /// <summary>
         /// Resolves the separator character from definition radios and the Other text box.
         /// </summary>
-        /// <returns>Word separator to persist; empty Other falls back to U+0020 SPACE.</returns>
-        private char _ResolveSpaceCharacter()
+        /// <param name="spaceCharacter">Word separator to persist when resolution succeeds.</param>
+        /// <returns>
+        /// <see langword="true"/> when the definition is complete; <see langword="false"/> when Other is selected
+        /// with an empty character (do not persist).
+        /// </returns>
+        private bool _TryResolveSpaceCharacter(out char spaceCharacter)
         {
-            return Definition switch
+            if (Definition == SpaceCharacterDefinition.Space)
             {
-                SpaceCharacterDefinition.Space => ' ',
-                SpaceCharacterDefinition.Underscore => '_',
-                SpaceCharacterDefinition.Other when OtherCharacter.Length > 0 => OtherCharacter[0],
-                _ => ' ',
-            };
+                spaceCharacter = ' ';
+                return true;
+            }
+
+            if (Definition == SpaceCharacterDefinition.Underscore)
+            {
+                spaceCharacter = '_';
+                return true;
+            }
+
+            if (Definition == SpaceCharacterDefinition.Other && OtherCharacter.Length > 0)
+            {
+                spaceCharacter = OtherCharacter[0];
+                return true;
+            }
+
+            spaceCharacter = default;
+            return false;
         }
 
         /// <summary>
