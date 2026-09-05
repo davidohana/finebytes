@@ -3,10 +3,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
-using Mfr.App.Ui.Views.AppliedFilters;
-using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.App.Ui.Views.FilterEditors.Misc;
 using Mfr.Filters.Misc;
 using Mfr.Tests.Ui.AppliedFilters;
@@ -25,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [AvaloniaFact]
         public void Controls_update_chain_options()
         {
-            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Mover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -71,7 +68,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 var dest = Path.Combine(dir, "Dest");
                 Directory.CreateDirectory(dest);
 
-                var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+                var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
                 mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Mover"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
@@ -132,7 +129,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 var filePath = Path.Combine(dir, "track.mp3");
                 File.WriteAllText(filePath, "x");
 
-                var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+                var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
                 mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Mover"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
@@ -169,7 +166,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [AvaloniaFact]
         public void Root_folder_drag_over_rejects_non_file()
         {
-            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Mover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -199,36 +196,6 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             );
 
             window.Close();
-        }
-
-        private static (
-            Window Window,
-            MainWindowViewModel MainViewModel,
-            FilterEditorView EditorView
-        ) _ShowFilterEditorPanes()
-        {
-            var mainViewModel = new MainWindowViewModel();
-            var appliedView = new AppliedFiltersView
-            {
-                DataContext = mainViewModel.AppliedFiltersViewModel,
-                AddFromPaletteCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
-            };
-            var editorView = new FilterEditorView { DataContext = mainViewModel.FilterEditorViewModel };
-
-            var grid = new Grid { RowDefinitions = new RowDefinitions("*,*"), Children = { appliedView, editorView } };
-            Grid.SetRow(editorView, 1);
-
-            var window = new Window
-            {
-                Width = 320,
-                Height = 280,
-                Content = grid,
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            return (window, mainViewModel, editorView);
         }
     }
 }

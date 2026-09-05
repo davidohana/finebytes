@@ -25,7 +25,7 @@ Filter editor:
 - [ ] 4. Add ViewModel under ViewModels/FilterEditors/<Group>/
 - [ ] 5. Add matching View under Views/FilterEditors/<Group>/
 - [ ] 6. Register in FilterOptionsEditorFactory
-- [ ] 7. VM tests + headless ToChain() tests (each filter type in the group)
+- [ ] 7. Dedicated VM + headless tests under Ui/FilterEditors/<Group>/ (each filter type in the group)
 - [ ] 8. Mark plan todo done; format/lint touched files
 ```
 
@@ -47,7 +47,7 @@ Do **not** batch unrelated filters. File-list / audio / Formatter stay separate 
 
 - **ViewLocator** — `FilterEditorViewLocator` — prefix-replace; no edit if naming matches
 
-- **Tests** — `Mfr.Tests/Ui/FilterEditors/FilterEditorViewModelTests.cs` + `FilterEditorViewTests.cs`
+- **Tests** — dedicated `Mfr.Tests/Ui/FilterEditors/<FilterGroup>/YourFilterEditorViewModelTests.cs` (+ `…ViewTests.cs` for headless); host selection/chrome only in root `FilterEditorViewModelTests` / `FilterEditorViewTests`. Headless hosts: `FilterEditorTestUi.ShowFilterEditorPanes()`.
 
 - Namespace / `x:Class` must match folder (`…FilterEditors.Trimming`, etc.).
 
@@ -98,10 +98,10 @@ Add a `switch` arm in `FilterOptionsEditorFactory.Create`. Until registered, sel
 
 For **each** filter type wired in the pass:
 
-1. **VM** (`FilterEditorViewModelTests`): construct step + editor; assert defaults; mutate properties; assert `step.Filter` options
-1. **Headless** (`FilterEditorViewTests`, `[AvaloniaFact]`): append via `AppliedFiltersTestUi.Entry("Type")`; find named controls; set values; assert `ToChain().Steps[0].Filter` options
+1. **VM** (`Ui/FilterEditors/<Group>/…ViewModelTests`): construct step + editor; assert defaults; mutate properties; assert `step.Filter` options
+1. **Headless** (`…ViewTests`, `[AvaloniaFact]`): `FilterEditorTestUi.ShowFilterEditorPanes()`; append via `AppliedFiltersTestUi.Entry("Type")`; find named controls; set values; assert `ToChain().Steps[0].Filter` options
 
-Follow `mfr-ui-headless-tests` for gesture/control rules. Prefer extending the existing FilterEditors test files over new one-off suites.
+Follow `mfr-ui-headless-tests` for gesture/control rules. Put per-editor facts in that editor’s suite — do not add them to the root host mega-suites.
 
 ## Out of scope (do not do in an editor pass)
 

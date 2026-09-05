@@ -30,12 +30,9 @@ Synthesized from per-filter worktree reviews and [cross-editor dedup explore](ht
 
 `SentenceEndCharactersFilter` is a state-only `BaseFilter` (no `Target` / `ApplyScope`); `ApplyCore` always sets `SentenceEndChars`.
 
-### 4. Isolate remaining editor tests like Mover — **high / medium**
+### 4. Isolate remaining editor tests like Mover — **done**
 
-- **Sites:** shared `FilterEditorViewModelTests` / `FilterEditorViewTests` still hold many per-filter facts; Mover / Fix Leading Zeros / Name List / Token Mover already have dedicated suites
-- **Target:** move remaining `*_options_update_*` / headless gestures under `Ui/FilterEditors/<Group>/`; extract shared `_ShowFilterEditorPanes` helper once
-- **Value:** less mega-suite churn; one owner per editor
-- **Cost:** low risk per filter; shared-file touch
+Per-editor VM/view suites live under `Mfr.Tests/Ui/FilterEditors/<Group>/`; shared host selection/chrome stays in `FilterEditorViewModelTests` / `FilterEditorViewTests`. Headless hosts use `FilterEditorTestUi.ShowFilterEditorPanes`.
 
 ### 5. Multiline list editor / line-iteration helper — **medium**
 
