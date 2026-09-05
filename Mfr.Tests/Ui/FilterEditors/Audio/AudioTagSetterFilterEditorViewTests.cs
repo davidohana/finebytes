@@ -59,7 +59,9 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             var autoInc = editor
                 .GetVisualDescendants()
                 .OfType<CompactCheckBox>()
-                .Single(box => box.IsVisible && (box.Tag as string) == AudioTagSetterFieldRowViewModel.AutoIncrementTag);
+                .Single(box =>
+                    box.IsVisible && (box.Tag as string) == AudioTagSetterFieldRowViewModel.AutoIncrementTag
+                );
             Assert.True(autoInc.IsChecked);
 
             trackBox.Text = "1";

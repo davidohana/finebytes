@@ -58,6 +58,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 AttributesSetterFilter => new AttributesSetterFilterEditorViewModel(step),
                 TagRemoverFilter => new TagRemoverFilterEditorViewModel(step),
                 AudioTagSetterFilter => new AudioTagSetterFilterEditorViewModel(step),
+                Id3v2FieldSetterFilter => new Id3v2FieldSetterFilterEditorViewModel(step),
                 _ => null,
             };
         }

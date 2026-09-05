@@ -132,31 +132,16 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.NotEmpty(_Row(editor, AudioTagSetterFieldKind.Genre).GenreSuggestions);
             Assert.Contains("Rock", _Row(editor, AudioTagSetterFieldKind.Genre).GenreSuggestions);
 
-            Assert.Equal(
-                ["Basic", "Track / Disc", "Extended"],
-                editor.Sections.Select(section => section.Header)
-            );
+            Assert.Equal(["Basic", "Track / Disc", "Extended"], editor.Sections.Select(section => section.Header));
             Assert.Equal(
                 editor.FieldRows.Select(row => row.Kind),
                 editor.Sections.SelectMany(section => section.Rows).Select(row => row.Kind)
             );
-            Assert.All(
-                editor.Sections[0].Rows,
-                row => Assert.Equal(AudioTagSetterFieldGroup.Basic, row.Group)
-            );
-            Assert.All(
-                editor.Sections[1].Rows,
-                row => Assert.Equal(AudioTagSetterFieldGroup.TrackDisc, row.Group)
-            );
-            Assert.All(
-                editor.Sections[2].Rows,
-                row => Assert.Equal(AudioTagSetterFieldGroup.Extended, row.Group)
-            );
+            Assert.All(editor.Sections[0].Rows, row => Assert.Equal(AudioTagSetterFieldGroup.Basic, row.Group));
+            Assert.All(editor.Sections[1].Rows, row => Assert.Equal(AudioTagSetterFieldGroup.TrackDisc, row.Group));
+            Assert.All(editor.Sections[2].Rows, row => Assert.Equal(AudioTagSetterFieldGroup.Extended, row.Group));
             Assert.Empty(editor.Sections[0].FullWidthRows);
-            Assert.Equal(
-                [AudioTagSetterFieldKind.Lyrics],
-                editor.Sections[2].FullWidthRows.Select(row => row.Kind)
-            );
+            Assert.Equal([AudioTagSetterFieldKind.Lyrics], editor.Sections[2].FullWidthRows.Select(row => row.Kind));
             Assert.Equal(
                 editor.Sections[0].CompactRows.Where((_, i) => i % 2 == 0).Select(r => r.Kind),
                 editor.Sections[0].LeftCompactRows.Select(r => r.Kind)
