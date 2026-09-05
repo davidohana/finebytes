@@ -92,6 +92,7 @@ Add a `switch` arm in `FilterOptionsEditorFactory.Create`. Until registered, sel
 - **Enum / radio case mode** — `Case/LettersCaseFilterEditor*`
 - **Find/replace + Literal/Wildcard/Regex mode** — `Replace/ReplacerFilterEditor*` (shared: `Controls/ReplacerModeFieldset`, `Controls/ReplacerMatchOptionsFieldset`; list pairs: `ReplaceListFilterEditor*`)
 - **Timestamp field + optional date/time checkboxes** — `Attributes/DateTimeSetterFilterEditor*` (`DateTimeSetter`)
+- **Per-field three-state + format text** — `Audio/AudioTagSetterFilterEditor*` (`AudioTagSetter`)
 - **Space char catalog** — `Space/SpaceCharacterFilterEditor*`
 
 ## Tests

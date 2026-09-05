@@ -57,6 +57,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 TimeShifterFilter => new TimeShifterFilterEditorViewModel(step),
                 AttributesSetterFilter => new AttributesSetterFilterEditorViewModel(step),
                 TagRemoverFilter => new TagRemoverFilterEditorViewModel(step),
+                AudioTagSetterFilter => new AudioTagSetterFilterEditorViewModel(step),
                 _ => null,
             };
         }
