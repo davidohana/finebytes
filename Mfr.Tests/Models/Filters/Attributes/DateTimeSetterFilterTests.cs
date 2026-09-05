@@ -156,6 +156,47 @@ namespace Mfr.Tests.Models.Filters.Attributes
             Assert.Equal(s_Base, item.Preview.LastWriteTime);
         }
 
+        [Fact]
+        public void Far_future_file_date_is_no_op()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
+            var filter = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: TimestampField.LastWrite,
+                    SetDate: true,
+                    Date: new DateOnly(3026, 9, 5),
+                    SetTime: true,
+                    Time: new TimeOnly(18, 14, 0)
+                )
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(s_Base, item.Preview.LastWriteTime);
+        }
+
+        [Fact]
+        public void Max_supported_file_date_applies()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
+            var filter = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: TimestampField.LastWrite,
+                    SetDate: true,
+                    Date: FileTimestampDateLimits.Max,
+                    SetTime: false,
+                    Time: new TimeOnly(0, 0, 0)
+                )
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(
+                FileTimestampDateLimits.Max.ToDateTime(TimeOnly.FromDateTime(s_Base), s_Base.Kind),
+                item.Preview.LastWriteTime
+            );
+        }
+
         private static void _AssertOtherFieldsUnchanged(FileMeta preview, TimestampField selected)
         {
             foreach (var field in Enum.GetValues<TimestampField>())

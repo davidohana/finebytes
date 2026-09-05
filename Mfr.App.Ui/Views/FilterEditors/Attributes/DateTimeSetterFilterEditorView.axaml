@@ -52,7 +52,7 @@
             IsEnabled="{Binding SetDate}"
             Watermark="yyyy-MM-dd"
             Text="{Binding DateText}"
-            ToolTip.Tip="Calendar date as yyyy-MM-dd (1601-01-01 through 9999-12-31)."
+            ToolTip.Tip="Calendar date as yyyy-MM-dd (1601-01-01 through 2100-12-31)."
           />
           <Button
             Grid.Column="2"
@@ -86,7 +86,7 @@
             IsEnabled="{Binding SetTime}"
             Watermark="HH:mm:ss"
             Text="{Binding TimeText}"
-            ToolTip.Tip="Time of day as HH:mm:ss (hours 00-23)."
+            ToolTip.Tip="Time of day as HH:mm:ss or HH:mm (hours 00-23)."
           />
         </Grid>
       </StackPanel>

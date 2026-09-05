@@ -14,19 +14,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
     internal sealed partial class DateTimeSetterFilterEditorViewModel : FilterOptionsEditorViewModel
     {
         private const string DateFormat = "yyyy-MM-dd";
-        private const string TimeFormat = "HH':'mm':'ss";
+        private const string TimeFormatWithSeconds = "HH':'mm':'ss";
+        private const string TimeFormatMinutes = "HH':'mm";
         private const int DateTextLength = 10;
-        private const int TimeTextLength = 8;
+        private const int TimeTextLengthWithSeconds = 8;
 
-        /// <summary>
-        /// Earliest calendar date Windows <c>File.Set*Time</c> APIs accept (local).
-        /// </summary>
-        private static readonly DateOnly s_MinFileDate = new(1601, 1, 1);
-
-        /// <summary>
-        /// Latest calendar date <see cref="DateTime"/> can represent.
-        /// </summary>
-        private static readonly DateOnly s_MaxFileDate = new(9999, 12, 31);
+        private static readonly string[] s_TimeFormats = [TimeFormatWithSeconds, TimeFormatMinutes];
 
         private static readonly IReadOnlyList<TimestampFieldChoice> s_TimestampFields =
         [
@@ -76,7 +69,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         private bool _setTime;
 
         /// <summary>
-        /// Gets or sets the time-of-day text (<c>HH:mm:ss</c>).
+        /// Gets or sets the time-of-day text (<c>HH:mm:ss</c> or <c>HH:mm</c>).
         /// </summary>
         [ObservableProperty]
         private string _timeText = string.Empty;
@@ -104,7 +97,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 
             if (SetTime)
             {
-                TimeText = DateTime.Now.ToString(TimeFormat, CultureInfo.InvariantCulture);
+                TimeText = DateTime.Now.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture);
             }
         }
 
@@ -121,7 +114,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                 SetDate = filter.Options.SetDate;
                 DateText = filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture);
                 SetTime = filter.Options.SetTime;
-                TimeText = filter.Options.Time.ToString(TimeFormat, CultureInfo.InvariantCulture);
+                TimeText = filter.Options.Time.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture);
             });
         }
 
@@ -132,17 +125,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                 return;
             }
 
+            // Resolve each enabled field independently so an incomplete sibling cannot block a valid edit
+            // (e.g. date 2026-09-05 must still apply while time text is mid-edit "18:14").
             var date = filter.Options.Date;
             var time = filter.Options.Time;
-
-            if (SetDate && !_TryResolveDate(filter, ref date))
+            if (SetDate)
             {
-                return;
+                _ = _TryResolveDate(filter, ref date);
             }
 
-            if (SetTime && !_TryResolveTime(filter, ref time))
+            if (SetTime)
             {
-                return;
+                _ = _TryResolveTime(filter, ref time);
             }
 
             var options = new DateTimeSetterOptions(
@@ -156,7 +150,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         }
 
         /// <summary>
-        /// Parses <see cref="DateText"/> into a file-time-safe date, or reverts complete illegal input.
+        /// Parses <see cref="DateText"/> into a supported file date, or reverts complete illegal input.
         /// </summary>
         /// <returns><see langword="false"/> when the text is incomplete or was just reverted.</returns>
         private bool _TryResolveDate(DateTimeSetterFilter filter, ref DateOnly date)
@@ -169,7 +163,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.None,
                     out var parsed
-                ) && _IsValidFileDate(parsed)
+                ) && FileTimestampDateLimits.IsInRange(parsed)
             )
             {
                 date = parsed;
@@ -185,7 +179,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         }
 
         /// <summary>
-        /// Parses <see cref="TimeText"/> into a clock time, or reverts complete illegal input.
+        /// Parses <see cref="TimeText"/> as <c>HH:mm:ss</c> or <c>HH:mm</c>, or reverts complete illegal input.
         /// </summary>
         /// <returns><see langword="false"/> when the text is incomplete or was just reverted.</returns>
         private bool _TryResolveTime(DateTimeSetterFilter filter, ref TimeOnly time)
@@ -194,7 +188,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             if (
                 TimeOnly.TryParseExact(
                     text,
-                    TimeFormat,
+                    s_TimeFormats,
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.None,
                     out var parsed
@@ -205,7 +199,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                 return true;
             }
 
-            if (text.Length >= TimeTextLength)
+            if (text.Length >= TimeTextLengthWithSeconds)
             {
                 _RevertTimeText(filter);
             }
@@ -222,7 +216,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 
         private void _RevertTimeText(DateTimeSetterFilter filter)
         {
-            var restored = filter.Options.Time.ToString(TimeFormat, CultureInfo.InvariantCulture);
+            var restored = filter.Options.Time.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture);
             LoadWithoutApplying(() => TimeText = restored);
             _NudgeBoundText(() => TimeText, value => TimeText = value, restored);
         }
@@ -255,11 +249,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                     setText(restored);
                 });
             });
-        }
-
-        private static bool _IsValidFileDate(DateOnly date)
-        {
-            return date >= s_MinFileDate && date <= s_MaxFileDate;
         }
 
         private static TimestampFieldChoice _ChoiceFor(TimestampField field)
