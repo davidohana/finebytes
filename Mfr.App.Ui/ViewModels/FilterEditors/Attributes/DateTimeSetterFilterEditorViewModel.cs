@@ -14,6 +14,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
     {
         private const string DateFormat = "yyyy-MM-dd";
         private const string TimeFormat = "HH':'mm':'ss";
+        private const int DateTextLength = 10;
+        private const int TimeTextLength = 8;
+
+        /// <summary>
+        /// Earliest calendar date Windows <c>File.Set*Time</c> APIs accept (local).
+        /// </summary>
+        private static readonly DateOnly s_MinFileDate = new(1601, 1, 1);
+
+        /// <summary>
+        /// Latest calendar date <see cref="DateTime"/> can represent.
+        /// </summary>
+        private static readonly DateOnly s_MaxFileDate = new(9999, 12, 31);
 
         private static readonly IReadOnlyList<TimestampFieldChoice> s_TimestampFields =
         [
@@ -119,28 +131,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                 return;
             }
 
-            if (
-                !DateOnly.TryParseExact(
-                    (DateText ?? string.Empty).Trim(),
-                    DateFormat,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var date
-                )
-            )
+            var date = filter.Options.Date;
+            var time = filter.Options.Time;
+
+            if (SetDate && !_TryResolveDate(filter, ref date))
             {
                 return;
             }
 
-            if (
-                !TimeOnly.TryParseExact(
-                    (TimeText ?? string.Empty).Trim(),
-                    TimeFormat,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var time
-                )
-            )
+            if (SetTime && !_TryResolveTime(filter, ref time))
             {
                 return;
             }
@@ -153,6 +152,85 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                 Time: time
             );
             ApplyIfChanged(filter, filter with { Options = options });
+        }
+
+        /// <summary>
+        /// Parses <see cref="DateText"/> into a file-time-safe date, or reverts complete illegal input.
+        /// </summary>
+        /// <returns><see langword="false"/> when the text is incomplete or was just reverted.</returns>
+        private bool _TryResolveDate(DateTimeSetterFilter filter, ref DateOnly date)
+        {
+            var text = (DateText ?? string.Empty).Trim();
+            if (
+                DateOnly.TryParseExact(
+                    text,
+                    DateFormat,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var parsed
+                ) && _IsValidFileDate(parsed)
+            )
+            {
+                date = parsed;
+                return true;
+            }
+
+            if (text.Length >= DateTextLength)
+            {
+                _RevertDateText(filter);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Parses <see cref="TimeText"/> into a clock time, or reverts complete illegal input.
+        /// </summary>
+        /// <returns><see langword="false"/> when the text is incomplete or was just reverted.</returns>
+        private bool _TryResolveTime(DateTimeSetterFilter filter, ref TimeOnly time)
+        {
+            var text = (TimeText ?? string.Empty).Trim();
+            if (
+                TimeOnly.TryParseExact(
+                    text,
+                    TimeFormat,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var parsed
+                )
+            )
+            {
+                time = parsed;
+                return true;
+            }
+
+            if (text.Length >= TimeTextLength)
+            {
+                _RevertTimeText(filter);
+            }
+
+            return false;
+        }
+
+        private void _RevertDateText(DateTimeSetterFilter filter)
+        {
+            LoadWithoutApplying(() =>
+            {
+                DateText = filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture);
+            });
+        }
+
+        private void _RevertTimeText(DateTimeSetterFilter filter)
+        {
+            LoadWithoutApplying(() =>
+            {
+                TimeText = filter.Options.Time.ToString(TimeFormat, CultureInfo.InvariantCulture);
+            });
+        }
+
+        private static bool _IsValidFileDate(DateOnly date)
+        {
+            return date >= s_MinFileDate && date <= s_MaxFileDate;
         }
 
         private static TimestampFieldChoice _ChoiceFor(TimestampField field)
