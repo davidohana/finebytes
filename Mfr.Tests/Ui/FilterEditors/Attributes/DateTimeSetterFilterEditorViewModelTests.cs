@@ -50,7 +50,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         }
 
         /// <summary>
-        /// Verifies illegal clock times are not applied and the text reverts to the last valid value.
+        /// Verifies illegal clock times are not applied and the text reverts to the full applied value.
         /// </summary>
         [Fact]
         public void Date_time_setter_rejects_illegal_time_and_reverts_text()
@@ -118,10 +118,35 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         }
 
         /// <summary>
-        /// Verifies a valid date still applies when time text is incomplete (e.g. mid-edit <c>18:1</c>).
+        /// Verifies partial date text is restored to the full applied date (never left as <c>5</c>).
         /// </summary>
         [Fact]
-        public void Date_time_setter_applies_date_while_time_text_is_incomplete()
+        public void Date_time_setter_restores_full_date_for_partial_text()
+        {
+            var step = new AppliedFilterStepViewModel(
+                "Date/Time Setter",
+                new DateTimeSetterFilter(
+                    Options: new DateTimeSetterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        SetDate: true,
+                        Date: new DateOnly(2020, 12, 25),
+                        SetTime: true,
+                        Time: new TimeOnly(11, 11, 11)
+                    )
+                )
+            );
+            var editor = new DateTimeSetterFilterEditorViewModel(step) { DateText = "5" };
+
+            Assert.Equal("2020-12-25", editor.DateText);
+            Assert.Equal(new DateOnly(2020, 12, 25), ((DateTimeSetterFilter)step.Filter).Options.Date);
+            Assert.Equal("11:11:11", editor.TimeText);
+        }
+
+        /// <summary>
+        /// Verifies incomplete time text restores the full applied time while a valid date still applies.
+        /// </summary>
+        [Fact]
+        public void Date_time_setter_restores_full_time_for_incomplete_text()
         {
             var step = new AppliedFilterStepViewModel(
                 "Date/Time Setter",
@@ -140,7 +165,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             var options = ((DateTimeSetterFilter)step.Filter).Options;
             Assert.Equal(new DateOnly(2026, 9, 5), options.Date);
             Assert.Equal(new TimeOnly(19, 58, 0), options.Time);
-            Assert.Equal("18:1", editor.TimeText);
+            Assert.Equal("19:58:00", editor.TimeText);
+            Assert.Equal("2026-09-05", editor.DateText);
         }
 
         /// <summary>
@@ -168,10 +194,10 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         }
 
         /// <summary>
-        /// Verifies <c>HH:mm</c> time text is accepted (seconds default to zero).
+        /// Verifies <c>HH:mm</c> time text is accepted and rewritten as <c>HH:mm:ss</c>.
         /// </summary>
         [Fact]
-        public void Date_time_setter_accepts_hh_mm_time_text()
+        public void Date_time_setter_accepts_hh_mm_and_shows_full_time()
         {
             var step = new AppliedFilterStepViewModel(
                 "Date/Time Setter",
@@ -188,14 +214,14 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             var editor = new DateTimeSetterFilterEditorViewModel(step) { TimeText = "18:14" };
 
             Assert.Equal(new TimeOnly(18, 14, 0), ((DateTimeSetterFilter)step.Filter).Options.Time);
-            Assert.Equal("18:14", editor.TimeText);
+            Assert.Equal("18:14:00", editor.TimeText);
         }
 
         /// <summary>
-        /// Verifies far-future years like 3026 are rejected even when time text is incomplete.
+        /// Verifies far-future years like 3026 are rejected and incomplete time is restored to full.
         /// </summary>
         [Fact]
-        public void Date_time_setter_rejects_far_future_date_with_incomplete_time()
+        public void Date_time_setter_rejects_far_future_date_and_restores_incomplete_time()
         {
             var step = new AppliedFilterStepViewModel(
                 "Date/Time Setter",
@@ -212,6 +238,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             var editor = new DateTimeSetterFilterEditorViewModel(step) { TimeText = "18:1", DateText = "3026-09-05" };
 
             Assert.Equal("2026-09-05", editor.DateText);
+            Assert.Equal("19:58:00", editor.TimeText);
             var options = ((DateTimeSetterFilter)step.Filter).Options;
             Assert.Equal(new DateOnly(2026, 9, 5), options.Date);
             Assert.Equal(new TimeOnly(19, 58, 0), options.Time);
@@ -245,7 +272,33 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             Assert.Equal(new DateOnly(2019, 1, 1), options.Date);
             Assert.False(options.SetTime);
             Assert.Equal(new TimeOnly(9, 0, 15), options.Time);
+            // Time is unchecked: text is not validated/rewritten on date apply.
             Assert.Equal("25:19:01", editor.TimeText);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="DateTimeSetterFilterEditorViewModel.CommitDateText"/> restores partial input.
+        /// </summary>
+        [Fact]
+        public void Date_time_setter_commit_date_restores_partial_text()
+        {
+            var step = new AppliedFilterStepViewModel(
+                "Date/Time Setter",
+                new DateTimeSetterFilter(
+                    Options: new DateTimeSetterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        SetDate: true,
+                        Date: new DateOnly(2020, 12, 25),
+                        SetTime: true,
+                        Time: new TimeOnly(11, 11, 11)
+                    )
+                )
+            );
+            var editor = new DateTimeSetterFilterEditorViewModel(step) { DateText = "5" };
+            editor.CommitDateText();
+
+            Assert.Equal("2020-12-25", editor.DateText);
+            Assert.Equal(new DateOnly(2020, 12, 25), ((DateTimeSetterFilter)step.Filter).Options.Date);
         }
     }
 }

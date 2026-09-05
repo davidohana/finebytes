@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
@@ -52,8 +54,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             Assert.False(string.IsNullOrWhiteSpace(timeBox.Text));
 
             fieldCombo.SelectedItem = editorVm.TimestampFields.Single(c => c.Field == TimestampField.Creation);
-            dateBox.Text = "2020-12-25";
-            timeBox.Text = "09:00:15";
+            _CommitDate(dateBox, editorVm, "2020-12-25");
+            _CommitTime(timeBox, editorVm, "09:00:15");
             setTimeCheck.IsChecked = false;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -75,7 +77,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             Assert.Equal(DateOnly.FromDateTime(DateTime.Today), filter.Options.Date);
             Assert.True(filter.Options.SetTime);
 
-            timeBox.Text = "25:19:01";
+            _CommitTime(timeBox, editorVm, "25:19:01");
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -86,7 +88,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             );
             Assert.NotEqual("25:19:01", timeBox.Text);
 
-            dateBox.Text = "2024-02-30";
+            _CommitDate(dateBox, editorVm, "2024-02-30");
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -97,7 +99,42 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             );
             Assert.NotEqual("2024-02-30", dateBox.Text);
 
+            _CommitDate(dateBox, editorVm, "5");
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(
+                filter.Options.Date.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+                dateBox.Text
+            );
+            Assert.NotEqual("5", dateBox.Text);
+
+            _CommitTime(timeBox, editorVm, "18:14");
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(new TimeOnly(18, 14, 0), filter.Options.Time);
+            Assert.Equal("18:14:00", timeBox.Text);
+
             window.Close();
+        }
+
+        private static void _CommitDate(TextBox dateBox, DateTimeSetterFilterEditorViewModel editorVm, string text)
+        {
+            dateBox.Text = text;
+            editorVm.DateText = text;
+            dateBox.RaiseEvent(new RoutedEventArgs(InputElement.LostFocusEvent));
+            editorVm.CommitDateText();
+        }
+
+        private static void _CommitTime(TextBox timeBox, DateTimeSetterFilterEditorViewModel editorVm, string text)
+        {
+            timeBox.Text = text;
+            editorVm.TimeText = text;
+            timeBox.RaiseEvent(new RoutedEventArgs(InputElement.LostFocusEvent));
+            editorVm.CommitTimeText();
         }
     }
 }
