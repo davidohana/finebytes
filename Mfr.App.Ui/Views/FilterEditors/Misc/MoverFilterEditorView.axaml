@@ -40,7 +40,7 @@
             x:Name="RootFolderBox"
             Classes="filter-editor-field-wrap"
             MinWidth="240"
-            MaxLength="200"
+            MaxLength="520"
             Watermark="C:\"
             Text="{Binding RootFolder}"
           />
@@ -49,10 +49,7 @@
           <ToolTip.Tip>
             <controls:RichToolTip>
               <TextBlock Classes="rich-tip-title" Text="Optional path appended below the root folder." />
-              <TextBlock
-                Classes="rich-tip-body"
-                Text="Combined after Root folder for each renamed item."
-              />
+              <TextBlock Classes="rich-tip-body" Text="Combined after Root folder for each renamed item." />
               <TextBlock
                 Classes="rich-tip-bullet"
                 Text="• May include formatter tokens such as &lt;parent-folder&gt; or &lt;file-name&gt;."
@@ -62,10 +59,13 @@
                 Text="• Use backslashes (\) to create nested folders, e.g. &lt;parent-folder&gt;\&lt;file-name&gt;."
               />
               <TextBlock Classes="rich-tip-bullet" Text="• Leave empty to land items directly in the root folder." />
-              <TextBlock Classes="rich-tip-bullet" Text="• Non-existent folders are created on commit; original folders are not erased." />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Non-existent folders are created on commit; original folders are not erased."
+              />
             </controls:RichToolTip>
           </ToolTip.Tip>
-          <TextBlock Classes="filter-editor-label" Text="Sub-Folder:" />
+          <TextBlock Classes="filter-editor-label" Text="Sub-folder:" />
           <TextBox
             x:Name="SubFolderBox"
             Classes="filter-editor-field-wrap"
