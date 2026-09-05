@@ -16,8 +16,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         public ReplaceListFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
+            Match = new ReplacerMatchOptionsEditor(defaultWholeWord: true);
+            Match.Bind(_OnMatchChanged);
             _SyncFromFilter();
         }
+
+        /// <summary>
+        /// Gets shared mode and match-flag fields.
+        /// </summary>
+        public ReplacerMatchOptionsEditor Match { get; }
 
         /// <summary>
         /// Gets or sets the line-separated editor text for search/replace pairs.
@@ -26,51 +33,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         private string _entriesText = string.Empty;
 
         /// <summary>
-        /// Gets or sets the pattern interpretation mode for all pairs.
-        /// </summary>
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(EntriesWatermark))]
-        private ReplacerMode _mode = ReplacerMode.Literal;
-
-        /// <summary>
         /// Gets a mode-specific example watermark for an empty entries box.
         /// </summary>
         public string EntriesWatermark =>
-            Mode switch
+            Match.Mode switch
             {
                 ReplacerMode.Literal => ". => _\nfeat. => feature.\nLive",
                 ReplacerMode.Wildcard => "DSC*.JPG => photo.jpg\ntrack?.mp3 => track0.mp3\n*.tmp",
                 ReplacerMode.Regex => "[0-9]+ => N\n\\. => _\n\\s+ => _",
-                _ => throw new ArgumentOutOfRangeException(nameof(Mode), Mode, null),
+                _ => throw new ArgumentOutOfRangeException(nameof(Match.Mode), Match.Mode, null),
             };
 
-        /// <summary>
-        /// Gets or sets whether matching is case-sensitive.
-        /// </summary>
-        [ObservableProperty]
-        private bool _caseSensitive;
-
-        /// <summary>
-        /// Gets or sets whether all matches are replaced per pair.
-        /// </summary>
-        [ObservableProperty]
-        private bool _replaceAll = true;
-
-        /// <summary>
-        /// Gets or sets whether matching is constrained to whole words.
-        /// </summary>
-        [ObservableProperty]
-        private bool _wholeWord = true;
-
         partial void OnEntriesTextChanged(string value) => _ApplyOptions(parseEntries: true);
-
-        partial void OnModeChanged(ReplacerMode value) => _ApplyOptions(parseEntries: false);
-
-        partial void OnCaseSensitiveChanged(bool value) => _ApplyOptions(parseEntries: false);
-
-        partial void OnReplaceAllChanged(bool value) => _ApplyOptions(parseEntries: false);
-
-        partial void OnWholeWordChanged(bool value) => _ApplyOptions(parseEntries: false);
 
         private void _SyncFromFilter()
         {
@@ -82,11 +56,17 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
             LoadWithoutApplying(() =>
             {
                 EntriesText = ReplaceListParser.FormatEditorText(filter.Options.Entries);
-                Mode = filter.Options.Mode;
-                CaseSensitive = filter.Options.CaseSensitive;
-                ReplaceAll = filter.Options.ReplaceAll;
-                WholeWord = filter.Options.WholeWord;
+                Match.Load(filter.Options.Match);
             });
+        }
+
+        /// <summary>
+        /// Notifies mode-dependent UI and writes options when match fields change.
+        /// </summary>
+        private void _OnMatchChanged()
+        {
+            OnPropertyChanged(nameof(EntriesWatermark));
+            _ApplyOptions(parseEntries: false);
         }
 
         /// <summary>
@@ -104,13 +84,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
             }
 
             var entries = parseEntries ? ReplaceListParser.ParseEditorText(EntriesText) : filter.Options.Entries;
-            var options = new ReplaceListOptions(
-                Entries: entries,
-                Mode: Mode,
-                CaseSensitive: CaseSensitive,
-                ReplaceAll: ReplaceAll,
-                WholeWord: WholeWord
-            );
+            var options = new ReplaceListOptions(Entries: entries, Match: Match.ToOptions());
             ApplyIfChanged(filter, filter with { Options = options });
         }
     }

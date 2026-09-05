@@ -181,10 +181,12 @@ namespace Mfr.Tests.Engine
                   "options": {
                     "find": "a",
                     "replacement": "b",
-                    "mode": "Literal",
-                    "caseSensitive": true,
-                    "replaceAll": true,
-                    "wholeWord": false
+                    "match": {
+                      "mode": "Literal",
+                      "caseSensitive": true,
+                      "replaceAll": true,
+                      "wholeWord": false
+                    }
                   }
                 }
                 """;

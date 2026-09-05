@@ -22,10 +22,12 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions(
                     "a",
                     "X",
-                    ReplacerMode.Literal,
-                    CaseSensitive: true,
-                    ReplaceAll: replaceAll,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: replaceAll,
+                        WholeWord: false
+                    )
                 )
             );
             Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "aba"));
@@ -42,10 +44,12 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions(
                     "f*o",
                     "X",
-                    ReplacerMode.Wildcard,
-                    CaseSensitive: true,
-                    ReplaceAll: true,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Wildcard,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
                 )
             );
             Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "foo"));
@@ -64,10 +68,12 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions(
                     @"\d+",
                     "N",
-                    ReplacerMode.Regex,
-                    CaseSensitive: true,
-                    ReplaceAll: replaceAll,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Regex,
+                        CaseSensitive: true,
+                        ReplaceAll: replaceAll,
+                        WholeWord: false
+                    )
                 )
             );
             Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "a12bc34"));
@@ -84,10 +90,12 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions(
                     "a",
                     "X",
-                    ReplacerMode.Literal,
-                    CaseSensitive: false,
-                    ReplaceAll: true,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: false,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
                 )
             );
             Assert.Equal("XbX", FilterTestHelpers.ApplyToPrefix(f, "AbA"));
@@ -104,10 +112,12 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions(
                     "cat",
                     "dog",
-                    ReplacerMode.Literal,
-                    CaseSensitive: true,
-                    ReplaceAll: true,
-                    WholeWord: true
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: true
+                    )
                 )
             );
             Assert.Equal("dog", FilterTestHelpers.ApplyToPrefix(f, "cat"));
@@ -126,10 +136,12 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions(
                     "f?o",
                     "X",
-                    ReplacerMode.Wildcard,
-                    CaseSensitive: true,
-                    ReplaceAll: true,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Wildcard,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
                 )
             );
             Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "foo"));
@@ -147,10 +159,12 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions(
                     "CAT",
                     "dog",
-                    ReplacerMode.Literal,
-                    CaseSensitive: false,
-                    ReplaceAll: true,
-                    WholeWord: true
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: false,
+                        ReplaceAll: true,
+                        WholeWord: true
+                    )
                 )
             );
             Assert.Equal("dog", FilterTestHelpers.ApplyToPrefix(f, "cat"));
@@ -168,7 +182,11 @@ namespace Mfr.Tests.Models.Filters.Replace
         {
             var f = new ReplacerFilter(
                 _target,
-                new ReplacerOptions("", "X", mode, CaseSensitive: true, ReplaceAll: true, WholeWord: false)
+                new ReplacerOptions(
+                    "",
+                    "X",
+                    new ReplacerMatchOptions(Mode: mode, CaseSensitive: true, ReplaceAll: true, WholeWord: false)
+                )
             );
             Assert.Equal("aba", FilterTestHelpers.ApplyToPrefix(f, "aba"));
         }
@@ -184,7 +202,11 @@ namespace Mfr.Tests.Models.Filters.Replace
             var find = mode == ReplacerMode.Wildcard ? "a*" : "a";
             var f = new ReplacerFilter(
                 _target,
-                new ReplacerOptions(find, "$1", mode, CaseSensitive: true, ReplaceAll: true, WholeWord: false)
+                new ReplacerOptions(
+                    find,
+                    "$1",
+                    new ReplacerMatchOptions(Mode: mode, CaseSensitive: true, ReplaceAll: true, WholeWord: false)
+                )
             );
             Assert.Equal("$1", FilterTestHelpers.ApplyToPrefix(f, "a"));
         }
@@ -200,10 +222,12 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions(
                     @"(a)(b)",
                     "$2$1",
-                    ReplacerMode.Regex,
-                    CaseSensitive: true,
-                    ReplaceAll: true,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Regex,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
                 )
             );
             Assert.Equal("ba", FilterTestHelpers.ApplyToPrefix(f, "ab"));
@@ -220,10 +244,12 @@ namespace Mfr.Tests.Models.Filters.Replace
                 new ReplacerOptions(
                     "(",
                     "X",
-                    ReplacerMode.Regex,
-                    CaseSensitive: true,
-                    ReplaceAll: true,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Regex,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
                 )
             );
             var ex = Assert.Throws<ArgumentException>(f.Setup);

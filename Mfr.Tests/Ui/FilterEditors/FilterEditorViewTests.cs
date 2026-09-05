@@ -890,16 +890,16 @@ namespace Mfr.Tests.Ui.FilterEditors
             var filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.Equal("dog", filter.Options.Find);
             Assert.Equal("cat", filter.Options.Replacement);
-            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Mode);
-            Assert.True(filter.Options.CaseSensitive);
-            Assert.False(filter.Options.ReplaceAll);
-            Assert.True(filter.Options.WholeWord);
+            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Match.Mode);
+            Assert.True(filter.Options.Match.CaseSensitive);
+            Assert.False(filter.Options.Match.ReplaceAll);
+            Assert.True(filter.Options.Match.WholeWord);
 
             regex.IsChecked = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
             filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-            Assert.Equal(ReplacerMode.Regex, filter.Options.Mode);
+            Assert.Equal(ReplacerMode.Regex, filter.Options.Match.Mode);
             Assert.Equal(@"\((.+)\)", find.Watermark);
             Assert.Equal("$1", replacement.Watermark);
 
@@ -962,10 +962,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal("b", filter.Options.Entries[0].Replacement);
             Assert.Equal(".", filter.Options.Entries[1].Search);
             Assert.Equal("_", filter.Options.Entries[1].Replacement);
-            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Mode);
-            Assert.True(filter.Options.CaseSensitive);
-            Assert.False(filter.Options.ReplaceAll);
-            Assert.False(filter.Options.WholeWord);
+            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Match.Mode);
+            Assert.True(filter.Options.Match.CaseSensitive);
+            Assert.False(filter.Options.Match.ReplaceAll);
+            Assert.False(filter.Options.Match.WholeWord);
 
             window.Close();
         }
@@ -1180,6 +1180,50 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.True(filter.Options.All);
             Assert.True(removeAll.IsChecked);
             Assert.False(editorVm.AreBlockTypesEnabled);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Attributes Setter tri-state checkbox edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Attributes_setter_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AttributesSetter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<AttributesSetterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<AttributesSetterFilterEditorView>().Single();
+            var readOnlyBox = editor.FindControl<CheckBox>("ReadOnlyCheckBox");
+            var hiddenBox = editor.FindControl<CheckBox>("HiddenCheckBox");
+            var archiveBox = editor.FindControl<CheckBox>("ArchiveCheckBox");
+            var systemBox = editor.FindControl<CheckBox>("SystemCheckBox");
+            Assert.NotNull(readOnlyBox);
+            Assert.NotNull(hiddenBox);
+            Assert.NotNull(archiveBox);
+            Assert.NotNull(systemBox);
+            Assert.True(readOnlyBox.IsThreeState);
+            Assert.Null(readOnlyBox.IsChecked);
+            Assert.Null(hiddenBox.IsChecked);
+            Assert.Null(archiveBox.IsChecked);
+            Assert.Null(systemBox.IsChecked);
+
+            hiddenBox.IsChecked = true;
+            archiveBox.IsChecked = false;
+            readOnlyBox.IsChecked = true;
+            systemBox.IsChecked = null;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (AttributesSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(AttributeTriState.Set, filter.Options.ReadOnly);
+            Assert.Equal(AttributeTriState.Set, filter.Options.Hidden);
+            Assert.Equal(AttributeTriState.Clear, filter.Options.Archive);
+            Assert.Equal(AttributeTriState.Keep, filter.Options.System);
 
             window.Close();
         }

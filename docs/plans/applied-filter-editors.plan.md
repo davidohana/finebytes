@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around + Capitalize After + Sentence End + Strip Parentheses + Cleaner + Counter + Inserter + Casing List + Replace List + Name List + Replacer + Token Mover + Mover + Date/Time Setter done. Audio Tag Remover done. Next: Time Shifter, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
+overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around + Capitalize After + Sentence End + Strip Parentheses + Cleaner + Counter + Inserter + Casing List + Replace List + Name List + Replacer + Token Mover + Mover + Date/Time Setter + Attributes Setter + Audio Tag Remover done. Next: Time Shifter, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
 todos:
   - id: f1-f4
     content: "F1–F4: ctors, Applied list, Filter Options/Apply To, Space Character + Letters Case"
@@ -67,7 +67,7 @@ todos:
     status: pending
   - id: f5-attributes-setter
     content: "F5 Attributes Setter"
-    status: pending
+    status: completed
   - id: f5-tag-remover
     content: "F5 Audio Tag Remover"
     status: completed
@@ -87,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-05):** F5 Mover + Date/Time Setter + Audio Tag Remover done. **Next: F5 Time Shifter**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-05):** F5 Mover + Date/Time Setter + Attributes Setter + Audio Tag Remover done. **Next: F5 Time Shifter**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ## Already shipped (F1–F4)
 
@@ -225,7 +225,7 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 - **17 (done)** — **Mover** (Misc) — root folder + optional sub-folder template (formatter tokens / `\`)
 - **18 (done)** — **Date/Time Setter** (Attributes) — one `DateTimeSetter` filter; optional date + time checkboxes; timestamp-field picker
 - **19 (next)** — Time Shifter (Attributes) — field + amount + unit (not grouped with setters)
-- **20** — Attributes Setter (Attributes) — attribute flags
+- **20 (done)** — Attributes Setter (Attributes) — attribute flags
 - **21 (done)** — Audio Tag Remover (Audio) — all / block types
 - **22** — Audio Tag Setter (Audio) — per-field format specs
 - **23** — ID3v2 Field Setter (Audio) — frame + value

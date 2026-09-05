@@ -14,17 +14,8 @@ namespace Mfr.Filters.Replace
     /// Options for replace-list transformations embedded in the filter.
     /// </summary>
     /// <param name="Entries">Search/replace pairs applied in order. Empty list is a no-op.</param>
-    /// <param name="Mode">Pattern interpretation mode.</param>
-    /// <param name="CaseSensitive">Whether matching is case-sensitive.</param>
-    /// <param name="ReplaceAll">Whether all matches are replaced for each pair.</param>
-    /// <param name="WholeWord">Whether matching is constrained to whole words.</param>
-    public sealed record ReplaceListOptions(
-        IReadOnlyList<ReplaceListEntry> Entries,
-        ReplacerMode Mode,
-        bool CaseSensitive,
-        bool ReplaceAll,
-        bool WholeWord
-    );
+    /// <param name="Match">Mode and match flags shared with <see cref="ReplacerOptions"/>.</param>
+    public sealed record ReplaceListOptions(IReadOnlyList<ReplaceListEntry> Entries, ReplacerMatchOptions Match);
 
     /// <summary>
     /// Applies sequential replacements from an embedded replace list.
@@ -52,13 +43,7 @@ namespace Mfr.Filters.Replace
         public ReplaceListFilter()
             : this(
                 new FilePrefixTarget(),
-                new ReplaceListOptions(
-                    Entries: [],
-                    Mode: ReplacerMode.Literal,
-                    CaseSensitive: false,
-                    ReplaceAll: true,
-                    WholeWord: true
-                )
+                new ReplaceListOptions(Entries: [], Match: ReplacerMatchOptions.ForReplaceList)
             ) { }
 
         /// <summary>
@@ -84,14 +69,7 @@ namespace Mfr.Filters.Replace
             foreach (var (search, compiledReplacement) in compiledEntries)
             {
                 var replacement = compiledReplacement(item);
-                var replacerOptions = new ReplacerOptions(
-                    Find: search,
-                    Replacement: replacement,
-                    Mode: Options.Mode,
-                    CaseSensitive: Options.CaseSensitive,
-                    ReplaceAll: Options.ReplaceAll,
-                    WholeWord: Options.WholeWord
-                );
+                var replacerOptions = new ReplacerOptions(Find: search, Replacement: replacement, Match: Options.Match);
                 transformed = ReplacerFilter.ReplaceSegment(transformed, replacerOptions);
             }
 

@@ -12,7 +12,7 @@
   x:DataType="vm:ReplaceListFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
-    <controls:ReplacerModeFieldset x:Name="ModeFieldset" GroupName="ReplaceListMode" />
+    <controls:ReplacerModeFieldset x:Name="ModeFieldset" GroupName="ReplaceListMode" DataContext="{Binding Match}" />
     <controls:FieldsetGroup Header="Replace List">
       <StackPanel Spacing="4">
         <ToolTip.Tip>
@@ -39,6 +39,6 @@
         />
       </StackPanel>
     </controls:FieldsetGroup>
-    <controls:ReplacerMatchOptionsFieldset x:Name="MatchOptionsFieldset" />
+    <controls:ReplacerMatchOptionsFieldset x:Name="MatchOptionsFieldset" DataContext="{Binding Match}" />
   </StackPanel>
 </UserControl>

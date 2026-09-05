@@ -193,10 +193,12 @@ namespace Mfr.Tests.Models.Filters.Replace
         {
             var options = new ReplaceListOptions(
                 Entries: entries,
-                Mode: mode,
-                CaseSensitive: caseSensitive,
-                ReplaceAll: replaceAll,
-                WholeWord: wholeWord
+                Match: new ReplacerMatchOptions(
+                    Mode: mode,
+                    CaseSensitive: caseSensitive,
+                    ReplaceAll: replaceAll,
+                    WholeWord: wholeWord
+                )
             );
             return new ReplaceListFilter(Target: _target, Options: options);
         }
