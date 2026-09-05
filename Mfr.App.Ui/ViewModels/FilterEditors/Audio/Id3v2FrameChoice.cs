@@ -6,7 +6,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
     /// ComboBox row for a modeled ID3v2 frame id with a user-visible label.
     /// </summary>
     /// <param name="FrameId">Four-character frame id (uppercase).</param>
-    /// <param name="DisplayName">Label shown in the field picker (e.g. <c>TIT2 (Title)</c>).</param>
+    /// <param name="DisplayName">Label shown in the field picker (e.g. <c>TIT2 (Title/songname/content description)</c>).</param>
     internal sealed record Id3v2FrameChoice(string FrameId, string DisplayName)
     {
         /// <summary>
@@ -14,6 +14,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// </summary>
         public static IReadOnlyList<Id3v2FrameChoice> All { get; } =
         [.. Id3v2ModeledFrame.AllModeledFrameIds.Select(id => new Id3v2FrameChoice(id, _LabelFor(id)))];
+
+        /// <summary>
+        /// Default frame row (<c>TIT2</c>) used for empty/unknown ids.
+        /// </summary>
+        public static Id3v2FrameChoice Tit2 { get; } = All.First(c => c.FrameId == "TIT2");
 
         /// <summary>
         /// Returns the combo row for <paramref name="frameId"/>, or TIT2 when unknown/empty.
@@ -24,7 +29,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         {
             if (string.IsNullOrWhiteSpace(frameId))
             {
-                return All.First(c => c.FrameId == "TIT2");
+                return Tit2;
             }
 
             var normalized = frameId.Trim().ToUpperInvariant();
@@ -36,13 +41,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
                 }
             }
 
-            return All.First(c => c.FrameId == "TIT2");
+            return Tit2;
         }
-
-        /// <summary>
-        /// Gets whether this frame uses language and/or description identity.
-        /// </summary>
-        public bool IsMultiInstance => Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(FrameId);
 
         /// <summary>
         /// Gets whether the language box applies (<c>COMM</c> / <c>USLT</c>).
@@ -52,7 +52,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// <summary>
         /// Gets whether the description box applies (<c>COMM</c> / <c>USLT</c> / <c>TXXX</c>).
         /// </summary>
-        public bool ShowsDescription => IsMultiInstance;
+        public bool ShowsDescription => Id3v2ModeledFrame.MultiInstanceFrameIds.Contains(FrameId);
 
         /// <inheritdoc />
         public override string ToString()

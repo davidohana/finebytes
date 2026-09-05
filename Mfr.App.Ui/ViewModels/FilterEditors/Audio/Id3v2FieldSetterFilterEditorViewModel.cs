@@ -16,7 +16,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         public Id3v2FieldSetterFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
-            _selectedFrame = Id3v2FrameChoice.For("TIT2");
+            _selectedFrame = Id3v2FrameChoice.Tit2;
             _SyncFromFilter();
         }
 
@@ -74,14 +74,20 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
                 return;
             }
 
-            if (!value.ShowsLanguage)
+            if (!value.ShowsLanguage || !value.ShowsDescription)
             {
-                LoadWithoutApplying(() => Language = string.Empty);
-            }
+                LoadWithoutApplying(() =>
+                {
+                    if (!value.ShowsLanguage)
+                    {
+                        Language = string.Empty;
+                    }
 
-            if (!value.ShowsDescription)
-            {
-                LoadWithoutApplying(() => Description = string.Empty);
+                    if (!value.ShowsDescription)
+                    {
+                        Description = string.Empty;
+                    }
+                });
             }
 
             _ApplyOptions();
