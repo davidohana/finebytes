@@ -45,8 +45,8 @@
           <controls:CompactNumericUpDown
             x:Name="AmountSpinner"
             Width="88"
-            Minimum="-10000000"
-            Maximum="10000000"
+            Minimum="{x:Static vm:TimeShifterFilterEditorViewModel.AmountMin}"
+            Maximum="{x:Static vm:TimeShifterFilterEditorViewModel.AmountMax}"
             Increment="1"
             FormatString="0"
             ToolTip.Tip="Positive shifts forward; negative shifts backward."

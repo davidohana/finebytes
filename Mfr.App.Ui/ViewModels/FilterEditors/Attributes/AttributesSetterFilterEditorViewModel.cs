@@ -20,28 +20,28 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         }
 
         /// <summary>
-        /// Gets or sets the read-only flag mode (On / Off / Keep).
+        /// Gets or sets the read-only flag mode (<see cref="AttributeTriState"/>; UI On/Off/Keep).
         /// </summary>
         [ObservableProperty]
-        private AttributeTriState _readOnly;
+        private AttributeTriState _readOnly = AttributeTriState.Keep;
 
         /// <summary>
-        /// Gets or sets the hidden flag mode (On / Off / Keep).
+        /// Gets or sets the hidden flag mode (<see cref="AttributeTriState"/>; UI On/Off/Keep).
         /// </summary>
         [ObservableProperty]
-        private AttributeTriState _hidden;
+        private AttributeTriState _hidden = AttributeTriState.Keep;
 
         /// <summary>
-        /// Gets or sets the archive flag mode (On / Off / Keep).
+        /// Gets or sets the archive flag mode (<see cref="AttributeTriState"/>; UI On/Off/Keep).
         /// </summary>
         [ObservableProperty]
-        private AttributeTriState _archive;
+        private AttributeTriState _archive = AttributeTriState.Keep;
 
         /// <summary>
-        /// Gets or sets the system flag mode (On / Off / Keep).
+        /// Gets or sets the system flag mode (<see cref="AttributeTriState"/>; UI On/Off/Keep).
         /// </summary>
         [ObservableProperty]
-        private AttributeTriState _system;
+        private AttributeTriState _system = AttributeTriState.Keep;
 
         partial void OnReadOnlyChanged(AttributeTriState value) => _ApplyOptions();
 

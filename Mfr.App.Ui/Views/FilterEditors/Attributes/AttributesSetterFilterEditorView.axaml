@@ -25,121 +25,89 @@
       </ToolTip.Tip>
       <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
         <controls:FilterEditorLabeledRow Label="Read-only:">
-          <StackPanel
-            Margin="16,0,0,0"
-            Orientation="Horizontal"
-            Spacing="16"
-            HorizontalAlignment="Left"
-          >
+          <StackPanel Margin="16,0,0,0" Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
             <controls:CompactRadioButton
               x:Name="ReadOnlyOnRadio"
               GroupName="AttributesSetterReadOnly"
               Content="On"
-              ToolTip.Tip="Turn the read-only attribute on for every item."
               IsChecked="{Binding ReadOnly, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Set}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="ReadOnlyOffRadio"
               GroupName="AttributesSetterReadOnly"
               Content="Off"
-              ToolTip.Tip="Turn the read-only attribute off for every item."
               IsChecked="{Binding ReadOnly, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Clear}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="ReadOnlyKeepRadio"
               GroupName="AttributesSetterReadOnly"
               Content="Keep"
-              ToolTip.Tip="Leave the read-only attribute unchanged (default)."
               IsChecked="{Binding ReadOnly, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Keep}, Mode=TwoWay}"
             />
           </StackPanel>
         </controls:FilterEditorLabeledRow>
         <controls:FilterEditorLabeledRow Label="Hidden:">
-          <StackPanel
-            Margin="16,0,0,0"
-            Orientation="Horizontal"
-            Spacing="16"
-            HorizontalAlignment="Left"
-          >
+          <StackPanel Margin="16,0,0,0" Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
             <controls:CompactRadioButton
               x:Name="HiddenOnRadio"
               GroupName="AttributesSetterHidden"
               Content="On"
-              ToolTip.Tip="Turn the hidden attribute on for every item."
               IsChecked="{Binding Hidden, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Set}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="HiddenOffRadio"
               GroupName="AttributesSetterHidden"
               Content="Off"
-              ToolTip.Tip="Turn the hidden attribute off for every item."
               IsChecked="{Binding Hidden, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Clear}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="HiddenKeepRadio"
               GroupName="AttributesSetterHidden"
               Content="Keep"
-              ToolTip.Tip="Leave the hidden attribute unchanged (default)."
               IsChecked="{Binding Hidden, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Keep}, Mode=TwoWay}"
             />
           </StackPanel>
         </controls:FilterEditorLabeledRow>
         <controls:FilterEditorLabeledRow Label="Archive:">
-          <StackPanel
-            Margin="16,0,0,0"
-            Orientation="Horizontal"
-            Spacing="16"
-            HorizontalAlignment="Left"
-          >
+          <StackPanel Margin="16,0,0,0" Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
             <controls:CompactRadioButton
               x:Name="ArchiveOnRadio"
               GroupName="AttributesSetterArchive"
               Content="On"
-              ToolTip.Tip="Turn the archive attribute on for every item."
               IsChecked="{Binding Archive, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Set}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="ArchiveOffRadio"
               GroupName="AttributesSetterArchive"
               Content="Off"
-              ToolTip.Tip="Turn the archive attribute off for every item."
               IsChecked="{Binding Archive, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Clear}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="ArchiveKeepRadio"
               GroupName="AttributesSetterArchive"
               Content="Keep"
-              ToolTip.Tip="Leave the archive attribute unchanged (default)."
               IsChecked="{Binding Archive, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Keep}, Mode=TwoWay}"
             />
           </StackPanel>
         </controls:FilterEditorLabeledRow>
         <controls:FilterEditorLabeledRow Label="System:">
-          <StackPanel
-            Margin="16,0,0,0"
-            Orientation="Horizontal"
-            Spacing="16"
-            HorizontalAlignment="Left"
-          >
+          <StackPanel Margin="16,0,0,0" Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
             <controls:CompactRadioButton
               x:Name="SystemOnRadio"
               GroupName="AttributesSetterSystem"
               Content="On"
-              ToolTip.Tip="Turn the system attribute on for every item."
               IsChecked="{Binding System, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Set}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="SystemOffRadio"
               GroupName="AttributesSetterSystem"
               Content="Off"
-              ToolTip.Tip="Turn the system attribute off for every item."
               IsChecked="{Binding System, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Clear}, Mode=TwoWay}"
             />
             <controls:CompactRadioButton
               x:Name="SystemKeepRadio"
               GroupName="AttributesSetterSystem"
               Content="Keep"
-              ToolTip.Tip="Leave the system attribute unchanged (default)."
               IsChecked="{Binding System, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Keep}, Mode=TwoWay}"
             />
           </StackPanel>

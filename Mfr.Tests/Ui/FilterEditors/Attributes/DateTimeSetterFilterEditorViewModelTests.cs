@@ -110,12 +110,15 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             Assert.Equal(new DateOnly(2020, 12, 25), ((DateTimeSetterFilter)step.Filter).Options.Date);
 
             editor.DateText = "2100-12-31";
-            Assert.Equal("2100-12-31", editor.DateText);
-            Assert.Equal(new DateOnly(2100, 12, 31), ((DateTimeSetterFilter)step.Filter).Options.Date);
+            Assert.Equal(
+                FileTimestampDateLimits.Max.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+                editor.DateText
+            );
+            Assert.Equal(FileTimestampDateLimits.Max, ((DateTimeSetterFilter)step.Filter).Options.Date);
         }
 
         /// <summary>
-        /// Verifies a valid date still applies when time text is incomplete (HH:mm mid-edit toward HH:mm:ss).
+        /// Verifies a valid date still applies when time text is incomplete (e.g. mid-edit <c>18:1</c>).
         /// </summary>
         [Fact]
         public void Date_time_setter_applies_date_while_time_text_is_incomplete()
@@ -138,6 +141,30 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             Assert.Equal(new DateOnly(2026, 9, 5), options.Date);
             Assert.Equal(new TimeOnly(19, 58, 0), options.Time);
             Assert.Equal("18:1", editor.TimeText);
+        }
+
+        /// <summary>
+        /// Verifies illegal complete <c>HH:mm</c> times revert like illegal <c>HH:mm:ss</c>.
+        /// </summary>
+        [Fact]
+        public void Date_time_setter_rejects_illegal_hh_mm_and_reverts_text()
+        {
+            var step = new AppliedFilterStepViewModel(
+                "Date/Time Setter",
+                new DateTimeSetterFilter(
+                    Options: new DateTimeSetterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        SetDate: true,
+                        Date: new DateOnly(2020, 12, 25),
+                        SetTime: true,
+                        Time: new TimeOnly(23, 19, 1)
+                    )
+                )
+            );
+            var editor = new DateTimeSetterFilterEditorViewModel(step) { TimeText = "25:00" };
+
+            Assert.Equal("23:19:01", editor.TimeText);
+            Assert.Equal(new TimeOnly(23, 19, 1), ((DateTimeSetterFilter)step.Filter).Options.Time);
         }
 
         /// <summary>
