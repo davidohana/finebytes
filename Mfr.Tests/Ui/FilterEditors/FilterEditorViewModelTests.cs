@@ -379,6 +379,47 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Replacer option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Replacer_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Replacer", new ReplacerFilter());
+            var editor = new ReplacerFilterEditorViewModel(step);
+
+            Assert.Equal(string.Empty, editor.Find);
+            Assert.Equal(string.Empty, editor.Replacement);
+            Assert.Equal(ReplacerMode.Literal, editor.Mode);
+            Assert.Contains("literally", editor.FindToolTip, StringComparison.Ordinal);
+            Assert.DoesNotContain("$0", editor.ReplacementToolTip, StringComparison.Ordinal);
+            Assert.False(editor.CaseSensitive);
+            Assert.True(editor.ReplaceAll);
+            Assert.False(editor.WholeWord);
+
+            editor.Mode = ReplacerMode.Wildcard;
+            Assert.Contains("*", editor.FindToolTip, StringComparison.Ordinal);
+            Assert.DoesNotContain("$0", editor.ReplacementToolTip, StringComparison.Ordinal);
+
+            editor.Find = @"\((.+)\)";
+            editor.Replacement = "$1";
+            editor.Mode = ReplacerMode.Regex;
+            editor.CaseSensitive = true;
+            editor.ReplaceAll = false;
+            editor.WholeWord = true;
+
+            Assert.Contains("regex", editor.FindToolTip, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("$0", editor.ReplacementToolTip, StringComparison.Ordinal);
+
+            var options = ((ReplacerFilter)step.Filter).Options;
+            Assert.Equal(@"\((.+)\)", options.Find);
+            Assert.Equal("$1", options.Replacement);
+            Assert.Equal(ReplacerMode.Regex, options.Mode);
+            Assert.True(options.CaseSensitive);
+            Assert.False(options.ReplaceAll);
+            Assert.True(options.WholeWord);
+        }
+
+        /// <summary>
         /// Verifies Replace List option edits replace the step filter options.
         /// </summary>
         [Fact]

@@ -826,6 +826,69 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies Replacer option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Replacer_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<ReplacerFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+
+            var editor = editorView.GetVisualDescendants().OfType<ReplacerFilterEditorView>().Single();
+            var find = editor.FindControl<TextBox>("FindBox");
+            var replacement = editor.FindControl<TextBox>("ReplacementBox");
+            var literal = editor.FindControl<CompactRadioButton>("LiteralRadio");
+            var wildcard = editor.FindControl<CompactRadioButton>("WildcardRadio");
+            var regex = editor.FindControl<CompactRadioButton>("RegexRadio");
+            var caseSensitive = editor.FindControl<CompactCheckBox>("CaseSensitiveCheckBox");
+            var replaceAll = editor.FindControl<CompactCheckBox>("ReplaceAllCheckBox");
+            var wholeWord = editor.FindControl<CompactCheckBox>("WholeWordCheckBox");
+            Assert.NotNull(find);
+            Assert.NotNull(replacement);
+            Assert.NotNull(literal);
+            Assert.NotNull(wildcard);
+            Assert.NotNull(regex);
+            Assert.NotNull(caseSensitive);
+            Assert.NotNull(replaceAll);
+            Assert.NotNull(wholeWord);
+            Assert.Equal(string.Empty, find.Text);
+            Assert.Equal(string.Empty, replacement.Text);
+            Assert.True(literal.IsChecked);
+            Assert.False(caseSensitive.IsChecked);
+            Assert.True(replaceAll.IsChecked);
+            Assert.False(wholeWord.IsChecked);
+
+            find.Text = "dog";
+            replacement.Text = "cat";
+            wildcard.IsChecked = true;
+            caseSensitive.IsChecked = true;
+            replaceAll.IsChecked = false;
+            wholeWord.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal("dog", filter.Options.Find);
+            Assert.Equal("cat", filter.Options.Replacement);
+            Assert.Equal(ReplacerMode.Wildcard, filter.Options.Mode);
+            Assert.True(filter.Options.CaseSensitive);
+            Assert.False(filter.Options.ReplaceAll);
+            Assert.True(filter.Options.WholeWord);
+
+            regex.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(ReplacerMode.Regex, filter.Options.Mode);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Replace List option edits persist on the applied step.
         /// </summary>
         [AvaloniaFact]
