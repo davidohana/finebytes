@@ -22,39 +22,26 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Strip_parentheses_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("StripParentheses"));
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             Assert.IsType<StripParenthesesFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<StripParenthesesFilterEditorView>().Single();
-
             var squareRadio = editor.FindControl<RadioButton>("SquareRadio");
-
             var removeContents = editor.FindControl<CompactCheckBox>("RemoveContentsCheckBox");
-
             Assert.NotNull(squareRadio);
-
             Assert.NotNull(removeContents);
-
             Assert.True(removeContents.IsChecked);
 
             squareRadio.IsChecked = true;
-
             removeContents.IsChecked = false;
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             var filter = (StripParenthesesFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-
             Assert.Equal(ParenthesisType.Square, filter.Options.Type);
-
             Assert.False(filter.Options.RemoveContents);
 
             window.Close();

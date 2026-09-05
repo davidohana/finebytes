@@ -27,7 +27,6 @@ namespace Mfr.Tests.Ui.FilterEditors
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
 
             Assert.False(mainViewModel.FilterEditorViewModel.HasSelectedStep);
-
             Assert.Equal(string.Empty, _TitleText(editorView));
 
             window.Close();
@@ -40,37 +39,24 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Selecting_applied_row_updates_configuration_title()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-
             var appliedViewModel = mainViewModel.AppliedFiltersViewModel;
-
             appliedViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
-
             appliedViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal("Applied Filter: Letters Case", mainViewModel.FilterEditorViewModel.TitleText);
-
             Assert.Equal("Applied Filter: Letters Case", _TitleText(editorView));
 
             var list = _AppliedList(window);
-
             list.Focus();
-
             Dispatcher.UIThread.RunJobs();
-
             AppliedFiltersTestUi.ClickRow(window, list, rowIndex: 0);
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(appliedViewModel.Steps[0], appliedViewModel.SelectedSteps[0]);
-
             Assert.Equal("Applied Filter: Shrink Spaces", mainViewModel.FilterEditorViewModel.TitleText);
-
             Assert.Equal("Applied Filter: Shrink Spaces", _TitleText(editorView));
 
             window.Close();
@@ -83,15 +69,11 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Non_string_filter_shows_title_only()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal("Applied Filter: Audio Tag Remover", mainViewModel.FilterEditorViewModel.TitleText);
-
             Assert.Equal("Applied Filter: Audio Tag Remover", _TitleText(editorView));
 
             window.Close();
@@ -104,15 +86,11 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Optionless_filter_has_no_options_editor()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             Assert.Null(mainViewModel.FilterEditorViewModel.OptionsEditor);
-
             Assert.Null(_OptionsEditorSlot(editorView).Content);
 
             window.Close();
@@ -125,28 +103,19 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Fieldset_header_does_not_cover_full_top_border()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             var editor = editorView.GetVisualDescendants().OfType<SpaceCharacterFilterEditorView>().Single();
-
             var group = editor.GetVisualDescendants().OfType<FieldsetGroup>().First();
-
             var headerPresenter = group
                 .GetVisualDescendants()
                 .OfType<ContentPresenter>()
                 .Single(item => item.Name == "PART_HeaderPresenter");
-
             var border = group.GetVisualDescendants().OfType<Border>().Single(item => item.Name == "PART_Border");
-
             Assert.Equal(new Thickness(1, 0, 1, 1), border.BorderThickness);
-
             Assert.True(headerPresenter.Bounds.Width > 0);
-
             Assert.True(headerPresenter.Bounds.Width < group.Bounds.Width / 2);
 
             window.Close();
@@ -159,30 +128,22 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Filter_editor_field_styles_come_from_app_theme()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(
                 AppliedFiltersTestUi.Entry("ShrinkDuplicateCharacters")
             );
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             var editor = editorView.GetVisualDescendants().OfType<ShrinkDuplicateCharactersFilterEditorView>().Single();
-
             var box = editor.FindControl<TextBox>("CharacterBox");
-
             Assert.NotNull(box);
-
             Assert.Equal(22, box.MinHeight);
-
             Assert.Equal(22, box.Height);
 
             var titleBar = editorView
                 .GetVisualDescendants()
                 .OfType<Border>()
                 .First(border => border.Classes.Contains("filter-editor-title-bar"));
-
             Assert.Equal(22, titleBar.MinHeight);
 
             window.Close();
@@ -193,13 +154,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             var appliedView = window.Content is Grid grid
                 ? grid.Children.OfType<AppliedFiltersView>().FirstOrDefault()
                 : null;
-
             Assert.NotNull(appliedView);
 
             var list = appliedView.FindControl<ListBox>("AppliedFiltersList");
-
             Assert.NotNull(list);
-
             return list;
         }
 
@@ -216,9 +174,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         private static ContentControl _OptionsEditorSlot(FilterEditorView editorView)
         {
             var slot = editorView.FindControl<ContentControl>("OptionsEditorSlot");
-
             Assert.NotNull(slot);
-
             return slot;
         }
     }

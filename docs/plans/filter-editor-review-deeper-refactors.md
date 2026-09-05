@@ -12,9 +12,10 @@ Synthesized from per-filter worktree reviews and [cross-editor dedup explore](ht
 - Count L/R ×4 → one VM + `ICountOptionsFilter`
 - Space After + Around → one SpaceTrigger editor
 - Capitalize After + Sentence End → one CharacterList editor
-- Date + Time Setter → one DateTimeSetter editor
+- Date + Time Setter → one DateTimeSetter **filter** + editor
 - Replacer mode/match UI fieldsets reused by Replace List
 - Replace List engine → `ReplacerFilter.ReplaceSegment`
+- Timestamp field combo catalog → `TimestampFieldChoice.All` / `For`
 
 ## Ranked follow-ups (best cost-to-value first)
 
@@ -85,7 +86,6 @@ Editor skips apply when Other + empty (keeps last valid options; no silent `' '`
 | Merge Replacer + Replace List into one editor     | Primary surfaces differ; mode/match already shared             |
 | Unify Space After/Around option JSON schema       | Editor already shared; persist key rename for little gain      |
 | Merge four Count filters into one type + enum     | High JSON/palette/docs churn                                   |
-| Merge Date + Time Setter filter types             | Product/schema pass — not a review cleanup                     |
 | Shared single-char editor VM                      | Only Shrink Dup today; weak until a second identical editor    |
 | Force-merge list parsers (Name/Replace/Casing)    | Intentional blank / `=>` / whitespace semantics differ         |
 | Non-regex `CharacterRunHelpers` rewrite           | Micro-gain; shared Shrink Spaces risk                          |
@@ -113,3 +113,6 @@ Editor skips apply when Other + empty (keeps last valid options; no silent `' '`
 | #21 | Cleaner           |
 | #22 | Fix Leading Zeros |
 | #23 | Mover             |
+
+For Attributes / Audio F5 editors (#24–#30) follow-ups, see
+`docs/plans/f5-attributes-audio-editors-review-deeper-refactors.md`.

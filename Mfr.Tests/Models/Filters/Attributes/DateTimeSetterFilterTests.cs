@@ -137,8 +137,30 @@ namespace Mfr.Tests.Models.Filters.Attributes
             Assert.Equal(new DateTime(2020, 12, 25, 9, 0, 15, DateTimeKind.Local), item.Preview.LastWriteTime);
         }
 
+        [Theory]
+        [InlineData(1600, 12, 31)]
+        [InlineData(3026, 9, 5)]
+        [InlineData(2101, 1, 1)]
+        public void Out_of_range_date_skips_date_but_still_applies_time(int year, int month, int day)
+        {
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
+            var filter = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: TimestampField.LastWrite,
+                    SetDate: true,
+                    Date: new DateOnly(year, month, day),
+                    SetTime: true,
+                    Time: new TimeOnly(18, 14, 0)
+                )
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(new DateTime(2024, 3, 15, 18, 14, 0, DateTimeKind.Unspecified), item.Preview.LastWriteTime);
+        }
+
         [Fact]
-        public void Out_of_range_file_date_is_no_op()
+        public void Out_of_range_date_with_time_off_is_no_op()
         {
             var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
             var filter = new DateTimeSetterFilter(
@@ -146,27 +168,8 @@ namespace Mfr.Tests.Models.Filters.Attributes
                     TimestampField: TimestampField.LastWrite,
                     SetDate: true,
                     Date: new DateOnly(1600, 12, 31),
-                    SetTime: true,
+                    SetTime: false,
                     Time: new TimeOnly(12, 0, 0)
-                )
-            );
-            filter.Setup();
-            filter.Apply(item);
-
-            Assert.Equal(s_Base, item.Preview.LastWriteTime);
-        }
-
-        [Fact]
-        public void Far_future_file_date_is_no_op()
-        {
-            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
-            var filter = new DateTimeSetterFilter(
-                Options: new DateTimeSetterOptions(
-                    TimestampField: TimestampField.LastWrite,
-                    SetDate: true,
-                    Date: new DateOnly(3026, 9, 5),
-                    SetTime: true,
-                    Time: new TimeOnly(18, 14, 0)
                 )
             );
             filter.Setup();

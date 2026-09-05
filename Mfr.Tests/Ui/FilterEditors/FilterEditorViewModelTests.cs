@@ -21,7 +21,6 @@ namespace Mfr.Tests.Ui.FilterEditors
             editor.SyncSelection([]);
 
             Assert.False(editor.HasSelectedStep);
-
             Assert.Equal(string.Empty, editor.TitleText);
         }
 
@@ -32,13 +31,11 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void SyncSelection_with_one_step_sets_title()
         {
             var editor = new FilterEditorViewModel();
-
             var step = new AppliedFilterStepViewModel("Shrink Spaces", new ShrinkSpacesFilter());
 
             editor.SyncSelection([step]);
 
             Assert.True(editor.HasSelectedStep);
-
             Assert.Equal("Applied Filter: Shrink Spaces", editor.TitleText);
         }
 
@@ -49,15 +46,12 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void SyncSelection_with_multi_select_uses_first_row()
         {
             var editor = new FilterEditorViewModel();
-
             var first = new AppliedFilterStepViewModel("Shrink Spaces", new ShrinkSpacesFilter());
-
             var second = new AppliedFilterStepViewModel("Letters Case", new LettersCaseFilter());
 
             editor.SyncSelection([first, second]);
 
             Assert.True(editor.HasSelectedStep);
-
             Assert.Equal("Applied Filter: Shrink Spaces", editor.TitleText);
         }
     }

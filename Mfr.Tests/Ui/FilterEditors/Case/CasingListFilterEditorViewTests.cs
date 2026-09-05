@@ -23,43 +23,28 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Casing_list_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("CasingList"));
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             Assert.IsType<CasingListFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<CasingListFilterEditorView>().Single();
-
             var words = editor.FindControl<TextBox>("WordsBox");
-
             var uppercase = editor.FindControl<CompactCheckBox>("UppercaseSentenceInitialCheckBox");
-
             Assert.NotNull(words);
-
             Assert.NotNull(uppercase);
-
             Assert.Equal(TextWrapping.Wrap, words.TextWrapping);
-
             Assert.Equal(string.Empty, words.Text);
-
             Assert.True(uppercase.IsChecked);
 
             words.Text = "and or RMX";
-
             uppercase.IsChecked = false;
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             var filter = (CasingListFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
-
             Assert.Equal(["and", "or", "RMX"], filter.Options.Words);
-
             Assert.False(filter.Options.UppercaseSentenceInitial);
 
             window.Close();

@@ -10,15 +10,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
     /// </summary>
     internal sealed partial class TimeShifterFilterEditorViewModel : FilterOptionsEditorViewModel
     {
-        private const int AmountMin = -10_000_000;
-        private const int AmountMax = 10_000_000;
+        /// <summary>Signed amount spinner lower bound (must match AXAML Minimum).</summary>
+        public const decimal AmountMin = -10_000_000m;
 
-        private static readonly IReadOnlyList<TimestampFieldChoice> s_TimestampFields =
-        [
-            new(TimestampField.Creation, "Creation"),
-            new(TimestampField.LastWrite, "Last Write"),
-            new(TimestampField.LastAccess, "Last Access"),
-        ];
+        /// <summary>Signed amount spinner upper bound (must match AXAML Maximum).</summary>
+        public const decimal AmountMax = 10_000_000m;
 
         /// <summary>
         /// Unit combo order: MFR7 Days-first list, with Months/Years instead of Milliseconds.
@@ -40,7 +36,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         public TimeShifterFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
-            _selectedTimestampField = _ChoiceFor(TimestampField.LastWrite);
+            _selectedTimestampField = TimestampFieldChoice.For(TimestampField.LastWrite);
             _selectedUnit = TimeShiftUnit.Days;
             _SyncFromFilter();
         }
@@ -48,7 +44,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         /// <summary>
         /// Gets the timestamp-field combo choices (MFR7 labels).
         /// </summary>
-        public IReadOnlyList<TimestampFieldChoice> TimestampFields => s_TimestampFields;
+        public IReadOnlyList<TimestampFieldChoice> TimestampFields => TimestampFieldChoice.All;
 
         /// <summary>
         /// Gets the shift-unit combo choices.
@@ -91,9 +87,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 
             LoadWithoutApplying(() =>
             {
-                SelectedTimestampField = _ChoiceFor(filter.Options.TimestampField);
+                SelectedTimestampField = TimestampFieldChoice.For(filter.Options.TimestampField);
                 Amount = filter.Options.Amount;
-                SelectedUnit = _UnitOrDefault(filter.Options.Unit);
+                SelectedUnit = filter.Options.Unit;
             });
         }
 
@@ -109,27 +105,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 
             var options = new TimeShifterOptions(
                 TimestampField: SelectedTimestampField.Field,
-                Amount: ClampToInt(Amount, AmountMin, AmountMax),
+                Amount: ClampToInt(Amount, (int)AmountMin, (int)AmountMax),
                 Unit: SelectedUnit
             );
             ApplyIfChanged(filter, filter with { Options = options });
-        }
-
-        /// <summary>
-        /// Maps a <see cref="TimestampField"/> to its combo row; unknown values fall back to Last Write.
-        /// </summary>
-        private static TimestampFieldChoice _ChoiceFor(TimestampField field)
-        {
-            return s_TimestampFields.FirstOrDefault(c => c.Field == field)
-                ?? s_TimestampFields.First(c => c.Field == TimestampField.LastWrite);
-        }
-
-        /// <summary>
-        /// Returns <paramref name="unit"/> when listed in the combo; otherwise Days.
-        /// </summary>
-        private static TimeShiftUnit _UnitOrDefault(TimeShiftUnit unit)
-        {
-            return s_Units.Contains(unit) ? unit : TimeShiftUnit.Days;
         }
     }
 }

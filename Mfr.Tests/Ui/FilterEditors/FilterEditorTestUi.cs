@@ -22,33 +22,24 @@ namespace Mfr.Tests.Ui.FilterEditors
         ) ShowFilterEditorPanes()
         {
             var mainViewModel = new MainWindowViewModel();
-
             var appliedView = new AppliedFiltersView
             {
                 DataContext = mainViewModel.AppliedFiltersViewModel,
-
                 AddFromPaletteCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
             };
-
             var editorView = new FilterEditorView { DataContext = mainViewModel.FilterEditorViewModel };
 
             var grid = new Grid { RowDefinitions = new RowDefinitions("*,*"), Children = { appliedView, editorView } };
-
             Grid.SetRow(editorView, 1);
 
             var window = new Window
             {
                 Width = 320,
-
                 Height = 280,
-
                 Content = grid,
             };
-
             window.Show();
-
             window.UpdateLayout();
-
             Dispatcher.UIThread.RunJobs();
 
             return (window, mainViewModel, editorView);
