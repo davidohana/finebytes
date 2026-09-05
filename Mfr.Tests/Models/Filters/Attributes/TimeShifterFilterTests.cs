@@ -46,13 +46,16 @@ namespace Mfr.Tests.Models.Filters.Attributes
         }
 
         [Fact]
-        public void Chain_DateSetter_then_TimeShifter_composes_on_last_access()
+        public void Chain_DateTimeSetter_then_TimeShifter_composes_on_last_access()
         {
             var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: s_Base);
-            var setDate = new DateSetterFilter(
-                Options: new DateSetterOptions(
+            var setDate = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
                     TimestampField: TimestampField.LastAccess,
-                    Date: new DateOnly(2019, 1, 1)
+                    SetDate: true,
+                    Date: new DateOnly(2019, 1, 1),
+                    SetTime: false,
+                    Time: new TimeOnly(0, 0, 0)
                 )
             );
             var shift = new TimeShifterFilter(

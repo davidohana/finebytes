@@ -727,10 +727,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         Find: "track",
                         Replacement: "song",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: false,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: false,
+                            WholeWord: false
+                        )
                     )
                 ),
                 new TagRemoverFilter(new TagRemoverOptions(All: true))
@@ -1557,8 +1559,14 @@ namespace Mfr.Tests.Engine
         {
             return _CreatePresetAllEnabled(
                 name,
-                new DateSetterFilter(
-                    Options: new DateSetterOptions(TimestampField: TimestampField.LastWrite, Date: date)
+                new DateTimeSetterFilter(
+                    Options: new DateTimeSetterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        SetDate: true,
+                        Date: date,
+                        SetTime: false,
+                        Time: new TimeOnly(0, 0, 0)
+                    )
                 )
             );
         }
@@ -1586,10 +1594,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         "b",
                         "c",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: false,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: false,
+                            WholeWord: false
+                        )
                     )
                 ),
                 new ReplacerFilter(
@@ -1597,10 +1607,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         "a",
                         "b",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: false,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: false,
+                            WholeWord: false
+                        )
                     )
                 )
             );
@@ -1615,10 +1627,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         Find: "OldParent",
                         Replacement: "NewParent",
-                        Mode: ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: false,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: false,
+                            WholeWord: false
+                        )
                     )
                 )
             );
@@ -1694,10 +1708,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         "a",
                         "b",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: true,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: true,
+                            WholeWord: false
+                        )
                     )
                 )
             );

@@ -74,36 +74,17 @@ namespace Mfr.Tests.Engine
         }
 
         [Fact]
-        public void DateSetter_roundtrips_with_timestamp_field()
+        public void DateTimeSetter_roundtrips_with_timestamp_field()
         {
             var json = /*lang=json,strict*/
                 """
                 {
-                  "type": "DateSetter",
+                  "type": "DateTimeSetter",
                   "options": {
                     "timestampField": "lastWrite",
-                    "date": "2021-07-04"
-                  }
-                }
-                """;
-
-            var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
-            Assert.NotNull(filter);
-            var typed = Assert.IsType<DateSetterFilter>(filter);
-            Assert.Equal(new DateOnly(2021, 7, 4), typed.Options.Date);
-            Assert.Equal(TimestampField.LastWrite, typed.Options.TimestampField);
-            typed.Setup();
-        }
-
-        [Fact]
-        public void TimeSetter_roundtrips_with_timestamp_field()
-        {
-            var json = /*lang=json,strict*/
-                """
-                {
-                  "type": "TimeSetter",
-                  "options": {
-                    "timestampField": "lastAccess",
+                    "setDate": true,
+                    "date": "2021-07-04",
+                    "setTime": true,
                     "time": "18:30:00"
                   }
                 }
@@ -111,9 +92,12 @@ namespace Mfr.Tests.Engine
 
             var filter = JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default);
             Assert.NotNull(filter);
-            var typed = Assert.IsType<TimeSetterFilter>(filter);
+            var typed = Assert.IsType<DateTimeSetterFilter>(filter);
+            Assert.True(typed.Options.SetDate);
+            Assert.Equal(new DateOnly(2021, 7, 4), typed.Options.Date);
+            Assert.True(typed.Options.SetTime);
             Assert.Equal(new TimeOnly(18, 30, 0), typed.Options.Time);
-            Assert.Equal(TimestampField.LastAccess, typed.Options.TimestampField);
+            Assert.Equal(TimestampField.LastWrite, typed.Options.TimestampField);
             typed.Setup();
         }
 
@@ -197,10 +181,12 @@ namespace Mfr.Tests.Engine
                   "options": {
                     "find": "a",
                     "replacement": "b",
-                    "mode": "Literal",
-                    "caseSensitive": true,
-                    "replaceAll": true,
-                    "wholeWord": false
+                    "match": {
+                      "mode": "Literal",
+                      "caseSensitive": true,
+                      "replaceAll": true,
+                      "wholeWord": false
+                    }
                   }
                 }
                 """;

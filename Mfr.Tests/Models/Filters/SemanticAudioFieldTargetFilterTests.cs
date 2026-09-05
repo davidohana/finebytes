@@ -155,10 +155,12 @@ namespace Mfr.Tests.Models.Filters
                 new ReplacerOptions(
                     Find: "199",
                     Replacement: "200",
-                    Mode: ReplacerMode.Literal,
-                    CaseSensitive: true,
-                    ReplaceAll: false,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: false,
+                        WholeWord: false
+                    )
                 )
             );
 
@@ -184,10 +186,12 @@ namespace Mfr.Tests.Models.Filters
                 new ReplacerOptions(
                     Find: "Rock",
                     Replacement: "Metal",
-                    Mode: ReplacerMode.Literal,
-                    CaseSensitive: true,
-                    ReplaceAll: false,
-                    WholeWord: false
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: false,
+                        WholeWord: false
+                    )
                 )
             );
 

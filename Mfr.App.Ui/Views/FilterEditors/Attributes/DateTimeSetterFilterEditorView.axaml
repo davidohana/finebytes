@@ -7,68 +7,88 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
   d:DesignWidth="560"
-  d:DesignHeight="100"
+  d:DesignHeight="140"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Attributes.DateTimeSetterFilterEditorView"
   x:DataType="vm:DateTimeSetterFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">
-      <StackPanel Orientation="Horizontal" Spacing="6">
-        <TextBlock
-          Classes="filter-editor-label"
-          VerticalAlignment="Center"
-          Text="Set file's"
+      <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
+        <controls:FilterEditorLabeledRow
+          Label="Set file's"
           ToolTip.Tip="Which filesystem timestamp this filter updates."
-        />
-        <ComboBox
-          x:Name="TimestampFieldCombo"
-          Classes="filter-editor-field"
-          Width="110"
-          ItemsSource="{Binding TimestampFields}"
-          SelectedItem="{Binding SelectedTimestampField}"
         >
-          <ToolTip.Tip>
-            <controls:RichToolTip>
-              <TextBlock Classes="rich-tip-bullet" Text="• Creation: file/folder creation time." />
-              <TextBlock Classes="rich-tip-bullet" Text="• Last Write: last modified time." />
-              <TextBlock Classes="rich-tip-bullet" Text="• Last Access: last accessed time." />
-            </controls:RichToolTip>
-          </ToolTip.Tip>
-        </ComboBox>
-        <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="{Binding ValuePhrase}" />
-        <TextBox
-          x:Name="DateBox"
-          Classes="filter-editor-field"
-          Width="100"
-          MaxLength="10"
-          IsVisible="{Binding IsDateMode}"
-          Watermark="yyyy-MM-dd"
-          Text="{Binding DateText}"
-          ToolTip.Tip="Calendar date as yyyy-MM-dd. The time-of-day part of the timestamp is preserved."
-        />
-        <TextBox
-          x:Name="TimeBox"
-          Classes="filter-editor-field"
-          Width="88"
-          MaxLength="8"
-          IsVisible="{Binding IsTimeMode}"
-          Watermark="HH:mm:ss"
-          Text="{Binding TimeText}"
-          ToolTip.Tip="Time of day as HH:mm:ss. The calendar date part of the timestamp is preserved."
-        />
-        <Button
-          x:Name="CurrentButton"
-          Classes="filter-editor-button"
-          Content="Current"
-          Command="{Binding SetCurrentCommand}"
-        >
-          <ToolTip.Tip>
-            <controls:RichToolTip>
-              <TextBlock Classes="rich-tip-bullet" Text="• Date Setter: fills today’s calendar date." />
-              <TextBlock Classes="rich-tip-bullet" Text="• Time Setter: fills the current clock time." />
-            </controls:RichToolTip>
-          </ToolTip.Tip>
-        </Button>
+          <ComboBox
+            x:Name="TimestampFieldCombo"
+            Classes="filter-editor-field"
+            Width="110"
+            HorizontalAlignment="Left"
+            ItemsSource="{Binding TimestampFields}"
+            SelectedItem="{Binding SelectedTimestampField}"
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-bullet" Text="• Creation: file/folder creation time." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Last Write: last modified time." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Last Access: last accessed time." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </ComboBox>
+        </controls:FilterEditorLabeledRow>
+        <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="6">
+          <controls:CompactCheckBox
+            x:Name="SetDateCheckBox"
+            Content="Date"
+            VerticalAlignment="Center"
+            IsChecked="{Binding SetDate}"
+            ToolTip.Tip="When checked, replace the calendar date; otherwise keep the existing date."
+          />
+          <TextBox
+            Grid.Column="1"
+            x:Name="DateBox"
+            Classes="filter-editor-field"
+            Width="100"
+            MaxLength="10"
+            IsEnabled="{Binding SetDate}"
+            Watermark="yyyy-MM-dd"
+            Text="{Binding DateText}"
+            ToolTip.Tip="Calendar date as yyyy-MM-dd."
+          />
+          <Button
+            Grid.Column="2"
+            x:Name="CurrentButton"
+            Classes="filter-editor-button"
+            Content="Current"
+            Command="{Binding SetCurrentCommand}"
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-bullet" Text="• Fills today’s date when Date is checked." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Fills the current clock time when Time is checked." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </Button>
+        </Grid>
+        <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6">
+          <controls:CompactCheckBox
+            x:Name="SetTimeCheckBox"
+            Content="Time"
+            VerticalAlignment="Center"
+            IsChecked="{Binding SetTime}"
+            ToolTip.Tip="When checked, replace the time-of-day; otherwise keep the existing time."
+          />
+          <TextBox
+            Grid.Column="1"
+            x:Name="TimeBox"
+            Classes="filter-editor-field"
+            Width="88"
+            MaxLength="8"
+            IsEnabled="{Binding SetTime}"
+            Watermark="HH:mm:ss"
+            Text="{Binding TimeText}"
+            ToolTip.Tip="Time of day as HH:mm:ss."
+          />
+        </Grid>
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>

@@ -23,10 +23,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         "track",
                         "stale",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: true,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: true,
+                            WholeWord: false
+                        )
                     )
                 ),
             ]);
@@ -43,10 +45,12 @@ namespace Mfr.Tests.Engine
                             Options: new ReplacerOptions(
                                 "track",
                                 "song",
-                                ReplacerMode.Literal,
-                                CaseSensitive: true,
-                                ReplaceAll: true,
-                                WholeWord: false
+                                Match: new ReplacerMatchOptions(
+                                    Mode: ReplacerMode.Literal,
+                                    CaseSensitive: true,
+                                    ReplaceAll: true,
+                                    WholeWord: false
+                                )
                             )
                         )
                     ),
@@ -74,10 +78,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         "track",
                         "song",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: true,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: true,
+                            WholeWord: false
+                        )
                     )
                 ),
                 new ReplacerFilter(
@@ -85,10 +91,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         "old",
                         "new",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: true,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: true,
+                            WholeWord: false
+                        )
                     )
                 ),
             ]);
@@ -114,10 +122,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         ".mp3",
                         ".flac",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: true,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: true,
+                            WholeWord: false
+                        )
                     )
                 ),
                 new FormatterFilter(
@@ -147,10 +157,12 @@ namespace Mfr.Tests.Engine
                     Options: new ReplacerOptions(
                         "a",
                         "b",
-                        ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: true,
-                        WholeWord: false
+                        Match: new ReplacerMatchOptions(
+                            Mode: ReplacerMode.Literal,
+                            CaseSensitive: true,
+                            ReplaceAll: true,
+                            WholeWord: false
+                        )
                     )
                 ),
             ]);

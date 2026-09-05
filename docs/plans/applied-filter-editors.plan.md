@@ -60,7 +60,7 @@ todos:
     content: "F5 Mover — root folder + optional sub-folder template"
     status: completed
   - id: f5-date-time-setter
-    content: "F5 Date Setter + Time Setter — shared timestamp-field picker + date/time value editors"
+    content: "F5 Date/Time Setter — one filter with optional date + time checkboxes + timestamp-field picker"
     status: completed
   - id: f5-time-shifter
     content: "F5 Time Shifter"
@@ -87,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-05):** F5 Mover + Date Setter + Time Setter + Attributes Setter done. **Next: F5 Time Shifter**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-05):** F5 Mover + Date/Time Setter + Attributes Setter done. **Next: F5 Time Shifter**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ## Already shipped (F1–F4)
 
@@ -127,7 +127,7 @@ ViewModels/FilterEditors/          Views/FilterEditors/
     Counter…, Inserter…, NameList…
     TokenMover…, Formatter…
   Attributes/                        Attributes/
-    DateSetter… / TimeSetter…
+    DateTimeSetter…
     TimeShifter…, AttributesSetter…
   Audio/                             Audio/
     TagRemover…, AudioTagSetter…
@@ -197,7 +197,7 @@ ______________________________________________________________________
 
 - Identical options type / same shared editor (e.g. all four Count L/R filters).
 - Near-identical UI with only labels/property names differing (e.g. Space After + Space Around).
-- Shared control surface plus a small value variant (e.g. Date Setter + Time Setter: same timestamp-field picker, date vs time value).
+- Shared control surface plus a small value variant (historical example was Date + Time Setter; those are now one `DateTimeSetter` filter).
 
 Do **not** batch unrelated filters just to shrink the todo list. File-list filters (Casing / Replace / Name List) stay separate — they share a path-picker *idea* but different option shapes. Audio tag editors stay separate. Time Shifter stays separate from Date/Time Setter.
 
@@ -223,7 +223,7 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 - **15 (done)** — Replacer (Replace) — find/replace / regex / scope
 - **16 (done)** — Token Mover (Formatting) — token indices / destination
 - **17 (done)** — **Mover** (Misc) — root folder + optional sub-folder template (formatter tokens / `\`)
-- **18 (done)** — **Date + Time Setter** (Attributes) — Date Setter, Time Setter; shared timestamp-field picker; date vs time value
+- **18 (done)** — **Date/Time Setter** (Attributes) — one `DateTimeSetter` filter; optional date + time checkboxes; timestamp-field picker
 - **19 (next)** — Time Shifter (Attributes) — field + amount + unit (not grouped with setters)
 - **20 (done)** — Attributes Setter (Attributes) — attribute flags
 - **21** — Audio Tag Remover (Audio) — all / block types

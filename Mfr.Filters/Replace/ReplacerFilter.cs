@@ -29,18 +29,8 @@ namespace Mfr.Filters.Replace
     /// </summary>
     /// <param name="Find">Search pattern.</param>
     /// <param name="Replacement">Replacement value.</param>
-    /// <param name="Mode">Pattern interpretation mode.</param>
-    /// <param name="CaseSensitive">Whether matching is case-sensitive.</param>
-    /// <param name="ReplaceAll">Whether all matches are replaced.</param>
-    /// <param name="WholeWord">Whether matching is constrained to whole words.</param>
-    public sealed record ReplacerOptions(
-        string Find,
-        string Replacement,
-        ReplacerMode Mode,
-        bool CaseSensitive,
-        bool ReplaceAll,
-        bool WholeWord
-    );
+    /// <param name="Match">Mode and match flags shared with <see cref="ReplaceListOptions"/>.</param>
+    public sealed record ReplacerOptions(string Find, string Replacement, ReplacerMatchOptions Match);
 
     /// <summary>
     /// Replaces text according to search options.
@@ -61,14 +51,7 @@ namespace Mfr.Filters.Replace
         public ReplacerFilter()
             : this(
                 new FilePrefixTarget(),
-                new ReplacerOptions(
-                    Find: "",
-                    Replacement: "",
-                    Mode: ReplacerMode.Literal,
-                    CaseSensitive: false,
-                    ReplaceAll: true,
-                    WholeWord: false
-                )
+                new ReplacerOptions(Find: "", Replacement: "", Match: ReplacerMatchOptions.ForReplacer)
             ) { }
 
         /// <summary>
@@ -79,7 +62,7 @@ namespace Mfr.Filters.Replace
         /// <inheritdoc />
         protected override void _Setup()
         {
-            if (Options.Mode != ReplacerMode.Regex || Options.Find.Length == 0)
+            if (Options.Match.Mode != ReplacerMode.Regex || Options.Find.Length == 0)
             {
                 return;
             }
@@ -112,26 +95,27 @@ namespace Mfr.Filters.Replace
                 return segment;
             }
 
-            var regexOptions = options.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
-            var pattern = options.Mode switch
+            var match = options.Match;
+            var regexOptions = match.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+            var pattern = match.Mode switch
             {
                 ReplacerMode.Literal => Regex.Escape(options.Find),
                 ReplacerMode.Wildcard => _WildcardToRegex(options.Find),
                 ReplacerMode.Regex => options.Find,
-                _ => throw new ArgumentOutOfRangeException(nameof(options), options.Mode, null),
+                _ => throw new ArgumentOutOfRangeException(nameof(options), match.Mode, null),
             };
 
-            if (options.WholeWord)
+            if (match.WholeWord)
             {
                 pattern = $@"\b(?:{pattern})\b";
             }
 
             var regex = new Regex(pattern, regexOptions);
-            var count = options.ReplaceAll ? int.MaxValue : 1;
+            var count = match.ReplaceAll ? int.MaxValue : 1;
 
             // Literal/Wildcard must insert Replacement as plain text. Regex.Replace's string overload
             // treats $0/$1/$$ as substitutions (MFR7 uses MatchEvaluator / String.Replace for the same reason).
-            if (options.Mode == ReplacerMode.Regex)
+            if (match.Mode == ReplacerMode.Regex)
             {
                 return regex.Replace(segment, options.Replacement, count);
             }

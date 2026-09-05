@@ -465,16 +465,16 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             Assert.Equal(string.Empty, editor.Find);
             Assert.Equal(string.Empty, editor.Replacement);
-            Assert.Equal(ReplacerMode.Literal, editor.Mode);
+            Assert.Equal(ReplacerMode.Literal, editor.Match.Mode);
             Assert.Equal("feat.", editor.FindWatermark);
             Assert.Equal("feature.", editor.ReplacementWatermark);
             Assert.Contains("literally", editor.FindToolTip, StringComparison.Ordinal);
             Assert.DoesNotContain("$0", editor.ReplacementToolTip, StringComparison.Ordinal);
-            Assert.False(editor.CaseSensitive);
-            Assert.True(editor.ReplaceAll);
-            Assert.False(editor.WholeWord);
+            Assert.False(editor.Match.CaseSensitive);
+            Assert.True(editor.Match.ReplaceAll);
+            Assert.False(editor.Match.WholeWord);
 
-            editor.Mode = ReplacerMode.Wildcard;
+            editor.Match.Mode = ReplacerMode.Wildcard;
             Assert.Equal("DSC*.JPG", editor.FindWatermark);
             Assert.Equal("photo.jpg", editor.ReplacementWatermark);
             Assert.Contains("*", editor.FindToolTip, StringComparison.Ordinal);
@@ -482,10 +482,10 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             editor.Find = @"\((.+)\)";
             editor.Replacement = "$1";
-            editor.Mode = ReplacerMode.Regex;
-            editor.CaseSensitive = true;
-            editor.ReplaceAll = false;
-            editor.WholeWord = true;
+            editor.Match.Mode = ReplacerMode.Regex;
+            editor.Match.CaseSensitive = true;
+            editor.Match.ReplaceAll = false;
+            editor.Match.WholeWord = true;
 
             Assert.Equal(@"\((.+)\)", editor.FindWatermark);
             Assert.Equal("$1", editor.ReplacementWatermark);
@@ -495,10 +495,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             var options = ((ReplacerFilter)step.Filter).Options;
             Assert.Equal(@"\((.+)\)", options.Find);
             Assert.Equal("$1", options.Replacement);
-            Assert.Equal(ReplacerMode.Regex, options.Mode);
-            Assert.True(options.CaseSensitive);
-            Assert.False(options.ReplaceAll);
-            Assert.True(options.WholeWord);
+            Assert.Equal(ReplacerMode.Regex, options.Match.Mode);
+            Assert.True(options.Match.CaseSensitive);
+            Assert.False(options.Match.ReplaceAll);
+            Assert.True(options.Match.WholeWord);
         }
 
         /// <summary>
@@ -511,22 +511,22 @@ namespace Mfr.Tests.Ui.FilterEditors
             var editor = new ReplaceListFilterEditorViewModel(step);
 
             Assert.Equal(string.Empty, editor.EntriesText);
-            Assert.Equal(ReplacerMode.Literal, editor.Mode);
+            Assert.Equal(ReplacerMode.Literal, editor.Match.Mode);
             Assert.Equal(". => _\nfeat. => feature.\nLive", editor.EntriesWatermark);
-            Assert.False(editor.CaseSensitive);
-            Assert.True(editor.ReplaceAll);
-            Assert.True(editor.WholeWord);
+            Assert.False(editor.Match.CaseSensitive);
+            Assert.True(editor.Match.ReplaceAll);
+            Assert.True(editor.Match.WholeWord);
 
-            editor.Mode = ReplacerMode.Wildcard;
+            editor.Match.Mode = ReplacerMode.Wildcard;
             Assert.Equal("DSC*.JPG => photo.jpg\ntrack?.mp3 => track0.mp3\n*.tmp", editor.EntriesWatermark);
-            editor.Mode = ReplacerMode.Regex;
+            editor.Match.Mode = ReplacerMode.Regex;
             Assert.Equal("[0-9]+ => N\n\\. => _\n\\s+ => _", editor.EntriesWatermark);
 
             editor.EntriesText = "a => b\nBlue Train => Blue_Train\nx";
-            editor.Mode = ReplacerMode.Wildcard;
-            editor.CaseSensitive = true;
-            editor.ReplaceAll = false;
-            editor.WholeWord = false;
+            editor.Match.Mode = ReplacerMode.Wildcard;
+            editor.Match.CaseSensitive = true;
+            editor.Match.ReplaceAll = false;
+            editor.Match.WholeWord = false;
 
             var options = ((ReplaceListFilter)step.Filter).Options;
             Assert.Equal(3, options.Entries.Count);
@@ -536,10 +536,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal("Blue_Train", options.Entries[1].Replacement);
             Assert.Equal("x", options.Entries[2].Search);
             Assert.Equal("", options.Entries[2].Replacement);
-            Assert.Equal(ReplacerMode.Wildcard, options.Mode);
-            Assert.True(options.CaseSensitive);
-            Assert.False(options.ReplaceAll);
-            Assert.False(options.WholeWord);
+            Assert.Equal(ReplacerMode.Wildcard, options.Match.Mode);
+            Assert.True(options.Match.CaseSensitive);
+            Assert.False(options.Match.ReplaceAll);
+            Assert.False(options.Match.WholeWord);
         }
 
         /// <summary>
@@ -553,27 +553,32 @@ namespace Mfr.Tests.Ui.FilterEditors
                 Target: new FilePrefixTarget(),
                 Options: new ReplaceListOptions(
                     Entries: [new ReplaceListEntry("a=>b", "x")],
-                    Mode: ReplacerMode.Literal,
-                    CaseSensitive: false,
-                    ReplaceAll: true,
-                    WholeWord: true
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: false,
+                        ReplaceAll: true,
+                        WholeWord: true
+                    )
                 )
             );
             var step = new AppliedFilterStepViewModel("Replace List", filter);
             _ = new ReplaceListFilterEditorViewModel(step)
             {
-                Mode = ReplacerMode.Regex,
-                CaseSensitive = true,
-                WholeWord = false,
+                Match =
+                {
+                    Mode = ReplacerMode.Regex,
+                    CaseSensitive = true,
+                    WholeWord = false,
+                },
             };
 
             var options = ((ReplaceListFilter)step.Filter).Options;
             Assert.Single(options.Entries);
             Assert.Equal("a=>b", options.Entries[0].Search);
             Assert.Equal("x", options.Entries[0].Replacement);
-            Assert.Equal(ReplacerMode.Regex, options.Mode);
-            Assert.True(options.CaseSensitive);
-            Assert.False(options.WholeWord);
+            Assert.Equal(ReplacerMode.Regex, options.Match.Mode);
+            Assert.True(options.Match.CaseSensitive);
+            Assert.False(options.Match.WholeWord);
         }
 
         /// <summary>
@@ -623,66 +628,39 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies Date Setter option edits replace the step filter options.
+        /// Verifies Date/Time Setter option edits replace the step filter options.
         /// </summary>
         [Fact]
-        public void Date_setter_options_update_step_options()
+        public void Date_time_setter_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Date Setter", new DateSetterFilter());
+            var step = new AppliedFilterStepViewModel("Date/Time Setter", new DateTimeSetterFilter());
             var editor = new DateTimeSetterFilterEditorViewModel(step);
 
-            Assert.True(editor.IsDateMode);
-            Assert.Equal("date to:", editor.ValuePhrase);
+            Assert.True(editor.SetDate);
+            Assert.True(editor.SetTime);
             Assert.Equal(TimestampField.LastWrite, editor.SelectedTimestampField.Field);
             Assert.Equal(
                 DateTime.Today.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
                 editor.DateText
             );
+            Assert.False(string.IsNullOrWhiteSpace(editor.TimeText));
 
             editor.SelectedTimestampField = editor.TimestampFields.Single(c => c.Field == TimestampField.Creation);
             editor.DateText = "2020-12-25";
-
-            var options = ((DateSetterFilter)step.Filter).Options;
-            Assert.Equal(TimestampField.Creation, options.TimestampField);
-            Assert.Equal(new DateOnly(2020, 12, 25), options.Date);
-
-            editor.SetCurrentCommand.Execute(null);
-            options = ((DateSetterFilter)step.Filter).Options;
-            Assert.Equal(DateOnly.FromDateTime(DateTime.Today), options.Date);
-
-            var beforeInvalid = options;
-            editor.DateText = "2020-13-40";
-            Assert.Same(beforeInvalid, ((DateSetterFilter)step.Filter).Options);
-        }
-
-        /// <summary>
-        /// Verifies Time Setter option edits replace the step filter options.
-        /// </summary>
-        [Fact]
-        public void Time_setter_options_update_step_options()
-        {
-            var step = new AppliedFilterStepViewModel("Time Setter", new TimeSetterFilter());
-            var editor = new DateTimeSetterFilterEditorViewModel(step);
-
-            Assert.True(editor.IsTimeMode);
-            Assert.Equal("time to:", editor.ValuePhrase);
-            Assert.Equal(TimestampField.LastWrite, editor.SelectedTimestampField.Field);
-            Assert.False(string.IsNullOrWhiteSpace(editor.TimeText));
-
-            editor.SelectedTimestampField = editor.TimestampFields.Single(c => c.Field == TimestampField.LastAccess);
             editor.TimeText = "09:00:15";
+            editor.SetTime = false;
 
-            var options = ((TimeSetterFilter)step.Filter).Options;
-            Assert.Equal(TimestampField.LastAccess, options.TimestampField);
+            var options = ((DateTimeSetterFilter)step.Filter).Options;
+            Assert.Equal(TimestampField.Creation, options.TimestampField);
+            Assert.True(options.SetDate);
+            Assert.Equal(new DateOnly(2020, 12, 25), options.Date);
+            Assert.False(options.SetTime);
             Assert.Equal(new TimeOnly(9, 0, 15), options.Time);
 
-            var beforeInvalid = options;
-            editor.TimeText = "25:61:99";
-            Assert.Same(beforeInvalid, ((TimeSetterFilter)step.Filter).Options);
-
-            editor.TimeText = "09:00:15";
+            editor.SetTime = true;
             editor.SetCurrentCommand.Execute(null);
-            options = ((TimeSetterFilter)step.Filter).Options;
+            options = ((DateTimeSetterFilter)step.Filter).Options;
+            Assert.Equal(DateOnly.FromDateTime(DateTime.Today), options.Date);
             Assert.Equal(
                 editor.TimeText,
                 options.Time.ToString("HH':'mm':'ss", System.Globalization.CultureInfo.InvariantCulture)

@@ -16,8 +16,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         public ReplacerFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
+            Match = new ReplacerMatchOptionsEditor(defaultWholeWord: false);
+            Match.Bind(_OnMatchChanged);
             _SyncFromFilter();
         }
+
+        /// <summary>
+        /// Gets shared mode and match-flag fields.
+        /// </summary>
+        public ReplacerMatchOptionsEditor Match { get; }
 
         /// <summary>
         /// Gets or sets the search pattern.
@@ -32,94 +39,58 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         private string _replacement = string.Empty;
 
         /// <summary>
-        /// Gets or sets the pattern interpretation mode.
-        /// </summary>
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(FindToolTip))]
-        [NotifyPropertyChangedFor(nameof(ReplacementToolTip))]
-        [NotifyPropertyChangedFor(nameof(FindWatermark))]
-        [NotifyPropertyChangedFor(nameof(ReplacementWatermark))]
-        private ReplacerMode _mode = ReplacerMode.Literal;
-
-        /// <summary>
         /// Gets a mode-specific tooltip for the Find field.
         /// </summary>
         public string FindToolTip =>
-            Mode switch
+            Match.Mode switch
             {
                 ReplacerMode.Literal => "Exact text to find in the target.\nSpecial characters are matched literally.",
                 ReplacerMode.Wildcard =>
                     "Pattern to find in the target.\n* matches any characters; ? matches one character.",
                 ReplacerMode.Regex => "Regular expression to find in the target.\nUses .NET regex syntax.",
-                _ => throw new ArgumentOutOfRangeException(nameof(Mode), Mode, null),
+                _ => throw new ArgumentOutOfRangeException(nameof(Match.Mode), Match.Mode, null),
             };
 
         /// <summary>
         /// Gets a mode-specific tooltip for the Replace field.
         /// </summary>
         public string ReplacementToolTip =>
-            Mode switch
+            Match.Mode switch
             {
                 ReplacerMode.Literal or ReplacerMode.Wildcard =>
                     "Replacement for each match.\nLeave empty to strip matches.",
                 ReplacerMode.Regex =>
                     "Replacement for each match.\nLeave empty to strip matches.\n$0 / $1… refer to captured groups.",
-                _ => throw new ArgumentOutOfRangeException(nameof(Mode), Mode, null),
+                _ => throw new ArgumentOutOfRangeException(nameof(Match.Mode), Match.Mode, null),
             };
 
         /// <summary>
         /// Gets a mode-specific example watermark for an empty Find box.
         /// </summary>
         public string FindWatermark =>
-            Mode switch
+            Match.Mode switch
             {
                 ReplacerMode.Literal => "feat.",
                 ReplacerMode.Wildcard => "DSC*.JPG",
                 ReplacerMode.Regex => @"\((.+)\)",
-                _ => throw new ArgumentOutOfRangeException(nameof(Mode), Mode, null),
+                _ => throw new ArgumentOutOfRangeException(nameof(Match.Mode), Match.Mode, null),
             };
 
         /// <summary>
         /// Gets a mode-specific example watermark for an empty Replace box.
         /// </summary>
         public string ReplacementWatermark =>
-            Mode switch
+            Match.Mode switch
             {
                 ReplacerMode.Literal => "feature.",
                 ReplacerMode.Wildcard => "photo.jpg",
                 ReplacerMode.Regex => "$1",
-                _ => throw new ArgumentOutOfRangeException(nameof(Mode), Mode, null),
+                _ => throw new ArgumentOutOfRangeException(nameof(Match.Mode), Match.Mode, null),
             };
-
-        /// <summary>
-        /// Gets or sets whether matching is case-sensitive.
-        /// </summary>
-        [ObservableProperty]
-        private bool _caseSensitive;
-
-        /// <summary>
-        /// Gets or sets whether all matches are replaced.
-        /// </summary>
-        [ObservableProperty]
-        private bool _replaceAll = true;
-
-        /// <summary>
-        /// Gets or sets whether matching is constrained to whole words.
-        /// </summary>
-        [ObservableProperty]
-        private bool _wholeWord;
 
         partial void OnFindChanged(string value) => _ApplyOptions();
 
         partial void OnReplacementChanged(string value) => _ApplyOptions();
-
-        partial void OnModeChanged(ReplacerMode value) => _ApplyOptions();
-
-        partial void OnCaseSensitiveChanged(bool value) => _ApplyOptions();
-
-        partial void OnReplaceAllChanged(bool value) => _ApplyOptions();
-
-        partial void OnWholeWordChanged(bool value) => _ApplyOptions();
 
         /// <summary>
         /// Loads option fields from the applied <see cref="ReplacerFilter"/> without writing back.
@@ -135,11 +106,20 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
             {
                 Find = filter.Options.Find;
                 Replacement = filter.Options.Replacement;
-                Mode = filter.Options.Mode;
-                CaseSensitive = filter.Options.CaseSensitive;
-                ReplaceAll = filter.Options.ReplaceAll;
-                WholeWord = filter.Options.WholeWord;
+                Match.Load(filter.Options.Match);
             });
+        }
+
+        /// <summary>
+        /// Notifies mode-dependent UI and writes options when match fields change.
+        /// </summary>
+        private void _OnMatchChanged()
+        {
+            OnPropertyChanged(nameof(FindToolTip));
+            OnPropertyChanged(nameof(ReplacementToolTip));
+            OnPropertyChanged(nameof(FindWatermark));
+            OnPropertyChanged(nameof(ReplacementWatermark));
+            _ApplyOptions();
         }
 
         /// <summary>
@@ -155,10 +135,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
             var options = new ReplacerOptions(
                 Find: Find ?? string.Empty,
                 Replacement: Replacement ?? string.Empty,
-                Mode: Mode,
-                CaseSensitive: CaseSensitive,
-                ReplaceAll: ReplaceAll,
-                WholeWord: WholeWord
+                Match: Match.ToOptions()
             );
             ApplyIfChanged(filter, filter with { Options = options });
         }

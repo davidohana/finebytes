@@ -4,7 +4,7 @@ using Mfr.Filters.Attributes;
 namespace Mfr.App.Ui.Views.FilterEditors.Attributes
 {
     /// <summary>
-    /// Shared option editor for <see cref="DateSetterFilter"/> and <see cref="TimeSetterFilter"/>.
+    /// Option editor for <see cref="DateTimeSetterFilter"/>.
     /// </summary>
     public partial class DateTimeSetterFilterEditorView : UserControl
     {

@@ -22,12 +22,9 @@ Synthesized from per-filter worktree reviews and [cross-editor dedup explore](ht
 
 `TimestampFields.Update` owns the Creation / LastWrite / LastAccess switch; Date Setter, Time Setter, and Time Shifter pass field-specific transforms.
 
-### 2. Shared `ReplacerMatchOptions` record — **high**
+### 2. Shared `ReplacerMatchOptions` record — **done**
 
-- **Sites:** `ReplacerOptions` / `ReplaceListOptions` (Mode + CaseSensitive + ReplaceAll + WholeWord); both editor VMs
-- **Target:** one nested match-options record; optional thin VM helper for the four props
-- **Value:** one owner for match policy; surfaces intentional WholeWord default split (Replacer `false`, Replace List `true`)
-- **Cost:** medium (option shapes, JSON nesting, tests)
+`ReplacerOptions` / `ReplaceListOptions` nest one `match` record (Mode + CaseSensitive + ReplaceAll + WholeWord); editor VMs share `ReplacerMatchOptionsEditor`. Defaults: Replacer `WholeWord` false, Replace List true.
 
 ### 3. Sentence End side-effect outside scoped transform — **high**
 

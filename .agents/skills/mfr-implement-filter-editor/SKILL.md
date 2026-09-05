@@ -91,7 +91,7 @@ Add a `switch` arm in `FilterOptionsEditorFactory.Create`. Until registered, sel
 - **Shared two-filter labels differ** — `Space/SpaceTriggerFilterEditor*` or `Case/CharacterListFilterEditor*`
 - **Enum / radio case mode** — `Case/LettersCaseFilterEditor*`
 - **Find/replace + Literal/Wildcard/Regex mode** — `Replace/ReplacerFilterEditor*` (shared: `Controls/ReplacerModeFieldset`, `Controls/ReplacerMatchOptionsFieldset`; list pairs: `ReplaceListFilterEditor*`)
-- **Shared timestamp field + date/time value** — `Attributes/DateTimeSetterFilterEditor*` (Date Setter + Time Setter)
+- **Timestamp field + optional date/time checkboxes** — `Attributes/DateTimeSetterFilterEditor*` (`DateTimeSetter`)
 - **Space char catalog** — `Space/SpaceCharacterFilterEditor*`
 
 ## Tests

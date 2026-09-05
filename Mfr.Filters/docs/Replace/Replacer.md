@@ -4,16 +4,22 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 
 ## Options
 
-| Property        | Type          | Description                                                                                                       |
-| --------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `find`          | string        | Search pattern (meaning depends on `mode`). Empty → no-op.                                                        |
-| `replacement`   | string        | Replacement text. In `Regex` mode, `$0` / `$1`… are substitutions; in `Literal` / `Wildcard` they are plain text. |
-| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — see **Modes**.                                                                |
-| `caseSensitive` | bool          | Match case when searching.                                                                                        |
-| `replaceAll`    | bool          | If `true`, replace every match; if `false`, only the **first** match.                                             |
-| `wholeWord`     | bool          | Restrict matches to whole words (word boundaries).                                                                |
+| Property      | Type   | Description                                                                                                       |
+| ------------- | ------ | ----------------------------------------------------------------------------------------------------------------- |
+| `find`        | string | Search pattern (meaning depends on `match.mode`). Empty → no-op.                                                  |
+| `replacement` | string | Replacement text. In `Regex` mode, `$0` / `$1`… are substitutions; in `Literal` / `Wildcard` they are plain text. |
+| `match`       | object | Shared match policy (`mode`, `caseSensitive`, `replaceAll`, `wholeWord`) — see **Match**.                         |
 
-### Modes (`mode`)
+### Match (`match`)
+
+| Property        | Type          | Description                                                           |
+| --------------- | ------------- | --------------------------------------------------------------------- |
+| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — see **Modes**.                    |
+| `caseSensitive` | bool          | Match case when searching.                                            |
+| `replaceAll`    | bool          | If `true`, replace every match; if `false`, only the **first** match. |
+| `wholeWord`     | bool          | Restrict matches to whole words (word boundaries). Default: `false`.  |
+
+### Modes (`match.mode`)
 
 | Value      | `find` meaning                                    |
 | ---------- | ------------------------------------------------- |
@@ -63,10 +69,12 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
   "options": {
     "find": "a",
     "replacement": "X",
-    "mode": "Literal",
-    "caseSensitive": true,
-    "replaceAll": true,
-    "wholeWord": false
+    "match": {
+      "mode": "Literal",
+      "caseSensitive": true,
+      "replaceAll": true,
+      "wholeWord": false
+    }
   }
 }
 ```
