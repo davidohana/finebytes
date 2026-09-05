@@ -9,13 +9,23 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// <param name="propertyKey">Property key within the Audio Tag group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    internal abstract class AudioTagRenameListField(string propertyKey, string displayName, int? defaultWidth = 100)
-        : OriginalOnlyRenameListField(
+    /// <param name="supportsPreview">
+    /// When <see langword="true"/>, a preview column variant may be added (MFR7 <c>ReadWriteApply</c>).
+    /// </param>
+    internal abstract class AudioTagRenameListField(
+        string propertyKey,
+        string displayName,
+        int? defaultWidth = 100,
+        bool supportsPreview = false
+    )
+        : RenameListField(
             AudioTagRenameListFields.Group,
             AudioTagRenameListFields.GroupLabel,
             propertyKey,
             displayName,
             defaultWidth,
+            isSortable: true,
+            supportsPreview,
             RenameListMetadataRequirement.TagLib
         );
 
@@ -31,7 +41,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         string displayName,
         SemanticAudioField field,
         int? defaultWidth = 100
-    ) : AudioTagRenameListField(propertyKey, displayName, defaultWidth)
+    ) : AudioTagRenameListField(propertyKey, displayName, defaultWidth, supportsPreview: true)
     {
         /// <summary>
         /// Gets the semantic audio field addressed by this column.

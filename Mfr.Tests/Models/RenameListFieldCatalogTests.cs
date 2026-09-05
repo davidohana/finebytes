@@ -1,4 +1,5 @@
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
@@ -8,6 +9,7 @@ using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
 using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
+using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Models
 {
@@ -300,7 +302,7 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void Audio_tag_fields_resolve_semantic_overlay_without_preview()
+        public void Audio_tag_fields_resolve_semantic_overlay()
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: meta =>
             {
@@ -356,7 +358,7 @@ namespace Mfr.Tests.Models
                 )
             );
 
-            Assert.False(RenameListFieldCatalog.GetField(AudioTagRenameListFields.Group, "Title").SupportsPreview);
+            Assert.True(RenameListFieldCatalog.GetField(AudioTagRenameListFields.Group, "Title").SupportsPreview);
             Assert.Equal(
                 RenameListMetadataRequirement.TagLib,
                 RenameListFieldCatalog.GetMetadataRequirement(
@@ -411,6 +413,9 @@ namespace Mfr.Tests.Models
             );
 
             Assert.False(RenameListFieldCatalog.GetField(ImageRenameListFields.Group, "Width").SupportsPreview);
+            Assert.False(
+                RenameListFieldCatalog.GetField(JpegRenameListFields.Group, "ExifDirectory*36867").SupportsPreview
+            );
             Assert.Equal(
                 RenameListMetadataRequirement.ImageProperties,
                 RenameListFieldCatalog.GetMetadataRequirement(
@@ -529,7 +534,6 @@ namespace Mfr.Tests.Models
         {
             string[] originalOnlyGroups =
             [
-                AudioTagRenameListFields.Group,
                 MediaRenameListFields.Group,
                 MpegRenameListFields.Group,
                 ImageRenameListFields.Group,
@@ -546,6 +550,55 @@ namespace Mfr.Tests.Models
                 Assert.True(field.IsSortable, field.PropertyKey);
                 Assert.True(RenameListFieldCatalog.IsSortableKey(field.OriginalKey), field.PropertyKey);
             }
+        }
+
+        [Fact]
+        public void AudioTag_fields_preview_flags_match_mfr7_read_write_apply()
+        {
+            string[] originalOnlyKeys =
+            [
+                "FirstAlbumArtist",
+                "FirstComposer",
+                "FirstGenre",
+                "FirstPerformer",
+                "TagTypes",
+            ];
+
+            foreach (var field in RenameListFieldCatalog.GetFieldsForGroup(AudioTagRenameListFields.Group))
+            {
+                var supportsPreview = !originalOnlyKeys.Contains(field.PropertyKey);
+                Assert.Equal(supportsPreview, field.SupportsPreview);
+                Assert.True(field.IsSortable, field.PropertyKey);
+                Assert.True(RenameListFieldCatalog.IsSortableKey(field.OriginalKey), field.PropertyKey);
+            }
+        }
+
+        [Fact]
+        public void AudioTag_title_preview_differs_after_AudioTagSetter()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: ".mp3",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "OldTitle")
+            );
+            var titleOriginal = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+            var titlePreview = RenameListFieldKey.Preview(AudioTagRenameListFields.Group, "Title");
+
+            Assert.Equal("OldTitle", RenameListFieldCatalog.Resolve(item, titleOriginal));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, titlePreview));
+
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "NewTitle"))
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("OldTitle", RenameListFieldCatalog.Resolve(item, titleOriginal));
+            Assert.Equal("NewTitle", RenameListFieldCatalog.Resolve(item, titlePreview));
+            Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, titlePreview));
+            Assert.False(
+                RenameListFieldCatalog.GetField(AudioTagRenameListFields.Group, "FirstPerformer").SupportsPreview
+            );
         }
 
         [Fact]

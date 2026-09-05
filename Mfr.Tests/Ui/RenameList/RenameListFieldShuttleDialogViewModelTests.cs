@@ -514,6 +514,27 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void AudioTag_group_offers_writable_preview_fields()
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
+                    ),
+                ],
+                []
+            );
+            dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == AudioTagRenameListFields.Group);
+
+            Assert.Equal(32, dialogVm.AvailableOriginalFields.Count);
+            Assert.Equal(27, dialogVm.AvailablePreviewFields.Count);
+            Assert.Contains(dialogVm.AvailablePreviewFields, field => field.PropertyKey == "Title");
+            Assert.DoesNotContain(dialogVm.AvailablePreviewFields, field => field.PropertyKey == "TagTypes");
+            Assert.DoesNotContain(dialogVm.AvailablePreviewFields, field => field.PropertyKey == "FirstPerformer");
+            Assert.Equal(32, dialogVm.AvailableSortFields.Count);
+        }
+
+        [Fact]
         public void Jpeg_tag_group_has_no_preview_fields()
         {
             var dialogVm = _CreateDefaultDialog();
@@ -521,6 +542,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(17, dialogVm.AvailableOriginalFields.Count);
             Assert.Empty(dialogVm.AvailablePreviewFields);
+            Assert.DoesNotContain(dialogVm.AvailablePreviewFields, field => field.PropertyKey == "ExifDirectory*36867");
         }
 
         private static RenameListFieldShuttleDialogViewModel _CreateDefaultDialog()
