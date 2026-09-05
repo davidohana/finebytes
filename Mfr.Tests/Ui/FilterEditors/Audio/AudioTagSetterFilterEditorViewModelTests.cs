@@ -157,6 +157,14 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
                 [AudioTagSetterFieldKind.Lyrics],
                 editor.Sections[2].FullWidthRows.Select(row => row.Kind)
             );
+            Assert.Equal(
+                editor.Sections[0].CompactRows.Where((_, i) => i % 2 == 0).Select(r => r.Kind),
+                editor.Sections[0].LeftCompactRows.Select(r => r.Kind)
+            );
+            Assert.Equal(
+                editor.Sections[0].CompactRows.Where((_, i) => i % 2 == 1).Select(r => r.Kind),
+                editor.Sections[0].RightCompactRows.Select(r => r.Kind)
+            );
         }
 
         /// <summary>

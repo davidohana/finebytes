@@ -17,6 +17,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             [.. Rows.Where(row => !row.Multiline)];
 
         /// <summary>
+        /// Gets the left column of compact rows (even indexes).
+        /// </summary>
+        public IReadOnlyList<AudioTagSetterFieldRowViewModel> LeftCompactRows { get; } =
+            [.. Rows.Where(row => !row.Multiline).Where((_, index) => index % 2 == 0)];
+
+        /// <summary>
+        /// Gets the right column of compact rows (odd indexes).
+        /// </summary>
+        public IReadOnlyList<AudioTagSetterFieldRowViewModel> RightCompactRows { get; } =
+            [.. Rows.Where(row => !row.Multiline).Where((_, index) => index % 2 == 1)];
+
+        /// <summary>
         /// Gets full-width rows (lyrics) below the two-column grid.
         /// </summary>
         public IReadOnlyList<AudioTagSetterFieldRowViewModel> FullWidthRows { get; } =

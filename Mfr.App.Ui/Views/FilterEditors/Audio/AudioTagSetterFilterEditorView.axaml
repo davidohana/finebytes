@@ -13,7 +13,7 @@
 >
   <UserControl.Resources>
     <DataTemplate x:Key="AudioTagSetterFieldRowTemplate" x:DataType="vm:AudioTagSetterFieldRowViewModel">
-      <Grid Margin="0,0,8,4">
+      <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="6" />
@@ -98,7 +98,7 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <StackPanel Spacing="8" Grid.IsSharedSizeScope="True">
+  <StackPanel Spacing="8">
     <ItemsControl x:Name="SectionsItemsControl" ItemsSource="{Binding Sections}">
       <ItemsControl.ItemsPanel>
         <ItemsPanelTemplate>
@@ -119,17 +119,30 @@
                 <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: leave the field unchanged." />
               </controls:RichToolTip>
             </ToolTip.Tip>
-            <StackPanel Spacing="4">
-              <ItemsControl
-                ItemsSource="{Binding CompactRows}"
-                ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
-              >
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <UniformGrid Columns="2" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-              </ItemsControl>
+            <StackPanel Spacing="4" Grid.IsSharedSizeScope="True">
+              <Grid ColumnDefinitions="*,24,*">
+                <ItemsControl
+                  ItemsSource="{Binding LeftCompactRows}"
+                  ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
+                >
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Spacing="4" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <ItemsControl
+                  Grid.Column="2"
+                  ItemsSource="{Binding RightCompactRows}"
+                  ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
+                >
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Spacing="4" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                </ItemsControl>
+              </Grid>
               <ItemsControl
                 ItemsSource="{Binding FullWidthRows}"
                 ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
