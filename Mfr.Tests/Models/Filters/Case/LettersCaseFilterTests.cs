@@ -120,6 +120,47 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
+        /// Verifies weird-case without fixed places varies by rename-list index.
+        /// </summary>
+        [Fact]
+        public void Apply_WeirdCase_WithoutFixedPlaces_VariesByRenameListIndex()
+        {
+            var f = new LettersCaseFilter(
+                _target,
+                new LettersCaseOptions(
+                    Mode: LettersCaseMode.WeirdCase,
+                    CapitalizeSkipWords: [],
+                    WeirdUppercaseChancePercent: 50,
+                    WeirdFixedPlaces: false
+                )
+            );
+            var a = FilterTestHelpers.ApplyToPrefix(f, "abcdefgh", renameListIndex: 0);
+            var b = FilterTestHelpers.ApplyToPrefix(f, "abcdefgh", renameListIndex: 999);
+
+            Assert.NotEqual(_BuildUpperMask(a), _BuildUpperMask(b));
+        }
+
+        /// <summary>
+        /// Verifies weird-case clamps out-of-range chance percents at apply time.
+        /// </summary>
+        [Theory]
+        [InlineData(-5, "abc xyz")]
+        [InlineData(150, "ABC XYZ")]
+        public void Apply_WeirdCase_ClampsChancePercent(int chancePercent, string expected)
+        {
+            var f = new LettersCaseFilter(
+                _target,
+                new LettersCaseOptions(
+                    Mode: LettersCaseMode.WeirdCase,
+                    CapitalizeSkipWords: [],
+                    WeirdUppercaseChancePercent: chancePercent,
+                    WeirdFixedPlaces: false
+                )
+            );
+            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "AbC XyZ"));
+        }
+
+        /// <summary>
         /// Verifies capitalize respects skip words.
         /// </summary>
         [Fact]
@@ -140,6 +181,16 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
             Assert.Equal("Hello world. Next line.", FilterTestHelpers.ApplyToPrefix(f, "hello world. next line."));
+        }
+
+        /// <summary>
+        /// Verifies sentence case capitalizes non-ASCII letters at sentence starts.
+        /// </summary>
+        [Fact]
+        public void Apply_SentenceCase_CapitalizesNonAsciiLetters()
+        {
+            var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            Assert.Equal("École. Über next.", FilterTestHelpers.ApplyToPrefix(f, "école. über next."));
         }
 
         /// <summary>
